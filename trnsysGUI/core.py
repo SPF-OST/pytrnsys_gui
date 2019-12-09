@@ -640,11 +640,8 @@ class DiagramEncoder(json.JSONEncoder):
 
                     # res.append(dct)
                     blockDct["Connection-" + str(t.id)] = dct
-            global globalID
-            global trnsysID
-            global globalConnID
 
-            idDict = {"__idDct__": True, "GlobalId": globalID, "trnsysID": trnsysID, "globalConnID": globalConnID}
+            idDict = {"__idDct__": True, "GlobalId": obj.idGen.getID(), "trnsysID": obj.idGen.getTrnsysID(), "globalConnID": obj.idGen.getConnID()}
             blockDct["IDs"] = idDict
 
             nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName}
@@ -2340,7 +2337,7 @@ class DiagramEditor(QWidget):
         # tempList = []
         # for t in self.trnsysObj:
 
-    # Own, primitiv insertion sort
+    # Own, primitiv insertion sort, unused
     def insertionSort(self):
         print("Len of trnsyObj before sort is " + str(len(self.trnsysObj)))
         print("List is " + str(self.trnsysObj))
@@ -2374,14 +2371,6 @@ class DiagramEditor(QWidget):
         res = self.trnsysObj.sort(key=self.sortId)
         for s in self.trnsysObj:
             print("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
-
-        a = [int(s.id) for s in self.trnsysObj]
-        a.sort()
-        print(a)
-
-        for s in self.trnsysObj:
-            if s.id == 191 or s.id == 192 or s.id == 56:
-                print("Duplicate obj is " + str(s.displayName) + " " + str(s.id))
 
     def sortId(self, l1):
         return l1.trnsysId
@@ -2727,7 +2716,14 @@ class MainWindow(QMainWindow):
         self.centralWidget.editGroups()
 
     def mb_debug(self):
-        print(self.centralWidget.trnsysObj)
+        # print(self.centralWidget.trnsysObj)
+        a = [int(s.id) for s in self.centralWidget.trnsysObj]
+        a.sort()
+        print(a)
+
+        for s in self.centralWidget.trnsysObj:
+            if s.id == 11:
+                print("Duplicate id obj is " + str(s.displayName) + " " + str(s.id))
 
     def openFile(self):
         print("Opening diagram")
