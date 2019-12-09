@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPen
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu
 
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.StorageTank import StorageTank
+# from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.Connection import Connection
 
@@ -35,12 +35,13 @@ class HeatExchanger(QGraphicsItemGroup):
         self.parent.inputs.append(self.port1)
         self.parent.outputs.append(self.port2)
 
+        delta = 4
         if self.sSide == 0:
-            self.port1.setPos(self.offset + QPointF(-2 * StorageTank.delta, 0))
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * StorageTank.delta, 0))
+            self.port1.setPos(self.offset + QPointF(-2 * delta, 0))
+            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * delta, 0))
         if self.sSide == 2:
-            self.port1.setPos(self.offset + QPointF(2 * StorageTank.delta, 0))
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * StorageTank.delta, 0))
+            self.port1.setPos(self.offset + QPointF(2 * delta, 0))
+            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
 
         if kwargs == {}:
             print("Creating new HeatExchanger")
@@ -84,7 +85,8 @@ class HeatExchanger(QGraphicsItemGroup):
     def setParent(self, p):
         self.parent = p
 
-        if type(p) is StorageTank:
+        if p.name is "StorageTank":
+            print("p is a StorageTank")
             self.setParentItem(p)
         else:
             print("A non-Storage-Tank block is trying to set parent of heatExchanger")
@@ -98,10 +100,10 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def drawHxL(self, param, factor):
         s = self.offset
-
+        delta = 4
         bb = False
         if bb:
-            lineTop = QGraphicsLineItem(s.x() - 2 * StorageTank.delta, s.y() + 0, s.x() + self.w, s.y() + 0, self)
+            lineTop = QGraphicsLineItem(s.x() - 2 * delta, s.y() + 0, s.x() + self.w, s.y() + 0, self)
             lineTop.setPen(QPen(Qt.black, 2))
             self.lines.append(lineTop)
 
@@ -114,14 +116,14 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.lines.append(line)
                 sw = (sw + 1)
 
-            lineBottom = QGraphicsLineItem(s.x() - 2 * StorageTank.delta, s.y() + self.h, s.x() + self.w,
+            lineBottom = QGraphicsLineItem(s.x() - 2 * delta, s.y() + self.h, s.x() + self.w,
                                            s.y() + self.h,
                                            self)
             lineBottom.setPen(QPen(Qt.black, 2))
             self.lines.append(lineBottom)
         else:
             self.floorHeight()
-            lineTop = QGraphicsLineItem(s.x() - 2 * StorageTank.delta, s.y() + 0, s.x() + self.w, s.y() + 0, self)
+            lineTop = QGraphicsLineItem(s.x() - 2 * delta, s.y() + 0, s.x() + self.w, s.y() + 0, self)
             lineTop.setPen(QPen(Qt.black, 2))
             self.lines.append(lineTop)
 
@@ -145,7 +147,7 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.lines.append(line1)
                 self.lines.append(line2)
 
-            lineBottom = QGraphicsLineItem(s.x() - 2 * StorageTank.delta, s.y() + self.h, s.x() + self.w,
+            lineBottom = QGraphicsLineItem(s.x() - 2 * delta, s.y() + self.h, s.x() + self.w,
                                            s.y() + self.h,
                                            self)
             lineBottom.setPen(QPen(Qt.black, 2))
@@ -153,10 +155,11 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def drawHxR(self, param, factor):
         s = self.offset
+        delta = 4
 
         bb = False
         if bb:
-            lineTop = QGraphicsLineItem(s.x() + 2 * StorageTank.delta, s.y() + 0, s.x() - self.w, s.y() + 0, self)
+            lineTop = QGraphicsLineItem(s.x() + 2 * delta, s.y() + 0, s.x() - self.w, s.y() + 0, self)
             lineTop.setPen(QPen(Qt.black, 2))
             self.lines.append(lineTop)
 
@@ -169,7 +172,7 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.lines.append(line)
                 sw = (sw + 1)
 
-            lineBottom = QGraphicsLineItem(s.x() + 2 * StorageTank.delta, s.y() + self.h, s.x() - self.w,
+            lineBottom = QGraphicsLineItem(s.x() + 2 * delta, s.y() + self.h, s.x() - self.w,
                                            s.y() + self.h,
                                            self)
             lineBottom.setPen(QPen(Qt.black, 2))
@@ -177,7 +180,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
         else:
             self.floorHeight()
-            lineTop = QGraphicsLineItem(s.x() + 2 * StorageTank.delta, s.y() + 0, s.x() - self.w, s.y() + 0, self)
+            lineTop = QGraphicsLineItem(s.x() + 2 * delta, s.y() + 0, s.x() - self.w, s.y() + 0, self)
             lineTop.setPen(QPen(Qt.black, 2))
             self.lines.append(lineTop)
 
@@ -203,19 +206,20 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.lines.append(line1)
                 self.lines.append(line2)
 
-            lineBottom = QGraphicsLineItem(s.x() + 2 * StorageTank.delta, s.y() + self.h, s.x() - self.w,
+            lineBottom = QGraphicsLineItem(s.x() + 2 * delta, s.y() + self.h, s.x() - self.w,
                                            s.y() + self.h,
                                            self)
             lineBottom.setPen(QPen(Qt.black, 2))
             self.lines.append(lineBottom)
 
     def floorHeight(self):
+        delta = 4
         # Could be used if static partH would be used for the heatexchanger
         self.h = self.h - self.h % HeatExchanger.partH
         if self.sSide == 0:
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * StorageTank.delta, 0))
+            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * delta, 0))
         if self.sSide == 2:
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * StorageTank.delta, 0))
+            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
 
     def contextMenuEvent(self, event):
         menu = QMenu()

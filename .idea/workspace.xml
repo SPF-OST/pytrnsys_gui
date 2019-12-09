@@ -2,18 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled4.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trnsysGUI/export.dck" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/Connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/Group.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Group.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/copyGroup.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/copyGroup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/HeatExchanger.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/HeatExchanger.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled3.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled3.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/groupDlg.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/groupDlg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/export.dck" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -86,6 +80,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="ConfigStorage" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="TrnsysGUI" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/trnsysGUI" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="Connection" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="TrnsysGUI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -99,27 +114,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/Connection.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Connector" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="TrnsysGUI" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/trnsysGUI" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/Connector.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -173,10 +167,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.core" />
+        <item itemvalue="Python.ConfigStorage" />
         <item itemvalue="Python.BlockItem" />
         <item itemvalue="Python.Connection" />
         <item itemvalue="Python.Group" />
-        <item itemvalue="Python.Connector" />
       </list>
     </recent_temporary>
   </component>

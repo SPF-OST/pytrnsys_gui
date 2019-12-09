@@ -194,13 +194,13 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         # bl.flippedV = i["FlippedV"] # No support for vertical flip
                         bl.changeSize()
 
-                        bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
+                        bl.setPos(float(i["StoragePosition"][0]) + offset_x, float(i["StoragePosition"][1]) + offset_y)
                         # bl.trnsysId = i["trnsysID"]
                         # bl.id = i["ID"]
                         # Add heat exchanger
                         for h in i["HxList"]:
                             hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
-                                                QPointF(h["Offset"][0] + offset_y, h["Offset"][1] + offset_y),
+                                                QPointF(h["Offset"][0], h["Offset"][1]),
                                                 bl, h["DisplayName"] + "New",
                                                 port1ID=h['Port1ID'], port2ID=h['Port2ID'], connTrnsysID=self.editor.idGen.getTrnsysID())
 
@@ -218,7 +218,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
 
                             conn = bl.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
                                                         fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
-                                                        connId=self.editor.getID(), connCid=self.editor.getConnID(),
+                                                        connId=self.editor.idGen.getID(), connCid=self.editor.idGen.getConnID(),
                                                         connDispName=x["ConnDisName"] + "New",
                                                         trnsysConnId=self.editor.idGen.getTrnsysID())
 
@@ -274,6 +274,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
                             resConnList.append(c)
                         else:
                             print("This is an internal connection (e.g. in the storage) and thus is not created now")
+
                     elif "__idDct__" in arr[k]:
                         resBlockList.append(arr[k])
                     else:
@@ -1856,6 +1857,7 @@ class DiagramEditor(QWidget):
         print(loopText)
         f += loopText + "\n"
         return f
+
     def exportPrintPipeLosses(self):
         f = ''
         lossText = ''
@@ -1905,15 +1907,13 @@ class DiagramEditor(QWidget):
     def exportData(self):
         self.setUpStorageInnerConns()
 
-        # self.insertionSort()
         self.sortTrnsysObj()
 
         print("Self trnsysObj" + str(self.trnsysObj))
 
         fullExportText = ''
 
-        filepath = Path(Path(__file__).resolve().parent.joinpath("diagrams"))
-
+        filepath = Path(Path(__file__).resolve().parent)
         if Path(filepath.joinpath('export.dck')).exists():
             qmb = QMessageBox(self)
             qmb.setText("Warning: " +
@@ -1928,23 +1928,19 @@ class DiagramEditor(QWidget):
                 print("Canceling")
                 return
         else:
-            # export file does not exist yet
+            # Export file does not exist yet
             pass
 
         print("Printing the TRNSYS file... \n")
 
-
-
-        # print(header.read())
         fullExportText += header.read()
+        header.seek(0)
         print("\n")
 
         simulationUnit = 450
         simulationType = 935
-
         descConnLength = 20
 
-        # parameters = len(self.trnsysObj) * 4 + 1
         parameters = 0
 
         for t in self.trnsysObj:
@@ -1964,7 +1960,6 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportPrintEquations(simulationUnit)
         fullExportText += self.exportUnits(451)
 
-        # To test
         fullExportText += self.exportPrintLoops()
         fullExportText += self.exportPrintPipeLoops()
         fullExportText += self.exportPrintPipeLosses()
@@ -2589,7 +2584,6 @@ class DiagramEditor(QWidget):
         if self.saveAsPath.name == '':
 
             filepath = Path(Path(__file__).resolve().parent.joinpath("diagrams"))
-            # print(filepath)
 
             if Path(filepath.joinpath(self.diagramName + '.json')).exists():
                 qmb = QMessageBox(self)

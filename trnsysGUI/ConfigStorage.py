@@ -2,6 +2,8 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QHBoxLayout, QListWidget, QPushButton, QSpacerItem, \
     QVBoxLayout, QRadioButton, QDialog
 
+from trnsysGUI.HeatExchanger import HeatExchanger
+
 
 class ConfigStorage(QDialog):
     def __init__(self, storage, parent):
