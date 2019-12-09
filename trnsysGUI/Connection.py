@@ -1,0 +1,889 @@
+from math import atan, sqrt, acos
+
+from PyQt5.QtCore import QLineF, QPointF
+from PyQt5.QtWidgets import QGraphicsTextItem
+
+from trnsysGUI.Collector import Collector
+from trnsysGUI.CornerItem import CornerItem
+from trnsysGUI.Node import Node
+from trnsysGUI.PortItem import PortItem
+from trnsysGUI.Pump import Pump
+from trnsysGUI.TVentil import TVentil
+from trnsysGUI.segmentItem import segmentItem
+
+
+def calcDist(p1, p2):
+    vec = p1 - p2
+    norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
+    return norm
+
+
+class Connection(object):
+    def __init__(self, fromPort, toPort, isBlock, parent, **kwargs):
+        self.fromPort = fromPort
+        self.toPort = toPort
+        self.isBlockConn = isBlock
+        self.isStorageIO = False
+        self.displayName = None
+
+        self.parent = parent
+        self.groupName = 'Untitled'
+
+        # Export related
+        self.typeNumber = 0
+        self.exportConnsString = ""
+        self.exportInputName = "0"
+        self.exportInitialInput = -1
+        self.exportEquations = []
+        self.trnsysConn = []
+
+        # Global
+        self.id = self.parent.idGen.getID()
+        self.connId = self.parent.idGen.getConnID()
+        self.trnsysId = self.parent.idGen.getTrnsysID()
+
+        self.segments = []
+
+        self.startNode = Node()
+        self.endNode = Node()
+        self.firstS = None
+
+        self.segmentsLoad = None
+        self.cornersLoad = None
+
+        if kwargs == {}:
+            print("New connection being created")
+            self.fromPortId = None
+            self.toPortId = None
+            self.initNew(parent)
+            # self.label.setPos(self.fromPort.pos())
+            # self.label.setPlainText(self.displayName)
+        else:
+            print("Connection being loaded")
+            self.fromPortId = kwargs["fromPortId"]
+            self.toPortId = kwargs["toPortId"]
+            self.segmentsLoad = kwargs["segmentsLoad"]
+            self.cornersLoad = kwargs["cornersLoad"]
+
+            # print("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
+            # self.initLoad()
+
+        # For dfs1
+        self.traversed = False
+
+    # Note: Nodes can have as parent 1)Connection 2)CornerItem
+    # In case 1), there are further two cases: a) Node is at port b) Node is at disr seg
+
+    def initNew(self, parent):
+
+        self.parent = parent
+        print("Parent is " + str(self.parent))
+
+        # Global
+        self.parent.trnsysObj.append(self)
+
+        self.displayName = 'UntitledConn' + str(self.connId)
+
+        # global editorMode
+        if self.parent.editorMode == 0:
+            print("Creating a new connection in mode 0")
+            self.initSegmentM0()
+        elif self.parent.editorMode == 1:
+            print("Creating a new connection in mode 1")
+            self.initSegmentM1()
+        else:
+            print("No valid mode during creating of connection")
+
+        self.parent.connectionList.append(self)
+        self.fromPort.connectionList.append(self)
+        self.toPort.connectionList.append(self)
+
+        # self.correctPorts()
+
+    def initLoad(self):
+        # Called by DiagramEditor when loading connection
+
+        print("self is " + str(self.isBlockConn))
+        print("Port 1 is " + str(self.fromPort) + "has Id" + str(self.fromPort.id))
+        print("Port 2 is " + str(self.toPort))
+
+        # self.parent = loadParent
+        self.initSegmentM0()
+
+        self.parent.trnsysObj.append(self)
+
+        self.parent.connectionList.append(self)
+        self.fromPort.connectionList.append(self)
+        self.toPort.connectionList.append(self)
+
+        if len(self.cornersLoad) > 0:
+            self.loadSegments()
+
+        # Still not tested
+        # self.correctPorts()
+
+    def loadSegments(self):
+        self.clearConn()
+
+        print("cornerLoads is " + str(self.cornersLoad))
+
+        tempNode = self.startNode
+
+        print("start node has nn " + str(tempNode.nextNode))
+        print(" ")
+        rad = 4
+
+        for x in range(len(self.cornersLoad)):
+            cor = CornerItem(- rad, - rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
+            # print("items are now " + str(self.parent.diagramScene.items()))
+            print("Corner" + str(cor) + " has  " + str(cor.node))
+
+            cor.setPos(float(self.cornersLoad[x][0]), float(self.cornersLoad[x][1]))
+            cor.setFlags(cor.ItemIsSelectable | cor.ItemIsMovable)
+            cor.setFlag(cor.ItemSendsScenePositionChanges, True)
+
+            cor.setZValue(100)
+            cor.setVisible(True)
+
+            self.parent.diagramScene.addItem(cor)
+
+            cor.node.nextNode.setPrev(cor.node)
+            cor.node.prevNode.setNext(cor.node)
+            segmentItem(tempNode, cor.node, self)
+
+            tempNode = cor.node
+
+            self.printConn()
+
+        segmentItem(tempNode, tempNode.nextN(), self)
+
+        # self.parent.diagramScene.addItem(lastSeg)
+
+        self.printConn()
+
+        for s in self.segments:
+            pos1 = None
+            pos2 = None
+
+            if isinstance(s.startNode.parent, Connection) and s.startNode.prevNode is None:
+                # print("startnode is at connection")
+                pos1 = s.startNode.parent.fromPort.scenePos().x(), s.startNode.parent.fromPort.scenePos().y()
+            if isinstance(s.endNode.parent, Connection) and s.endNode.nextNode is None:
+                # print("endnode is at connection")
+                pos2 = s.endNode.parent.toPort.scenePos().x(), s.endNode.parent.toPort.scenePos().y()
+
+            if type(s.startNode.parent) is CornerItem:
+                # print("startnode is at corner")
+                print(str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos()))
+                pos1 = s.startNode.parent.scenePos().x(), s.startNode.parent.scenePos().y()
+            if type(s.endNode.parent) is CornerItem:
+                # print("endnode is at corner")
+                pos2 = s.endNode.parent.scenePos().x(), s.endNode.parent.scenePos().y()
+
+            print("pos1 is " + str(pos1))
+            print("pos2 is " + str(pos2))
+
+            s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
+
+            if self.isBlockConn:
+                s.setVisible(False)
+
+            self.parent.diagramScene.addItem(s)
+
+    def correctPorts(self):
+        if isinstance(self.fromPort.parent, Pump):
+            if self.fromPort.name == 'i':
+                self.switchPorts()
+
+        if isinstance(self.toPort.parent, Pump):
+            if self.toPort.name == 'o':
+                self.switchPorts()
+
+        if isinstance(self.fromPort, Collector):
+            if self.fromPort.name == 'i':
+                self.switchPorts()
+
+        if isinstance(self.toPort, Collector):
+            if self.toPort.name == 'o':
+                self.switchPorts()
+
+        # Need consistent inputs[] and outputs[] list!
+        if isinstance(self.fromPort.parent, TVentil):
+            self.switchPorts()
+
+    def switchPorts(self):
+        temp = self.fromPort
+        self.fromPort = self.toPort
+        self.toPort = temp
+
+    def showLabel(self, b):
+        if b:
+            self.firstS.label.setVisible(True)
+        else:
+            self.firstS.label.setVisible(False)
+
+    def setDisplayName(self, newName):
+        self.displayName = newName
+        self.updateSegLabels()
+
+    def updateSegLabels(self):
+        for s in self.segments:
+            s.label.setPlainText(self.displayName)
+
+    def positionLabel(self):
+
+        if self.parent.editorMode == 0:
+            vec1 = self.firstS.line().p2() - self.firstS.line().p1()
+            vec2 = QPointF(1 / 10 * vec1.x(), 1 / 10 * vec1.y())
+
+            eps = 0.5
+            if vec1.x() == 0:
+                angleBetween = atan(vec1.y() / eps)
+            else:
+                angleBetween = atan(vec1.y() / vec1.x())
+
+            d1 = calcDist(QPointF(0, 0), vec1)
+
+            if d1 == 0:
+                d1 = eps
+
+            vec3 = QPointF(-5 * angleBetween * vec1.y() / d1,
+                           5 * angleBetween * vec1.x() / d1)
+
+            # self.fromPort.parent.setPos(self.fromPort.parent.scenePos())
+            # self.firstS.label.setPos(self.firstS.label.pos() + QPointF(20, -20))
+            self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
+
+        elif self.parent.editorMode == 1:
+            print("changing label pos in emode 1")
+            if self.fromPort.side == 0:
+                self.firstS.label.setPos(self.fromPort.pos() + QPointF(-60, -30))
+                # self.firstS.label.setVisible(True)
+
+            # Here the behavior of positioning can be improved
+            elif self.fromPort.side in [1, 2, 3]:
+                self.firstS.label.setPos(self.fromPort.pos() + QPointF(-40, -30))
+                # self.firstS.label.setVisible(True)
+        else:
+            pass
+
+    def initSegmentM0(self):
+
+        self.startNode.setParent(self)
+        self.endNode.setParent(self)
+
+        self.startNode.setNext(self.endNode)
+        self.endNode.setPrev(self.startNode)
+
+        self.firstS = segmentItem(self.startNode, self.endNode, self)
+
+        self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
+
+        if self.isBlockConn:
+            self.firstS.setVisible(False)
+
+        self.parent.diagramScene.addItem(self.firstS)
+
+        self.positionLabel()
+
+    def initSegmentM1(self):
+        # Can be rewritten for efficiency etc. (e.g not doing initSegmentM0 and calling niceConn())
+
+        self.startNode.setParent(self)
+        self.endNode.setParent(self)
+
+        self.startNode.setNext(self.endNode)
+        self.endNode.setPrev(self.startNode)
+
+        self.firstS = segmentItem(self.startNode, self.endNode, self)
+
+        self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
+
+        if self.isBlockConn:
+            self.firstS.setVisible(False)
+
+        self.parent.diagramScene.addItem(self.firstS)
+
+        self.niceConn()
+
+        self.positionLabel()
+
+    def getNodePos(self, searchCorner):
+
+        corners = self.getCorners()
+
+        for i in range(len(corners)):
+            if corners[i] == searchCorner:
+                print("Found a corner")
+                return i
+        print("corner not found is " + str(searchCorner))
+
+        return 0
+        # Alternative
+        # return corners.index(searchCorner)
+
+    def getStartPoint(self):
+        return QPointF(self.fromPort.scenePos())
+
+    def getEndPoint(self):
+        return QPointF(self.toPort.scenePos())
+
+    def setStartPort(self, newStartPort):
+        self.fromPort = newStartPort
+        self.startPos = newStartPort.scenePos()
+        # self.fromPort.posCallbacks.append(self.setStartPos)
+
+    def setEndPort(self, newEndPort):
+        self.toPort = newEndPort
+
+    def setStartPos(self):
+        pass
+
+    def setEndPos(self):
+        pass
+
+    def children(self):
+        pass
+
+    def printConn(self):
+        print("------------------------------------")
+        print("This is the printout of connection: " + self.displayName + str(self))
+        print("It has fromPort " + str(self.fromPort))
+        print("It has toPort " + str(self.toPort))
+        print("It has startNode " + str(self.startNode))
+        print("It has endNode " + str(self.endNode))
+
+        # self.printConnNodes()
+        print("\n")
+        # self.printConnSegs()
+        print("It goes from " + self.fromPort.parent.displayName + " to " + self.toPort.parent.displayName)
+        print("------------------------------------")
+
+    def printConnNodes(self):
+        print("These are the nodes: ")
+
+        element = self.startNode
+        while element.nextN() is not None:
+            print("Node is " + str(element) + " has nextNode " + str(element.nextN()) + " has pL " + str(
+                self.partialLength(element)))
+            element = element.nextN()
+
+        print("Node is " + str(element) + " has nextNode " + str(element.nextN()))
+
+    def printConnSegs(self):
+        print("These are the segments in order")
+        for s in self.segments:
+            print("Segment is " + str(s) + " has global id " + str(s.id) + " has startnode " + str(
+                s.startNode) + " endnode " + str(s.endNode))
+
+    def niceConn(self):
+        if self.isBlockConn:
+            return
+
+        # Here different cases can be implemented using self.PORT.side as sketched on paper
+        rad = 4
+
+        print(
+            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
+        print(
+            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
+
+        if ((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
+                (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
+                self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
+            print("Ports are directed to each other")
+            self.clearConn()
+
+            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+
+            corner1.node.setNext(corner2.node)
+
+            seg1 = segmentItem(self.startNode, corner1.node, self)
+            seg2 = segmentItem(corner1.node, corner2.node, self)
+            seg3 = segmentItem(corner2.node, self.endNode, self)
+
+            self.startNode.setNext(corner1.node)
+            self.endNode.setPrev(corner2.node)
+
+            # print("niceConn...")
+            self.printConnNodes()
+            self.parent.diagramScene.addItem(seg1)
+            self.parent.diagramScene.addItem(seg2)
+            self.parent.diagramScene.addItem(seg3)
+
+            self.parent.diagramScene.addItem(corner1)
+            self.parent.diagramScene.addItem(corner2)
+
+            pos1 = self.fromPort.scenePos()
+            pos2 = self.toPort.scenePos()
+
+            midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
+
+            help_point_1 = QPointF(midx, pos1.y())
+            help_point_2 = QPointF(midx, pos2.y())
+
+            seg1.setLine(QLineF(pos1, help_point_1))
+            seg2.setLine(QLineF(help_point_1, help_point_2))
+            seg3.setLine(QLineF(help_point_2, pos2))
+
+            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
+
+            corner1.setZValue(100)
+            corner2.setZValue(100)
+
+            corner1.setPos(help_point_1)
+            corner2.setPos(help_point_2)
+
+        elif (self.fromPort.side == 2) and (self.toPort.side == 2):
+            print("NiceConn 2 to 2")
+            portOffset = 30
+            self.clearConn()
+
+            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
+            corner3 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
+            corner4 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
+
+            corner1.node.setNext(corner2.node)
+            corner2.node.setNext(corner3.node)
+            corner3.node.setNext(corner4.node)
+
+            seg1 = segmentItem(self.startNode, corner1.node, self)
+            seg2 = segmentItem(corner1.node, corner2.node, self)
+            seg3 = segmentItem(corner2.node, corner3.node, self)
+            seg4 = segmentItem(corner3.node, corner4.node, self)
+            seg5 = segmentItem(corner4.node, self.endNode, self)
+
+            self.startNode.setNext(corner1.node)
+            self.endNode.setPrev(corner4.node)
+
+            self.parent.diagramScene.addItem(seg1)
+            self.parent.diagramScene.addItem(seg2)
+            self.parent.diagramScene.addItem(seg3)
+            self.parent.diagramScene.addItem(seg4)
+            self.parent.diagramScene.addItem(seg5)
+
+            self.parent.diagramScene.addItem(corner1)
+            self.parent.diagramScene.addItem(corner2)
+            self.parent.diagramScene.addItem(corner3)
+            self.parent.diagramScene.addItem(corner4)
+
+            pos1 = self.fromPort.scenePos()
+            pos2 = self.toPort.scenePos()
+
+            baseline_h = max(pos1.y(), pos2.y()) + 100
+
+            p1 = QPointF(pos1.x() + portOffset, pos1.y())
+            p2 = QPointF(p1.x(), baseline_h)
+            p3 = QPointF(pos2.x() + portOffset, baseline_h)
+            p4 = QPointF(p3.x(), pos2.y())
+
+            seg1.setLine(QLineF(pos1, p1))
+            seg2.setLine(QLineF(p1, p2))
+            seg3.setLine(QLineF(p2, p3))
+            seg4.setLine(QLineF(p3, p4))
+            seg5.setLine(QLineF(p4, pos2))
+
+            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
+            corner3.setFlag(corner3.ItemSendsScenePositionChanges, True)
+            corner4.setFlag(corner4.ItemSendsScenePositionChanges, True)
+
+            corner1.setZValue(100)
+            corner2.setZValue(100)
+            corner3.setZValue(100)
+            corner4.setZValue(100)
+
+            corner1.setPos(p1)
+            corner2.setPos(p2)
+            corner3.setPos(p3)
+            corner4.setPos(p4)
+
+        elif (self.fromPort.side == 0) and (self.toPort.side == 0):
+            print("NiceConn 0 to 0")
+            portOffset = 30
+            self.clearConn()
+
+            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
+            corner3 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
+            corner4 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
+
+            corner1.node.setNext(corner2.node)
+            corner2.node.setNext(corner3.node)
+            corner3.node.setNext(corner4.node)
+
+            seg1 = segmentItem(self.startNode, corner1.node, self)
+            seg2 = segmentItem(corner1.node, corner2.node, self)
+            seg3 = segmentItem(corner2.node, corner3.node, self)
+            seg4 = segmentItem(corner3.node, corner4.node, self)
+            seg5 = segmentItem(corner4.node, self.endNode, self)
+
+            self.startNode.setNext(corner1.node)
+            self.endNode.setPrev(corner4.node)
+
+            self.parent.diagramScene.addItem(seg1)
+            self.parent.diagramScene.addItem(seg2)
+            self.parent.diagramScene.addItem(seg3)
+            self.parent.diagramScene.addItem(seg4)
+            self.parent.diagramScene.addItem(seg5)
+
+            self.parent.diagramScene.addItem(corner1)
+            self.parent.diagramScene.addItem(corner2)
+            self.parent.diagramScene.addItem(corner3)
+            self.parent.diagramScene.addItem(corner4)
+
+            pos1 = self.fromPort.scenePos()
+            pos2 = self.toPort.scenePos()
+
+            baseline_h = max(pos1.y(), pos2.y()) + 100
+
+            # p1 = QPointF(pos1.x() + 50, pos1.y())
+            p1 = QPointF(pos1.x() - portOffset, pos1.y())
+            p2 = QPointF(p1.x(), baseline_h)
+            p3 = QPointF(pos2.x() - portOffset, baseline_h)
+            p4 = QPointF(p3.x(), pos2.y())
+
+            seg1.setLine(QLineF(pos1, p1))
+            seg2.setLine(QLineF(p1, p2))
+            seg3.setLine(QLineF(p2, p3))
+            seg4.setLine(QLineF(p3, p4))
+            seg5.setLine(QLineF(p4, pos2))
+
+            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
+            corner3.setFlag(corner3.ItemSendsScenePositionChanges, True)
+            corner4.setFlag(corner4.ItemSendsScenePositionChanges, True)
+
+            corner1.setZValue(100)
+            corner2.setZValue(100)
+            corner3.setZValue(100)
+            corner4.setZValue(100)
+
+            corner1.setPos(p1)
+            corner2.setPos(p2)
+            corner3.setPos(p3)
+            corner4.setPos(p4)
+
+        else:
+            print("No compatible layout found between port")
+            print("Sides are " + str(self.fromPort.side) + " and " + str(self.toPort.side))
+
+        self.firstS = self.getFirstSeg()
+
+        print("Conn has now " + str(self.firstS))
+
+    def clearConn(self):
+        # Deletes all segments and corners in connection
+        # print("Connection was before: ")
+        # self.printConnNodes()
+
+        walker = self.endNode
+
+        items = self.parent.diagramScene.items()
+
+        for it in items:
+            if type(it) is segmentItem:
+                if it.startNode.lastNode() is self.endNode or it.startNode.firstNode() is self.startNode:
+                    # print("Del segment")
+                    self.parent.diagramScene.removeItem(it)
+            if type(it) is QGraphicsTextItem:
+                if type(it.parent) is PortItem:
+                    print("it has " + str(it.parent()))
+                    print("Deleting it")
+                    self.parent.diagramScene.removeItem(it)
+
+        for seg in self.segments:
+            self.parent.diagramScene.removeItem(seg.label)
+
+        self.segments.clear()
+
+        if walker.prevN() is not self.startNode:
+            walker = walker.prevN()
+
+            while walker.prevN() is not self.startNode:
+                # print("Del corner...")
+                if type(walker.parent) is not Connection:
+                    self.parent.diagramScene.removeItem(walker.parent)
+                else:
+                    print("Caution, this is a disrupt.")
+                walker = walker.prevN()
+                # del (walker.nextN())
+
+            if type(walker.parent) is not Connection:
+                self.parent.diagramScene.removeItem(walker.parent)
+            else:
+                print("Caution.")
+                # del walker
+
+            self.startNode.setNext(self.endNode)
+            self.endNode.setPrev(self.startNode)
+
+        # print("Connection is now: ")
+        # self.printConnNodes()
+
+    def deleteConn(self):
+        print("Deleting connection " + self.displayName + " " + str(self))
+        print("fromPort is at " + str(self.fromPort.parent.displayName))
+        print("toPort is at " + str(self.toPort.parent.displayName))
+        self.clearConn()
+        self.fromPort.connectionList.remove(self)
+        print("Connectionlist of fromPort after removal is:")
+        [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.fromPort.connectionList ]
+        self.toPort.connectionList.remove(self)
+        print("Connectionlist of toPort after removal is:")
+        [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.toPort.connectionList ]
+        if self in self.parent.trnsysObj:
+            self.parent.trnsysObj.remove(self)
+        else:
+            print("-------> tr obj are " + str(self.parent.trnsysObj))
+            print(self.id)
+            print([i.id for i in self.parent.trnsysObj])
+            return
+        print("Removing trnsysObj " + str(self))
+        self.parent.connectionList.remove(self)
+        del self
+
+    def buildBridges(self):
+        # This function finds the colliding line segments and creates the interrupted line effect
+
+        # Debug:
+        # print("Segments in brigdes function is " + str(self.segments))
+        # print("Length of segments is " + str(len(self.segments)))
+        for s in self.segments:
+            col = s.collidingItems()
+            # Why do the child segments have again colliding Items?
+            # print("Start and end of loop segment is " + str(s.startNode) + " and " + str(s.endNode))
+            # print("Col items are " + str(col))
+
+            for c in col:
+                if type(c) is segmentItem:
+                    # print("There is a segment colliding....")
+                    # print("c.hasBridge is " + str(c.hasBridge))
+                    # print("s.hasBridge is " + str(s.hasBridge))
+
+                    # Both have no bridge and do not collide at the endpoints:
+                    # if (s.hasBridge == False) and (c.hasBridge == False) and (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
+                    if (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
+
+                        # print("Self has startnode " + str(s.startNode) + " and endnode " + str(
+                        #     s.endNode) + " c has startNode " + str(c.startNode) + " and endnode " + str(c.endNode))
+
+                        qp1 = s.line().p1()
+                        qp2 = s.line().p2()
+                        qp1_ = c.line().p1()
+                        qp2_ = c.line().p2()
+
+                        eps2 = 5
+                        if abs(qp1.x() - qp2.x()) < eps2 or abs(qp1_.x() - qp2_.x()) < eps2:
+                            print("Can't build bridge because one segment is almost verical")
+
+                        else:
+
+                            node1 = Node()
+                            node2 = Node()
+
+                            node1.setPrev(s.startNode)
+                            node1.setNext(node2)
+                            node2.setPrev(node1)
+                            node2.setNext(s.endNode)
+                            node1.setParent(self)
+                            node2.setParent(self)
+
+                            s.startNode.setNext(node1)
+                            s.endNode.setPrev(node2)
+
+                            s.firstChild = segmentItem(s.startNode, node1, s.parent)
+                            s.secondChild = segmentItem(node2, s.endNode, s.parent)
+
+                            s.hasBridge = True
+                            c.hasBridge = True
+                            s.bridgedSegment = c
+                            c.bridgedSegment = s
+
+                            s.firstChild.setVisible(False)
+                            s.secondChild.setVisible(False)
+
+                            self.parent.diagramScene.addItem(s.firstChild)
+                            self.parent.diagramScene.addItem(s.secondChild)
+
+                            # print("Points are " + str(qp1) + str(qp2) + str(qp1_) + str(qp2_))
+
+                            # TODO: Fix division through zero
+                            # eps1 = 1
+                            # if (abs(qp2.x() - qp1.x()) > eps1) and (abs(qp2_.x() - qp1_.x()) > eps1) :
+
+                            n1 = (qp1.y() * qp2.x() - qp2.y() * qp1.x()) / (qp2.x() - qp1.x())
+                            n2 = (qp1_.y() * qp2_.x() - qp2_.y() * qp1_.x()) / (qp2_.x() - qp1_.x())
+
+                            m1 = (qp2.y() - qp1.y()) / (qp2.x() - qp1.x())
+                            m2 = (qp2_.y() - qp1_.y()) / (qp2_.x() - qp1_.x())
+
+                            # print("division by " + str(m1) + "    " + str(m2))
+                            collisionPos = QPointF((n1 - n2) / (m2 - m1), m1 * (n1 - n2) / (m2 - m1) + n1)
+
+                            vecp2p1 = qp2 - qp1
+                            vecp2p1_ = qp2_ - qp1_
+
+                            normVec = sqrt(vecp2p1.x() ** 2 + vecp2p1.y() ** 2)
+                            normVec_ = sqrt(vecp2p1_.x() ** 2 + vecp2p1_.y() ** 2)
+
+                            # Compute angle between lines
+                            scalarProd = vecp2p1.x() * vecp2p1_.x() + vecp2p1.y() + vecp2p1_.y()
+                            angleBetween = acos(scalarProd / (normVec * normVec_))
+                            # print(str(degrees(angleBetween)))
+
+                            # Almost working: if line approaches 90 deg or if lines touch because too steep, problem
+                            f = 10
+                            distFactor = max(f * 1 / angleBetween, f)
+                            # print("distFactor " +  str(distFactor))
+
+                            # normalVec = QPointF(-distFactor/normVec * vecp2p1.y(), distFactor/normVec * vecp2p1.x())
+                            normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(),
+                                                  distFactor / normVec * vecp2p1.y())
+
+                            # print("vector is " + str(normVecp2p1))
+                            # print("collisionpos is " + str(collisionPos))
+                            # newPos1 = collisionPos - normalVec
+                            # newPos2 = collisionPos + normalVec
+
+                            newPos1 = collisionPos - normVecp2p1
+                            newPos2 = collisionPos + normVecp2p1
+
+                            s.firstChild.setLine(QLineF(qp1.x(), qp1.y(), newPos1.x(), newPos1.y()))
+                            s.secondChild.setLine(QLineF(newPos2.x(), newPos2.y(), qp2.x(), qp2.y()))
+
+                            s.firstChild.setVisible(True)
+                            s.secondChild.setVisible(True)
+
+                            s.hide()
+
+                            self.parent.diagramScene.removeItem(s)
+                            self.segments.remove(s)
+
+                            # print("s.bridged element is " + str(s.bridgedSegment))
+                            # print("c.bridged element is " + str(c.bridgedSegment))
+                            # print(len(self.segments))
+
+    def getFirstSeg(self):
+        return self.segments[0]
+
+    def totalLength(self):
+        s = self.startNode
+        e = self.endNode
+        res = 0
+
+        for seg in self.segments:
+            res += calcDist(seg.line().p1(), seg.line().p2())
+        return res
+
+    def partialLength(self, node):
+        # Returns the cummulative length of line up to given node
+        # Assumes that segments is ordered correctly!
+        res = 0
+        # print("Node calling pL is " + str(node))
+        # print("Segments has len " + str(len(self.segments)))
+        if node == self.startNode:
+            return res
+
+        for i in self.segments:
+            # print("Current seg is " + str(i))
+            # print("Adding " + str(calcDist(i.line().p1(), i.line().p2())))
+            res += calcDist(i.line().p1(), i.line().p2())
+            if i.endNode == node:
+                # print("Breaking")
+                break
+
+        # print("Node " + str(node) + " has pL " + str(res) + "\n")
+        return res
+
+    def invertConnection(self):
+        # Invert segment list
+        self.segments.reverse()
+
+        # Invert nodes
+        self.invertNodes()
+
+        # Invert ports
+        temp = self.toPort
+        self.toPort = self.fromPort
+        self.fromPort = temp
+
+        sn = self.startNode
+        self.startNode = self.endNode
+        self.endNode = sn
+
+        for s in self.segments:
+            temp2 = s.startNode
+            s.startNode = s.endNode
+            s.endNode = temp2
+
+            temp3 = s.firstChild
+            s.firstChild = s.secondChild
+            s.secondChild = temp3
+
+            s.setLine(s.line().p2().x(), s.line().p2().y(), s.line().p1().x(), s.line().p1().y())
+
+            s.updateGrad()
+
+    def invertNodes(self):
+        temp = None
+        element = self.startNode
+
+        while element.nextN() is not None:
+            temp = element.nextN()
+            pr = element.prevN()
+            ne = element.nextN()
+
+            element.setNext(pr)
+            element.setPrev(ne)
+            element = temp
+
+        pr = element.prevN()
+        ne = element.nextN()
+        element.setNext(pr)
+        element.setPrev(ne)
+
+    def getCorners(self):
+        res = []
+
+        tempNode = self.startNode.nextN()
+
+        while tempNode.nextN() is not None:
+            print("Hello from corner" + str(tempNode))
+            res.append(tempNode.parent)
+            tempNode = tempNode.nextN()
+
+        # for s in self.segments:
+        #     elements = self.parent.diagramScene.items(s.line().p2())
+        #     for e in elements:
+        #         if type(e) is CornerItem:
+        #             # print("Found corner" + str(e))
+        #             res.append(e)
+
+        # print("Corners are " + str(res))
+        # print("Calling printconn from ")
+        # self.printConn()
+
+        print("getcorners gives " + str(res))
+
+        return res
+
+    def setConnToGroup(self, newGroupName):
+        print("In setConnToGroup")
+        if newGroupName == self.groupName:
+            print("Block " + str(self) + str(self.displayName) + "is already in this group")
+            return
+        else:
+            print("groups is " + str(self.parent.groupList))
+            for g in self.parent.groupList:
+                print("At group " + str(g.displayName))
+                if g.displayName == self.groupName:
+                    print("Found the old group")
+                    g.itemList.remove(self)
+                if g.displayName == newGroupName:
+                    print("Found the new group")
+                    g.itemList.append(self)
+                    self.groupName = newGroupName

@@ -1,0 +1,105 @@
+QPushButton {
+  font-family: 'MS Reference Sans Serif', sans-serif;
+  font-weight: 600;
+  padding: 1.25rem 2rem;
+  font-size: 1rem;
+  border-radius:20px;
+  border: 0;
+  background: #3eecac;
+  background: #20fc99;
+  background: #08aeea;
+  color: #009933;
+  color: #2af598;
+  text-transform: uppercase;
+}
+
+QPushButton:hover{
+  background: #009933;
+  background: #2af598;
+  color: #3eecac;
+  color: #08aeea;
+}
+
+
+/*QPushButton {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 900;
+  padding: 2px;
+  font-size: 1rem;
+  border-radius:3px;
+  border-width: 2px;
+  background: white;
+  color: #1976d2;
+  text-transform: uppercase;
+  border-color: #1976d2;
+  border-style: solid;
+}
+
+QPushButton:hover{
+  background: #1976d2;
+  color: white;
+}*/
+
+/*
+QGraphicsItem {
+ color:green;
+ border-width: 3;
+ border-color: yellow;
+
+}*/
+
+QDialog{
+ background: #8dd5fc;
+ border-radius: 10px;
+ border: none;
+}
+
+QLineEdit{
+    border-radius: 3px;
+    border: none;
+}
+
+
+QListView{
+    border-radius: 20px;
+    border: none;
+     background: #77C9D4;
+     padding: 10px;
+
+
+}
+
+QGraphicsView{
+    border:none;
+    border-radius: 20px;
+}
+QGraphicsScene{
+    border-radius: 20px;
+}
+
+QToolBar{
+    border: none;
+}
+
+QMainWindow{
+    background: #57BC90
+}
+
+QMenuBar{
+    background: #57BC90;
+    border: none;
+}
+
+QAction:Hover{
+
+}
+
+
+
+QMenuBar:Hover{
+    background: #2af598;
+}
+
+/*      background-image: linear-gradient(to right top, #2c00ff, #0087ff, #00bbff, #00e2ba, #5eff5e);
+*/
+
