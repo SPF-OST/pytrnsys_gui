@@ -2,11 +2,12 @@ from PyQt5.QtWidgets import QDialog, QLineEdit, QHBoxLayout, QPushButton, QGridL
 
 
 class groupDlg(QDialog):
-    def __init__(self, group, parent):
+    def __init__(self, group, parent, itemList):
         super(groupDlg, self).__init__(parent)
         self.setModal(True)
         self.parent = parent
         self.group = group
+        self.itemList = itemList
         nameLabel = QLabel("Name:")
         self.le = QLineEdit(self.group.displayName)
 
@@ -25,20 +26,19 @@ class groupDlg(QDialog):
 
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
-        self.setWindowTitle("Change connection name")
+        self.setWindowTitle("Set new group")
         self.show()
 
     def acceptedEdit(self):
-        self.group.setName(self.le.text())
-        self.group.setItemsGroup()
+        if self.le.text() is not "":
+            self.group.setName(self.le.text())
+            self.group.setItemsGroup(self.itemList)
 
-        global selectionMode
-        selectionMode = False
-        self.close()
+            self.parent.selectionMode = False
+            self.close()
 
     def cancel(self):
-        global selectionMode
-        selectionMode = False
+        self.parent.selectionMode = False
 
         self.close()
 

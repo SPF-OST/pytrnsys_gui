@@ -67,5 +67,3 @@ MfrDHW= 0 ! Not used
 MfrCW= 1000
 MfrPuCirc= 1000
 xFracMixDhw=1
-
-UNIT 400 TYPE 935

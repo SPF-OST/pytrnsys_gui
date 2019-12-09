@@ -28,9 +28,11 @@ class Group(QGraphicsRectItem):
 
         self.setVisible(False)
 
+        # Add rect to scene
         self.parent.addItem(self)
+
+        # Add group to groupList
         self.parent.parent().groupList.append(self)
-        self.setItemsGroup()
 
         self.updateLabelPos()
 
@@ -71,11 +73,13 @@ class Group(QGraphicsRectItem):
         return center.x() - (max_x - min_x) / 2 * factor, center.y() - (max_y - min_y) / 2 * factor, (
                     max_x - min_x) * factor, (max_y - min_y) * factor
 
-    def setItemsGroup(self):
+    def setItemsGroup(self, itemList):
 
-        for o in self.itemList:
-            if isinstance(o, BlockItem) or isinstance(o, Connection):
-                o.groupName = self.displayName
+        for o in itemList:
+            if isinstance(o, BlockItem):
+                o.setBlockToGroup(self.displayName)
+            elif isinstance(o, Connection):
+                o.setConnToGroup(self.displayName)
             else:
                 print("Found an item which is wether Block nor Connection in setItemsGroup")
 
@@ -110,7 +114,7 @@ class Group(QGraphicsRectItem):
     def setName(self, newName):
         self.displayName = newName
         self.label.setPlainText(newName)
-        self.setItemsGroup()
+        # self.setItemsGroup()
 
     def updateLabelPos(self):
         factor = 0.9
