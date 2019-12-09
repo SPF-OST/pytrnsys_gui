@@ -52,7 +52,6 @@ __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
-header = open("res/Constants.txt", "r")
 cssSs = open("res/style.txt", "r")
 
 # global globalID
@@ -1933,8 +1932,10 @@ class DiagramEditor(QWidget):
 
         print("Printing the TRNSYS file... \n")
 
+        header = open("res/Constants.txt", "r")
         fullExportText += header.read()
-        header.seek(0)
+        header.close()
+
         print("\n")
 
         simulationUnit = 450
