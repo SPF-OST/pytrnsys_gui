@@ -37,8 +37,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         print("Setting the displayName of " + str(self) + "to " + self.displayName)
 
-        self.groupName = 'UntitledGroup'
-        # self.setDefaultGroup()
+        self.groupName = ''
+        self.setDefaultGroup()
 
         self.inputs = []
         self.outputs = []
@@ -83,9 +83,9 @@ class BlockItem(QGraphicsPixmapItem):
 
         print("self.name is " + str(self.name))
         # Update size for generic block:
-        if self.name != 'TeePiece' and self.name != 'TVentil' and self.name != 'Pump'\
-                and self.name != 'Kollektor' and self.name != 'HP' and self.name != 'IceStorage'\
-                and self.name != 'Radiator' and self.name != 'WTap' and self.name != 'WTap_main'\
+        if self.name != 'TeePiece' and self.name != 'TVentil' and self.name != 'Pump' \
+                and self.name != 'Kollektor' and self.name != 'HP' and self.name != 'IceStorage' \
+                and self.name != 'Radiator' and self.name != 'WTap' and self.name != 'WTap_main' \
                 and self.name != 'Connector':
             self.changeSize()
 
@@ -120,15 +120,6 @@ class BlockItem(QGraphicsPixmapItem):
 
     def setId(self, newId):
         self.id = newId
-
-    def setGroupName(self, newGroupName):
-        existingGroup = None
-        for i in self.parent.groupList:
-            if i.displayName == newGroupName:
-                existingGroup.append(self)
-
-        if existingGroup == None:
-            print("No existing group found to add block to")
 
     def launchNotepadFile(self):
         print("Launching notpad")
@@ -320,8 +311,24 @@ class BlockItem(QGraphicsPixmapItem):
         print("TrnsysTypeNumber = " + str(self.typeNumber))
         print("Size = " + str(self.w) + " * " + str(self.h))
 
+        self.printIds()
+        self.printConnections()
+
+    def printIds(self):
+        print("ID:" + str(self.id))
+        print("TrnsysID: " + str(self.trnsysId))
+
+        for inp in self.inputs:
+            print("Has input with ID " + str(inp.id))
+
+        for out in self.outputs:
+            print("Has output with ID " + str(out.id))
+
+
+    def printConnections(self):
+        print("Connections are:")
         for c in self.getConnections():
-            print(c.displayName)
+            print(c.displayName + " with ID " + str(c.id))
 
     def inspectBlock(self):
         self.parent.parent().listV.clear()

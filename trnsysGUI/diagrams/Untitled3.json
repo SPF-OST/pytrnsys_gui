@@ -3,7 +3,7 @@
         ".__BlockDct__": true,
         "Block-1": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Pump",
+            "BlockDisplayName": "Pump1",
             "BlockName": "Pump",
             "BlockPosition": [
                 -796.0,
@@ -26,8 +26,8 @@
             "BlockDisplayName": "Radiator13",
             "BlockName": "Radiator",
             "BlockPosition": [
-                -420.0,
-                -345.0
+                -391.0,
+                -359.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -62,25 +62,25 @@
             "RotationN": 0,
             "trnsysID": 7
         },
-        "Block-4": {
+        "Block-19": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Kollektor4",
+            "BlockDisplayName": "Kollektor19",
             "BlockName": "Kollektor",
             "BlockPosition": [
-                -1063.0,
+                -1048.0,
                 -405.0
             ],
             "FlippedH": false,
             "FlippedV": false,
-            "ID": 4,
+            "ID": 19,
             "PortsIDIn": [
-                5
+                20
             ],
             "PortsIDOut": [
-                6
+                21
             ],
             "RotationN": 0,
-            "trnsysID": 2
+            "trnsysID": 9
         },
         "Block-8": {
             ".__BlockDict__": true,
@@ -102,25 +102,6 @@
             ],
             "RotationN": 0,
             "trnsysID": 4
-        },
-        "Connection-12": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 2,
-            "ConnDisplayName": "UntitledConn2",
-            "ConnID": 12,
-            "CornerPositions": [],
-            "PortFromID": 5,
-            "PortToID": 9,
-            "SegmentPositions": [
-                [
-                    -955.0,
-                    -395.0,
-                    -674.0,
-                    -395.225
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 5
         },
         "Connection-20": {
             ".__ConnectionDict__": true,
@@ -177,14 +158,14 @@
             "ConnDisplayName": "UntitledConn5",
             "ConnID": 22,
             "CornerPositions": [],
-            "PortFromID": 18,
-            "PortToID": 15,
+            "PortFromID": 10,
+            "PortToID": 14,
             "SegmentPositions": [
                 [
                     -608.0,
-                    -249.575,
-                    -428.0,
-                    -250.0
+                    -395.225,
+                    -399.0,
+                    -354.0
                 ]
             ],
             "isBlockConn": false,
@@ -195,65 +176,25 @@
             "ConnCID": 6,
             "ConnDisplayName": "UntitledConn6",
             "ConnID": 23,
-            "CornerPositions": [
-                [
-                    -505.0,
-                    -395.0
-                ],
-                [
-                    -505.0,
-                    -340.0
-                ]
-            ],
-            "PortFromID": 10,
-            "PortToID": 14,
+            "CornerPositions": [],
+            "PortFromID": 15,
+            "PortToID": 18,
             "SegmentPositions": [
                 [
+                    -399.0,
+                    -264.0,
                     -608.0,
-                    -395.225,
-                    -505.0,
-                    -395.0
-                ],
-                [
-                    -505.0,
-                    -395.0,
-                    -505.0,
-                    -340.0
-                ],
-                [
-                    -505.0,
-                    -340.0,
-                    -428.0,
-                    -340.0
+                    -249.575
                 ]
             ],
             "isBlockConn": false,
             "trnsysID": 11
         },
-        "Connection-7": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 1,
-            "ConnDisplayName": "UntitledConn1",
-            "ConnID": 7,
-            "CornerPositions": [],
-            "PortFromID": 2,
-            "PortToID": 6,
-            "SegmentPositions": [
-                [
-                    -800.0,
-                    -315.4,
-                    -955.0,
-                    -315.0
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 3
-        },
         "IDs": {
-            "GlobalId": 24,
+            "GlobalId": 0,
             "__idDct__": true,
-            "globalConnID": 7,
-            "trnsysID": 12
+            "globalConnID": 0,
+            "trnsysID": 0
         },
         "Strings": {
             "DiagramName": "Untitled3",

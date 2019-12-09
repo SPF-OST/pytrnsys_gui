@@ -27,7 +27,8 @@ class Connection(object):
         self.displayName = None
 
         self.parent = parent
-        self.groupName = 'Untitled'
+        self.groupName = ''
+        self.setDefaultGroup()
 
         # Export related
         self.typeNumber = 0
@@ -53,8 +54,8 @@ class Connection(object):
 
         if kwargs == {}:
             print("New connection being created")
-            self.fromPortId = None
-            self.toPortId = None
+            self.fromPortId = self.parent.idGen.getID()
+            self.toPortId = self.parent.idGen.getID()
             self.initNew(parent)
             # self.label.setPos(self.fromPort.pos())
             # self.label.setPlainText(self.displayName)
@@ -870,6 +871,9 @@ class Connection(object):
         print("getcorners gives " + str(res))
 
         return res
+
+    def setDefaultGroup(self):
+        self.setConnToGroup("defaultGroup")
 
     def setConnToGroup(self, newGroupName):
         print("In setConnToGroup")
