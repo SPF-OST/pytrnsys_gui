@@ -1418,7 +1418,6 @@ class DiagramEditor(QWidget):
         f += str(lineNr) + "\n"
 
         #exportConnsString: i/o i/o 0 0
-
         offset = 1
         # Dont forget to check if trnsysObj.index() is fully equivalent to global id
         for t in self.trnsysObj:
