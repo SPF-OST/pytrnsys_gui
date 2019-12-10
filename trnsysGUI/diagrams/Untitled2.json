@@ -82,6 +82,66 @@
             "RotationN": -1,
             "trnsysID": 15
         },
+        "Block-178": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Connector178",
+            "BlockName": "Connector",
+            "BlockPosition": [
+                0.0,
+                0.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "ID": 178,
+            "PortsIDIn": [
+                179
+            ],
+            "PortsIDOut": [
+                180
+            ],
+            "RotationN": 0,
+            "trnsysID": 88
+        },
+        "Block-187": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Connector187",
+            "BlockName": "Connector",
+            "BlockPosition": [
+                0.0,
+                0.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "ID": 187,
+            "PortsIDIn": [
+                188
+            ],
+            "PortsIDOut": [
+                189
+            ],
+            "RotationN": 0,
+            "trnsysID": 91
+        },
+        "Block-196": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Connector196",
+            "BlockName": "Connector",
+            "BlockPosition": [
+                0.0,
+                0.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "ID": 196,
+            "PortsIDIn": [
+                197
+            ],
+            "PortsIDOut": [
+                198
+            ],
+            "RotationN": 0,
+            "trnsysID": 94
+        },
         "Block-21": {
             ".__BlockDict__": true,
             "BlockDisplayName": "TeeHpEvap",
@@ -354,7 +414,7 @@
         },
         "Block-67": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "IceStorage",
+            "BlockDisplayName": "IceStore",
             "BlockName": "IceStorage",
             "BlockPosition": [
                 -1163.0,
@@ -415,7 +475,7 @@
         },
         "Block-73": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Connector",
+            "BlockDisplayName": "ConShDhw",
             "BlockName": "Connector",
             "BlockPosition": [
                 -107.0,
@@ -474,7 +534,7 @@
         },
         "Block-82": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "WTap_main",
+            "BlockDisplayName": "DHWMains",
             "BlockName": "WTap_main",
             "BlockPosition": [
                 447.0,
@@ -1610,10 +1670,10 @@
             "trnsysID": 41
         },
         "IDs": {
-            "GlobalId": 192,
+            "GlobalId": 0,
             "__idDct__": true,
-            "globalConnID": 61,
-            "trnsysID": 99
+            "globalConnID": 0,
+            "trnsysID": 0
         },
         "Strings": {
             "DiagramName": "Untitled2",

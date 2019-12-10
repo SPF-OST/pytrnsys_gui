@@ -1,2 +1,3 @@
-trnsysGUI/clipboard.json
-trnsysGUI/export.dck
+trnsysGUI*.pyc
+*.xml
+trnsysGUI/_pycache_/
