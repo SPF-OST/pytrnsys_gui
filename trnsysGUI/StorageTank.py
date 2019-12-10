@@ -228,8 +228,8 @@ class StorageTank(BlockItem):
 
         # sideVar = "Right"
 
-        print("self.parent is " + str(self.parent))
-        print("self.parent.parent is " + str(self.parent.parent))
+        # print("self.parent is " + str(self.parent))
+        # print("self.parent.parent is " + str(self.parent.parent))
 
         tempArrConn = []
         side_test = side
@@ -279,10 +279,10 @@ class StorageTank(BlockItem):
                     if j.isdigit():
                         resId += str(j)
 
-                print("Res is " + resId)
-                print("c1 name before is " + c1.displayName)
+                # print("Res is " + resId)
+                # print("c1 name before is " + c1.displayName)
                 c1.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
-                print("c1 name is " + c1.displayName)
+                # print("c1 name is " + c1.displayName)
 
                 resId = ""
 
@@ -384,3 +384,13 @@ class StorageTank(BlockItem):
         print("storage leftside " + str(self.leftSide))
         print("storage rightside " + str(self.rightSide))
         self.parent.parent().dumpInformation()
+
+    def deleteBlock(self):
+        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.deleteConns()
+        print("self.parent.parent" + str(self.parent.parent()))
+        self.parent.parent().trnsysObj.remove(self)
+        print("deleting block " + str(self) + self.displayName)
+        print("self.scene is" + str(self.parent.scene()))
+        self.parent.scene().removeItem(self)
+        del self

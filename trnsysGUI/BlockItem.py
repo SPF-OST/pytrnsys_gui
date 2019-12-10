@@ -35,7 +35,7 @@ class BlockItem(QGraphicsPixmapItem):
         else:
             self.displayName = name
 
-        print("Setting the displayName of " + str(self) + "to " + self.displayName)
+        # print("Setting the displayName of " + str(self) + "to " + self.displayName)
 
         self.groupName = ''
         self.setDefaultGroup()
@@ -102,19 +102,19 @@ class BlockItem(QGraphicsPixmapItem):
         self.setBlockToGroup("defaultGroup")
 
     def setBlockToGroup(self, newGroupName):
-        print("In setBlockToGroup")
+        # print("In setBlockToGroup")
         if newGroupName == self.groupName:
             print("Block " + str(self) + str(self.displayName) + "is already in this group")
             return
         else:
-            print("groups is " + str(self.parent.parent().groupList))
+            # print("groups is " + str(self.parent.parent().groupList))
             for g in self.parent.parent().groupList:
                 print("At group " + str(g.displayName))
                 if g.displayName == self.groupName:
-                    print("Found the old group")
+                    # print("Found the old group")
                     g.itemList.remove(self)
                 if g.displayName == newGroupName:
-                    print("Found the new group")
+                    # print("Found the new group")
                     g.itemList.append(self)
                     self.groupName = newGroupName
 
@@ -291,7 +291,6 @@ class BlockItem(QGraphicsPixmapItem):
         print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
         print("self.parent.parent" + str(self.parent.parent()))
-        # print("Self parent parent trnsysObj is " + str(self.parent.parent().trnsysObj))
         self.parent.parent().trnsysObj.remove(self)
         print("deleting block " + str(self) + self.displayName)
         print("self.scene is" + str(self.parent.scene()))

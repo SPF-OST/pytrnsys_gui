@@ -53,7 +53,7 @@ class Connection(object):
         self.cornersLoad = None
 
         if kwargs == {}:
-            print("New connection being created")
+            # print("New connection being created")
             self.fromPortId = self.parent.idGen.getID()
             self.toPortId = self.parent.idGen.getID()
             self.initNew(parent)
@@ -78,7 +78,7 @@ class Connection(object):
     def initNew(self, parent):
 
         self.parent = parent
-        print("Parent is " + str(self.parent))
+        # print("Parent is " + str(self.parent))
 
         # Global
         self.parent.trnsysObj.append(self)

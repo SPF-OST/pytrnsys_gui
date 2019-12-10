@@ -1243,16 +1243,19 @@ class DiagramEditor(QWidget):
                     else:
                         print("heatExchanger has not valid sSide")
 
-                print("t.leftside is " + str(t.leftSide))
-                print("t.leftside is " + str(t.rightSide))
+                # print("t.leftside has len " + str(len(t.leftSide)))
+                # print("t.leftside is " + str(t.rightSide))
                 t.connectInside(self.findStorageCorrespPorts(t.leftSide), t.insideConnLeft, "L")
                 t.connectInside(self.findStorageCorrespPorts(t.rightSide), t.insideConnRight, "R")
 
     def findStorageCorrespPorts(self, portList):
+        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
+
         res = []
-        print("Finding c ports")
+        # print("Finding c ports")
         for p in portList:
             if len(p.connectionList) > 0:           # check if not >1 needed
+                # connectionList[0] is the hidden connection created when the portPair is
                 if p.connectionList[1].fromPort is p:
                     res.append(p.connectionList[1].toPort)
                 elif p.connectionList[1].toPort is p:
@@ -1260,15 +1263,14 @@ class DiagramEditor(QWidget):
                 else:
                     print("Port is not fromPort nor toPort")
 
-        # print("res is " + str(res))
-        [print(p.parent.displayName) for p in res]
+        # [print(p.parent.displayName) for p in res]
         return res
 
     def findStorageCorrespPortsHx(self, portList):
         res = []
 
         for p in portList:
-            print("Port has")
+            # print("Port has")
             # [print(c.displayName) for c in p.connectionList]
 
             if len(p.connectionList) > 1:
@@ -1285,7 +1287,7 @@ class DiagramEditor(QWidget):
                     res.append(p.connectionList[0].fromPort)
                 else:
                     print("Port is not fromPort nor toPort")
-        print("res is " + str(res))
+        # print("res is " + str(res))
         return res
 
     def tearDownStorageInnerConns(self):
@@ -1298,40 +1300,35 @@ class DiagramEditor(QWidget):
                 [print(e.displayName) for e in t.insideConnRight]
 
                 # Remove old insideConnection:
-                if len(t.insideConnLeft) > 0:
+                # if len(t.insideConnLeft) > 0:
                     # print("t.insideConnection has " + str(len(t.insideConnLeft)) + "TPieces/connection")
+                for tp in t.insideConnLeft:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.insideConnLeft = []
 
-                    for tp in t.insideConnLeft:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.insideConnLeft.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                for tp in t.insideConnRight:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.insideConnRight = []
 
-                if len(t.insideConnRight) > 0:
-                    for tp in t.insideConnRight:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.insideConnRight.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                for tp in t.hxInsideConnsLeft:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.hxInsideConnsLeft = []
 
-                if len(t.hxInsideConnsLeft):
-                    for tp in t.insideConnLeft:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.hxInsideConnsLeft.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
-
-                if len(t.hxInsideConnsRight):
-                    for tp in t.insideConnRight:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.hxInsideConnsRight.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
-                    # t.insideConnRight.clear()
+                for tp in t.hxInsideConnsRight:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.hxInsideConnsRight = []
 
         # self.setTrnsysIdBack()
 
