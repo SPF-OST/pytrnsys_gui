@@ -3,8 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/TrnsysGUI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TrnsysGUI.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/export.dck" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/export.dck" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/export.dck" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,7 +31,8 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI/diagrams" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI" />
+    <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -55,7 +58,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.BlockItem">
+  <component name="RunManager" selected="Python.core">
     <configuration name="BlockItem" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="TrnsysGUI" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -147,9 +150,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\s2marti\AppData\Local\Continuum\anaconda3\envs\spf_GUI\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/trnsysGUI" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/core.py" />
@@ -163,8 +166,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.BlockItem" />
         <item itemvalue="Python.core" />
+        <item itemvalue="Python.BlockItem" />
         <item itemvalue="Python.StorageTank" />
         <item itemvalue="Python.ConfigStorage" />
         <item itemvalue="Python.Connection" />
