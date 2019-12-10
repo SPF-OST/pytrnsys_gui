@@ -3,10 +3,10 @@ CONSTANTS 2
 dtSim = 1.
 dtSimFile = 1.
 CONSTANTS 3
- FrInte_Tol = 0.003
+FrInte_Tol = 0.003
 FrConv_Tol = 0.001
- PI = 3.1415927
- EQUATIONS 3
+PI = 3.1415927
+EQUATIONS 3
 START = 0            !744  !4350   ! 744
 STOP  = 5 !END
 Nix = 0.0
@@ -26,44 +26,3 @@ EQUATIONS 3
  rhoWat=1000
  cpWat=4200
  tRoomStore=20
- *** Black box component temperatures
-EQUATIONS 14
-TColl=1
-TEvapHp=1
-THp=1
-TRadiatorSH=1
-TIceHX_1=1
-TStutzen1T0=1
-TStutzen2T0=1
-TStutzen3T0=1
-TStutzen4T0=1
-TStutzen5T0=1
-TStutzen7T0=1
-TStutzen10T0=1
-TCoilHX_1=1
-TCoilHX_4=1
-*** Pump outlet temperatures
-EQUATIONS 7
-TPuCol = TPiColPuIn
-TPuHpEvap = TPiHpEvapOut
-TPuHpCond = TPiHPInPu
-TPuSH = TPiSHOutMix
-TDHW = TPiDHWDemand
-TCW = 10 ! Change temperature from the mains
-TPuCirc = TPiInPuCirc
-
-EQUATIONS 14	!Definition of mass flows and fractions
-MfrPuCol= 1000
-xFracMixHxTes=1
-xFracDivHpEvap=1
-MfrPuHpEvap= 1000
-xFracDivHp=1
-MfrPuHpCond= 1000
-xFracDivHpRt=1
-xFracMixCirc=1
-MfrPuSH= 1000
-xFracDivSH=1
-MfrDHW= 0 ! Not used
-MfrCW= 1000
-MfrPuCirc= 1000
-xFracMixDhw=1

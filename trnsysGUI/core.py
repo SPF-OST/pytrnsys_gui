@@ -1339,9 +1339,77 @@ class DiagramEditor(QWidget):
     #
     #     self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
 
+    def exportBlackBox(self):
+        f = " *** Black box component temperatures" + "\n"
+        equationNr = 0
+
+        for t in self.trnsysObj:
+            if isinstance(t, Connection):
+                continue
+
+            if not t.isVisible():
+                # Virtual element
+                continue
+
+            if isinstance(t, HeatPump):
+                f += "T" + t.displayName + "HeatPump" + "=1 \n"
+                f += "T" + t.displayName + "Evap" + "=1 \n"
+                equationNr += 2
+                continue
+
+            if isinstance(t, StorageTank):
+                for p in t.inputs + t.outputs:
+                    if p.side == 0:
+                        lr = "Left"
+                    else:
+                        lr = "Right"
+                    f += "T" + t.displayName + "Port" + lr + str(int(100*(1-(p.scenePos().y() - p.parent.scenePos().y())/p.parent.h))) + "=1\n"
+                    equationNr += 1
+                    continue
+
+            if len(t.inputs + t.outputs) == 2 and not isinstance(t, Connector):
+                f += "T" + t.displayName + "=1 \n"
+
+                equationNr += 1
+
+        f = "EQUATIONS " + str(equationNr) + "\n" + f
+
+        return f
+
+    def exportPumpOutlets(self):
+        f = "*** Pump outlet temperatures" + "\n"
+        equationNr = 0
+        for t in self.trnsysObj:
+            if isinstance(t, Pump):
+                f += "T" + t.displayName + " = " + "T" + t.outputs[0].connectionList[0].displayName + "\n"
+                equationNr += 1
+            elif isinstance(t, WTap) or isinstance(t, WTap_main):
+                io = t.inputs + t.outputs
+                f += "T" + t.displayName + " = " + "T" + io[0].connectionList[0].displayName + "\n"
+                equationNr += 1
+
+        f = "EQUATIONS " + str(equationNr) + "\n" + f
+        return f
+
+    def exportMassFlows(self):
+        f = "*** Massflowrates" + "\n"
+        equationNr = 0
+
+        for t in self.trnsysObj:
+            if isinstance(t, Pump):
+                f += "Mfr" + t.displayName + " = 1000" + "\n"
+                equationNr += 1
+            elif isinstance(t, TVentil):
+                f += "xFrac" + t.displayName + " = 1" + "\n"
+                equationNr += 1
+
+        f = "EQUATIONS " + str(equationNr) + "\n\n" + f
+
+        return f
+
     def exportPrintConnections(self, simulationUnit, simulationType, descConnLength, parameters, lineNr):
         # If not all ports of an object are connected, less than 5 numbers will show up
-        f = ''
+        f = ""
         print("UNIT " + str(simulationUnit) + " TYPE " + str(simulationType))
         f += "UNIT " + str(simulationUnit) + " TYPE " + str(simulationType) + "\n"
         print("PARAMETERS " + str(parameters))
@@ -1641,6 +1709,7 @@ class DiagramEditor(QWidget):
             #     continue
             # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
             #     continue
+
             if type(t) is HeatPump:
                 # print("----->" + str(t.exportConnsString))
 
@@ -1957,6 +2026,16 @@ class DiagramEditor(QWidget):
         lineNrParameters = parameters
         parameters = parameters * 4 + 1
 
+        print("NEW export -----------------------------")
+        print(self.exportBlackBox())
+        print(self.exportPumpOutlets())
+        print(self.exportMassFlows())
+        print("New export -----------------------------")
+
+        fullExportText += self.exportBlackBox()
+        fullExportText += self.exportPumpOutlets()
+        fullExportText += self.exportMassFlows()
+
         fullExportText += self.exportPrintConnections(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
         fullExportText += self.exportPrintInputs(lineNrParameters)
         fullExportText += self.exportPrintEquations(simulationUnit)
@@ -1965,6 +2044,7 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportPrintLoops()
         fullExportText += self.exportPrintPipeLoops()
         fullExportText += self.exportPrintPipeLosses()
+
 
         print("------------------------> END OF EXPORT <------------------------")
 
