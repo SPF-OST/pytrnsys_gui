@@ -242,10 +242,13 @@ class StorageTank(BlockItem):
             print("Only 2 ports in side list")
             print("ports have " + str(side[0].parent) + str(side[1].parent))
 
-            connector = Connector("Connector", "ConnectorINSPECIAL", self.parent)
+            connector = Connector("Connector", "Connector", self.parent)
+            connector.setVisible(False)
+            self.parent.scene().addItem(connector)
+            tpList.append(connector)
+
             c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
             c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
-            tpList.append(connector)
             c1.displayName = side[0].connectionList[0].displayName
             c1.isStorageIO = True
             c2.displayName = side[1].connectionList[0].displayName
@@ -264,7 +267,10 @@ class StorageTank(BlockItem):
 
             for i in range(0, x, 2):
                 tpiece = TeePiece("TeePiece", "TeePiece", self.parent)
-                # print("Connecting inside")
+                tpiece.setVisible(False)
+                self.parent.scene().addItem(tpiece)
+                tpList.append(tpiece)
+
                 c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent())
                 c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent())
 
@@ -286,8 +292,6 @@ class StorageTank(BlockItem):
 
                 c2.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
 
-                tpList.append(tpiece)
-                tpiece.setVisible(False)
 
                 tempArrConn.append(c1)
                 tempArrConn.append(c2)

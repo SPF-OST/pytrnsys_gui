@@ -14,8 +14,8 @@ class Pump(BlockItem):
         self.h = 82 * factor
         self.typeNumber = 1
 
-        self.inputs.append(PortItem('o', 2, self))
-        self.outputs.append(PortItem('i', 0, self))
+        self.inputs.append(PortItem('i', 0, self))
+        self.outputs.append(PortItem('o', 2, self))
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))

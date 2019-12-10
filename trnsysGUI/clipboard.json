@@ -1,0 +1,86 @@
+{
+    "Blocks": {
+        ".__BlockDct__": true,
+        "Block-8": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeePiece8",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -972.0,
+                -472.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "ID": 8,
+            "PortsIDIn": [
+                9,
+                10
+            ],
+            "PortsIDOut": [
+                11
+            ],
+            "RotationN": 0,
+            "trnsysID": 3
+        },
+        "BlockStorage-1": {
+            ".__StorageDict__": true,
+            "FlippedH": false,
+            "FlippedV": false,
+            "HxList": [
+                {
+                    "DisplayName": "sdf2",
+                    "Height": 80.0,
+                    "ID": 2,
+                    "Offset": [
+                        0.0,
+                        10.0
+                    ],
+                    "ParentID": 1,
+                    "Port1ID": 3,
+                    "Port2ID": 4,
+                    "SideNr": 0,
+                    "Width": 40,
+                    "connTrnsysID": 2
+                }
+            ],
+            "ID": 1,
+            "PortPairList": [],
+            "StorageDisplayName": "StorageTank1",
+            "StorageName": "StorageTank",
+            "StoragePosition": [
+                -788.0,
+                -450.0
+            ],
+            "trnsysID": 1
+        },
+        "Connection-12": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 2,
+            "ConnDisplayName": "UntitledConn2",
+            "ConnID": 12,
+            "CornerPositions": [],
+            "PortFromID": 10,
+            "PortToID": 3,
+            "SegmentPositions": [
+                [
+                    -914.0,
+                    -438.575,
+                    -796.0,
+                    -440.0
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 4
+        },
+        "IDs": {
+            "GlobalId": 0,
+            "__idDct__": true,
+            "globalConnID": 0,
+            "trnsysID": 0
+        },
+        "Strings": {
+            "DiagramName": "COPYGROUP",
+            "__nameDct__": true
+        }
+    }
+}
