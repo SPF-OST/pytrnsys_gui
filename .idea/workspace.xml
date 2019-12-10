@@ -4,12 +4,9 @@
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/Connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/Pump.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Pump.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/clipboard.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/clipboard.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled2.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled2.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/groupDlg.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/groupDlg.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,17 +31,18 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../spf_gui" />
     <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\images" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\res" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\diagrams" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\diagrams" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\images" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI" />
     </key>
@@ -170,9 +168,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.core" />
+        <item itemvalue="Python.BlockItem" />
         <item itemvalue="Python.StorageTank" />
         <item itemvalue="Python.Pump" />
-        <item itemvalue="Python.BlockItem" />
         <item itemvalue="Python.ConfigStorage" />
       </list>
     </recent_temporary>

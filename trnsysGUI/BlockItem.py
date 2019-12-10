@@ -2,7 +2,7 @@ import os
 from math import sqrt
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QPointF
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
@@ -340,3 +340,11 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.parent().listV.addItem("Inputs: " + str(self.inputs))
         self.parent.parent().listV.addItem("Outputs: " + str(self.outputs))
 
+    # def itemChange(self, change, value):
+    #     # print(change, value)
+    #     if change == self.ItemPositionHasChanged:
+    #         print("itemcahgne")
+    #         value = QPointF(value.x() - value.x() % 150, value.y() - value.y() % 150)
+    #         return change, value
+    #     else:
+    #         return super(BlockItem, self).itemChange(change, value)

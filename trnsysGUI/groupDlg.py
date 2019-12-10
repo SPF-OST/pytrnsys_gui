@@ -35,6 +35,7 @@ class groupDlg(QDialog):
             self.group.setItemsGroup(self.itemList)
 
             self.parent.selectionMode = False
+            self.parent.groupMode = False
             self.close()
 
     def cancel(self):

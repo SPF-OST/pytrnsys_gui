@@ -751,28 +751,58 @@ class DiagramScene(QGraphicsScene):
         # global selectionMode
         # global copyMode
         # global pasting
+        if self.parent().pasting:
+            # Dismantle group
+            self.parent().clearCopyGroup()
+
+        if self.parent().itemsSelected:
+            # Dismantle selection
+            self.parent().clearSelectionGroup()
 
         if self.parent().selectionMode:
-            self.released = True
+            # self.released = True
             print("There are elements inside the selection " + str(self.hasElementsInRect()))
             if self.hasElementsInRect():
-                if not self.parent().copyMode:
+                if self.parent().groupMode:
                     g = self.createGroup()
                     groupDlg(g, self.parent(), self.elementsInRect())
-                else:
+                elif self.parent().multipleSelectMode:
+                    self.parent().createSelectionGroup(self.elementsInRect())
+                elif self.parent().copyMode:
                     self.parent().copyElements()
+                else:
+                    print("No recognized mode")
             else:
                 self.parent().copyMode = False
-                # pasting = True
                 self.parent().selectionMode = False
 
             self.released = False
             self.pressed = False
             self.selectionRect.setVisible(False)
 
-        if self.parent().pasting:
-            # Dismantle group
-            self.parent().clearCopyGroup()
+
+    # def drawBackground(self, painter, rect):
+    #     if self.parent().snapGrid:
+    #         pen = QPen()
+    #         pen.setWidth(2)
+    #         pen.setCosmetic(True)
+    #         painter.setPen(pen)
+    #
+    #         gridSize = 20
+    #
+    #
+    #         left = int(rect.left()) - (int(rect.left()) % gridSize)
+    #         top = int(rect.top()) - (int(rect.top()) % gridSize)
+    #         points = []
+    #         for x in range(left, int(rect.height()), gridSize):
+    #             for y in range(top, int(rect.bottom()), gridSize):
+    #                 points.append(QPointF(x, y))
+    #
+    #         for x in points:
+    #             painter.drawPoint(x)
+    #     else:
+    #         pass
+    #         # super(DiagramScene, self).drawBackground(painter, rect)
 
     # def mouseMoveEvent(self, e):
     #     self.setMouseTracking(True)
@@ -808,6 +838,9 @@ class DiagramScene(QGraphicsScene):
                 self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(), event.scenePos().x() - self.sRstart.x(),
                                            event.scenePos().y() - self.sRstart.y())
                 self.selectionRect.setVisible(True)
+
+        # if len(self.items(event.scenePos())) == 0:
+            # print("No items here!")
 
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
@@ -912,8 +945,12 @@ class EditorGraphicsView(QGraphicsView):
                 bl = Connector(name, name, self)
             else:
                 bl = BlockItem(name, name, self)
-            p1 = self.mapToScene(event.pos())
 
+            if self.parent().snapGrid:
+                qp = QPoint(event.pos().x() - event.pos().x() % 150, event.pos().y() - event.pos().y() % 150)
+                p1 = self.mapToScene(qp)
+            else:
+                p1 = self.mapToScene(event.pos())
             # cellS = 50
             # pos1x = int(p1.x()/cellS) * cellS
             # pos1y = int(p1.y()/cellS) * cellS
@@ -988,11 +1025,16 @@ class DiagramEditor(QWidget):
         self.saveAsPath = Path()
         self.idGen = IdGenerator()
 
-        self.pasting = False
-        self.copyMode = False
         self.selectionMode = False
+        self.groupMode = False
+        self.copyMode = False
+        self.multipleSelectedMode = False
+
+        self.pasting = False
+        self.itemsSelected = False
 
         self.editorMode = 0
+        self.snapGrid = False
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -1067,6 +1109,7 @@ class DiagramEditor(QWidget):
         self.defaultGroup.setName("defaultGroup")
 
         self.copyGroupList = QGraphicsItemGroup()
+        self.selectionGroupList = QGraphicsItemGroup()
 
         a = 400  # Start of upmost button y-value
         b = 50  # distance between starts of button y-values
@@ -2638,6 +2681,25 @@ class DiagramEditor(QWidget):
 
         self.pasting = False
 
+    def createSelectionGroup(self, selectionList):
+        for t in selectionList:
+            if isinstance(t, BlockItem):
+                self.selectionGroupList.addToGroup(t)
+
+        self.multipleSelectedMode = False
+        self.selectionMode = False
+
+        self.diagramScene.addItem(self.selectionGroupList)
+        self.selectionGroupList.setFlags(self.selectionGroupList.ItemIsMovable)
+
+        self.itemsSelected = True
+
+    def clearSelectionGroup(self):
+        for it in self.selectionGroupList.childItems():
+            self.selectionGroupList.removeFromGroup(it)
+
+        self.itemsSelected = False
+
     def newDiagram(self):
         self.centralWidget.delBlocks()
 
@@ -2650,7 +2712,6 @@ class DiagramEditor(QWidget):
         # self.globalConnID = 0
 
         self.idGen.reset()
-
         newDiagramDlg(self)
 
     # Behavior:
@@ -2777,6 +2838,9 @@ class MainWindow(QMainWindow):
         editGroupsAction = QAction(QIcon('images/modal-list.png'), "Edit groups/loops", self)
         editGroupsAction.triggered.connect(self.editGroups)
 
+        selectMultipleAction = QAction(QIcon('images/elastic.png'), "Select multiple items", self)
+        selectMultipleAction.triggered.connect(self.createSelection)
+
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
@@ -2827,6 +2891,7 @@ class MainWindow(QMainWindow):
         selectTb.addAction(pasteAction)
         selectTb.addAction(toggleConnLabels)
         selectTb.addAction(editGroupsAction)
+        selectTb.addAction(selectMultipleAction)
         selectTb.addAction(trnsysList)
 
         self.sb = self.statusBar()
@@ -2876,6 +2941,9 @@ class MainWindow(QMainWindow):
         # print("Tb createGroup pressed")
         # global selectionMode
         self.centralWidget.selectionMode = True
+        self.centralWidget.groupMode = True
+        self.centralWidget.copyMode = False
+        self.centralWidget.multipleSelectMode = False
 
     def tidyUp(self):
         print("Tidying up...")
@@ -2900,6 +2968,8 @@ class MainWindow(QMainWindow):
 
         self.centralWidget.selectionMode = True
         self.centralWidget.copyMode = True
+        self.centralWidget.groupMode = False
+        self.centralWidget.multipleSelectMode = False
 
     def pasteSelection(self):
         print("Pasting selection")
@@ -2933,6 +3003,12 @@ class MainWindow(QMainWindow):
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
         self.centralWidget.setConnLabelVis(self.labelVisState)
+
+    def createSelection(self):
+        self.centralWidget.selectionMode = True
+        self.centralWidget.copyMode = False
+        self.centralWidget.groupMode = False
+        self.centralWidget.multipleSelectMode = True
 
     def mouseMoveEvent(self, e):
         pass
