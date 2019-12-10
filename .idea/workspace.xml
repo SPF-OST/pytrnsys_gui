@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,15 +31,15 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI/diagrams" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\res" />
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\diagrams" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\images" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\res" />
-      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -189,7 +188,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

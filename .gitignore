@@ -1,3 +1,4 @@
-trnsysGUI*.pyc
-*.xml
 trnsysGUI/_pycache_/
+*.xml
+.idea
+trnsysGUI/export.dck
