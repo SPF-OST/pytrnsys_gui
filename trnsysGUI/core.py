@@ -1655,8 +1655,8 @@ class DiagramEditor(QWidget):
                 for i in range(0, 3):
 
                     if i < 2:
-                        temp = prefix + t.displayName + "-Evap" + "_" + abc[i] + "=[" +\
-                               str(equationNumber) + "]\n"
+                        temp = prefix + t.displayName + "_Evap" + "_" + abc[i] + "=[" + \
+                               str(simulationUnit) + "," + str(equationNumber) + "]\n"
                         tot += temp
                         t.exportEquations.append(temp)
                         equationNumber += 1
@@ -1709,7 +1709,7 @@ class DiagramEditor(QWidget):
 
             # T-Pieces and Mixers
             if t.typeNumber == 2 or t.typeNumber == 3:
-                unitText += "UNIT" + str(unitNumber) + " TYPE " + str(typeNr1) + "\n"
+                unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr1) + "\n"
                 unitText += "!" + t.displayName + "\n"
                 unitText += "PARAMETERS 0\n"
                 # unitText += "INPUTS " + str(2 * len(t.getConnections()))

@@ -1,2 +1,3 @@
 *.pyc
 *.xml
+trnsysGUI/_pycache_/
