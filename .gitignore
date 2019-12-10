@@ -1,3 +1,4 @@
 *.pyc
 *.xml
 trnsysGUI/_pycache_/
+.idea/workspace.xml
