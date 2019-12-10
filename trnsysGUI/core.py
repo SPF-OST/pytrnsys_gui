@@ -1250,7 +1250,7 @@ class DiagramEditor(QWidget):
 
     def findStorageCorrespPorts(self, portList):
         res = []
-
+        print("Finding c ports")
         for p in portList:
             if len(p.connectionList) > 0:           # check if not >1 needed
                 if p.connectionList[1].fromPort is p:
@@ -1260,7 +1260,8 @@ class DiagramEditor(QWidget):
                 else:
                     print("Port is not fromPort nor toPort")
 
-        print("res is " + str(res))
+        # print("res is " + str(res))
+        [print(p.parent.displayName) for p in res]
         return res
 
     def findStorageCorrespPortsHx(self, portList):
