@@ -3,3 +3,4 @@ class copyGroup():
         self.diagramName = "COPYGROUP"
         # self.diagramEditor = editor
         self.trnsysObj = []
+        self.groupList = []

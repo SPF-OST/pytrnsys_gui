@@ -189,6 +189,8 @@ class segmentItem(QGraphicsLineItem):
             self.keyPr = 1
             print("Setting key to 1")
 
+            self.parent.highlightConn()
+
     def mouseMoveEvent(self, e):
         # print("mouse moved")
         # print(str(e.button()))
@@ -568,6 +570,8 @@ class segmentItem(QGraphicsLineItem):
         a6 = menu.addAction('Print group')
         a6.triggered.connect(self.printGroup)
 
+        a7 = menu.addAction('Inspect')
+        a7.triggered.connect(self.inspect)
         menu.exec_(event.screenPos())
 
     def configGroup(self):
@@ -577,3 +581,7 @@ class segmentItem(QGraphicsLineItem):
 
     def printGroup(self):
         print(self.parent.groupName)
+
+    def inspect(self):
+        self.parent.highlightConn()
+        self.parent.inspectConn()

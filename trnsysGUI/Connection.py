@@ -1,6 +1,7 @@
 from math import atan, sqrt, acos
 
 from PyQt5.QtCore import QLineF, QPointF
+from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsTextItem
 
 from trnsysGUI.Collector import Collector
@@ -892,3 +893,29 @@ class Connection(object):
                     g.itemList.append(self)
 
             self.groupName = newGroupName
+
+    def highlightConn(self):
+
+        self.unhighlightOtherConns()
+
+        for s in self.segments:
+            pen1 = QPen(QColor(125, 242, 189), 4)
+            s.setPen(pen1)
+
+    def unhighlightOtherConns(self):
+        for c in self.parent.connectionList:
+            c.unhighlightConn()
+
+    def unhighlightConn(self):
+        for s in self.segments:
+            s.updateGrad()
+
+    def inspectConn(self):
+        self.parent.listV.clear()
+        self.parent.listV.addItem("Display name: " + self.displayName)
+        self.parent.listV.addItem("Group name: " + self.groupName)
+        self.parent.listV.addItem("Parent: " + str(self.parent))
+        # self.parent.listV.addItem("Position: " + str(self.pos()))
+        # self.parent.listV.addItem("Sceneposition: " + str(self.scenePos()))
+        self.parent.listV.addItem("fromPort: " + str(self.fromPort))
+        self.parent.listV.addItem("toPort: " + str(self.toPort))

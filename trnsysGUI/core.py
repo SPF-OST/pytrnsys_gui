@@ -354,7 +354,8 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'Connector':
                             bl = Connector(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                         else:
-                            bl = BlockItem(i["BlockName"], i["BlockName"], self.editor.diagramView)
+                            bl = BlockItem(i["BlockName"], i["BlockName"
+                                                             ""], self.editor.diagramView)
                         # print("Bl name is" + bl.name)
 
                         bl.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
@@ -363,6 +364,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.updateFlipStateH(i["FlippedH"])
                         bl.updateFlipStateV(i["FlippedV"])
                         bl.rotateBlockToN(i["RotationN"])
+                        bl.displayName = i["BlockDisplayName"]
 
                         bl.groupName = "defaultGroup"
                         bl.setBlockToGroup(i["GroupName"])
@@ -382,6 +384,8 @@ class DiagramDecoder(json.JSONDecoder):
                         bl = StorageTank(i["StorageName"], i["StorageDisplayName"], self.editor.diagramView)
                         bl.flippedH = i["FlippedH"]
                         # bl.flippedV = i["FlippedV"] # No support for vertical flip
+                        bl.displayName = i["StorageName"]
+
                         bl.changeSize()
 
                         bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
@@ -429,7 +433,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.flippedH = i["FlippedH"]
                         bl.flippedV = i["FlippedV"]
                         bl.childIds = i["childIds"]
-
+                        bl.displayName = i["HeatPumpName"]
                         bl.changeSize()
 
                         for x in range(len(bl.inputs)):
@@ -746,6 +750,8 @@ class DiagramScene(QGraphicsScene):
         self.viewRect2.setPen(p1)
 
         self.selectionRect.setVisible(False)
+        self.viewRect1.setVisible(False)
+        self.viewRect2.setVisible(False)
 
         self.addItem(self.selectionRect)
         self.addItem(self.viewRect1)
@@ -850,16 +856,19 @@ class DiagramScene(QGraphicsScene):
     #     self.window().mouseMoveEvent(e)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_A:
-            print("Toggling mode")
-            # global editorMode
-            self.parent().editorMode = (self.parent().editorMode + 1) % 2
-            self.parent().parent().sb.showMessage("Mode is " + str(self.parent().editorMode))
+        pass
+        # if event.key() == Qt.Key_A:
+        #     print("Toggling mode")
+        #     # global editorMode
+        #     self.parent().editorMode = (self.parent().editorMode + 1) % 2
+        #     self.parent().parent().sb.showMessage("Mode is " + str(self.parent().editorMode))
+        #
+        # if event.key() == Qt.Key_S:
+        #     print("Toggling selectionMode")
+        #     # global selectionMode
+        #     self.parent().selectionMode = not self.parent().selectionMode
 
-        if event.key() == Qt.Key_S:
-            print("Toggling selectionMode")
-            # global selectionMode
-            self.parent().selectionMode = not self.parent().selectionMode
+
 
         # global copyMode
         #
@@ -879,8 +888,10 @@ class DiagramScene(QGraphicsScene):
                                            event.scenePos().y() - self.sRstart.y())
                 self.selectionRect.setVisible(True)
 
-        # if len(self.items(event.scenePos())) == 0:
-            # print("No items here!")
+        if len(self.items(event.scenePos())) == 0:
+            print("No items here!")
+            for c in self.parent().connectionList:
+                c.unhighlightConn()
 
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
@@ -1319,11 +1330,11 @@ class DiagramEditor(QWidget):
 
                 for hx in t.heatExchangers:
                     if hx.sSide == 0:
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsLeft)
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsLeft, "L")
                     elif hx.sSide == 2:
                         print("storage of hx R is " + str(t.displayName))
                         print("hx ports are" + str(hx.port1) + str(hx.port2))
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsRight)
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsRight, "R")
                     else:
                         print("heatExchanger has not valid sSide")
 
@@ -2869,9 +2880,11 @@ class MainWindow(QMainWindow):
 
         copyAction = QAction(QIcon('images/clipboard.png'), "Copy to clipboard", self)
         copyAction.triggered.connect(self.copySelection)
+        copyAction.setShortcut("c")
 
         pasteAction = QAction(QIcon('images/puzzle-piece.png'), "Paste from clipboard", self)
         pasteAction.triggered.connect(self.pasteSelection)
+        pasteAction.setShortcut("v")
 
         toggleConnLabels = QAction(QIcon('images/labelToggle.png'), "Toggle pipe labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
@@ -2881,6 +2894,15 @@ class MainWindow(QMainWindow):
 
         selectMultipleAction = QAction(QIcon('images/elastic.png'), "Select multiple items", self)
         selectMultipleAction.triggered.connect(self.createSelection)
+        selectMultipleAction.setShortcut("s")
+
+        multipleDeleteAction = QAction("Delete selection", self)
+        multipleDeleteAction.triggered.connect(self.deleteMultiple)
+        multipleDeleteAction.setShortcut("Ctrl+d")
+
+        toggleEditorModeAction = QAction("Toggle editor mode", self)
+        toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
+        toggleEditorModeAction.setShortcut("m")
 
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
@@ -2893,11 +2915,14 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(fileMenuNewAction)
 
         fileMenuOpenAction = QAction("Open", self)
+
         fileMenuOpenAction.triggered.connect(self.openFile)
+        fileMenuOpenAction.setShortcut("Ctrl+o")
         self.fileMenu.addAction(fileMenuOpenAction)
 
         fileMenuSaveAction = QAction("Save", self)
         fileMenuSaveAction.triggered.connect(self.saveDia)
+        fileMenuSaveAction.setShortcut("Ctrl+s")
         self.fileMenu.addAction(fileMenuSaveAction)
 
         fileMenuSaveAsAction = QAction("Save as", self)
@@ -2906,10 +2931,13 @@ class MainWindow(QMainWindow):
 
         self.mb.addMenu(self.fileMenu)
 
-        self.s1Menu = QMenu("Third")
-        self.s1Menu.addAction("Place1")
+        self.s1Menu = QMenu("Edit")
+        self.s1Menu.addAction(toggleEditorModeAction)
+        self.s1Menu.addAction(multipleDeleteAction)
         self.s1Menu.addAction("Place2")
         self.s1Menu.addAction("Place3")
+        self.s1Menu.addAction("Place4")
+        self.s1Menu.addAction("Place5")
 
         self.mb.addMenu(self.s1Menu)
         self.mb.addMenu("Help")
@@ -3045,11 +3073,34 @@ class MainWindow(QMainWindow):
         self.labelVisState = not self.labelVisState
         self.centralWidget.setConnLabelVis(self.labelVisState)
 
+    def toggleEditorMode(self):
+        print("Toggling editor mode")
+        self.centralWidget.editorMode = (self.centralWidget.editorMode + 1) % 2
+        self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
+
     def createSelection(self):
         self.centralWidget.selectionMode = True
         self.centralWidget.copyMode = False
         self.centralWidget.groupMode = False
         self.centralWidget.multipleSelectMode = True
+
+    def deleteMultiple(self):
+        # print("pressed del")
+        temp = []
+        print(self.centralWidget.selectionGroupList.childItems())
+
+        for t in self.centralWidget.selectionGroupList.childItems():
+            temp.append(t)
+            self.centralWidget.selectionGroupList.removeFromGroup(t)
+
+        for t in temp:
+            if isinstance(t, BlockItem):
+                t.deleteBlock()
+            elif isinstance(t, Connection):
+                t.deleteConn()
+            else:
+                print("Neiter a Block nor Connection in copyGroupList ")
+
 
     def mouseMoveEvent(self, e):
         pass

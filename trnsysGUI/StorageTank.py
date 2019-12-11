@@ -292,7 +292,6 @@ class StorageTank(BlockItem):
 
                 c2.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
 
-
                 tempArrConn.append(c1)
                 tempArrConn.append(c2)
 
@@ -330,10 +329,11 @@ class StorageTank(BlockItem):
 
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
 
-    def connectHxs(self, side, connList):
+    def connectHxs(self, side, connList, lr):
         print("ports have " + str(side[0].parent) + str(side[1].parent))
 
         connector = Connector("Connector", "Connector", self.parent)
+        connector.displayName = "Connector" + self.displayName + lr + str(+ connector.id)
         c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
         c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
         connList.append(connector)

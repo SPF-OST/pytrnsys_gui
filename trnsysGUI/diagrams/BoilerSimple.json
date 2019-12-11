@@ -1,0 +1,557 @@
+{
+    "Blocks": {
+        "..__GroupDct-defaultGroup": {
+            ".__GroupDict__": true,
+            "GroupName": "defaultGroup",
+            "Position": [
+                0,
+                0
+            ],
+            "Size": [
+                100,
+                100
+            ]
+        },
+        ".__BlockDct__": true,
+        "Block-19": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Boiler",
+            "BlockName": "Bvi",
+            "BlockPosition": [
+                -1166.0,
+                -492.0
+            ],
+            "FlippedH": true,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 19,
+            "PortsIDIn": [
+                20
+            ],
+            "PortsIDOut": [
+                21
+            ],
+            "RotationN": 0,
+            "trnsysID": 6
+        },
+        "Block-22": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Collector",
+            "BlockName": "Kollektor",
+            "BlockPosition": [
+                -1166.0,
+                -348.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 22,
+            "PortsIDIn": [
+                23
+            ],
+            "PortsIDOut": [
+                24
+            ],
+            "RotationN": 0,
+            "trnsysID": 7
+        },
+        "Block-25": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Pump7",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -1019.0,
+                -283.0
+            ],
+            "FlippedH": true,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 25,
+            "PortsIDIn": [
+                26
+            ],
+            "PortsIDOut": [
+                27
+            ],
+            "RotationN": 0,
+            "trnsysID": 8
+        },
+        "Block-28": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TMix",
+            "BlockName": "TVentil",
+            "BlockPosition": [
+                -602.0,
+                -473.0
+            ],
+            "FlippedH": false,
+            "FlippedV": true,
+            "GroupName": "defaultGroup",
+            "ID": 28,
+            "PortsIDIn": [
+                29,
+                30
+            ],
+            "PortsIDOut": [
+                31
+            ],
+            "RotationN": 0,
+            "trnsysID": 9
+        },
+        "Block-32": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TPiece",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -597.0,
+                -263.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 32,
+            "PortsIDIn": [
+                33,
+                34
+            ],
+            "PortsIDOut": [
+                35
+            ],
+            "RotationN": 0,
+            "trnsysID": 10
+        },
+        "Block-36": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "WTapTop",
+            "BlockName": "WTap",
+            "BlockPosition": [
+                -349.0,
+                -472.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 36,
+            "PortsIDIn": [
+                37
+            ],
+            "PortsIDOut": [],
+            "RotationN": 0,
+            "trnsysID": 11
+        },
+        "Block-38": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "WTapBottom",
+            "BlockName": "WTap_main",
+            "BlockPosition": [
+                -358.0,
+                -256.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 38,
+            "PortsIDIn": [
+                39
+            ],
+            "PortsIDOut": [],
+            "RotationN": 0,
+            "trnsysID": 12
+        },
+        "BlockStorage-1": {
+            ".__StorageDict__": true,
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "HxList": [
+                {
+                    "DisplayName": "HxTop2",
+                    "Height": 20.0,
+                    "ID": 2,
+                    "Offset": [
+                        0.0,
+                        10.0
+                    ],
+                    "ParentID": 1,
+                    "Port1ID": 3,
+                    "Port2ID": 4,
+                    "SideNr": 0,
+                    "Width": 40,
+                    "connTrnsysID": 2
+                },
+                {
+                    "DisplayName": "HxBottom8",
+                    "Height": 20.0,
+                    "ID": 8,
+                    "Offset": [
+                        0.0,
+                        50.0
+                    ],
+                    "ParentID": 1,
+                    "Port1ID": 9,
+                    "Port2ID": 10,
+                    "SideNr": 0,
+                    "Width": 40,
+                    "connTrnsysID": 3
+                }
+            ],
+            "ID": 1,
+            "PortPairList": [
+                {
+                    "ConnCID": 3,
+                    "ConnDisName": "UntitledConn3",
+                    "ConnID": 16,
+                    "Port1ID": 14,
+                    "Port1offset": 10.0,
+                    "Port2ID": 15,
+                    "Port2offset": 90.0,
+                    "Side": false,
+                    "trnsysID": 5
+                }
+            ],
+            "StorageDisplayName": "StorageTank22",
+            "StorageName": "StorageTank",
+            "StoragePosition": [
+                -842.0,
+                -416.0
+            ],
+            "trnsysID": 1
+        },
+        "Connection-40": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 4,
+            "ConnDisplayName": "MixWTapMain",
+            "ConnID": 40,
+            "CornerPositions": [],
+            "GroupName": "defaultGroup",
+            "PortFromID": 39,
+            "PortToID": 34,
+            "SegmentPositions": [
+                [
+                    -366.0,
+                    -231.0,
+                    -539.0,
+                    -229.575
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 13
+        },
+        "Connection-43": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 5,
+            "ConnDisplayName": "MixWTap",
+            "ConnID": 43,
+            "CornerPositions": [],
+            "GroupName": "defaultGroup",
+            "PortFromID": 37,
+            "PortToID": 31,
+            "SegmentPositions": [
+                [
+                    -357.0,
+                    -458.095,
+                    -534.0,
+                    -456.696
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 14
+        },
+        "Connection-46": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 6,
+            "ConnDisplayName": "MixCirc",
+            "ConnID": 46,
+            "CornerPositions": [],
+            "GroupName": "defaultGroup",
+            "PortFromID": 30,
+            "PortToID": 35,
+            "SegmentPositions": [
+                [
+                    -572.0,
+                    -428.31600000000003,
+                    -572.0,
+                    -271.0
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 15
+        },
+        "Connection-49": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 7,
+            "ConnDisplayName": "ColIn",
+            "ConnID": 49,
+            "CornerPositions": [],
+            "GroupName": "defaultGroup",
+            "PortFromID": 27,
+            "PortToID": 24,
+            "SegmentPositions": [
+                [
+                    -1023.0,
+                    -258.4,
+                    -1058.0,
+                    -258.0
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 16
+        },
+        "Connection-52": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 8,
+            "ConnDisplayName": "TesIn",
+            "ConnID": 52,
+            "CornerPositions": [
+                [
+                    -669.5,
+                    -229.575
+                ],
+                [
+                    -669.5,
+                    -326.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 33,
+            "PortToID": 15,
+            "SegmentPositions": [
+                [
+                    -605.0,
+                    -229.575,
+                    -669.5,
+                    -229.575
+                ],
+                [
+                    -669.5,
+                    -229.575,
+                    -669.5,
+                    -326.0
+                ],
+                [
+                    -669.5,
+                    -326.0,
+                    -734.0,
+                    -326.0
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 17
+        },
+        "Connection-55": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 9,
+            "ConnDisplayName": "TesOut",
+            "ConnID": 55,
+            "CornerPositions": [
+                [
+                    -672.0,
+                    -406.0
+                ],
+                [
+                    -672.0,
+                    -456.696
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 14,
+            "PortToID": 29,
+            "SegmentPositions": [
+                [
+                    -734.0,
+                    -406.0,
+                    -672.0,
+                    -406.0
+                ],
+                [
+                    -672.0,
+                    -406.0,
+                    -672.0,
+                    -456.696
+                ],
+                [
+                    -672.0,
+                    -456.696,
+                    -610.0,
+                    -456.696
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 18
+        },
+        "Connection-58": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 10,
+            "ConnDisplayName": "BoilerOut",
+            "ConnID": 58,
+            "CornerPositions": [
+                [
+                    -918.0,
+                    -458.6666666666667
+                ],
+                [
+                    -918.0,
+                    -406.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 20,
+            "PortToID": 3,
+            "SegmentPositions": [
+                [
+                    -1058.0,
+                    -458.6666666666667,
+                    -918.0,
+                    -458.6666666666667
+                ],
+                [
+                    -918.0,
+                    -458.6666666666667,
+                    -918.0,
+                    -406.0
+                ],
+                [
+                    -918.0,
+                    -406.0,
+                    -850.0,
+                    -406.0
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 19
+        },
+        "Connection-61": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 11,
+            "ConnDisplayName": "BoilerIn",
+            "ConnID": 61,
+            "CornerPositions": [
+                [
+                    -952.5,
+                    -425.3333333333333
+                ],
+                [
+                    -952.5,
+                    -386.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 21,
+            "PortToID": 4,
+            "SegmentPositions": [
+                [
+                    -1058.0,
+                    -425.3333333333333,
+                    -952.5,
+                    -425.3333333333333
+                ],
+                [
+                    -952.5,
+                    -425.3333333333333,
+                    -952.5,
+                    -386.0
+                ],
+                [
+                    -952.5,
+                    -386.0,
+                    -850.0,
+                    -386.0
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 20
+        },
+        "Connection-64": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 12,
+            "ConnDisplayName": "ColOut",
+            "ConnID": 64,
+            "CornerPositions": [
+                [
+                    -954.0,
+                    -338.0
+                ],
+                [
+                    -954.0,
+                    -366.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 23,
+            "PortToID": 9,
+            "SegmentPositions": [
+                [
+                    -1058.0,
+                    -338.0,
+                    -954.0,
+                    -338.0
+                ],
+                [
+                    -954.0,
+                    -338.0,
+                    -954.0,
+                    -366.0
+                ],
+                [
+                    -954.0,
+                    -366.0,
+                    -850.0,
+                    -366.0
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 21
+        },
+        "Connection-67": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 13,
+            "ConnDisplayName": "PuIn",
+            "ConnID": 67,
+            "CornerPositions": [
+                [
+                    -902.5,
+                    -346.0
+                ],
+                [
+                    -902.5,
+                    -258.4
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 10,
+            "PortToID": 26,
+            "SegmentPositions": [
+                [
+                    -850.0,
+                    -346.0,
+                    -902.5,
+                    -346.0
+                ],
+                [
+                    -902.5,
+                    -346.0,
+                    -902.5,
+                    -258.4
+                ],
+                [
+                    -902.5,
+                    -258.4,
+                    -955.0,
+                    -258.4
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 22
+        },
+        "IDs": {
+            "GlobalId": 0,
+            "__idDct__": true,
+            "globalConnID": 0,
+            "trnsysID": 0
+        },
+        "Strings": {
+            "DiagramName": "BoilerSimple",
+            "__nameDct__": true
+        }
+    }
+}
