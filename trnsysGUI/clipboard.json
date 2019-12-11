@@ -1,307 +1,147 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "Block-1": {
+        "Block-28": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Collector",
-            "BlockName": "Kollektor",
-            "BlockPosition": [
-                -1171.0,
-                -535.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 1,
-            "PortsIDIn": [
-                2
-            ],
-            "PortsIDOut": [
-                3
-            ],
-            "RotationN": 0,
-            "trnsysID": 1
-        },
-        "Block-25": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "MixHxTes",
+            "BlockDisplayName": "TMix",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -922.0,
-                -461.0
+                -602.0,
+                -473.0
             ],
             "FlippedH": false,
             "FlippedV": true,
             "GroupName": "defaultGroup",
-            "ID": 25,
+            "ID": 28,
             "PortsIDIn": [
-                28,
-                29
+                29,
+                30
             ],
             "PortsIDOut": [
-                30
+                31
             ],
             "RotationN": 0,
             "trnsysID": 9
         },
-        "Block-4": {
+        "Block-32": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "PuCol",
-            "BlockName": "Pump",
-            "BlockPosition": [
-                -1021.0,
-                -469.0
-            ],
-            "FlippedH": true,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 4,
-            "PortsIDIn": [
-                5
-            ],
-            "PortsIDOut": [
-                6
-            ],
-            "RotationN": 0,
-            "trnsysID": 2
-        },
-        "Block-41": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "TeeDivTes",
+            "BlockDisplayName": "TPiece",
             "BlockName": "TeePiece",
             "BlockPosition": [
-                -846.0,
-                -530.0
+                -597.0,
+                -263.0
             ],
             "FlippedH": false,
-            "FlippedV": true,
+            "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 41,
+            "ID": 32,
             "PortsIDIn": [
-                8,
-                9
+                33,
+                34
             ],
             "PortsIDOut": [
-                10
+                35
             ],
             "RotationN": 0,
-            "trnsysID": 3
+            "trnsysID": 10
         },
-        "Block-56": {
+        "Block-36": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "TeeOutIce",
-            "BlockName": "TeePiece",
+            "BlockDisplayName": "WTapTop",
+            "BlockName": "WTap",
             "BlockPosition": [
-                -959.0,
-                -293.0
+                -349.0,
+                -472.0
             ],
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 56,
+            "ID": 36,
             "PortsIDIn": [
-                20,
-                21
+                37
             ],
-            "PortsIDOut": [
-                22
-            ],
-            "RotationN": 1,
-            "trnsysID": 7
-        },
-        "Block-67": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "IceStore",
-            "BlockName": "IceStorage",
-            "BlockPosition": [
-                -1163.0,
-                -242.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 67,
-            "PortsIDIn": [
-                17
-            ],
-            "PortsIDOut": [
-                18
-            ],
+            "PortsIDOut": [],
             "RotationN": 0,
-            "trnsysID": 6
+            "trnsysID": 11
         },
-        "Block-7": {
+        "Block-38": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "TeeColToHp",
-            "BlockName": "TeePiece",
+            "BlockDisplayName": "WTapBottom",
+            "BlockName": "WTap_main",
             "BlockPosition": [
-                -886.0,
-                -402.0
+                -358.0,
+                -256.0
             ],
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 7,
+            "ID": 38,
             "PortsIDIn": [
-                13,
-                14
+                39
             ],
-            "PortsIDOut": [
-                15
-            ],
-            "RotationN": 1,
-            "trnsysID": 5
+            "PortsIDOut": [],
+            "RotationN": 0,
+            "trnsysID": 12
         },
-        "Connection-178": {
+        "Connection-40": {
             ".__ConnectionDict__": true,
-            "ConnCID": 52,
-            "ConnDisplayName": "PiColIn",
-            "ConnID": 178,
+            "ConnCID": 4,
+            "ConnDisplayName": "MixWTapMain",
+            "ConnID": 40,
             "CornerPositions": [],
             "GroupName": "defaultGroup",
-            "PortFromID": 6,
-            "PortToID": 3,
+            "PortFromID": 39,
+            "PortToID": 34,
             "SegmentPositions": [
                 [
-                    -1025.0,
-                    -444.4,
-                    -1063.0,
-                    -445.0
+                    -366.0,
+                    -231.0,
+                    -539.0,
+                    -229.575
                 ]
             ],
             "isBlockConn": false,
-            "trnsysID": 88
+            "trnsysID": 13
         },
-        "Connection-181": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 53,
-            "ConnDisplayName": "PiColPuIn",
-            "ConnID": 181,
-            "CornerPositions": [],
-            "GroupName": "defaultGroup",
-            "PortFromID": 28,
-            "PortToID": 5,
-            "SegmentPositions": [
-                [
-                    -930.0,
-                    -444.696,
-                    -957.0,
-                    -444.4
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 89
-        },
-        "Connection-54": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 2,
-            "ConnDisplayName": "PiIceIn",
-            "ConnID": 54,
-            "CornerPositions": [],
-            "GroupName": "defaultGroup",
-            "PortFromID": 17,
-            "PortToID": 21,
-            "SegmentPositions": [
-                [
-                    -1055.0,
-                    -234.69230769230768,
-                    -892.425,
-                    -235.0
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 17
-        },
-        "Connection-55": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 3,
-            "ConnDisplayName": "PiIceToCol",
-            "ConnID": 55,
-            "CornerPositions": [],
-            "GroupName": "defaultGroup",
-            "PortFromID": 20,
-            "PortToID": 29,
-            "SegmentPositions": [
-                [
-                    -892.425,
-                    -301.0,
-                    -892.0,
-                    -416.31600000000003
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 18
-        },
-        "Connection-57": {
+        "Connection-43": {
             ".__ConnectionDict__": true,
             "ConnCID": 5,
-            "ConnDisplayName": "PiColOut",
-            "ConnID": 57,
+            "ConnDisplayName": "MixWTap",
+            "ConnID": 43,
             "CornerPositions": [],
             "GroupName": "defaultGroup",
-            "PortFromID": 2,
-            "PortToID": 8,
+            "PortFromID": 37,
+            "PortToID": 31,
             "SegmentPositions": [
                 [
-                    -1063.0,
-                    -525.0,
-                    -854.0,
-                    -525.225
+                    -357.0,
+                    -458.095,
+                    -534.0,
+                    -456.696
                 ]
             ],
             "isBlockConn": false,
-            "trnsysID": 20
+            "trnsysID": 14
         },
-        "Connection-58": {
+        "Connection-46": {
             ".__ConnectionDict__": true,
             "ConnCID": 6,
-            "ConnDisplayName": "PiColToIce",
-            "ConnID": 58,
+            "ConnDisplayName": "MixCirc",
+            "ConnID": 46,
             "CornerPositions": [],
             "GroupName": "defaultGroup",
-            "PortFromID": 10,
-            "PortToID": 13,
+            "PortFromID": 30,
+            "PortToID": 35,
             "SegmentPositions": [
                 [
-                    -821.0,
-                    -483.8,
-                    -819.425,
-                    -410.0
+                    -572.0,
+                    -428.31600000000003,
+                    -572.0,
+                    -271.0
                 ]
             ],
             "isBlockConn": false,
-            "trnsysID": 21
-        },
-        "Connection-62": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 10,
-            "ConnDisplayName": "PiIceOut",
-            "ConnID": 62,
-            "CornerPositions": [
-                [
-                    -819.0,
-                    -154.0
-                ]
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 14,
-            "PortToID": 18,
-            "SegmentPositions": [
-                [
-                    -819.425,
-                    -344.0,
-                    -819.0,
-                    -154.0
-                ],
-                [
-                    -819.0,
-                    -154.0,
-                    -1055.0,
-                    -154.30769230769232
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 25
+            "trnsysID": 15
         },
         "IDs": {
             "GlobalId": 0,

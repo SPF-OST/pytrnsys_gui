@@ -899,7 +899,7 @@ class Connection(object):
         self.unhighlightOtherConns()
 
         for s in self.segments:
-            pen1 = QPen(QColor(125,242, 189), 4)
+            pen1 = QPen(QColor(125, 242, 189), 4)
             s.setPen(pen1)
 
     def unhighlightOtherConns(self):

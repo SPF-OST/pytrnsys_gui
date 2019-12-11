@@ -4,7 +4,8 @@
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/Connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/segmentItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/segmentItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/clipboard.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/clipboard.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
