@@ -881,7 +881,7 @@ class Connection(object):
             print("Block " + str(self) + str(self.displayName) + "is already in this group")
             return
         else:
-            print("groups is " + str(self.parent.groupList))
+            # print("groups is " + str(self.parent.groupList))
             for g in self.parent.groupList:
                 print("At group " + str(g.displayName))
                 if g.displayName == self.groupName:
@@ -890,4 +890,5 @@ class Connection(object):
                 if g.displayName == newGroupName:
                     print("Found the new group")
                     g.itemList.append(self)
-                    self.groupName = newGroupName
+
+            self.groupName = newGroupName

@@ -19,7 +19,7 @@ class Collector(BlockItem):
         self.changeSize()
 
     def changeSize(self):
-        print("passing through c change size")
+        # print("passing through c change size")
         w = self.w
         h = self.h
 

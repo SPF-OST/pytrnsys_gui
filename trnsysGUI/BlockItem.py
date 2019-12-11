@@ -110,13 +110,15 @@ class BlockItem(QGraphicsPixmapItem):
             # print("groups is " + str(self.parent.parent().groupList))
             for g in self.parent.parent().groupList:
                 print("At group " + str(g.displayName))
+                print("self group is " + self.groupName)
                 if g.displayName == self.groupName:
-                    # print("Found the old group")
+                    print("Found the old group " + self.groupName)
                     g.itemList.remove(self)
                 if g.displayName == newGroupName:
-                    # print("Found the new group")
+                    print("Found the new group " + newGroupName)
                     g.itemList.append(self)
-                    self.groupName = newGroupName
+
+            self.groupName = newGroupName
 
     def setId(self, newId):
         self.id = newId

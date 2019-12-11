@@ -27,17 +27,24 @@ class PortItem(QGraphicsEllipseItem):
         self.ashColorR = QColor(239, 57, 75)
         self.ashColorB = QColor(20, 83, 245)
 
-        QGraphicsEllipseItem.__init__(self, QRectF(-6, -6, 12.0, 12.0), parent)
+        QGraphicsEllipseItem.__init__(self, QRectF(-8, -8, 16.0, 16.0), parent)
+        # QGraphicsEllipseItem.__init__(self, QRectF(-7, -7, 14.0, 14.0), parent)
+        self.outerRing = QGraphicsEllipseItem(-4, -4, 8, 8, self)
+        self.outerRing.setPen(QPen(QColor(0, 0, 0, 0), 0))
+
         if name == 'i':
             color = QColor(self.ashColorR)
-            # color = QColor(Qt.black)
+            self.outerRing.setBrush(QColor(self.ashColorR))
+
         if name == 'o':
-            # color = QColor(Qt.black)
             color = QColor(self.ashColorB)
+            self.outerRing.setBrush(QColor(self.ashColorB))
 
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.setBrush(QBrush(color))
+
+        # self.setBrush(QBrush(color))
+        self.setBrush(QBrush(QtCore.Qt.white))
 
         # Hacky fix for no border of ellipse
         p1 = QPen(QColor(0, 0, 0, 0), 0)
@@ -128,11 +135,13 @@ class PortItem(QGraphicsEllipseItem):
         # print("Hovering")
 
         self.setRect(-7, -7, 14.0, 14.0)
+        self.outerRing.setRect(-7, -7, 14.0, 14.0)
         if self.name == 'i':
-            # self.setBrush(QColor(239, 57, 75))
-            self.setBrush(Qt.red)
+            # self.setBrush(Qt.red)
+            self.outerRing.setBrush(Qt.red)
         if self.name == 'o':
-            self.setBrush(QColor(Qt.blue))
+            # self.setBrush(QColor(Qt.blue))
+            self.outerRing.setBrush(QColor(Qt.blue))
 
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")
@@ -140,10 +149,14 @@ class PortItem(QGraphicsEllipseItem):
         # self.setRect(-7, -7, 14, 14)
         # sleep(30)
 
-        self.setRect(-6, -6, 12, 12)
+        # self.setRect(-6, -6, 12, 12)
+        self.setRect(-7, -7, 14, 14)
+        self.outerRing.setRect(-4, -4, 8, 8)
         if len(self.connectionList) == 0:
             if self.name == 'i':
                 # self.setBrush(Qt.red)
-                self.setBrush(self.ashColorR)
+                # self.setBrush(self.ashColorR)
+                self.outerRing.setBrush(self.ashColorR)
             if self.name == 'o':
-                self.setBrush(self.ashColorB)
+                # self.setBrush(self.ashColorR)
+                self.outerRing.setBrush(self.ashColorB)

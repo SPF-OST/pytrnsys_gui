@@ -309,8 +309,20 @@ class DiagramDecoder(json.JSONDecoder):
             for k in sorted((arr.keys())):
                 if type(arr[k]) is dict:
                     # print("Found a block or Connection")
-                    if ".__BlockDict__" in arr[k]:
-                        # print("Found a block ")
+
+                    if ".__GroupDict__" in arr[k]:
+                        print("Found the group dict")
+                        i = arr[k]
+                        print("Decoding group " + str(i["GroupName"]))
+
+                        groupListNames = [g.displayName for g in self.editor.groupList]
+
+                        if i["GroupName"] not in groupListNames:
+                            g = Group(i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1], self.editor.diagramScene)
+                            g.setName(i["GroupName"])
+
+                    elif ".__BlockDict__" in arr[k]:
+                        print("Found a block ")
                         i = arr[k]
 
                         # print("Bl name " +  arr[k]["BlockName"] + str(type(arr[k]["BlockName"])))
@@ -352,6 +364,9 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.updateFlipStateV(i["FlippedV"])
                         bl.rotateBlockToN(i["RotationN"])
 
+                        bl.groupName = "defaultGroup"
+                        bl.setBlockToGroup(i["GroupName"])
+
                         print(len(bl.inputs))
                         for x in range(len(bl.inputs)):
                             bl.inputs[x].id = i["PortsIDIn"][x]
@@ -372,6 +387,9 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
                         bl.trnsysId = i["trnsysID"]
                         bl.id = i["ID"]
+
+                        bl.groupName = "defaultGroup"
+                        bl.setBlockToGroup(i["GroupName"])
 
                         # Add heat exchangers
                         for h in i["HxList"]:
@@ -426,6 +444,9 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.trnsysId = i["trnsysID"]
                         bl.id = i["ID"]
 
+                        bl.groupName = "defaultGroup"
+                        bl.setBlockToGroup(i["GroupName"])
+
                         resBlockList.append(bl)
 
                     elif ".__ConnectionDict__" in arr[k]:
@@ -457,6 +478,10 @@ class DiagramDecoder(json.JSONDecoder):
                             c.connId = i["ConnCID"]
                             c.trnsysId = i["trnsysID"]
                             c.displayName = i["ConnDisplayName"]
+
+                            c.groupName = "defaultGroup"
+                            c.setConnToGroup(i["GroupName"])
+
                             resConnList.append(c)
 
                         else:
@@ -483,7 +508,6 @@ class DiagramEncoder(json.JSONEncoder):
 
             res = {}
             blockDct = {".__BlockDct__": True}
-            connDct = {".__ConnDct__": True}
 
             for t in obj.trnsysObj:
                 dct = {}
@@ -510,6 +534,7 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['FlippedH'] = t.flippedH
                     dct['FlippedV'] = t.flippedV
                     dct['RotationN'] = t.rotationN
+                    dct['GroupName'] = t.groupName
 
                     blockDct["Block-" + str(t.id)] = dct
 
@@ -603,6 +628,8 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['PortPairList'] = portPairList
                     dct['FlippedH'] = t.flippedH
                     dct['FlippedV'] = t.flippedH
+                    dct['GroupName'] = t.groupName
+
                     # dct['RotationN'] = t.rotationN
 
                     blockDct["BlockStorage-" + str(t.id)] = dct
@@ -632,6 +659,8 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['FlippedH'] = t.flippedH
                     dct['FlippedV'] = t.flippedH
                     dct['RotationN'] = t.rotationN
+                    dct['GroupName'] = t.groupName
+
 
                     # Why does it not appear with this key??
                     blockDct["BlockHeatPump-" + str(t.id)] = dct
@@ -648,6 +677,7 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['ConnID'] = t.id
                     dct['ConnCID'] = t.connId
                     dct['trnsysID'] = t.trnsysId
+                    dct['GroupName'] = t.groupName
 
                     segments = []  # Not used, but instead corners[]
 
@@ -673,8 +703,18 @@ class DiagramEncoder(json.JSONEncoder):
             nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName}
             blockDct["Strings"] = nameDict
 
+            # groupDict = {"..__GroupDict__": True}
+            for g in obj.groupList:
+                dct = {}
+                dct[".__GroupDict__"] = True
+                dct["GroupName"] = g.displayName
+                dct["Position"] = g.x, g.y
+                dct["Size"] = g.w, g.h
+                # dct["..Group-" + g.displayName] = dct
+
+                blockDct["..__GroupDct-" + g.displayName] = dct
+
             res["Blocks"] = blockDct
-            # res["Connections"] = connDct
 
             return res
         else:
@@ -1219,6 +1259,7 @@ class DiagramEditor(QWidget):
 
     # Connections related methods
     def startConnection(self, port):
+        print("port is " + str(port))
         self.tempStartPort = port
         self.startedConnection = True
         # print("Started Connection")
@@ -1250,7 +1291,7 @@ class DiagramEditor(QWidget):
         if self.startedConnection:
             releasePos = event.scenePos()
             itemsAtReleasePos = self.diagramScene.items(releasePos)
-
+            print("items are " + str(itemsAtReleasePos))
             for it in itemsAtReleasePos:
                 if type(it) is PortItem:
                     self.createConnection(self.tempStartPort, it)
@@ -1259,7 +1300,7 @@ class DiagramEditor(QWidget):
                     self.connLineItem.setVisible(False)
 
                     # Not necessary
-                    self.tempStartPort = None
+                    # self.tempStartPort = None
 
     def cleanUpConnections(self):
         for c in self.connectionList:
@@ -2509,13 +2550,13 @@ class DiagramEditor(QWidget):
                     k.changeSize()
                     self.diagramScene.addItem(k)
                     print("self grouplist is " + str(self.groupList))
-                    k.setBlockToGroup("defaultGroup")
+                    # k.setBlockToGroup("defaultGroup")
 
                 if isinstance(k, StorageTank):
                     print("Loading a Storage")
                     k.setParent(self.diagramView)
                     k.updateImage()
-                    k.setBlockToGroup("defaultGroup")
+                    # k.setBlockToGroup("defaultGroup")
 
                     for hx in k.heatExchangers:
                         hx.initLoad()
@@ -2528,7 +2569,7 @@ class DiagramEditor(QWidget):
                     # print("Connection fromPort" + str(k.fromPort))
                     # print("Connection toPort" + str(k.toPort))
                     k.initLoad()
-                    k.setConnToGroup("defaultGroup")
+                    # k.setConnToGroup("defaultGroup")
 
                 if isinstance(k, dict):
                     if "__idDct__" in k:

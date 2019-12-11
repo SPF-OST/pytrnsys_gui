@@ -39,6 +39,7 @@ class GroupChooserConnDlg(QDialog):
     def acceptedEdit(self):
         if len(self.listw.selectedItems()) > 0:
             self.conn.setConnToGroup(self.listw.selectedItems()[0].text())
+            self.close()
 
         # print("Changed group in connDlg to " + str(self.listw.selectedItems()[0].text()))
         # for g in self.parent.groupList:
