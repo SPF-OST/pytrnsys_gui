@@ -565,9 +565,15 @@ class segmentItem(QGraphicsLineItem):
         a5 = menu.addAction('Print corners')
         a5.triggered.connect(self.parent.getCorners)
 
+        a6 = menu.addAction('Print group')
+        a6.triggered.connect(self.printGroup)
+
         menu.exec_(event.screenPos())
 
     def configGroup(self):
         print("sle paras" + str(self.parent))
         print("sle paras" + str(self.parent.parent))
         GroupChooserConnDlg(self.parent, self.parent.parent)
+
+    def printGroup(self):
+        print(self.parent.groupName)

@@ -1,5 +1,29 @@
 {
     "Blocks": {
+        "..__GroupDct-G5": {
+            ".__GroupDict__": true,
+            "GroupName": "G5",
+            "Position": [
+                66.0,
+                -210.0
+            ],
+            "Size": [
+                431.0,
+                242.0
+            ]
+        },
+        "..__GroupDct-defaultGroup": {
+            ".__GroupDict__": true,
+            "GroupName": "defaultGroup",
+            "Position": [
+                0,
+                0
+            ],
+            "Size": [
+                100,
+                100
+            ]
+        },
         ".__BlockDct__": true,
         "Block-1": {
             ".__BlockDict__": true,
@@ -11,6 +35,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 1,
             "PortsIDIn": [
                 2
@@ -31,6 +56,7 @@
             ],
             "FlippedH": true,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 11,
             "PortsIDIn": [
                 41
@@ -51,6 +77,7 @@
             ],
             "FlippedH": true,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 14,
             "PortsIDIn": [
                 44
@@ -71,6 +98,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 17,
             "PortsIDIn": [
                 47,
@@ -92,6 +120,7 @@
             ],
             "FlippedH": false,
             "FlippedV": true,
+            "GroupName": "defaultGroup",
             "ID": 21,
             "PortsIDIn": [
                 24,
@@ -113,6 +142,7 @@
             ],
             "FlippedH": false,
             "FlippedV": true,
+            "GroupName": "defaultGroup",
             "ID": 25,
             "PortsIDIn": [
                 28,
@@ -134,6 +164,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 29,
             "PortsIDIn": [
                 51,
@@ -155,6 +186,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 33,
             "PortsIDIn": [
                 37,
@@ -176,6 +208,7 @@
             ],
             "FlippedH": false,
             "FlippedV": true,
+            "GroupName": "defaultGroup",
             "ID": 37,
             "PortsIDIn": [
                 70,
@@ -197,6 +230,7 @@
             ],
             "FlippedH": true,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 4,
             "PortsIDIn": [
                 5
@@ -217,6 +251,7 @@
             ],
             "FlippedH": false,
             "FlippedV": true,
+            "GroupName": "defaultGroup",
             "ID": 41,
             "PortsIDIn": [
                 8,
@@ -238,6 +273,7 @@
             ],
             "FlippedH": false,
             "FlippedV": true,
+            "GroupName": "G5",
             "ID": 45,
             "PortsIDIn": [
                 111,
@@ -259,6 +295,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 49,
             "PortsIDIn": [
                 74,
@@ -280,6 +317,7 @@
             ],
             "FlippedH": true,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 53,
             "PortsIDIn": [
                 78
@@ -300,6 +338,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 56,
             "PortsIDIn": [
                 20,
@@ -321,6 +360,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 60,
             "PortsIDIn": [
                 81,
@@ -342,6 +382,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "G5",
             "ID": 64,
             "PortsIDIn": [
                 119
@@ -362,6 +403,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 67,
             "PortsIDIn": [
                 17
@@ -382,6 +424,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 7,
             "PortsIDIn": [
                 13,
@@ -403,6 +446,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 70,
             "PortsIDIn": [
                 108
@@ -423,6 +467,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 73,
             "PortsIDIn": [
                 189
@@ -443,6 +488,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "G5",
             "ID": 76,
             "PortsIDIn": [
                 115,
@@ -456,7 +502,7 @@
         },
         "Block-80": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "WTap",
+            "BlockDisplayName": "WTap80",
             "BlockName": "WTap",
             "BlockPosition": [
                 455.0,
@@ -464,6 +510,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 80,
             "PortsIDIn": [
                 85
@@ -482,6 +529,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "ID": 82,
             "PortsIDIn": [
                 87
@@ -500,6 +548,7 @@
             ],
             "FlippedH": false,
             "FlippedV": true,
+            "GroupName": "defaultGroup",
             "ID": 84,
             "PortsIDIn": [
                 89,
@@ -513,7 +562,7 @@
         },
         "Block-88": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Radiator",
+            "BlockDisplayName": "Radiator88",
             "BlockName": "Radiator",
             "BlockPosition": [
                 378.0,
@@ -521,6 +570,7 @@
             ],
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "G5",
             "ID": 88,
             "PortsIDIn": [
                 93
@@ -541,6 +591,7 @@
             ],
             "FlippedH": false,
             "FlippedV": true,
+            "GroupName": "defaultGroup",
             "ID": 91,
             "PortsIDIn": [
                 98,
@@ -556,7 +607,8 @@
             ".__HeatPumpDict__": true,
             "FlippedH": false,
             "FlippedV": false,
-            "HeatPumpDisplayName": "HP",
+            "GroupName": "defaultGroup",
+            "HeatPumpDisplayName": "HP95",
             "HeatPumpName": "HP",
             "HeatPumpPosition": [
                 -522.0,
@@ -582,6 +634,7 @@
             ".__StorageDict__": true,
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "HxList": [
                 {
                     "DisplayName": "HxTop1129",
@@ -672,6 +725,7 @@
             ".__StorageDict__": true,
             "FlippedH": false,
             "FlippedV": false,
+            "GroupName": "defaultGroup",
             "HxList": [],
             "ID": 150,
             "PortPairList": [
@@ -723,6 +777,7 @@
             "ConnDisplayName": "PiMixToMix",
             "ConnID": 101,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 98,
             "PortToID": 72,
             "SegmentPositions": [
@@ -742,6 +797,7 @@
             "ConnDisplayName": "PiDHWDemand",
             "ConnID": 103,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 91,
             "PortToID": 85,
             "SegmentPositions": [
@@ -761,6 +817,7 @@
             "ConnDisplayName": "PiDHWMains",
             "ConnID": 104,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 82,
             "PortToID": 87,
             "SegmentPositions": [
@@ -780,6 +837,7 @@
             "ConnDisplayName": "PiMixDHW",
             "ConnID": 105,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 83,
             "PortToID": 90,
             "SegmentPositions": [
@@ -799,6 +857,7 @@
             "ConnDisplayName": "PiDivCirc",
             "ConnID": 106,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 99,
             "PortToID": 89,
             "SegmentPositions": [
@@ -818,6 +877,7 @@
             "ConnDisplayName": "PiRadOut",
             "ConnID": 123,
             "CornerPositions": [],
+            "GroupName": "G5",
             "PortFromID": 94,
             "PortToID": 117,
             "SegmentPositions": [
@@ -837,6 +897,7 @@
             "ConnDisplayName": "PiSHInMix",
             "ConnID": 124,
             "CornerPositions": [],
+            "GroupName": "G5",
             "PortFromID": 116,
             "PortToID": 113,
             "SegmentPositions": [
@@ -856,6 +917,7 @@
             "ConnDisplayName": "PiHpToTesDHWIn",
             "ConnID": 133,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 51,
             "PortToID": 126,
             "SegmentPositions": [
@@ -880,6 +942,7 @@
                     -622.0
                 ]
             ],
+            "GroupName": "defaultGroup",
             "PortFromID": 127,
             "PortToID": 48,
             "SegmentPositions": [
@@ -905,6 +968,7 @@
             "ConnDisplayName": "PiTesDHWOut",
             "ConnID": 143,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 140,
             "PortToID": 70,
             "SegmentPositions": [
@@ -924,6 +988,7 @@
             "ConnDisplayName": "PiTesDHwIn",
             "ConnID": 144,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 141,
             "PortToID": 81,
             "SegmentPositions": [
@@ -943,6 +1008,7 @@
             "ConnDisplayName": "PiCircIn",
             "ConnID": 145,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 74,
             "PortToID": 137,
             "SegmentPositions": [
@@ -962,6 +1028,7 @@
             "ConnDisplayName": "PiShTesOut",
             "ConnID": 160,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 154,
             "PortToID": 111,
             "SegmentPositions": [
@@ -981,6 +1048,7 @@
             "ConnDisplayName": "PiShTesIn",
             "ConnID": 161,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 115,
             "PortToID": 155,
             "SegmentPositions": [
@@ -1013,6 +1081,7 @@
                     -446.0
                 ]
             ],
+            "GroupName": "defaultGroup",
             "PortFromID": 52,
             "PortToID": 151,
             "SegmentPositions": [
@@ -1055,6 +1124,7 @@
                     -89.0
                 ]
             ],
+            "GroupName": "defaultGroup",
             "PortFromID": 47,
             "PortToID": 152,
             "SegmentPositions": [
@@ -1085,6 +1155,7 @@
                     -525.0
                 ]
             ],
+            "GroupName": "defaultGroup",
             "PortFromID": 9,
             "PortToID": 130,
             "SegmentPositions": [
@@ -1110,6 +1181,7 @@
             "ConnDisplayName": "PiOutHxTes",
             "ConnID": 171,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 30,
             "PortToID": 131,
             "SegmentPositions": [
@@ -1129,6 +1201,7 @@
             "ConnDisplayName": "PiColIn",
             "ConnID": 178,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 6,
             "PortToID": 3,
             "SegmentPositions": [
@@ -1148,6 +1221,7 @@
             "ConnDisplayName": "PiColPuIn",
             "ConnID": 181,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 28,
             "PortToID": 5,
             "SegmentPositions": [
@@ -1167,6 +1241,7 @@
             "ConnDisplayName": "PiHpOutPu",
             "ConnID": 184,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 42,
             "PortToID": 39,
             "SegmentPositions": [
@@ -1186,6 +1261,7 @@
             "ConnDisplayName": "UntitledConn55",
             "ConnID": 187,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 34,
             "PortToID": 41,
             "SegmentPositions": [
@@ -1205,6 +1281,7 @@
             "ConnDisplayName": "PiHpCondIn",
             "ConnID": 190,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 45,
             "PortToID": 35,
             "SegmentPositions": [
@@ -1224,6 +1301,7 @@
             "ConnDisplayName": "PiTesShToDHw1",
             "ConnID": 191,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 190,
             "PortToID": 157,
             "SegmentPositions": [
@@ -1243,6 +1321,7 @@
             "ConnDisplayName": "PiTesShToDHw2",
             "ConnID": 192,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 189,
             "PortToID": 147,
             "SegmentPositions": [
@@ -1262,6 +1341,7 @@
             "ConnDisplayName": "PiHpInPu",
             "ConnID": 193,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 49,
             "PortToID": 44,
             "SegmentPositions": [
@@ -1281,6 +1361,7 @@
             "ConnDisplayName": "PiRadIn",
             "ConnID": 196,
             "CornerPositions": [],
+            "GroupName": "G5",
             "PortFromID": 120,
             "PortToID": 93,
             "SegmentPositions": [
@@ -1300,6 +1381,7 @@
             "ConnDisplayName": "PiShOutMix",
             "ConnID": 199,
             "CornerPositions": [],
+            "GroupName": "G5",
             "PortFromID": 112,
             "PortToID": 119,
             "SegmentPositions": [
@@ -1319,6 +1401,7 @@
             "ConnDisplayName": "PiTesDHWOutToSh",
             "ConnID": 202,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 146,
             "PortToID": 108,
             "SegmentPositions": [
@@ -1338,6 +1421,7 @@
             "ConnDisplayName": "PiTesDHwToSh",
             "ConnID": 205,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 109,
             "PortToID": 158,
             "SegmentPositions": [
@@ -1357,6 +1441,7 @@
             "ConnDisplayName": "PiInPuCirc",
             "ConnID": 208,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 100,
             "PortToID": 78,
             "SegmentPositions": [
@@ -1376,6 +1461,7 @@
             "ConnDisplayName": "PiCircOutPu",
             "ConnID": 211,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 79,
             "PortToID": 75,
             "SegmentPositions": [
@@ -1395,6 +1481,7 @@
             "ConnDisplayName": "PiIceIn",
             "ConnID": 54,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 17,
             "PortToID": 21,
             "SegmentPositions": [
@@ -1414,6 +1501,7 @@
             "ConnDisplayName": "PiIceToCol",
             "ConnID": 55,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 20,
             "PortToID": 29,
             "SegmentPositions": [
@@ -1433,6 +1521,7 @@
             "ConnDisplayName": "PiColOut",
             "ConnID": 57,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 2,
             "PortToID": 8,
             "SegmentPositions": [
@@ -1452,6 +1541,7 @@
             "ConnDisplayName": "PiColToIce",
             "ConnID": 58,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 10,
             "PortToID": 13,
             "SegmentPositions": [
@@ -1471,6 +1561,7 @@
             "ConnDisplayName": "PiIceToHp",
             "ConnID": 59,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 15,
             "PortToID": 24,
             "SegmentPositions": [
@@ -1490,6 +1581,7 @@
             "ConnDisplayName": "PiHpOutDiv",
             "ConnID": 61,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 37,
             "PortToID": 22,
             "SegmentPositions": [
@@ -1514,6 +1606,7 @@
                     -154.0
                 ]
             ],
+            "GroupName": "defaultGroup",
             "PortFromID": 14,
             "PortToID": 18,
             "SegmentPositions": [
@@ -1539,6 +1632,7 @@
             "ConnDisplayName": "PiHpEvapIn",
             "ConnID": 64,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 25,
             "PortToID": 32,
             "SegmentPositions": [
@@ -1558,6 +1652,7 @@
             "ConnDisplayName": "PiHpEvapMix",
             "ConnID": 65,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 26,
             "PortToID": 38,
             "SegmentPositions": [
@@ -1577,6 +1672,7 @@
             "ConnDisplayName": "PiHpCondOut",
             "ConnID": 66,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 33,
             "PortToID": 53,
             "SegmentPositions": [
@@ -1596,6 +1692,7 @@
             "ConnDisplayName": "PiCircMix",
             "ConnID": 96,
             "CornerPositions": [],
+            "GroupName": "defaultGroup",
             "PortFromID": 76,
             "PortToID": 71,
             "SegmentPositions": [
@@ -1616,7 +1713,7 @@
             "trnsysID": 0
         },
         "Strings": {
-            "DiagramName": "Untitled2",
+            "DiagramName": "Untitled6",
             "__nameDct__": true
         }
     }

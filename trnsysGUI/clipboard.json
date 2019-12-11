@@ -1,76 +1,66 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "Block-8": {
+        "Block-1": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "TeePiece8",
+            "BlockDisplayName": "TeePiece1",
             "BlockName": "TeePiece",
             "BlockPosition": [
-                -972.0,
-                -472.0
+                -915.0,
+                -463.0
             ],
             "FlippedH": false,
             "FlippedV": false,
-            "ID": 8,
+            "ID": 1,
             "PortsIDIn": [
-                9,
-                10
+                2,
+                3
             ],
             "PortsIDOut": [
-                11
+                4
             ],
             "RotationN": 0,
-            "trnsysID": 3
-        },
-        "BlockStorage-1": {
-            ".__StorageDict__": true,
-            "FlippedH": false,
-            "FlippedV": false,
-            "HxList": [
-                {
-                    "DisplayName": "sdf2",
-                    "Height": 80.0,
-                    "ID": 2,
-                    "Offset": [
-                        0.0,
-                        10.0
-                    ],
-                    "ParentID": 1,
-                    "Port1ID": 3,
-                    "Port2ID": 4,
-                    "SideNr": 0,
-                    "Width": 40,
-                    "connTrnsysID": 2
-                }
-            ],
-            "ID": 1,
-            "PortPairList": [],
-            "StorageDisplayName": "StorageTank1",
-            "StorageName": "StorageTank",
-            "StoragePosition": [
-                -788.0,
-                -450.0
-            ],
             "trnsysID": 1
         },
-        "Connection-12": {
+        "Block-5": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeePiece5",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -685.0,
+                -357.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "ID": 5,
+            "PortsIDIn": [
+                6,
+                7
+            ],
+            "PortsIDOut": [
+                8
+            ],
+            "RotationN": 0,
+            "trnsysID": 2
+        },
+        "Connection-9": {
             ".__ConnectionDict__": true,
-            "ConnCID": 2,
-            "ConnDisplayName": "UntitledConn2",
-            "ConnID": 12,
+            "ConnCID": 1,
+            "ConnDisplayName": "UntitledConn1",
+            "ConnID": 9,
             "CornerPositions": [],
-            "PortFromID": 10,
-            "PortToID": 3,
+            "PortFromID": 3,
+            "PortToID": 6,
             "SegmentPositions": [
                 [
-                    -914.0,
-                    -438.575,
-                    -796.0,
-                    -440.0
+                    -857.0,
+                    -429.575,
+                    -693.0,
+                    -323.575
                 ]
             ],
             "isBlockConn": false,
-            "trnsysID": 4
+            "trnsysID": 3
         },
         "IDs": {
             "GlobalId": 0,

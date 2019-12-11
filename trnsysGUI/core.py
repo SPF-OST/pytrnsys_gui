@@ -309,8 +309,20 @@ class DiagramDecoder(json.JSONDecoder):
             for k in sorted((arr.keys())):
                 if type(arr[k]) is dict:
                     # print("Found a block or Connection")
-                    if ".__BlockDict__" in arr[k]:
-                        # print("Found a block ")
+
+                    if ".__GroupDict__" in arr[k]:
+                        print("Found the group dict")
+                        i = arr[k]
+                        print("Decoding group " + str(i["GroupName"]))
+
+                        groupListNames = [g.displayName for g in self.editor.groupList]
+
+                        if i["GroupName"] not in groupListNames:
+                            g = Group(i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1], self.editor.diagramScene)
+                            g.setName(i["GroupName"])
+
+                    elif ".__BlockDict__" in arr[k]:
+                        print("Found a block ")
                         i = arr[k]
 
                         # print("Bl name " +  arr[k]["BlockName"] + str(type(arr[k]["BlockName"])))
@@ -352,6 +364,9 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.updateFlipStateV(i["FlippedV"])
                         bl.rotateBlockToN(i["RotationN"])
 
+                        bl.groupName = "defaultGroup"
+                        bl.setBlockToGroup(i["GroupName"])
+
                         print(len(bl.inputs))
                         for x in range(len(bl.inputs)):
                             bl.inputs[x].id = i["PortsIDIn"][x]
@@ -372,6 +387,9 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
                         bl.trnsysId = i["trnsysID"]
                         bl.id = i["ID"]
+
+                        bl.groupName = "defaultGroup"
+                        bl.setBlockToGroup(i["GroupName"])
 
                         # Add heat exchangers
                         for h in i["HxList"]:
@@ -426,6 +444,9 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.trnsysId = i["trnsysID"]
                         bl.id = i["ID"]
 
+                        bl.groupName = "defaultGroup"
+                        bl.setBlockToGroup(i["GroupName"])
+
                         resBlockList.append(bl)
 
                     elif ".__ConnectionDict__" in arr[k]:
@@ -457,6 +478,10 @@ class DiagramDecoder(json.JSONDecoder):
                             c.connId = i["ConnCID"]
                             c.trnsysId = i["trnsysID"]
                             c.displayName = i["ConnDisplayName"]
+
+                            c.groupName = "defaultGroup"
+                            c.setConnToGroup(i["GroupName"])
+
                             resConnList.append(c)
 
                         else:
@@ -483,7 +508,6 @@ class DiagramEncoder(json.JSONEncoder):
 
             res = {}
             blockDct = {".__BlockDct__": True}
-            connDct = {".__ConnDct__": True}
 
             for t in obj.trnsysObj:
                 dct = {}
@@ -510,6 +534,7 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['FlippedH'] = t.flippedH
                     dct['FlippedV'] = t.flippedV
                     dct['RotationN'] = t.rotationN
+                    dct['GroupName'] = t.groupName
 
                     blockDct["Block-" + str(t.id)] = dct
 
@@ -603,6 +628,8 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['PortPairList'] = portPairList
                     dct['FlippedH'] = t.flippedH
                     dct['FlippedV'] = t.flippedH
+                    dct['GroupName'] = t.groupName
+
                     # dct['RotationN'] = t.rotationN
 
                     blockDct["BlockStorage-" + str(t.id)] = dct
@@ -632,6 +659,8 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['FlippedH'] = t.flippedH
                     dct['FlippedV'] = t.flippedH
                     dct['RotationN'] = t.rotationN
+                    dct['GroupName'] = t.groupName
+
 
                     # Why does it not appear with this key??
                     blockDct["BlockHeatPump-" + str(t.id)] = dct
@@ -648,6 +677,7 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['ConnID'] = t.id
                     dct['ConnCID'] = t.connId
                     dct['trnsysID'] = t.trnsysId
+                    dct['GroupName'] = t.groupName
 
                     segments = []  # Not used, but instead corners[]
 
@@ -673,8 +703,18 @@ class DiagramEncoder(json.JSONEncoder):
             nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName}
             blockDct["Strings"] = nameDict
 
+            # groupDict = {"..__GroupDict__": True}
+            for g in obj.groupList:
+                dct = {}
+                dct[".__GroupDict__"] = True
+                dct["GroupName"] = g.displayName
+                dct["Position"] = g.x, g.y
+                dct["Size"] = g.w, g.h
+                # dct["..Group-" + g.displayName] = dct
+
+                blockDct["..__GroupDct-" + g.displayName] = dct
+
             res["Blocks"] = blockDct
-            # res["Connections"] = connDct
 
             return res
         else:
@@ -751,28 +791,58 @@ class DiagramScene(QGraphicsScene):
         # global selectionMode
         # global copyMode
         # global pasting
+        if self.parent().pasting:
+            # Dismantle group
+            self.parent().clearCopyGroup()
+
+        if self.parent().itemsSelected:
+            # Dismantle selection
+            self.parent().clearSelectionGroup()
 
         if self.parent().selectionMode:
-            self.released = True
+            # self.released = True
             print("There are elements inside the selection " + str(self.hasElementsInRect()))
             if self.hasElementsInRect():
-                if not self.parent().copyMode:
+                if self.parent().groupMode:
                     g = self.createGroup()
                     groupDlg(g, self.parent(), self.elementsInRect())
-                else:
+                elif self.parent().multipleSelectMode:
+                    self.parent().createSelectionGroup(self.elementsInRect())
+                elif self.parent().copyMode:
                     self.parent().copyElements()
+                else:
+                    print("No recognized mode")
             else:
                 self.parent().copyMode = False
-                # pasting = True
                 self.parent().selectionMode = False
 
             self.released = False
             self.pressed = False
             self.selectionRect.setVisible(False)
 
-        if self.parent().pasting:
-            # Dismantle group
-            self.parent().clearCopyGroup()
+
+    # def drawBackground(self, painter, rect):
+    #     if self.parent().snapGrid:
+    #         pen = QPen()
+    #         pen.setWidth(2)
+    #         pen.setCosmetic(True)
+    #         painter.setPen(pen)
+    #
+    #         gridSize = 20
+    #
+    #
+    #         left = int(rect.left()) - (int(rect.left()) % gridSize)
+    #         top = int(rect.top()) - (int(rect.top()) % gridSize)
+    #         points = []
+    #         for x in range(left, int(rect.height()), gridSize):
+    #             for y in range(top, int(rect.bottom()), gridSize):
+    #                 points.append(QPointF(x, y))
+    #
+    #         for x in points:
+    #             painter.drawPoint(x)
+    #     else:
+    #         pass
+    #         # super(DiagramScene, self).drawBackground(painter, rect)
 
     # def mouseMoveEvent(self, e):
     #     self.setMouseTracking(True)
@@ -808,6 +878,9 @@ class DiagramScene(QGraphicsScene):
                 self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(), event.scenePos().x() - self.sRstart.x(),
                                            event.scenePos().y() - self.sRstart.y())
                 self.selectionRect.setVisible(True)
+
+        # if len(self.items(event.scenePos())) == 0:
+            # print("No items here!")
 
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
@@ -912,8 +985,12 @@ class EditorGraphicsView(QGraphicsView):
                 bl = Connector(name, name, self)
             else:
                 bl = BlockItem(name, name, self)
-            p1 = self.mapToScene(event.pos())
 
+            if self.parent().snapGrid:
+                qp = QPoint(event.pos().x() - event.pos().x() % 150, event.pos().y() - event.pos().y() % 150)
+                p1 = self.mapToScene(qp)
+            else:
+                p1 = self.mapToScene(event.pos())
             # cellS = 50
             # pos1x = int(p1.x()/cellS) * cellS
             # pos1y = int(p1.y()/cellS) * cellS
@@ -988,11 +1065,16 @@ class DiagramEditor(QWidget):
         self.saveAsPath = Path()
         self.idGen = IdGenerator()
 
-        self.pasting = False
-        self.copyMode = False
         self.selectionMode = False
+        self.groupMode = False
+        self.copyMode = False
+        self.multipleSelectedMode = False
+
+        self.pasting = False
+        self.itemsSelected = False
 
         self.editorMode = 0
+        self.snapGrid = False
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -1067,6 +1149,7 @@ class DiagramEditor(QWidget):
         self.defaultGroup.setName("defaultGroup")
 
         self.copyGroupList = QGraphicsItemGroup()
+        self.selectionGroupList = QGraphicsItemGroup()
 
         a = 400  # Start of upmost button y-value
         b = 50  # distance between starts of button y-values
@@ -1176,6 +1259,7 @@ class DiagramEditor(QWidget):
 
     # Connections related methods
     def startConnection(self, port):
+        print("port is " + str(port))
         self.tempStartPort = port
         self.startedConnection = True
         # print("Started Connection")
@@ -1207,7 +1291,7 @@ class DiagramEditor(QWidget):
         if self.startedConnection:
             releasePos = event.scenePos()
             itemsAtReleasePos = self.diagramScene.items(releasePos)
-
+            print("items are " + str(itemsAtReleasePos))
             for it in itemsAtReleasePos:
                 if type(it) is PortItem:
                     self.createConnection(self.tempStartPort, it)
@@ -1216,7 +1300,7 @@ class DiagramEditor(QWidget):
                     self.connLineItem.setVisible(False)
 
                     # Not necessary
-                    self.tempStartPort = None
+                    # self.tempStartPort = None
 
     def cleanUpConnections(self):
         for c in self.connectionList:
@@ -1243,16 +1327,19 @@ class DiagramEditor(QWidget):
                     else:
                         print("heatExchanger has not valid sSide")
 
-                print("t.leftside is " + str(t.leftSide))
-                print("t.leftside is " + str(t.rightSide))
+                # print("t.leftside has len " + str(len(t.leftSide)))
+                # print("t.leftside is " + str(t.rightSide))
                 t.connectInside(self.findStorageCorrespPorts(t.leftSide), t.insideConnLeft, "L")
                 t.connectInside(self.findStorageCorrespPorts(t.rightSide), t.insideConnRight, "R")
 
     def findStorageCorrespPorts(self, portList):
+        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
+
         res = []
-        print("Finding c ports")
+        # print("Finding c ports")
         for p in portList:
             if len(p.connectionList) > 0:           # check if not >1 needed
+                # connectionList[0] is the hidden connection created when the portPair is
                 if p.connectionList[1].fromPort is p:
                     res.append(p.connectionList[1].toPort)
                 elif p.connectionList[1].toPort is p:
@@ -1260,15 +1347,14 @@ class DiagramEditor(QWidget):
                 else:
                     print("Port is not fromPort nor toPort")
 
-        # print("res is " + str(res))
-        [print(p.parent.displayName) for p in res]
+        # [print(p.parent.displayName) for p in res]
         return res
 
     def findStorageCorrespPortsHx(self, portList):
         res = []
 
         for p in portList:
-            print("Port has")
+            # print("Port has")
             # [print(c.displayName) for c in p.connectionList]
 
             if len(p.connectionList) > 1:
@@ -1285,7 +1371,7 @@ class DiagramEditor(QWidget):
                     res.append(p.connectionList[0].fromPort)
                 else:
                     print("Port is not fromPort nor toPort")
-        print("res is " + str(res))
+        # print("res is " + str(res))
         return res
 
     def tearDownStorageInnerConns(self):
@@ -1298,40 +1384,35 @@ class DiagramEditor(QWidget):
                 [print(e.displayName) for e in t.insideConnRight]
 
                 # Remove old insideConnection:
-                if len(t.insideConnLeft) > 0:
+                # if len(t.insideConnLeft) > 0:
                     # print("t.insideConnection has " + str(len(t.insideConnLeft)) + "TPieces/connection")
+                for tp in t.insideConnLeft:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.insideConnLeft = []
 
-                    for tp in t.insideConnLeft:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.insideConnLeft.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                for tp in t.insideConnRight:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.insideConnRight = []
 
-                if len(t.insideConnRight) > 0:
-                    for tp in t.insideConnRight:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.insideConnRight.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                for tp in t.hxInsideConnsLeft:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.hxInsideConnsLeft = []
 
-                if len(t.hxInsideConnsLeft):
-                    for tp in t.insideConnLeft:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.hxInsideConnsLeft.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
-
-                if len(t.hxInsideConnsRight):
-                    for tp in t.insideConnRight:
-                        if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                            t.hxInsideConnsRight.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            print("Element other than TPiece/connector found in insideConnection " + str(tp))
-                    # t.insideConnRight.clear()
+                for tp in t.hxInsideConnsRight:
+                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
+                        tp.deleteBlock()
+                    else:
+                        print("Element other than TPiece/connector found in insideConnection " + str(tp))
+                t.hxInsideConnsRight = []
 
         # self.setTrnsysIdBack()
 
@@ -2469,13 +2550,13 @@ class DiagramEditor(QWidget):
                     k.changeSize()
                     self.diagramScene.addItem(k)
                     print("self grouplist is " + str(self.groupList))
-                    k.setBlockToGroup("defaultGroup")
+                    # k.setBlockToGroup("defaultGroup")
 
                 if isinstance(k, StorageTank):
                     print("Loading a Storage")
                     k.setParent(self.diagramView)
                     k.updateImage()
-                    k.setBlockToGroup("defaultGroup")
+                    # k.setBlockToGroup("defaultGroup")
 
                     for hx in k.heatExchangers:
                         hx.initLoad()
@@ -2488,7 +2569,7 @@ class DiagramEditor(QWidget):
                     # print("Connection fromPort" + str(k.fromPort))
                     # print("Connection toPort" + str(k.toPort))
                     k.initLoad()
-                    k.setConnToGroup("defaultGroup")
+                    # k.setConnToGroup("defaultGroup")
 
                 if isinstance(k, dict):
                     if "__idDct__" in k:
@@ -2641,6 +2722,25 @@ class DiagramEditor(QWidget):
 
         self.pasting = False
 
+    def createSelectionGroup(self, selectionList):
+        for t in selectionList:
+            if isinstance(t, BlockItem):
+                self.selectionGroupList.addToGroup(t)
+
+        self.multipleSelectedMode = False
+        self.selectionMode = False
+
+        self.diagramScene.addItem(self.selectionGroupList)
+        self.selectionGroupList.setFlags(self.selectionGroupList.ItemIsMovable)
+
+        self.itemsSelected = True
+
+    def clearSelectionGroup(self):
+        for it in self.selectionGroupList.childItems():
+            self.selectionGroupList.removeFromGroup(it)
+
+        self.itemsSelected = False
+
     def newDiagram(self):
         self.centralWidget.delBlocks()
 
@@ -2653,7 +2753,6 @@ class DiagramEditor(QWidget):
         # self.globalConnID = 0
 
         self.idGen.reset()
-
         newDiagramDlg(self)
 
     # Behavior:
@@ -2780,6 +2879,9 @@ class MainWindow(QMainWindow):
         editGroupsAction = QAction(QIcon('images/modal-list.png'), "Edit groups/loops", self)
         editGroupsAction.triggered.connect(self.editGroups)
 
+        selectMultipleAction = QAction(QIcon('images/elastic.png'), "Select multiple items", self)
+        selectMultipleAction.triggered.connect(self.createSelection)
+
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
@@ -2830,6 +2932,7 @@ class MainWindow(QMainWindow):
         selectTb.addAction(pasteAction)
         selectTb.addAction(toggleConnLabels)
         selectTb.addAction(editGroupsAction)
+        selectTb.addAction(selectMultipleAction)
         selectTb.addAction(trnsysList)
 
         self.sb = self.statusBar()
@@ -2879,6 +2982,9 @@ class MainWindow(QMainWindow):
         # print("Tb createGroup pressed")
         # global selectionMode
         self.centralWidget.selectionMode = True
+        self.centralWidget.groupMode = True
+        self.centralWidget.copyMode = False
+        self.centralWidget.multipleSelectMode = False
 
     def tidyUp(self):
         print("Tidying up...")
@@ -2903,6 +3009,8 @@ class MainWindow(QMainWindow):
 
         self.centralWidget.selectionMode = True
         self.centralWidget.copyMode = True
+        self.centralWidget.groupMode = False
+        self.centralWidget.multipleSelectMode = False
 
     def pasteSelection(self):
         print("Pasting selection")
@@ -2936,6 +3044,12 @@ class MainWindow(QMainWindow):
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
         self.centralWidget.setConnLabelVis(self.labelVisState)
+
+    def createSelection(self):
+        self.centralWidget.selectionMode = True
+        self.centralWidget.copyMode = False
+        self.centralWidget.groupMode = False
+        self.centralWidget.multipleSelectMode = True
 
     def mouseMoveEvent(self, e):
         pass

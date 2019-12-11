@@ -38,7 +38,8 @@ class GroupChooserBlockDlg(QDialog):
 
     def acceptedEdit(self):
         if len(self.listw.selectedItems()) > 0:
-            self.block.setBlockToGroup(self.listw.selectedItems()[0].displayName)
+            self.block.setBlockToGroup(self.listw.selectedItems()[0].text())
+            self.close()
 
     def cancel(self):
         # print("Canceling")
