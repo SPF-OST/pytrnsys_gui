@@ -354,7 +354,8 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'Connector':
                             bl = Connector(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                         else:
-                            bl = BlockItem(i["BlockName"], i["BlockName"], self.editor.diagramView)
+                            bl = BlockItem(i["BlockName"], i["BlockName"
+                                                             ""], self.editor.diagramView)
                         # print("Bl name is" + bl.name)
 
                         bl.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
@@ -363,6 +364,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.updateFlipStateH(i["FlippedH"])
                         bl.updateFlipStateV(i["FlippedV"])
                         bl.rotateBlockToN(i["RotationN"])
+                        bl.displayName = i["BlockDisplayName"]
 
                         bl.groupName = "defaultGroup"
                         bl.setBlockToGroup(i["GroupName"])
@@ -382,6 +384,8 @@ class DiagramDecoder(json.JSONDecoder):
                         bl = StorageTank(i["StorageName"], i["StorageDisplayName"], self.editor.diagramView)
                         bl.flippedH = i["FlippedH"]
                         # bl.flippedV = i["FlippedV"] # No support for vertical flip
+                        bl.displayName = i["StorageName"]
+
                         bl.changeSize()
 
                         bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
@@ -429,7 +433,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.flippedH = i["FlippedH"]
                         bl.flippedV = i["FlippedV"]
                         bl.childIds = i["childIds"]
-
+                        bl.displayName = i["HeatPumpName"]
                         bl.changeSize()
 
                         for x in range(len(bl.inputs)):
@@ -1319,11 +1323,11 @@ class DiagramEditor(QWidget):
 
                 for hx in t.heatExchangers:
                     if hx.sSide == 0:
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsLeft)
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsLeft, "L")
                     elif hx.sSide == 2:
                         print("storage of hx R is " + str(t.displayName))
                         print("hx ports are" + str(hx.port1) + str(hx.port2))
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsRight)
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsRight, "R")
                     else:
                         print("heatExchanger has not valid sSide")
 
@@ -2872,6 +2876,7 @@ class MainWindow(QMainWindow):
 
         pasteAction = QAction(QIcon('images/puzzle-piece.png'), "Paste from clipboard", self)
         pasteAction.triggered.connect(self.pasteSelection)
+        pasteAction.setShortcut("Ctrl+v")
 
         toggleConnLabels = QAction(QIcon('images/labelToggle.png'), "Toggle pipe labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
@@ -2893,11 +2898,14 @@ class MainWindow(QMainWindow):
         self.fileMenu.addAction(fileMenuNewAction)
 
         fileMenuOpenAction = QAction("Open", self)
+
         fileMenuOpenAction.triggered.connect(self.openFile)
+        fileMenuOpenAction.setShortcut("Ctrl+o")
         self.fileMenu.addAction(fileMenuOpenAction)
 
         fileMenuSaveAction = QAction("Save", self)
         fileMenuSaveAction.triggered.connect(self.saveDia)
+        fileMenuSaveAction.setShortcut("Ctrl+s")
         self.fileMenu.addAction(fileMenuSaveAction)
 
         fileMenuSaveAsAction = QAction("Save as", self)
@@ -3046,6 +3054,7 @@ class MainWindow(QMainWindow):
         self.centralWidget.setConnLabelVis(self.labelVisState)
 
     def createSelection(self):
+        self.menuBar().setActiveAction(self.sele)
         self.centralWidget.selectionMode = True
         self.centralWidget.copyMode = False
         self.centralWidget.groupMode = False

@@ -36,7 +36,7 @@
         },
         "Block-22": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Kollektor",
+            "BlockDisplayName": "Collector",
             "BlockName": "Kollektor",
             "BlockPosition": [
                 -1166.0,
@@ -57,7 +57,7 @@
         },
         "Block-25": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Pump",
+            "BlockDisplayName": "Pump7",
             "BlockName": "Pump",
             "BlockPosition": [
                 -1019.0,
@@ -78,7 +78,7 @@
         },
         "Block-28": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "TVentil",
+            "BlockDisplayName": "TMix",
             "BlockName": "TVentil",
             "BlockPosition": [
                 -602.0,
@@ -100,7 +100,7 @@
         },
         "Block-32": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "TeePiece",
+            "BlockDisplayName": "TPiece",
             "BlockName": "TeePiece",
             "BlockPosition": [
                 -597.0,
@@ -122,7 +122,7 @@
         },
         "Block-36": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "WTap",
+            "BlockDisplayName": "WTapTop",
             "BlockName": "WTap",
             "BlockPosition": [
                 -349.0,
@@ -141,7 +141,7 @@
         },
         "Block-38": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "WTap_main",
+            "BlockDisplayName": "WTapBottom",
             "BlockName": "WTap_main",
             "BlockPosition": [
                 -358.0,
@@ -209,7 +209,7 @@
                     "trnsysID": 5
                 }
             ],
-            "StorageDisplayName": "StorageTank1",
+            "StorageDisplayName": "StorageTank22",
             "StorageName": "StorageTank",
             "StoragePosition": [
                 -842.0,

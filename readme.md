@@ -27,3 +27,6 @@ To update the segments adjacent to a corner, two methods can be used:
 The gradient of a connection is a full interpolation between start and end color.
 
 The diagramEditor also has a list of Groups, which contain a list of Connections and Blocks, _groupList_. One can create new groups, name them and they appear as loop in the trnsys export.
+
+######Usage notes:
+- Dont drag on a line and release afterwards on the line (segment will break)
