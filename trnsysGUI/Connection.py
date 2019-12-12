@@ -21,6 +21,7 @@ def calcDist(p1, p2):
 
 class Connection(object):
     def __init__(self, fromPort, toPort, isBlock, parent, **kwargs):
+        print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
         self.toPort = toPort
         self.isBlockConn = isBlock
@@ -630,13 +631,18 @@ class Connection(object):
         print("Deleting connection " + self.displayName + " " + str(self))
         print("fromPort is at " + str(self.fromPort.parent.displayName))
         print("toPort is at " + str(self.toPort.parent.displayName))
+
         self.clearConn()
         self.fromPort.connectionList.remove(self)
-        print("Connectionlist of fromPort after removal is:")
-        [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.fromPort.connectionList ]
+
+        # print("Connectionlist of fromPort after removal is:")
+        # [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.fromPort.connectionList ]
+
         self.toPort.connectionList.remove(self)
-        print("Connectionlist of toPort after removal is:")
-        [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.toPort.connectionList ]
+
+        # print("Connectionlist of toPort after removal is:")
+        # [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.toPort.connectionList ]
+
         if self in self.parent.trnsysObj:
             self.parent.trnsysObj.remove(self)
         else:
@@ -644,6 +650,9 @@ class Connection(object):
             print(self.id)
             print([i.id for i in self.parent.trnsysObj])
             return
+
+        self.removeConnFromGroup()
+
         print("Removing trnsysObj " + str(self))
         self.parent.connectionList.remove(self)
         del self
@@ -909,6 +918,16 @@ class Connection(object):
     def unhighlightConn(self):
         for s in self.segments:
             s.updateGrad()
+
+    def removeConnFromGroup(self):
+        for g in self.parent.groupList:
+            if g.displayName == self.groupName:
+                if self in g.itemList:
+                    g.itemList.remove(self)
+                else:
+                    print("While removing conn from group, groupName is invalid")
+            else:
+                print("While removeing conn from group, no group with conn.groupName")
 
     def inspectConn(self):
         self.parent.listV.clear()

@@ -86,7 +86,7 @@ class BlockItem(QGraphicsPixmapItem):
         if self.name != 'TeePiece' and self.name != 'TVentil' and self.name != 'Pump' \
                 and self.name != 'Kollektor' and self.name != 'HP' and self.name != 'IceStorage' \
                 and self.name != 'Radiator' and self.name != 'WTap' and self.name != 'WTap_main' \
-                and self.name != 'Connector':
+                and self.name != 'Connector' and self.name != 'GenericBlock':
             self.changeSize()
 
     def setParent(self, p):
@@ -283,11 +283,12 @@ class BlockItem(QGraphicsPixmapItem):
     def deleteConns(self):
 
         for p in self.inputs:
-            for c in p.connectionList:
-                c.deleteConn()
+            while len(p.connectionList) > 0:
+                p.connectionList[0].deleteConn()
+
         for p in self.outputs:
-            for c in p.connectionList:
-                c.deleteConn()
+            while len(p.connectionList) > 0:
+                p.connectionList[0].deleteConn()
 
     def deleteBlock(self):
         print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")

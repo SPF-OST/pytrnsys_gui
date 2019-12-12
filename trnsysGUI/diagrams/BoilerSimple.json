@@ -57,7 +57,7 @@
         },
         "Block-25": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Pump7",
+            "BlockDisplayName": "PuCol",
             "BlockName": "Pump",
             "BlockPosition": [
                 -1019.0,
@@ -209,7 +209,7 @@
                     "trnsysID": 5
                 }
             ],
-            "StorageDisplayName": "StorageTank22",
+            "StorageDisplayName": "StorageTank",
             "StorageName": "StorageTank",
             "StoragePosition": [
                 -842.0,

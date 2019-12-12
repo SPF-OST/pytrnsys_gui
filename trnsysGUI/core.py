@@ -14,7 +14,7 @@ from pathlib import Path
 
 # from trnsysGUI.CircularDep import *
 # from trnsysGUI.Connection import Connection
-
+# from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
@@ -365,6 +365,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.updateFlipStateV(i["FlippedV"])
                         bl.rotateBlockToN(i["RotationN"])
                         bl.displayName = i["BlockDisplayName"]
+                        bl.label.setPlainText(bl.displayName)
 
                         bl.groupName = "defaultGroup"
                         bl.setBlockToGroup(i["GroupName"])
@@ -994,6 +995,8 @@ class EditorGraphicsView(QGraphicsView):
                 bl = WTap_main(name, name, self)
             elif name == 'Connector':
                 bl = Connector(name, name, self)
+            # elif name == 'GenericBlock':
+            #     bl = GenericBlock(name, name, self)
             else:
                 bl = BlockItem(name, name, self)
 
@@ -1002,6 +1005,7 @@ class EditorGraphicsView(QGraphicsView):
                 p1 = self.mapToScene(qp)
             else:
                 p1 = self.mapToScene(event.pos())
+
             # cellS = 50
             # pos1x = int(p1.x()/cellS) * cellS
             # pos1y = int(p1.y()/cellS) * cellS
@@ -1124,6 +1128,8 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'WTap_main')), 'WTap_main'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Radiator')), 'Radiator'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Connector')), 'Connector'))
+        # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericBlock')), 'GenericBlock'))
+
 
         for i in self.libItems:
             self.libraryModel.appendRow(i)

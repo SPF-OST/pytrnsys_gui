@@ -2,10 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/GenericBlock.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/images/GenericBlock.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/newPortDlg.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/Collector.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Collector.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/Connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/clipboard.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/clipboard.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/BoilerSimple.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/BoilerSimple.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,12 +32,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="-25" />
-    <option name="y" value="117" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
-  </component>
   <component name="ProjectId" id="1UVhbJKy11z4WPcWuBu0jR9vRk0" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -36,7 +39,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI/diagrams" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI/images" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -44,6 +47,7 @@
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\images" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\diagrams" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\images" />
@@ -105,7 +109,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Connection" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="StorageTank" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="TrnsysGUI" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -117,7 +121,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/Connection.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/StorageTank.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -171,17 +175,17 @@
     <list>
       <item itemvalue="Python.ConfigStorage" />
       <item itemvalue="Python.BlockItem" />
-      <item itemvalue="Python.Connection" />
       <item itemvalue="Python.core" />
       <item itemvalue="Python.segmentItem" />
+      <item itemvalue="Python.StorageTank" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.core" />
+        <item itemvalue="Python.StorageTank" />
         <item itemvalue="Python.segmentItem" />
         <item itemvalue="Python.ConfigStorage" />
         <item itemvalue="Python.BlockItem" />
-        <item itemvalue="Python.Connection" />
       </list>
     </recent_temporary>
   </component>

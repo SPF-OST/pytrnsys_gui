@@ -53,7 +53,6 @@ class StorageTank(BlockItem):
 
         port1 = None
         port2 = None
-        tempSideList = None
         sideNr = 0
 
         if left:
@@ -94,6 +93,8 @@ class StorageTank(BlockItem):
         if left:
             port1.setPos(-2 * StorageTank.delta, hAbsI)
             port2.setPos(-2 * StorageTank.delta, hAbsO)
+            port1.side = 0
+            port2.side = 0
         else:
             port1.setPos(self.w + 2 * StorageTank.delta, hAbsI)
             port2.setPos(self.w + 2 * StorageTank.delta, hAbsO)
@@ -394,3 +395,17 @@ class StorageTank(BlockItem):
         print("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         del self
+
+    def deleteBlockDebug(self):
+        print("Listing all connections")
+        conns = []
+        for p in self.inputs + self.outputs:
+            for c in p.connectionList:
+                conns.append(c)
+
+        [print(
+            c.displayName + ", fromPort: " + c.fromPort.parent.displayName + ", toPort: " + c.toPort.parent.displayName)
+         for c in conns]
+
+    def deleteHeatExchangers(self):
+        pass
