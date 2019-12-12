@@ -2,19 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/trnsysGUI/GenericBlock.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trnsysGUI/images/GenericBlock.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/trnsysGUI/newPortDlg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/Collector.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Collector.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/Connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/BoilerSimple.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/BoilerSimple.json" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

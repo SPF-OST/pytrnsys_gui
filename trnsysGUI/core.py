@@ -764,16 +764,6 @@ class DiagramScene(QGraphicsScene):
         self.released = False
         self.pressed = False
 
-        # self.addItem(QGraphicsEllipseItem(0,0,3,3, None))
-
-        # qrg = QRadialGradient(0, 0, 10)
-        # qrg.setSpread(QGradient.RepeatSpread)
-        # self.setBackgroundBrush(qrg)
-        # self.setBackgroundBrush(QtCore.Qt.blue)
-        # qb = QBrush()
-        # qb.setStyle(Qt.Dense7Pattern)
-        # self.setBackgroundBrush(qb)
-
     # def contextMenuEvent(self, event):
     #     menu = QMenu()
     #     a4 = menu.addAction('Print end and start items')
@@ -828,28 +818,26 @@ class DiagramScene(QGraphicsScene):
             self.selectionRect.setVisible(False)
 
 
-    # def drawBackground(self, painter, rect):
-    #     if self.parent().snapGrid:
-    #         pen = QPen()
-    #         pen.setWidth(2)
-    #         pen.setCosmetic(True)
-    #         painter.setPen(pen)
-    #
-    #         gridSize = 20
-    #
-    #
-    #         left = int(rect.left()) - (int(rect.left()) % gridSize)
-    #         top = int(rect.top()) - (int(rect.top()) % gridSize)
-    #         points = []
-    #         for x in range(left, int(rect.height()), gridSize):
-    #             for y in range(top, int(rect.bottom()), gridSize):
-    #                 points.append(QPointF(x, y))
-    #
-    #         for x in points:
-    #             painter.drawPoint(x)
-    #     else:
-    #         pass
-    #         # super(DiagramScene, self).drawBackground(painter, rect)
+    def drawBackground(self, painter, rect):
+        if self.parent().snapGrid:
+            pen = QPen()
+            pen.setWidth(2)
+            pen.setCosmetic(True)
+            painter.setPen(pen)
+
+            gridSize = 50
+
+            left = int(rect.left()) - (int(rect.left()) % gridSize)
+            top = int(rect.top()) - (int(rect.top()) % gridSize)
+            points = []
+            for x in range(left, int(rect.height()), gridSize):
+                for y in range(top, int(rect.bottom()), gridSize):
+                    points.append(QPointF(x, y))
+
+            for x in points:
+                painter.drawPoint(x)
+        else:
+            super(DiagramScene, self).drawBackground(painter, rect)
 
     # def mouseMoveEvent(self, e):
     #     self.setMouseTracking(True)
@@ -893,6 +881,7 @@ class DiagramScene(QGraphicsScene):
             print("No items here!")
             for c in self.parent().connectionList:
                 c.unhighlightConn()
+
 
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
@@ -3085,6 +3074,7 @@ class MainWindow(QMainWindow):
         self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
 
     def createSelection(self):
+        self.centralWidget.clearSelectionGroup()
         self.centralWidget.selectionMode = True
         self.centralWidget.copyMode = False
         self.centralWidget.groupMode = False

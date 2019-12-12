@@ -326,7 +326,6 @@ class BlockItem(QGraphicsPixmapItem):
         for out in self.outputs:
             print("Has output with ID " + str(out.id))
 
-
     def printConnections(self):
         print("Connections are:")
         for c in self.getConnections():
@@ -343,11 +342,12 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.parent().listV.addItem("Inputs: " + str(self.inputs))
         self.parent.parent().listV.addItem("Outputs: " + str(self.outputs))
 
-    # def itemChange(self, change, value):
-    #     # print(change, value)
-    #     if change == self.ItemPositionHasChanged:
-    #         print("itemcahgne")
-    #         value = QPointF(value.x() - value.x() % 150, value.y() - value.y() % 150)
-    #         return change, value
-    #     else:
-    #         return super(BlockItem, self).itemChange(change, value)
+    def itemChange(self, change, value):
+        # print(change, value)
+        if change == self.ItemPositionChange and self.parent.parent().snapGrid:
+            print("itemcahgne")
+            print(type(value))
+            value = QPointF(value.x() - value.x() % 50, value.y() - value.y() % 50)
+            return value
+        else:
+            return super(BlockItem, self).itemChange(change, value)
