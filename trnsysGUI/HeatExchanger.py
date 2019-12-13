@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QPen
-from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu
+from PyQt5.QtGui import QPen, QColor
+from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu, QGraphicsRectItem
 
 from trnsysGUI.PortItem import PortItem
 # from trnsysGUI.StorageTank import StorageTank
@@ -20,6 +20,8 @@ class HeatExchanger(QGraphicsItemGroup):
         self.h = sizeH
         self.sSide = side
         self.id = self.parent.parent.parent().idGen.getID()
+
+        # self.rectangle = QGraphicsRectItem(0,0 ,self.w -5, self.h, self)
 
         self.conn = None
 
@@ -101,6 +103,7 @@ class HeatExchanger(QGraphicsItemGroup):
     def drawHxL(self, param, factor):
         s = self.offset
         delta = 4
+        # set bb = True for equal amount of lines
         bb = False
         if bb:
             lineTop = QGraphicsLineItem(s.x() - 2 * delta, s.y() + 0, s.x() + self.w, s.y() + 0, self)
@@ -153,10 +156,12 @@ class HeatExchanger(QGraphicsItemGroup):
             lineBottom.setPen(QPen(Qt.black, 2))
             self.lines.append(lineBottom)
 
+            # self.rectangle.setPos(lineTop.line().p1().x(), lineTop.line().p1().y())
+
     def drawHxR(self, param, factor):
         s = self.offset
         delta = 4
-
+        # set bb = True for equal amount of lines
         bb = False
         if bb:
             lineTop = QGraphicsLineItem(s.x() + 2 * delta, s.y() + 0, s.x() - self.w, s.y() + 0, self)
@@ -212,6 +217,9 @@ class HeatExchanger(QGraphicsItemGroup):
             lineBottom.setPen(QPen(Qt.black, 2))
             self.lines.append(lineBottom)
 
+            # self.rectangle.setPos(lineTop.line().p2().x(), lineTop.line().p2().y())
+
+
     def floorHeight(self):
         delta = 4
         # Could be used if static partH would be used for the heatexchanger
@@ -239,3 +247,19 @@ class HeatExchanger(QGraphicsItemGroup):
     def rename(self, newName):
         self.conn.displayName = newName
         self.displayName = newName
+
+    def highlightHx(self):
+        for ch in self.childItems():
+            if isinstance(ch, QGraphicsLineItem):
+                pen1 = QPen(QColor(125, 242, 189), 3)
+                ch.setPen(pen1)
+
+    def unhighlightHx(self):
+        for ch in self.childItems():
+            if isinstance(ch, QGraphicsLineItem):
+                ch.setPen(QPen(Qt.black, 2))
+
+    def mousePressEvent(self, event):
+        self.highlightHx()
+        print("pressed")
+        # super(HeatExchanger, self).keyPressEvent(event)

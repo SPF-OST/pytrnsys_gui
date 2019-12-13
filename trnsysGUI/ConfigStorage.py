@@ -87,6 +87,7 @@ class ConfigStorage(QDialog):
         gl.addWidget(addButton, 10, 0, 1, 1)
         removeButton = QPushButton("Remove...")
         removeButton.clicked.connect(self.removeHxL)
+        removeButton.clicked.connect(self.removeHxR)
         gl.addWidget(removeButton, 10, 1, 1, 1)
         spaceHx = QSpacerItem(self.width(), spacerHeight)
         gl.addItem(spaceHx, 11, 0, 1, 2)
@@ -216,11 +217,13 @@ class ConfigStorage(QDialog):
                     self.storage.heatExchangers.remove(i)
                     self.listWL.takeItem(self.listWL.row(self.listWL.selectedItems()[0]))
 
-                    for c in i.port1.connectionList:
-                        c.deleteConn()
+                    # for c in i.port1.connectionList:
+                    while len(i.port1.connectionList) > 0:
+                        i.port1.connectionList[0].deleteConn()
 
-                    for c in i.port2.connectionList:
-                        c.deleteConn()
+                    # for c in i.port2.connectionList:
+                    while len(i.port2.connectionList) > 0:
+                        i.port2.connectionList[0].deleteConn()
 
                     self.storage.inputs.remove(i.port1)
                     self.storage.outputs.remove(i.port2)
@@ -238,14 +241,15 @@ class ConfigStorage(QDialog):
             for j in self.listWR.selectedItems():
                 if i.displayName == j.text()[:j.text().find(",")]:
                     self.storage.heatExchangers.remove(i)
-                    self.listW.takeItem(self.listWR.row(self.listWR.selectedItems()[0]))
+                    self.listWR.takeItem(self.listWR.row(self.listWR.selectedItems()[0]))
 
+                    # for c in i.port1.connectionList:
+                    while len(i.port1.connectionList) > 0:
+                        i.port1.connectionList[0].deleteConn()
 
-                    for c in i.port1.connectionList:
-                        c.deleteConn()
-
-                    for c in i.port2.connectionList:
-                        c.deleteConn()
+                    # for c in i.port2.connectionList:
+                    while len(i.port2.connectionList) > 0:
+                        i.port2.connectionList[0].deleteConn()
 
                     self.storage.inputs.remove(i.port1)
                     self.storage.outputs.remove(i.port2)

@@ -385,7 +385,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl = StorageTank(i["StorageName"], i["StorageDisplayName"], self.editor.diagramView)
                         bl.flippedH = i["FlippedH"]
                         # bl.flippedV = i["FlippedV"] # No support for vertical flip
-                        bl.displayName = i["StorageName"]
+                        bl.displayName = i["StorageDisplayName"]
 
                         bl.changeSize()
 
@@ -788,6 +788,8 @@ class DiagramScene(QGraphicsScene):
         # global selectionMode
         # global copyMode
         # global pasting
+
+
         if self.parent().pasting:
             # Dismantle group
             self.parent().clearCopyGroup()
@@ -816,7 +818,6 @@ class DiagramScene(QGraphicsScene):
             self.released = False
             self.pressed = False
             self.selectionRect.setVisible(False)
-
 
     def drawBackground(self, painter, rect):
         if self.parent().snapGrid:
@@ -882,7 +883,12 @@ class DiagramScene(QGraphicsScene):
             for c in self.parent().connectionList:
                 c.unhighlightConn()
 
+            self.parent().alignYLineItem.setVisible(False)
 
+            for st in self.parent().trnsysObj:
+                if isinstance(st, StorageTank):
+                    for hx in st.heatExchangers:
+                        hx.unhighlightHx()
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
 
@@ -995,11 +1001,6 @@ class EditorGraphicsView(QGraphicsView):
             else:
                 p1 = self.mapToScene(event.pos())
 
-            # cellS = 50
-            # pos1x = int(p1.x()/cellS) * cellS
-            # pos1y = int(p1.y()/cellS) * cellS
-            # bl.setPos(pos1x, pos1y)
-
             bl.setPos(p1)
             self.scene().addItem(bl)
 
@@ -1017,6 +1018,15 @@ class EditorGraphicsView(QGraphicsView):
         QGraphicsView.mouseMoveEvent(self, event)
         self.parent().mouseMoveEvent(event)
 
+    def mouseReleaseEvent(self, mouseEvent):
+        pass
+        # print(str(mouseEvent.pos()))
+        #     for ot in self.trnsysObj:
+        #     t.setPos(t.pos())
+        # #     self.parent().alignYLineItem.setVisible(False)
+
+        super(EditorGraphicsView, self).mouseReleaseEvent(mouseEvent)
+
     def wheelEvent(self, event):
         super(EditorGraphicsView, self).wheelEvent(event)
 
@@ -1025,6 +1035,18 @@ class EditorGraphicsView(QGraphicsView):
                 self.scale(1.25, 1.25)
             else:
                 self.scale(0.8, 0.8)
+
+    def mousePressEvent(self, event):
+    #     pass
+        # for t in self.parent().trnsysObj:
+        #     if isinstance(t, BlockItem):
+        #         t.alignMode = True
+        #         print("Changing alignmentmode")
+        # for t in self.parent().trnsysObj:
+        #     if isinstance(t, BlockItem):
+        #         t.itemChange(t.ItemPositionChange, t.pos())
+
+        super(EditorGraphicsView, self).mousePressEvent(event)
 
     # def drawBackground(self, painter_, rect):
     #
@@ -1074,6 +1096,8 @@ class DiagramEditor(QWidget):
         self.copyMode = False
         self.multipleSelectedMode = False
 
+        self.alignMode = False
+
         self.pasting = False
         self.itemsSelected = False
 
@@ -1118,7 +1142,6 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Radiator')), 'Radiator'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Connector')), 'Connector'))
         # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericBlock')), 'GenericBlock'))
-
 
         for i in self.libItems:
             self.libraryModel.appendRow(i)
@@ -1216,6 +1239,14 @@ class DiagramEditor(QWidget):
         self.connLineItem.setPen(QtGui.QPen(connLinecolor, linePx))
         self.connLineItem.setVisible(False)
         self.diagramScene.addItem(self.connLineItem)
+
+        self.alignYLine = QLineF()
+        self.alignYLineItem = QGraphicsLineItem(self.alignYLine)
+        self.alignYLineItem.setPen(QtGui.QPen(QColor(196, 196, 196), 2))
+        self.alignYLineItem.setVisible(False)
+        self.diagramScene.addItem(self.alignYLineItem)
+
+        self.alignXLine = QLineF()
 
         # #Search related lists
         self.bfs_visitedNodes = []
@@ -1338,6 +1369,12 @@ class DiagramEditor(QWidget):
                 t.connectInside(self.findStorageCorrespPorts(t.leftSide), t.insideConnLeft, "L")
                 t.connectInside(self.findStorageCorrespPorts(t.rightSide), t.insideConnRight, "R")
 
+                print("------Checking insideConns")
+                print(t.hxInsideConnsLeft)
+                print(t.hxInsideConnsRight)
+                print(t.insideConnLeft)
+                print(t.insideConnRight)
+
     def findStorageCorrespPorts(self, portList):
         # This function gets the ports on the other side of pipes connected to a port of the StorageTank
 
@@ -1384,38 +1421,59 @@ class DiagramEditor(QWidget):
         for t in self.trnsysObj:
             if type(t) is StorageTank:
 
-                print("in conn left list is ")
-                [print(e.displayName) for e in t.insideConnLeft]
-                print("in conn right list is ")
-                [print(e.displayName) for e in t.insideConnRight]
+                # print("in conn left list is ")
+                # [print(e.displayName) for e in t.insideConnLeft]
+                # print("in conn right list is ")
+                # [print(e.displayName) for e in t.insideConnRight]
 
                 # Remove old insideConnection:
                 # if len(t.insideConnLeft) > 0:
                     # print("t.insideConnection has " + str(len(t.insideConnLeft)) + "TPieces/connection")
-                for tp in t.insideConnLeft:
+
+                while len(t.insideConnLeft) > 0:
+                    tp = t.insideConnLeft[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.insideConnLeft.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.insideConnLeft = []
 
-                for tp in t.insideConnRight:
+                while len(t.insideConnRight) > 0:
+                    tp = t.insideConnRight[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.insideConnRight.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.insideConnRight = []
 
-                for tp in t.hxInsideConnsLeft:
+                while len(t.hxInsideConnsLeft) > 0:
+                    tp = t.hxInsideConnsLeft[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.hxInsideConnsLeft.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.hxInsideConnsLeft = []
 
-                for tp in t.hxInsideConnsRight:
+                while len(t.hxInsideConnsRight) > 0:
+                    tp = t.hxInsideConnsRight[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.hxInsideConnsRight.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.hxInsideConnsRight = []
@@ -2068,8 +2126,9 @@ class DiagramEditor(QWidget):
 
         fullExportText = ''
 
-        filepath = Path(Path(__file__).resolve().parent)
-        if Path(filepath.joinpath('export.dck')).exists():
+        exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+
+        if Path(exportPath).exists():
             qmb = QMessageBox(self)
             qmb.setText("Warning: " +
                         "An export file exists already. Do you want to overwrite or cancel?")
@@ -2131,10 +2190,10 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportPrintPipeLoops()
         fullExportText += self.exportPrintPipeLosses()
 
-
         print("------------------------> END OF EXPORT <------------------------")
 
-        f = open("export.dck", 'w')
+        # f = open('export.dck', 'w')
+        f = open(str(exportPath), 'w')
         f.truncate(0)
         f.write(fullExportText)
         f.close()
@@ -2564,6 +2623,7 @@ class DiagramEditor(QWidget):
                     k.updateImage()
                     # k.setBlockToGroup("defaultGroup")
 
+                    print("dddd is " + k.displayName)
                     for hx in k.heatExchangers:
                         hx.initLoad()
 
@@ -2899,6 +2959,12 @@ class MainWindow(QMainWindow):
         toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
         toggleEditorModeAction.setShortcut("m")
 
+        toggleSnapAction = QAction("Toggle snap grid", self)
+        toggleSnapAction.triggered.connect(self.toggleSnap)
+
+        toggleAlignModeAction = QAction("Toggle align mode", self)
+        toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
+
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
@@ -2929,8 +2995,8 @@ class MainWindow(QMainWindow):
         self.s1Menu = QMenu("Edit")
         self.s1Menu.addAction(toggleEditorModeAction)
         self.s1Menu.addAction(multipleDeleteAction)
-        self.s1Menu.addAction("Place2")
-        self.s1Menu.addAction("Place3")
+        self.s1Menu.addAction(toggleSnapAction)
+        self.s1Menu.addAction(toggleAlignModeAction)
         self.s1Menu.addAction("Place4")
         self.s1Menu.addAction("Place5")
 
@@ -3054,6 +3120,11 @@ class MainWindow(QMainWindow):
             if s.id == 11:
                 print("Duplicate id obj is " + str(s.displayName) + " " + str(s.id))
 
+        for t in self.centralWidget.trnsysObj:
+            t.alignMode = True
+            print(t.alignMode)
+
+
     def openFile(self):
         print("Opening diagram")
         self.centralWidget.delBlocks()
@@ -3072,6 +3143,14 @@ class MainWindow(QMainWindow):
         print("Toggling editor mode")
         self.centralWidget.editorMode = (self.centralWidget.editorMode + 1) % 2
         self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
+
+    def toggleAlignMode(self):
+        print("Toggling alignMode")
+        self.centralWidget.alignMode = not self.centralWidget.alignMode
+
+    def toggleSnap(self):
+        self.centralWidget.snapGrid = not self.centralWidget.snapGrid
+        self.centralWidget.diagramScene.update()
 
     def createSelection(self):
         self.centralWidget.clearSelectionGroup()

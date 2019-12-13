@@ -244,6 +244,7 @@ class StorageTank(BlockItem):
             print("ports have " + str(side[0].parent) + str(side[1].parent))
 
             connector = Connector("Connector", "Connector", self.parent)
+            connector.displayName = "ConnectorTes" + self.displayName + sideVar + str(connector.id)
             connector.setVisible(False)
             self.parent.scene().addItem(connector)
             tpList.append(connector)
@@ -268,6 +269,7 @@ class StorageTank(BlockItem):
 
             for i in range(0, x, 2):
                 tpiece = TeePiece("TeePiece", "TeePiece", self.parent)
+                tpiece.displayName = "TPieceTes" + self.displayName + sideVar + str(tpiece.id)
                 tpiece.setVisible(False)
                 self.parent.scene().addItem(tpiece)
                 tpList.append(tpiece)
@@ -320,7 +322,7 @@ class StorageTank(BlockItem):
 
         for s in side_test:
             for t in tempArrConn:
-                print("Checking s")
+                # print("Checking s")
                 if t.fromPort is s or t.toPort is s:
                     print("This is a real connection " + str(t.displayName))
                     if len(s.connectionList) > 0:
@@ -409,3 +411,8 @@ class StorageTank(BlockItem):
 
     def deleteHeatExchangers(self):
         pass
+
+    # def keyPressEvent(self, event):
+    #     print("Pressed st")
+    #
+    #     super(StorageTank, self).keyPressEvent(event)
