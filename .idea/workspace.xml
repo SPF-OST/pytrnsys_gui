@@ -5,6 +5,13 @@
       <change beforePath="$PROJECT_DIR$/.idea/TrnsysGUI.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/TrnsysGUI.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/exports/HotWater2cols.dck" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/exports/HotWater2cols.dck" afterDir="false" />
+>>>>>>> 56d24352b7111149b58b950326262035d6bb145a
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -107,8 +114,12 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+<<<<<<< HEAD
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+=======
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../spf_gui" />
+>>>>>>> 56d24352b7111149b58b950326262035d6bb145a
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">

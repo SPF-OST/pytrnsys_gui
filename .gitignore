@@ -3,5 +3,6 @@ trnsysGUI/_pycache_/
 *.pyc
 **/.idea/workspace.xml
 **/.idea/tasks.xml
+**/.idea/
 trnsysGUI/export.dck
 
