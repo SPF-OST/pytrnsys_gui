@@ -16,7 +16,8 @@
       <change beforePath="$PROJECT_DIR$/trnsysGUI/PortItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/PortItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/DHWOnly.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/test.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/test.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/exports/HotWater.dck" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/exports/HotWater.dck" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
