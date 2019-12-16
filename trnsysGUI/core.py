@@ -2903,7 +2903,7 @@ class DiagramEditor(QWidget):
         # print(self.saveAsPath)
         # print(self.diagramName)
 
-        # self.encodeDiagram(str(self.saveAsPath))
+        self.encodeDiagram(str(self.saveAsPath))
 
     def renameDiagram(self, newName):
 
@@ -3091,9 +3091,11 @@ class MainWindow(QMainWindow):
     def loadDia(self):
         print("Loading diagram")
         # Maybe delete all elements before loading?
-        self.centralWidget.delBlocks()
-        filepath = Path(__file__).parent.joinpath("diagrams").joinpath("jsonOut.json")
-        self.centralWidget.decodeDiagram(str(filepath))
+        # self.centralWidget.delBlocks()
+        # filepath = Path(__file__).parent.joinpath("diagrams").joinpath("jsonOut.json")
+        # self.centralWidget.decodeDiagram(str(filepath))
+
+        self.openFile()
 
     def exportTrnsys(self):
         print("Exporting Trnsys file...")

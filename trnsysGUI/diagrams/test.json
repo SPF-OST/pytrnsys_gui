@@ -1,0 +1,71 @@
+{
+    "Blocks": {
+        "..__GroupDct-defaultGroup": {
+            ".__GroupDict__": true,
+            "GroupName": "defaultGroup",
+            "Position": [
+                0,
+                0
+            ],
+            "Size": [
+                100,
+                100
+            ]
+        },
+        ".__BlockDct__": true,
+        "Block-1": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeePiece1",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -1026.0,
+                -447.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1,
+            "PortsIDIn": [
+                2,
+                3
+            ],
+            "PortsIDOut": [
+                4
+            ],
+            "RotationN": 0,
+            "trnsysID": 1
+        },
+        "Block-5": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeePiece5",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -878.0,
+                -524.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 5,
+            "PortsIDIn": [
+                6,
+                7
+            ],
+            "PortsIDOut": [
+                8
+            ],
+            "RotationN": 0,
+            "trnsysID": 2
+        },
+        "IDs": {
+            "GlobalId": 0,
+            "__idDct__": true,
+            "globalConnID": 0,
+            "trnsysID": 0
+        },
+        "Strings": {
+            "DiagramName": "test",
+            "__nameDct__": true
+        }
+    }
+}
