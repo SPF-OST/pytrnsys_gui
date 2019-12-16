@@ -151,9 +151,6 @@ class PortItem(QGraphicsEllipseItem):
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")
 
-        # self.setRect(-7, -7, 14, 14)
-        # sleep(30)
-
         # self.setRect(-6, -6, 12, 12)
         self.setRect(-7, -7, 14, 14)
         self.outerRing.setRect(-4, -4, 8, 8)

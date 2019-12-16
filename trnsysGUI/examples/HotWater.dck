@@ -39,7 +39,7 @@ TStoragePortLeft9=1
 TStoragePortRight9=1
 EQUATIONS 3
 *** Pump outlet temperatures
-TPuTesColOut = TPiPuCol
+TPuTesCol = TPiPuCol
 TWTapTop = TPiMixWTapTop
 TWTapBottom = TPiTpWTapBottom
 EQUATIONS 2

@@ -18,8 +18,8 @@
             "BlockDisplayName": "TeePiece1",
             "BlockName": "TeePiece",
             "BlockPosition": [
-                -1026.0,
-                -447.0
+                -1146.0,
+                -553.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -40,8 +40,8 @@
             "BlockDisplayName": "TeePiece5",
             "BlockName": "TeePiece",
             "BlockPosition": [
-                -878.0,
-                -524.0
+                -909.0,
+                -421.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -57,6 +57,26 @@
             "RotationN": 0,
             "trnsysID": 2
         },
+        "Connection-9": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 1,
+            "ConnDisplayName": "UntitledConn1",
+            "ConnID": 9,
+            "CornerPositions": [],
+            "GroupName": "defaultGroup",
+            "PortFromID": 3,
+            "PortToID": 6,
+            "SegmentPositions": [
+                [
+                    -1088.0,
+                    -519.575,
+                    -917.0,
+                    -387.575
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 3
+        },
         "IDs": {
             "GlobalId": 0,
             "__idDct__": true,
@@ -64,7 +84,7 @@
             "trnsysID": 0
         },
         "Strings": {
-            "DiagramName": "test",
+            "DiagramName": "Untitled",
             "__nameDct__": true
         }
     }

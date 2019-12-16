@@ -1,0 +1,946 @@
+Version 17
+CONSTANTS 2
+dtSim = 1.
+dtSimFile = 1.
+CONSTANTS 3
+FrInte_Tol = 0.003
+FrConv_Tol = 0.001
+PI = 3.1415927
+EQUATIONS 3
+START = 0            !744  !4350   ! 744
+STOP  = 5 !END
+Nix = 0.0
+SIMULATION START STOP dtSim
+TOLERANCES    FrInte_Tol  FrConv_Tol
+LIMITS 30 2000 25                 ! Max iterations   Max warnings    Trace limit      ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ 1      ! TRNSYS numerical integration solver method
+WIDTH 132          ! TRNSYS output file width, number of characters
+LIST             ! NOLIST statement
+! MAP statement
+SOLVER 0 1 1      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK 0     ! Nan DEBUG statement
+OVERWRITE_CHECK 0     ! Overwrite DEBUG statement
+EQSOLVER 0     ! EQUATION SOLVER statement
+TIME_REPORT 1  ! 1 time report is used 0 is not used
+EQUATIONS 3
+ rhoWat=1000
+ cpWat=4200
+ tRoomStore=20
+EQUATIONS 24
+ *** Black box component temperatures
+TCol=1 
+TPuColTEs=1 
+TPuIce=1 
+TIce=1 
+TPuHpEvap=1 
+THeatPumpHeatPump=1 
+THeatPumpEvap=1 
+TPuHpCond=1 
+TPuSH=1 
+TRad=1 
+TTesHydSplitPortLeft90=1
+TTesHydSplitPortRight90=1
+TTesHydSplitPortLeft9=1
+TTesHydSplitPortRight9=1
+TTesPortLeft90=1
+TTesPortLeft50=1
+TTesPortLeft40=1
+TTesPortRight90=1
+TTesPortRight50=1
+TTesPortLeft70=1
+TTesPortLeft9=1
+TTesPortLeft19=1
+TTesPortRight70=1
+TTesPortRight9=1
+EQUATIONS 7
+*** Pump outlet temperatures
+TPuColTEs = TPiInHxTes
+TPuIce = TPiIceIn
+TPuHpEvap = TPiPuToMixCond
+TPuHpCond = TPiHpCondIn
+TDHW = TPiDHW
+TCW = TPiCW
+TPuSH = TPiRadIn
+EQUATIONS 11
+
+*** Massflowrates
+MfrPuColTEs = 1000
+xFracMixIce = 1
+MfrPuIce = 1000
+xFracDivHpEvap = 1
+MfrPuHpEvap = 1000
+xFracDivHp = 1
+MfrPuHpCond = 1000
+xFracDivHpRt = 1
+xFracMixDHW = 1
+xFracDivSh = 1
+MfrPuSH = 1000
+UNIT 450 TYPE 935
+PARAMETERS 277
+69
+32 34 0 0           !1 : Col
+34 84 35 2          !2 : TeeCol
+32 33 36 2          !3 : TeeDivTes
+33 83 0 1           !4 : PuColTEs
+78 35 39 2          !5 : TeeHydSplit
+36 39 37 3          !6 : MixIce
+37 38 0 1           !7 : PuIce
+38 77 0 0           !8 : Ice
+80 43 41 3          !9 : DivHpEvap
+81 40 43 2          !10 : TeeHpEvap
+42 40 0 1           !11 : PuHpEvap
+41 42 0 0           !12 : HeatPumpHeatPump
+44 45 0 0           !13 : HeatPumpEvap
+86 89 44 3          !14 : DivHp
+46 45 0 1           !15 : PuHpCond
+46 87 90 3          !16 : DivHpRt
+93 27 25 3          !17 : MixDHW
+97 26 27 2          !18 : TeeDivDHW
+25 0 0 0            !19 : DHW
+26 0 0 0            !20 : CW
+94 31 29 3          !21 : DivSh
+96 30 31 2          !22 : TeeMixSH
+29 28 0 1           !23 : PuSH
+28 30 0 0           !24 : Rad
+17 19 0 0           !25 : PiDHW
+18 20 0 0           !26 : PiCW
+17 18 0 0           !27 : PiDHWMix
+23 24 0 0           !28 : PiRadIn
+21 23 0 0           !29 : PiSHOutMix
+24 22 0 0           !30 : PiRadOut
+21 22 0 0           !31 : PiSHInMix
+1 3 0 0             !32 : PiColOut
+3 4 0 0             !33 : PiColToTes
+2 1 0 0             !34 : PiColIn
+2 5 0 0             !35 : PiHydToCol
+3 6 0 0             !36 : PiColToIce
+6 7 0 0             !37 : PiPuColToIce
+7 8 0 0             !38 : PiIceIn
+5 6 0 0             !39 : PiHydToMix
+11 10 0 0           !40 : PiPuToMixCond
+9 12 0 0            !41 : PiHpEvapIn
+12 11 0 0           !42 : PiHpEvapOut
+9 10 0 0            !43 : PiTeeHpEvapDiv
+12 14 0 0           !44 : PiHpCondOut
+15 12 0 0           !45 : PiHpCondIn
+16 15 0 0           !46 : PiHpInPu
+77 78 0 0           !76 : ConnectorTesTesHydSplitL228
+8 76 0 0            !77 : PiIceOut
+5 76 0 0            !78 : PiHydOut
+80 81 0 0           !79 : ConnectorTesTesHydSplitR237
+9 79 0 0            !80 : PiIceToHp
+10 79 0 0           !81 : PiHpToIce
+83 84 0 0           !82 : ConnectorTesL246
+4 82 0 0            !83 : PiInHxTes
+2 82 0 0            !84 : PiOutHxTes
+86 87 91 2          !85 : TPieceTesTesL255
+14 85 0 0           !86 : PiHpToTesDHWIn
+85 16 0 0           !87 : PiHpToTesDHWOut
+89 90 91 2          !88 : TPieceTesTesL265
+14 88 0 0           !89 : PiHpToTesSHIn
+88 16 0 0           !90 : PiHpToTesShOut
+88 85 0 0           !91 : PiTesLTes_54
+93 94 98 2          !92 : TPieceTesTesR278
+17 92 0 0           !93 : PiTesDHWOut
+92 21 0 0           !94 : PiSHTesOut
+96 97 98 2          !95 : TPieceTesTesR288
+22 95 0 0           !96 : PiSHTesIn
+95 18 0 0           !97 : PiTesDWHIn
+95 92 0 0           !98 : PiTesRTes_59
+
+INPUTS 69
+ 0,0  0,0  0,0  MfrPuColTEs  0,0  xFracMixIce  MfrPuIce  0,0  xFracDivHpEvap  0,0 
+ MfrPuHpEvap  0,0  0,0  xFracDivHp  MfrPuHpCond  xFracDivHpRt  xFracMixDHW  0,0  0,0 
+ 0,0  xFracDivSh  0,0  MfrPuSH  0,0  0,0  0,0  0,0  0,0 
+ 0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0 
+ 0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0 
+ 0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0 
+ 0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0 
+ 0,0  0,0  0,0  0,0  0,0 
+
+*** Initial Inputs *
+-1 -1 -1 0.0 -1 0.0 0.0 -1 0.0 
+-1 0.0  -1 -1 0.0 0.0 0.0 0.0 -1 
+-1 -1 0.0 -1 0.0 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 
+EQUATIONS 154	!! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrCol_A=[450,1]
+MfrCol_B=[450,2]
+MfrTeeCol_A=[450,3]
+MfrTeeCol_B=[450,4]
+MfrTeeCol_C=[450,5]
+MfrTeeDivTes_A=[450,6]
+MfrTeeDivTes_B=[450,7]
+MfrTeeDivTes_C=[450,8]
+MfrPuColTEs_A=[450,9]
+MfrPuColTEs_B=[450,10]
+MfrTeeHydSplit_A=[450,11]
+MfrTeeHydSplit_B=[450,12]
+MfrTeeHydSplit_C=[450,13]
+MfrMixIce_A=[450,14]
+MfrMixIce_B=[450,15]
+MfrMixIce_C=[450,16]
+MfrPuIce_A=[450,17]
+MfrPuIce_B=[450,18]
+MfrIce_A=[450,19]
+MfrIce_B=[450,20]
+MfrDivHpEvap_A=[450,21]
+MfrDivHpEvap_B=[450,22]
+MfrDivHpEvap_C=[450,23]
+MfrTeeHpEvap_A=[450,24]
+MfrTeeHpEvap_B=[450,25]
+MfrTeeHpEvap_C=[450,26]
+MfrPuHpEvap_A=[450,27]
+MfrPuHpEvap_B=[450,28]
+MfrHeatPump-HeatPump_A=[450,29]
+MfrHeatPump-HeatPump_B=[450,30]
+MfrHeatPump_Evap_A=[450,31]
+MfrHeatPump_Evap_B=[450,32]
+MfrDivHp_A=[450,33]
+MfrDivHp_B=[450,34]
+MfrDivHp_C=[450,35]
+MfrPuHpCond_A=[450,36]
+MfrPuHpCond_B=[450,37]
+MfrDivHpRt_A=[450,38]
+MfrDivHpRt_B=[450,39]
+MfrDivHpRt_C=[450,40]
+MfrMixDHW_A=[450,41]
+MfrMixDHW_B=[450,42]
+MfrMixDHW_C=[450,43]
+MfrTeeDivDHW_A=[450,44]
+MfrTeeDivDHW_B=[450,45]
+MfrTeeDivDHW_C=[450,46]
+MfrDHW_A=[450,47]
+MfrDHW_B=[450,48]
+MfrCW_A=[450,49]
+MfrCW_B=[450,50]
+MfrDivSh_A=[450,51]
+MfrDivSh_B=[450,52]
+MfrDivSh_C=[450,53]
+MfrTeeMixSH_A=[450,54]
+MfrTeeMixSH_B=[450,55]
+MfrTeeMixSH_C=[450,56]
+MfrPuSH_A=[450,57]
+MfrPuSH_B=[450,58]
+MfrRad_A=[450,59]
+MfrRad_B=[450,60]
+MfrPiDHW_A=[450,61]
+MfrPiDHW_B=[450,62]
+MfrPiCW_A=[450,63]
+MfrPiCW_B=[450,64]
+MfrPiDHWMix_A=[450,65]
+MfrPiDHWMix_B=[450,66]
+MfrPiRadIn_A=[450,67]
+MfrPiRadIn_B=[450,68]
+MfrPiSHOutMix_A=[450,69]
+MfrPiSHOutMix_B=[450,70]
+MfrPiRadOut_A=[450,71]
+MfrPiRadOut_B=[450,72]
+MfrPiSHInMix_A=[450,73]
+MfrPiSHInMix_B=[450,74]
+MfrPiColOut_A=[450,75]
+MfrPiColOut_B=[450,76]
+MfrPiColToTes_A=[450,77]
+MfrPiColToTes_B=[450,78]
+MfrPiColIn_A=[450,79]
+MfrPiColIn_B=[450,80]
+MfrPiHydToCol_A=[450,81]
+MfrPiHydToCol_B=[450,82]
+MfrPiColToIce_A=[450,83]
+MfrPiColToIce_B=[450,84]
+MfrPiPuColToIce_A=[450,85]
+MfrPiPuColToIce_B=[450,86]
+MfrPiIceIn_A=[450,87]
+MfrPiIceIn_B=[450,88]
+MfrPiHydToMix_A=[450,89]
+MfrPiHydToMix_B=[450,90]
+MfrPiPuToMixCond_A=[450,91]
+MfrPiPuToMixCond_B=[450,92]
+MfrPiHpEvapIn_A=[450,93]
+MfrPiHpEvapIn_B=[450,94]
+MfrPiHpEvapOut_A=[450,95]
+MfrPiHpEvapOut_B=[450,96]
+MfrPiTeeHpEvapDiv_A=[450,97]
+MfrPiTeeHpEvapDiv_B=[450,98]
+MfrPiHpCondOut_A=[450,99]
+MfrPiHpCondOut_B=[450,100]
+MfrPiHpCondIn_A=[450,101]
+MfrPiHpCondIn_B=[450,102]
+MfrPiHpInPu_A=[450,103]
+MfrPiHpInPu_B=[450,104]
+MfrConnectorTesTesHydSplitL228_A=[450,105]
+MfrConnectorTesTesHydSplitL228_B=[450,106]
+MfrPiIceOut_A=[450,107]
+MfrPiIceOut_B=[450,108]
+MfrPiHydOut_A=[450,109]
+MfrPiHydOut_B=[450,110]
+MfrConnectorTesTesHydSplitR237_A=[450,111]
+MfrConnectorTesTesHydSplitR237_B=[450,112]
+MfrPiIceToHp_A=[450,113]
+MfrPiIceToHp_B=[450,114]
+MfrPiHpToIce_A=[450,115]
+MfrPiHpToIce_B=[450,116]
+MfrConnectorTesL246_A=[450,117]
+MfrConnectorTesL246_B=[450,118]
+MfrPiInHxTes_A=[450,119]
+MfrPiInHxTes_B=[450,120]
+MfrPiOutHxTes_A=[450,121]
+MfrPiOutHxTes_B=[450,122]
+MfrTPieceTesTesL255_A=[450,123]
+MfrTPieceTesTesL255_B=[450,124]
+MfrTPieceTesTesL255_C=[450,125]
+MfrPiHpToTesDHWIn_A=[450,126]
+MfrPiHpToTesDHWIn_B=[450,127]
+MfrPiHpToTesDHWOut_A=[450,128]
+MfrPiHpToTesDHWOut_B=[450,129]
+MfrTPieceTesTesL265_A=[450,130]
+MfrTPieceTesTesL265_B=[450,131]
+MfrTPieceTesTesL265_C=[450,132]
+MfrPiHpToTesSHIn_A=[450,133]
+MfrPiHpToTesSHIn_B=[450,134]
+MfrPiHpToTesShOut_A=[450,135]
+MfrPiHpToTesShOut_B=[450,136]
+MfrPiTesLTes_54_A=[450,137]
+MfrPiTesLTes_54_B=[450,138]
+MfrTPieceTesTesR278_A=[450,139]
+MfrTPieceTesTesR278_B=[450,140]
+MfrTPieceTesTesR278_C=[450,141]
+MfrPiTesDHWOut_A=[450,142]
+MfrPiTesDHWOut_B=[450,143]
+MfrPiSHTesOut_A=[450,144]
+MfrPiSHTesOut_B=[450,145]
+MfrTPieceTesTesR288_A=[450,146]
+MfrTPieceTesTesR288_B=[450,147]
+MfrTPieceTesTesR288_C=[450,148]
+MfrPiSHTesIn_A=[450,149]
+MfrPiSHTesIn_B=[450,150]
+MfrPiTesDWHIn_A=[450,151]
+MfrPiTesDWHIn_B=[450,152]
+MfrPiTesRTes_59_A=[450,153]
+MfrPiTesRTes_59_B=[450,154]
+
+
+UNIT 451 TYPE 929
+!TeeCol
+PARAMETERS 0
+INPUTS 6
+MfrTeeCol_A
+MfrTeeCol_B
+MfrTeeCol_C
+PiColIn
+PiOutHxTes
+PiHydToCol
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeCol= [451,1]
+
+UNIT 452 TYPE 929
+!TeeDivTes
+PARAMETERS 0
+INPUTS 6
+MfrTeeDivTes_A
+MfrTeeDivTes_B
+MfrTeeDivTes_C
+PiColOut
+PiColToTes
+PiColToIce
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeDivTes= [452,1]
+
+UNIT 453 TYPE 929
+!TeeHydSplit
+PARAMETERS 0
+INPUTS 6
+MfrTeeHydSplit_A
+MfrTeeHydSplit_B
+MfrTeeHydSplit_C
+PiHydOut
+PiHydToCol
+PiHydToMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeHydSplit= [453,1]
+
+UNIT 454 TYPE 929
+!MixIce
+PARAMETERS 0
+INPUTS 6
+MfrMixIce_A
+MfrMixIce_B
+MfrMixIce_C
+PiColToIce
+PiHydToMix
+PiPuColToIce
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixIce= [454,1]
+
+UNIT 455 TYPE 929
+!DivHpEvap
+PARAMETERS 0
+INPUTS 6
+MfrDivHpEvap_A
+MfrDivHpEvap_B
+MfrDivHpEvap_C
+PiIceToHp
+PiTeeHpEvapDiv
+PiHpEvapIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivHpEvap= [455,1]
+
+UNIT 456 TYPE 929
+!TeeHpEvap
+PARAMETERS 0
+INPUTS 6
+MfrTeeHpEvap_A
+MfrTeeHpEvap_B
+MfrTeeHpEvap_C
+PiHpToIce
+PiPuToMixCond
+PiTeeHpEvapDiv
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeHpEvap= [456,1]
+
+UNIT 457 TYPE 929
+!DivHp
+PARAMETERS 0
+INPUTS 6
+MfrDivHp_A
+MfrDivHp_B
+MfrDivHp_C
+PiHpToTesDHWIn
+PiHpToTesSHIn
+PiHpCondOut
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivHp= [457,1]
+
+UNIT 458 TYPE 929
+!DivHpRt
+PARAMETERS 0
+INPUTS 6
+MfrDivHpRt_A
+MfrDivHpRt_B
+MfrDivHpRt_C
+PiHpInPu
+PiHpToTesDHWOut
+PiHpToTesShOut
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivHpRt= [458,1]
+
+UNIT 459 TYPE 929
+!MixDHW
+PARAMETERS 0
+INPUTS 6
+MfrMixDHW_A
+MfrMixDHW_B
+MfrMixDHW_C
+PiTesDHWOut
+PiDHWMix
+PiDHW
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixDHW= [459,1]
+
+UNIT 460 TYPE 929
+!TeeDivDHW
+PARAMETERS 0
+INPUTS 6
+MfrTeeDivDHW_A
+MfrTeeDivDHW_B
+MfrTeeDivDHW_C
+PiTesDWHIn
+PiCW
+PiDHWMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeDivDHW= [460,1]
+
+UNIT 461 TYPE 929
+!DivSh
+PARAMETERS 0
+INPUTS 6
+MfrDivSh_A
+MfrDivSh_B
+MfrDivSh_C
+PiSHTesOut
+PiSHInMix
+PiSHOutMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivSh= [461,1]
+
+UNIT 462 TYPE 929
+!TeeMixSH
+PARAMETERS 0
+INPUTS 6
+MfrTeeMixSH_A
+MfrTeeMixSH_B
+MfrTeeMixSH_C
+PiSHTesIn
+PiRadOut
+PiSHInMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeMixSH= [462,1]
+
+UNIT463 TYPE 931
+!PiIceOut
+PARAMETERS 6
+diPiIceOut
+LPiIceOut
+UPiIceOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TIce
+MfrPiIceOut_A
+TRoomStore
+TConnectorTesTesHydSplitL228
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceOut= [463,1]
+PPiIceOut_kW= [463,3]/3600 !kW
+MfrPiIceOut= MfrPiIceOut_A
+UNIT464 TYPE 931
+!PiHydOut
+PARAMETERS 6
+diPiHydOut
+LPiHydOut
+UPiHydOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeHydSplit
+MfrPiHydOut_A
+TRoomStore
+TConnectorTesTesHydSplitL228
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHydOut= [464,1]
+PPiHydOut_kW= [464,3]/3600 !kW
+MfrPiHydOut= MfrPiHydOut_A
+UNIT465 TYPE 931
+!PiIceToHp
+PARAMETERS 6
+diPiIceToHp
+LPiIceToHp
+UPiIceToHp
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivHpEvap
+MfrPiIceToHp_A
+TRoomStore
+TConnectorTesTesHydSplitR237
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceToHp= [465,1]
+PPiIceToHp_kW= [465,3]/3600 !kW
+MfrPiIceToHp= MfrPiIceToHp_A
+UNIT466 TYPE 931
+!PiHpToIce
+PARAMETERS 6
+diPiHpToIce
+LPiHpToIce
+UPiHpToIce
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeHpEvap
+MfrPiHpToIce_A
+TRoomStore
+TConnectorTesTesHydSplitR237
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpToIce= [466,1]
+PPiHpToIce_kW= [466,3]/3600 !kW
+MfrPiHpToIce= MfrPiHpToIce_A
+UNIT467 TYPE 931
+!PiInHxTes
+PARAMETERS 6
+diPiInHxTes
+LPiInHxTes
+UPiInHxTes
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuColTEs
+MfrPiInHxTes_A
+TRoomStore
+TConnectorTesL246
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiInHxTes= [467,1]
+PPiInHxTes_kW= [467,3]/3600 !kW
+MfrPiInHxTes= MfrPiInHxTes_A
+UNIT468 TYPE 931
+!PiOutHxTes
+PARAMETERS 6
+diPiOutHxTes
+LPiOutHxTes
+UPiOutHxTes
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeCol
+MfrPiOutHxTes_A
+TRoomStore
+TConnectorTesL246
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiOutHxTes= [468,1]
+PPiOutHxTes_kW= [468,3]/3600 !kW
+MfrPiOutHxTes= MfrPiOutHxTes_A
+UNIT 469 TYPE 929
+!TPieceTesTesL255
+PARAMETERS 0
+INPUTS 6
+MfrTPieceTesTesL255_A
+MfrTPieceTesTesL255_B
+MfrTPieceTesTesL255_C
+PiHpToTesDHWIn
+PiHpToTesDHWOut
+PiTesLTes_54
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTPieceTesTesL255= [469,1]
+
+UNIT 470 TYPE 929
+!TPieceTesTesL265
+PARAMETERS 0
+INPUTS 6
+MfrTPieceTesTesL265_A
+MfrTPieceTesTesL265_B
+MfrTPieceTesTesL265_C
+PiHpToTesSHIn
+PiHpToTesShOut
+PiTesLTes_54
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTPieceTesTesL265= [470,1]
+
+UNIT 471 TYPE 929
+!TPieceTesTesR278
+PARAMETERS 0
+INPUTS 6
+MfrTPieceTesTesR278_A
+MfrTPieceTesTesR278_B
+MfrTPieceTesTesR278_C
+PiTesDHWOut
+PiSHTesOut
+PiTesRTes_59
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTPieceTesTesR278= [471,1]
+
+UNIT 472 TYPE 929
+!TPieceTesTesR288
+PARAMETERS 0
+INPUTS 6
+MfrTPieceTesTesR288_A
+MfrTPieceTesTesR288_B
+MfrTPieceTesTesR288_C
+PiSHTesIn
+PiTesDWHIn
+PiTesRTes_59
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTPieceTesTesR288= [472,1]
+
+CONSTANTS 8
+** Fluid Loop : defaultGroup
+di_loop_0=0.2
+L_loop_0=2
+U_loop_0=10
+L_loop_0_save = Mfr_loop_0_nom*dtSim/rhoWat/((di_loop_0/2)^2*3.14
+U_loop_0_save = 10*L_loop_0_save
+
+EQUATIONS 177
+** Fluid Loop : defaultGroup
+**di_loop_0=0.2
+**L_loop_0=2
+**U_loop_0=10
+*** PiDHW
+diPiDHW=di_loop_0
+LPiDHW=L_loop_0
+UPiDHW=U_loop_0
+*** PiCW
+diPiCW=di_loop_0
+LPiCW=L_loop_0
+UPiCW=U_loop_0
+*** PiDHWMix
+diPiDHWMix=di_loop_0
+LPiDHWMix=L_loop_0
+UPiDHWMix=U_loop_0
+*** PiRadIn
+diPiRadIn=di_loop_0
+LPiRadIn=L_loop_0
+UPiRadIn=U_loop_0
+*** PiSHOutMix
+diPiSHOutMix=di_loop_0
+LPiSHOutMix=L_loop_0
+UPiSHOutMix=U_loop_0
+*** PiRadOut
+diPiRadOut=di_loop_0
+LPiRadOut=L_loop_0
+UPiRadOut=U_loop_0
+*** PiSHInMix
+diPiSHInMix=di_loop_0
+LPiSHInMix=L_loop_0
+UPiSHInMix=U_loop_0
+*** PiColOut
+diPiColOut=di_loop_0
+LPiColOut=L_loop_0
+UPiColOut=U_loop_0
+*** PiColToTes
+diPiColToTes=di_loop_0
+LPiColToTes=L_loop_0
+UPiColToTes=U_loop_0
+*** PiColIn
+diPiColIn=di_loop_0
+LPiColIn=L_loop_0
+UPiColIn=U_loop_0
+*** PiHydToCol
+diPiHydToCol=di_loop_0
+LPiHydToCol=L_loop_0
+UPiHydToCol=U_loop_0
+*** PiColToIce
+diPiColToIce=di_loop_0
+LPiColToIce=L_loop_0
+UPiColToIce=U_loop_0
+*** PiPuColToIce
+diPiPuColToIce=di_loop_0
+LPiPuColToIce=L_loop_0
+UPiPuColToIce=U_loop_0
+*** PiIceIn
+diPiIceIn=di_loop_0
+LPiIceIn=L_loop_0
+UPiIceIn=U_loop_0
+*** PiHydToMix
+diPiHydToMix=di_loop_0
+LPiHydToMix=L_loop_0
+UPiHydToMix=U_loop_0
+*** PiPuToMixCond
+diPiPuToMixCond=di_loop_0
+LPiPuToMixCond=L_loop_0
+UPiPuToMixCond=U_loop_0
+*** PiHpEvapIn
+diPiHpEvapIn=di_loop_0
+LPiHpEvapIn=L_loop_0
+UPiHpEvapIn=U_loop_0
+*** PiHpEvapOut
+diPiHpEvapOut=di_loop_0
+LPiHpEvapOut=L_loop_0
+UPiHpEvapOut=U_loop_0
+*** PiTeeHpEvapDiv
+diPiTeeHpEvapDiv=di_loop_0
+LPiTeeHpEvapDiv=L_loop_0
+UPiTeeHpEvapDiv=U_loop_0
+*** PiHpCondOut
+diPiHpCondOut=di_loop_0
+LPiHpCondOut=L_loop_0
+UPiHpCondOut=U_loop_0
+*** PiHpCondIn
+diPiHpCondIn=di_loop_0
+LPiHpCondIn=L_loop_0
+UPiHpCondIn=U_loop_0
+*** PiHpInPu
+diPiHpInPu=di_loop_0
+LPiHpInPu=L_loop_0
+UPiHpInPu=U_loop_0
+*** UntitledConn23
+diUntitledConn23=di_loop_0
+LUntitledConn23=L_loop_0
+UUntitledConn23=U_loop_0
+*** UntitledConn24
+diUntitledConn24=di_loop_0
+LUntitledConn24=L_loop_0
+UUntitledConn24=U_loop_0
+*** PiIceOut
+diPiIceOut=di_loop_0
+LPiIceOut=L_loop_0
+UPiIceOut=U_loop_0
+*** PiHydOut
+diPiHydOut=di_loop_0
+LPiHydOut=L_loop_0
+UPiHydOut=U_loop_0
+*** PiIceToHp
+diPiIceToHp=di_loop_0
+LPiIceToHp=L_loop_0
+UPiIceToHp=U_loop_0
+*** PiHpToIce
+diPiHpToIce=di_loop_0
+LPiHpToIce=L_loop_0
+UPiHpToIce=U_loop_0
+*** UntitledConn29
+diUntitledConn29=di_loop_0
+LUntitledConn29=L_loop_0
+UUntitledConn29=U_loop_0
+*** UntitledConn30
+diUntitledConn30=di_loop_0
+LUntitledConn30=L_loop_0
+UUntitledConn30=U_loop_0
+*** Hx182
+diHx182=di_loop_0
+LHx182=L_loop_0
+UHx182=U_loop_0
+*** PiHpToTesDHWIn
+diPiHpToTesDHWIn=di_loop_0
+LPiHpToTesDHWIn=L_loop_0
+UPiHpToTesDHWIn=U_loop_0
+*** PiHpToTesShOut
+diPiHpToTesShOut=di_loop_0
+LPiHpToTesShOut=L_loop_0
+UPiHpToTesShOut=U_loop_0
+*** PiHpToTesDHWOut
+diPiHpToTesDHWOut=di_loop_0
+LPiHpToTesDHWOut=L_loop_0
+UPiHpToTesDHWOut=U_loop_0
+*** PiHpToTesSHIn
+diPiHpToTesSHIn=di_loop_0
+LPiHpToTesSHIn=L_loop_0
+UPiHpToTesSHIn=U_loop_0
+*** PiInHxTes
+diPiInHxTes=di_loop_0
+LPiInHxTes=L_loop_0
+UPiInHxTes=U_loop_0
+*** PiOutHxTes
+diPiOutHxTes=di_loop_0
+LPiOutHxTes=L_loop_0
+UPiOutHxTes=U_loop_0
+*** UntitledConn38
+diUntitledConn38=di_loop_0
+LUntitledConn38=L_loop_0
+UUntitledConn38=U_loop_0
+*** UntitledConn39
+diUntitledConn39=di_loop_0
+LUntitledConn39=L_loop_0
+UUntitledConn39=U_loop_0
+*** PiTesDHWOut
+diPiTesDHWOut=di_loop_0
+LPiTesDHWOut=L_loop_0
+UPiTesDHWOut=U_loop_0
+*** PiTesDWHIn
+diPiTesDWHIn=di_loop_0
+LPiTesDWHIn=L_loop_0
+UPiTesDWHIn=U_loop_0
+*** PiSHTesOut
+diPiSHTesOut=di_loop_0
+LPiSHTesOut=L_loop_0
+UPiSHTesOut=U_loop_0
+*** PiSHTesIn
+diPiSHTesIn=di_loop_0
+LPiSHTesIn=L_loop_0
+UPiSHTesIn=U_loop_0
+*** PiIceOut
+diPiIceOut=di_loop_0
+LPiIceOut=L_loop_0
+UPiIceOut=U_loop_0
+*** PiHydOut
+diPiHydOut=di_loop_0
+LPiHydOut=L_loop_0
+UPiHydOut=U_loop_0
+*** PiIceToHp
+diPiIceToHp=di_loop_0
+LPiIceToHp=L_loop_0
+UPiIceToHp=U_loop_0
+*** PiHpToIce
+diPiHpToIce=di_loop_0
+LPiHpToIce=L_loop_0
+UPiHpToIce=U_loop_0
+*** PiInHxTes
+diPiInHxTes=di_loop_0
+LPiInHxTes=L_loop_0
+UPiInHxTes=U_loop_0
+*** PiOutHxTes
+diPiOutHxTes=di_loop_0
+LPiOutHxTes=L_loop_0
+UPiOutHxTes=U_loop_0
+*** PiHpToTesDHWIn
+diPiHpToTesDHWIn=di_loop_0
+LPiHpToTesDHWIn=L_loop_0
+UPiHpToTesDHWIn=U_loop_0
+*** PiHpToTesDHWOut
+diPiHpToTesDHWOut=di_loop_0
+LPiHpToTesDHWOut=L_loop_0
+UPiHpToTesDHWOut=U_loop_0
+*** PiHpToTesSHIn
+diPiHpToTesSHIn=di_loop_0
+LPiHpToTesSHIn=L_loop_0
+UPiHpToTesSHIn=U_loop_0
+*** PiHpToTesShOut
+diPiHpToTesShOut=di_loop_0
+LPiHpToTesShOut=L_loop_0
+UPiHpToTesShOut=U_loop_0
+*** PiTesLTes_54
+diPiTesLTes_54=di_loop_0
+LPiTesLTes_54=L_loop_0
+UPiTesLTes_54=U_loop_0
+*** PiTesDHWOut
+diPiTesDHWOut=di_loop_0
+LPiTesDHWOut=L_loop_0
+UPiTesDHWOut=U_loop_0
+*** PiSHTesOut
+diPiSHTesOut=di_loop_0
+LPiSHTesOut=L_loop_0
+UPiSHTesOut=U_loop_0
+*** PiSHTesIn
+diPiSHTesIn=di_loop_0
+LPiSHTesIn=L_loop_0
+UPiSHTesIn=U_loop_0
+*** PiTesDWHIn
+diPiTesDWHIn=di_loop_0
+LPiTesDWHIn=L_loop_0
+UPiTesDWHIn=U_loop_0
+*** PiTesRTes_59
+diPiTesRTes_59=di_loop_0
+LPiTesRTes_59=L_loop_0
+UPiTesRTes_59=U_loop_0
+
+
+PipeLoss0=PPiDHW_kW+PPiCW_kW+PPiDHWMix_kW+PPiRadIn_kW+PPiSHOutMix_kW+PPiRadOut_kW+PPiSHInMix_kW+PPiColOut_kW+PPiColToTes_kW+PPiColIn_kW+PPiHydToCol_kW+PPiColToIce_kW+PPiPuColToIce_kW+PPiIceIn_kW+PPiHydToMix_kW+PPiPuToMixCond_kW+PPiHpEvapIn_kW+PPiHpEvapOut_kW+PPiTeeHpEvapDiv_kW+PPiHpCondOut_kW+PPiHpCondIn_kW+PPiHpInPu_kW+PUntitledConn23_kW+PUntitledConn24_kW+PPiIceOut_kW+PPiHydOut_kW+PPiIceToHp_kW+PPiHpToIce_kW+PUntitledConn29_kW+PUntitledConn30_kW+PHx182_kW+PPiHpToTesDHWIn_kW+PPiHpToTesShOut_kW+PPiHpToTesDHWOut_kW+PPiHpToTesSHIn_kW+PPiInHxTes_kW+PPiOutHxTes_kW+PUntitledConn38_kW+PUntitledConn39_kW+PPiTesDHWOut_kW+PPiTesDWHIn_kW+PPiSHTesOut_kW+PPiSHTesIn_kW+PPiIceOut_kW+PPiHydOut_kW+PPiIceToHp_kW+PPiHpToIce_kW+PPiInHxTes_kW+PPiOutHxTes_kW+PPiHpToTesDHWIn_kW+PPiHpToTesDHWOut_kW+PPiHpToTesSHIn_kW+PPiHpToTesShOut_kW+PPiTesLTes_54_kW+PPiTesDHWOut_kW+PPiSHTesOut_kW+PPiSHTesIn_kW+PPiTesDWHIn_kW+PPiTesRTes_59_kW
+PipeLossTotal=PipeLoss0

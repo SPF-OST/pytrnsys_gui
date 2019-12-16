@@ -2,10 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/test.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/HotWater.dck" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/HotWater.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/HotWater2cols.dck" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/HotWater2cols.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/SpaceHeating.dck" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/SpaceHeating.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/SpaceHeatingHybrid.dck" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/SpaceHeatingHybrid.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/Untitled6.dck" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/examples/Untitled6.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/PortItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/PortItem.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/DHWOnly.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/test.json" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,7 +41,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../spf_gui" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI/examples" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -39,11 +50,11 @@
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\examples" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\images" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\diagrams" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\images" />
-      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI" />
     </key>
   </component>
   <component name="RunDashboard">

@@ -2278,7 +2278,7 @@ class DiagramEditor(QWidget):
             self.trnsysObj[0].deleteBlock()
 
         while len(self.groupList) > 1:
-            self.groupList[0].deleteGroup()
+            self.groupList[-1].deleteGroup()
 
 
         print("Groups are " + str(self.groupList))
@@ -2880,15 +2880,26 @@ class DiagramEditor(QWidget):
                 if ret == QMessageBox.Save:
                     print("Overwriting")
                     self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+                    msgb = QMessageBox(self)
+                    msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                    msgb.exec()
+
                 else:
                     print("Canceling")
             else:
                 self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+                msgb = QMessageBox(self)
+                msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                msgb.exec()
         else:
             if self.saveAsPath.exists():
                 pass
             else:
                 self.encodeDiagram(str(self.saveAsPath))
+                msgb = QMessageBox(self)
+                msgb.setText("Saved diagram at" + str(self.saveAsPath))
+                msgb.exec()
+
 
         # print(glob.glob("*.json"))
 
@@ -3108,6 +3119,9 @@ class MainWindow(QMainWindow):
     def deleteDia(self):
         print("Deleting diagram")
         self.centralWidget.delBlocks()
+        msgb = QMessageBox(self)
+        msgb.setText("Deleted diagram" + str(self.centralWidget.saveAsPath) + "[" + str(len(self.centralWidget.trnsysObj)) + "]")
+        msgb.exec()
 
     def createGroup(self):
         # print("Tb createGroup pressed")
