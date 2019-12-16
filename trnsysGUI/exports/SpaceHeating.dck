@@ -26,69 +26,69 @@ EQUATIONS 3
  rhoWat=1000
  cpWat=4200
  tRoomStore=20
-EQUATIONS 13
- *** Black box component temperatures
-TPuCol=1 
+
+EQUATIONS 11
+*** Black box component temperatures
 TCollektor=1 
 TBoiler=1 
 TRad=1 
-TPuRad=1 
 TStoragePortLeft90=1
-TStoragePortLeft30=1
 TStoragePortRight90=1
+TStoragePortLeft30=1
 TStoragePortRight60=1
 TStoragePortLeft70=1
-TStoragePortLeft9=1
 TStoragePortRight9=1
+TStoragePortLeft9=1
 TStoragePortRight40=1
+
 EQUATIONS 4
 *** Pump outlet temperatures
 TPuCol = TPiColIn
 TWTapTop = TPiWTapTop
 TWTapBottom = TPiWTapBottom
 TPuRad = TPiRadIn
-EQUATIONS 4
 
+EQUATIONS 4
 *** Massflowrates
 MfrPuCol = 1000
 xFracTMixTop = 1
 xFracTMixBottom = 1
 MfrPuRad = 1000
+
 UNIT 450 TYPE 935
 PARAMETERS 125
 31
-44 19 0 1           !1 : PuCol
-43 19 0 0           !2 : Collektor
-37 38 0 0           !3 : Boiler
-41 27 26 2          !4 : TeePieceBottom
-47 30 31 2          !5 : TeePieceTop
-40 26 25 3          !6 : TMixTop
-46 31 28 3          !7 : TMixBottom
-25 0 0 0            !8 : WTapTop
-27 0 0 0            !9 : WTapBottom
-29 30 0 0           !10 : Rad
-28 29 0 1           !11 : PuRad
-1 2 0 0             !19 : PiColIn
-6 8 0 0             !25 : PiWTapTop
-6 4 0 0             !26 : PiTMixTopTeePieceBottom
-4 9 0 0             !27 : PiWTapBottom
-7 11 0 0            !28 : PiTMixBottomPu
-11 10 0 0           !29 : PiRadIn
-10 5 0 0            !30 : PiRadOut
-7 5 0 0             !31 : PiTMixBottomTeePieceTop
-37 38 0 0           !36 : ConnectorStorageL110
-3 36 0 0            !37 : PiBoilerTes
-3 36 0 0            !38 : PiTesBoiler
-40 41 0 0           !39 : ConnectorStorageR119
-6 39 0 0            !40 : PiTesTMixTop
-4 39 0 0            !41 : PiTeePieceBottomTes
-43 44 0 0           !42 : ConnectorTesStorageL128
-2 42 0 0            !43 : PiColOut
-1 42 0 0            !44 : PiTesPu
-46 47 0 0           !45 : ConnectorTesStorageR137
-7 45 0 0            !46 : PiTesTMixBottom
-5 45 0 0            !47 : PiTeePieceTopTes
-
+28 12 0 1           !1 : PuCol
+27 12 0 0           !2 : Collektor
+21 22 0 0           !3 : Boiler
+25 15 14 2          !4 : TeePieceBottom
+31 18 19 2          !5 : TeePieceTop
+24 14 13 3          !6 : TMixTop
+30 19 16 3          !7 : TMixBottom
+13 0 0 0            !8 : WTapTop
+15 0 0 0            !9 : WTapBottom
+17 18 0 0           !10 : Rad
+16 17 0 1           !11 : PuRad
+1 2 0 0             !12 : PiColIn
+6 8 0 0             !13 : PiWTapTop
+6 4 0 0             !14 : PiTMixTopTeePieceBottom
+4 9 0 0             !15 : PiWTapBottom
+7 11 0 0            !16 : PiTMixBottomPu
+11 10 0 0           !17 : PiRadIn
+10 5 0 0            !18 : PiRadOut
+7 5 0 0             !19 : PiTMixBottomTeePieceTop
+21 22 0 0           !20 : HxStorageL90
+3 20 0 0            !21 : PiBoilerTes
+3 20 0 0            !22 : PiTesBoiler
+24 25 0 0           !23 : HxStorageR90
+6 23 0 0            !24 : PiTesTMixTop
+4 23 0 0            !25 : PiTeePieceBottomTes
+27 28 0 0           !26 : ConnStorageL89
+2 26 0 0            !27 : PiColOut
+1 26 0 0            !28 : PiTesPu
+30 31 0 0           !29 : ConnStorageR98
+7 29 0 0            !30 : PiTesTMixBottom
+5 29 0 0            !31 : PiTeePieceTopTes
 INPUTS 31
  MfrPuCol  0,0  0,0  0,0  0,0  xFracTMixTop  xFracTMixBottom  0,0  0,0  0,0 
  MfrPuRad  0,0  0,0  0,0  0,0  0,0  0,0  0,0  0,0 
@@ -143,26 +143,26 @@ MfrPiRadOut_A=[450,39]
 MfrPiRadOut_B=[450,40]
 MfrPiTMixBottomTeePieceTop_A=[450,41]
 MfrPiTMixBottomTeePieceTop_B=[450,42]
-MfrConnectorStorageL110_A=[450,43]
-MfrConnectorStorageL110_B=[450,44]
+MfrHxStorageL90_A=[450,43]
+MfrHxStorageL90_B=[450,44]
 MfrPiBoilerTes_A=[450,45]
 MfrPiBoilerTes_B=[450,46]
 MfrPiTesBoiler_A=[450,47]
 MfrPiTesBoiler_B=[450,48]
-MfrConnectorStorageR119_A=[450,49]
-MfrConnectorStorageR119_B=[450,50]
+MfrHxStorageR90_A=[450,49]
+MfrHxStorageR90_B=[450,50]
 MfrPiTesTMixTop_A=[450,51]
 MfrPiTesTMixTop_B=[450,52]
 MfrPiTeePieceBottomTes_A=[450,53]
 MfrPiTeePieceBottomTes_B=[450,54]
-MfrConnectorTesStorageL128_A=[450,55]
-MfrConnectorTesStorageL128_B=[450,56]
+MfrConnStorageL89_A=[450,55]
+MfrConnStorageL89_B=[450,56]
 MfrPiColOut_A=[450,57]
 MfrPiColOut_B=[450,58]
 MfrPiTesPu_A=[450,59]
 MfrPiTesPu_B=[450,60]
-MfrConnectorTesStorageR137_A=[450,61]
-MfrConnectorTesStorageR137_B=[450,62]
+MfrConnStorageR98_A=[450,61]
+MfrConnStorageR98_B=[450,62]
 MfrPiTesTMixBottom_A=[450,63]
 MfrPiTesTMixBottom_B=[450,64]
 MfrPiTeePieceTopTes_A=[450,65]
@@ -176,9 +176,9 @@ INPUTS 6
 MfrTeePieceBottom_A
 MfrTeePieceBottom_B
 MfrTeePieceBottom_C
-PiTeePieceBottomTes
-PiWTapBottom
-PiTMixTopTeePieceBottom
+TPiTeePieceBottomTes
+TPiWTapBottom
+TPiTMixTopTeePieceBottom
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
@@ -191,9 +191,9 @@ INPUTS 6
 MfrTeePieceTop_A
 MfrTeePieceTop_B
 MfrTeePieceTop_C
-PiTeePieceTopTes
-PiRadOut
-PiTMixBottomTeePieceTop
+TPiTeePieceTopTes
+TPiRadOut
+TPiTMixBottomTeePieceTop
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
@@ -206,9 +206,9 @@ INPUTS 6
 MfrTMixTop_A
 MfrTMixTop_B
 MfrTMixTop_C
-PiTesTMixTop
-PiTMixTopTeePieceBottom
-PiWTapTop
+TPiTesTMixTop
+TPiTMixTopTeePieceBottom
+TPiWTapTop
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
@@ -221,15 +221,191 @@ INPUTS 6
 MfrTMixBottom_A
 MfrTMixBottom_B
 MfrTMixBottom_C
-PiTesTMixBottom
-PiTMixBottomTeePieceTop
-PiTMixBottomPu
+TPiTesTMixBottom
+TPiTMixBottomTeePieceTop
+TPiTMixBottomPu
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTMixBottom= [454,1]
 
-UNIT455 TYPE 931
+UNIT 455 TYPE 931
+!PiColIn
+PARAMETERS 6
+diPiColIn
+LPiColIn
+UPiColIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCol
+MfrPiColIn_A
+TRoomStore
+TCollektor
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColIn= [455,1]
+PPiColIn_kW= [455,3]/3600 !kW
+MfrPiColIn= MfrPiColIn_A
+
+UNIT 456 TYPE 931
+!PiWTapTop
+PARAMETERS 6
+diPiWTapTop
+LPiWTapTop
+UPiWTapTop
+RhoWat
+CPWat
+20
+INPUTS 4
+TTMixTop
+MfrPiWTapTop_A
+TRoomStore
+TWTapTop
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiWTapTop= [456,1]
+PPiWTapTop_kW= [456,3]/3600 !kW
+MfrPiWTapTop= MfrPiWTapTop_A
+
+UNIT 457 TYPE 931
+!PiTMixTopTeePieceBottom
+PARAMETERS 6
+diPiTMixTopTeePieceBottom
+LPiTMixTopTeePieceBottom
+UPiTMixTopTeePieceBottom
+RhoWat
+CPWat
+20
+INPUTS 4
+TTMixTop
+MfrPiTMixTopTeePieceBottom_A
+TRoomStore
+TTeePieceBottom
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTMixTopTeePieceBottom= [457,1]
+PPiTMixTopTeePieceBottom_kW= [457,3]/3600 !kW
+MfrPiTMixTopTeePieceBottom= MfrPiTMixTopTeePieceBottom_A
+
+UNIT 458 TYPE 931
+!PiWTapBottom
+PARAMETERS 6
+diPiWTapBottom
+LPiWTapBottom
+UPiWTapBottom
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePieceBottom
+MfrPiWTapBottom_A
+TRoomStore
+TWTapBottom
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiWTapBottom= [458,1]
+PPiWTapBottom_kW= [458,3]/3600 !kW
+MfrPiWTapBottom= MfrPiWTapBottom_A
+
+UNIT 459 TYPE 931
+!PiTMixBottomPu
+PARAMETERS 6
+diPiTMixBottomPu
+LPiTMixBottomPu
+UPiTMixBottomPu
+RhoWat
+CPWat
+20
+INPUTS 4
+TTMixBottom
+MfrPiTMixBottomPu_A
+TRoomStore
+TPuRad
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTMixBottomPu= [459,1]
+PPiTMixBottomPu_kW= [459,3]/3600 !kW
+MfrPiTMixBottomPu= MfrPiTMixBottomPu_A
+
+UNIT 460 TYPE 931
+!PiRadIn
+PARAMETERS 6
+diPiRadIn
+LPiRadIn
+UPiRadIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuRad
+MfrPiRadIn_A
+TRoomStore
+TRad
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiRadIn= [460,1]
+PPiRadIn_kW= [460,3]/3600 !kW
+MfrPiRadIn= MfrPiRadIn_A
+
+UNIT 461 TYPE 931
+!PiRadOut
+PARAMETERS 6
+diPiRadOut
+LPiRadOut
+UPiRadOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TRad
+MfrPiRadOut_A
+TRoomStore
+TTeePieceTop
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiRadOut= [461,1]
+PPiRadOut_kW= [461,3]/3600 !kW
+MfrPiRadOut= MfrPiRadOut_A
+
+UNIT 462 TYPE 931
+!PiTMixBottomTeePieceTop
+PARAMETERS 6
+diPiTMixBottomTeePieceTop
+LPiTMixBottomTeePieceTop
+UPiTMixBottomTeePieceTop
+RhoWat
+CPWat
+20
+INPUTS 4
+TTMixBottom
+MfrPiTMixBottomTeePieceTop_A
+TRoomStore
+TTeePieceTop
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTMixBottomTeePieceTop= [462,1]
+PPiTMixBottomTeePieceTop_kW= [462,3]/3600 !kW
+MfrPiTMixBottomTeePieceTop= MfrPiTMixBottomTeePieceTop_A
+
+UNIT 463 TYPE 931
 !PiBoilerTes
 PARAMETERS 6
 diPiBoilerTes
@@ -242,15 +418,16 @@ INPUTS 4
 TBoiler
 MfrPiBoilerTes_A
 TRoomStore
-TConnectorStorageL110
+THxStorageL90
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiBoilerTes= [455,1]
-PPiBoilerTes_kW= [455,3]/3600 !kW
+TPiBoilerTes= [463,1]
+PPiBoilerTes_kW= [463,3]/3600 !kW
 MfrPiBoilerTes= MfrPiBoilerTes_A
-UNIT456 TYPE 931
+
+UNIT 464 TYPE 931
 !PiTesBoiler
 PARAMETERS 6
 diPiTesBoiler
@@ -263,15 +440,16 @@ INPUTS 4
 TBoiler
 MfrPiTesBoiler_A
 TRoomStore
-TConnectorStorageL110
+THxStorageL90
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTesBoiler= [456,1]
-PPiTesBoiler_kW= [456,3]/3600 !kW
+TPiTesBoiler= [464,1]
+PPiTesBoiler_kW= [464,3]/3600 !kW
 MfrPiTesBoiler= MfrPiTesBoiler_A
-UNIT457 TYPE 931
+
+UNIT 465 TYPE 931
 !PiTesTMixTop
 PARAMETERS 6
 diPiTesTMixTop
@@ -284,15 +462,16 @@ INPUTS 4
 TTMixTop
 MfrPiTesTMixTop_A
 TRoomStore
-TConnectorStorageR119
+THxStorageR90
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTesTMixTop= [457,1]
-PPiTesTMixTop_kW= [457,3]/3600 !kW
+TPiTesTMixTop= [465,1]
+PPiTesTMixTop_kW= [465,3]/3600 !kW
 MfrPiTesTMixTop= MfrPiTesTMixTop_A
-UNIT458 TYPE 931
+
+UNIT 466 TYPE 931
 !PiTeePieceBottomTes
 PARAMETERS 6
 diPiTeePieceBottomTes
@@ -305,15 +484,16 @@ INPUTS 4
 TTeePieceBottom
 MfrPiTeePieceBottomTes_A
 TRoomStore
-TConnectorStorageR119
+THxStorageR90
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTeePieceBottomTes= [458,1]
-PPiTeePieceBottomTes_kW= [458,3]/3600 !kW
+TPiTeePieceBottomTes= [466,1]
+PPiTeePieceBottomTes_kW= [466,3]/3600 !kW
 MfrPiTeePieceBottomTes= MfrPiTeePieceBottomTes_A
-UNIT459 TYPE 931
+
+UNIT 467 TYPE 931
 !PiColOut
 PARAMETERS 6
 diPiColOut
@@ -326,15 +506,16 @@ INPUTS 4
 TCollektor
 MfrPiColOut_A
 TRoomStore
-TConnectorTesStorageL128
+TConnStorageL89
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiColOut= [459,1]
-PPiColOut_kW= [459,3]/3600 !kW
+TPiColOut= [467,1]
+PPiColOut_kW= [467,3]/3600 !kW
 MfrPiColOut= MfrPiColOut_A
-UNIT460 TYPE 931
+
+UNIT 468 TYPE 931
 !PiTesPu
 PARAMETERS 6
 diPiTesPu
@@ -347,15 +528,16 @@ INPUTS 4
 TPuCol
 MfrPiTesPu_A
 TRoomStore
-TConnectorTesStorageL128
+TConnStorageL89
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTesPu= [460,1]
-PPiTesPu_kW= [460,3]/3600 !kW
+TPiTesPu= [468,1]
+PPiTesPu_kW= [468,3]/3600 !kW
 MfrPiTesPu= MfrPiTesPu_A
-UNIT461 TYPE 931
+
+UNIT 469 TYPE 931
 !PiTesTMixBottom
 PARAMETERS 6
 diPiTesTMixBottom
@@ -368,15 +550,16 @@ INPUTS 4
 TTMixBottom
 MfrPiTesTMixBottom_A
 TRoomStore
-TConnectorTesStorageR137
+TConnStorageR98
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTesTMixBottom= [461,1]
-PPiTesTMixBottom_kW= [461,3]/3600 !kW
+TPiTesTMixBottom= [469,1]
+PPiTesTMixBottom_kW= [469,3]/3600 !kW
 MfrPiTesTMixBottom= MfrPiTesTMixBottom_A
-UNIT462 TYPE 931
+
+UNIT 470 TYPE 931
 !PiTeePieceTopTes
 PARAMETERS 6
 diPiTeePieceTopTes
@@ -389,43 +572,36 @@ INPUTS 4
 TTeePieceTop
 MfrPiTeePieceTopTes_A
 TRoomStore
-TConnectorTesStorageR137
+TConnStorageR98
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTeePieceTopTes= [462,1]
-PPiTeePieceTopTes_kW= [462,3]/3600 !kW
+TPiTeePieceTopTes= [470,1]
+PPiTeePieceTopTes_kW= [470,3]/3600 !kW
 MfrPiTeePieceTopTes= MfrPiTeePieceTopTes_A
-CONSTANTS 8
+
+CONSTANTS 5
 ** Fluid Loop : defaultGroup
 di_loop_0=0.2
 L_loop_0=2
 U_loop_0=10
-L_loop_0_save = Mfr_loop_0_nom*dtSim/rhoWat/((di_loop_0/2)^2*3.14
+L_loop_0_save = Mfr_loop_0_nom*dtSim/rhoWat/((di_loop_0/2)^2*3.14)
 U_loop_0_save = 10*L_loop_0_save
 
-EQUATIONS 84
+EQUATIONS 48
 ** Fluid Loop : defaultGroup
 **di_loop_0=0.2
 **L_loop_0=2
 **U_loop_0=10
-*** HxBottom37
-diHxBottom37=di_loop_0
-LHxBottom37=L_loop_0
-UHxBottom37=U_loop_0
-*** UntitledConn2
-diUntitledConn2=di_loop_0
-LUntitledConn2=L_loop_0
-UUntitledConn2=U_loop_0
-*** HxCenter48
-diHxCenter48=di_loop_0
-LHxCenter48=L_loop_0
-UHxCenter48=U_loop_0
-*** UntitledConn4
-diUntitledConn4=di_loop_0
-LUntitledConn4=L_loop_0
-UUntitledConn4=U_loop_0
+*** PiTeePieceTopTes
+diPiTeePieceTopTes=di_loop_0
+LPiTeePieceTopTes=L_loop_0
+UPiTeePieceTopTes=U_loop_0
+*** PiTeePieceBottomTes
+diPiTeePieceBottomTes=di_loop_0
+LPiTeePieceBottomTes=L_loop_0
+UPiTeePieceBottomTes=U_loop_0
 *** PiColIn
 diPiColIn=di_loop_0
 LPiColIn=L_loop_0
@@ -482,47 +658,7 @@ UPiTMixBottomTeePieceTop=U_loop_0
 diPiTesTMixBottom=di_loop_0
 LPiTesTMixBottom=L_loop_0
 UPiTesTMixBottom=U_loop_0
-*** PiTeePieceTopTes
-diPiTeePieceTopTes=di_loop_0
-LPiTeePieceTopTes=L_loop_0
-UPiTeePieceTopTes=U_loop_0
-*** PiTeePieceBottomTes
-diPiTeePieceBottomTes=di_loop_0
-LPiTeePieceBottomTes=L_loop_0
-UPiTeePieceBottomTes=U_loop_0
-*** PiBoilerTes
-diPiBoilerTes=di_loop_0
-LPiBoilerTes=L_loop_0
-UPiBoilerTes=U_loop_0
-*** PiTesBoiler
-diPiTesBoiler=di_loop_0
-LPiTesBoiler=L_loop_0
-UPiTesBoiler=U_loop_0
-*** PiTesTMixTop
-diPiTesTMixTop=di_loop_0
-LPiTesTMixTop=L_loop_0
-UPiTesTMixTop=U_loop_0
-*** PiTeePieceBottomTes
-diPiTeePieceBottomTes=di_loop_0
-LPiTeePieceBottomTes=L_loop_0
-UPiTeePieceBottomTes=U_loop_0
-*** PiColOut
-diPiColOut=di_loop_0
-LPiColOut=L_loop_0
-UPiColOut=U_loop_0
-*** PiTesPu
-diPiTesPu=di_loop_0
-LPiTesPu=L_loop_0
-UPiTesPu=U_loop_0
-*** PiTesTMixBottom
-diPiTesTMixBottom=di_loop_0
-LPiTesTMixBottom=L_loop_0
-UPiTesTMixBottom=U_loop_0
-*** PiTeePieceTopTes
-diPiTeePieceTopTes=di_loop_0
-LPiTeePieceTopTes=L_loop_0
-UPiTeePieceTopTes=U_loop_0
 
 
-PipeLoss0=PHxBottom37_kW+PUntitledConn2_kW+PHxCenter48_kW+PUntitledConn4_kW+PPiColIn_kW+PPiTesPu_kW+PPiColOut_kW+PPiTesBoiler_kW+PPiBoilerTes_kW+PPiTesTMixTop_kW+PPiWTapTop_kW+PPiTMixTopTeePieceBottom_kW+PPiWTapBottom_kW+PPiTMixBottomPu_kW+PPiRadIn_kW+PPiRadOut_kW+PPiTMixBottomTeePieceTop_kW+PPiTesTMixBottom_kW+PPiTeePieceTopTes_kW+PPiTeePieceBottomTes_kW+PPiBoilerTes_kW+PPiTesBoiler_kW+PPiTesTMixTop_kW+PPiTeePieceBottomTes_kW+PPiColOut_kW+PPiTesPu_kW+PPiTesTMixBottom_kW+PPiTeePieceTopTes_kW
+PipeLoss0=PPiTeePieceTopTes_kW+PPiTeePieceBottomTes_kW+PPiColIn_kW+PPiTesPu_kW+PPiColOut_kW+PPiTesBoiler_kW+PPiBoilerTes_kW+PPiTesTMixTop_kW+PPiWTapTop_kW+PPiTMixTopTeePieceBottom_kW+PPiWTapBottom_kW+PPiTMixBottomPu_kW+PPiRadIn_kW+PPiRadOut_kW+PPiTMixBottomTeePieceTop_kW+PPiTesTMixBottom_kW
 PipeLossTotal=PipeLoss0

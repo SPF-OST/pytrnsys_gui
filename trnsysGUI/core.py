@@ -1482,7 +1482,7 @@ class DiagramEditor(QWidget):
     #     self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
 
     def exportBlackBox(self):
-        f = " *** Black box component temperatures" + "\n"
+        f = "*** Black box component temperatures" + "\n"
         equationNr = 0
 
         for t in self.trnsysObj:
@@ -1497,6 +1497,8 @@ class DiagramEditor(QWidget):
                 f += "T" + t.displayName + "HeatPump" + "=1 \n"
                 f += "T" + t.displayName + "Evap" + "=1 \n"
                 equationNr += 2
+                continue
+            if isinstance(t, Pump):
                 continue
 
             if isinstance(t, StorageTank):
@@ -1514,7 +1516,7 @@ class DiagramEditor(QWidget):
 
                 equationNr += 1
 
-        f = "EQUATIONS " + str(equationNr) + "\n" + f
+        f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return f
 
@@ -1530,7 +1532,7 @@ class DiagramEditor(QWidget):
                 f += "T" + t.displayName + " = " + "T" + io[0].connectionList[0].displayName + "\n"
                 equationNr += 1
 
-        f = "EQUATIONS " + str(equationNr) + "\n" + f
+        f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
         return f
 
     def exportMassFlows(self):
@@ -1545,7 +1547,7 @@ class DiagramEditor(QWidget):
                 f += "xFrac" + t.displayName + " = 1" + "\n"
                 equationNr += 1
 
-        f = "EQUATIONS " + str(equationNr) + "\n\n" + f
+        f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return f
 
@@ -1733,13 +1735,9 @@ class DiagramEditor(QWidget):
 
         tempS = f
 
-        # print((self.convertToStringList(f)))
-        # self.correctIds(self.convertToStringList(f))
-        # f = self.correctIds(self.convertToStringList(f))
-        # print("".join(f))
-        # f = self.correctIds("".join(self.convertToStringList(f)))
-        # f = self.correctIds(self.convertToStringList(f))
-        f = tempS[0:3] + "\n" + self.correctIds(self.convertToStringList(tempS)[3:]) + "\n"
+        t = self.convertToStringList(tempS)
+
+        f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
 
         return f
 
@@ -1941,7 +1939,7 @@ class DiagramEditor(QWidget):
                     unitText += s[0:s.find('=')] + "\n"
 
                 for it in t.trnsysConn:
-                    unitText += it.displayName + "\n"
+                    unitText += "T" + it.displayName + "\n"
 
                 unitText += "***Initial values\n"
                 unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
@@ -1955,7 +1953,8 @@ class DiagramEditor(QWidget):
 
             # Pipes
             if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-                if t.isBlockConn and t.isStorageIO:
+                # if t.isBlockConn and t.isStorageIO:
+                if True:
                     parameterNumber = 6
                     inputNumbers = 4
 
@@ -1970,7 +1969,7 @@ class DiagramEditor(QWidget):
                     # Momentarily hardcoded
                     equationNr = 3
 
-                    unitText += "UNIT" + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
+                    unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
                     unitText += "!" + t.displayName + "\n"
                     unitText += "PARAMETERS " + str(parameterNumber) + "\n"
 
@@ -2003,6 +2002,7 @@ class DiagramEditor(QWidget):
 
                     unitNumber += 1
                     # print(unitText)
+                    unitText += "\n"
                     f += unitText
 
         return f
@@ -2029,7 +2029,7 @@ class DiagramEditor(QWidget):
             loopText += LLp + "=" + str(g.exportL) + "\n"
             loopText += ULp + "=" + str(g.exportU) + "\n"
             loopText += LLp + suffix1 + " = " "Mfr_" + "loop_" + str(loopNr) + "_nom*" + string1 + "((" + \
-                        diLp + "/2)^2*" + Pi + "\n"
+                        diLp + "/2)^2*" + Pi + ")\n"
 
             loopText += ULp + suffix1 + " = " + str(g.exportU) + "*" + LLp + suffix1
 
@@ -2064,7 +2064,7 @@ class DiagramEditor(QWidget):
             loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
 
             for c in g.itemList:
-                if isinstance(c, Connection):
+                if isinstance(c, Connection) and not c.isBlockConn:
                     loopText += "*** " + c.displayName +"\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
@@ -2088,7 +2088,7 @@ class DiagramEditor(QWidget):
             lossText += strVar + str(self.groupList.index(g)) + "="
 
             for i in g.itemList:
-                if isinstance(i, Connection):
+                if isinstance(i, Connection)  and not i.isBlockConn:
                     lossText += "P" + i.displayName + "_kW" + "+"
 
             lossText = lossText[:-1]

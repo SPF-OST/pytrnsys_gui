@@ -244,7 +244,7 @@ class StorageTank(BlockItem):
             print("ports have " + str(side[0].parent) + str(side[1].parent))
 
             connector = Connector("Connector", "Connector", self.parent)
-            connector.displayName = "ConnectorTes" + self.displayName + sideVar + str(connector.id)
+            connector.displayName = "Conn" + self.displayName + sideVar + str(connector.id)
             connector.setVisible(False)
             self.parent.scene().addItem(connector)
             tpList.append(connector)
