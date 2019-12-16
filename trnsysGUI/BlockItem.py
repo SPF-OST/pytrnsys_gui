@@ -375,14 +375,14 @@ class BlockItem(QGraphicsPixmapItem):
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
                     # QMouseEvent()
-                    self.parent.parent().alignYLineItem.setLine(self.pos().x(), t.pos().y(), t.pos().x(), t.pos().y())
+                    self.parent.parent().alignYLineItem.setLine(self.pos().x() + self.w/2, t.pos().y(), t.pos().x() + t.w/2, t.pos().y())
+
                     self.parent.parent().alignYLineItem.setVisible(True)
 
-                    # qtm = QTimer()
-                    # qtm.timeout.connect(self.timerfunc)
-                    # qtm.setInterval(1000)
-                    # qtm.setSingleShot(True)
-                    # qtm.start(2000)
+                    qtm = QTimer(self.parent.parent())
+                    qtm.timeout.connect(self.timerfunc)
+                    qtm.setSingleShot(True)
+                    qtm.start(1000)
 
                     e = QMouseEvent(QEvent.MouseButtonRelease, self.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton, QtCore.Qt.NoModifier)
                     self.parent.mouseReleaseEvent(e)
@@ -392,8 +392,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         return value
 
-    # def timerfunc(self):
-    #     self.parent.parent().alignYLineItem.setVisible(False)
+    def timerfunc(self):
+        self.parent.parent().alignYLineItem.setVisible(False)
 
     def updateAlignment(self):
         pass
