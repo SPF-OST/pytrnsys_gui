@@ -4,15 +4,7 @@
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/BlockItem.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/ConfigStorage.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/HeatExchanger.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/HeatExchanger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/StorageTank.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/BoilerSimple.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled2.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled3.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/diagrams/Untitled4.json" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

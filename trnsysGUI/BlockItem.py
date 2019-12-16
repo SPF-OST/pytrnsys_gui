@@ -2,7 +2,7 @@ import os
 from math import sqrt
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent
+from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
@@ -375,8 +375,15 @@ class BlockItem(QGraphicsPixmapItem):
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
                     # QMouseEvent()
-                    # self.parent.parent().alignYLineItem.setLine(self.pos().x(), t.pos().y(), t.pos().x(), t.pos().y())
-                    # self.parent.parent().alignYLineItem.setVisible(True)
+                    self.parent.parent().alignYLineItem.setLine(self.pos().x(), t.pos().y(), t.pos().x(), t.pos().y())
+                    self.parent.parent().alignYLineItem.setVisible(True)
+
+                    # qtm = QTimer()
+                    # qtm.timeout.connect(self.timerfunc)
+                    # qtm.setInterval(1000)
+                    # qtm.setSingleShot(True)
+                    # qtm.start(2000)
+
                     e = QMouseEvent(QEvent.MouseButtonRelease, self.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton, QtCore.Qt.NoModifier)
                     self.parent.mouseReleaseEvent(e)
                     self.parent.parent().alignMode = False
@@ -384,6 +391,9 @@ class BlockItem(QGraphicsPixmapItem):
                     # self.aligned = True
 
         return value
+
+    # def timerfunc(self):
+    #     self.parent.parent().alignYLineItem.setVisible(False)
 
     def updateAlignment(self):
         pass

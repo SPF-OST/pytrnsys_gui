@@ -764,11 +764,6 @@ class DiagramScene(QGraphicsScene):
         self.released = False
         self.pressed = False
 
-    # def contextMenuEvent(self, event):
-    #     menu = QMenu()
-    #     a4 = menu.addAction('Print end and start items')
-    #     menu.exec_(event.screenPos())
-
     def mouseMoveEvent(self, mouseEvent):
         self.parent().sceneMouseMoveEvent(mouseEvent)
         super(DiagramScene, self).mouseMoveEvent(mouseEvent)
@@ -2961,10 +2956,11 @@ class MainWindow(QMainWindow):
 
         toggleSnapAction = QAction("Toggle snap grid", self)
         toggleSnapAction.triggered.connect(self.toggleSnap)
+        toggleSnapAction.setShortcut("a")
 
         toggleAlignModeAction = QAction("Toggle align mode", self)
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
-
+        toggleAlignModeAction.setShortcut("q")
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
