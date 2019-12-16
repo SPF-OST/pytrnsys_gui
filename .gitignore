@@ -5,4 +5,5 @@ trnsysGUI/_pycache_/
 **/.idea/tasks.xml
 **/.idea/
 trnsysGUI/export.dck
-
+*.log
+*.lst
