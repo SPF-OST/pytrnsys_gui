@@ -52,33 +52,8 @@ __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
+# CSS Style-sheet
 cssSs = open("res/style.txt", "r")
-
-# global globalID
-# globalID = 0
-#
-# global globalConnID
-# globalConnID = 0
-#
-# global trnsysID
-# trnsysID = 0
-#
-# global globalSegID
-# globalSegID = 0
-
-def encode_Block(bl):
-    print("bl is " + str(type(bl)))
-    if isinstance(bl, BlockItem):
-        return {"__Block__": True,
-                "Name": bl.name,
-                "dispName": bl.displayName,
-                "Position": bl.pos(),
-                "GroupName": bl.groupName,
-                "ID": bl.id}
-    else:
-        type_name = bl.__class__.__name__
-        raise TypeError("Object of type '{}' is not JSON serializable".format(type_name))
-
 
 def calcDist(p1, p2):
     vec = p1 - p2
@@ -87,6 +62,7 @@ def calcDist(p1, p2):
 
 
 class DiagramDecoderPaste(json.JSONDecoder):
+    # Decodes the clipboard
     def __init__(self, *args, **kwargs):
         self.editor = kwargs["editor"]
         kwargs.pop("editor")
@@ -286,6 +262,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
 
 
 class DiagramDecoder(json.JSONDecoder):
+    # Decodes the diagram
     def __init__(self, *args, **kwargs):
         self.editor = kwargs["editor"]
         kwargs.pop("editor")
@@ -507,6 +484,7 @@ class DiagramDecoder(json.JSONDecoder):
 
 # TrnsysObj are stored in a list of dictionaries
 class DiagramEncoder(json.JSONEncoder):
+    # Encodes the diagram (entire diagram or clipboard
     def default(self, obj):
         if isinstance(obj, DiagramEditor) or isinstance(obj, copyGroup):
             print("Is diagram or copygroup")
@@ -1486,7 +1464,7 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, Connection) or isinstance(t, Pump):
                 continue
 
             if not t.isVisible():
@@ -1497,8 +1475,6 @@ class DiagramEditor(QWidget):
                 f += "T" + t.displayName + "HeatPump" + "=1 \n"
                 f += "T" + t.displayName + "Evap" + "=1 \n"
                 equationNr += 2
-                continue
-            if isinstance(t, Pump):
                 continue
 
             if isinstance(t, StorageTank):
@@ -1562,13 +1538,10 @@ class DiagramEditor(QWidget):
         f += str(lineNr) + "\n"
 
         #exportConnsString: i/o i/o 0 0
-        offset = 1
-        # Dont forget to check if trnsysObj.index() is fully equivalent to global id
+
         for t in self.trnsysObj:
             if type(t) is StorageTank:
-                # create insideConn
-                # t.connectInside() # this needs to happen before going trough trnsysObj, just after clicking export
-                # Then after export, clean up (delete blocks, set trnsysId to max(trnsysId in trnsysObj)
+                # Ignored because the used connections are the generated ones.
                 pass
 
             elif type(t) is HeatPump:
@@ -1687,51 +1660,6 @@ class DiagramEditor(QWidget):
                 # If at least one port is at a StorageTank
                 else:
                     pass
-                    # All connections are already correctly set in setUpStorageInnerConns
-
-                    # Difficult, unclear alternative using ports on StorageTank:
-
-                    # # If connection is inside StorageTank
-                    # print("->1")
-                    # if type(t.fromPort.parent) is StorageTank and type(t.toPort.parent) is StorageTank:
-                    #     print("->2")
-                    #
-                    #     # If connection is not the first (portPair) connection:
-                    #     # print(t.fromPort.connectionList)
-                    #     # print(t.toPort.connectionList)
-                    #     if len(t.fromPort.connectionList) > 0 and len(t.toPort.connectionList) > 0:
-                    #         print("->3")
-                    #
-                    #         # Search for the corresponding ports outside of the StorageTank
-                    #         firstPort = None
-                    #         secondPort = None
-                    #
-                    #         # Here we assume that the outside connection of the StorageTank
-                    #         # is created after the portPair connection and before the insideConn
-                    #         # For two ports only, there is no connection generated in insideConn
-                    #
-                    #         a = 1
-                    #         # if len(t.fromPort.connectionList) < 3:
-                    #         #                                 #     a = 0
-                    #
-                    #         if t.fromPort.connectionList[a].fromPort is t.fromPort:
-                    #             firstPort = t.fromPort.connectionList[a].toPort
-                    #         elif t.fromPort.connectionList[a].toPort is t.fromPort:
-                    #             firstPort = t.fromPort.connectionList[a].fromPort
-                    #         else:
-                    #             print("No firstPort set")
-                    #
-                    #         if t.toPort.connectionList[1].fromPort is t.toPort:
-                    #             secondPort = t.fromPort.connectionList[1].toPort
-                    #         elif t.toPort.connectionList[1].toPort is t.toPort:
-                    #             secondPort = t.fromPort.connectionList[1].fromPort
-                    #         else:
-                    #             print("No secondPort set")
-                    #
-                    #         # print("--------> FirstPort is " + str(firstPort))
-                    #         # print("--------> SecondPort is " + str(secondPort))
-
-                        # Idea: the generated Connections should directly be made with corresp ports
 
         tempS = f
 
@@ -2126,11 +2054,10 @@ class DiagramEditor(QWidget):
         return f
 
     def exportData(self):
+        # Main trnsys export function
         self.setUpStorageInnerConns()
 
         self.sortTrnsysObj()
-
-        # print("Self trnsysObj" + str(self.trnsysObj))
 
         fullExportText = ''
 
@@ -2179,12 +2106,6 @@ class DiagramEditor(QWidget):
         lineNrParameters = parameters
         parameters = parameters * 4 + 1
 
-        # print("NEW export -----------------------------")
-        # print(self.exportBlackBox())
-        # print(self.exportPumpOutlets())
-        # print(self.exportMassFlows())
-        # print("New export -----------------------------")
-
         fullExportText += self.exportBlackBox()
         fullExportText += self.exportPumpOutlets()
         fullExportText += self.exportMassFlows()
@@ -2205,7 +2126,6 @@ class DiagramEditor(QWidget):
         f.write(fullExportText)
         f.close()
 
-        # self.exportEnd1(139, 25)
         # self.cleanUpExportedElements()
 
         self.tearDownStorageInnerConns()
@@ -2265,7 +2185,7 @@ class DiagramEditor(QWidget):
         diagramDlg(self)
 
     def delGroup(self):
-        # This is used for deleting the first connected componts group found by BFS
+        # This is used for deleting the first connected componts group found by BFS, unused
         for bl in self.blockList:
             bl.deleteBlock()
 
@@ -2704,35 +2624,6 @@ class DiagramEditor(QWidget):
 
         # tempList = []
         # for t in self.trnsysObj:
-
-    # Own, primitiv insertion sort, unused
-    def insertionSort(self):
-        print("Len of trnsyObj before sort is " + str(len(self.trnsysObj)))
-        print("List is " + str(self.trnsysObj))
-
-        # for s in self.trnsysObj:
-        #     print("before, s has tr id " + str(s.trnsysId))
-
-        newTrnsysList = []
-        newTrnsysList.append(self.trnsysObj.pop(0))
-
-        for t in self.trnsysObj:
-            for n in newTrnsysList:
-                if n.trnsysId > t.trnsysId:
-                    # print("Found a larger id, inserting")
-                    newTrnsysList.insert(newTrnsysList.index(n), t)
-                    break
-            if t.trnsysId > newTrnsysList[-1].trnsysId:
-                newTrnsysList.append(t)
-
-        self.trnsysObj = newTrnsysList
-
-        print("Len of trnsyObj after sort is " + str(len(self.trnsysObj)))
-        # print("List is now " + str(self.trnsysObj))
-        # for s in self.trnsysObj:
-        #     print("s has tr id " + str(s.trnsysId))
-
-        # self.sortTrnsysObj()
 
 
     def sortTrnsysObj(self):
