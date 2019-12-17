@@ -9,3 +9,6 @@ trnsysGUI/exports/
 **/.idea/
 *.log
 *.lst
+/.idea/misc.xml
+/.idea/TrnsysGUI.iml
+/.idea/TrnsysGUI.iml
