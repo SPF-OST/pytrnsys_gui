@@ -16,6 +16,8 @@ class WTap_main(BlockItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
+        self.typeNumber = 4
+
         self.changeSize()
 
     def changeSize(self):

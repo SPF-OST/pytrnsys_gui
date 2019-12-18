@@ -82,17 +82,10 @@ class BlockItem(QGraphicsPixmapItem):
         self.setFlag(self.ItemSendsScenePositionChanges, True)
 
         print("self.name is " + str(self.name))
-        # Update size for generic block:
-        if self.name != 'TeePiece' and self.name != 'TVentil' and self.name != 'Pump' \
-                and self.name != 'Kollektor' and self.name != 'HP' and self.name != 'IceStorage' \
-                and self.name != 'Radiator' and self.name != 'WTap' and self.name != 'WTap_main' \
-                and self.name != 'Connector' and self.name != 'GenericBlock':
-            self.changeSize()
 
-        # self.aligned = False
-        # self.wasAligned = False
-        # self.alignMode = True
-        # self.updatePos = False
+        # Update size for generic block:
+        if self.name == 'Bvi':
+            self.changeSize()
 
     def setParent(self, p):
         self.parent = p

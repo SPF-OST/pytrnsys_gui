@@ -35,12 +35,12 @@ class PortItem(QGraphicsEllipseItem):
         if name == 'i':
             color = QColor(self.ashColorR)
             # self.outerRing.setBrush(QColor(self.ashColorR))
-            self.outerRing.setBrush(QColor(0,0,0))
+            self.outerRing.setBrush(QColor(0, 0, 0))
 
         if name == 'o':
             color = QColor(self.ashColorB)
             # self.outerRing.setBrush(QColor(self.ashColorB))
-            self.outerRing.setBrush(QColor(0,0,0))
+            self.outerRing.setBrush(QColor(0, 0, 0))
 
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
