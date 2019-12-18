@@ -137,6 +137,27 @@
             "RotationN": 0,
             "trnsysID": 2
         },
+        "Block-48": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PuBoiler",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -875.0,
+                -643.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 48,
+            "PortsIDIn": [
+                49
+            ],
+            "PortsIDOut": [
+                50
+            ],
+            "RotationN": 0,
+            "trnsysID": 23
+        },
         "Block-7": {
             ".__BlockDict__": true,
             "BlockDisplayName": "Boiler",
@@ -381,46 +402,25 @@
             "isBlockConn": false,
             "trnsysID": 14
         },
-        "Connection-47": {
+        "Connection-54": {
             ".__ConnectionDict__": true,
-            "ConnCID": 7,
-            "ConnDisplayName": "PiBoilerTes",
-            "ConnID": 47,
-            "CornerPositions": [
-                [
-                    -900.0,
-                    -616.6666666666666
-                ],
-                [
-                    -900.0,
-                    -460.0
-                ]
-            ],
+            "ConnCID": 15,
+            "ConnDisplayName": "PiBoiPu",
+            "ConnID": 54,
+            "CornerPositions": [],
             "GroupName": "defaultGroup",
-            "PortFromID": 8,
-            "PortToID": 24,
+            "PortFromID": 49,
+            "PortToID": 8,
             "SegmentPositions": [
                 [
+                    -879.0,
+                    -618.4,
                     -1042.0,
-                    -616.6666666666666,
-                    -900.0,
                     -616.6666666666666
-                ],
-                [
-                    -900.0,
-                    -616.6666666666666,
-                    -900.0,
-                    -460.0
-                ],
-                [
-                    -900.0,
-                    -460.0,
-                    -758.0,
-                    -460.0
                 ]
             ],
             "isBlockConn": false,
-            "trnsysID": 15
+            "trnsysID": 25
         },
         "Connection-55": {
             ".__ConnectionDict__": true,
@@ -563,6 +563,26 @@
             ],
             "isBlockConn": false,
             "trnsysID": 22
+        },
+        "Connection-99": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 28,
+            "ConnDisplayName": "PiBoiTes",
+            "ConnID": 99,
+            "CornerPositions": [],
+            "GroupName": "defaultGroup",
+            "PortFromID": 24,
+            "PortToID": 50,
+            "SegmentPositions": [
+                [
+                    -758.0,
+                    -460.0,
+                    -811.0,
+                    -618.4
+                ]
+            ],
+            "isBlockConn": false,
+            "trnsysID": 47
         },
         "IDs": {
             "GlobalId": 0,
