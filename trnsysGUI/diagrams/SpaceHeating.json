@@ -761,10 +761,10 @@
             "trnsysID": 32
         },
         "IDs": {
-            "GlobalId": 0,
+            "GlobalId": 100,
             "__idDct__": true,
-            "globalConnID": 0,
-            "trnsysID": 0
+            "globalConnID": 100,
+            "trnsysID": 100
         },
         "Strings": {
             "DiagramName": "SpaceHeating",

@@ -41,6 +41,15 @@ class IdGenerator(object):
     def setBlockID(self, id):
         self.blockIdCounter = count(id)
 
+    def setID(self, id):
+        self.idCounter = count(id)
+
+    def setConnID(self, id):
+        self.connIdCounter = count(id)
+
+    def setTrnsysID(self, id):
+        self.trnsysIdCounter = count(id)
+
     def reset(self):
         self.ids = []
         self.trnsysIds = []
