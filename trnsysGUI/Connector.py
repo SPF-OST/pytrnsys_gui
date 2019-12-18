@@ -6,7 +6,7 @@ from trnsysGUI.PortItem import PortItem
 
 
 class Connector(BlockItem):
-    def __init__(self, trnsysType, name='Untitled', parent=None):
+    def __init__(self, trnsysType, name='Untitled', parent=None, **kwargs):
         super(Connector, self).__init__(trnsysType, name, parent)
         self.sizeFactor = 0.5
         self.w = 100 * self.sizeFactor
@@ -17,7 +17,8 @@ class Connector(BlockItem):
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
+        if "storagePorts" in kwargs:
+            self.storagePorts = kwargs["storagePorts"]
         self.changeSize()
 
     def changeSize(self):

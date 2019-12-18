@@ -222,7 +222,7 @@ class StorageTank(BlockItem):
         # Same as checkInside, but using BFS
         pass
 
-    def connectInside(self, side, tpList, sideVar):
+    def connectInside(self, side, side2, tpList, sideVar):
         # Side should be list of all ports to the same side
         # Assert that the storage has at least 2 ports at side
         # Side is used in this function to store the nodes of one layer
@@ -243,7 +243,7 @@ class StorageTank(BlockItem):
             print("Only 2 ports in side list")
             print("ports have " + str(side[0].parent) + str(side[1].parent))
 
-            connector = Connector("Connector", "Connector", self.parent)
+            connector = Connector("Connector", "Connector", self.parent, storagePorts=side2)
             connector.displayName = "Conn" + self.displayName + sideVar + str(connector.id)
             connector.setVisible(False)
             self.parent.scene().addItem(connector)
@@ -333,9 +333,10 @@ class StorageTank(BlockItem):
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
 
     def connectHxs(self, side, side2, connList, lr):
+        # Adds a Connector block and connections to the external blocks (both virtual)
         print("ports have " + str(side[0].parent) + str(side[1].parent))
 
-        connector = Connector("Connector", "Connector", self.parent)
+        connector = Connector("Connector", "Connector", self.parent, storagePorts=side2)
         connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
         c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
         c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())

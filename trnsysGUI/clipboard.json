@@ -1,147 +1,79 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "Block-28": {
+        "Block-1": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "TMix",
-            "BlockName": "TVentil",
+            ".__HeatPumpTwoDict__": true,
+            "BlockDisplayName": "HPTwoHx1",
+            "BlockName": "HPTwoHx",
             "BlockPosition": [
-                -602.0,
-                -473.0
+                -996.0,
+                -339.0
             ],
             "FlippedH": false,
-            "FlippedV": true,
+            "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 28,
+            "HeatPumpDisplayName": "HPTwoHx1",
+            "HeatPumpName": "HPTwoHx",
+            "HeatPumpPosition": [
+                -996.0,
+                -339.0
+            ],
+            "ID": 1,
             "PortsIDIn": [
-                29,
-                30
+                2,
+                3,
+                4
             ],
             "PortsIDOut": [
-                31
+                5,
+                6,
+                7
             ],
             "RotationN": 0,
-            "trnsysID": 9
+            "childIds": [
+                1,
+                2,
+                3
+            ],
+            "trnsysID": 1
         },
-        "Block-32": {
+        "BlockHeatPump-1": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "TPiece",
-            "BlockName": "TeePiece",
+            ".__HeatPumpTwoDict__": true,
+            "BlockDisplayName": "HPTwoHx1",
+            "BlockName": "HPTwoHx",
             "BlockPosition": [
-                -597.0,
-                -263.0
+                -996.0,
+                -339.0
             ],
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 32,
+            "HeatPumpDisplayName": "HPTwoHx1",
+            "HeatPumpName": "HPTwoHx",
+            "HeatPumpPosition": [
+                -996.0,
+                -339.0
+            ],
+            "ID": 1,
             "PortsIDIn": [
-                33,
-                34
+                2,
+                3,
+                4
             ],
             "PortsIDOut": [
-                35
+                5,
+                6,
+                7
             ],
             "RotationN": 0,
-            "trnsysID": 10
-        },
-        "Block-36": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "WTapTop",
-            "BlockName": "WTap",
-            "BlockPosition": [
-                -349.0,
-                -472.0
+            "childIds": [
+                1,
+                2,
+                3
             ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 36,
-            "PortsIDIn": [
-                37
-            ],
-            "PortsIDOut": [],
-            "RotationN": 0,
-            "trnsysID": 11
-        },
-        "Block-38": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "WTapBottom",
-            "BlockName": "WTap_main",
-            "BlockPosition": [
-                -358.0,
-                -256.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 38,
-            "PortsIDIn": [
-                39
-            ],
-            "PortsIDOut": [],
-            "RotationN": 0,
-            "trnsysID": 12
-        },
-        "Connection-40": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 4,
-            "ConnDisplayName": "MixWTapMain",
-            "ConnID": 40,
-            "CornerPositions": [],
-            "GroupName": "defaultGroup",
-            "PortFromID": 39,
-            "PortToID": 34,
-            "SegmentPositions": [
-                [
-                    -366.0,
-                    -231.0,
-                    -539.0,
-                    -229.575
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 13
-        },
-        "Connection-43": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 5,
-            "ConnDisplayName": "MixWTap",
-            "ConnID": 43,
-            "CornerPositions": [],
-            "GroupName": "defaultGroup",
-            "PortFromID": 37,
-            "PortToID": 31,
-            "SegmentPositions": [
-                [
-                    -357.0,
-                    -458.095,
-                    -534.0,
-                    -456.696
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 14
-        },
-        "Connection-46": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 6,
-            "ConnDisplayName": "MixCirc",
-            "ConnID": 46,
-            "CornerPositions": [],
-            "GroupName": "defaultGroup",
-            "PortFromID": 30,
-            "PortToID": 35,
-            "SegmentPositions": [
-                [
-                    -572.0,
-                    -428.31600000000003,
-                    -572.0,
-                    -271.0
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 15
+            "trnsysID": 1
         },
         "IDs": {
             "GlobalId": 0,

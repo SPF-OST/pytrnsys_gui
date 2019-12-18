@@ -936,5 +936,5 @@ class Connection(object):
         self.parent.listV.addItem("Parent: " + str(self.parent))
         # self.parent.listV.addItem("Position: " + str(self.pos()))
         # self.parent.listV.addItem("Sceneposition: " + str(self.scenePos()))
-        self.parent.listV.addItem("fromPort: " + str(self.fromPort))
-        self.parent.listV.addItem("toPort: " + str(self.toPort))
+        self.parent.listV.addItem("fromPort: " + str(self.fromPort) + str(self.fromPort.id))
+        self.parent.listV.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
