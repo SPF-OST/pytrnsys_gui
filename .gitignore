@@ -1,6 +1,14 @@
 trnsysGUI/_pycache_/
+trnsysGUI/export.dck
+trnsysGUI/diagrams/
+trnsysGUI/exports/
 *.xml
 *.pyc
-trnsysGUI/export.dck
-/.idea/workspace.xml
-/.idea/
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/
+*.log
+*.lst
+/.idea/misc.xml
+/.idea/TrnsysGUI.iml
+/.idea/TrnsysGUI.iml

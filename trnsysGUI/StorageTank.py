@@ -53,7 +53,6 @@ class StorageTank(BlockItem):
 
         port1 = None
         port2 = None
-        tempSideList = None
         sideNr = 0
 
         if left:
@@ -94,6 +93,8 @@ class StorageTank(BlockItem):
         if left:
             port1.setPos(-2 * StorageTank.delta, hAbsI)
             port2.setPos(-2 * StorageTank.delta, hAbsO)
+            port1.side = 0
+            port2.side = 0
         else:
             port1.setPos(self.w + 2 * StorageTank.delta, hAbsI)
             port2.setPos(self.w + 2 * StorageTank.delta, hAbsO)
@@ -243,6 +244,7 @@ class StorageTank(BlockItem):
             print("ports have " + str(side[0].parent) + str(side[1].parent))
 
             connector = Connector("Connector", "Connector", self.parent)
+            connector.displayName = "Conn" + self.displayName + sideVar + str(connector.id)
             connector.setVisible(False)
             self.parent.scene().addItem(connector)
             tpList.append(connector)
@@ -267,6 +269,7 @@ class StorageTank(BlockItem):
 
             for i in range(0, x, 2):
                 tpiece = TeePiece("TeePiece", "TeePiece", self.parent)
+                tpiece.displayName = "TPieceTes" + self.displayName + sideVar + str(tpiece.id)
                 tpiece.setVisible(False)
                 self.parent.scene().addItem(tpiece)
                 tpList.append(tpiece)
@@ -319,7 +322,7 @@ class StorageTank(BlockItem):
 
         for s in side_test:
             for t in tempArrConn:
-                print("Checking s")
+                # print("Checking s")
                 if t.fromPort is s or t.toPort is s:
                     print("This is a real connection " + str(t.displayName))
                     if len(s.connectionList) > 0:
@@ -329,11 +332,11 @@ class StorageTank(BlockItem):
 
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
 
-    def connectHxs(self, side, connList, lr):
+    def connectHxs(self, side, side2, connList, lr):
         print("ports have " + str(side[0].parent) + str(side[1].parent))
 
         connector = Connector("Connector", "Connector", self.parent)
-        connector.displayName = "Connector" + self.displayName + lr + str(+ connector.id)
+        connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
         c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
         c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
         connList.append(connector)
@@ -394,3 +397,22 @@ class StorageTank(BlockItem):
         print("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         del self
+
+    def deleteBlockDebug(self):
+        print("Listing all connections")
+        conns = []
+        for p in self.inputs + self.outputs:
+            for c in p.connectionList:
+                conns.append(c)
+
+        [print(
+            c.displayName + ", fromPort: " + c.fromPort.parent.displayName + ", toPort: " + c.toPort.parent.displayName)
+         for c in conns]
+
+    def deleteHeatExchangers(self):
+        pass
+
+    # def keyPressEvent(self, event):
+    #     print("Pressed st")
+    #
+    #     super(StorageTank, self).keyPressEvent(event)

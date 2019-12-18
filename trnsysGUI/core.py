@@ -14,7 +14,7 @@ from pathlib import Path
 
 # from trnsysGUI.CircularDep import *
 # from trnsysGUI.Connection import Connection
-
+# from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
@@ -52,33 +52,8 @@ __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
+# CSS Style-sheet
 cssSs = open("res/style.txt", "r")
-
-# global globalID
-# globalID = 0
-#
-# global globalConnID
-# globalConnID = 0
-#
-# global trnsysID
-# trnsysID = 0
-#
-# global globalSegID
-# globalSegID = 0
-
-def encode_Block(bl):
-    print("bl is " + str(type(bl)))
-    if isinstance(bl, BlockItem):
-        return {"__Block__": True,
-                "Name": bl.name,
-                "dispName": bl.displayName,
-                "Position": bl.pos(),
-                "GroupName": bl.groupName,
-                "ID": bl.id}
-    else:
-        type_name = bl.__class__.__name__
-        raise TypeError("Object of type '{}' is not JSON serializable".format(type_name))
-
 
 def calcDist(p1, p2):
     vec = p1 - p2
@@ -87,6 +62,7 @@ def calcDist(p1, p2):
 
 
 class DiagramDecoderPaste(json.JSONDecoder):
+    # Decodes the clipboard
     def __init__(self, *args, **kwargs):
         self.editor = kwargs["editor"]
         kwargs.pop("editor")
@@ -286,6 +262,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
 
 
 class DiagramDecoder(json.JSONDecoder):
+    # Decodes the diagram
     def __init__(self, *args, **kwargs):
         self.editor = kwargs["editor"]
         kwargs.pop("editor")
@@ -365,6 +342,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.updateFlipStateV(i["FlippedV"])
                         bl.rotateBlockToN(i["RotationN"])
                         bl.displayName = i["BlockDisplayName"]
+                        bl.label.setPlainText(bl.displayName)
 
                         bl.groupName = "defaultGroup"
                         bl.setBlockToGroup(i["GroupName"])
@@ -384,7 +362,7 @@ class DiagramDecoder(json.JSONDecoder):
                         bl = StorageTank(i["StorageName"], i["StorageDisplayName"], self.editor.diagramView)
                         bl.flippedH = i["FlippedH"]
                         # bl.flippedV = i["FlippedV"] # No support for vertical flip
-                        bl.displayName = i["StorageName"]
+                        bl.displayName = i["StorageDisplayName"]
 
                         bl.changeSize()
 
@@ -506,6 +484,7 @@ class DiagramDecoder(json.JSONDecoder):
 
 # TrnsysObj are stored in a list of dictionaries
 class DiagramEncoder(json.JSONEncoder):
+    # Encodes the diagram (entire diagram or clipboard
     def default(self, obj):
         if isinstance(obj, DiagramEditor) or isinstance(obj, copyGroup):
             print("Is diagram or copygroup")
@@ -763,21 +742,6 @@ class DiagramScene(QGraphicsScene):
         self.released = False
         self.pressed = False
 
-        # self.addItem(QGraphicsEllipseItem(0,0,3,3, None))
-
-        # qrg = QRadialGradient(0, 0, 10)
-        # qrg.setSpread(QGradient.RepeatSpread)
-        # self.setBackgroundBrush(qrg)
-        # self.setBackgroundBrush(QtCore.Qt.blue)
-        # qb = QBrush()
-        # qb.setStyle(Qt.Dense7Pattern)
-        # self.setBackgroundBrush(qb)
-
-    # def contextMenuEvent(self, event):
-    #     menu = QMenu()
-    #     a4 = menu.addAction('Print end and start items')
-    #     menu.exec_(event.screenPos())
-
     def mouseMoveEvent(self, mouseEvent):
         self.parent().sceneMouseMoveEvent(mouseEvent)
         super(DiagramScene, self).mouseMoveEvent(mouseEvent)
@@ -797,6 +761,8 @@ class DiagramScene(QGraphicsScene):
         # global selectionMode
         # global copyMode
         # global pasting
+
+
         if self.parent().pasting:
             # Dismantle group
             self.parent().clearCopyGroup()
@@ -826,29 +792,26 @@ class DiagramScene(QGraphicsScene):
             self.pressed = False
             self.selectionRect.setVisible(False)
 
+    def drawBackground(self, painter, rect):
+        if self.parent().snapGrid:
+            pen = QPen()
+            pen.setWidth(2)
+            pen.setCosmetic(True)
+            painter.setPen(pen)
 
-    # def drawBackground(self, painter, rect):
-    #     if self.parent().snapGrid:
-    #         pen = QPen()
-    #         pen.setWidth(2)
-    #         pen.setCosmetic(True)
-    #         painter.setPen(pen)
-    #
-    #         gridSize = 20
-    #
-    #
-    #         left = int(rect.left()) - (int(rect.left()) % gridSize)
-    #         top = int(rect.top()) - (int(rect.top()) % gridSize)
-    #         points = []
-    #         for x in range(left, int(rect.height()), gridSize):
-    #             for y in range(top, int(rect.bottom()), gridSize):
-    #                 points.append(QPointF(x, y))
-    #
-    #         for x in points:
-    #             painter.drawPoint(x)
-    #     else:
-    #         pass
-    #         # super(DiagramScene, self).drawBackground(painter, rect)
+            gridSize = 50
+
+            left = int(rect.left()) - (int(rect.left()) % gridSize)
+            top = int(rect.top()) - (int(rect.top()) % gridSize)
+            points = []
+            for x in range(left, int(rect.height()), gridSize):
+                for y in range(top, int(rect.bottom()), gridSize):
+                    points.append(QPointF(x, y))
+
+            for x in points:
+                painter.drawPoint(x)
+        else:
+            super(DiagramScene, self).drawBackground(painter, rect)
 
     # def mouseMoveEvent(self, e):
     #     self.setMouseTracking(True)
@@ -892,6 +855,13 @@ class DiagramScene(QGraphicsScene):
             print("No items here!")
             for c in self.parent().connectionList:
                 c.unhighlightConn()
+
+            self.parent().alignYLineItem.setVisible(False)
+
+            for st in self.parent().trnsysObj:
+                if isinstance(st, StorageTank):
+                    for hx in st.heatExchangers:
+                        hx.unhighlightHx()
 
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
@@ -958,6 +928,7 @@ class EditorGraphicsView(QGraphicsView):
         # self.setMinimumSize(1300, 700)
         self.parent().diagramScene.viewRect2.setPos(-self.width() / 2, -self.height() / 2)
         # self.parent().diagramScene.viewRect2.setPos(1300, 700)
+        self.setRenderHint(QPainter.Antialiasing)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasFormat('component/name'):
@@ -994,6 +965,8 @@ class EditorGraphicsView(QGraphicsView):
                 bl = WTap_main(name, name, self)
             elif name == 'Connector':
                 bl = Connector(name, name, self)
+            # elif name == 'GenericBlock':
+            #     bl = GenericBlock(name, name, self)
             else:
                 bl = BlockItem(name, name, self)
 
@@ -1002,10 +975,6 @@ class EditorGraphicsView(QGraphicsView):
                 p1 = self.mapToScene(qp)
             else:
                 p1 = self.mapToScene(event.pos())
-            # cellS = 50
-            # pos1x = int(p1.x()/cellS) * cellS
-            # pos1y = int(p1.y()/cellS) * cellS
-            # bl.setPos(pos1x, pos1y)
 
             bl.setPos(p1)
             self.scene().addItem(bl)
@@ -1024,6 +993,15 @@ class EditorGraphicsView(QGraphicsView):
         QGraphicsView.mouseMoveEvent(self, event)
         self.parent().mouseMoveEvent(event)
 
+    def mouseReleaseEvent(self, mouseEvent):
+        pass
+        # print(str(mouseEvent.pos()))
+        #     for ot in self.trnsysObj:
+        #     t.setPos(t.pos())
+        # #     self.parent().alignYLineItem.setVisible(False)
+
+        super(EditorGraphicsView, self).mouseReleaseEvent(mouseEvent)
+
     def wheelEvent(self, event):
         super(EditorGraphicsView, self).wheelEvent(event)
 
@@ -1032,6 +1010,18 @@ class EditorGraphicsView(QGraphicsView):
                 self.scale(1.25, 1.25)
             else:
                 self.scale(0.8, 0.8)
+
+    def mousePressEvent(self, event):
+    #     pass
+        # for t in self.parent().trnsysObj:
+        #     if isinstance(t, BlockItem):
+        #         t.alignMode = True
+        #         print("Changing alignmentmode")
+        # for t in self.parent().trnsysObj:
+        #     if isinstance(t, BlockItem):
+        #         t.itemChange(t.ItemPositionChange, t.pos())
+
+        super(EditorGraphicsView, self).mousePressEvent(event)
 
     # def drawBackground(self, painter_, rect):
     #
@@ -1081,6 +1071,8 @@ class DiagramEditor(QWidget):
         self.copyMode = False
         self.multipleSelectedMode = False
 
+        self.alignMode = False
+
         self.pasting = False
         self.itemsSelected = False
 
@@ -1124,6 +1116,7 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'WTap_main')), 'WTap_main'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Radiator')), 'Radiator'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Connector')), 'Connector'))
+        # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericBlock')), 'GenericBlock'))
 
         for i in self.libItems:
             self.libraryModel.appendRow(i)
@@ -1221,6 +1214,14 @@ class DiagramEditor(QWidget):
         self.connLineItem.setPen(QtGui.QPen(connLinecolor, linePx))
         self.connLineItem.setVisible(False)
         self.diagramScene.addItem(self.connLineItem)
+
+        self.alignYLine = QLineF()
+        self.alignYLineItem = QGraphicsLineItem(self.alignYLine)
+        self.alignYLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
+        self.alignYLineItem.setVisible(False)
+        self.diagramScene.addItem(self.alignYLineItem)
+
+        self.alignXLine = QLineF()
 
         # #Search related lists
         self.bfs_visitedNodes = []
@@ -1330,11 +1331,11 @@ class DiagramEditor(QWidget):
 
                 for hx in t.heatExchangers:
                     if hx.sSide == 0:
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsLeft, "L")
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2], t.hxInsideConnsLeft, "L")
                     elif hx.sSide == 2:
                         print("storage of hx R is " + str(t.displayName))
                         print("hx ports are" + str(hx.port1) + str(hx.port2))
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), t.hxInsideConnsRight, "R")
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2], t.hxInsideConnsRight, "R")
                     else:
                         print("heatExchanger has not valid sSide")
 
@@ -1342,6 +1343,12 @@ class DiagramEditor(QWidget):
                 # print("t.leftside is " + str(t.rightSide))
                 t.connectInside(self.findStorageCorrespPorts(t.leftSide), t.insideConnLeft, "L")
                 t.connectInside(self.findStorageCorrespPorts(t.rightSide), t.insideConnRight, "R")
+
+                print("------Checking insideConns")
+                print(t.hxInsideConnsLeft)
+                print(t.hxInsideConnsRight)
+                print(t.insideConnLeft)
+                print(t.insideConnRight)
 
     def findStorageCorrespPorts(self, portList):
         # This function gets the ports on the other side of pipes connected to a port of the StorageTank
@@ -1389,38 +1396,59 @@ class DiagramEditor(QWidget):
         for t in self.trnsysObj:
             if type(t) is StorageTank:
 
-                print("in conn left list is ")
-                [print(e.displayName) for e in t.insideConnLeft]
-                print("in conn right list is ")
-                [print(e.displayName) for e in t.insideConnRight]
+                # print("in conn left list is ")
+                # [print(e.displayName) for e in t.insideConnLeft]
+                # print("in conn right list is ")
+                # [print(e.displayName) for e in t.insideConnRight]
 
                 # Remove old insideConnection:
                 # if len(t.insideConnLeft) > 0:
                     # print("t.insideConnection has " + str(len(t.insideConnLeft)) + "TPieces/connection")
-                for tp in t.insideConnLeft:
+
+                while len(t.insideConnLeft) > 0:
+                    tp = t.insideConnLeft[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.insideConnLeft.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.insideConnLeft = []
 
-                for tp in t.insideConnRight:
+                while len(t.insideConnRight) > 0:
+                    tp = t.insideConnRight[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.insideConnRight.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.insideConnRight = []
 
-                for tp in t.hxInsideConnsLeft:
+                while len(t.hxInsideConnsLeft) > 0:
+                    tp = t.hxInsideConnsLeft[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.hxInsideConnsLeft.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.hxInsideConnsLeft = []
 
-                for tp in t.hxInsideConnsRight:
+                while len(t.hxInsideConnsRight) > 0:
+                    tp = t.hxInsideConnsRight[0]
                     if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        tp.deleteBlock()
+                        if tp in self.trnsysObj:
+                            t.hxInsideConnsRight.remove(tp)
+                            tp.deleteBlock()
+                        else:
+                            print("The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
                     else:
                         print("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.hxInsideConnsRight = []
@@ -1432,11 +1460,11 @@ class DiagramEditor(QWidget):
     #     self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
 
     def exportBlackBox(self):
-        f = " *** Black box component temperatures" + "\n"
+        f = "*** Black box component temperatures" + "\n"
         equationNr = 0
 
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, Connection) or isinstance(t, Pump):
                 continue
 
             if not t.isVisible():
@@ -1464,7 +1492,7 @@ class DiagramEditor(QWidget):
 
                 equationNr += 1
 
-        f = "EQUATIONS " + str(equationNr) + "\n" + f
+        f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return f
 
@@ -1480,7 +1508,7 @@ class DiagramEditor(QWidget):
                 f += "T" + t.displayName + " = " + "T" + io[0].connectionList[0].displayName + "\n"
                 equationNr += 1
 
-        f = "EQUATIONS " + str(equationNr) + "\n" + f
+        f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
         return f
 
     def exportMassFlows(self):
@@ -1495,28 +1523,25 @@ class DiagramEditor(QWidget):
                 f += "xFrac" + t.displayName + " = 1" + "\n"
                 equationNr += 1
 
-        f = "EQUATIONS " + str(equationNr) + "\n\n" + f
+        f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return f
 
     def exportPrintConnections(self, simulationUnit, simulationType, descConnLength, parameters, lineNr):
         # If not all ports of an object are connected, less than 5 numbers will show up
         f = ""
-        print("UNIT " + str(simulationUnit) + " TYPE " + str(simulationType))
+        # print("UNIT " + str(simulationUnit) + " TYPE " + str(simulationType))
         f += "UNIT " + str(simulationUnit) + " TYPE " + str(simulationType) + "\n"
-        print("PARAMETERS " + str(parameters))
+        # print("PARAMETERS " + str(parameters))
         f += "PARAMETERS " + str(parameters) + "\n"
-        print(str(lineNr))
+        # print(str(lineNr))
         f += str(lineNr) + "\n"
 
         #exportConnsString: i/o i/o 0 0
-        offset = 1
-        # Dont forget to check if trnsysObj.index() is fully equivalent to global id
+
         for t in self.trnsysObj:
             if type(t) is StorageTank:
-                # create insideConn
-                # t.connectInside() # this needs to happen before going trough trnsysObj, just after clicking export
-                # Then after export, clean up (delete blocks, set trnsysId to max(trnsysId in trnsysObj)
+                # Ignored because the used connections are the generated ones.
                 pass
 
             elif type(t) is HeatPump:
@@ -1540,7 +1565,7 @@ class DiagramEditor(QWidget):
 
                                     # HeatPump will have a two liner exportConnString
                                     t.exportConnsString += temp + "\n"
-                                    print(temp + "!" + str(t.childIds[0]) + " : " + t.displayName + "HeatPump")
+                                    # print(temp + "!" + str(t.childIds[0]) + " : " + t.displayName + "HeatPump")
                                     f += temp + "!" + str(t.childIds[0]) + " : " + t.displayName + "HeatPump" + "\n"
 
                                 elif i == 1:
@@ -1550,10 +1575,10 @@ class DiagramEditor(QWidget):
 
                                     # HeatPump will have a two liner exportConnString
                                     t.exportConnsString += temp + "\n"
-                                    print(temp + "!" + str(t.childIds[1]) + " : " + t.displayName + "Evap")
+                                    # print(temp + "!" + str(t.childIds[1]) + " : " + t.displayName + "Evap")
                                     f += temp + "!" + str(t.childIds[1]) + " : " + t.displayName + "Evap" + "\n"
                                 else:
-                                    print("There are more inputs than trnsysIds ")
+                                    # print("There are more inputs than trnsysIds ")
                                     f += "Error: There are more inputs than trnsysIds" + "\n"
 
                                 # Presumably used only for storing the order of connections
@@ -1561,8 +1586,9 @@ class DiagramEditor(QWidget):
                                 t.trnsysConn.append(t.outputs[i].connectionList[0])
 
                             else:
-                                print("Output of HeatPump for input[{0}] is not connected ".format(i))
-                                f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
+                                # print("Output of HeatPump for input[{0}] is not connected ".format(i))
+                                f += "Output of HFeatPump for input[{0}] is not connected ".format(i) + "\n"
+
             else:
                 # No StorageTank and no HeatPump
                 if isinstance(t, BlockItem):
@@ -1602,7 +1628,7 @@ class DiagramEditor(QWidget):
                     temp += " " * (descConnLength - len(temp))
                     t.exportConnsString = temp
                     # print(temp + "!" + str(self.trnsysObj.index(t) + offset) + " : " + str(t.displayName))
-                    print(temp + "!" + str(t.trnsysId) + " : " + str(t.displayName))
+                    # print(temp + "!" + str(t.trnsysId) + " : " + str(t.displayName))
                     f += temp + "!" + str(t.trnsysId) + " : " + str(t.displayName) + "\n"
 
                 if type(t) is Connection:
@@ -1621,11 +1647,11 @@ class DiagramEditor(QWidget):
                         t.trnsysConn.append(t.fromPort.parent)
                         t.trnsysConn.append(t.toPort.parent)
                     else:
-                        print("Error: Parent of this port is not a BlockItem")
+                        # print("Error: Parent of this port is not a BlockItem")
                         f += "Error: Parent of this port is not a BlockItem" + "\n"
                         return
 
-                    print(temp + " " * (descConnLength - len(temp)) + "!" + str(t.trnsysId) + " : " + str(t.displayName))
+                    # print(temp + " " * (descConnLength - len(temp)) + "!" + str(t.trnsysId) + " : " + str(t.displayName))
                     f += temp + " " * (descConnLength - len(temp)) + "!" + str(t.trnsysId) + " : " + str(t.displayName) + "\n"
 
                 #TODO: Check if no problem with other storagetanks (very probable)
@@ -1634,58 +1660,19 @@ class DiagramEditor(QWidget):
                 # If at least one port is at a StorageTank
                 else:
                     pass
-                    # All connections are already correctly set in setUpStorageInnerConns
 
-                    # Difficult, unclear alternative using ports on StorageTank:
+        tempS = f
 
-                    # # If connection is inside StorageTank
-                    # print("->1")
-                    # if type(t.fromPort.parent) is StorageTank and type(t.toPort.parent) is StorageTank:
-                    #     print("->2")
-                    #
-                    #     # If connection is not the first (portPair) connection:
-                    #     # print(t.fromPort.connectionList)
-                    #     # print(t.toPort.connectionList)
-                    #     if len(t.fromPort.connectionList) > 0 and len(t.toPort.connectionList) > 0:
-                    #         print("->3")
-                    #
-                    #         # Search for the corresponding ports outside of the StorageTank
-                    #         firstPort = None
-                    #         secondPort = None
-                    #
-                    #         # Here we assume that the outside connection of the StorageTank
-                    #         # is created after the portPair connection and before the insideConn
-                    #         # For two ports only, there is no connection generated in insideConn
-                    #
-                    #         a = 1
-                    #         # if len(t.fromPort.connectionList) < 3:
-                    #         #                                 #     a = 0
-                    #
-                    #         if t.fromPort.connectionList[a].fromPort is t.fromPort:
-                    #             firstPort = t.fromPort.connectionList[a].toPort
-                    #         elif t.fromPort.connectionList[a].toPort is t.fromPort:
-                    #             firstPort = t.fromPort.connectionList[a].fromPort
-                    #         else:
-                    #             print("No firstPort set")
-                    #
-                    #         if t.toPort.connectionList[1].fromPort is t.toPort:
-                    #             secondPort = t.fromPort.connectionList[1].toPort
-                    #         elif t.toPort.connectionList[1].toPort is t.toPort:
-                    #             secondPort = t.fromPort.connectionList[1].fromPort
-                    #         else:
-                    #             print("No secondPort set")
-                    #
-                    #         # print("--------> FirstPort is " + str(firstPort))
-                    #         # print("--------> SecondPort is " + str(secondPort))
+        t = self.convertToStringList(tempS)
 
-                        # Idea: the generated Connections should directly be made with corresp ports
-        f += "\n"
+        f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
+
         return f
 
     def exportPrintInputs(self, inputNr):
         #  add a string to block and connection for exportPrintInput
         f = ''
-        print("INPUTS " + str(inputNr))
+        # print("INPUTS " + str(inputNr))
         f += "INPUTS " + str(inputNr) + "\n"
 
         pump_prefix = "Mfr"
@@ -1743,7 +1730,7 @@ class DiagramEditor(QWidget):
 
             counter += 1
 
-        print("\n*** Initial Inputs *")
+        # print("\n*** Initial Inputs *")
         f += "\n*** Initial Inputs *" + "\n"
 
         counter2 = 0
@@ -1753,17 +1740,17 @@ class DiagramEditor(QWidget):
             if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
                 continue
             if type(t) is HeatPump:
-                print(" " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " ", end='')
+                # print(" " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " ", end='')
                 f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
                 counter2 += 1
                 continue
             # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
             #     continue
-            print(str(t.exportInitialInput) + " ", end='')
+            # print(str(t.exportInitialInput) + " ", end='')
             f += str(t.exportInitialInput) + " "
 
             if counter2 == 8:
-                print("")
+                # print("")
                 f += "\n"
                 counter2 = 0
 
@@ -1774,7 +1761,7 @@ class DiagramEditor(QWidget):
             # else:
             #     print(str(t.exportInitialInput))
 
-        print("\n")
+        # print("\n")
         f += "\n"
 
         return f
@@ -1841,12 +1828,12 @@ class DiagramEditor(QWidget):
         head = "EQUATIONS {0}	!! Output up to three (A,B,C) mass flow rates of each component, positive = " \
                "input/inlet, negative = output/outlet ".format(equationNumber-1)
 
-        print(head)
+        # print(head)
         f += head + "\n"
-        print(tot)
+        # print(tot)
         f += tot + "\n"
 
-        print("")
+        # print("")
         f += "\n"
 
         return f
@@ -1880,7 +1867,7 @@ class DiagramEditor(QWidget):
                     unitText += s[0:s.find('=')] + "\n"
 
                 for it in t.trnsysConn:
-                    unitText += it.displayName + "\n"
+                    unitText += "T" + it.displayName + "\n"
 
                 unitText += "***Initial values\n"
                 unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
@@ -1889,12 +1876,13 @@ class DiagramEditor(QWidget):
                 unitText += "T" + t.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
 
                 unitNumber += 1
-                print(unitText)
+                # print(unitText)
                 f += unitText + "\n"
 
             # Pipes
             if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-                if t.isBlockConn and t.isStorageIO:
+                # if t.isBlockConn and t.isStorageIO:
+                if True:
                     parameterNumber = 6
                     inputNumbers = 4
 
@@ -1909,7 +1897,7 @@ class DiagramEditor(QWidget):
                     # Momentarily hardcoded
                     equationNr = 3
 
-                    unitText += "UNIT" + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
+                    unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
                     unitText += "!" + t.displayName + "\n"
                     unitText += "PARAMETERS " + str(parameterNumber) + "\n"
 
@@ -1928,7 +1916,7 @@ class DiagramEditor(QWidget):
                         unitText += tempRoomVar + "\n"
                         unitText += "T" + t.trnsysConn[1].displayName + "\n"
                     else:
-                        print("----> NO VALUE\n" * 3 + "at connection with parents " + str(t.fromPort.parent) + str(t.toPort.parent))
+                        # print("----> NO VALUE\n" * 3 + "at connection with parents " + str(t.fromPort.parent) + str(t.toPort.parent))
                         f += "Error: NO VALUE\n" * 3 + "at connection with parents " + str(t.fromPort.parent) + str(t.toPort.parent) + "\n"
 
                     unitText += "***Initial values\n"
@@ -1941,7 +1929,8 @@ class DiagramEditor(QWidget):
                     unitText += "Mfr" + t.displayName + "= " + "Mfr" + t.displayName + "_A" "\n"
 
                     unitNumber += 1
-                    print(unitText)
+                    # print(unitText)
+                    unitText += "\n"
                     f += unitText
 
         return f
@@ -1968,17 +1957,17 @@ class DiagramEditor(QWidget):
             loopText += LLp + "=" + str(g.exportL) + "\n"
             loopText += ULp + "=" + str(g.exportU) + "\n"
             loopText += LLp + suffix1 + " = " "Mfr_" + "loop_" + str(loopNr) + "_nom*" + string1 + "((" + \
-                        diLp + "/2)^2*" + Pi + "\n"
+                        diLp + "/2)^2*" + Pi + ")\n"
 
             loopText += ULp + suffix1 + " = " + str(g.exportU) + "*" + LLp + suffix1
 
-            constsNr += 8
+            constsNr += 5
 
             loopText += "\n"
 
-        print(constString + str(constsNr))
+        # print(constString + str(constsNr))
         f += constString + str(constsNr) + "\n"
-        print(loopText)
+        # print(loopText)
         f += loopText + "\n"
 
         return f
@@ -2003,7 +1992,7 @@ class DiagramEditor(QWidget):
             loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
 
             for c in g.itemList:
-                if isinstance(c, Connection):
+                if isinstance(c, Connection) and not c.isBlockConn:
                     loopText += "*** " + c.displayName +"\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
@@ -2012,9 +2001,9 @@ class DiagramEditor(QWidget):
 
             loopText += "\n"
 
-        print(equationString + str(equationNr))
+        # print(equationString + str(equationNr))
         f += equationString + str(equationNr) + "\n"
-        print(loopText)
+        # print(loopText)
         f += loopText + "\n"
         return f
 
@@ -2027,7 +2016,7 @@ class DiagramEditor(QWidget):
             lossText += strVar + str(self.groupList.index(g)) + "="
 
             for i in g.itemList:
-                if isinstance(i, Connection):
+                if isinstance(i, Connection)  and not i.isBlockConn:
                     lossText += "P" + i.displayName + "_kW" + "+"
 
             lossText = lossText[:-1]
@@ -2040,7 +2029,7 @@ class DiagramEditor(QWidget):
 
         lossText = lossText[:-1]
 
-        print(lossText)
+        # print(lossText)
         f += lossText + "\n"
         return f
 
@@ -2060,21 +2049,21 @@ class DiagramEditor(QWidget):
         text += "0     ! 9 Delimiter\n"
         text += "1     ! 10 Print labels\n"
 
-        print(text)
+        # print(text)
         f += text + "\n"
         return f
 
     def exportData(self):
+        # Main trnsys export function
         self.setUpStorageInnerConns()
 
         self.sortTrnsysObj()
 
-        print("Self trnsysObj" + str(self.trnsysObj))
-
         fullExportText = ''
 
-        filepath = Path(Path(__file__).resolve().parent)
-        if Path(filepath.joinpath('export.dck')).exists():
+        exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+
+        if Path(exportPath).exists():
             qmb = QMessageBox(self)
             qmb.setText("Warning: " +
                         "An export file exists already. Do you want to overwrite or cancel?")
@@ -2117,12 +2106,6 @@ class DiagramEditor(QWidget):
         lineNrParameters = parameters
         parameters = parameters * 4 + 1
 
-        print("NEW export -----------------------------")
-        print(self.exportBlackBox())
-        print(self.exportPumpOutlets())
-        print(self.exportMassFlows())
-        print("New export -----------------------------")
-
         fullExportText += self.exportBlackBox()
         fullExportText += self.exportPumpOutlets()
         fullExportText += self.exportMassFlows()
@@ -2136,18 +2119,48 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportPrintPipeLoops()
         fullExportText += self.exportPrintPipeLosses()
 
-
         print("------------------------> END OF EXPORT <------------------------")
 
-        f = open("export.dck", 'w')
+        f = open(str(exportPath), 'w')
         f.truncate(0)
         f.write(fullExportText)
         f.close()
 
-        # self.exportEnd1(139, 25)
         # self.cleanUpExportedElements()
 
         self.tearDownStorageInnerConns()
+
+    def findId(self, s):
+        return s[s.find("!") + 1:s.find(" ", s.find("!"))]
+
+    def convertToStringList(self, l):
+        res = []
+        temp = ""
+        for i in l:
+            if i == "\n":
+                res.append(temp)
+                temp = ""
+            else:
+                temp += i
+
+        return res
+
+    def correctIds(self, lineList):
+        fileCopy = lineList[:]
+        print("fds" + str(fileCopy))
+        fileCopy = [" " + l for l in fileCopy]
+
+        counter = 0
+        for line in lineList:
+            counter += 1
+            k = self.findId(line)
+            if k != str(counter):
+                fileCopy = [l.replace(" " + str(k) + " ", " " + str(counter) + " ") for l in fileCopy]
+                fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
+
+        fileCopy = [l[1:None] for l in fileCopy]
+        return '\n'.join(fileCopy)
+
 
     def cleanUpExportedElements(self):
         for t in self.trnsysObj:
@@ -2172,7 +2185,7 @@ class DiagramEditor(QWidget):
         diagramDlg(self)
 
     def delGroup(self):
-        # This is used for deleting the first connected componts group found by BFS
+        # This is used for deleting the first connected componts group found by BFS, unused
         for bl in self.blockList:
             bl.deleteBlock()
 
@@ -2185,7 +2198,7 @@ class DiagramEditor(QWidget):
             self.trnsysObj[0].deleteBlock()
 
         while len(self.groupList) > 1:
-            self.groupList[0].deleteGroup()
+            self.groupList[-1].deleteGroup()
 
 
         print("Groups are " + str(self.groupList))
@@ -2569,6 +2582,7 @@ class DiagramEditor(QWidget):
                     k.updateImage()
                     # k.setBlockToGroup("defaultGroup")
 
+                    print("dddd is " + k.displayName)
                     for hx in k.heatExchangers:
                         hx.initLoad()
 
@@ -2610,35 +2624,6 @@ class DiagramEditor(QWidget):
 
         # tempList = []
         # for t in self.trnsysObj:
-
-    # Own, primitiv insertion sort, unused
-    def insertionSort(self):
-        print("Len of trnsyObj before sort is " + str(len(self.trnsysObj)))
-        print("List is " + str(self.trnsysObj))
-
-        # for s in self.trnsysObj:
-        #     print("before, s has tr id " + str(s.trnsysId))
-
-        newTrnsysList = []
-        newTrnsysList.append(self.trnsysObj.pop(0))
-
-        for t in self.trnsysObj:
-            for n in newTrnsysList:
-                if n.trnsysId > t.trnsysId:
-                    # print("Found a larger id, inserting")
-                    newTrnsysList.insert(newTrnsysList.index(n), t)
-                    break
-            if t.trnsysId > newTrnsysList[-1].trnsysId:
-                newTrnsysList.append(t)
-
-        self.trnsysObj = newTrnsysList
-
-        print("Len of trnsyObj after sort is " + str(len(self.trnsysObj)))
-        # print("List is now " + str(self.trnsysObj))
-        # for s in self.trnsysObj:
-        #     print("s has tr id " + str(s.trnsysId))
-
-        # self.sortTrnsysObj()
 
 
     def sortTrnsysObj(self):
@@ -2786,15 +2771,26 @@ class DiagramEditor(QWidget):
                 if ret == QMessageBox.Save:
                     print("Overwriting")
                     self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+                    msgb = QMessageBox(self)
+                    msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                    msgb.exec()
+
                 else:
                     print("Canceling")
             else:
                 self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+                msgb = QMessageBox(self)
+                msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                msgb.exec()
         else:
             if self.saveAsPath.exists():
                 pass
             else:
                 self.encodeDiagram(str(self.saveAsPath))
+                msgb = QMessageBox(self)
+                msgb.setText("Saved diagram at" + str(self.saveAsPath))
+                msgb.exec()
+
 
         # print(glob.glob("*.json"))
 
@@ -2809,7 +2805,7 @@ class DiagramEditor(QWidget):
         # print(self.saveAsPath)
         # print(self.diagramName)
 
-        # self.encodeDiagram(str(self.saveAsPath))
+        self.encodeDiagram(str(self.saveAsPath))
 
     def renameDiagram(self, newName):
 
@@ -2904,6 +2900,13 @@ class MainWindow(QMainWindow):
         toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
         toggleEditorModeAction.setShortcut("m")
 
+        toggleSnapAction = QAction("Toggle snap grid", self)
+        toggleSnapAction.triggered.connect(self.toggleSnap)
+        toggleSnapAction.setShortcut("a")
+
+        toggleAlignModeAction = QAction("Toggle align mode", self)
+        toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
+        toggleAlignModeAction.setShortcut("q")
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
@@ -2934,8 +2937,8 @@ class MainWindow(QMainWindow):
         self.s1Menu = QMenu("Edit")
         self.s1Menu.addAction(toggleEditorModeAction)
         self.s1Menu.addAction(multipleDeleteAction)
-        self.s1Menu.addAction("Place2")
-        self.s1Menu.addAction("Place3")
+        self.s1Menu.addAction(toggleSnapAction)
+        self.s1Menu.addAction(toggleAlignModeAction)
         self.s1Menu.addAction("Place4")
         self.s1Menu.addAction("Place5")
 
@@ -2990,9 +2993,11 @@ class MainWindow(QMainWindow):
     def loadDia(self):
         print("Loading diagram")
         # Maybe delete all elements before loading?
-        self.centralWidget.delBlocks()
-        filepath = Path(__file__).parent.joinpath("diagrams").joinpath("jsonOut.json")
-        self.centralWidget.decodeDiagram(str(filepath))
+        # self.centralWidget.delBlocks()
+        # filepath = Path(__file__).parent.joinpath("diagrams").joinpath("jsonOut.json")
+        # self.centralWidget.decodeDiagram(str(filepath))
+
+        self.openFile()
 
     def exportTrnsys(self):
         print("Exporting Trnsys file...")
@@ -3005,6 +3010,9 @@ class MainWindow(QMainWindow):
     def deleteDia(self):
         print("Deleting diagram")
         self.centralWidget.delBlocks()
+        msgb = QMessageBox(self)
+        msgb.setText("Deleted diagram" + str(self.centralWidget.saveAsPath) + "[" + str(len(self.centralWidget.trnsysObj)) + "]")
+        msgb.exec()
 
     def createGroup(self):
         # print("Tb createGroup pressed")
@@ -3059,6 +3067,11 @@ class MainWindow(QMainWindow):
             if s.id == 11:
                 print("Duplicate id obj is " + str(s.displayName) + " " + str(s.id))
 
+        for t in self.centralWidget.trnsysObj:
+            t.alignMode = True
+            print(t.alignMode)
+
+
     def openFile(self):
         print("Opening diagram")
         self.centralWidget.delBlocks()
@@ -3078,7 +3091,16 @@ class MainWindow(QMainWindow):
         self.centralWidget.editorMode = (self.centralWidget.editorMode + 1) % 2
         self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
 
+    def toggleAlignMode(self):
+        print("Toggling alignMode")
+        self.centralWidget.alignMode = not self.centralWidget.alignMode
+
+    def toggleSnap(self):
+        self.centralWidget.snapGrid = not self.centralWidget.snapGrid
+        self.centralWidget.diagramScene.update()
+
     def createSelection(self):
+        self.centralWidget.clearSelectionGroup()
         self.centralWidget.selectionMode = True
         self.centralWidget.copyMode = False
         self.centralWidget.groupMode = False

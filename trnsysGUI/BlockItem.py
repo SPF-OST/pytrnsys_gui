@@ -2,8 +2,8 @@ import os
 from math import sqrt
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize, QPointF
-from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor
+from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent, QTimer
+from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
 from trnsysGUI.BlockDlg import BlockDlg
@@ -86,8 +86,13 @@ class BlockItem(QGraphicsPixmapItem):
         if self.name != 'TeePiece' and self.name != 'TVentil' and self.name != 'Pump' \
                 and self.name != 'Kollektor' and self.name != 'HP' and self.name != 'IceStorage' \
                 and self.name != 'Radiator' and self.name != 'WTap' and self.name != 'WTap_main' \
-                and self.name != 'Connector':
+                and self.name != 'Connector' and self.name != 'GenericBlock':
             self.changeSize()
+
+        # self.aligned = False
+        # self.wasAligned = False
+        # self.alignMode = True
+        # self.updatePos = False
 
     def setParent(self, p):
         self.parent = p
@@ -283,11 +288,12 @@ class BlockItem(QGraphicsPixmapItem):
     def deleteConns(self):
 
         for p in self.inputs:
-            for c in p.connectionList:
-                c.deleteConn()
+            while len(p.connectionList) > 0:
+                p.connectionList[0].deleteConn()
+
         for p in self.outputs:
-            for c in p.connectionList:
-                c.deleteConn()
+            while len(p.connectionList) > 0:
+                p.connectionList[0].deleteConn()
 
     def deleteBlock(self):
         print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
@@ -325,7 +331,6 @@ class BlockItem(QGraphicsPixmapItem):
         for out in self.outputs:
             print("Has output with ID " + str(out.id))
 
-
     def printConnections(self):
         print("Connections are:")
         for c in self.getConnections():
@@ -342,11 +347,72 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.parent().listV.addItem("Inputs: " + str(self.inputs))
         self.parent.parent().listV.addItem("Outputs: " + str(self.outputs))
 
-    # def itemChange(self, change, value):
-    #     # print(change, value)
-    #     if change == self.ItemPositionHasChanged:
-    #         print("itemcahgne")
-    #         value = QPointF(value.x() - value.x() % 150, value.y() - value.y() % 150)
-    #         return change, value
-    #     else:
-    #         return super(BlockItem, self).itemChange(change, value)
+    def itemChange(self, change, value):
+        # print(change, value)
+        if change == self.ItemPositionChange:
+            if self.parent.parent().snapGrid:
+                print("itemchange")
+                print(type(value))
+                value = QPointF(value.x() - value.x() % 50, value.y() - value.y() % 50)
+                return value
+            else:
+                # if self.hasElementsInYBand() and not self.elementInY() and not self.aligned:
+                if self.parent.parent().alignMode:
+                    if self.hasElementsInYBand():
+                        return self.alignBlock(value)
+                    else:
+                        # self.aligned = False
+                        return value
+
+                else:
+                    return value
+        else:
+            return super(BlockItem, self).itemChange(change, value)
+
+    def alignBlock(self, value):
+        for t in self.parent.parent().trnsysObj:
+            if isinstance(t, BlockItem) and t is not self:
+                if self.elementInYBand(t):
+                    value = QPointF(self.pos().x(), t.pos().y())
+                    # QMouseEvent()
+                    self.parent.parent().alignYLineItem.setLine(self.pos().x() + self.w/2, t.pos().y(), t.pos().x() + t.w/2, t.pos().y())
+
+                    self.parent.parent().alignYLineItem.setVisible(True)
+
+                    qtm = QTimer(self.parent.parent())
+                    qtm.timeout.connect(self.timerfunc)
+                    qtm.setSingleShot(True)
+                    qtm.start(1000)
+
+                    e = QMouseEvent(QEvent.MouseButtonRelease, self.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton, QtCore.Qt.NoModifier)
+                    self.parent.mouseReleaseEvent(e)
+                    self.parent.parent().alignMode = False
+                    # self.setPos(self.pos().x(), t.pos().y())
+                    # self.aligned = True
+
+        return value
+
+    def timerfunc(self):
+        self.parent.parent().alignYLineItem.setVisible(False)
+
+    def updateAlignment(self):
+        pass
+
+    def hasElementsInYBand(self):
+        for t in self.parent.parent().trnsysObj:
+            if isinstance(t, BlockItem):
+                if self.elementInYBand(t):
+                    return True
+
+        return False
+
+    def elementInYBand(self, t):
+        eps = 50
+        return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+
+    def elementInY(self):
+        for t in self.parent.parent().trnsysObj:
+            if isinstance(t, BlockItem):
+                if self.scenePos().y == t.scenePos().y():
+                    return True
+        return False

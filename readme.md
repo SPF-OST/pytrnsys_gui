@@ -30,3 +30,10 @@ The diagramEditor also has a list of Groups, which contain a list of Connections
 
 ######Usage notes:
 - Dont drag on a line and release afterwards on the line (segment will break)
+
+######Shortcuts
+- "c"       : start copying
+- "v"       : paste
+- "s"       : start selecting multiple items
+- "Ctrl+d"  : Delete selection
+- "m"       : Toggle editor/connection mode

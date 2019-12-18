@@ -57,8 +57,8 @@ class ConfigStorage(QDialog):
         qhbL.addWidget(self.listWR)
 
         offsetLabel = QLabel("Height offsets in percent")
-        offsetLeILabel = QLabel("Input:")
-        offsetLeOLabel = QLabel("Output:")
+        offsetLeILabel = QLabel("Input (upper port): ")
+        offsetLeOLabel = QLabel("Output (lower port):")
         self.offsetLeI = QLineEdit("0")
         self.offsetLeO = QLineEdit("0")
         self.lButton = QRadioButton("Left side")
@@ -87,6 +87,7 @@ class ConfigStorage(QDialog):
         gl.addWidget(addButton, 10, 0, 1, 1)
         removeButton = QPushButton("Remove...")
         removeButton.clicked.connect(self.removeHxL)
+        removeButton.clicked.connect(self.removeHxR)
         gl.addWidget(removeButton, 10, 1, 1, 1)
         spaceHx = QSpacerItem(self.width(), spacerHeight)
         gl.addItem(spaceHx, 11, 0, 1, 2)
@@ -94,7 +95,9 @@ class ConfigStorage(QDialog):
         manPortLay = QVBoxLayout()
         manPortLabel = QLabel("<b>Set port manually</b>")
         manPortLabel2 = QLabel("Enter height in percent: ")
+        portlabelUpper = QLabel("Upper port")
         self.manPortLeI = QLineEdit("0")
+        portlabelLower = QLabel("Lower port")
         self.manPortLeO = QLineEdit("0")
         self.manrButton = QRadioButton("Right side")
         self.manlButton = QRadioButton("Left side")
@@ -104,7 +107,9 @@ class ConfigStorage(QDialog):
 
         manPortLay.addWidget(manPortLabel)
         manPortLay.addWidget(manPortLabel2)
+        manPortLay.addWidget(portlabelUpper)
         manPortLay.addWidget(self.manPortLeI)
+        manPortLay.addWidget(portlabelLower)
         manPortLay.addWidget(self.manPortLeO)
         manPortLay.addWidget(self.manlButton)
         manPortLay.addWidget(self.manrButton)
@@ -158,7 +163,7 @@ class ConfigStorage(QDialog):
                     h.displayName + ", y_offset = " + str(100 - 100 * h.offset.y() / self.storage.h) + "%")
 
     def addHx(self):
-        if abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 20:
+        if abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 20 and float(self.offsetLeI.text()) > float(self.offsetLeO.text()):
             print("Adding hx")
             if self.rButton.isChecked():
                 print("addhxr")
@@ -167,7 +172,7 @@ class ConfigStorage(QDialog):
                 print("addhxr")
                 self.addHxL()
         else:
-            print("At least 20% of difference needed")
+            print("At least 20% of difference and larger top port than bottom port needed")
 
     def addHxL(self):
         # print(str(abs(1 / 100 * float(self.offsetLeO.text()) - 1 / 100 * float(self.offsetLeI.text()))))
@@ -199,9 +204,10 @@ class ConfigStorage(QDialog):
         # self.storage.updateImage(self.h_hx)
 
     def manAddPortPair(self):
-        self.storage.setSideManualPair(self.manlButton.isChecked(),
-                                       (1 - 1 / 100 * float(self.manPortLeI.text())) * self.storage.h,
-                                       (1 - 1 / 100 * float(self.manPortLeO.text())) * self.storage.h)
+        if float(self.manPortLeI.text()) > float(self.offsetLeO.text()):
+            self.storage.setSideManualPair(self.manlButton.isChecked(),
+                                           (1 - 1 / 100 * float(self.manPortLeI.text())) * self.storage.h,
+                                           (1 - 1 / 100 * float(self.manPortLeO.text())) * self.storage.h)
 
     def removeHxL(self):
         for i in self.storage.heatExchangers:
@@ -210,6 +216,18 @@ class ConfigStorage(QDialog):
                 if i.displayName == j.text()[:j.text().find(",")]:
                     self.storage.heatExchangers.remove(i)
                     self.listWL.takeItem(self.listWL.row(self.listWL.selectedItems()[0]))
+
+                    # for c in i.port1.connectionList:
+                    while len(i.port1.connectionList) > 0:
+                        i.port1.connectionList[0].deleteConn()
+
+                    # for c in i.port2.connectionList:
+                    while len(i.port2.connectionList) > 0:
+                        i.port2.connectionList[0].deleteConn()
+
+                    self.storage.inputs.remove(i.port1)
+                    self.storage.outputs.remove(i.port2)
+
                     self.storage.parent.scene().removeItem(i.port1)
                     self.storage.parent.scene().removeItem(i.port2)
                     self.storage.parent.scene().removeItem(i)
@@ -223,7 +241,19 @@ class ConfigStorage(QDialog):
             for j in self.listWR.selectedItems():
                 if i.displayName == j.text()[:j.text().find(",")]:
                     self.storage.heatExchangers.remove(i)
-                    self.listW.takeItem(self.listWR.row(self.listWR.selectedItems()[0]))
+                    self.listWR.takeItem(self.listWR.row(self.listWR.selectedItems()[0]))
+
+                    # for c in i.port1.connectionList:
+                    while len(i.port1.connectionList) > 0:
+                        i.port1.connectionList[0].deleteConn()
+
+                    # for c in i.port2.connectionList:
+                    while len(i.port2.connectionList) > 0:
+                        i.port2.connectionList[0].deleteConn()
+
+                    self.storage.inputs.remove(i.port1)
+                    self.storage.outputs.remove(i.port2)
+
                     self.storage.parent.scene().removeItem(i.port1)
                     self.storage.parent.scene().removeItem(i.port2)
                     self.storage.parent.scene().removeItem(i)

@@ -34,11 +34,13 @@ class PortItem(QGraphicsEllipseItem):
 
         if name == 'i':
             color = QColor(self.ashColorR)
-            self.outerRing.setBrush(QColor(self.ashColorR))
+            # self.outerRing.setBrush(QColor(self.ashColorR))
+            self.outerRing.setBrush(QColor(0,0,0))
 
         if name == 'o':
             color = QColor(self.ashColorB)
-            self.outerRing.setBrush(QColor(self.ashColorB))
+            # self.outerRing.setBrush(QColor(self.ashColorB))
+            self.outerRing.setBrush(QColor(0,0,0))
 
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
@@ -138,16 +140,16 @@ class PortItem(QGraphicsEllipseItem):
         self.outerRing.setRect(-7, -7, 14.0, 14.0)
         if self.name == 'i':
             # self.setBrush(Qt.red)
-            self.outerRing.setBrush(Qt.red)
+            # self.outerRing.setBrush(Qt.red)
+            self.outerRing.setBrush(QColor(0,0,0))
         if self.name == 'o':
             # self.setBrush(QColor(Qt.blue))
-            self.outerRing.setBrush(QColor(Qt.blue))
+            # self.outerRing.setBrush(QColor(Qt.blue))
+            self.outerRing.setBrush(QColor(0,0,0))
+
 
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")
-
-        # self.setRect(-7, -7, 14, 14)
-        # sleep(30)
 
         # self.setRect(-6, -6, 12, 12)
         self.setRect(-7, -7, 14, 14)
@@ -156,7 +158,11 @@ class PortItem(QGraphicsEllipseItem):
             if self.name == 'i':
                 # self.setBrush(Qt.red)
                 # self.setBrush(self.ashColorR)
-                self.outerRing.setBrush(self.ashColorR)
+                # self.outerRing.setBrush(self.ashColorR)
+                self.outerRing.setBrush(QColor(0, 0, 0))
+
             if self.name == 'o':
                 # self.setBrush(self.ashColorR)
-                self.outerRing.setBrush(self.ashColorB)
+                # self.outerRing.setBrush(self.ashColorB)
+                self.outerRing.setBrush(QColor(0, 0, 0))
+

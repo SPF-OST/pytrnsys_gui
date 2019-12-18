@@ -2,16 +2,51 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76e4e400-b20d-49ab-ae63-78024573aaab" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/trnsysGUI/diagrams/test.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/Connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/Connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/trnsysGUI/clipboard.json" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/clipboard.json" afterDir="false" />
+<<<<<<< HEAD
+=======
       <change beforePath="$PROJECT_DIR$/trnsysGUI/core.py" beforeDir="false" afterPath="$PROJECT_DIR$/trnsysGUI/core.py" afterDir="false" />
+>>>>>>> 56d24352b7111149b58b950326262035d6bb145a
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/readme.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="68">
+                <caret line="7" column="14" selection-start-line="7" selection-start-column="14" selection-end-line="7" selection-end-column="14" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/trnsysGUI/core.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/trnsysGUI/diagrams/Untitled.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1581" />
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -23,27 +58,74 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="-25" />
-    <option name="y" value="117" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-1688" />
+    <option name="y" value="21" />
+    <option name="width" value="1696" />
+    <option name="height" value="1026" />
   </component>
   <component name="ProjectId" id="1UVhbJKy11z4WPcWuBu0jR9vRk0" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="TrnsysGUI" type="b2602c69:ProjectViewProjectNode" />
+              <item name="TrnsysGUI" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TrnsysGUI" type="b2602c69:ProjectViewProjectNode" />
+              <item name="TrnsysGUI" type="462c0819:PsiDirectoryNode" />
+              <item name="trnsysGUI" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TrnsysGUI" type="b2602c69:ProjectViewProjectNode" />
+              <item name="TrnsysGUI" type="462c0819:PsiDirectoryNode" />
+              <item name="trnsysGUI" type="462c0819:PsiDirectoryNode" />
+              <item name="diagrams" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TrnsysGUI" type="b2602c69:ProjectViewProjectNode" />
+              <item name="TrnsysGUI" type="462c0819:PsiDirectoryNode" />
+              <item name="trnsysGUI" type="462c0819:PsiDirectoryNode" />
+              <item name="exports" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TrnsysGUI" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/trnsysGUI/diagrams" />
+<<<<<<< HEAD
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+=======
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../spf_gui" />
+>>>>>>> 56d24352b7111149b58b950326262035d6bb145a
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\exports" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\res" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\images" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI\diagrams" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\trnsysGUI" />
       <recent name="C:\Users\s2marti\PycharmProjects\TrnsysGUI\images" />
@@ -105,7 +187,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Connection" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="StorageTank" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="TrnsysGUI" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -117,7 +199,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/Connection.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trnsysGUI/StorageTank.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -171,17 +253,17 @@
     <list>
       <item itemvalue="Python.ConfigStorage" />
       <item itemvalue="Python.BlockItem" />
-      <item itemvalue="Python.Connection" />
       <item itemvalue="Python.core" />
       <item itemvalue="Python.segmentItem" />
+      <item itemvalue="Python.StorageTank" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.core" />
+        <item itemvalue="Python.BlockItem" />
+        <item itemvalue="Python.StorageTank" />
         <item itemvalue="Python.segmentItem" />
         <item itemvalue="Python.ConfigStorage" />
-        <item itemvalue="Python.BlockItem" />
-        <item itemvalue="Python.Connection" />
       </list>
     </recent_temporary>
   </component>
@@ -198,14 +280,57 @@
     </task>
     <servers />
   </component>
+  <component name="ToolWindowManager">
+    <frame x="-1688" y="21" width="1696" height="1026" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Favorites" side_tool="true" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28588662" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" />
+      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" sideWeight="0.50060314" side_tool="true" weight="0.34042552" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49939686" visible="true" weight="0.34042552" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
             <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
               <option name="COLUMN_ORDER" />
             </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
           </value>
         </entry>
       </map>
@@ -217,5 +342,29 @@
         <watch expression="self.trnsysObj" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/readme.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="68">
+            <caret line="7" column="14" selection-start-line="7" selection-start-column="14" selection-end-line="7" selection-end-column="14" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/trnsysGUI/diagrams/Untitled.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1581" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/trnsysGUI/core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>

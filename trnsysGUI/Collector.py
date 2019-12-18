@@ -9,9 +9,8 @@ class Collector(BlockItem):
     def __init__(self, trnsysType, name='Untitled', parent=None):
         super(Collector, self).__init__(trnsysType, name, parent)
 
-        self.inputs.append(PortItem('i', 0, self))
+        self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
-        print("appended i and o " + str(len(self.outputs)))
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
