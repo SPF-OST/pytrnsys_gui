@@ -1,0 +1,470 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>trnsysGUI.ConfigStorage &mdash; TrnsysGUI 2020 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> TrnsysGUI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide/index.html">User’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CodeReference.html">Code Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TrnsysGUI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>trnsysGUI.ConfigStorage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for trnsysGUI.ConfigStorage</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="k">import</span> <span class="n">QPointF</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="k">import</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QLineEdit</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QHBoxLayout</span><span class="p">,</span> <span class="n">QListWidget</span><span class="p">,</span> <span class="n">QPushButton</span><span class="p">,</span> <span class="n">QSpacerItem</span><span class="p">,</span> \
+    <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QRadioButton</span><span class="p">,</span> <span class="n">QDialog</span>
+
+<span class="kn">from</span> <span class="nn">trnsysGUI.HeatExchanger</span> <span class="k">import</span> <span class="n">HeatExchanger</span>
+
+
+<div class="viewcode-block" id="ConfigStorage"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage">[docs]</a><span class="k">class</span> <span class="nc">ConfigStorage</span><span class="p">(</span><span class="n">QDialog</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConfigStorage</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Parameters:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w_hx</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h_hx</span> <span class="o">=</span> <span class="mi">60</span>
+        <span class="n">spacerHeight</span> <span class="o">=</span> <span class="mi">15</span>
+
+        <span class="c1"># VBoxLayout</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Please configure the storage tank:&quot;</span><span class="p">)</span>
+        <span class="n">tankNameLabel</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="n">tankNameLabel</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;&lt;b&gt;Tank name: &lt;/b&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">le</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">())</span>
+
+        <span class="n">connectionsLabelL</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="n">connectionsLabelL</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;&lt;b&gt;Left (distributed) Ports: &lt;/b&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leCNL</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">inputs</span><span class="p">)))</span>
+
+        <span class="n">connectionsLabelR</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="n">connectionsLabelR</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;&lt;b&gt;Right (distributed) Ports: &lt;/b&gt;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leCNR</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">outputs</span><span class="p">)))</span>
+
+        <span class="n">addSideAutoButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Add (distributed) ports&quot;</span><span class="p">)</span>
+        <span class="n">addSideAutoButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addSideAuto</span><span class="p">)</span>
+        <span class="n">spaceVBox</span> <span class="o">=</span> <span class="n">QSpacerItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">spacerHeight</span><span class="p">)</span>
+
+        <span class="c1"># Grid layout</span>
+        <span class="n">gl</span> <span class="o">=</span> <span class="n">QGridLayout</span><span class="p">()</span>
+        <span class="n">hxsLabel</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;b&gt;Heat Exchangers &lt;/b&gt;&quot;</span><span class="p">)</span>
+        <span class="c1"># spinBox = QSpinBox()</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">hxsLabel</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># gl.addWidget(spinBox, 1, 0, 1, 2)</span>
+
+        <span class="n">qhbL</span> <span class="o">=</span> <span class="n">QHBoxLayout</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">listWL</span> <span class="o">=</span> <span class="n">QListWidget</span><span class="p">()</span>
+        <span class="c1"># self.listWL.setMinimumWidth(self.width()/2)</span>
+        <span class="c1"># self.listWL.resize(QSize(self.listWL.minimumHeight(), self.width()/2))</span>
+        <span class="c1"># gl.addWidget(self.listWL, 1, 0, 2, 2)</span>
+        <span class="n">qhbL</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listWL</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">listWR</span> <span class="o">=</span> <span class="n">QListWidget</span><span class="p">()</span>
+        <span class="c1"># self.setBaseSize(QSize(100, 50))</span>
+        <span class="c1"># gl.addWidget(self.listWR, 1, 1, 1, 2)</span>
+        <span class="n">qhbL</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listWR</span><span class="p">)</span>
+
+        <span class="n">offsetLabel</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Height offsets in percent&quot;</span><span class="p">)</span>
+        <span class="n">offsetLeILabel</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Input (upper port): &quot;</span><span class="p">)</span>
+        <span class="n">offsetLeOLabel</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Output (lower port):&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lButton</span> <span class="o">=</span> <span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Left side&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rButton</span> <span class="o">=</span> <span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Right side&quot;</span><span class="p">)</span>
+
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">offsetLabel</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">offsetLeILabel</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">offsetLeOLabel</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># hxsideHbL = QHBoxLayout()</span>
+        <span class="c1"># hxsideHbL.addWidget(self.lButton)</span>
+        <span class="c1"># hxsideHbL.addWidget(self.rButton)</span>
+
+        <span class="c1"># gl.addLayout(hxsideHbL, 6, 0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hxNameLe</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hxNameLe</span><span class="o">.</span><span class="n">setPlaceholderText</span><span class="p">(</span><span class="s2">&quot;Enter a name...&quot;</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hxNameLe</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lButton</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rButton</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">addButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Add...&quot;</span><span class="p">)</span>
+        <span class="n">addButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">addHx</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">addButton</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">removeButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Remove...&quot;</span><span class="p">)</span>
+        <span class="n">removeButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeHxL</span><span class="p">)</span>
+        <span class="n">removeButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removeHxR</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">removeButton</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">spaceHx</span> <span class="o">=</span> <span class="n">QSpacerItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">spacerHeight</span><span class="p">)</span>
+        <span class="n">gl</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">spaceHx</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">manPortLay</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">manPortLabel</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;b&gt;Set port manually&lt;/b&gt;&quot;</span><span class="p">)</span>
+        <span class="n">manPortLabel2</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Enter height in percent: &quot;</span><span class="p">)</span>
+        <span class="n">portlabelUpper</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Upper port&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manPortLeI</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="n">portlabelLower</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;Lower port&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manPortLeO</span> <span class="o">=</span> <span class="n">QLineEdit</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manrButton</span> <span class="o">=</span> <span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Right side&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manlButton</span> <span class="o">=</span> <span class="n">QRadioButton</span><span class="p">(</span><span class="s2">&quot;Left side&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manAddButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Add (manual) ports&quot;</span><span class="p">)</span>
+        <span class="n">spaceManPort</span> <span class="o">=</span> <span class="n">QSpacerItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">spacerHeight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manAddButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manAddPortPair</span><span class="p">)</span>
+
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">manPortLabel</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">manPortLabel2</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">portlabelUpper</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manPortLeI</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">portlabelLower</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manPortLeO</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manlButton</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manrButton</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manAddButton</span><span class="p">)</span>
+        <span class="n">manPortLay</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">spaceManPort</span><span class="p">)</span>
+
+        <span class="n">increaseSizeButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Increase size&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">okButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;OK (change name)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancelButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Cancel&quot;</span><span class="p">)</span>
+
+        <span class="n">increaseSizeButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">incrSize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">okButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">acceptedEdit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancelButton</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancel</span><span class="p">)</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">tankNameLabel</span><span class="p">)</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">le</span><span class="p">)</span>
+        <span class="c1"># L.addWidget(connectionsLabelL)</span>
+        <span class="c1"># L.addWidget(self.leCNL)</span>
+        <span class="c1"># L.addWidget(connectionsLabelR)</span>
+        <span class="c1"># L.addWidget(self.leCNR)</span>
+        <span class="c1"># L.addWidget(addSideAutoButton)</span>
+        <span class="c1"># L.addItem(spaceVBox)</span>
+
+        <span class="n">L</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">qhbL</span><span class="p">)</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">gl</span><span class="p">)</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="n">manPortLay</span><span class="p">)</span>
+
+        <span class="n">L</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">increaseSizeButton</span><span class="p">)</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">okButton</span><span class="p">)</span>
+        <span class="n">L</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cancelButton</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadHxL</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ConfigStorage.addSideAuto"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.addSideAuto">[docs]</a>    <span class="k">def</span> <span class="nf">addSideAuto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">setLeftSideAuto</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leCNL</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">setRightSideAuto</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leCNR</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="ConfigStorage.loadHxL"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.loadHxL">[docs]</a>    <span class="k">def</span> <span class="nf">loadHxL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">heatExchangers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">h</span><span class="o">.</span><span class="n">sSide</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">listWL</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span>
+                    <span class="n">h</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;, y_offset = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">offset</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">h</span><span class="o">.</span><span class="n">sSide</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">listWR</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span>
+                    <span class="n">h</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;, y_offset = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">h</span><span class="o">.</span><span class="n">offset</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigStorage.addHx"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.addHx">[docs]</a>    <span class="k">def</span> <span class="nf">addHx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span> <span class="o">&gt;=</span> <span class="mi">20</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="o">.</span><span class="n">text</span><span class="p">()):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding hx&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rButton</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;addhxr&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addHxR</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lButton</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;addhxr&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">addHxL</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;At least 20</span><span class="si">% o</span><span class="s2">f difference and larger top port than bottom port needed&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigStorage.addHxL"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.addHxL">[docs]</a>    <span class="k">def</span> <span class="nf">addHxL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(str(abs(1 / 100 * float(self.offsetLeO.text()) - 1 / 100 * float(self.offsetLeI.text()))))</span>
+        <span class="n">hx_temp</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_hx</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span>
+            <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">()))),</span>
+                                <span class="n">QPointF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span><span class="p">),</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">hxNameLe</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listWL</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">hx_temp</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;, y_offsets = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;%, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">)</span></div>
+        <span class="c1"># self.storage.h += self.h_hx</span>
+
+        <span class="c1"># Todo: Don&#39;t forget that size is not enlarged by h_hx if constant size heat exchanger part is chosen</span>
+        <span class="c1"># self.storage.updateImage(self.h_hx)</span>
+
+<div class="viewcode-block" id="ConfigStorage.addHxR"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.addHxR">[docs]</a>    <span class="k">def</span> <span class="nf">addHxR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(str(abs(1 / 100 * float(self.offsetLeO.text()) - 1 / 100 * float(self.offsetLeI.text()))))</span>
+        <span class="n">hx_temp</span> <span class="o">=</span> <span class="n">HeatExchanger</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_hx</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span>
+            <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span> <span class="o">*</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">()))),</span>
+                                <span class="n">QPointF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">w</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span><span class="p">),</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">hxNameLe</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listWR</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">hx_temp</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;, y_offset = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeI</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;%, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="o">.</span><span class="n">text</span><span class="p">())))</span></div>
+        <span class="c1"># self.storage.h += self.h_hx</span>
+
+        <span class="c1"># Todo: Don&#39;t forget that size is not enlarged by h_hx if constant size heat exchanger part is chosen</span>
+        <span class="c1"># self.storage.updateImage(self.h_hx)</span>
+
+<div class="viewcode-block" id="ConfigStorage.manAddPortPair"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.manAddPortPair">[docs]</a>    <span class="k">def</span> <span class="nf">manAddPortPair</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manPortLeI</span><span class="o">.</span><span class="n">text</span><span class="p">())</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsetLeO</span><span class="o">.</span><span class="n">text</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">setSideManualPair</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manlButton</span><span class="o">.</span><span class="n">isChecked</span><span class="p">(),</span>
+                                           <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manPortLeI</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span><span class="p">,</span>
+                                           <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">100</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manPortLeO</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConfigStorage.removeHxL"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.removeHxL">[docs]</a>    <span class="k">def</span> <span class="nf">removeHxL</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">heatExchangers</span><span class="p">:</span>
+            <span class="c1"># Name is identified through index of comma</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listWL</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">displayName</span> <span class="o">==</span> <span class="n">j</span><span class="o">.</span><span class="n">text</span><span class="p">()[:</span><span class="n">j</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">heatExchangers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">listWL</span><span class="o">.</span><span class="n">takeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listWL</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listWL</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">()[</span><span class="mi">0</span><span class="p">]))</span>
+
+                    <span class="c1"># for c in i.port1.connectionList:</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="o">.</span><span class="n">connectionList</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="o">.</span><span class="n">connectionList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deleteConn</span><span class="p">()</span>
+
+                    <span class="c1"># for c in i.port2.connectionList:</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="o">.</span><span class="n">connectionList</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="o">.</span><span class="n">connectionList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deleteConn</span><span class="p">()</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
+
+        <span class="c1"># self.storage.h -= self.h_hx</span>
+        <span class="c1"># self.storage.updateImage(-self.h_hx)</span>
+
+<div class="viewcode-block" id="ConfigStorage.removeHxR"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.removeHxR">[docs]</a>    <span class="k">def</span> <span class="nf">removeHxR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">heatExchangers</span><span class="p">:</span>
+            <span class="c1"># Name is identified through index of comma</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">listWR</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">displayName</span> <span class="o">==</span> <span class="n">j</span><span class="o">.</span><span class="n">text</span><span class="p">()[:</span><span class="n">j</span><span class="o">.</span><span class="n">text</span><span class="p">()</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">heatExchangers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">listWR</span><span class="o">.</span><span class="n">takeItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listWR</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">listWR</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">()[</span><span class="mi">0</span><span class="p">]))</span>
+
+                    <span class="c1"># for c in i.port1.connectionList:</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="o">.</span><span class="n">connectionList</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="o">.</span><span class="n">connectionList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deleteConn</span><span class="p">()</span>
+
+                    <span class="c1"># for c in i.port2.connectionList:</span>
+                    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="o">.</span><span class="n">connectionList</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="o">.</span><span class="n">connectionList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deleteConn</span><span class="p">()</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port1</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">port2</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
+
+    <span class="c1"># self.storage.h -= self.h_hx</span>
+    <span class="c1"># self.storage.updateImage(-self.h_hx)</span>
+
+<div class="viewcode-block" id="ConfigStorage.incrSize"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.incrSize">[docs]</a>    <span class="k">def</span> <span class="nf">incrSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">updatePortPositions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_hx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_hx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">updateImage</span><span class="p">()</span></div>
+
+    <span class="c1"># Unused</span>
+<div class="viewcode-block" id="ConfigStorage.decrSize"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.decrSize">[docs]</a>    <span class="k">def</span> <span class="nf">decrSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">updatePortPositions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h_hx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">h</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h_hx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">updateImage</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfigStorage.acceptedEdit"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.acceptedEdit">[docs]</a>    <span class="k">def</span> <span class="nf">acceptedEdit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># print(&quot;Changing displayName&quot;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">le</span><span class="o">.</span><span class="n">text</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ConfigStorage.cancel"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.ConfigStorage.ConfigStorage.cancel">[docs]</a>    <span class="k">def</span> <span class="nf">cancel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
