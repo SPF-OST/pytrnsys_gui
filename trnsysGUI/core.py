@@ -375,6 +375,9 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.displayName = i["StorageDisplayName"]
 
                         bl.changeSize()
+                        # Commit?
+                        bl.h = i["size_h"]
+                        bl.updateImage()
 
                         bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
                         bl.trnsysId = i["trnsysID"]
