@@ -375,6 +375,8 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.displayName = i["StorageDisplayName"]
 
                         bl.changeSize()
+                        bl.h = i["size_h"]
+                        bl.updateImage()
 
                         bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
                         bl.trnsysId = i["trnsysID"]
@@ -649,6 +651,7 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['FlippedH'] = t.flippedH
                     dct['FlippedV'] = t.flippedH
                     dct['GroupName'] = t.groupName
+                    dct['size_h'] = t.h
 
                     # dct['RotationN'] = t.rotationN
 
@@ -862,7 +865,7 @@ class DiagramScene(QGraphicsScene):
             pen.setCosmetic(True)
             painter.setPen(pen)
 
-            gridSize = 50
+            gridSize = self.parent().snapSize
 
             left = int(rect.left()) - (int(rect.left()) % gridSize)
             top = int(rect.top()) - (int(rect.top()) % gridSize)
@@ -1039,8 +1042,9 @@ class EditorGraphicsView(QGraphicsView):
             else:
                 bl = BlockItem(name, name, self)
 
+            snapSize = self.parent().snapSize
             if self.parent().snapGrid:
-                qp = QPoint(event.pos().x() - event.pos().x() % 150, event.pos().y() - event.pos().y() % 150)
+                qp = QPoint(event.pos().x() - event.pos().x() % snapSize, event.pos().y() - event.pos().y() % snapSize)
                 p1 = self.mapToScene(qp)
             else:
                 p1 = self.mapToScene(event.pos())
@@ -1147,6 +1151,7 @@ class DiagramEditor(QWidget):
 
         self.editorMode = 1
         self.snapGrid = False
+        self.snapSize = 50
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -1569,9 +1574,11 @@ class DiagramEditor(QWidget):
                             # print("dds " + p.connectionList[2].displayName)
 
                             if p.connectionList[1].fromPort is p:
-                                f += p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                                f += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
                             else:
-                                f += p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                                f += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+
+                            equationNr += 1
 
             if len(t.inputs + t.outputs) == 2 and not isinstance(t, Connector):
                 f += "T" + t.displayName + "=1 \n"
@@ -1602,7 +1609,7 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
-            if isinstance(t, Pump) or isinstance(t, WTap):
+            if isinstance(t, Pump) or isinstance(t, WTap_main):
                 f += "Mfr" + t.displayName + " = 1000" + "\n"
                 equationNr += 1
             elif isinstance(t, TVentil):
@@ -1981,14 +1988,76 @@ class DiagramEditor(QWidget):
                     unitText += "INPUTS " + str(inputNumbers) + "\n"
 
                     if len(t.trnsysConn) == 2:
-                        # if isinstance(Connector, t.trnsysConn[0]) and not t.trnsysConn[0].isVisible():
-                        #
-                        #     unitText += "T" + t.trnsysConn[0].displayName + "\n"
+                        # if isinstance(Connector, t.trnsysConn[0]) and not t.trnsysConn[0].isVisible() and firstGenerated:
+                        # or if it is tpiece and not visible and firstGenerated
+                        if isinstance(t.trnsysConn[0], BlockItem) and t.trnsysConn[0].inFirstRow:
+                            portToPrint = None
+                            for p in t.trnsysConn[0].inputs + t.trnsysConn[0].outputs:
+                                if t in p.connectionList:
+                                    # Found the port of the generated block adjacent to this pipe
+                                    # Assumes 1st connection is with storageTank
+                                    if t.fromPort == p:
+                                        if t.toPort.connectionList[0].fromPort == t.toPort:
+                                            portToPrint = t.toPort.connectionList[0].toPort
+                                        else:
+                                            portToPrint = t.toPort.connectionList[0].fromPort
+                                    else:
+                                        if t.fromPort.connectionList[0].fromPort == t.fromPort:
+                                            portToPrint = t.fromPort.connectionList[0].toPort
+                                        else:
+                                            portToPrint = t.fromPort.connectionList[0].fromPort
+                            if portToPrint is None:
+                                print("Error: No portToprint found when printing UNIT of " + t.displayName)
+                                return
 
-                        unitText += "T" + t.trnsysConn[0].displayName + "\n"
+                            if portToPrint.side == 0:
+                                lr = "Left"
+                            else:
+                                lr = "Right"
+
+                            unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
+                                        portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                        else:
+                            unitText += "T" + t.trnsysConn[0].displayName + "\n"
+
                         unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
                         unitText += tempRoomVar + "\n"
-                        unitText += "T" + t.trnsysConn[1].displayName + "\n"
+
+                        if isinstance(t.trnsysConn[1], BlockItem) and t.trnsysConn[1].inFirstRow:
+                            portToPrint = None
+                            for p in t.trnsysConn[1].inputs + t.trnsysConn[1].outputs:
+                                if t in p.connectionList:
+                                    # Found the port of the generated block adjacent to this pipe
+                                    # Assumes 1st connection is with storageTank
+                                    if t.fromPort == p:
+                                        if t.toPort.connectionList[0].fromPort == t.toPort:
+                                            portToPrint = t.toPort.connectionList[0].toPort
+                                        else:
+                                            portToPrint = t.toPort.connectionList[0].fromPort
+                                    else:
+                                        if t.fromPort.connectionList[0].fromPort == t.fromPort:
+                                            portToPrint = t.fromPort.connectionList[0].toPort
+                                        else:
+                                            portToPrint = t.fromPort.connectionList[0].fromPort
+
+                            if portToPrint is None:
+                                print("Error: No portToprint found when printing UNIT of " + t.displayName)
+                                return
+
+                            if portToPrint.side == 0:
+                                lr = "Left"
+                            else:
+                                lr = "Right"
+
+                            unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
+                                    portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                        else:
+                            unitText += "T" + t.trnsysConn[1].displayName + "\n"
+                        #
+                        # unitText += "T" + t.trnsysConn[0].displayName + "\n"
+                        # unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
+                        # unitText += tempRoomVar + "\n"
+                        # unitText += "T" + t.trnsysConn[1].displayName + "\n"
                     else:
                         f += "Error: NO VALUE\n" * 3 + "at connection with parents " + str(t.fromPort.parent) + str(t.toPort.parent) + "\n"
 
@@ -2654,7 +2723,7 @@ class DiagramEditor(QWidget):
         return l1.trnsysId
 
     def copyElements(self):
-        clipboardGroup = copyGroup()
+        clipboardGroup = copyGroup(self)
         print(self.diagramScene.elementsInRect())
 
         for t in self.diagramScene.elementsInRect():
