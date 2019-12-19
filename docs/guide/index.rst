@@ -11,5 +11,5 @@ For more details checkout the :ref:`reference`.
 .. toctree::
    :maxdepth: 3
 
-   runSimulations
-   configfile
+   readme
+

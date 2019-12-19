@@ -12,3 +12,5 @@ trnsysGUI/exports/
 /.idea/misc.xml
 /.idea/TrnsysGUI.iml
 /.idea/TrnsysGUI.iml
+
+docs/_build/
