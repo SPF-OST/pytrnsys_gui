@@ -1680,17 +1680,8 @@ class DiagramEditor(QWidget):
                 # No StorageTank and no HeatPump
                 if isinstance(t, BlockItem):
                     temp = ""
-                    for i in t.inputs:
-                        # ConnectionList lenght should be max offset
-                        for c in i.connectionList:
-                            if type(c.fromPort.parent) is StorageTank and i.connectionList.index(c) == 0:
-                                continue
-                            elif type(c.toPort.parent) is StorageTank and i.connectionList.index(c) == 0:
-                                continue
-                            else:
-                                temp = temp + str(c.trnsysId) + " "
-                                t.trnsysConn.append(c)
 
+                    # Here, first the outputs are printed such that the main port of diverters is printed first
                     for o in t.outputs:
                         # ConnectionList lenght should be max offset
                         for c in o.connectionList:
@@ -1701,6 +1692,42 @@ class DiagramEditor(QWidget):
                             else:
                                 temp = temp + str(c.trnsysId) + " "
                                 t.trnsysConn.append(c)
+
+                    if isinstance(t, TVentil):
+                        # This is to assert that the input in front of the output is always printed before the third one
+                        # More testing needed
+                        for i in t.inputs:
+                            # Either left or right
+                            tempArr = []
+
+                            for c in i.connectionList:
+                                if type(c.fromPort.parent) is StorageTank and i.connectionList.index(c) == 0:
+                                    continue
+                                elif type(c.toPort.parent) is StorageTank and i.connectionList.index(c) == 0:
+                                    continue
+                                else:
+                                    # On same hight as output
+                                    if i.pos().x() == t.outputs[0].pos().x() or i.pos().y() == t.outputs[0].y():
+                                        tempArr.insert(0, c)
+                                    else:
+                                        tempArr.append(c)
+
+                            for conn in tempArr:
+                                temp = temp + str(conn.trnsysId) + " "
+                                t.trnsysConn.append(conn)
+
+                    else:
+                        # No diverters
+                        for i in t.inputs:
+                            # ConnectionList lenght should be max offset
+                            for c in i.connectionList:
+                                if type(c.fromPort.parent) is StorageTank and i.connectionList.index(c) == 0:
+                                    continue
+                                elif type(c.toPort.parent) is StorageTank and i.connectionList.index(c) == 0:
+                                    continue
+                                else:
+                                    temp = temp + str(c.trnsysId) + " "
+                                    t.trnsysConn.append(c)
 
                     if t.typeNumber != 2 and t.typeNumber != 3:
                         temp += "0 "
@@ -1724,9 +1751,15 @@ class DiagramEditor(QWidget):
                     # Assert that parent is of type BlockItem
                     if isinstance(t.toPort.parent, BlockItem) and isinstance(t.fromPort.parent, BlockItem):
                         # if isinstance(t.fromPort.parent, Connector) and not t.fromPort.parent.isVisible() or isinstance(t.toPort.parent, Connector) and not t.toPort.parent.isVisible():
+                        if type(t.fromPort.parent) is TVentil and t.fromPort in t.fromPort.parent.outputs:
+                            t.trnsysConn.insert(0, t.fromPort.parent)
+                        else:
+                            t.trnsysConn.append(t.fromPort.parent)
 
-                        t.trnsysConn.append(t.fromPort.parent)
-                        t.trnsysConn.append(t.toPort.parent)
+                        if type(t.toPort.parent) is TVentil and t.fromPort in t.toPort.parent.outputs:
+                            t.trnsysConn.insert(0, t.toPort.parent)
+                        else:
+                            t.trnsysConn.append(t.toPort.parent)
                     else:
                         f += "Error: Parent of this port is not a BlockItem" + "\n"
                         return
@@ -2896,6 +2929,16 @@ class DiagramEditor(QWidget):
         self.encodeDiagram(str(self.saveAsPath))
 
     def renameDiagram(self, newName):
+        """
+
+        Parameters
+        ----------
+        newName
+
+        Returns
+        -------
+
+        """
 
         if self.saveAsPath.name != '':
             # print("Path name is " + self.saveAsPath.name)
