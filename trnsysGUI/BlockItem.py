@@ -22,6 +22,7 @@ def calcDist(p1, p2):
 class BlockItem(QGraphicsPixmapItem):
 
     def __init__(self, trnsysType, name='Untitled', parent=None):
+
         super(BlockItem, self).__init__(None)
         self.w = 100.0
         self.h = 100.0
@@ -89,6 +90,7 @@ class BlockItem(QGraphicsPixmapItem):
 
         # Experimental, used for detecting genereated blocks attached to storage ports
         self.inFirstRow = False
+
     def setParent(self, p):
         self.parent = p
 
