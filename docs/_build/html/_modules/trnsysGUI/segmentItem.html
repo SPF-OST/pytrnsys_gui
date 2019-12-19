@@ -1,0 +1,775 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>trnsysGUI.segmentItem &mdash; TrnsysGUI 2020 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> TrnsysGUI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide/index.html">User’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CodeReference.html">Code Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TrnsysGUI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>trnsysGUI.segmentItem</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for trnsysGUI.segmentItem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="k">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QtGui</span><span class="p">,</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="k">import</span> <span class="n">QPointF</span><span class="p">,</span> <span class="n">QLineF</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="k">import</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QLinearGradient</span><span class="p">,</span> <span class="n">QBrush</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="k">import</span> <span class="n">QGraphicsLineItem</span><span class="p">,</span> <span class="n">QGraphicsTextItem</span><span class="p">,</span> <span class="n">QMenu</span>
+
+<span class="kn">from</span> <span class="nn">trnsysGUI.GroupChooserConnDlg</span> <span class="k">import</span> <span class="n">GroupChooserConnDlg</span>
+<span class="kn">from</span> <span class="nn">trnsysGUI.CornerItem</span> <span class="k">import</span> <span class="n">CornerItem</span>
+<span class="kn">from</span> <span class="nn">trnsysGUI.segmentDlg</span> <span class="k">import</span> <span class="n">segmentDlg</span>
+
+
+<div class="viewcode-block" id="calcDist"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.calcDist">[docs]</a><span class="k">def</span> <span class="nf">calcDist</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">vec</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">norm</span></div>
+
+
+<div class="viewcode-block" id="segmentItem"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem">[docs]</a><span class="k">class</span> <span class="nc">segmentItem</span><span class="p">(</span><span class="n">QGraphicsLineItem</span><span class="p">):</span>
+    <span class="c1"># Cant construct with Connection as parent class</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startNode</span><span class="p">,</span> <span class="n">endNode</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">segmentItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># print(QColor(QtCore.Qt.red).red())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dragged</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialised</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;seg parent is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span> <span class="o">=</span> <span class="n">startNode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span> <span class="o">=</span> <span class="n">endNode</span>
+
+        <span class="c1"># These nodes are the nodes before and after the crossing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">disrBeforeNode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disrAfterNode</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">disrBeforeSeg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disrAfterSeg</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">disrBefore</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disrAfter</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hasBridge</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bridgedSegment</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Only for editorMode 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">keyPr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inited</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Used to only create the child objects once</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># self.id = getSegID()  # Only for debug used</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insertInParentSegments</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initGrad</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QGraphicsTextItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">displayName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">fromPort</span><span class="p">)</span>
+        <span class="c1"># self.parent.parent.diagramScene.addItem(self.label)</span>
+        <span class="c1"># self.label.setPos(self.parent.fromPort.scenePos())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># if len(self.parent.segments) &gt; 1:</span>
+        <span class="c1">#     self.label.setVisible(False)</span>
+        <span class="c1"># print(&quot;line has start point &quot; + str(self.line().p1()))</span>
+
+<div class="viewcode-block" id="segmentItem.segLength"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.segLength">[docs]</a>    <span class="k">def</span> <span class="nf">segLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">calcDist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="segmentItem.interpolate"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.interpolate">[docs]</a>    <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partLen2</span><span class="p">,</span> <span class="n">totLenConn</span><span class="p">,</span> <span class="p">):</span>
+        <span class="n">c1_r</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">c1_b</span> <span class="o">=</span> <span class="mi">255</span>
+        <span class="n">c2_r</span> <span class="o">=</span> <span class="mi">255</span>
+        <span class="n">c2_b</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">f1</span> <span class="o">=</span> <span class="n">partLen2</span> <span class="o">/</span> <span class="n">totLenConn</span>
+        <span class="n">f2</span> <span class="o">=</span> <span class="p">(</span><span class="n">totLenConn</span> <span class="o">-</span> <span class="n">partLen2</span><span class="p">)</span> <span class="o">/</span> <span class="n">totLenConn</span>
+        <span class="k">return</span> <span class="n">QColor</span><span class="p">(</span><span class="n">f1</span> <span class="o">*</span> <span class="n">c2_r</span> <span class="o">+</span> <span class="n">f2</span> <span class="o">*</span> <span class="n">c1_r</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">f1</span> <span class="o">*</span> <span class="n">c2_b</span> <span class="o">+</span> <span class="n">f2</span> <span class="o">*</span> <span class="n">c1_b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.initGrad"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.initGrad">[docs]</a>    <span class="k">def</span> <span class="nf">initGrad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># color = QColor(177, 202, 211)</span>
+        <span class="c1"># color = QColor(3, 124, 193)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span>
+
+        <span class="n">pen1</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Dont forget that disr segments can also have parent type not CornerItem</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span><span class="p">:</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">firstNode</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span><span class="p">:</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">lastNode</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span>
+
+        <span class="c1"># At init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span> <span class="o">=</span> <span class="n">QLinearGradient</span><span class="p">(</span><span class="n">QPointF</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">x1</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()),</span>
+                                          <span class="n">QPointF</span><span class="p">(</span><span class="n">x2</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">x2</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span><span class="o">.</span><span class="n">setColorAt</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">blue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span><span class="o">.</span><span class="n">setColorAt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span><span class="p">)</span>
+        <span class="c1"># self.setPen(QtGui.QPen(color, 2))</span>
+        <span class="n">pen1</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.updateGrad"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.updateGrad">[docs]</a>    <span class="k">def</span> <span class="nf">updateGrad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">color</span> <span class="o">=</span> <span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">red</span>
+
+        <span class="n">pen1</span> <span class="o">=</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QPen</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="n">totLenConn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">totalLength</span><span class="p">()</span>
+        <span class="n">partLen1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">partialLength</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="p">)</span>
+        <span class="n">partLen2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">partialLength</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="p">)</span>
+
+        <span class="c1"># print(&quot;totlenconn is &quot; + str(totLenConn))</span>
+        <span class="c1"># print(&quot;partlen1 is &quot; + str(partLen1) + &quot;(node1)&quot; + str(self.startNode))</span>
+        <span class="c1"># print(&quot;partlen2  is &quot; + str(partLen2) + &quot;(node2)&quot; + str(self.endNode) +&quot;\n&quot;)</span>
+
+        <span class="c1"># TODO: Dont forget that disr segments can also have parent type not CornerItem</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span><span class="p">:</span>
+            <span class="c1"># print(&quot;In updategrad, startnode parent is corner&quot;)</span>
+            <span class="c1"># print(&quot;I have a corner parent, self is &quot; + str(self))</span>
+
+            <span class="n">startGradP</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">startGradP</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">startGradP</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span><span class="p">:</span>
+            <span class="c1"># print(&quot;In update grad, endnode parent is corner&quot;)</span>
+            <span class="c1"># print(&quot;I have a corner parent, self is &quot; + str(self))</span>
+            <span class="n">endGradP</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">endGradP</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">endGradP</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span> <span class="o">=</span> <span class="n">QLinearGradient</span><span class="p">(</span><span class="n">startGradP</span><span class="p">,</span> <span class="n">endGradP</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span><span class="o">.</span><span class="n">setColorAt</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">partLen1</span><span class="p">,</span> <span class="n">totLenConn</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span><span class="o">.</span><span class="n">setColorAt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">partLen2</span><span class="p">,</span> <span class="n">totLenConn</span><span class="p">))</span>
+
+        <span class="n">pen1</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linearGrad</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.insertInParentSegments"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.insertInParentSegments">[docs]</a>    <span class="k">def</span> <span class="nf">insertInParentSegments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># This function inserts the segment in correct order to the segment list of the connection.</span>
+
+        <span class="n">prevSeg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">endNode</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="p">:</span>
+                <span class="n">prevSeg</span> <span class="o">=</span> <span class="n">s</span>
+
+        <span class="c1"># This should do the trick</span>
+        <span class="c1"># Todo: Add support for disr segments</span>
+        <span class="c1"># print(&quot;Self start parent is &quot; + str(self.startNode.parent))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">prevSeg</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="c1"># def mouseDoubleClickEvent(self, event):</span>
+    <span class="c1">#     if event.button() == 1:</span>
+    <span class="c1">#         dia = segmentDlg(self, self.scene().parent())</span>
+
+<div class="viewcode-block" id="segmentItem.mousePressEvent"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.mousePressEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mousePressEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keyPr</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting key to 1&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">highlightConn</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="segmentItem.mouseMoveEvent"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.mouseMoveEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseMoveEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+        <span class="c1"># print(&quot;mouse moved&quot;)</span>
+        <span class="c1"># print(str(e.button()))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyPr</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;moved with button 1&quot;</span><span class="p">)</span>
+            <span class="c1"># global editorMode</span>
+            <span class="n">newPos</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">editorMode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">inited</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">initInMode0</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dragInMode0</span><span class="p">(</span><span class="n">newPos</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">editorMode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isVertical</span><span class="p">():</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segment is vertical&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isHorizontal</span><span class="p">():</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segment is vertical&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+                <span class="c1"># if type(self.startNode.parent) is Connection and self.startNode.prevN() is None:</span>
+                <span class="c1">#     print(&quot;We begin at the fromPort&quot;)</span>
+
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We end at toPort&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">inited</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">initInMode1</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dragInMode1</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">newPos</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We end at fromPort&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">inited</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">initInMode1</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dragInMode1</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">newPos</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unrecognized editorMode in segmentItem mouseMoveEvent&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.mouseReleaseEvent"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.mouseReleaseEvent">[docs]</a>    <span class="k">def</span> <span class="nf">mouseReleaseEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+        <span class="c1"># Should be same as below</span>
+        <span class="c1"># self.scene().removeItem(self)</span>
+
+        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keyPr</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">editorMode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inited</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">editorMode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">):</span>
+                        <span class="c1"># self.hide()</span>
+                        <span class="c1"># self.parent.segments.remove(self)</span>
+                        <span class="c1"># self.parent.parent.diagramScene.removeItem(self)</span>
+
+                        <span class="n">segbef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">getNodePos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">)]</span>
+
+                        <span class="n">segbef</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">segbef</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">segbef</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                       <span class="n">segbef</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+                        <span class="c1"># Allow for iterative branching</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">inited</span> <span class="o">=</span> <span class="kc">False</span>
+
+                    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">):</span>
+                        <span class="n">segafter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">getNodePos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">)]</span>
+
+                        <span class="n">segafter</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">segafter</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                         <span class="n">segafter</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">segafter</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+                        <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setFlag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemSendsScenePositionChanges</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+                        <span class="c1"># Allow for iterative branching</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">inited</span> <span class="o">=</span> <span class="kc">False</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;getting no start or end&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="segmentItem.initInMode0"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.initInMode0">[docs]</a>    <span class="k">def</span> <span class="nf">initInMode0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disrAfterNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span>
+
+            <span class="n">segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">startNode</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">disrBeforeSeg</span> <span class="o">=</span> <span class="n">s</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">disrAfterSeg</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disrBefore</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disrBeforeNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span>
+
+            <span class="n">segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">endNode</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">disrAfterSeg</span> <span class="o">=</span> <span class="n">s</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">disrBeforeSeg</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disrAfter</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span>
+
+        <span class="n">rad</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span> <span class="o">=</span> <span class="n">CornerItem</span><span class="p">(</span><span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span> <span class="o">=</span> <span class="n">segmentItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span> <span class="o">=</span> <span class="n">segmentItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">setNext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">setPrev</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inited</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="segmentItem.initInMode1"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.initInMode1">[docs]</a>    <span class="k">def</span> <span class="nf">initInMode1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+
+        <span class="n">rad</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="c1"># We are at the toPort.</span>
+                <span class="c1"># self.end = self.endNode</span>
+                <span class="c1"># self.start = self.startNode</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span> <span class="o">=</span> <span class="n">CornerItem</span><span class="p">(</span><span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span> <span class="o">=</span> <span class="n">CornerItem</span><span class="p">(</span><span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">setNext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">setNext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">setPrev</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span>
+
+                <span class="c1"># self.startNode.setNext(self.secondCorner.node)</span>
+                <span class="c1"># self.endNode.setPrev(self.thirdCorner.node)</span>
+                <span class="c1"># self.startNode.setPrev(self.thirdCorner.node)</span>
+                <span class="c1"># self.endNode.parent.setPos()</span>
+                <span class="c1"># self.endNode = self.secondCorner.node</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span> <span class="o">=</span> <span class="n">segmentItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span> <span class="o">=</span> <span class="n">segmentItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">nextN</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="c1"># self.thirdLine.setVisible(False)</span>
+
+                <span class="c1"># self.startNode.parent.setPos(self.startNode.parent.pos().x(), newPos.y())</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;inited&quot;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">inited</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="c1"># We are at the toPort.</span>
+                <span class="c1"># self.end = self.endNode</span>
+                <span class="c1"># self.start = self.startNode</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span> <span class="o">=</span> <span class="n">CornerItem</span><span class="p">(</span><span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span> <span class="o">=</span> <span class="n">CornerItem</span><span class="p">(</span><span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="o">-</span><span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="p">,</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">setNext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">setNext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">setPrev</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">startNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span>
+
+                <span class="c1"># self.startNode.setNext(self.secondCorner.node)</span>
+                <span class="c1"># self.endNode.setPrev(self.thirdCorner.node)</span>
+                <span class="c1"># self.startNode.setPrev(self.thirdCorner.node)</span>
+                <span class="c1"># self.endNode.parent.setPos()</span>
+                <span class="c1"># self.endNode = self.secondCorner.node</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span> <span class="o">=</span> <span class="n">segmentItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">prevN</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span> <span class="o">=</span> <span class="n">segmentItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="c1"># self.thirdLine.setVisible(False)</span>
+
+                <span class="c1"># self.startNode.parent.setPos(self.startNode.parent.pos().x(), newPos.y())</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">diagramScene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;inited&quot;</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">inited</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="segmentItem.isVertical"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.isVertical">[docs]</a>    <span class="k">def</span> <span class="nf">isVertical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="segmentItem.isHorizontal"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.isHorizontal">[docs]</a>    <span class="k">def</span> <span class="nf">isHorizontal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="segmentItem.dragInMode0"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.dragInMode0">[docs]</a>    <span class="k">def</span> <span class="nf">dragInMode0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newPos</span><span class="p">):</span>
+        <span class="n">p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">newPos</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">QLineF</span><span class="p">(</span><span class="n">p1</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">p1</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">QLineF</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">p2</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">p2</span><span class="o">.</span><span class="n">y</span><span class="p">()))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">newPos</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">updateGrad</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span><span class="o">.</span><span class="n">updateGrad</span><span class="p">()</span>
+
+            <span class="c1"># Bring corner to front</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondChild</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cornerChild</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.dragInMode1"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.dragInMode1">[docs]</a>    <span class="k">def</span> <span class="nf">dragInMode1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">newPos</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;after inited&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">b</span><span class="p">:</span>
+            <span class="c1"># if False:</span>
+            <span class="n">lineFactor</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">4</span>
+
+            <span class="c1"># x-val of branching when there is a segment before toPort</span>
+            <span class="c1"># v1 = abs(self.endNode.parent.toPort.pos().x() - self.secondCorner.pos().x()) * lineFactor</span>
+            <span class="c1"># v1 = self.secondCorner.pos().x() + v1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="mi">10</span><span class="p">,</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="c1"># self.thirdCorner.setBrush(QtCore.Qt.blue)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">-</span> <span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="c1"># self.secondCorner.setBrush(QtCore.Qt.yellow)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setY</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if False:</span>
+            <span class="n">lineFactor</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">4</span>
+
+            <span class="c1"># x-val of branching when there is a segment before toPort</span>
+            <span class="c1"># v1 = abs(self.endNode.parent.toPort.pos().x() - self.secondCorner.pos().x()) * lineFactor</span>
+            <span class="c1"># v1 = self.secondCorner.pos().x() + v1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="c1"># self.secondCorner.setBrush(QtCore.Qt.blue)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="c1"># self.thirdCorner.setBrush(QtCore.Qt.yellow)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">setY</span><span class="p">(</span><span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">newPos</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>  <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setZValue</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thirdCorner</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">firstLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">secondLine</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.renameConn"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.renameConn">[docs]</a>    <span class="k">def</span> <span class="nf">renameConn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dia</span> <span class="o">=</span> <span class="n">segmentDlg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="segmentItem.printItemsAt"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.printItemsAt">[docs]</a>    <span class="k">def</span> <span class="nf">printItemsAt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Items at startnode are &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">())))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Items at endnode are &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">())))</span>
+        <span class="c1"># print(self.scene().items(self.endNode.parent.scenePos()))</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="c1"># sleep(0.2)</span>
+            <span class="c1"># s.setPen(QPen(QtCore.Qt.red))</span>
+            <span class="c1"># s.parent.parent.update()</span>
+            <span class="c1"># s.setPen(QPen(QtCore.Qt.blue))</span>
+            <span class="c1"># sleep(2)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Segment in list is&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; has startnode&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">startNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; endnode &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">endNode</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span></div>
+
+        <span class="c1"># for x in range(20):</span>
+        <span class="c1">#     print(x)</span>
+        <span class="c1">#     sleep(0.2)</span>
+
+<div class="viewcode-block" id="segmentItem.contextMenuEvent"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.contextMenuEvent">[docs]</a>    <span class="k">def</span> <span class="nf">contextMenuEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">QMenu</span><span class="p">()</span>
+        <span class="n">a1</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Rename...&#39;</span><span class="p">)</span>
+        <span class="n">a1</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">renameConn</span><span class="p">)</span>
+
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Delete this connection&#39;</span><span class="p">)</span>
+        <span class="n">a2</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">deleteConn</span><span class="p">)</span>
+
+        <span class="n">a3</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Invert this connection&#39;</span><span class="p">)</span>
+        <span class="n">a3</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">invertConnection</span><span class="p">)</span>
+
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Set group &#39;</span><span class="p">)</span>
+        <span class="n">b1</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configGroup</span><span class="p">)</span>
+        <span class="n">a4</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Print end and start items&#39;</span><span class="p">)</span>
+        <span class="n">a4</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">printItemsAt</span><span class="p">)</span>
+
+        <span class="n">a5</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Print corners&#39;</span><span class="p">)</span>
+        <span class="n">a5</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">getCorners</span><span class="p">)</span>
+
+        <span class="n">a6</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Print group&#39;</span><span class="p">)</span>
+        <span class="n">a6</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">printGroup</span><span class="p">)</span>
+
+        <span class="n">a7</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="s1">&#39;Inspect&#39;</span><span class="p">)</span>
+        <span class="n">a7</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inspect</span><span class="p">)</span>
+        <span class="n">menu</span><span class="o">.</span><span class="n">exec_</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">screenPos</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="segmentItem.configGroup"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.configGroup">[docs]</a>    <span class="k">def</span> <span class="nf">configGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sle paras&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sle paras&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+        <span class="n">GroupChooserConnDlg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.printGroup"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.printGroup">[docs]</a>    <span class="k">def</span> <span class="nf">printGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">groupName</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="segmentItem.inspect"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.segmentItem.segmentItem.inspect">[docs]</a>    <span class="k">def</span> <span class="nf">inspect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">highlightConn</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">inspectConn</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
