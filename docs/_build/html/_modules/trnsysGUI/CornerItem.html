@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>trnsysGUI.CornerItem &mdash; TrnsysGUI 2020 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> TrnsysGUI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide/index.html">User’s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CodeReference.html">Code Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TrnsysGUI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>trnsysGUI.CornerItem</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for trnsysGUI.CornerItem</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5</span> <span class="k">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="k">import</span> <span class="n">QBrush</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="k">import</span> <span class="n">QGraphicsEllipseItem</span>
+
+<span class="kn">from</span> <span class="nn">trnsysGUI.Node</span> <span class="k">import</span> <span class="n">Node</span>
+
+<span class="c1"># Using hasattr to detect type of parent of node, better solution needed</span>
+<span class="c1"># No support for disr segements</span>
+
+
+<div class="viewcode-block" id="CornerItem"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.CornerItem.CornerItem">[docs]</a><span class="k">class</span> <span class="nc">CornerItem</span><span class="p">(</span><span class="n">QGraphicsEllipseItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="n">prevNode</span><span class="p">,</span> <span class="n">nextNode</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CornerItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init pos is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">QBrush</span><span class="p">(</span><span class="n">QtCore</span><span class="o">.</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prevNode</span><span class="p">,</span> <span class="n">nextNode</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setFlags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ItemIsSelectable</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemIsMovable</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">posCallbacks</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="CornerItem.itemChange"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.CornerItem.CornerItem.itemChange">[docs]</a>    <span class="k">def</span> <span class="nf">itemChange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># print(&quot;Change is &quot; + str(change))</span>
+        <span class="k">if</span> <span class="n">change</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemScenePositionHasChanged</span><span class="p">:</span>
+            <span class="c1"># print(&quot;pos change&quot;)</span>
+
+            <span class="c1"># print(&quot;self has partial lenght &quot; + str(self.parent.partialLength(self)))</span>
+            <span class="c1"># print(&quot;Self is at &quot; + str(self.parent.partialLength(self.node) / (self.parent.totalLength())) + &quot;% of the whole connection&quot;)</span>
+
+            <span class="n">nNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span>
+            <span class="n">pNode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parent is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+            <span class="n">positionInArr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">getNodePos</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="n">segBefore</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">positionInArr</span><span class="p">]</span>
+            <span class="n">segAfter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="p">[</span><span class="n">positionInArr</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># print(&quot;Position in arr is&quot; + str(positionInArr))</span>
+            <span class="c1"># segsBefore.setLine(self.scenePos().x(), self.scenePos().y(), segsBefore.line().p2().x(), segsBefore.line().p2().y())</span>
+            <span class="c1"># segsBefore.setLine(self.scenePos().x(), self.scenePos().y(), segsBefore.line().p2().x(), segsBefore.line().p2().y())</span>
+
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">nNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span><span class="p">:</span>
+                <span class="c1"># segAfter.setPen(QPen(Qt.red))</span>
+
+                <span class="n">segAfter</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">segAfter</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>
+                                 <span class="n">segAfter</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+                <span class="c1"># elementsAtNextNode = self.scene().items(nNode.parent.scenePos())</span>
+                <span class="c1"># # print(&quot;Type of nNode parent is corner&quot;)</span>
+                <span class="c1"># for e in elementsAtNextNode:</span>
+                <span class="c1">#     if type(e) is segmentItem:</span>
+                <span class="c1">#         if e.endNode is nNode:</span>
+                <span class="c1">#             # print(&quot;This is the nnode segment&quot;)</span>
+                <span class="c1">#             e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(), e.line().p2().y())</span>
+
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">pNode</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">is</span> <span class="n">CornerItem</span><span class="p">:</span>
+                <span class="c1"># segBefore.setPen(QPen(Qt.blue))</span>
+
+                <span class="n">segBefore</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">segBefore</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">segBefore</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+                <span class="c1"># elementsAtNextNode = self.scene().items(pNode.parent.scenePos())</span>
+                <span class="c1"># # print(&quot;Type of pNode parent is corner&quot;)</span>
+                <span class="c1"># for e in elementsAtNextNode:</span>
+                <span class="c1">#     if type(e) is segmentItem:</span>
+                <span class="c1">#         if e.startNode is pNode:</span>
+                <span class="c1">#             # print(&quot;This is the pnode segment&quot;)</span>
+                <span class="c1">#             e.setLine(e.line().p1().x(), e.line().p1().y(), self.scenePos().x(), self.scenePos().y())</span>
+
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">):</span>
+
+                <span class="c1"># print(&quot;The moving node (cornerItem) is &quot; + str(self.node))</span>
+                <span class="c1"># print(&quot;type of nNode is conn&quot;)</span>
+
+                <span class="c1"># We have two options: either nNode is at a port or at a disrupted segment</span>
+
+                <span class="k">if</span> <span class="n">nNode</span><span class="o">.</span><span class="n">nextN</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># We are at a disrupted segment</span>
+                    <span class="k">pass</span>
+                    <span class="c1"># segments = nNode.parent.segments</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># s = None</span>
+                    <span class="c1"># s2 = None</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># for x in segments:</span>
+                    <span class="c1">#     if x.endNode is nNode:</span>
+                    <span class="c1">#         s = x</span>
+                    <span class="c1">#     if x.startNode is nNode.nextN():</span>
+                    <span class="c1">#         s2 = x</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># if s is None or s2 is None:</span>
+                    <span class="c1">#     print(&quot;Error, there shouldn&#39;t be a empty s or s2&quot;)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># s.startNode.setNext(s2.endNode)</span>
+                    <span class="c1"># s2.endNode.setPrev(s.startNode)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS = segmentItem(s.startNode, s2.endNode, s.parent)</span>
+                    <span class="c1"># newS.setVisible(False)</span>
+                    <span class="c1"># s.parent.parent.diagramScene.addItem(newS)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># if type(s2.endNode.parent) is Connection:</span>
+                    <span class="c1">#     print(&quot;Line of s is &quot; + str(s.line()))</span>
+                    <span class="c1">#     print(&quot;Line of s2 is &quot; + str(s2.line()))</span>
+                    <span class="c1">#     newS.setLine(self.scenePos().x(),</span>
+                    <span class="c1">#                  self.scenePos().y(),</span>
+                    <span class="c1">#                  s2.line().p2().x(),</span>
+                    <span class="c1">#                  s2.line().p2().y())</span>
+                    <span class="c1">#     print(&quot;Set pos node to Connection&quot;)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># elif type(s2.endNode.parent) is CornerItem:</span>
+                    <span class="c1">#     newS.setLine(self.scenePos().x(),</span>
+                    <span class="c1">#                  self.scenePos().y(),</span>
+                    <span class="c1">#                  s2.line().p2().x(),</span>
+                    <span class="c1">#                  s2.line().p2().y())</span>
+                    <span class="c1">#     print(&quot;Set pos node to node&quot;)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># else:</span>
+                    <span class="c1">#     pass</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS.setVisible(True)</span>
+                    <span class="c1"># s.hide()</span>
+                    <span class="c1"># s2.hide()</span>
+                    <span class="c1"># s.parent.segments.remove(s2)</span>
+                    <span class="c1"># s.parent.segments.remove(s)</span>
+                    <span class="c1"># # print(&quot;Length of segments is &quot; + str(len(segments)))</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># del s2.endNode</span>
+                    <span class="c1"># del s.endNode</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS.parent.parent.diagramScene.removeItem(s)</span>
+                    <span class="c1"># newS.parent.parent.diagramScene.removeItem(s2)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS.parent.buildBridges()</span>
+
+
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">lastNode</span><span class="p">()</span> <span class="ow">is</span> <span class="n">nNode</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;nNode is at toPort&quot;)</span>
+                        <span class="n">tItems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">nNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">())</span>
+
+                        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tItems</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s2">&quot;dragged&quot;</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">endNode</span> <span class="ow">is</span> <span class="n">nNode</span><span class="p">:</span>
+                                    <span class="n">t</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">t</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>
+                                              <span class="n">t</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pNode</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;fromPort&quot;</span><span class="p">):</span>
+                <span class="c1"># print(&quot;The moving node (cornerItem) is &quot; + str(self.node))</span>
+                <span class="c1"># print(&quot;type of pNode is conn&quot;)</span>
+
+                <span class="k">if</span> <span class="n">pNode</span><span class="o">.</span><span class="n">prevN</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># We are at a disrupted segment</span>
+                    <span class="k">pass</span>
+
+                    <span class="c1"># segments = nNode.parent.segments</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># s = None</span>
+                    <span class="c1"># s2 = None</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># for x in segments:</span>
+                    <span class="c1">#     if x.startNode is pNode:</span>
+                    <span class="c1">#         s2 = x</span>
+                    <span class="c1">#     if x.endNode is pNode.prevN():</span>
+                    <span class="c1">#         s = x</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># if s is None or s2 is None:</span>
+                    <span class="c1">#     print(&quot;Error, there shouldn&#39;t be a empty s or s2&quot;)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># s.startNode.setNext(s2.endNode)</span>
+                    <span class="c1"># s2.endNode.setPrev(s.startNode)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS = segmentItem(s.startNode, s2.endNode, s.parent)</span>
+                    <span class="c1"># newS.setVisible(False)</span>
+                    <span class="c1"># s.parent.parent.diagramScene.addItem(newS)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># if type(s2.endNode.parent) is Connection:</span>
+                    <span class="c1">#     print(&quot;Line of s is &quot; + str(s.line()))</span>
+                    <span class="c1">#     print(&quot;Line of s2 is &quot; + str(s2.line()))</span>
+                    <span class="c1">#     newS.setLine(s.line().p2().x(),</span>
+                    <span class="c1">#                  s.line().p2().y(), self.scenePos().x(), self.scenePos().y())</span>
+                    <span class="c1">#</span>
+                    <span class="c1">#     print(&quot;Set pos node to Connection&quot;)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># elif type(s2.endNode.parent) is CornerItem:</span>
+                    <span class="c1">#     newS.setLine(s.line().p1().x(),</span>
+                    <span class="c1">#                  s.line().p1().y(), self.scenePos().x(), self.scenePos().y())</span>
+                    <span class="c1">#     print(&quot;Set pos node to node&quot;)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># else:</span>
+                    <span class="c1">#     pass</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS.setVisible(True)</span>
+                    <span class="c1"># s.hide()</span>
+                    <span class="c1"># s2.hide()</span>
+                    <span class="c1"># s.parent.segments.remove(s2)</span>
+                    <span class="c1"># s.parent.segments.remove(s)</span>
+                    <span class="c1"># # print(&quot;Length of segments is &quot; + str(len(segments)))</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># del s2.endNode</span>
+                    <span class="c1"># del s.endNode</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS.parent.parent.diagramScene.removeItem(s)</span>
+                    <span class="c1"># newS.parent.parent.diagramScene.removeItem(s2)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># newS.parent.buildBridges()</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">firstNode</span><span class="p">()</span> <span class="ow">is</span> <span class="n">pNode</span><span class="p">:</span>
+                        <span class="c1"># print(&quot;pNode is at fromPort&quot;)</span>
+                        <span class="n">fItems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">pNode</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">scenePos</span><span class="p">())</span>
+
+                        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fItems</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;dragged&quot;</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">startNode</span> <span class="ow">is</span> <span class="n">pNode</span><span class="p">:</span>
+                                    <span class="n">f</span><span class="o">.</span><span class="n">setLine</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">line</span><span class="p">()</span><span class="o">.</span><span class="n">p1</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span>
+                                              <span class="bp">self</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">updateGrad</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">change</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ItemScenePositionHasChanged</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">posCallbacks</span><span class="p">:</span>
+                <span class="n">cb</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CornerItem</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">itemChange</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
