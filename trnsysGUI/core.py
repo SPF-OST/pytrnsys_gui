@@ -1724,9 +1724,15 @@ class DiagramEditor(QWidget):
                     # Assert that parent is of type BlockItem
                     if isinstance(t.toPort.parent, BlockItem) and isinstance(t.fromPort.parent, BlockItem):
                         # if isinstance(t.fromPort.parent, Connector) and not t.fromPort.parent.isVisible() or isinstance(t.toPort.parent, Connector) and not t.toPort.parent.isVisible():
+                        if type(t.fromPort.parent) is TVentil and t.fromPort in t.fromPort.parent.outputs:
+                            t.trnsysConn.insert(0, t.fromPort.parent)
+                        else:
+                            t.trnsysConn.append(t.fromPort.parent)
 
-                        t.trnsysConn.append(t.fromPort.parent)
-                        t.trnsysConn.append(t.toPort.parent)
+                        if type(t.toPort.parent) is TVentil and t.fromPort in t.toPort.parent.outputs:
+                            t.trnsysConn.insert(0, t.toPort.parent)
+                        else:
+                            t.trnsysConn.append(t.toPort.parent)
                     else:
                         f += "Error: Parent of this port is not a BlockItem" + "\n"
                         return
@@ -2896,6 +2902,16 @@ class DiagramEditor(QWidget):
         self.encodeDiagram(str(self.saveAsPath))
 
     def renameDiagram(self, newName):
+        """
+
+        Parameters
+        ----------
+        newName
+
+        Returns
+        -------
+
+        """
 
         if self.saveAsPath.name != '':
             # print("Path name is " + self.saveAsPath.name)
