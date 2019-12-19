@@ -128,12 +128,12 @@ class ConfigStorage(QDialog):
         L.addWidget(description)
         L.addWidget(tankNameLabel)
         L.addWidget(self.le)
-        L.addWidget(connectionsLabelL)
-        L.addWidget(self.leCNL)
-        L.addWidget(connectionsLabelR)
-        L.addWidget(self.leCNR)
-        L.addWidget(addSideAutoButton)
-        L.addItem(spaceVBox)
+        # L.addWidget(connectionsLabelL)
+        # L.addWidget(self.leCNL)
+        # L.addWidget(connectionsLabelR)
+        # L.addWidget(self.leCNR)
+        # L.addWidget(addSideAutoButton)
+        # L.addItem(spaceVBox)
 
         L.addLayout(qhbL)
         L.addLayout(gl)
@@ -262,7 +262,14 @@ class ConfigStorage(QDialog):
     # self.storage.updateImage(-self.h_hx)
 
     def incrSize(self):
+        self.storage.updatePortPositions(self.h_hx)
         self.storage.h += self.h_hx
+        self.storage.updateImage()
+
+    # Unused
+    def decrSize(self):
+        self.storage.updatePortPositions(self.h_hx)
+        self.storage.h -= self.h_hx
         self.storage.updateImage()
 
     def acceptedEdit(self):

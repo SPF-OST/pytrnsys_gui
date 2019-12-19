@@ -49,6 +49,27 @@ class StorageTank(BlockItem):
                 self.outputs.append(PortItem('o', 0, self))
                 self.outputs[-1].setPos(self.w + 2 * StorageTank.delta, hAbs)
 
+    def changeSize(self):
+        w = self.w
+        h = self.h
+
+        """ Resize block function """
+        delta = 4
+
+        # Limit the block size:
+        if h < 20:
+            h = 20
+        if w < 40:
+            w = 40
+
+        # center label:
+        rect = self.label.boundingRect()
+        lw, lh = rect.width(), rect.height()
+        lx = (w - lw) / 2
+        self.label.setPos(lx, h)
+
+        return w, h
+
     def setSideManualPair(self, left, hAbsI, hAbsO, **kwargs):
 
         port1 = None
@@ -245,6 +266,10 @@ class StorageTank(BlockItem):
 
             connector = Connector("Connector", "Connector", self.parent, storagePorts=side2)
             connector.displayName = "Conn" + self.displayName + sideVar + str(connector.id)
+
+            # Used for recognizing it to print the temperature of the storage ports
+            connector.inFirstRow = True
+
             connector.setVisible(False)
             self.parent.scene().addItem(connector)
             tpList.append(connector)
@@ -330,6 +355,10 @@ class StorageTank(BlockItem):
                     else:
                         print("Found a port outside that has no connection to inside")
 
+        # If tpieces were generated, the first len(side_test) ones have to be marked as firstRow
+        for x in tpList[:len(side_test)]:
+            x.inFirstRow = True
+
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
 
     def connectHxs(self, side, side2, connList, lr):
@@ -413,6 +442,10 @@ class StorageTank(BlockItem):
     def deleteHeatExchangers(self):
         pass
 
+    def updatePortPositions(self, h):
+        for p in self.inputs + self.outputs:
+            rel_h_old = p.pos().y() / self.h
+            p.setPos(p.pos().x(), rel_h_old * (self.h + h))
     # def keyPressEvent(self, event):
     #     print("Pressed st")
     #

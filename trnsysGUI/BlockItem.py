@@ -87,6 +87,8 @@ class BlockItem(QGraphicsPixmapItem):
         if self.name == 'Bvi':
             self.changeSize()
 
+        # Experimental, used for detecting genereated blocks attached to storage ports
+        self.inFirstRow = False
     def setParent(self, p):
         self.parent = p
 
@@ -344,9 +346,10 @@ class BlockItem(QGraphicsPixmapItem):
         # print(change, value)
         if change == self.ItemPositionChange:
             if self.parent.parent().snapGrid:
+                snapSize = self.parent.parent().snapSize
                 print("itemchange")
                 print(type(value))
-                value = QPointF(value.x() - value.x() % 50, value.y() - value.y() % 50)
+                value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
                 return value
             else:
                 # if self.hasElementsInYBand() and not self.elementInY() and not self.aligned:
