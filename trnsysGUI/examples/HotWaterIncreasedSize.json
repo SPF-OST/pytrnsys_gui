@@ -324,7 +324,7 @@
         "Connection-109": {
             ".__ConnectionDict__": true,
             "ConnCID": 102,
-            "ConnDisplayName": "UntitledConn102",
+            "ConnDisplayName": "PiMixTPiece",
             "ConnID": 109,
             "CornerPositions": [
                 [
@@ -691,10 +691,10 @@
             "trnsysID": 19
         },
         "IDs": {
-            "GlobalId": 172,
+            "GlobalId": 199,
             "__idDct__": true,
-            "globalConnID": 117,
-            "trnsysID": 124
+            "globalConnID": 123,
+            "trnsysID": 133
         },
         "Strings": {
             "DiagramName": "HotWaterIncreasedSize",

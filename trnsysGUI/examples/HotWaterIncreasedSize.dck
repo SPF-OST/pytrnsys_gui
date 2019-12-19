@@ -63,7 +63,7 @@ PARAMETERS 89
 2 1 0 0             !8 : PiPuCol
 10 15 0 1         !9 : PuBoiler
 3 9 0 0           !10 : PiBoilerPu
-4 7 0 0             !11 : UntitledConn102
+4 7 0 0             !11 : PiMixTPiece
 4 5 0 0             !12 : PiWTapTop
 7 6 0 0             !13 : PiWTapBottom
 15 16 0 0         !14 : HxStorageL60
@@ -72,7 +72,7 @@ PARAMETERS 89
 18 19 0 0         !17 : HxStorageL30
 1 17 0 0           !18 : PiColTes
 2 17 0 0           !19 : PiTesPu
-21 22 0 0         !20 : ConnStorageR190
+21 22 0 0         !20 : ConnStorageR217
 4 20 0 0           !21 : PiTesMix
 7 20 0 0           !22 : PiTpTes
 INPUTS 22
@@ -107,8 +107,8 @@ MfrPuBoiler_A=[450,19]
 MfrPuBoiler_B=[450,20]
 MfrPiBoilerPu_A=[450,21]
 MfrPiBoilerPu_B=[450,22]
-MfrUntitledConn102_A=[450,23]
-MfrUntitledConn102_B=[450,24]
+MfrPiMixTPiece_A=[450,23]
+MfrPiMixTPiece_B=[450,24]
 MfrPiWTapTop_A=[450,25]
 MfrPiWTapTop_B=[450,26]
 MfrPiWTapBottom_A=[450,27]
@@ -125,8 +125,8 @@ MfrPiColTes_A=[450,37]
 MfrPiColTes_B=[450,38]
 MfrPiTesPu_A=[450,39]
 MfrPiTesPu_B=[450,40]
-MfrConnStorageR190_A=[450,41]
-MfrConnStorageR190_B=[450,42]
+MfrConnStorageR217_A=[450,41]
+MfrConnStorageR217_B=[450,42]
 MfrPiTesMix_A=[450,43]
 MfrPiTesMix_B=[450,44]
 MfrPiTpTes_A=[450,45]
@@ -141,7 +141,7 @@ MfrTMix_A
 MfrTMix_B
 MfrTMix_C
 TPiTesMix
-TUntitledConn102
+TPiMixTPiece
 TPiWTapTop
 ***Initial values
 0 0 0 20 20 20 
@@ -157,7 +157,7 @@ MfrTPiece_B
 MfrTPiece_C
 TPiTpTes
 TPiWTapBottom
-TUntitledConn102
+TPiMixTPiece
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
@@ -208,26 +208,26 @@ PPiBoilerPu_kW= [454,3]/3600 !kW
 MfrPiBoilerPu= MfrPiBoilerPu_A
 
 UNIT 455 TYPE 931
-!UntitledConn102
+!PiMixTPiece
 PARAMETERS 6
-diUntitledConn102
-LUntitledConn102
-UUntitledConn102
+diPiMixTPiece
+LPiMixTPiece
+UPiMixTPiece
 RhoWat
 CPWat
 20
 INPUTS 4
 TTMix
-MfrUntitledConn102_A
+MfrPiMixTPiece_A
 TRoomStore
 TTPiece
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TUntitledConn102= [455,1]
-PUntitledConn102_kW= [455,3]/3600 !kW
-MfrUntitledConn102= MfrUntitledConn102_A
+TPiMixTPiece= [455,1]
+PPiMixTPiece_kW= [455,3]/3600 !kW
+MfrPiMixTPiece= MfrPiMixTPiece_A
 
 UNIT 456 TYPE 931
 !PiWTapTop
@@ -425,10 +425,10 @@ UPiBoilerPu=U_loop_0
 diPiPuTes=di_loop_0
 LPiPuTes=L_loop_0
 UPiPuTes=U_loop_0
-*** UntitledConn102
-diUntitledConn102=di_loop_0
-LUntitledConn102=L_loop_0
-UUntitledConn102=U_loop_0
+*** PiMixTPiece
+diPiMixTPiece=di_loop_0
+LPiMixTPiece=L_loop_0
+UPiMixTPiece=U_loop_0
 *** PiWTapTop
 diPiWTapTop=di_loop_0
 LPiWTapTop=L_loop_0
@@ -464,6 +464,6 @@ UPiTpTes=U_loop_0
 
 
 EQUATIONS 2
-PipeLoss0=PPiBoilerPu_kW+PPiPuTes_kW+PUntitledConn102_kW+PPiWTapTop_kW+PPiWTapBottom_kW+PPiPuCol_kW+PPiTesPu_kW+PPiColTes_kW+PPiTesBoiler_kW+PPiTesMix_kW+PPiTpTes_kW
+PipeLoss0=PPiBoilerPu_kW+PPiPuTes_kW+PPiMixTPiece_kW+PPiWTapTop_kW+PPiWTapBottom_kW+PPiPuCol_kW+PPiTesPu_kW+PPiColTes_kW+PPiTesBoiler_kW+PPiTesMix_kW+PPiTpTes_kW
 PipeLossTotal=PipeLoss0
 ENDS
