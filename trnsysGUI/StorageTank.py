@@ -269,10 +269,26 @@ class StorageTank(BlockItem):
 
             # Used for recognizing it to print the temperature of the storage ports
             connector.inFirstRow = True
-
             connector.setVisible(False)
+
             self.parent.scene().addItem(connector)
             tpList.append(connector)
+
+            # Check if external connections to the storagetank have storage ports as fromPorts or toPorts
+            # if side[0] has toPort at storage: connector on second place
+            # if side[0].connectionList[0].fromPort is side[0]:
+            #     c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
+            # else:
+            #     c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
+            #     pass
+            #
+            # if side[1].connectionList[0].fromPort is side[1]:
+            #     c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
+            # else:
+            #     c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
+            #     pass
+
+            # Check where the fact is used that connector is at fromPort!
 
             c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
             c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
@@ -367,8 +383,26 @@ class StorageTank(BlockItem):
 
         connector = Connector("Connector", "Connector", self.parent, storagePorts=side2)
         connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
-        c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
-        c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
+
+        if side[0].connectionList[0].fromPort is side[0]:
+            c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
+        else:
+            c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
+            pass
+
+        if side[1].connectionList[0].fromPort is side[1]:
+            c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
+        else:
+            c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
+            pass
+
+
+
+
+
+
+        # c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
+        # c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
         connList.append(connector)
         c1.displayName = side[0].connectionList[0].displayName
         c1.isStorageIO = True
