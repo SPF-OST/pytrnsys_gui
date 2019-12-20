@@ -1227,6 +1227,8 @@ class DiagramEditor(QWidget):
         self.copyGroupList = QGraphicsItemGroup()
         self.selectionGroupList = QGraphicsItemGroup()
 
+        self.printerUnitnr = 0
+
         a = 400  # Start of upmost button y-value
         b = 50  # distance between starts of button y-values
         b_start = 75
@@ -1562,6 +1564,7 @@ class DiagramEditor(QWidget):
                     else:
                         # Check if there is at least one internal connection
                         # p.name == i to only allow one temperature entry per hx
+                        # Prints the name of the Hx Connector element.
                         # Assumes that the Other port has no connection except to the storage
                         if len(p.connectionList) > 0 and p.name == 'i':
                             # f += "T" + p.connectionList[1].displayName + "=1\n"
@@ -2114,6 +2117,8 @@ class DiagramEditor(QWidget):
                     unitText += "\n"
                     f += unitText
 
+        self.printerUnitnr = unitNumber
+
         return f
 
     def exportPrintLoops(self):
@@ -2206,27 +2211,60 @@ class DiagramEditor(QWidget):
 
         lossText = lossText[:-1]
 
-        f += "EQUATIONS " + str(len(self.groupList) + 1) + "\n" + lossText + "\n" + "ENDS"
+        f += "EQUATIONS " + str(len(self.groupList) + 1) + "\n" + lossText + "\n\n"
         return f
 
-    def exportEnd1(self, unitNr, typeNr):
-        f = ''
-        text = ''
-        text += "UNIT {0} TYPE {1} \n".format(unitNr, typeNr)
-        text += "PARAMETERS 10"
-        text += "dtSim             ! 1 Printing interval\n"
-        text += "START             ! 2 Start time\n"
-        text += "STOP              ! 3 Stop time\n"
-        text += "90     ! 4 Logical unit\n"
-        text += "0     ! 5 Units printing mode\n"
-        text += "0     ! 6 Relative or absolute start time\n"
-        text += "-1     ! 7 Overwrite or Append\n"
-        text += "-1     ! 8 Print header\n"
-        text += "0     ! 9 Delimiter\n"
-        text += "1     ! 10 Print labels\n"
+    def exportPrinter(self, unitnr, descLen):
+        typenr = 25
+        printingMode = 0
+        relAbsStart = 0
+        overwriteApp = -1
+        printHeader = -1
+        delimiter = 0
+        printLabels = 1
 
-        # print(text)
-        f += text + "\n"
+        f = "ASSIGN " + self.diagramName + ".prt " + str(unitnr) + "\n\n"
+        
+        f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
+        f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
+        f += "PARAMETERS 10" + "\n"
+        f += "dtSim"
+        f += " " * (descLen - len(f)) + "! 1 Printing interval" + "\n"
+        f += "START"
+        f += " " * (descLen - len(f)) + "! 2 Start time" + "\n"
+        f += "STOP"
+        f += " " * (descLen - len(f)) + "! 3 Stop time" + "\n"
+        f += str(unitnr)
+        f += " " * (descLen - len(f)) + "! 4 Logical unit" + "\n"
+        f += str(printingMode)
+        f += " " * (descLen - len(f)) + "! 5 Units printing mode" + "\n"
+        f += str(relAbsStart)
+        f += " " * (descLen - len(f)) + "! 6 Relative or absolute start time" + "\n"
+        f += str(overwriteApp)
+        f += " " * (descLen - len(f)) + "! 7 Overwrite or Append" + "\n"
+        f += str(printHeader)
+        f += " " * (descLen - len(f)) + "! 8 Print header" + "\n"
+        f += str(delimiter)
+        f += " " * (descLen - len(f)) + "! 9 Delimiter" + "\n"
+        f += str(printLabels)
+        f += " " * (descLen - len(f)) + "! 10 Print labels" + "\n"
+        f += "\n"
+
+        s = ''
+        breakline = 0
+        for t in self.trnsysObj:
+            if isinstance(t, Connection):
+                breakline += 1
+                if breakline % 8 == 0:
+                    s += "\n"
+                s += "Mfr" + t.displayName + " "
+            if isinstance(t, TVentil):
+                breakline += 1
+                if breakline % 8 == 0:
+                    s += "\n"
+                s += "xFrac" + t.displayName + " "
+        f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\nEnds"
+
         return f
 
     def exportData(self):
@@ -2294,6 +2332,9 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportPrintLoops()
         fullExportText += self.exportPrintPipeLoops()
         fullExportText += self.exportPrintPipeLosses()
+
+        # unitnr should maybe be variable in exportData()
+        fullExportText += self.exportPrinter(self.printerUnitnr, 15)
 
         print("------------------------> END OF EXPORT <------------------------")
 
@@ -2949,6 +2990,10 @@ class DiagramEditor(QWidget):
         for c in self.trnsysObj:
             if isinstance(c, Connection) and not c.isBlockConn:
                 c.showLabel(b)
+        # Faster alternative, untested
+        # for c in self.connectionList:
+        #     if not c.isBlockConn:
+        #         c.showLabel(b)
 
     def findGroupByName(self, name):
         for g in self.groupList:
@@ -3200,6 +3245,14 @@ class MainWindow(QMainWindow):
         for p in temp:
             if p.isFromHx:
                 print("Port with parent " + str(p.parent.displayName) + "is from Hx")
+
+        res = True
+
+        for b in self.centralWidget.trnsysObj:
+            if isinstance(b, Connection) and b not in self.centralWidget.connectionList:
+                res = False
+
+        print("editor connectionList is consistent with trnsysObj: " + str(res))
 
     def openFile(self):
         print("Opening diagram")
