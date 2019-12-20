@@ -1679,20 +1679,21 @@ class DiagramEditor(QWidget):
                     temp = ""
 
                     # Here, first the outputs are printed such that the main port of diverters is printed first
-                    for o in t.outputs:
-                        # ConnectionList lenght should be max offset
-                        for c in o.connectionList:
-                            if type(c.fromPort.parent) is StorageTank and o.connectionList.index(c) == 0:
-                                continue
-                            elif type(c.toPort.parent) is StorageTank and o.connectionList.index(c) == 0:
-                                continue
-                            else:
-                                temp = temp + str(c.trnsysId) + " "
-                                t.trnsysConn.append(c)
 
                     if isinstance(t, TVentil):
                         # This is to assert that the input in front of the output is always printed before the third one
                         # More testing needed
+                        for o in t.outputs:
+                            # ConnectionList lenght should be max offset
+                            for c in o.connectionList:
+                                if type(c.fromPort.parent) is StorageTank and o.connectionList.index(c) == 0:
+                                    continue
+                                elif type(c.toPort.parent) is StorageTank and o.connectionList.index(c) == 0:
+                                    continue
+                                else:
+                                    temp = temp + str(c.trnsysId) + " "
+                                    t.trnsysConn.append(c)
+
                         for i in t.inputs:
                             # Either left or right
                             tempArr = []
@@ -1714,13 +1715,24 @@ class DiagramEditor(QWidget):
                                 t.trnsysConn.append(conn)
 
                     else:
-                        # No diverters
+                        # No diverters, no pumps
                         for i in t.inputs:
                             # ConnectionList lenght should be max offset
                             for c in i.connectionList:
                                 if type(c.fromPort.parent) is StorageTank and i.connectionList.index(c) == 0:
                                     continue
                                 elif type(c.toPort.parent) is StorageTank and i.connectionList.index(c) == 0:
+                                    continue
+                                else:
+                                    temp = temp + str(c.trnsysId) + " "
+                                    t.trnsysConn.append(c)
+
+                        for o in t.outputs:
+                            # ConnectionList lenght should be max offset
+                            for c in o.connectionList:
+                                if type(c.fromPort.parent) is StorageTank and o.connectionList.index(c) == 0:
+                                    continue
+                                elif type(c.toPort.parent) is StorageTank and o.connectionList.index(c) == 0:
                                     continue
                                 else:
                                     temp = temp + str(c.trnsysId) + " "
