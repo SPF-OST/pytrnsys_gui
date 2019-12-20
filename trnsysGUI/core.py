@@ -246,7 +246,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
                             # c.id = i["ConnID"]
                             # c.connId = i["ConnCID"]
                             # c.trnsysId = i["trnsysID"]
-                            c.displayName = i["ConnDisplayName"] + "COPY"
+                            c.setName(i["ConnDisplayName"] + "COPY")
 
                             # Note: This wouldn't allow two connections to the same port (which is not really used, but ok)
                             # fport.id = getID()
@@ -498,8 +498,8 @@ class DiagramDecoder(json.JSONDecoder):
                             c.id = i["ConnID"]
                             c.connId = i["ConnCID"]
                             c.trnsysId = i["trnsysID"]
-                            c.displayName = i["ConnDisplayName"]
-
+                            # c.displayName = i["ConnDisplayName"]
+                            c.setName(i["ConnDisplayName"])
                             c.groupName = "defaultGroup"
                             c.setConnToGroup(i["GroupName"])
 
@@ -519,7 +519,6 @@ class DiagramDecoder(json.JSONDecoder):
             return resBlockList, resConnList
 
         return arr
-
 
 # TrnsysObj are stored in a list of dictionaries
 class DiagramEncoder(json.JSONEncoder):
@@ -752,14 +751,12 @@ class DiagramEncoder(json.JSONEncoder):
             nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName}
             blockDct["Strings"] = nameDict
 
-            # groupDict = {"..__GroupDict__": True}
             for g in obj.groupList:
                 dct = {}
                 dct[".__GroupDict__"] = True
                 dct["GroupName"] = g.displayName
                 dct["Position"] = g.x, g.y
                 dct["Size"] = g.w, g.h
-                # dct["..Group-" + g.displayName] = dct
 
                 blockDct["..__GroupDct-" + g.displayName] = dct
 
@@ -1840,7 +1837,6 @@ class DiagramEditor(QWidget):
 
             counter += 1
 
-        # print("\n*** Initial Inputs *")
         f += "\n*** Initial Inputs *" + "\n"
 
         counter2 = 0
@@ -1850,13 +1846,11 @@ class DiagramEditor(QWidget):
             if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
                 continue
             if type(t) is HeatPump:
-                # print(" " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " ", end='')
                 f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
                 counter2 += 1
                 continue
             # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
             #     continue
-            # print(str(t.exportInitialInput) + " ", end='')
             f += str(t.exportInitialInput) + " "
 
             if counter2 == 8:
@@ -1871,7 +1865,6 @@ class DiagramEditor(QWidget):
             # else:
             #     print(str(t.exportInitialInput))
 
-        # print("\n")
         f += "\n"
 
         return f
@@ -1944,12 +1937,8 @@ class DiagramEditor(QWidget):
         head = "EQUATIONS {0}	! Output up to three (A,B,C) mass flow rates of each component, positive = " \
                "input/inlet, negative = output/outlet ".format(nEqUsed-1)
 
-        # print(head)
         f += head + "\n"
-        # print(tot)
         f += tot + "\n"
-
-        # print("")
         f += "\n"
 
         return f
@@ -2145,9 +2134,7 @@ class DiagramEditor(QWidget):
 
             loopText += "\n"
 
-        # print(constString + str(constsNr))
         f += constString + str(constsNr) + "\n"
-        # print(loopText)
         f += loopText + "\n"
 
         return f
@@ -2181,9 +2168,7 @@ class DiagramEditor(QWidget):
 
             loopText += "\n"
 
-        # print(equationString + str(equationNr))
         f += equationString + str(equationNr) + "\n"
-        # print(loopText)
         f += loopText + "\n"
         return f
 
@@ -2209,7 +2194,6 @@ class DiagramEditor(QWidget):
 
         lossText = lossText[:-1]
 
-        # print(lossText)
         f += "EQUATIONS " + str(len(self.groupList) + 1) + "\n" + lossText + "\n" + "ENDS"
         return f
 
@@ -2341,7 +2325,6 @@ class DiagramEditor(QWidget):
         fileCopy = [l[1:None] for l in fileCopy]
         return '\n'.join(fileCopy)
 
-
     def cleanUpExportedElements(self):
         for t in self.trnsysObj:
             if isinstance(t, BlockItem):
@@ -2372,8 +2355,6 @@ class DiagramEditor(QWidget):
     def delBlocks(self):
         # Delete the whole diagram
         while len(self.trnsysObj) > 0:
-            # print(self.trnsysObj)
-            # if isinstance(bl, BlockItem):
             print("In deleting...")
             self.trnsysObj[0].deleteBlock()
 
@@ -2689,7 +2670,6 @@ class DiagramEditor(QWidget):
 
         with open(filename, 'r') as jsonfile:
             blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)  # Working
-            # blocklist = json.load(jsonfile, object_hook=as_diagram)   # not Working
 
         print(" I got to the printer" + str(blocklist))
 
@@ -2751,7 +2731,6 @@ class DiagramEditor(QWidget):
 
         # tempList = []
         # for t in self.trnsysObj:
-
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)
@@ -2918,14 +2897,6 @@ class DiagramEditor(QWidget):
                 msgb.setText("Saved diagram at" + str(self.saveAsPath))
                 msgb.exec()
 
-
-        # print(glob.glob("*.json"))
-
-        # filesInDir = glob.glob()
-        # if filename in filesInDir:
-        #     QMessageBox(self, "Warning", "This diagram name exists already. Please rename this diagram")
-        # else:
-
     def saveAs(self):
         self.saveAsPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
         self.diagramName = self.saveAsPath.stem
@@ -2963,8 +2934,9 @@ class DiagramEditor(QWidget):
         groupsEditor(self)
 
     def setConnLabelVis(self, b):
-        for c in self.connectionList:
-            c.showLabel(b)
+        for c in self.trnsysObj:
+            if isinstance(c, Connection) and not c.isBlockConn:
+                c.showLabel(b)
 
     def findGroupByName(self, name):
         for g in self.groupList:
@@ -3076,8 +3048,6 @@ class MainWindow(QMainWindow):
         self.s1Menu.addAction(multipleDeleteAction)
         self.s1Menu.addAction(toggleSnapAction)
         self.s1Menu.addAction(toggleAlignModeAction)
-        self.s1Menu.addAction("Place4")
-        self.s1Menu.addAction("Place5")
 
         self.mb.addMenu(self.s1Menu)
         self.mb.addMenu("Help")

@@ -17,7 +17,6 @@ def calcDist(p1, p2):
 
 
 class segmentItem(QGraphicsLineItem):
-    # Cant construct with Connection as parent class
     def __init__(self, startNode, endNode, parent):
         super(segmentItem, self).__init__(None)
         # print(QColor(QtCore.Qt.red).red())
@@ -27,7 +26,7 @@ class segmentItem(QGraphicsLineItem):
         self.dragged = False
         self.initialised = False
         self.parent = parent
-        print("seg parent is " + str(self.parent))
+        # print("seg parent is " + str(self.parent))
         self.firstChild = None
         self.secondChild = None
         self.cornerChild = None
@@ -72,7 +71,7 @@ class segmentItem(QGraphicsLineItem):
         # self.parent.parent.diagramScene.addItem(self.label)
         # self.label.setPos(self.parent.fromPort.scenePos())
         self.label.setVisible(False)
-
+        self.label.setFlag(self.ItemIsMovable, True)
         # if len(self.parent.segments) > 1:
         #     self.label.setVisible(False)
         # print("line has start point " + str(self.line().p1()))
