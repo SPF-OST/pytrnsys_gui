@@ -1884,6 +1884,8 @@ class DiagramEditor(QWidget):
 
         prefix = "Mfr"
         equationNumber = 1
+        nEqUsed = 1 #DC
+
         tot = ""
 
         # counter = 1
@@ -1908,7 +1910,8 @@ class DiagramEditor(QWidget):
                                str(equationNumber) + "]\n"
                         tot += temp
                         t.exportEquations.append(temp)
-                        equationNumber += 1
+                        nEqUsed += 1 #DC
+                    equationNumber += 1 #DC-ERROR it should count anyway
 
                 for i in range(0, 3):
 
@@ -1917,7 +1920,8 @@ class DiagramEditor(QWidget):
                                str(simulationUnit) + "," + str(equationNumber) + "]\n"
                         tot += temp
                         t.exportEquations.append(temp)
-                        equationNumber += 1
+                        nEqUsed += 1 #DC
+                    equationNumber += 1 #DC-ERROR it should count anyway
                 continue
 
             for i in range(0, 3):
@@ -1927,16 +1931,18 @@ class DiagramEditor(QWidget):
                     tot += temp
                     t.exportEquations.append(temp)
                     equationNumber += 1
+                    nEqUsed += 1 #DC
                 else:
                     if i < 2:
                         temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
                                str(equationNumber) + "]\n"
                         tot += temp
                         t.exportEquations.append(temp)
-                        equationNumber += 1
+                        nEqUsed += 1 #DC
+                    equationNumber += 1#DC-ERROR it should count anyway
 
-        head = "EQUATIONS {0}	!! Output up to three (A,B,C) mass flow rates of each component, positive = " \
-               "input/inlet, negative = output/outlet ".format(equationNumber-1)
+        head = "EQUATIONS {0}	! Output up to three (A,B,C) mass flow rates of each component, positive = " \
+               "input/inlet, negative = output/outlet ".format(nEqUsed-1)
 
         # print(head)
         f += head + "\n"
