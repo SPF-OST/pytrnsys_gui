@@ -1,8 +1,8 @@
 from math import atan, sqrt, acos
 
-from PyQt5.QtCore import QLineF, QPointF
+from PyQt5.QtCore import QLineF, QPointF, QTimer, QRect, QRectF
 from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsTextItem
+from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsRectItem
 
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
@@ -111,7 +111,7 @@ class Connection(object):
         print("Port 2 is " + str(self.toPort))
 
         # self.parent = loadParent
-        self.initSegmentM0()
+        self.initSegmentM1()
 
         self.parent.trnsysObj.append(self)
 
@@ -193,6 +193,15 @@ class Connection(object):
 
             self.parent.diagramScene.addItem(s)
 
+        self.firstS = self.segments[0]
+
+        self.positionLabel()
+
+    def setName(self, newName):
+        self.displayName = newName
+        for s in self.segments:
+            s.label.setPlainText(newName)
+
     def correctPorts(self):
         if isinstance(self.fromPort.parent, Pump):
             if self.fromPort.name == 'i':
@@ -258,14 +267,21 @@ class Connection(object):
             self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
 
         elif self.parent.editorMode == 1:
-            print("changing label pos in emode 1")
+            print("changing label pos in editor mode 1")
             if self.fromPort.side == 0:
-                self.firstS.label.setPos(self.fromPort.pos() + QPointF(-60, -30))
+                # self.firstS.label.setPos(self.fromPort.pos() + QPointF(-60, -30))
+                self.firstS.label.setPos(QPointF(-60, 0))
                 # self.firstS.label.setVisible(True)
 
             # Here the behavior of positioning can be improved
             elif self.fromPort.side in [1, 2, 3]:
-                self.firstS.label.setPos(self.fromPort.pos() + QPointF(-40, -30))
+                # self.firstS.label.setPos(self.fromPort.pos() + QPointF(-40, -30))
+                self.firstS.label.setPos(QPointF(20, 0))
+                # Working out label positioning
+                # if len(self.firstS.label.collidingItems()) > 0:
+                #     self.parent.diagramScene.addItem(QGraphicsRectItem(self.firstS.label.boundingRect(), self.fromPort) )
+                #     print(self.firstS.label.collidingItems())
+                #     print("Not well suited place for " + self.displayName)
                 # self.firstS.label.setVisible(True)
         else:
             pass

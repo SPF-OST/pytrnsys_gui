@@ -125,6 +125,10 @@ class BlockItem(QGraphicsPixmapItem):
     def setId(self, newId):
         self.id = newId
 
+    def setName(self, newName):
+        self.displayName = newName
+        self.label.setPlainText(newName)
+
     def launchNotepadFile(self):
         print("Launching notpad")
         global FilePath
