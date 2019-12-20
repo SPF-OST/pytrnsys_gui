@@ -16,7 +16,8 @@ class CornerItem(QGraphicsEllipseItem):
         self.setBrush(QBrush(QtCore.Qt.black))
         self.node = Node(self, prevNode, nextNode)
 
-        self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
+        # self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
+        # self.setFlag(self.ItemIsMovable, False)
 
         self.posCallbacks = []
 

@@ -142,7 +142,7 @@ class Connection(object):
             print("Corner" + str(cor) + " has  " + str(cor.node))
 
             cor.setPos(float(self.cornersLoad[x][0]), float(self.cornersLoad[x][1]))
-            cor.setFlags(cor.ItemIsSelectable | cor.ItemIsMovable)
+            # cor.setFlags(cor.ItemIsSelectable | cor.ItemIsMovable)
             cor.setFlag(cor.ItemSendsScenePositionChanges, True)
 
             cor.setZValue(100)
