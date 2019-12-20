@@ -186,7 +186,7 @@
             "GroupName": "defaultGroup",
             "HxList": [
                 {
-                    "DisplayName": "HxTop23",
+                    "DisplayName": "HxBoiler",
                     "Height": 20.0,
                     "ID": 23,
                     "Offset": [
@@ -201,7 +201,7 @@
                     "connTrnsysID": 9
                 },
                 {
-                    "DisplayName": "HxBottom29",
+                    "DisplayName": "HxSolar",
                     "Height": 20.0,
                     "ID": 29,
                     "Offset": [
@@ -271,9 +271,9 @@
                     -616.4
                 ],
                 [
-                    -922.0,
-                    -616.4,
                     -977.5,
+                    -616.4,
+                    -922.0,
                     -616.4
                 ]
             ],
@@ -329,34 +329,34 @@
             "CornerPositions": [
                 [
                     -488.5,
-                    -570.316
+                    -389.0
                 ],
                 [
                     -488.5,
-                    -389.0
+                    -570.316
                 ]
             ],
             "GroupName": "defaultGroup",
-            "PortFromID": 12,
-            "PortToID": 21,
+            "PortFromID": 21,
+            "PortToID": 12,
             "SegmentPositions": [
-                [
-                    -488.0,
-                    -570.316,
-                    -488.5,
-                    -570.316
-                ],
-                [
-                    -488.5,
-                    -570.316,
-                    -488.5,
-                    -389.0
-                ],
                 [
                     -488.0,
                     -389.0,
                     -488.5,
                     -389.0
+                ],
+                [
+                    -488.5,
+                    -389.0,
+                    -488.5,
+                    -570.316
+                ],
+                [
+                    -488.5,
+                    -570.316,
+                    -488.0,
+                    -570.316
                 ]
             ],
             "isBlockConn": false,
@@ -365,7 +365,7 @@
         "Connection-112": {
             ".__ConnectionDict__": true,
             "ConnCID": 103,
-            "ConnDisplayName": "PiDheDemand",
+            "ConnDisplayName": "PiDhwDemand",
             "ConnID": 112,
             "CornerPositions": [
                 [
@@ -411,44 +411,44 @@
             "CornerPositions": [
                 [
                     -385.0,
-                    -347.575
+                    -308.0
                 ],
                 [
                     -385.0,
-                    -308.0
+                    -347.575
                 ]
             ],
             "GroupName": "defaultGroup",
-            "PortFromID": 20,
-            "PortToID": 17,
+            "PortFromID": 17,
+            "PortToID": 20,
             "SegmentPositions": [
                 [
-                    -455.0,
-                    -347.575,
-                    -385.0,
-                    -347.575
-                ],
-                [
-                    -385.0,
-                    -347.575,
+                    -329.0,
+                    -308.0,
                     -385.0,
                     -308.0
                 ],
                 [
                     -385.0,
                     -308.0,
-                    -329.0,
-                    -308.0
+                    -385.0,
+                    -347.575
+                ],
+                [
+                    -385.0,
+                    -347.575,
+                    -455.0,
+                    -347.575
                 ]
             ],
             "isBlockConn": false,
             "trnsysID": 105
         },
-        "Connection-35": {
+        "Connection-310": {
             ".__ConnectionDict__": true,
-            "ConnCID": 3,
+            "ConnCID": 150,
             "ConnDisplayName": "PiColIn",
-            "ConnID": 35,
+            "ConnID": 310,
             "CornerPositions": [
                 [
                     -1000.0,
@@ -476,14 +476,14 @@
                     -350.0
                 ],
                 [
-                    -1046.0,
-                    -350.0,
                     -1000.0,
+                    -350.0,
+                    -1046.0,
                     -350.0
                 ]
             ],
             "isBlockConn": false,
-            "trnsysID": 11
+            "trnsysID": 172
         },
         "Connection-38": {
             ".__ConnectionDict__": true,
@@ -493,34 +493,34 @@
             "CornerPositions": [
                 [
                     -822.0,
-                    -349.4
+                    -410.0
                 ],
                 [
                     -822.0,
-                    -410.0
+                    -349.4
                 ]
             ],
             "GroupName": "defaultGroup",
-            "PortFromID": 5,
-            "PortToID": 31,
+            "PortFromID": 31,
+            "PortToID": 5,
             "SegmentPositions": [
                 [
-                    -886.0,
-                    -349.4,
-                    -822.0,
-                    -349.4
-                ],
-                [
-                    -822.0,
-                    -349.4,
+                    -758.0,
+                    -410.0,
                     -822.0,
                     -410.0
                 ],
                 [
                     -822.0,
                     -410.0,
-                    -758.0,
-                    -410.0
+                    -822.0,
+                    -349.4
+                ],
+                [
+                    -822.0,
+                    -349.4,
+                    -886.0,
+                    -349.4
                 ]
             ],
             "isBlockConn": false,
@@ -640,9 +640,9 @@
                     -598.696
                 ],
                 [
-                    -526.0,
-                    -598.696,
                     -575.0,
+                    -598.696,
+                    -526.0,
                     -598.696
                 ]
             ],
@@ -691,10 +691,10 @@
             "trnsysID": 19
         },
         "IDs": {
-            "GlobalId": 228,
+            "GlobalId": 313,
             "__idDct__": true,
-            "globalConnID": 131,
-            "trnsysID": 144
+            "globalConnID": 151,
+            "trnsysID": 173
         },
         "Strings": {
             "DiagramName": "HotWaterIncreasedSize",
