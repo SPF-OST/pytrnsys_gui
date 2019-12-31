@@ -14,7 +14,7 @@ class HeatExchanger(QGraphicsItemGroup):
     def __init__(self, side, sizeW, sizeH, offset, parent, name='Untitled', **kwargs):
         super(HeatExchanger, self).__init__(parent)
         self.parent = parent
-        self.offset = offset  # QPointF expected
+        self.offset = offset  # QPointF
         self.lines = []
         self.w = sizeW
         self.h = sizeH
@@ -161,7 +161,8 @@ class HeatExchanger(QGraphicsItemGroup):
     def drawHxR(self, param, factor):
         s = self.offset
         delta = 4
-        # set bb = True for equal amount of lines
+        # set bb = True for equal amount of line segments between the ports
+
         bb = False
         if bb:
             lineTop = QGraphicsLineItem(s.x() + 2 * delta, s.y() + 0, s.x() - self.w, s.y() + 0, self)
@@ -219,7 +220,6 @@ class HeatExchanger(QGraphicsItemGroup):
 
             # self.rectangle.setPos(lineTop.line().p2().x(), lineTop.line().p2().y())
 
-
     def floorHeight(self):
         delta = 4
         # Could be used if static partH would be used for the heatexchanger
@@ -258,6 +258,29 @@ class HeatExchanger(QGraphicsItemGroup):
         for ch in self.childItems():
             if isinstance(ch, QGraphicsLineItem):
                 ch.setPen(QPen(Qt.black, 2))
+
+    def updateLines(self, h):
+        self.removeLines()
+        print("p1 pos " + str(self.port1.pos()))
+        print("p2 pos " + str(self.port2.pos()))
+
+        self.setPos(self.x(), self.port1.pos().y())
+        self.h = self.port2.pos().y() - self.port1.pos().y()
+
+        self.offset = QPointF(0, self.port1.pos().y())
+        # self.rectangle = QGraphicsRectItem(0, 0, self.w -5, self.h, self)
+
+        self.drawHx(6, 0.4)
+
+        # if len(self.lines) == 0:
+        #     self.drawHx(6, 0.4)
+        # else:
+        #     print("Lines is not empty")
+
+    def removeLines(self):
+        while len(self.lines) != 0:
+            self.parent.parent.parent().diagramScene.removeItem(self.lines[0])
+            self.lines.remove(self.lines[0])
 
     def mousePressEvent(self, event):
         self.highlightHx()

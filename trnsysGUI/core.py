@@ -15,6 +15,8 @@ from pathlib import Path
 # from trnsysGUI.CircularDep import *
 # from trnsysGUI.Connection import Connection
 from trnsysGUI.GenericBlock import GenericBlock
+from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
+from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
@@ -57,13 +59,30 @@ __status__ = "Prototype"
 cssSs = open("res/style.txt", "r")
 
 def calcDist(p1, p2):
+    """
+
+    Parameters
+    ----------
+    p1
+    :type p1: QPointF
+    p2
+    :type p2: QPointF
+
+    Returns
+    -------
+
+    """
     vec = p1 - p2
     norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
     return norm
 
 
 class DiagramDecoderPaste(json.JSONDecoder):
-    # Decodes the clipboard
+    """
+    Decodes the clipboard.
+    It creates the copied blocks with suffix COPY, it does not set the ids forward.
+
+    """
     def __init__(self, *args, **kwargs):
         self.editor = kwargs["editor"]
         kwargs.pop("editor")
@@ -267,7 +286,9 @@ class DiagramDecoderPaste(json.JSONDecoder):
 
 
 class DiagramDecoder(json.JSONDecoder):
-    # Decodes the diagram
+    """
+    Decodes the diagram
+    """
     def __init__(self, *args, **kwargs):
         self.editor = kwargs["editor"]
         kwargs.pop("editor")
@@ -520,10 +541,26 @@ class DiagramDecoder(json.JSONDecoder):
 
         return arr
 
-# TrnsysObj are stored in a list of dictionaries
+
 class DiagramEncoder(json.JSONEncoder):
-    # Encodes the diagram (entire diagram or clipboard
+    """
+    This class encodes the diagram (entire diagram or clipboard)
+    obj is passed along to get some of the diagram editor porperties, for instance the id-generator
+    TrnsysObj are stored in a list of dictionaries.
+    """
+
     def default(self, obj):
+        """
+
+        Parameters
+        ----------
+        obj
+        :type obj: DiagramEditor
+
+        Returns
+        -------
+
+        """
         if isinstance(obj, DiagramEditor) or isinstance(obj, copyGroup):
             print("Is diagram or copygroup")
 
@@ -769,6 +806,12 @@ class DiagramEncoder(json.JSONEncoder):
 
 
 class DiagramScene(QGraphicsScene):
+    """
+    This class serves as container for QGraphicsItems and is used in combination with the DiagramView to display the
+    diagram.
+    It contains a rectangle for copy-paste or selecting multiple items.
+
+    """
     def __init__(self, parent=None):
         # Static size
         # super(DiagramScene, self).__init__(QRectF(0, 0, parent.height(), 1500), parent)
@@ -988,6 +1031,9 @@ class DiagramScene(QGraphicsScene):
 
 
 class EditorGraphicsView(QGraphicsView):
+    """
+    Displays the items from the DiagramScene. Can be zoomed and have a
+    """
     def __init__(self, scene, parent=None):
         QGraphicsView.__init__(self, scene, parent)
         # self.setMinimumSize(self.parent().horizontalLayout.height, 700)
@@ -1129,6 +1175,41 @@ class EditorGraphicsView(QGraphicsView):
 
 
 class DiagramEditor(QWidget):
+    """
+    This class is the central widget of the MainWindow.
+    It contains the items library, diagram graphics scene and graphics view, and the inspector widget
+
+    Function of Connections:
+    Logically:
+    A Connection is composed of a fromPort and a toPort, which gives the direction of the pipe.
+    Ports are attached to Blocks.
+    Initially, there is a temporary fromPort set to None.
+    As soon any Port is clicked and dragged, tempStartPort is set to that Port and startedConnectino is set to True.
+    If the mouse is then released over a Port, a Connection is created, otherwise startedConnection is set to False
+    and the process is interrupted.
+    Visually:
+    A diagram editor has a QGraphicsLineItem (connLineItem) which is set Visible only when a connection is being created
+
+    Function of BlockItems:
+    Items can be added to the library by adding them to the model of the library broswer view.
+    Then they can be dragged and dropped into the diagram view.
+
+    Function of trnsysExport:
+    When exporting the trnsys file, exportData() is called.
+
+    Function of save and load:
+    A diagram can be saved to a json file by calling encodeDiagram and can then be loaded by calling decodeDiagram wiht
+    appropiate filenames.
+
+    Function of copy-paste:
+    Copying a rectangular part of the diagram to the clipboard is just encoding the diagram to the file clipboard.json,
+    and pasting will load the clipboard using a slighly different decoder than for loading an entire diagram.
+    When the elements are pasted, they compose a group which can be dragged around and is desintegrated when the mouse
+    is released.
+    It is controlled by the attributes selectionMode, groupMode, copyMode and multipleSelectedMode
+
+
+    """
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
 
@@ -1159,9 +1240,8 @@ class DiagramEditor(QWidget):
         self.libraryBrowserView.setResizeMode(QListView.Adjust)
         self.libraryModel.setColumnCount(0)
 
-        # OLD: Library icon creation
-        # pixmap = QPixmap(60, 60)
-        # self.create_icon(pixmap)
+        self.datagen = PipeDataHandler(self)
+        #self.mfVis = MassFlowVisualizer(self)
 
         self.libItems = []
         # r_folder = "res\\"
@@ -2995,6 +3075,11 @@ class DiagramEditor(QWidget):
         #     if not c.isBlockConn:
         #         c.showLabel(b)
 
+    def updateConnGrads(self):
+        for t in self.trnsysObj:
+            if isinstance(t, Connection):
+                t.updateSegGrads()
+
     def findGroupByName(self, name):
         for g in self.groupList:
             if g.displayName == name:
@@ -3008,6 +3093,13 @@ class DiagramEditor(QWidget):
 
 
 class MainWindow(QMainWindow):
+    """
+    This is the class containing the entire GUI window
+
+    It has a menubar, a central widget and a message bar at the bottom. The central widget is
+    the QWidget subclass containing the items library, the diagram editor and the element inspector
+    listview.
+    """
 
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -3073,6 +3165,10 @@ class MainWindow(QMainWindow):
         toggleAlignModeAction = QAction("Toggle align mode", self)
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
+
+        openVisualizerAction = QAction(QIcon('images/controller.png'), "Start visualization of mass flows",self)
+        openVisualizerAction.triggered.connect(self.visualizeMf)
+
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
@@ -3128,6 +3224,7 @@ class MainWindow(QMainWindow):
         selectTb.addAction(toggleConnLabels)
         selectTb.addAction(editGroupsAction)
         selectTb.addAction(selectMultipleAction)
+        selectTb.addAction(openVisualizerAction)
         selectTb.addAction(trnsysList)
 
         self.sb = self.statusBar()
@@ -3253,6 +3350,10 @@ class MainWindow(QMainWindow):
                 res = False
 
         print("editor connectionList is consistent with trnsysObj: " + str(res))
+
+    def visualizeMf(self):
+        self.centralWidget.datagen.generateData()
+        MassFlowVisualizer(self.centralWidget)
 
     def openFile(self):
         print("Opening diagram")

@@ -140,7 +140,6 @@ class StorageTank(BlockItem):
             c.id = kwargs["connId"]
             c.connId = kwargs["connCid"]
             c.trnsysId = kwargs["trnsysConnId"]
-
             return c
 
     def setLeftSideManual(self, s, hAbs):
@@ -478,6 +477,11 @@ class StorageTank(BlockItem):
         for p in self.inputs + self.outputs:
             rel_h_old = p.pos().y() / self.h
             p.setPos(p.pos().x(), rel_h_old * (self.h + h))
+
+    def updateHxLines(self, h):
+        for hx in self.heatExchangers:
+            hx.updateLines(h)
+
     # def keyPressEvent(self, event):
     #     print("Pressed st")
     #
