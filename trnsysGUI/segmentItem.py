@@ -213,7 +213,7 @@ class segmentItem(QGraphicsLineItem):
                         self.startNode.parent.setPos(newPos.x(), self.startNode.parent.scenePos().y())
                         self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
                                      self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
-
+                        self.updateGrad()
                     if self.isHorizontal():
                         print("Segment is vertical")
                         self.endNode.parent.setPos(self.endNode.parent.scenePos().x(), newPos.y())

@@ -451,6 +451,9 @@ class Connection(object):
 
             corner1.setZValue(100)
             corner2.setZValue(100)
+            self.fromPort.setZValue(100)
+            self.toPort.setZValue(100)
+            print("Here in niceconn")
 
             corner1.setPos(help_point_1)
             corner2.setPos(help_point_2)

@@ -1,7 +1,8 @@
 from PyQt5 import QtCore
-from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtCore import QRectF, Qt, QPointF
 from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QMenu
+
 
 # from trnsysGUI.test import getID
 
@@ -55,6 +56,9 @@ class PortItem(QGraphicsEllipseItem):
         self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setAcceptHoverEvents(True)
 
+        self.savePos = None
+        self.savedPos = False
+
     def setParent(self, p):
         self.parent = p
         self.setParentItem(p)
@@ -67,6 +71,14 @@ class PortItem(QGraphicsEllipseItem):
         # print(str(self.scene()))    # Prints object of type diagramScene, ok
         # print(str(self.scene().items))  # Error that NoneType object has no attribute 'items'
         # Sometimes scene is None!
+
+        if self.parent.parent.parent().moveHxPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
+            if not self.savePos is None:
+                print("val is " + str(value))
+                value.setY(max(value.y(), 0))
+                value.setY(min(value.y(), self.parent.h))
+
+                return QPointF(self.savePos.x(), value.y())
 
         if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 0:
             for conn in self.connectionList:
@@ -81,8 +93,6 @@ class PortItem(QGraphicsEllipseItem):
                     e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(),
                               e.line().p2().y())
 
-
-
                 if conn.toPort is self:
                     # print("This port is the ending port of connection")
                     # nextNodeInConn = conn.endNode.prevN()
@@ -93,8 +103,6 @@ class PortItem(QGraphicsEllipseItem):
                     # New
                     e = conn.segments[-1]
                     e.setLine(e.line().p1().x(), e.line().p1().y(), self.scenePos().x(), self.scenePos().y())
-
-
 
                 # global pasting
                 if not self.parent.parent.parent().pasting:
@@ -131,7 +139,11 @@ class PortItem(QGraphicsEllipseItem):
         return super(PortItem, self).itemChange(change, value)
 
     def mousePressEvent(self, event):
-        self.scene().parent().startConnection(self)
+        if self.parent.parent.parent().moveHxPorts and hasattr(self.parent, 'heatExchangers'):
+            self.setFlag(self.ItemIsMovable)
+            self.savePos = self.pos()
+        else:
+            self.scene().parent().startConnection(self)
 
     def hoverEnterEvent(self, event):
         # print("Hovering")
@@ -146,7 +158,6 @@ class PortItem(QGraphicsEllipseItem):
             # self.setBrush(QColor(Qt.blue))
             # self.outerRing.setBrush(QColor(Qt.blue))
             self.outerRing.setBrush(QColor(0,0,0))
-
 
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")
@@ -166,3 +177,32 @@ class PortItem(QGraphicsEllipseItem):
                 # self.outerRing.setBrush(self.ashColorB)
                 self.outerRing.setBrush(QColor(0, 0, 0))
 
+    def deleteDirectPorts(self):
+        print("Deleting direct ports")
+
+    def mouseDoubleClickEvent(self, event):
+        print("double clicked")
+        if hasattr(self.parent, 'heatExchangers') and not self.isFromHx:
+            self.deleteHxPortPair()
+
+    def deleteHxPortPair(self):
+        if self.connectionList[0].fromPort is self:
+            self.deletePort(self.connectionList[0].toPort)
+        elif self.connectionList[0].toPort is self:
+            self.deletePort(self.connectionList[0].fromPort)
+        else:
+            print("Something wrong")
+
+        self.deletePort(self)
+
+    def deletePort(self, obj):
+        while len(obj.connectionList) > 0:
+            obj.connectionList[0].deleteConn()
+
+        if obj in obj.parent.inputs:
+            obj.parent.inputs.remove(obj)
+
+        if obj in obj.parent.outputs:
+            obj.parent.outputs.remove(obj)
+
+        obj.parent.parent.scene().removeItem(obj)

@@ -926,7 +926,9 @@ class DiagramScene(QGraphicsScene):
 
     def keyPressEvent(self, event):
         pass
-        # if event.key() == Qt.Key_A:
+        if event.key() == Qt.Key_L:
+            self.parent().moveHxPorts = not self.parent().moveHxPorts
+            print("Changing move bool to " + str(self.parent().moveHxPorts))
         #     print("Toggling mode")
         #     # global editorMode
         #     self.parent().editorMode = (self.parent().editorMode + 1) % 2
@@ -1242,6 +1244,8 @@ class DiagramEditor(QWidget):
 
         self.datagen = PipeDataHandler(self)
         #self.mfVis = MassFlowVisualizer(self)
+
+        self.moveHxPorts = False
 
         self.libItems = []
         # r_folder = "res\\"

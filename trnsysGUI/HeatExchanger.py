@@ -31,6 +31,8 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port1 = PortItem('i', self.sSide, self.parent)
         self.port2 = PortItem('o', self.sSide, self.parent)
 
+
+
         self.port1.isFromHx = True
         self.port2.isFromHx = True
 

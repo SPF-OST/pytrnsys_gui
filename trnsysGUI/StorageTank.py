@@ -99,9 +99,11 @@ class StorageTank(BlockItem):
 
         if port1 is None:
             port1 = PortItem('i', sideNr, self)
+            port1.setZValue(100)
 
         if port2 is None:
             port2 = PortItem('o', sideNr, self)
+            port2.setZValue(100)
 
         self.inputs.append(port1)
         self.outputs.append(port2)
