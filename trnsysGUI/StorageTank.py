@@ -30,6 +30,8 @@ class StorageTank(BlockItem):
         self.hxInsideConnsLeft = []
         self.hxInsideConnsRight = []
 
+        self.changeSize()
+
     # Unused
     def setSideManual(self, left, s, hAbs):
         if left:

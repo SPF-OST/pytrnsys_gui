@@ -192,7 +192,6 @@ class PortItem(QGraphicsEllipseItem):
             self.deletePort(self.connectionList[0].fromPort)
         else:
             print("Something wrong")
-
         self.deletePort(self)
 
     def deletePort(self, obj):
