@@ -101,6 +101,7 @@ class HeatExchanger(QGraphicsItemGroup):
             self.drawHxR(param, factor)
 
     def drawHxL(self, param, factor):
+        # self.offset is the height of the first port
         s = self.offset
         delta = 4
         # set bb = True for equal amount of lines
@@ -261,21 +262,15 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def updateLines(self, h):
         self.removeLines()
-        print("p1 pos " + str(self.port1.pos()))
-        print("p2 pos " + str(self.port2.pos()))
 
-        self.setPos(self.x(), self.port1.pos().y())
         self.h = self.port2.pos().y() - self.port1.pos().y()
 
-        self.offset = QPointF(0, self.port1.pos().y())
-        # self.rectangle = QGraphicsRectItem(0, 0, self.w -5, self.h, self)
+        if self.sSide == 0:
+            self.offset = QPointF(0, self.port1.pos().y())
+        else:
+            self.offset = QPointF(self.parent.w, self.port1.pos().y())
 
         self.drawHx(6, 0.4)
-
-        # if len(self.lines) == 0:
-        #     self.drawHx(6, 0.4)
-        # else:
-        #     print("Lines is not empty")
 
     def removeLines(self):
         while len(self.lines) != 0:
