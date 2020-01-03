@@ -14,6 +14,8 @@ from pathlib import Path
 
 # from trnsysGUI.CircularDep import *
 # from trnsysGUI.Connection import Connection
+from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
+
 from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
@@ -44,6 +46,7 @@ from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.copyGroup import copyGroup
 from trnsysGUI.IdGenerator import IdGenerator
 from trnsysGUI.Connection import Connection
+from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import *
@@ -929,6 +932,7 @@ class DiagramScene(QGraphicsScene):
         if event.key() == Qt.Key_L:
             self.parent().moveHxPorts = not self.parent().moveHxPorts
             print("Changing move bool to " + str(self.parent().moveHxPorts))
+
         #     print("Toggling mode")
         #     # global editorMode
         #     self.parent().editorMode = (self.parent().editorMode + 1) % 2
@@ -1097,6 +1101,8 @@ class EditorGraphicsView(QGraphicsView):
             bl.setPos(p1)
             self.scene().addItem(bl)
 
+            bl.oldPos = bl.scenePos()
+
             # Debug parent of blockitem
             # print("scene items" + str(self.scene().items()))
             # print("scene parent" + str(self.scene().parent()))
@@ -1141,6 +1147,10 @@ class EditorGraphicsView(QGraphicsView):
 
         super(EditorGraphicsView, self).mousePressEvent(event)
 
+    def deleteBlockCom  (self, bl):
+        command = DeleteBlockCommand(bl, "Delete block command")
+        print("Deleted block")
+        self.parent().parent().undoStack.push(command)
     # def drawBackground(self, painter_, rect):
     #
     #     mCellSize_w = 15
@@ -1439,7 +1449,9 @@ class DiagramEditor(QWidget):
         # print("Creating connection...")
         if startPort is not endPort:
             # if len(endPort.connectionList) == 0:
-            Connection(startPort, endPort, False, self)
+            # Connection(startPort, endPort, False, self)
+            command = CreateConnectionCommand(startPort, endPort, False, self, "CreateConn Command")
+            self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
         if self.startedConnection:
@@ -3232,8 +3244,20 @@ class MainWindow(QMainWindow):
         selectTb.addAction(trnsysList)
 
         self.sb = self.statusBar()
-        # sb.setToolTip("hi")
         self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
+
+        self.undoStack = QUndoStack(self)
+        undoAction = self.undoStack.createUndoAction(self, "Undo")
+        undoAction.setShortcut("Ctrl+z")
+
+        redoAction = self.undoStack.createRedoAction(self, "Redo")
+        redoAction.setShortcut("Ctrl+y")
+
+        self.s1Menu.addAction(undoAction)
+        self.s1Menu.addAction(redoAction)
+
+        # self.undowidget = QUndoView(self.undoStack, self)
+        # self.undowidget.setMinimumSize(300, 100)
 
     def newDia(self):
         print("Creating new diagram")

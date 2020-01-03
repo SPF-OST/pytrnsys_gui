@@ -2,7 +2,7 @@ from math import atan, sqrt, acos
 
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsTextItem
+from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
@@ -676,6 +676,10 @@ class Connection(object):
         self.parent.connectionList.remove(self)
         del self
 
+    def deleteConnCom(self):
+        command = DeleteConnectionCommand(self, "Delete conn comand")
+        self.parent.parent().undoStack.push(command)
+
     def buildBridges(self):
         # This function finds the colliding line segments and creates the interrupted line effect
 
@@ -981,3 +985,19 @@ class Connection(object):
         for s in self.segments:
             s.updateGrad()
 
+
+class DeleteConnectionCommand(QUndoCommand):
+    def __init__(self, conn, descr):
+        super(DeleteConnectionCommand, self).__init__(descr)
+        self.conn = conn
+        self.connFromPort = self.conn.fromPort
+        self.connToPort = self.conn.toPort
+        self.connIsBlock = self.conn.isBlockConn
+        self.connParent = self.conn.parent
+
+    def redo(self):
+        self.conn.deleteConn()
+        self.conn = None
+
+    def undo(self):
+        self.conn = Connection(self.connFromPort, self.connToPort, self.connIsBlock, self.connParent)

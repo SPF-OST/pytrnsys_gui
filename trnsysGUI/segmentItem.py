@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QMenu
 
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.CornerItem import CornerItem
+# from trnsysGUI.deleteConnectionCommand import DeleteConnectionCommand
 from trnsysGUI.segmentDlg import segmentDlg
 
 
@@ -17,7 +18,17 @@ def calcDist(p1, p2):
 
 
 class segmentItem(QGraphicsLineItem):
+
     def __init__(self, startNode, endNode, parent):
+        """
+
+        Parameters
+        ----------
+        startNode
+        endNode
+        parent: type(parent): Connection
+        """
+
         super(segmentItem, self).__init__(None)
         # print(QColor(QtCore.Qt.red).red())
 
@@ -553,7 +564,7 @@ class segmentItem(QGraphicsLineItem):
         a1.triggered.connect(self.renameConn)
 
         a2 = menu.addAction('Delete this connection')
-        a2.triggered.connect(self.parent.deleteConn)
+        a2.triggered.connect(self.parent.deleteConnCom)
 
         a3 = menu.addAction('Invert this connection')
         a3.triggered.connect(self.parent.invertConnection)
