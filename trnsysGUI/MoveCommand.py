@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QUndoCommand
 
 class MoveCommand(QUndoCommand):
     def __init__(self, diagramItem, oldPos, descr):
-        print("created move command")
         super(MoveCommand, self).__init__(descr)
         self.oldPos = oldPos
         self.newPos = diagramItem.scenePos()

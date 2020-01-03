@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QMenu
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.CornerItem import CornerItem
 # from trnsysGUI.deleteConnectionCommand import DeleteConnectionCommand
+from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 from trnsysGUI.segmentDlg import segmentDlg
 
 
@@ -86,6 +87,8 @@ class segmentItem(QGraphicsLineItem):
         # if len(self.parent.segments) > 1:
         #     self.label.setVisible(False)
         # print("line has start point " + str(self.line().p1()))
+
+        self.oldX = None
 
     def segLength(self):
         return calcDist(self.line().p1(), self.line().p2())
@@ -201,6 +204,9 @@ class segmentItem(QGraphicsLineItem):
 
             self.parent.highlightConn()
 
+            self.oldX = self.startNode.parent.scenePos().x()
+            print("set oldx")
+
     def mouseMoveEvent(self, e):
         # print("mouse moved")
         # print(str(e.button()))
@@ -267,6 +273,10 @@ class segmentItem(QGraphicsLineItem):
                     self.parent.parent.diagramScene.removeItem(self)
 
             elif self.parent.parent.editorMode == 1:
+                command = HorizSegmentMoveCommand(self, self.oldX, "Moving segment command")
+                self.parent.parent.parent().undoStack.push(command)
+                self.oldX = self.scenePos().x()
+
                 if self.secondCorner is not None:
                     if hasattr(self.endNode.parent, "fromPort"):
                         # self.hide()
@@ -309,6 +319,8 @@ class segmentItem(QGraphicsLineItem):
 
                     else:
                         print("getting no start or end")
+
+
             else:
                 pass
 
