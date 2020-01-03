@@ -74,22 +74,21 @@ class DeleteBlockCommand(QUndoCommand):
         else:
             bl = trnsysGUI.BlockItem.BlockItem(name, name, self.blParent)
 
-        if name != "StorageTank":
-            bl.trnsysId = self.blTrnsysId
-            bl.id = self.blId
-            bl.updateFlipStateH(self.blFlippedH)
-            bl.updateFlipStateV(self.blFlippedV)
-            bl.rotateBlockToN(self.blRotation)
-            bl.displayName = self.bldName
-            bl.label.setPlainText(bl.displayName)
+        bl.trnsysId = self.blTrnsysId
+        bl.id = self.blId
+        bl.updateFlipStateH(self.blFlippedH)
+        bl.updateFlipStateV(self.blFlippedV)
+        bl.rotateBlockToN(self.blRotation)
+        bl.displayName = self.bldName
+        bl.label.setPlainText(bl.displayName)
 
-            bl.groupName = "defaultGroup"
-            bl.setBlockToGroup(self.blGroupName)
+        bl.groupName = "defaultGroup"
+        bl.setBlockToGroup(self.blGroupName)
 
-            bl.setPos(self.blPos)
-            self.blParent.scene().addItem(bl)
+        bl.setPos(self.blPos)
+        self.blParent.scene().addItem(bl)
 
-            bl.oldPos = bl.scenePos()
+        bl.oldPos = bl.scenePos()
 
     def savePortsId(self):
         for p in self.bl.inputs:
