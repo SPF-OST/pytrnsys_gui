@@ -12,6 +12,7 @@ class TVentil(BlockItem):
         self.w = 100 * factor
         self.h = 61.14 * factor
         self.typeNumber = 3
+        self.isComplexDiv = False
 
         self.inputs.append(PortItem('o', 0, self))
         self.inputs.append(PortItem('o', 1, self))
@@ -52,3 +53,5 @@ class TVentil(BlockItem):
 
         return w, h
 
+    def setComplexDiv(self, b):
+        self.isComplexDiv = b

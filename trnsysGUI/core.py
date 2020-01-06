@@ -1722,10 +1722,44 @@ class DiagramEditor(QWidget):
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return f
+    
+    def exportDivSetting(self):
+        f = ""
+        constants = 0
+        for t in self.trnsysObj:
+            if isinstance(t, TVentil):
+                if t.isComplexDiv:
+                    constants += 1
+                    f += "T_set_" + t.displayName + "\n"
+
+        f = "CONSTANTS " + str(constants) + "\n" + f + "\n"
+
+        for t in self.trnsysObj:
+            if isinstance(t, TVentil) and t.isComplexDiv:
+                f += "UNIT X TYPE 811 ! Passive Divider for heating \n"
+                f += "PARAMETERS 1" + "\n"
+                f += "INPUTS 4 \n"
+
+                if t.outputs[0].pos().y() == t.inputs[0].pos().y() or t.outputs[0].pos().x() == t.inputs[0].pos().x():
+                    first = t.inputs[0]
+                    second = t.inputs[1]
+
+                f += "T" + first.connectionList[0].displayName + "\n"
+                f += "T" + second.connectionList[0].displayName + "\n"
+                f += "Mfr" + t.outputs[0].connectionList[0].displayName + "\n"
+
+                f += "T_set_" + t.displayName + "\n"
+                f += "*** INITIAL INPUT VALUES" + "\n"
+                f += "35.0 21.0 800.0 T_set_" + t.displayName + "\n"
+
+                f += "EQUATIONS " + str(constants) + "\n"
+                f += "xFrac" + t.displayName + " =  1.-[X,5]" + "\n"
+
+        return f + "\n"
 
     def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength, parameters, lineNr):
         # If not all ports of an object are connected, less than 4 numbers will show up
-        # TrnsysConn is an array containing the fromPort and twoPort in order as they appear in the export of connections
+        # TrnsysConn is a list containing the fromPort and twoPort in order as they appear in the export of connections
         f = ""
         f += "UNIT " + str(simulationUnit) + " TYPE " + str(simulationType) + "\n"
         f += "PARAMETERS " + str(parameters) + "\n"
@@ -2429,6 +2463,7 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportBlackBox()
         fullExportText += self.exportPumpOutlets()
         fullExportText += self.exportMassFlows()
+        fullExportText += self.exportDivSetting()
 
         fullExportText += self.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
         fullExportText += self.exportInputsFlowSolver(lineNrParameters)

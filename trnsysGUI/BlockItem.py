@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import QUndoCommand
 # from trnsysGUI.TeePiece import TeePiece
 # from trnsysGUI.WTap import WTap
 # from trnsysGUI.WTap_main import WTap_main
-
+from trnsysGUI.TVentilDlg import TVentilDlg
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -237,14 +237,15 @@ class BlockItem(QGraphicsPixmapItem):
         self.changeSize()
 
     def mouseDoubleClickEvent(self, event):
-        dia = BlockDlg(self, self.scene().parent())
+        if hasattr(self, "isComplexDiv"):
+            dia = TVentilDlg(self, self.scene().parent())
+        else:
+            dia = BlockDlg(self, self.scene().parent())
 
     def mouseReleaseEvent(self, event):
         print("Released mouse over block")
         if self.oldPos is None:
             print("For Undo Framework: oldPos is None")
-
-
         else:
             if self.scenePos() != self.oldPos:
                 print("Block was dragged")
