@@ -312,7 +312,7 @@
             "GroupName": "defaultGroup",
             "HxList": [
                 {
-                    "DisplayName": "621",
+                    "DisplayName": "HxSolar",
                     "Height": 20.0,
                     "ID": 621,
                     "Offset": [
@@ -382,9 +382,9 @@
                     -205.4
                 ],
                 [
-                    -928.0,
-                    -205.4,
                     -977.5,
+                    -205.4,
+                    -928.0,
                     -205.4
                 ]
             ],
@@ -751,9 +751,9 @@
                     -148.0
                 ],
                 [
-                    -774.0,
-                    -148.0,
                     -817.0,
+                    -148.0,
+                    -774.0,
                     -148.0
                 ]
             ],
@@ -763,7 +763,7 @@
         "Connection-604": {
             ".__ConnectionDict__": true,
             "ConnCID": 220,
-            "ConnDisplayName": "UntitledConn220",
+            "ConnDisplayName": "PiTesShOut",
             "ConnID": 604,
             "CornerPositions": [
                 [
@@ -804,7 +804,7 @@
         "Connection-607": {
             ".__ConnectionDict__": true,
             "ConnCID": 221,
-            "ConnDisplayName": "UntitledConn221",
+            "ConnDisplayName": "PiTesShIn",
             "ConnID": 607,
             "CornerPositions": [
                 [
@@ -915,9 +915,9 @@
                     -373.0
                 ],
                 [
-                    -771.0,
-                    -373.0,
                     -845.5,
+                    -373.0,
+                    -771.0,
                     -373.0
                 ]
             ],
@@ -1048,10 +1048,10 @@
             "trnsysID": 283
         },
         "IDs": {
-            "GlobalId": 647,
+            "GlobalId": 648,
             "__idDct__": true,
-            "globalConnID": 231,
-            "trnsysID": 284
+            "globalConnID": 232,
+            "trnsysID": 285
         },
         "Strings": {
             "DiagramName": "CombiSystem2Tes",
