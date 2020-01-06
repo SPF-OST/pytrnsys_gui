@@ -2106,7 +2106,7 @@ class DiagramEditor(QWidget):
             if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
                 # if t.isBlockConn and t.isStorageIO:
                 # DC-ERROR Connections don't have isVisble(), but we need to avoid printing the virtual ones here
-                if True : #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
+                if t.firstS.isVisible(): #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
                     parameterNumber = 6
                     inputNumbers = 4
 
