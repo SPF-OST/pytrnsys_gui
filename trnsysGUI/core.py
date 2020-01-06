@@ -2812,6 +2812,17 @@ class DiagramEditor(QWidget):
             json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
 
     def encodeDiagram(self, filename):
+        """
+        Encodes the diagram to a json file.
+
+        Parameters
+        ----------
+        filename : str
+
+        Returns
+        -------
+
+        """
         print("filename is at encoder" + str(filename))
         # if filename != "":
         with open(filename, 'w') as jsonfile:
@@ -2819,6 +2830,17 @@ class DiagramEditor(QWidget):
 
     def decodeDiagram(self, filename):
         # filename = 'jsonOut.json'
+        """
+        Decodes the diagram
+
+        Parameters
+        ----------
+        filename : str
+
+        Returns
+        -------
+
+        """
 
         with open(filename, 'r') as jsonfile:
             blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)  # Working
@@ -2890,9 +2912,25 @@ class DiagramEditor(QWidget):
             print("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
 
     def sortId(self, l1):
+        """
+        Sort function returning a sortable key
+        Parameters
+        ----------
+        l1 : Block/Connection
+
+        Returns
+        -------
+
+        """
         return l1.trnsysId
 
     def copyElements(self):
+        """
+        Copies elements
+        Returns
+        -------
+
+        """
         clipboardGroup = copyGroup(self)
         print(self.diagramScene.elementsInRect())
 
@@ -3191,7 +3229,7 @@ class MainWindow(QMainWindow):
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
 
-        openVisualizerAction = QAction(QIcon('images/controller.png'), "Start visualization of mass flows",self)
+        openVisualizerAction = QAction(QIcon('images/controller.png'), "Start visualization of mass flows", self)
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)

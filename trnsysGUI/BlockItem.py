@@ -391,6 +391,8 @@ class BlockItem(QGraphicsPixmapItem):
 
     def itemChange(self, change, value):
         # print(change, value)
+        # Snap grid excludes alignment
+
         if change == self.ItemPositionChange:
             if self.parent.parent().snapGrid:
                 snapSize = self.parent.parent().snapSize
