@@ -133,12 +133,12 @@ class StorageTank(BlockItem):
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
 
         if kwargs == {}:
-            Connection(port1, port2, True, self.parent.parent())
+            Connection(port1, port2, True, self.parent.parent(),visible=True)
             return
         else:
             port1.id = kwargs["fromPortId"]
             port2.id = kwargs["toPortId"]
-            c = Connection(port1, port2, True, self.parent.parent(), fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
+            c = Connection(port1, port2, True, self.parent.parent(),visible=True, fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
                            segmentsLoad=[], cornersLoad=[])
             c.displayName = kwargs["connDispName"]
             c.id = kwargs["connId"]
@@ -281,15 +281,15 @@ class StorageTank(BlockItem):
             # Check if external connections to the storagetank have storage ports as fromPorts or toPorts
             # if side[0] has toPort at storage: connector on second place
             if side[0].connectionList[0].fromPort is side[0]:
-                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
+                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(),visible=False)
             else:
-                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
+                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(),visible=False)
                 pass
 
             if side[1].connectionList[0].fromPort is side[1]:
-                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
+                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(),visible=False)
             else:
-                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
+                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(),visible=False)
                 pass
 
             # Check where the fact is used that connector is at fromPort!
@@ -320,8 +320,8 @@ class StorageTank(BlockItem):
                 self.parent.scene().addItem(tpiece)
                 tpList.append(tpiece)
 
-                c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent())
-                c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent())
+                c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent(),visible=False)
+                c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent(),visible=False)
 
                 resId = ""
                 for j in c1.displayName:
@@ -358,7 +358,7 @@ class StorageTank(BlockItem):
             h += 20
             # print(str(len(side)))
 
-        lastC = Connection(side[0], side[1], True, self.parent.parent())
+        lastC = Connection(side[0], side[1], True, self.parent.parent(),visible=False)
         lastC.firstS.setVisible(False)
         resId = ""
         for j in lastC.displayName:
@@ -390,15 +390,15 @@ class StorageTank(BlockItem):
         connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
 
         if side[0].connectionList[0].fromPort is side[0]:
-            c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
+            c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(),visible=False)
         else:
-            c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
+            c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(),visible=False)
             pass
 
         if side[1].connectionList[0].fromPort is side[1]:
-            c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
+            c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(),visible=False)
         else:
-            c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
+            c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(),visible=False)
             pass
 
 

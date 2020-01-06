@@ -22,7 +22,6 @@ class segmentItem(QGraphicsLineItem):
 
     def __init__(self, startNode, endNode, parent):
         """
-
         Parameters
         ----------
         startNode

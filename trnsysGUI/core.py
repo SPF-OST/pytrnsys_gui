@@ -1675,6 +1675,7 @@ class DiagramEditor(QWidget):
                             if p.connectionList[1].fromPort is p:
                                 f += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
                             else:
+                                #Here the Hx name is printed.
                                 f += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
 
                             equationNr += 1
@@ -1693,7 +1694,9 @@ class DiagramEditor(QWidget):
         equationNr = 0
         for t in self.trnsysObj:
             if isinstance(t, Pump):
-                f += "T" + t.displayName + " = " + "T" + t.outputs[0].connectionList[0].displayName + "\n"
+                # f += "T" + t.displayName + " = " + "T" + t.outputs[0].connectionList[0].displayName + "\n" DC-ERROR
+                f += "T" + t.displayName + " = " + "T" + t.inputs[0].connectionList[0].displayName + "\n"
+
                 equationNr += 1
             elif isinstance(t, WTap) or isinstance(t, WTap_main):
                 io = t.inputs + t.outputs
@@ -1719,7 +1722,7 @@ class DiagramEditor(QWidget):
 
         return f
 
-    def exportPrintConnections(self, simulationUnit, simulationType, descConnLength, parameters, lineNr):
+    def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength, parameters, lineNr):
         # If not all ports of an object are connected, less than 4 numbers will show up
         # TrnsysConn is an array containing the fromPort and twoPort in order as they appear in the export of connections
         f = ""
@@ -1892,11 +1895,11 @@ class DiagramEditor(QWidget):
 
         return f
 
-    def exportPrintInputs(self, inputNr):
+    def exportInputsFlowSolver(self, inputNr):
         #  add a string to block and connection for exportPrintInput
         f = ''
         # print("INPUTS " + str(inputNr))
-        f += "INPUTS " + str(inputNr) + "\n"
+        f += "INPUTS " + str(inputNr) + "! for Type 935\n"
 
         pump_prefix = "Mfr"
         mix_prefix = "xFrac"
@@ -1983,7 +1986,7 @@ class DiagramEditor(QWidget):
 
         return f
 
-    def exportPrintEquations(self, simulationUnit):
+    def exportOutputsFlowSolver(self, simulationUnit):
         # Maybe add tuple (displayname, counting number)
         f = ''
 
@@ -2057,13 +2060,13 @@ class DiagramEditor(QWidget):
 
         return f
 
-    def exportUnits(self, startingUnit):
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):
         # Prints the part of the export where the pipes, tp and div Units are printed
 
         f = ''
         unitNumber = startingUnit
-        typeNr1 = 929
-        typeNr2 = 931
+        typeNr1 = 929 #Temperature calculation from a tee-piece
+        typeNr2 = 931 #Temperature calculation from a pipe
 
         for t in self.trnsysObj:
 
@@ -2077,7 +2080,7 @@ class DiagramEditor(QWidget):
             equationConstant2 = 3
 
             # T-Pieces and Mixers
-            if t.typeNumber == 2 or t.typeNumber == 3:
+            if (t.typeNumber == 2 or t.typeNumber == 3) and t.isVisible(): #DC-ERROR added isVisible
                 unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr1) + "\n"
                 unitText += "!" + t.displayName + "\n"
                 unitText += "PARAMETERS 0\n"
@@ -2098,10 +2101,11 @@ class DiagramEditor(QWidget):
                 unitNumber += 1
                 f += unitText + "\n"
 
-            # Pipes
+            # Pipes DC-ERROR added isVisible below. The fromPort toPort StorageTank does not work to detect if it is virtual.
             if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
                 # if t.isBlockConn and t.isStorageIO:
-                if True:
+                # DC-ERROR Connections don't have isVisble(), but we need to avoid printing the virtual ones here
+                if True : #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
                     parameterNumber = 6
                     inputNumbers = 4
 
@@ -2215,6 +2219,8 @@ class DiagramEditor(QWidget):
                     unitNumber += 1
                     unitText += "\n"
                     f += unitText
+                else:
+                    pass #virtual element
 
         self.printerUnitnr = unitNumber
 
@@ -2313,7 +2319,7 @@ class DiagramEditor(QWidget):
         f += "EQUATIONS " + str(len(self.groupList) + 1) + "\n" + lossText + "\n\n"
         return f
 
-    def exportPrinter(self, unitnr, descLen):
+    def exportMassFlowPrinter(self, unitnr, descLen):
         typenr = 25
         printingMode = 0
         relAbsStart = 0
@@ -2423,17 +2429,17 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportPumpOutlets()
         fullExportText += self.exportMassFlows()
 
-        fullExportText += self.exportPrintConnections(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
-        fullExportText += self.exportPrintInputs(lineNrParameters)
-        fullExportText += self.exportPrintEquations(simulationUnit)
-        fullExportText += self.exportUnits(451)
+        fullExportText += self.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
+        fullExportText += self.exportInputsFlowSolver(lineNrParameters)
+        fullExportText += self.exportOutputsFlowSolver(simulationUnit)
+        fullExportText += self.exportPipeAndTeeTypesForTemp(simulationUnit+1) #DC-ERROR
 
         fullExportText += self.exportPrintLoops()
         fullExportText += self.exportPrintPipeLoops()
         fullExportText += self.exportPrintPipeLosses()
 
         # unitnr should maybe be variable in exportData()
-        fullExportText += self.exportPrinter(self.printerUnitnr, 15)
+        fullExportText += self.exportMassFlowPrinter(self.printerUnitnr, 15)
 
         print("------------------------> END OF EXPORT <------------------------")
 

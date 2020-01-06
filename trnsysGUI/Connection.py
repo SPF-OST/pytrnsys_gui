@@ -20,13 +20,14 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
-    def __init__(self, fromPort, toPort, isBlock, parent, **kwargs):
+    def __init__(self, fromPort, toPort, isBlock, parent,visible=True,**kwargs):
         print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
         self.toPort = toPort
         self.isBlockConn = isBlock
         self.isStorageIO = False
         self.displayName = None
+        self.visible = visible #DC add this to pipes too
 
         self.parent = parent
         self.groupName = ''
@@ -76,6 +77,10 @@ class Connection(object):
 
     # Note: Nodes can have as parent 1)Connection 2)CornerItem
     # In case 1), there are further two cases: a) Node is at port b) Node is at disr seg
+
+    #DC adding the isVisual function
+    def isVisible(self):
+        return self.visible
 
     def initNew(self, parent):
 
