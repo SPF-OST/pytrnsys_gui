@@ -203,8 +203,9 @@ class segmentItem(QGraphicsLineItem):
 
             self.parent.highlightConn()
 
-            self.oldX = self.startNode.parent.scenePos().x()
-            print("set oldx")
+            if self.isVertical():
+                self.oldX = self.startNode.parent.scenePos().x()
+                print("set oldx")
 
     def mouseMoveEvent(self, e):
         # print("mouse moved")
@@ -272,9 +273,10 @@ class segmentItem(QGraphicsLineItem):
                     self.parent.parent.diagramScene.removeItem(self)
 
             elif self.parent.parent.editorMode == 1:
-                command = HorizSegmentMoveCommand(self, self.oldX, "Moving segment command")
-                self.parent.parent.parent().undoStack.push(command)
-                self.oldX = self.scenePos().x()
+                if self.isVertical():
+                    command = HorizSegmentMoveCommand(self, self.oldX, "Moving segment command")
+                    self.parent.parent.parent().undoStack.push(command)
+                    self.oldX = self.scenePos().x()
 
                 if self.secondCorner is not None:
                     if hasattr(self.endNode.parent, "fromPort"):
@@ -318,8 +320,6 @@ class segmentItem(QGraphicsLineItem):
 
                     else:
                         print("getting no start or end")
-
-
             else:
                 pass
 
