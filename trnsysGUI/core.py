@@ -92,9 +92,19 @@ class DiagramDecoderPaste(json.JSONDecoder):
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
     def object_hook(self, arr):
-        # Object hook seem to get executed for every sub object in the json file.
-        # print(arr)
-        # # print("type is " + str(type(arr)))
+        """
+        This is the decoding function from the clipboard. It seems to get executed for every sub dictionary in the json file.
+        By looking for the specific key containing the name of dict elements, one can extract the needed dict.
+        The name of the dicts is important because the order in which they are loaded matters (some objects depend on others)
+
+        Parameters
+        ----------
+        arr
+
+        Returns
+        -------
+
+        """
 
         resBlockList = []
         offset_x = 300
@@ -234,6 +244,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         resBlockList.append(bl)
 
                     elif ".__ConnectionDict__" in arr[k]:
+                        # It is important to load the connections at last because else the ports are not defined.
                         i = arr[k]
 
                         fport = None
@@ -298,10 +309,18 @@ class DiagramDecoder(json.JSONDecoder):
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
     def object_hook(self, arr):
-        # Object hook seem to get executed for every sub object in the json file.
+        """
+        This is the decoding function from the clipboard. It seems to get executed for every sub dictionary in the json file.
+        By looking for the specific key containing the name of dict elements, one can extract the needed dict.
+        The name of the dicts is important because the order in which they are loaded matters (some objects depend on others)
+        Parameters
+        ----------
+        arr
 
-        # print(arr)
-        # # print("type is " + str(type(arr)))
+        Returns
+        -------
+
+        """
 
         resBlockList = []
 
@@ -549,7 +568,9 @@ class DiagramEncoder(json.JSONEncoder):
     """
     This class encodes the diagram (entire diagram or clipboard)
     obj is passed along to get some of the diagram editor porperties, for instance the id-generator
-    TrnsysObj are stored in a list of dictionaries.
+    TrnsysObj are then stored in a list of dictionaries, saved to a json file.
+    Important: There is a slight naming error, since the dict containing all sub dicts (dicts for each block, connection
+    and Id-generator) has the key ".__BlockDct__", although there are also other elements in there.
     """
 
     def default(self, obj):
@@ -867,11 +888,6 @@ class DiagramScene(QGraphicsScene):
         self.parent().sceneMouseReleaseEvent(mouseEvent)
         super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
 
-        # global selectionMode
-        # global copyMode
-        # global pasting
-
-
         if self.parent().pasting:
             # Dismantle group
             self.parent().clearCopyGroup()
@@ -978,18 +994,6 @@ class DiagramScene(QGraphicsScene):
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
 
-        # for o in self.parent().trnsysObj:
-        #     if isinstance(o, BlockItem):
-        #         print("Checking block to group")
-        #         if self.isInRect(o.scenePos()):
-        #             newGroup.itemList.append(o)
-        #             o.setGroupName()
-        #
-        #     if type(o) is Connection:
-        #         print("Checking connection to group")
-        #         if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
-        #             newGroup.itemList.append(o)
-
         return newGroup
 
     def elementsInRect(self):
@@ -1038,7 +1042,8 @@ class DiagramScene(QGraphicsScene):
 
 class EditorGraphicsView(QGraphicsView):
     """
-    Displays the items from the DiagramScene. Can be zoomed and have a
+    Displays the items from the DiagramScene. Here, the drag and drop from the library to the View is implemented.
+
     """
     def __init__(self, scene, parent=None):
         QGraphicsView.__init__(self, scene, parent)
@@ -1047,6 +1052,7 @@ class EditorGraphicsView(QGraphicsView):
         # self.setMinimumSize(1300, 700)
         self.parent().diagramScene.viewRect2.setPos(-self.width() / 2, -self.height() / 2)
         # self.parent().diagramScene.viewRect2.setPos(1300, 700)
+        # Use aliasing or not:
         self.setRenderHint(QPainter.Antialiasing)
 
     def dragEnterEvent(self, event):
@@ -1197,8 +1203,10 @@ class DiagramEditor(QWidget):
     Ports are attached to Blocks.
     Initially, there is a temporary fromPort set to None.
     As soon any Port is clicked and dragged, tempStartPort is set to that Port and startedConnectino is set to True.
-    If the mouse is then released over a Port, a Connection is created, otherwise startedConnection is set to False
+    -> startConnection()
+    If the mouse is then released over a different Port, a Connection is created, otherwise startedConnection is set to False
     and the process is interrupted.
+    -> createConnection()
     Visually:
     A diagram editor has a QGraphicsLineItem (connLineItem) which is set Visible only when a connection is being created
 
@@ -1395,9 +1403,6 @@ class DiagramEditor(QWidget):
         self.bfs_visitedNodes = []
         self.bfs_neighborNodes = []
 
-    def test_func(self):
-        print("In test func")
-
     def create_icon(self, map_icon):
         map_icon.fill()
         painter = QPainter(map_icon)
@@ -1442,8 +1447,6 @@ class DiagramEditor(QWidget):
         print("port is " + str(port))
         self.tempStartPort = port
         self.startedConnection = True
-        # print("Started Connection")
-        # print("tempPort is " + str(self.tempStartPort))
 
     def createConnection(self, startPort, endPort):
         # print("Creating connection...")
@@ -3115,6 +3118,12 @@ class MainWindow(QMainWindow):
     It has a menubar, a central widget and a message bar at the bottom. The central widget is
     the QWidget subclass containing the items library, the diagram editor and the element inspector
     listview.
+
+    QActions comprise an icon (optionally), a description (tool tip) and the parent widget
+    They are connected to a method via the Signals-and-Slots framework, allowing the execution of functions by an event.
+    Shortcuts can be assigned to QActions.
+    They get included into the application either by being added to a menu or a tool bar.
+
     """
 
     def __init__(self, parent=None):
