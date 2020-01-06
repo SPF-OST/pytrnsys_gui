@@ -1504,11 +1504,11 @@ class DiagramEditor(QWidget):
 
                 for hx in t.heatExchangers:
                     if hx.sSide == 0:
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2], t.hxInsideConnsLeft, "L")
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2], t.hxInsideConnsLeft, "L", hx)
                     elif hx.sSide == 2:
                         print("storage of hx R is " + str(t.displayName))
                         print("hx ports are" + str(hx.port1) + str(hx.port2))
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2], t.hxInsideConnsRight, "R")
+                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2], t.hxInsideConnsRight, "R", hx)
                     else:
                         print("heatExchanger has not valid sSide")
 
@@ -1672,10 +1672,11 @@ class DiagramEditor(QWidget):
                             print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
                             # print("dds " + p.connectionList[2].displayName)
 
+                            # p is a hx port; the external port has two connections, so the second one yields the hx connector
                             if p.connectionList[1].fromPort is p:
                                 f += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
                             else:
-                                #Here the Hx name is printed.
+                                # Here the Hx name is printed.
                                 f += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
 
                             equationNr += 1
@@ -2220,7 +2221,7 @@ class DiagramEditor(QWidget):
                     unitText += "\n"
                     f += unitText
                 else:
-                    pass #virtual element
+                    pass # virtual element
 
         self.printerUnitnr = unitNumber
 

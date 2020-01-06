@@ -20,7 +20,7 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
-    def __init__(self, fromPort, toPort, isBlock, parent,visible=True,**kwargs):
+    def __init__(self, fromPort, toPort, isBlock, parent, visible=True, **kwargs):
         print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
         self.toPort = toPort

@@ -320,8 +320,8 @@ class StorageTank(BlockItem):
                 self.parent.scene().addItem(tpiece)
                 tpList.append(tpiece)
 
-                c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent(),visible=False)
-                c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent(),visible=False)
+                c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent(), visible=False)
+                c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent(), visible=False)
 
                 resId = ""
                 for j in c1.displayName:
@@ -382,25 +382,25 @@ class StorageTank(BlockItem):
 
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
 
-    def connectHxs(self, side, side2, connList, lr):
+    def connectHxs(self, side, side2, connList, lr, heatX):
         # Adds a Connector block and connections to the external blocks (both virtual)
         print("ports have " + str(side[0].parent) + str(side[1].parent))
 
         connector = Connector("Connector", "Connector", self.parent, storagePorts=side2)
-        connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
+        connector.displayName = heatX.displayName
+        # connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
 
         if side[0].connectionList[0].fromPort is side[0]:
-            c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(),visible=False)
+            c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(), visible=False)
         else:
-            c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(),visible=False)
+            c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(), visible=False)
             pass
 
         if side[1].connectionList[0].fromPort is side[1]:
-            c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(),visible=False)
+            c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(), visible=False)
         else:
-            c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(),visible=False)
+            c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(), visible=False)
             pass
-
 
         # c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
         # c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
