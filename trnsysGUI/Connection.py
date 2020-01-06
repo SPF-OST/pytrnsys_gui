@@ -1,8 +1,8 @@
 from math import atan, sqrt, acos
 
-from PyQt5.QtCore import QLineF, QPointF, QTimer, QRect, QRectF
+from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
@@ -456,6 +456,9 @@ class Connection(object):
 
             corner1.setZValue(100)
             corner2.setZValue(100)
+            self.fromPort.setZValue(100)
+            self.toPort.setZValue(100)
+            print("Here in niceconn")
 
             corner1.setPos(help_point_1)
             corner2.setPos(help_point_2)
@@ -677,6 +680,10 @@ class Connection(object):
         print("Removing trnsysObj " + str(self))
         self.parent.connectionList.remove(self)
         del self
+
+    def deleteConnCom(self):
+        command = DeleteConnectionCommand(self, "Delete conn comand")
+        self.parent.parent().undoStack.push(command)
 
     def buildBridges(self):
         # This function finds the colliding line segments and creates the interrupted line effect
@@ -959,3 +966,43 @@ class Connection(object):
         # self.parent.listV.addItem("Sceneposition: " + str(self.scenePos()))
         self.parent.listV.addItem("fromPort: " + str(self.fromPort) + str(self.fromPort.id))
         self.parent.listV.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
+
+    def setColor(self, **kwargs):
+        col = QColor(0, 0, 0)
+
+        if "mfr" in kwargs:
+            if kwargs["mfr"] == "NegMfr":
+                col = QColor(0, 0, 255)
+            elif kwargs["mfr"] == "ZeroMfr":
+                col = QColor(142, 142, 142) # Gray
+            else:
+                # PosMfr
+                col = QColor(255, 0, 0)
+
+            for s in self.segments:
+                pen1 = QPen(col, 2)
+                s.setPen(pen1)
+
+        else:
+            print("No color to set in Connection.setColor()")
+
+    def updateSegGrads(self):
+        for s in self.segments:
+            s.updateGrad()
+
+
+class DeleteConnectionCommand(QUndoCommand):
+    def __init__(self, conn, descr):
+        super(DeleteConnectionCommand, self).__init__(descr)
+        self.conn = conn
+        self.connFromPort = self.conn.fromPort
+        self.connToPort = self.conn.toPort
+        self.connIsBlock = self.conn.isBlockConn
+        self.connParent = self.conn.parent
+
+    def redo(self):
+        self.conn.deleteConn()
+        self.conn = None
+
+    def undo(self):
+        self.conn = Connection(self.connFromPort, self.connToPort, self.connIsBlock, self.connParent)

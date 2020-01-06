@@ -7,8 +7,29 @@ from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
 from trnsysGUI.BlockDlg import BlockDlg
+# from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
+import trnsysGUI.DeleteBlockCommand
+
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.GroupChooserDlg import GroupChooserBlockDlg
+from trnsysGUI.MoveCommand import MoveCommand
+
+from PyQt5.QtWidgets import QUndoCommand
+
+# from trnsysGUI.Collector import Collector
+# from trnsysGUI.Connector import Connector
+# from trnsysGUI.GenericBlock import GenericBlock
+# from trnsysGUI.HeatPump import HeatPump
+# from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
+# from trnsysGUI.IceStorage import IceStorage
+# from trnsysGUI.Pump import Pump
+# from trnsysGUI.Radiator import Radiator
+# from trnsysGUI.StorageTank import StorageTank
+# from trnsysGUI.TVentil import TVentil
+# from trnsysGUI.TeePiece import TeePiece
+# from trnsysGUI.WTap import WTap
+# from trnsysGUI.WTap_main import WTap_main
+
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -91,6 +112,9 @@ class BlockItem(QGraphicsPixmapItem):
         # Experimental, used for detecting genereated blocks attached to storage ports
         self.inFirstRow = False
 
+        # Undo framework related
+        self.oldPos = None
+
     def setParent(self, p):
         self.parent = p
 
@@ -158,7 +182,7 @@ class BlockItem(QGraphicsPixmapItem):
 
         dB = QIcon('images/close.png')
         c1 = menu.addAction(dB, 'Delete this Block')
-        c1.triggered.connect(self.deleteBlock)
+        c1.triggered.connect(self.deleteBlockCom)
 
         # sG = QIcon('')
         c2 = menu.addAction("Set group")
@@ -214,6 +238,23 @@ class BlockItem(QGraphicsPixmapItem):
 
     def mouseDoubleClickEvent(self, event):
         dia = BlockDlg(self, self.scene().parent())
+
+    def mouseReleaseEvent(self, event):
+        print("Released mouse over block")
+        if self.oldPos is None:
+            print("For Undo Framework: oldPos is None")
+
+
+        else:
+            if self.scenePos() != self.oldPos:
+                print("Block was dragged")
+                print("Old pos is" + str(self.oldPos))
+                command = MoveCommand(self, self.oldPos, "Move BlockItem")
+                self.parent.parent().parent().undoStack.push(command)
+                self.oldPos = self.scenePos()
+
+        super(BlockItem, self).mouseReleaseEvent(event)
+
 
     def getConnections(self):
         c = []
@@ -418,3 +459,89 @@ class BlockItem(QGraphicsPixmapItem):
                 if self.scenePos().y == t.scenePos().y():
                     return True
         return False
+
+    def deleteBlockCom(self):
+        # command = trnsysGUI.DeleteBlockCommand.DeleteBlockCommand(self, "Delete block command")
+        # self.parent.parent().parent().undoStack.push(command)
+        self.parent.deleteBlockCom(self)
+
+    # Both classes in same module did not work
+    # class DeleteBlockCommand(QUndoCommand):
+    #     def __init__(self, bl, descr):
+    #         super(DeleteBlockCommand, self).__init__(descr)
+    #         self.bl = bl
+    #         self.blW = bl.w
+    #         self.blH = bl.h
+    #         self.blParent = bl.parent
+    #         self.blId = bl.id
+    #         self.blTrnsysId = bl.trnsysId
+    #
+    #         self.portsIdIn = []
+    #         self.portsIdOut = []
+    #         self.savePortsId()
+    #
+    #         self.blFlippedH = bl.flippedH
+    #         self.blFlippedV = bl.flippedV
+    #         self.blRotation = bl.rotationN
+    #         self.blGroupName = bl.groupName
+    #         self.blName = bl.name
+    #         self.bldName = bl.displayName
+    #         self.blPos = bl.pos()
+    #
+    #     def redo(self):
+    #         self.bl.deleteBlock()
+    #         self.bl = None
+    #
+    #     def undo(self):
+    #         name = self.blName
+    #         if name == 'StorageTank':
+    #             bl = StorageTank(name, name, self)
+    #         elif name == 'TeePiece':
+    #             bl = TeePiece(name, name, self)
+    #         elif name == 'TVentil':
+    #             bl = TVentil(name, name, self)
+    #         elif name == 'Pump':
+    #             bl = Pump(name, name, self)
+    #         elif name == 'Kollektor':
+    #             bl = Collector(name, name, self)
+    #         elif name == 'HP':
+    #             bl = HeatPump(name, name, self)
+    #         elif name == 'IceStorage':
+    #             bl = IceStorage(name, name, self)
+    #         elif name == 'Radiator':
+    #             bl = Radiator(name, name, self)
+    #         elif name == 'WTap':
+    #             bl = WTap(name, name, self)
+    #         elif name == 'WTap_main':
+    #             bl = WTap_main(name, name, self)
+    #         elif name == 'Connector':
+    #             bl = Connector(name, name, self)
+    #         elif name == 'GenericBlock':
+    #             bl = GenericBlock(name, name, self)
+    #         elif name == 'HPTwoHx':
+    #             bl = HeatPumpTwoHx(name, name, self)
+    #         else:
+    #             bl = BlockItem(name, name, self)
+    #
+    #         if name != "StorageTank":
+    #             bl.trnsysId = self.blTrnsysId
+    #             bl.id = self.blId
+    #             bl.updateFlipStateH(self.blFlippedH)
+    #             bl.updateFlipStateV(self.blFlippedV)
+    #             bl.rotateBlockToN(self.blRotation)
+    #             bl.displayName = self.bldName
+    #             bl.label.setPlainText(bl.displayName)
+    #
+    #             bl.groupName = "defaultGroup"
+    #             bl.setBlockToGroup(self.blGroupName)
+    #
+    #             bl.setPos(self.blPos)
+    #             self.blParent.scene().addItem(bl)
+    #
+    #             bl.oldPos = bl.scenePos()
+    #
+    #     def savePortsId(self):
+    #         for p in self.bl.inputs:
+    #             self.portsIdIn.append(p.id)
+    #         for p in self.bl.outputs:
+    #             self.portsIdOut.append(p.id)

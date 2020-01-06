@@ -30,6 +30,8 @@ class StorageTank(BlockItem):
         self.hxInsideConnsLeft = []
         self.hxInsideConnsRight = []
 
+        self.changeSize()
+
     # Unused
     def setSideManual(self, left, s, hAbs):
         if left:
@@ -99,9 +101,11 @@ class StorageTank(BlockItem):
 
         if port1 is None:
             port1 = PortItem('i', sideNr, self)
+            port1.setZValue(100)
 
         if port2 is None:
             port2 = PortItem('o', sideNr, self)
+            port2.setZValue(100)
 
         self.inputs.append(port1)
         self.outputs.append(port2)
@@ -140,7 +144,6 @@ class StorageTank(BlockItem):
             c.id = kwargs["connId"]
             c.connId = kwargs["connCid"]
             c.trnsysId = kwargs["trnsysConnId"]
-
             return c
 
     def setLeftSideManual(self, s, hAbs):
@@ -478,6 +481,11 @@ class StorageTank(BlockItem):
         for p in self.inputs + self.outputs:
             rel_h_old = p.pos().y() / self.h
             p.setPos(p.pos().x(), rel_h_old * (self.h + h))
+
+    def updateHxLines(self, h):
+        for hx in self.heatExchangers:
+            hx.updateLines(h)
+
     # def keyPressEvent(self, event):
     #     print("Pressed st")
     #

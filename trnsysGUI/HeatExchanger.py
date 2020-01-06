@@ -14,7 +14,7 @@ class HeatExchanger(QGraphicsItemGroup):
     def __init__(self, side, sizeW, sizeH, offset, parent, name='Untitled', **kwargs):
         super(HeatExchanger, self).__init__(parent)
         self.parent = parent
-        self.offset = offset  # QPointF expected
+        self.offset = offset  # QPointF
         self.lines = []
         self.w = sizeW
         self.h = sizeH
@@ -30,6 +30,8 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self.port1 = PortItem('i', self.sSide, self.parent)
         self.port2 = PortItem('o', self.sSide, self.parent)
+
+
 
         self.port1.isFromHx = True
         self.port2.isFromHx = True
@@ -101,6 +103,7 @@ class HeatExchanger(QGraphicsItemGroup):
             self.drawHxR(param, factor)
 
     def drawHxL(self, param, factor):
+        # self.offset is the height of the first port
         s = self.offset
         delta = 4
         # set bb = True for equal amount of lines
@@ -161,7 +164,8 @@ class HeatExchanger(QGraphicsItemGroup):
     def drawHxR(self, param, factor):
         s = self.offset
         delta = 4
-        # set bb = True for equal amount of lines
+        # set bb = True for equal amount of line segments between the ports
+
         bb = False
         if bb:
             lineTop = QGraphicsLineItem(s.x() + 2 * delta, s.y() + 0, s.x() - self.w, s.y() + 0, self)
@@ -219,7 +223,6 @@ class HeatExchanger(QGraphicsItemGroup):
 
             # self.rectangle.setPos(lineTop.line().p2().x(), lineTop.line().p2().y())
 
-
     def floorHeight(self):
         delta = 4
         # Could be used if static partH would be used for the heatexchanger
@@ -258,6 +261,23 @@ class HeatExchanger(QGraphicsItemGroup):
         for ch in self.childItems():
             if isinstance(ch, QGraphicsLineItem):
                 ch.setPen(QPen(Qt.black, 2))
+
+    def updateLines(self, h):
+        self.removeLines()
+
+        self.h = self.port2.pos().y() - self.port1.pos().y()
+
+        if self.sSide == 0:
+            self.offset = QPointF(0, self.port1.pos().y())
+        else:
+            self.offset = QPointF(self.parent.w, self.port1.pos().y())
+
+        self.drawHx(6, 0.4)
+
+    def removeLines(self):
+        while len(self.lines) != 0:
+            self.parent.parent.parent().diagramScene.removeItem(self.lines[0])
+            self.lines.remove(self.lines[0])
 
     def mousePressEvent(self, event):
         self.highlightHx()

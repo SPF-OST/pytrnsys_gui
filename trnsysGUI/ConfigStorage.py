@@ -157,13 +157,21 @@ class ConfigStorage(QDialog):
         for h in self.storage.heatExchangers:
             if h.sSide == 0:
                 self.listWL.addItem(
-                    h.displayName + ", y_offset = " + str(100 - 100 * h.offset.y() / self.storage.h) + "%")
+                    h.displayName + ", y_offset = " + "%.2f" %(100 - 100 * h.offset.y() / self.storage.h) + "%")
             if h.sSide == 2:
                 self.listWR.addItem(
-                    h.displayName + ", y_offset = " + str(100 - 100 * h.offset.y() / self.storage.h) + "%")
+                    h.displayName + ", y_offset = " + "%.2f" %(100 - 100 * h.offset.y() / self.storage.h) + "%")
 
     def addHx(self):
-        if abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 20 and float(self.offsetLeI.text()) > float(self.offsetLeO.text()):
+        """
+        Checks whether the inputs are in the correct range [0,100] and in order, and calls the function for creating a
+        HeatExchanger on the respective side.
+
+        Returns
+        -------
+
+        """
+        if self.minOffsetDistance() and float(self.offsetLeI.text()) > float(self.offsetLeO.text() and self.offsetsInRange()):
             print("Adding hx")
             if self.rButton.isChecked():
                 print("addhxr")
@@ -172,32 +180,48 @@ class ConfigStorage(QDialog):
                 print("addhxr")
                 self.addHxL()
         else:
-            print("At least 20% of difference and larger top port than bottom port needed")
+            print("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
+
+    def minOffsetDistance(self):
+        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 20
+
+    def offsetsInRange(self):
+        return (0 < float(self.offsetLeI.text()) < 100) and (0 < float(self.offsetLeO.text()) < 100)
 
     def addHxL(self):
-        # print(str(abs(1 / 100 * float(self.offsetLeO.text()) - 1 / 100 * float(self.offsetLeI.text()))))
+        """
+        Creates a HeatExchanger on the left side and adds it to the listWL
+        The comma in the display string of listWL is crucial, since the removeHx function takes the string until the
+        comma as name of the Heatexchanger to delete.
+
+        Returns
+        -------
+
+        """
         hx_temp = HeatExchanger(0, self.w_hx, abs(
             1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
                                 QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
                                 self.storage,
                                 self.hxNameLe.text())
-        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + str(float(self.offsetLeI.text())) + "%, " + str(
-            float(self.offsetLeO.text())) + "%")
-        # self.storage.h += self.h_hx
-
-        # Todo: Don't forget that size is not enlarged by h_hx if constant size heat exchanger part is chosen
-        # self.storage.updateImage(self.h_hx)
+        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%.2f" %(float(self.offsetLeI.text())) + "%")
 
     def addHxR(self):
-        # print(str(abs(1 / 100 * float(self.offsetLeO.text()) - 1 / 100 * float(self.offsetLeI.text()))))
+        """
+       Creates a HeatExchanger on the right side and adds it to the listWR
+       The comma in the display string of listWR is crucial, since the removeHx function takes the string until the
+       comma as name of the Heatexchanger to delete.
+
+       Returns
+       -------
+
+        """
         hx_temp = HeatExchanger(2, self.w_hx, abs(
             1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
                                 QPointF(self.storage.w,
                                         self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
                                 self.storage,
                                 self.hxNameLe.text())
-        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + str(float(self.offsetLeI.text())) + "%, " + str(
-            float(self.offsetLeO.text())))
+        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%.2f" %(float(self.offsetLeI.text())) + "%")
         # self.storage.h += self.h_hx
 
         # Todo: Don't forget that size is not enlarged by h_hx if constant size heat exchanger part is chosen
@@ -263,6 +287,7 @@ class ConfigStorage(QDialog):
 
     def incrSize(self):
         self.storage.updatePortPositions(self.h_hx)
+        self.storage.updateHxLines(self.h_hx)
         self.storage.h += self.h_hx
         self.storage.updateImage()
 
