@@ -19,6 +19,7 @@ class GenericBlock(BlockItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
+        self.imagesource = name
         self.changeSize()
 
     def changeSize(self):
@@ -67,6 +68,10 @@ class GenericBlock(BlockItem):
         name = str(self.pickImage().resolve())
         if name != "":
             self.setImage(name)
+            self.setImagesource(name)
+
+    def setImagesource(self, name):
+        self.imagesource = name
 
     def pickImage(self):
         return Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png")[0])

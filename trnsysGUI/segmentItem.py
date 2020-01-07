@@ -136,7 +136,9 @@ class segmentItem(QGraphicsLineItem):
 
         # self.linearGrad.setColorAt(0, QtCore.Qt.gray)
         # self.linearGrad.setColorAt(1, QtCore.Qt.black)
+
         # self.setPen(QtGui.QPen(color, 2))
+
         pen1.setBrush(QBrush(self.linearGrad))
 
         self.setPen(pen1)

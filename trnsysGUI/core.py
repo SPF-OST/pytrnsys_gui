@@ -380,9 +380,10 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'Connector':
                             bl = Connector(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                         elif i["BlockName"] == 'GenericBlock':
-                            bl = GenericBlock(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            print("Should not find a GenericBlock here")
+                            bl = GenericBlock(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                         elif i["BlockName"] == 'HPTwoHx':
-                            bl = HeatPumpTwoHx(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = HeatPumpTwoHx(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
 
                         else:
                             bl = BlockItem(i["BlockName"], i["BlockName"
@@ -514,6 +515,32 @@ class DiagramDecoder(json.JSONDecoder):
 
                         resBlockList.append(bl)
 
+                    elif ".__GenericBlockDict__" in arr[k]:
+                        print("Loading a generic block")
+                        i = arr[k]
+                        bl = GenericBlock(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                        bl.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
+                        bl.trnsysId = i["trnsysID"]
+                        bl.id = i["ID"]
+                        bl.updateFlipStateH(i["FlippedH"])
+                        bl.updateFlipStateV(i["FlippedV"])
+                        bl.rotateBlockToN(i["RotationN"])
+                        bl.displayName = i["BlockDisplayName"]
+                        bl.label.setPlainText(bl.displayName)
+
+                        bl.groupName = "defaultGroup"
+                        bl.setBlockToGroup(i["GroupName"])
+
+                        print(len(bl.inputs))
+                        for x in range(len(bl.inputs)):
+                            bl.inputs[x].id = i["PortsIDIn"][x]
+
+                        for x in range(len(bl.outputs)):
+                            bl.outputs[x].id = i["PortsIDOut"][x]
+
+                        bl.setImage(i["Imagesource"])
+                        resBlockList.append(bl)
+
                     elif ".__ConnectionDict__" in arr[k]:
                         print("Loading a connection in Decoder")
                         i = arr[k]
@@ -594,9 +621,9 @@ class DiagramEncoder(json.JSONEncoder):
 
             for t in obj.trnsysObj:
                 dct = {}
-                if isinstance(t, BlockItem) and type(t) is not StorageTank and type(t) is not HeatPump:
+                if isinstance(t, BlockItem) and type(t) is not StorageTank and type(t) is not HeatPump and type(t) is not HeatPumpTwoHx and type(t) is not GenericBlock:
                     if t.isVisible() is False:
-                        print("Invisible block [probably a insideBlock?]" + str(t) + str(t.displayName))
+                        print("Invisible block [probably an insideBlock?]" + str(t) + str(t.displayName))
                         continue
                     portListInputs = []
                     portListOutputs = []
@@ -620,6 +647,31 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['GroupName'] = t.groupName
 
                     blockDct["Block-" + str(t.id)] = dct
+
+                if type(t) is GenericBlock:
+                    portListInputs = []
+                    portListOutputs = []
+
+                    for p in t.inputs:
+                        portListInputs.append(p.id)
+                    for p in t.outputs:
+                        portListOutputs.append(p.id)
+
+                    dct['.__GenericBlockDict__'] = True
+                    dct['BlockName'] = t.name
+                    dct['BlockDisplayName'] = t.displayName
+                    dct['BlockPosition'] = (float(t.pos().x()), float(t.pos().y()))
+                    dct['ID'] = t.id
+                    dct['trnsysID'] = t.trnsysId
+                    dct['PortsIDIn'] = portListInputs
+                    dct['PortsIDOut'] = portListOutputs
+                    dct['FlippedH'] = t.flippedH
+                    dct['FlippedV'] = t.flippedV
+                    dct['RotationN'] = t.rotationN
+                    dct['GroupName'] = t.groupName
+                    dct['Imagesource'] = t.imagesource
+
+                    blockDct["GenericBlock-" + str(t.id)] = dct
 
                 if type(t) is StorageTank:
                     print("Encoding a storage tank")
