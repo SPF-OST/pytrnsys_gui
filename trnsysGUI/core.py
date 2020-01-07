@@ -61,6 +61,7 @@ __status__ = "Prototype"
 # CSS Style-sheet
 cssSs = open("res/style.txt", "r")
 
+
 def calcDist(p1, p2):
     """
 
@@ -3276,6 +3277,9 @@ class MainWindow(QMainWindow):
         openVisualizerAction = QAction(QIcon('images/controller.png'), "Start visualization of mass flows", self)
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
+        runMassflowSolverAction = QAction(QIcon('images/gear.png'), "Run the massflow solver", self)
+        runMassflowSolverAction.triggered.connect(self.runMassflowSolver)
+
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
@@ -3332,6 +3336,7 @@ class MainWindow(QMainWindow):
         selectTb.addAction(editGroupsAction)
         selectTb.addAction(selectMultipleAction)
         selectTb.addAction(openVisualizerAction)
+        selectTb.addAction(runMassflowSolverAction)
         selectTb.addAction(trnsysList)
 
         self.sb = self.statusBar()
@@ -3526,6 +3531,9 @@ class MainWindow(QMainWindow):
             else:
                 print("Neiter a Block nor Connection in copyGroupList ")
 
+    def runMassflowSolver(self):
+        print("Running massflow solver...")
+        # @DC Put the execution of the solver here
 
     def mouseMoveEvent(self, e):
         pass
