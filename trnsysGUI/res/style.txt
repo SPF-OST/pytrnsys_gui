@@ -1,4 +1,4 @@
-QPushButton {
+/*QPushButton {
   font-family: 'MS Reference Sans Serif', sans-serif;
   font-weight: 600;
   padding: 1.25rem 2rem;
@@ -10,6 +10,18 @@ QPushButton {
   background: #08aeea;
   color: #009933;
   color: #2af598;
+  text-transform: uppercase;
+}*/
+
+QPushButton {
+  font-family: 'MS Reference Sans Serif', sans-serif;
+  font-weight: 600;
+  padding: 1.25rem 2rem;
+  font-size: 1rem;
+  border-radius:5px;
+  border: 0;
+  background: #4CAF50;
+  color: white;
   text-transform: uppercase;
 }
 
@@ -60,14 +72,14 @@ QLineEdit{
 }
 
 
-QListView{
+/*QListView{
     border-radius: 20px;
     border: none;
      background: #77C9D4;
      padding: 10px;
 
 
-}
+}*/
 
 QGraphicsView{
     border:none;

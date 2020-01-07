@@ -16,5 +16,6 @@ class CreateConnectionCommand(QUndoCommand):
         self.conn = Connection(self.connFromPort, self.connToPort, self.isBlock, self.connParent)
 
     def undo(self):
-        self.conn.deleteConn()
+        if self.conn in self.conn.parent.connectionList:
+            self.conn.deleteConn()
 

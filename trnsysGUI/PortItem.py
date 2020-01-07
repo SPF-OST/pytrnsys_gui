@@ -143,6 +143,7 @@ class PortItem(QGraphicsEllipseItem):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
         else:
+            self.setFlag(self.ItemIsMovable, False)
             self.scene().parent().startConnection(self)
 
     def hoverEnterEvent(self, event):
@@ -153,11 +154,11 @@ class PortItem(QGraphicsEllipseItem):
         if self.name == 'i':
             # self.setBrush(Qt.red)
             # self.outerRing.setBrush(Qt.red)
-            self.outerRing.setBrush(QColor(0,0,0))
+            self.outerRing.setBrush(QColor(0, 0, 0))
         if self.name == 'o':
             # self.setBrush(QColor(Qt.blue))
             # self.outerRing.setBrush(QColor(Qt.blue))
-            self.outerRing.setBrush(QColor(0,0,0))
+            self.outerRing.setBrush(QColor(0, 0, 0))
 
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")

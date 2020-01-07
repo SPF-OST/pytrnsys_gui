@@ -1137,7 +1137,7 @@ class EditorGraphicsView(QGraphicsView):
 
         if int(event.modifiers()) == 67108864:
             if event.angleDelta().y() > 0:
-                self.scale(1.25, 1.25)
+                self.scale(1.2, 1.2)
             else:
                 self.scale(0.8, 0.8)
 
@@ -2138,9 +2138,11 @@ class DiagramEditor(QWidget):
 
             # Pipes DC-ERROR added isVisible below. The fromPort toPort StorageTank does not work to detect if it is virtual.
             if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
+            # if type(t) is Connection and t.firstS.isVisible:
                 # if t.isBlockConn and t.isStorageIO:
                 # DC-ERROR Connections don't have isVisble(), but we need to avoid printing the virtual ones here
-                if t.firstS.isVisible(): #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
+                # if t.firstS.isVisible(): #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
+                if True:
                     parameterNumber = 6
                     inputNumbers = 4
 
@@ -2234,7 +2236,7 @@ class DiagramEditor(QWidget):
                                     portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
                         else:
                             unitText += "T" + t.trnsysConn[1].displayName + "\n"
-                        #
+
                         # unitText += "T" + t.trnsysConn[0].displayName + "\n"
                         # unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
                         # unitText += tempRoomVar + "\n"
@@ -2317,7 +2319,7 @@ class DiagramEditor(QWidget):
 
             for c in g.itemList:
                 if isinstance(c, Connection) and not c.isBlockConn:
-                    loopText += "*** " + c.displayName +"\n"
+                    loopText += "*** " + c.displayName + "\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
                     loopText += "U" + c.displayName + "=" + ULp + "\n"
@@ -3356,6 +3358,7 @@ class MainWindow(QMainWindow):
 
         self.centralWidget = DiagramEditor()
         self.setCentralWidget(self.centralWidget)
+        # self.centralWidget.newDiagram()
 
     def saveDia(self):
         print("Saving diagram")

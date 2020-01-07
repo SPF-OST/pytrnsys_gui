@@ -133,12 +133,12 @@ class StorageTank(BlockItem):
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
 
         if kwargs == {}:
-            Connection(port1, port2, True, self.parent.parent(),visible=True)
+            Connection(port1, port2, True, self.parent.parent(), visible=False)
             return
         else:
             port1.id = kwargs["fromPortId"]
             port2.id = kwargs["toPortId"]
-            c = Connection(port1, port2, True, self.parent.parent(),visible=True, fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
+            c = Connection(port1, port2, True, self.parent.parent(), visible=False, fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
                            segmentsLoad=[], cornersLoad=[])
             c.displayName = kwargs["connDispName"]
             c.id = kwargs["connId"]
@@ -158,6 +158,7 @@ class StorageTank(BlockItem):
         self.inputs[-1].setPos(self.w + 2 * StorageTank.delta, hAbs)
 
     def setLeftSideAuto(self, n):
+        # Momentarily not used
         h = self.h
         autoInputs = []
 
@@ -167,10 +168,10 @@ class StorageTank(BlockItem):
             temp.setPos(-2 * StorageTank.delta, 1 / (n + 1) * h * (i + 1))
             autoInputs.append(temp)
 
-        print("Momentarily not used")
         # self.connectInside(autoInputs, SOMELIST)
 
     def setRightSideAuto(self, n):
+        # Momentarily not used
         delta = 4
         h = self.h
         autoInputs = []
@@ -181,11 +182,7 @@ class StorageTank(BlockItem):
             temp.setPos(2 * delta + 100, 1 / (n + 1) * h * (i + 1))
             autoInputs.append(temp)
 
-        print("Momentarily not used")
         # self.connectInside(autoInputs, SOMELIST)
-
-    def getNotHxPorts(self):
-        pass
 
     def checkConnectInside(self, port1, port2, maxhops, d):
         # Finds connection between the insideConnected of StorageTank but need improvement
