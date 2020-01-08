@@ -1313,12 +1313,12 @@ class DiagramEditor(QWidget):
         self.libraryModel.setColumnCount(0)
 
         self.datagen = PipeDataHandler(self)
-        #self.mfVis = MassFlowVisualizer(self)
 
         self.moveHxPorts = False
 
         self.libItems = []
-        # r_folder = "res\\"
+
+        # res folder for library icons
         r_folder = "images/"
 
         # Investigate why file ending is not needed
@@ -1369,7 +1369,7 @@ class DiagramEditor(QWidget):
 
         self.startedConnection = False
         self.tempStartPort = None
-        self.tempEndPort = None
+        # self.tempEndPort = None
         self.connectionList = []
         self.trnsysObj = []
         self.groupList = []
@@ -1383,6 +1383,7 @@ class DiagramEditor(QWidget):
 
         self.printerUnitnr = 0
 
+        # For debug buttons (button1 - button6)
         a = 400  # Start of upmost button y-value
         b = 50  # distance between starts of button y-values
         b_start = 75
@@ -1424,9 +1425,11 @@ class DiagramEditor(QWidget):
         # self.button6.clicked.connect(self.button6_clicked)
 
         # Hardcode color scheme:
+
+
+        # Different colors for connLineColor
         colorsc = "red"
         linePx = 4
-
         if colorsc == "red":
             connLinecolor = QColor(Qt.red)
             # connLinecolor = QColor(252, 60, 60)
@@ -1437,12 +1440,14 @@ class DiagramEditor(QWidget):
         else:
             connLinecolor = QColor(196, 196, 196)  # Gray
 
+        # Only for displaying on-going creation of connection
         self.connLine = QLineF()
         self.connLineItem = QGraphicsLineItem(self.connLine)
         self.connLineItem.setPen(QtGui.QPen(connLinecolor, linePx))
         self.connLineItem.setVisible(False)
         self.diagramScene.addItem(self.connLineItem)
 
+        # For line that shows quickly up when using the align mode
         self.alignYLine = QLineF()
         self.alignYLineItem = QGraphicsLineItem(self.alignYLine)
         self.alignYLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
@@ -3240,6 +3245,25 @@ class DiagramEditor(QWidget):
 
         return None
 
+
+    def setAlignMode(self, b):
+        self.alignMode = True
+
+    def setEditorMode(self, b):
+        self.editorMode = b
+
+    def setMoveHxPorts(self, b):
+        self.moveHxPorts = b
+
+    def setSnapGrid(self, b):
+        self.snapGrid = b
+
+    def setSnapSize(self, s):
+        self.snapSize = s
+
+    def setitemsSelected(self, b):
+        self.itemsSelected = b
+
     # def mouseMoveEvent(self, e):
     #     print("In editor")
     #     self.parent().mouseMoveEvent(e)
@@ -3594,6 +3618,9 @@ class MainWindow(QMainWindow):
         # text = "x: {0},  y: {1}".format(x, y)
         # self.sb.showMessage(text)
         # #print("event")
+
+
+
 
 
 if __name__ == '__main__':
