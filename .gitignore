@@ -14,5 +14,6 @@ trnsysGUI/exports/*.dck
 /.idea/TrnsysGUI.iml
 
 trnsysGUI/massflowData/flows.txt
+trnsysGUI/VectorGraphicsExport.svg
 
 docs/_build/

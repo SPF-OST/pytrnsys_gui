@@ -14,6 +14,8 @@ from pathlib import Path
 
 # from trnsysGUI.CircularDep import *
 # from trnsysGUI.Connection import Connection
+from PyQt5.QtSvg import QSvgGenerator
+
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 
 from trnsysGUI.GenericBlock import GenericBlock
@@ -1460,6 +1462,8 @@ class DiagramEditor(QWidget):
         self.bfs_visitedNodes = []
         self.bfs_neighborNodes = []
 
+
+
     def create_icon(self, map_icon):
         map_icon.fill()
         painter = QPainter(map_icon)
@@ -1474,7 +1478,8 @@ class DiagramEditor(QWidget):
 
     # Debug buttons
     def button1_clicked(self):
-        self.dumpInformation()
+        # self.dumpInformation()
+
 
     def button2_clicked(self):
         for c in self.connectionList:
@@ -2593,6 +2598,22 @@ class DiagramEditor(QWidget):
                 t.exportInitialInput = -1
                 t.exportEquations = []
                 t.trnsysConn = []
+
+    def exportSvg(self):
+        # For exporting a svg file (text is still too large):
+        generator = QSvgGenerator()
+        generator.setResolution(300)
+        # generator.setSize(QSize(800, 800))
+        generator.setSize(QSize(self.diagramScene.width(), self.diagramScene.height()))
+        # generator.setViewBox(QRect(0, 0, 800, 800))
+        generator.setViewBox(self.diagramScene.sceneRect())
+        generator.setFileName("VectorGraphicsExport.svg")
+
+        painter = QPainter()
+        painter.begin(generator)
+        painter.setRenderHint(QPainter.Antialiasing)
+        self.diagramScene.render(painter)
+        painter.end()
 
     def setName(self, newName):
         self.diagramName = newName
