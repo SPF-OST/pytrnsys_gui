@@ -420,7 +420,6 @@ class BlockItem(QGraphicsPixmapItem):
             if isinstance(t, BlockItem) and t is not self:
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
-                    # QMouseEvent()
                     self.parent.parent().alignYLineItem.setLine(self.pos().x() + self.w/2, t.pos().y(), t.pos().x() + t.w/2, t.pos().y())
 
                     self.parent.parent().alignYLineItem.setVisible(True)
