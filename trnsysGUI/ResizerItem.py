@@ -18,7 +18,7 @@ class ResizerItem(QGraphicsEllipseItem):
     def itemChange(self, change, value):
         if change == self.ItemPositionChange:
             print("relative pos has changed")
-            self.parent.w, self.parent.h = self.pos().x(), self.pos().y()
-            self.parent.setPixmap(self.parent.pixmap.scaled(QSize(self.parent.w, self.parent.h)))
+            self.parent.setItemSize(self.pos().x(), self.pos().y())
+            self.parent.updatePixmap()
 
         return super(ResizerItem, self).itemChange(change, value)

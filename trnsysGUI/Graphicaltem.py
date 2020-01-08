@@ -1,4 +1,5 @@
 from PyQt5 import QtCore
+from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QImage, QCursor
 from PyQt5.QtWidgets import QGraphicsPixmapItem
 
@@ -23,4 +24,8 @@ class GraphicalItem(QGraphicsPixmapItem):
 
         self.resizer = ResizerItem(self)
 
+    def setItemSize(self, w, h):
+        self.w, self.h = w, h
 
+    def updatePixmap(self):
+        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
