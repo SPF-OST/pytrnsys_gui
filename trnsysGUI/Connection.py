@@ -338,7 +338,7 @@ class Connection(object):
 
         for i in range(len(corners)):
             if corners[i] == searchCorner:
-                print("Found a corner")
+                # print("Found a corner")
                 return i
         print("corner not found is " + str(searchCorner))
 

@@ -19,7 +19,7 @@ class GenericBlock(BlockItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
-        self.imagesource = name
+        self.imagesource = ("images/" + self.name)
         self.changeSize()
 
     def changeSize(self):
@@ -60,6 +60,7 @@ class GenericBlock(BlockItem):
         print(relH)
 
     def setImage(self, name):
+        print("Setting image with name" + name)
         self.image = QImage(name)
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))

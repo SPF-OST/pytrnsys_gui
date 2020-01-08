@@ -243,7 +243,7 @@ class BlockItem(QGraphicsPixmapItem):
             dia = BlockDlg(self, self.scene().parent())
 
     def mouseReleaseEvent(self, event):
-        print("Released mouse over block")
+        # print("Released mouse over block")
         if self.oldPos is None:
             print("For Undo Framework: oldPos is None")
         else:

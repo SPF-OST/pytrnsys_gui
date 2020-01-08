@@ -354,11 +354,11 @@ class DiagramDecoder(json.JSONDecoder):
                         # print("Bl name " +  arr[k]["BlockName"] + str(type(arr[k]["BlockName"])))
                         # print("Bl disp name " +  arr[k]["BlockDisplayName"])
 
-                        if i["BlockName"] == 'StorageTank':
-                            print("Decoder should not find a Storage here")
-                            bl = StorageTank(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                        # if i["BlockName"] == 'StorageTank':
+                        #     print("Decoder should not find a Storage here")
+                        #     bl = StorageTank(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                             # c = ConfigStorage(bl, self.editor.diagramView)
-                        elif i["BlockName"] == 'TeePiece':
+                        if i["BlockName"] == 'TeePiece':
                             bl = TeePiece(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                         elif i["BlockName"] == 'TVentil':
                             bl = TVentil(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
@@ -379,9 +379,9 @@ class DiagramDecoder(json.JSONDecoder):
                             bl = WTap_main(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                         elif i["BlockName"] == 'Connector':
                             bl = Connector(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
-                        elif i["BlockName"] == 'GenericBlock':
-                            print("Should not find a GenericBlock here")
-                            bl = GenericBlock(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                        # elif i["BlockName"] == 'GenericBlock':
+                        #     print("Should not find a GenericBlock here")
+                        #     bl = GenericBlock(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
 
@@ -671,7 +671,8 @@ class DiagramEncoder(json.JSONEncoder):
                     dct['GroupName'] = t.groupName
                     dct['Imagesource'] = t.imagesource
 
-                    blockDct["GenericBlock-" + str(t.id)] = dct
+                    # Important: this key name is used for the order of loading ("BlockGeneric" < "Connection-")
+                    blockDct["BlockGeneric" + str(t.id)] = dct
 
                 if type(t) is StorageTank:
                     print("Encoding a storage tank")
@@ -801,8 +802,6 @@ class DiagramEncoder(json.JSONEncoder):
 
                 if type(t) is HeatPumpTwoHx:
                     print("Encoding a HeatPump")
-
-                    # childIdList = []
 
                     portListInputs = []
                     portListOutputs = []
