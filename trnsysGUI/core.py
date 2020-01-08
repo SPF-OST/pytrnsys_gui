@@ -1479,6 +1479,7 @@ class DiagramEditor(QWidget):
     # Debug buttons
     def button1_clicked(self):
         # self.dumpInformation()
+        pass
 
 
     def button2_clicked(self):
@@ -2600,10 +2601,10 @@ class DiagramEditor(QWidget):
                 t.trnsysConn = []
 
     def exportSvg(self):
+
         # For exporting a svg file (text is still too large):
         generator = QSvgGenerator()
         generator.setResolution(300)
-        # generator.setSize(QSize(800, 800))
         generator.setSize(QSize(self.diagramScene.width(), self.diagramScene.height()))
         # generator.setViewBox(QRect(0, 0, 800, 800))
         generator.setViewBox(self.diagramScene.sceneRect())
