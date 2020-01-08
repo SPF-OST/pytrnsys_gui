@@ -19,6 +19,7 @@ from PyQt5.QtSvg import QSvgGenerator
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 
 from trnsysGUI.GenericBlock import GenericBlock
+from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
@@ -1148,8 +1149,14 @@ class EditorGraphicsView(QGraphicsView):
                 bl = GenericBlock(name, name, self)
             elif name == 'HPTwoHx':
                 bl = HeatPumpTwoHx(name, name, self)
+            elif name == 'GenericItem':
+                bl = GraphicalItem(self)
             else:
                 bl = BlockItem(name, name, self)
+
+
+
+
 
             snapSize = self.parent().snapSize
             if self.parent().snapGrid:
@@ -1345,6 +1352,7 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Connector')), 'Connector'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericBlock')), 'GenericBlock'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
 
         for i in self.libItems:
             self.libraryModel.appendRow(i)
