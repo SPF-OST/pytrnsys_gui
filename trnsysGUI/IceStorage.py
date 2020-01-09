@@ -6,8 +6,8 @@ from trnsysGUI.PortItem import PortItem
 
 
 class IceStorage(BlockItem):
-    def __init__(self, trnsysType, name='Untitled', parent=None):
-        super(IceStorage, self).__init__(trnsysType, name, parent)
+    def __init__(self, trnsysType, parent, **kwargs):
+        super(IceStorage, self).__init__(trnsysType, parent, kwargs)
         self.w = 100
         self.h = 95
         self.inputs.append(PortItem('i', 1, self))

@@ -132,34 +132,48 @@ class DiagramDecoderPaste(json.JSONDecoder):
 
                         if i["BlockName"] == 'StorageTank':
                             print("No storage tank should be found here")
-                            bl = StorageTank(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = StorageTank(i["BlockName"], self.editor.diagramView,
+                                             displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                             # c = ConfigStorage(bl, self.editor.diagramView)
                         elif i["BlockName"] == 'TeePiece':
-                            bl = TeePiece(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = TeePiece(i["BlockName"], self.editor.diagramView,
+                                          displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'TVentil':
-                            bl = TVentil(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = TVentil(i["BlockName"], self.editor.diagramView,
+                                         displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'Pump':
-                            bl = Pump(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = Pump(i["BlockName"], self.editor.diagramView,
+                                      displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'Kollektor':
-                            bl = Collector(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = Collector(i["BlockName"], self.editor.diagramView,
+                                           displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'HP':
-                            bl = HeatPump(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = HeatPump(i["BlockName"], self.editor.diagramView,
+                                          displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'IceStorage':
-                            bl = IceStorage(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = IceStorage(i["BlockName"], self.editor.diagramView,
+                                            displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'Radiator':
-                            bl = Radiator(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = Radiator(i["BlockName"], self.editor.diagramView,
+                                          displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'WTap':
-                            bl = WTap(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = WTap(i["BlockName"], self.editor.diagramView,
+                                      displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'WTap_main':
-                            bl = WTap_main(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = WTap_main(i["BlockName"], self.editor.diagramView,
+                                           displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'Connector':
-                            bl = Connector(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = Connector(i["BlockName"], self.editor.diagramView,
+                                           displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'GenericBlock':
-                            bl = GenericBlock(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = GenericBlock(i["BlockName"], self.editor.diagramView,
+                                              displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'HPTwoHx':
-                            bl = HeatPumpTwoHx(i["BlockName"], i["BlockDisplayName"] + "COPY", self.editor.diagramView)
+                            bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         else:
-                            bl = BlockItem(i["BlockName"], i["BlockName"] + "COPY", self.editor.diagramView)
+                            bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockName"] + "COPY",
+                                           loaded=True)
                         # print("Bl name is" + bl.name)
 
                         bl.setPos(float(i["BlockPosition"][0] + offset_x),
@@ -1123,36 +1137,36 @@ class EditorGraphicsView(QGraphicsView):
             name = str(event.mimeData().data('component/name'), encoding='utf-8')
             print("name is " + name)
             if name == 'StorageTank':
-                bl = StorageTank(name, name, self)
+                bl = StorageTank(name, self)
                 c = ConfigStorage(bl, self)
             elif name == 'TeePiece':
-                bl = TeePiece(name, name, self)
+                bl = TeePiece(name, self)
             elif name == 'TVentil':
-                bl = TVentil(name, name, self)
+                bl = TVentil(name, self)
             elif name == 'Pump':
-                bl = Pump(name, name, self)
+                bl = Pump(name, self)
             elif name == 'Kollektor':
-                bl = Collector(name, name, self)
+                bl = Collector(name, self)
             elif name == 'HP':
-                bl = HeatPump(name, name, self)
+                bl = HeatPump(name, self)
             elif name == 'IceStorage':
-                bl = IceStorage(name, name, self)
+                bl = IceStorage(name, self)
             elif name == 'Radiator':
-                bl = Radiator(name, name, self)
+                bl = Radiator(name, self)
             elif name == 'WTap':
-                bl = WTap(name, name, self)
+                bl = WTap(name, self)
             elif name == 'WTap_main':
-                bl = WTap_main(name, name, self)
+                bl = WTap_main(name, self)
             elif name == 'Connector':
-                bl = Connector(name, name, self)
+                bl = Connector(name, self)
             elif name == 'GenericBlock':
-                bl = GenericBlock(name, name, self)
+                bl = GenericBlock(name, self)
             elif name == 'HPTwoHx':
-                bl = HeatPumpTwoHx(name, name, self)
+                bl = HeatPumpTwoHx(name, self)
             elif name == 'GenericItem':
                 bl = GraphicalItem(self)
             else:
-                bl = BlockItem(name, name, self)
+                bl = BlockItem(name, self)
 
             snapSize = self.parent().snapSize
             if self.parent().snapGrid:

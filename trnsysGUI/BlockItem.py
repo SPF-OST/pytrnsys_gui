@@ -42,7 +42,7 @@ def calcDist(p1, p2):
 
 class BlockItem(QGraphicsPixmapItem):
 
-    def __init__(self, trnsysType, name='Untitled', parent=None):
+    def __init__(self, trnsysType, name='Untitled', parent=None, **kwargs):
 
         super(BlockItem, self).__init__(None)
         self.w = 100.0

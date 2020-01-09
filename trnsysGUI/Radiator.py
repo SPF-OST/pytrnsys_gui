@@ -3,8 +3,8 @@ from trnsysGUI.PortItem import PortItem
 
 
 class Radiator(BlockItem):
-    def __init__(self, trnsysType, name='Untitled', parent=None):
-        super(Radiator, self).__init__(trnsysType, name, parent)
+    def __init__(self, trnsysType, parent, **kwargs):
+        super(Radiator, self).__init__(trnsysType, parent, kwargs)
 
         self.inputs.append(PortItem('i', 0, self))
         self.outputs.append(PortItem('o', 0, self))

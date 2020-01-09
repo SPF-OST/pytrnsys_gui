@@ -9,8 +9,8 @@ from trnsysGUI.Connection import Connection
 class StorageTank(BlockItem):
     delta = 4
 
-    def __init__(self, trnsysType, name, parent):
-        super(StorageTank, self).__init__(trnsysType, name, parent)
+    def __init__(self, trnsysType, parent, **kwargs):
+        super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
         # self.leftConnections = 0
         # self.rightConnections = 0
         self.parent = parent

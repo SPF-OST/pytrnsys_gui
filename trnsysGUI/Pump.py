@@ -6,8 +6,8 @@ from trnsysGUI.PortItem import PortItem
 
 
 class Pump(BlockItem):
-    def __init__(self, trnsysType, name='Untitled', parent=None):
-        super(Pump, self).__init__(trnsysType, name, parent)
+    def __init__(self, trnsysType, parent, **kwargs):
+        super(Pump, self).__init__(trnsysType, parent, kwargs)
         factor = 0.6
         print("creating pump")
         self.w = 100 * factor

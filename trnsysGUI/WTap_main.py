@@ -6,8 +6,8 @@ from trnsysGUI.PortItem import PortItem
 
 
 class WTap_main(BlockItem):
-    def __init__(self, trnsysType, name='Untitled', parent=None):
-        super(WTap_main, self).__init__(trnsysType, name, parent)
+    def __init__(self, trnsysType, name, parent, **kwargs):
+        super(WTap_main, self).__init__(trnsysType, name, parent, kwargs)
         factor = 0.5
         self.w = 100 * factor
         self.h = 100 * factor
