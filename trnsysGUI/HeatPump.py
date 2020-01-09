@@ -54,3 +54,62 @@ class HeatPump(BlockItem):
 
         return w, h
 
+    def encode(self):
+        if self.isVisible():
+            print("Encoding a HeatPump")
+
+            # childIdList = []
+
+            portListInputs = []
+            portListOutputs = []
+
+            for p in self.inputs:
+                portListInputs.append(p.id)
+            for p in self.outputs:
+                portListOutputs.append(p.id)
+
+            dct = {}
+            dct['.__HeatPumpDict__'] = True
+            dct['HeatPumpName'] = self.name
+            dct['HeatPumpDisplayName'] = self.displayName
+            dct['PortsIDIn'] = portListInputs
+            dct['PortsIDOut'] = portListOutputs
+            dct['HeatPumpPosition'] = (float(self.pos().x()), float(self.pos().y()))
+            dct['ID'] = self.id
+            dct['trnsysID'] = self.trnsysId
+            dct['childIds'] = self.childIds
+            dct['FlippedH'] = self.flippedH
+            dct['FlippedV'] = self.flippedH
+            dct['RotationN'] = self.rotationN
+            dct['GroupName'] = self.groupName
+
+            dictName = "Block-"
+
+            return dictName, dct
+
+    def decode(self, i, resConnList, resBlockList):
+        print("Loading a HeatPump block")
+
+        self.flippedH = i["FlippedH"]
+        self.flippedV = i["FlippedV"]
+        self.childIds = i["childIds"]
+        self.displayName = i["HeatPumpName"]
+        self.changeSize()
+
+        for x in range(len(self.inputs)):
+            self.inputs[x].id = i["PortsIDIn"][x]
+            print("Input at heatExchanger")
+
+        for x in range(len(self.outputs)):
+            self.outputs[x].id = i["PortsIDOut"][x]
+            print("Output at heatExchanger")
+
+        self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
+        self.trnsysId = i["trnsysID"]
+        self.id = i["ID"]
+
+        self.groupName = "defaultGroup"
+        self.setBlockToGroup(i["GroupName"])
+
+        resBlockList.append(self)
+

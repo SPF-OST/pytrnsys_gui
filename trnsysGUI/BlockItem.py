@@ -468,6 +468,56 @@ class BlockItem(QGraphicsPixmapItem):
         # self.parent.parent().parent().undoStack.push(command)
         self.parent.deleteBlockCom(self)
 
+    def encode(self):
+        if self.isVisible():
+            portListInputs = []
+            portListOutputs = []
+
+            for p in self.inputs:
+                portListInputs.append(p.id)
+            for p in self.outputs:
+                portListOutputs.append(p.id)
+            dct = {}
+
+            dct['.__BlockDict__'] = True
+            dct['BlockName'] = self.name
+            dct['BlockDisplayName'] = self.displayName
+            dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
+            dct['ID'] = self.id
+            dct['trnsysID'] = self.trnsysId
+            dct['PortsIDIn'] = portListInputs
+            dct['PortsIDOut'] = portListOutputs
+            dct['FlippedH'] = self.flippedH
+            dct['FlippedV'] = self.flippedV
+            dct['RotationN'] = self.rotationN
+            dct['GroupName'] = self.groupName
+
+            dictName = "Block-"
+
+            return dictName, dct
+
+    def decode(self, i, resConnList, resBlockList):
+        self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
+        self.trnsysId = i["trnsysID"]
+        self.id = i["ID"]
+        self.updateFlipStateH(i["FlippedH"])
+        self.updateFlipStateV(i["FlippedV"])
+        self.rotateBlockToN(i["RotationN"])
+        self.displayName = i["BlockDisplayName"]
+        self.label.setPlainText(self.displayName)
+
+        self.groupName = "defaultGroup"
+        self.setBlockToGroup(i["GroupName"])
+
+        print(len(self.inputs))
+        for x in range(len(self.inputs)):
+            self.inputs[x].id = i["PortsIDIn"][x]
+
+        for x in range(len(self.outputs)):
+            self.outputs[x].id = i["PortsIDOut"][x]
+
+        resBlockList.append(self)
+
     # Both classes in same module did not work
     # class DeleteBlockCommand(QUndoCommand):
     #     def __init__(self, bl, descr):

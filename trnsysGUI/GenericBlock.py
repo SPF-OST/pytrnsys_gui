@@ -120,3 +120,37 @@ class GenericBlock(BlockItem):
         e1.triggered.connect(self.inspectBlock)
 
         menu.exec_(event.screenPos())
+
+    def encode(self):
+        if self.isVisible():
+            print("Encoding a HeatPump")
+
+            portListInputs = []
+            portListOutputs = []
+
+            for p in self.inputs:
+                portListInputs.append(p.id)
+            for p in self.outputs:
+                portListOutputs.append(p.id)
+
+            dct = {}
+            dct['.__GenericBlockDict__'] = True
+            dct['BlockName'] = self.name
+            dct['BlockDisplayName'] = self.displayName
+            dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
+            dct['ID'] = self.id
+            dct['trnsysID'] = self.trnsysId
+            dct['PortsIDIn'] = portListInputs
+            dct['PortsIDOut'] = portListOutputs
+            dct['FlippedH'] = self.flippedH
+            dct['FlippedV'] = self.flippedV
+            dct['RotationN'] = self.rotationN
+            dct['GroupName'] = self.groupName
+            dct['Imagesource'] = self.imagesource
+
+            dictName = "Block-"
+            return dictName, dct
+
+    def decode(self, i, resConnList, resBlockList):
+        super(GenericBlock, self).decode(i, resConnList, resBlockList)
+        self.setImage(i["Imagesource"])

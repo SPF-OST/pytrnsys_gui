@@ -990,6 +990,42 @@ class Connection(object):
         for s in self.segments:
             s.updateGrad()
 
+    def encode(self):
+        if not self.isBlockConn:
+            print("Encoding a connection")
+
+            dct = {}
+            dct['.__ConnectionDict__'] = True
+            dct['PortFromID'] = self.fromPort.id
+            dct['PortToID'] = self.toPort.id
+            dct['isBlockConn'] = self.isBlockConn
+            dct['ConnDisplayName'] = self.displayName
+            dct['ConnID'] = self.id
+            dct['ConnCID'] = self.connId
+            dct['trnsysID'] = self.trnsysId
+            dct['GroupName'] = self.groupName
+
+            segments = []  # Not used, but instead corners[]
+
+            for s in self.segments:
+                segmentTupel = (s.line().p1().x(), s.line().p1().y(), s.line().p2().x(), s.line().p2().y())
+                segments.append(segmentTupel)
+            # print("Segments in encoder is " + str(segments))
+            dct['SegmentPositions'] = segments
+
+            corners = []
+
+            for s in self.getCorners():
+                cornerTupel = (s.pos().x(), s.pos().y())
+                corners.append(cornerTupel)
+            dct['CornerPositions'] = corners
+            dictName = "Connection-"
+
+            return dictName, dct
+
+    def decode(self, i, resConnList, resBlockList):
+        pass
+
 
 class DeleteConnectionCommand(QUndoCommand):
     def __init__(self, conn, descr):

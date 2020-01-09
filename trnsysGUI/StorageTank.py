@@ -1,6 +1,9 @@
+from PyQt5.QtCore import QPointF
+
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
 from trnsysGUI.Connector import Connector
+from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.Connection import Connection
@@ -483,7 +486,151 @@ class StorageTank(BlockItem):
         for hx in self.heatExchangers:
             hx.updateLines(h)
 
-    # def keyPressEvent(self, event):
-    #     print("Pressed st")
-    #
-    #     super(StorageTank, self).keyPressEvent(event)
+    def encode(self):
+        if self.isVisible():
+            print("Encoding a storage tank")
+
+            hxList = []
+            for hx in self.heatExchangers:
+                hxDct = {"DisplayName": hx.displayName}
+                hxDct['ID'] = hx.id
+                hxDct['ParentID'] = hx.parent.id
+                hxDct['connTrnsysID'] = hx.conn.trnsysId
+                # hxDct['connDispName'] = hx.conn.diplayName    # Both are set in initNew
+                hxDct['Offset'] = (hx.offset.x(), hx.offset.y())
+                hxDct['Width'] = hx.w
+                hxDct['Height'] = hx.h
+                hxDct['SideNr'] = hx.sSide
+                hxDct['Port1ID'] = hx.port1.id
+                hxDct['Port2ID'] = hx.port2.id
+
+                hxList.append(hxDct)
+
+            portPairList = []
+
+            for manP in self.leftSide + self.rightSide:
+                manP.portPairVisited = True
+                print("This port is part of a manual port pair ")
+                for innerC in manP.connectionList:
+                    print("There is a connection")
+                    if innerC.fromPort is manP and type(innerC.toPort.parent) is StorageTank \
+                            and not innerC.toPort.portPairVisited:
+                        print("Found the corresponding port")
+
+                        portPairDct = {"Port1ID": manP.id}
+
+                        b = self.hasManPortById(manP.id)
+
+                        print("side encoded is" + str(b))
+
+                        portPairDct["Side"] = b
+                        portPairDct["Port1offset"] = float(manP.scenePos().y() - self.scenePos().y())
+                        portPairDct["Port2ID"] = innerC.toPort.id
+                        portPairDct["Port2offset"] = float(innerC.toPort.scenePos().y() - self.scenePos().y())
+                        portPairDct["ConnDisName"] = innerC.displayName
+                        portPairDct["ConnID"] = innerC.id
+                        portPairDct["ConnCID"] = innerC.connId
+                        portPairDct["trnsysID"] = innerC.trnsysId
+
+                        portPairList.append(portPairDct)
+
+                        # innerC.deleteConn()
+
+                    elif innerC.toPort is manP and type(innerC.fromPort.parent) is StorageTank \
+                            and not innerC.fromPort.portPairVisited:
+
+                        print("Found the corresponding port")
+
+                        portPairDct = {"Port2ID": manP.id}
+
+                        b = self.hasManPortById(manP.id)
+
+                        print("side encoded is" + str(b))
+
+                        portPairDct["Side"] = b
+                        portPairDct["Port2offset"] = float(manP.scenePos().y() - self.scenePos().y())
+                        portPairDct["Port1ID"] = innerC.fromPort.id
+                        portPairDct["Port1offset"] = float(innerC.fromPort.scenePos().y() - self.scenePos().y())
+                        portPairDct["ConnDisName"] = innerC.displayName
+                        portPairDct["ConnID"] = innerC.id
+                        portPairDct["ConnCID"] = innerC.connId
+                        portPairDct["trnsysID"] = innerC.trnsysId
+
+                        # print("Portpairlist is " + str(portPairDct))
+                        portPairList.append(portPairDct)
+
+                        # innerC.deleteConn()
+
+                    else:
+                        print("Did not found the corresponding (inner) port")
+
+            for manP in self.leftSide + self.rightSide:
+                manP.portPairVisited = False
+            dct = {}
+            dct['.__StorageDict__'] = True
+            dct['StorageName'] = self.name
+            dct['StorageDisplayName'] = self.displayName
+            dct['StoragePosition'] = (float(self.pos().x()), float(self.pos().y()))
+            dct['ID'] = self.id
+            dct['trnsysID'] = self.trnsysId
+            dct['HxList'] = hxList
+            dct['PortPairList'] = portPairList
+            dct['FlippedH'] = self.flippedH
+            dct['FlippedV'] = self.flippedH
+            dct['GroupName'] = self.groupName
+            dct['size_h'] = self.h
+
+            # dct['RotationN'] = t.rotationN
+            dictName = "Block-"
+
+            return dictName, dct
+
+    def decode(self, i, resConnList, resBlockList):
+        print("Loading a Storage in Decoder")
+        
+        self.flippedH = i["FlippedH"]
+        # self.flippedV = i["FlippedV"] # No support for vertical flip
+        self.displayName = i["StorageDisplayName"]
+
+        self.changeSize()
+        self.h = i["size_h"]
+        self.updateImage()
+
+        self.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
+        self.trnsysId = i["trnsysID"]
+        self.id = i["ID"]
+
+        self.groupName = "defaultGroup"
+        self.setBlockToGroup(i["GroupName"])
+
+        # Add heat exchangers
+        for h in i["HxList"]:
+            hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
+                                QPointF(h["Offset"][0], h["Offset"][1]), self, h["DisplayName"],
+                                port1ID=h['Port1ID'], port2ID=h['Port2ID'],
+                                connTrnsysID=h['connTrnsysID'])
+
+            hEx.setId(h["ID"])
+            hEx.port1.id = h['Port1ID']
+            hEx.port2.id = h['Port2ID']
+
+            # hxDct['ParentID'] = hx.parent.id
+            # hxDct['Port2ID'] = hx.port2.id
+
+        # Add manual inputs
+        for x in i["PortPairList"]:
+            print("Printing port pair")
+            print(x)
+
+            conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
+                                        fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
+                                        connId=x["ConnID"], connCid=x["ConnCID"],
+                                        connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"])
+            conn.id = x["ConnID"]
+            conn.connId = x["ConnCID"]
+            conn.trnsysId = x["trnsysID"]
+            conn.displayName = x["ConnDisName"]
+
+            resConnList.append(conn)
+        resBlockList.append(self)
+
