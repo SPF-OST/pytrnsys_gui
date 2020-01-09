@@ -19,6 +19,10 @@ class ResizerItem(QGraphicsEllipseItem):
         if change == self.ItemPositionChange:
             print("relative pos has changed")
             self.parent.setItemSize(self.pos().x(), self.pos().y())
-            self.parent.updatePixmap()
+            self.parent.updateImage()
 
         return super(ResizerItem, self).itemChange(change, value)
+
+    def mouseReleaseEvent(self, event):
+        self.setPos(self.parent.boundingRect().bottomRight())
+        super(ResizerItem, self).mouseReleaseEvent(event)
