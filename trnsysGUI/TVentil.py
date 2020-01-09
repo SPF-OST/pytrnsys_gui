@@ -7,7 +7,7 @@ from trnsysGUI.PortItem import PortItem
 
 class TVentil(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(TVentil, self).__init__(trnsysType, parent, kwargs)
+        super(TVentil, self).__init__(trnsysType, parent, **kwargs)
         factor = 0.6
         self.w = 100 * factor
         self.h = 61.14 * factor

@@ -7,7 +7,7 @@ from trnsysGUI.PortItem import PortItem
 
 class TeePiece(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(TeePiece, self).__init__(trnsysType, parent, kwargs)
+        super(TeePiece, self).__init__(trnsysType, parent, **kwargs)
         self.sizeFactor = 0.5
         self.w = 100 * self.sizeFactor
         self.h = 76.4 * self.sizeFactor

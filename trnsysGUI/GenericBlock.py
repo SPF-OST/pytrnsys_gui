@@ -11,7 +11,7 @@ from trnsysGUI.newPortDlg import newPortDlg
 
 class GenericBlock(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(GenericBlock, self).__init__(trnsysType, parent, kwargs)
+        super(GenericBlock, self).__init__(trnsysType, parent, **kwargs)
 
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))

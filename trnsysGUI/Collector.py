@@ -7,7 +7,7 @@ from trnsysGUI.PortItem import PortItem
 
 class Collector(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(Collector, self).__init__(trnsysType, parent, kwargs)
+        super(Collector, self).__init__(trnsysType, parent, **kwargs)
 
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))

@@ -42,7 +42,8 @@ def calcDist(p1, p2):
 
 class BlockItem(QGraphicsPixmapItem):
 
-    def __init__(self, trnsysType, name='Untitled', parent=None, **kwargs):
+
+    def __init__(self, trnsysType, parent, **kwargs):
 
         super(BlockItem, self).__init__(None)
         self.w = 100.0
@@ -50,12 +51,13 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
 
-        # Temporary differentiation between new block and loaded block
-        if trnsysType == name:
-            # self.displayName = name[:-4] + str(self.id)
-            self.displayName = name + str(self.id)
+        if "displayName" in kwargs:
+            self.displayName = kwargs["displayName"]
         else:
-            self.displayName = name
+            self.displayName = trnsysType + str(self.id)
+
+        if "loadedBlock" not in kwargs:
+            self.parent.parent().trnsysObj.append(self)
 
         # print("Setting the displayName of " + str(self) + "to " + self.displayName)
 

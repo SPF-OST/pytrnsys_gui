@@ -7,7 +7,7 @@ from trnsysGUI.PortItem import PortItem
 
 class HeatPump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(HeatPump, self).__init__(trnsysType, parent, kwargs)
+        super(HeatPump, self).__init__(trnsysType, parent, **kwargs)
 
         self.inputs.append(PortItem('i', 0, self))
         self.inputs.append(PortItem('i', 2, self))
