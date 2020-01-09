@@ -1154,10 +1154,6 @@ class EditorGraphicsView(QGraphicsView):
             else:
                 bl = BlockItem(name, name, self)
 
-
-
-
-
             snapSize = self.parent().snapSize
             if self.parent().snapGrid:
                 qp = QPoint(event.pos().x() - event.pos().x() % snapSize, event.pos().y() - event.pos().y() % snapSize)

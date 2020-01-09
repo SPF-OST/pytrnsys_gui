@@ -1,6 +1,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QImage, QCursor
+from PyQt5.QtGui import QPixmap, QImage, QCursor, QIcon
+from PyQt5.QtSvg import QSvgRenderer
 from PyQt5.QtWidgets import QGraphicsPixmapItem
 
 from trnsysGUI.ResizerItem import ResizerItem
@@ -14,9 +15,10 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.w = 100.0
         self.h = 100.0
         self.parent = parent
-        self.image = QImage("images/genericItem")
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(self.w, self.h))
+        # self.image = QImage("images/genericItem")
+        # self.image = QImage("gear.svg")
+        self.image = QPixmap(QIcon("gear.svg").pixmap(QSize(self.w, self.h)).toImage())
+        self.setPixmap(self.image)
 
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
         self.setFlag(self.ItemSendsScenePositionChanges, True)
