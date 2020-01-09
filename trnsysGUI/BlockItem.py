@@ -42,7 +42,6 @@ def calcDist(p1, p2):
 
 class BlockItem(QGraphicsPixmapItem):
 
-
     def __init__(self, trnsysType, parent, **kwargs):
 
         super(BlockItem, self).__init__(None)

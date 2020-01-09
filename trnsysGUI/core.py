@@ -17,6 +17,10 @@ from pathlib import Path
 from PyQt5.QtSvg import QSvgGenerator
 
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
+from trnsysGUI.Boiler import Boiler
+from trnsysGUI.AirSourceHP import AirSourceHP
+from trnsysGUI.GroundSourceHx import GroundSourceHx
+from trnsysGUI.PV import PV
 
 from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.Graphicaltem import GraphicalItem
@@ -170,6 +174,18 @@ class DiagramDecoderPaste(json.JSONDecoder):
                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'Boiler':
+                            bl = Boiler(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'AirSourceHP':
+                            bl = AirSourceHP(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'PV':
+                            bl = PV(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'GroundSourceHx':
+                            bl = GroundSourceHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         else:
                             bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockName"] + "COPY",
@@ -407,9 +423,28 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'Connector':
                             bl = Connector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                            loadedBlock=True)
+                        elif i["BlockName"] == 'Boiler':
+                            bl = Boiler(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
+                        elif i["BlockName"] == 'AirSourceHP':
+                            bl = AirSourceHP(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
+                        elif i["BlockName"] == 'PV':
+                            bl = PV(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
+                        elif i["BlockName"] == 'GroundSourceHx':
+                            bl = GroundSourceHx(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
+
+                        # elif i["BlockName"] == 'AirSourceHp':
+                        #     bl = AirSourceHp(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                        #                    loadedBlock=True)
+
                         # elif i["BlockName"] == 'GenericBlock':
                         #     print("Should not find a GenericBlock here")
                         #     bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True), self.editor.diagramView)
+
+
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
@@ -1174,6 +1209,14 @@ class EditorGraphicsView(QGraphicsView):
                 bl = GenericBlock(name, self)
             elif name == 'HPTwoHx':
                 bl = HeatPumpTwoHx(name, self)
+            elif name == 'Boiler':
+                bl = Boiler(name, self)
+            elif name == 'AirSourceHP':
+                bl = AirSourceHP(name, self)
+            elif name == 'PV':
+                bl = PV(name, self)
+            elif name == 'GroundSourceHx':
+                bl = GroundSourceHx(name, self)
             elif name == 'GenericItem':
                 bl = GraphicalItem(self)
             else:
@@ -1363,7 +1406,7 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TVentil')), 'TVentil'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'StorageTank')), 'StorageTank'))
 
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Bvi')), 'Bvi'))
+        # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Bvi')), 'Bvi'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TeePiece')), 'TeePiece'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HP')), 'HP'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'IceStorage')), 'IceStorage'))
@@ -1372,6 +1415,11 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Radiator')), 'Radiator'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Connector')), 'Connector'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericBlock')), 'GenericBlock'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Boiler')), 'Boiler'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'AirSourceHP')), 'AirSourceHP'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'PV')), 'PV'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GroundSourceHx')), 'GroundSourceHx'))
+
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
 

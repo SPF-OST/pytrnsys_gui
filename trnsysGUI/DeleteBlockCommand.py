@@ -13,8 +13,10 @@ import trnsysGUI.TVentil
 import trnsysGUI.TeePiece
 import trnsysGUI.WTap
 import trnsysGUI.WTap_main
-
+import trnsysGUI.Boiler
 import trnsysGUI.BlockItem
+import trnsysGUI.AirSourceHP
+import trnsysGUI.PV
 
 
 class DeleteBlockCommand(QUndoCommand):
@@ -71,6 +73,14 @@ class DeleteBlockCommand(QUndoCommand):
             bl = trnsysGUI.GenericBlock.GenericBlock(name, self.blParent)
         elif name == 'HPTwoHx':
             bl = trnsysGUI.HeatPumpTwoHx.HeatPumpTwoHx(name, self.blParent)
+        elif name == 'Boiler':
+            bl = trnsysGUI.Boiler.Boiler(name, self.blParent)
+        elif name == 'AirSourceHP':
+            bl = trnsysGUI.AirSourceHP.AirSourceHP(name, self.blParent)
+        elif name == 'PV':
+            bl = trnsysGUI.PV.PV
+        elif name == 'GroundSourceHx':
+            bl = trnsysGUI.GroundSourceHx.GroundSourceHx(name, self.blParent)
         else:
             bl = trnsysGUI.BlockItem.BlockItem(name, self.blParent)
 

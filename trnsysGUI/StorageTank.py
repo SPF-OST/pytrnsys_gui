@@ -278,15 +278,15 @@ class StorageTank(BlockItem):
             # Check if external connections to the storagetank have storage ports as fromPorts or toPorts
             # if side[0] has toPort at storage: connector on second place
             if side[0].connectionList[0].fromPort is side[0]:
-                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(),visible=False)
+                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(), visible=False)
             else:
-                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(),visible=False)
+                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(), visible=False)
                 pass
 
             if side[1].connectionList[0].fromPort is side[1]:
-                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(),visible=False)
+                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(), visible=False)
             else:
-                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(),visible=False)
+                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(), visible=False)
                 pass
 
             # Check where the fact is used that connector is at fromPort!
