@@ -311,7 +311,7 @@ class StorageTank(BlockItem):
                 mem.append(side[x])
 
             for i in range(0, x, 2):
-                tpiece = TeePiece("TeePiece", "TeePiece", self.parent)
+                tpiece = TeePiece("TeePiece", self.parent)
                 tpiece.displayName = "TPieceTes" + self.displayName + sideVar + str(tpiece.id)
                 tpiece.setVisible(False)
                 self.parent.scene().addItem(tpiece)
@@ -383,7 +383,7 @@ class StorageTank(BlockItem):
         # Adds a Connector block and connections to the external blocks (both virtual)
         print("ports have " + str(side[0].parent) + str(side[1].parent))
 
-        connector = Connector("Connector", "Connector", self.parent, storagePorts=side2)
+        connector = Connector("Connector", self.parent, storagePorts=side2)
         connector.displayName = heatX.displayName
         # connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
 

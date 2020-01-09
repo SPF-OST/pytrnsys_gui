@@ -46,33 +46,33 @@ class DeleteBlockCommand(QUndoCommand):
     def undo(self):
         name = self.blName
         if name == 'StorageTank':
-            bl = trnsysGUI.StorageTank.StorageTank(name, name, self.blParent)
+            bl = trnsysGUI.StorageTank.StorageTank(name, self.blParent)
         elif name == 'TeePiece':
-            bl = trnsysGUI.TeePiece.TeePiece(name, name, self.blParent)
+            bl = trnsysGUI.TeePiece.TeePiece(name, self.blParent)
         elif name == 'TVentil':
-            bl = trnsysGUI.TVentil.TVentil(name, name, self.blParent)
+            bl = trnsysGUI.TVentil.TVentil(name, self.blParent)
         elif name == 'Pump':
-            bl = trnsysGUI.Pump.Pump(name, name, self.blParent)
+            bl = trnsysGUI.Pump.Pump(name, self.blParent)
         elif name == 'Kollektor':
-            bl = trnsysGUI.Collector.Collector(name, name, self.blParent)
+            bl = trnsysGUI.Collector.Collector(name, self.blParent)
         elif name == 'HP':
-            bl = trnsysGUI.HeatPump.HeatPump(name, name, self.blParent)
+            bl = trnsysGUI.HeatPump.HeatPump(name, self.blParent)
         elif name == 'IceStorage':
-            bl = trnsysGUI.IceStorage.IceStorage(name, name, self.blParent)
+            bl = trnsysGUI.IceStorage.IceStorage(name, self.blParent)
         elif name == 'Radiator':
-            bl = trnsysGUI.Radiator.Radiator(name, name, self.blParent)
+            bl = trnsysGUI.Radiator.Radiator(name, self.blParent)
         elif name == 'WTap':
-            bl = trnsysGUI.WTap.WTap(name, name, self.blParent)
+            bl = trnsysGUI.WTap.WTap(name, self.blParent)
         elif name == 'WTap_main':
-            bl = trnsysGUI.WTap_mainW.Tap_main(name, name, self.blParent)
+            bl = trnsysGUI.WTap_mainW.Tap_main(name, self.blParent)
         elif name == 'Connector':
-            bl = trnsysGUI.Connector.Connector(name, name, self.blParent)
+            bl = trnsysGUI.Connector.Connector(name, self.blParent)
         elif name == 'GenericBlock':
-            bl = trnsysGUI.GenericBlock.GenericBlock(name, name, self.blParent)
+            bl = trnsysGUI.GenericBlock.GenericBlock(name, self.blParent)
         elif name == 'HPTwoHx':
-            bl = trnsysGUI.HeatPumpTwoHx.HeatPumpTwoHx(name, name, self.blParent)
+            bl = trnsysGUI.HeatPumpTwoHx.HeatPumpTwoHx(name, self.blParent)
         else:
-            bl = trnsysGUI.BlockItem.BlockItem(name, name, self.blParent)
+            bl = trnsysGUI.BlockItem.BlockItem(name, self.blParent)
 
         bl.trnsysId = self.blTrnsysId
         bl.id = self.blId

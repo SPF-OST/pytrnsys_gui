@@ -3523,7 +3523,7 @@ class MainWindow(QMainWindow):
         print("Deleting diagram")
         self.centralWidget.delBlocks()
         msgb = QMessageBox(self)
-        msgb.setText("Deleted diagram" + str(self.centralWidget.saveAsPath) + "[" + str(len(self.centralWidget.trnsysObj)) + "]")
+        msgb.setText("Deleted diagram (Path: " + str(self.centralWidget.saveAsPath) + ")[" + str(len(self.centralWidget.trnsysObj)) + "]")
         msgb.exec()
 
     def createGroup(self):
