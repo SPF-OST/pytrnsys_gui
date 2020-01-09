@@ -375,36 +375,47 @@ class DiagramDecoder(json.JSONDecoder):
                         #     print("Decoder should not find a Storage here")
                         #     bl = StorageTank(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
                             # c = ConfigStorage(bl, self.editor.diagramView)
+
                         if i["BlockName"] == 'TeePiece':
-                            bl = TeePiece(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = TeePiece(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                          loadedBlock=True)
                         elif i["BlockName"] == 'TVentil':
-                            bl = TVentil(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = TVentil(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                         loadedBlock=True)
                         elif i["BlockName"] == 'Pump':
-                            bl = Pump(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = Pump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                      loadedBlock=True)
                         elif i["BlockName"] == 'Kollektor':
-                            bl = Collector(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = Collector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
                         elif i["BlockName"] == 'HP':
-                            bl = HeatPump(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = HeatPump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                          loadedBlock=True)
                             print("Encoder should not find a HeatPump here")
                         elif i["BlockName"] == 'IceStorage':
-                            bl = IceStorage(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = IceStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                            loadedBlock=True)
                         elif i["BlockName"] == 'Radiator':
-                            bl = Radiator(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = Radiator(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                          loadedBlock=True)
                         elif i["BlockName"] == 'WTap':
-                            bl = WTap(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = WTap(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                      loadedBlock=True)
                         elif i["BlockName"] == 'WTap_main':
-                            bl = WTap_main(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = WTap_main(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
                         elif i["BlockName"] == 'Connector':
-                            bl = Connector(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = Connector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
                         # elif i["BlockName"] == 'GenericBlock':
                         #     print("Should not find a GenericBlock here")
-                        #     bl = GenericBlock(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                        #     bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True), self.editor.diagramView)
                         elif i["BlockName"] == 'HPTwoHx':
-                            bl = HeatPumpTwoHx(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                            bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loadedBlock=True)
 
                         else:
-                            bl = BlockItem(i["BlockName"], i["BlockName"
-                                                             ""], self.editor.diagramView)
+                            bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
                         # print("Bl name is" + bl.name)
 
                         bl.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
@@ -431,7 +442,7 @@ class DiagramDecoder(json.JSONDecoder):
                     elif ".__StorageDict__" in arr[k]:
                         print("Loading a Storage in Decoder")
                         i = arr[k]
-                        bl = StorageTank(i["StorageName"], i["StorageDisplayName"], self.editor.diagramView)
+                        bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName=i["StorageDisplayName"], loadedBlock=True)
                         bl.flippedH = i["FlippedH"]
                         # bl.flippedV = i["FlippedV"] # No support for vertical flip
                         bl.displayName = i["StorageDisplayName"]
@@ -481,7 +492,7 @@ class DiagramDecoder(json.JSONDecoder):
                     elif ".__HeatPumpDict__" in arr[k]:
                         print("Loading a HeatPump in Decoder")
                         i = arr[k]
-                        bl = HeatPump(i["HeatPumpName"], i["HeatPumpDisplayName"], self.editor.diagramView)
+                        bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"], loadedBlock=True)
                         bl.flippedH = i["FlippedH"]
                         bl.flippedV = i["FlippedV"]
                         bl.childIds = i["childIds"]
@@ -508,7 +519,7 @@ class DiagramDecoder(json.JSONDecoder):
                     elif ".__HeatPumpTwoDict__" in arr[k]:
                         print("Loading a HeatPumpTwo in Decoder")
                         i = arr[k]
-                        bl = HeatPump(i["HeatPumpName"], i["HeatPumpDisplayName"], self.editor.diagramView)
+                        bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"], loadedBlock=True)
                         bl.flippedH = i["FlippedH"]
                         bl.flippedV = i["FlippedV"]
                         bl.childIds = i["childIds"]
@@ -535,7 +546,7 @@ class DiagramDecoder(json.JSONDecoder):
                     elif ".__GenericBlockDict__" in arr[k]:
                         print("Loading a generic block")
                         i = arr[k]
-                        bl = GenericBlock(i["BlockName"], i["BlockDisplayName"], self.editor.diagramView)
+                        bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True)
                         bl.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
                         bl.trnsysId = i["trnsysID"]
                         bl.id = i["ID"]
