@@ -535,83 +535,33 @@ class BlockItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
-    # Both classes in same module did not work
-    # class DeleteBlockCommand(QUndoCommand):
-    #     def __init__(self, bl, descr):
-    #         super(DeleteBlockCommand, self).__init__(descr)
-    #         self.bl = bl
-    #         self.blW = bl.w
-    #         self.blH = bl.h
-    #         self.blParent = bl.parent
-    #         self.blId = bl.id
-    #         self.blTrnsysId = bl.trnsysId
-    #
-    #         self.portsIdIn = []
-    #         self.portsIdOut = []
-    #         self.savePortsId()
-    #
-    #         self.blFlippedH = bl.flippedH
-    #         self.blFlippedV = bl.flippedV
-    #         self.blRotation = bl.rotationN
-    #         self.blGroupName = bl.groupName
-    #         self.blName = bl.name
-    #         self.bldName = bl.displayName
-    #         self.blPos = bl.pos()
-    #
-    #     def redo(self):
-    #         self.bl.deleteBlock()
-    #         self.bl = None
-    #
-    #     def undo(self):
-    #         name = self.blName
-    #         if name == 'StorageTank':
-    #             bl = StorageTank(name, name, self)
-    #         elif name == 'TeePiece':
-    #             bl = TeePiece(name, name, self)
-    #         elif name == 'TVentil':
-    #             bl = TVentil(name, name, self)
-    #         elif name == 'Pump':
-    #             bl = Pump(name, name, self)
-    #         elif name == 'Kollektor':
-    #             bl = Collector(name, name, self)
-    #         elif name == 'HP':
-    #             bl = HeatPump(name, name, self)
-    #         elif name == 'IceStorage':
-    #             bl = IceStorage(name, name, self)
-    #         elif name == 'Radiator':
-    #             bl = Radiator(name, name, self)
-    #         elif name == 'WTap':
-    #             bl = WTap(name, name, self)
-    #         elif name == 'WTap_main':
-    #             bl = WTap_main(name, name, self)
-    #         elif name == 'Connector':
-    #             bl = Connector(name, name, self)
-    #         elif name == 'GenericBlock':
-    #             bl = GenericBlock(name, name, self)
-    #         elif name == 'HPTwoHx':
-    #             bl = HeatPumpTwoHx(name, name, self)
-    #         else:
-    #             bl = BlockItem(name, name, self)
-    #
-    #         if name != "StorageTank":
-    #             bl.trnsysId = self.blTrnsysId
-    #             bl.id = self.blId
-    #             bl.updateFlipStateH(self.blFlippedH)
-    #             bl.updateFlipStateV(self.blFlippedV)
-    #             bl.rotateBlockToN(self.blRotation)
-    #             bl.displayName = self.bldName
-    #             bl.label.setPlainText(bl.displayName)
-    #
-    #             bl.groupName = "defaultGroup"
-    #             bl.setBlockToGroup(self.blGroupName)
-    #
-    #             bl.setPos(self.blPos)
-    #             self.blParent.scene().addItem(bl)
-    #
-    #             bl.oldPos = bl.scenePos()
-    #
-    #     def savePortsId(self):
-    #         for p in self.bl.inputs:
-    #             self.portsIdIn.append(p.id)
-    #         for p in self.bl.outputs:
-    #             self.portsIdOut.append(p.id)
+    def exportParameterSolver(self, descConnLength):
+        temp = ""
+        for i in self.inputs:
+            # ConnectionList lenght should be max offset
+            for c in i.connectionList:
+                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        for o in self.outputs:
+            # ConnectionList lenght should be max offset
+            for c in o.connectionList:
+                if type(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                elif type(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        temp += str(self.typeNumber)
+        temp += " " * (descConnLength - len(temp))
+        self.exportConnsString = temp
+
+        return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+

@@ -190,7 +190,7 @@ class GenericBlock(BlockItem):
 
     def encode(self):
         if self.isVisible():
-            print("Encoding a HeatPump")
+            print("Encoding a Generic Block")
 
             portListInputs = []
             portListOutputs = []
@@ -221,10 +221,15 @@ class GenericBlock(BlockItem):
 
     def decode(self, i, resConnList, resBlockList):
         print("Portpair is " + str(i['PortPairsNb']))
+        correcter = 0
         for j in range(4):
-            for k in range(i['PortPairsNb'][j]):
+            if j == 2:
+                correcter = -1
+            for k in range(i['PortPairsNb'][j] + correcter):
+                print("Show me this message")
                 self.addPortPair(j)
 
+        print("tHere are " + str(len(self.inputs)) + " and " + str(len(i["PortsIDIn"])))
         super(GenericBlock, self).decode(i, resConnList, resBlockList)
         self.setImage(i["Imagesource"])
 

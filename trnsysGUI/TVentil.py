@@ -55,3 +55,43 @@ class TVentil(BlockItem):
 
     def setComplexDiv(self, b):
         self.isComplexDiv = b
+
+    def exportParameterSolver(self, descConnLength):
+        for o in self.outputs:
+            # ConnectionList lenght should be max offset
+            for c in o.connectionList:
+                if type(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                elif type(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        for i in self.inputs:
+            # Either left or right
+            tempArr = []
+
+            for c in i.connectionList:
+                if type(c.fromPort.parent) and i.connectionList.index(c) == 0:
+                    continue
+                elif type(c.toPort.parent) and i.connectionList.index(c) == 0:
+                    continue
+                else:
+                    # On same hight as output
+                    if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
+                        tempArr.insert(0, c)
+                    else:
+                        tempArr.append(c)
+
+            for conn in tempArr:
+                temp = temp + str(conn.trnsysId) + " "
+                self.trnsysConn.append(conn)
+
+            temp += "0 "
+
+            temp += str(self.typeNumber)
+            temp += " " * (descConnLength - len(temp))
+            self.exportConnsString = temp
+
+            return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
