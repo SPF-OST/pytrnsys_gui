@@ -1926,7 +1926,7 @@ class DiagramEditor(QWidget):
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
         return f
 
-    def exportMassFlows(self):
+    def exportMassFlows(self): # What the controller should give
         f = "*** Massflowrates" + "\n"
         equationNr = 0
 
@@ -1984,7 +1984,7 @@ class DiagramEditor(QWidget):
         f += "PARAMETERS " + str(parameters) + "\n"
         f += str(lineNr) + "\n"
 
-        #exportConnsString: i/o i/o 0 0
+        # exportConnsString: i/o i/o 0 0
 
         for t in self.trnsysObj:
             if type(t) is StorageTank:

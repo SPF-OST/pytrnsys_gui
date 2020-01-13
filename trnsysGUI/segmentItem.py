@@ -93,22 +93,22 @@ class segmentItem(QGraphicsLineItem):
         return calcDist(self.line().p1(), self.line().p2())
 
     def interpolate(self, partLen2, totLenConn, ):
-        c1_r = 0
-        c1_b = 255
-        # c1_r = 160
-        # c1_b = 160
-        # c1_g = 160
+        # c1_r = 0
+        # c1_b = 255
+        c1_r = 160
+        c1_b = 160
+        c1_g = 160
 
-        c2_r = 255
-        c2_b = 0
-        # c2_r = 0
+        # c2_r = 255
         # c2_b = 0
-        # c2_g = 0
+        c2_r = 0
+        c2_b = 0
+        c2_g = 0
 
         f1 = partLen2 / totLenConn
         f2 = (totLenConn - partLen2) / totLenConn
-        return QColor(f1 * c2_r + f2 * c1_r, 0, f1 * c2_b + f2 * c1_b)
-        # return QColor(f1 * c2_r + f2 * c1_r, f1 * c2_g + f2 * c1_g, f1 * c2_b + f2 * c1_b)
+        # return QColor(f1 * c2_r + f2 * c1_r, 0, f1 * c2_b + f2 * c1_b)
+        return QColor(f1 * c2_r + f2 * c1_r, f1 * c2_g + f2 * c1_g, f1 * c2_b + f2 * c1_b)
 
     def initGrad(self):
         # color = QColor(177, 202, 211)
@@ -134,8 +134,8 @@ class segmentItem(QGraphicsLineItem):
         self.linearGrad.setColorAt(0, QtCore.Qt.blue)
         self.linearGrad.setColorAt(1, QtCore.Qt.red)
 
-        # self.linearGrad.setColorAt(0, QtCore.Qt.gray)
-        # self.linearGrad.setColorAt(1, QtCore.Qt.black)
+        self.linearGrad.setColorAt(0, QtCore.Qt.gray)
+        self.linearGrad.setColorAt(1, QtCore.Qt.black)
 
         # self.setPen(QtGui.QPen(color, 2))
 

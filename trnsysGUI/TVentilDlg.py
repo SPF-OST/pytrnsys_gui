@@ -13,7 +13,7 @@ class TVentilDlg(QDialog):
 
         self.hFlipBoxLabel = QLabel("Horizontal Flip")
         self.vFlipBoxLabel = QLabel("Vertical Flip")
-        self.complexDivLabel = QLabel("Set complex")
+        self.complexDivLabel = QLabel("Tempering valve")
         self.hFlipBox = QCheckBox()
         self.vFlipBox = QCheckBox()
         self.complexDiv = QCheckBox()
