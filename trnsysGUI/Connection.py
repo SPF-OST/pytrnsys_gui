@@ -28,6 +28,7 @@ class Connection(object):
         self.isStorageIO = False
         self.displayName = None
         self.visible = visible  # DC add this to pipes too
+        self.hiddenGenerated = False
 
         self.parent = parent
         self.groupName = ''
@@ -323,7 +324,11 @@ class Connection(object):
 
         self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
 
+
+
         if self.isBlockConn:
+            # if self.displayName == "UntitledConn189":
+            #     print("PiTesRCombiTes_189XXXXXXXX is now set invisible")
             self.firstS.setVisible(False)
 
         self.parent.diagramScene.addItem(self.firstS)

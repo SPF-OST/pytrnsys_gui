@@ -226,10 +226,8 @@ class GenericBlock(BlockItem):
             if j == 2:
                 correcter = -1
             for k in range(i['PortPairsNb'][j] + correcter):
-                print("Show me this message")
                 self.addPortPair(j)
 
-        print("tHere are " + str(len(self.inputs)) + " and " + str(len(i["PortsIDIn"])))
         super(GenericBlock, self).decode(i, resConnList, resBlockList)
         self.setImage(i["Imagesource"])
 

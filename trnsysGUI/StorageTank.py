@@ -323,6 +323,9 @@ class StorageTank(BlockItem):
                 c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent(), visible=False)
                 c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent(), visible=False)
 
+                # c1.firstS.setVisible(False)
+                # c2.firstS.setVisible(False)
+
                 resId = ""
                 for j in c1.displayName:
                     if j.isdigit():
@@ -344,9 +347,6 @@ class StorageTank(BlockItem):
                 tempArrConn.append(c1)
                 tempArrConn.append(c2)
 
-                # c1.firstS.setVisible(False)
-                # c2.firstS.setVisible(False)
-
                 # self.parent.addItem(QGraphicsEllipseItem(h, i * 10, 3, 3))
 
                 if i == 0:
@@ -358,13 +358,16 @@ class StorageTank(BlockItem):
             h += 20
             # print(str(len(side)))
 
-        lastC = Connection(side[0], side[1], True, self.parent.parent(),visible=False)
-        lastC.firstS.setVisible(False)
+        lastC = Connection(side[0], side[1], True, self.parent.parent())
+        # lastC.firstS.setVisible(False)
         resId = ""
         for j in lastC.displayName:
             if j.isdigit():
                 resId += str(j)
         lastC.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
+
+        if len(side2) > 2:
+            lastC.hiddenGenerated = True
 
         for s in side_test:
             for t in tempArrConn:

@@ -2054,7 +2054,7 @@ class DiagramEditor(QWidget):
 
             else:
                 # No StorageTank and no HeatPump
-                print("No sto no hp, "+ str(type(t)) + t.displayName)
+                print("No sto no hp, " + str(type(t)) + t.displayName)
                 if isinstance(t, BlockItem):
                     temp = ""
 
@@ -2384,12 +2384,14 @@ class DiagramEditor(QWidget):
                 f += unitText + "\n"
 
             # Pipes DC-ERROR added isVisible below. The fromPort toPort StorageTank does not work to detect if it is virtual.
-            if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
+            if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank) and not t.hiddenGenerated:
             # if type(t) is Connection and t.firstS.isVisible:
                 # if t.isBlockConn and t.isStorageIO:
                 # DC-ERROR Connections don't have isVisble(), but we need to avoid printing the virtual ones here
                 # if t.firstS.isVisible(): #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
                 if True:
+                    if t.displayName == "PiTesRCombiTes_189":
+                        print("Inside conn is PiTesRCombiTes_189")
                     parameterNumber = 6
                     inputNumbers = 4
 
