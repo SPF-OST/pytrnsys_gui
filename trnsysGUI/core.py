@@ -2644,12 +2644,12 @@ class DiagramEditor(QWidget):
         s = ''
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, Connection) and not t.isBlockConn:
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
                 s += "Mfr" + t.displayName + " "
-            if isinstance(t, TVentil):
+            if isinstance(t, TVentil) and t.isVisible():
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"

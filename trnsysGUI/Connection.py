@@ -20,14 +20,14 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
-    def __init__(self, fromPort, toPort, isBlock, parent, visible=True, **kwargs):
+    def __init__(self, fromPort, toPort, isBlock, parent, **kwargs):
         print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
         self.toPort = toPort
         self.isBlockConn = isBlock
         self.isStorageIO = False
         self.displayName = None
-        self.visible = visible  # DC add this to pipes too
+        # self.visible = visible  # DC add this to pipes too
         self.hiddenGenerated = False
 
         self.parent = parent
