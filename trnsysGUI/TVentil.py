@@ -57,6 +57,8 @@ class TVentil(BlockItem):
         self.isComplexDiv = b
 
     def exportParameterSolver(self, descConnLength):
+        temp = ""
+
         for o in self.outputs:
             # ConnectionList lenght should be max offset
             for c in o.connectionList:
