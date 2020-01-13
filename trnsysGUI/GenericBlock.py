@@ -214,11 +214,17 @@ class GenericBlock(BlockItem):
             dct['RotationN'] = self.rotationN
             dct['GroupName'] = self.groupName
             dct['Imagesource'] = self.imagesource
+            dct['PortPairsNb'] = [self.getPairNb(i) for i in range(4)]
 
             dictName = "Block-"
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
+        print("Portpair is " + str(i['PortPairsNb']))
+        for j in range(4):
+            for k in range(i['PortPairsNb'][j]):
+                self.addPortPair(j)
+
         super(GenericBlock, self).decode(i, resConnList, resBlockList)
         self.setImage(i["Imagesource"])
 

@@ -1736,11 +1736,11 @@ class DiagramEditor(QWidget):
                 t.connectInside(self.findStorageCorrespPorts(t.leftSide), t.leftSide, t.insideConnLeft, "L")
                 t.connectInside(self.findStorageCorrespPorts(t.rightSide), t.rightSide, t.insideConnRight, "R")
 
-                print("------Checking insideConns")
-                print(t.hxInsideConnsLeft)
-                print(t.hxInsideConnsRight)
-                print(t.insideConnLeft)
-                print(t.insideConnRight)
+                # print("------Checking insideConns")
+                # print(t.hxInsideConnsLeft)
+                # print(t.hxInsideConnsRight)
+                # print(t.insideConnLeft)
+                # print(t.insideConnRight)
 
     def findStorageCorrespPorts(self, portList):
         # This function gets the ports on the other side of pipes connected to a port of the StorageTank
