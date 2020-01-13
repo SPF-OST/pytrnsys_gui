@@ -77,8 +77,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.trnsysConn = []
 
         # This case is because loaded blocks have parent=None
-        if self.parent is not None:
-            self.parent.parent().trnsysObj.append(self)
+        # if self.parent is not None:
+        #     self.parent.parent().trnsysObj.append(self)
 
         # Transform related
         self.flippedV = False

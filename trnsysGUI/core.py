@@ -1634,7 +1634,7 @@ class DiagramEditor(QWidget):
 
     # Debug buttons
     def button1_clicked(self):
-        # self.dumpInformation()
+        self.dumpInformation()
         pass
 
 
