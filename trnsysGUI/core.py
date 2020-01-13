@@ -192,90 +192,171 @@ class DiagramDecoderPaste(json.JSONDecoder):
                                            loaded=True)
                         # print("Bl name is" + bl.name)
 
-                        bl.setPos(float(i["BlockPosition"][0] + offset_x),
-                                  float(i["BlockPosition"][1] + offset_y))
+                        # bl.setPos(float(i["BlockPosition"][0] + offset_x),
+                        #           float(i["BlockPosition"][1] + offset_y))
+                        #
+                        # # bl.trnsysId = i["trnsysID"]
+                        # bl.updateFlipStateH(i["FlippedH"])
+                        # bl.updateFlipStateV(i["FlippedV"])
+                        # bl.rotateBlockToN(i["RotationN"])
+                        #
+                        # for x in range(len(bl.inputs)):
+                        #     bl.inputs[x].id = i["PortsIDIn"][x]
+                        #
+                        # for x in range(len(bl.outputs)):
+                        #     bl.outputs[x].id = i["PortsIDOut"][x]
+                        #
+                        # resBlockList.append(bl)
 
-                        # bl.trnsysId = i["trnsysID"]
-                        bl.updateFlipStateH(i["FlippedH"])
-                        bl.updateFlipStateV(i["FlippedV"])
-                        bl.rotateBlockToN(i["RotationN"])
-
-                        for x in range(len(bl.inputs)):
-                            bl.inputs[x].id = i["PortsIDIn"][x]
-
-                        for x in range(len(bl.outputs)):
-                            bl.outputs[x].id = i["PortsIDOut"][x]
-
-                        resBlockList.append(bl)
+                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
 
                     elif ".__HeatPumpDict__" in arr[k]:
-                        print("Loading a HeatPump in Decoder")
+                        print("Loading a HeatPump in DecoderPaste")
                         i = arr[k]
-                        bl = HeatPump(i["HeatPumpName"], i["HeatPumpDisplayName"] + "COPY", self.editor.diagramView)
+                        bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"] + "COPY", loadedBlock=True)
+                        # # bl.flippedH = i["FlippedH"]
+                        # # bl.flippedV = i["FlippedV"]
+                        # # bl.childIds = i["childIds"]
+                        #
+                        # bl.changeSize()
+                        #
+                        # for x in range(len(bl.inputs)):
+                        #     bl.inputs[x].id = i["PortsIDIn"][x]
+                        #     print("Input at heatExchanger")
+                        #
+                        # for x in range(len(bl.outputs)):
+                        #     bl.outputs[x].id = i["PortsIDOut"][x]
+                        #     print("Output at heatExchanger")
+                        #
+                        # bl.setPos(float(i["HeatPumpPosition"][0]) + offset_x, float(i["HeatPumpPosition"][1] + offset_y))
+                        #
+                        # resBlockList.append(bl)
+                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
+
+                    elif ".__HeatPumpTwoDict__" in arr[k]:
+                        print("Loading a HeatPump in DecoderPaste")
+                        i = arr[k]
+                        bl = HeatPumpTwoHx(i["HeatPumpName"], self.editor.diagramView,
+                                      displayName=i["HeatPumpDisplayName"] + "COPY", loadedBlock=True)
+                        # # bl.flippedH = i["FlippedH"]
+                        # # bl.flippedV = i["FlippedV"]
+                        # # bl.childIds = i["childIds"]
+                        #
+                        # bl.changeSize()
+                        #
+                        # for x in range(len(bl.inputs)):
+                        #     bl.inputs[x].id = i["PortsIDIn"][x]
+                        #     print("Input at heatExchanger")
+                        #
+                        # for x in range(len(bl.outputs)):
+                        #     bl.outputs[x].id = i["PortsIDOut"][x]
+                        #     print("Output at heatExchanger")
+                        #
+                        # bl.setPos(float(i["HeatPumpPosition"][0]) + offset_x, float(i["HeatPumpPosition"][1] + offset_y))
+                        #
+                        # resBlockList.append(bl)
+                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
+
+                    elif ".__GenericBlockDict__" in arr[k]:
+                        print("Loading a GenericBlock in DecoderPaste")
+                        i = arr[k]
+                        bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"] + "COPY", loadedBlock=True)
+                        # bl.setPos(float(i["BlockPosition"][0] + offset_x), float(i["BlockPosition"][1] + offset_y))
+                        # bl.trnsysId = i["trnsysID"]
+                        # # bl.id = i["ID"]
+                        # bl.updateFlipStateH(i["FlippedH"])
+                        # bl.updateFlipStateV(i["FlippedV"])
+                        # bl.rotateBlockToN(i["RotationN"])
+                        # bl.label.setPlainText(bl.displayName)
+                        #
+                        # bl.groupName = "defaultGroup"
+                        # bl.setBlockToGroup(i["GroupName"])
+                        #
+                        # print(len(bl.inputs))
+                        # for x in range(len(bl.inputs)):
+                        #     bl.inputs[x].id = i["PortsIDIn"][x]
+                        #
+                        # for x in range(len(bl.outputs)):
+                        #     bl.outputs[x].id = i["PortsIDOut"][x]
+                        #
+                        # bl.setImage(i["Imagesource"])
+                        # resBlockList.append(bl)
+                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
+
+                    elif ".__HeatPumpTwoDict__" in arr[k]:
+                        print("Loading a HeatPumpTwoHx in DecoderPaste")
+                        i = arr[k]
+                        bl = HeatPumpTwoHx(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"] + "COPY",
+                                      loadedBlock=True)
                         # bl.flippedH = i["FlippedH"]
                         # bl.flippedV = i["FlippedV"]
-                        # bl.childIds = i["childIds"]
-
-                        bl.changeSize()
-
-                        for x in range(len(bl.inputs)):
-                            bl.inputs[x].id = i["PortsIDIn"][x]
-                            print("Input at heatExchanger")
-
-                        for x in range(len(bl.outputs)):
-                            bl.outputs[x].id = i["PortsIDOut"][x]
-                            print("Output at heatExchanger")
-
-                        bl.setPos(float(i["HeatPumpPosition"][0]) + offset_x, float(i["HeatPumpPosition"][1] + offset_y))
+                        # # bl.childIds = i["childIds"]
+                        # bl.displayName = i["HeatPumpName"]
+                        # bl.changeSize()
+                        #
+                        # for x in range(len(bl.inputs)):
+                        #     bl.inputs[x].id = i["PortsIDIn"][x]
+                        #     print("Input at heatExchanger")
+                        #
+                        # for x in range(len(bl.outputs)):
+                        #     bl.outputs[x].id = i["PortsIDOut"][x]
+                        #     print("Output at heatExchanger")
+                        #
+                        # bl.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1]+ offset_y))
                         # bl.trnsysId = i["trnsysID"]
                         # bl.id = i["ID"]
-
-                        resBlockList.append(bl)
+                        #
+                        # bl.groupName = "defaultGroup"
+                        # bl.setBlockToGroup(i["GroupName"])
+                        #
+                        # resBlockList.append(bl)
+                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockLists)
 
                     elif ".__StorageDict__" in arr[k]:
                         print("Loading a Storage in Decoder")
                         i = arr[k]
-                        bl = StorageTank(i["StorageName"], i["StorageDisplayName"] + "COPY", self.editor.diagramView)
-                        bl.flippedH = i["FlippedH"]
-                        # bl.flippedV = i["FlippedV"] # No support for vertical flip
-                        bl.changeSize()
-
-                        bl.setPos(float(i["StoragePosition"][0]) + offset_x, float(i["StoragePosition"][1]) + offset_y)
-                        # bl.trnsysId = i["trnsysID"]
-                        # bl.id = i["ID"]
-                        # Add heat exchanger
-                        for h in i["HxList"]:
-                            hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
-                                                QPointF(h["Offset"][0], h["Offset"][1]),
-                                                bl, h["DisplayName"] + "New",
-                                                port1ID=h['Port1ID'], port2ID=h['Port2ID'], connTrnsysID=self.editor.idGen.getTrnsysID())
-
-                            # hEx.setId(["ID"])
-                            hEx.port1.id = h['Port1ID']
-                            hEx.port2.id = h['Port2ID']
-
-                            # hxDct['ParentID'] = hx.parent.id
-                            # hxDct['Port2ID'] = hx.port2.id
-
-                        # Add manual inputs
-                        for x in i["PortPairList"]:
-                            print("Printing port pair")
-                            print(x)
-
-                            conn = bl.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
-                                                        fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
-                                                        connId=self.editor.idGen.getID(), connCid=self.editor.idGen.getConnID(),
-                                                        connDispName=x["ConnDisName"] + "New",
-                                                        trnsysConnId=self.editor.idGen.getTrnsysID())
-
-                            # conn.id = x["ConnID"]
-                            # conn.connId = x["ConnCID"]
-                            # conn.trnsysId = x["trnsysID"]
-                            # conn.displayName = x["ConnDisName"]
-
-                            # resStorageConnList.append(conn)
-                            resConnList.append(conn)
-                        resBlockList.append(bl)
+                        bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName= i["StorageDisplayName"] + "COPY", loaded=True)
+                        # bl.flippedH = i["FlippedH"]
+                        # # bl.flippedV = i["FlippedV"] # No support for vertical flip
+                        # bl.changeSize()
+                        #
+                        # bl.setPos(float(i["StoragePosition"][0]) + offset_x, float(i["StoragePosition"][1]) + offset_y)
+                        # # bl.trnsysId = i["trnsysID"]
+                        # # bl.id = i["ID"]
+                        # # Add heat exchanger
+                        # for h in i["HxList"]:
+                        #     hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
+                        #                         QPointF(h["Offset"][0], h["Offset"][1]),
+                        #                         bl, h["DisplayName"] + "New",
+                        #                         port1ID=h['Port1ID'], port2ID=h['Port2ID'], connTrnsysID=self.editor.idGen.getTrnsysID())
+                        #
+                        #     # hEx.setId(["ID"])
+                        #     hEx.port1.id = h['Port1ID']
+                        #     hEx.port2.id = h['Port2ID']
+                        #
+                        #     # hxDct['ParentID'] = hx.parent.id
+                        #     # hxDct['Port2ID'] = hx.port2.id
+                        #
+                        # # Add manual inputs
+                        # for x in i["PortPairList"]:
+                        #     print("Printing port pair")
+                        #     print(x)
+                        #
+                        #     conn = bl.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
+                        #                                 fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
+                        #                                 connId=self.editor.idGen.getID(), connCid=self.editor.idGen.getConnID(),
+                        #                                 connDispName=x["ConnDisName"] + "New",
+                        #                                 trnsysConnId=self.editor.idGen.getTrnsysID())
+                        #
+                        #     # conn.id = x["ConnID"]
+                        #     # conn.connId = x["ConnCID"]
+                        #     # conn.trnsysId = x["trnsysID"]
+                        #     # conn.displayName = x["ConnDisName"]
+                        #
+                        #     # resStorageConnList.append(conn)
+                        #     resConnList.append(conn)
+                        # resBlockList.append(bl)
+                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList, editor=self.editor)
 
                     elif ".__ConnectionDict__" in arr[k]:
                         # It is important to load the connections at last because else the ports are not defined.
@@ -327,7 +408,6 @@ class DiagramDecoderPaste(json.JSONDecoder):
                     else:
                         print("Error: Not recognized object in decoder")
 
-            # return resBlockList, resConnList, resStorageConnList
             return resBlockList, resConnList
 
         return arr
@@ -380,6 +460,9 @@ class DiagramDecoder(json.JSONDecoder):
                             g = Group(i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1], self.editor.diagramScene)
                             g.setName(i["GroupName"])
 
+                    # Could be compressed even more by not differentiating .__BlockDict__, .__StorageDict__, .__HeatPumpDict__ etc
+                    # For example, changing the key of the "special" blocks to ".__BlockDict__" in encoder or by the line below
+                    # elif ".__BlockDict__" in arr[k] or ".__StorageDict__" in arr[k] or ".__HeatPumpDict__" in arr[k] or ".__HeatPumpTwoDict__" in arr[k]:
                     elif ".__BlockDict__" in arr[k]:
                         print("Found a block ")
                         i = arr[k]
@@ -430,7 +513,6 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
-
                         else:
                             bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
                         # print("Bl name is" + bl.name)
@@ -1910,12 +1992,14 @@ class DiagramEditor(QWidget):
                 pass
 
             elif type(t) is HeatPump:
+                print("heatpump in param solver")
                 # Only print a connection for each input, not for output (A HeatPump is defined by one input on each side)
                 # At creation, allocates a second trnsysId to have one for each side
                 for i in range(len(t.inputs)):
                     # ConnectionList lenght should be max offset
                     temp = ""
                     for c in t.inputs[i].connectionList:
+                        #
                         if type(c.fromPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
                             continue
                         elif type(c.toPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
@@ -1950,8 +2034,27 @@ class DiagramEditor(QWidget):
                             else:
                                 f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
 
+            elif type(t) is GenericBlock:
+                print("Generic block in param solver")
+                for i in range(len(t.inputs)):
+                    temp = ""
+                    c = t.inputs[i].connectionList[0]
+                    if type(c.fromPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
+                        continue
+                    elif type(c.toPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
+                        continue
+                    else:
+                        temp = str(c.trnsysId) + " " + str(
+                            t.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
+                        temp += " " * (descConnLength - len(temp))
+
+                        # Generic block will have a 2n-liner exportConnString
+                        t.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(t.childIds[i]) + " : " + t.displayName + "HeatPump" + "\n"
+
             else:
                 # No StorageTank and no HeatPump
+                print("No sto no hp, "+ str(type(t)) + t.displayName)
                 if isinstance(t, BlockItem):
                     temp = ""
 
@@ -1959,7 +2062,6 @@ class DiagramEditor(QWidget):
 
                     if isinstance(t, TVentil):
                         # This is to assert that the input in front of the output is always printed before the third one
-                        # More testing needed
                         for o in t.outputs:
                             # ConnectionList lenght should be max offset
                             for c in o.connectionList:
@@ -2052,15 +2154,9 @@ class DiagramEditor(QWidget):
 
                     f += temp + " " * (descConnLength - len(temp)) + "!" + str(t.trnsysId) + " : " + str(t.displayName) + "\n"
 
-                #TODO: Check if no problem with other storagetanks (very probable)
-
-                # Very careful examination needed!
-                # If at least one port is at a StorageTank
-                else:
-                    pass
-
         tempS = f
-
+        print("param solver text is ")
+        print(f)
         t = self.convertToStringList(tempS)
 
         f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
@@ -2102,9 +2198,15 @@ class DiagramEditor(QWidget):
                 t.exportInitialInput = 0.0
             else:
                 temp += " 0,0 " #+ "[" + t.displayName
+                # Because a HeatPump appears twice in the hydraulic export
+                # Same for the generic block
                 if type(t) is HeatPump:
                     temp += " 0,0 " #+ "[" + t.displayName
                     counter += 1
+                if type(t) is GenericBlock:
+                    for i in range(len(t.inputs)-1):
+                        temp += " 0,0 "
+                        counter += 1
 
             # Used before storage and heatpump introduced changes
             # breakline = ((self.trnsysObj.index(t) + 1) % 8 == 0)
@@ -2135,9 +2237,17 @@ class DiagramEditor(QWidget):
             if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
                 continue
             if type(t) is HeatPump:
+                # 100120 Why only one exportInitialInput for Heatpump? => what for Generic Block
                 f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
                 counter2 += 1
                 continue
+
+            if type(t) is GenericBlock:
+                for i in range(len(t.inputs)):
+                    f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
+                    counter2 += 1
+                continue
+
             # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
             #     continue
             f += str(t.exportInitialInput) + " "
@@ -2166,7 +2276,7 @@ class DiagramEditor(QWidget):
 
         prefix = "Mfr"
         equationNumber = 1
-        nEqUsed = 1 #DC
+        nEqUsed = 1 # DC
 
         tot = ""
 

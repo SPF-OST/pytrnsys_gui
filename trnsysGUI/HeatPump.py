@@ -113,3 +113,21 @@ class HeatPump(BlockItem):
 
         resBlockList.append(self)
 
+    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        print("Loading a HeatPump in Decoder")
+
+        self.changeSize()
+
+        for x in range(len(self.inputs)):
+            self.inputs[x].id = i["PortsIDIn"][x]
+            print("Input at heatExchanger")
+
+        for x in range(len(self.outputs)):
+            self.outputs[x].id = i["PortsIDOut"][x]
+            print("Output at heatExchanger")
+
+        self.setPos(float(i["HeatPumpPosition"][0]) + offset_x, float(i["HeatPumpPosition"][1] + offset_y))
+        self.groupName = "defaultGroup"
+        self.setBlockToGroup(i["GroupName"])
+
+        resBlockList.append(self)

@@ -634,3 +634,36 @@ class StorageTank(BlockItem):
             resConnList.append(conn)
         resBlockList.append(self)
 
+    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        self.flippedH = i["FlippedH"]
+        self.changeSize()
+        self.h = i["size_h"]
+        self.updateImage()
+
+        self.setPos(float(i["StoragePosition"][0]) + offset_x, float(i["StoragePosition"][1]) + offset_y)
+
+        # Add heat exchanger
+        for h in i["HxList"]:
+            hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
+                                QPointF(h["Offset"][0], h["Offset"][1]),
+                                self, h["DisplayName"] + "New",
+                                port1ID=h['Port1ID'], port2ID=h['Port2ID'],
+                                connTrnsysID=kwargs["editor"].idGen.getTrnsysID())
+
+            # hEx.setId(["ID"])
+            hEx.port1.id = h['Port1ID']
+            hEx.port2.id = h['Port2ID']
+
+        # Add manual inputs
+        for x in i["PortPairList"]:
+            print("Printing port pair")
+            print(x)
+
+            conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
+                                        fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
+                                        connId=kwargs["editor"].idGen.getID(), connCid=kwargs["editor"].idGen.getConnID(),
+                                        connDispName=x["ConnDisName"] + "New",
+                                        trnsysConnId=kwargs["editor"].idGen.getTrnsysID())
+
+            resConnList.append(conn)
+        resBlockList.append(self)

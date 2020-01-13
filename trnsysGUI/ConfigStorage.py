@@ -300,7 +300,6 @@ class ConfigStorage(QDialog):
     def acceptedEdit(self):
         # print("Changing displayName")
         self.storage.setName(self.le.text())
-
         self.close()
 
     def cancel(self):

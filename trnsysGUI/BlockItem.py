@@ -518,6 +518,23 @@ class BlockItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
+    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        self.setPos(float(i["BlockPosition"][0] + offset_x),
+                  float(i["BlockPosition"][1] + offset_y))
+
+        # bl.trnsysId = i["trnsysID"]
+        self.updateFlipStateH(i["FlippedH"])
+        self.updateFlipStateV(i["FlippedV"])
+        self.rotateBlockToN(i["RotationN"])
+
+        for x in range(len(self.inputs)):
+            self.inputs[x].id = i["PortsIDIn"][x]
+
+        for x in range(len(self.outputs)):
+            self.outputs[x].id = i["PortsIDOut"][x]
+
+        resBlockList.append(self)
+
     # Both classes in same module did not work
     # class DeleteBlockCommand(QUndoCommand):
     #     def __init__(self, bl, descr):

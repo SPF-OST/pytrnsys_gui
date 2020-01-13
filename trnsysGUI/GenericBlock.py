@@ -5,8 +5,9 @@ from PyQt5.QtGui import QPixmap, QImage, QIcon
 from PyQt5.QtWidgets import QMenu, QFileDialog
 
 from trnsysGUI.BlockItem import BlockItem
+from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.newPortDlg import newPortDlg
+# from trnsysGUI.newPortDlg import newPortDlg
 
 
 class GenericBlock(BlockItem):
@@ -19,6 +20,9 @@ class GenericBlock(BlockItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
+        self.childIds = []
+        self.childIds.append(self.trnsysId)
+
         self.imagesource = ("images/" + self.name)
         self.changeSize()
 
@@ -26,10 +30,11 @@ class GenericBlock(BlockItem):
         # print("passing through c change size")
         w = self.w
         h = self.h
-
-        """ Resize block function """
         delta = 4
         deltaH = self.h / 10
+
+        """ Resize block function """
+
 
         # Limit the block size:
         if h < 20:
@@ -42,18 +47,80 @@ class GenericBlock(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        # Update port positions:
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                               h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                              h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
-        self.inputs[0].side = 2 - 2 * self.flippedH
-        self.outputs[0].side = 2 - 2 * self.flippedH
+        self.outputs[0].setPos(2 * delta + w,
+                               h - 2 * delta)
+        self.inputs[0].setPos(2 * delta + w,
+                              2 * delta)
+        # self.inputs[0].side = 2 - 2 * self.flippedH
+        # self.outputs[0].side = 2 - 2 * self.flippedH
 
+        self.updatePortPos()
         return w, h
 
+    def updatePortPos(self):
+        delta = 4
+        deltaH = self.h / 10
+        w = self.w
+        h = self.h
+
+        # Update port positions:
+        # self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
+        #                        h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
+        # self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
+        #                       h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
+        # self.inputs[0].side = 2 - 2 * self.flippedH
+        # self.outputs[0].side = 2 - 2 * self.flippedH
+
+        # Number of pairs on each side, starting left, clockwise
+        pairNbs = [0, 0, 0, 0]
+        for s in range(4):
+            pairNbs[s] = self.getPairNb(s)
+
+        portNb = [0, 0, 0, 0]
+        for i in self.inputs:
+            # This could be necessary if one were able to add ports when block not flipped/rotated
+            # if i.initSide == 0:
+            # Below, i.side == initside
+
+            # if i.side == 0:
+            #     distBetweenPorts = (self.h - 4*delta) / (2 * self.getPairNb(0) - 1)
+            #     print("distance betw ports " + str(distBetweenPorts))
+            #     i.setPos(- 2*delta + 4 * self.flippedH * delta + self.flippedH * w,
+            #               2*delta + distBetweenPorts * portNb[0])
+            #     i.side = 0 + 2 * self.flippedH
+            #     portNb[0] += 1
+            #
+            #     self.outputs[self.inputs.index(i)].setPos(- 2*delta + 4 * self.flippedH * delta + self.flippedH * w,
+            #                2*delta + distBetweenPorts * portNb[0])
+            #     self.outputs[self.inputs.index(i)].side = 0 + 2 * self.flippedH
+            #     portNb[0] += 1
+            #
+            # if i.side == 1:
+            #     distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(1) - 1)
+            #     print("distance betw ports " + str(distBetweenPorts))
+            #     i.setPos(2 * delta + distBetweenPorts * portNb[1],
+            #              - 2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
+            #     i.side = 1 + 2 * self.flippedV
+            #     portNb[1] += 1
+            #
+            #     self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[1],
+            #              - 2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
+            #     self.outputs[self.inputs.index(i)].side = 1 + 2 * self.flippedV
+            #     portNb[1] += 1
+            pass
+
+    def getPairNb(self, side):
+        res = 0
+        for i in self.inputs:
+            if i.side == side:
+                res += 1
+
+        print("there are " + str(res) + " pairs on the side "+ str(side))
+        return res
+
     def addPortDlg(self):
-        newPortDlg(self, self.parent.parent())
+        # newPortDlg(self, self.parent.parent())
+        dlg = GenericPortPairDlg(self, self.parent.parent())
 
     def addPort(self, io, relH):
         print(io)
@@ -154,3 +221,82 @@ class GenericBlock(BlockItem):
     def decode(self, i, resConnList, resBlockList):
         super(GenericBlock, self).decode(i, resConnList, resBlockList)
         self.setImage(i["Imagesource"])
+
+    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        super(GenericBlock, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
+        self.setImage(i["Imagesource"])
+
+    def addPortPair(self, side):
+        h = self.h
+        w = self.w
+        delta = 4
+        print("side is " + str(side))
+        self.inputs.append(PortItem("i", side, self))
+        self.outputs.append(PortItem("o", side, self))
+        # Allocate id
+        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
+
+        portNb = [0, 0, 0, 0]
+        for i in self.inputs:
+            if i.side == 0:
+                distBetweenPorts = (self.h - 4*delta) / (2 * self.getPairNb(0) - 1)
+                print("distance betw ports " + str(distBetweenPorts))
+                i.setPos(- 2*delta,
+                          2 * delta + distBetweenPorts * portNb[0])
+                portNb[0] += 1
+
+                self.outputs[self.inputs.index(i)].setPos(- 2*delta,
+                           2*delta + distBetweenPorts * portNb[0])
+                portNb[0] += 1
+            elif i.side == 1:
+                distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(1) - 1)
+                i.setPos(2 * delta + distBetweenPorts * portNb[1], -2 * delta)
+                portNb[1] += 1
+
+                self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[1], - 2 * delta)
+                portNb[1] += 1
+
+            elif i.side == 2:
+                print("side == 2")
+                distBetweenPorts = (self.h - 4 * delta) / (2 * self.getPairNb(2) - 1)
+                print("side 2 dist betw ports is " + str(distBetweenPorts))
+                i.setPos(2 * delta + w,
+                         2 * delta + distBetweenPorts * portNb[2])
+                print(2 * delta + distBetweenPorts * portNb[2])
+                portNb[2] += 1
+
+                self.outputs[self.inputs.index(i)].setPos(2 * delta + w,
+                                                          2 * delta + distBetweenPorts * portNb[2])
+                print(2 * delta + distBetweenPorts * portNb[2])
+                portNb[2] += 1
+
+            else:
+                distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(3) - 1)
+                print("distance betw ports " + str(distBetweenPorts))
+                i.setPos(2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
+                portNb[3] += 1
+
+                self.outputs[self.inputs.index(i)].setPos( 2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
+                portNb[3] += 1
+
+    def removePortPairOnSide(self, side):
+        for i in self.inputs:
+            if i.side == side:
+                self.removePortPair(self.inputs.index(i))
+                return
+
+    def removePortPair(self, n):
+        self.inputs.remove(self.inputs[n])
+        self.outputs.remove(self.outputs[n])
+
+    def updateFlipStateH(self, state):
+        self.pixmap = QPixmap(self.image.mirrored(bool(state), self.flippedV))
+        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        self.flippedH = bool(state)
+        self.updatePortPos()
+
+    def updateFlipStateV(self, state):
+        self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
+        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        self.flippedV = bool(state)
+        self.updatePortPos()
