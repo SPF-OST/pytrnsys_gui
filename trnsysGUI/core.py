@@ -1856,54 +1856,56 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
-            if isinstance(t, Connection) or isinstance(t, Pump):
-                continue
-
-            if not t.isVisible():
-                # Virtual block
-                continue
-
-            if isinstance(t, HeatPump):
-                f += "T" + t.displayName + "HeatPump" + "=1 \n"
-                f += "T" + t.displayName + "Evap" + "=1 \n"
-                equationNr += 2
-                continue
-
-            if isinstance(t, StorageTank):
-                for p in t.inputs + t.outputs:
-                    if not p.isFromHx:
-                        if p.side == 0:
-                            lr = "Left"
-                        else:
-                            lr = "Right"
-                        f += "T" + t.displayName + "Port" + lr + str(int(100*(1-(p.scenePos().y() - p.parent.scenePos().y())/p.parent.h))) + "=1\n"
-                        equationNr += 1
-                        continue
-                    else:
-                        # Check if there is at least one internal connection
-                        # p.name == i to only allow one temperature entry per hx
-                        # Prints the name of the Hx Connector element.
-                        # Assumes that the Other port has no connection except to the storage
-                        if len(p.connectionList) > 0 and p.name == 'i':
-                            # f += "T" + p.connectionList[1].displayName + "=1\n"
-                            print("dds " + p.connectionList[1].displayName)
-                            print("dds " + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName)
-                            print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
-                            # print("dds " + p.connectionList[2].displayName)
-
-                            # p is a hx port; the external port has two connections, so the second one yields the hx connector
-                            if p.connectionList[1].fromPort is p:
-                                f += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
-                            else:
-                                # Here the Hx name is printed.
-                                f += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
-
-                            equationNr += 1
-
-            if len(t.inputs + t.outputs) == 2 and not isinstance(t, Connector):
-                f += "T" + t.displayName + "=1 \n"
-
-                equationNr += 1
+            # if isinstance(t, Connection) or isinstance(t, Pump):
+            #     continue
+            #
+            # if not t.isVisible():
+            #     # Virtual block
+            #     continue
+            #
+            # if isinstance(t, HeatPump):
+            #     f += "T" + t.displayName + "HeatPump" + "=1 \n"
+            #     f += "T" + t.displayName + "Evap" + "=1 \n"
+            #     equationNr += 2
+            #
+            #     continue
+            #
+            # if isinstance(t, StorageTank):
+            #     for p in t.inputs + t.outputs:
+            #         if not p.isFromHx:
+            #             if p.side == 0:
+            #                 lr = "Left"
+            #             else:
+            #                 lr = "Right"
+            #             f += "T" + t.displayName + "Port" + lr + str(int(100*(1-(p.scenePos().y() - p.parent.scenePos().y())/p.parent.h))) + "=1\n"
+            #             equationNr += 1
+            #             continue
+            #         else:
+            #             # Check if there is at least one internal connection
+            #             # p.name == i to only allow one temperature entry per hx
+            #             # Prints the name of the Hx Connector element.
+            #             # Assumes that the Other port has no connection except to the storage
+            #             if len(p.connectionList) > 0 and p.name == 'i':
+            #                 # f += "T" + p.connectionList[1].displayName + "=1\n"
+            #                 print("dds " + p.connectionList[1].displayName)
+            #                 print("dds " + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName)
+            #                 print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
+            #                 # print("dds " + p.connectionList[2].displayName)
+            #
+            #                 # p is a hx port; the external port has two connections, so the second one yields the hx connector
+            #                 if p.connectionList[1].fromPort is p:
+            #                     f += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+            #                 else:
+            #                     # Here the Hx name is printed.
+            #                     f += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+            #
+            #                 equationNr += 1
+            #
+            # if len(t.inputs + t.outputs) == 2 and not isinstance(t, Connector):
+            #     f += "T" + t.displayName + "=1 \n"
+            #     equationNr += 1
+            f += t.exportBlackBox()[0]
+            equationNr += t.exportBlackBox()[1]
 
         f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
@@ -1913,15 +1915,15 @@ class DiagramEditor(QWidget):
         f = "*** Pump outlet temperatures" + "\n"
         equationNr = 0
         for t in self.trnsysObj:
-            if isinstance(t, Pump):
-                # f += "T" + t.displayName + " = " + "T" + t.outputs[0].connectionList[0].displayName + "\n" DC-ERROR
-                f += "T" + t.displayName + " = " + "T" + t.inputs[0].connectionList[0].displayName + "\n"
-
-                equationNr += 1
-            elif isinstance(t, WTap) or isinstance(t, WTap_main):
-                io = t.inputs + t.outputs
-                f += "T" + t.displayName + " = " + "T" + io[0].connectionList[0].displayName + "\n"
-                equationNr += 1
+            # if isinstance(t, Pump):
+            #     f += "T" + t.displayName + " = " + "T" + t.inputs[0].connectionList[0].displayName + "\n"
+            #     equationNr += 1
+            # elif isinstance(t, WTap) or isinstance(t, WTap_main):
+            #     io = t.inputs + t.outputs
+            #     f += "T" + t.displayName + " = " + "T" + io[0].connectionList[0].displayName + "\n"
+            #     equationNr += 1
+            f += t.exportPumpOutlets()[0]
+            equationNr += t.exportPumpOutlets()[1]
 
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
         return f
@@ -1931,12 +1933,14 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
-            if isinstance(t, Pump) or isinstance(t, WTap_main):
-                f += "Mfr" + t.displayName + " = 1000" + "\n"
-                equationNr += 1
-            elif isinstance(t, TVentil):
-                f += "xFrac" + t.displayName + " = 1" + "\n"
-                equationNr += 1
+            # if isinstance(t, Pump) or isinstance(t, WTap_main):
+            #     f += "Mfr" + t.displayName + " = 1000" + "\n"
+            #     equationNr += 1
+            # elif isinstance(t, TVentil):
+            #     f += "xFrac" + t.displayName + " = 1" + "\n"
+            #     equationNr += 1
+            f += t.exportMassFlows()[0]
+            equationNr += t.exportMassFlows()[1]
 
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
@@ -1946,10 +1950,12 @@ class DiagramEditor(QWidget):
         f = ""
         constants = 0
         for t in self.trnsysObj:
-            if isinstance(t, TVentil):
-                if t.isComplexDiv:
-                    constants += 1
-                    f += "T_set_" + t.displayName + "\n"
+            # if isinstance(t, TVentil):
+            #     if t.isComplexDiv:
+            #         constants += 1
+            #         f += "T_set_" + t.displayName + "\n"
+            f += t.exportDivSetting()[0]
+            constants += t.exportDivSetting()[1]
 
         f = "CONSTANTS " + str(constants) + "\n" + f + "\n"
 

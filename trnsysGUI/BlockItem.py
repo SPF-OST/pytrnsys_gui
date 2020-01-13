@@ -565,3 +565,21 @@ class BlockItem(QGraphicsPixmapItem):
 
         return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
+    def exportBlackBox(self):
+        # if len(t.inputs + t.outputs) == 2 and not isinstance(self, Connector):
+        if len(self.inputs + self.outputs) == 2 and self.isVisible():
+            resStr = "T" + self.displayName + "=1 \n"
+            equationNr = 1
+
+            return resStr, equationNr
+        else:
+            return "", 0
+
+    def exportPumpOutlets(self):
+        return "", 0
+
+    def exportMassFlows(self):
+        return "", 0
+
+    def exportDivSetting(self):
+        return "", 0

@@ -45,3 +45,13 @@ class WTap_main(BlockItem):
         self.inputs[0].side = 0 + 2 * self.flippedH
 
         return w, h
+
+    def exportPumpOutlets(self):
+        resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
+        equationNr = 1
+        return resStr, equationNr
+
+    def exportMassFlows(self):
+        resStr = "Mfr" + self.displayName + " = 1000" + "\n"
+        equationNr = 1
+        return resStr, equationNr

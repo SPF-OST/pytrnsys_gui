@@ -1031,6 +1031,17 @@ class Connection(object):
     def decode(self, i, resConnList, resBlockList):
         pass
 
+    def exportBlackBox(self):
+        return "", 0
+
+    def exportPumpOutlets(self):
+        return "", 0
+
+    def exportMassFlows(self):
+        return "", 0
+
+    def exportDivSetting(self):
+        return "", 0
 
 class DeleteConnectionCommand(QUndoCommand):
     def __init__(self, conn, descr):

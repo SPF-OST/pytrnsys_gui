@@ -47,3 +47,6 @@ class Connector(BlockItem):
         self.outputs[0].side = 2 - 2 * self.flippedH
 
         return w, h
+
+    def exportBlackBox(self):
+        return "", 0

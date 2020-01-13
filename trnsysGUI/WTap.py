@@ -47,3 +47,7 @@ class WTap(BlockItem):
 
         return w, h
 
+    def exportPumpOutlets(self):
+        resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
+        equationNr = 1
+        return resStr, equationNr

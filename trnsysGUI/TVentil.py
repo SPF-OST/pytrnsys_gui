@@ -97,3 +97,16 @@ class TVentil(BlockItem):
             self.exportConnsString = temp
 
             return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+
+    def exportMassFlows(self):
+        resStr = "xFrac" + self.displayName + " = 1" + "\n"
+        equationNr = 1
+        return resStr, equationNr
+
+    def exportDivSetting(self):
+        if self.isComplexDiv:
+            constants = 1
+            f = "T_set_" + self.displayName + "\n"
+            return f, constants
+        else:
+            return "", 0

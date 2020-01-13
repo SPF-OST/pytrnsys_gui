@@ -670,3 +670,40 @@ class StorageTank(BlockItem):
 
             resConnList.append(conn)
         resBlockList.append(self)
+
+    def exportBlackBox(self):
+        equationNr = 0
+        resStr = ""
+
+        for p in self.inputs + self.outputs:
+            if not p.isFromHx:
+                if p.side == 0:
+                    lr = "Left"
+                else:
+                    lr = "Right"
+                resStr += "T" + self.displayName + "Port" + lr + str(
+                    int(100 * (1 - (p.scenePos().y() - p.parent.scenePos().y()) / p.parent.h))) + "=1\n"
+                equationNr += 1
+                continue
+            else:
+                # Check if there is at least one internal connection
+                # p.name == i to only allow one temperature entry per hx
+                # Prints the name of the Hx Connector element.
+                # Assumes that the Other port has no connection except to the storage
+                if len(p.connectionList) > 0 and p.name == 'i':
+                    # f += "T" + p.connectionList[1].displayName + "=1\n"
+                    print("dds " + p.connectionList[1].displayName)
+                    print("dds " + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName)
+                    print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
+                    # print("dds " + p.connectionList[2].displayName)
+
+                    # p is a hx port; the external port has two connections, so the second one yields the hx connector
+                    if p.connectionList[1].fromPort is p:
+                        resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                    else:
+                        # Here the Hx name is printed.
+                        resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+
+                    equationNr += 1
+
+        return resStr, equationNr
