@@ -32,7 +32,7 @@ class CornerItem(QGraphicsEllipseItem):
             nNode = self.node.nextN()
             pNode = self.node.prevN()
 
-            print("Parent is " + str(self.parent))
+            # print("Parent is " + str(self.parent))
             positionInArr = self.parent.getNodePos(self)
 
             segBefore = self.parent.segments[positionInArr]

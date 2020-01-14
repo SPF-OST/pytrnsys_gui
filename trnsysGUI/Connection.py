@@ -273,7 +273,7 @@ class Connection(object):
             self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
 
         elif self.parent.editorMode == 1:
-            print("changing label pos in editor mode 1")
+            # print("changing label pos in editor mode 1")
             if self.fromPort.side == 0:
                 # self.firstS.label.setPos(self.fromPort.pos() + QPointF(-60, -30))
                 self.firstS.label.setPos(QPointF(-60, 0))
@@ -896,7 +896,6 @@ class Connection(object):
         tempNode = self.startNode.nextN()
 
         while tempNode.nextN() is not None:
-            print("Hello from corner" + str(tempNode))
             res.append(tempNode.parent)
             tempNode = tempNode.nextN()
 
@@ -911,7 +910,7 @@ class Connection(object):
         # print("Calling printconn from ")
         # self.printConn()
 
-        print("getcorners gives " + str(res))
+        # print("getcorners gives " + str(res))
 
         return res
 

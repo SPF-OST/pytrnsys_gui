@@ -2181,7 +2181,6 @@ class DiagramEditor(QWidget):
     def exportInputsFlowSolver(self, inputNr):
         #  add a string to block and connection for exportPrintInput
         f = ''
-        # print("INPUTS " + str(inputNr))
         f += "INPUTS " + str(inputNr) + "! for Type 935\n"
 
         pump_prefix = "Mfr"
@@ -2196,44 +2195,27 @@ class DiagramEditor(QWidget):
             if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
                 continue
 
-            # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
-            #     continue
-            # if isinstance(t, BlockItem) and not t.isVisible():
-            #     continue
-
             if t.typeNumber in [1, 4]:
                 temp1 = pump_prefix + t.displayName
-                t.exportInputName = " " + temp1 + " " #+ "[" + t.displayName + " "
+                t.exportInputName = " " + temp1 + " "
                 temp += t.exportInputName
                 t.exportInitialInput = 0.0
             elif t.typeNumber == 3:
                 temp1 = mix_prefix + t.displayName
-                t.exportInputName = " " + temp1 + " " #+ "[" + t.displayName + " "
+                t.exportInputName = " " + temp1 + " "
                 temp += t.exportInputName
                 t.exportInitialInput = 0.0
             else:
-                temp += " 0,0 " #+ "[" + t.displayName
+                temp += " 0,0 "
                 # Because a HeatPump appears twice in the hydraulic export
                 # Same for the generic block
                 if type(t) is HeatPump:
-                    temp += " 0,0 " #+ "[" + t.displayName
+                    temp += " 0,0 "
                     counter += 1
                 if type(t) is GenericBlock:
                     for i in range(len(t.inputs)-1):
                         temp += " 0,0 "
                         counter += 1
-
-            # Used before storage and heatpump introduced changes
-            # breakline = ((self.trnsysObj.index(t) + 1) % 8 == 0)
-            # # breakline = ((t.trnsysId + 1) % 8 == 0)
-            # if (self.trnsysObj.index(t) != (len(self.trnsysObj) - 1)) and not breakline:
-            #     # if (t.trnsysId != (len(self.trnsysObj) - 1)) and not breakline:
-            #     temp = temp + ", "
-            #
-            # if not breakline:
-            #     print(temp, end='')
-            # else:
-            #     print(temp)
 
             if counter > 8 or t == self.trnsysObj[-1]:
                 print(temp)
@@ -2254,6 +2236,7 @@ class DiagramEditor(QWidget):
             if type(t) is HeatPump:
                 # 100120 Why only one exportInitialInput for Heatpump? => what for Generic Block
                 f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
+                f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
                 counter2 += 1
                 continue
 
@@ -2263,8 +2246,6 @@ class DiagramEditor(QWidget):
                     counter2 += 1
                 continue
 
-            # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
-            #     continue
             f += str(t.exportInitialInput) + " "
 
             if counter2 == 8:
@@ -2284,7 +2265,6 @@ class DiagramEditor(QWidget):
         return f
 
     def exportOutputsFlowSolver(self, simulationUnit):
-        # Maybe add tuple (displayname, counting number)
         f = ''
 
         abc = list(string.ascii_uppercase)[0:3]
@@ -2307,9 +2287,10 @@ class DiagramEditor(QWidget):
             # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
             #     continue
 
-            if type(t) is HeatPump:
-                # print("----->" + str(t.exportConnsString))
+            if type(t) is TeePiece and not t.isVisible():   # Ignore virtual tpieces
+                continue
 
+            if type(t) is HeatPump:
                 for i in range(0, 3):
 
                     if i < 2:
@@ -2362,8 +2343,8 @@ class DiagramEditor(QWidget):
 
         f = ''
         unitNumber = startingUnit
-        typeNr1 = 929 #Temperature calculation from a tee-piece
-        typeNr2 = 931 #Temperature calculation from a pipe
+        typeNr1 = 929 # Temperature calculation from a tee-piece
+        typeNr2 = 931 # Temperature calculation from a pipe
 
         for t in self.trnsysObj:
 
@@ -2377,7 +2358,7 @@ class DiagramEditor(QWidget):
             equationConstant2 = 3
 
             # T-Pieces and Mixers
-            if (t.typeNumber == 2 or t.typeNumber == 3) and t.isVisible(): #DC-ERROR added isVisible
+            if (t.typeNumber == 2 or t.typeNumber == 3) and t.isVisible():  # DC-ERROR added isVisible
                 unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr1) + "\n"
                 unitText += "!" + t.displayName + "\n"
                 unitText += "PARAMETERS 0\n"

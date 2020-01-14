@@ -252,9 +252,6 @@ class StorageTank(BlockItem):
 
         # sideVar = "Right"
 
-        # print("self.parent is " + str(self.parent))
-        # print("self.parent.parent is " + str(self.parent.parent))
-
         tempArrConn = []
         side_test = side
 
