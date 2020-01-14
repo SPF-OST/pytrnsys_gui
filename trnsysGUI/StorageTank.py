@@ -136,13 +136,13 @@ class StorageTank(BlockItem):
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
 
         if kwargs == {}:
-            Connection(port1, port2, True, self.parent.parent(), visible=False)
+            Connection(port1, port2, True, self.parent.parent())
             return
         else:
             port1.id = kwargs["fromPortId"]
             port2.id = kwargs["toPortId"]
-            c = Connection(port1, port2, True, self.parent.parent(), visible=False, fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
-                           segmentsLoad=[], cornersLoad=[])
+            c = Connection(port1, port2, True, self.parent.parent(), fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
+                           segmentsLoad=[], cornersLoad=[], loadedConn=True)
             c.displayName = kwargs["connDispName"]
             c.id = kwargs["connId"]
             c.connId = kwargs["connCid"]
@@ -278,21 +278,18 @@ class StorageTank(BlockItem):
             # Check if external connections to the storagetank have storage ports as fromPorts or toPorts
             # if side[0] has toPort at storage: connector on second place
             if side[0].connectionList[0].fromPort is side[0]:
-                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(), visible=False)
+                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
             else:
-                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(), visible=False)
+                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
                 pass
 
             if side[1].connectionList[0].fromPort is side[1]:
-                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(), visible=False)
+                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
             else:
-                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(), visible=False)
+                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
                 pass
 
             # Check where the fact is used that connector is at fromPort!
-
-            # c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
-            # c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
 
             c1.displayName = side[0].connectionList[0].displayName
             c1.isStorageIO = True
@@ -626,7 +623,7 @@ class StorageTank(BlockItem):
             conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
                                         fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
                                         connId=x["ConnID"], connCid=x["ConnCID"],
-                                        connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"])
+                                        connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"], loadedConn=True)
             conn.id = x["ConnID"]
             conn.connId = x["ConnCID"]
             conn.trnsysId = x["trnsysID"]
@@ -664,7 +661,7 @@ class StorageTank(BlockItem):
                                         fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
                                         connId=kwargs["editor"].idGen.getID(), connCid=kwargs["editor"].idGen.getConnID(),
                                         connDispName=x["ConnDisName"] + "New",
-                                        trnsysConnId=kwargs["editor"].idGen.getTrnsysID())
+                                        trnsysConnId=kwargs["editor"].idGen.getTrnsysID(), loadedConn=True)
 
             resConnList.append(conn)
         resBlockList.append(self)

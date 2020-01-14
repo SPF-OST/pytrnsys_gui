@@ -390,7 +390,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
 
                             c = Connection(fport, tPort, i["isBlockConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"])
+                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
                             # c.id = i["ConnID"]
                             # c.connId = i["ConnCID"]
                             # c.trnsysId = i["trnsysID"]
@@ -424,7 +424,7 @@ class DiagramDecoder(json.JSONDecoder):
 
     def object_hook(self, arr):
         """
-        This is the decoding function from the clipboard. It seems to get executed for every sub dictionary in the json file.
+        This is the decoding function. object_hook seems to get executed for every sub dictionary in the json file.
         By looking for the specific key containing the name of dict elements, one can extract the needed dict.
         The name of the dicts is important because the order in which they are loaded matters (some objects depend on others)
         Parameters
@@ -695,7 +695,7 @@ class DiagramDecoder(json.JSONDecoder):
                         if True:
                             c = Connection(fport, tPort, i["isBlockConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"])
+                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
                             c.id = i["ConnID"]
                             c.connId = i["ConnCID"]
                             c.trnsysId = i["trnsysID"]
@@ -2584,7 +2584,7 @@ class DiagramEditor(QWidget):
             lossText += strVar + str(self.groupList.index(g)) + "="
 
             for i in g.itemList:
-                if isinstance(i, Connection)  and not i.isBlockConn:
+                if isinstance(i, Connection) and not i.isBlockConn:
                     lossText += "P" + i.displayName + "_kW" + "+"
 
             lossText = lossText[:-1]
@@ -3181,9 +3181,10 @@ class DiagramEditor(QWidget):
 
                 if isinstance(k, Connection):
                     print("Almost done with loading a connection")
-                    # print("Connection displ name " + str(k.displayName))
+                    print("Connection displ name " + str(k.displayName))
                     # print("Connection fromPort" + str(k.fromPort))
                     # print("Connection toPort" + str(k.toPort))
+                    print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
                     k.initLoad()
                     # k.setConnToGroup("defaultGroup")
 

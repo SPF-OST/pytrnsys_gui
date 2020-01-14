@@ -20,11 +20,11 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
-    def __init__(self, fromPort, toPort, isBlock, parent, **kwargs):
+    def __init__(self, fromPort, toPort, isVirtual, parent, **kwargs):
         print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
         self.toPort = toPort
-        self.isBlockConn = isBlock
+        self.isBlockConn = isVirtual
         self.isStorageIO = False
         self.displayName = None
         # self.visible = visible  # DC add this to pipes too
@@ -64,14 +64,15 @@ class Connection(object):
             # self.label.setPos(self.fromPort.pos())
             # self.label.setPlainText(self.displayName)
         else:
-            print("Connection being loaded")
-            self.fromPortId = kwargs["fromPortId"]
-            self.toPortId = kwargs["toPortId"]
-            self.segmentsLoad = kwargs["segmentsLoad"]
-            self.cornersLoad = kwargs["cornersLoad"]
+            if "loadedConn" in kwargs:
+                print("Connection being loaded")
+                self.fromPortId = kwargs["fromPortId"]
+                self.toPortId = kwargs["toPortId"]
+                self.segmentsLoad = kwargs["segmentsLoad"]
+                self.cornersLoad = kwargs["cornersLoad"]
 
-            # print("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
-            # self.initLoad()
+                # print("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
+                # self.initLoad()
 
         # For dfs1
         self.traversed = False
