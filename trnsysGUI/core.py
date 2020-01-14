@@ -1933,16 +1933,6 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
-<<<<<<< HEAD
-            # if isinstance(t, Pump) or isinstance(t, WTap_main):
-            #     f += "Mfr" + t.displayName + " = 1000" + "\n"
-            #     equationNr += 1
-            # elif isinstance(t, TVentil):
-            #     f += "xFrac" + t.displayName + " = 1" + "\n"
-            #     equationNr += 1
-            f += t.exportMassFlows()[0]
-            equationNr += t.exportMassFlows()[1]
-=======
             if isinstance(t, Pump) or isinstance(t, WTap_main):
                 f += "Mfr" + t.displayName + " = 1000" + "\n"
                 equationNr += 1
@@ -1951,7 +1941,6 @@ class DiagramEditor(QWidget):
                 if (t.isComplexDiv==False):
                     f += "xFrac" + t.displayName + " = 1" + "\n"
                     equationNr += 1
->>>>>>> 444984fe2bfe6f2affcb87a22244743a0b748847
 
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
@@ -1969,16 +1958,6 @@ class DiagramEditor(QWidget):
         constants = 0
         f2 = ""
         for t in self.trnsysObj:
-<<<<<<< HEAD
-            # if isinstance(t, TVentil):
-            #     if t.isComplexDiv:
-            #         constants += 1
-            #         f += "T_set_" + t.displayName + "\n"
-            f += t.exportDivSetting()[0]
-            constants += t.exportDivSetting()[1]
-
-        f = "CONSTANTS " + str(constants) + "\n" + f + "\n"
-=======
             if isinstance(t, TVentil):
                 if t.isComplexDiv:
                     constants += 1
@@ -1986,7 +1965,6 @@ class DiagramEditor(QWidget):
         if(constants>0):
             f = "CONSTANTS " + str(constants) + "\n"
             f += f2+ "\n"
->>>>>>> 444984fe2bfe6f2affcb87a22244743a0b748847
 
         for t in self.trnsysObj:
             if isinstance(t, TVentil) and t.isComplexDiv:
