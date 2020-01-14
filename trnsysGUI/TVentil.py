@@ -8,11 +8,13 @@ from trnsysGUI.PortItem import PortItem
 class TVentil(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(TVentil, self).__init__(trnsysType, parent, **kwargs)
-        factor = 0.6
-        self.w = 100 * factor
-        self.h = 61.14 * factor
+        # factor = 0.6
+        # self.w = 100 * factor
+        # self.h = 61.14 * factor
+        self.h = 50
+        self.w = 50
         self.typeNumber = 3
-        self.isComplexDiv = False
+        self.isTempering = False
 
         self.inputs.append(PortItem('o', 0, self))
         self.inputs.append(PortItem('o', 1, self))
@@ -54,7 +56,26 @@ class TVentil(BlockItem):
         return w, h
 
     def setComplexDiv(self, b):
-        self.isComplexDiv = b
+        self.isTempering = b
+
+    def encode(self):
+        dictName, dct = super(TVentil, self).encode()
+        dct['IsTempering'] = self.isTempering
+        return dictName, dct
+
+    def decode(self, i, resConnList, resBlockList):
+        super(TVentil, self).decode(i, resConnList, resBlockList)
+        if "IsTempering" not in i:
+            print("Old version of diagram")
+        else:
+            self.isTempering = i["IsTempering"]
+
+    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        super(TVentil, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
+        if "IsTempering" not in i:
+            print("Old version of diagram")
+        else:
+            self.isTempering = i["IsTempering"]
 
     def exportParameterSolver(self, descConnLength):
         temp = ""
@@ -104,7 +125,7 @@ class TVentil(BlockItem):
         return resStr, equationNr
 
     def exportDivSetting(self):
-        if self.isComplexDiv:
+        if self.isTempering:
             constants = 1
             f = "T_set_" + self.displayName + "\n"
             return f, constants

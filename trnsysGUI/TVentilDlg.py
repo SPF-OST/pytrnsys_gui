@@ -23,7 +23,7 @@ class TVentilDlg(QDialog):
         self.hFlipBox.setCheckState(self.block.flippedH * 2)
         self.vFlipBox.setCheckState(self.block.flippedV * 2)
         self.complexDiv.setTristate(False)
-        self.complexDiv.setCheckState(self.block.isComplexDiv)
+        self.complexDiv.setCheckState(self.block.isTempering)
 
         flipLayout = QHBoxLayout()
         flipLayout.addWidget(self.hFlipBoxLabel)

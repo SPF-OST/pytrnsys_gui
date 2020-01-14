@@ -238,7 +238,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.changeSize()
 
     def mouseDoubleClickEvent(self, event):
-        if hasattr(self, "isComplexDiv"):
+        if hasattr(self, "isTempering"):
             dia = TVentilDlg(self, self.scene().parent())
         else:
             dia = BlockDlg(self, self.scene().parent())

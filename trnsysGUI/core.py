@@ -1938,7 +1938,7 @@ class DiagramEditor(QWidget):
                 equationNr += 1
 
             elif isinstance(t, TVentil):
-                if (t.isComplexDiv==False):
+                if (t.isTempering==False):
                     f += "xFrac" + t.displayName + " = 1" + "\n"
                     equationNr += 1
 
@@ -1959,7 +1959,7 @@ class DiagramEditor(QWidget):
         f2 = ""
         for t in self.trnsysObj:
             if isinstance(t, TVentil):
-                if t.isComplexDiv:
+                if t.isTempering:
                     constants += 1
                     f2 += "T_set_" + t.displayName + " = 50\n"
         if(constants>0):
@@ -1967,7 +1967,7 @@ class DiagramEditor(QWidget):
             f += f2+ "\n"
 
         for t in self.trnsysObj:
-            if isinstance(t, TVentil) and t.isComplexDiv:
+            if isinstance(t, TVentil) and t.isTempering:
                 nUnit = nUnit + 1
                 f += "UNIT %d TYPE 811 ! Passive Divider for heating \n"%nUnit
                 f += "PARAMETERS 1" + "\n"

@@ -2,40 +2,33 @@
     "Blocks": {
         ".__BlockDct__": true,
         "Block-1": {
-            ".__HeatPumpTwoDict__": true,
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TVentil1",
+            "BlockName": "TVentil",
+            "BlockPosition": [
+                -1010.0,
+                -537.0
+            ],
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "HeatPumpDisplayName": "HPTwoHx1",
-            "HeatPumpName": "HPTwoHx",
-            "HeatPumpPosition": [
-                -1089.0,
-                -324.0
-            ],
             "ID": 1,
+            "IsTempering": 2,
             "PortsIDIn": [
-                2,
-                3,
-                4
-            ],
-            "PortsIDOut": [
-                5,
-                6,
-                7
-            ],
-            "RotationN": 0,
-            "childIds": [
-                1,
                 2,
                 3
             ],
+            "PortsIDOut": [
+                4
+            ],
+            "RotationN": 0,
             "trnsysID": 1
         },
         "IDs": {
-            "GlobalId": 8,
+            "GlobalId": 5,
             "__idDct__": true,
             "globalConnID": 1,
-            "trnsysID": 4
+            "trnsysID": 2
         },
         "Strings": {
             "DiagramName": "COPYGROUP",
