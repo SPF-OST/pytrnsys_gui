@@ -1933,6 +1933,7 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
+<<<<<<< HEAD
             # if isinstance(t, Pump) or isinstance(t, WTap_main):
             #     f += "Mfr" + t.displayName + " = 1000" + "\n"
             #     equationNr += 1
@@ -1941,15 +1942,34 @@ class DiagramEditor(QWidget):
             #     equationNr += 1
             f += t.exportMassFlows()[0]
             equationNr += t.exportMassFlows()[1]
+=======
+            if isinstance(t, Pump) or isinstance(t, WTap_main):
+                f += "Mfr" + t.displayName + " = 1000" + "\n"
+                equationNr += 1
+
+            elif isinstance(t, TVentil):
+                if (t.isComplexDiv==False):
+                    f += "xFrac" + t.displayName + " = 1" + "\n"
+                    equationNr += 1
+>>>>>>> 444984fe2bfe6f2affcb87a22244743a0b748847
 
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return f
     
-    def exportDivSetting(self):
+    def exportDivSetting(self,unit):
+        """
+
+        :param unit: the index of the previous unit number used.
+        :return:
+        """
+
+        nUnit=unit
         f = ""
         constants = 0
+        f2 = ""
         for t in self.trnsysObj:
+<<<<<<< HEAD
             # if isinstance(t, TVentil):
             #     if t.isComplexDiv:
             #         constants += 1
@@ -1958,11 +1978,22 @@ class DiagramEditor(QWidget):
             constants += t.exportDivSetting()[1]
 
         f = "CONSTANTS " + str(constants) + "\n" + f + "\n"
+=======
+            if isinstance(t, TVentil):
+                if t.isComplexDiv:
+                    constants += 1
+                    f2 += "T_set_" + t.displayName + " = 50\n"
+        if(constants>0):
+            f = "CONSTANTS " + str(constants) + "\n"
+            f += f2+ "\n"
+>>>>>>> 444984fe2bfe6f2affcb87a22244743a0b748847
 
         for t in self.trnsysObj:
             if isinstance(t, TVentil) and t.isComplexDiv:
-                f += "UNIT X TYPE 811 ! Passive Divider for heating \n"
+                nUnit = nUnit + 1
+                f += "UNIT %d TYPE 811 ! Passive Divider for heating \n"%nUnit
                 f += "PARAMETERS 1" + "\n"
+                f += "5 !Nb.of iterations before fixing the value \n"
                 f += "INPUTS 4 \n"
 
                 if t.outputs[0].pos().y() == t.inputs[0].pos().y() or t.outputs[0].pos().x() == t.inputs[0].pos().x():
@@ -1977,8 +2008,8 @@ class DiagramEditor(QWidget):
                 f += "*** INITIAL INPUT VALUES" + "\n"
                 f += "35.0 21.0 800.0 T_set_" + t.displayName + "\n"
 
-                f += "EQUATIONS " + str(constants) + "\n"
-                f += "xFrac" + t.displayName + " =  1.-[X,5]" + "\n"
+                f += "EQUATIONS 1\n"
+                f += "xFrac" + t.displayName + " =  1.-[%d,5] \n"%nUnit
 
         return f + "\n"
 
@@ -2720,7 +2751,7 @@ class DiagramEditor(QWidget):
         fullExportText += self.exportBlackBox()
         fullExportText += self.exportPumpOutlets()
         fullExportText += self.exportMassFlows()
-        fullExportText += self.exportDivSetting()
+        fullExportText += self.exportDivSetting(simulationUnit-10) #To be improved !! I just fix it
 
         fullExportText += self.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
         fullExportText += self.exportInputsFlowSolver(lineNrParameters)
