@@ -1946,7 +1946,7 @@ class DiagramEditor(QWidget):
 
         return f
     
-    def exportDivSetting(self,unit):
+    def exportDivSetting(self, unit):
         """
 
         :param unit: the index of the previous unit number used.
@@ -1962,7 +1962,7 @@ class DiagramEditor(QWidget):
                 if t.isTempering:
                     constants += 1
                     f2 += "T_set_" + t.displayName + " = 50\n"
-        if(constants>0):
+        if constants > 0:
             f = "CONSTANTS " + str(constants) + "\n"
             f += f2+ "\n"
 
@@ -2069,7 +2069,6 @@ class DiagramEditor(QWidget):
 
             else:
                 # No StorageTank and no HeatPump
-                print("No sto no hp, " + str(type(t)) + t.displayName)
                 if isinstance(t, BlockItem):
                     temp = ""
 
@@ -3837,29 +3836,15 @@ if __name__ == '__main__':
     # app.setStyleSheet(cssSs_)
     app.exec_()
 
-# Found bug: fixed/when renaming/click on connection, connection gets destroyed
-# Found bug: fixed/90 degrees for bridges doesn't work
 # Found bug: when dragging bridging connection over another segment, crash
 # Found glitch: when having a disr segment, gradient is not correct anymore
 # Found bug: IceStorage, when creating new connection and moving block, the connection does not update position
 # Found bug: When in mode 1, sometimes dragging leads to segments collaps to a small point
-# Found bug: fixed/When reloading, a node was inexistent in loadSegement => setPre() crashed
-# Found glitch: fixed/Moving pasted group rapidly produces hang in some segments (only the ones next to port?)
 
-# Todo: Fix bugs
-# Todo 0: Implement nice connections to support side handling
-# Todo 1:   done/Correct export
-# Todo 2:   done/Correct gradient for lines
-# Todo 3:   Improve autoarrange of connections
-# Todo 4:   old/Prevent loops when adding connections to StorageBlock
-# Todo 5:   done/Implement segements list of connection IN ORDER, ie with insert at the correct position
-#           s.t. one can easily get distance of segment to fromPort
-# Todo 6: Check correct deletion of blocks and connections
+# Improve autoarrange of connections
+# TODO:   old/Prevent loops when adding connections to StorageBlock
 # TODO 7: Solve mix up between i/o and left/right side
 
-# TODO: Note that no direct connection between storages allowed
 # There is a mess introduced with kwargs because the dencoder returns objects, which cannot have any
 # connection to the "outside" of the decoder. This could maybe be improved by returning just the dict
 # to the DiagramEditor class, which then can easily create the objects correctly.
-
-# Think about a clean and concise way of putting elements into groups

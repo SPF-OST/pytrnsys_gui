@@ -366,9 +366,10 @@ class StorageTank(BlockItem):
         if len(side2) > 2:
             lastC.hiddenGenerated = True
 
+        # Here the virtual pipes copy the name of their corresponding real pipe
+        # Could be used to set a new attribute generatedPrinted
         for s in side_test:
             for t in tempArrConn:
-                # print("Checking s")
                 if t.fromPort is s or t.toPort is s:
                     print("This is a real connection " + str(t.displayName))
                     if len(s.connectionList) > 0:
@@ -417,7 +418,7 @@ class StorageTank(BlockItem):
         if self not in self.parent.parent().trnsysObj:
             self.parent.parent().trnsysObj.append(self)
 
-        # TODO: Should hx be also in trnsysObj
+        # TODO: Should hx be also in trnsysObj?
         for hx in self.heatExchangers:
             hx.parent = self
 

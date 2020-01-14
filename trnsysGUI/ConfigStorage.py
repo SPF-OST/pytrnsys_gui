@@ -222,10 +222,6 @@ class ConfigStorage(QDialog):
                                 self.storage,
                                 self.hxNameLe.text())
         self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%.2f" %(float(self.offsetLeI.text())) + "%")
-        # self.storage.h += self.h_hx
-
-        # Todo: Don't forget that size is not enlarged by h_hx if constant size heat exchanger part is chosen
-        # self.storage.updateImage(self.h_hx)
 
     def manAddPortPair(self):
         if float(self.manPortLeI.text()) > float(self.offsetLeO.text()):

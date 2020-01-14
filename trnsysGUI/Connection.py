@@ -1042,6 +1042,31 @@ class Connection(object):
     def exportDivSetting(self):
         return "", 0
 
+    def exportParameterFlowSolver(self):
+        descConnLength = 20
+        f = ""
+        # If neither port is at a StorageTank
+        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
+            return "", 0
+
+        temp = str(self.fromPort.parent.trnsysId) + " " + str(
+            self.toPort.parent.trnsysId) + " 0" * 2 + " "  # + str(t.trnsysId)
+        self.exportConnsString = temp
+
+        if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
+            self.trnsysConn.insert(0, self.fromPort.parent)
+        else:
+            self.trnsysConn.append(self.fromPort.parent)
+
+        if type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs:
+            self.trnsysConn.insert(0, self.toPort.parent)
+        else:
+            self.trnsysConn.append(self.toPort.parent)
+
+        f += temp + " " * (descConnLength - len(temp)) + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+
+        return f, 1
+
 class DeleteConnectionCommand(QUndoCommand):
     def __init__(self, conn, descr):
         super(DeleteConnectionCommand, self).__init__(descr)
