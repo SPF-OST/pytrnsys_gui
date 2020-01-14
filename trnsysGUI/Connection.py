@@ -24,11 +24,11 @@ class Connection(object):
         print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
         self.toPort = toPort
-        self.isBlockConn = isVirtual
+        self.isVirtualConn = isVirtual
         self.isStorageIO = False
         self.displayName = None
-        # self.visible = visible  # DC add this to pipes too
         self.hiddenGenerated = False
+        self.isClone = False
 
         self.parent = parent
         self.groupName = ''
@@ -70,7 +70,6 @@ class Connection(object):
                 self.toPortId = kwargs["toPortId"]
                 self.segmentsLoad = kwargs["segmentsLoad"]
                 self.cornersLoad = kwargs["cornersLoad"]
-
                 # print("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
                 # self.initLoad()
 
@@ -82,7 +81,16 @@ class Connection(object):
 
     # DC adding the isVisual function
     def isVisible(self):
-        return self.visible
+        res = True
+        for s in self.segments:
+            if not s.isVisible():
+                res = False
+
+        return res
+
+    def setClone(self, b):
+        self.isClone = b
+
 
     def initNew(self, parent):
 
@@ -113,7 +121,7 @@ class Connection(object):
     def initLoad(self):
         # Called by DiagramEditor when loading connection
 
-        print("self is " + str(self.isBlockConn))
+        print("self is " + str(self.isVirtualConn))
         print("Port 1 is " + str(self.fromPort) + "has Id" + str(self.fromPort.id))
         print("Port 2 is " + str(self.toPort))
 
@@ -195,7 +203,7 @@ class Connection(object):
 
             s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
 
-            if self.isBlockConn:
+            if self.isVirtualConn:
                 s.setVisible(False)
 
             self.parent.diagramScene.addItem(s)
@@ -305,7 +313,7 @@ class Connection(object):
 
         self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
 
-        if self.isBlockConn:
+        if self.isVirtualConn:
             self.firstS.setVisible(False)
 
         self.parent.diagramScene.addItem(self.firstS)
@@ -327,7 +335,7 @@ class Connection(object):
 
 
 
-        if self.isBlockConn:
+        if self.isVirtualConn:
             # if self.displayName == "UntitledConn189":
             #     print("PiTesRCombiTes_189XXXXXXXX is now set invisible")
             self.firstS.setVisible(False)
@@ -407,7 +415,7 @@ class Connection(object):
                 s.startNode) + " endnode " + str(s.endNode))
 
     def niceConn(self):
-        if self.isBlockConn:
+        if self.isVirtualConn:
             return
 
         # Here different cases can be implemented using self.PORT.side as sketched on paper
@@ -996,14 +1004,14 @@ class Connection(object):
             s.updateGrad()
 
     def encode(self):
-        if not self.isBlockConn:
+        if not self.isVirtualConn:
             print("Encoding a connection")
 
             dct = {}
             dct['.__ConnectionDict__'] = True
             dct['PortFromID'] = self.fromPort.id
             dct['PortToID'] = self.toPort.id
-            dct['isBlockConn'] = self.isBlockConn
+            dct['isVirtualConn'] = self.isVirtualConn
             dct['ConnDisplayName'] = self.displayName
             dct['ConnID'] = self.id
             dct['ConnCID'] = self.connId
@@ -1068,13 +1076,14 @@ class Connection(object):
 
         return f, 1
 
+
 class DeleteConnectionCommand(QUndoCommand):
     def __init__(self, conn, descr):
         super(DeleteConnectionCommand, self).__init__(descr)
         self.conn = conn
         self.connFromPort = self.conn.fromPort
         self.connToPort = self.conn.toPort
-        self.connIsBlock = self.conn.isBlockConn
+        self.connIsBlock = self.conn.isVirtualConn
         self.connParent = self.conn.parent
 
     def redo(self):

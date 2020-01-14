@@ -342,10 +342,10 @@ class BlockItem(QGraphicsPixmapItem):
     def deleteBlock(self):
         print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        print("self.parent.parent" + str(self.parent.parent()))
+        # print("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         print("deleting block " + str(self) + self.displayName)
-        print("self.scene is" + str(self.parent.scene()))
+        # print("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         del self
 
