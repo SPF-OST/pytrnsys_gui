@@ -2705,7 +2705,7 @@ class DiagramEditor(QWidget):
         s = ''
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isBlockConn:
+            if isinstance(t, Connection) and not t.isVirtualConn:
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"

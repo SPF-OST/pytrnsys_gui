@@ -265,7 +265,7 @@ class StorageTank(BlockItem):
             print("Only 2 ports in side list")
             print("ports have " + str(side[0].parent) + str(side[1].parent))
 
-            connector = Connector("Connector", "Connector", self.parent, storagePorts=side2)
+            connector = Connector("Connector", self.parent, storagePorts=side2)
             connector.displayName = "Conn" + self.displayName + sideVar + str(connector.id)
 
             # Used for recognizing it to print the temperature of the storage ports
