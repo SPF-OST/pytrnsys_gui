@@ -751,5 +751,14 @@ class StorageTank(BlockItem):
     def printPortNb(self):
         print("ST has "+ str(self.inputs) + " and " + str(self.outputs))
 
-    def exportParametersFlowSolver(self):
+    def exportParametersFlowSolver(self, descConnLength):
         return "", 0
+
+    def exportInputsFlowSolver1(self):
+        return "", 0
+
+    def exportInputsFlowSolver2(self):
+        return self.exportInputsFlowSolver1()
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        return "", equationNumber, 0

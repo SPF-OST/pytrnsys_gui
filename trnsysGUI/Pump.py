@@ -15,6 +15,8 @@ class Pump(BlockItem):
         self.h = 30
         self.typeNumber = 1
 
+        self.exportInitialInput = 0.0
+
         self.inputs.append(PortItem('i', 0, self))
         self.outputs.append(PortItem('o', 2, self))
 
@@ -61,4 +63,10 @@ class Pump(BlockItem):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"
         equationNr = 1
         return resStr, equationNr
+
+    def exportInputsFlowSolver1(self):
+        temp1 = "Mfr" + self.displayName
+        self.exportInputName = " " + temp1 + " "
+        return self.exportInputName, 1
+
 

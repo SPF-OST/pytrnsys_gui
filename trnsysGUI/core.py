@@ -19,6 +19,7 @@ from PyQt5.QtSvg import QSvgGenerator
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
+from trnsysGUI.Export import Export
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.PV import PV
 
@@ -1937,14 +1938,14 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
-            # if isinstance(t, Pump) or isinstance(t, WTap_main):
-            #     f += "Mfr" + t.displayName + " = 1000" + "\n"
-            #     equationNr += 1
-            #
-            # elif isinstance(t, TVentil):
-            #     if not t.isTempering:
-            #         f += "xFrac" + t.displayName + " = 1" + "\n"
-            #         equationNr += 1
+            if isinstance(t, Pump) or isinstance(t, WTap_main):
+                f += "Mfr" + t.displayName + " = 1000" + "\n"
+                equationNr += 1
+
+            elif isinstance(t, TVentil):
+                if not t.isTempering:
+                    f += "xFrac" + t.displayName + " = 1" + "\n"
+                    equationNr += 1
             f += t.exportMassFlows()[0]
             equationNr += t.exportMassFlows()[1]
 
@@ -2586,7 +2587,6 @@ class DiagramEditor(QWidget):
         f += loopText + "\n"
         return f
 
-
     def exportPrintPipeLosses(self):
         f = ''
         lossText = ''
@@ -2715,6 +2715,8 @@ class DiagramEditor(QWidget):
         return f
 
     def exportData(self):
+        print("------------------------> START OF EXPORT <------------------------")
+
         # Main trnsys export function
         self.setUpStorageInnerConns()
 
@@ -2755,6 +2757,7 @@ class DiagramEditor(QWidget):
 
         parameters = 0
 
+        # This has to be changed
         for t in self.trnsysObj:
             if type(t) is StorageTank:
                 continue
@@ -2767,23 +2770,42 @@ class DiagramEditor(QWidget):
         lineNrParameters = parameters
         parameters = parameters * 4 + 1
 
-        fullExportText += self.exportBlackBox()
-        fullExportText += self.exportPumpOutlets()
-        fullExportText += self.exportMassFlows()
-        fullExportText += self.exportDivSetting(simulationUnit-10) #To be improved !! I just fix it
+        exporter = Export(self.trnsysObj, self)
 
-        fullExportText += self.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
-        fullExportText += self.exportInputsFlowSolver(lineNrParameters)
-        fullExportText += self.exportOutputsFlowSolver(simulationUnit)
-        fullExportText += self.exportPipeAndTeeTypesForTemp(simulationUnit+1) #DC-ERROR
+        # fullExportText += self.exportBlackBox()
+        # fullExportText += self.exportPumpOutlets()
+        # fullExportText += self.exportMassFlows()
+        # fullExportText += self.exportDivSetting(simulationUnit-10) #To be improved !! I just fix it
 
-        fullExportText += self.exportPrintLoops()
-        fullExportText += self.exportPrintPipeLoops()
-        fullExportText += self.exportPrintPipeLosses()
+        fullExportText += exporter.exportBlackBox()
+        fullExportText += exporter.exportPumpOutlets()
+        fullExportText += exporter.exportMassFlows()
+        fullExportText += exporter.exportDivSetting(simulationUnit - 10)
+
+        # fullExportText += self.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
+        # fullExportText += self.exportInputsFlowSolver(lineNrParameters)
+        # fullExportText += self.exportOutputsFlowSolver(simulationUnit)
+        # fullExportText += self.exportPipeAndTeeTypesForTemp(simulationUnit+1) # DC-ERROR
+
+        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
+        fullExportText += exporter.exportInputsFlowSolver(lineNrParameters)
+        fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
+        fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit+1)   # DC-ERROR
+
+        # fullExportText += self.exportPrintLoops()
+        # fullExportText += self.exportPrintPipeLoops()
+        # fullExportText += self.exportPrintPipeLosses()
+
+        fullExportText += exporter.exportPrintLoops()
+        fullExportText += exporter.exportPrintPipeLoops()
+        fullExportText += exporter.exportPrintPipeLosses()
 
         # unitnr should maybe be variable in exportData()
-        fullExportText += self.exportMassFlowPrinter(self.printerUnitnr, 15)
-        fullExportText += self.exportTempPrinter(self.printerUnitnr+1, 15)
+        # fullExportText += self.exportMassFlowPrinter(self.printerUnitnr, 15)
+        # fullExportText += self.exportTempPrinter(self.printerUnitnr+1, 15)
+
+        fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
+        fullExportText += exporter.exportTempPrinter(self.printerUnitnr+1, 15)
         fullExportText += "ENDS"
 
         print("------------------------> END OF EXPORT <------------------------")

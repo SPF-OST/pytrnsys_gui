@@ -51,3 +51,84 @@ class TeePiece(BlockItem):
         self.outputs[0].side = 1 - 1 * self.flippedH
 
         return w, h
+
+    def exportParametersFlowSolver(self, descConnLength):
+        temp = ""
+        for i in self.inputs:
+            # ConnectionList lenght should be max offset
+            for c in i.connectionList:
+                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        for o in self.outputs:
+            # ConnectionList lenght should be max offset
+            for c in o.connectionList:
+                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        temp += str(self.typeNumber)
+        temp += " " * (descConnLength - len(temp))
+        self.exportConnsString = temp
+
+        f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+
+        return f, 1
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        if self.isVisible():
+            tot = ""
+            for i in range(0, 3):
+                temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                       str(equationNumber) + "]\n"
+                tot += temp
+                self.exportEquations.append(temp)
+                # nEqUsed += 1  # DC
+                equationNumber += 1  # DC-ERR
+            return tot, equationNumber, 3
+        else:
+            return "", equationNumber + 3, 0
+
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):
+        if self.isVisible():
+            f = ''
+            unitNumber = startingUnit
+            tNr = 929  # Temperature calculation from a tee-piece
+
+            unitText = ""
+            ambientT = 20
+
+            equationConstant = 1
+
+            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+            unitText += "!" + self.displayName + "\n"
+            unitText += "PARAMETERS 0\n"
+            unitText += "INPUTS 6\n"
+
+            for s in self.exportEquations:
+                unitText += s[0:s.find('=')] + "\n"
+
+            for it in self.trnsysConn:
+                unitText += "T" + it.displayName + "\n"
+
+            unitText += "***Initial values\n"
+            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+
+            unitText += "EQUATIONS 1\n"
+            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+
+            unitNumber += 1
+            f += unitText + "\n"
+
+            return f, unitNumber
+        else:
+            return "", startingUnit

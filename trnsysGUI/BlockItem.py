@@ -587,8 +587,8 @@ class BlockItem(QGraphicsPixmapItem):
     def exportDivSetting2(self, nUnit):
         return "", nUnit
 
-    def exportParametersFlowSolver(self):
-        descConnLength = 20
+    def exportParametersFlowSolver(self, descConnLength):
+        # descConnLength = 20
         temp = ""
         for i in self.inputs:
             # ConnectionList lenght should be max offset
@@ -612,6 +612,7 @@ class BlockItem(QGraphicsPixmapItem):
                     temp = temp + str(c.trnsysId) + " "
                     self.trnsysConn.append(c)
 
+        temp += "0 "
         temp += str(self.typeNumber)
         temp += " " * (descConnLength - len(temp))
         self.exportConnsString = temp
@@ -619,3 +620,26 @@ class BlockItem(QGraphicsPixmapItem):
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
         return f, 1
+
+    def exportInputsFlowSolver1(self):
+        return "0,0 ", 1
+
+    def exportInputsFlowSolver2(self):
+        # return str(self.exportInitialInput) + " [" + self.displayName + "]", 1
+        return str(self.exportInitialInput) + " ", 1
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        tot = ""
+        for i in range(0, 3):
+            if i < 2:
+                temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                       str(equationNumber) + "]\n"
+                tot += temp
+                self.exportEquations.append(temp)
+                # nEqUsed += 1  # DC
+            equationNumber += 1  # DC-ERROR it should count anyway
+
+        return tot, equationNumber, 2
+
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):
+        return "", startingUnit

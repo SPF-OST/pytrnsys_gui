@@ -310,8 +310,8 @@ class GenericBlock(BlockItem):
         self.flippedV = bool(state)
         self.updatePortPos()
 
-    def exportParametersFlowSolver(self):
-        descConnLength = 20
+    def exportParametersFlowSolver(self, descConnLength):
+        # descConnLength = 20
         equationNr = 0
         for i in range(len(self.inputs)):
             temp = ""
@@ -330,3 +330,28 @@ class GenericBlock(BlockItem):
                 f = temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "HeatPump" + "\n"
 
         return f, equationNr
+
+    def exportInputsFlowSolver1(self):
+        return "0,0 " * len(self.inputs), len(self.inputs)
+
+    def exportInputsFlowSolver2(self):
+        f = ""
+        for i in range(len(self.inputs)):
+            f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
+
+        return f, len(self.inputs)
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        tot = ""
+        for j in range(len(self.inputs)):
+            for i in range(0, 3):
+
+                if i < 2:
+                    temp = prefix + self.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                           str(equationNumber) + "]\n"
+                    tot += temp
+                    self.exportEquations.append(temp)
+                    # nEqUsed += 1  # DC
+                equationNumber += 1  # DC-ERROR it should count anyway
+
+        return tot, equationNumber, 2 * len(self.inputs)

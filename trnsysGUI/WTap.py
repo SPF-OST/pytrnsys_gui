@@ -51,3 +51,37 @@ class WTap(BlockItem):
         resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
         equationNr = 1
         return resStr, equationNr
+
+    def exportParametersFlowSolver(self, descConnLength):
+        # descConnLength = 20
+        temp = ""
+        for i in self.inputs:
+            # ConnectionList lenght should be max offset
+            for c in i.connectionList:
+                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        for o in self.outputs:
+            # ConnectionList lenght should be max offset
+            for c in o.connectionList:
+                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        temp += "0 0 "
+        temp += str(self.typeNumber)
+        temp += " " * (descConnLength - len(temp))
+        self.exportConnsString = temp
+
+        f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+
+        return f, 1

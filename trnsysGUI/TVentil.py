@@ -16,6 +16,8 @@ class TVentil(BlockItem):
         self.typeNumber = 3
         self.isTempering = False
 
+        self.exportInitialInput = 0.0
+
         self.inputs.append(PortItem('o', 0, self))
         self.inputs.append(PortItem('o', 1, self))
         self.outputs.append(PortItem('i', 2, self))
@@ -160,8 +162,8 @@ class TVentil(BlockItem):
         else:
             return "", nUnit
 
-    def exportParametersFlowSolver(self):
-        descConnLength = 20
+    def exportParametersFlowSolver(self, descConnLength):
+        # descConnLength = 20
         temp = ""
 
         # This is to assert that the input in front of the output is always printed before the third one
@@ -170,7 +172,7 @@ class TVentil(BlockItem):
             for c in o.connectionList:
                 if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
                     continue
-                elif hasattr(c.toPort.parent) and o.connectionList.index(c) == 0:
+                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
@@ -202,3 +204,57 @@ class TVentil(BlockItem):
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
         return f, 1
+
+    def exportInputsFlowSolver1(self):
+        temp1 = "xFrac" + self.displayName
+        self.exportInputName = " " + temp1 + " "
+        return self.exportInputName, 1
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        if self.isVisible():
+            tot = ""
+            for i in range(0,3):
+                temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                       str(equationNumber) + "]\n"
+                tot += temp
+                self.exportEquations.append(temp)
+                # nEqUsed += 1  # DC
+                equationNumber += 1  # DC-ERR
+            return tot, equationNumber, 3
+        else:
+            return "", equationNumber + 1, 0
+
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):
+        if self.isVisible():
+            f = ''
+            unitNumber = startingUnit
+            tNr = 929  # Temperature calculation from a tee-piece
+
+            unitText = ""
+            ambientT = 20
+
+            equationConstant = 1
+
+            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+            unitText += "!" + self.displayName + "\n"
+            unitText += "PARAMETERS 0\n"
+            unitText += "INPUTS 6\n"
+
+            for s in self.exportEquations:
+                unitText += s[0:s.find('=')] + "\n"
+
+            for it in self.trnsysConn:
+                unitText += "T" + it.displayName + "\n"
+
+            unitText += "***Initial values\n"
+            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+
+            unitText += "EQUATIONS 1\n"
+            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+
+            unitNumber += 1
+            f += unitText + "\n"
+
+            return f, unitNumber
+        else:
+            return "", startingUnit

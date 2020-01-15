@@ -138,8 +138,8 @@ class HeatPump(BlockItem):
         eqNb = 2
         return resStr, eqNb
 
-    def exportParametersFlowSolver(self):
-        descConnLength = 20
+    def exportParametersFlowSolver(self, descConnLength):
+        # descConnLength = 20
         f = ""
         for i in range(len(self.inputs)):
             # ConnectionList lenght should be max offset
@@ -180,3 +180,27 @@ class HeatPump(BlockItem):
                         f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
 
         return f, 2
+
+    def exportInputsFlowSolver1(self):
+        return "0,0 0,0 ", 2
+
+    def exportInputsFlowSolver2(self):
+        f = ""
+        f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
+        f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
+        return f, 2
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        tot = ""
+        for j in range(2):
+            for i in range(0, 3):
+
+                if i < 2:
+                    temp = prefix + self.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                           str(equationNumber) + "]\n"
+                    tot += temp
+                    self.exportEquations.append(temp)
+                    # nEqUsed += 1  # DC
+                equationNumber += 1  # DC-ERROR it should count anyway
+
+        return tot, equationNumber, 2

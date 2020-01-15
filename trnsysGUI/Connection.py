@@ -1054,8 +1054,8 @@ class Connection(object):
     def exportDivSetting2(self, nUnit):
         return "", nUnit
 
-    def exportParameterFlowSolver(self):
-        descConnLength = 20
+    def exportParametersFlowSolver(self, descConnLength):
+        # descConnLength = 20
         f = ""
         # If neither port is at a StorageTank
         if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
@@ -1079,6 +1079,165 @@ class Connection(object):
         f += temp + " " * (descConnLength - len(temp)) + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
         return f, 1
+
+    def exportInputsFlowSolver1(self):
+        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
+            return "", 0
+        else:
+            return "0,0 ", 1
+
+    def exportInputsFlowSolver2(self):
+        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
+            return "", 0
+        else:
+            return str(self.exportInitialInput) + " ", 1
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
+            return "", equationNumber, 0
+        else:
+            tot = ""
+            for i in range(0, 3):
+                if i < 2:
+                    temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                           str(equationNumber) + "]\n"
+                    tot += temp
+                    self.exportEquations.append(temp)
+                    # nEqUsed += 1  # DC
+                equationNumber += 1  # DC-ERROR it should count anyway
+
+            return tot, equationNumber, 2
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):
+        if not (hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers")) and not self.hiddenGenerated:
+            f = ''
+            unitNumber = startingUnit
+            typeNr2 = 931  # Temperature calculation from a pipe
+
+            unitText = ""
+            ambientT = 20
+
+            densityVar = "RhoWat"
+            specHeatVar = "CPWat"
+
+            equationConstant1 = 1
+            equationConstant2 = 3
+
+            parameterNumber = 6
+            inputNumbers = 4
+
+            # Fixed strings
+            diameterPrefix = "di"
+            lengthPrefix = "L"
+            lossPrefix = "U"
+            tempRoomVar = "TRoomStore"
+            initialValueS = "20 0.0 20 20"
+            powerPrefix = "P"
+
+            # Momentarily hardcoded
+            equationNr = 3
+
+            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
+            unitText += "!" + self.displayName + "\n"
+            unitText += "PARAMETERS " + str(parameterNumber) + "\n"
+
+            unitText += diameterPrefix + self.displayName + "\n"
+            unitText += lengthPrefix + self.displayName + "\n"
+            unitText += lossPrefix + self.displayName + "\n"
+            unitText += densityVar + "\n"
+            unitText += specHeatVar + "\n"
+            unitText += str(ambientT) + "\n"
+
+            unitText += "INPUTS " + str(inputNumbers) + "\n"
+
+            if len(self.trnsysConn) == 2:
+                # if isinstance(Connector, t.trnsysConn[0]) and not t.trnsysConn[0].isVisible() and firstGenerated:
+                # or if it is tpiece and not visible and firstGenerated
+                if hasattr(self.trnsysConn[0], "rotationN") and not self.trnsysConn[0].isVisible():
+                    # This is the case for a generated TPiece
+                    portToPrint = None
+                    for p in self.trnsysConn[0].inputs + self.trnsysConn[0].outputs:
+                        if self in p.connectionList:
+                            # Found the port of the generated block adjacent to this pipe
+                            # Assumes 1st connection is with storageTank
+                            if self.fromPort == p:
+                                if self.toPort.connectionList[0].fromPort == self.toPort:
+                                    portToPrint = self.toPort.connectionList[0].toPort
+                                else:
+                                    portToPrint = self.toPort.connectionList[0].fromPort
+                            else:
+                                if self.fromPort.connectionList[0].fromPort == self.fromPort:
+                                    portToPrint = self.fromPort.connectionList[0].toPort
+                                else:
+                                    portToPrint = self.fromPort.connectionList[0].fromPort
+                    if portToPrint is None:
+                        print("Error: No portToprint found when printing UNIT of " + self.displayName)
+                        return
+
+                    if portToPrint.side == 0:
+                        lr = "Left"
+                    else:
+                        lr = "Right"
+
+                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
+                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                else:
+                    unitText += "T" + self.trnsysConn[0].displayName + "\n"
+
+                unitText += self.exportEquations[0][0:self.exportEquations[0].find("=")] + "\n"
+                unitText += tempRoomVar + "\n"
+
+                # if isinstance(self.trnsysConn[1], BlockItem) and not self.trnsysConn[1].isVisible():
+                if hasattr(self.trnsysConn[1], "rotationN") and not self.trnsysConn[1].isVisible():
+                    portToPrint = None
+                    for p in self.trnsysConn[1].inputs + self.trnsysConn[1].outputs:
+                        if self in p.connectionList:
+                            # Found the port of the generated block adjacent to this pipe
+                            # Assumes 1st connection is with storageTank
+                            if self.fromPort == p:
+                                if self.toPort.connectionList[0].fromPort == self.toPort:
+                                    portToPrint = self.toPort.connectionList[0].toPort
+                                else:
+                                    portToPrint = self.toPort.connectionList[0].fromPort
+                            else:
+                                if self.fromPort.connectionList[0].fromPort == self.fromPort:
+                                    portToPrint = self.fromPort.connectionList[0].toPort
+                                else:
+                                    portToPrint = self.fromPort.connectionList[0].fromPort
+
+                    if portToPrint is None:
+                        print("Error: No portToprint found when printing UNIT of " + self.displayName)
+                        return
+
+                    if portToPrint.side == 0:
+                        lr = "Left"
+                    else:
+                        lr = "Right"
+
+                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
+                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                else:
+                    unitText += "T" + self.trnsysConn[1].displayName + "\n"
+
+            else:
+                f += "Error: NO VALUE\n" * 3 + "at connection with parents " + str(self.fromPort.parent) + str(
+                    self.toPort.parent) + "\n"
+
+            unitText += "***Initial values\n"
+            unitText += initialValueS + "\n\n"
+
+            unitText += "EQUATIONS " + str(equationNr) + "\n"
+            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
+            unitText += powerPrefix + self.displayName + "_kW" + "= [" + str(unitNumber) + "," + str(
+                equationConstant2) + "]/3600 !kW\n"
+            unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
+
+            unitNumber += 1
+            unitText += "\n"
+            f += unitText
+
+            return unitText, unitNumber
+        else:
+            return "", startingUnit, 0
 
 
 class DeleteConnectionCommand(QUndoCommand):
