@@ -2293,8 +2293,10 @@ class DiagramEditor(QWidget):
             # if type(t) is Connection and t.isVirtualConn and not t.isStorageIO:
             #     continue
 
-            if type(t) is TeePiece and not t.isVisible():   # Ignore virtual tpieces
-                continue
+            #if type(t) is TeePiece and not t.isVisible():   # Ignore virtual tpieces
+                #continue DC-ERROR
+             #   equationNumber += 3 #it needs to add to the outputs id anyway
+             #   continue
 
             if type(t) is HeatPump:
                 for i in range(0, 3):
@@ -2320,12 +2322,15 @@ class DiagramEditor(QWidget):
 
             for i in range(0, 3):
                 if t.typeNumber == 2 or t.typeNumber == 3:
-                    temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                           str(equationNumber) + "]\n"
-                    tot += temp
-                    t.exportEquations.append(temp)
-                    equationNumber += 1
-                    nEqUsed += 1 #DC
+                    if(t.isVisible()):
+                        temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                               str(equationNumber) + "]\n"
+                        tot += temp
+                        t.exportEquations.append(temp)
+                        nEqUsed += 1 #DC
+
+                    equationNumber += 1 #DC-ERROR this needs to add even of is virtual. We don't print it but it exist in the flow solver
+
                 else:
                     if i < 2:
                         temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
@@ -2581,6 +2586,7 @@ class DiagramEditor(QWidget):
         f += loopText + "\n"
         return f
 
+
     def exportPrintPipeLosses(self):
         f = ''
         lossText = ''
@@ -2615,7 +2621,7 @@ class DiagramEditor(QWidget):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.diagramName + ".prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self.diagramName + "_Mfr.prt " + str(unitnr) + "\n\n"
         
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -2655,7 +2661,56 @@ class DiagramEditor(QWidget):
                 if breakline % 8 == 0:
                     s += "\n"
                 s += "xFrac" + t.displayName + " "
-        f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\nEnds"
+        f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
+
+        return f
+
+    def exportTempPrinter(self, unitnr, descLen):
+
+        typenr = 25
+        printingMode = 0
+        relAbsStart = 0
+        overwriteApp = -1
+        printHeader = -1
+        delimiter = 0
+        printLabels = 1
+
+        f = "ASSIGN " + self.diagramName + "_T.prt " + str(unitnr) + "\n\n"
+
+        f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
+        f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
+        f += "PARAMETERS 10" + "\n"
+        f += "dtSim"
+        f += " " * (descLen - len(f)) + "! 1 Printing interval" + "\n"
+        f += "START"
+        f += " " * (descLen - len(f)) + "! 2 Start time" + "\n"
+        f += "STOP"
+        f += " " * (descLen - len(f)) + "! 3 Stop time" + "\n"
+        f += str(unitnr)
+        f += " " * (descLen - len(f)) + "! 4 Logical unit" + "\n"
+        f += str(printingMode)
+        f += " " * (descLen - len(f)) + "! 5 Units printing mode" + "\n"
+        f += str(relAbsStart)
+        f += " " * (descLen - len(f)) + "! 6 Relative or absolute start time" + "\n"
+        f += str(overwriteApp)
+        f += " " * (descLen - len(f)) + "! 7 Overwrite or Append" + "\n"
+        f += str(printHeader)
+        f += " " * (descLen - len(f)) + "! 8 Print header" + "\n"
+        f += str(delimiter)
+        f += " " * (descLen - len(f)) + "! 9 Delimiter" + "\n"
+        f += str(printLabels)
+        f += " " * (descLen - len(f)) + "! 10 Print labels" + "\n"
+        f += "\n"
+
+        s = ''
+        breakline = 0
+        for t in self.trnsysObj:
+            if isinstance(t, Connection) and not t.isBlockConn:
+                breakline += 1
+                if breakline % 8 == 0:
+                    s += "\n"
+                s += "T" + t.displayName + " "
+        f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
 
@@ -2728,6 +2783,8 @@ class DiagramEditor(QWidget):
 
         # unitnr should maybe be variable in exportData()
         fullExportText += self.exportMassFlowPrinter(self.printerUnitnr, 15)
+        fullExportText += self.exportTempPrinter(self.printerUnitnr+1, 15)
+        fullExportText += "ENDS"
 
         print("------------------------> END OF EXPORT <------------------------")
 

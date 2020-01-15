@@ -1076,13 +1076,13 @@
             "trnsysID": 284
         },
         "IDs": {
-            "GlobalId": 643,
+            "GlobalId": 684,
             "__idDct__": true,
-            "globalConnID": 233,
-            "trnsysID": 285
+            "globalConnID": 242,
+            "trnsysID": 298
         },
         "Strings": {
-            "DiagramName": "CombiSystem1Tes",
+            "DiagramName": "CombiSystem1Tes-oldBolier",
             "__nameDct__": true
         }
     }
