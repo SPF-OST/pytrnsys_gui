@@ -2,33 +2,43 @@
     "Blocks": {
         ".__BlockDct__": true,
         "Block-1": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "TVentil1",
-            "BlockName": "TVentil",
-            "BlockPosition": [
-                -1010.0,
-                -537.0
-            ],
+            ".__StorageDict__": true,
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
+            "HxList": [
+                {
+                    "DisplayName": "sdf2",
+                    "Height": 80.0,
+                    "ID": 2,
+                    "Offset": [
+                        0.0,
+                        10.0
+                    ],
+                    "ParentID": 1,
+                    "Port1ID": 3,
+                    "Port2ID": 4,
+                    "SideNr": 0,
+                    "Width": 40,
+                    "connTrnsysID": 2
+                }
+            ],
             "ID": 1,
-            "IsTempering": 2,
-            "PortsIDIn": [
-                2,
-                3
+            "PortPairList": [],
+            "StorageDisplayName": "StorageTank1",
+            "StorageName": "StorageTank",
+            "StoragePosition": [
+                -943.0,
+                -412.0
             ],
-            "PortsIDOut": [
-                4
-            ],
-            "RotationN": 0,
+            "size_h": 100.0,
             "trnsysID": 1
         },
         "IDs": {
-            "GlobalId": 5,
+            "GlobalId": 8,
             "__idDct__": true,
-            "globalConnID": 1,
-            "trnsysID": 2
+            "globalConnID": 2,
+            "trnsysID": 3
         },
         "Strings": {
             "DiagramName": "COPYGROUP",

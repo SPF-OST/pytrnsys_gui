@@ -315,7 +315,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
                     elif ".__StorageDict__" in arr[k]:
                         print("Loading a Storage in Decoder")
                         i = arr[k]
-                        bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName= i["StorageDisplayName"] + "COPY", loaded=True)
+                        bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName=i["StorageDisplayName"] + "COPY", loaded=True)
                         # bl.flippedH = i["FlippedH"]
                         # # bl.flippedV = i["FlippedV"] # No support for vertical flip
                         # bl.changeSize()
@@ -382,15 +382,15 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         if tPort is None:
                             print("Did not found a tPort")
 
-                        # if not i["isBlockConn"]:  # Now internal connections don't get encoded in the first place
+                        # if not i["isVirtualConn"]:  # Now internal connections don't get encoded in the first place
                         if True:
                             for cornerL in i["CornerPositions"]:
                                 cornerL[0] += offset_x
                                 cornerL[1] += offset_y
 
-                            c = Connection(fport, tPort, i["isBlockConn"], self.editor,
+                            c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"])
+                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
                             # c.id = i["ConnID"]
                             # c.connId = i["ConnCID"]
                             # c.trnsysId = i["trnsysID"]
@@ -424,7 +424,7 @@ class DiagramDecoder(json.JSONDecoder):
 
     def object_hook(self, arr):
         """
-        This is the decoding function from the clipboard. It seems to get executed for every sub dictionary in the json file.
+        This is the decoding function. object_hook seems to get executed for every sub dictionary in the json file.
         By looking for the specific key containing the name of dict elements, one can extract the needed dict.
         The name of the dicts is important because the order in which they are loaded matters (some objects depend on others)
         Parameters
@@ -691,11 +691,11 @@ class DiagramDecoder(json.JSONDecoder):
                         if tPort is None:
                             print("Did not found a tPort")
 
-                        # if not i["isBlockConn"]:  # Now internal connections don't get encoded in the first place
+                        # if not i["isVirtualConn"]:  # Now internal connections don't get encoded in the first place
                         if True:
-                            c = Connection(fport, tPort, i["isBlockConn"], self.editor,
+                            c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"])
+                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
                             c.id = i["ConnID"]
                             c.connId = i["ConnCID"]
                             c.trnsysId = i["trnsysID"]
@@ -961,13 +961,13 @@ class DiagramEncoder(json.JSONEncoder):
                 #     # blockDct["BlockHeatPump-" + str(t.id)] = dct
                 #     blockDct["BlockHeatPump-" + str(t.id)] = t.encode()
                 #
-                # if isinstance(t, Connection) and not t.isBlockConn:
+                # if isinstance(t, Connection) and not t.isVirtualConn:
                 #     # print("Encoding a connection")
                 #     #
                 #     # dct['.__ConnectionDict__'] = True
                 #     # dct['PortFromID'] = t.fromPort.id
                 #     # dct['PortToID'] = t.toPort.id
-                #     # dct['isBlockConn'] = t.isBlockConn
+                #     # dct['isVirtualConn'] = t.isVirtualConn
                 #     # dct['ConnDisplayName'] = t.displayName
                 #     # dct['ConnID'] = t.id
                 #     # dct['ConnCID'] = t.connId
@@ -994,7 +994,7 @@ class DiagramEncoder(json.JSONEncoder):
                 if isinstance(t, BlockItem) and t.isVisible() is False:
                     print("Invisible block [probably an insideBlock?]" + str(t) + str(t.displayName))
                     continue
-                if isinstance(t, Connection) and t.isBlockConn:
+                if isinstance(t, Connection) and t.isVirtualConn:
                     continue
 
                 dictName, dct = t.encode()
@@ -1750,12 +1750,16 @@ class DiagramEditor(QWidget):
         for p in portList:
             if len(p.connectionList) > 0:           # check if not >1 needed
                 # connectionList[0] is the hidden connection created when the portPair is
-                if p.connectionList[1].fromPort is p:
-                    res.append(p.connectionList[1].toPort)
-                elif p.connectionList[1].toPort is p:
-                    res.append(p.connectionList[1].fromPort)
-                else:
-                    print("Port is not fromPort nor toPort")
+                i = 0
+                while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
+                    i+=1
+                if len(p.connectionList) >= i+1:
+                    if p.connectionList[i].fromPort is p:
+                        res.append(p.connectionList[i].toPort)
+                    elif p.connectionList[i].toPort is p:
+                        res.append(p.connectionList[i].fromPort)
+                    else:
+                        print("Port is not fromPort nor toPort")
 
         # [print(p.parent.displayName) for p in res]
         return res
@@ -1946,7 +1950,7 @@ class DiagramEditor(QWidget):
 
         return f
     
-    def exportDivSetting(self,unit):
+    def exportDivSetting(self, unit):
         """
 
         :param unit: the index of the previous unit number used.
@@ -1962,7 +1966,7 @@ class DiagramEditor(QWidget):
                 if t.isTempering:
                     constants += 1
                     f2 += "T_set_" + t.displayName + " = 50\n"
-        if(constants>0):
+        if constants > 0:
             f = "CONSTANTS " + str(constants) + "\n"
             f += f2+ "\n"
 
@@ -2069,7 +2073,6 @@ class DiagramEditor(QWidget):
 
             else:
                 # No StorageTank and no HeatPump
-                print("No sto no hp, " + str(type(t)) + t.displayName)
                 if isinstance(t, BlockItem):
                     temp = ""
 
@@ -2109,6 +2112,7 @@ class DiagramEditor(QWidget):
                                 t.trnsysConn.append(conn)
 
                     else:
+                        print(t.displayName + " has " + str([p.connectionList for p in t.inputs + t.outputs]))
                         # No diverters, no pumps
                         for i in t.inputs:
                             # ConnectionList lenght should be max offset
@@ -2255,11 +2259,6 @@ class DiagramEditor(QWidget):
 
             counter2 += 1
 
-            # if (self.trnsysObj.index(t) + 1) % 8 != 0:
-            #     print(str(t.exportInitialInput) + " ", end='')
-            # else:
-            #     print(str(t.exportInitialInput))
-
         f += "\n"
 
         return f
@@ -2284,7 +2283,7 @@ class DiagramEditor(QWidget):
                 continue
             # if type(t) is Connector:
             #     continue
-            # if type(t) is Connection and t.isBlockConn and not t.isStorageIO:
+            # if type(t) is Connection and t.isVirtualConn and not t.isStorageIO:
             #     continue
 
             #if type(t) is TeePiece and not t.isVisible():   # Ignore virtual tpieces
@@ -2387,12 +2386,10 @@ class DiagramEditor(QWidget):
             # Pipes DC-ERROR added isVisible below. The fromPort toPort StorageTank does not work to detect if it is virtual.
             if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank) and not t.hiddenGenerated:
             # if type(t) is Connection and t.firstS.isVisible:
-                # if t.isBlockConn and t.isStorageIO:
+                # if t.isVirtualConn and t.isStorageIO:
                 # DC-ERROR Connections don't have isVisble(), but we need to avoid printing the virtual ones here
                 # if t.firstS.isVisible(): #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
                 if True:
-                    if t.displayName == "PiTesRCombiTes_189":
-                        print("Inside conn is PiTesRCombiTes_189")
                     parameterNumber = 6
                     inputNumbers = 4
 
@@ -2423,7 +2420,8 @@ class DiagramEditor(QWidget):
                     if len(t.trnsysConn) == 2:
                         # if isinstance(Connector, t.trnsysConn[0]) and not t.trnsysConn[0].isVisible() and firstGenerated:
                         # or if it is tpiece and not visible and firstGenerated
-                        if isinstance(t.trnsysConn[0], BlockItem) and t.trnsysConn[0].inFirstRow:
+                        if isinstance(t.trnsysConn[0], BlockItem) and not t.trnsysConn[0].isVisible():
+                            # This is the case for a generated TPiece
                             portToPrint = None
                             for p in t.trnsysConn[0].inputs + t.trnsysConn[0].outputs:
                                 if t in p.connectionList:
@@ -2456,7 +2454,7 @@ class DiagramEditor(QWidget):
                         unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
                         unitText += tempRoomVar + "\n"
 
-                        if isinstance(t.trnsysConn[1], BlockItem) and t.trnsysConn[1].inFirstRow:
+                        if isinstance(t.trnsysConn[1], BlockItem) and not t.trnsysConn[1].isVisible():
                             portToPrint = None
                             for p in t.trnsysConn[1].inputs + t.trnsysConn[1].outputs:
                                 if t in p.connectionList:
@@ -2568,7 +2566,7 @@ class DiagramEditor(QWidget):
             loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
 
             for c in g.itemList:
-                if isinstance(c, Connection) and not c.isBlockConn:
+                if isinstance(c, Connection) and not c.isVirtualConn:
                     loopText += "*** " + c.displayName + "\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
@@ -2591,7 +2589,7 @@ class DiagramEditor(QWidget):
             lossText += strVar + str(self.groupList.index(g)) + "="
 
             for i in g.itemList:
-                if isinstance(i, Connection)  and not i.isBlockConn:
+                if isinstance(i, Connection) and not i.isVirtualConn:
                     lossText += "P" + i.displayName + "_kW" + "+"
 
             lossText = lossText[:-1]
@@ -2646,7 +2644,7 @@ class DiagramEditor(QWidget):
         s = ''
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isBlockConn:
+            if isinstance(t, Connection) and not t.isVirtualConn:
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
@@ -3242,6 +3240,7 @@ class DiagramEditor(QWidget):
                     # print("Connection displ name " + str(k.displayName))
                     # print("Connection fromPort" + str(k.fromPort))
                     # print("Connection toPort" + str(k.toPort))
+                    # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
                     k.initLoad()
                     # k.setConnToGroup("defaultGroup")
 
@@ -3487,11 +3486,11 @@ class DiagramEditor(QWidget):
 
     def setConnLabelVis(self, b):
         for c in self.trnsysObj:
-            if isinstance(c, Connection) and not c.isBlockConn:
+            if isinstance(c, Connection) and not c.isVirtualConn:
                 c.showLabel(b)
         # Faster alternative, untested
         # for c in self.connectionList:
-        #     if not c.isBlockConn:
+        #     if not c.isVirtualConn:
         #         c.showLabel(b)
 
     def updateConnGrads(self):
@@ -3894,29 +3893,15 @@ if __name__ == '__main__':
     # app.setStyleSheet(cssSs_)
     app.exec_()
 
-# Found bug: fixed/when renaming/click on connection, connection gets destroyed
-# Found bug: fixed/90 degrees for bridges doesn't work
 # Found bug: when dragging bridging connection over another segment, crash
 # Found glitch: when having a disr segment, gradient is not correct anymore
 # Found bug: IceStorage, when creating new connection and moving block, the connection does not update position
 # Found bug: When in mode 1, sometimes dragging leads to segments collaps to a small point
-# Found bug: fixed/When reloading, a node was inexistent in loadSegement => setPre() crashed
-# Found glitch: fixed/Moving pasted group rapidly produces hang in some segments (only the ones next to port?)
 
-# Todo: Fix bugs
-# Todo 0: Implement nice connections to support side handling
-# Todo 1:   done/Correct export
-# Todo 2:   done/Correct gradient for lines
-# Todo 3:   Improve autoarrange of connections
-# Todo 4:   old/Prevent loops when adding connections to StorageBlock
-# Todo 5:   done/Implement segements list of connection IN ORDER, ie with insert at the correct position
-#           s.t. one can easily get distance of segment to fromPort
-# Todo 6: Check correct deletion of blocks and connections
+# Improve autoarrange of connections
+# TODO:   old/Prevent loops when adding connections to StorageBlock
 # TODO 7: Solve mix up between i/o and left/right side
 
-# TODO: Note that no direct connection between storages allowed
 # There is a mess introduced with kwargs because the dencoder returns objects, which cannot have any
 # connection to the "outside" of the decoder. This could maybe be improved by returning just the dict
 # to the DiagramEditor class, which then can easily create the objects correctly.
-
-# Think about a clean and concise way of putting elements into groups

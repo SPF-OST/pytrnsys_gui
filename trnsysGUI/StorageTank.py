@@ -1,4 +1,6 @@
 from PyQt5.QtCore import QPointF
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMenu
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
@@ -105,16 +107,14 @@ class StorageTank(BlockItem):
         if port1 is None:
             port1 = PortItem('i', sideNr, self)
             port1.setZValue(100)
+            self.inputs.append(port1)
+            tempSideList.append(port1)
 
         if port2 is None:
             port2 = PortItem('o', sideNr, self)
             port2.setZValue(100)
-
-        self.inputs.append(port1)
-        self.outputs.append(port2)
-
-        tempSideList.append(port1)
-        tempSideList.append(port2)
+            self.outputs.append(port2)
+            tempSideList.append(port2)
 
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
@@ -136,13 +136,13 @@ class StorageTank(BlockItem):
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
 
         if kwargs == {}:
-            Connection(port1, port2, True, self.parent.parent(), visible=False)
+            Connection(port1, port2, True, self.parent.parent())
             return
         else:
             port1.id = kwargs["fromPortId"]
             port2.id = kwargs["toPortId"]
-            c = Connection(port1, port2, True, self.parent.parent(), visible=False, fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
-                           segmentsLoad=[], cornersLoad=[])
+            c = Connection(port1, port2, True, self.parent.parent(), fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
+                           segmentsLoad=[], cornersLoad=[], loadedConn=True)
             c.displayName = kwargs["connDispName"]
             c.id = kwargs["connId"]
             c.connId = kwargs["connCid"]
@@ -249,10 +249,11 @@ class StorageTank(BlockItem):
     def connectInside(self, side, side2, tpList, sideVar):
         # Side should be list of all ports to the same side
         # Side is used in this function to store the nodes of one layer
-
-        # sideVar = "Right"
-
+        for si in side:
+            print("side element" + si.parent.displayName)
         tempArrConn = []
+
+        # Copy of the corresponding ports
         side_test = side
 
         # Assert that the storage has at least 2 ports at side
@@ -278,21 +279,18 @@ class StorageTank(BlockItem):
             # Check if external connections to the storagetank have storage ports as fromPorts or toPorts
             # if side[0] has toPort at storage: connector on second place
             if side[0].connectionList[0].fromPort is side[0]:
-                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent(), visible=False)
+                c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
             else:
-                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent(), visible=False)
+                c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
                 pass
 
             if side[1].connectionList[0].fromPort is side[1]:
-                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent(), visible=False)
+                c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
             else:
-                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent(), visible=False)
+                c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
                 pass
 
             # Check where the fact is used that connector is at fromPort!
-
-            # c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
-            # c2 = Connection(side[1], connector.outputs[0], True, self.parent.parent())
 
             c1.displayName = side[0].connectionList[0].displayName
             c1.isStorageIO = True
@@ -306,9 +304,11 @@ class StorageTank(BlockItem):
             mem = []
             if len(side) % 2 == 0:
                 x = len(side)
+                print("Even number of ports in side")
             else:
                 x = len(side) - 1
                 mem.append(side[x])
+                # print("Uneven " + side(x))
 
             for i in range(0, x, 2):
                 tpiece = TeePiece("TeePiece", self.parent)
@@ -319,6 +319,8 @@ class StorageTank(BlockItem):
 
                 c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent())
                 c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent())
+                print("c1 is from " + side[i].parent.displayName + " to " + tpiece.inputs[0].parent.displayName)
+                print("c2 is from " + tpiece.inputs[1].parent.displayName + " to " + side[i+1].parent.displayName)
 
                 # c1.firstS.setVisible(False)
                 # c2.firstS.setVisible(False)
@@ -328,7 +330,6 @@ class StorageTank(BlockItem):
                     if j.isdigit():
                         resId += str(j)
 
-                # print("Res is " + resId)
                 # print("c1 name before is " + c1.displayName)
                 c1.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
                 # print("c1 name is " + c1.displayName)
@@ -356,7 +357,7 @@ class StorageTank(BlockItem):
             # print(str(len(side)))
 
         lastC = Connection(side[0], side[1], True, self.parent.parent())
-        # lastC.firstS.setVisible(False)
+        print("lastc is from " + side[0].parent.displayName + " to " + side[1].parent.displayName)
         resId = ""
         for j in lastC.displayName:
             if j.isdigit():
@@ -366,13 +367,15 @@ class StorageTank(BlockItem):
         if len(side2) > 2:
             lastC.hiddenGenerated = True
 
+        # Here the virtual pipes clone the name of their corresponding real pipe
+        # Could be used to set a new attribute generatedPrinted
         for s in side_test:
             for t in tempArrConn:
-                # print("Checking s")
                 if t.fromPort is s or t.toPort is s:
                     print("This is a real connection " + str(t.displayName))
                     if len(s.connectionList) > 0:
-                        t.displayName = s.connectionList[0].displayName
+                        t.displayName = s.connectionList[0].displayName # + "GEN"
+                        t.setClone(True)
                     else:
                         print("Found a port outside that has no connection to inside")
 
@@ -417,7 +420,7 @@ class StorageTank(BlockItem):
         if self not in self.parent.parent().trnsysObj:
             self.parent.parent().trnsysObj.append(self)
 
-        # TODO: Should hx be also in trnsysObj
+        # TODO: Should hx be also in trnsysObj?
         for hx in self.heatExchangers:
             hx.parent = self
 
@@ -625,7 +628,7 @@ class StorageTank(BlockItem):
             conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
                                         fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
                                         connId=x["ConnID"], connCid=x["ConnCID"],
-                                        connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"])
+                                        connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"], loadedConn=True)
             conn.id = x["ConnID"]
             conn.connId = x["ConnCID"]
             conn.trnsysId = x["trnsysID"]
@@ -663,7 +666,7 @@ class StorageTank(BlockItem):
                                         fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
                                         connId=kwargs["editor"].idGen.getID(), connCid=kwargs["editor"].idGen.getConnID(),
                                         connDispName=x["ConnDisName"] + "New",
-                                        trnsysConnId=kwargs["editor"].idGen.getTrnsysID())
+                                        trnsysConnId=kwargs["editor"].idGen.getTrnsysID(), loadedConn=True)
 
             resConnList.append(conn)
         resBlockList.append(self)
@@ -704,3 +707,46 @@ class StorageTank(BlockItem):
                     equationNr += 1
 
         return resStr, equationNr
+
+    def contextMenuEvent(self, event):
+        menu = QMenu()
+
+        lNtp = QIcon('images/Notebook.png')
+        a1 = menu.addAction(lNtp, 'Launch NotePad++')
+        a1.triggered.connect(self.launchNotepadFile)
+
+        rr = QIcon('images/rotate-to-right.png')
+        a2 = menu.addAction(rr, 'Rotate Block clockwise')
+        a2.triggered.connect(self.rotateBlockCW)
+
+        ll = QIcon('images/rotate-left.png')
+        a3 = menu.addAction(ll, 'Rotate Block counter-clockwise')
+        a3.triggered.connect(self.rotateBlockCCW)
+
+        rRot = QIcon('images/move-left.png')
+        a4 = menu.addAction(rRot, 'Reset Rotation')
+        a4.triggered.connect(self.resetRotation)
+
+        b1 = menu.addAction('Print Rotation')
+        b1.triggered.connect(self.printRotation)
+
+        dB = QIcon('images/close.png')
+        c1 = menu.addAction(dB, 'Delete this Block')
+        c1.triggered.connect(self.deleteBlockCom)
+
+        # sG = QIcon('')
+        c2 = menu.addAction("Set group")
+        c2.triggered.connect(self.configGroup)
+
+        d1 = menu.addAction('Dump information')
+        d1.triggered.connect(self.dumpBlockInfo)
+
+        e1 = menu.addAction('Inspect')
+        e1.triggered.connect(self.inspectBlock)
+
+        e2 = menu.addAction('Print port nb')
+        e2.triggered.connect(self.printPortNb)
+        menu.exec_(event.screenPos())
+
+    def printPortNb(self):
+        print("ST has "+ str(self.inputs) + " and " + str(self.outputs))
