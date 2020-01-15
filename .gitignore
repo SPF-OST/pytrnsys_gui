@@ -17,3 +17,5 @@ trnsysGUI/massflowData/flows.txt
 trnsysGUI/VectorGraphicsExport.svg
 
 docs/_build/
+
+docs/trnsysGUI.uml
