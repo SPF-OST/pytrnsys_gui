@@ -1752,7 +1752,7 @@ class DiagramEditor(QWidget):
                 # connectionList[0] is the hidden connection created when the portPair is
                 i = 0
                 while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
-                    i+=1
+                    i += 1
                 if len(p.connectionList) >= i+1:
                     if p.connectionList[i].fromPort is p:
                         res.append(p.connectionList[i].toPort)
@@ -1937,14 +1937,16 @@ class DiagramEditor(QWidget):
         equationNr = 0
 
         for t in self.trnsysObj:
-            if isinstance(t, Pump) or isinstance(t, WTap_main):
-                f += "Mfr" + t.displayName + " = 1000" + "\n"
-                equationNr += 1
-
-            elif isinstance(t, TVentil):
-                if (t.isTempering==False):
-                    f += "xFrac" + t.displayName + " = 1" + "\n"
-                    equationNr += 1
+            # if isinstance(t, Pump) or isinstance(t, WTap_main):
+            #     f += "Mfr" + t.displayName + " = 1000" + "\n"
+            #     equationNr += 1
+            #
+            # elif isinstance(t, TVentil):
+            #     if not t.isTempering:
+            #         f += "xFrac" + t.displayName + " = 1" + "\n"
+            #         equationNr += 1
+            f += t.exportMassFlows()[0]
+            equationNr += t.exportMassFlows()[1]
 
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
@@ -1957,41 +1959,47 @@ class DiagramEditor(QWidget):
         :return:
         """
 
-        nUnit=unit
+        nUnit = unit
         f = ""
         constants = 0
         f2 = ""
+
         for t in self.trnsysObj:
-            if isinstance(t, TVentil):
-                if t.isTempering:
-                    constants += 1
-                    f2 += "T_set_" + t.displayName + " = 50\n"
+            # if isinstance(t, TVentil):
+            #     if t.isTempering:
+            #         constants += 1
+            #         f2 += "T_set_" + t.displayName + " = 50\n"
+            f2 += t.exportDivSetting1()[0]
+            constants += t.exportDivSetting1()[1]
         if constants > 0:
             f = "CONSTANTS " + str(constants) + "\n"
-            f += f2+ "\n"
+            f += f2 + "\n"
 
         for t in self.trnsysObj:
-            if isinstance(t, TVentil) and t.isTempering:
-                nUnit = nUnit + 1
-                f += "UNIT %d TYPE 811 ! Passive Divider for heating \n"%nUnit
-                f += "PARAMETERS 1" + "\n"
-                f += "5 !Nb.of iterations before fixing the value \n"
-                f += "INPUTS 4 \n"
-
-                if t.outputs[0].pos().y() == t.inputs[0].pos().y() or t.outputs[0].pos().x() == t.inputs[0].pos().x():
-                    first = t.inputs[0]
-                    second = t.inputs[1]
-
-                f += "T" + first.connectionList[0].displayName + "\n"
-                f += "T" + second.connectionList[0].displayName + "\n"
-                f += "Mfr" + t.outputs[0].connectionList[0].displayName + "\n"
-
-                f += "T_set_" + t.displayName + "\n"
-                f += "*** INITIAL INPUT VALUES" + "\n"
-                f += "35.0 21.0 800.0 T_set_" + t.displayName + "\n"
-
-                f += "EQUATIONS 1\n"
-                f += "xFrac" + t.displayName + " =  1.-[%d,5] \n"%nUnit
+            # if isinstance(t, TVentil) and t.isTempering:
+            #     nUnit = nUnit + 1
+            #     f += "UNIT %d TYPE 811 ! Passive Divider for heating \n"%nUnit
+            #     f += "PARAMETERS 1" + "\n"
+            #     f += "5 !Nb.of iterations before fixing the value \n"
+            #     f += "INPUTS 4 \n"
+            #
+            #     if t.outputs[0].pos().y() == t.inputs[0].pos().y() or t.outputs[0].pos().x() == t.inputs[0].pos().x():
+            #         first = t.inputs[0]
+            #         second = t.inputs[1]
+            #
+            #     f += "T" + first.connectionList[0].displayName + "\n"
+            #     f += "T" + second.connectionList[0].displayName + "\n"
+            #     f += "Mfr" + t.outputs[0].connectionList[0].displayName + "\n"
+            #
+            #     f += "T_set_" + t.displayName + "\n"
+            #     f += "*** INITIAL INPUT VALUES" + "\n"
+            #     f += "35.0 21.0 800.0 T_set_" + t.displayName + "\n"
+            #
+            #     f += "EQUATIONS 1\n"
+            #     f += "xFrac" + t.displayName + " =  1.-[%d,5] \n"%nUnit
+            res = t.exportDivSetting2(nUnit)
+            f += res[0]
+            nUnit = res[1]
 
         return f + "\n"
 
@@ -2054,7 +2062,7 @@ class DiagramEditor(QWidget):
                                 f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
 
             elif type(t) is GenericBlock:
-                print("Generic block in param solver")
+                # print("Generic block in param solver")
                 for i in range(len(t.inputs)):
                     temp = ""
                     c = t.inputs[i].connectionList[0]
@@ -2157,7 +2165,7 @@ class DiagramEditor(QWidget):
 
                     # Assert that parent is of type BlockItem
                     if isinstance(t.toPort.parent, BlockItem) and isinstance(t.fromPort.parent, BlockItem):
-                        # if isinstance(t.fromPort.parent, Connector) and not t.fromPort.parent.isVisible() or isinstance(t.toPort.parent, Connector) and not t.toPort.parent.isVisible():
+                        # This is to ensure that the "output" of a Div always appears first
                         if type(t.fromPort.parent) is TVentil and t.fromPort in t.fromPort.parent.outputs:
                             t.trnsysConn.insert(0, t.fromPort.parent)
                         else:
@@ -2253,7 +2261,6 @@ class DiagramEditor(QWidget):
             f += str(t.exportInitialInput) + " "
 
             if counter2 == 8:
-                # print("")
                 f += "\n"
                 counter2 = 0
 

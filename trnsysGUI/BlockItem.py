@@ -581,8 +581,11 @@ class BlockItem(QGraphicsPixmapItem):
     def exportMassFlows(self):
         return "", 0
 
-    def exportDivSetting(self):
+    def exportDivSetting1(self):
         return "", 0
+
+    def exportDivSetting2(self, nUnit):
+        return "", nUnit
 
     def exportParametersFlowSolver(self):
         descConnLength = 20

@@ -1048,8 +1048,11 @@ class Connection(object):
     def exportMassFlows(self):
         return "", 0
 
-    def exportDivSetting(self):
+    def exportDivSetting1(self):
         return "", 0
+
+    def exportDivSetting2(self, nUnit):
+        return "", nUnit
 
     def exportParameterFlowSolver(self):
         descConnLength = 20
@@ -1062,6 +1065,7 @@ class Connection(object):
             self.toPort.parent.trnsysId) + " 0" * 2 + " "  # + str(t.trnsysId)
         self.exportConnsString = temp
 
+        # This is to ensure that the "output" of a Div always appears first
         if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
             self.trnsysConn.insert(0, self.fromPort.parent)
         else:

@@ -124,10 +124,81 @@ class TVentil(BlockItem):
         equationNr = 1
         return resStr, equationNr
 
-    def exportDivSetting(self):
+    def exportDivSetting1(self):
         if self.isTempering:
             constants = 1
             f = "T_set_" + self.displayName + "\n"
             return f, constants
         else:
             return "", 0
+
+    def exportDivSetting2(self, nUnit):
+        if self.isTempering:
+            f = ""
+            nUnit = nUnit + 1
+            f += "UNIT %d TYPE 811 ! Passive Divider for heating \n" % nUnit
+            f += "PARAMETERS 1" + "\n"
+            f += "5 !Nb.of iterations before fixing the value \n"
+            f += "INPUTS 4 \n"
+
+            if self.outputs[0].pos().y() == self.inputs[0].pos().y() or self.outputs[0].pos().x() == self.inputs[0].pos().x():
+                first = self.inputs[0]
+                second = self.inputs[1]
+
+            f += "T" + first.connectionList[0].displayName + "\n"
+            f += "T" + second.connectionList[0].displayName + "\n"
+            f += "Mfr" + self.outputs[0].connectionList[0].displayName + "\n"
+
+            f += "T_set_" + self.displayName + "\n"
+            f += "*** INITIAL INPUT VALUES" + "\n"
+            f += "35.0 21.0 800.0 T_set_" + self.displayName + "\n"
+
+            f += "EQUATIONS 1\n"
+            f += "xFrac" + self.displayName + " =  1.-[%d,5] \n\n" % nUnit
+
+            return f, nUnit
+        else:
+            return "", nUnit
+
+    def exportParametersFlowSolver(self):
+        descConnLength = 20
+        temp = ""
+
+        # This is to assert that the input in front of the output is always printed before the third one
+        for o in self.outputs:
+            # ConnectionList lenght should be max offset
+            for c in o.connectionList:
+                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                    continue
+                elif hasattr(c.toPort.parent) and o.connectionList.index(c) == 0:
+                    continue
+                else:
+                    temp = temp + str(c.trnsysId) + " "
+                    self.trnsysConn.append(c)
+
+        for i in self.inputs:
+            # Either left or right
+            tempArr = []
+
+            for c in i.connectionList:
+                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                    continue
+                else:
+                    # On same hight as output
+                    if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
+                        tempArr.insert(0, c)
+                    else:
+                        tempArr.append(c)
+
+            for conn in tempArr:
+                temp = temp + str(conn.trnsysId) + " "
+                self.trnsysConn.append(conn)
+
+        temp += str(self.typeNumber)
+        temp += " " * (descConnLength - len(temp))
+        self.exportConnsString = temp
+        f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+
+        return f, 1

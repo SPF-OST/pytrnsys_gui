@@ -309,3 +309,24 @@ class GenericBlock(BlockItem):
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
         self.updatePortPos()
+
+    def exportParametersFlowSolver(self):
+        descConnLength = 20
+        equationNr = 0
+        for i in range(len(self.inputs)):
+            temp = ""
+            c = self.inputs[i].connectionList[0]
+            if type(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
+                continue
+            elif type(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
+                continue
+            else:
+                temp = str(c.trnsysId) + " " + str(
+                    self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
+                temp += " " * (descConnLength - len(temp))
+
+                # Generic block will have a 2n-liner exportConnString
+                self.exportConnsString += temp + "\n"
+                f = temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "HeatPump" + "\n"
+
+        return f, equationNr
