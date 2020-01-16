@@ -313,6 +313,13 @@ class GenericBlock(BlockItem):
         self.flippedV = bool(state)
         self.updatePortPos()
 
+    def exportBlackBox(self):
+        resStr = ""
+        for i in range(len(self.inputs)):
+            resStr += "T" + self.displayName + "X" + str(i) + "=1 \n"
+        eqNb = len(self.inputs)
+        return resStr, eqNb
+
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20
         equationNr = 0

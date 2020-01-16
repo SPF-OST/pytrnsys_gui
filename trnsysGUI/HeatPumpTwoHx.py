@@ -142,6 +142,13 @@ class HeatPumpTwoHx(BlockItem):
         self.setBlockToGroup(i["GroupName"])
         resBlockList.append(self)
 
+    def exportBlackBox(self):
+        resStr = "T" + self.displayName + "X0" + "=1 \n"
+        resStr += "T" + self.displayName + "X1" + "=1 \n"
+        resStr += "T" + self.displayName + "X3" + "=1 \n"
+        eqNb = 3
+        return resStr, eqNb
+
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20
         f = ""

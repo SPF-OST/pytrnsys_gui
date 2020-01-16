@@ -135,8 +135,10 @@ class HeatPump(BlockItem):
         resBlockList.append(self)
 
     def exportBlackBox(self):
-        resStr = "T" + self.displayName + "HeatPump" + "=1 \n"
-        resStr += "T" + self.displayName + "Evap" + "=1 \n"
+        # resStr = "T" + self.displayName + "HeatPump" + "=1 \n"
+        # resStr += "T" + self.displayName + "Evap" + "=1 \n"
+        resStr = "T" + self.displayName + "X0" + "=1 \n"
+        resStr += "T" + self.displayName + "X1" + "=1 \n"
         eqNb = 2
         return resStr, eqNb
 

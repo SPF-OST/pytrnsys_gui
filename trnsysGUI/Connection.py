@@ -1192,6 +1192,8 @@ class Connection(object):
 
                     unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
                             portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                elif hasattr(self.trnsysConn[0], "subBlockCounter"):
+                    unitText += "T" + self.trnsysConn[0].displayName + "X" + str(self.trnsysConn[0].getSubBlockOffset(self)) + "\n"
                 else:
                     unitText += "T" + self.trnsysConn[0].displayName + "\n"
 
@@ -1227,6 +1229,8 @@ class Connection(object):
 
                     unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
                             portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                elif hasattr(self.trnsysConn[1], "subBlockCounter"):
+                    unitText += "T" + self.trnsysConn[1].displayName + "X" + str(self.trnsysConn[1].getSubBlockOffset(self)) + "\n"
                 else:
                     unitText += "T" + self.trnsysConn[1].displayName + "\n"
 
