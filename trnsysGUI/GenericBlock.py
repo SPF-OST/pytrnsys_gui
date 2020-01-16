@@ -137,17 +137,17 @@ class GenericBlock(BlockItem):
 
     def changeImage(self):
         name = str(self.pickImage().resolve())
-        if name[-3:] == ".png":
+        if name[-3:] == "png" or name[-3:] == "svg":
             self.setImage(name)
             self.setImagesource(name)
         else:
-            print("No image picked")
+            print("No image picked, name is " + name)
 
     def setImagesource(self, name):
         self.imagesource = name
 
     def pickImage(self):
-        return Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png")[0])
+        return Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png *.svg")[0])
 
     def contextMenuEvent(self, event):
         menu = QMenu()
