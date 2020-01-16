@@ -88,6 +88,7 @@ class segmentItem(QGraphicsLineItem):
         # print("line has start point " + str(self.line().p1()))
 
         self.oldX = None
+        self.setToolTip(self.parent.displayName)
 
     def segLength(self):
         return calcDist(self.line().p1(), self.line().p2())
