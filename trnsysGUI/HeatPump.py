@@ -22,6 +22,8 @@ class HeatPump(BlockItem):
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
+        self.subBlockCounter = 0
+
         self.changeSize()
 
     def changeSize(self):
@@ -145,9 +147,9 @@ class HeatPump(BlockItem):
             # ConnectionList lenght should be max offset
             temp = ""
             for c in self.inputs[i].connectionList:
-                if hasattr(c.fromPort.parent) and self.inputs[i].connectionList.index(c) == 0:
+                if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                     continue
-                elif hasattr(c.toPort.parent) and self.inputs[i].connectionList.index(c) == 0:
+                elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                     continue
                 else:
                     if len(self.outputs[i].connectionList) > 0:
@@ -187,7 +189,6 @@ class HeatPump(BlockItem):
     def exportInputsFlowSolver2(self):
         f = ""
         f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
-        f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
         return f, 2
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
@@ -203,4 +204,9 @@ class HeatPump(BlockItem):
                     # nEqUsed += 1  # DC
                 equationNumber += 1  # DC-ERROR it should count anyway
 
-        return tot, equationNumber, 2
+        return tot, equationNumber, 4
+
+    def getSubBlockOffset(self, c):
+        for i in range(2):
+            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+                return i

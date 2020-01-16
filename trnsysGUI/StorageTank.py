@@ -611,7 +611,7 @@ class StorageTank(BlockItem):
             hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
                                 QPointF(h["Offset"][0], h["Offset"][1]), self, h["DisplayName"],
                                 port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                                connTrnsysID=h['connTrnsysID'])
+                                connTrnsysID=h['connTrnsysID'], loadedHx=True)
 
             hEx.setId(h["ID"])
             hEx.port1.id = h['Port1ID']
@@ -651,7 +651,7 @@ class StorageTank(BlockItem):
                                 QPointF(h["Offset"][0], h["Offset"][1]),
                                 self, h["DisplayName"] + "New",
                                 port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                                connTrnsysID=kwargs["editor"].idGen.getTrnsysID())
+                                connTrnsysID=kwargs["editor"].idGen.getTrnsysID(), loadedHx=True)
 
             # hEx.setId(["ID"])
             hEx.port1.id = h['Port1ID']

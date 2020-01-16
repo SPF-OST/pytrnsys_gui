@@ -1061,8 +1061,21 @@ class Connection(object):
         if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
             return "", 0
 
-        temp = str(self.fromPort.parent.trnsysId) + " " + str(
-            self.toPort.parent.trnsysId) + " 0" * 2 + " "  # + str(t.trnsysId)
+        temp = ""
+        if hasattr(self.fromPort.parent, "subBlockCounter"):
+            temp = str(self.fromPort.parent.trnsysId + self.fromPort.parent.getSubBlockOffset(self)) + " "
+        else:
+            temp = str(self.fromPort.parent.trnsysId) + " "
+
+        if hasattr(self.toPort.parent, "subBlockCounter"):
+            temp += str(self.toPort.parent.trnsysId + self.toPort.parent.getSubBlockOffset(self))
+        else:
+            temp += str(self.toPort.parent.trnsysId)
+
+            # temp = str(self.fromPort.parent.trnsysId) + " " + str(
+            #     self.toPort.parent.trnsysId) + " 0" * 2 + " "  # + str(t.trnsysId)
+
+        temp += " 0" * 2 + " "
         self.exportConnsString = temp
 
         # This is to ensure that the "output" of a Div always appears first

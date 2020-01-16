@@ -23,7 +23,10 @@ class GenericBlock(BlockItem):
         self.childIds = []
         self.childIds.append(self.trnsysId)
 
+        self.subBlockCounter = 0
+
         self.imagesource = ("images/" + self.name)
+
         self.changeSize()
 
     def changeSize(self):
@@ -313,12 +316,13 @@ class GenericBlock(BlockItem):
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20
         equationNr = 0
+        f = ''
         for i in range(len(self.inputs)):
             temp = ""
             c = self.inputs[i].connectionList[0]
-            if type(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
+            if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                 continue
-            elif type(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
+            elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                 continue
             else:
                 temp = str(c.trnsysId) + " " + str(
@@ -327,7 +331,7 @@ class GenericBlock(BlockItem):
 
                 # Generic block will have a 2n-liner exportConnString
                 self.exportConnsString += temp + "\n"
-                f = temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "HeatPump" + "\n"
+                f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i) + "\n"
 
         return f, equationNr
 
@@ -337,7 +341,7 @@ class GenericBlock(BlockItem):
     def exportInputsFlowSolver2(self):
         f = ""
         for i in range(len(self.inputs)):
-            f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
+            f += " " + str(self.exportInitialInput) + " "
 
         return f, len(self.inputs)
 
@@ -347,7 +351,7 @@ class GenericBlock(BlockItem):
             for i in range(0, 3):
 
                 if i < 2:
-                    temp = prefix + self.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                    temp = prefix + self.displayName + "-X" + str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
                            str(equationNumber) + "]\n"
                     tot += temp
                     self.exportEquations.append(temp)
@@ -355,3 +359,8 @@ class GenericBlock(BlockItem):
                 equationNumber += 1  # DC-ERROR it should count anyway
 
         return tot, equationNumber, 2 * len(self.inputs)
+
+    def getSubBlockOffset(self, c):
+        for i in range(len(self.inputs)):
+            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+                return i

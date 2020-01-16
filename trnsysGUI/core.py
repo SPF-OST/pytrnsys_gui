@@ -20,6 +20,7 @@ from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Export import Export
+from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.PV import PV
 
@@ -643,6 +644,11 @@ class DiagramDecoder(json.JSONDecoder):
                         # bl.setBlockToGroup(i["GroupName"])
                         #
                         # resBlockList.append(bl)
+                        bl.decode(i, resConnList, resBlockList)
+
+                    elif ".__ExternalHxDict__" in arr[k]:
+                        i = arr[k]
+                        bl = ExternalHx(i["ExternalHxName"], self.editor.diagramView, displayName=i["ExternalHxDisplayName"], loadedBlock=True)
                         bl.decode(i, resConnList, resBlockList)
 
                     elif ".__GenericBlockDict__" in arr[k]:
@@ -1297,6 +1303,8 @@ class EditorGraphicsView(QGraphicsView):
                 bl = PV(name, self)
             elif name == 'GroundSourceHx':
                 bl = GroundSourceHx(name, self)
+            elif name == 'ExternalHx':
+                bl = ExternalHx(name, self)
             elif name == 'GenericItem':
                 bl = GraphicalItem(self)
             else:
@@ -1499,6 +1507,7 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'AirSourceHP')), 'AirSourceHP'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'PV')), 'PV'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GroundSourceHx')), 'GroundSourceHx'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
 
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
@@ -1618,7 +1627,6 @@ class DiagramEditor(QWidget):
         # #Search related lists
         self.bfs_visitedNodes = []
         self.bfs_neighborNodes = []
-
 
 
     def create_icon(self, map_icon):
@@ -2765,7 +2773,18 @@ class DiagramEditor(QWidget):
             if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
                 continue
             if type(t) is HeatPump:
-                parameters += 1
+                parameters += 2
+                continue
+            if type(t) is GenericBlock:
+                parameters += len(t.inputs)
+                continue
+            if type(t) is ExternalHx:
+                parameters += 2
+                continue
+            if type(t) is HeatPumpTwoHx:
+                parameters += 3
+                continue
+
             parameters += 1
 
         lineNrParameters = parameters

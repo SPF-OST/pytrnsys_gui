@@ -31,8 +31,6 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port1 = PortItem('i', self.sSide, self.parent)
         self.port2 = PortItem('o', self.sSide, self.parent)
 
-
-
         self.port1.isFromHx = True
         self.port2.isFromHx = True
 
@@ -53,9 +51,10 @@ class HeatExchanger(QGraphicsItemGroup):
             self.initNew()
             self.loadedConnTrId = None  # Should not be used
         else:
-            print("Loading existing HeatExchanger")
-            self.displayName = name
-            self.loadedConnTrId = kwargs["connTrnsysID"]
+            if "loadedHx" in kwargs:
+                print("Loading existing HeatExchanger")
+                self.displayName = name
+                self.loadedConnTrId = kwargs["connTrnsysID"]
 
     def initNew(self):
 
