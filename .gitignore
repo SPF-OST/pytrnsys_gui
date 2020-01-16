@@ -12,7 +12,7 @@ trnsysGUI/exports/*.dck
 /.idea/misc.xml
 /.idea/TrnsysGUI.iml
 /.idea/TrnsysGUI.iml
-
+*prt
 trnsysGUI/massflowData/flows.txt
 trnsysGUI/VectorGraphicsExport.svg
 

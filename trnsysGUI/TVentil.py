@@ -129,7 +129,7 @@ class TVentil(BlockItem):
     def exportDivSetting1(self):
         if self.isTempering:
             constants = 1
-            f = "T_set_" + self.displayName + "\n"
+            f = "T_set_" + self.displayName + "=50 ! @input : To be defined by user \n"
             return f, constants
         else:
             return "", 0
