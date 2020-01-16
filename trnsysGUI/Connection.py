@@ -1107,6 +1107,7 @@ class Connection(object):
                 equationNumber += 1  # DC-ERROR it should count anyway
 
             return tot, equationNumber, 2
+
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if not (hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers")) and not self.hiddenGenerated:
             f = ''
@@ -1150,10 +1151,8 @@ class Connection(object):
             unitText += "INPUTS " + str(inputNumbers) + "\n"
 
             if len(self.trnsysConn) == 2:
-                # if isinstance(Connector, t.trnsysConn[0]) and not t.trnsysConn[0].isVisible() and firstGenerated:
-                # or if it is tpiece and not visible and firstGenerated
+                # If trnsysConn[0] is a block and it is virtual (generated):
                 if hasattr(self.trnsysConn[0], "rotationN") and not self.trnsysConn[0].isVisible():
-                    # This is the case for a generated TPiece
                     portToPrint = None
                     for p in self.trnsysConn[0].inputs + self.trnsysConn[0].outputs:
                         if self in p.connectionList:
@@ -1238,6 +1237,32 @@ class Connection(object):
             return unitText, unitNumber
         else:
             return "", startingUnit, 0
+
+    def findStoragePort(self, virtualBlock):
+        portToPrint = None
+        for p in virtualBlock.inputs + virtualBlock.outputs:
+            if self in p.connectionList:
+                # Found the port of the generated block adjacent to this pipe
+                # Assumes 1st connection is with storageTank
+                if self.fromPort == p:
+                    if self.toPort.connectionList[0].fromPort == self.toPort:
+                        portToPrint = self.toPort.connectionList[0].toPort
+                    else:
+                        portToPrint = self.toPort.connectionList[0].fromPort
+                else:
+                    if self.fromPort.connectionList[0].fromPort == self.fromPort:
+                        portToPrint = self.fromPort.connectionList[0].toPort
+                    else:
+                        portToPrint = self.fromPort.connectionList[0].fromPort
+        return portToPrint
+
+    def cleanUpAfterTrnsysExport(self):
+        self.exportConnsString = ""
+        self.exportInputName = "0"
+        # self.exportInitialInput = -1
+        self.exportEquations = []
+        self.trnsysConn = []
+
 
 
 class DeleteConnectionCommand(QUndoCommand):

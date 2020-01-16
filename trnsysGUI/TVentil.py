@@ -122,14 +122,17 @@ class TVentil(BlockItem):
             return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
     def exportMassFlows(self):
-        resStr = "xFrac" + self.displayName + " = 1" + "\n"
-        equationNr = 1
-        return resStr, equationNr
+        if not self.isTempering:
+            resStr = "xFrac" + self.displayName + " = 1" + "\n"
+            equationNr = 1
+            return resStr, equationNr
+        else:
+            return "", 0
 
     def exportDivSetting1(self):
         if self.isTempering:
             constants = 1
-            f = "T_set_" + self.displayName + "\n"
+            f = "T_set_" + self.displayName + "=50\n"
             return f, constants
         else:
             return "", 0

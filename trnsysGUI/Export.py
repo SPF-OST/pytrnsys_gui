@@ -57,7 +57,7 @@ class Export(object):
         constants = 0
         f2 = ""
         for t in self.trnsysObj:
-            f += t.exportDivSetting1()[0]
+            f2 += t.exportDivSetting1()[0]
             constants += t.exportDivSetting1()[1]
 
         if constants > 0:

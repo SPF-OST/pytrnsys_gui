@@ -643,3 +643,10 @@ class BlockItem(QGraphicsPixmapItem):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         return "", startingUnit
+    
+    def cleanUpAfterTrnsysExport(self):
+        self.exportConnsString = ""
+        self.exportInputName = "0"
+        # self.exportInitialInput = -1
+        self.exportEquations = []
+        self.trnsysConn = []

@@ -6,11 +6,10 @@ trnsysGUI/exports/*.dck
 *.pyc
 **/.idea/workspace.xml
 **/.idea/tasks.xml
-**/.idea/
+/.idea/
 *.log
 *.lst
 /.idea/misc.xml
-/.idea/TrnsysGUI.iml
 /.idea/TrnsysGUI.iml
 
 trnsysGUI/massflowData/flows.txt
