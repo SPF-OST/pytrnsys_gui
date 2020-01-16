@@ -137,9 +137,11 @@ class GenericBlock(BlockItem):
 
     def changeImage(self):
         name = str(self.pickImage().resolve())
-        if name != "":
+        if name[-3:] == ".png":
             self.setImage(name)
             self.setImagesource(name)
+        else:
+            print("No image picked")
 
     def setImagesource(self, name):
         self.imagesource = name
