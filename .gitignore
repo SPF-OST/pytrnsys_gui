@@ -11,8 +11,15 @@ trnsysGUI/exports/*.dck
 *.lst
 /.idea/misc.xml
 /.idea/TrnsysGUI.iml
+<<<<<<< HEAD
 
+=======
+/.idea/TrnsysGUI.iml
+*prt
+>>>>>>> 8ab45024bfe762a5b3ff904d9ac1cc992d457e04
 trnsysGUI/massflowData/flows.txt
 trnsysGUI/VectorGraphicsExport.svg
 
 docs/_build/
+
+docs/trnsysGUI.uml
