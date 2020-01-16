@@ -1241,7 +1241,7 @@ class DiagramScene(QGraphicsScene):
             return False
 
 
-class EditorGraphicsView(QGraphicsView):
+class DiagramView(QGraphicsView):
     """
     Displays the items from the DiagramScene. Here, the drag and drop from the library to the View is implemented.
 
@@ -1343,10 +1343,10 @@ class EditorGraphicsView(QGraphicsView):
         #     t.setPos(t.pos())
         # #     self.parent().alignYLineItem.setVisible(False)
 
-        super(EditorGraphicsView, self).mouseReleaseEvent(mouseEvent)
+        super(DiagramView, self).mouseReleaseEvent(mouseEvent)
 
     def wheelEvent(self, event):
-        super(EditorGraphicsView, self).wheelEvent(event)
+        super(DiagramView, self).wheelEvent(event)
 
         if int(event.modifiers()) == 67108864:
             if event.angleDelta().y() > 0:
@@ -1364,7 +1364,7 @@ class EditorGraphicsView(QGraphicsView):
         #     if isinstance(t, BlockItem):
         #         t.itemChange(t.ItemPositionChange, t.pos())
 
-        super(EditorGraphicsView, self).mousePressEvent(event)
+        super(DiagramView, self).mousePressEvent(event)
 
     def deleteBlockCom  (self, bl):
         command = DeleteBlockCommand(bl, "Delete block command")
@@ -1520,7 +1520,7 @@ class DiagramEditor(QWidget):
         self.libraryBrowserView.setDragDropMode(self.libraryBrowserView.DragOnly)
 
         self.diagramScene = DiagramScene(self)
-        self.diagramView = EditorGraphicsView(self.diagramScene, self)
+        self.diagramView = DiagramView(self.diagramScene, self)
 
         # For list view
         self.vertL = QVBoxLayout()
