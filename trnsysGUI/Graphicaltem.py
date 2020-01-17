@@ -77,7 +77,6 @@ class GraphicalItem(QGraphicsPixmapItem):
         dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
         dct['ID'] = self.id
         dct['Size'] = self.w, self.h
-        # self.resizer.setPos(0,0)#self.w, self.h)
         dct['ImageSource'] = self.imageSource
         dct['FlippedH'] = self.flippedH
         dct['FlippedV'] = self.flippedV

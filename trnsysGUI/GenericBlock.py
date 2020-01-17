@@ -207,7 +207,6 @@ class GenericBlock(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            # dct['.__GenericBlockDict__'] = True
             dct['.__BlockDict__'] = True
             dct['BlockName'] = self.name
             dct['BlockDisplayName'] = self.displayName

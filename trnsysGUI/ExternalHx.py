@@ -72,10 +72,7 @@ class ExternalHx(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            # dct['.__ExternalHxDict__'] = True
             dct['.__BlockDict__'] = True
-            # dct['ExternalHxName'] = self.name
-            # dct['ExternalHxDisplayName'] = self.displayName
             dct['BlockName'] = self.name
             dct['BlockDisplayName'] = self.displayName
             dct['PortsIDIn'] = portListInputs
@@ -99,7 +96,6 @@ class ExternalHx(BlockItem):
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
         self.childIds = i["childIds"]
-        # self.displayName = i["ExternalHxName"]
         self.displayName = i["BlockDisplayName"]
         self.changeSize()
 
