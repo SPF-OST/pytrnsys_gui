@@ -529,7 +529,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.setPos(float(i["BlockPosition"][0] + offset_x),
                   float(i["BlockPosition"][1] + offset_y))
 
-        # bl.trnsysId = i["trnsysID"]
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
         self.rotateBlockToN(i["RotationN"])
