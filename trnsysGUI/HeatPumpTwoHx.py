@@ -122,7 +122,8 @@ class HeatPumpTwoHx(BlockItem):
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
-        self.displayName = i["HeatPumpName"]
+        # self.displayName = i["HeatPumpName"]
+        # self.displayName = i["BlockName"]
 
         self.changeSize()
 

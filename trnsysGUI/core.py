@@ -174,9 +174,6 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
-                        elif i["BlockName"] == 'HPTwoHx':
-                            bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
-                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'Boiler':
                             bl = Boiler(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"] + "COPY", loaded=True)
@@ -188,50 +185,68 @@ class DiagramDecoderPaste(json.JSONDecoder):
                                                displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'GroundSourceHx':
                             bl = GroundSourceHx(i["BlockName"], self.editor.diagramView,
+                                    displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+
+                        # [--- New encoding
+                        elif i["BlockName"] == 'StorageTank':
+                            bl = StorageTank(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'HeatPump':
+                            bl = HeatPump(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'HPTwoHx':
+                            bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'ExternalHx':
+                            bl = ExternalHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        elif i["BlockName"] == 'GenericBlock':
+                            bl = GenericBlock(i["BlockName"], self.editor.diagramView,
+                                            displayName=i["BlockDisplayName"] + "COPY", loaded=True)
+                        # new encoding ---]
+
                         else:
                             bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockName"] + "COPY",
                                            loaded=True)
 
-
                         bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
 
-                    elif ".__HeatPumpDict__" in arr[k]:
-                        print("Loading a HeatPump in DecoderPaste")
-                        i = arr[k]
-                        bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"] + "COPY", loadedBlock=True)
-
-                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
-
-                    elif ".__HeatPumpTwoDict__" in arr[k]:
-                        print("Loading a HeatPump in DecoderPaste")
-                        i = arr[k]
-                        bl = HeatPumpTwoHx(i["HeatPumpName"], self.editor.diagramView,
-                                      displayName=i["HeatPumpDisplayName"] + "COPY", loadedBlock=True)
-
-                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
-
-                    elif ".__GenericBlockDict__" in arr[k]:
-                        print("Loading a GenericBlock in DecoderPaste")
-                        i = arr[k]
-                        bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"] + "COPY", loadedBlock=True)
-
-                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
-
-                    elif ".__HeatPumpTwoDict__" in arr[k]:
-                        print("Loading a HeatPumpTwoHx in DecoderPaste")
-                        i = arr[k]
-                        bl = HeatPumpTwoHx(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"] + "COPY",
-                                      loadedBlock=True)
-
-                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockLists)
-
-                    elif ".__StorageDict__" in arr[k]:
-                        print("Loading a Storage in Decoder")
-                        i = arr[k]
-                        bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName=i["StorageDisplayName"] + "COPY", loaded=True)
-
-                        bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList, editor=self.editor)
+                    # elif ".__HeatPumpDict__" in arr[k]:
+                    #     print("Loading a HeatPump in DecoderPaste")
+                    #     i = arr[k]
+                    #     bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"] + "COPY", loadedBlock=True)
+                    #
+                    #     bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
+                    #
+                    # elif ".__HeatPumpTwoDict__" in arr[k]:
+                    #     print("Loading a HeatPump in DecoderPaste")
+                    #     i = arr[k]
+                    #     bl = HeatPumpTwoHx(i["HeatPumpName"], self.editor.diagramView,
+                    #                   displayName=i["HeatPumpDisplayName"] + "COPY", loadedBlock=True)
+                    #
+                    #     bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
+                    #
+                    # elif ".__GenericBlockDict__" in arr[k]:
+                    #     print("Loading a GenericBlock in DecoderPaste")
+                    #     i = arr[k]
+                    #     bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"] + "COPY", loadedBlock=True)
+                    #
+                    #     bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
+                    #
+                    # elif ".__HeatPumpTwoDict__" in arr[k]:
+                    #     print("Loading a HeatPumpTwoHx in DecoderPaste")
+                    #     i = arr[k]
+                    #     bl = HeatPumpTwoHx(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"] + "COPY",
+                    #                   loadedBlock=True)
+                    #
+                    #     bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockLists)
+                    #
+                    # elif ".__StorageDict__" in arr[k]:
+                    #     print("Loading a Storage in Decoder")
+                    #     i = arr[k]
+                    #     bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName=i["StorageDisplayName"] + "COPY", loaded=True)
+                    #
+                    #     bl.decodePaste(i, offset_x, offset_y, resConnList, resBlockList, editor=self.editor)
 
                     elif ".__ConnectionDict__" in arr[k]:
                         # It is important to load the connections at last because else the ports are not defined.
@@ -3132,6 +3147,12 @@ class DiagramEditor(QWidget):
                         hx.initLoad()
 
                     # print("Printing storage tank" + str(k))
+
+                if isinstance(k, GraphicalItem):
+                    k.setParent(self.diagramView)
+                    self.diagramScene.addItem(k)
+                    k.resizer.setPos(k.w, k.h)
+                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
 
                 if isinstance(k, Connection):
                     print("Almost done with loading a connection")

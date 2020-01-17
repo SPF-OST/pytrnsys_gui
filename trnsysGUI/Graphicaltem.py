@@ -100,6 +100,17 @@ class GraphicalItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
+    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        self.setPos(float(i["BlockPosition"][0] + offset_x),
+                    float(i["BlockPosition"][1] + offset_y))
+
+        # bl.trnsysId = i["trnsysID"]
+        # self.updateFlipStateH(i["FlippedH"])
+        # self.updateFlipStateV(i["FlippedV"])
+        # self.rotateBlockToN(i["RotationN"])
+
+        resBlockList.append(self)
+
     def setParent(self, parent):
         self.parent = parent
         if self not in self.parent.parent().graphicalObj:

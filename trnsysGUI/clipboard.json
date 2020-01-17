@@ -2,43 +2,172 @@
     "Blocks": {
         ".__BlockDct__": true,
         "Block-1": {
-            ".__StorageDict__": true,
+            ".__BlockDict__": true,
+            "BlockDisplayName": "GenericBlock1",
+            "BlockName": "GenericBlock",
+            "BlockPosition": [
+                -775.0,
+                -371.0
+            ],
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "HxList": [
-                {
-                    "DisplayName": "sdf2",
-                    "Height": 80.0,
-                    "ID": 2,
-                    "Offset": [
-                        0.0,
-                        10.0
-                    ],
-                    "ParentID": 1,
-                    "Port1ID": 3,
-                    "Port2ID": 4,
-                    "SideNr": 0,
-                    "Width": 40,
-                    "connTrnsysID": 2
-                }
-            ],
             "ID": 1,
-            "PortPairList": [],
-            "StorageDisplayName": "StorageTank1",
-            "StorageName": "StorageTank",
-            "StoragePosition": [
-                -943.0,
-                -412.0
+            "Imagesource": "images/GenericBlock",
+            "PortPairsNb": [
+                0,
+                0,
+                1,
+                0
             ],
-            "size_h": 100.0,
+            "PortsIDIn": [
+                2
+            ],
+            "PortsIDOut": [
+                3
+            ],
+            "RotationN": 0,
             "trnsysID": 1
         },
+        "Block-4": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "GenericBlock4",
+            "BlockName": "GenericBlock",
+            "BlockPosition": [
+                -1059.0,
+                -371.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 4,
+            "Imagesource": "images/GenericBlock",
+            "PortPairsNb": [
+                2,
+                0,
+                1,
+                0
+            ],
+            "PortsIDIn": [
+                5,
+                7,
+                9
+            ],
+            "PortsIDOut": [
+                6,
+                8,
+                10
+            ],
+            "RotationN": 0,
+            "trnsysID": 2
+        },
+        "Connection-11": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 1,
+            "ConnDisplayName": "UntitledConn1",
+            "ConnID": 11,
+            "CornerPositions": [
+                [
+                    -867.0,
+                    -335.0
+                ],
+                [
+                    -867.0,
+                    -363.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 8,
+            "PortToID": 2,
+            "SegmentPositions": [
+                [
+                    -1067.0,
+                    -335.0,
+                    -867.0,
+                    -335.0
+                ],
+                [
+                    -867.0,
+                    -335.0,
+                    -867.0,
+                    -363.0
+                ],
+                [
+                    -867.0,
+                    -363.0,
+                    -667.0,
+                    -363.0
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 5
+        },
+        "Connection-14": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 2,
+            "ConnDisplayName": "UntitledConn2",
+            "ConnID": 14,
+            "CornerPositions": [
+                [
+                    -921.0,
+                    -279.0
+                ],
+                [
+                    -921.0,
+                    -179.0
+                ],
+                [
+                    -637.0,
+                    -179.0
+                ],
+                [
+                    -637.0,
+                    -279.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 6,
+            "PortToID": 3,
+            "SegmentPositions": [
+                [
+                    -951.0,
+                    -279.0,
+                    -921.0,
+                    -279.0
+                ],
+                [
+                    -921.0,
+                    -279.0,
+                    -921.0,
+                    -179.0
+                ],
+                [
+                    -921.0,
+                    -179.0,
+                    -637.0,
+                    -179.0
+                ],
+                [
+                    -637.0,
+                    -179.0,
+                    -637.0,
+                    -279.0
+                ],
+                [
+                    -637.0,
+                    -279.0,
+                    -667.0,
+                    -279.0
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 6
+        },
         "IDs": {
-            "GlobalId": 8,
+            "GlobalId": 17,
             "__idDct__": true,
-            "globalConnID": 2,
-            "trnsysID": 3
+            "globalConnID": 3,
+            "trnsysID": 7
         },
         "Strings": {
             "DiagramName": "COPYGROUP",

@@ -238,6 +238,13 @@ class GenericBlock(BlockItem):
         self.setImage(i["Imagesource"])
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        correcter = 0
+        for j in range(4):
+            if j == 2:
+                correcter = -1
+            for k in range(i['PortPairsNb'][j] + correcter):
+                self.addPortPair(j)
+
         super(GenericBlock, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
         self.setImage(i["Imagesource"])
 
