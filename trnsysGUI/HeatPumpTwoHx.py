@@ -77,9 +77,12 @@ class HeatPumpTwoHx(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            dct['.__HeatPumpTwoDict__'] = True
-            dct['HeatPumpName'] = self.name
-            dct['HeatPumpDisplayName'] = self.displayName
+            # dct['.__HeatPumpTwoDict__'] = True
+            dct['.__BlockDict__'] = True
+            # dct['HeatPumpName'] = self.name
+            # dct['HeatPumpDisplayName'] = self.displayName
+            dct['BlockName'] = self.name
+            dct['BlockDisplayName'] = self.displayName
             dct['PortsIDIn'] = portListInputs
             dct['PortsIDOut'] = portListOutputs
             dct['HeatPumpPosition'] = (float(self.pos().x()), float(self.pos().y()))
@@ -99,7 +102,8 @@ class HeatPumpTwoHx(BlockItem):
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
         self.childIds = i["childIds"]
-        self.displayName = i["HeatPumpName"]
+        # self.displayName = i["HeatPumpName"]
+        self.displayName = i["BlockDisplayName"]
         self.changeSize()
 
         for x in range(len(self.inputs)):

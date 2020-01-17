@@ -465,9 +465,6 @@ class DiagramDecoder(json.JSONDecoder):
                     # Adding the blocks to the scene could also be done inside Decoder now (before not possible because
                     # no way of accessing the diagramView)
 
-                    # Could be compressed even more by not differentiating .__BlockDict__, .__StorageDict__, .__HeatPumpDict__ etc
-                    # For example, changing the key of the "special" blocks to ".__BlockDict__" in encoder or by the line below
-                    # elif ".__BlockDict__" in arr[k] or ".__StorageDict__" in arr[k] or ".__HeatPumpDict__" in arr[k] or ".__HeatPumpTwoDict__" in arr[k]:
                     elif ".__BlockDict__" in arr[k]:
                         print("Found a block ")
                         i = arr[k]
@@ -487,7 +484,6 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'HP':
                             bl = HeatPump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                           loadedBlock=True)
-                            print("Encoder should not find a HeatPump here")
                         elif i["BlockName"] == 'IceStorage':
                             bl = IceStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                             loadedBlock=True)
@@ -515,11 +511,28 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'GroundSourceHx':
                             bl = GroundSourceHx(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                            loadedBlock=True)
+
+                        # [--- new encoding
+                        elif i["BlockName"] == 'StorageTank':
+                            bl = StorageTank(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'HeatPump':
+                            bl = HeatPump(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loadedBlock=True)
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'ExternalHx':
+                            bl = ExternalHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'GenericBlock':
+                            bl = GenericBlock(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loadedBlock=True)
+                        # --- new encoding]
+
                         elif i["BlockName"] == "GraphicalItem":
                             bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
+
                         else:
                             bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
                         # print("Bl name is" + bl.name)
@@ -547,141 +560,150 @@ class DiagramDecoder(json.JSONDecoder):
 
                         bl.decode(i, resConnList, resBlockList)
 
-                    elif ".__StorageDict__" in arr[k]:
-                        i = arr[k]
-                        bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName=i["StorageDisplayName"], loadedBlock=True)
-                        bl.decode(arr[k], resConnList, resBlockList)
-                        # bl.flippedH = i["FlippedH"]
-                        # # bl.flippedV = i["FlippedV"] # No support for vertical flip
-                        # bl.displayName = i["StorageDisplayName"]
-                        #
-                        # bl.changeSize()
-                        # bl.h = i["size_h"]
-                        # bl.updateImage()
-                        #
-                        # bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
-                        # bl.trnsysId = i["trnsysID"]
-                        # bl.id = i["ID"]
-                        #
-                        # bl.groupName = "defaultGroup"
-                        # bl.setBlockToGroup(i["GroupName"])
-                        #
-                        # # Add heat exchangers
-                        # for h in i["HxList"]:
-                        #     hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
-                        #                         QPointF(h["Offset"][0], h["Offset"][1]), bl, h["DisplayName"],
-                        #                         port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                        #                         connTrnsysID=h['connTrnsysID'])
-                        #
-                        #     hEx.setId(h["ID"])
-                        #     hEx.port1.id = h['Port1ID']
-                        #     hEx.port2.id = h['Port2ID']
-                        #
-                        #     # hxDct['ParentID'] = hx.parent.id
-                        #     # hxDct['Port2ID'] = hx.port2.id
-                        #
-                        # # Add manual inputs
-                        # for x in i["PortPairList"]:
-                        #     print("Printing port pair")
-                        #     print(x)
-                        #
-                        #     conn = bl.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
-                        #                                 fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
-                        #                                 connId=x["ConnID"], connCid=x["ConnCID"],
-                        #                                 connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"])
-                        #     conn.id = x["ConnID"]
-                        #     conn.connId = x["ConnCID"]
-                        #     conn.trnsysId = x["trnsysID"]
-                        #     conn.displayName = x["ConnDisName"]
-                        #
-                        #     resConnList.append(conn)
-                        # resBlockList.append(bl)
-
-                    elif ".__HeatPumpDict__" in arr[k]:
-                        i = arr[k]
-                        bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"], loadedBlock=True)
-                        # bl.flippedH = i["FlippedH"]
-                        # bl.flippedV = i["FlippedV"]
-                        # bl.childIds = i["childIds"]
-                        # bl.displayName = i["HeatPumpName"]
-                        # bl.changeSize()
-                        #
-                        # for x in range(len(bl.inputs)):
-                        #     bl.inputs[x].id = i["PortsIDIn"][x]
-                        #     print("Input at heatExchanger")
-                        #
-                        # for x in range(len(bl.outputs)):
-                        #     bl.outputs[x].id = i["PortsIDOut"][x]
-                        #     print("Output at heatExchanger")
-                        #
-                        # bl.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
-                        # bl.trnsysId = i["trnsysID"]
-                        # bl.id = i["ID"]
-                        #
-                        # bl.groupName = "defaultGroup"
-                        # bl.setBlockToGroup(i["GroupName"])
-                        #
-                        # resBlockList.append(bl)
-                        bl.decode(i, resConnList, resBlockList)
-
-                    elif ".__HeatPumpTwoDict__" in arr[k]:
-                        i = arr[k]
-                        bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"], loadedBlock=True)
-                        # bl.flippedH = i["FlippedH"]
-                        # bl.flippedV = i["FlippedV"]
-                        # bl.childIds = i["childIds"]
-                        # bl.displayName = i["HeatPumpName"]
-                        # bl.changeSize()
-                        #
-                        # for x in range(len(bl.inputs)):
-                        #     bl.inputs[x].id = i["PortsIDIn"][x]
-                        #     print("Input at heatExchanger")
-                        #
-                        # for x in range(len(bl.outputs)):
-                        #     bl.outputs[x].id = i["PortsIDOut"][x]
-                        #     print("Output at heatExchanger")
-                        #
-                        # bl.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
-                        # bl.trnsysId = i["trnsysID"]
-                        # bl.id = i["ID"]
-                        #
-                        # bl.groupName = "defaultGroup"
-                        # bl.setBlockToGroup(i["GroupName"])
-                        #
-                        # resBlockList.append(bl)
-                        bl.decode(i, resConnList, resBlockList)
-
-                    elif ".__ExternalHxDict__" in arr[k]:
-                        i = arr[k]
-                        bl = ExternalHx(i["ExternalHxName"], self.editor.diagramView, displayName=i["ExternalHxDisplayName"], loadedBlock=True)
-                        bl.decode(i, resConnList, resBlockList)
-
-                    elif ".__GenericBlockDict__" in arr[k]:
-                        print("Loading a generic block")
-                        i = arr[k]
-                        bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True)
-                        # bl.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
-                        # bl.trnsysId = i["trnsysID"]
-                        # bl.id = i["ID"]
-                        # bl.updateFlipStateH(i["FlippedH"])
-                        # bl.updateFlipStateV(i["FlippedV"])
-                        # bl.rotateBlockToN(i["RotationN"])
-                        # bl.displayName = i["BlockDisplayName"]
-                        # bl.label.setPlainText(bl.displayName)
-                        #
-                        # bl.groupName = "defaultGroup"
-                        # bl.setBlockToGroup(i["GroupName"])
-                        #
-                        # print(len(bl.inputs))
-                        # for x in range(len(bl.inputs)):
-                        #     bl.inputs[x].id = i["PortsIDIn"][x]
-                        #
-                        # for x in range(len(bl.outputs)):
-                        #     bl.outputs[x].id = i["PortsIDOut"][x]
-                        #
-                        # bl.setImage(i["Imagesource"])
-                        # resBlockList.append(bl)
-                        bl.decode(i, resConnList, resBlockList)
+                    # elif ".__StorageDict__" in arr[k]:
+                    #     print("Wrong")
+                    #     i = arr[k]
+                    #     bl = StorageTank(i["StorageName"],  self.editor.diagramView, displayName=i["StorageDisplayName"], loadedBlock=True)
+                    #     bl.decode(arr[k], resConnList, resBlockList)
+                    #     # bl.flippedH = i["FlippedH"]
+                    #     # # bl.flippedV = i["FlippedV"] # No support for vertical flip
+                    #     # bl.displayName = i["StorageDisplayName"]
+                    #     #
+                    #     # bl.changeSize()
+                    #     # bl.h = i["size_h"]
+                    #     # bl.updateImage()
+                    #     #
+                    #     # bl.setPos(float(i["StoragePosition"][0]), float(i["StoragePosition"][1]))
+                    #     # bl.trnsysId = i["trnsysID"]
+                    #     # bl.id = i["ID"]
+                    #     #
+                    #     # bl.groupName = "defaultGroup"
+                    #     # bl.setBlockToGroup(i["GroupName"])
+                    #     #
+                    #     # # Add heat exchangers
+                    #     # for h in i["HxList"]:
+                    #     #     hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
+                    #     #                         QPointF(h["Offset"][0], h["Offset"][1]), bl, h["DisplayName"],
+                    #     #                         port1ID=h['Port1ID'], port2ID=h['Port2ID'],
+                    #     #                         connTrnsysID=h['connTrnsysID'])
+                    #     #
+                    #     #     hEx.setId(h["ID"])
+                    #     #     hEx.port1.id = h['Port1ID']
+                    #     #     hEx.port2.id = h['Port2ID']
+                    #     #
+                    #     #     # hxDct['ParentID'] = hx.parent.id
+                    #     #     # hxDct['Port2ID'] = hx.port2.id
+                    #     #
+                    #     # # Add manual inputs
+                    #     # for x in i["PortPairList"]:
+                    #     #     print("Printing port pair")
+                    #     #     print(x)
+                    #     #
+                    #     #     conn = bl.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
+                    #     #                                 fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
+                    #     #                                 connId=x["ConnID"], connCid=x["ConnCID"],
+                    #     #                                 connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"])
+                    #     #     conn.id = x["ConnID"]
+                    #     #     conn.connId = x["ConnCID"]
+                    #     #     conn.trnsysId = x["trnsysID"]
+                    #     #     conn.displayName = x["ConnDisName"]
+                    #     #
+                    #     #     resConnList.append(conn)
+                    #     # resBlockList.append(bl)
+                    #
+                    # elif ".__HeatPumpDict__" in arr[k]:
+                    #     print("Wrong")
+                    #
+                    #     i = arr[k]
+                    #     bl = HeatPump(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"], loadedBlock=True)
+                    #     # bl.flippedH = i["FlippedH"]
+                    #     # bl.flippedV = i["FlippedV"]
+                    #     # bl.childIds = i["childIds"]
+                    #     # bl.displayName = i["HeatPumpName"]
+                    #     # bl.changeSize()
+                    #     #
+                    #     # for x in range(len(bl.inputs)):
+                    #     #     bl.inputs[x].id = i["PortsIDIn"][x]
+                    #     #     print("Input at heatExchanger")
+                    #     #
+                    #     # for x in range(len(bl.outputs)):
+                    #     #     bl.outputs[x].id = i["PortsIDOut"][x]
+                    #     #     print("Output at heatExchanger")
+                    #     #
+                    #     # bl.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
+                    #     # bl.trnsysId = i["trnsysID"]
+                    #     # bl.id = i["ID"]
+                    #     #
+                    #     # bl.groupName = "defaultGroup"
+                    #     # bl.setBlockToGroup(i["GroupName"])
+                    #     #
+                    #     # resBlockList.append(bl)
+                    #     bl.decode(i, resConnList, resBlockList)
+                    #
+                    # elif ".__HeatPumpTwoDict__" in arr[k]:
+                    #     print("Wrong")
+                    #
+                    #     i = arr[k]
+                    #     bl = HeatPumpTwoHx(i["HeatPumpName"], self.editor.diagramView, displayName=i["HeatPumpDisplayName"], loadedBlock=True)
+                    #     # bl.flippedH = i["FlippedH"]
+                    #     # bl.flippedV = i["FlippedV"]
+                    #     # bl.childIds = i["childIds"]
+                    #     # bl.displayName = i["HeatPumpName"]
+                    #     # bl.changeSize()
+                    #     #
+                    #     # for x in range(len(bl.inputs)):
+                    #     #     bl.inputs[x].id = i["PortsIDIn"][x]
+                    #     #     print("Input at heatExchanger")
+                    #     #
+                    #     # for x in range(len(bl.outputs)):
+                    #     #     bl.outputs[x].id = i["PortsIDOut"][x]
+                    #     #     print("Output at heatExchanger")
+                    #     #
+                    #     # bl.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
+                    #     # bl.trnsysId = i["trnsysID"]
+                    #     # bl.id = i["ID"]
+                    #     #
+                    #     # bl.groupName = "defaultGroup"
+                    #     # bl.setBlockToGroup(i["GroupName"])
+                    #     #
+                    #     # resBlockList.append(bl)
+                    #     bl.decode(i, resConnList, resBlockList)
+                    #
+                    # elif ".__ExternalHxDict__" in arr[k]:
+                    #     print("Wrong")
+                    #
+                    #     i = arr[k]
+                    #     bl = ExternalHx(i["ExternalHxName"], self.editor.diagramView, displayName=i["ExternalHxDisplayName"], loadedBlock=True)
+                    #     bl.decode(i, resConnList, resBlockList)
+                    #
+                    # elif ".__GenericBlockDict__" in arr[k]:
+                    #     print("Wrong")
+                    #
+                    #     print("Loading a generic block")
+                    #     i = arr[k]
+                    #     bl = GenericBlock(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True)
+                    #     # bl.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
+                    #     # bl.trnsysId = i["trnsysID"]
+                    #     # bl.id = i["ID"]
+                    #     # bl.updateFlipStateH(i["FlippedH"])
+                    #     # bl.updateFlipStateV(i["FlippedV"])
+                    #     # bl.rotateBlockToN(i["RotationN"])
+                    #     # bl.displayName = i["BlockDisplayName"]
+                    #     # bl.label.setPlainText(bl.displayName)
+                    #     #
+                    #     # bl.groupName = "defaultGroup"
+                    #     # bl.setBlockToGroup(i["GroupName"])
+                    #     #
+                    #     # print(len(bl.inputs))
+                    #     # for x in range(len(bl.inputs)):
+                    #     #     bl.inputs[x].id = i["PortsIDIn"][x]
+                    #     #
+                    #     # for x in range(len(bl.outputs)):
+                    #     #     bl.outputs[x].id = i["PortsIDOut"][x]
+                    #     #
+                    #     # bl.setImage(i["Imagesource"])
+                    #     # resBlockList.append(bl)
+                    #     bl.decode(i, resConnList, resBlockList)
 
                     elif ".__ConnectionDict__" in arr[k]:
                         print("Loading a connection in Decoder")

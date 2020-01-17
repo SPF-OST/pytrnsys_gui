@@ -570,9 +570,12 @@ class StorageTank(BlockItem):
             for manP in self.leftSide + self.rightSide:
                 manP.portPairVisited = False
             dct = {}
-            dct['.__StorageDict__'] = True
-            dct['StorageName'] = self.name
-            dct['StorageDisplayName'] = self.displayName
+            # dct['.__StorageDict__'] = True
+            dct['.__BlockDict__'] = True
+            # dct['StorageName'] = self.name
+            # dct['StorageDisplayName'] = self.displayName
+            dct['BlockName'] = self.name
+            dct['BlockDisplayName'] = self.displayName
             dct['StoragePosition'] = (float(self.pos().x()), float(self.pos().y()))
             dct['ID'] = self.id
             dct['trnsysID'] = self.trnsysId
@@ -593,7 +596,8 @@ class StorageTank(BlockItem):
         
         self.flippedH = i["FlippedH"]
         # self.flippedV = i["FlippedV"] # No support for vertical flip
-        self.displayName = i["StorageDisplayName"]
+        # self.displayName = i["StorageDisplayName"]
+        self.displayName = i["BlockDisplayName"]
 
         self.changeSize()
         self.h = i["size_h"]
