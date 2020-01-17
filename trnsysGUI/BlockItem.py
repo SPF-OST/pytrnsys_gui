@@ -89,6 +89,12 @@ class BlockItem(QGraphicsPixmapItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
+        # Use svg instead of png for blocks:
+        # self.imageSource = "images/" + self.name + ".svg"
+        # self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
+        # self.setPixmap(self.image)
+        # self.pixmap = self.image
+
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
@@ -469,6 +475,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.deleteBlockCom(self)
 
     def encode(self):
+        # Double check that no virtual block gets encoded
         if self.isVisible():
             portListInputs = []
             portListOutputs = []

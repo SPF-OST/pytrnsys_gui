@@ -135,6 +135,7 @@ class GenericBlock(BlockItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
+
     def changeImage(self):
         name = str(self.pickImage().resolve())
         if name[-3:] == "png" or name[-3:] == "svg":

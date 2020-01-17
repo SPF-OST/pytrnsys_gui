@@ -5,3 +5,4 @@ class copyGroup():
         self.trnsysObj = []
         self.groupList = []
         self.idGen = editor.idGen
+        self.graphicalObj = []

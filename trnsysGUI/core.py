@@ -462,6 +462,9 @@ class DiagramDecoder(json.JSONDecoder):
                             g = Group(i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1], self.editor.diagramScene)
                             g.setName(i["GroupName"])
 
+                    # Adding the blocks to the scene could also be done inside Decoder now (before not possible because
+                    # no way of accessing the diagramView)
+
                     # Could be compressed even more by not differentiating .__BlockDict__, .__StorageDict__, .__HeatPumpDict__ etc
                     # For example, changing the key of the "special" blocks to ".__BlockDict__" in encoder or by the line below
                     # elif ".__BlockDict__" in arr[k] or ".__StorageDict__" in arr[k] or ".__HeatPumpDict__" in arr[k] or ".__HeatPumpTwoDict__" in arr[k]:
@@ -515,6 +518,8 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == "GraphicalItem":
+                            bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
                         else:
                             bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
                         # print("Bl name is" + bl.name)
@@ -1021,6 +1026,10 @@ class DiagramEncoder(json.JSONEncoder):
                 dct["Size"] = g.w, g.h
 
                 blockDct["..__GroupDct-" + g.displayName] = dct
+
+            for gi in obj.graphicalObj:
+                dictName, dct = gi.encode()
+                blockDct[dictName + str(gi.id)] = dct
 
             res["Blocks"] = blockDct
 
@@ -1542,6 +1551,7 @@ class DiagramEditor(QWidget):
         self.trnsysObj = []
         self.groupList = []
         self.blockList = []
+        self.graphicalObj = []
 
         self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
         self.defaultGroup.setName("defaultGroup")
@@ -3292,6 +3302,12 @@ class DiagramEditor(QWidget):
                     # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
                     k.initLoad()
                     # k.setConnToGroup("defaultGroup")
+
+                if isinstance(k, GraphicalItem):
+                    k.setParent(self.diagramView)
+                    self.diagramScene.addItem(k)
+                    k.resizer.setPos(k.w, k.h)
+                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
 
                 if isinstance(k, dict):
                     if "__idDct__" in k:
