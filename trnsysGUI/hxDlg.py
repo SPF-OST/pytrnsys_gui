@@ -6,7 +6,7 @@ class hxDlg(QDialog):
         super(hxDlg, self).__init__(sceneparent)
         self.hx = hx
         nameLabel = QLabel("Name:")
-        objectLabel = QLabel("Object:" + str(self.hx))
+        # objectLabel = QLabel("Object:" + str(self.hx))
         self.le = QLineEdit(self.hx.displayName)
 
         self.okButton = QPushButton("OK")

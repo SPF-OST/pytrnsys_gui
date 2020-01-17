@@ -16,6 +16,7 @@ from pathlib import Path
 # from trnsysGUI.Connection import Connection
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
@@ -23,6 +24,8 @@ from trnsysGUI.Export import Export
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.GroundSourceHx import GroundSourceHx
+from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
+from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.PV import PV
 
 from trnsysGUI.GenericBlock import GenericBlock
@@ -30,9 +33,11 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
+from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
+from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 
 from trnsysGUI.BlockItem import BlockItem
@@ -69,6 +74,8 @@ __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
 # CSS Style-sheet
+from trnsysGUI.segmentDlg import segmentDlg
+
 cssSs = open("res/style.txt", "r")
 
 
@@ -573,7 +580,8 @@ class DiagramScene(QGraphicsScene):
             if self.hasElementsInRect():
                 if self.parent().groupMode:
                     g = self.createGroup()
-                    groupDlg(g, self.parent(), self.elementsInRect())
+                    # groupDlg(g, self.parent(), self.elementsInRect())
+                    self.parent().showGroupDlg(g, self.elementsInRect())
                 elif self.parent().multipleSelectMode:
                     self.parent().createSelectionGroup(self.elementsInRect())
                 elif self.parent().copyMode:
@@ -740,7 +748,8 @@ class DiagramView(QGraphicsView):
             print("name is " + name)
             if name == 'StorageTank':
                 bl = StorageTank(name, self)
-                c = ConfigStorage(bl, self)
+                # c = ConfigStorage(bl, self)
+                self.parent().showConfigStorage(bl)
             elif name == 'TeePiece':
                 bl = TeePiece(name, self)
             elif name == 'TVentil':
@@ -763,7 +772,8 @@ class DiagramView(QGraphicsView):
                 bl = Connector(name, self)
             elif name == 'GenericBlock':
                 bl = GenericBlock(name, self)
-                c = GenericPortPairDlg(bl, self)
+                # c = GenericPortPairDlg(bl, self)
+                self.parent().showGenericPortPairDlg(bl)
             elif name == 'HPTwoHx':
                 bl = HeatPumpTwoHx(name, self)
             elif name == 'Boiler':
@@ -953,13 +963,6 @@ class DiagramEditor(QWidget):
         # res folder for library icons
         r_folder = "images/"
 
-        # Investigate why file ending is not needed
-        # Uncomment these to use the copied icons of polysun
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'TWV'))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'Pump2'))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'Kollektor2'))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'StorageTank2'))
-
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Pump')),  'Pump'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Kollektor')),  'Kollektor'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TVentil')), 'TVentil'))
@@ -1028,11 +1031,11 @@ class DiagramEditor(QWidget):
         b = 50  # distance between starts of button y-values
         b_start = 75
 
-        self.button = QPushButton(self)
-        self.button.setText("Print info")
-        self.button.move(b_start, a)
-        self.button.setMinimumSize(120, 40)
-        self.button.clicked.connect(self.button1_clicked)
+        # self.button = QPushButton(self)
+        # self.button.setText("Print info")
+        # self.button.move(b_start, a)
+        # self.button.setMinimumSize(120, 40)
+        # self.button.clicked.connect(self.button1_clicked)
         #
         # self.button2 = QPushButton(self)
         # self.button2.setText("Build Bridges")
@@ -1068,6 +1071,7 @@ class DiagramEditor(QWidget):
 
 
         # Different colors for connLineColor
+
         colorsc = "red"
         linePx = 4
         if colorsc == "red":
@@ -1095,6 +1099,10 @@ class DiagramEditor(QWidget):
         self.diagramScene.addItem(self.alignYLineItem)
 
         self.alignXLine = QLineF()
+        self.alignXLineItem = QGraphicsLineItem(self.alignXLine)
+        self.alignXLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
+        self.alignXLineItem.setVisible(False)
+        self.diagramScene.addItem(self.alignXLineItem)
 
         # #Search related lists
         self.bfs_visitedNodes = []
@@ -2377,8 +2385,8 @@ class DiagramEditor(QWidget):
     def setName(self, newName):
         self.diagramName = newName
 
-    def propertiesDlg(self):
-        diagramDlg(self)
+    # def propertiesDlg(self):
+    #     diagramDlg(self)
 
     def delGroup(self):
         # This is used for deleting the first connected componts group found by BFS, unused
@@ -2522,31 +2530,6 @@ class DiagramEditor(QWidget):
                 if not c.toPort.visited:
                     self.dfs(c.toPort, maxdepth, d)
 
-            # for c in connsOthers:
-            #
-            #     if c.fromPort.parent is port.parent:
-            #
-            #         if c.fromPort is port:
-            #             for c2 in port.connectionList:
-            #                 if c2.fromPort is port and not c2.toPort.visited:
-            #                     self.dfs(c2.toPort, maxdepth, d + 1)
-            #                 if c2.toPort is port and not c2.fromPort.visited:
-            #                     self.dfs(c2.fromPort, maxdepth, d + 1)
-            #         else:
-            #             if not c.toPort.visited:
-            #                 self.dfs(c.toPort, maxdepth, d + 1)
-            #
-            #     if c.toPort.parent is port.parent:
-            #         if c.toPort is port:
-            #             for c2 in port.connectionList:
-            #                 if c2.fromPort is port and not c2.toPort.visited:
-            #                     self.dfs(c2.toPort, maxdepth, d + 1)
-            #                 if c2.toPort is port and not c2.fromPort.visited:
-            #                     self.dfs(c2.fromPort, maxdepth, d + 1)
-            #         else:
-            #             if not c.fromPort.visited:
-            #                 self.dfs(c.fromPort, maxdepth, d + 1)
-
     def dfs1(self, port, maxdepth, d):
         print("At port " + str(port))
 
@@ -2595,19 +2578,6 @@ class DiagramEditor(QWidget):
                     print("Found a loop, says port " + str(port))
 
         port.color = 'black'
-
-        # for c in connsOthers:
-        #     if c.fromPort.parent is port.parent:
-        #         if c.fromPort.color == 'white':
-        #             self.dfs1(c.fromPort, maxdepth, d)
-        #         if c.fromPort.color == 'gray':
-        #             print("Found a loop returning to ")
-        #
-        #     if c.toPort.parent is port.parent:
-        #         if c.toPort.color == 'white':
-        #             self.dfs1(c.toPort, maxdepth, d)
-        #         if c.toPort.color == 'gray':
-        #             print("Found a loop returning to ")
 
         for op in (port.parent.inputs + port.parent.outputs):
             if op.color == 'white' and len(op.connectionList) > 0:
@@ -2792,7 +2762,6 @@ class DiagramEditor(QWidget):
             print("Tr obj is" + str(t) + " " + str(t.trnsysId))
 
         # tempList = []
-        # for t in self.trnsysObj:
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)
@@ -3015,7 +2984,8 @@ class DiagramEditor(QWidget):
         # print("Diagram name is: " + self.diagramName)
 
     def editGroups(self):
-        groupsEditor(self)
+        # groupsEditor(self)
+        self.showGroupsEditor()
 
     def setConnLabelVis(self, b):
         for c in self.trnsysObj:
@@ -3056,6 +3026,47 @@ class DiagramEditor(QWidget):
 
     def setitemsSelected(self, b):
         self.itemsSelected = b
+
+    # Dialog calls
+    def showBlockDlg(self, bl):
+        c = BlockDlg(bl, self)
+
+    def showDiagramDlg(self):
+        c = diagramDlg(self)
+
+    def showGenericPortPairDlg(self, bl):
+        c = GenericPortPairDlg(bl, self)
+
+    def showGroupChooserBlockDlg(self, bl):
+        c = GroupChooserBlockDlg(bl, self)
+
+    def showGroupChooserConnDlg(self, conn):
+        c = GroupChooserConnDlg(conn, self)
+    
+    def showGroupDlg(self, group, itemList):
+        c = groupDlg(group, self, itemList)
+
+    def showHxDlg(self, hx):
+        c = hxDlg(hx, self)
+
+    def showNewDiagramDlg(self):
+        c = newDiagramDlg(self)
+
+    # Not used
+    # def showNewPortDlg(self):
+    #     c = newPortDlg
+
+    def showSegmentDlg(self, seg):
+        c = segmentDlg(seg, self)
+
+    def showTVentilDlg(self, bl):
+        c = TVentilDlg(bl, self)
+
+    def showConfigStorageDlg(self, bl):
+        c = ConfigStorage(bl, self)
+
+    def showGroupsEditor(self):
+        c = groupsEditor(self)
 
     # def mouseMoveEvent(self, e):
     #     print("In editor")
@@ -3259,7 +3270,8 @@ class MainWindow(QMainWindow):
 
     def renameDia(self):
         print("Renaming diagram...")
-        self.centralWidget.propertiesDlg()
+        # self.centralWidget.propertiesDlg()
+        self.centralWidget.showDiagramDlg()
 
     def deleteDia(self):
         print("Deleting diagram")
