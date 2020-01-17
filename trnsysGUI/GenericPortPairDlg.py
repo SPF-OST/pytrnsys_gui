@@ -25,7 +25,7 @@ class GenericPortPairDlg(QDialog):
         positionLayout.addWidget(self.rButtonBottom)
 
         self.addButton = QPushButton("Add port pair")
-        self.cancelButton = QPushButton("Cancel")
+        self.cancelButton = QPushButton("Close")
 
         self.addButton.clicked.connect(self.addPortPair)
         self.cancelButton.clicked.connect(self.cancel)
@@ -84,19 +84,6 @@ class GenericPortPairDlg(QDialog):
             return 3
         else:
             return None
-
-    def acceptedEdit(self):
-        if self.le.text() != "":
-            height = self.le.text()
-
-            if self.oButton.isChecked():
-                io = "o"
-            else:
-                io = "i"
-
-            self.block.addPort(io, height)
-
-            self.close()
 
     def cancel(self):
         self.close()

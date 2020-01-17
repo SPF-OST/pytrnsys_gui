@@ -27,6 +27,10 @@ class GenericBlock(BlockItem):
 
         self.imagesource = ("images/" + self.name)
 
+        # Disallow adding port pairs later, because the trnsysIDs of the generated port pairs have to be
+        # consecutive to be correctly printed out in the export
+        self.isSet = True
+
         self.changeSize()
 
     def changeSize(self):
@@ -183,8 +187,9 @@ class GenericBlock(BlockItem):
         c3 = menu.addAction("Set image")
         c3.triggered.connect(self.changeImage)
 
-        c4 = menu.addAction("Add port")
-        c4.triggered.connect(self.addPortDlg)
+        if not self.isSet:
+            c4 = menu.addAction("Add port")
+            c4.triggered.connect(self.addPortDlg)
 
         d1 = menu.addAction('Dump information')
         d1.triggered.connect(self.dumpBlockInfo)

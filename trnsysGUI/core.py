@@ -21,6 +21,7 @@ from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Export import Export
 from trnsysGUI.ExternalHx import ExternalHx
+from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.PV import PV
 
@@ -136,12 +137,7 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         # print("Bl name " +  arr[k]["BlockName"] + str(type(arr[k]["BlockName"])))
                         # print("Bl disp name " +  arr[k]["BlockDisplayName"])
 
-                        if i["BlockName"] == 'StorageTank':
-                            print("No storage tank should be found here")
-                            bl = StorageTank(i["BlockName"], self.editor.diagramView,
-                                             displayName=i["BlockDisplayName"] + "COPY", loaded=True)
-                            # c = ConfigStorage(bl, self.editor.diagramView)
-                        elif i["BlockName"] == 'TeePiece':
+                        if i["BlockName"] == 'TeePiece':
                             bl = TeePiece(i["BlockName"], self.editor.diagramView,
                                           displayName=i["BlockDisplayName"] + "COPY", loaded=True)
                         elif i["BlockName"] == 'TVentil':
@@ -1008,6 +1004,7 @@ class DiagramView(QGraphicsView):
                 bl = Connector(name, self)
             elif name == 'GenericBlock':
                 bl = GenericBlock(name, self)
+                c = GenericPortPairDlg(bl, self)
             elif name == 'HPTwoHx':
                 bl = HeatPumpTwoHx(name, self)
             elif name == 'Boiler':
