@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget,QVBoxLayout,QWidget, QDoubleSpinBox
+from PyQt5.QtGui import QIcon
 
 
 class TVentilDlg(QDialog):
@@ -8,7 +9,7 @@ class TVentilDlg(QDialog):
         nameLabel = QLabel("Name:")
         self.block = block
         self.le = QLineEdit(self.block.label.toPlainText())
-
+        self.setWindowIcon(QIcon(block.pixmap))
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
@@ -38,14 +39,42 @@ class TVentilDlg(QDialog):
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.okButton)
         buttonLayout.addWidget(self.cancelButton)
-        layout = QGridLayout()
-        layout.addWidget(nameLabel, 0, 0)
-        layout.addWidget(self.le, 0, 1)
-        layout.addLayout(flipLayout, 1, 0, 3, 0)
-        layout.addLayout(buttonLayout, 2, 0, 3, 0)
-        self.setLayout(layout)
+        tab1Layout = QGridLayout(self)
+        tab1Layout.addWidget(nameLabel, 0, 0)
+        tab1Layout.addWidget(self.le, 0, 1)
+        tab1Layout.addLayout(flipLayout, 1, 0, 3, 0)
 
-        self.setFixedSize(300, 150)
+        positionLayout = QHBoxLayout()
+        self.positionMassFlowSolverLabel = QLabel("Valve Position")
+        self.positionMassFlowSolver = QDoubleSpinBox()
+        self.positionMassFlowSolver.setDecimals(1)
+        self.positionMassFlowSolver.setSingleStep(0.1)
+        self.positionMassFlowSolver.setProperty("value", 1.0)
+        self.positionMassFlowSolver.setRange(0,1.0)
+        self.positionMassFlowSolver.valueChanged.connect(self.positionMassFlowSolverChanged)
+        positionLayout.addWidget(self.positionMassFlowSolverLabel)
+        positionLayout.addWidget(self.positionMassFlowSolver)
+
+        # Initialize tab screen
+        self.tabs = QTabWidget()
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+        # Add tabs
+        self.tabs.addTab(self.tab1, "Diagram")
+        self.tabs.addTab(self.tab2, "Mass Flow Solver")
+        self.tab1.setLayout(tab1Layout)
+        self.tab2.setLayout(positionLayout)
+        #self.tab2 = layout
+        #self.tabs.resize(300, 200)
+
+
+        #self.tabs.addTab(self.tab2, "Tab 2")
+        self.layout2 = QGridLayout(self)
+        self.layout2.addWidget(self.tabs,0,0)
+        self.layout2.addLayout(buttonLayout, 2, 0, 3, 0)
+        self.setLayout(self.layout2)
+
+        self.setFixedSize(340, 180)
 
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
@@ -70,6 +99,9 @@ class TVentilDlg(QDialog):
 
     def setNewComplexState(self, state):
         self.block.setComplexDiv(state)
+
+    def positionMassFlowSolverChanged(self,value):
+        self.block.setPositionForMassFlowSolver(value)
 
     def cancel(self):
         self.close()

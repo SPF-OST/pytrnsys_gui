@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout
-
+from PyQt5.QtGui import QIcon
 
 class BlockDlg(QDialog):
     def __init__(self, block, parent=None):
@@ -7,7 +7,7 @@ class BlockDlg(QDialog):
         nameLabel = QLabel("Name:")
         self.block = block
         self.le = QLineEdit(self.block.label.toPlainText())
-
+        self.setWindowIcon(QIcon(block.pixmap))
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
