@@ -390,7 +390,7 @@
                     -207.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 101
         },
         "Connection-109": {
@@ -431,7 +431,7 @@
                     -605.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 103
         },
         "Connection-115": {
@@ -472,7 +472,7 @@
                     -412.575
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 105
         },
         "Connection-310": {
@@ -513,7 +513,7 @@
                     -350.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 172
         },
         "Connection-327": {
@@ -554,7 +554,7 @@
                     -177.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 179
         },
         "Connection-340": {
@@ -595,7 +595,7 @@
                     -236.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 183
         },
         "Connection-346": {
@@ -636,7 +636,7 @@
                     -604.095
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 185
         },
         "Connection-352": {
@@ -677,7 +677,7 @@
                     -85.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 187
         },
         "Connection-355": {
@@ -718,7 +718,7 @@
                     -85.57499999999999
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 188
         },
         "Connection-598": {
@@ -759,7 +759,7 @@
                     -148.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 268
         },
         "Connection-604": {
@@ -800,7 +800,7 @@
                     -271.77777777777777
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 270
         },
         "Connection-607": {
@@ -841,7 +841,7 @@
                     -85.57499999999999
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 271
         },
         "Connection-610": {
@@ -882,7 +882,7 @@
                     -100.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 272
         },
         "Connection-627": {
@@ -923,7 +923,7 @@
                     -373.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 277
         },
         "Connection-630": {
@@ -964,7 +964,7 @@
                     -430.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 278
         },
         "Connection-638": {
@@ -1005,7 +1005,7 @@
                     -363.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 281
         },
         "Connection-644": {
@@ -1046,14 +1046,14 @@
                     -640.7777777777778
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 283
         },
         "IDs": {
-            "GlobalId": 651,
+            "GlobalId": 723,
             "__idDct__": true,
-            "globalConnID": 235,
-            "trnsysID": 288
+            "globalConnID": 251,
+            "trnsysID": 312
         },
         "Strings": {
             "DiagramName": "CombiSystem2Tes",

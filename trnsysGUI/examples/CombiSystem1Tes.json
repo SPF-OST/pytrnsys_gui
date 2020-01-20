@@ -19,7 +19,7 @@
             "BlockName": "Kollektor",
             "BlockPosition": [
                 -1154.0,
-                -410.0
+                -440.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -39,8 +39,8 @@
             "BlockDisplayName": "TMix",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -457.0,
-                -688.0
+                -464.0,
+                -670.0
             ],
             "FlippedH": false,
             "FlippedV": true,
@@ -102,8 +102,8 @@
             "BlockDisplayName": "WTapBottom",
             "BlockName": "WTap_main",
             "BlockPosition": [
-                -287.0,
-                -436.0
+                -321.0,
+                -333.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -121,8 +121,8 @@
             "BlockDisplayName": "TPiece",
             "BlockName": "TeePiece",
             "BlockPosition": [
-                -456.0,
-                -444.0
+                -454.0,
+                -446.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -235,8 +235,8 @@
             "BlockDisplayName": "MixSh",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -499.0,
-                -369.0
+                -508.0,
+                -281.0
             ],
             "FlippedH": false,
             "FlippedV": true,
@@ -301,8 +301,8 @@
             "BlockDisplayName": "PuCol",
             "BlockName": "Pump",
             "BlockPosition": [
-                -942.0,
-                -335.0
+                -943.0,
+                -365.0
             ],
             "FlippedH": true,
             "FlippedV": false,
@@ -317,26 +317,26 @@
             "RotationN": 0,
             "trnsysID": 2
         },
-        "Block-634": {
+        "Block-550": {
             ".__BlockDict__": true,
             "BlockDisplayName": "Boiler",
             "BlockName": "Boiler",
             "BlockPosition": [
-                -1158.0,
-                -625.0
+                -1147.0,
+                -613.0
             ],
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 634,
+            "ID": 550,
             "PortsIDIn": [
-                635
+                551
             ],
             "PortsIDOut": [
-                636
+                552
             ],
             "RotationN": 0,
-            "trnsysID": 282
+            "trnsysID": 254
         },
         "Connection-106": {
             ".__ConnectionDict__": true,
@@ -376,7 +376,7 @@
                     -460.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 102
         },
         "Connection-109": {
@@ -387,11 +387,11 @@
             "CornerPositions": [
                 [
                     -432.0,
-                    -452.0
+                    -454.0
                 ],
                 [
                     -432.0,
-                    -630.0
+                    -612.0
                 ]
             ],
             "GroupName": "defaultGroup",
@@ -399,25 +399,25 @@
             "PortToID": 12,
             "SegmentPositions": [
                 [
-                    -431.0,
-                    -452.0,
+                    -429.0,
+                    -454.0,
                     -432.0,
-                    -452.0
+                    -454.0
                 ],
                 [
                     -432.0,
-                    -452.0,
+                    -454.0,
                     -432.0,
-                    -630.0
+                    -612.0
                 ],
                 [
                     -432.0,
-                    -630.0,
-                    -432.0,
-                    -630.0
+                    -612.0,
+                    -439.0,
+                    -612.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 103
         },
         "Connection-115": {
@@ -428,11 +428,11 @@
             "CornerPositions": [
                 [
                     -385.0,
-                    -411.0
+                    -308.0
                 ],
                 [
                     -385.0,
-                    -410.575
+                    -412.575
                 ]
             ],
             "GroupName": "defaultGroup",
@@ -440,25 +440,25 @@
             "PortToID": 20,
             "SegmentPositions": [
                 [
-                    -295.0,
-                    -411.0,
+                    -329.0,
+                    -308.0,
                     -385.0,
-                    -411.0
+                    -308.0
                 ],
                 [
                     -385.0,
-                    -411.0,
+                    -308.0,
                     -385.0,
-                    -410.575
+                    -412.575
                 ],
                 [
                     -385.0,
-                    -410.575,
-                    -398.0,
-                    -410.575
+                    -412.575,
+                    -396.0,
+                    -412.575
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 105
         },
         "Connection-310": {
@@ -469,11 +469,11 @@
             "CornerPositions": [
                 [
                     -1000.0,
-                    -320.0
+                    -350.0
                 ],
                 [
                     -1000.0,
-                    -320.0
+                    -350.0
                 ]
             ],
             "GroupName": "defaultGroup",
@@ -481,25 +481,25 @@
             "PortToID": 3,
             "SegmentPositions": [
                 [
-                    -950.0,
-                    -320.0,
+                    -951.0,
+                    -350.0,
                     -1000.0,
-                    -320.0
+                    -350.0
                 ],
                 [
                     -1000.0,
-                    -320.0,
+                    -350.0,
                     -1000.0,
-                    -320.0
+                    -350.0
                 ],
                 [
                     -1000.0,
-                    -320.0,
+                    -350.0,
                     -1046.0,
-                    -320.0
+                    -350.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 172
         },
         "Connection-327": {
@@ -510,7 +510,7 @@
             "CornerPositions": [
                 [
                     -395.0,
-                    -346.77777777777777
+                    -258.77777777777777
                 ],
                 [
                     -395.0,
@@ -522,14 +522,14 @@
             "PortToID": 321,
             "SegmentPositions": [
                 [
-                    -441.0,
-                    -346.77777777777777,
+                    -450.0,
+                    -258.77777777777777,
                     -395.0,
-                    -346.77777777777777
+                    -258.77777777777777
                 ],
                 [
                     -395.0,
-                    -346.77777777777777,
+                    -258.77777777777777,
                     -395.0,
                     -177.0
                 ],
@@ -540,7 +540,7 @@
                     -177.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 179
         },
         "Connection-340": {
@@ -555,7 +555,7 @@
                 ],
                 [
                     -476.0,
-                    -311.0
+                    -223.0
                 ]
             ],
             "GroupName": "defaultGroup",
@@ -572,16 +572,16 @@
                     -476.0,
                     -127.0,
                     -476.0,
-                    -311.0
+                    -223.0
                 ],
                 [
                     -476.0,
-                    -311.0,
-                    -474.0,
-                    -311.0
+                    -223.0,
+                    -483.0,
+                    -223.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 183
         },
         "Connection-346": {
@@ -592,7 +592,7 @@
             "CornerPositions": [
                 [
                     -313.0,
-                    -665.7777777777778
+                    -647.7777777777778
                 ],
                 [
                     -313.0,
@@ -604,14 +604,14 @@
             "PortToID": 15,
             "SegmentPositions": [
                 [
-                    -399.0,
-                    -665.7777777777778,
+                    -406.0,
+                    -647.7777777777778,
                     -313.0,
-                    -665.7777777777778
+                    -647.7777777777778
                 ],
                 [
                     -313.0,
-                    -665.7777777777778,
+                    -647.7777777777778,
                     -313.0,
                     -604.095
                 ],
@@ -622,7 +622,7 @@
                     -604.095
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 185
         },
         "Connection-352": {
@@ -663,7 +663,7 @@
                     -87.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 187
         },
         "Connection-355": {
@@ -704,7 +704,7 @@
                     -85.57499999999999
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 188
         },
         "Connection-358": {
@@ -745,7 +745,7 @@
                     -280.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 189
         },
         "Connection-361": {
@@ -760,7 +760,7 @@
                 ],
                 [
                     -579.0,
-                    -346.77777777777777
+                    -258.77777777777777
                 ]
             ],
             "GroupName": "defaultGroup",
@@ -777,16 +777,16 @@
                     -579.0,
                     -346.0,
                     -579.0,
-                    -346.77777777777777
+                    -258.77777777777777
                 ],
                 [
                     -579.0,
-                    -346.77777777777777,
-                    -507.0,
-                    -346.77777777777777
+                    -258.77777777777777,
+                    -516.0,
+                    -258.77777777777777
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 190
         },
         "Connection-373": {
@@ -797,15 +797,15 @@
             "CornerPositions": [
                 [
                     -788.0,
-                    -400.0
+                    -430.0
                 ],
                 [
                     -788.0,
-                    -399.0
+                    -369.0
                 ],
                 [
                     -788.0,
-                    -399.0
+                    -369.0
                 ],
                 [
                     -788.0,
@@ -818,25 +818,25 @@
             "SegmentPositions": [
                 [
                     -1046.0,
-                    -400.0,
+                    -430.0,
                     -788.0,
-                    -400.0
+                    -430.0
                 ],
                 [
                     -788.0,
-                    -400.0,
+                    -430.0,
                     -788.0,
-                    -399.0
+                    -369.0
                 ],
                 [
                     -788.0,
-                    -399.0,
+                    -369.0,
                     -788.0,
-                    -399.0
+                    -369.0
                 ],
                 [
                     -788.0,
-                    -399.0,
+                    -369.0,
                     -788.0,
                     -346.0
                 ],
@@ -847,7 +847,7 @@
                     -346.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 193
         },
         "Connection-376": {
@@ -862,7 +862,7 @@
                 ],
                 [
                     -822.0,
-                    -320.0
+                    -350.0
                 ]
             ],
             "GroupName": "defaultGroup",
@@ -879,16 +879,16 @@
                     -822.0,
                     -286.0,
                     -822.0,
-                    -320.0
+                    -350.0
                 ],
                 [
                     -822.0,
-                    -320.0,
-                    -902.0,
-                    -320.0
+                    -350.0,
+                    -903.0,
+                    -350.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 194
         },
         "Connection-55": {
@@ -903,7 +903,7 @@
                 ],
                 [
                     -575.0,
-                    -665.7777777777778
+                    -647.7777777777778
                 ]
             ],
             "GroupName": "defaultGroup",
@@ -920,17 +920,99 @@
                     -575.0,
                     -490.0,
                     -575.0,
-                    -665.7777777777778
+                    -647.7777777777778
                 ],
                 [
                     -575.0,
-                    -665.7777777777778,
-                    -465.0,
-                    -665.7777777777778
+                    -647.7777777777778,
+                    -472.0,
+                    -647.7777777777778
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 18
+        },
+        "Connection-553": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 211,
+            "ConnDisplayName": "PiBoilerOut",
+            "ConnID": 553,
+            "CornerPositions": [
+                [
+                    -999.5,
+                    -603.0
+                ],
+                [
+                    -999.5,
+                    -616.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 551,
+            "PortToID": 101,
+            "SegmentPositions": [
+                [
+                    -1076.0,
+                    -603.0,
+                    -999.5,
+                    -603.0
+                ],
+                [
+                    -999.5,
+                    -603.0,
+                    -999.5,
+                    -616.0
+                ],
+                [
+                    -999.5,
+                    -616.0,
+                    -923.0,
+                    -616.0
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 255
+        },
+        "Connection-556": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 212,
+            "ConnDisplayName": "PiBoilerIn",
+            "ConnID": 556,
+            "CornerPositions": [
+                [
+                    -917.0,
+                    -523.0
+                ],
+                [
+                    -917.0,
+                    -440.0
+                ]
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 552,
+            "PortToID": 25,
+            "SegmentPositions": [
+                [
+                    -1076.0,
+                    -523.0,
+                    -917.0,
+                    -523.0
+                ],
+                [
+                    -917.0,
+                    -523.0,
+                    -917.0,
+                    -440.0
+                ],
+                [
+                    -917.0,
+                    -440.0,
+                    -758.0,
+                    -440.0
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 256
         },
         "Connection-58": {
             ".__ConnectionDict__": true,
@@ -940,18 +1022,10 @@
             "CornerPositions": [
                 [
                     -575.0,
-                    -410.575
+                    -412.575
                 ],
                 [
                     -575.0,
-                    -410.0
-                ],
-                [
-                    -641.0,
-                    -410.0
-                ],
-                [
-                    -641.0,
                     -410.0
                 ]
             ],
@@ -960,126 +1034,32 @@
             "PortToID": 51,
             "SegmentPositions": [
                 [
-                    -464.0,
-                    -410.575,
+                    -462.0,
+                    -412.575,
                     -575.0,
-                    -410.575
+                    -412.575
                 ],
                 [
                     -575.0,
-                    -410.575,
+                    -412.575,
                     -575.0,
                     -410.0
                 ],
                 [
                     -575.0,
-                    -410.0,
-                    -641.0,
-                    -410.0
-                ],
-                [
-                    -641.0,
-                    -410.0,
-                    -641.0,
-                    -410.0
-                ],
-                [
-                    -641.0,
                     -410.0,
                     -642.0,
                     -410.0
                 ]
             ],
-            "isBlockConn": false,
+            "isVirtualConn": false,
             "trnsysID": 19
         },
-        "Connection-637": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 231,
-            "ConnDisplayName": "PiBoilerIn",
-            "ConnID": 637,
-            "CornerPositions": [
-                [
-                    -922.5,
-                    -535.0
-                ],
-                [
-                    -922.5,
-                    -440.0
-                ]
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 636,
-            "PortToID": 25,
-            "SegmentPositions": [
-                [
-                    -1087.0,
-                    -535.0,
-                    -922.5,
-                    -535.0
-                ],
-                [
-                    -922.5,
-                    -535.0,
-                    -922.5,
-                    -440.0
-                ],
-                [
-                    -922.5,
-                    -440.0,
-                    -758.0,
-                    -440.0
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 283
-        },
-        "Connection-640": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 232,
-            "ConnDisplayName": "PiBoilerOut",
-            "ConnID": 640,
-            "CornerPositions": [
-                [
-                    -1005.0,
-                    -615.0
-                ],
-                [
-                    -1005.0,
-                    -616.0
-                ]
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 635,
-            "PortToID": 101,
-            "SegmentPositions": [
-                [
-                    -1087.0,
-                    -615.0,
-                    -1005.0,
-                    -615.0
-                ],
-                [
-                    -1005.0,
-                    -615.0,
-                    -1005.0,
-                    -616.0
-                ],
-                [
-                    -1005.0,
-                    -616.0,
-                    -923.0,
-                    -616.0
-                ]
-            ],
-            "isBlockConn": false,
-            "trnsysID": 284
-        },
         "IDs": {
-            "GlobalId": 643,
+            "GlobalId": 559,
             "__idDct__": true,
-            "globalConnID": 233,
-            "trnsysID": 285
+            "globalConnID": 213,
+            "trnsysID": 257
         },
         "Strings": {
             "DiagramName": "CombiSystem1Tes",
