@@ -31,8 +31,17 @@ class segmentDlg(QDialog):
     def acceptedEdit(self):
         # print("Changing displayName")
         newName = self.le.text()
-        self.seg.parent.setDisplayName(newName)
+        if newName != "" and not self.nameExists(newName):
+            self.seg.parent.setDisplayName(newName)
+            self.seg.setToolTip(newName)
         self.close()
 
     def cancel(self):
         self.close()
+
+    def nameExists(self, n):
+        for t in self.parent().trnsysObj:
+            if t.displayName == n:
+                return True
+        return False
+

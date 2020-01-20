@@ -570,9 +570,9 @@ class StorageTank(BlockItem):
             for manP in self.leftSide + self.rightSide:
                 manP.portPairVisited = False
             dct = {}
-            dct['.__StorageDict__'] = True
-            dct['StorageName'] = self.name
-            dct['StorageDisplayName'] = self.displayName
+            dct['.__BlockDict__'] = True
+            dct['BlockName'] = self.name
+            dct['BlockDisplayName'] = self.displayName
             dct['StoragePosition'] = (float(self.pos().x()), float(self.pos().y()))
             dct['ID'] = self.id
             dct['trnsysID'] = self.trnsysId
@@ -593,7 +593,7 @@ class StorageTank(BlockItem):
         
         self.flippedH = i["FlippedH"]
         # self.flippedV = i["FlippedV"] # No support for vertical flip
-        self.displayName = i["StorageDisplayName"]
+        self.displayName = i["BlockDisplayName"]
 
         self.changeSize()
         self.h = i["size_h"]
@@ -611,7 +611,7 @@ class StorageTank(BlockItem):
             hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
                                 QPointF(h["Offset"][0], h["Offset"][1]), self, h["DisplayName"],
                                 port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                                connTrnsysID=h['connTrnsysID'])
+                                connTrnsysID=h['connTrnsysID'], loadedHx=True)
 
             hEx.setId(h["ID"])
             hEx.port1.id = h['Port1ID']
@@ -651,7 +651,7 @@ class StorageTank(BlockItem):
                                 QPointF(h["Offset"][0], h["Offset"][1]),
                                 self, h["DisplayName"] + "New",
                                 port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                                connTrnsysID=kwargs["editor"].idGen.getTrnsysID())
+                                connTrnsysID=kwargs["editor"].idGen.getTrnsysID(), loadedHx=True)
 
             # hEx.setId(["ID"])
             hEx.port1.id = h['Port1ID']

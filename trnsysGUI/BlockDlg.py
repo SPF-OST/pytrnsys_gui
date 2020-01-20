@@ -51,8 +51,9 @@ class BlockDlg(QDialog):
     def acceptedEdit(self):
         print("Changing displayName")
         newName = self.le.text()
-        self.block.label.setPlainText(newName)
-        self.block.displayName = newName
+        if newName != "" and not self.nameExists(newName):
+            self.block.label.setPlainText(newName)
+            self.block.displayName = newName
         self.close()
 
     def setNewFlipStateH(self, state):
@@ -63,3 +64,9 @@ class BlockDlg(QDialog):
 
     def cancel(self):
         self.close()
+
+    def nameExists(self, n):
+        for t in self.parent().trnsysObj:
+            if t.displayName == n:
+                return True
+        return False

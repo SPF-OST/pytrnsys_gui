@@ -23,7 +23,14 @@ class GenericBlock(BlockItem):
         self.childIds = []
         self.childIds.append(self.trnsysId)
 
+        self.subBlockCounter = 0
+
         self.imagesource = ("images/" + self.name)
+
+        # Disallow adding port pairs later, because the trnsysIDs of the generated port pairs have to be
+        # consecutive to be correctly printed out in the export
+        self.isSet = True
+
         self.changeSize()
 
     def changeSize(self):
@@ -132,17 +139,20 @@ class GenericBlock(BlockItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
+
     def changeImage(self):
         name = str(self.pickImage().resolve())
-        if name != "":
+        if name[-3:] == "png" or name[-3:] == "svg":
             self.setImage(name)
             self.setImagesource(name)
+        else:
+            print("No image picked, name is " + name)
 
     def setImagesource(self, name):
         self.imagesource = name
 
     def pickImage(self):
-        return Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png")[0])
+        return Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png *.svg")[0])
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -177,8 +187,9 @@ class GenericBlock(BlockItem):
         c3 = menu.addAction("Set image")
         c3.triggered.connect(self.changeImage)
 
-        c4 = menu.addAction("Add port")
-        c4.triggered.connect(self.addPortDlg)
+        if not self.isSet:
+            c4 = menu.addAction("Add port")
+            c4.triggered.connect(self.addPortDlg)
 
         d1 = menu.addAction('Dump information')
         d1.triggered.connect(self.dumpBlockInfo)
@@ -201,7 +212,7 @@ class GenericBlock(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            dct['.__GenericBlockDict__'] = True
+            dct['.__BlockDict__'] = True
             dct['BlockName'] = self.name
             dct['BlockDisplayName'] = self.displayName
             dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
@@ -232,6 +243,13 @@ class GenericBlock(BlockItem):
         self.setImage(i["Imagesource"])
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+        correcter = 0
+        for j in range(4):
+            if j == 2:
+                correcter = -1
+            for k in range(i['PortPairsNb'][j] + correcter):
+                self.addPortPair(j)
+
         super(GenericBlock, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
         self.setImage(i["Imagesource"])
 
@@ -310,15 +328,23 @@ class GenericBlock(BlockItem):
         self.flippedV = bool(state)
         self.updatePortPos()
 
+    def exportBlackBox(self):
+        resStr = ""
+        for i in range(len(self.inputs)):
+            resStr += "T" + self.displayName + "X" + str(i) + "=1 \n"
+        eqNb = len(self.inputs)
+        return resStr, eqNb
+
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20
         equationNr = 0
+        f = ''
         for i in range(len(self.inputs)):
             temp = ""
             c = self.inputs[i].connectionList[0]
-            if type(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
+            if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                 continue
-            elif type(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
+            elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                 continue
             else:
                 temp = str(c.trnsysId) + " " + str(
@@ -327,7 +353,7 @@ class GenericBlock(BlockItem):
 
                 # Generic block will have a 2n-liner exportConnString
                 self.exportConnsString += temp + "\n"
-                f = temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "HeatPump" + "\n"
+                f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i) + "\n"
 
         return f, equationNr
 
@@ -337,7 +363,7 @@ class GenericBlock(BlockItem):
     def exportInputsFlowSolver2(self):
         f = ""
         for i in range(len(self.inputs)):
-            f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
+            f += " " + str(self.exportInitialInput) + " "
 
         return f, len(self.inputs)
 
@@ -347,7 +373,7 @@ class GenericBlock(BlockItem):
             for i in range(0, 3):
 
                 if i < 2:
-                    temp = prefix + self.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                    temp = prefix + self.displayName + "-X" + str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
                            str(equationNumber) + "]\n"
                     tot += temp
                     self.exportEquations.append(temp)
@@ -355,3 +381,8 @@ class GenericBlock(BlockItem):
                 equationNumber += 1  # DC-ERROR it should count anyway
 
         return tot, equationNumber, 2 * len(self.inputs)
+
+    def getSubBlockOffset(self, c):
+        for i in range(len(self.inputs)):
+            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+                return i

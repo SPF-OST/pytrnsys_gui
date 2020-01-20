@@ -5,10 +5,11 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
 
 
-class HeatPump(BlockItem):
+class ExternalHx(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(HeatPump, self).__init__(trnsysType, parent, **kwargs)
-
+        super(ExternalHx, self).__init__(trnsysType, parent, **kwargs)
+        self.h = 100
+        self.w = 94
         self.inputs.append(PortItem('i', 0, self))
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 0, self))
@@ -44,13 +45,13 @@ class HeatPump(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 4 * h / 15)
-        self.inputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 4 * h / 15)
+        self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 5)
+        self.inputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, h / 5)
         self.inputs[0].side = 0 + 2 * self.flippedH
         self.inputs[1].side = 2 - 2 * self.flippedH
 
-        self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
-        self.outputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 2 * h / 3)
+        self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 0.83 * h)
+        self.outputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.83 * h)
         self.outputs[0].side = 0 + 2 * self.flippedH
         self.outputs[1].side = 2 - 2 * self.flippedH
 
@@ -58,7 +59,7 @@ class HeatPump(BlockItem):
 
     def encode(self):
         if self.isVisible():
-            print("Encoding a HeatPump")
+            print("Encoding a ExternalHx")
 
             # childIdList = []
 
@@ -76,7 +77,7 @@ class HeatPump(BlockItem):
             dct['BlockDisplayName'] = self.displayName
             dct['PortsIDIn'] = portListInputs
             dct['PortsIDOut'] = portListOutputs
-            dct['HeatPumpPosition'] = (float(self.pos().x()), float(self.pos().y()))
+            dct['ExternalHxPosition'] = (float(self.pos().x()), float(self.pos().y()))
             dct['ID'] = self.id
             dct['trnsysID'] = self.trnsysId
             dct['childIds'] = self.childIds
@@ -90,7 +91,7 @@ class HeatPump(BlockItem):
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        print("Loading a HeatPump block")
+        print("Loading a ExternalHx block")
 
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
@@ -106,7 +107,7 @@ class HeatPump(BlockItem):
             self.outputs[x].id = i["PortsIDOut"][x]
             print("Output at heatExchanger")
 
-        self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
+        self.setPos(float(i["ExternalHxPosition"][0]), float(i["ExternalHxPosition"][1]))
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
 
@@ -116,7 +117,7 @@ class HeatPump(BlockItem):
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        print("Loading a HeatPump in Decoder")
+        print("Loading a ExternalHx in Decoder")
 
         self.changeSize()
 
@@ -128,15 +129,13 @@ class HeatPump(BlockItem):
             self.outputs[x].id = i["PortsIDOut"][x]
             print("Output at heatExchanger")
 
-        self.setPos(float(i["HeatPumpPosition"][0]) + offset_x, float(i["HeatPumpPosition"][1] + offset_y))
+        self.setPos(float(i["ExternalHxPosition"][0]) + offset_x, float(i["ExternalHxPosition"][1] + offset_y))
         self.groupName = "defaultGroup"
         self.setBlockToGroup(i["GroupName"])
 
         resBlockList.append(self)
 
     def exportBlackBox(self):
-        # resStr = "T" + self.displayName + "HeatPump" + "=1 \n"
-        # resStr += "T" + self.displayName + "Evap" + "=1 \n"
         resStr = "T" + self.displayName + "X0" + "=1 \n"
         resStr += "T" + self.displayName + "X1" + "=1 \n"
         eqNb = 2
@@ -161,18 +160,18 @@ class HeatPump(BlockItem):
                                 self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
                             temp += " " * (descConnLength - len(temp))
 
-                            # HeatPump will have a two-liner exportConnString
+                            # ExternalHx will have a two-liner exportConnString
                             self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "HeatPump" + "\n"
+                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
 
                         elif i == 1:
                             temp = str(c.trnsysId) + " " + str(
                                 self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[1])
                             temp += " " * (descConnLength - len(temp))
 
-                            # HeatPump will have a two liner exportConnString
+                            # ExternalHx will have a two liner exportConnString
                             self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Evap" + "\n"
+                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
                         else:
                             f += "Error: There are more inputs than trnsysIds" + "\n"
 
@@ -181,7 +180,7 @@ class HeatPump(BlockItem):
                         self.trnsysConn.append(self.outputs[i].connectionList[0])
 
                     else:
-                        f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
+                        f += "Output of ExternalHx for input[{0}] is not connected ".format(i) + "\n"
 
         return f, 2
 
@@ -197,9 +196,8 @@ class HeatPump(BlockItem):
         tot = ""
         for j in range(2):
             for i in range(0, 3):
-
                 if i < 2:
-                    temp = prefix + self.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                    temp = prefix + self.displayName + "-Side" + str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
                            str(equationNumber) + "]\n"
                     tot += temp
                     self.exportEquations.append(temp)
