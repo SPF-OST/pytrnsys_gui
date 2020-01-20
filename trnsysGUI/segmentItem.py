@@ -227,7 +227,6 @@ class segmentItem(QGraphicsLineItem):
 
         if self.keyPr == 1:
             print("moved with button 1")
-            # global editorMode
             newPos = e.pos()
 
             if self.parent.parent.editorMode == 0:
@@ -563,8 +562,9 @@ class segmentItem(QGraphicsLineItem):
             self.secondLine.setVisible(True)
 
     def renameConn(self):
-        dia = segmentDlg(self, self.scene().parent())
-
+        # dia = segmentDlg(self, self.scene().parent())
+        self.scene().parent().showSegmentDlg(self)
+        
     def printItemsAt(self):
         print("Items at startnode are " + str(self.scene().items(self.line().p1())))
         print("Items at endnode are " + str(self.scene().items(self.line().p2())))

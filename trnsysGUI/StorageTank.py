@@ -35,6 +35,8 @@ class StorageTank(BlockItem):
         self.hxInsideConnsLeft = []
         self.hxInsideConnsRight = []
 
+        self.directPortConnsForList = []
+
         self.changeSize()
 
     # Unused
@@ -129,14 +131,9 @@ class StorageTank(BlockItem):
             port1.side = 2
             port2.side = 2
 
-        # print("Self is " + str(self))
-        # print("Self.parent is " + str(self.parent))
-        # print("Self.parent.parent() is " + str(self.parent.parent()))
-
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
-
         if kwargs == {}:
-            Connection(port1, port2, True, self.parent.parent())
+            self.directPortConnsForList.append(Connection(port1, port2, True, self.parent.parent()))
             return
         else:
             port1.id = kwargs["fromPortId"]
@@ -147,6 +144,7 @@ class StorageTank(BlockItem):
             c.id = kwargs["connId"]
             c.connId = kwargs["connCid"]
             c.trnsysId = kwargs["trnsysConnId"]
+            self.directPortConnsForList.append(c)
             return c
 
     def setLeftSideManual(self, s, hAbs):
@@ -698,11 +696,14 @@ class StorageTank(BlockItem):
                     # print("dds " + p.connectionList[2].displayName)
 
                     # p is a hx port; the external port has two connections, so the second one yields the hx connector
+
+                    # Here the Hx name is printed.
                     if p.connectionList[1].fromPort is p:
-                        resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        # resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
                     else:
-                        # Here the Hx name is printed.
-                        resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        # resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
 
                     equationNr += 1
 

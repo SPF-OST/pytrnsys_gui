@@ -244,7 +244,8 @@ class HeatExchanger(QGraphicsItemGroup):
         menu.exec_(event.screenPos())
 
     def renameHx(self):
-        dia = hxDlg(self, self.scene().parent())
+        # dia = hxDlg(self, self.scene().parent())
+        self.scene().parent().showHxDlg(self)
 
     def rename(self, newName):
         self.conn.displayName = newName

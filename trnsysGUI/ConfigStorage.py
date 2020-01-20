@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QHBoxLayout, QListWidget, QPushButton, QSpacerItem, \
-    QVBoxLayout, QRadioButton, QDialog
+    QVBoxLayout, QRadioButton, QDialog, QTabWidget, QWidget
 
 from trnsysGUI.HeatExchanger import HeatExchanger
 
@@ -16,7 +16,16 @@ class ConfigStorage(QDialog):
         # Parameters:
         self.w_hx = 40
         self.h_hx = 60
+
         spacerHeight = 15
+
+        self.tabs = QTabWidget()
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+
+        # Add tabs
+        self.tabs.addTab(self.tab1, "Heatexchangers")
+        self.tabs.addTab(self.tab2, "Direct ports")
 
         # VBoxLayout
         description = QLabel("Please configure the storage tank:")
@@ -24,24 +33,22 @@ class ConfigStorage(QDialog):
         tankNameLabel.setText("<b>Tank name: </b>")
         self.le = QLineEdit(self.storage.label.toPlainText())
 
-        connectionsLabelL = QLabel()
-        connectionsLabelL.setText("<b>Left (distributed) Ports: </b>")
-        self.leCNL = QLineEdit(str(len(self.storage.inputs)))
+        # connectionsLabelL = QLabel()
+        # connectionsLabelL.setText("<b>Left (distributed) Ports: </b>")
+        # self.leCNL = QLineEdit(str(len(self.storage.inputs)))
 
-        connectionsLabelR = QLabel()
-        connectionsLabelR.setText("<b>Right (distributed) Ports: </b>")
-        self.leCNR = QLineEdit(str(len(self.storage.outputs)))
+        # connectionsLabelR = QLabel()
+        # connectionsLabelR.setText("<b>Right (distributed) Ports: </b>")
+        # self.leCNR = QLineEdit(str(len(self.storage.outputs)))
 
-        addSideAutoButton = QPushButton("Add (distributed) ports")
-        addSideAutoButton.clicked.connect(self.addSideAuto)
-        spaceVBox = QSpacerItem(self.width(), spacerHeight)
+        # addSideAutoButton = QPushButton("Add (distributed) ports")
+        # addSideAutoButton.clicked.connect(self.addSideAuto)
+        # spaceVBox = QSpacerItem(self.width(), spacerHeight)
 
         # Grid layout
         gl = QGridLayout()
         hxsLabel = QLabel("<b>Heat Exchangers </b>")
-        # spinBox = QSpinBox()
         gl.addWidget(hxsLabel, 0, 0, 1, 2)
-        # gl.addWidget(spinBox, 1, 0, 1, 2)
 
         qhbL = QHBoxLayout()
 
@@ -70,6 +77,8 @@ class ConfigStorage(QDialog):
         gl.addWidget(offsetLeOLabel, 6, 0, 1, 1)
         gl.addWidget(self.offsetLeO, 7, 0, 1, 2)
 
+
+
         # hxsideHbL = QHBoxLayout()
         # hxsideHbL.addWidget(self.lButton)
         # hxsideHbL.addWidget(self.rButton)
@@ -93,14 +102,29 @@ class ConfigStorage(QDialog):
         gl.addItem(spaceHx, 11, 0, 1, 2)
 
         manPortLay = QVBoxLayout()
+        qhbL2 = QHBoxLayout()
+
+        self.listWL2 = QListWidget()
+        qhbL2.addWidget(self.listWL2)
+
+        self.listWR2 = QListWidget()
+        qhbL2.addWidget(self.listWR2)
+
+        manPortLay.addLayout(qhbL2)
+
         manPortLabel = QLabel("<b>Set port manually</b>")
         manPortLabel2 = QLabel("Enter height in percent: ")
         portlabelUpper = QLabel("Upper port")
         self.manPortLeI = QLineEdit("0")
         portlabelLower = QLabel("Lower port")
         self.manPortLeO = QLineEdit("0")
-        self.manrButton = QRadioButton("Right side")
+
+        qhbl3 = QHBoxLayout()
         self.manlButton = QRadioButton("Left side")
+        self.manrButton = QRadioButton("Right side")
+        qhbl3.addWidget(self.manlButton)
+        qhbl3.addWidget(self.manrButton)
+
         self.manAddButton = QPushButton("Add (manual) ports")
         spaceManPort = QSpacerItem(self.width(), spacerHeight)
         self.manAddButton.clicked.connect(self.manAddPortPair)
@@ -111,8 +135,7 @@ class ConfigStorage(QDialog):
         manPortLay.addWidget(self.manPortLeI)
         manPortLay.addWidget(portlabelLower)
         manPortLay.addWidget(self.manPortLeO)
-        manPortLay.addWidget(self.manlButton)
-        manPortLay.addWidget(self.manrButton)
+        manPortLay.addLayout(qhbl3)
         manPortLay.addWidget(self.manAddButton)
         manPortLay.addItem(spaceManPort)
 
@@ -128,6 +151,7 @@ class ConfigStorage(QDialog):
         L.addWidget(description)
         L.addWidget(tankNameLabel)
         L.addWidget(self.le)
+
         # L.addWidget(connectionsLabelL)
         # L.addWidget(self.leCNL)
         # L.addWidget(connectionsLabelR)
@@ -135,9 +159,15 @@ class ConfigStorage(QDialog):
         # L.addWidget(addSideAutoButton)
         # L.addItem(spaceVBox)
 
-        L.addLayout(qhbL)
-        L.addLayout(gl)
-        L.addLayout(manPortLay)
+        t1Layout = QVBoxLayout()
+        t1Layout.addLayout(qhbL)
+        t1Layout.addLayout(gl)
+
+        self.tab1.setLayout(t1Layout)
+
+        self.tab2.setLayout(manPortLay)
+
+        L.addWidget(self.tabs)
 
         L.addWidget(increaseSizeButton)
         L.addWidget(self.okButton)
@@ -146,12 +176,24 @@ class ConfigStorage(QDialog):
         self.setLayout(L)
 
         self.loadHxL()
+        self.loadDirPorts()
+
+        # This is to ensure that only one list element is selected
+        self.listWR.setSelectionMode(1)
+        self.listWL.setSelectionMode(1)
+        self.listWR.clicked.connect(self.listWRClicked)
+        self.listWL.clicked.connect(self.listWLClicked)
+
+        self.listWR.setSelectionMode(1)
+        self.listWL.setSelectionMode(1)
+        self.listWR.clicked.connect(self.listWR2Clicked)
+        self.listWL.clicked.connect(self.listWL2Clicked)
 
         self.show()
 
-    def addSideAuto(self):
-        self.storage.setLeftSideAuto(int(self.leCNL.text()))
-        self.storage.setRightSideAuto(int(self.leCNR.text()))
+    # def addSideAuto(self):
+    #     self.storage.setLeftSideAuto(int(self.leCNL.text()))
+    #     self.storage.setRightSideAuto(int(self.leCNR.text()))
 
     def loadHxL(self):
         for h in self.storage.heatExchangers:
@@ -161,6 +203,42 @@ class ConfigStorage(QDialog):
             if h.sSide == 2:
                 self.listWR.addItem(
                     h.displayName + ", y_offset = " + "%.2f" %(100 - 100 * h.offset.y() / self.storage.h) + "%")
+
+    def loadDirPorts(self):
+        for c in self.storage.directPortConnsForList:
+            if c.fromPort.side == 0:
+                listW = self.listWL2
+            else:
+                listW = self.listWR2
+            listW.addItem("Port pair from " + "%d%%" % (100 - 100 * c.fromPort.pos().y() / self.storage.h) +
+                          " to " + "%d%%" % (100 - 100 * c.toPort.pos().y() / self.storage.h))
+
+    # Unused
+    def addPortPairToList(self, p):
+        if not p.isFromHx:
+            if p.side == 2:
+                listW = self.listWR2
+            else:
+                listW = self.listWL2
+
+            if p.connectionList[0].fromPort is p:
+                otherPort = p.connectionList[0].toPort
+            else:
+                otherPort = p.connectionList[0].fromPort
+
+            listW.addItem("Port pair from " + "%0.2f" % (100 - 100 * p.pos().y() / self.storage.h) +
+                          " to " + "%0.2f" % (100 - 100 * otherPort.pos().y() / self.storage.h))
+
+    def listWLClicked(self):
+        self.listWR.clearSelection()
+    def listWRClicked(self):
+        self.listWL.clearSelection()
+
+    def listWL2Clicked(self):
+        self.listWR2.clearSelection()
+    def listWR2Clicked(self):
+        self.listWL2.clearSelection()
+
 
     def addHx(self):
         """
@@ -177,7 +255,7 @@ class ConfigStorage(QDialog):
                 print("addhxr")
                 self.addHxR()
             if self.lButton.isChecked():
-                print("addhxr")
+                print("addhxl")
                 self.addHxL()
         else:
             print("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
@@ -203,7 +281,9 @@ class ConfigStorage(QDialog):
                                 QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
                                 self.storage,
                                 self.hxNameLe.text())
-        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%.2f" %(float(self.offsetLeI.text())) + "%")
+
+        # Add HeatExchanger string to list
+        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%d" %(float(self.offsetLeI.text())) + "%")
 
     def addHxR(self):
         """
@@ -221,13 +301,18 @@ class ConfigStorage(QDialog):
                                         self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
                                 self.storage,
                                 self.hxNameLe.text())
-        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%.2f" %(float(self.offsetLeI.text())) + "%")
+        # Add HeatExchanger string to list
+        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%d" %(float(self.offsetLeI.text())) + "%")
 
     def manAddPortPair(self):
         if float(self.manPortLeI.text()) > float(self.offsetLeO.text()):
             self.storage.setSideManualPair(self.manlButton.isChecked(),
                                            (1 - 1 / 100 * float(self.manPortLeI.text())) * self.storage.h,
                                            (1 - 1 / 100 * float(self.manPortLeO.text())) * self.storage.h)
+
+        self.listWL2.clear()
+        self.listWR2.clear()
+        self.loadDirPorts()
 
     def removeHxL(self):
         for i in self.storage.heatExchangers:

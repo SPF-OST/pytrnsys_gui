@@ -11,7 +11,7 @@ from trnsysGUI.BlockDlg import BlockDlg
 import trnsysGUI.DeleteBlockCommand
 
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.GroupChooserDlg import GroupChooserBlockDlg
+from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.MoveCommand import MoveCommand
 
 from PyQt5.QtWidgets import QUndoCommand
@@ -121,6 +121,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         # Undo framework related
         self.oldPos = None
+
+        print("pasdf" + str(self.parent.parent()))
 
     def setParent(self, p):
         self.parent = p
@@ -246,8 +248,10 @@ class BlockItem(QGraphicsPixmapItem):
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
             dia = TVentilDlg(self, self.scene().parent())
+            dia = self.parent.parent().showBlockDlg(self)
         else:
-            dia = BlockDlg(self, self.scene().parent())
+            # dia = BlockDlg(self, self.scene().parent())
+            dia = self.parent.parent().showBlockDlg(self)
 
     def mouseReleaseEvent(self, event):
         # print("Released mouse over block")
@@ -356,7 +360,8 @@ class BlockItem(QGraphicsPixmapItem):
         del self
 
     def configGroup(self):
-        GroupChooserBlockDlg(self, self.parent.parent())
+        # GroupChooserBlockDlg(self, self.parent.parent())
+        self.parent.parent().showGroupChooserBlockDlg(self)
 
     def dumpBlockInfo(self):
         # for a in inspect.getMembers(self):

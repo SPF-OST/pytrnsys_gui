@@ -16,6 +16,8 @@ from pathlib import Path
 # from trnsysGUI.Connection import Connection
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.BlockDlg import BlockDlg
+from trnsysGUI.DeepInspector import DeepInspector
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
@@ -23,6 +25,8 @@ from trnsysGUI.Export import Export
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.GroundSourceHx import GroundSourceHx
+from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
+from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.PV import PV
 
 from trnsysGUI.GenericBlock import GenericBlock
@@ -30,10 +34,13 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
+from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
+from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.newDiagramDlg import newDiagramDlg
+from trnsysGUI.settingsDlg import settingsDlg
 
 from trnsysGUI.BlockItem import BlockItem
 
@@ -63,12 +70,16 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+import os
+
 __version__ = "1.0.0"
 __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
 # CSS Style-sheet
+from trnsysGUI.segmentDlg import segmentDlg
+
 cssSs = open("res/style.txt", "r")
 
 
@@ -77,10 +88,9 @@ def calcDist(p1, p2):
 
     Parameters
     ----------
-    p1
-    :type p1: QPointF
-    p2
-    :type p2: QPointF
+    p1 : :obj: `QPointF`
+
+    p2 : :obj: `QPointF`
 
     Returns
     -------
@@ -506,7 +516,29 @@ class DiagramScene(QGraphicsScene):
     diagram.
     It contains a rectangle for copy-paste or selecting multiple items.
 
+    Attributes
+    ----------
+
+    sRstart : :obj:`QPointF`
+        Upper left corner position of selectionRect
+    sRh : int
+        selectionRectHeight
+    sRw : int
+        selectionRectWidth
+    selectionRect : :obj:`QGraphicsRectItem`
+        Rectangle that displays the selection
+    viewRect1 : :obj:`QGraphicsRectItem`
+        Used to set the initial DiagramScene size to approximately DiagramView size
+    viewRect2 : :obj:`QGraphicsRectItem`
+            Used to set the initial DiagramScene size to approximately DiagramView size
+    released : bool
+        Enables the display of the selectionRect
+    pressed : bool
+        Set to True when selectionMode is True and mousePressed
+        Set to False when no element in selection
+
     """
+
     def __init__(self, parent=None):
         # Static size
         # super(DiagramScene, self).__init__(QRectF(0, 0, parent.height(), 1500), parent)
@@ -547,7 +579,6 @@ class DiagramScene(QGraphicsScene):
         self.parent().sceneMouseMoveEvent(mouseEvent)
         super(DiagramScene, self).mouseMoveEvent(mouseEvent)
 
-        # global selectionMode
         if self.parent().selectionMode and not self.released and self.pressed:
             self.selectionRect.setVisible(True)
             self.sRw = mouseEvent.scenePos().x() - self.sRstart.x()
@@ -555,10 +586,10 @@ class DiagramScene(QGraphicsScene):
             self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh)
 
     def mouseReleaseEvent(self, mouseEvent):
-        # print("Releasing mouse in DiagramScene...")
+        print("Releasing mouse in DiagramScene...")
         self.parent().sceneMouseReleaseEvent(mouseEvent)
         super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
-
+        self.parent().moveHxPorts = False
         if self.parent().pasting:
             # Dismantle group
             self.parent().clearCopyGroup()
@@ -573,7 +604,8 @@ class DiagramScene(QGraphicsScene):
             if self.hasElementsInRect():
                 if self.parent().groupMode:
                     g = self.createGroup()
-                    groupDlg(g, self.parent(), self.elementsInRect())
+                    # groupDlg(g, self.parent(), self.elementsInRect())
+                    self.parent().showGroupDlg(g, self.elementsInRect())
                 elif self.parent().multipleSelectMode:
                     self.parent().createSelectionGroup(self.elementsInRect())
                 elif self.parent().copyMode:
@@ -589,6 +621,7 @@ class DiagramScene(QGraphicsScene):
             self.selectionRect.setVisible(False)
 
     def drawBackground(self, painter, rect):
+        # Overwrite drawBackground if snapGrid is True
         if self.parent().snapGrid:
             pen = QPen()
             pen.setWidth(2)
@@ -630,11 +663,6 @@ class DiagramScene(QGraphicsScene):
         #     # global selectionMode
         #     self.parent().selectionMode = not self.parent().selectionMode
 
-
-
-        # global copyMode
-        #
-        # if pasting:
 
     def mousePressEvent(self, event):
         # self.parent().mousePressEvent(event)
@@ -740,7 +768,8 @@ class DiagramView(QGraphicsView):
             print("name is " + name)
             if name == 'StorageTank':
                 bl = StorageTank(name, self)
-                c = ConfigStorage(bl, self)
+                # c = ConfigStorage(bl, self)
+                self.parent().showConfigStorageDlg(bl)
             elif name == 'TeePiece':
                 bl = TeePiece(name, self)
             elif name == 'TVentil':
@@ -763,7 +792,8 @@ class DiagramView(QGraphicsView):
                 bl = Connector(name, self)
             elif name == 'GenericBlock':
                 bl = GenericBlock(name, self)
-                c = GenericPortPairDlg(bl, self)
+                # c = GenericPortPairDlg(bl, self)
+                self.parent().showGenericPortPairDlg(bl)
             elif name == 'HPTwoHx':
                 bl = HeatPumpTwoHx(name, self)
             elif name == 'Boiler':
@@ -826,7 +856,6 @@ class DiagramView(QGraphicsView):
                 self.scale(0.8, 0.8)
 
     def mousePressEvent(self, event):
-    #     pass
         # for t in self.parent().trnsysObj:
         #     if isinstance(t, BlockItem):
         #         t.alignMode = True
@@ -841,39 +870,6 @@ class DiagramView(QGraphicsView):
         command = DeleteBlockCommand(bl, "Delete block command")
         print("Deleted block")
         self.parent().parent().undoStack.push(command)
-    # def drawBackground(self, painter_, rect):
-    #
-    #     mCellSize_w = 15
-    #     mCellSize_h = 15
-    #
-    #     left_ = int(rect.left()) - ( int(rect.left()) % mCellSize_w)
-    #     top_ = int(rect.top()) - ( int(rect.top()) % mCellSize_h)
-    #
-    #     # QVarLengthArray < QLineF, 100 > lines;
-    #     lines = []
-    #
-    #     for x in range(30):
-    #         for y in range(30):
-    #             self.scene().addItem(QGraphicsEllipseItem(x* mCellSize_h, y * mCellSize_w, 1, 1))
-    #
-    #     # for x in range(left_, int(rect.right()), mCellSize_w):
-    #     #     # lines.append(QGraphicsEllipseItem(x, left_, 5, 5 ))
-    #     #     self.scene().addItem(QGraphicsEllipseItem(x, left_, 2, 2 ))
-    #     #     # lines.append(QLineF(x, rect.top(), x, rect.bottom()))
-    #     #     QGraphicsEllipseItem()
-    #     # for y in range(top_, int(rect.bottom()), mCellSize_h):
-    #     #     # lines.append(QGraphicsEllipseItem(top_, y, 5, 5 ))
-    #     #     self.scene().addItem(QGraphicsEllipseItem(top_, y,  2, 2))
-    #     #     # lines.append(QLineF(rect.left(), y, rect.right(), y))
-    #
-    #
-    #     # pen = QtGui.QPen(QtCore.Qt.black, 1)
-    #     #
-    #     # pen.setStyle(Qt.DotLine)
-    #     # painter_.setPen(pen)
-    #     #
-    #     # for i in lines:
-    #     #     painter_.drawLine(i)
 
 
 class DiagramEditor(QWidget):
@@ -912,6 +908,59 @@ class DiagramEditor(QWidget):
     is released.
     It is controlled by the attributes selectionMode, groupMode, copyMode and multipleSelectedMode
 
+    Attributes
+    ----------
+    diagramName : str
+        Name used for saving the diagram
+    saveAsPath : :obj:`Path`
+        Default saving location is trnsysGUI/diagrams, path only set if "save as" used
+    idGen : :obj:`IdGenerator`
+        Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
+    selectionMode : bool
+        Enables/disables selection rectangle in DiagramScene
+    groupMode : bool
+        Enables creation of a new group in DiagramScene
+    copyMode : bool
+        Enables copying elements in the selection rectangle
+    multipleSelectedMode : bool
+        Unused
+    alignMode : bool
+        Enables mode in which a dragged block is aligned to y or x value of another one
+        Toggled in the MainWindow class in toggleAlignMode()
+    pasting : bool
+        Used to allow dragging of the copygroup right after pasting. Set to true after decodingPaste is called.
+        Set to false as soon as releasedMouse after decodePaste.
+    itemsSelected : bool
+
+    editorMode : int
+        Mode 0: Pipes are PolySun-like
+        Mode 1: Pipes have only 90deg angles, visio-like
+    snapGrid : bool
+        Enable/Disable align grid
+    snapSize : int
+        Size of align grid
+
+    *** layouts ***
+
+
+    datagen : :obj:`PipeDataHandler`
+        Used for generating random massflows for every timestep to test the massflow
+        visualizer prototype
+    moveHxPorts: bool
+        Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
+    diagramScene : :obj:`QGraphicsScene`
+        Contains the "logical" part of the diagram
+    diagramView : :obj:`QGraphicsView`
+        Contains the visualization of the diagramScene
+    self.startedConnection = False
+        tempStartPort : :obj:`PortItem`
+        connectionList : :obj:`List` of :obj:`Connection`
+        trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+        groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+        blockList : :obj:`List` of :obj:
+        graphicalObj : :obj:`List` of :obj:
+    connLine : :obj:`QLineF`
+    connLineItem = :obj:`QGraphicsLineItem`
 
     """
     def __init__(self, parent=None):
@@ -935,6 +984,8 @@ class DiagramEditor(QWidget):
         self.snapGrid = False
         self.snapSize = 50
 
+        self.latexPath = 'C:\Trnsys17\Exe\TRNExe.exe'
+
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
         self.libraryModel = LibraryModel(self)
@@ -952,13 +1003,6 @@ class DiagramEditor(QWidget):
 
         # res folder for library icons
         r_folder = "images/"
-
-        # Investigate why file ending is not needed
-        # Uncomment these to use the copied icons of polysun
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'TWV'))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'Pump2'))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'Kollektor2'))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(pixmap), r_folder + 'StorageTank2'))
 
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Pump')),  'Pump'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Kollektor')),  'Kollektor'))
@@ -996,9 +1040,10 @@ class DiagramEditor(QWidget):
         # For list view
         self.vertL = QVBoxLayout()
         self.vertL.addWidget(self.libraryBrowserView)
+        self.vertL.setStretchFactor(self.libraryBrowserView, 2)
         self.listV = QListWidget()
         self.vertL.addWidget(self.listV)
-        # self.horizontalLayout.addWidget(self.libraryBrowserView)
+        self.vertL.setStretchFactor(self.listV, 1)
 
         self.horizontalLayout.addLayout(self.vertL)
 
@@ -1008,7 +1053,6 @@ class DiagramEditor(QWidget):
 
         self.startedConnection = False
         self.tempStartPort = None
-        # self.tempEndPort = None
         self.connectionList = []
         self.trnsysObj = []
         self.groupList = []
@@ -1023,51 +1067,19 @@ class DiagramEditor(QWidget):
 
         self.printerUnitnr = 0
 
-        # For debug buttons (button1 - button6)
+        # For debug button
         a = 400  # Start of upmost button y-value
         b = 50  # distance between starts of button y-values
         b_start = 75
 
-        self.button = QPushButton(self)
-        self.button.setText("Print info")
-        self.button.move(b_start, a)
-        self.button.setMinimumSize(120, 40)
-        self.button.clicked.connect(self.button1_clicked)
-        #
-        # self.button2 = QPushButton(self)
-        # self.button2.setText("Build Bridges")
-        # self.button2.setMinimumSize(120, 40)
-        # self.button2.move(b_start, a + b)
-        # self.button2.clicked.connect(self.button2_clicked)
-        #
-        # self.button3 = QPushButton(self)
-        # self.button3.setText("Export data")
-        # self.button3.move(b_start, a + 2 * b)
-        # self.button3.setMinimumSize(120, 40)
-        # self.button3.clicked.connect(self.button3_clicked)
-        #
-        # self.button4 = QPushButton(self)
-        # self.button4.setText("Clean up")
-        # self.button4.move(b_start, a + 3 * b)
-        # self.button4.setMinimumSize(120, 40)
-        # self.button4.clicked.connect(self.button4_clicked)
-        #
-        # self.button5 = QPushButton(self)
-        # self.button5.setText("BFS/dfs group")
-        # self.button5.move(b_start, a + 4 * b)
-        # self.button5.setMinimumSize(120, 40)
-        # self.button5.clicked.connect(self.button5_clicked)
-        #
-        # self.button6 = QPushButton(self)
-        # self.button6.setText("Delete group")
-        # self.button6.move(b_start, a + 5 * b)
-        # self.button6.setMinimumSize(120, 40)
-        # self.button6.clicked.connect(self.button6_clicked)
-
-        # Hardcode color scheme:
-
+        # self.button = QPushButton(self)
+        # self.button.setText("Print info")
+        # self.button.move(b_start, a)
+        # self.button.setMinimumSize(120, 40)
+        # self.button.clicked.connect(self.button1_clicked)
 
         # Different colors for connLineColor
+
         colorsc = "red"
         linePx = 4
         if colorsc == "red":
@@ -1095,6 +1107,10 @@ class DiagramEditor(QWidget):
         self.diagramScene.addItem(self.alignYLineItem)
 
         self.alignXLine = QLineF()
+        self.alignXLineItem = QGraphicsLineItem(self.alignXLine)
+        self.alignXLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
+        self.alignXLineItem.setVisible(False)
+        self.diagramScene.addItem(self.alignXLineItem)
 
         # #Search related lists
         self.bfs_visitedNodes = []
@@ -1136,11 +1152,29 @@ class DiagramEditor(QWidget):
         # Remember that first bfs has to be run!
         self.delGroup()
 
-    def bfs_b(self):
-        self.bfs(self.connectionList[0].fromPort)
-        # self.dfs1(self.connectionList[0].fromPort, 8, 0)
-        # print(self.dfs2(self.connectionList[0].fromPort, 8, 0))
 
+    def dumpInformation(self):
+        print("\n\nHello, this is a dump of the diagram information.\n")
+        print("Mode is " + str(self.editorMode) + "\n")
+
+        print("Next ID is " + str(self.idGen.getID()))
+        print("Next bID is " + str(self.idGen.getBlockID()))
+        print("Next cID is " + str(self.idGen.getConnID()))
+
+        print("TrnsysObjects are:")
+        for t in self.trnsysObj:
+            print(str(t))
+        print("")
+
+        print("DiagramScene items are:")
+        sItems = self.diagramScene.items()
+        for it in sItems:
+            print(str(it))
+        print("")
+
+        for c in self.connectionList:
+            c.printConn()
+        print("")
 
     # Connections related methods
     def startConnection(self, port):
@@ -1336,864 +1370,10 @@ class DiagramEditor(QWidget):
     #
     #     self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
 
-    def exportBlackBox(self):
-        f = "*** Black box component temperatures" + "\n"
-        equationNr = 0
 
-        for t in self.trnsysObj:
-            # if isinstance(t, Connection) or isinstance(t, Pump):
-            #     continue
-            #
-            # if not t.isVisible():
-            #     # Virtual block
-            #     continue
-            #
-            # if isinstance(t, HeatPump):
-            #     f += "T" + t.displayName + "HeatPump" + "=1 \n"
-            #     f += "T" + t.displayName + "Evap" + "=1 \n"
-            #     equationNr += 2
-            #
-            #     continue
-            #
-            # if isinstance(t, StorageTank):
-            #     for p in t.inputs + t.outputs:
-            #         if not p.isFromHx:
-            #             if p.side == 0:
-            #                 lr = "Left"
-            #             else:
-            #                 lr = "Right"
-            #             f += "T" + t.displayName + "Port" + lr + str(int(100*(1-(p.scenePos().y() - p.parent.scenePos().y())/p.parent.h))) + "=1\n"
-            #             equationNr += 1
-            #             continue
-            #         else:
-            #             # Check if there is at least one internal connection
-            #             # p.name == i to only allow one temperature entry per hx
-            #             # Prints the name of the Hx Connector element.
-            #             # Assumes that the Other port has no connection except to the storage
-            #             if len(p.connectionList) > 0 and p.name == 'i':
-            #                 # f += "T" + p.connectionList[1].displayName + "=1\n"
-            #                 print("dds " + p.connectionList[1].displayName)
-            #                 print("dds " + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName)
-            #                 print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
-            #                 # print("dds " + p.connectionList[2].displayName)
-            #
-            #                 # p is a hx port; the external port has two connections, so the second one yields the hx connector
-            #                 if p.connectionList[1].fromPort is p:
-            #                     f += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
-            #                 else:
-            #                     # Here the Hx name is printed.
-            #                     f += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
-            #
-            #                 equationNr += 1
-            #
-            # if len(t.inputs + t.outputs) == 2 and not isinstance(t, Connector):
-            #     f += "T" + t.displayName + "=1 \n"
-            #     equationNr += 1
-            f += t.exportBlackBox()[0]
-            equationNr += t.exportBlackBox()[1]
 
-        f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
-        return f
 
-    def exportPumpOutlets(self):
-        f = "*** Pump outlet temperatures" + "\n"
-        equationNr = 0
-        for t in self.trnsysObj:
-            # if isinstance(t, Pump):
-            #     f += "T" + t.displayName + " = " + "T" + t.inputs[0].connectionList[0].displayName + "\n"
-            #     equationNr += 1
-            # elif isinstance(t, WTap) or isinstance(t, WTap_main):
-            #     io = t.inputs + t.outputs
-            #     f += "T" + t.displayName + " = " + "T" + io[0].connectionList[0].displayName + "\n"
-            #     equationNr += 1
-            f += t.exportPumpOutlets()[0]
-            equationNr += t.exportPumpOutlets()[1]
-
-        f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
-        return f
-
-    def exportMassFlows(self): # What the controller should give
-        f = "*** Massflowrates" + "\n"
-        equationNr = 0
-
-        for t in self.trnsysObj:
-            if isinstance(t, Pump) or isinstance(t, WTap_main):
-                f += "Mfr" + t.displayName + " = 1000" + "\n"
-                equationNr += 1
-
-            elif isinstance(t, TVentil):
-                if not t.isTempering:
-                    f += "xFrac" + t.displayName + " = 1" + "\n"
-                    equationNr += 1
-            f += t.exportMassFlows()[0]
-            equationNr += t.exportMassFlows()[1]
-
-        f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
-
-        return f
-    
-    def exportDivSetting(self, unit):
-        """
-
-        :param unit: the index of the previous unit number used.
-        :return:
-        """
-
-        nUnit = unit
-        f = ""
-        constants = 0
-        f2 = ""
-
-        for t in self.trnsysObj:
-            # if isinstance(t, TVentil):
-            #     if t.isTempering:
-            #         constants += 1
-            #         f2 += "T_set_" + t.displayName + " = 50\n"
-            f2 += t.exportDivSetting1()[0]
-            constants += t.exportDivSetting1()[1]
-
-        if constants > 0:
-            f = "CONSTANTS " + str(constants) + "\n"
-            f += f2 + "\n"
-
-        for t in self.trnsysObj:
-            # if isinstance(t, TVentil) and t.isTempering:
-            #     nUnit = nUnit + 1
-            #     f += "UNIT %d TYPE 811 ! Passive Divider for heating \n"%nUnit
-            #     f += "PARAMETERS 1" + "\n"
-            #     f += "5 !Nb.of iterations before fixing the value \n"
-            #     f += "INPUTS 4 \n"
-            #
-            #     if t.outputs[0].pos().y() == t.inputs[0].pos().y() or t.outputs[0].pos().x() == t.inputs[0].pos().x():
-            #         first = t.inputs[0]
-            #         second = t.inputs[1]
-            #
-            #     f += "T" + first.connectionList[0].displayName + "\n"
-            #     f += "T" + second.connectionList[0].displayName + "\n"
-            #     f += "Mfr" + t.outputs[0].connectionList[0].displayName + "\n"
-            #
-            #     f += "T_set_" + t.displayName + "\n"
-            #     f += "*** INITIAL INPUT VALUES" + "\n"
-            #     f += "35.0 21.0 800.0 T_set_" + t.displayName + "\n"
-            #
-            #     f += "EQUATIONS 1\n"
-            #     f += "xFrac" + t.displayName + " =  1.-[%d,5] \n"%nUnit
-            res = t.exportDivSetting2(nUnit)
-            f += res[0]
-            nUnit = res[1]
-
-        return f + "\n"
-
-    def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength, parameters, lineNr):
-        # If not all ports of an object are connected, less than 4 numbers will show up
-        # TrnsysConn is a list containing the fromPort and twoPort in order as they appear in the export of connections
-        f = ""
-        f += "UNIT " + str(simulationUnit) + " TYPE " + str(simulationType) + "\n"
-        f += "PARAMETERS " + str(parameters) + "\n"
-        f += str(lineNr) + "\n"
-
-        # exportConnsString: i/o i/o 0 0
-
-        for t in self.trnsysObj:
-            if type(t) is StorageTank:
-                # Ignored because the used connections are the generated ones.
-                pass
-
-            elif type(t) is HeatPump:
-                print("heatpump in param solver")
-                # Only print a connection for each input, not for output (A HeatPump is defined by one input on each side)
-                # At creation, allocates a second trnsysId to have one for each side
-                for i in range(len(t.inputs)):
-                    # ConnectionList lenght should be max offset
-                    temp = ""
-                    for c in t.inputs[i].connectionList:
-                        #
-                        if type(c.fromPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
-                            continue
-                        elif type(c.toPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
-                            continue
-                        else:
-                            if len(t.outputs[i].connectionList) > 0:
-
-                                if i == 0:
-                                    temp = str(c.trnsysId) + " " + str(
-                                        t.outputs[i].connectionList[0].trnsysId) + " 0 0 " #+ str(t.childIds[0])
-                                    temp += " " * (descConnLength - len(temp))
-
-                                    # HeatPump will have a two-liner exportConnString
-                                    t.exportConnsString += temp + "\n"
-                                    f += temp + "!" + str(t.childIds[0]) + " : " + t.displayName + "HeatPump" + "\n"
-
-                                elif i == 1:
-                                    temp = str(c.trnsysId) + " " + str(
-                                        t.outputs[i].connectionList[0].trnsysId) + " 0 0 " #+ str(t.childIds[1])
-                                    temp += " " * (descConnLength - len(temp))
-
-                                    # HeatPump will have a two liner exportConnString
-                                    t.exportConnsString += temp + "\n"
-                                    f += temp + "!" + str(t.childIds[1]) + " : " + t.displayName + "Evap" + "\n"
-                                else:
-                                    f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                                # Presumably used only for storing the order of connections
-                                t.trnsysConn.append(c)
-                                t.trnsysConn.append(t.outputs[i].connectionList[0])
-
-                            else:
-                                f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
-
-            elif type(t) is GenericBlock:
-                # print("Generic block in param solver")
-                for i in range(len(t.inputs)):
-                    temp = ""
-                    c = t.inputs[i].connectionList[0]
-                    if type(c.fromPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
-                        continue
-                    elif type(c.toPort.parent) is StorageTank and t.inputs[i].connectionList.index(c) == 0:
-                        continue
-                    else:
-                        temp = str(c.trnsysId) + " " + str(
-                            t.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
-                        temp += " " * (descConnLength - len(temp))
-
-                        # Generic block will have a 2n-liner exportConnString
-                        t.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(t.childIds[i]) + " : " + t.displayName + "HeatPump" + "\n"
-
-            else:
-                # No StorageTank and no HeatPump
-                if isinstance(t, BlockItem):
-                    temp = ""
-
-                    # Here, first the outputs are printed such that the main port of diverters is printed first
-
-                    if isinstance(t, TVentil):
-                        # This is to assert that the input in front of the output is always printed before the third one
-                        for o in t.outputs:
-                            # ConnectionList lenght should be max offset
-                            for c in o.connectionList:
-                                if type(c.fromPort.parent) is StorageTank and o.connectionList.index(c) == 0:
-                                    continue
-                                elif type(c.toPort.parent) is StorageTank and o.connectionList.index(c) == 0:
-                                    continue
-                                else:
-                                    temp = temp + str(c.trnsysId) + " "
-                                    t.trnsysConn.append(c)
-
-                        for i in t.inputs:
-                            # Either left or right
-                            tempArr = []
-
-                            for c in i.connectionList:
-                                if type(c.fromPort.parent) is StorageTank and i.connectionList.index(c) == 0:
-                                    continue
-                                elif type(c.toPort.parent) is StorageTank and i.connectionList.index(c) == 0:
-                                    continue
-                                else:
-                                    # On same hight as output
-                                    if i.pos().x() == t.outputs[0].pos().x() or i.pos().y() == t.outputs[0].y():
-                                        tempArr.insert(0, c)
-                                    else:
-                                        tempArr.append(c)
-
-                            for conn in tempArr:
-                                temp = temp + str(conn.trnsysId) + " "
-                                t.trnsysConn.append(conn)
-
-                    else:
-                        print(t.displayName + " has " + str([p.connectionList for p in t.inputs + t.outputs]))
-                        # No diverters, no pumps
-                        for i in t.inputs:
-                            # ConnectionList lenght should be max offset
-                            for c in i.connectionList:
-                                if type(c.fromPort.parent) is StorageTank and i.connectionList.index(c) == 0:
-                                    continue
-                                elif type(c.toPort.parent) is StorageTank and i.connectionList.index(c) == 0:
-                                    continue
-                                else:
-                                    temp = temp + str(c.trnsysId) + " "
-                                    t.trnsysConn.append(c)
-
-                        for o in t.outputs:
-                            # ConnectionList lenght should be max offset
-                            for c in o.connectionList:
-                                if type(c.fromPort.parent) is StorageTank and o.connectionList.index(c) == 0:
-                                    continue
-                                elif type(c.toPort.parent) is StorageTank and o.connectionList.index(c) == 0:
-                                    continue
-                                else:
-                                    temp = temp + str(c.trnsysId) + " "
-                                    t.trnsysConn.append(c)
-
-                    if t.typeNumber != 2 and t.typeNumber != 3:
-                        temp += "0 "
-
-                    if isinstance(t, WTap_main) or isinstance(t, WTap):
-                        temp += "0 "
-
-                    temp += str(t.typeNumber)
-                    temp += " " * (descConnLength - len(temp))
-                    t.exportConnsString = temp
-                    f += temp + "!" + str(t.trnsysId) + " : " + str(t.displayName) + "\n"
-
-                if type(t) is Connection:
-                    # If neither port is at a StorageTank
-                    if type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank:
-                        continue
-
-                    temp = str(t.fromPort.parent.trnsysId) + " " + str(t.toPort.parent.trnsysId) + " 0" * 2 + " " #+ str(t.trnsysId)
-                    t.exportConnsString = temp
-
-                    # Assert that parent is of type BlockItem
-                    if isinstance(t.toPort.parent, BlockItem) and isinstance(t.fromPort.parent, BlockItem):
-                        # This is to ensure that the "output" of a Div always appears first
-                        if type(t.fromPort.parent) is TVentil and t.fromPort in t.fromPort.parent.outputs:
-                            t.trnsysConn.insert(0, t.fromPort.parent)
-                        else:
-                            t.trnsysConn.append(t.fromPort.parent)
-
-                        if type(t.toPort.parent) is TVentil and t.fromPort in t.toPort.parent.outputs:
-                            t.trnsysConn.insert(0, t.toPort.parent)
-                        else:
-                            t.trnsysConn.append(t.toPort.parent)
-                    else:
-                        f += "Error: Parent of this port is not a BlockItem" + "\n"
-                        return
-
-                    f += temp + " " * (descConnLength - len(temp)) + "!" + str(t.trnsysId) + " : " + str(t.displayName) + "\n"
-
-        tempS = f
-        print("param solver text is ")
-        print(f)
-        t = self.convertToStringList(tempS)
-
-        f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
-
-        return f
-
-    def exportInputsFlowSolver(self, inputNr):
-        #  add a string to block and connection for exportPrintInput
-        f = ''
-        f += "INPUTS " + str(inputNr) + "! for Type 935\n"
-
-        pump_prefix = "Mfr"
-        mix_prefix = "xFrac"
-
-        temp = ""
-        counter = 0
-
-        for t in self.trnsysObj:
-            if type(t) is StorageTank:
-                continue
-            if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-                continue
-
-            if t.typeNumber in [1, 4]:
-                temp1 = pump_prefix + t.displayName
-                t.exportInputName = " " + temp1 + " "
-                temp += t.exportInputName
-                t.exportInitialInput = 0.0
-            elif t.typeNumber == 3:
-                temp1 = mix_prefix + t.displayName
-                t.exportInputName = " " + temp1 + " "
-                temp += t.exportInputName
-                t.exportInitialInput = 0.0
-            else:
-                temp += " 0,0 "
-                # Because a HeatPump appears twice in the hydraulic export
-                # Same for the generic block
-                if type(t) is HeatPump:
-                    temp += " 0,0 "
-                    counter += 1
-                if type(t) is GenericBlock:
-                    for i in range(len(t.inputs)-1):
-                        temp += " 0,0 "
-                        counter += 1
-
-            if counter > 8 or t == self.trnsysObj[-1]:
-                print(temp)
-                f += temp + "\n"
-                temp = ""
-                counter = 0
-
-            counter += 1
-
-        f += "\n*** Initial Inputs *" + "\n"
-
-        counter2 = 0
-        for t in self.trnsysObj:
-            if type(t) is StorageTank:
-                continue
-            if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-                continue
-            if type(t) is HeatPump:
-                # 100120 Why only one exportInitialInput for Heatpump? => what for Generic Block
-                f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-                f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-                counter2 += 1
-                continue
-
-            if type(t) is GenericBlock:
-                for i in range(len(t.inputs)):
-                    f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-                    counter2 += 1
-                continue
-
-            f += str(t.exportInitialInput) + " "
-
-            if counter2 == 8:
-                f += "\n"
-                counter2 = 0
-
-            counter2 += 1
-
-        f += "\n"
-
-        return f
-
-    def exportOutputsFlowSolver(self, simulationUnit):
-        f = ''
-
-        abc = list(string.ascii_uppercase)[0:3]
-
-        prefix = "Mfr"
-        equationNumber = 1
-        nEqUsed = 1 # DC
-
-        tot = ""
-
-        # counter = 1
-        for t in self.trnsysObj:
-            # for i in range(0, (1 + int((t.typeNumber == 2) or (t.typeNumber == 3))))
-            if type(t) is StorageTank:
-                continue
-            if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-                continue
-            # if type(t) is Connector:
-            #     continue
-            # if type(t) is Connection and t.isVirtualConn and not t.isStorageIO:
-            #     continue
-
-            #if type(t) is TeePiece and not t.isVisible():   # Ignore virtual tpieces
-                #continue DC-ERROR
-             #   equationNumber += 3 #it needs to add to the outputs id anyway
-             #   continue
-
-            if type(t) is HeatPump:
-                for i in range(0, 3):
-
-                    if i < 2:
-                        temp = prefix + t.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," +\
-                               str(equationNumber) + "]\n"
-                        tot += temp
-                        t.exportEquations.append(temp)
-                        nEqUsed += 1 #DC
-                    equationNumber += 1 #DC-ERROR it should count anyway
-
-                for i in range(0, 3):
-
-                    if i < 2:
-                        temp = prefix + t.displayName + "_Evap" + "_" + abc[i] + "=[" + \
-                               str(simulationUnit) + "," + str(equationNumber) + "]\n"
-                        tot += temp
-                        t.exportEquations.append(temp)
-                        nEqUsed += 1 #DC
-                    equationNumber += 1 #DC-ERROR it should count anyway
-                continue
-
-            for i in range(0, 3):
-                if t.typeNumber == 2 or t.typeNumber == 3:
-                    if(t.isVisible()):
-                        temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                               str(equationNumber) + "]\n"
-                        tot += temp
-                        t.exportEquations.append(temp)
-                        nEqUsed += 1 #DC
-
-                    equationNumber += 1 #DC-ERROR this needs to add even of is virtual. We don't print it but it exist in the flow solver
-
-                else:
-                    if i < 2:
-                        temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                               str(equationNumber) + "]\n"
-                        tot += temp
-                        t.exportEquations.append(temp)
-                        nEqUsed += 1 #DC
-                    equationNumber += 1#DC-ERROR it should count anyway
-
-        head = "EQUATIONS {0}	! Output up to three (A,B,C) mass flow rates of each component, positive = " \
-               "input/inlet, negative = output/outlet ".format(nEqUsed-1)
-
-        f += head + "\n"
-        f += tot + "\n"
-        f += "\n"
-
-        return f
-
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        # Prints the part of the export where the pipes, tp and div Units are printed
-
-        f = ''
-        unitNumber = startingUnit
-        typeNr1 = 929 # Temperature calculation from a tee-piece
-        typeNr2 = 931 # Temperature calculation from a pipe
-
-        for t in self.trnsysObj:
-
-            unitText = ""
-            ambientT = 20
-
-            densityVar = "RhoWat"
-            specHeatVar = "CPWat"
-
-            equationConstant1 = 1
-            equationConstant2 = 3
-
-            # T-Pieces and Mixers
-            if (t.typeNumber == 2 or t.typeNumber == 3) and t.isVisible():  # DC-ERROR added isVisible
-                unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr1) + "\n"
-                unitText += "!" + t.displayName + "\n"
-                unitText += "PARAMETERS 0\n"
-                unitText += "INPUTS 6\n"
-
-                for s in t.exportEquations:
-                    unitText += s[0:s.find('=')] + "\n"
-
-                for it in t.trnsysConn:
-                    unitText += "T" + it.displayName + "\n"
-
-                unitText += "***Initial values\n"
-                unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
-
-                unitText += "EQUATIONS 1\n"
-                unitText += "T" + t.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-
-                unitNumber += 1
-                f += unitText + "\n"
-
-            # Pipes DC-ERROR added isVisible below. The fromPort toPort StorageTank does not work to detect if it is virtual.
-            if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank) and not t.hiddenGenerated:
-            # if type(t) is Connection and t.firstS.isVisible:
-                # if t.isVirtualConn and t.isStorageIO:
-                # DC-ERROR Connections don't have isVisble(), but we need to avoid printing the virtual ones here
-                # if t.firstS.isVisible(): #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
-                if True:
-                    parameterNumber = 6
-                    inputNumbers = 4
-
-                    # Fixed strings
-                    diameterPrefix = "di"
-                    lengthPrefix = "L"
-                    lossPrefix = "U"
-                    tempRoomVar = "TRoomStore"
-                    initialValueS = "20 0.0 20 20"
-                    powerPrefix = "P"
-
-                    # Momentarily hardcoded
-                    equationNr = 3
-
-                    unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-                    unitText += "!" + t.displayName + "\n"
-                    unitText += "PARAMETERS " + str(parameterNumber) + "\n"
-
-                    unitText += diameterPrefix + t.displayName + "\n"
-                    unitText += lengthPrefix + t.displayName + "\n"
-                    unitText += lossPrefix + t.displayName + "\n"
-                    unitText += densityVar + "\n"
-                    unitText += specHeatVar + "\n"
-                    unitText += str(ambientT) + "\n"
-
-                    unitText += "INPUTS " + str(inputNumbers) + "\n"
-
-                    if len(t.trnsysConn) == 2:
-                        # if isinstance(Connector, t.trnsysConn[0]) and not t.trnsysConn[0].isVisible() and firstGenerated:
-                        # or if it is tpiece and not visible and firstGenerated
-                        if isinstance(t.trnsysConn[0], BlockItem) and not t.trnsysConn[0].isVisible():
-                            # This is the case for a generated TPiece
-                            portToPrint = None
-                            for p in t.trnsysConn[0].inputs + t.trnsysConn[0].outputs:
-                                if t in p.connectionList:
-                                    # Found the port of the generated block adjacent to this pipe
-                                    # Assumes 1st connection is with storageTank
-                                    if t.fromPort == p:
-                                        if t.toPort.connectionList[0].fromPort == t.toPort:
-                                            portToPrint = t.toPort.connectionList[0].toPort
-                                        else:
-                                            portToPrint = t.toPort.connectionList[0].fromPort
-                                    else:
-                                        if t.fromPort.connectionList[0].fromPort == t.fromPort:
-                                            portToPrint = t.fromPort.connectionList[0].toPort
-                                        else:
-                                            portToPrint = t.fromPort.connectionList[0].fromPort
-                            if portToPrint is None:
-                                print("Error: No portToprint found when printing UNIT of " + t.displayName)
-                                return
-
-                            if portToPrint.side == 0:
-                                lr = "Left"
-                            else:
-                                lr = "Right"
-
-                            unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
-                                        portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
-                        else:
-                            unitText += "T" + t.trnsysConn[0].displayName + "\n"
-
-                        unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
-                        unitText += tempRoomVar + "\n"
-
-                        if isinstance(t.trnsysConn[1], BlockItem) and not t.trnsysConn[1].isVisible():
-                            portToPrint = None
-                            for p in t.trnsysConn[1].inputs + t.trnsysConn[1].outputs:
-                                if t in p.connectionList:
-                                    # Found the port of the generated block adjacent to this pipe
-                                    # Assumes 1st connection is with storageTank
-                                    if t.fromPort == p:
-                                        if t.toPort.connectionList[0].fromPort == t.toPort:
-                                            portToPrint = t.toPort.connectionList[0].toPort
-                                        else:
-                                            portToPrint = t.toPort.connectionList[0].fromPort
-                                    else:
-                                        if t.fromPort.connectionList[0].fromPort == t.fromPort:
-                                            portToPrint = t.fromPort.connectionList[0].toPort
-                                        else:
-                                            portToPrint = t.fromPort.connectionList[0].fromPort
-
-                            if portToPrint is None:
-                                print("Error: No portToprint found when printing UNIT of " + t.displayName)
-                                return
-
-                            if portToPrint.side == 0:
-                                lr = "Left"
-                            else:
-                                lr = "Right"
-
-                            unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
-                                    portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
-                        else:
-                            unitText += "T" + t.trnsysConn[1].displayName + "\n"
-
-                        # unitText += "T" + t.trnsysConn[0].displayName + "\n"
-                        # unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
-                        # unitText += tempRoomVar + "\n"
-                        # unitText += "T" + t.trnsysConn[1].displayName + "\n"
-                    else:
-                        f += "Error: NO VALUE\n" * 3 + "at connection with parents " + str(t.fromPort.parent) + str(t.toPort.parent) + "\n"
-
-                    unitText += "***Initial values\n"
-                    unitText += initialValueS + "\n\n"
-
-                    unitText += "EQUATIONS " + str(equationNr) + "\n"
-                    unitText += "T" + t.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-                    unitText += powerPrefix + t.displayName + "_kW" + "= [" + str(unitNumber) + "," + str(
-                        equationConstant2) + "]/3600 !kW\n"
-                    unitText += "Mfr" + t.displayName + "= " + "Mfr" + t.displayName + "_A" "\n"
-
-                    unitNumber += 1
-                    unitText += "\n"
-                    f += unitText
-                else:
-                    pass # virtual element
-
-        self.printerUnitnr = unitNumber
-
-        return f
-
-    def exportPrintLoops(self):
-        f = ''
-        loopText = ''
-        constsNr = 0
-        constString = "CONSTANTS "
-        suffix1 = "_save"
-        string1 = "dtSim/rhoWat/"
-        Pi = "3.14"
-        for g in self.groupList:
-
-            loopText += "** Fluid Loop : " + g.displayName + "\n"
-
-            loopNr = self.groupList.index(g)
-
-            diLp = "di_loop_" + str(loopNr)
-            LLp = "L_loop_" + str(loopNr)
-            ULp = "U_loop_" + str(loopNr)
-
-            loopText += diLp + "=" + str(g.exportDi) + "\n"
-            loopText += LLp + "=" + str(g.exportL) + "\n"
-            loopText += ULp + "=" + str(g.exportU) + "\n"
-            # loopText += LLp + suffix1 + " = " "Mfr_" + "loop_" + str(loopNr) + "_nom*" + string1 + "((" + \
-            #             diLp + "/2)^2*" + Pi + ")\n"
-
-            # loopText += ULp + suffix1 + " = " + str(g.exportU) + "*" + LLp + suffix1
-
-            constsNr += 3
-
-            loopText += "\n"
-
-        f += constString + str(constsNr) + "\n"
-        f += loopText + "\n"
-
-        return f
-
-    def exportPrintPipeLoops(self):
-        f = ''
-        loopText = ""
-        equationString = "EQUATIONS "
-        equationNr = 0
-
-        for g in self.groupList:
-            loopText += "** Fluid Loop : " + g.displayName + "\n"
-
-            loopNr = self.groupList.index(g)
-
-            diLp = "di_loop_" + str(loopNr)
-            LLp = "L_loop_" + str(loopNr)
-            ULp = "U_loop_" + str(loopNr)
-
-            loopText += "**" + diLp + "=" + str(g.exportDi) + "\n"
-            loopText += "**" + LLp + "=" + str(g.exportL) + "\n"
-            loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
-
-            for c in g.itemList:
-                if isinstance(c, Connection) and not c.isVirtualConn:
-                    loopText += "*** " + c.displayName + "\n"
-                    loopText += "di" + c.displayName + "=" + diLp + "\n"
-                    loopText += "L" + c.displayName + "=" + LLp + "\n"
-                    loopText += "U" + c.displayName + "=" + ULp + "\n"
-                    equationNr += 3
-
-            loopText += "\n"
-
-        f += equationString + str(equationNr) + "\n"
-        f += loopText + "\n"
-        return f
-
-    def exportPrintPipeLosses(self):
-        f = ''
-        lossText = ''
-        strVar = 'PipeLoss'
-
-        for g in self.groupList:
-            lossText += strVar + str(self.groupList.index(g)) + "="
-
-            for i in g.itemList:
-                if isinstance(i, Connection) and not i.isVirtualConn:
-                    lossText += "P" + i.displayName + "_kW" + "+"
-
-            lossText = lossText[:-1]
-            lossText += "\n"
-
-        lossText += strVar + "Total="
-
-        for g in self.groupList:
-            lossText += strVar + str(self.groupList.index(g)) + "+"
-
-        lossText = lossText[:-1]
-
-        f += "EQUATIONS " + str(len(self.groupList) + 1) + "\n" + lossText + "\n\n"
-        return f
-
-    def exportMassFlowPrinter(self, unitnr, descLen):
-        typenr = 25
-        printingMode = 0
-        relAbsStart = 0
-        overwriteApp = -1
-        printHeader = -1
-        delimiter = 0
-        printLabels = 1
-
-        f = "ASSIGN " + self.diagramName + "_Mfr.prt " + str(unitnr) + "\n\n"
-        
-        f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
-        f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
-        f += "PARAMETERS 10" + "\n"
-        f += "dtSim"
-        f += " " * (descLen - len(f)) + "! 1 Printing interval" + "\n"
-        f += "START"
-        f += " " * (descLen - len(f)) + "! 2 Start time" + "\n"
-        f += "STOP"
-        f += " " * (descLen - len(f)) + "! 3 Stop time" + "\n"
-        f += str(unitnr)
-        f += " " * (descLen - len(f)) + "! 4 Logical unit" + "\n"
-        f += str(printingMode)
-        f += " " * (descLen - len(f)) + "! 5 Units printing mode" + "\n"
-        f += str(relAbsStart)
-        f += " " * (descLen - len(f)) + "! 6 Relative or absolute start time" + "\n"
-        f += str(overwriteApp)
-        f += " " * (descLen - len(f)) + "! 7 Overwrite or Append" + "\n"
-        f += str(printHeader)
-        f += " " * (descLen - len(f)) + "! 8 Print header" + "\n"
-        f += str(delimiter)
-        f += " " * (descLen - len(f)) + "! 9 Delimiter" + "\n"
-        f += str(printLabels)
-        f += " " * (descLen - len(f)) + "! 10 Print labels" + "\n"
-        f += "\n"
-
-        s = ''
-        breakline = 0
-        for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isVirtualConn:
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "Mfr" + t.displayName + " "
-            if isinstance(t, TVentil) and t.isVisible():
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "xFrac" + t.displayName + " "
-        f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
-
-        return f
-
-    def exportTempPrinter(self, unitnr, descLen):
-
-        typenr = 25
-        printingMode = 0
-        relAbsStart = 0
-        overwriteApp = -1
-        printHeader = -1
-        delimiter = 0
-        printLabels = 1
-
-        f = "ASSIGN " + self.diagramName + "_T.prt " + str(unitnr) + "\n\n"
-
-        f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
-        f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
-        f += "PARAMETERS 10" + "\n"
-        f += "dtSim"
-        f += " " * (descLen - len(f)) + "! 1 Printing interval" + "\n"
-        f += "START"
-        f += " " * (descLen - len(f)) + "! 2 Start time" + "\n"
-        f += "STOP"
-        f += " " * (descLen - len(f)) + "! 3 Stop time" + "\n"
-        f += str(unitnr)
-        f += " " * (descLen - len(f)) + "! 4 Logical unit" + "\n"
-        f += str(printingMode)
-        f += " " * (descLen - len(f)) + "! 5 Units printing mode" + "\n"
-        f += str(relAbsStart)
-        f += " " * (descLen - len(f)) + "! 6 Relative or absolute start time" + "\n"
-        f += str(overwriteApp)
-        f += " " * (descLen - len(f)) + "! 7 Overwrite or Append" + "\n"
-        f += str(printHeader)
-        f += " " * (descLen - len(f)) + "! 8 Print header" + "\n"
-        f += str(delimiter)
-        f += " " * (descLen - len(f)) + "! 9 Delimiter" + "\n"
-        f += str(printLabels)
-        f += " " * (descLen - len(f)) + "! 10 Print labels" + "\n"
-        f += "\n"
-
-        s = ''
-        breakline = 0
-        for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isVirtualConn:
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "T" + t.displayName + " "
-        f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
-
-        return f
 
     def exportData(self):
         print("------------------------> START OF EXPORT <------------------------")
@@ -2264,37 +1444,21 @@ class DiagramEditor(QWidget):
 
         exporter = Export(self.trnsysObj, self)
 
-        # fullExportText += self.exportBlackBox()
-        # fullExportText += self.exportPumpOutlets()
-        # fullExportText += self.exportMassFlows()
-        # fullExportText += self.exportDivSetting(simulationUnit-10) #To be improved !! I just fix it
-
         fullExportText += exporter.exportBlackBox()
         fullExportText += exporter.exportPumpOutlets()
         fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
-
-        # fullExportText += self.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
-        # fullExportText += self.exportInputsFlowSolver(lineNrParameters)
-        # fullExportText += self.exportOutputsFlowSolver(simulationUnit)
-        # fullExportText += self.exportPipeAndTeeTypesForTemp(simulationUnit+1) # DC-ERROR
 
         fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
         fullExportText += exporter.exportInputsFlowSolver(lineNrParameters)
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit+1)   # DC-ERROR
 
-        # fullExportText += self.exportPrintLoops()
-        # fullExportText += self.exportPrintPipeLoops()
-        # fullExportText += self.exportPrintPipeLosses()
-
         fullExportText += exporter.exportPrintLoops()
         fullExportText += exporter.exportPrintPipeLoops()
         fullExportText += exporter.exportPrintPipeLosses()
 
         # unitnr should maybe be variable in exportData()
-        # fullExportText += self.exportMassFlowPrinter(self.printerUnitnr, 15)
-        # fullExportText += self.exportTempPrinter(self.printerUnitnr+1, 15)
 
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr+1, 15)
@@ -2309,37 +1473,8 @@ class DiagramEditor(QWidget):
 
         self.cleanUpExportedElements()
         self.tearDownStorageInnerConns()
+        return exportPath
 
-    def findId(self, s):
-        return s[s.find("!") + 1:s.find(" ", s.find("!"))]
-
-    def convertToStringList(self, l):
-        res = []
-        temp = ""
-        for i in l:
-            if i == "\n":
-                res.append(temp)
-                temp = ""
-            else:
-                temp += i
-
-        return res
-
-    def correctIds(self, lineList):
-        fileCopy = lineList[:]
-        print("fds" + str(fileCopy))
-        fileCopy = [" " + l for l in fileCopy]
-
-        counter = 0
-        for line in lineList:
-            counter += 1
-            k = self.findId(line)
-            if k != str(counter):
-                fileCopy = [l.replace(" " + str(k) + " ", " " + str(counter) + " ") for l in fileCopy]
-                fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
-
-        fileCopy = [l[1:None] for l in fileCopy]
-        return '\n'.join(fileCopy)
 
     def cleanUpExportedElements(self):
         for t in self.trnsysObj:
@@ -2377,16 +1512,13 @@ class DiagramEditor(QWidget):
     def setName(self, newName):
         self.diagramName = newName
 
-    def propertiesDlg(self):
-        diagramDlg(self)
-
     def delGroup(self):
         # This is used for deleting the first connected componts group found by BFS, unused
         for bl in self.blockList:
             bl.deleteBlock()
 
     def delBlocks(self):
-        # Delete the whole diagram
+        # Deletesthe whole diagram
         while len(self.trnsysObj) > 0:
             print("In deleting...")
             self.trnsysObj[0].deleteBlock()
@@ -2394,33 +1526,16 @@ class DiagramEditor(QWidget):
         while len(self.groupList) > 1:
             self.groupList[-1].deleteGroup()
 
-
         print("Groups are " + str(self.groupList))
 
-    def dumpInformation(self):
-        print("\n\nHello, this is a dump of the diagram information.\n")
-        print("Mode is " + str(self.editorMode) + "\n")
 
-        print("Next ID is " + str(self.idGen.getID()))
-        print("Next bID is " + str(self.idGen.getBlockID()))
-        print("Next cID is " + str(self.idGen.getConnID()))
 
-        print("TrnsysObjects are:")
-        for t in self.trnsysObj:
-            print(str(t))
-        print("")
+    # Graph searach related methods, unused
+    def bfs_b(self):
+        self.bfs(self.connectionList[0].fromPort)
+        # self.dfs1(self.connectionList[0].fromPort, 8, 0)
+        # print(self.dfs2(self.connectionList[0].fromPort, 8, 0))
 
-        print("DiagramScene items are:")
-        sItems = self.diagramScene.items()
-        for it in sItems:
-            print(str(it))
-        print("")
-
-        for c in self.connectionList:
-            c.printConn()
-        print("")
-
-    # Graph searach related methods
     def bfs(self, startPort):
         self.bfs_neighborNodes.append(startPort)
         self.bfs_visitedNodes.append(startPort)
@@ -2522,31 +1637,6 @@ class DiagramEditor(QWidget):
                 if not c.toPort.visited:
                     self.dfs(c.toPort, maxdepth, d)
 
-            # for c in connsOthers:
-            #
-            #     if c.fromPort.parent is port.parent:
-            #
-            #         if c.fromPort is port:
-            #             for c2 in port.connectionList:
-            #                 if c2.fromPort is port and not c2.toPort.visited:
-            #                     self.dfs(c2.toPort, maxdepth, d + 1)
-            #                 if c2.toPort is port and not c2.fromPort.visited:
-            #                     self.dfs(c2.fromPort, maxdepth, d + 1)
-            #         else:
-            #             if not c.toPort.visited:
-            #                 self.dfs(c.toPort, maxdepth, d + 1)
-            #
-            #     if c.toPort.parent is port.parent:
-            #         if c.toPort is port:
-            #             for c2 in port.connectionList:
-            #                 if c2.fromPort is port and not c2.toPort.visited:
-            #                     self.dfs(c2.toPort, maxdepth, d + 1)
-            #                 if c2.toPort is port and not c2.fromPort.visited:
-            #                     self.dfs(c2.fromPort, maxdepth, d + 1)
-            #         else:
-            #             if not c.fromPort.visited:
-            #                 self.dfs(c.fromPort, maxdepth, d + 1)
-
     def dfs1(self, port, maxdepth, d):
         print("At port " + str(port))
 
@@ -2595,19 +1685,6 @@ class DiagramEditor(QWidget):
                     print("Found a loop, says port " + str(port))
 
         port.color = 'black'
-
-        # for c in connsOthers:
-        #     if c.fromPort.parent is port.parent:
-        #         if c.fromPort.color == 'white':
-        #             self.dfs1(c.fromPort, maxdepth, d)
-        #         if c.fromPort.color == 'gray':
-        #             print("Found a loop returning to ")
-        #
-        #     if c.toPort.parent is port.parent:
-        #         if c.toPort.color == 'white':
-        #             self.dfs1(c.toPort, maxdepth, d)
-        #         if c.toPort.color == 'gray':
-        #             print("Found a loop returning to ")
 
         for op in (port.parent.inputs + port.parent.outputs):
             if op.color == 'white' and len(op.connectionList) > 0:
@@ -2689,6 +1766,17 @@ class DiagramEditor(QWidget):
 
 
     def encode(self, filename, encodeList):
+        """
+        Encoding function. Not used. encodeDiagram is used instead
+        Parameters
+        ----------
+        filename : str
+        encodeList : :obj:`list` of :obj:`BlockItem` and :obj:`Connection`
+
+        Returns
+        -------
+
+        """
         with open(filename, 'w') as jsonfile:
             json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
 
@@ -2749,8 +1837,6 @@ class DiagramEditor(QWidget):
                     k.setParent(self.diagramView)
                     k.updateImage()
                     # k.setBlockToGroup("defaultGroup")
-
-                    # print("dddd is " + k.displayName)
                     for hx in k.heatExchangers:
                         hx.initLoad()
 
@@ -2792,7 +1878,6 @@ class DiagramEditor(QWidget):
             print("Tr obj is" + str(t) + " " + str(t.trnsysId))
 
         # tempList = []
-        # for t in self.trnsysObj:
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)
@@ -2939,12 +2024,12 @@ class DiagramEditor(QWidget):
         # self.globalConnID = 0
 
         self.idGen.reset()
-        newDiagramDlg(self)
+        # newDiagramDlg(self)
+        self.showNewDiagramDlg()
 
     # Behavior:
     # If saveas has not been used, diagram will be saved in /diagrams
     # if saveas has been used, diagram will be saved in self.saveAsPath
-
     def save(self):
         print("saveaspath is " + str(self.saveAsPath))
         if self.saveAsPath.name == '':
@@ -3015,7 +2100,8 @@ class DiagramEditor(QWidget):
         # print("Diagram name is: " + self.diagramName)
 
     def editGroups(self):
-        groupsEditor(self)
+        # groupsEditor(self)
+        self.showGroupsEditor()
 
     def setConnLabelVis(self, b):
         for c in self.trnsysObj:
@@ -3056,6 +2142,56 @@ class DiagramEditor(QWidget):
 
     def setitemsSelected(self, b):
         self.itemsSelected = b
+
+    # Dialog calls
+    def showBlockDlg(self, bl):
+        c = BlockDlg(bl, self)
+
+    def showDiagramDlg(self):
+        c = diagramDlg(self)
+
+    def showGenericPortPairDlg(self, bl):
+        c = GenericPortPairDlg(bl, self)
+
+    def showGroupChooserBlockDlg(self, bl):
+        c = GroupChooserBlockDlg(bl, self)
+
+    def showGroupChooserConnDlg(self, conn):
+        c = GroupChooserConnDlg(conn, self)
+    
+    def showGroupDlg(self, group, itemList):
+        c = groupDlg(group, self, itemList)
+
+    def showHxDlg(self, hx):
+        c = hxDlg(hx, self)
+
+    def showNewDiagramDlg(self):
+        c = newDiagramDlg(self)
+
+    # Not used
+    # def showNewPortDlg(self):
+    #     c = newPortDlg
+
+    def showSegmentDlg(self, seg):
+        c = segmentDlg(seg, self)
+
+    def showTVentilDlg(self, bl):
+        c = TVentilDlg(bl, self)
+
+    def showConfigStorageDlg(self, bl):
+        c = ConfigStorage(bl, self)
+
+    def showGroupsEditor(self):
+        c = groupsEditor(self)
+
+    def testFunctionInspection(self, *args):
+        print("Ok, here is my log")
+        print(int(args[0])+1)
+        if len(self.connectionList) > 0:
+            self.connectionList[0].highlightConn()
+
+    def getConnection(self, n):
+        return self.connectionList[int(n)]
 
     # def mouseMoveEvent(self, e):
     #     print("In editor")
@@ -3173,6 +2309,15 @@ class MainWindow(QMainWindow):
         fileMenuSaveAsAction.triggered.connect(self.saveDiaAs)
         self.fileMenu.addAction(fileMenuSaveAsAction)
 
+        changeSettingsAction = QAction("Change settings", self)
+        changeSettingsAction.triggered.connect(self.changeSettings)
+        self.fileMenu.addAction(changeSettingsAction)
+
+        movePortAction = QAction("Move direct ports", self)
+        movePortAction.triggered.connect(self.movePorts)
+        movePortAction.setShortcut("ctrl+m")
+
+
         self.mb.addMenu(self.fileMenu)
 
         self.s1Menu = QMenu("Edit")
@@ -3180,6 +2325,8 @@ class MainWindow(QMainWindow):
         self.s1Menu.addAction(multipleDeleteAction)
         self.s1Menu.addAction(toggleSnapAction)
         self.s1Menu.addAction(toggleAlignModeAction)
+        self.s1Menu.addAction(movePortAction)
+
 
         self.mb.addMenu(self.s1Menu)
         self.mb.addMenu("Help")
@@ -3223,6 +2370,10 @@ class MainWindow(QMainWindow):
         # self.undowidget = QUndoView(self.undoStack, self)
         # self.undowidget.setMinimumSize(300, 100)
 
+    def changeSettings(self):
+        settingsDialog = settingsDlg(self)
+
+
     def newDia(self):
         print("Creating new diagram")
         # self.centralWidget.newDiagram()
@@ -3231,7 +2382,6 @@ class MainWindow(QMainWindow):
 
         self.centralWidget = DiagramEditor()
         self.setCentralWidget(self.centralWidget)
-        # self.centralWidget.newDiagram()
 
     def saveDia(self):
         print("Saving diagram")
@@ -3259,7 +2409,8 @@ class MainWindow(QMainWindow):
 
     def renameDia(self):
         print("Renaming diagram...")
-        self.centralWidget.propertiesDlg()
+        # self.centralWidget.propertiesDlg()
+        self.centralWidget.showDiagramDlg()
 
     def deleteDia(self):
         print("Deleting diagram")
@@ -3312,6 +2463,7 @@ class MainWindow(QMainWindow):
         self.centralWidget.editGroups()
 
     def mb_debug(self):
+        pass
         # print(self.centralWidget.trnsysObj)
         # a = [int(s.id) for s in self.centralWidget.trnsysObj]
         # a.sort()
@@ -3325,24 +2477,28 @@ class MainWindow(QMainWindow):
         #     t.alignMode = True
         #     print(t.alignMode)
 
-        temp = []
-        for t in self.centralWidget.trnsysObj:
-            if isinstance(t, BlockItem):
-                for p in t.inputs + t.outputs:
-                    if p not in temp:
-                        temp.append(p)
 
-        for p in temp:
-            if p.isFromHx:
-                print("Port with parent " + str(p.parent.displayName) + "is from Hx")
 
-        res = True
+        # temp = []
+        # for t in self.centralWidget.trnsysObj:
+        #     if isinstance(t, BlockItem):
+        #         for p in t.inputs + t.outputs:
+        #             if p not in temp:
+        #                 temp.append(p)
+        #
+        # for p in temp:
+        #     if p.isFromHx:
+        #         print("Port with parent " + str(p.parent.displayName) + "is from Hx")
+        #
+        # res = True
+        #
+        # for b in self.centralWidget.trnsysObj:
+        #     if isinstance(b, Connection) and b not in self.centralWidget.connectionList:
+        #         res = False
+        #
+        # print("editor connectionList is consistent with trnsysObj: " + str(res))
 
-        for b in self.centralWidget.trnsysObj:
-            if isinstance(b, Connection) and b not in self.centralWidget.connectionList:
-                res = False
-
-        print("editor connectionList is consistent with trnsysObj: " + str(res))
+        # dIns = DeepInspector(self.centralWidget)
 
     def visualizeMf(self):
         self.centralWidget.datagen.generateData()
@@ -3401,7 +2557,12 @@ class MainWindow(QMainWindow):
 
     def runMassflowSolver(self):
         print("Running massflow solver...")
-        # @DC Put the execution of the solver here
+        exportPath = self.centralWidget.exportData()
+        cmd = self.centralWidget.latexPath + ' ' + str(exportPath)
+        os.system(cmd)
+
+    def movePorts(self):
+        self.centralWidget.moveHxPorts = True
 
     def mouseMoveEvent(self, e):
         pass

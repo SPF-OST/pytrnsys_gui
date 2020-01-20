@@ -127,7 +127,8 @@ class GenericBlock(BlockItem):
 
     def addPortDlg(self):
         # newPortDlg(self, self.parent.parent())
-        dlg = GenericPortPairDlg(self, self.parent.parent())
+        # dlg = GenericPortPairDlg(self, self.parent.parent())
+        self.parent.parent().showGenericPortPairDlg(self)
 
     def addPort(self, io, relH):
         print(io)
