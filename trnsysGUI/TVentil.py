@@ -15,6 +15,7 @@ class TVentil(BlockItem):
         self.w = 50
         self.typeNumber = 3
         self.isTempering = False
+        self.positionForMassFlowSolver = None
 
         self.exportInitialInput = 0.0
 
@@ -60,24 +61,32 @@ class TVentil(BlockItem):
     def setComplexDiv(self, b):
         self.isTempering = b
 
+    def setPositionForMassFlowSolver(self,f):
+        self.positionForMassFlowSolver = f
+
     def encode(self):
         dictName, dct = super(TVentil, self).encode()
         dct['IsTempering'] = self.isTempering
+        dct['PositionForMassFlowSolver'] = self.positionForMassFlowSolver
         return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
         super(TVentil, self).decode(i, resConnList, resBlockList)
-        if "IsTempering" not in i:
+        if "IsTempering" or "PositionForMassFlowSolver" not in i:
             print("Old version of diagram")
+            self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
+            self.positionForMassFlowSolver = i['PositionForMassFlowSolver']
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         super(TVentil, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
-        if "IsTempering" not in i:
+        if "IsTempering" or "PositionForMassFlowSolver" not in i:
             print("Old version of diagram")
+            self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
+            self.positionForMassFlowSolver = i['PositionForMassFlowSolver']
 
     def exportParameterSolver(self, descConnLength):
         temp = ""
@@ -123,7 +132,7 @@ class TVentil(BlockItem):
 
     def exportMassFlows(self):
         if not self.isTempering:
-            resStr = "xFrac" + self.displayName + " = 1" + "\n"
+            resStr = "xFrac" + self.displayName + " = "+str(self.positionForMassFlowSolver) + "\n"
             equationNr = 1
             return resStr, equationNr
         else:

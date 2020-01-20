@@ -34,6 +34,7 @@ from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.newDiagramDlg import newDiagramDlg
+from trnsysGUI.settingsDlg import settingsDlg
 
 from trnsysGUI.BlockItem import BlockItem
 
@@ -62,6 +63,8 @@ from PyQt5 import QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+
+import os
 
 __version__ = "1.0.0"
 __author__ = "Stefano Marti"
@@ -934,6 +937,8 @@ class DiagramEditor(QWidget):
         self.editorMode = 1
         self.snapGrid = False
         self.snapSize = 50
+
+        self.latexPath = 'C:\Trnsys17\Exe\TRNExe.exe'
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -2309,6 +2314,7 @@ class DiagramEditor(QWidget):
 
         self.cleanUpExportedElements()
         self.tearDownStorageInnerConns()
+        return exportPath
 
     def findId(self, s):
         return s[s.find("!") + 1:s.find(" ", s.find("!"))]
@@ -3173,6 +3179,10 @@ class MainWindow(QMainWindow):
         fileMenuSaveAsAction.triggered.connect(self.saveDiaAs)
         self.fileMenu.addAction(fileMenuSaveAsAction)
 
+        changeSettingsAction = QAction("Change settings",self)
+        changeSettingsAction.triggered.connect(self.changeSettings)
+        self.fileMenu.addAction(changeSettingsAction)
+
         self.mb.addMenu(self.fileMenu)
 
         self.s1Menu = QMenu("Edit")
@@ -3222,6 +3232,10 @@ class MainWindow(QMainWindow):
 
         # self.undowidget = QUndoView(self.undoStack, self)
         # self.undowidget.setMinimumSize(300, 100)
+
+    def changeSettings(self):
+        settingsDialog = settingsDlg(self)
+
 
     def newDia(self):
         print("Creating new diagram")
@@ -3401,7 +3415,10 @@ class MainWindow(QMainWindow):
 
     def runMassflowSolver(self):
         print("Running massflow solver...")
-        # @DC Put the execution of the solver here
+        exportPath = self.centralWidget.exportData()
+        cmd = self.centralWidet.latexPath + ' ' + exportPath
+        os.system(cmd)
+
 
     def mouseMoveEvent(self, e):
         pass
