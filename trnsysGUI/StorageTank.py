@@ -698,11 +698,14 @@ class StorageTank(BlockItem):
                     # print("dds " + p.connectionList[2].displayName)
 
                     # p is a hx port; the external port has two connections, so the second one yields the hx connector
+
+                    # Here the Hx name is printed.
                     if p.connectionList[1].fromPort is p:
-                        resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        # resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
                     else:
-                        # Here the Hx name is printed.
-                        resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        # resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
 
                     equationNr += 1
 

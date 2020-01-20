@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, 
 
 
 class TVentilDlg(QDialog):
+
     def __init__(self, block, parent=None):
         super(TVentilDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")

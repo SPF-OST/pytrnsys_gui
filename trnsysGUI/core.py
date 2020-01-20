@@ -17,6 +17,7 @@ from pathlib import Path
 from PyQt5.QtSvg import QSvgGenerator
 
 from trnsysGUI.BlockDlg import BlockDlg
+from trnsysGUI.DeepInspector import DeepInspector
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
@@ -84,10 +85,9 @@ def calcDist(p1, p2):
 
     Parameters
     ----------
-    p1
-    :type p1: QPointF
-    p2
-    :type p2: QPointF
+    p1 : :obj: `QPointF`
+
+    p2 : :obj: `QPointF`
 
     Returns
     -------
@@ -513,7 +513,29 @@ class DiagramScene(QGraphicsScene):
     diagram.
     It contains a rectangle for copy-paste or selecting multiple items.
 
+    Attributes
+    ----------
+
+    sRstart : :obj:`QPointF`
+        Upper left corner position of selectionRect
+    sRh : int
+        selectionRectHeight
+    sRw : int
+        selectionRectWidth
+    selectionRect : :obj:`QGraphicsRectItem`
+        Rectangle that displays the selection
+    viewRect1 : :obj:`QGraphicsRectItem`
+        Used to set the initial DiagramScene size to approximately DiagramView size
+    viewRect2 : :obj:`QGraphicsRectItem`
+            Used to set the initial DiagramScene size to approximately DiagramView size
+    released : bool
+        Enables the display of the selectionRect
+    pressed : bool
+        Set to True when selectionMode is True and mousePressed
+        Set to False when no element in selection
+
     """
+
     def __init__(self, parent=None):
         # Static size
         # super(DiagramScene, self).__init__(QRectF(0, 0, parent.height(), 1500), parent)
@@ -554,7 +576,6 @@ class DiagramScene(QGraphicsScene):
         self.parent().sceneMouseMoveEvent(mouseEvent)
         super(DiagramScene, self).mouseMoveEvent(mouseEvent)
 
-        # global selectionMode
         if self.parent().selectionMode and not self.released and self.pressed:
             self.selectionRect.setVisible(True)
             self.sRw = mouseEvent.scenePos().x() - self.sRstart.x()
@@ -562,7 +583,7 @@ class DiagramScene(QGraphicsScene):
             self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh)
 
     def mouseReleaseEvent(self, mouseEvent):
-        # print("Releasing mouse in DiagramScene...")
+        print("Releasing mouse in DiagramScene...")
         self.parent().sceneMouseReleaseEvent(mouseEvent)
         super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
 
@@ -597,6 +618,7 @@ class DiagramScene(QGraphicsScene):
             self.selectionRect.setVisible(False)
 
     def drawBackground(self, painter, rect):
+        # Overwrite drawBackground if snapGrid is True
         if self.parent().snapGrid:
             pen = QPen()
             pen.setWidth(2)
@@ -638,11 +660,6 @@ class DiagramScene(QGraphicsScene):
         #     # global selectionMode
         #     self.parent().selectionMode = not self.parent().selectionMode
 
-
-
-        # global copyMode
-        #
-        # if pasting:
 
     def mousePressEvent(self, event):
         # self.parent().mousePressEvent(event)
@@ -749,7 +766,7 @@ class DiagramView(QGraphicsView):
             if name == 'StorageTank':
                 bl = StorageTank(name, self)
                 # c = ConfigStorage(bl, self)
-                self.parent().showConfigStorage(bl)
+                self.parent().showConfigStorageDlg(bl)
             elif name == 'TeePiece':
                 bl = TeePiece(name, self)
             elif name == 'TVentil':
@@ -836,7 +853,6 @@ class DiagramView(QGraphicsView):
                 self.scale(0.8, 0.8)
 
     def mousePressEvent(self, event):
-    #     pass
         # for t in self.parent().trnsysObj:
         #     if isinstance(t, BlockItem):
         #         t.alignMode = True
@@ -851,39 +867,6 @@ class DiagramView(QGraphicsView):
         command = DeleteBlockCommand(bl, "Delete block command")
         print("Deleted block")
         self.parent().parent().undoStack.push(command)
-    # def drawBackground(self, painter_, rect):
-    #
-    #     mCellSize_w = 15
-    #     mCellSize_h = 15
-    #
-    #     left_ = int(rect.left()) - ( int(rect.left()) % mCellSize_w)
-    #     top_ = int(rect.top()) - ( int(rect.top()) % mCellSize_h)
-    #
-    #     # QVarLengthArray < QLineF, 100 > lines;
-    #     lines = []
-    #
-    #     for x in range(30):
-    #         for y in range(30):
-    #             self.scene().addItem(QGraphicsEllipseItem(x* mCellSize_h, y * mCellSize_w, 1, 1))
-    #
-    #     # for x in range(left_, int(rect.right()), mCellSize_w):
-    #     #     # lines.append(QGraphicsEllipseItem(x, left_, 5, 5 ))
-    #     #     self.scene().addItem(QGraphicsEllipseItem(x, left_, 2, 2 ))
-    #     #     # lines.append(QLineF(x, rect.top(), x, rect.bottom()))
-    #     #     QGraphicsEllipseItem()
-    #     # for y in range(top_, int(rect.bottom()), mCellSize_h):
-    #     #     # lines.append(QGraphicsEllipseItem(top_, y, 5, 5 ))
-    #     #     self.scene().addItem(QGraphicsEllipseItem(top_, y,  2, 2))
-    #     #     # lines.append(QLineF(rect.left(), y, rect.right(), y))
-    #
-    #
-    #     # pen = QtGui.QPen(QtCore.Qt.black, 1)
-    #     #
-    #     # pen.setStyle(Qt.DotLine)
-    #     # painter_.setPen(pen)
-    #     #
-    #     # for i in lines:
-    #     #     painter_.drawLine(i)
 
 
 class DiagramEditor(QWidget):
@@ -922,6 +905,59 @@ class DiagramEditor(QWidget):
     is released.
     It is controlled by the attributes selectionMode, groupMode, copyMode and multipleSelectedMode
 
+    Attributes
+    ----------
+    diagramName : str
+        Name used for saving the diagram
+    saveAsPath : :obj:`Path`
+        Default saving location is trnsysGUI/diagrams, path only set if "save as" used
+    idGen : :obj:`IdGenerator`
+        Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
+    selectionMode : bool
+        Enables/disables selection rectangle in DiagramScene
+    groupMode : bool
+        Enables creation of a new group in DiagramScene
+    copyMode : bool
+        Enables copying elements in the selection rectangle
+    multipleSelectedMode : bool
+        Unused
+    alignMode : bool
+        Enables mode in which a dragged block is aligned to y or x value of another one
+        Toggled in the MainWindow class in toggleAlignMode()
+    pasting : bool
+        Used to allow dragging of the copygroup right after pasting. Set to true after decodingPaste is called.
+        Set to false as soon as releasedMouse after decodePaste.
+    itemsSelected : bool
+
+    editorMode : int
+        Mode 0: Pipes are PolySun-like
+        Mode 1: Pipes have only 90deg angles, visio-like
+    snapGrid : bool
+        Enable/Disable align grid
+    snapSize : int
+        Size of align grid
+
+    *** layouts ***
+
+
+    datagen : :obj:`PipeDataHandler`
+        Used for generating random massflows for every timestep to test the massflow
+        visualizer prototype
+    moveHxPorts: bool
+        Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
+    diagramScene : :obj:`QGraphicsScene`
+        Contains the "logical" part of the diagram
+    diagramView : :obj:`QGraphicsView`
+        Contains the visualization of the diagramScene
+    self.startedConnection = False
+        tempStartPort : :obj:`PortItem`
+        connectionList : :obj:`List` of :obj:`Connection`
+        trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+        groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+        blockList : :obj:`List` of :obj:
+        graphicalObj : :obj:`List` of :obj:
+    connLine : :obj:`QLineF`
+    connLineItem = :obj:`QGraphicsLineItem`
 
     """
     def __init__(self, parent=None):
@@ -999,9 +1035,10 @@ class DiagramEditor(QWidget):
         # For list view
         self.vertL = QVBoxLayout()
         self.vertL.addWidget(self.libraryBrowserView)
+        self.vertL.setStretchFactor(self.libraryBrowserView, 2)
         self.listV = QListWidget()
         self.vertL.addWidget(self.listV)
-        # self.horizontalLayout.addWidget(self.libraryBrowserView)
+        self.vertL.setStretchFactor(self.listV, 1)
 
         self.horizontalLayout.addLayout(self.vertL)
 
@@ -1011,7 +1048,6 @@ class DiagramEditor(QWidget):
 
         self.startedConnection = False
         self.tempStartPort = None
-        # self.tempEndPort = None
         self.connectionList = []
         self.trnsysObj = []
         self.groupList = []
@@ -1026,7 +1062,7 @@ class DiagramEditor(QWidget):
 
         self.printerUnitnr = 0
 
-        # For debug buttons (button1 - button6)
+        # For debug button
         a = 400  # Start of upmost button y-value
         b = 50  # distance between starts of button y-values
         b_start = 75
@@ -1036,39 +1072,6 @@ class DiagramEditor(QWidget):
         # self.button.move(b_start, a)
         # self.button.setMinimumSize(120, 40)
         # self.button.clicked.connect(self.button1_clicked)
-        #
-        # self.button2 = QPushButton(self)
-        # self.button2.setText("Build Bridges")
-        # self.button2.setMinimumSize(120, 40)
-        # self.button2.move(b_start, a + b)
-        # self.button2.clicked.connect(self.button2_clicked)
-        #
-        # self.button3 = QPushButton(self)
-        # self.button3.setText("Export data")
-        # self.button3.move(b_start, a + 2 * b)
-        # self.button3.setMinimumSize(120, 40)
-        # self.button3.clicked.connect(self.button3_clicked)
-        #
-        # self.button4 = QPushButton(self)
-        # self.button4.setText("Clean up")
-        # self.button4.move(b_start, a + 3 * b)
-        # self.button4.setMinimumSize(120, 40)
-        # self.button4.clicked.connect(self.button4_clicked)
-        #
-        # self.button5 = QPushButton(self)
-        # self.button5.setText("BFS/dfs group")
-        # self.button5.move(b_start, a + 4 * b)
-        # self.button5.setMinimumSize(120, 40)
-        # self.button5.clicked.connect(self.button5_clicked)
-        #
-        # self.button6 = QPushButton(self)
-        # self.button6.setText("Delete group")
-        # self.button6.move(b_start, a + 5 * b)
-        # self.button6.setMinimumSize(120, 40)
-        # self.button6.clicked.connect(self.button6_clicked)
-
-        # Hardcode color scheme:
-
 
         # Different colors for connLineColor
 
@@ -1144,11 +1147,29 @@ class DiagramEditor(QWidget):
         # Remember that first bfs has to be run!
         self.delGroup()
 
-    def bfs_b(self):
-        self.bfs(self.connectionList[0].fromPort)
-        # self.dfs1(self.connectionList[0].fromPort, 8, 0)
-        # print(self.dfs2(self.connectionList[0].fromPort, 8, 0))
 
+    def dumpInformation(self):
+        print("\n\nHello, this is a dump of the diagram information.\n")
+        print("Mode is " + str(self.editorMode) + "\n")
+
+        print("Next ID is " + str(self.idGen.getID()))
+        print("Next bID is " + str(self.idGen.getBlockID()))
+        print("Next cID is " + str(self.idGen.getConnID()))
+
+        print("TrnsysObjects are:")
+        for t in self.trnsysObj:
+            print(str(t))
+        print("")
+
+        print("DiagramScene items are:")
+        sItems = self.diagramScene.items()
+        for it in sItems:
+            print(str(it))
+        print("")
+
+        for c in self.connectionList:
+            c.printConn()
+        print("")
 
     # Connections related methods
     def startConnection(self, port):
@@ -2405,30 +2426,14 @@ class DiagramEditor(QWidget):
 
         print("Groups are " + str(self.groupList))
 
-    def dumpInformation(self):
-        print("\n\nHello, this is a dump of the diagram information.\n")
-        print("Mode is " + str(self.editorMode) + "\n")
 
-        print("Next ID is " + str(self.idGen.getID()))
-        print("Next bID is " + str(self.idGen.getBlockID()))
-        print("Next cID is " + str(self.idGen.getConnID()))
 
-        print("TrnsysObjects are:")
-        for t in self.trnsysObj:
-            print(str(t))
-        print("")
+    # Graph searach related methods, unused
+    def bfs_b(self):
+        self.bfs(self.connectionList[0].fromPort)
+        # self.dfs1(self.connectionList[0].fromPort, 8, 0)
+        # print(self.dfs2(self.connectionList[0].fromPort, 8, 0))
 
-        print("DiagramScene items are:")
-        sItems = self.diagramScene.items()
-        for it in sItems:
-            print(str(it))
-        print("")
-
-        for c in self.connectionList:
-            c.printConn()
-        print("")
-
-    # Graph searach related methods
     def bfs(self, startPort):
         self.bfs_neighborNodes.append(startPort)
         self.bfs_visitedNodes.append(startPort)
@@ -2659,6 +2664,17 @@ class DiagramEditor(QWidget):
 
 
     def encode(self, filename, encodeList):
+        """
+        Encoding function. Not used. encodeDiagram is used instead
+        Parameters
+        ----------
+        filename : str
+        encodeList : :obj:`list` of :obj:`BlockItem` and :obj:`Connection`
+
+        Returns
+        -------
+
+        """
         with open(filename, 'w') as jsonfile:
             json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
 
@@ -2908,12 +2924,12 @@ class DiagramEditor(QWidget):
         # self.globalConnID = 0
 
         self.idGen.reset()
-        newDiagramDlg(self)
+        # newDiagramDlg(self)
+        self.showNewDiagramDlg()
 
     # Behavior:
     # If saveas has not been used, diagram will be saved in /diagrams
     # if saveas has been used, diagram will be saved in self.saveAsPath
-
     def save(self):
         print("saveaspath is " + str(self.saveAsPath))
         if self.saveAsPath.name == '':
@@ -3067,6 +3083,15 @@ class DiagramEditor(QWidget):
 
     def showGroupsEditor(self):
         c = groupsEditor(self)
+
+    def testFunctionInspection(self, *args):
+        print("Ok, here is my log")
+        print(int(args[0])+1)
+        if len(self.connectionList) > 0:
+            self.connectionList[0].highlightConn()
+
+    def getConnection(self, n):
+        return self.connectionList[int(n)]
 
     # def mouseMoveEvent(self, e):
     #     print("In editor")
@@ -3242,7 +3267,6 @@ class MainWindow(QMainWindow):
 
         self.centralWidget = DiagramEditor()
         self.setCentralWidget(self.centralWidget)
-        # self.centralWidget.newDiagram()
 
     def saveDia(self):
         print("Saving diagram")
@@ -3337,24 +3361,28 @@ class MainWindow(QMainWindow):
         #     t.alignMode = True
         #     print(t.alignMode)
 
-        temp = []
-        for t in self.centralWidget.trnsysObj:
-            if isinstance(t, BlockItem):
-                for p in t.inputs + t.outputs:
-                    if p not in temp:
-                        temp.append(p)
 
-        for p in temp:
-            if p.isFromHx:
-                print("Port with parent " + str(p.parent.displayName) + "is from Hx")
 
-        res = True
+        # temp = []
+        # for t in self.centralWidget.trnsysObj:
+        #     if isinstance(t, BlockItem):
+        #         for p in t.inputs + t.outputs:
+        #             if p not in temp:
+        #                 temp.append(p)
+        #
+        # for p in temp:
+        #     if p.isFromHx:
+        #         print("Port with parent " + str(p.parent.displayName) + "is from Hx")
+        #
+        # res = True
+        #
+        # for b in self.centralWidget.trnsysObj:
+        #     if isinstance(b, Connection) and b not in self.centralWidget.connectionList:
+        #         res = False
+        #
+        # print("editor connectionList is consistent with trnsysObj: " + str(res))
 
-        for b in self.centralWidget.trnsysObj:
-            if isinstance(b, Connection) and b not in self.centralWidget.connectionList:
-                res = False
-
-        print("editor connectionList is consistent with trnsysObj: " + str(res))
+        dIns = DeepInspector(self.centralWidget)
 
     def visualizeMf(self):
         self.centralWidget.datagen.generateData()

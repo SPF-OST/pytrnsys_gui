@@ -20,6 +20,41 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
+    """
+    A connection (pipe) stores and displays the connection between two blocks.
+
+    Attributes
+    ----------
+
+    fromPort : :obj:`PortItem`
+        Port where the Connection starts
+    toPort : :obj:`PortItem`
+        Port where the Connection ends
+    isVirtualConn : bool
+        Same as return of isVisible() from Qt. Virtual connections are invisible and either generated
+        when adding HeatExchanger or direct ports to a StorageTank
+    isStorageIO : bool
+        ?
+    displayName : str
+        Name that is displayed by tooltip, and the name label
+    hiddenGenerated : bool
+        To detect between connections generated during export to connect all direct ports inside a StorageTank
+    isClone : bool
+        True for Connections that are generated during export and carry same displayName as the corresponding Connections
+        to a StorageTank
+    parent : :obj:DiagramEditor
+    groupName : str
+        Name of the group the Connection belongs to
+    typeNumber : int
+        Number that is displayed in the massflow export
+    exportConnsString : str
+    exportInputName : str
+        Unused. Could be used in exportInputsFlowSolver1()
+    exportInitialInput : int
+    exportEquations : :obj:`List` of ?
+    trnsysConn : :obj:`List` of ?
+
+    """
     def __init__(self, fromPort, toPort, isVirtual, parent, **kwargs):
         print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
