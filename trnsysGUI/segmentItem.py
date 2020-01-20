@@ -227,7 +227,6 @@ class segmentItem(QGraphicsLineItem):
 
         if self.keyPr == 1:
             print("moved with button 1")
-            # global editorMode
             newPos = e.pos()
 
             if self.parent.parent.editorMode == 0:

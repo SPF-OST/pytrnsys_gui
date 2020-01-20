@@ -120,10 +120,10 @@ class ConfigStorage(QDialog):
         self.manPortLeO = QLineEdit("0")
 
         qhbl3 = QHBoxLayout()
-        self.manrButton = QRadioButton("Right side")
         self.manlButton = QRadioButton("Left side")
-        qhbl3.addWidget(self.manrButton)
+        self.manrButton = QRadioButton("Right side")
         qhbl3.addWidget(self.manlButton)
+        qhbl3.addWidget(self.manrButton)
 
         self.manAddButton = QPushButton("Add (manual) ports")
         spaceManPort = QSpacerItem(self.width(), spacerHeight)
@@ -210,8 +210,8 @@ class ConfigStorage(QDialog):
                 listW = self.listWL2
             else:
                 listW = self.listWR2
-            listW.addItem("Port pair from " + "%0.2f" % (100 - 100 * c.fromPort.pos().y() / self.storage.h) +
-                          " to " + "%0.2f" % (100 - 100 * c.toPort.pos().y() / self.storage.h))
+            listW.addItem("Port pair from " + "%d%%" % (100 - 100 * c.fromPort.pos().y() / self.storage.h) +
+                          " to " + "%d%%" % (100 - 100 * c.toPort.pos().y() / self.storage.h))
 
     # Unused
     def addPortPairToList(self, p):
@@ -255,7 +255,7 @@ class ConfigStorage(QDialog):
                 print("addhxr")
                 self.addHxR()
             if self.lButton.isChecked():
-                print("addhxr")
+                print("addhxl")
                 self.addHxL()
         else:
             print("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
@@ -281,7 +281,9 @@ class ConfigStorage(QDialog):
                                 QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
                                 self.storage,
                                 self.hxNameLe.text())
-        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%.2f" %(float(self.offsetLeI.text())) + "%")
+
+        # Add HeatExchanger string to list
+        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%d" %(float(self.offsetLeI.text())) + "%")
 
     def addHxR(self):
         """
@@ -299,7 +301,8 @@ class ConfigStorage(QDialog):
                                         self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
                                 self.storage,
                                 self.hxNameLe.text())
-        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%.2f" %(float(self.offsetLeI.text())) + "%")
+        # Add HeatExchanger string to list
+        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%d" %(float(self.offsetLeI.text())) + "%")
 
     def manAddPortPair(self):
         if float(self.manPortLeI.text()) > float(self.offsetLeO.text()):

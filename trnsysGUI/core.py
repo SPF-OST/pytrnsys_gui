@@ -1837,8 +1837,6 @@ class DiagramEditor(QWidget):
                     k.setParent(self.diagramView)
                     k.updateImage()
                     # k.setBlockToGroup("defaultGroup")
-
-                    # print("dddd is " + k.displayName)
                     for hx in k.heatExchangers:
                         hx.initLoad()
 

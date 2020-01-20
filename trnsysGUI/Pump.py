@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
@@ -9,6 +9,7 @@ class Pump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Pump, self).__init__(trnsysType, parent, **kwargs)
         # factor = 0.6 for old pump
+        # factor = 1
         # self.w = 100 * factor
         # self.h = 82 * factor
         self.w = 30
