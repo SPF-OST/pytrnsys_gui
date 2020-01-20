@@ -1367,7 +1367,113 @@ class DiagramEditor(QWidget):
         # self.setTrnsysIdBack()
 
     # def setTrnsysIdBack(self):
+    #
     #     self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
+
+
+
+
+
+
+    def exportData(self):
+        print("------------------------> START OF EXPORT <------------------------")
+
+        # Main trnsys export function
+        self.setUpStorageInnerConns()
+
+        self.sortTrnsysObj()
+
+        fullExportText = ''
+
+        exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+
+        if Path(exportPath).exists():
+            qmb = QMessageBox(self)
+            qmb.setText("Warning: " +
+                        "An export file exists already. Do you want to overwrite or cancel?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == QMessageBox.Save:
+                print("Overwriting")
+                # continue
+            else:
+                print("Canceling")
+                return
+        else:
+            # Export file does not exist yet
+            pass
+
+        print("Printing the TRNSYS file... \n")
+
+        header = open("res/Constants.txt", "r")
+        fullExportText += header.read()
+        header.close()
+
+        print("\n")
+
+        simulationUnit = 450
+        simulationType = 935
+        descConnLength = 20
+
+        parameters = 0
+
+        # This has to be changed
+        for t in self.trnsysObj:
+            if type(t) is StorageTank:
+                continue
+            if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
+                continue
+            if type(t) is HeatPump:
+                parameters += 2
+                continue
+            if type(t) is GenericBlock:
+                parameters += len(t.inputs)
+                continue
+            if type(t) is ExternalHx:
+                parameters += 2
+                continue
+            if type(t) is HeatPumpTwoHx:
+                parameters += 3
+                continue
+
+            parameters += 1
+
+        lineNrParameters = parameters
+        parameters = parameters * 4 + 1
+
+        exporter = Export(self.trnsysObj, self)
+
+        fullExportText += exporter.exportBlackBox()
+        fullExportText += exporter.exportPumpOutlets()
+        fullExportText += exporter.exportMassFlows()
+        fullExportText += exporter.exportDivSetting(simulationUnit - 10)
+
+        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
+        fullExportText += exporter.exportInputsFlowSolver(lineNrParameters)
+        fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
+        fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit+1)   # DC-ERROR
+
+        fullExportText += exporter.exportPrintLoops()
+        fullExportText += exporter.exportPrintPipeLoops()
+        fullExportText += exporter.exportPrintPipeLosses()
+
+        # unitnr should maybe be variable in exportData()
+
+        fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
+        fullExportText += exporter.exportTempPrinter(self.printerUnitnr+1, 15)
+        fullExportText += "ENDS"
+
+        print("------------------------> END OF EXPORT <------------------------")
+
+        f = open(str(exportPath), 'w')
+        f.truncate(0)
+        f.write(fullExportText)
+        f.close()
+
+        self.cleanUpExportedElements()
+        self.tearDownStorageInnerConns()
+        return exportPath
 
 
     def cleanUpExportedElements(self):
@@ -1406,23 +1512,19 @@ class DiagramEditor(QWidget):
     def setName(self, newName):
         self.diagramName = newName
 
-    # def propertiesDlg(self):
-    #     diagramDlg(self)
-
     def delGroup(self):
         # This is used for deleting the first connected componts group found by BFS, unused
         for bl in self.blockList:
             bl.deleteBlock()
 
     def delBlocks(self):
-        # Delete the whole diagram
+        # Deletesthe whole diagram
         while len(self.trnsysObj) > 0:
             print("In deleting...")
             self.trnsysObj[0].deleteBlock()
 
         while len(self.groupList) > 1:
             self.groupList[-1].deleteGroup()
-
 
         print("Groups are " + str(self.groupList))
 
