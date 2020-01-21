@@ -1,3 +1,4 @@
+import re
 import string
 
 from trnsysGUI.Connection import Connection
@@ -84,11 +85,11 @@ class Export(object):
         for t in self.trnsysObj:
             f += t.exportParametersFlowSolver(descConnLength)[0]
 
-
         tempS = f
         print("param solver text is ")
         print(f)
         t = self.convertToStringList(tempS)
+        print("And now the ids come")
 
         f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
 
@@ -107,22 +108,47 @@ class Export(object):
         return res
 
     def findId(self, s):
-        return s[s.find("!") + 1:s.find(" ", s.find("!"))]
+        a = s[s.find("!") + 1:s.find(" ", s.find("!"))]
+        print(a)
+        return a
 
     def correctIds(self, lineList):
         fileCopy = lineList[:]
         print("fds" + str(fileCopy))
         fileCopy = [" " + l for l in fileCopy]
 
+        matchNumber = re.compile(r'\d+')
+
         counter = 0
         for line in lineList:
             counter += 1
             k = self.findId(line)
             if k != str(counter):
-                fileCopy = [l.replace(" " + str(k) + " ", " " + str(counter) + " ") for l in fileCopy]
+
+                descConnlen = 15
+                res = fileCopy[:]
+                for l in range(len(fileCopy)):
+                    print("In filecopy...")
+                    ids = matchNumber.findall(fileCopy[l])
+                    print("ids are " + str(ids) + " k is " + str(k))
+                    print(res[l])
+                    for i in range(3):
+                        if ids[i] == str(k):
+                            ids[i] = str(counter)
+
+                    fileCopyTempLine = fileCopy[l]
+                    rest = fileCopyTempLine[fileCopyTempLine.find("!"):]
+                    res[l] = ids[0] + " " + ids[1] + " " + ids[2] + " " + ids[3]
+                    res[l] += " "*(descConnlen - len(res[l])) + rest
+                    # print(res[l])
+
+                fileCopy = res
                 fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
 
-        fileCopy = [l[1:None] for l in fileCopy]
+                # fileCopy = [l.replace(" " + str(k) + " ", " " + str(counter) + " ") for l in fileCopy]
+                # fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
+
+        # fileCopy = [l[1:None] for l in fileCopy]
         return '\n'.join(fileCopy)
 
     def exportInputsFlowSolver(self, inputNr):

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # import random
+import re
 import string
 from math import sqrt, acos, pi, degrees, atan
 
@@ -2585,6 +2586,13 @@ if __name__ == '__main__':
     form.showMaximized()
     form.show()
     # app.setStyleSheet(cssSs_)
+
+    # match = re.compile(r'\d{1,} {1,}\d{1,}')
+    # match2 = re.compile(r'\d+')
+    # x = match.sub("AAAA" ,"29 12 0 0         !1 : Collector", count=1)
+    # x = match2.findall("29 12 0 0         !1 : Collector")
+    # print(x)
+    # print(type(x))
     app.exec_()
 
 # Found bug: when dragging bridging connection over another segment, crash
