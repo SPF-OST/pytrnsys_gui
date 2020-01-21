@@ -520,7 +520,9 @@ class segmentItem(QGraphicsLineItem):
                                    self.thirdCorner.scenePos().x(), newPos.y())
             self.secondLine.setLine(self.thirdCorner.scenePos().x(), self.thirdCorner.scenePos().y(),
                                     self.thirdCorner.node.nextN().parent.scenePos().x(), self.thirdCorner.node.nextN().parent.scenePos().y())
-            self.setLine(self.line().p1().x(), self.line().p1().y(),
+            # self.setLine(self.line().p1().x(), self.line().p1().y(),
+            #              self.secondCorner.scenePos().x(), self.secondCorner.scenePos().y())
+            self.setLine(self.startNode.parent.fromPort.scenePos().x(), self.startNode.parent.fromPort.scenePos().y(),
                          self.secondCorner.scenePos().x(), self.secondCorner.scenePos().y())
 
             self.secondCorner.setZValue(100)
@@ -532,6 +534,9 @@ class segmentItem(QGraphicsLineItem):
             self.thirdCorner.setVisible(True)
             self.firstLine.setVisible(True)
             self.secondLine.setVisible(True)
+
+            # self.startNode.parent.fromPort.itemChange(self.startNode.parent.fromPort.ItemScenePositionHasChanged,
+            #                                   self.startNode.parent.fromPort.pos())
 
         else:
             # if False:
@@ -549,7 +554,8 @@ class segmentItem(QGraphicsLineItem):
 
             self.firstLine.setLine(self.secondCorner.node.prevN().parent.scenePos().x(), newPos.y(), self.secondCorner.scenePos().x(), newPos.y())
             self.secondLine.setLine(self.secondCorner.scenePos().x(), self.secondCorner.scenePos().y(), self.thirdCorner.scenePos().x(),  self.thirdCorner.scenePos().y())
-            self.setLine(self.thirdCorner.scenePos().x(), self.thirdCorner.scenePos().y(), self.line().p2().x(), self.line().p2().y())
+            # self.setLine(self.thirdCorner.scenePos().x(), self.thirdCorner.scenePos().y(), self.line().p2().x(), self.line().p2().y())
+            self.setLine(self.thirdCorner.scenePos().x(), self.thirdCorner.scenePos().y(), self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
 
             self.secondCorner.setZValue(100)
             self.thirdCorner.setZValue(100)
@@ -560,6 +566,8 @@ class segmentItem(QGraphicsLineItem):
             self.thirdCorner.setVisible(True)
             self.firstLine.setVisible(True)
             self.secondLine.setVisible(True)
+
+            # self.endNode.parent.toPort.itemChange(self.endNode.parent.toPort.ItemScenePositionHasChanged, self.endNode.parent.toPort.pos())
 
     def renameConn(self):
         # dia = segmentDlg(self, self.scene().parent())
