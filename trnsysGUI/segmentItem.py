@@ -241,9 +241,13 @@ class segmentItem(QGraphicsLineItem):
                         print("Segment is vertical")
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
                         self.startNode.parent.setPos(newPos.x(), self.startNode.parent.scenePos().y())
-                        self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
-                                     self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
+                        # self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
+                                     # self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
+
+                        self.setLine(newPos.x(), self.startNode.parent.scenePos().y(),
+                                     newPos.x(), self.endNode.parent.scenePos().y())
                         self.updateGrad()
+
                     if self.isHorizontal():
                         print("Segment is vertical")
                         self.endNode.parent.setPos(self.endNode.parent.scenePos().x(), newPos.y())
@@ -503,13 +507,6 @@ class segmentItem(QGraphicsLineItem):
         print("after inited")
 
         if b:
-            # if False:
-            lineFactor = 3 / 4
-
-            # x-val of branching when there is a segment before toPort
-            # v1 = abs(self.endNode.parent.toPort.pos().x() - self.secondCorner.pos().x()) * lineFactor
-            # v1 = self.secondCorner.pos().x() + v1
-
             self.thirdCorner.setPos(newPos.x() - 10, newPos.y())
             # self.thirdCorner.setBrush(QtCore.Qt.blue)
             self.secondCorner.setPos(newPos.x() - 10, self.parent.fromPort.scenePos().y())
@@ -539,13 +536,6 @@ class segmentItem(QGraphicsLineItem):
             #                                   self.startNode.parent.fromPort.pos())
 
         else:
-            # if False:
-            lineFactor = 3 / 4
-
-            # x-val of branching when there is a segment before toPort
-            # v1 = abs(self.endNode.parent.toPort.pos().x() - self.secondCorner.pos().x()) * lineFactor
-            # v1 = self.secondCorner.pos().x() + v1
-
             self.secondCorner.setPos(newPos.x() + 10, newPos.y())
             # self.secondCorner.setBrush(QtCore.Qt.blue)
             self.thirdCorner.setPos(newPos.x() + 10, self.parent.toPort.scenePos().y())

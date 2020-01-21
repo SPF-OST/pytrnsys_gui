@@ -84,11 +84,11 @@ class Export(object):
         for t in self.trnsysObj:
             f += t.exportParametersFlowSolver(descConnLength)[0]
 
-
         tempS = f
         print("param solver text is ")
         print(f)
         t = self.convertToStringList(tempS)
+        print("And now the ids come")
 
         f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
 
@@ -107,7 +107,9 @@ class Export(object):
         return res
 
     def findId(self, s):
-        return s[s.find("!") + 1:s.find(" ", s.find("!"))]
+        a = s[s.find("!") + 1:s.find(" ", s.find("!"))]
+        print(a)
+        return a
 
     def correctIds(self, lineList):
         fileCopy = lineList[:]
