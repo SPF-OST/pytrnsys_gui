@@ -2091,7 +2091,15 @@ class DiagramEditor(QWidget):
                 msgb.exec()
 
     def saveAs(self):
-        self.saveAsPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
+        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
+        if str(pickedPath) == ".":
+            msgb = QMessageBox(self)
+            msgb.setText("No valid path selected, aborting save as")
+            msgb.exec()
+            return
+        # print("picked path is" + str(pickedPath))
+
+        self.saveAsPath = pickedPath
         self.diagramName = self.saveAsPath.stem
         # print(self.saveAsPath)
         # print(self.diagramName)
@@ -2345,7 +2353,7 @@ class MainWindow(QMainWindow):
         self.mb.addMenu(self.fileMenu)
 
         self.s1Menu = QMenu("Edit")
-        self.s1Menu.addAction(toggleEditorModeAction)
+        # self.s1Menu.addAction(toggleEditorModeAction)
         self.s1Menu.addAction(multipleDeleteAction)
         self.s1Menu.addAction(toggleSnapAction)
         self.s1Menu.addAction(toggleAlignModeAction)
