@@ -67,8 +67,8 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port2.setZValue(100)
 
         randomValue = int(random.uniform(20, 200))
-        self.port1.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
-        self.port2.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
+        self.port1.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
+        self.port2.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
         self.port1.visibleColor = QColor(randomValue, randomValue, randomValue)
         self.port2.visibleColor = QColor(randomValue, randomValue, randomValue)
 
@@ -88,8 +88,8 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port2.setZValue(100)
 
         randomValue = int(random.uniform(20, 200))
-        self.port1.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
-        self.port2.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
+        self.port1.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
+        self.port2.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
         self.port1.visibleColor = QColor(randomValue, randomValue, randomValue)
         self.port2.visibleColor = QColor(randomValue, randomValue, randomValue)
 

@@ -32,22 +32,22 @@ class PortItem(QGraphicsEllipseItem):
         # QGraphicsEllipseItem.__init__(self, QRectF(-7, -7, 14.0, 14.0), parent)
 
         # OuterRing should be called innerCircle
-        self.outerRing = QGraphicsEllipseItem(-4, -4, 8, 8, self)
-        self.outerRing.setPen(QPen(QColor(0, 0, 0, 0), 0))
+        self.innerCircle = QGraphicsEllipseItem(-4, -4, 8, 8, self)
+        self.innerCircle.setPen(QPen(QColor(0, 0, 0, 0), 0))
 
-        self.visibleColor = QColor(0,0,0)
+        self.visibleColor = QColor(0, 0, 0)
 
         # This if is only for input/output having different colors
         if name == 'i':
             color = QColor(self.ashColorR)
-            # self.outerRing.setBrush(QColor(self.ashColorR))
-            # self.outerRing.setBrush(QColor(0, 0, 0))
-            self.outerRing.setBrush(self.visibleColor)
+            # self.innerCircle.setBrush(QColor(self.ashColorR))
+            # self.innerCircle.setBrush(QColor(0, 0, 0))
+            self.innerCircle.setBrush(self.visibleColor)
         if name == 'o':
             color = QColor(self.ashColorB)
-            # self.outerRing.setBrush(QColor(self.ashColorB))
-            # self.outerRing.setBrush(QColor(0, 0, 0))
-            self.outerRing.setBrush(self.visibleColor)
+            # self.innerCircle.setBrush(QColor(self.ashColorB))
+            # self.innerCircle.setBrush(QColor(0, 0, 0))
+            self.innerCircle.setBrush(self.visibleColor)
 
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
@@ -156,36 +156,36 @@ class PortItem(QGraphicsEllipseItem):
         # print("Hovering")
 
         self.setRect(-7, -7, 14.0, 14.0)
-        self.outerRing.setRect(-7, -7, 14.0, 14.0)
+        self.innerCircle.setRect(-7, -7, 14.0, 14.0)
         if self.name == 'i':
             # self.setBrush(Qt.red)
-            # self.outerRing.setBrush(Qt.red)
-            # self.outerRing.setBrush(QColor(0, 0, 0))
-            self.outerRing.setBrush(self.visibleColor)
+            # self.innerCircle.setBrush(Qt.red)
+            # self.innerCircle.setBrush(QColor(0, 0, 0))
+            self.innerCircle.setBrush(self.visibleColor)
         if self.name == 'o':
             # self.setBrush(QColor(Qt.blue))
-            # self.outerRing.setBrush(QColor(Qt.blue))
-            # self.outerRing.setBrush(QColor(0, 0, 0))
-            self.outerRing.setBrush(self.visibleColor)
+            # self.innerCircle.setBrush(QColor(Qt.blue))
+            # self.innerCircle.setBrush(QColor(0, 0, 0))
+            self.innerCircle.setBrush(self.visibleColor)
 
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")
 
         # self.setRect(-6, -6, 12, 12)
         self.setRect(-7, -7, 14, 14)
-        self.outerRing.setRect(-4, -4, 8, 8)
+        self.innerCircle.setRect(-4, -4, 8, 8)
         if len(self.connectionList) == 0:
             if self.name == 'i':
                 # self.setBrush(Qt.red)
                 # self.setBrush(self.ashColorR)
-                # self.outerRing.setBrush(self.ashColorR)
-                # self.outerRing.setBrush(QColor(0, 0, 0))
-                self.outerRing.setBrush(self.visibleColor)
+                # self.innerCircle.setBrush(self.ashColorR)
+                # self.innerCircle.setBrush(QColor(0, 0, 0))
+                self.innerCircle.setBrush(self.visibleColor)
             if self.name == 'o':
                 # self.setBrush(self.ashColorR)
-                # self.outerRing.setBrush(self.ashColorB)
-                # self.outerRing.setBrush(QColor(0, 0, 0))
-                self.outerRing.setBrush(self.visibleColor)
+                # self.innerCircle.setBrush(self.ashColorB)
+                # self.innerCircle.setBrush(QColor(0, 0, 0))
+                self.innerCircle.setBrush(self.visibleColor)
 
     def mouseDoubleClickEvent(self, event):
         print("double clicked")

@@ -127,8 +127,8 @@ class StorageTank(BlockItem):
             port2.side = 2
 
         randomValue = int(random.uniform(20, 200))
-        port1.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
-        port2.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
+        port1.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
+        port2.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
         port1.visibleColor = QColor(randomValue, randomValue, randomValue)
         port2.visibleColor = QColor(randomValue, randomValue, randomValue)
 
