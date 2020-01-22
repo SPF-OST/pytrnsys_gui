@@ -1258,7 +1258,7 @@ class DiagramEditor(QWidget):
                 # print(t.insideConnLeft)
                 # print(t.insideConnRight)
 
-    def findStorageCorrespPorts(self, portList):
+    def findStorageCorrespPorts1(self, portList):
         # This function gets the ports on the other side of pipes connected to a port of the StorageTank
 
         res = []
@@ -1267,7 +1267,8 @@ class DiagramEditor(QWidget):
             if len(p.connectionList) > 0:           # check if not >1 needed
                 # connectionList[0] is the hidden connection created when the portPair is
                 i = 0
-                while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
+                # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
+                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
                     i += 1
                 if len(p.connectionList) >= i+1:
                     if p.connectionList[i].fromPort is p:
@@ -1278,6 +1279,28 @@ class DiagramEditor(QWidget):
                         print("Port is not fromPort nor toPort")
 
         # [print(p.parent.displayName) for p in res]
+        return res
+
+    def findStorageCorrespPorts(self, portList):
+        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
+
+        res = []
+        for p in portList:
+            firstOutConn = None
+            for c in p.connectionList:
+                firstOutConn = c
+                if c.toPort.parent != c.fromPort.parent:
+                    break
+
+            if firstOutConn is not None:
+                if firstOutConn.toPort == p:
+                    res.append(firstOutConn.fromPort)
+                else:
+                    res.append(firstOutConn.toPort)
+            else:
+                print("Error. No corresponding storage port found")
+                res.append(p)
+
         return res
 
     def findStorageCorrespPortsHx(self, portList):

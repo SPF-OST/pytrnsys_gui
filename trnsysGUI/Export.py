@@ -128,10 +128,10 @@ class Export(object):
                 descConnlen = 15
                 res = fileCopy[:]
                 for l in range(len(fileCopy)):
-                    print("In filecopy...")
+                    # print("In filecopy...")
                     ids = matchNumber.findall(fileCopy[l])
-                    print("ids are " + str(ids) + " k is " + str(k))
-                    print(res[l])
+                    # print("ids are " + str(ids) + " k is " + str(k))
+                    # print(res[l])
                     for i in range(3):
                         if ids[i] == str(k):
                             ids[i] = str(counter)
