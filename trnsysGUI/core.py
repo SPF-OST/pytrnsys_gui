@@ -1931,8 +1931,10 @@ class DiagramEditor(QWidget):
 
         for t in self.trnsysObj:
             print("Tr obj is" + str(t) + " " + str(t.trnsysId))
-
+            if hasattr(t, "isTempering"):
+                print("tv has " +str(t.isTempering))
         # tempList = []
+
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)

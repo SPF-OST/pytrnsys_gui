@@ -61,7 +61,7 @@ class TVentil(BlockItem):
         return w, h
 
     def setComplexDiv(self, b):
-        self.isTempering = b
+        self.isTempering = bool(b)
 
     def setPositionForMassFlowSolver(self,f):
         self.positionForMassFlowSolver = f
@@ -74,7 +74,7 @@ class TVentil(BlockItem):
 
     def decode(self, i, resConnList, resBlockList):
         super(TVentil, self).decode(i, resConnList, resBlockList)
-        if "IsTempering" or "PositionForMassFlowSolver" not in i:
+        if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
             print("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
         else:
