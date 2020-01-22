@@ -66,11 +66,11 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port1.setZValue(100)
         self.port2.setZValue(100)
 
-        randomValue = int(random.uniform(80,200))
-        self.port1.outerRing.setBrush(QColor(randomValue,randomValue,randomValue))
-        self.port2.outerRing.setBrush(QColor(randomValue,randomValue,randomValue))
-        self.port1.visibleColor = QColor(randomValue,randomValue,randomValue)
-        self.port2.visibleColor = QColor(randomValue,randomValue,randomValue)
+        randomValue = int(random.uniform(20, 200))
+        self.port1.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
+        self.port2.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
+        self.port1.visibleColor = QColor(randomValue, randomValue, randomValue)
+        self.port2.visibleColor = QColor(randomValue, randomValue, randomValue)
 
         # StartPos is a QPoint
         self.drawHx(6, 0.4)
@@ -87,7 +87,7 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port1.setZValue(100)
         self.port2.setZValue(100)
 
-        randomValue = int(random.uniform(80,200))
+        randomValue = int(random.uniform(20, 200))
         self.port1.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
         self.port2.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
         self.port1.visibleColor = QColor(randomValue, randomValue, randomValue)

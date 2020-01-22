@@ -1,5 +1,7 @@
+import random
+
 from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 from PyQt5.QtWidgets import QMenu
 
 from trnsysGUI.BlockItem import BlockItem
@@ -99,13 +101,6 @@ class StorageTank(BlockItem):
             if i.pos().y() == hAbsO:
                 print("Can't create a new output over an existing input")
 
-        # for o in self.tempSideList:
-        #     if o.pos().y() == hAbsO:
-        #         print("Found an existing output port")
-        #         port2 = o
-        #     if o.pos().y() == hAbsI:
-        #         print("Can't create a new input over an existing output")
-
         if port1 is None:
             port1 = PortItem('i', sideNr, self)
             port1.setZValue(100)
@@ -131,6 +126,12 @@ class StorageTank(BlockItem):
             port1.side = 2
             port2.side = 2
 
+        randomValue = int(random.uniform(20, 200))
+        port1.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
+        port2.outerRing.setBrush(QColor(randomValue, randomValue, randomValue))
+        port1.visibleColor = QColor(randomValue, randomValue, randomValue)
+        port2.visibleColor = QColor(randomValue, randomValue, randomValue)
+
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
         if kwargs == {}:
             self.directPortConnsForList.append(Connection(port1, port2, True, self.parent.parent()))
@@ -138,6 +139,7 @@ class StorageTank(BlockItem):
         else:
             port1.id = kwargs["fromPortId"]
             port2.id = kwargs["toPortId"]
+
             c = Connection(port1, port2, True, self.parent.parent(), fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
                            segmentsLoad=[], cornersLoad=[], loadedConn=True)
             c.displayName = kwargs["connDispName"]
@@ -146,17 +148,6 @@ class StorageTank(BlockItem):
             c.trnsysId = kwargs["trnsysConnId"]
             self.directPortConnsForList.append(c)
             return c
-
-    def setLeftSideManual(self, s, hAbs):
-        # Just for testing, should be properly implemented as parameters
-
-        self.inputs.append(PortItem(s, 0, self))
-        self.inputs[-1].setPos(-2 * StorageTank.delta,
-                               hAbs)  # Not sure if this is the correct access to class variables
-
-    def setRightSideManual(self, s, hAbs):
-        self.inputs.append(PortItem(s, 0, self))
-        self.inputs[-1].setPos(self.w + 2 * StorageTank.delta, hAbs)
 
     def setLeftSideAuto(self, n):
         # Momentarily not used
