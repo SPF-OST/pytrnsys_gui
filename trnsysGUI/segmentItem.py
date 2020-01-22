@@ -245,8 +245,8 @@ class segmentItem(QGraphicsLineItem):
                         # self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
                                      # self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
 
-                        self.setLine(newPos.x(), self.startNode.parent.scenePos().y(),
-                                     newPos.x(), self.endNode.parent.scenePos().y())
+                        # self.setLine(newPos.x(), self.startNode.parent.scenePos().y(),
+                        #              newPos.x(), self.endNode.parent.scenePos().y())
                         self.updateGrad()
                     if self.isHorizontal():
                         print("Segment is horizontal")
@@ -322,15 +322,18 @@ class segmentItem(QGraphicsLineItem):
                     self.parent.parent.parent().undoStack.push(command)
                     self.oldX = self.scenePos().x()
 
-                # if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
-                #         nextHorizSeg = self.parent.segments[self.parent.segments.index(self) + 2]
-                #         if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
-                #                 self.endNode.parent.pos().y()):
-                #             # print("Next h seg could be deleted")
-                #             self.deleteNextHorizSeg(False, nextHorizSeg)
-                #             return
+                if self.isHorizontal():
+                    if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
+                            nextHorizSeg = self.parent.segments[self.parent.segments.index(self) + 2]
+                            if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
+                                    self.endNode.parent.pos().y()):
+                                # print("Next h seg could be deleted")
+                                self.deleteNextHorizSeg(False, nextHorizSeg)
+                                return
 
                 if self.secondCorner is not None:
+                    print("Second corner is not none")
+                    # if PortItem
                     if hasattr(self.endNode.parent, "fromPort"):
                         # self.hide()
                         # self.parent.segments.remove(self)
@@ -352,6 +355,7 @@ class segmentItem(QGraphicsLineItem):
                         self.secondLine = None
                         self.inited = False
 
+                    # if PortItem
                     elif hasattr(self.startNode.parent, "fromPort"):
                         segafter = self.parent.segments[self.parent.getNodePos(self.thirdCorner.node.nextN().parent)]
 
@@ -372,6 +376,9 @@ class segmentItem(QGraphicsLineItem):
 
                     else:
                         print("getting no start or end")
+
+                else:
+                    print("Second corner is none")
             else:
                 pass
 
