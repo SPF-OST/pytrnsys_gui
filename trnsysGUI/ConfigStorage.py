@@ -231,11 +231,13 @@ class ConfigStorage(QDialog):
 
     def listWLClicked(self):
         self.listWR.clearSelection()
+
     def listWRClicked(self):
         self.listWL.clearSelection()
 
     def listWL2Clicked(self):
         self.listWR2.clearSelection()
+
     def listWR2Clicked(self):
         self.listWL2.clearSelection()
 
