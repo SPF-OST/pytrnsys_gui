@@ -187,15 +187,12 @@ class PortItem(QGraphicsEllipseItem):
                 # self.outerRing.setBrush(QColor(0, 0, 0))
                 self.outerRing.setBrush(self.visibleColor)
 
-    def deleteDirectPorts(self):
-        print("Deleting direct ports")
-
     def mouseDoubleClickEvent(self, event):
         print("double clicked")
         if hasattr(self.parent, 'heatExchangers') and not self.isFromHx:
-            self.deleteHxPortPair()
+            self.deleteDirectPortPair()
 
-    def deleteHxPortPair(self):
+    def deleteDirectPortPair(self):
         if self.connectionList[0].fromPort is self:
             self.deletePort(self.connectionList[0].toPort)
         elif self.connectionList[0].toPort is self:
@@ -215,3 +212,5 @@ class PortItem(QGraphicsEllipseItem):
             obj.parent.outputs.remove(obj)
 
         obj.parent.parent.scene().removeItem(obj)
+
+        obj.parent.directPortConnsForList = [c for c in obj.parent.directPortConnsForList if c.fromPort != self and c.toPort != self]
