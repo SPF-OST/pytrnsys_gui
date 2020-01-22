@@ -177,7 +177,8 @@ class Connection(object):
         if len(self.cornersLoad) > 0:
             self.loadSegments()
 
-        self.setLabelPos(self.labelPosLoad)
+        if self.labelPosLoad is not None:
+            self.setLabelPos(self.labelPosLoad)
 
         # Still not tested
         # self.correctPorts()

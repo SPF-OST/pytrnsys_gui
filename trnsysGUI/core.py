@@ -448,10 +448,18 @@ class DiagramDecoder(json.JSONDecoder):
                         if tPort is None:
                             print("Error: Did not found a toPort")
 
-                        c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
-                                       fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                                       segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"],
-                                       labelPos=i["FirstSegmentLabelPos"], loadedConn=True)
+                        # To allow loading json files without FirstSegmentPos
+                        if "FirstSegmentLabelPos" in i:
+                            c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
+                                           fromPortId=i["PortFromID"], toPortId=i["PortToID"],
+                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"],
+                                           labelPos=i["FirstSegmentLabelPos"], loadedConn=True)
+                        else:
+                            c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
+                                           fromPortId=i["PortFromID"], toPortId=i["PortToID"],
+                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"],
+                                           loadedConn=True)
+
                         c.decode(i, resConnList, resBlockList)
 
                         # else:
