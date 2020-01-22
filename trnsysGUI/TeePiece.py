@@ -39,7 +39,7 @@ class TeePiece(BlockItem):
         lx = (w - lw) / 2
 
         deltaH = self.h / 8
-        
+
         self.label.setPos(lx, h - self.flippedV*(h+h/2))
 
         self.inputs[0].setPos(- 2 * delta + 4 * self.flippedH * delta + w * self.flippedH,

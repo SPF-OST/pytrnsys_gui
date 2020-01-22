@@ -90,6 +90,7 @@ class Connection(object):
 
         self.segmentsLoad = None
         self.cornersLoad = None
+        self.labelPosLoad = None
 
         if kwargs == {}:
             # print("New connection being created")
@@ -105,6 +106,10 @@ class Connection(object):
                 self.toPortId = kwargs["toPortId"]
                 self.segmentsLoad = kwargs["segmentsLoad"]
                 self.cornersLoad = kwargs["cornersLoad"]
+
+                if "labelPos" in kwargs:
+                    self.labelPosLoad = kwargs["labelPos"]
+
                 # print("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
                 # self.initLoad()
 
@@ -171,6 +176,8 @@ class Connection(object):
 
         if len(self.cornersLoad) > 0:
             self.loadSegments()
+
+        self.setLabelPos(self.labelPosLoad)
 
         # Still not tested
         # self.correctPorts()
@@ -1060,6 +1067,11 @@ class Connection(object):
                 segments.append(segmentTupel)
             # print("Segments in encoder is " + str(segments))
             dct['SegmentPositions'] = segments
+            if len(self.segments) > 0:
+                dct['FirstSegmentLabelPos'] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+            else:
+                print("This connection has no segment")
+                dct['FirstSegmentLabelPos'] = self.fromPort.pos().x(), self.fromPort.pos().y()
 
             corners = []
 
@@ -1072,7 +1084,21 @@ class Connection(object):
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        pass
+        print("Loading a connection in Decoder")
+
+        self.id = i["ConnID"]
+        self.connId = i["ConnCID"]
+        self.trnsysId = i["trnsysID"]
+        self.setName(i["ConnDisplayName"])
+        self.groupName = "defaultGroup"
+        self.setConnToGroup(i["GroupName"])
+        # self.setLabelPos(i["FirstSegmentLabelPos"])
+
+        resConnList.append(self)
+
+    def setLabelPos(self, tup):
+        if len(self.segments) > 0:
+            self.segments[0].label.setPos(tup[0], tup[1])
 
     def exportBlackBox(self):
         return "", 0
