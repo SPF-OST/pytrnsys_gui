@@ -236,6 +236,7 @@ class segmentItem(QGraphicsLineItem):
                     self.dragInMode0(newPos)
 
             elif self.parent.parent.editorMode == 1:
+                print(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                     if self.isVertical():
                         print("Segment is vertical")
@@ -247,9 +248,8 @@ class segmentItem(QGraphicsLineItem):
                         self.setLine(newPos.x(), self.startNode.parent.scenePos().y(),
                                      newPos.x(), self.endNode.parent.scenePos().y())
                         self.updateGrad()
-
                     if self.isHorizontal():
-                        print("Segment is vertical")
+                        print("Segment is horizontal")
                         self.endNode.parent.setPos(self.endNode.parent.scenePos().x(), newPos.y())
                         self.startNode.parent.setPos(self.startNode.parent.scenePos().x(), newPos.y())
                         self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
@@ -274,6 +274,33 @@ class segmentItem(QGraphicsLineItem):
             else:
                 print("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
+    def deleteNextHorizSeg(self, b, nextS):
+        if b:
+            pass
+        else:
+            nodeTodelete = self.endNode
+            self.endNode = nextS.endNode
+
+            self.startNode.setNext(self.endNode)
+            self.endNode.setPrev(self.startNode)
+
+            nextS.setVisible(False)
+            nodeTodelete.parent.setVisible(False)
+            print(self.parent.getCorners())
+            self.parent.parent.diagramScene.removeItem(nextS)
+            self.parent.segments.remove(nextS)
+            self.parent.parent.diagramScene.removeItem(nodeTodelete.parent)
+
+            # del nodeTodelete.parent
+            # del nodeTodelete
+
+            print("ToPrint")
+            print(self.startNode.parent.scenePos())
+            print(self.endNode.parent.toPort.scenePos())
+
+            self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
+                         self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
+
     def mouseReleaseEvent(self, e):
         # Should be same as below
         # self.scene().removeItem(self)
@@ -294,6 +321,14 @@ class segmentItem(QGraphicsLineItem):
                     command = HorizSegmentMoveCommand(self, self.oldX, "Moving segment command")
                     self.parent.parent.parent().undoStack.push(command)
                     self.oldX = self.scenePos().x()
+
+                # if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
+                #         nextHorizSeg = self.parent.segments[self.parent.segments.index(self) + 2]
+                #         if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
+                #                 self.endNode.parent.pos().y()):
+                #             # print("Next h seg could be deleted")
+                #             self.deleteNextHorizSeg(False, nextHorizSeg)
+                #             return
 
                 if self.secondCorner is not None:
                     if hasattr(self.endNode.parent, "fromPort"):
@@ -569,17 +604,8 @@ class segmentItem(QGraphicsLineItem):
         # print(self.scene().items(self.endNode.parent.scenePos()))
 
         for s in self.parent.segments:
-            # sleep(0.2)
-            # s.setPen(QPen(QtCore.Qt.red))
-            # s.parent.parent.update()
-            # s.setPen(QPen(QtCore.Qt.blue))
-            # sleep(2)
             print("Segment in list is" + str(s) + " has startnode" + str(s.startNode.parent) + " endnode " + str(
                 s.endNode.parent))
-
-        # for x in range(20):
-        #     print(x)
-        #     sleep(0.2)
 
     def contextMenuEvent(self, event):
         menu = QMenu()

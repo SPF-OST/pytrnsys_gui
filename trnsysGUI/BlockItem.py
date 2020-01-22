@@ -247,10 +247,8 @@ class BlockItem(QGraphicsPixmapItem):
 
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
-            dia = TVentilDlg(self, self.scene().parent())
-            dia = self.parent.parent().showBlockDlg(self)
+            dia = self.parent.parent().showTVentilDlg(self)
         else:
-            # dia = BlockDlg(self, self.scene().parent())
             dia = self.parent.parent().showBlockDlg(self)
 
     def mouseReleaseEvent(self, event):
@@ -266,7 +264,6 @@ class BlockItem(QGraphicsPixmapItem):
                 self.oldPos = self.scenePos()
 
         super(BlockItem, self).mouseReleaseEvent(event)
-
 
     def getConnections(self):
         c = []

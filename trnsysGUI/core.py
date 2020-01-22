@@ -1258,7 +1258,7 @@ class DiagramEditor(QWidget):
                 # print(t.insideConnLeft)
                 # print(t.insideConnRight)
 
-    def findStorageCorrespPorts(self, portList):
+    def findStorageCorrespPorts1(self, portList):
         # This function gets the ports on the other side of pipes connected to a port of the StorageTank
 
         res = []
@@ -1267,7 +1267,8 @@ class DiagramEditor(QWidget):
             if len(p.connectionList) > 0:           # check if not >1 needed
                 # connectionList[0] is the hidden connection created when the portPair is
                 i = 0
-                while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
+                # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
+                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
                     i += 1
                 if len(p.connectionList) >= i+1:
                     if p.connectionList[i].fromPort is p:
@@ -1278,6 +1279,28 @@ class DiagramEditor(QWidget):
                         print("Port is not fromPort nor toPort")
 
         # [print(p.parent.displayName) for p in res]
+        return res
+
+    def findStorageCorrespPorts(self, portList):
+        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
+
+        res = []
+        for p in portList:
+            firstOutConn = None
+            for c in p.connectionList:
+                firstOutConn = c
+                if c.toPort.parent != c.fromPort.parent:
+                    break
+
+            if firstOutConn is not None:
+                if firstOutConn.toPort == p:
+                    res.append(firstOutConn.fromPort)
+                else:
+                    res.append(firstOutConn.toPort)
+            else:
+                print("Error. No corresponding storage port found")
+                res.append(p)
+
         return res
 
     def findStorageCorrespPortsHx(self, portList):
@@ -2068,7 +2091,15 @@ class DiagramEditor(QWidget):
                 msgb.exec()
 
     def saveAs(self):
-        self.saveAsPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
+        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
+        if str(pickedPath) == ".":
+            msgb = QMessageBox(self)
+            msgb.setText("No valid path selected, aborting save as")
+            msgb.exec()
+            return
+        # print("picked path is" + str(pickedPath))
+
+        self.saveAsPath = pickedPath
         self.diagramName = self.saveAsPath.stem
         # print(self.saveAsPath)
         # print(self.diagramName)
@@ -2322,7 +2353,7 @@ class MainWindow(QMainWindow):
         self.mb.addMenu(self.fileMenu)
 
         self.s1Menu = QMenu("Edit")
-        self.s1Menu.addAction(toggleEditorModeAction)
+        # self.s1Menu.addAction(toggleEditorModeAction)
         self.s1Menu.addAction(multipleDeleteAction)
         self.s1Menu.addAction(toggleSnapAction)
         self.s1Menu.addAction(toggleAlignModeAction)
