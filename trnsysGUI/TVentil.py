@@ -43,9 +43,11 @@ class TVentil(BlockItem):
         rect = self.label.boundingRect()
         lw, lh = rect.width(), rect.height()
         lx = (w - lw) / 2
-        self.label.setPos(lx, h)
+
 
         deltaH = self.h / 18
+        self.label.setPos(lx, h - self.flippedV*(h+h/2))
+        
         self.inputs[0].setPos(- 2 * delta + 4 * self.flippedH * delta + w * self.flippedH,
                               h / 2 + deltaH - 2 * deltaH * self.flippedV)
         self.inputs[1].setPos(w / 2, -2 * delta + 4 * delta * self.flippedV + h * self.flippedV)
