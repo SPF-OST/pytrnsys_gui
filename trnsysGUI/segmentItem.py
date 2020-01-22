@@ -278,28 +278,43 @@ class segmentItem(QGraphicsLineItem):
         if b:
             pass
         else:
-            nodeTodelete = self.endNode
+            nodeTodelete1 = self.endNode
+            nodeTodelete2 = self.endNode.nextN()
             self.endNode = nextS.endNode
 
             self.startNode.setNext(self.endNode)
             self.endNode.setPrev(self.startNode)
 
-            nextS.setVisible(False)
-            nodeTodelete.parent.setVisible(False)
-            print(self.parent.getCorners())
+            # nextS.setVisible(False)
+            # nodeTodelete.parent.setVisible(False)
+            # print(self.parent.getCorners())
+
+            posx1 = self.parent.segments[self.parent.segments.index(self) + 2].line().p2().x()
+            # posx2 = self.parent.segments[self.parent.segments.indexs(self)]
+
             self.parent.parent.diagramScene.removeItem(nextS)
             self.parent.segments.remove(nextS)
-            self.parent.parent.diagramScene.removeItem(nodeTodelete.parent)
+            self.parent.parent.diagramScene.removeItem(nodeTodelete1.parent)
+
+            indexOfSelf = self.parent.segments.index(self)
+            nextVS = self.parent.segments[indexOfSelf + 1]
+
+            self.parent.parent.diagramScene.removeItem(nextVS)
+            self.parent.segments.remove(nextVS)
+            self.parent.parent.diagramScene.removeItem(nodeTodelete2.parent)
 
             # del nodeTodelete.parent
             # del nodeTodelete
 
-            print("ToPrint")
-            print(self.startNode.parent.scenePos())
-            print(self.endNode.parent.toPort.scenePos())
+            # print("ToPrint")
+            # print(self.startNode.parent.scenePos())
+            # print(self.endNode.parent.toPort.scenePos())
+
+            # self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
+                         # self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
 
             self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
-                         self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
+                         posx1, self.startNode.parent.scenePos().y())
 
     def mouseReleaseEvent(self, e):
         # Should be same as below
