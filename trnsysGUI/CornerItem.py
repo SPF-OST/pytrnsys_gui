@@ -11,7 +11,7 @@ class CornerItem(QGraphicsEllipseItem):
         CornerItems represent corners for each Connection.
         When a segmentItem is dragged, it will also move the corners, which will trigger the CornerItem
         itemChange method of Qt. There, the adjacent segments are redrawn.
-        
+
         Note: Using hasattr to detect type of parent of node, better solution needed
         Note: No support for disr (interrupted) segements
 

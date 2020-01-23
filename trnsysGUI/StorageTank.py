@@ -18,8 +18,6 @@ class StorageTank(BlockItem):
 
     def __init__(self, trnsysType, parent, **kwargs):
         super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
-        # self.leftConnections = 0
-        # self.rightConnections = 0
         self.parent = parent
 
         self.leftSide = []
@@ -41,6 +39,23 @@ class StorageTank(BlockItem):
 
         self.changeSize()
 
+    # Setter functions
+    def setParent(self, p):
+        print("Setting parent of Storage Tank (and its hx)")
+        self.parent = p
+
+        if self not in self.parent.parent().trnsysObj:
+            self.parent.parent().trnsysObj.append(self)
+
+        # TODO: Should hx be also in trnsysObj?
+        for hx in self.heatExchangers:
+            hx.parent = self
+
+    def setName(self, newName):
+        self.label.setPlainText(newName)
+        self.displayName = newName
+
+
     # Unused
     def setSideManual(self, left, s, hAbs):
         if left:
@@ -60,27 +75,8 @@ class StorageTank(BlockItem):
                 self.outputs.append(PortItem('o', 0, self))
                 self.outputs[-1].setPos(self.w + 2 * StorageTank.delta, hAbs)
 
-    def changeSize(self):
-        w = self.w
-        h = self.h
 
-        """ Resize block function """
-        delta = 4
-
-        # Limit the block size:
-        if h < 20:
-            h = 20
-        if w < 40:
-            w = 40
-
-        # center label:
-        rect = self.label.boundingRect()
-        lw, lh = rect.width(), rect.height()
-        lx = (w - lw) / 2
-        self.label.setPos(lx, h)
-
-        return w, h
-
+    # Ports related
     def setSideManualPair(self, left, hAbsI, hAbsO, **kwargs):
 
         port1 = None
@@ -424,72 +420,31 @@ class StorageTank(BlockItem):
         c2.displayName = side[1].connectionList[0].displayName
         c2.isStorageIO = True
 
-    def setParent(self, p):
-        print("Setting parent of Storage Tank (and its hx)")
-        self.parent = p
 
-        if self not in self.parent.parent().trnsysObj:
-            self.parent.parent().trnsysObj.append(self)
+    # Transform related
+    def changeSize(self):
+        """ Resize block function """
+        w = self.w
+        h = self.h
 
-        # TODO: Should hx be also in trnsysObj?
-        for hx in self.heatExchangers:
-            hx.parent = self
+        # Limit the block size:
+        if h < 20:
+            h = 20
+        if w < 40:
+            w = 40
 
-    def setName(self, newName):
-        self.label.setPlainText(newName)
-        self.displayName = newName
+        # center label:
+        rect = self.label.boundingRect()
+        lw, lh = rect.width(), rect.height()
+        lx = (w - lw) / 2
+        self.label.setPos(lx, h)
 
-    def hasManPortById(self, idFind):
-
-        res = -1
-
-        for p in self.leftSide:
-            if p.id == idFind:
-                res = True
-
-        for p in self.rightSide:
-            if p.id == idFind:
-                res = False
-        return res
+        return w, h
 
     def updateImage(self):
         self.pixmap = self.pixmap.scaled(100, self.h)
         self.setPixmap(self.pixmap)
         self.label.setPos(self.label.pos().x(), self.h)
-
-    def mouseDoubleClickEvent(self, event):
-        dia = ConfigStorage(self, self.scene().parent())
-
-    def dumpBlockInfo(self):
-        print("storage input list " + str(self.inputs))
-        print("storage outputs list " + str(self.outputs))
-        print("storage leftside " + str(self.leftSide))
-        print("storage rightside " + str(self.rightSide))
-        self.parent.parent().dumpInformation()
-
-    def deleteBlock(self):
-        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.deleteConns()
-        print("self.parent.parent" + str(self.parent.parent()))
-        self.parent.parent().trnsysObj.remove(self)
-        print("deleting block " + str(self) + self.displayName)
-        print("self.scene is" + str(self.parent.scene()))
-        self.parent.scene().removeItem(self)
-        del self
-
-    def deleteBlockDebug(self):
-        print("Listing all connections")
-        conns = []
-        for p in self.inputs + self.outputs:
-            for c in p.connectionList:
-                conns.append(c)
-
-        [print(
-            c.displayName + ", fromPort: " + c.fromPort.parent.displayName + ", toPort: " + c.toPort.parent.displayName)
-         for c in conns]
-
-    def deleteHeatExchangers(self):
-        pass
 
     def updatePortPositions(self, h):
         for p in self.inputs + self.outputs:
@@ -500,6 +455,8 @@ class StorageTank(BlockItem):
         for hx in self.heatExchangers:
             hx.updateLines(h)
 
+
+    # Encoding
     def encode(self):
         if self.isVisible():
             print("Encoding a storage tank")
@@ -682,46 +639,30 @@ class StorageTank(BlockItem):
             resConnList.append(conn)
         resBlockList.append(self)
 
-    def exportBlackBox(self):
-        equationNr = 0
-        resStr = ""
 
+    # Debug
+    def dumpBlockInfo(self):
+        print("storage input list " + str(self.inputs))
+        print("storage outputs list " + str(self.outputs))
+        print("storage leftside " + str(self.leftSide))
+        print("storage rightside " + str(self.rightSide))
+        self.parent.parent().dumpInformation()
+
+    def deleteBlockDebug(self):
+        print("Listing all connections")
+        conns = []
         for p in self.inputs + self.outputs:
-            if not p.isFromHx:
-                if p.side == 0:
-                    lr = "Left"
-                else:
-                    lr = "Right"
-                resStr += "T" + self.displayName + "Port" + lr + str(
-                    int(100 * (1 - (p.scenePos().y() - p.parent.scenePos().y()) / p.parent.h))) + "=1\n"
-                equationNr += 1
-                continue
-            else:
-                # Check if there is at least one internal connection
-                # p.name == i to only allow one temperature entry per hx
-                # Prints the name of the Hx Connector element.
-                # Assumes that the Other port has no connection except to the storage
-                if len(p.connectionList) > 0 and p.name == 'i':
-                    # f += "T" + p.connectionList[1].displayName + "=1\n"
-                    print("dds " + p.connectionList[1].displayName)
-                    print("dds " + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName)
-                    print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
-                    # print("dds " + p.connectionList[2].displayName)
+            for c in p.connectionList:
+                conns.append(c)
 
-                    # p is a hx port; the external port has two connections, so the second one yields the hx connector
+        [print(
+            c.displayName + ", fromPort: " + c.fromPort.parent.displayName + ", toPort: " + c.toPort.parent.displayName)
+         for c in conns]
 
-                    # Here the Hx name is printed.
-                    if p.connectionList[1].fromPort is p:
-                        # resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
-                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
-                    else:
-                        # resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
-                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
+    def printPortNb(self):
+        print("ST has "+ str(self.inputs) + " and " + str(self.outputs))
 
-                    equationNr += 1
-
-        return resStr, equationNr
-
+    # Misc
     def contextMenuEvent(self, event):
         menu = QMenu()
 
@@ -762,8 +703,73 @@ class StorageTank(BlockItem):
         e2.triggered.connect(self.printPortNb)
         menu.exec_(event.screenPos())
 
-    def printPortNb(self):
-        print("ST has "+ str(self.inputs) + " and " + str(self.outputs))
+    def mouseDoubleClickEvent(self, event):
+        dia = ConfigStorage(self, self.scene().parent())
+
+    def hasManPortById(self, idFind):
+
+        res = -1
+
+        for p in self.leftSide:
+            if p.id == idFind:
+                res = True
+
+        for p in self.rightSide:
+            if p.id == idFind:
+                res = False
+        return res
+
+    def deleteBlock(self):
+        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.deleteConns()
+        print("self.parent.parent" + str(self.parent.parent()))
+        self.parent.parent().trnsysObj.remove(self)
+        print("deleting block " + str(self) + self.displayName)
+        print("self.scene is" + str(self.parent.scene()))
+        self.parent.scene().removeItem(self)
+        del self
+
+
+    # Export related
+    def exportBlackBox(self):
+        equationNr = 0
+        resStr = ""
+
+        for p in self.inputs + self.outputs:
+            if not p.isFromHx:
+                if p.side == 0:
+                    lr = "Left"
+                else:
+                    lr = "Right"
+                resStr += "T" + self.displayName + "Port" + lr + str(
+                    int(100 * (1 - (p.scenePos().y() - p.parent.scenePos().y()) / p.parent.h))) + "=1\n"
+                equationNr += 1
+                continue
+            else:
+                # Check if there is at least one internal connection
+                # p.name == i to only allow one temperature entry per hx
+                # Prints the name of the Hx Connector element.
+                # Assumes that the Other port has no connection except to the storage
+                if len(p.connectionList) > 0 and p.name == 'i':
+                    # f += "T" + p.connectionList[1].displayName + "=1\n"
+                    print("dds " + p.connectionList[1].displayName)
+                    print("dds " + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName)
+                    print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
+                    # print("dds " + p.connectionList[2].displayName)
+
+                    # p is a hx port; the external port has two connections, so the second one yields the hx connector
+
+                    # Here the Hx name is printed.
+                    if p.connectionList[1].fromPort is p:
+                        # resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
+                    else:
+                        # resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
+
+                    equationNr += 1
+
+        return resStr, equationNr
 
     def exportParametersFlowSolver(self, descConnLength):
         return "", 0

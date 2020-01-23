@@ -645,8 +645,6 @@ class segmentItem(QGraphicsLineItem):
         menu.exec_(event.screenPos())
 
     def configGroup(self):
-        print("sle paras" + str(self.parent))
-        print("sle paras" + str(self.parent.parent))
         GroupChooserConnDlg(self.parent, self.parent.parent)
 
     def printGroup(self):
