@@ -58,8 +58,6 @@ class BlockItem(QGraphicsPixmapItem):
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
 
-        # print("Setting the displayName of " + str(self) + "to " + self.displayName)
-
         self.groupName = ''
         self.setDefaultGroup()
 
@@ -89,13 +87,15 @@ class BlockItem(QGraphicsPixmapItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
-        # Use svg instead of png for blocks:
+        # To use svg instead of png for blocks:
         # self.imageSource = "images/" + self.name + ".svg"
         # self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
         # self.setPixmap(self.image)
         # self.pixmap = self.image
 
+        # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
+        self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
         self.label = QGraphicsTextItem(self.displayName, self)
@@ -108,9 +108,7 @@ class BlockItem(QGraphicsPixmapItem):
             # Inputs get appended in ConfigStorage
             pass
 
-        self.setFlag(self.ItemSendsScenePositionChanges, True)
-
-        print("self.name is " + str(self.name))
+        print("Block name is " + str(self.name))
 
         # Update size for generic block:
         if self.name == 'Bvi':
@@ -122,8 +120,6 @@ class BlockItem(QGraphicsPixmapItem):
         # Undo framework related
         self.oldPos = None
 
-        print("pasdf" + str(self.parent.parent()))
-
     def setParent(self, p):
         self.parent = p
 
@@ -132,8 +128,6 @@ class BlockItem(QGraphicsPixmapItem):
             # print("trnsysObj are " + str(self.parent.parent().trnsysObj))
 
     def setDefaultGroup(self):
-        # self.groupName = "defaultGroup"
-        # self.parent.parent().defaultGroup.addBlock(self)
         self.setBlockToGroup("defaultGroup")
 
     def setBlockToGroup(self, newGroupName):
@@ -230,7 +224,6 @@ class BlockItem(QGraphicsPixmapItem):
             self.inputs[0].side = 0 + 2 * self.flippedH
             self.outputs[0].side = 0 + 2 * self.flippedH
 
-
         return w, h
 
     def updateFlipStateH(self, state):
@@ -280,8 +273,10 @@ class BlockItem(QGraphicsPixmapItem):
         # print("Port side is " + str(port.side))
 
     def rotateBlockCW(self):
-        # Hacky rotation function
-        self.setTransformOriginPoint(50, 50)
+        # Rotate block clockwise
+        # self.setTransformOriginPoint(50, 50)
+        # self.setTransformOriginPoint(self.w/2, self.h/2)
+        self.setTransformOriginPoint(0, 0)
         self.setRotation((self.rotationN + 1) * 90)
         self.rotationN += 1
         print("rotated by " + str(self.rotationN))
@@ -303,8 +298,9 @@ class BlockItem(QGraphicsPixmapItem):
                 self.rotateBlockCCW()
 
     def rotateBlockCCW(self):
-        # Hacky rotation function
-        self.setTransformOriginPoint(50, 50)
+        # Rotate block clockwise
+        # self.setTransformOriginPoint(50, 50)
+        self.setTransformOriginPoint(0, 0)
         self.setRotation((self.rotationN - 1) * 90)
         self.rotationN -= 1
         print("rotated by " + str(self.rotationN))

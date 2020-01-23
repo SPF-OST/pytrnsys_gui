@@ -25,59 +25,32 @@ class CornerItem(QGraphicsEllipseItem):
         # print("Change is " + str(change))
         if change == self.ItemScenePositionHasChanged:
             # print("pos change")
-
             # print("self has partial lenght " + str(self.parent.partialLength(self)))
             # print("Self is at " + str(self.parent.partialLength(self.node) / (self.parent.totalLength())) + "% of the whole connection")
 
             nNode = self.node.nextN()
             pNode = self.node.prevN()
 
-            # print("Parent is " + str(self.parent))
             positionInArr = self.parent.getNodePos(self)
 
             segBefore = self.parent.segments[positionInArr]
             segAfter = self.parent.segments[positionInArr + 1]
 
             # print("Position in arr is" + str(positionInArr))
-            # segsBefore.setLine(self.scenePos().x(), self.scenePos().y(), segsBefore.line().p2().x(), segsBefore.line().p2().y())
-            # segsBefore.setLine(self.scenePos().x(), self.scenePos().y(), segsBefore.line().p2().x(), segsBefore.line().p2().y())
 
             if type(nNode.parent) is CornerItem:
-                # segAfter.setPen(QPen(Qt.red))
-
                 segAfter.setLine(self.scenePos().x(), self.scenePos().y(), segAfter.line().p2().x(),
                                  segAfter.line().p2().y())
-                # pass
-
-                # elementsAtNextNode = self.scene().items(nNode.parent.scenePos())
-                # # print("Type of nNode parent is corner")
-                # for e in elementsAtNextNode:
-                #     if type(e) is segmentItem:
-                #         if e.endNode is nNode:
-                #             # print("This is the nnode segment")
-                #             e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(), e.line().p2().y())
 
             if type(pNode.parent) is CornerItem:
-                # segBefore.setPen(QPen(Qt.blue))
-
                 segBefore.setLine(segBefore.line().p1().x(), segBefore.line().p1().y(), self.scenePos().x(),
                                   self.scenePos().y())
 
-                # elementsAtNextNode = self.scene().items(pNode.parent.scenePos())
-                # # print("Type of pNode parent is corner")
-                # for e in elementsAtNextNode:
-                #     if type(e) is segmentItem:
-                #         if e.startNode is pNode:
-                #             # print("This is the pnode segment")
-                #             e.setLine(e.line().p1().x(), e.line().p1().y(), self.scenePos().x(), self.scenePos().y())
-
             if hasattr(nNode.parent, "fromPort"):
-
                 # print("The moving node (cornerItem) is " + str(self.node))
                 # print("type of nNode is conn")
 
                 # We have two options: either nNode is at a port or at a disrupted segment
-
                 if nNode.nextN() is not None:
                     # We are at a disrupted segment
                     pass
@@ -140,19 +113,7 @@ class CornerItem(QGraphicsEllipseItem):
 
                     if self.node.lastNode() is nNode:
                         print("nNode is at toPort")
-                        # tItems = self.scene().items(nNode.parent.toPort.scenePos())
-                        # print("items are " + str(tItems))
-                        # for t in tItems:
-                        #     if hasattr(t, "dragged"):
-                        #         if t.endNode is nNode:
-                        #             print("scenePos " + str(self.scenePos()))
-                        #             t.setLine(self.scenePos().x(), self.scenePos().y(), t.line().p2().x(),
-                        #                       t.line().p2().y())
                         t = self.parent.segments[-1]
-
-                        # print("theyr equal" + str(self.scenePos()) == t.)
-                        # t.setLine(self.scenePos().x(), self.scenePos().y(), t.line().p2().x(),
-                        #                       t.line().p2().y())
                         t.setLine(self.scenePos().x(), self.scenePos().y(), nNode.parent.toPort.scenePos().x(),
                                               nNode.parent.toPort.scenePos().y())
 
@@ -163,7 +124,6 @@ class CornerItem(QGraphicsEllipseItem):
                 if pNode.prevN() is not None:
                     # We are at a disrupted segment
                     pass
-
                     # segments = nNode.parent.segments
                     #
                     # s = None
@@ -219,17 +179,7 @@ class CornerItem(QGraphicsEllipseItem):
                 else:
                     if self.node.firstNode() is pNode:
                         print("pNode is at fromPort")
-                        # fItems = self.scene().items(pNode.parent.fromPort.scenePos())
-
-                        # for f in fItems:
-                        #     if hasattr(f, "dragged"):
-                        #         if f.startNode is pNode:
-                        #             f.setLine(f.line().p1().x(), f.line().p1().y(), self.scenePos().x(),
-                        #                       self.scenePos().y())
-
                         f = self.parent.segments[0]
-                        # f.setLine(f.line().p1().x(), f.line().p1().y(), self.scenePos().x(),
-                        #                       self.scenePos().y())
                         f.setLine(pNode.parent.fromPort.scenePos().x(), pNode.parent.fromPort.scenePos().y(), self.scenePos().x(),
                                               self.scenePos().y())
 

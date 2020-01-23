@@ -972,8 +972,10 @@ class DiagramEditor(QWidget):
     snapSize : int
         Size of align grid
 
-    *** layouts ***
-
+    horizontalLayout : :obj:`QHBoxLayout`
+    Contains the diagram editor and the layout containing the library browser view and the listview
+    vertL : :obj:`QVBoxLayout`
+    Cointains the library browser view and the listWidget
 
     datagen : :obj:`PipeDataHandler`
         Used for generating random massflows for every timestep to test the massflow
@@ -984,13 +986,13 @@ class DiagramEditor(QWidget):
         Contains the "logical" part of the diagram
     diagramView : :obj:`QGraphicsView`
         Contains the visualization of the diagramScene
-    self.startedConnection = False
-        tempStartPort : :obj:`PortItem`
-        connectionList : :obj:`List` of :obj:`Connection`
-        trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-        groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-        blockList : :obj:`List` of :obj:
-        graphicalObj : :obj:`List` of :obj:
+    startedConnection : Bool
+    tempStartPort : :obj:`PortItem`
+    connectionList : :obj:`List` of :obj:`Connection`
+    trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+    groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+    blockList : :obj:`List` of :obj:`BlockItem`
+    graphicalObj : :obj:`List` of :obj:`GraphicalItem`
     connLine : :obj:`QLineF`
     connLineItem = :obj:`QGraphicsLineItem`
 
@@ -1012,6 +1014,8 @@ class DiagramEditor(QWidget):
         self.pasting = False
         self.itemsSelected = False
 
+        self.moveDirectPorts = False
+
         self.editorMode = 1
         self.snapGrid = False
         self.snapSize = 50
@@ -1028,8 +1032,6 @@ class DiagramEditor(QWidget):
         self.libraryModel.setColumnCount(0)
 
         self.datagen = PipeDataHandler(self)
-
-        self.moveDirectPorts = False
 
         self.libItems = []
 
@@ -1078,7 +1080,6 @@ class DiagramEditor(QWidget):
         self.vertL.setStretchFactor(self.listV, 1)
 
         self.horizontalLayout.addLayout(self.vertL)
-
         self.horizontalLayout.addWidget(self.diagramView)
         self.horizontalLayout.setStretchFactor(self.diagramView, 5)
         self.horizontalLayout.setStretchFactor(self.libraryBrowserView, 1)
@@ -1088,8 +1089,8 @@ class DiagramEditor(QWidget):
         self.connectionList = []
         self.trnsysObj = []
         self.groupList = []
-        self.blockList = []
         self.graphicalObj = []
+        self.blockList = []
 
         self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
         self.defaultGroup.setName("defaultGroup")
@@ -1100,9 +1101,9 @@ class DiagramEditor(QWidget):
         self.printerUnitnr = 0
 
         # For debug button
-        a = 400  # Start of upmost button y-value
-        b = 50  # distance between starts of button y-values
-        b_start = 75
+        # a = 400  # Start of upmost button y-value
+        # b = 50  # distance between starts of button y-values
+        # b_start = 75
 
         # self.button = QPushButton(self)
         # self.button.setText("Print info")
@@ -1111,7 +1112,6 @@ class DiagramEditor(QWidget):
         # self.button.clicked.connect(self.button1_clicked)
 
         # Different colors for connLineColor
-
         colorsc = "red"
         linePx = 4
         if colorsc == "red":
@@ -1138,6 +1138,7 @@ class DiagramEditor(QWidget):
         self.alignYLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignYLineItem)
 
+        # For line that shows quickly up when using align mode
         self.alignXLine = QLineF()
         self.alignXLineItem = QGraphicsLineItem(self.alignXLine)
         self.alignXLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
@@ -1552,15 +1553,7 @@ class DiagramEditor(QWidget):
     def setName(self, newName):
         self.diagramName = newName
 
-    def delGroup(self):
-        """
-        This is used for deleting the first connected componts group found by BFS, unused
-        Returns
-        -------
 
-        """
-        for bl in self.blockList:
-            bl.deleteBlock()
 
     def delBlocks(self):
         """
@@ -2329,6 +2322,16 @@ class DiagramEditor(QWidget):
                 print("Found a loop in other")
                 rlist = []
                 return rlist.append(self)
+
+    def delGroup(self):
+        """
+        This is used for deleting the first connected componts group found by BFS, unused
+        Returns
+        -------
+
+        """
+        for bl in self.blockList:
+            bl.deleteBlock()
 
 
 class MainWindow(QMainWindow):

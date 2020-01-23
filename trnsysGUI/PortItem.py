@@ -52,7 +52,6 @@ class PortItem(QGraphicsEllipseItem):
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
-        # self.setBrush(QBrush(color))
         self.setBrush(QBrush(QtCore.Qt.white))
 
         # Hacky fix for no border of ellipse
@@ -70,13 +69,6 @@ class PortItem(QGraphicsEllipseItem):
         self.setParentItem(p)
 
     def itemChange(self, change, value):
-
-        # Here is something strange going on:
-        # posCallback is filled from unknown line
-        # The following lines are strange:
-        # print(str(self.scene()))    # Prints object of type diagramScene, ok
-        # print(str(self.scene().items))  # Error that NoneType object has no attribute 'items'
-        # Sometimes scene is None!
 
         if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
             if not self.savePos is None:
@@ -117,6 +109,7 @@ class PortItem(QGraphicsEllipseItem):
 
         if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 1:
             for conn in self.connectionList:
+                # Update position of connection label
                 conn.positionLabel()
 
                 if conn.fromPort is self:
@@ -136,9 +129,7 @@ class PortItem(QGraphicsEllipseItem):
                 else:
                     print("Error: In Mode 1, moving a portItem, portItem is wether from nor toPort")
 
-        # These line are somehow needed, need to investigate why
         if change == self.ItemScenePositionHasChanged:
-            # print(str(change))
             for cb in self.posCallbacks:
                 cb(value)
             return value

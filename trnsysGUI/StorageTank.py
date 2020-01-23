@@ -149,36 +149,21 @@ class StorageTank(BlockItem):
             self.directPortConnsForList.append(c)
             return c
 
-    def setLeftSideAuto(self, n):
-        # Momentarily not used
-        h = self.h
-        autoInputs = []
-
-        for i in range(n):
-            temp = PortItem('i', 0, self)
-            self.inputs.append(temp)
-            temp.setPos(-2 * StorageTank.delta, 1 / (n + 1) * h * (i + 1))
-            autoInputs.append(temp)
-
-        # self.connectInside(autoInputs, SOMELIST)
-
-    def setRightSideAuto(self, n):
-        # Momentarily not used
-        delta = 4
-        h = self.h
-        autoInputs = []
-
-        for i in range(n):
-            temp = PortItem('o', 0, self)
-            self.outputs.append(temp)
-            temp.setPos(2 * delta + 100, 1 / (n + 1) * h * (i + 1))
-            autoInputs.append(temp)
-
-        # self.connectInside(autoInputs, SOMELIST)
-
     def checkConnectInside(self, port1, port2, maxhops, d):
-        # Finds connection between the insideConnected of StorageTank but need improvement
-        # Basically a depth first algorithm
+        """
+        Was used to check if connectInside works
+        Basically a depth first algorithm
+        Parameters
+        ----------
+        port1
+        port2
+        maxhops
+        d
+
+        Returns
+        -------
+
+        """
         port1.visited = True
 
         print(" " * 3 * d + "In port1 " + str(port1) + "at depth " + str(d))
@@ -231,11 +216,27 @@ class StorageTank(BlockItem):
                     else:
                         print(" " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank")
 
-    def checkInside2(self, port1, port2, maxdepth, d):
-        # Same as checkInside, but using BFS
-        pass
-
     def connectInside(self, side, side2, tpList, sideVar):
+        """
+        Function generating the internal connections of the StorageTank direct ports
+        Parameters
+        ----------
+        side : :obj:`List` of :obj:`PortItem`
+        External Ports to which the generated elements are connected to
+
+        side2 : :obj:`List` of :obj:`PortItems`
+        StorageTank direct ports
+
+        tpList :obj:`List` of :obj:`TeePiece` or :obj:`Connector`
+        List of elements that should be deleted after the Trnsys export
+
+        sideVar : str
+        String added to the name of the generated elements
+
+        Returns
+        -------
+
+        """
         # Side should be list of all ports to the same side
         # Side is used in this function to store the nodes of one layer
         for si in side:
@@ -375,7 +376,28 @@ class StorageTank(BlockItem):
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
 
     def connectHxs(self, side, side2, connList, lr, heatX):
-        # Adds a Connector block and connections to the external blocks (both virtual)
+        """
+        Adds a Connector block and connections to the external blocks (both virtual)
+
+        Parameters
+        ----------
+        side : :obj:`List` of :obj:`PortItem`
+        List of corresponding (external, to connect) PortItems
+
+        side2 : :obj:`List` of :obj:`PortItem`
+        Pair of Hx ports
+
+        connList
+        lr : str
+        String that gets added to the generated element's name
+        heatX
+        HeatExchanger the ports are part of
+
+        Returns
+        -------
+
+        """
+
         print("ports have " + str(side[0].parent) + str(side[1].parent))
 
         connector = Connector("Connector", self.parent, storagePorts=side2)
