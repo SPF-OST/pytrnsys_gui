@@ -4,20 +4,34 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from trnsysGUI.Node import Node
 
-# Using hasattr to detect type of parent of node, better solution needed
-# No support for disr segements
-
 
 class CornerItem(QGraphicsEllipseItem):
     def __init__(self, x, y, r1, r2, prevNode, nextNode, parent=None):
+        """
+        CornerItems represent corners for each Connection.
+        When a segmentItem is dragged, it will also move the corners, which will trigger the CornerItem
+        itemChange method of Qt. There, the adjacent segments are redrawn.
+        
+        Note: Using hasattr to detect type of parent of node, better solution needed
+        Note: No support for disr (interrupted) segements
+
+        Parameters
+        ----------
+        x
+        y
+        r1 : int
+        semi-axis length in x direction
+        r2 : int
+        semi-axis length in y direction
+        prevNode
+        nextNode
+        parent
+        """
         super(CornerItem, self).__init__(x, y, r1, r2, None)
         print("init pos is " + str(self.pos()))
         self.parent = parent
         self.setBrush(QBrush(QtCore.Qt.black))
         self.node = Node(self, prevNode, nextNode)
-
-        # self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
-        # self.setFlag(self.ItemIsMovable, False)
 
         self.posCallbacks = []
 
@@ -180,8 +194,8 @@ class CornerItem(QGraphicsEllipseItem):
                     if self.node.firstNode() is pNode:
                         print("pNode is at fromPort")
                         f = self.parent.segments[0]
-                        f.setLine(pNode.parent.fromPort.scenePos().x(), pNode.parent.fromPort.scenePos().y(), self.scenePos().x(),
-                                              self.scenePos().y())
+                        f.setLine(pNode.parent.fromPort.scenePos().x(), pNode.parent.fromPort.scenePos().y(),
+                                  self.scenePos().x(), self.scenePos().y())
 
             for s in self.parent.segments:
                 s.updateGrad()

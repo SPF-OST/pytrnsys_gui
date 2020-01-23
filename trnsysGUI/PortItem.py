@@ -4,9 +4,6 @@ from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QMenu
 
 
-# from trnsysGUI.test import getID
-
-
 class PortItem(QGraphicsEllipseItem):
     def __init__(self, name, side, parent):
         self.parent = parent
@@ -15,6 +12,7 @@ class PortItem(QGraphicsEllipseItem):
         self.posCallbacks = []
         self.connectionList = []
         self.id = self.parent.parent.parent().idGen.getID()
+
         # This boolean is used when the storage inside is connected, thus preventing Hx to connect to that.
         self.isFromHx = False
 
@@ -29,9 +27,7 @@ class PortItem(QGraphicsEllipseItem):
         self.ashColorB = QColor(20, 83, 245)
 
         QGraphicsEllipseItem.__init__(self, QRectF(-8, -8, 16.0, 16.0), parent)
-        # QGraphicsEllipseItem.__init__(self, QRectF(-7, -7, 14.0, 14.0), parent)
 
-        # OuterRing should be called innerCircle
         self.innerCircle = QGraphicsEllipseItem(-4, -4, 8, 8, self)
         self.innerCircle.setPen(QPen(QColor(0, 0, 0, 0), 0))
 
@@ -52,6 +48,7 @@ class PortItem(QGraphicsEllipseItem):
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
+        # The Port itself is larger than only the innerCircle
         self.setBrush(QBrush(QtCore.Qt.white))
 
         # Hacky fix for no border of ellipse
@@ -61,6 +58,7 @@ class PortItem(QGraphicsEllipseItem):
         self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setAcceptHoverEvents(True)
 
+        # QUndo framework related
         self.savePos = None
         self.savedPos = False
 

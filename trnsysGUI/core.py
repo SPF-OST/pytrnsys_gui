@@ -78,11 +78,10 @@ __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
-# CSS Style-sheet
 from trnsysGUI.segmentDlg import segmentDlg
 
+# CSS file
 cssSs = open("res/style.txt", "r")
-
 
 def calcDist(p1, p2):
     """

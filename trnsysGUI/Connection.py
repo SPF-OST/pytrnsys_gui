@@ -113,8 +113,8 @@ class Connection(object):
                 # print("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
                 # self.initLoad()
 
-        # For dfs1
-        self.traversed = False
+        # Unused. For dfs1
+        # self.traversed = False
 
     # Note: Nodes can have as parent 1)Connection 2)CornerItem
     # In case 1), there are further two cases: a) Node is at port b) Node is at disr seg

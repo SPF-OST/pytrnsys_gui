@@ -22,7 +22,8 @@ class segmentItem(QGraphicsLineItem):
 
     def __init__(self, startNode, endNode, parent):
         """
-        Parameters
+        A connection is displayed as a chain of segmentItems (stored in Connection.segments)
+        Parameters.
         ----------
         startNode
         endNode
@@ -30,14 +31,13 @@ class segmentItem(QGraphicsLineItem):
         """
 
         super(segmentItem, self).__init__(None)
-        # print(QColor(QtCore.Qt.red).red())
 
         self.setFlag(self.ItemIsSelectable, True)
 
         self.dragged = False
         self.initialised = False
         self.parent = parent
-        # print("seg parent is " + str(self.parent))
+
         self.firstChild = None
         self.secondChild = None
         self.cornerChild = None
@@ -49,15 +49,13 @@ class segmentItem(QGraphicsLineItem):
         self.start = None
         self.end = None
 
+        # Unused. Related to interrupting segments for a clearer diagram
         self.disrBeforeNode = None
         self.disrAfterNode = None
-
         self.disrBeforeSeg = None
         self.disrAfterSeg = None
-
         self.disrBefore = False
         self.disrAfter = False
-
         self.hasBridge = False
         self.bridgedSegment = None
 
@@ -70,22 +68,17 @@ class segmentItem(QGraphicsLineItem):
         self.secondLine = None
 
         self.keyPr = 0
-        self.inited = False # Used to only create the child objects once
+        # Used to only create the child objects once
+        self.inited = False
 
         self.linearGrad = None
 
-        # self.id = getSegID()  # Only for debug used
         self.insertInParentSegments()
         self.initGrad()
 
         self.label = QGraphicsTextItem(self.parent.displayName, self.parent.fromPort)
-        # self.parent.parent.diagramScene.addItem(self.label)
-        # self.label.setPos(self.parent.fromPort.scenePos())
         self.label.setVisible(False)
         self.label.setFlag(self.ItemIsMovable, True)
-        # if len(self.parent.segments) > 1:
-        #     self.label.setVisible(False)
-        # print("line has start point " + str(self.line().p1()))
 
         self.oldX = None
         self.setToolTip(self.parent.displayName)

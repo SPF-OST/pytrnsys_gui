@@ -120,6 +120,7 @@ class BlockItem(QGraphicsPixmapItem):
         # Undo framework related
         self.oldPos = None
 
+    # Setter functions
     def setParent(self, p):
         self.parent = p
 
@@ -156,11 +157,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.displayName = newName
         self.label.setPlainText(newName)
 
-    def launchNotepadFile(self):
-        print("Launching notpad")
-        global FilePath
-        os.system('start notepad++ ' + FilePath)
 
+    # Interaction related
     def contextMenuEvent(self, event):
         menu = QMenu()
 
@@ -199,6 +197,32 @@ class BlockItem(QGraphicsPixmapItem):
 
         menu.exec_(event.screenPos())
 
+    def launchNotepadFile(self):
+        print("Launching notpad")
+        global FilePath
+        os.system('start notepad++ ' + FilePath)
+
+    def mouseDoubleClickEvent(self, event):
+        if hasattr(self, "isTempering"):
+            dia = self.parent.parent().showTVentilDlg(self)
+        else:
+            dia = self.parent.parent().showBlockDlg(self)
+
+    def mouseReleaseEvent(self, event):
+        # print("Released mouse over block")
+        if self.oldPos is None:
+            print("For Undo Framework: oldPos is None")
+        else:
+            if self.scenePos() != self.oldPos:
+                print("Block was dragged")
+                print("Old pos is" + str(self.oldPos))
+                command = MoveCommand(self, self.oldPos, "Move BlockItem")
+                self.parent.parent().parent().undoStack.push(command)
+                self.oldPos = self.scenePos()
+
+        super(BlockItem, self).mouseReleaseEvent(event)
+
+    # Transform related
     def changeSize(self):
         w = self.w
         h = self.h
@@ -237,36 +261,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
         self.changeSize()
-
-    def mouseDoubleClickEvent(self, event):
-        if hasattr(self, "isTempering"):
-            dia = self.parent.parent().showTVentilDlg(self)
-        else:
-            dia = self.parent.parent().showBlockDlg(self)
-
-    def mouseReleaseEvent(self, event):
-        # print("Released mouse over block")
-        if self.oldPos is None:
-            print("For Undo Framework: oldPos is None")
-        else:
-            if self.scenePos() != self.oldPos:
-                print("Block was dragged")
-                print("Old pos is" + str(self.oldPos))
-                command = MoveCommand(self, self.oldPos, "Move BlockItem")
-                self.parent.parent().parent().undoStack.push(command)
-                self.oldPos = self.scenePos()
-
-        super(BlockItem, self).mouseReleaseEvent(event)
-
-    def getConnections(self):
-        c = []
-        for i in self.inputs:
-            for cl in i.connectionList:
-                c.append(cl)
-        for o in self.outputs:
-            for cl in o.connectionList:
-                c.append(cl)
-        return c
 
     def updateSide(self, port, n):
         port.side = (port.side + n) % 4
@@ -332,6 +326,8 @@ class BlockItem(QGraphicsPixmapItem):
     def printRotation(self):
         print("Rotation is " + str(self.rotationN))
 
+
+    # Deletion related
     def deleteConns(self):
 
         for p in self.inputs:
@@ -352,9 +348,26 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.scene().removeItem(self)
         del self
 
+    def deleteBlockCom(self):
+        # command = trnsysGUI.DeleteBlockCommand.DeleteBlockCommand(self, "Delete block command")
+        # self.parent.parent().parent().undoStack.push(command)
+        self.parent.deleteBlockCom(self)
+
+
     def configGroup(self):
         # GroupChooserBlockDlg(self, self.parent.parent())
         self.parent.parent().showGroupChooserBlockDlg(self)
+
+    def getConnections(self):
+        c = []
+        for i in self.inputs:
+            for cl in i.connectionList:
+                c.append(cl)
+        for o in self.outputs:
+            for cl in o.connectionList:
+                c.append(cl)
+        return c
+
 
     def dumpBlockInfo(self):
         # for a in inspect.getMembers(self):
@@ -395,6 +408,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.parent().listV.addItem("Inputs: " + str(self.inputs))
         self.parent.parent().listV.addItem("Outputs: " + str(self.outputs))
 
+
+    # AlignMode related
     def itemChange(self, change, value):
         # print(change, value)
         # Snap grid excludes alignment
@@ -467,11 +482,10 @@ class BlockItem(QGraphicsPixmapItem):
                     return True
         return False
 
-    def deleteBlockCom(self):
-        # command = trnsysGUI.DeleteBlockCommand.DeleteBlockCommand(self, "Delete block command")
-        # self.parent.parent().parent().undoStack.push(command)
-        self.parent.deleteBlockCom(self)
 
+
+
+    # Encoding
     def encode(self):
         # Double check that no virtual block gets encoded
         if self.isVisible():
@@ -539,6 +553,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
+
+    # Export related
     def exportParameterSolver(self, descConnLength):
         temp = ""
         for i in self.inputs:
