@@ -795,6 +795,7 @@ class DiagramView(QGraphicsView):
             event.accept()
 
     def dropEvent(self, event):
+        """Here, the dropped icons create BlockItems/GraphicalItems"""
         if event.mimeData().hasFormat('component/name'):
             name = str(event.mimeData().data('component/name'), encoding='utf-8')
             print("name is " + name)
@@ -898,7 +899,17 @@ class DiagramView(QGraphicsView):
 
         super(DiagramView, self).mousePressEvent(event)
 
-    def deleteBlockCom  (self, bl):
+    def deleteBlockCom(self, bl):
+        """
+        Pushes the deleteBlockCommand onto the undoStack
+        Parameters
+        ----------
+        bl
+
+        Returns
+        -------
+
+        """
         command = DeleteBlockCommand(bl, "Delete block command")
         print("Deleted block")
         self.parent().parent().undoStack.push(command)
@@ -991,7 +1002,6 @@ class DiagramEditor(QWidget):
     connectionList : :obj:`List` of :obj:`Connection`
     trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
     groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-    blockList : :obj:`List` of :obj:`BlockItem`
     graphicalObj : :obj:`List` of :obj:`GraphicalItem`
     connLine : :obj:`QLineF`
     connLineItem = :obj:`QGraphicsLineItem`
@@ -1003,6 +1013,9 @@ class DiagramEditor(QWidget):
         self.diagramName = 'Untitled'
         self.saveAsPath = Path()
         self.idGen = IdGenerator()
+
+        # Generator for massflow display testing
+        self.datagen = PipeDataHandler(self)
 
         self.selectionMode = False
         self.groupMode = False
@@ -1017,6 +1030,8 @@ class DiagramEditor(QWidget):
         self.moveDirectPorts = False
 
         self.editorMode = 1
+
+        # Related to the grid blocks can snap to
         self.snapGrid = False
         self.snapSize = 50
 
@@ -1026,18 +1041,14 @@ class DiagramEditor(QWidget):
         self.libraryBrowserView = QListView(self)
         self.libraryModel = LibraryModel(self)
 
-        # Investigate why choosing 100 sets 2 columns
         self.libraryBrowserView.setGridSize(QSize(65, 65))
         self.libraryBrowserView.setResizeMode(QListView.Adjust)
         self.libraryModel.setColumnCount(0)
 
-        self.datagen = PipeDataHandler(self)
-
         self.libItems = []
 
-        # res folder for library icons
+        # Resource folder for library icons
         r_folder = "images/"
-
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Pump')),  'Pump'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Kollektor')),  'Kollektor'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TVentil')), 'TVentil'))
@@ -1057,7 +1068,6 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'PV')), 'PV'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GroundSourceHx')), 'GroundSourceHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
-
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
 
@@ -1090,7 +1100,6 @@ class DiagramEditor(QWidget):
         self.trnsysObj = []
         self.groupList = []
         self.graphicalObj = []
-        self.blockList = []
 
         self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
         self.defaultGroup.setName("defaultGroup")
@@ -1146,9 +1155,9 @@ class DiagramEditor(QWidget):
         self.diagramScene.addItem(self.alignXLineItem)
 
         # #Search related lists
-        self.bfs_visitedNodes = []
-        self.bfs_neighborNodes = []
-
+        # self.bfs_visitedNodes = []
+        # self.bfs_neighborNodes = []
+        # self.blockList = []
 
     # Debug function
     def dumpInformation(self):
@@ -1549,11 +1558,28 @@ class DiagramEditor(QWidget):
             #     t.trnsysConn = []
             t.cleanUpAfterTrnsysExport()
 
+    def sortTrnsysObj(self):
+        res = self.trnsysObj.sort(key=self.sortId)
+        for s in self.trnsysObj:
+            print("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
+
+    def sortId(self, l1):
+        """
+        Sort function returning a sortable key
+        Parameters
+        ----------
+        l1 : Block/Connection
+
+        Returns
+        -------
+
+        """
+        return l1.trnsysId
+
+
 
     def setName(self, newName):
         self.diagramName = newName
-
-
 
     def delBlocks(self):
         """
@@ -1571,6 +1597,22 @@ class DiagramEditor(QWidget):
             self.groupList[-1].deleteGroup()
 
         print("Groups are " + str(self.groupList))
+
+    def newDiagram(self):
+        self.centralWidget.delBlocks()
+
+        # global id
+        # global trnsysID
+        # global globalConnID
+
+        # self.id = 0
+        # self.trnsysID = 0
+        # self.globalConnID = 0
+
+        self.idGen.reset()
+        # newDiagramDlg(self)
+        self.showNewDiagramDlg()
+
 
     # Encoding / decoding
     def encode(self, filename, encodeList):
@@ -1708,25 +1750,6 @@ class DiagramEditor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-
-    def sortTrnsysObj(self):
-        res = self.trnsysObj.sort(key=self.sortId)
-        for s in self.trnsysObj:
-            print("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
-
-    def sortId(self, l1):
-        """
-        Sort function returning a sortable key
-        Parameters
-        ----------
-        l1 : Block/Connection
-
-        Returns
-        -------
-
-        """
-        return l1.trnsysId
-
     def copyElements(self):
         """
         Copies elements
@@ -1842,25 +1865,16 @@ class DiagramEditor(QWidget):
 
         self.itemsSelected = False
 
-    def newDiagram(self):
-        self.centralWidget.delBlocks()
 
-        # global id
-        # global trnsysID
-        # global globalConnID
-
-        # self.id = 0
-        # self.trnsysID = 0
-        # self.globalConnID = 0
-
-        self.idGen.reset()
-        # newDiagramDlg(self)
-        self.showNewDiagramDlg()
-
-    # Behavior:
-    # If saveas has not been used, diagram will be saved in /diagrams
-    # if saveas has been used, diagram will be saved in self.saveAsPath
+    # Saving related
     def save(self):
+        """
+        If saveas has not been used, diagram will be saved in "/diagrams"
+        If saveas has been used, diagram will be saved in self.saveAsPath
+        Returns
+        -------
+
+        """
         print("saveaspath is " + str(self.saveAsPath))
         if self.saveAsPath.name == '':
 
@@ -1937,32 +1951,8 @@ class DiagramEditor(QWidget):
         # print("Path is now: " + str(self.saveAsPath))
         # print("Diagram name is: " + self.diagramName)
 
-    def editGroups(self):
-        # groupsEditor(self)
-        self.showGroupsEditor()
 
-    def setConnLabelVis(self, b):
-        for c in self.trnsysObj:
-            if isinstance(c, Connection) and not c.isVirtualConn:
-                c.showLabel(b)
-        # Faster alternative, untested
-        # for c in self.connectionList:
-        #     if not c.isVirtualConn:
-        #         c.showLabel(b)
-
-    def updateConnGrads(self):
-        for t in self.trnsysObj:
-            if isinstance(t, Connection):
-                t.updateSegGrads()
-
-    def findGroupByName(self, name):
-        for g in self.groupList:
-            if g.displayName == name:
-                return g
-
-        return None
-
-
+    # Mode related
     def setAlignMode(self, b):
         self.alignMode = True
 
@@ -1990,6 +1980,33 @@ class DiagramEditor(QWidget):
 
     def setitemsSelected(self, b):
         self.itemsSelected = b
+
+
+    # Misc
+    def editGroups(self):
+        self.showGroupsEditor()
+
+    def setConnLabelVis(self, b):
+        for c in self.trnsysObj:
+            if isinstance(c, Connection) and not c.isVirtualConn:
+                c.showLabel(b)
+        # Faster alternative, untested
+        # for c in self.connectionList:
+        #     if not c.isVirtualConn:
+        #         c.showLabel(b)
+
+    def updateConnGrads(self):
+        for t in self.trnsysObj:
+            if isinstance(t, Connection):
+                t.updateSegGrads()
+
+    def findGroupByName(self, name):
+        for g in self.groupList:
+            if g.displayName == name:
+                return g
+
+        return None
+
 
     # Dialog calls
     def showBlockDlg(self, bl):
@@ -2409,9 +2426,9 @@ class MainWindow(QMainWindow):
         multipleDeleteAction.triggered.connect(self.deleteMultiple)
         multipleDeleteAction.setShortcut("Ctrl+d")
 
-        toggleEditorModeAction = QAction("Toggle editor mode", self)
-        toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
-        toggleEditorModeAction.setShortcut("m")
+        # toggleEditorModeAction = QAction("Toggle editor mode", self)
+        # toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
+        # toggleEditorModeAction.setShortcut("m")
 
         toggleSnapAction = QAction("Toggle snap grid", self)
         toggleSnapAction.triggered.connect(self.toggleSnap)
