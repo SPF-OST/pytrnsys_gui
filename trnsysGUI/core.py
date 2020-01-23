@@ -2392,7 +2392,21 @@ class MainWindow(QMainWindow):
         self.s1Menu.addAction(movePortAction)
 
         self.mb.addMenu(self.s1Menu)
-        self.mb.addMenu("Help")
+        AboutAction = QAction("About", self)
+        AboutAction.triggered.connect(self.showAbout)
+
+        VersionAction = QAction("Version", self)
+        VersionAction.triggered.connect(self.showVersion)
+
+        CreditsAction = QAction("Credits", self)
+        CreditsAction.triggered.connect(self.showCredits)
+
+        self.helpMenu = QMenu("Help")
+        self.helpMenu.addAction(AboutAction)
+        self.helpMenu.addAction(VersionAction)
+        self.helpMenu.addAction(CreditsAction)
+
+        self.mb.addMenu(self.helpMenu)
         self.mb.addSeparator()
 
         tb = self.addToolBar('Main Toolbar...')
@@ -2635,7 +2649,22 @@ class MainWindow(QMainWindow):
         # self.sb.showMessage(text)
         # #print("event")
 
+    def showAbout(self):
+        msgb = QMessageBox(self)
+        msgb.setText("PyQt based diagram editor coupled to Trnsys functions")
+        msgb.exec()
 
+    def showVersion(self):
+        msgb = QMessageBox(self)
+        msgb.setText("Currrent version is " + __version__ + " with status " + __status__)
+        msgb.exec()
+
+    def showCredits(self):
+        msgb = QMessageBox(self)
+        msgb.setText("<p><b>Contributors:</b></p>"
+                     "<p>Stefano Marti, Dani Carbonell, Mattia Battaglia, and Jeremias Schmidli."
+                     "Icons made by Jeremias Schmidli and with icons by Vaadin from  www.flaticon.com</p>")
+        msgb.exec()
 
 
 
