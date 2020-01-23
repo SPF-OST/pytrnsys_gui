@@ -285,12 +285,7 @@ class segmentItem(QGraphicsLineItem):
             self.startNode.setNext(self.endNode)
             self.endNode.setPrev(self.startNode)
 
-            # nextS.setVisible(False)
-            # nodeTodelete.parent.setVisible(False)
-            # print(self.parent.getCorners())
-
             posx1 = self.parent.segments[self.parent.segments.index(self) + 2].line().p2().x()
-            # posx2 = self.parent.segments[self.parent.segments.indexs(self)]
 
             self.parent.parent.diagramScene.removeItem(nextS)
             self.parent.segments.remove(nextS)
@@ -306,15 +301,41 @@ class segmentItem(QGraphicsLineItem):
             # del nodeTodelete.parent
             # del nodeTodelete
 
-            # print("ToPrint")
-            # print(self.startNode.parent.scenePos())
-            # print(self.endNode.parent.toPort.scenePos())
-
             # self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
                          # self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
 
             self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
                          posx1, self.startNode.parent.scenePos().y())
+
+    def deletePrevHorizSeg(self, b, prevS):
+        if b:
+            pass
+        else:
+            nodeTodelete1 = self.startNode
+            nodeTodelete2 = self.startNode.prevN()
+            self.startNode = prevS.startNode
+
+            self.startNode.setNext(self.endNode)
+            self.endNode.setPrev(self.startNode)
+
+            posx1 = self.parent.segments[self.parent.segments.index(self) - 2].line().p1().x()
+
+            self.parent.parent.diagramScene.removeItem(prevS)
+            self.parent.segments.remove(prevS)
+            self.parent.parent.diagramScene.removeItem(nodeTodelete1.parent)
+
+            indexOfSelf = self.parent.segments.index(self)
+            nextVS = self.parent.segments[indexOfSelf - 1]
+
+            self.parent.parent.diagramScene.removeItem(nextVS)
+            self.parent.segments.remove(nextVS)
+            self.parent.parent.diagramScene.removeItem(nodeTodelete2.parent)
+
+            # self.setLine(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y(),
+                         # self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
+
+            self.setLine(posx1, self.endNode.parent.scenePos().y(),
+                         self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
 
     def mouseReleaseEvent(self, e):
         # Should be same as below
@@ -344,6 +365,13 @@ class segmentItem(QGraphicsLineItem):
                                     self.endNode.parent.pos().y()):
                                 # print("Next h seg could be deleted")
                                 self.deleteNextHorizSeg(False, nextHorizSeg)
+                                return
+
+                            prevHorizSeg = self.parent.segments[self.parent.segments.index(self) - 2]
+                            if prevHorizSeg.isHorizontal() and int(prevHorizSeg.line().p2().y()) == int(
+                                    self.startNode.parent.pos().y()):
+                                # print("Prev h seg could be deleted")
+                                self.deletePrevHorizSeg(False, prevHorizSeg)
                                 return
 
                 if self.secondCorner is not None:
