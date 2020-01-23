@@ -78,7 +78,7 @@ class PortItem(QGraphicsEllipseItem):
         # print(str(self.scene().items))  # Error that NoneType object has no attribute 'items'
         # Sometimes scene is None!
 
-        if self.parent.parent.parent().moveHxPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
+        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
             if not self.savePos is None:
                 print("val is " + str(value))
                 value.setY(max(value.y(), 0))
@@ -145,7 +145,7 @@ class PortItem(QGraphicsEllipseItem):
         return super(PortItem, self).itemChange(change, value)
 
     def mousePressEvent(self, event):
-        if self.parent.parent.parent().moveHxPorts and hasattr(self.parent, 'heatExchangers'):
+        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers'):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
         else:

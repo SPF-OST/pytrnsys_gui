@@ -621,7 +621,7 @@ class DiagramScene(QGraphicsScene):
         print("Releasing mouse in DiagramScene...")
         self.parent().sceneMouseReleaseEvent(mouseEvent)
         super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
-        self.parent().moveHxPorts = False
+        self.parent().moveDirectPorts = False
         if self.parent().pasting:
             # Dismantle group
             self.parent().clearCopyGroup()
@@ -682,8 +682,8 @@ class DiagramScene(QGraphicsScene):
     def keyPressEvent(self, event):
         pass
         if event.key() == Qt.Key_L:
-            self.parent().moveHxPorts = not self.parent().moveHxPorts
-            print("Changing move bool to " + str(self.parent().moveHxPorts))
+            self.parent().moveDirectPorts = not self.parent().moveDirectPorts
+            print("Changing move bool to " + str(self.parent().moveDirectPorts))
 
         #     print("Toggling mode")
         #     # global editorMode
@@ -978,7 +978,7 @@ class DiagramEditor(QWidget):
     datagen : :obj:`PipeDataHandler`
         Used for generating random massflows for every timestep to test the massflow
         visualizer prototype
-    moveHxPorts: bool
+    moveDirectPorts: bool
         Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
     diagramScene : :obj:`QGraphicsScene`
         Contains the "logical" part of the diagram
@@ -1029,7 +1029,7 @@ class DiagramEditor(QWidget):
 
         self.datagen = PipeDataHandler(self)
 
-        self.moveHxPorts = False
+        self.moveDirectPorts = False
 
         self.libItems = []
 
@@ -1149,42 +1149,7 @@ class DiagramEditor(QWidget):
         self.bfs_neighborNodes = []
 
 
-    def create_icon(self, map_icon):
-        map_icon.fill()
-        painter = QPainter(map_icon)
-        painter.fillRect(10, 10, 40, 40, QColor(88, 233, 252))
-        # painter.setBrush(Qt.red)
-        painter.setBrush(QColor(252, 136, 98))
-        painter.drawEllipse(36, 2, 15, 15)
-        painter.setBrush(Qt.yellow)
-        painter.drawEllipse(20, 20, 20, 20)
-        painter.end()
-
-
-    # Debug buttons
-    def button1_clicked(self):
-        self.dumpInformation()
-        pass
-
-
-    def button2_clicked(self):
-        for c in self.connectionList:
-            c.buildBridges()
-
-    def button3_clicked(self):
-        self.exportData()
-
-    def button4_clicked(self):
-        self.cleanUpConnections()
-
-    def button5_clicked(self):
-        self.bfs_b()
-
-    def button6_clicked(self):
-        # Remember that first bfs has to be run!
-        self.delGroup()
-
-
+    # Debug function
     def dumpInformation(self):
         print("\n\nHello, this is a dump of the diagram information.\n")
         print("Mode is " + str(self.editorMode) + "\n")
@@ -1208,13 +1173,38 @@ class DiagramEditor(QWidget):
             c.printConn()
         print("")
 
+
     # Connections related methods
     def startConnection(self, port):
+        """
+        When a PortItem is clicked, it is saved into the tempStartPort
+
+        Parameters
+        ----------
+        port : :obj:`PortItem`
+
+        Returns
+        -------
+
+        """
         print("port is " + str(port))
         self.tempStartPort = port
         self.startedConnection = True
 
     def createConnection(self, startPort, endPort):
+        """
+        Creates a new connection if startPort and endPort are not the same. Is added as a command to the
+        undoStack.
+
+        Parameters
+        ----------
+        startPort : :obj:`PortItem`
+        endPort : :obj:`PortItem`
+
+        Returns
+        -------
+
+        """
         # print("Creating connection...")
         if startPort is not endPort:
             # if len(endPort.connectionList) == 0:
@@ -1223,6 +1213,17 @@ class DiagramEditor(QWidget):
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
+        """
+        Qt method that sets the line signalling the creation of a new connection.
+
+        Parameters
+        ----------
+        event
+
+        Returns
+        -------
+
+        """
         if self.startedConnection:
             # print("Started conn, should draw")
             tempx = self.tempStartPort.scenePos().x()
@@ -1265,6 +1266,14 @@ class DiagramEditor(QWidget):
 
     # Export related methods
     def setUpStorageInnerConns(self):
+        """
+        This function is called before the export file is generated. It connects all direct ports using TPieces and
+        Connections and it connects the HeatExchanger ports using a Connector block (this is because HeatExchangers
+        should work like BlockItems. This could maybe be improved by having a HeatExchanger as BlockItem sublclass.)
+        Returns
+        -------
+
+        """
         for t in self.trnsysObj:
             if type(t) is StorageTank:
 
@@ -1289,31 +1298,18 @@ class DiagramEditor(QWidget):
                 # print(t.insideConnLeft)
                 # print(t.insideConnRight)
 
-    def findStorageCorrespPorts1(self, portList):
-        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
-
-        res = []
-        # print("Finding c ports")
-        for p in portList:
-            if len(p.connectionList) > 0:           # check if not >1 needed
-                # connectionList[0] is the hidden connection created when the portPair is
-                i = 0
-                # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
-                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
-                    i += 1
-                if len(p.connectionList) >= i+1:
-                    if p.connectionList[i].fromPort is p:
-                        res.append(p.connectionList[i].toPort)
-                    elif p.connectionList[i].toPort is p:
-                        res.append(p.connectionList[i].fromPort)
-                    else:
-                        print("Port is not fromPort nor toPort")
-
-        # [print(p.parent.displayName) for p in res]
-        return res
-
     def findStorageCorrespPorts(self, portList):
-        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
+        """
+        This function gets the ports on the other side of pipes connected to a port of the StorageTank
+
+        Parameters
+        ----------
+        portList :obj:`List` of :obj:`PortItem`
+
+        Returns
+        -------
+        res : :obj:`List` of :obj:`PortItem`
+        """
 
         res = []
         for p in portList:
@@ -1335,8 +1331,16 @@ class DiagramEditor(QWidget):
         return res
 
     def findStorageCorrespPortsHx(self, portList):
-        res = []
+        """
+        Parameters
+        ----------
+        portList
 
+        Returns
+        -------
+        res : :obj:`List` of :obj:`PortItem`
+        """
+        res = []
         for p in portList:
             # print("Port has")
             # [print(c.displayName) for c in p.connectionList]
@@ -1359,6 +1363,12 @@ class DiagramEditor(QWidget):
         return res
 
     def tearDownStorageInnerConns(self):
+        """
+        Deletes all generated inner connections after exporting to Trnsys
+        Returns
+        -------
+
+        """
         for t in self.trnsysObj:
             if type(t) is StorageTank:
 
@@ -1420,15 +1430,6 @@ class DiagramEditor(QWidget):
                 t.hxInsideConnsRight = []
 
         # self.setTrnsysIdBack()
-
-    # def setTrnsysIdBack(self):
-    #
-    #     self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
-
-
-
-
-
 
     def exportData(self):
         print("------------------------> START OF EXPORT <------------------------")
@@ -1530,7 +1531,6 @@ class DiagramEditor(QWidget):
         self.tearDownStorageInnerConns()
         return exportPath
 
-
     def cleanUpExportedElements(self):
         for t in self.trnsysObj:
             # if isinstance(t, BlockItem):
@@ -1548,32 +1548,28 @@ class DiagramEditor(QWidget):
             #     t.trnsysConn = []
             t.cleanUpAfterTrnsysExport()
 
-    def exportSvg(self):
-
-        # For exporting a svg file (text is still too large):
-        generator = QSvgGenerator()
-        generator.setResolution(300)
-        generator.setSize(QSize(self.diagramScene.width(), self.diagramScene.height()))
-        # generator.setViewBox(QRect(0, 0, 800, 800))
-        generator.setViewBox(self.diagramScene.sceneRect())
-        generator.setFileName("VectorGraphicsExport.svg")
-
-        painter = QPainter()
-        painter.begin(generator)
-        painter.setRenderHint(QPainter.Antialiasing)
-        self.diagramScene.render(painter)
-        painter.end()
 
     def setName(self, newName):
         self.diagramName = newName
 
     def delGroup(self):
-        # This is used for deleting the first connected componts group found by BFS, unused
+        """
+        This is used for deleting the first connected componts group found by BFS, unused
+        Returns
+        -------
+
+        """
         for bl in self.blockList:
             bl.deleteBlock()
 
     def delBlocks(self):
-        # Deletesthe whole diagram
+        """
+        Deletes the whole diagram
+
+        Returns
+        -------
+
+        """
         while len(self.trnsysObj) > 0:
             print("In deleting...")
             self.trnsysObj[0].deleteBlock()
@@ -1583,243 +1579,7 @@ class DiagramEditor(QWidget):
 
         print("Groups are " + str(self.groupList))
 
-
-
-    # Graph searach related methods, unused
-    def bfs_b(self):
-        self.bfs(self.connectionList[0].fromPort)
-        # self.dfs1(self.connectionList[0].fromPort, 8, 0)
-        # print(self.dfs2(self.connectionList[0].fromPort, 8, 0))
-
-    def bfs(self, startPort):
-        self.bfs_neighborNodes.append(startPort)
-        self.bfs_visitedNodes.append(startPort)
-        self.blockList.append(startPort.parent)
-
-        node = None
-
-        # for j in range(3):
-        while len(self.bfs_neighborNodes) > 0:
-            node = self.bfs_neighborNodes.pop(0)
-
-            # conns = node.parent.getConnections()
-            for i in node.parent.getConnections():
-
-                print("Parent has connections " + str(node.
-                                                      parent.getConnections()))
-
-                # Looking at nodes of current block
-                if i.toPort.parent is node.parent and i.toPort is not node:
-                    if i.toPort not in self.bfs_visitedNodes:
-                        self.bfs_neighborNodes.append(i.toPort)
-                        self.bfs_visitedNodes.append(i.toPort)
-                        print("Adding toPort " + str(i.toPort))
-                        if i.toPort.parent not in self.blockList:
-                            self.blockList.append(i.toPort.parent)
-
-                # Looking at nodes of current block
-                if i.fromPort.parent is node.parent and i.fromPort is not node:
-                    if i.fromPort not in self.bfs_visitedNodes:
-                        self.bfs_neighborNodes.append(i.fromPort)
-                        self.bfs_visitedNodes.append(i.fromPort)
-                        print("Adding fromPort " + str(i.toPort))
-                        if i.fromPort.parent not in self.blockList:
-                            self.blockList.append(i.fromPort.parent)
-
-                # Looking at connection of node itself
-                if i.toPort == node and i.fromPort not in self.bfs_visitedNodes:
-                    self.bfs_neighborNodes.append(i.fromPort)
-                    self.bfs_visitedNodes.append(i.fromPort)
-                    print("Adding fromPort " + str(i.fromPort))
-                    if i.fromPort.parent not in self.blockList:
-                        self.blockList.append(i.fromPort.parent)
-
-                # Looking at connection of node itself
-                if i.fromPort == node and i.toPort not in self.bfs_visitedNodes:
-                    self.bfs_neighborNodes.append(i.toPort)
-                    self.bfs_visitedNodes.append(i.toPort)
-                    print("Adding toPort " + str(i.toPort))
-                    if i.toPort.parent not in self.blockList:
-                        self.blockList.append(i.toPort.parent)
-
-        print("Blocklist " + str(self.blockList) + "\n")
-
-    def dfs(self, port, maxdepth, d):
-        print("At port " + str(port))
-
-        # if port.visited:
-        #     print("Found a cycle")
-        #
-        # if port == self.connectionList[0].fromPort:
-        #     print("Found a cycle")
-
-        # Return condition
-        if d == maxdepth or port.visited:
-            print("Returning at port " + str(port) + ", " + str(port.parent))
-            return
-
-        port.visited = True
-
-        # Recursion
-        # Algorithm:
-        # Go through all connections port has, then through all connections the other ports of own block has
-
-        conns = port.parent.getConnections()
-        connsP = []
-        connsOthers = []
-
-        for c1 in conns:
-            if c1 in port.connectionList:
-                connsP.append(c1)
-            else:
-                connsOthers.append(c1)
-
-        # Assertion
-        # print("Sum of elements is " + str(len(connsP) + len(connsOthers)))
-
-        for c in connsP:
-            if c.fromPort is port and not c.toPort.visited:
-                self.dfs(c.toPort, maxdepth, d + 1)
-            if c.toPort is port and not c.fromPort.visited:
-                self.dfs(c.fromPort, maxdepth, d + 1)
-
-        for c in connsOthers:
-            if c.fromPort.parent is port.parent:
-                if not c.fromPort.visited:
-                    self.dfs(c.fromPort, maxdepth, d)
-
-            if c.toPort.parent is port.parent:
-                if not c.toPort.visited:
-                    self.dfs(c.toPort, maxdepth, d)
-
-    def dfs1(self, port, maxdepth, d):
-        print("At port " + str(port))
-
-        # Return condition
-        if d == maxdepth:
-            print("Returning at port " + str(port) + ", " + str(port.parent))
-            return
-
-        port.color = 'gray'
-
-        # Recursion
-        # Algorithm:
-        # Go through all connections port has, then through all connections the other ports of own block has
-
-        conns = port.parent.getConnections()
-        connsP = []
-        connsOthers = []
-
-        for c1 in conns:
-            if not c1.traversed:
-                if c1 in port.connectionList:
-                    connsP.append(c1)
-                else:
-                    connsOthers.append(c1)
-
-        # print("conns are now " + str(connsP))
-        # print("conns are now " + str(connsOthers))
-
-        # Assertion
-        # print("Sum of elements is " + str(len(connsP) + len(connsOthers)))
-
-        for c in connsP:
-
-            if c.fromPort is port:
-                if c.toPort.color == 'white':
-                    c.traversed = True
-                    self.dfs1(c.toPort, maxdepth, d + 1)
-                if c.toPort.color == 'gray':
-                    print("Found a loop, says port " + str(port))
-
-            if c.toPort is port:
-                if c.fromPort.color == 'white':
-                    c.traversed = True
-                    self.dfs1(c.fromPort, maxdepth, d + 1)
-                if c.fromPort.color == 'gray':
-                    print("Found a loop, says port " + str(port))
-
-        port.color = 'black'
-
-        for op in (port.parent.inputs + port.parent.outputs):
-            if op.color == 'white' and len(op.connectionList) > 0:
-                self.dfs1(op, maxdepth, d)
-            if op.color == 'gray':
-                print("Found a loop in other")
-
-    def dfs2(self, port, maxdepth, d):
-        print("At port " + str(port))
-
-        # Return condition
-        if d == maxdepth:
-            print("Returning at port " + str(port) + ", " + str(port.parent))
-            return
-
-        port.color = 'gray'
-
-        conns = port.parent.getConnections()
-        connsP = []
-        connsOthers = []
-
-        for c1 in conns:
-            if not c1.traversed:
-                if c1 in port.connectionList:
-                    connsP.append(c1)
-                else:
-                    connsOthers.append(c1)
-
-        # print("conns are now " + str(connsP))
-        # print("conns are now " + str(connsOthers))
-
-        # Assertion
-        # print("Sum of elements is " + str(len(connsP) + len(connsOthers)))
-
-        for c in connsP:
-
-            if c.fromPort is port:
-                if c.toPort.color == 'white':
-                    c.traversed = True
-                    rlist = self.dfs2(c.toPort, maxdepth, d + 1)
-                    if rlist is not None:
-                        return rlist.append(port)
-                    else:
-                        rlist = []
-                        return rlist.append(port)
-                if c.toPort.color == 'gray':
-                    print("Found a loop, says port " + str(port))
-                    rlist = []
-                    return rlist.append(port)
-
-            if c.toPort is port:
-                if c.fromPort.color == 'white':
-                    c.traversed = True
-                    rlist = self.dfs2(c.fromPort, maxdepth, d + 1)
-                    if rlist is not None:
-                        return rlist.append(port)
-                    else:
-                        rlist = []
-                        return rlist.append(port)
-                if c.fromPort.color == 'gray':
-                    print("Found a loop, says port " + str(port))
-                    rlist = []
-                    return rlist.append(port)
-        port.color = 'black'
-
-        for op in (port.parent.inputs + port.parent.outputs):
-            if op.color == 'white' and len(op.connectionList) > 0:
-                rlist = self.dfs2(op, maxdepth, d)
-                if rlist is not None:
-                    return rlist.append(port)
-                else:
-                    rlist = []
-                    return rlist.append(port)
-                return rlist.append(self)
-            if op.color == 'gray':
-                print("Found a loop in other")
-                rlist = []
-                return rlist.append(self)
-
-
+    # Encoding / decoding
     def encode(self, filename, encodeList):
         """
         Encoding function. Not used. encodeDiagram is used instead
@@ -1934,6 +1694,26 @@ class DiagramEditor(QWidget):
             if hasattr(t, "isTempering"):
                 print("tv has " +str(t.isTempering))
         # tempList = []
+
+    def exportSvg(self):
+        """
+        For exporting a svg file (text is still too large)
+        Returns
+        -------
+
+        """
+        generator = QSvgGenerator()
+        generator.setResolution(300)
+        generator.setSize(QSize(self.diagramScene.width(), self.diagramScene.height()))
+        # generator.setViewBox(QRect(0, 0, 800, 800))
+        generator.setViewBox(self.diagramScene.sceneRect())
+        generator.setFileName("VectorGraphicsExport.svg")
+
+        painter = QPainter()
+        painter.begin(generator)
+        painter.setRenderHint(QPainter.Antialiasing)
+        self.diagramScene.render(painter)
+        painter.end()
 
 
     def sortTrnsysObj(self):
@@ -2196,8 +1976,18 @@ class DiagramEditor(QWidget):
     def setEditorMode(self, b):
         self.editorMode = b
 
-    def setMoveHxPorts(self, b):
-        self.moveHxPorts = b
+    def setMoveDirectPorts(self, b):
+        """
+        Sets the bool moveDirectPorts. When mouse released in diagramScene, moveDirectPorts is set to False again
+        Parameters
+        ----------
+        b : bool
+
+        Returns
+        -------
+
+        """
+        self.moveDirectPorts = b
 
     def setSnapGrid(self, b):
         self.snapGrid = b
@@ -2258,9 +2048,287 @@ class DiagramEditor(QWidget):
     def getConnection(self, n):
         return self.connectionList[int(n)]
 
-    # def mouseMoveEvent(self, e):
-    #     print("In editor")
-    #     self.parent().mouseMoveEvent(e)
+    # Unused
+    def create_icon(self, map_icon):
+        map_icon.fill()
+        painter = QPainter(map_icon)
+        painter.fillRect(10, 10, 40, 40, QColor(88, 233, 252))
+        # painter.setBrush(Qt.red)
+        painter.setBrush(QColor(252, 136, 98))
+        painter.drawEllipse(36, 2, 15, 15)
+        painter.setBrush(Qt.yellow)
+        painter.drawEllipse(20, 20, 20, 20)
+        painter.end()
+
+    def setTrnsysIdBack(self):
+        self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
+
+    def findStorageCorrespPorts1(self, portList):
+        """
+        This function gets the ports on the other side of pipes connected to a port of the StorageTank. Unused
+
+        Parameters
+        ----------
+        portList : :obj:`List` of :obj:`PortItems`
+
+        Returns
+        -------
+
+        """
+
+        res = []
+        # print("Finding c ports")
+        for p in portList:
+            if len(p.connectionList) > 0:           # check if not >1 needed
+                # connectionList[0] is the hidden connection created when the portPair is
+                i = 0
+                # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
+                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
+                    i += 1
+                if len(p.connectionList) >= i+1:
+                    if p.connectionList[i].fromPort is p:
+                        res.append(p.connectionList[i].toPort)
+                    elif p.connectionList[i].toPort is p:
+                        res.append(p.connectionList[i].fromPort)
+                    else:
+                        print("Port is not fromPort nor toPort")
+
+        # [print(p.parent.displayName) for p in res]
+        return res
+
+    # Graph searach related methods, unused
+    def bfs_b(self):
+        self.bfs(self.connectionList[0].fromPort)
+        # self.dfs1(self.connectionList[0].fromPort, 8, 0)
+        # print(self.dfs2(self.connectionList[0].fromPort, 8, 0))
+
+    def bfs(self, startPort):
+        self.bfs_neighborNodes.append(startPort)
+        self.bfs_visitedNodes.append(startPort)
+        self.blockList.append(startPort.parent)
+
+        node = None
+
+        # for j in range(3):
+        while len(self.bfs_neighborNodes) > 0:
+            node = self.bfs_neighborNodes.pop(0)
+
+            # conns = node.parent.getConnections()
+            for i in node.parent.getConnections():
+
+                print("Parent has connections " + str(node.
+                                                      parent.getConnections()))
+
+                # Looking at nodes of current block
+                if i.toPort.parent is node.parent and i.toPort is not node:
+                    if i.toPort not in self.bfs_visitedNodes:
+                        self.bfs_neighborNodes.append(i.toPort)
+                        self.bfs_visitedNodes.append(i.toPort)
+                        print("Adding toPort " + str(i.toPort))
+                        if i.toPort.parent not in self.blockList:
+                            self.blockList.append(i.toPort.parent)
+
+                # Looking at nodes of current block
+                if i.fromPort.parent is node.parent and i.fromPort is not node:
+                    if i.fromPort not in self.bfs_visitedNodes:
+                        self.bfs_neighborNodes.append(i.fromPort)
+                        self.bfs_visitedNodes.append(i.fromPort)
+                        print("Adding fromPort " + str(i.toPort))
+                        if i.fromPort.parent not in self.blockList:
+                            self.blockList.append(i.fromPort.parent)
+
+                # Looking at connection of node itself
+                if i.toPort == node and i.fromPort not in self.bfs_visitedNodes:
+                    self.bfs_neighborNodes.append(i.fromPort)
+                    self.bfs_visitedNodes.append(i.fromPort)
+                    print("Adding fromPort " + str(i.fromPort))
+                    if i.fromPort.parent not in self.blockList:
+                        self.blockList.append(i.fromPort.parent)
+
+                # Looking at connection of node itself
+                if i.fromPort == node and i.toPort not in self.bfs_visitedNodes:
+                    self.bfs_neighborNodes.append(i.toPort)
+                    self.bfs_visitedNodes.append(i.toPort)
+                    print("Adding toPort " + str(i.toPort))
+                    if i.toPort.parent not in self.blockList:
+                        self.blockList.append(i.toPort.parent)
+
+        print("Blocklist " + str(self.blockList) + "\n")
+
+    def dfs(self, port, maxdepth, d):
+        print("At port " + str(port))
+
+        # if port.visited:
+        #     print("Found a cycle")
+        #
+        # if port == self.connectionList[0].fromPort:
+        #     print("Found a cycle")
+
+        # Return condition
+        if d == maxdepth or port.visited:
+            print("Returning at port " + str(port) + ", " + str(port.parent))
+            return
+
+        port.visited = True
+
+        # Recursion
+        # Algorithm:
+        # Go through all connections port has, then through all connections the other ports of own block has
+
+        conns = port.parent.getConnections()
+        connsP = []
+        connsOthers = []
+
+        for c1 in conns:
+            if c1 in port.connectionList:
+                connsP.append(c1)
+            else:
+                connsOthers.append(c1)
+
+        # Assertion
+        # print("Sum of elements is " + str(len(connsP) + len(connsOthers)))
+
+        for c in connsP:
+            if c.fromPort is port and not c.toPort.visited:
+                self.dfs(c.toPort, maxdepth, d + 1)
+            if c.toPort is port and not c.fromPort.visited:
+                self.dfs(c.fromPort, maxdepth, d + 1)
+
+        for c in connsOthers:
+            if c.fromPort.parent is port.parent:
+                if not c.fromPort.visited:
+                    self.dfs(c.fromPort, maxdepth, d)
+
+            if c.toPort.parent is port.parent:
+                if not c.toPort.visited:
+                    self.dfs(c.toPort, maxdepth, d)
+
+    def dfs1(self, port, maxdepth, d):
+        print("At port " + str(port))
+
+        # Return condition
+        if d == maxdepth:
+            print("Returning at port " + str(port) + ", " + str(port.parent))
+            return
+
+        port.color = 'gray'
+
+        # Recursion
+        # Algorithm:
+        # Go through all connections port has, then through all connections the other ports of own block has
+
+        conns = port.parent.getConnections()
+        connsP = []
+        connsOthers = []
+
+        for c1 in conns:
+            if not c1.traversed:
+                if c1 in port.connectionList:
+                    connsP.append(c1)
+                else:
+                    connsOthers.append(c1)
+
+        # print("conns are now " + str(connsP))
+        # print("conns are now " + str(connsOthers))
+
+        # Assertion
+        # print("Sum of elements is " + str(len(connsP) + len(connsOthers)))
+
+        for c in connsP:
+
+            if c.fromPort is port:
+                if c.toPort.color == 'white':
+                    c.traversed = True
+                    self.dfs1(c.toPort, maxdepth, d + 1)
+                if c.toPort.color == 'gray':
+                    print("Found a loop, says port " + str(port))
+
+            if c.toPort is port:
+                if c.fromPort.color == 'white':
+                    c.traversed = True
+                    self.dfs1(c.fromPort, maxdepth, d + 1)
+                if c.fromPort.color == 'gray':
+                    print("Found a loop, says port " + str(port))
+
+        port.color = 'black'
+
+        for op in (port.parent.inputs + port.parent.outputs):
+            if op.color == 'white' and len(op.connectionList) > 0:
+                self.dfs1(op, maxdepth, d)
+            if op.color == 'gray':
+                print("Found a loop in other")
+
+    def dfs2(self, port, maxdepth, d):
+        print("At port " + str(port))
+
+        # Return condition
+        if d == maxdepth:
+            print("Returning at port " + str(port) + ", " + str(port.parent))
+            return
+
+        port.color = 'gray'
+
+        conns = port.parent.getConnections()
+        connsP = []
+        connsOthers = []
+
+        for c1 in conns:
+            if not c1.traversed:
+                if c1 in port.connectionList:
+                    connsP.append(c1)
+                else:
+                    connsOthers.append(c1)
+
+        # print("conns are now " + str(connsP))
+        # print("conns are now " + str(connsOthers))
+
+        # Assertion
+        # print("Sum of elements is " + str(len(connsP) + len(connsOthers)))
+
+        for c in connsP:
+
+            if c.fromPort is port:
+                if c.toPort.color == 'white':
+                    c.traversed = True
+                    rlist = self.dfs2(c.toPort, maxdepth, d + 1)
+                    if rlist is not None:
+                        return rlist.append(port)
+                    else:
+                        rlist = []
+                        return rlist.append(port)
+                if c.toPort.color == 'gray':
+                    print("Found a loop, says port " + str(port))
+                    rlist = []
+                    return rlist.append(port)
+
+            if c.toPort is port:
+                if c.fromPort.color == 'white':
+                    c.traversed = True
+                    rlist = self.dfs2(c.fromPort, maxdepth, d + 1)
+                    if rlist is not None:
+                        return rlist.append(port)
+                    else:
+                        rlist = []
+                        return rlist.append(port)
+                if c.fromPort.color == 'gray':
+                    print("Found a loop, says port " + str(port))
+                    rlist = []
+                    return rlist.append(port)
+        port.color = 'black'
+
+        for op in (port.parent.inputs + port.parent.outputs):
+            if op.color == 'white' and len(op.connectionList) > 0:
+                rlist = self.dfs2(op, maxdepth, d)
+                if rlist is not None:
+                    return rlist.append(port)
+                else:
+                    rlist = []
+                    return rlist.append(port)
+                return rlist.append(self)
+            if op.color == 'gray':
+                print("Found a loop in other")
+                rlist = []
+                return rlist.append(self)
 
 
 class MainWindow(QMainWindow):
@@ -2649,7 +2717,7 @@ class MainWindow(QMainWindow):
         os.system(cmd)
 
     def movePorts(self):
-        self.centralWidget.moveHxPorts = True
+        self.centralWidget.moveDirectPorts = True
 
     def mouseMoveEvent(self, e):
         pass
@@ -2676,7 +2744,6 @@ class MainWindow(QMainWindow):
                      "<p>Stefano Marti, Dani Carbonell, Mattia Battaglia, and Jeremias Schmidli."
                      "Icons made by Jeremias Schmidli and with icons by Vaadin from  www.flaticon.com</p>")
         msgb.exec()
-
 
 
 if __name__ == '__main__':
