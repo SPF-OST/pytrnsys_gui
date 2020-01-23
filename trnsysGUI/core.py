@@ -2285,14 +2285,19 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
         self.labelVisState = False
 
+        # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
         saveDiaAction.triggered.connect(self.saveDia)
+
         loadDiaAction = QAction(QIcon('images/outbox.png'), "Load system diagram", self)
         loadDiaAction.triggered.connect(self.loadDia)
+
         exportTrnsysAction = QAction(QIcon('images/font-file.png'), "Export trnsys file", self)
         exportTrnsysAction.triggered.connect(self.exportTrnsys)
+
         renameDiaAction = QAction(QIcon('images/text-label.png'), "Rename system diagram", self)
         renameDiaAction.triggered.connect(self.renameDia)
+
         deleteDiaAction = QAction(QIcon('images/trash.png'), "Delete system diagram", self)
         deleteDiaAction.triggered.connect(self.deleteDia)
 
@@ -2304,8 +2309,10 @@ class MainWindow(QMainWindow):
 
         zoomInAction = QAction(QIcon('images/zoom-in.png'), "Zoom in", self)
         zoomInAction.triggered.connect(self.setZoomIn)
+
         zoomOutAction = QAction(QIcon('images/zoom-Out.png'), "Zoom Out", self)
         zoomOutAction.triggered.connect(self.setZoomOut)
+
         zoom0Action = QAction(QIcon('images/zoom-0.png'), "Reset zoom", self)
         zoom0Action.triggered.connect(self.setZoom0)
 
@@ -2352,63 +2359,7 @@ class MainWindow(QMainWindow):
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
-        self.mb = self.menuBar()
-        self.fileMenu = QMenu("File")
-
-        fileMenuNewAction = QAction("New", self)
-        fileMenuNewAction.triggered.connect(self.newDia)
-        self.fileMenu.addAction(fileMenuNewAction)
-
-        fileMenuOpenAction = QAction("Open", self)
-
-        fileMenuOpenAction.triggered.connect(self.openFile)
-        fileMenuOpenAction.setShortcut("Ctrl+o")
-        self.fileMenu.addAction(fileMenuOpenAction)
-
-        fileMenuSaveAction = QAction("Save", self)
-        fileMenuSaveAction.triggered.connect(self.saveDia)
-        fileMenuSaveAction.setShortcut("Ctrl+s")
-        self.fileMenu.addAction(fileMenuSaveAction)
-
-        fileMenuSaveAsAction = QAction("Save as", self)
-        fileMenuSaveAsAction.triggered.connect(self.saveDiaAs)
-        self.fileMenu.addAction(fileMenuSaveAsAction)
-
-        changeSettingsAction = QAction("Change settings", self)
-        changeSettingsAction.triggered.connect(self.changeSettings)
-        self.fileMenu.addAction(changeSettingsAction)
-
-        movePortAction = QAction("Move direct ports", self)
-        movePortAction.triggered.connect(self.movePorts)
-        movePortAction.setShortcut("ctrl+m")
-
-        self.mb.addMenu(self.fileMenu)
-
-        self.s1Menu = QMenu("Edit")
-        # self.s1Menu.addAction(toggleEditorModeAction)
-        self.s1Menu.addAction(multipleDeleteAction)
-        self.s1Menu.addAction(toggleSnapAction)
-        self.s1Menu.addAction(toggleAlignModeAction)
-        self.s1Menu.addAction(movePortAction)
-
-        self.mb.addMenu(self.s1Menu)
-        AboutAction = QAction("About", self)
-        AboutAction.triggered.connect(self.showAbout)
-
-        VersionAction = QAction("Version", self)
-        VersionAction.triggered.connect(self.showVersion)
-
-        CreditsAction = QAction("Credits", self)
-        CreditsAction.triggered.connect(self.showCredits)
-
-        self.helpMenu = QMenu("Help")
-        self.helpMenu.addAction(AboutAction)
-        self.helpMenu.addAction(VersionAction)
-        self.helpMenu.addAction(CreditsAction)
-
-        self.mb.addMenu(self.helpMenu)
-        self.mb.addSeparator()
-
+        # Tool bar
         tb = self.addToolBar('Main Toolbar...')
         tb.setObjectName('Toolbar')
         tb.addAction(saveDiaAction)
@@ -2430,9 +2381,69 @@ class MainWindow(QMainWindow):
         tb.addAction(runMassflowSolverAction)
         tb.addAction(trnsysList)
 
+        # Menu bar actions
+        self.fileMenu = QMenu("File")
+
+        fileMenuNewAction = QAction("New", self)
+        fileMenuNewAction.triggered.connect(self.newDia)
+        fileMenuNewAction.setShortcut("Ctrl+n")
+        self.fileMenu.addAction(fileMenuNewAction)
+
+        fileMenuOpenAction = QAction("Open", self)
+        fileMenuOpenAction.triggered.connect(self.openFile)
+        fileMenuOpenAction.setShortcut("Ctrl+o")
+        self.fileMenu.addAction(fileMenuOpenAction)
+
+        fileMenuSaveAction = QAction("Save", self)
+        fileMenuSaveAction.triggered.connect(self.saveDia)
+        fileMenuSaveAction.setShortcut("Ctrl+s")
+        self.fileMenu.addAction(fileMenuSaveAction)
+
+        fileMenuSaveAsAction = QAction("Save as", self)
+        fileMenuSaveAsAction.triggered.connect(self.saveDiaAs)
+        self.fileMenu.addAction(fileMenuSaveAsAction)
+
+        changeSettingsAction = QAction("Change settings", self)
+        changeSettingsAction.triggered.connect(self.changeSettings)
+        self.fileMenu.addAction(changeSettingsAction)
+
+        movePortAction = QAction("Move direct ports", self)
+        movePortAction.triggered.connect(self.movePorts)
+        movePortAction.setShortcut("ctrl+m")
+
+        self.editMenu = QMenu("Edit")
+        # self.editMenu.addAction(toggleEditorModeAction)
+        self.editMenu.addAction(multipleDeleteAction)
+        self.editMenu.addAction(toggleSnapAction)
+        self.editMenu.addAction(toggleAlignModeAction)
+        self.editMenu.addAction(movePortAction)
+
+        AboutAction = QAction("About", self)
+        AboutAction.triggered.connect(self.showAbout)
+
+        VersionAction = QAction("Version", self)
+        VersionAction.triggered.connect(self.showVersion)
+
+        CreditsAction = QAction("Credits", self)
+        CreditsAction.triggered.connect(self.showCredits)
+
+        self.helpMenu = QMenu("Help")
+        self.helpMenu.addAction(AboutAction)
+        self.helpMenu.addAction(VersionAction)
+        self.helpMenu.addAction(CreditsAction)
+
+        # Menu bar
+        self.mb = self.menuBar()
+        self.mb.addMenu(self.fileMenu)
+        self.mb.addMenu(self.editMenu)
+        self.mb.addMenu(self.helpMenu)
+        self.mb.addSeparator()
+
+        # Status bar
         self.sb = self.statusBar()
         self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
 
+        # QUndo framework
         self.undoStack = QUndoStack(self)
         undoAction = self.undoStack.createUndoAction(self, "Undo")
         undoAction.setShortcut("Ctrl+z")
@@ -2440,8 +2451,8 @@ class MainWindow(QMainWindow):
         redoAction = self.undoStack.createRedoAction(self, "Redo")
         redoAction.setShortcut("Ctrl+y")
 
-        self.s1Menu.addAction(undoAction)
-        self.s1Menu.addAction(redoAction)
+        self.editMenu.addAction(undoAction)
+        self.editMenu.addAction(redoAction)
 
         # self.undowidget = QUndoView(self.undoStack, self)
         # self.undowidget.setMinimumSize(300, 100)
