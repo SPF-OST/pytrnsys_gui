@@ -453,58 +453,9 @@ class Connection(object):
         print(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
 
-        if ((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
-                (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
-                self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
-            print("Ports are directed to each other")
-            self.clearConn()
 
-            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
-            corner1.node.setNext(corner2.node)
-
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, self.endNode, self)
-
-            self.startNode.setNext(corner1.node)
-            self.endNode.setPrev(corner2.node)
-
-            # print("niceConn...")
-            self.printConnNodes()
-            self.parent.diagramScene.addItem(seg1)
-            self.parent.diagramScene.addItem(seg2)
-            self.parent.diagramScene.addItem(seg3)
-
-            self.parent.diagramScene.addItem(corner1)
-            self.parent.diagramScene.addItem(corner2)
-
-            pos1 = self.fromPort.scenePos()
-            pos2 = self.toPort.scenePos()
-
-            midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
-
-            help_point_1 = QPointF(midx, pos1.y())
-            help_point_2 = QPointF(midx, pos2.y())
-
-            seg1.setLine(QLineF(pos1, help_point_1))
-            seg2.setLine(QLineF(help_point_1, help_point_2))
-            seg3.setLine(QLineF(help_point_2, pos2))
-
-            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
-
-            corner1.setZValue(100)
-            corner2.setZValue(100)
-            self.fromPort.setZValue(100)
-            self.toPort.setZValue(100)
-            print("Here in niceconn")
-
-            corner1.setPos(help_point_1)
-            corner2.setPos(help_point_2)
-
-        elif (self.fromPort.side == 2) and (self.toPort.side == 2):
+        if (self.fromPort.side == 2) and (self.toPort.side == 2):
             print("NiceConn 2 to 2")
             portOffset = 30
             self.clearConn()
@@ -636,12 +587,60 @@ class Connection(object):
             corner4.setPos(p4)
 
         else:
-            print("No compatible layout found between port")
-            print("Sides are " + str(self.fromPort.side) + " and " + str(self.toPort.side))
+        # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
+        #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
+        #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
 
-        self.firstS = self.getFirstSeg()
+            print("Ports are directed to each other")
+            self.clearConn()
 
-        print("Conn has now " + str(self.firstS))
+            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+
+            corner1.node.setNext(corner2.node)
+
+            seg1 = segmentItem(self.startNode, corner1.node, self)
+            seg2 = segmentItem(corner1.node, corner2.node, self)
+            seg3 = segmentItem(corner2.node, self.endNode, self)
+
+            self.startNode.setNext(corner1.node)
+            self.endNode.setPrev(corner2.node)
+
+            # print("niceConn...")
+            self.printConnNodes()
+            self.parent.diagramScene.addItem(seg1)
+            self.parent.diagramScene.addItem(seg2)
+            self.parent.diagramScene.addItem(seg3)
+
+            self.parent.diagramScene.addItem(corner1)
+            self.parent.diagramScene.addItem(corner2)
+
+            pos1 = self.fromPort.scenePos()
+            pos2 = self.toPort.scenePos()
+
+            midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
+
+            help_point_1 = QPointF(midx, pos1.y())
+            help_point_2 = QPointF(midx, pos2.y())
+
+            seg1.setLine(QLineF(pos1, help_point_1))
+            seg2.setLine(QLineF(help_point_1, help_point_2))
+            seg3.setLine(QLineF(help_point_2, pos2))
+
+            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
+
+            corner1.setZValue(100)
+            corner2.setZValue(100)
+            self.fromPort.setZValue(100)
+            self.toPort.setZValue(100)
+            print("Here in niceconn")
+
+            corner1.setPos(help_point_1)
+            corner2.setPos(help_point_2)
+            self.firstS = self.getFirstSeg()
+
+            print("Conn has now " + str(self.firstS))
 
     def clearConn(self):
         # Deletes all segments and corners in connection
@@ -863,13 +862,11 @@ class Connection(object):
         # Returns the cummulative length of line up to given node
         # Assumes that segments is ordered correctly!
         res = 0
-        # print("Node calling pL is " + str(node))
         # print("Segments has len " + str(len(self.segments)))
         if node == self.startNode:
             return res
 
         for i in self.segments:
-            # print("Current seg is " + str(i))
             # print("Adding " + str(calcDist(i.line().p1(), i.line().p2())))
             res += calcDist(i.line().p1(), i.line().p2())
             if i.endNode == node:
@@ -927,6 +924,7 @@ class Connection(object):
         element.setPrev(ne)
 
     def getCorners(self):
+        # Returns a list containing all the corners of this connection
         res = []
 
         tempNode = self.startNode.nextN()
@@ -935,19 +933,7 @@ class Connection(object):
             res.append(tempNode.parent)
             tempNode = tempNode.nextN()
 
-        # for s in self.segments:
-        #     elements = self.parent.diagramScene.items(s.line().p2())
-        #     for e in elements:
-        #         if type(e) is CornerItem:
-        #             # print("Found corner" + str(e))
-        #             res.append(e)
-
-        # print("Corners are " + str(res))
-        # print("Calling printconn from ")
-        # self.printConn()
-
         # print("getcorners gives " + str(res))
-
         return res
 
     def setDefaultGroup(self):
@@ -972,7 +958,6 @@ class Connection(object):
             self.groupName = newGroupName
 
     def highlightConn(self):
-
         self.unhighlightOtherConns()
 
         for s in self.segments:
@@ -1117,9 +1102,6 @@ class Connection(object):
             temp += str(self.toPort.parent.trnsysId + self.toPort.parent.getSubBlockOffset(self))
         else:
             temp += str(self.toPort.parent.trnsysId)
-
-            # temp = str(self.fromPort.parent.trnsysId) + " " + str(
-            #     self.toPort.parent.trnsysId) + " 0" * 2 + " "  # + str(t.trnsysId)
 
         temp += " 0" * 2 + " "
         self.exportConnsString = temp
