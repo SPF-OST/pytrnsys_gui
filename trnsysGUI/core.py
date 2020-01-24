@@ -250,9 +250,6 @@ class DiagramDecoderPaste(json.JSONDecoder):
                             c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
                                            segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
-                            # c.id = i["ConnID"]
-                            # c.connId = i["ConnCID"]
-                            # c.trnsysId = i["trnsysID"]
                             c.setName(i["ConnDisplayName"] + "COPY")
 
                             # Note: This wouldn't allow two connections to the same port (which is not really used, but ok)
@@ -396,44 +393,12 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.decode(i, resConnList, resBlockList)
 
                     elif ".__ConnectionDict__" in arr[k]:
-                        # print("Loading a connection in Decoder")
-                        # i = arr[k]
-                        #
-                        # fport = None
-                        # tPort = None
-                        #
-                        # for connBl in resBlockList:
-                        #     for p in connBl.inputs + connBl.outputs:
-                        #         if p.id == i["PortFromID"]:
-                        #             fport = p
-                        #         if p.id == i["PortToID"]:
-                        #             tPort = p
-                        #
-                        # if fport is None:
-                        #     print("Did not found a fromPort")
-                        #
-                        # if tPort is None:
-                        #     print("Did not found a tPort")
-                        #
-                        # # if not i["isVirtualConn"]:  # Now internal connections don't get encoded in the first place
-                        # if True:
-                        #     c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
-                        #                    fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                        #                    segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
-                        #     c.id = i["ConnID"]
-                        #     c.connId = i["ConnCID"]
-                        #     c.trnsysId = i["trnsysID"]
-                        #     # c.displayName = i["ConnDisplayName"]
-                        #     c.setName(i["ConnDisplayName"])
-                        #     c.groupName = "defaultGroup"
-                        #     c.setConnToGroup(i["GroupName"])
-                        #
-                        #     resConnList.append(c)
-
                         i = arr[k]
+
                         fport = None
                         tPort = None
 
+                        # Looking for the ports the connection is connected to
                         for connBl in resBlockList:
                             for p in connBl.inputs + connBl.outputs:
                                 if p.id == i["PortFromID"]:
@@ -447,7 +412,7 @@ class DiagramDecoder(json.JSONDecoder):
                         if tPort is None:
                             print("Error: Did not found a toPort")
 
-                        # To allow loading json files without FirstSegmentPos
+                        # To allow loading json files without FirstSegmentPos (old version of encoding)
                         if "FirstSegmentLabelPos" in i:
                             c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
@@ -460,9 +425,6 @@ class DiagramDecoder(json.JSONDecoder):
                                            loadedConn=True)
 
                         c.decode(i, resConnList, resBlockList)
-
-                        # else:
-                        #     print("This is an internal connection (e.g. in the storage) and thus is not created now")
 
                     elif "__idDct__" in arr[k]:
                         resBlockList.append(arr[k])

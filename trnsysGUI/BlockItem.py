@@ -523,8 +523,9 @@ class BlockItem(QGraphicsPixmapItem):
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
         self.rotateBlockToN(i["RotationN"])
-        self.displayName = i["BlockDisplayName"]
-        self.label.setPlainText(self.displayName)
+        # self.displayName = i["BlockDisplayName"]
+        # self.label.setPlainText(self.displayName)
+        self.setName(i["BlockDisplayName"])
 
         self.groupName = "defaultGroup"
         self.setBlockToGroup(i["GroupName"])
