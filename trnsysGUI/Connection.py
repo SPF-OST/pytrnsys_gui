@@ -451,9 +451,6 @@ class Connection(object):
             pass
 
 
-
-
-
     # Makes 90deg angles of connection
     def niceConn(self):
         """

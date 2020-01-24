@@ -129,9 +129,25 @@ class BlockItem(QGraphicsPixmapItem):
             # print("trnsysObj are " + str(self.parent.parent().trnsysObj))
 
     def setDefaultGroup(self):
+        """
+        Sets the group to defaultGroup when being created.
+        Returns
+        -------
+
+        """
         self.setBlockToGroup("defaultGroup")
 
     def setBlockToGroup(self, newGroupName):
+        """
+        Sets the groupName of this Block to newGroupName and appends itself to the itemList of that group
+        Parameters
+        ----------
+        newGroupName
+
+        Returns
+        -------
+
+        """
         # print("In setBlockToGroup")
         if newGroupName == self.groupName:
             print("Block " + str(self) + str(self.displayName) + "is already in this group")
@@ -139,13 +155,11 @@ class BlockItem(QGraphicsPixmapItem):
         else:
             # print("groups is " + str(self.parent.parent().groupList))
             for g in self.parent.parent().groupList:
-                print("At group " + str(g.displayName))
-                print("self group is " + self.groupName)
                 if g.displayName == self.groupName:
                     print("Found the old group " + self.groupName)
                     g.itemList.remove(self)
                 if g.displayName == newGroupName:
-                    print("Found the new group " + newGroupName)
+                    # print("Found the new group " + newGroupName)
                     g.itemList.append(self)
 
             self.groupName = newGroupName
@@ -356,10 +370,21 @@ class BlockItem(QGraphicsPixmapItem):
 
 
     def configGroup(self):
-        # GroupChooserBlockDlg(self, self.parent.parent())
+        """
+        This method is called from the contextMenu and allows to pick a group for this block.
+        Returns
+        -------
+
+        """
         self.parent.parent().showGroupChooserBlockDlg(self)
 
     def getConnections(self):
+        """
+        Get the connections from inputs and outputs of this block.
+        Returns
+        -------
+        c : :obj:`List` of :obj:`BlockItem`
+        """
         c = []
         for i in self.inputs:
             for cl in i.connectionList:
@@ -370,6 +395,7 @@ class BlockItem(QGraphicsPixmapItem):
         return c
 
 
+    # Debug
     def dumpBlockInfo(self):
         # for a in inspect.getMembers(self):
         #     print(str(a))
@@ -456,13 +482,30 @@ class BlockItem(QGraphicsPixmapItem):
                     # self.setPos(self.pos().x(), t.pos().y())
                     # self.aligned = True
 
+                if self.elementInXBand(t):
+                    value = QPointF(t.pos().x(), self.pos().y())
+                    self.parent.parent().alignXLineItem.setLine(t.pos().x(), t.pos().y() + self.w / 2,
+                                                                t.pos().x(), self.pos().y() + t.w / 2)
+
+                    self.parent.parent().alignXLineItem.setVisible(True)
+
+                    qtm = QTimer(self.parent.parent())
+                    qtm.timeout.connect(self.timerfunc2)
+                    qtm.setSingleShot(True)
+                    qtm.start(1000)
+
+                    e = QMouseEvent(QEvent.MouseButtonRelease, self.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton,
+                                    QtCore.Qt.NoModifier)
+                    self.parent.mouseReleaseEvent(e)
+                    self.parent.parent().alignMode = False
+
         return value
 
     def timerfunc(self):
         self.parent.parent().alignYLineItem.setVisible(False)
 
-    def updateAlignment(self):
-        pass
+    def timerfunc2(self):
+        self.parent.parent().alignXLineItem.setVisible(False)
 
     def hasElementsInYBand(self):
         for t in self.parent.parent().trnsysObj:
@@ -472,9 +515,21 @@ class BlockItem(QGraphicsPixmapItem):
 
         return False
 
+    def hasElementsInXBand(self):
+        for t in self.parent.parent().trnsysObj:
+            if isinstance(t, BlockItem):
+                if self.elementInXBand(t):
+                    return True
+
+        return False
+
     def elementInYBand(self, t):
         eps = 50
         return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+
+    def elementInXBand(self, t):
+        eps = 50
+        return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
 
     def elementInY(self):
         for t in self.parent.parent().trnsysObj:
@@ -482,8 +537,6 @@ class BlockItem(QGraphicsPixmapItem):
                 if self.scenePos().y == t.scenePos().y():
                     return True
         return False
-
-
 
 
     # Encoding
