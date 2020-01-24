@@ -222,6 +222,7 @@ class BlockItem(QGraphicsPixmapItem):
 
         super(BlockItem, self).mouseReleaseEvent(event)
 
+
     # Transform related
     def changeSize(self):
         w = self.w

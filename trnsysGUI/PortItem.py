@@ -157,6 +157,8 @@ class PortItem(QGraphicsEllipseItem):
             # self.innerCircle.setBrush(QColor(0, 0, 0))
             self.innerCircle.setBrush(self.visibleColor)
 
+        self._debugPrint()
+
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")
 
@@ -175,6 +177,21 @@ class PortItem(QGraphicsEllipseItem):
                 # self.innerCircle.setBrush(self.ashColorB)
                 # self.innerCircle.setBrush(QColor(0, 0, 0))
                 self.innerCircle.setBrush(self.visibleColor)
+
+        self._debugClear()
+
+    def _debugPrint(self):
+        self.parent.parent.parent().listV.addItem("This is a PortItem")
+        self.parent.parent.parent().listV.addItem("Connections:")
+        for c in self.connectionList:
+            self.parent.parent.parent().listV.addItem(c.displayName)
+        self.parent.parent.parent().listV.addItem("Flipped state (H,V):" + str(self.parent.flippedH) + ", " + str(self.parent.flippedV))
+        self.parent.parent.parent().listV.addItem("Side: " + str(self.side))
+        self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
+        self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)
+
+    def _debugClear(self):
+        self.parent.parent.parent().listV.clear()
 
     def mouseDoubleClickEvent(self, event):
         print("double clicked")

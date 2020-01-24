@@ -56,7 +56,7 @@ class Connection(object):
 
     """
     def __init__(self, fromPort, toPort, isVirtual, parent, **kwargs):
-        print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
+        # print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.fromPort = fromPort
         self.toPort = toPort
         self.isVirtualConn = isVirtual
@@ -97,8 +97,6 @@ class Connection(object):
             self.fromPortId = self.parent.idGen.getID()
             self.toPortId = self.parent.idGen.getID()
             self.initNew(parent)
-            # self.label.setPos(self.fromPort.pos())
-            # self.label.setPlainText(self.displayName)
         else:
             if "loadedConn" in kwargs:
                 print("Connection being loaded")
@@ -277,7 +275,6 @@ class Connection(object):
             if self.toPort.name == 'o':
                 self.switchPorts()
 
-        # Need consistent inputs[] and outputs[] list!
         if isinstance(self.fromPort.parent, TVentil):
             self.switchPorts()
 
@@ -319,33 +316,20 @@ class Connection(object):
 
             vec3 = QPointF(-5 * angleBetween * vec1.y() / d1,
                            5 * angleBetween * vec1.x() / d1)
-
-            # self.fromPort.parent.setPos(self.fromPort.parent.scenePos())
-            # self.firstS.label.setPos(self.firstS.label.pos() + QPointF(20, -20))
             self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
 
         elif self.parent.editorMode == 1:
             # print("changing label pos in editor mode 1")
             if self.fromPort.side == 0:
-                # self.firstS.label.setPos(self.fromPort.pos() + QPointF(-60, -30))
                 self.firstS.label.setPos(QPointF(-60, 0))
-                # self.firstS.label.setVisible(True)
 
             # Here the behavior of positioning can be improved
             elif self.fromPort.side in [1, 2, 3]:
-                # self.firstS.label.setPos(self.fromPort.pos() + QPointF(-40, -30))
                 self.firstS.label.setPos(QPointF(20, 0))
-                # Working out label positioning
-                # if len(self.firstS.label.collidingItems()) > 0:
-                #     self.parent.diagramScene.addItem(QGraphicsRectItem(self.firstS.label.boundingRect(), self.fromPort) )
-                #     print(self.firstS.label.collidingItems())
-                #     print("Not well suited place for " + self.displayName)
-                # self.firstS.label.setVisible(True)
         else:
             pass
 
     def initSegmentM0(self):
-
         self.startNode.setParent(self)
         self.endNode.setParent(self)
 

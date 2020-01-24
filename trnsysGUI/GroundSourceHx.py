@@ -45,7 +45,9 @@ class GroundSourceHx(BlockItem):
         self.outputs[0].setPos(w - w * self.flippedH - deltaH + 2 * deltaH * self.flippedH, -2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
         self.inputs[0].setPos(h * self.flippedH + deltaH - 2 * deltaH * self.flippedH,
                               - 2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
-        self.inputs[0].side = 1 + 2 * self.flippedV
-        self.outputs[0].side = 1 + 2 * self.flippedV
+        # self.inputs[0].side = 1 + 2 * self.flippedV
+        # self.outputs[0].side = 1 + 2 * self.flippedV
+        self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
+        self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
 
         return w, h

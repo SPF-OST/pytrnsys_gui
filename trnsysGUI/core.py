@@ -880,7 +880,7 @@ class DiagramView(QGraphicsView):
 
     def wheelEvent(self, event):
         super(DiagramView, self).wheelEvent(event)
-
+        # 67108864(dez) = 100000000000000000000000000(bin)
         if int(event.modifiers()) == 67108864:
             if event.angleDelta().y() > 0:
                 self.scale(1.2, 1.2)
