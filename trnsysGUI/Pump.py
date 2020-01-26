@@ -47,9 +47,10 @@ class Pump(BlockItem):
         # Update port positions:
         self.inputs[0].setPos(self.flippedH * w - 2* delta + 2 * delta * self.flippedH, h / 2)
         self.outputs[0].setPos(w - self.flippedH * w - 2* delta * self.flippedH, h / 2)
-        self.inputs[0].side = 2 * self.flippedH
-        self.outputs[0].side = 2 - 2 * self.flippedH
-
+        # self.inputs[0].side = 2 * self.flippedH
+        # self.outputs[0].side = 2 - 2 * self.flippedH
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h
 
     def exportBlackBox(self):

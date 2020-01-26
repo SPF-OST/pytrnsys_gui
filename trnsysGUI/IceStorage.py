@@ -48,7 +48,8 @@ class IceStorage(BlockItem):
                                h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
         self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta + w - self.flippedH * w,
                               h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
-        self.inputs[0].side = 2 - 2 * self.flippedH
-        self.outputs[0].side = 1 - 1 * self.flippedH
-
+        # self.inputs[0].side = 2 - 2 * self.flippedH
+        # self.outputs[0].side = 1 - 1 * self.flippedH
+        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 1 - 1 * self.flippedH) % 4
         return w, h

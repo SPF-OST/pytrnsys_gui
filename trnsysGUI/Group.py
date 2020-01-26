@@ -17,6 +17,8 @@ class Group(QGraphicsRectItem):
         self.h = h
 
         self.displayName = 'Untitled'
+
+        # List of items part of this group
         self.itemList = []
 
         self.exportDi = 0.2
@@ -34,10 +36,10 @@ class Group(QGraphicsRectItem):
         # Add group to groupList
         self.parent.parent().groupList.append(self)
 
+        # Update the label position
         self.updateLabelPos()
 
     def computeRect(self):
-
         factor = 1.2
         center = None
 
@@ -74,7 +76,16 @@ class Group(QGraphicsRectItem):
                     max_x - min_x) * factor, (max_y - min_y) * factor
 
     def setItemsGroup(self, itemList):
+        """
+        Sets the items to this group
+        Parameters
+        ----------
+        itemList
 
+        Returns
+        -------
+
+        """
         for o in itemList:
             if isinstance(o, BlockItem):
                 o.setBlockToGroup(self.displayName)

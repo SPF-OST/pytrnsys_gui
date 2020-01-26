@@ -1,10 +1,23 @@
 class Node(object):
     def __init__(self, parent=None, prevNode=None, nextNode=None):
+        """
+        Nodes
+        can
+        have as parent
+        1)Connection (then it is at a PortItem)
+        2)CornerItem
+
+        Parameters
+        ----------
+        parent
+        prevNode
+        nextNode
+        """
+
         self.prevNode = prevNode
         self.nextNode = nextNode
         self.parent = parent
 
-    # Still deciding if direct access to attributes is ok
     def nextN(self):
         return self.nextNode
 

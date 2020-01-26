@@ -58,8 +58,6 @@ class BlockItem(QGraphicsPixmapItem):
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
 
-        # print("Setting the displayName of " + str(self) + "to " + self.displayName)
-
         self.groupName = ''
         self.setDefaultGroup()
 
@@ -89,13 +87,15 @@ class BlockItem(QGraphicsPixmapItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
-        # Use svg instead of png for blocks:
+        # To use svg instead of png for blocks:
         # self.imageSource = "images/" + self.name + ".svg"
         # self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
         # self.setPixmap(self.image)
         # self.pixmap = self.image
 
+        # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
+        self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
         self.label = QGraphicsTextItem(self.displayName, self)
@@ -108,9 +108,7 @@ class BlockItem(QGraphicsPixmapItem):
             # Inputs get appended in ConfigStorage
             pass
 
-        self.setFlag(self.ItemSendsScenePositionChanges, True)
-
-        print("self.name is " + str(self.name))
+        print("Block name is " + str(self.name))
 
         # Update size for generic block:
         if self.name == 'Bvi':
@@ -122,8 +120,7 @@ class BlockItem(QGraphicsPixmapItem):
         # Undo framework related
         self.oldPos = None
 
-        print("pasdf" + str(self.parent.parent()))
-
+    # Setter functions
     def setParent(self, p):
         self.parent = p
 
@@ -132,11 +129,25 @@ class BlockItem(QGraphicsPixmapItem):
             # print("trnsysObj are " + str(self.parent.parent().trnsysObj))
 
     def setDefaultGroup(self):
-        # self.groupName = "defaultGroup"
-        # self.parent.parent().defaultGroup.addBlock(self)
+        """
+        Sets the group to defaultGroup when being created.
+        Returns
+        -------
+
+        """
         self.setBlockToGroup("defaultGroup")
 
     def setBlockToGroup(self, newGroupName):
+        """
+        Sets the groupName of this Block to newGroupName and appends itself to the itemList of that group
+        Parameters
+        ----------
+        newGroupName
+
+        Returns
+        -------
+
+        """
         # print("In setBlockToGroup")
         if newGroupName == self.groupName:
             print("Block " + str(self) + str(self.displayName) + "is already in this group")
@@ -144,13 +155,11 @@ class BlockItem(QGraphicsPixmapItem):
         else:
             # print("groups is " + str(self.parent.parent().groupList))
             for g in self.parent.parent().groupList:
-                print("At group " + str(g.displayName))
-                print("self group is " + self.groupName)
                 if g.displayName == self.groupName:
                     print("Found the old group " + self.groupName)
                     g.itemList.remove(self)
                 if g.displayName == newGroupName:
-                    print("Found the new group " + newGroupName)
+                    # print("Found the new group " + newGroupName)
                     g.itemList.append(self)
 
             self.groupName = newGroupName
@@ -162,11 +171,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.displayName = newName
         self.label.setPlainText(newName)
 
-    def launchNotepadFile(self):
-        print("Launching notpad")
-        global FilePath
-        os.system('start notepad++ ' + FilePath)
 
+    # Interaction related
     def contextMenuEvent(self, event):
         menu = QMenu()
 
@@ -205,6 +211,33 @@ class BlockItem(QGraphicsPixmapItem):
 
         menu.exec_(event.screenPos())
 
+    def launchNotepadFile(self):
+        print("Launching notpad")
+        global FilePath
+        os.system('start notepad++ ' + FilePath)
+
+    def mouseDoubleClickEvent(self, event):
+        if hasattr(self, "isTempering"):
+            dia = self.parent.parent().showTVentilDlg(self)
+        else:
+            dia = self.parent.parent().showBlockDlg(self)
+
+    def mouseReleaseEvent(self, event):
+        # print("Released mouse over block")
+        if self.oldPos is None:
+            print("For Undo Framework: oldPos is None")
+        else:
+            if self.scenePos() != self.oldPos:
+                print("Block was dragged")
+                print("Old pos is" + str(self.oldPos))
+                command = MoveCommand(self, self.oldPos, "Move BlockItem")
+                self.parent.parent().parent().undoStack.push(command)
+                self.oldPos = self.scenePos()
+
+        super(BlockItem, self).mouseReleaseEvent(event)
+
+
+    # Transform related
     def changeSize(self):
         w = self.w
         h = self.h
@@ -230,7 +263,6 @@ class BlockItem(QGraphicsPixmapItem):
             self.inputs[0].side = 0 + 2 * self.flippedH
             self.outputs[0].side = 0 + 2 * self.flippedH
 
-
         return w, h
 
     def updateFlipStateH(self, state):
@@ -245,43 +277,15 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedV = bool(state)
         self.changeSize()
 
-    def mouseDoubleClickEvent(self, event):
-        if hasattr(self, "isTempering"):
-            dia = self.parent.parent().showTVentilDlg(self)
-        else:
-            dia = self.parent.parent().showBlockDlg(self)
-
-    def mouseReleaseEvent(self, event):
-        # print("Released mouse over block")
-        if self.oldPos is None:
-            print("For Undo Framework: oldPos is None")
-        else:
-            if self.scenePos() != self.oldPos:
-                print("Block was dragged")
-                print("Old pos is" + str(self.oldPos))
-                command = MoveCommand(self, self.oldPos, "Move BlockItem")
-                self.parent.parent().parent().undoStack.push(command)
-                self.oldPos = self.scenePos()
-
-        super(BlockItem, self).mouseReleaseEvent(event)
-
-    def getConnections(self):
-        c = []
-        for i in self.inputs:
-            for cl in i.connectionList:
-                c.append(cl)
-        for o in self.outputs:
-            for cl in o.connectionList:
-                c.append(cl)
-        return c
-
     def updateSide(self, port, n):
         port.side = (port.side + n) % 4
         # print("Port side is " + str(port.side))
 
     def rotateBlockCW(self):
-        # Hacky rotation function
-        self.setTransformOriginPoint(50, 50)
+        # Rotate block clockwise
+        # self.setTransformOriginPoint(50, 50)
+        # self.setTransformOriginPoint(self.w/2, self.h/2)
+        self.setTransformOriginPoint(0, 0)
         self.setRotation((self.rotationN + 1) * 90)
         self.rotationN += 1
         print("rotated by " + str(self.rotationN))
@@ -303,8 +307,9 @@ class BlockItem(QGraphicsPixmapItem):
                 self.rotateBlockCCW()
 
     def rotateBlockCCW(self):
-        # Hacky rotation function
-        self.setTransformOriginPoint(50, 50)
+        # Rotate block clockwise
+        # self.setTransformOriginPoint(50, 50)
+        self.setTransformOriginPoint(0, 0)
         self.setRotation((self.rotationN - 1) * 90)
         self.rotationN -= 1
         print("rotated by " + str(self.rotationN))
@@ -336,6 +341,8 @@ class BlockItem(QGraphicsPixmapItem):
     def printRotation(self):
         print("Rotation is " + str(self.rotationN))
 
+
+    # Deletion related
     def deleteConns(self):
 
         for p in self.inputs:
@@ -356,10 +363,39 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.scene().removeItem(self)
         del self
 
+    def deleteBlockCom(self):
+        # command = trnsysGUI.DeleteBlockCommand.DeleteBlockCommand(self, "Delete block command")
+        # self.parent.parent().parent().undoStack.push(command)
+        self.parent.deleteBlockCom(self)
+
+
     def configGroup(self):
-        # GroupChooserBlockDlg(self, self.parent.parent())
+        """
+        This method is called from the contextMenu and allows to pick a group for this block.
+        Returns
+        -------
+
+        """
         self.parent.parent().showGroupChooserBlockDlg(self)
 
+    def getConnections(self):
+        """
+        Get the connections from inputs and outputs of this block.
+        Returns
+        -------
+        c : :obj:`List` of :obj:`BlockItem`
+        """
+        c = []
+        for i in self.inputs:
+            for cl in i.connectionList:
+                c.append(cl)
+        for o in self.outputs:
+            for cl in o.connectionList:
+                c.append(cl)
+        return c
+
+
+    # Debug
     def dumpBlockInfo(self):
         # for a in inspect.getMembers(self):
         #     print(str(a))
@@ -399,6 +435,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.parent().listV.addItem("Inputs: " + str(self.inputs))
         self.parent.parent().listV.addItem("Outputs: " + str(self.outputs))
 
+
+    # AlignMode related
     def itemChange(self, change, value):
         # print(change, value)
         # Snap grid excludes alignment
@@ -444,13 +482,30 @@ class BlockItem(QGraphicsPixmapItem):
                     # self.setPos(self.pos().x(), t.pos().y())
                     # self.aligned = True
 
+                if self.elementInXBand(t):
+                    value = QPointF(t.pos().x(), self.pos().y())
+                    self.parent.parent().alignXLineItem.setLine(t.pos().x(), t.pos().y() + self.w / 2,
+                                                                t.pos().x(), self.pos().y() + t.w / 2)
+
+                    self.parent.parent().alignXLineItem.setVisible(True)
+
+                    qtm = QTimer(self.parent.parent())
+                    qtm.timeout.connect(self.timerfunc2)
+                    qtm.setSingleShot(True)
+                    qtm.start(1000)
+
+                    e = QMouseEvent(QEvent.MouseButtonRelease, self.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton,
+                                    QtCore.Qt.NoModifier)
+                    self.parent.mouseReleaseEvent(e)
+                    self.parent.parent().alignMode = False
+
         return value
 
     def timerfunc(self):
         self.parent.parent().alignYLineItem.setVisible(False)
 
-    def updateAlignment(self):
-        pass
+    def timerfunc2(self):
+        self.parent.parent().alignXLineItem.setVisible(False)
 
     def hasElementsInYBand(self):
         for t in self.parent.parent().trnsysObj:
@@ -460,9 +515,21 @@ class BlockItem(QGraphicsPixmapItem):
 
         return False
 
+    def hasElementsInXBand(self):
+        for t in self.parent.parent().trnsysObj:
+            if isinstance(t, BlockItem):
+                if self.elementInXBand(t):
+                    return True
+
+        return False
+
     def elementInYBand(self, t):
         eps = 50
         return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+
+    def elementInXBand(self, t):
+        eps = 50
+        return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
 
     def elementInY(self):
         for t in self.parent.parent().trnsysObj:
@@ -471,11 +538,8 @@ class BlockItem(QGraphicsPixmapItem):
                     return True
         return False
 
-    def deleteBlockCom(self):
-        # command = trnsysGUI.DeleteBlockCommand.DeleteBlockCommand(self, "Delete block command")
-        # self.parent.parent().parent().undoStack.push(command)
-        self.parent.deleteBlockCom(self)
 
+    # Encoding
     def encode(self):
         # Double check that no virtual block gets encoded
         if self.isVisible():
@@ -512,8 +576,9 @@ class BlockItem(QGraphicsPixmapItem):
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
         self.rotateBlockToN(i["RotationN"])
-        self.displayName = i["BlockDisplayName"]
-        self.label.setPlainText(self.displayName)
+        # self.displayName = i["BlockDisplayName"]
+        # self.label.setPlainText(self.displayName)
+        self.setName(i["BlockDisplayName"])
 
         self.groupName = "defaultGroup"
         self.setBlockToGroup(i["GroupName"])
@@ -543,6 +608,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
+
+    # Export related
     def exportParameterSolver(self, descConnLength):
         temp = ""
         for i in self.inputs:

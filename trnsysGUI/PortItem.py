@@ -4,9 +4,6 @@ from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QMenu
 
 
-# from trnsysGUI.test import getID
-
-
 class PortItem(QGraphicsEllipseItem):
     def __init__(self, name, side, parent):
         self.parent = parent
@@ -15,6 +12,7 @@ class PortItem(QGraphicsEllipseItem):
         self.posCallbacks = []
         self.connectionList = []
         self.id = self.parent.parent.parent().idGen.getID()
+
         # This boolean is used when the storage inside is connected, thus preventing Hx to connect to that.
         self.isFromHx = False
 
@@ -29,9 +27,7 @@ class PortItem(QGraphicsEllipseItem):
         self.ashColorB = QColor(20, 83, 245)
 
         QGraphicsEllipseItem.__init__(self, QRectF(-8, -8, 16.0, 16.0), parent)
-        # QGraphicsEllipseItem.__init__(self, QRectF(-7, -7, 14.0, 14.0), parent)
 
-        # OuterRing should be called innerCircle
         self.innerCircle = QGraphicsEllipseItem(-4, -4, 8, 8, self)
         self.innerCircle.setPen(QPen(QColor(0, 0, 0, 0), 0))
 
@@ -52,7 +48,7 @@ class PortItem(QGraphicsEllipseItem):
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
-        # self.setBrush(QBrush(color))
+        # The Port itself is larger than only the innerCircle
         self.setBrush(QBrush(QtCore.Qt.white))
 
         # Hacky fix for no border of ellipse
@@ -62,6 +58,7 @@ class PortItem(QGraphicsEllipseItem):
         self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setAcceptHoverEvents(True)
 
+        # QUndo framework related
         self.savePos = None
         self.savedPos = False
 
@@ -71,14 +68,7 @@ class PortItem(QGraphicsEllipseItem):
 
     def itemChange(self, change, value):
 
-        # Here is something strange going on:
-        # posCallback is filled from unknown line
-        # The following lines are strange:
-        # print(str(self.scene()))    # Prints object of type diagramScene, ok
-        # print(str(self.scene().items))  # Error that NoneType object has no attribute 'items'
-        # Sometimes scene is None!
-
-        if self.parent.parent.parent().moveHxPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
+        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
             if not self.savePos is None:
                 print("val is " + str(value))
                 value.setY(max(value.y(), 0))
@@ -117,6 +107,7 @@ class PortItem(QGraphicsEllipseItem):
 
         if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 1:
             for conn in self.connectionList:
+                # Update position of connection label
                 conn.positionLabel()
 
                 if conn.fromPort is self:
@@ -136,16 +127,14 @@ class PortItem(QGraphicsEllipseItem):
                 else:
                     print("Error: In Mode 1, moving a portItem, portItem is wether from nor toPort")
 
-        # These line are somehow needed, need to investigate why
         if change == self.ItemScenePositionHasChanged:
-            # print(str(change))
             for cb in self.posCallbacks:
                 cb(value)
             return value
         return super(PortItem, self).itemChange(change, value)
 
     def mousePressEvent(self, event):
-        if self.parent.parent.parent().moveHxPorts and hasattr(self.parent, 'heatExchangers'):
+        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers'):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
         else:
@@ -168,6 +157,8 @@ class PortItem(QGraphicsEllipseItem):
             # self.innerCircle.setBrush(QColor(0, 0, 0))
             self.innerCircle.setBrush(self.visibleColor)
 
+        self._debugPrint()
+
     def hoverLeaveEvent(self, event):
         # print("Leaving hover")
 
@@ -186,6 +177,21 @@ class PortItem(QGraphicsEllipseItem):
                 # self.innerCircle.setBrush(self.ashColorB)
                 # self.innerCircle.setBrush(QColor(0, 0, 0))
                 self.innerCircle.setBrush(self.visibleColor)
+
+        self._debugClear()
+
+    def _debugPrint(self):
+        self.parent.parent.parent().listV.addItem("This is a PortItem")
+        self.parent.parent.parent().listV.addItem("Connections:")
+        for c in self.connectionList:
+            self.parent.parent.parent().listV.addItem(c.displayName)
+        self.parent.parent.parent().listV.addItem("Flipped state (H,V):" + str(self.parent.flippedH) + ", " + str(self.parent.flippedV))
+        self.parent.parent.parent().listV.addItem("Side: " + str(self.side))
+        self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
+        self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)
+
+    def _debugClear(self):
+        self.parent.parent.parent().listV.clear()
 
     def mouseDoubleClickEvent(self, event):
         print("double clicked")
