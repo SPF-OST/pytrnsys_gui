@@ -202,7 +202,7 @@ class HeatPump(BlockItem):
             for i in range(0, 3):
 
                 if i < 2:
-                    temp = prefix + self.displayName + "-HeatPump-Side"+str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                    temp = prefix + self.displayName + "-Hp-Side"+str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
                            str(equationNumber) + "]\n"
                     tot += temp
                     self.exportEquations.append(temp)
