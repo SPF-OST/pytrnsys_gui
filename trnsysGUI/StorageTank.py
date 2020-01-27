@@ -286,6 +286,7 @@ class StorageTank(BlockItem):
 
         h = 20
         # print("Self.parent.parent()" + str(self.parent.parent()))
+        layer = 1
         while len(side) > 2:
             mem = []
             if len(side) % 2 == 0:
@@ -307,9 +308,11 @@ class StorageTank(BlockItem):
                 c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent())
                 print("c1 is from " + side[i].parent.displayName + " to " + tpiece.inputs[0].parent.displayName)
                 print("c2 is from " + tpiece.inputs[1].parent.displayName + " to " + side[i+1].parent.displayName)
-
-                # c1.firstS.setVisible(False)
-                # c2.firstS.setVisible(False)
+                if layer>1:
+                    c1.firstS.setVisible(False)
+                    c2.firstS.setVisible(False)
+                    c1.hiddenGenerated = True
+                    c2.hiddenGenerated = True
 
                 resId = ""
                 for j in c1.displayName:
@@ -339,10 +342,12 @@ class StorageTank(BlockItem):
                     mem.insert(-1, tpiece.outputs[0])
 
             side = mem
+            layer+=1
             h += 20
             # print(str(len(side)))
 
         lastC = Connection(side[0], side[1], True, self.parent.parent())
+        lastC.firstS.setVisible(False)
         print("lastc is from " + side[0].parent.displayName + " to " + side[1].parent.displayName)
         resId = ""
         for j in lastC.displayName:
