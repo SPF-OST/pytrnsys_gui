@@ -48,9 +48,12 @@ class TeePiece(BlockItem):
                               h - deltaH + 2 * deltaH * self.flippedV - h * self.flippedV)
         self.outputs[0].setPos(w / 2, -2 * delta + 4 * delta * self.flippedV + h * self.flippedV)
 
-        self.inputs[0].side = 0 + 2 * self.flippedH
-        self.inputs[1].side = 2 - 2 * self.flippedH
-        self.outputs[0].side = 1 - 1 * self.flippedH
+        # self.inputs[0].side = 0 + 2 * self.flippedH
+        # self.inputs[1].side = 2 - 2 * self.flippedH
+        # self.outputs[0].side = 1 - 1 * self.flippedH
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 1 - 1 * self.flippedH) % 4
 
         return w, h
 
@@ -59,9 +62,9 @@ class TeePiece(BlockItem):
         for i in self.inputs:
             # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow:
                     continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow:
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
@@ -70,9 +73,9 @@ class TeePiece(BlockItem):
         for o in self.outputs:
             # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow:
                     continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow:
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "

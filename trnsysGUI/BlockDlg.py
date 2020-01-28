@@ -52,8 +52,9 @@ class BlockDlg(QDialog):
         print("Changing displayName")
         newName = self.le.text()
         if newName != "" and not self.nameExists(newName):
-            self.block.label.setPlainText(newName)
-            self.block.displayName = newName
+            self.block.setName(newName)
+            # self.block.label.setPlainText(newName)
+            # self.block.displayName = newName
         self.close()
 
     def setNewFlipStateH(self, state):

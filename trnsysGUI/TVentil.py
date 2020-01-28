@@ -54,16 +54,20 @@ class TVentil(BlockItem):
         self.outputs[0].setPos(w + 2 * delta - self.flippedH * w - 4 * self.flippedH * delta,
                                h / 2 + deltaH - 2 * deltaH * self.flippedV)
 
-        self.inputs[0].side = 0 + 2 * self.flippedH
-        self.inputs[1].side = 1 + 2 * self.flippedH
-        self.outputs[0].side = 2 - 2 * self.flippedH
+        # self.inputs[0].side = 0 + 2 * self.flippedH
+        # self.inputs[1].side = 1 + 2 * self.flippedV
+        # self.outputs[0].side = 2 - 2 * self.flippedH
+
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.inputs[1].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
+        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h
 
     def setComplexDiv(self, b):
         self.isTempering = bool(b)
 
-    def setPositionForMassFlowSolver(self,f):
+    def setPositionForMassFlowSolver(self, f):
         self.positionForMassFlowSolver = f
 
     def encode(self):

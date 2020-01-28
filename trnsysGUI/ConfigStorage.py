@@ -191,10 +191,6 @@ class ConfigStorage(QDialog):
 
         self.show()
 
-    # def addSideAuto(self):
-    #     self.storage.setLeftSideAuto(int(self.leCNL.text()))
-    #     self.storage.setRightSideAuto(int(self.leCNR.text()))
-
     def loadHxL(self):
         for h in self.storage.heatExchangers:
             if h.sSide == 0:

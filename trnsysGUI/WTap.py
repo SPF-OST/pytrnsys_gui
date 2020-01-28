@@ -41,9 +41,8 @@ class WTap(BlockItem):
 
         self.inputs[0].setPos(-2 * delta + (4 * delta + w) * self.flippedH,
                               deltaHF * h - deltaHF * w * self.flippedV + (1 - deltaHF) * w * self.flippedV)
-        print(self.inputs[0].pos())
-        print(self.inputs[0].scenePos())
-        self.inputs[0].side = 0 + 2 * self.flippedH
+        # self.inputs[0].side = 0 + 2 * self.flippedH
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h
 

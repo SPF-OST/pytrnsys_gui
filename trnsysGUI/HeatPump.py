@@ -46,14 +46,17 @@ class HeatPump(BlockItem):
 
         self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 4 * h / 15)
         self.inputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 4 * h / 15)
-        self.inputs[0].side = 0 + 2 * self.flippedH
-        self.inputs[1].side = 2 - 2 * self.flippedH
+        # self.inputs[0].side = 0 + 2 * self.flippedH
+        # self.inputs[1].side = 2 - 2 * self.flippedH
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
         self.outputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 2 * h / 3)
-        self.outputs[0].side = 0 + 2 * self.flippedH
-        self.outputs[1].side = 2 - 2 * self.flippedH
-
+        # self.outputs[0].side = 0 + 2 * self.flippedH
+        # self.outputs[1].side = 2 - 2 * self.flippedH
+        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.outputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h
 
     def encode(self):
@@ -199,7 +202,7 @@ class HeatPump(BlockItem):
             for i in range(0, 3):
 
                 if i < 2:
-                    temp = prefix + self.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
+                    temp = prefix + self.displayName + "-Hp-Side"+str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
                            str(equationNumber) + "]\n"
                     tot += temp
                     self.exportEquations.append(temp)

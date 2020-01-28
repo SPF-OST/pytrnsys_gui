@@ -43,8 +43,10 @@ class Connector(BlockItem):
                               h/2)
         self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta + w - self.flippedH * w, h/2)
 
-        self.inputs[0].side = 0 + 2 * self.flippedH
-        self.outputs[0].side = 2 - 2 * self.flippedH
+        # self.inputs[0].side = 0 + 2 * self.flippedH
+        # self.outputs[0].side = 2 - 2 * self.flippedH
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h
 

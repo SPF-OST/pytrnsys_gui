@@ -78,11 +78,10 @@ __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
-# CSS Style-sheet
 from trnsysGUI.segmentDlg import segmentDlg
 
+# CSS file
 cssSs = open("res/style.txt", "r")
-
 
 def calcDist(p1, p2):
     """
@@ -251,9 +250,6 @@ class DiagramDecoderPaste(json.JSONDecoder):
                             c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
                                            segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
-                            # c.id = i["ConnID"]
-                            # c.connId = i["ConnCID"]
-                            # c.trnsysId = i["trnsysID"]
                             c.setName(i["ConnDisplayName"] + "COPY")
 
                             # Note: This wouldn't allow two connections to the same port (which is not really used, but ok)
@@ -397,44 +393,12 @@ class DiagramDecoder(json.JSONDecoder):
                         bl.decode(i, resConnList, resBlockList)
 
                     elif ".__ConnectionDict__" in arr[k]:
-                        # print("Loading a connection in Decoder")
-                        # i = arr[k]
-                        #
-                        # fport = None
-                        # tPort = None
-                        #
-                        # for connBl in resBlockList:
-                        #     for p in connBl.inputs + connBl.outputs:
-                        #         if p.id == i["PortFromID"]:
-                        #             fport = p
-                        #         if p.id == i["PortToID"]:
-                        #             tPort = p
-                        #
-                        # if fport is None:
-                        #     print("Did not found a fromPort")
-                        #
-                        # if tPort is None:
-                        #     print("Did not found a tPort")
-                        #
-                        # # if not i["isVirtualConn"]:  # Now internal connections don't get encoded in the first place
-                        # if True:
-                        #     c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
-                        #                    fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                        #                    segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"], loadedConn=True)
-                        #     c.id = i["ConnID"]
-                        #     c.connId = i["ConnCID"]
-                        #     c.trnsysId = i["trnsysID"]
-                        #     # c.displayName = i["ConnDisplayName"]
-                        #     c.setName(i["ConnDisplayName"])
-                        #     c.groupName = "defaultGroup"
-                        #     c.setConnToGroup(i["GroupName"])
-                        #
-                        #     resConnList.append(c)
-
                         i = arr[k]
+
                         fport = None
                         tPort = None
 
+                        # Looking for the ports the connection is connected to
                         for connBl in resBlockList:
                             for p in connBl.inputs + connBl.outputs:
                                 if p.id == i["PortFromID"]:
@@ -448,7 +412,7 @@ class DiagramDecoder(json.JSONDecoder):
                         if tPort is None:
                             print("Error: Did not found a toPort")
 
-                        # To allow loading json files without FirstSegmentPos
+                        # To allow loading json files without FirstSegmentPos (old version of encoding)
                         if "FirstSegmentLabelPos" in i:
                             c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
                                            fromPortId=i["PortFromID"], toPortId=i["PortToID"],
@@ -461,9 +425,6 @@ class DiagramDecoder(json.JSONDecoder):
                                            loadedConn=True)
 
                         c.decode(i, resConnList, resBlockList)
-
-                        # else:
-                        #     print("This is an internal connection (e.g. in the storage) and thus is not created now")
 
                     elif "__idDct__" in arr[k]:
                         resBlockList.append(arr[k])
@@ -621,7 +582,7 @@ class DiagramScene(QGraphicsScene):
         print("Releasing mouse in DiagramScene...")
         self.parent().sceneMouseReleaseEvent(mouseEvent)
         super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
-        self.parent().moveHxPorts = False
+        self.parent().moveDirectPorts = False
         if self.parent().pasting:
             # Dismantle group
             self.parent().clearCopyGroup()
@@ -682,8 +643,8 @@ class DiagramScene(QGraphicsScene):
     def keyPressEvent(self, event):
         pass
         if event.key() == Qt.Key_L:
-            self.parent().moveHxPorts = not self.parent().moveHxPorts
-            print("Changing move bool to " + str(self.parent().moveHxPorts))
+            self.parent().moveDirectPorts = not self.parent().moveDirectPorts
+            print("Changing move bool to " + str(self.parent().moveDirectPorts))
 
         #     print("Toggling mode")
         #     # global editorMode
@@ -795,6 +756,7 @@ class DiagramView(QGraphicsView):
             event.accept()
 
     def dropEvent(self, event):
+        """Here, the dropped icons create BlockItems/GraphicalItems"""
         if event.mimeData().hasFormat('component/name'):
             name = str(event.mimeData().data('component/name'), encoding='utf-8')
             print("name is " + name)
@@ -880,7 +842,7 @@ class DiagramView(QGraphicsView):
 
     def wheelEvent(self, event):
         super(DiagramView, self).wheelEvent(event)
-
+        # 67108864(dez) = 100000000000000000000000000(bin)
         if int(event.modifiers()) == 67108864:
             if event.angleDelta().y() > 0:
                 self.scale(1.2, 1.2)
@@ -898,7 +860,17 @@ class DiagramView(QGraphicsView):
 
         super(DiagramView, self).mousePressEvent(event)
 
-    def deleteBlockCom  (self, bl):
+    def deleteBlockCom(self, bl):
+        """
+        Pushes the deleteBlockCommand onto the undoStack
+        Parameters
+        ----------
+        bl
+
+        Returns
+        -------
+
+        """
         command = DeleteBlockCommand(bl, "Delete block command")
         print("Deleted block")
         self.parent().parent().undoStack.push(command)
@@ -972,25 +944,26 @@ class DiagramEditor(QWidget):
     snapSize : int
         Size of align grid
 
-    *** layouts ***
-
+    horizontalLayout : :obj:`QHBoxLayout`
+    Contains the diagram editor and the layout containing the library browser view and the listview
+    vertL : :obj:`QVBoxLayout`
+    Cointains the library browser view and the listWidget
 
     datagen : :obj:`PipeDataHandler`
         Used for generating random massflows for every timestep to test the massflow
         visualizer prototype
-    moveHxPorts: bool
+    moveDirectPorts: bool
         Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
     diagramScene : :obj:`QGraphicsScene`
         Contains the "logical" part of the diagram
     diagramView : :obj:`QGraphicsView`
         Contains the visualization of the diagramScene
-    self.startedConnection = False
-        tempStartPort : :obj:`PortItem`
-        connectionList : :obj:`List` of :obj:`Connection`
-        trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-        groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-        blockList : :obj:`List` of :obj:
-        graphicalObj : :obj:`List` of :obj:
+    startedConnection : Bool
+    tempStartPort : :obj:`PortItem`
+    connectionList : :obj:`List` of :obj:`Connection`
+    trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+    groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
+    graphicalObj : :obj:`List` of :obj:`GraphicalItem`
     connLine : :obj:`QLineF`
     connLineItem = :obj:`QGraphicsLineItem`
 
@@ -1002,6 +975,9 @@ class DiagramEditor(QWidget):
         self.saveAsPath = Path()
         self.idGen = IdGenerator()
 
+        # Generator for massflow display testing
+        self.datagen = PipeDataHandler(self)
+
         self.selectionMode = False
         self.groupMode = False
         self.copyMode = False
@@ -1012,7 +988,11 @@ class DiagramEditor(QWidget):
         self.pasting = False
         self.itemsSelected = False
 
+        self.moveDirectPorts = False
+
         self.editorMode = 1
+
+        # Related to the grid blocks can snap to
         self.snapGrid = False
         self.snapSize = 50
 
@@ -1022,20 +1002,14 @@ class DiagramEditor(QWidget):
         self.libraryBrowserView = QListView(self)
         self.libraryModel = LibraryModel(self)
 
-        # Investigate why choosing 100 sets 2 columns
         self.libraryBrowserView.setGridSize(QSize(65, 65))
         self.libraryBrowserView.setResizeMode(QListView.Adjust)
         self.libraryModel.setColumnCount(0)
 
-        self.datagen = PipeDataHandler(self)
-
-        self.moveHxPorts = False
-
         self.libItems = []
 
-        # res folder for library icons
+        # Resource folder for library icons
         r_folder = "images/"
-
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Pump')),  'Pump'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Kollektor')),  'Kollektor'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TVentil')), 'TVentil'))
@@ -1055,7 +1029,6 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'PV')), 'PV'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GroundSourceHx')), 'GroundSourceHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
-
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
 
@@ -1078,7 +1051,6 @@ class DiagramEditor(QWidget):
         self.vertL.setStretchFactor(self.listV, 1)
 
         self.horizontalLayout.addLayout(self.vertL)
-
         self.horizontalLayout.addWidget(self.diagramView)
         self.horizontalLayout.setStretchFactor(self.diagramView, 5)
         self.horizontalLayout.setStretchFactor(self.libraryBrowserView, 1)
@@ -1088,7 +1060,6 @@ class DiagramEditor(QWidget):
         self.connectionList = []
         self.trnsysObj = []
         self.groupList = []
-        self.blockList = []
         self.graphicalObj = []
 
         self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
@@ -1100,9 +1071,9 @@ class DiagramEditor(QWidget):
         self.printerUnitnr = 0
 
         # For debug button
-        a = 400  # Start of upmost button y-value
-        b = 50  # distance between starts of button y-values
-        b_start = 75
+        # a = 400  # Start of upmost button y-value
+        # b = 50  # distance between starts of button y-values
+        # b_start = 75
 
         # self.button = QPushButton(self)
         # self.button.setText("Print info")
@@ -1111,7 +1082,6 @@ class DiagramEditor(QWidget):
         # self.button.clicked.connect(self.button1_clicked)
 
         # Different colors for connLineColor
-
         colorsc = "red"
         linePx = 4
         if colorsc == "red":
@@ -1138,6 +1108,7 @@ class DiagramEditor(QWidget):
         self.alignYLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignYLineItem)
 
+        # For line that shows quickly up when using align mode
         self.alignXLine = QLineF()
         self.alignXLineItem = QGraphicsLineItem(self.alignXLine)
         self.alignXLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
@@ -1145,46 +1116,11 @@ class DiagramEditor(QWidget):
         self.diagramScene.addItem(self.alignXLineItem)
 
         # #Search related lists
-        self.bfs_visitedNodes = []
-        self.bfs_neighborNodes = []
+        # self.bfs_visitedNodes = []
+        # self.bfs_neighborNodes = []
+        # self.blockList = []
 
-
-    def create_icon(self, map_icon):
-        map_icon.fill()
-        painter = QPainter(map_icon)
-        painter.fillRect(10, 10, 40, 40, QColor(88, 233, 252))
-        # painter.setBrush(Qt.red)
-        painter.setBrush(QColor(252, 136, 98))
-        painter.drawEllipse(36, 2, 15, 15)
-        painter.setBrush(Qt.yellow)
-        painter.drawEllipse(20, 20, 20, 20)
-        painter.end()
-
-
-    # Debug buttons
-    def button1_clicked(self):
-        self.dumpInformation()
-        pass
-
-
-    def button2_clicked(self):
-        for c in self.connectionList:
-            c.buildBridges()
-
-    def button3_clicked(self):
-        self.exportData()
-
-    def button4_clicked(self):
-        self.cleanUpConnections()
-
-    def button5_clicked(self):
-        self.bfs_b()
-
-    def button6_clicked(self):
-        # Remember that first bfs has to be run!
-        self.delGroup()
-
-
+    # Debug function
     def dumpInformation(self):
         print("\n\nHello, this is a dump of the diagram information.\n")
         print("Mode is " + str(self.editorMode) + "\n")
@@ -1208,13 +1144,38 @@ class DiagramEditor(QWidget):
             c.printConn()
         print("")
 
+
     # Connections related methods
     def startConnection(self, port):
+        """
+        When a PortItem is clicked, it is saved into the tempStartPort
+
+        Parameters
+        ----------
+        port : :obj:`PortItem`
+
+        Returns
+        -------
+
+        """
         print("port is " + str(port))
         self.tempStartPort = port
         self.startedConnection = True
 
     def createConnection(self, startPort, endPort):
+        """
+        Creates a new connection if startPort and endPort are not the same. Is added as a command to the
+        undoStack.
+
+        Parameters
+        ----------
+        startPort : :obj:`PortItem`
+        endPort : :obj:`PortItem`
+
+        Returns
+        -------
+
+        """
         # print("Creating connection...")
         if startPort is not endPort:
             # if len(endPort.connectionList) == 0:
@@ -1223,6 +1184,17 @@ class DiagramEditor(QWidget):
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
+        """
+        Qt method that sets the line signalling the creation of a new connection.
+
+        Parameters
+        ----------
+        event
+
+        Returns
+        -------
+
+        """
         if self.startedConnection:
             # print("Started conn, should draw")
             tempx = self.tempStartPort.scenePos().x()
@@ -1265,6 +1237,14 @@ class DiagramEditor(QWidget):
 
     # Export related methods
     def setUpStorageInnerConns(self):
+        """
+        This function is called before the export file is generated. It connects all direct ports using TPieces and
+        Connections and it connects the HeatExchanger ports using a Connector block (this is because HeatExchangers
+        should work like BlockItems. This could maybe be improved by having a HeatExchanger as BlockItem sublclass.)
+        Returns
+        -------
+
+        """
         for t in self.trnsysObj:
             if type(t) is StorageTank:
 
@@ -1289,31 +1269,18 @@ class DiagramEditor(QWidget):
                 # print(t.insideConnLeft)
                 # print(t.insideConnRight)
 
-    def findStorageCorrespPorts1(self, portList):
-        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
-
-        res = []
-        # print("Finding c ports")
-        for p in portList:
-            if len(p.connectionList) > 0:           # check if not >1 needed
-                # connectionList[0] is the hidden connection created when the portPair is
-                i = 0
-                # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
-                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
-                    i += 1
-                if len(p.connectionList) >= i+1:
-                    if p.connectionList[i].fromPort is p:
-                        res.append(p.connectionList[i].toPort)
-                    elif p.connectionList[i].toPort is p:
-                        res.append(p.connectionList[i].fromPort)
-                    else:
-                        print("Port is not fromPort nor toPort")
-
-        # [print(p.parent.displayName) for p in res]
-        return res
-
     def findStorageCorrespPorts(self, portList):
-        # This function gets the ports on the other side of pipes connected to a port of the StorageTank
+        """
+        This function gets the ports on the other side of pipes connected to a port of the StorageTank
+
+        Parameters
+        ----------
+        portList :obj:`List` of :obj:`PortItem`
+
+        Returns
+        -------
+        res : :obj:`List` of :obj:`PortItem`
+        """
 
         res = []
         for p in portList:
@@ -1335,8 +1302,16 @@ class DiagramEditor(QWidget):
         return res
 
     def findStorageCorrespPortsHx(self, portList):
-        res = []
+        """
+        Parameters
+        ----------
+        portList
 
+        Returns
+        -------
+        res : :obj:`List` of :obj:`PortItem`
+        """
+        res = []
         for p in portList:
             # print("Port has")
             # [print(c.displayName) for c in p.connectionList]
@@ -1359,6 +1334,12 @@ class DiagramEditor(QWidget):
         return res
 
     def tearDownStorageInnerConns(self):
+        """
+        Deletes all generated inner connections after exporting to Trnsys
+        Returns
+        -------
+
+        """
         for t in self.trnsysObj:
             if type(t) is StorageTank:
 
@@ -1420,15 +1401,6 @@ class DiagramEditor(QWidget):
                 t.hxInsideConnsRight = []
 
         # self.setTrnsysIdBack()
-
-    # def setTrnsysIdBack(self):
-    #
-    #     self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
-
-
-
-
-
 
     def exportData(self):
         print("------------------------> START OF EXPORT <------------------------")
@@ -1530,7 +1502,6 @@ class DiagramEditor(QWidget):
         self.tearDownStorageInnerConns()
         return exportPath
 
-
     def cleanUpExportedElements(self):
         for t in self.trnsysObj:
             # if isinstance(t, BlockItem):
@@ -1548,9 +1519,185 @@ class DiagramEditor(QWidget):
             #     t.trnsysConn = []
             t.cleanUpAfterTrnsysExport()
 
-    def exportSvg(self):
+    def sortTrnsysObj(self):
+        res = self.trnsysObj.sort(key=self.sortId)
+        for s in self.trnsysObj:
+            print("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
 
-        # For exporting a svg file (text is still too large):
+    def sortId(self, l1):
+        """
+        Sort function returning a sortable key
+        Parameters
+        ----------
+        l1 : Block/Connection
+
+        Returns
+        -------
+
+        """
+        return l1.trnsysId
+
+
+
+    def setName(self, newName):
+        self.diagramName = newName
+
+    def delBlocks(self):
+        """
+        Deletes the whole diagram
+
+        Returns
+        -------
+
+        """
+        while len(self.trnsysObj) > 0:
+            print("In deleting...")
+            self.trnsysObj[0].deleteBlock()
+
+        while len(self.groupList) > 1:
+            self.groupList[-1].deleteGroup()
+
+        print("Groups are " + str(self.groupList))
+
+    def newDiagram(self):
+        self.centralWidget.delBlocks()
+
+        # global id
+        # global trnsysID
+        # global globalConnID
+
+        # self.id = 0
+        # self.trnsysID = 0
+        # self.globalConnID = 0
+
+        self.idGen.reset()
+        # newDiagramDlg(self)
+        self.showNewDiagramDlg()
+
+
+    # Encoding / decoding
+    def encode(self, filename, encodeList):
+        """
+        Encoding function. Not used. encodeDiagram is used instead
+        Parameters
+        ----------
+        filename : str
+        encodeList : :obj:`list` of :obj:`BlockItem` and :obj:`Connection`
+
+        Returns
+        -------
+
+        """
+        with open(filename, 'w') as jsonfile:
+            json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
+
+    def encodeDiagram(self, filename):
+        """
+        Encodes the diagram to a json file.
+
+        Parameters
+        ----------
+        filename : str
+
+        Returns
+        -------
+
+        """
+        print("filename is at encoder" + str(filename))
+        # if filename != "":
+        with open(filename, 'w') as jsonfile:
+            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
+
+    def decodeDiagram(self, filename):
+        # filename = 'jsonOut.json'
+        """
+        Decodes the diagram
+
+        Parameters
+        ----------
+        filename : str
+
+        Returns
+        -------
+
+        """
+
+        with open(filename, 'r') as jsonfile:
+            blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)  # Working
+
+        print(" I got to the printer" + str(blocklist))
+
+        if len(self.groupList) == 0:
+            print("self.group is empty, adding default group")
+            self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
+            self.defaultGroup.setName("defaultGroup")
+
+        for j in blocklist["Blocks"]:
+            # print("J is " + str(j))
+
+            for k in j:
+                if isinstance(k, BlockItem):
+                    k.setParent(self.diagramView)
+                    k.changeSize()
+                    self.diagramScene.addItem(k)
+                    print("self grouplist is " + str(self.groupList))
+                    # k.setBlockToGroup("defaultGroup")
+
+                if isinstance(k, StorageTank):
+                    print("Loading a Storage")
+                    k.setParent(self.diagramView)
+                    k.updateImage()
+                    # k.setBlockToGroup("defaultGroup")
+                    for hx in k.heatExchangers:
+                        hx.initLoad()
+
+                    # print("Printing storage tank" + str(k))
+
+                if isinstance(k, Connection):
+                    print("Almost done with loading a connection")
+                    # print("Connection displ name " + str(k.displayName))
+                    # print("Connection fromPort" + str(k.fromPort))
+                    # print("Connection toPort" + str(k.toPort))
+                    # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
+                    k.initLoad()
+                    # k.setConnToGroup("defaultGroup")
+
+                if isinstance(k, GraphicalItem):
+                    k.setParent(self.diagramView)
+                    self.diagramScene.addItem(k)
+                    k.resizer.setPos(k.w, k.h)
+                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+
+                if isinstance(k, dict):
+                    if "__idDct__" in k:
+                        # here we don't set the ids because the copyGroup would need access to idGen
+                        print("Found the id dict while loading, not setting the ids")
+                        # global globalID
+                        # global trnsysID
+                        # global globalConnID
+
+                        self.idGen.setID(k["GlobalId"])
+                        self.idGen.setTrnsysID(k["trnsysID"])
+                        self.idGen.setConnID(k["globalConnID"])
+                        # self.idGen.setBlockID()
+
+                    if "__nameDct__" in k:
+                        print("Found the name dict while loading")
+                        self.diagramName = k["DiagramName"]
+
+        for t in self.trnsysObj:
+            print("Tr obj is" + str(t) + " " + str(t.trnsysId))
+            if hasattr(t, "isTempering"):
+                print("tv has " +str(t.isTempering))
+        # tempList = []
+
+    def exportSvg(self):
+        """
+        For exporting a svg file (text is still too large)
+        Returns
+        -------
+
+        """
         generator = QSvgGenerator()
         generator.setResolution(300)
         generator.setSize(QSize(self.diagramScene.width(), self.diagramScene.height()))
@@ -1564,26 +1711,361 @@ class DiagramEditor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def setName(self, newName):
+    def copyElements(self):
+        """
+        Copies elements
+        Returns
+        -------
+
+        """
+        clipboardGroup = copyGroup(self)
+        print(self.diagramScene.elementsInRect())
+
+        for t in self.diagramScene.elementsInRect():
+            print("element in rect is" + str(t))
+            clipboardGroup.trnsysObj.append(t)
+
+        self.saveToClipBoard(clipboardGroup)
+
+    def saveToClipBoard(self, copyList):
+        filename = 'clipboard.json'
+
+        with open(filename, 'w') as jsonfile:
+            json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
+
+    def pasteFromClipBoard(self):
+        filename = 'clipboard.json'
+
+        with open(filename, 'r') as jsonfile:
+            blocklist = json.load(jsonfile, cls=DiagramDecoderPaste, editor=self)
+
+        for j in blocklist["Blocks"]:
+            # print("J is " + str(j))
+
+            for k in j:
+                if isinstance(k, BlockItem):
+                    # k.setParent(self.diagramView)
+                    k.changeSize()
+                    self.copyGroupList.addToGroup(k)
+
+                    for inp in k.inputs:
+                        inp.id = self.idGen.getID()
+                    for out in k.outputs:
+                        out.id = self.idGen.getID()
+
+                    # copyGroupList.trnsysObj.append(k)
+                    # self.diagramScene.addItem(k)
+
+                if isinstance(k, StorageTank):
+                    print("Loading a Storage")
+                    # k.setParent(self.diagramView)
+                    k.updateImage()
+
+                    for hx in k.heatExchangers:
+                        hx.initLoad()
+
+                    # print("Printing storage tank" + str(k))
+
+                if isinstance(k, GraphicalItem):
+                    k.setParent(self.diagramView)
+                    self.diagramScene.addItem(k)
+                    k.resizer.setPos(k.w, k.h)
+                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+
+                if isinstance(k, Connection):
+                    print("Almost done with loading a connection")
+                    k.initLoad()
+                    for corners in k.getCorners():
+                        # copyGroupList.trnsysObj.append(k)
+                        self.copyGroupList.addToGroup(corners)
+
+                if isinstance(k, dict):
+                    pass
+
+                    # print("Global id is " + str(globalID))
+                    # print("trnsys id is " + str(trnsysID))
+
+        # global copyMode
+        # global selectionMode
+        # global pasting
+
+        self.copyMode = False
+        self.selectionMode = False
+
+        self.diagramScene.addItem(self.copyGroupList)
+        self.copyGroupList.setFlags(self.copyGroupList.ItemIsMovable)
+
+        self.pasting = True
+
+        # for t in self.trnsysObj:
+        #     print("Tr obj is" + str(t) + " " + str(t.trnsysId))
+
+    def clearCopyGroup(self):
+
+        for it in self.copyGroupList.childItems():
+            self.copyGroupList.removeFromGroup(it)
+
+        self.pasting = False
+
+    def createSelectionGroup(self, selectionList):
+        for t in selectionList:
+            if isinstance(t, BlockItem):
+                self.selectionGroupList.addToGroup(t)
+
+        self.multipleSelectedMode = False
+        self.selectionMode = False
+
+        self.diagramScene.addItem(self.selectionGroupList)
+        self.selectionGroupList.setFlags(self.selectionGroupList.ItemIsMovable)
+
+        self.itemsSelected = True
+
+    def clearSelectionGroup(self):
+        for it in self.selectionGroupList.childItems():
+            self.selectionGroupList.removeFromGroup(it)
+
+        self.itemsSelected = False
+
+
+    # Saving related
+    def save(self):
+        """
+        If saveas has not been used, diagram will be saved in "/diagrams"
+        If saveas has been used, diagram will be saved in self.saveAsPath
+        Returns
+        -------
+
+        """
+        print("saveaspath is " + str(self.saveAsPath))
+        if self.saveAsPath.name == '':
+
+            filepath = Path(Path(__file__).resolve().parent.joinpath("diagrams"))
+
+            if Path(filepath.joinpath(self.diagramName + '.json')).exists():
+                qmb = QMessageBox(self)
+                qmb.setText("Warning: " +
+                            "This diagram name exists already. Do you want to overwrite or cancel?")
+                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                qmb.setDefaultButton(QMessageBox.Cancel)
+                ret = qmb.exec()
+                if ret == QMessageBox.Save:
+                    print("Overwriting")
+                    self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+                    msgb = QMessageBox(self)
+                    msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                    msgb.exec()
+
+                else:
+                    print("Canceling")
+            else:
+                self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+                msgb = QMessageBox(self)
+                msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                msgb.exec()
+        else:
+            if self.saveAsPath.exists():
+                pass
+            else:
+                self.encodeDiagram(str(self.saveAsPath))
+                msgb = QMessageBox(self)
+                msgb.setText("Saved diagram at" + str(self.saveAsPath))
+                msgb.exec()
+
+    def saveAs(self):
+        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
+        if str(pickedPath) == ".":
+            msgb = QMessageBox(self)
+            msgb.setText("No valid path selected, aborting save as")
+            msgb.exec()
+            return
+        # print("picked path is" + str(pickedPath))
+
+        self.saveAsPath = pickedPath
+        self.diagramName = self.saveAsPath.stem
+        # print(self.saveAsPath)
+        # print(self.diagramName)
+
+        self.encodeDiagram(str(self.saveAsPath))
+
+    def renameDiagram(self, newName):
+        """
+
+        Parameters
+        ----------
+        newName
+
+        Returns
+        -------
+
+        """
+
+        if self.saveAsPath.name != '':
+            # print("Path name is " + self.saveAsPath.name)
+            if newName + ".json" in self.saveAsPath.glob("*"):
+                QMessageBox(self, "Warning", "This diagram name exists already in the directory."
+                                             " Please rename this diagram")
+            else:
+                self.saveAsPath = Path(self.saveAsPath.stem[0:self.saveAsPath.name.index(self.diagramName)] + newName)
+
         self.diagramName = newName
 
-    def delGroup(self):
-        # This is used for deleting the first connected componts group found by BFS, unused
-        for bl in self.blockList:
-            bl.deleteBlock()
-
-    def delBlocks(self):
-        # Deletesthe whole diagram
-        while len(self.trnsysObj) > 0:
-            print("In deleting...")
-            self.trnsysObj[0].deleteBlock()
-
-        while len(self.groupList) > 1:
-            self.groupList[-1].deleteGroup()
-
-        print("Groups are " + str(self.groupList))
+        # print("Path is now: " + str(self.saveAsPath))
+        # print("Diagram name is: " + self.diagramName)
 
 
+    # Mode related
+    def setAlignMode(self, b):
+        self.alignMode = True
+
+    def setEditorMode(self, b):
+        self.editorMode = b
+
+    def setMoveDirectPorts(self, b):
+        """
+        Sets the bool moveDirectPorts. When mouse released in diagramScene, moveDirectPorts is set to False again
+        Parameters
+        ----------
+        b : bool
+
+        Returns
+        -------
+
+        """
+        self.moveDirectPorts = b
+
+    def setSnapGrid(self, b):
+        self.snapGrid = b
+
+    def setSnapSize(self, s):
+        self.snapSize = s
+
+    def setitemsSelected(self, b):
+        self.itemsSelected = b
+
+
+    # Misc
+    def editGroups(self):
+        self.showGroupsEditor()
+
+    def setConnLabelVis(self, b):
+        for c in self.trnsysObj:
+            if isinstance(c, Connection) and not c.isVirtualConn:
+                c.showLabel(b)
+        # Faster alternative, untested
+        # for c in self.connectionList:
+        #     if not c.isVirtualConn:
+        #         c.showLabel(b)
+
+    def updateConnGrads(self):
+        for t in self.trnsysObj:
+            if isinstance(t, Connection):
+                t.updateSegGrads()
+
+    def findGroupByName(self, name):
+        for g in self.groupList:
+            if g.displayName == name:
+                return g
+
+        return None
+
+
+    # Dialog calls
+    def showBlockDlg(self, bl):
+        c = BlockDlg(bl, self)
+
+    def showDiagramDlg(self):
+        c = diagramDlg(self)
+
+    def showGenericPortPairDlg(self, bl):
+        c = GenericPortPairDlg(bl, self)
+
+    def showGroupChooserBlockDlg(self, bl):
+        c = GroupChooserBlockDlg(bl, self)
+
+    def showGroupChooserConnDlg(self, conn):
+        c = GroupChooserConnDlg(conn, self)
+    
+    def showGroupDlg(self, group, itemList):
+        c = groupDlg(group, self, itemList)
+
+    def showHxDlg(self, hx):
+        c = hxDlg(hx, self)
+
+    def showNewDiagramDlg(self):
+        c = newDiagramDlg(self)
+
+    # Not used
+    # def showNewPortDlg(self):
+    #     c = newPortDlg
+
+    def showSegmentDlg(self, seg):
+        c = segmentDlg(seg, self)
+
+    def showTVentilDlg(self, bl):
+        c = TVentilDlg(bl, self)
+
+    def showConfigStorageDlg(self, bl):
+        c = ConfigStorage(bl, self)
+
+    def showGroupsEditor(self):
+        c = groupsEditor(self)
+
+    def testFunctionInspection(self, *args):
+        print("Ok, here is my log")
+        print(int(args[0])+1)
+        if len(self.connectionList) > 0:
+            self.connectionList[0].highlightConn()
+
+    def getConnection(self, n):
+        return self.connectionList[int(n)]
+
+    # Unused
+    def create_icon(self, map_icon):
+        map_icon.fill()
+        painter = QPainter(map_icon)
+        painter.fillRect(10, 10, 40, 40, QColor(88, 233, 252))
+        # painter.setBrush(Qt.red)
+        painter.setBrush(QColor(252, 136, 98))
+        painter.drawEllipse(36, 2, 15, 15)
+        painter.setBrush(Qt.yellow)
+        painter.drawEllipse(20, 20, 20, 20)
+        painter.end()
+
+    def setTrnsysIdBack(self):
+        self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
+
+    def findStorageCorrespPorts1(self, portList):
+        """
+        This function gets the ports on the other side of pipes connected to a port of the StorageTank. Unused
+
+        Parameters
+        ----------
+        portList : :obj:`List` of :obj:`PortItems`
+
+        Returns
+        -------
+
+        """
+
+        res = []
+        # print("Finding c ports")
+        for p in portList:
+            if len(p.connectionList) > 0:           # check if not >1 needed
+                # connectionList[0] is the hidden connection created when the portPair is
+                i = 0
+                # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
+                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
+                    i += 1
+                if len(p.connectionList) >= i+1:
+                    if p.connectionList[i].fromPort is p:
+                        res.append(p.connectionList[i].toPort)
+                    elif p.connectionList[i].toPort is p:
+                        res.append(p.connectionList[i].fromPort)
+                    else:
+                        print("Port is not fromPort nor toPort")
+
+        # [print(p.parent.displayName) for p in res]
+        return res
 
     # Graph searach related methods, unused
     def bfs_b(self):
@@ -1819,448 +2301,15 @@ class DiagramEditor(QWidget):
                 rlist = []
                 return rlist.append(self)
 
-
-    def encode(self, filename, encodeList):
+    def delGroup(self):
         """
-        Encoding function. Not used. encodeDiagram is used instead
-        Parameters
-        ----------
-        filename : str
-        encodeList : :obj:`list` of :obj:`BlockItem` and :obj:`Connection`
-
+        This is used for deleting the first connected componts group found by BFS, unused
         Returns
         -------
 
         """
-        with open(filename, 'w') as jsonfile:
-            json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
-
-    def encodeDiagram(self, filename):
-        """
-        Encodes the diagram to a json file.
-
-        Parameters
-        ----------
-        filename : str
-
-        Returns
-        -------
-
-        """
-        print("filename is at encoder" + str(filename))
-        # if filename != "":
-        with open(filename, 'w') as jsonfile:
-            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
-
-    def decodeDiagram(self, filename):
-        # filename = 'jsonOut.json'
-        """
-        Decodes the diagram
-
-        Parameters
-        ----------
-        filename : str
-
-        Returns
-        -------
-
-        """
-
-        with open(filename, 'r') as jsonfile:
-            blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)  # Working
-
-        print(" I got to the printer" + str(blocklist))
-
-        if len(self.groupList) == 0:
-            print("self.group is empty, adding default group")
-            self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
-            self.defaultGroup.setName("defaultGroup")
-
-        for j in blocklist["Blocks"]:
-            # print("J is " + str(j))
-
-            for k in j:
-                if isinstance(k, BlockItem):
-                    k.setParent(self.diagramView)
-                    k.changeSize()
-                    self.diagramScene.addItem(k)
-                    print("self grouplist is " + str(self.groupList))
-                    # k.setBlockToGroup("defaultGroup")
-
-                if isinstance(k, StorageTank):
-                    print("Loading a Storage")
-                    k.setParent(self.diagramView)
-                    k.updateImage()
-                    # k.setBlockToGroup("defaultGroup")
-                    for hx in k.heatExchangers:
-                        hx.initLoad()
-
-                    # print("Printing storage tank" + str(k))
-
-                if isinstance(k, Connection):
-                    print("Almost done with loading a connection")
-                    # print("Connection displ name " + str(k.displayName))
-                    # print("Connection fromPort" + str(k.fromPort))
-                    # print("Connection toPort" + str(k.toPort))
-                    # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
-                    k.initLoad()
-                    # k.setConnToGroup("defaultGroup")
-
-                if isinstance(k, GraphicalItem):
-                    k.setParent(self.diagramView)
-                    self.diagramScene.addItem(k)
-                    k.resizer.setPos(k.w, k.h)
-                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
-
-                if isinstance(k, dict):
-                    if "__idDct__" in k:
-                        # here we don't set the ids because the copyGroup would need access to idGen
-                        print("Found the id dict while loading, not setting the ids")
-                        # global globalID
-                        # global trnsysID
-                        # global globalConnID
-
-                        self.idGen.setID(k["GlobalId"])
-                        self.idGen.setTrnsysID(k["trnsysID"])
-                        self.idGen.setConnID(k["globalConnID"])
-                        # self.idGen.setBlockID()
-
-                    if "__nameDct__" in k:
-                        print("Found the name dict while loading")
-                        self.diagramName = k["DiagramName"]
-
-        for t in self.trnsysObj:
-            print("Tr obj is" + str(t) + " " + str(t.trnsysId))
-            if hasattr(t, "isTempering"):
-                print("tv has " +str(t.isTempering))
-        # tempList = []
-
-
-    def sortTrnsysObj(self):
-        res = self.trnsysObj.sort(key=self.sortId)
-        for s in self.trnsysObj:
-            print("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
-
-    def sortId(self, l1):
-        """
-        Sort function returning a sortable key
-        Parameters
-        ----------
-        l1 : Block/Connection
-
-        Returns
-        -------
-
-        """
-        return l1.trnsysId
-
-    def copyElements(self):
-        """
-        Copies elements
-        Returns
-        -------
-
-        """
-        clipboardGroup = copyGroup(self)
-        print(self.diagramScene.elementsInRect())
-
-        for t in self.diagramScene.elementsInRect():
-            print("element in rect is" + str(t))
-            clipboardGroup.trnsysObj.append(t)
-
-        self.saveToClipBoard(clipboardGroup)
-
-    def saveToClipBoard(self, copyList):
-        filename = 'clipboard.json'
-
-        with open(filename, 'w') as jsonfile:
-            json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
-
-    def pasteFromClipBoard(self):
-        filename = 'clipboard.json'
-
-        with open(filename, 'r') as jsonfile:
-            blocklist = json.load(jsonfile, cls=DiagramDecoderPaste, editor=self)
-
-        for j in blocklist["Blocks"]:
-            # print("J is " + str(j))
-
-            for k in j:
-                if isinstance(k, BlockItem):
-                    # k.setParent(self.diagramView)
-                    k.changeSize()
-                    self.copyGroupList.addToGroup(k)
-
-                    for inp in k.inputs:
-                        inp.id = self.idGen.getID()
-                    for out in k.outputs:
-                        out.id = self.idGen.getID()
-
-                    # copyGroupList.trnsysObj.append(k)
-                    # self.diagramScene.addItem(k)
-
-                if isinstance(k, StorageTank):
-                    print("Loading a Storage")
-                    # k.setParent(self.diagramView)
-                    k.updateImage()
-
-                    for hx in k.heatExchangers:
-                        hx.initLoad()
-
-                    # print("Printing storage tank" + str(k))
-
-                if isinstance(k, GraphicalItem):
-                    k.setParent(self.diagramView)
-                    self.diagramScene.addItem(k)
-                    k.resizer.setPos(k.w, k.h)
-                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
-
-                if isinstance(k, Connection):
-                    print("Almost done with loading a connection")
-                    k.initLoad()
-                    for corners in k.getCorners():
-                        # copyGroupList.trnsysObj.append(k)
-                        self.copyGroupList.addToGroup(corners)
-
-                if isinstance(k, dict):
-                    pass
-
-                    # print("Global id is " + str(globalID))
-                    # print("trnsys id is " + str(trnsysID))
-
-        # global copyMode
-        # global selectionMode
-        # global pasting
-
-        self.copyMode = False
-        self.selectionMode = False
-
-        self.diagramScene.addItem(self.copyGroupList)
-        self.copyGroupList.setFlags(self.copyGroupList.ItemIsMovable)
-
-        self.pasting = True
-
-        # for t in self.trnsysObj:
-        #     print("Tr obj is" + str(t) + " " + str(t.trnsysId))
-
-    def clearCopyGroup(self):
-
-        for it in self.copyGroupList.childItems():
-            self.copyGroupList.removeFromGroup(it)
-
-        self.pasting = False
-
-    def createSelectionGroup(self, selectionList):
-        for t in selectionList:
-            if isinstance(t, BlockItem):
-                self.selectionGroupList.addToGroup(t)
-
-        self.multipleSelectedMode = False
-        self.selectionMode = False
-
-        self.diagramScene.addItem(self.selectionGroupList)
-        self.selectionGroupList.setFlags(self.selectionGroupList.ItemIsMovable)
-
-        self.itemsSelected = True
-
-    def clearSelectionGroup(self):
-        for it in self.selectionGroupList.childItems():
-            self.selectionGroupList.removeFromGroup(it)
-
-        self.itemsSelected = False
-
-    def newDiagram(self):
-        self.centralWidget.delBlocks()
-
-        # global id
-        # global trnsysID
-        # global globalConnID
-
-        # self.id = 0
-        # self.trnsysID = 0
-        # self.globalConnID = 0
-
-        self.idGen.reset()
-        # newDiagramDlg(self)
-        self.showNewDiagramDlg()
-
-    # Behavior:
-    # If saveas has not been used, diagram will be saved in /diagrams
-    # if saveas has been used, diagram will be saved in self.saveAsPath
-    def save(self):
-        print("saveaspath is " + str(self.saveAsPath))
-        if self.saveAsPath.name == '':
-
-            filepath = Path(Path(__file__).resolve().parent.joinpath("diagrams"))
-
-            if Path(filepath.joinpath(self.diagramName + '.json')).exists():
-                qmb = QMessageBox(self)
-                qmb.setText("Warning: " +
-                            "This diagram name exists already. Do you want to overwrite or cancel?")
-                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-                qmb.setDefaultButton(QMessageBox.Cancel)
-                ret = qmb.exec()
-                if ret == QMessageBox.Save:
-                    print("Overwriting")
-                    self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
-                    msgb = QMessageBox(self)
-                    msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
-                    msgb.exec()
-
-                else:
-                    print("Canceling")
-            else:
-                self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
-                msgb = QMessageBox(self)
-                msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
-                msgb.exec()
-        else:
-            if self.saveAsPath.exists():
-                pass
-            else:
-                self.encodeDiagram(str(self.saveAsPath))
-                msgb = QMessageBox(self)
-                msgb.setText("Saved diagram at" + str(self.saveAsPath))
-                msgb.exec()
-
-    def saveAs(self):
-        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
-        if str(pickedPath) == ".":
-            msgb = QMessageBox(self)
-            msgb.setText("No valid path selected, aborting save as")
-            msgb.exec()
-            return
-        # print("picked path is" + str(pickedPath))
-
-        self.saveAsPath = pickedPath
-        self.diagramName = self.saveAsPath.stem
-        # print(self.saveAsPath)
-        # print(self.diagramName)
-
-        self.encodeDiagram(str(self.saveAsPath))
-
-    def renameDiagram(self, newName):
-        """
-
-        Parameters
-        ----------
-        newName
-
-        Returns
-        -------
-
-        """
-
-        if self.saveAsPath.name != '':
-            # print("Path name is " + self.saveAsPath.name)
-            if newName + ".json" in self.saveAsPath.glob("*"):
-                QMessageBox(self, "Warning", "This diagram name exists already in the directory."
-                                             " Please rename this diagram")
-            else:
-                self.saveAsPath = Path(self.saveAsPath.stem[0:self.saveAsPath.name.index(self.diagramName)] + newName)
-
-        self.diagramName = newName
-
-        # print("Path is now: " + str(self.saveAsPath))
-        # print("Diagram name is: " + self.diagramName)
-
-    def editGroups(self):
-        # groupsEditor(self)
-        self.showGroupsEditor()
-
-    def setConnLabelVis(self, b):
-        for c in self.trnsysObj:
-            if isinstance(c, Connection) and not c.isVirtualConn:
-                c.showLabel(b)
-        # Faster alternative, untested
-        # for c in self.connectionList:
-        #     if not c.isVirtualConn:
-        #         c.showLabel(b)
-
-    def updateConnGrads(self):
-        for t in self.trnsysObj:
-            if isinstance(t, Connection):
-                t.updateSegGrads()
-
-    def findGroupByName(self, name):
-        for g in self.groupList:
-            if g.displayName == name:
-                return g
-
-        return None
-
-
-    def setAlignMode(self, b):
-        self.alignMode = True
-
-    def setEditorMode(self, b):
-        self.editorMode = b
-
-    def setMoveHxPorts(self, b):
-        self.moveHxPorts = b
-
-    def setSnapGrid(self, b):
-        self.snapGrid = b
-
-    def setSnapSize(self, s):
-        self.snapSize = s
-
-    def setitemsSelected(self, b):
-        self.itemsSelected = b
-
-    # Dialog calls
-    def showBlockDlg(self, bl):
-        c = BlockDlg(bl, self)
-
-    def showDiagramDlg(self):
-        c = diagramDlg(self)
-
-    def showGenericPortPairDlg(self, bl):
-        c = GenericPortPairDlg(bl, self)
-
-    def showGroupChooserBlockDlg(self, bl):
-        c = GroupChooserBlockDlg(bl, self)
-
-    def showGroupChooserConnDlg(self, conn):
-        c = GroupChooserConnDlg(conn, self)
-    
-    def showGroupDlg(self, group, itemList):
-        c = groupDlg(group, self, itemList)
-
-    def showHxDlg(self, hx):
-        c = hxDlg(hx, self)
-
-    def showNewDiagramDlg(self):
-        c = newDiagramDlg(self)
-
-    # Not used
-    # def showNewPortDlg(self):
-    #     c = newPortDlg
-
-    def showSegmentDlg(self, seg):
-        c = segmentDlg(seg, self)
-
-    def showTVentilDlg(self, bl):
-        c = TVentilDlg(bl, self)
-
-    def showConfigStorageDlg(self, bl):
-        c = ConfigStorage(bl, self)
-
-    def showGroupsEditor(self):
-        c = groupsEditor(self)
-
-    def testFunctionInspection(self, *args):
-        print("Ok, here is my log")
-        print(int(args[0])+1)
-        if len(self.connectionList) > 0:
-            self.connectionList[0].highlightConn()
-
-    def getConnection(self, n):
-        return self.connectionList[int(n)]
-
-    # def mouseMoveEvent(self, e):
-    #     print("In editor")
-    #     self.parent().mouseMoveEvent(e)
+        for bl in self.blockList:
+            bl.deleteBlock()
 
 
 class MainWindow(QMainWindow):
@@ -2285,14 +2334,19 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
         self.labelVisState = False
 
+        # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
         saveDiaAction.triggered.connect(self.saveDia)
+
         loadDiaAction = QAction(QIcon('images/outbox.png'), "Load system diagram", self)
         loadDiaAction.triggered.connect(self.loadDia)
+
         exportTrnsysAction = QAction(QIcon('images/font-file.png'), "Export trnsys file", self)
         exportTrnsysAction.triggered.connect(self.exportTrnsys)
+
         renameDiaAction = QAction(QIcon('images/text-label.png'), "Rename system diagram", self)
         renameDiaAction.triggered.connect(self.renameDia)
+
         deleteDiaAction = QAction(QIcon('images/trash.png'), "Delete system diagram", self)
         deleteDiaAction.triggered.connect(self.deleteDia)
 
@@ -2304,8 +2358,10 @@ class MainWindow(QMainWindow):
 
         zoomInAction = QAction(QIcon('images/zoom-in.png'), "Zoom in", self)
         zoomInAction.triggered.connect(self.setZoomIn)
+
         zoomOutAction = QAction(QIcon('images/zoom-Out.png'), "Zoom Out", self)
         zoomOutAction.triggered.connect(self.setZoomOut)
+
         zoom0Action = QAction(QIcon('images/zoom-0.png'), "Reset zoom", self)
         zoom0Action.triggered.connect(self.setZoom0)
 
@@ -2331,9 +2387,9 @@ class MainWindow(QMainWindow):
         multipleDeleteAction.triggered.connect(self.deleteMultiple)
         multipleDeleteAction.setShortcut("Ctrl+d")
 
-        toggleEditorModeAction = QAction("Toggle editor mode", self)
-        toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
-        toggleEditorModeAction.setShortcut("m")
+        # toggleEditorModeAction = QAction("Toggle editor mode", self)
+        # toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
+        # toggleEditorModeAction.setShortcut("m")
 
         toggleSnapAction = QAction("Toggle snap grid", self)
         toggleSnapAction.triggered.connect(self.toggleSnap)
@@ -2352,15 +2408,37 @@ class MainWindow(QMainWindow):
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
-        self.mb = self.menuBar()
+        # Tool bar
+        tb = self.addToolBar('Main Toolbar...')
+        tb.setObjectName('Toolbar')
+        tb.addAction(saveDiaAction)
+        tb.addAction(loadDiaAction)
+        tb.addAction(exportTrnsysAction)
+        tb.addAction(renameDiaAction)
+        tb.addAction(deleteDiaAction)
+        tb.addAction(groupNewAction)
+        tb.addAction(autoArrangeAction)
+        tb.addAction(zoomInAction)
+        tb.addAction(zoomOutAction)
+        tb.addAction(zoom0Action)
+        tb.addAction(copyAction)
+        tb.addAction(pasteAction)
+        tb.addAction(toggleConnLabels)
+        tb.addAction(editGroupsAction)
+        tb.addAction(selectMultipleAction)
+        tb.addAction(openVisualizerAction)
+        tb.addAction(runMassflowSolverAction)
+        tb.addAction(trnsysList)
+
+        # Menu bar actions
         self.fileMenu = QMenu("File")
 
         fileMenuNewAction = QAction("New", self)
         fileMenuNewAction.triggered.connect(self.newDia)
+        fileMenuNewAction.setShortcut("Ctrl+n")
         self.fileMenu.addAction(fileMenuNewAction)
 
         fileMenuOpenAction = QAction("Open", self)
-
         fileMenuOpenAction.triggered.connect(self.openFile)
         fileMenuOpenAction.setShortcut("Ctrl+o")
         self.fileMenu.addAction(fileMenuOpenAction)
@@ -2382,46 +2460,39 @@ class MainWindow(QMainWindow):
         movePortAction.triggered.connect(self.movePorts)
         movePortAction.setShortcut("ctrl+m")
 
+        self.editMenu = QMenu("Edit")
+        # self.editMenu.addAction(toggleEditorModeAction)
+        self.editMenu.addAction(multipleDeleteAction)
+        self.editMenu.addAction(toggleSnapAction)
+        self.editMenu.addAction(toggleAlignModeAction)
+        self.editMenu.addAction(movePortAction)
 
+        AboutAction = QAction("About", self)
+        AboutAction.triggered.connect(self.showAbout)
+
+        VersionAction = QAction("Version", self)
+        VersionAction.triggered.connect(self.showVersion)
+
+        CreditsAction = QAction("Credits", self)
+        CreditsAction.triggered.connect(self.showCredits)
+
+        self.helpMenu = QMenu("Help")
+        self.helpMenu.addAction(AboutAction)
+        self.helpMenu.addAction(VersionAction)
+        self.helpMenu.addAction(CreditsAction)
+
+        # Menu bar
+        self.mb = self.menuBar()
         self.mb.addMenu(self.fileMenu)
-
-        self.s1Menu = QMenu("Edit")
-        # self.s1Menu.addAction(toggleEditorModeAction)
-        self.s1Menu.addAction(multipleDeleteAction)
-        self.s1Menu.addAction(toggleSnapAction)
-        self.s1Menu.addAction(toggleAlignModeAction)
-        self.s1Menu.addAction(movePortAction)
-
-
-        self.mb.addMenu(self.s1Menu)
-        self.mb.addMenu("Help")
+        self.mb.addMenu(self.editMenu)
+        self.mb.addMenu(self.helpMenu)
         self.mb.addSeparator()
 
-        selectTb = self.addToolBar('Create group...')
-        selectTb.setObjectName('CreateGroupTb')
-
-        selectTb.addAction(saveDiaAction)
-        selectTb.addAction(loadDiaAction)
-        selectTb.addAction(exportTrnsysAction)
-        selectTb.addAction(renameDiaAction)
-        selectTb.addAction(deleteDiaAction)
-        selectTb.addAction(groupNewAction)
-        selectTb.addAction(autoArrangeAction)
-        selectTb.addAction(zoomInAction)
-        selectTb.addAction(zoomOutAction)
-        selectTb.addAction(zoom0Action)
-        selectTb.addAction(copyAction)
-        selectTb.addAction(pasteAction)
-        selectTb.addAction(toggleConnLabels)
-        selectTb.addAction(editGroupsAction)
-        selectTb.addAction(selectMultipleAction)
-        selectTb.addAction(openVisualizerAction)
-        selectTb.addAction(runMassflowSolverAction)
-        selectTb.addAction(trnsysList)
-
+        # Status bar
         self.sb = self.statusBar()
         self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
 
+        # QUndo framework
         self.undoStack = QUndoStack(self)
         undoAction = self.undoStack.createUndoAction(self, "Undo")
         undoAction.setShortcut("Ctrl+z")
@@ -2429,8 +2500,8 @@ class MainWindow(QMainWindow):
         redoAction = self.undoStack.createRedoAction(self, "Redo")
         redoAction.setShortcut("Ctrl+y")
 
-        self.s1Menu.addAction(undoAction)
-        self.s1Menu.addAction(redoAction)
+        self.editMenu.addAction(undoAction)
+        self.editMenu.addAction(redoAction)
 
         # self.undowidget = QUndoView(self.undoStack, self)
         # self.undowidget.setMinimumSize(300, 100)
@@ -2627,7 +2698,7 @@ class MainWindow(QMainWindow):
         os.system(cmd)
 
     def movePorts(self):
-        self.centralWidget.moveHxPorts = True
+        self.centralWidget.moveDirectPorts = True
 
     def mouseMoveEvent(self, e):
         pass
@@ -2638,8 +2709,22 @@ class MainWindow(QMainWindow):
         # self.sb.showMessage(text)
         # #print("event")
 
+    def showAbout(self):
+        msgb = QMessageBox(self)
+        msgb.setText("PyQt based diagram editor coupled to Trnsys functions")
+        msgb.exec()
 
+    def showVersion(self):
+        msgb = QMessageBox(self)
+        msgb.setText("Currrent version is " + __version__ + " with status " + __status__)
+        msgb.exec()
 
+    def showCredits(self):
+        msgb = QMessageBox(self)
+        msgb.setText("<p><b>Contributors:</b></p>"
+                     "<p>Stefano Marti, Dani Carbonell, Mattia Battaglia, and Jeremias Schmidli."
+                     "Icons made by Jeremias Schmidli and with icons by Vaadin from  www.flaticon.com</p>")
+        msgb.exec()
 
 
 if __name__ == '__main__':

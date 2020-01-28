@@ -15,7 +15,6 @@ class WTap_main(BlockItem):
 
         self.exportInitialInput = 0.0
 
-
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
@@ -43,9 +42,7 @@ class WTap_main(BlockItem):
         self.label.setPos(lx, h)
 
         self.inputs[0].setPos(-2 * delta + (4 * delta + w) * self.flippedH, h / 2)
-        print(self.inputs[0].pos())
-        print(self.inputs[0].scenePos())
-        self.inputs[0].side = 0 + 2 * self.flippedH
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h
 
