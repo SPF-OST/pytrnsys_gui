@@ -15,7 +15,7 @@ class TVentil(BlockItem):
         self.w = 50
         self.typeNumber = 3
         self.isTempering = False
-        self.positionForMassFlowSolver = None
+        self.positionForMassFlowSolver = 1.0
 
         self.exportInitialInput = 0.0
 

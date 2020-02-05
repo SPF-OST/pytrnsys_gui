@@ -996,7 +996,7 @@ class DiagramEditor(QWidget):
         self.snapGrid = False
         self.snapSize = 50
 
-        self.latexPath = 'C:\Trnsys17\Exe\TRNExe.exe'
+        self.trnsysPath = 'C:\Trnsys17\Exe\TRNExe.exe'
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -2637,8 +2637,8 @@ class MainWindow(QMainWindow):
         # dIns = DeepInspector(self.centralWidget)
 
     def visualizeMf(self):
-        self.centralWidget.datagen.generateData()
-        MassFlowVisualizer(self.centralWidget)
+        mfrFile = self.runMassflowSolver()
+        MassFlowVisualizer(self,mfrFile)
 
     def openFile(self):
         print("Opening diagram")
@@ -2694,8 +2694,20 @@ class MainWindow(QMainWindow):
     def runMassflowSolver(self):
         print("Running massflow solver...")
         exportPath = self.centralWidget.exportData()
-        cmd = self.centralWidget.latexPath + ' ' + str(exportPath)
+        cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
         os.system(cmd)
+        mfrFile = os.path.splitext(exportPath)[0]+'_Mfr.prt'
+        if not os.path.isfile(mfrFile):
+            msgb = QMessageBox(self)
+            msgb.setText("Trnsys not succesfully executed")
+            msgb.exec()
+        return mfrFile
+
+
+
+
+
+
 
     def movePorts(self):
         self.centralWidget.moveDirectPorts = True
