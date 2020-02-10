@@ -17,6 +17,10 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
 
+        # self.trnsysId = self.parent.parent().idGen.getTrnsysID()
+        # if "loadedBlock" not in kwargs:
+        #     self.parent.parent().trnsysObj.append(self)
+
         self.flippedH = False
         self.flippedV = False
         self.rotationN = 0
@@ -46,6 +50,9 @@ class GraphicalItem(QGraphicsPixmapItem):
 
         a1 = menu.addAction("Load different image")
         a1.triggered.connect(self.loadAction)
+
+        a2 = menu.addAction("Delete this block")
+        a2.triggered.connect(self.deleteBlock)
 
         menu.exec_(event.screenPos())
 
@@ -114,3 +121,10 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.parent = parent
         if self not in self.parent.parent().graphicalObj:
             self.parent.parent().graphicalObj.append(self)
+
+    def deleteBlock(self):
+        # self.parent.parent().trnsysObj.remove(self)
+        self.parent.parent().graphicalObj.remove(self)
+        self.parent.scene().removeItem(self)
+        del self
+

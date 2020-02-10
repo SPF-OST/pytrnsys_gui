@@ -4,25 +4,34 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QSlider, QDialog, QLineEdit, QPushButton, QHBoxLayout, QLabel, QGridLayout
 
 from trnsysGUI.Connection import Connection
+import pandas as pd
 
 
 class MassFlowVisualizer(QDialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent,mfrFile):
 
         super(MassFlowVisualizer, self).__init__(parent)
-        self.setMinimumSize(1000, 300)
+        self.dataFilePath = mfrFile
+        self.loadedFile = False
+
+        self.loadFile()
+
+        self.setMinimumSize(1000, 200)
 
         self.parent = parent
         self.timeStep = 0
-        self.timeSteps = 365    # 0 to 364
-        self.dataFilePath = "massflowData/flows.txt"
+        self.timeSteps = len(self.massFlowData.index)    # 0 to 364
+
 
         self.slider = QSlider(parent)
         self.setSlider()
         self.slider.sliderReleased.connect(self.testValChange)
         self.slider.sliderPressed.connect(self.pressedSlider)
-        self.loadedFile = False
+        self.slider.sliderMoved.connect(self.moveValues)
+        self.slider.setTickInterval(24)
+
+
         self.qtm = QTimer(parent)
         self.lines = None
         self.started = False
@@ -46,11 +55,23 @@ class MassFlowVisualizer(QDialog):
         layout.addLayout(buttonLayout, 1, 0, 2, 0)
         layout.addWidget(self.currentStepLabel, 2, 0, 1, 2)
         layout.addWidget(self.slider, 3, 0, 1, 2)  # Only for debug (Why do I need a 3 here instead of a 2 for int:row?)
+
         self.setLayout(layout)
+
 
         self.togglePauseButton.clicked.connect(self.togglePause)
         self.cancelButton.clicked.connect(self.cancel)
+
+        self.advance()
+
         self.setWindowTitle("Flow visualizer")
+        ph = parent.geometry().height()
+        pw = parent.geometry().width()
+        px = parent.geometry().x()
+        py = parent.geometry().y()
+        dw = self.width()
+        dh = self.height()
+        self.move(parent.centralWidget.diagramView.geometry().topLeft())
         self.show()
 
     def togglePause(self):
@@ -66,12 +87,13 @@ class MassFlowVisualizer(QDialog):
 
     def loadFile(self):
         if not self.loadedFile:
-            file = open(self.dataFilePath, 'r')
-            self.lines = file.readlines()
+            self.massFlowData = pd.read_csv(self.dataFilePath, sep='\t').rename(
+                columns=lambda x: x.strip())
         self.loadedFile = True
 
+
     def start(self):
-        self.loadFile()
+
         self.paused = False
         self.qtm = QTimer(self.parent)
         self.qtm.timeout.connect(self.advance)
@@ -84,27 +106,19 @@ class MassFlowVisualizer(QDialog):
             return
 
         if self.loadedFile:
-            line = self.lines[self.timeStep]
-            self.slider.setValue(self.timeStep)
-            self.currentStepLabel.setText("Step: " + str(self.timeStep))
-            self.timeStep += 1
-
-            vals = re.sub(r" {1,}", " ", line)
-            vals = vals.split(" ")[:-1]
-
-            # print(vals)
 
             i = 0
-            for t in self.parent.trnsysObj:
+            for t in self.parent.centralWidget.trnsysObj:
                 if isinstance(t, Connection):
-                    print("Found connection in ts " + str(self.timeStep) + " " + str(i))
-                    if float(vals[i]) < 0:
-                        t.setColor(mfr="NegMfr")
-                    elif float(vals[i]) == 0:
-                        t.setColor(mfr="ZeroMfr")
-                    else:
-                        t.setColor(mfr="PosMfr")
-                    i += 1
+                    if 'Mfr'+t.displayName in self.massFlowData.columns:
+                        print("Found connection in ts " + str(self.timeStep) + " " + str(i))
+                        if self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep] < 0:
+                            t.setColor(mfr="NegMfr")
+                        elif self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep] == 0:
+                            t.setColor(mfr="ZeroMfr")
+                        else:
+                            t.setColor(mfr="PosMfr")
+                        i += 1
 
         else:
             return
@@ -134,10 +148,16 @@ class MassFlowVisualizer(QDialog):
         self.currentStepLabel.setText("Step :" + str(val))
         self.timeStep = val
 
+    def moveValues(self):
+        val = self.slider.value()
+        self.currentStepLabel.setText("Step :" + str(val))
+        self.timeStep = val
+        self.advance()
+
     def pressedSlider(self):
         self.pauseVis()
 
     def closeEvent(self, a0):
         self.pauseVis()
-        self.parent.updateConnGrads()
+        self.parent.centralWidget.updateConnGrads()
         super(MassFlowVisualizer, self).closeEvent(a0)
