@@ -6,7 +6,7 @@ class settingsDlg(QDialog):
         super(settingsDlg, self).__init__(parent)
         self.setModal(True)
         self.parent = parent
-        nameLabel = QLabel("Latex Exe:")
+        nameLabel = QLabel("Trnsys Exe:")
         self.le = QLineEdit(parent.centralWidget.latexPath)
 
         self.okButton = QPushButton("OK")
