@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # import random
+import glob
 import re
 import string
 from math import sqrt, acos, pi, degrees, atan
@@ -15,6 +16,7 @@ from pathlib import Path
 
 # from trnsysGUI.CircularDep import *
 # from trnsysGUI.Connection import Connection
+from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
 from trnsysGUI.BlockDlg import BlockDlg
@@ -36,6 +38,9 @@ from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TVentilDlg import TVentilDlg
+from trnsysGUI.Test import Test
+from trnsysGUI.TestDlg import TestDlg
+from trnsysGUI.closeDlg import closeDlg
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
@@ -661,6 +666,24 @@ class DiagramScene(QGraphicsScene):
         # self.parent().mousePressEvent(event)
         super(DiagramScene, self).mousePressEvent(event)
 
+        """For selection when clicking on empty space"""
+        if len(self.items(event.scenePos())) == 0:
+            print("No items here!")
+            self.parent().clearSelectionGroup()
+            self.parent().selectionMode = True
+            self.parent().copyMode = False
+            self.parent().groupMode = False
+            self.parent().multipleSelectMode = True
+            for c in self.parent().connectionList:
+                c.unhighlightConn()
+
+            self.parent().alignYLineItem.setVisible(False)
+
+            for st in self.parent().trnsysObj:
+                if isinstance(st, StorageTank):
+                    for hx in st.heatExchangers:
+                        hx.unhighlightHx()
+
         # global selectionMode
         if self.parent().selectionMode:
             self.pressed = True
@@ -671,17 +694,17 @@ class DiagramScene(QGraphicsScene):
                                            event.scenePos().y() - self.sRstart.y())
                 self.selectionRect.setVisible(True)
 
-        if len(self.items(event.scenePos())) == 0:
-            print("No items here!")
-            for c in self.parent().connectionList:
-                c.unhighlightConn()
-
-            self.parent().alignYLineItem.setVisible(False)
-
-            for st in self.parent().trnsysObj:
-                if isinstance(st, StorageTank):
-                    for hx in st.heatExchangers:
-                        hx.unhighlightHx()
+        # if len(self.items(event.scenePos())) == 0:
+        #     print("No items here!")
+        #     for c in self.parent().connectionList:
+        #         c.unhighlightConn()
+        #
+        #     self.parent().alignYLineItem.setVisible(False)
+        #
+        #     for st in self.parent().trnsysObj:
+        #         if isinstance(st, StorageTank):
+        #             for hx in st.heatExchangers:
+        #                 hx.unhighlightHx()
 
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
@@ -704,6 +727,11 @@ class DiagramScene(QGraphicsScene):
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     res.append(o)
 
+            # if isinstance(o, GraphicalItem):
+            #     print("Checking graphic item to group")
+            #     if self.isInRect(o.scenePos()):
+            #         res.append(o)
+
         return res
 
     def hasElementsInRect(self):
@@ -718,6 +746,11 @@ class DiagramScene(QGraphicsScene):
                 print("Checking connection to group")
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     return True
+
+            # if isinstance(o, GraphicalItem):
+            #     print("Checking graphic item to group")
+            #     if self.isInRect(o.scenePos()):
+            #         return True
 
         return False
 
@@ -977,6 +1010,9 @@ class DiagramEditor(QWidget):
 
         # Generator for massflow display testing
         self.datagen = PipeDataHandler(self)
+
+        self.testEnabled = False
+        self.existReference = True
 
         self.selectionMode = False
         self.groupMode = False
@@ -1412,7 +1448,13 @@ class DiagramEditor(QWidget):
 
         fullExportText = ''
 
-        exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+        if self.testEnabled:
+            exportPath = Path(Path(__file__).resolve().parent.joinpath("export_test")).joinpath(self.diagramName + '.dck')
+        elif not self.existReference:
+            exportPath = Path(Path(__file__).resolve().parent.joinpath("Reference")).joinpath(
+                self.diagramName + '.dck')
+        else:
+            exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
 
         if Path(exportPath).exists():
             qmb = QMessageBox(self)
@@ -1787,6 +1829,7 @@ class DiagramEditor(QWidget):
 
         # global copyMode
         # global selectionMode
+        # global selectionMode
         # global pasting
 
         self.copyMode = False
@@ -1811,6 +1854,8 @@ class DiagramEditor(QWidget):
         for t in selectionList:
             if isinstance(t, BlockItem):
                 self.selectionGroupList.addToGroup(t)
+            # if isinstance(t, GraphicalItem):
+            #     self.selectionGroupList.addToGroup(t)
 
         self.multipleSelectedMode = False
         self.selectionMode = False
@@ -1912,6 +1957,18 @@ class DiagramEditor(QWidget):
         # print("Path is now: " + str(self.saveAsPath))
         # print("Diagram name is: " + self.diagramName)
 
+    def saveAtClose(self):
+        print("saveaspath is " + str(self.saveAsPath))
+
+
+        # closeDialog = closeDlg()
+        # if closeDialog.closeBool:
+        # TODO maybe save to a recent files folder instead
+        filepath = Path(Path(__file__).resolve().parent.joinpath("recent"))
+        self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+
+
+
 
     # Mode related
     def setAlignMode(self, b):
@@ -1941,6 +1998,7 @@ class DiagramEditor(QWidget):
 
     def setitemsSelected(self, b):
         self.itemsSelected = b
+
 
 
     # Misc
@@ -2311,6 +2369,133 @@ class DiagramEditor(QWidget):
         for bl in self.blockList:
             bl.deleteBlock()
 
+    def testFunction(self):
+        """
+        This function tests whether the exporting function is working correctly by comparing
+        an exported file to a reference file.
+        Warning message will be shown if any difference is found between the files.
+        -------
+        Things to note : The fileDir must be changed to corresponding directories on the PC
+
+        """
+
+        i = 0
+        self.tester = Test()
+        self.testPassed = True
+        msg = QMessageBox(self)
+        msg.setWindowTitle('Test Result')
+        # fileDir = 'U:/Desktop/TrnsysGUI/trnsysGUI/'
+        # examplesFilePath = fileDir + 'examplesNewEncoding/'
+        # exportedFilePath = fileDir + 'export_test/'
+        # originalFilePath = fileDir + 'Reference/'
+
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
+        examplesFilePath = os.path.join(ROOT_DIR, 'examplesNewEncoding')
+        exportedFilePath = os.path.join(ROOT_DIR, 'export_test')
+        originalFilePath = os.path.join(ROOT_DIR, 'Reference')
+
+        exportedFileList = []
+        originalFileList = []
+        exampleFileList = []
+
+
+
+        msg.setText("Test in progress")
+        msg.show()
+        QCoreApplication.processEvents()
+
+        # Clear the window
+        self.delBlocks()
+
+        # open, decode and export every example file
+
+        self.testEnabled = True
+        for files in os.listdir(examplesFilePath):
+            fileName = os.path.join(examplesFilePath, files)
+            exampleFileList.append(fileName)
+            self.decodeDiagram(fileName)
+            # Export example files
+            self.exportData()
+            self.delBlocks()
+        self.testEnabled = False
+
+        # get all files from exportedFile folder and Original folder
+        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList,
+                                  originalFileList)
+
+        # check if exported files exist inside reference folder
+        j = 0
+        while j < len(exportedFileList):
+            if not self.tester.checkFileExists(exportedFileList[j], originalFileList):
+                self.existReference = False
+                testDlg = TestDlg(exportedFileList[j])
+                if testDlg.exportBool:
+                    self.delBlocks()
+                    self.decodeDiagram(exampleFileList[j])
+                    self.exportData()
+                    self.delBlocks()
+                self.existReference = True
+            j += 1
+
+        # Retrieve newly added files if any
+        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList,
+                                  originalFileList)
+
+        # check if the files are identical
+        i, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
+
+        if self.testPassed:
+            msg.setText("%d files tested, no discrepancy found" % i)
+            msg.exec_()
+        else:
+            errorFile = originalFileList[i]
+            self.tester.showDifference(exportedFileList[i], originalFileList[i])
+            msg.setText("%d files tested, discrepancy found in %s" % ((i + 1), errorFile))
+            msg.exec_()
+
+        # Disable test and delete the exported files
+        self.tester.deleteFiles(exportedFilePath)
+
+    def printPDF(self):
+        """
+            ---------------------------------------------
+            Export diagram as pdf onto specified folder
+            fn = user input directory
+            ---------------------------------------------
+        """
+        fn, _ = QFileDialog.getSaveFileName(self, 'Export PDF', None, 'PDF files (.pdf);;All Files()')
+        if fn != '':
+            if QFileInfo(fn).suffix() == "": fn += '.pdf'
+            printer = QPrinter(QPrinter.HighResolution)
+            printer.setOrientation(QPrinter.Landscape)
+            printer.setOutputFormat(QPrinter.PdfFormat)
+            printer.setOutputFileName(fn)
+            painter = QPainter(printer)
+            self.diagramScene.render(painter)
+            painter.end()
+            print("File exported to %s" % fn)
+
+    # def printEMF(self):
+    #     """
+    #                 ---------------------------------------------
+    #                 Export diagram as EMF onto specified folder
+    #                 fn = user input directory
+    #                 ---------------------------------------------
+    #             """
+    #     fn, _ = QFileDialog.getSaveFileName(self, 'Export EMF', None, 'EMF files (.emf);;All Files()')
+    #     if fn != '':
+    #         if QFileInfo(fn).suffix() == "": fn += '.jpg'
+    #         printer = QPrinter(QPrinter.HighResolution)
+    #         printer.setOrientation(QPrinter.Landscape)
+    #         printer.setOutputFormat(QPrinter.PdfFormat)
+    #         printer.setOutputFileName(fn)
+    #         painter = QPainter(printer)
+    #         self.diagramScene.render(painter)
+    #         painter.end()
+    #         print("File exported to %s" % fn)
+
+
+
 
 class MainWindow(QMainWindow):
     """
@@ -2408,6 +2593,10 @@ class MainWindow(QMainWindow):
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
+        testAppAction = QAction("Test", self)
+        testAppAction.triggered.connect(self.testApp)
+        testAppAction.setShortcut("Ctrl+t")
+
         # Tool bar
         tb = self.addToolBar('Main Toolbar...')
         tb.setObjectName('Toolbar')
@@ -2456,6 +2645,16 @@ class MainWindow(QMainWindow):
         changeSettingsAction.triggered.connect(self.changeSettings)
         self.fileMenu.addAction(changeSettingsAction)
 
+        exportAsPDF = QAction("Export as PDF", self)
+        exportAsPDF.triggered.connect(self.exportPDF)
+        exportAsPDF.setShortcut("Ctrl+e")
+        self.fileMenu.addAction(exportAsPDF)
+
+        # exportAsEMF = QAction("Export as EMF", self)
+        # exportAsEMF.triggered.connect(self.exportEMF)
+        # exportAsEMF.setShortcut("Ctrl+F")
+        # self.fileMenu.addAction(exportAsEMF)
+
         movePortAction = QAction("Move direct ports", self)
         movePortAction.triggered.connect(self.movePorts)
         movePortAction.setShortcut("ctrl+m")
@@ -2466,6 +2665,8 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
         self.editMenu.addAction(movePortAction)
+        self.editMenu.addAction(testAppAction)
+
 
         AboutAction = QAction("About", self)
         AboutAction.triggered.connect(self.showAbout)
@@ -2642,13 +2843,48 @@ class MainWindow(QMainWindow):
 
     def openFile(self):
         print("Opening diagram")
-        self.centralWidget.delBlocks()
+        # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0]
         print(fileName)
         if fileName != '':
+            self.centralWidget.delBlocks()
             self.centralWidget.decodeDiagram(fileName)
         else:
             print("No filename chosen")
+
+    def openFileAtStartUp(self):
+        """
+        Opens the most recently modified file from the recent folder
+
+        Things to note : file directory must be changed to corresponding directory on individual PCs
+        -------
+        """
+
+        print("Opening diagram")
+        self.centralWidget.delBlocks()
+
+        # list_of_files = glob.glob('U:/Desktop/TrnsysGUI/trnsysGUI/recent/*')
+
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(ROOT_DIR, 'recent')
+        filePath = os.path.join(filePath, '*')
+        list_of_files = glob.glob(filePath)
+
+        if len(list_of_files) != 0:
+            latest_file = max(list_of_files, key=os.path.getmtime)
+        else:
+            latest_file = ''
+
+        while len(list_of_files) > 10:
+            fileToDelete = min(list_of_files, key=os.path.getmtime)
+            os.remove(fileToDelete)
+
+        print(latest_file)
+        if latest_file != '':
+            self.centralWidget.delBlocks()
+            self.centralWidget.decodeDiagram(latest_file)
+        else:
+            print("No filename available")
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
@@ -2688,6 +2924,8 @@ class MainWindow(QMainWindow):
                 t.deleteBlock()
             elif isinstance(t, Connection):
                 t.deleteConn()
+            # elif isinstance(t, GraphicalItem):
+            #     t.deleteBlock()
             else:
                 print("Neiter a Block nor Connection in copyGroupList ")
 
@@ -2726,6 +2964,20 @@ class MainWindow(QMainWindow):
                      "Icons made by Jeremias Schmidli and with icons by Vaadin from  www.flaticon.com</p>")
         msgb.exec()
 
+    def testApp(self):
+        self.centralWidget.testFunction()
+        self.newDia()
+
+    def exportPDF(self):
+        self.centralWidget.printPDF()
+
+    def closeEvent(self, e):
+        """Saves the current diagram into the Diagram Folder"""
+        self.centralWidget.saveAtClose()
+        e.accept()
+
+    # def exportEMF(self):
+    #     self.centralWidget.printEMF()
 
 if __name__ == '__main__':
     cssSs_ = cssSs.read()
@@ -2733,6 +2985,7 @@ if __name__ == '__main__':
     app.setApplicationName("Diagram Creator")
     form = MainWindow()
     form.showMaximized()
+    form.openFileAtStartUp()
     form.show()
     # app.setStyleSheet(cssSs_)
 
