@@ -144,6 +144,8 @@ class PortItem(QGraphicsEllipseItem):
     def hoverEnterEvent(self, event):
         # print("Hovering")
 
+        print(self.parent)
+
         self.setRect(-7, -7, 14.0, 14.0)
         self.innerCircle.setRect(-7, -7, 14.0, 14.0)
         if self.name == 'i':
@@ -199,13 +201,26 @@ class PortItem(QGraphicsEllipseItem):
             self.deleteDirectPortPair()
 
     def deleteDirectPortPair(self):
-        if self.connectionList[0].fromPort is self:
-            self.deletePort(self.connectionList[0].toPort)
-        elif self.connectionList[0].toPort is self:
-            self.deletePort(self.connectionList[0].fromPort)
-        else:
-            print("Something wrong")
+
+        # if self.connectionList[0].fromPort is self:
+        #     self.deletePort(self.connectionList[0].toPort)
+        # elif self.connectionList[0].toPort is self:
+        #     self.deletePort(self.connectionList[0].fromPort)
+        # else:
+        #     print("Something wrong")
+        # self.deletePort(self)
+
+        if len(self.connectionList) > 0:
+            if self.connectionList[0].fromPort is self:
+                self.deletePort(self.connectionList[0].toPort)
+            elif self.connectionList[0].toPort is self:
+                self.deletePort(self.connectionList[0].fromPort)
+            else:
+                print("Something wrong")
         self.deletePort(self)
+        #
+        # print("After delete: ")
+        # print(self.connectionList)
 
     def deletePort(self, obj):
         while len(obj.connectionList) > 0:
@@ -220,3 +235,9 @@ class PortItem(QGraphicsEllipseItem):
         obj.parent.parent.scene().removeItem(obj)
 
         obj.parent.directPortConnsForList = [c for c in obj.parent.directPortConnsForList if c.fromPort != self and c.toPort != self]
+
+        # if obj in obj.parent.leftSide and self.side == 0:
+        #     obj.parent.leftSide.remove(obj)
+        # if obj in obj.parent.rightSide and self.side == 2:
+        #     obj.parent.rightSide.remove(obj)
+

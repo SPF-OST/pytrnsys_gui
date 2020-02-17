@@ -278,8 +278,20 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def updateLines(self, h):
         self.removeLines()
-
         self.h = self.port2.pos().y() - self.port1.pos().y()
+        # TODO : fix hxExchange size error
+        # oldport2pos = self.port2.pos().y() / self.parent.h
+        # oldport1pos = self.port1.pos().y() / self.parent.h
+        #
+        # print(oldport2pos)
+        # print(oldport1pos)
+        #
+        # newport2pos = oldport2pos * (self.parent.h + h)
+        # newport1pos = oldport1pos * (self.parent.h + h)
+
+        # self.h = newport2pos - newport1pos
+        # print("parent height: \n")
+        # print(self.parent.h)
 
         if self.sSide == 0:
             self.offset = QPointF(0, self.port1.pos().y())
