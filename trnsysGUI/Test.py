@@ -35,6 +35,7 @@ class Test(object):
 
     def checkFiles(self, exportedFileList, originalFileList):
         i = 0
+        fileErrorList = []
         found = False
         while i < len(exportedFileList):
             j = 0
@@ -51,9 +52,11 @@ class Test(object):
             if found:
                 if not filecmp.cmp(exportedFileList[i], originalFileList[j], shallow=False):
                     self.testPassed = False
-                    break
+                    fileErrorList.append(i)
+                    # break
             i += 1
-        return i, self.testPassed
+        return fileErrorList, self.testPassed
+        # return i, self.testPassed
 
     def deleteFiles(self, fileDirectory):
         for dfiles in os.listdir(fileDirectory):
@@ -68,6 +71,9 @@ class Test(object):
         fileOne = open(file1)
         fileTwo = open(file2)
 
+        file1List = []
+        file2List = []
+
         fileOneLine = fileOne.readline()
         fileTwoLine = fileTwo.readline()
 
@@ -75,12 +81,23 @@ class Test(object):
             if fileOneLine != fileTwoLine:
                 print("Error found at line %d\n" % line)
                 print("Exported file: %s \nReference file: %s \n" % (fileOneLine, fileTwoLine))
+                file1Str = str(line) + ',' + fileOneLine
+                file2Str = str(line) + ',' + fileTwoLine
+                file1List.append(file1Str)
+                file2List.append(file2Str)
             fileOneLine = fileOne.readline()
             fileTwoLine = fileTwo.readline()
             line += 1
 
+        # print("File 1 list:")
+        # print(file1List)
+        # print("\nFile 2 List:")
+        # print(file2List)
+
         fileOne.close()
         fileTwo.close()
+
+        return file1List, file2List
 
     def sortList(self, list1, list2):
         list1.sort()

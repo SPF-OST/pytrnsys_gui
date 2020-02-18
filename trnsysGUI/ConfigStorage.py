@@ -24,7 +24,7 @@ class ConfigStorage(QDialog):
         self.tab2 = QWidget()
 
         # Add tabs
-        self.tabs.addTab(self.tab1, "Heatexchangers")
+        self.tabs.addTab(self.tab1, "Heat exchangers")
         self.tabs.addTab(self.tab2, "Direct ports")
 
         # VBoxLayout
@@ -73,9 +73,9 @@ class ConfigStorage(QDialog):
 
         gl.addWidget(offsetLabel, 3, 0, 1, 1)
         gl.addWidget(offsetLeILabel, 4, 0, 1, 1)
-        gl.addWidget(self.offsetLeI, 5, 0, 1, 2)
+        gl.addWidget(self.offsetLeI, 5, 0, 1, 3)
         gl.addWidget(offsetLeOLabel, 6, 0, 1, 1)
-        gl.addWidget(self.offsetLeO, 7, 0, 1, 2)
+        gl.addWidget(self.offsetLeO, 7, 0, 1, 3)
 
 
 
@@ -86,10 +86,10 @@ class ConfigStorage(QDialog):
         # gl.addLayout(hxsideHbL, 6, 0)
         self.hxNameLe = QLineEdit()
         self.hxNameLe.setPlaceholderText("Enter a name...")
-        gl.addWidget(self.hxNameLe, 8, 0, 1, 2)
+        gl.addWidget(self.hxNameLe, 8, 0, 1, 3)
 
         gl.addWidget(self.lButton, 9, 0, 1, 1)
-        gl.addWidget(self.rButton, 9, 1, 1, 1)
+        gl.addWidget(self.rButton, 9, 2, 1, 1)
 
         addButton = QPushButton("Add...")
         addButton.clicked.connect(self.addHx)
@@ -98,6 +98,9 @@ class ConfigStorage(QDialog):
         removeButton.clicked.connect(self.removeHxL)
         removeButton.clicked.connect(self.removeHxR)
         gl.addWidget(removeButton, 10, 1, 1, 1)
+        modifyButton = QPushButton("Modify")
+        modifyButton.clicked.connect(self.modifyHx)
+        gl.addWidget(modifyButton, 10, 2, 1, 1)
         spaceHx = QSpacerItem(self.width(), spacerHeight)
         gl.addItem(spaceHx, 11, 0, 1, 2)
 
@@ -129,6 +132,21 @@ class ConfigStorage(QDialog):
         spaceManPort = QSpacerItem(self.width(), spacerHeight)
         self.manAddButton.clicked.connect(self.manAddPortPair)
 
+        self.manRemovebutton = QPushButton("Remove ports")
+        self.manRemovebutton.clicked.connect(self.manRemovePortPairLeft)
+        self.manRemovebutton.clicked.connect(self.manRemovePortPairRight)
+
+        self.modifyPortButton = QPushButton("Modify")
+        self.modifyPortButton.clicked.connect(self.modifyPort)
+
+        warning = QLabel("                Remove and modify function for Direct Ports are not fully functional, use with caution!")
+
+
+        addRemoveButtons = QHBoxLayout()
+        addRemoveButtons.addWidget(self.manAddButton)
+        addRemoveButtons.addWidget(self.manRemovebutton)
+        addRemoveButtons.addWidget(self.modifyPortButton)
+
         manPortLay.addWidget(manPortLabel)
         manPortLay.addWidget(manPortLabel2)
         manPortLay.addWidget(portlabelUpper)
@@ -136,14 +154,20 @@ class ConfigStorage(QDialog):
         manPortLay.addWidget(portlabelLower)
         manPortLay.addWidget(self.manPortLeO)
         manPortLay.addLayout(qhbl3)
-        manPortLay.addWidget(self.manAddButton)
-        manPortLay.addItem(spaceManPort)
+        manPortLay.addLayout(addRemoveButtons)
+        manPortLay.addWidget(warning)
+        # manPortLay.addWidget(self.manAddButton)
+        # manPortLay.addItem(spaceManPort)
+        # manPortLay.addWidget(self.manRemovebutton)
+        # manPortLay.addItem(spaceManPort2)
 
         increaseSizeButton = QPushButton("Increase size")
-        self.okButton = QPushButton("OK (change name)")
+        decreaseSizeButton = QPushButton("Decrease size")
+        self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
         increaseSizeButton.clicked.connect(self.incrSize)
+        decreaseSizeButton.clicked.connect(self.decrSize)
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
 
@@ -170,6 +194,7 @@ class ConfigStorage(QDialog):
         L.addWidget(self.tabs)
 
         L.addWidget(increaseSizeButton)
+        L.addWidget(decreaseSizeButton)
         L.addWidget(self.okButton)
         L.addWidget(self.cancelButton)
 
@@ -184,10 +209,10 @@ class ConfigStorage(QDialog):
         self.listWR.clicked.connect(self.listWRClicked)
         self.listWL.clicked.connect(self.listWLClicked)
 
-        self.listWR.setSelectionMode(1)
-        self.listWL.setSelectionMode(1)
-        self.listWR.clicked.connect(self.listWR2Clicked)
-        self.listWL.clicked.connect(self.listWL2Clicked)
+        self.listWR2.setSelectionMode(1)
+        self.listWL2.setSelectionMode(1)
+        self.listWR2.clicked.connect(self.listWR2Clicked)
+        self.listWL2.clicked.connect(self.listWL2Clicked)
 
         self.show()
 
@@ -206,7 +231,7 @@ class ConfigStorage(QDialog):
                 listW = self.listWL2
             else:
                 listW = self.listWR2
-            listW.addItem("Port pair from " + "%d%%" % (100 - 100 * c.fromPort.pos().y() / self.storage.h) +
+            listW.addItem(c.displayName + ',' + "Port pair from " + "%d%%" % (100 - 100 * c.fromPort.pos().y() / self.storage.h) +
                           " to " + "%d%%" % (100 - 100 * c.toPort.pos().y() / self.storage.h))
 
     # Unused
@@ -311,11 +336,82 @@ class ConfigStorage(QDialog):
         self.listWL2.clear()
         self.listWR2.clear()
         self.loadDirPorts()
+        print("After creating left side has:")
+        for i in self.storage.leftSide:
+            print(i.pos().y())
+
+    def manRemovePortPairLeft(self):
+        # print("Before delete, left side has:")
+        # print(self.storage.leftSide)
+        for i in self.storage.directPortConnsForList:
+            print(self.storage.directPortConnsForList)
+            for j in self.listWL2.selectedItems():
+                if i.displayName == j.text()[:j.text().find(",")]:
+                    print('i :' + i.displayName)
+                    print('j : ' + j.text()[:j.text().find(",")])
+                    self.storage.directPortConnsForList.remove(i)
+                    self.listWL2.takeItem(self.listWL2.row(self.listWL2.selectedItems()[0]))
+
+                    while len(i.fromPort.connectionList) > 0:
+                        i.fromPort.connectionList[0].deleteConn()
+
+                    while len(i.toPort.connectionList) > 0:
+                        i.toPort.connectionList[0].deleteConn()
+
+                    self.storage.inputs.remove(i.fromPort)
+                    self.storage.outputs.remove(i.toPort)
+                    # self.storage.leftSide.remove(i.fromPort)
+                    # self.storage.leftSide.remove(i.toPort)
+
+                    self.storage.parent.scene().removeItem(i.fromPort)
+                    self.storage.parent.scene().removeItem(i.toPort)
+
+                    self.storage.parent.scene().removeItem(i.fromPort)
+                    self.storage.parent.scene().removeItem(i.toPort)
+                    self.storage.parent.scene().removeItem(i.fromPort)
+                    self.storage.parent.scene().removeItem(i.toPort)
+
+
+
+        # print("After delete, left side has:")
+        # print(self.storage.leftSide)
+
+    def manRemovePortPairRight(self):
+        for i in self.storage.directPortConnsForList:
+            for j in self.listWR2.selectedItems():
+                if i.displayName == j.text()[:j.text().find(",")]:
+                    # print('i :' + i.displayName)
+                    # print('j : ' + j.text()[:j.text().find(",")])
+                    self.storage.directPortConnsForList.remove(i)
+                    self.listWR2.takeItem(self.listWR2.row(self.listWR2.selectedItems()[0]))
+
+                    while len(i.fromPort.connectionList) > 0:
+                        i.fromPort.connectionList[0].deleteConn()
+
+                    while len(i.toPort.connectionList) > 0:
+                        i.toPort.connectionList[0].deleteConn()
+
+                    self.storage.inputs.remove(i.fromPort)
+                    self.storage.outputs.remove(i.toPort)
+                    # self.storage.rightSide.remove(i.fromPort)
+                    # self.storage.rightSide.remove(i.toPort)
+
+                    self.storage.parent.scene().removeItem(i.fromPort)
+                    self.storage.parent.scene().removeItem(i.toPort)
+
+                    self.storage.parent.scene().removeItem(i.fromPort)
+                    self.storage.parent.scene().removeItem(i.toPort)
+                    self.storage.parent.scene().removeItem(i.fromPort)
+                    self.storage.parent.scene().removeItem(i.toPort)
+
+
 
     def removeHxL(self):
         for i in self.storage.heatExchangers:
             # Name is identified through index of comma
             for j in self.listWL.selectedItems():
+                # print('printing display name: ' + i.displayName + '\n')
+                # print('printing j.text: ' + j.text())
                 if i.displayName == j.text()[:j.text().find(",")]:
                     self.storage.heatExchangers.remove(i)
                     self.listWL.takeItem(self.listWL.row(self.listWL.selectedItems()[0]))
@@ -361,9 +457,33 @@ class ConfigStorage(QDialog):
                     self.storage.parent.scene().removeItem(i.port2)
                     self.storage.parent.scene().removeItem(i)
 
+    def modifyHx(self):
+        # print("Left: ")
+        # print(self.listWL.selectedItems())
+        # print("\nRight: ")
+        # print(self.listWR.selectedItems())
+        if len(self.listWL.selectedItems()) == 0 and len(self.listWR.selectedItems()) == 0:
+            pass
+        else:
+            if self.rButton.isChecked() or self.lButton.isChecked():
+                self.addHx()
+                self.removeHxL()
+                self.removeHxR()
+
+    def modifyPort(self):
+        xValue = 0
+        if self.listWL2.selectedItems() is not None:
+            self.manRemovePortPairLeft()
+            xValue += 1
+        if self.listWR2.selectedItems() is not None:
+            self.manRemovePortPairRight()
+            xValue += 1
+        if xValue != 0:
+            self.manAddPortPair()
+
+
     # self.storage.h -= self.h_hx
     # self.storage.updateImage(-self.h_hx)
-
     def incrSize(self):
         self.storage.updatePortPositions(self.h_hx)
         self.storage.updateHxLines(self.h_hx)
@@ -372,7 +492,8 @@ class ConfigStorage(QDialog):
 
     # Unused
     def decrSize(self):
-        self.storage.updatePortPositions(self.h_hx)
+        self.storage.updatePortPositionsDec(self.h_hx)
+        self.storage.updateHxLines(-self.h_hx)
         self.storage.h -= self.h_hx
         self.storage.updateImage()
 

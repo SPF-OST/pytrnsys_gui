@@ -1,4 +1,5 @@
 import random
+import sys
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QIcon, QColor
@@ -90,12 +91,19 @@ class StorageTank(BlockItem):
             sideNr = 2
 
         # Check first if there is already a port at entered position:
+        print("Before creating left side has:")
+        print(self.leftSide)
         for i in tempSideList:
+            print("i :")
+            print(i)
             if i.pos().y() == hAbsI:
+                # TODO : can you create an input port over an existing input port?
                 print("Found an existing input port")
+                print(i.pos().y())
                 port1 = i
             if i.pos().y() == hAbsO:
                 print("Can't create a new output over an existing input")
+                # port2 = i
 
         if port1 is None:
             port1 = PortItem('i', sideNr, self)
@@ -425,6 +433,9 @@ class StorageTank(BlockItem):
         c2.displayName = side[1].connectionList[0].displayName
         c2.isStorageIO = True
 
+    def deletePorts(self, displayName):
+        pass
+
 
     # Transform related
     def changeSize(self):
@@ -455,10 +466,20 @@ class StorageTank(BlockItem):
         for p in self.inputs + self.outputs:
             rel_h_old = p.pos().y() / self.h
             p.setPos(p.pos().x(), rel_h_old * (self.h + h))
+            # p.setPos(rel_h_old, p.pos().x() * (self.h + h))
+
+    def updatePortPositionsDec(self, h):
+        for p in self.inputs + self.outputs:
+            rel_h_old = p.pos().y() / self.h
+            p.setPos(p.pos().x(), rel_h_old * (self.h - h))
 
     def updateHxLines(self, h):
         for hx in self.heatExchangers:
             hx.updateLines(h)
+
+    def updateHxLinesDec(self, h):
+        for hx in self.heatExchangers:
+            hx.updateLines(-h)
 
 
     # Encoding

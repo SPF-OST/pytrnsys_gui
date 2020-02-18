@@ -10,7 +10,7 @@ from trnsysGUI.CornerItem import CornerItem
 # from trnsysGUI.deleteConnectionCommand import DeleteConnectionCommand
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 from trnsysGUI.segmentDlg import segmentDlg
-
+# TODO : combine segments when horizontal
 
 def calcDist(p1, p2):
     vec = p1 - p2

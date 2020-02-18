@@ -19,6 +19,7 @@ from pathlib import Path
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.DeepInspector import DeepInspector
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
@@ -579,9 +580,21 @@ class DiagramScene(QGraphicsScene):
 
         if self.parent().selectionMode and not self.released and self.pressed:
             self.selectionRect.setVisible(True)
-            self.sRw = mouseEvent.scenePos().x() - self.sRstart.x()
-            self.sRh = mouseEvent.scenePos().y() - self.sRstart.y()
-            self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh)
+            self.sRw = (mouseEvent.scenePos().x() - self.sRstart.x())
+            self.sRh = (mouseEvent.scenePos().y() - self.sRstart.y())
+
+            if self.sRw < 0 and self.sRh > 0:  # from top right to bottom left
+                rectangleR1 = QRectF(self.sRstart.x(), self.sRstart.y(), -abs(self.sRw), self.sRh).normalized()
+                self.selectionRect.setRect(rectangleR1)
+            elif self.sRw < 0 and self.sRh < 0: # from bottom right to top left
+                rectangleR1 = QRectF(self.sRstart.x(), self.sRstart.y(), -abs(self.sRw), -abs(self.sRh)).normalized()
+                self.selectionRect.setRect(rectangleR1)
+            elif self.sRw > 0 and self.sRh < 0: # from bottom left to top right
+                rectangleR1 = QRectF(self.sRstart.x(), self.sRstart.y(), self.sRw, -abs(self.sRh)).normalized()
+                self.selectionRect.setRect(rectangleR1)
+            else:
+                rectangleR1 = QRectF(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh)
+                self.selectionRect.setRect(rectangleR1)
 
     def mouseReleaseEvent(self, mouseEvent):
         print("Releasing mouse in DiagramScene...")
@@ -598,7 +611,7 @@ class DiagramScene(QGraphicsScene):
 
         if self.parent().selectionMode:
             # self.released = True
-            print("There are elements inside the selection " + str(self.hasElementsInRect()))
+            print("There are elements inside the selection : " + str(self.hasElementsInRect()))
             if self.hasElementsInRect():
                 if self.parent().groupMode:
                     g = self.createGroup()
@@ -690,8 +703,8 @@ class DiagramScene(QGraphicsScene):
             # self.selectionRect.setParentItem(self)
             if not self.released:
                 self.sRstart = event.scenePos()
-                self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(), event.scenePos().x() - self.sRstart.x(),
-                                           event.scenePos().y() - self.sRstart.y())
+                self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(), abs(event.scenePos().x() - self.sRstart.x()),
+                                           abs(event.scenePos().y() - self.sRstart.y()))
                 self.selectionRect.setVisible(True)
 
         # if len(self.items(event.scenePos())) == 0:
@@ -756,11 +769,31 @@ class DiagramScene(QGraphicsScene):
 
     def isInRect(self, point):
         # Check if a point is in the selection rectangle
+        # from top left to bottom right
         if point.x() > self.sRstart.x() and point.x() < (
                 self.sRstart.x() + self.sRw) and point.y() > self.sRstart.y() and point.y() < (
                 self.sRstart.y() + self.sRh):
             print("In rect")
             return True
+
+        # from top right to bottom left
+        elif point.x() < self.sRstart.x() and point.x() > (self.sRstart.x() + self.sRw)\
+                and point.y() > self.sRstart.y() and point.y() < (self.sRstart.y() + self.sRh):
+            print("In rect")
+            return True
+
+        # from bottom right to top left
+        elif point.x() < self.sRstart.x() and point.x() > (self.sRstart.x() + self.sRw)\
+                and point.y() < self.sRstart.y() and point.y() > (self.sRstart.y() + self.sRh):
+            print("In rect")
+            return True
+
+        # from bottom left to top right
+        elif point.x() > self.sRstart.x() and point.x() < (self.sRstart.x() + self.sRw)\
+                and point.y() < self.sRstart.y() and point.y() > (self.sRstart.y() + self.sRh):
+            print("In rect")
+            return True
+
         else:
             return False
 
@@ -1151,6 +1184,7 @@ class DiagramEditor(QWidget):
         self.alignXLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignXLineItem)
 
+
         # #Search related lists
         # self.bfs_visitedNodes = []
         # self.bfs_neighborNodes = []
@@ -1216,6 +1250,13 @@ class DiagramEditor(QWidget):
         if startPort is not endPort:
             # if len(endPort.connectionList) == 0:
             # Connection(startPort, endPort, False, self)
+
+            if isinstance(startPort.parent, StorageTank) and isinstance(endPort.parent, StorageTank)\
+                    and startPort.parent != endPort.parent:
+                msgSTank = QMessageBox(self)
+                msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
+                msgSTank.exec_()
+
             command = CreateConnectionCommand(startPort, endPort, False, self, "CreateConn Command")
             self.parent().undoStack.push(command)
 
@@ -1963,7 +2004,6 @@ class DiagramEditor(QWidget):
 
         # closeDialog = closeDlg()
         # if closeDialog.closeBool:
-        # TODO maybe save to a recent files folder instead
         filepath = Path(Path(__file__).resolve().parent.joinpath("recent"))
         self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
 
@@ -2398,6 +2438,11 @@ class DiagramEditor(QWidget):
         originalFileList = []
         exampleFileList = []
 
+        errorList1 = []
+        errorLIst2 = []
+
+        fileNoList = []
+
 
 
         msg.setText("Test in progress")
@@ -2405,7 +2450,7 @@ class DiagramEditor(QWidget):
         QCoreApplication.processEvents()
 
         # Clear the window
-        self.delBlocks()
+        # self.delBlocks()
 
         # open, decode and export every example file
 
@@ -2442,16 +2487,24 @@ class DiagramEditor(QWidget):
                                   originalFileList)
 
         # check if the files are identical
-        i, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
+        fileNoList, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
+        # i, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
 
         if self.testPassed:
             msg.setText("%d files tested, no discrepancy found" % i)
             msg.exec_()
         else:
-            errorFile = originalFileList[i]
-            self.tester.showDifference(exportedFileList[i], originalFileList[i])
-            msg.setText("%d files tested, discrepancy found in %s" % ((i + 1), errorFile))
-            msg.exec_()
+            for fileNo in fileNoList:
+                errorFile = originalFileList[fileNo]
+                errorList1, errorList2 = self.tester.showDifference(exportedFileList[fileNo], originalFileList[fileNo])
+                msg.setText("%d files tested, discrepancy found in %s" % ((fileNo + 1), errorFile))
+                msg.exec_()
+                DifferenceDlg(self, errorList1, errorList2)
+            # errorFile = originalFileList[i]
+            # errorList1, errorList2 = self.tester.showDifference(exportedFileList[i], originalFileList[i])
+            # msg.setText("%d files tested, discrepancy found in %s" % ((i + 1), errorFile))
+            # msg.exec_()
+            # DifferenceDlg(self, errorList1, errorList2)
 
         # Disable test and delete the exported files
         self.tester.deleteFiles(exportedFilePath)
@@ -2568,9 +2621,10 @@ class MainWindow(QMainWindow):
         selectMultipleAction.triggered.connect(self.createSelection)
         selectMultipleAction.setShortcut("s")
 
+        deleteShortcut = QtGui.QKeySequence("Delete, Backspace, Ctrl+d")
         multipleDeleteAction = QAction("Delete selection", self)
         multipleDeleteAction.triggered.connect(self.deleteMultiple)
-        multipleDeleteAction.setShortcut("Ctrl+d")
+        multipleDeleteAction.setShortcuts(deleteShortcut)
 
         # toggleEditorModeAction = QAction("Toggle editor mode", self)
         # toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
@@ -2703,6 +2757,7 @@ class MainWindow(QMainWindow):
 
         self.editMenu.addAction(undoAction)
         self.editMenu.addAction(redoAction)
+
 
         # self.undowidget = QUndoView(self.undoStack, self)
         # self.undowidget.setMinimumSize(300, 100)
@@ -2979,6 +3034,12 @@ class MainWindow(QMainWindow):
     def testApp(self):
         self.centralWidget.testFunction()
         self.newDia()
+
+        msgb = QMessageBox(self)
+        msgb.setText("Test Complete, please restart the application. ")
+        msgb.exec()
+
+        self.close()
 
     def exportPDF(self):
         self.centralWidget.printPDF()
