@@ -2797,6 +2797,7 @@ class MainWindow(QMainWindow):
 
 
     def newDia(self):
+        # TODO : Check if the current diagram is saved, if not, ask user whether to save or not
         print("Creating new diagram")
         # self.centralWidget.newDiagram()
         self.centralWidget.delBlocks()
@@ -3064,6 +3065,7 @@ class MainWindow(QMainWindow):
         msgb.exec()
 
     def testApp(self):
+        self.newDia()
         self.centralWidget.testFunction()
         self.newDia()
 

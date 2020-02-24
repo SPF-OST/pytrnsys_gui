@@ -8,6 +8,15 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QHBoxLayout, QListWi
 
 
 class DifferenceDlg(QDialog):
+    """
+    This is the dialog box that displays the differences between the export
+    file and the reference file.
+
+    exportList and referenceList contains the list of unmatched strings from the
+    exported file and reference file respectively.
+
+    fileName refers to the name of the file where the differences are found.
+    """
     def __init__(self, parent, exportList, referenceList, fileName):
         super(DifferenceDlg, self).__init__(parent)
         self.parent = parent
@@ -109,8 +118,8 @@ class DifferenceDlg(QDialog):
 
         if len(self.listWL.selectedItems()) > 0:
             for items in self.listWL.selectedItems():
-                print(items.text()[:items.text().find(":")])
-                print(items.text()[items.text().find(":")+1:])
+                # print(items.text()[:items.text().find(":")])
+                # print(items.text()[items.text().find(":")+1:])
                 lineNo = items.text()[:items.text().find(":")]
                 string = items.text()[items.text().find(":")+1:]
                 self.updatedLines.append(items.text())
@@ -146,6 +155,22 @@ class DifferenceDlg(QDialog):
 
 
     def updateReferenceFile(self, lineNo, string):
+        """
+
+        Parameters
+        ----------
+        lineNo : the line number of the unmatch string
+        string : the correct string
+
+        1.Access the reference folder
+        2.read from the error file
+        3.Update the error lines
+        4.write to the error file
+
+        Returns
+        -------
+
+        """
         ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         originalFilePath = os.path.join(ROOT_DIR, 'Reference')
         fileToUpdate = os.path.join(originalFilePath, self.fileName)

@@ -107,10 +107,10 @@ class Export(object):
 
             # TODO : decide on what to do if variable name exceeds character limit
             # Create a checked variable instead of returning false : self.passChecked
-            # if len(ObjToCheck) > self.maxChar-5:
-            #     msgBox = QMessageBox()
-            #     msgBox.setText("Variable name <b>%s</b> is longer than %d characters! Please try exporting again after reducing name length." % (ObjToCheck, self.maxChar-5))
-            #     msgBox.exec_()
+            if len(ObjToCheck) > self.maxChar-5:
+                msgBox = QMessageBox()
+                msgBox.setText("Variable name <b>%s</b> is longer than %d characters! Please try exporting again after reducing name length." % (ObjToCheck, self.maxChar-5))
+                msgBox.exec_()
                 # return False
 
             # print(ObjToCheck)

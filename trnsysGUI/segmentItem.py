@@ -355,8 +355,8 @@ class segmentItem(QGraphicsLineItem):
                             #         self.endNode.parent.pos().y()): # TODO : Edit here to combine segment
                                 # print("Next h seg could be deleted")
                             if nextHorizSeg.isHorizontal() and \
-                                    int(self.endNode.parent.pos().y()-5) < int(nextHorizSeg.line().p2().y()) < int(
-                                    self.endNode.parent.pos().y()+5):
+                                    int(self.endNode.parent.pos().y()-8) < int(nextHorizSeg.line().p2().y()) < int(
+                                    self.endNode.parent.pos().y()+8):
                                 self.deleteNextHorizSeg(False, nextHorizSeg)
                                 return
 

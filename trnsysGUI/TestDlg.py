@@ -2,6 +2,10 @@ from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QLabel
 
 
 class TestDlg(QDialog):
+    """
+    This is the dialog box for testing. It will be called when an exported file cannot be found inside the reference
+    folder. (file of same name doesnt exist inside reference folder)
+    """
 
     def __init__(self, exportedFile, *args, **kwargs):
         super(TestDlg, self).__init__(*args, **kwargs)
