@@ -1,5 +1,8 @@
 import re
 import string
+import sys
+
+from PyQt5.QtWidgets import QMessageBox
 
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Pump import Pump
@@ -11,6 +14,7 @@ class Export(object):
     def __init__(self, objList, editor):
         self.trnsysObj = objList
         self.editor = editor
+        self.maxChar = 15
 
     def exportBlackBox(self):
         f = "*** Black box component temperatures" + "\n"
@@ -81,9 +85,36 @@ class Export(object):
         f += str(lineNr) + "\n"
 
         # exportConnsString: i/o i/o 0 0
-
+        tempObjList = []
         for t in self.trnsysObj:
-            f += t.exportParametersFlowSolver(descConnLength)[0]
+
+            ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
+            f += ObjToCheck
+            ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
+
+            # f += t.exportParametersFlowSolver(descConnLength)[0]
+            # ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
+            # ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
+
+            # TODO : check if variable name already exist
+            # if ObjToCheck in tempObjList and ObjToCheck != '\n' and ObjToCheck != '' and ObjToCheck != ' ':
+            #     msgBox = QMessageBox()
+            #     msgBox.setText("Variable name <b>%s</b> already exists! Please try again after renaming." % ObjToCheck)
+            #     msgBox.exec_()
+            #     # return False
+            # else:
+            #     tempObjList.append(ObjToCheck)
+
+            # TODO : decide on what to do if variable name exceeds character limit
+            # Create a checked variable instead of returning false : self.passChecked
+            # if len(ObjToCheck) > self.maxChar-5:
+            #     msgBox = QMessageBox()
+            #     msgBox.setText("Variable name <b>%s</b> is longer than %d characters! Please try exporting again after reducing name length." % (ObjToCheck, self.maxChar-5))
+            #     msgBox.exec_()
+                # return False
+
+            # print(ObjToCheck)
+            # print(len(ObjToCheck))
 
         tempS = f
         print("param solver text is ")

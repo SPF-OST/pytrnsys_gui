@@ -1,8 +1,9 @@
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon, QImage
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
+from trnsysGUI.ResizerItem import ResizerItem
 
 
 class Boiler(BlockItem):
@@ -50,3 +51,26 @@ class Boiler(BlockItem):
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h
+
+    # For resizing, need set imageSource
+    # def mousePressEvent(self, event):  # create resizer
+    #     try:
+    #         self.resizer
+    #     except AttributeError:
+    #         self.resizer = ResizerItem(self)
+    #         self.resizer.setPos(self.w, self.h)
+    #         self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
+    #     else:
+    #         return
+    #
+    # def setItemSize(self, w, h):
+    #     self.w, self.h = w, h
+    #
+    # def updateImage(self):
+    #     if self.imageSource[-3:] == "svg":
+    #         self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
+    #         self.setPixmap(self.image)
+    #
+    #     elif self.imageSource[-3:] == "png":
+    #         self.image = QImage(self.imageSource)
+    #         self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))

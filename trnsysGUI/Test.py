@@ -81,8 +81,8 @@ class Test(object):
             if fileOneLine != fileTwoLine:
                 print("Error found at line %d\n" % line)
                 print("Exported file: %s \nReference file: %s \n" % (fileOneLine, fileTwoLine))
-                file1Str = str(line) + ',' + fileOneLine
-                file2Str = str(line) + ',' + fileTwoLine
+                file1Str = str(line) + ':' + fileOneLine
+                file2Str = str(line) + ':' + fileTwoLine
                 file1List.append(file1Str)
                 file2List.append(file2Str)
             fileOneLine = fileOne.readline()

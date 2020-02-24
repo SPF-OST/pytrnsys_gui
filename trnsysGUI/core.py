@@ -71,6 +71,7 @@ from trnsysGUI.copyGroup import copyGroup
 from trnsysGUI.IdGenerator import IdGenerator
 from trnsysGUI.Connection import Connection
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
+from trnsysGUI.ResizerItem import ResizerItem
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import *
@@ -568,6 +569,8 @@ class DiagramScene(QGraphicsScene):
         self.addItem(self.viewRect1)
         self.addItem(self.viewRect2)
 
+        self.selectedItem = None
+
         # self.viewRect1.setPos(-1300, -100)
         # self.viewRect2.setPos(-1300, -100)
 
@@ -677,7 +680,14 @@ class DiagramScene(QGraphicsScene):
 
     def mousePressEvent(self, event):
         # self.parent().mousePressEvent(event)
+        # TODO : remove resizer when click on other block items
+        # TODO : item() returns a list of all items inside the scene
         super(DiagramScene, self).mousePressEvent(event)
+
+        # if self.selectedItem is not None:
+        #     self.selectedItem.clear()
+        if len(self.items(event.scenePos())) > 0:
+            self.selectedItem = self.items(event.scenePos())
 
         """For selection when clicking on empty space"""
         if len(self.items(event.scenePos())) == 0:
@@ -696,6 +706,18 @@ class DiagramScene(QGraphicsScene):
                 if isinstance(st, StorageTank):
                     for hx in st.heatExchangers:
                         hx.unhighlightHx()
+
+            if self.selectedItem is not None:
+                for items in self.selectedItem:
+                    if isinstance(items, GraphicalItem) and hasattr(items, 'resizer'):
+                        self.removeItem(items.resizer)
+                        items.deleteResizer()
+                    if isinstance(items, ResizerItem):
+                        self.removeItem(items)
+                        items.parent.deleteResizer()
+
+            if self.selectedItem is not None:
+                self.selectedItem.clear()
 
         # global selectionMode
         if self.parent().selectionMode:
@@ -1559,6 +1581,12 @@ class DiagramEditor(QWidget):
         fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
+        # if not exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters):
+        #     print("Nothing exported")
+        #     self.cleanUpExportedElements()
+        #     self.tearDownStorageInnerConns()
+        #     return exportPath
+
         fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
         fullExportText += exporter.exportInputsFlowSolver(lineNrParameters)
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
@@ -1748,8 +1776,8 @@ class DiagramEditor(QWidget):
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
                     self.diagramScene.addItem(k)
-                    k.resizer.setPos(k.w, k.h)
-                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+                    # k.resizer.setPos(k.w, k.h)
+                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
 
                 if isinstance(k, dict):
                     if "__idDct__" in k:
@@ -1816,6 +1844,8 @@ class DiagramEditor(QWidget):
         with open(filename, 'w') as jsonfile:
             json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
 
+        print("Copy complete!")
+
     def pasteFromClipBoard(self):
         filename = 'clipboard.json'
 
@@ -1852,8 +1882,8 @@ class DiagramEditor(QWidget):
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
                     self.diagramScene.addItem(k)
-                    k.resizer.setPos(k.w, k.h)
-                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+                    # k.resizer.setPos(k.w, k.h)
+                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
 
                 if isinstance(k, Connection):
                     print("Almost done with loading a connection")
@@ -2499,7 +2529,7 @@ class DiagramEditor(QWidget):
                 errorList1, errorList2 = self.tester.showDifference(exportedFileList[fileNo], originalFileList[fileNo])
                 msg.setText("%d files tested, discrepancy found in %s" % ((fileNo + 1), errorFile))
                 msg.exec_()
-                DifferenceDlg(self, errorList1, errorList2)
+                DifferenceDlg(self, errorList1, errorList2, originalFileList[fileNo])
             # errorFile = originalFileList[i]
             # errorList1, errorList2 = self.tester.showDifference(exportedFileList[i], originalFileList[i])
             # msg.setText("%d files tested, discrepancy found in %s" % ((i + 1), errorFile))
@@ -2605,11 +2635,11 @@ class MainWindow(QMainWindow):
 
         copyAction = QAction(QIcon('images/clipboard.png'), "Copy to clipboard", self)
         copyAction.triggered.connect(self.copySelection)
-        copyAction.setShortcut("c")
+        copyAction.setShortcut("Ctrl+c")
 
         pasteAction = QAction(QIcon('images/puzzle-piece.png'), "Paste from clipboard", self)
         pasteAction.triggered.connect(self.pasteSelection)
-        pasteAction.setShortcut("v")
+        pasteAction.setShortcut("Ctrl+v")
 
         toggleConnLabels = QAction(QIcon('images/labelToggle.png'), "Toggle pipe labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
@@ -2844,6 +2874,8 @@ class MainWindow(QMainWindow):
         self.centralWidget.copyMode = True
         self.centralWidget.groupMode = False
         self.centralWidget.multipleSelectMode = False
+
+        self.centralWidget.copyElements()
 
     def pasteSelection(self):
         print("Pasting selection")

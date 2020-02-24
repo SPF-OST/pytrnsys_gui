@@ -517,7 +517,7 @@
                 ],
                 [
                     -395.0,
-                    -206.0
+                    -208.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -538,13 +538,13 @@
                     -395.0,
                     -277.77777777777777,
                     -395.0,
-                    -206.0
+                    -208.0
                 ],
                 [
                     -395.0,
-                    -206.0,
+                    -208.0,
                     -195.0,
-                    -206.0
+                    -208.0
                 ]
             ],
             "isVirtualConn": false,
@@ -1360,25 +1360,8 @@
             "isVirtualConn": false,
             "trnsysID": 330
         },
-        "GraphicalItem-782": {
-            ".__BlockDict__": true,
-            "BlockName": "GraphicalItem",
-            "BlockPosition": [
-                -1150.0,
-                -54.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "ID": 782,
-            "ImageSource": "gear.svg",
-            "RotationN": 0,
-            "Size": [
-                100.0,
-                100.0
-            ]
-        },
         "IDs": {
-            "GlobalId": 783,
+            "GlobalId": 780,
             "__idDct__": true,
             "globalConnID": 269,
             "trnsysID": 332
