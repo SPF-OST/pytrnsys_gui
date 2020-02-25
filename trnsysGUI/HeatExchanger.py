@@ -146,6 +146,7 @@ class HeatExchanger(QGraphicsItemGroup):
             lineTop.setPen(QPen(Qt.black, 2))
             self.lines.append(lineTop)
 
+            # TODO : maybe draw half a piece when remainder is bigger than half of the triangular piece
             times = self.h / HeatExchanger.partH
             param = times / 2
             print("Times is " + str(times))

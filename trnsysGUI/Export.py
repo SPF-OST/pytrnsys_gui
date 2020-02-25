@@ -14,7 +14,7 @@ class Export(object):
     def __init__(self, objList, editor):
         self.trnsysObj = objList
         self.editor = editor
-        self.maxChar = 15
+        self.maxChar = 20
 
     def exportBlackBox(self):
         f = "*** Black box component temperatures" + "\n"
@@ -86,17 +86,13 @@ class Export(object):
 
         # exportConnsString: i/o i/o 0 0
         tempObjList = []
+        nameString = ''
         for t in self.trnsysObj:
 
             ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
             f += ObjToCheck
             ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
 
-            # f += t.exportParametersFlowSolver(descConnLength)[0]
-            # ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
-            # ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
-
-            # TODO : check if variable name already exist
             # if ObjToCheck in tempObjList and ObjToCheck != '\n' and ObjToCheck != '' and ObjToCheck != ' ':
             #     msgBox = QMessageBox()
             #     msgBox.setText("Variable name <b>%s</b> already exists! Please try again after renaming." % ObjToCheck)
@@ -105,16 +101,17 @@ class Export(object):
             # else:
             #     tempObjList.append(ObjToCheck)
 
-            # TODO : decide on what to do if variable name exceeds character limit
-            # Create a checked variable instead of returning false : self.passChecked
             if len(ObjToCheck) > self.maxChar-5:
-                msgBox = QMessageBox()
-                msgBox.setText("Variable name <b>%s</b> is longer than %d characters! Please try exporting again after reducing name length." % (ObjToCheck, self.maxChar-5))
-                msgBox.exec_()
+                nameString += ObjToCheck + '\n'
                 # return False
 
             # print(ObjToCheck)
             # print(len(ObjToCheck))
+        if nameString != '':
+            msgBox = QMessageBox()
+            msgBox.setText(
+                "The following variable names :\n%shas longer than %d characters!" % (nameString, self.maxChar - 5))
+            msgBox.exec_()
 
         tempS = f
         print("param solver text is ")

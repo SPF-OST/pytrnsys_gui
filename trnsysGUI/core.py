@@ -41,7 +41,6 @@ from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.Test import Test
 from trnsysGUI.TestDlg import TestDlg
-from trnsysGUI.closeDlg import closeDlg
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
@@ -962,6 +961,7 @@ class DiagramView(QGraphicsView):
         command = DeleteBlockCommand(bl, "Delete block command")
         print("Deleted block")
         self.parent().parent().undoStack.push(command)
+
 
 
 class DiagramEditor(QWidget):
@@ -2477,6 +2477,7 @@ class DiagramEditor(QWidget):
 
         msg.setText("Test in progress")
         msg.show()
+
         QCoreApplication.processEvents()
 
         # Clear the window
@@ -2690,15 +2691,15 @@ class MainWindow(QMainWindow):
         tb.addAction(renameDiaAction)
         tb.addAction(deleteDiaAction)
         tb.addAction(groupNewAction)
-        tb.addAction(autoArrangeAction)
+        # tb.addAction(autoArrangeAction)
         tb.addAction(zoomInAction)
         tb.addAction(zoomOutAction)
-        tb.addAction(zoom0Action)
-        tb.addAction(copyAction)
-        tb.addAction(pasteAction)
+        # tb.addAction(zoom0Action)
+        # tb.addAction(copyAction)
+        # tb.addAction(pasteAction)
         tb.addAction(toggleConnLabels)
         tb.addAction(editGroupsAction)
-        tb.addAction(selectMultipleAction)
+        # tb.addAction(selectMultipleAction)
         tb.addAction(openVisualizerAction)
         tb.addAction(runMassflowSolverAction)
         tb.addAction(trnsysList)
@@ -2749,6 +2750,8 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
         self.editMenu.addAction(movePortAction)
+        self.editMenu.addAction(copyAction)
+        self.editMenu.addAction(pasteAction)
         self.editMenu.addAction(testAppAction)
 
 

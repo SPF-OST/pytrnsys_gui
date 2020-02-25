@@ -3,11 +3,11 @@
         ".__BlockDct__": true,
         "Block-1": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Collector",
+            "BlockDisplayName": "Kollektor1",
             "BlockName": "Kollektor",
             "BlockPosition": [
-                -1154.0,
-                -440.0
+                -893.0,
+                -623.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -22,77 +22,11 @@
             "RotationN": 0,
             "trnsysID": 1
         },
-        "Block-4": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "PuCol",
-            "BlockName": "Pump",
-            "BlockPosition": [
-                -943.0,
-                -365.0
-            ],
-            "FlippedH": true,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 4,
-            "PortsIDIn": [
-                5
-            ],
-            "PortsIDOut": [
-                6
-            ],
-            "RotationN": 0,
-            "trnsysID": 2
-        },
-        "Connection-310": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 150,
-            "ConnDisplayName": "PiColIn",
-            "ConnID": 310,
-            "CornerPositions": [
-                [
-                    -1000.0,
-                    -350.0
-                ],
-                [
-                    -1000.0,
-                    -350.0
-                ]
-            ],
-            "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 6,
-            "PortToID": 3,
-            "SegmentPositions": [
-                [
-                    -951.0,
-                    -350.0,
-                    -1000.0,
-                    -350.0
-                ],
-                [
-                    -1000.0,
-                    -350.0,
-                    -1000.0,
-                    -350.0
-                ],
-                [
-                    -1000.0,
-                    -350.0,
-                    -1046.0,
-                    -350.0
-                ]
-            ],
-            "isVirtualConn": false,
-            "trnsysID": 172
-        },
         "IDs": {
-            "GlobalId": 855,
+            "GlobalId": 4,
             "__idDct__": true,
-            "globalConnID": 284,
-            "trnsysID": 353
+            "globalConnID": 1,
+            "trnsysID": 2
         },
         "Strings": {
             "DiagramName": "COPYGROUP",

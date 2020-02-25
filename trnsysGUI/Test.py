@@ -45,15 +45,15 @@ class Test(object):
 
         self.sortList(exportedFileList, originalFileList)
 
-    def checkFileExists(self, exportedFileList, originalFileList):
+    def checkFileExists(self, exportedFile, originalFileList):
         """
 
         Parameters
         ----------
-        exportedFileList : ONE FILE from the export_test folder
+        exportedFile : ONE FILE from the export_test folder
         originalFileList : list of files inside the reference folder
 
-        1.Check if ONE FILE inside the export_test folder can be found
+        1.Check if the individual files inside the export_test folder can be found
         inside the reference folder as well.
         2.If found, return true.
         3.Else, return false.
@@ -63,7 +63,7 @@ class Test(object):
 
         """
         i = 0
-        exportedFile = exportedFileList.split('\\')
+        exportedFile = exportedFile.split('\\')
         while i < len(originalFileList):
             referenceFile = originalFileList[i].split('\\')
             if exportedFile[-1] == referenceFile[-1]:

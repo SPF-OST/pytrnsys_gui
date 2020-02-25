@@ -517,7 +517,7 @@
                 ],
                 [
                     -395.0,
-                    -208.0
+                    -206.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -538,13 +538,13 @@
                     -395.0,
                     -277.77777777777777,
                     -395.0,
-                    -208.0
+                    -206.0
                 ],
                 [
                     -395.0,
-                    -208.0,
+                    -206.0,
                     -195.0,
-                    -208.0
+                    -206.0
                 ]
             ],
             "isVirtualConn": false,
@@ -1361,10 +1361,10 @@
             "trnsysID": 330
         },
         "IDs": {
-            "GlobalId": 780,
+            "GlobalId": 1275,
             "__idDct__": true,
-            "globalConnID": 269,
-            "trnsysID": 332
+            "globalConnID": 379,
+            "trnsysID": 497
         },
         "Strings": {
             "DiagramName": "SASHP+2Tes",

@@ -12,6 +12,7 @@ class Boiler(BlockItem):
         factor = 0.63
         self.w = factor * 100
         self.h = 100
+        self.portOffset = 5
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
 
@@ -41,9 +42,10 @@ class Boiler(BlockItem):
         self.label.setPos(lx, h)
 
         # Update port positions:
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
+        # TODO : need a variable such that when the flip checkbox is ticked, the variable becomes -1
+        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w + self.flippedHInt * self.portOffset,
                                h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
+        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w + self.flippedHInt * self.portOffset,
                               h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
