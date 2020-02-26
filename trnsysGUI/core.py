@@ -1579,12 +1579,6 @@ class DiagramEditor(QWidget):
         fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
-        # if not exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters):
-        #     print("Nothing exported")
-        #     self.cleanUpExportedElements()
-        #     self.tearDownStorageInnerConns()
-        #     return exportPath
-
         fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
         fullExportText += exporter.exportInputsFlowSolver(lineNrParameters)
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
@@ -2520,7 +2514,7 @@ class DiagramEditor(QWidget):
         # i, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
 
         if self.testPassed:
-            msg.setText("%d files tested, no discrepancy found" % i)
+            msg.setText("All files tested, no discrepancy found")
             msg.exec_()
         else:
             for fileNo in fileNoList:

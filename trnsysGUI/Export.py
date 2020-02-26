@@ -93,6 +93,8 @@ class Export(object):
             f += ObjToCheck
             ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
 
+            # f += t.exportParametersFlowSolver(descConnLength)[0]
+
             # if ObjToCheck in tempObjList and ObjToCheck != '\n' and ObjToCheck != '' and ObjToCheck != ' ':
             #     msgBox = QMessageBox()
             #     msgBox.setText("Variable name <b>%s</b> already exists! Please try again after renaming." % ObjToCheck)

@@ -22,3 +22,15 @@ Differences:
 <b>Reason for change:</b>
 test
 ==============================================================
+==============================================================
+26/02/2020 14:09:59
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\Combi+2Tes.dck
+
+Differences:
+23:EQSOLVER 0     ! EQUATION SOLVER statement
+
+Reason for change:
+
+==============================================================
