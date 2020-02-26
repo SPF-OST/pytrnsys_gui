@@ -82,6 +82,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedV = False
         self.flippedH = False
         self.rotationN = 0
+        self.flippedHInt = 1
 
         self.image = QImage("images/" + self.name)
         self.pixmap = QPixmap(self.image)
@@ -269,6 +270,10 @@ class BlockItem(QGraphicsPixmapItem):
         self.pixmap = QPixmap(self.image.mirrored(bool(state), self.flippedV))
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedH = bool(state)
+        if state == False:
+            self.flippedHInt = -1
+        else:
+            self.flippedHInt = 1
         self.changeSize()
 
     def updateFlipStateV(self, state):

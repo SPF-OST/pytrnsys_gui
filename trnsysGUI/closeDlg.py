@@ -2,6 +2,10 @@ from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QVBoxLayout, QLabel
 
 
 class closeDlg(QDialog):
+    """
+    Not used currently. Keep for future sake.
+    Used to prompt user whether to save their current template
+    """
 
     def __init__(self, *args, **kwargs):
         super(closeDlg, self).__init__(*args, **kwargs)

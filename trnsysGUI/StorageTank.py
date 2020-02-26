@@ -91,19 +91,17 @@ class StorageTank(BlockItem):
             sideNr = 2
 
         # Check first if there is already a port at entered position:
-        print("Before creating left side has:")
-        print(self.leftSide)
+        # TODO : need to check if the exact same port pair is created
         for i in tempSideList:
-            print("i :")
-            print(i)
             if i.pos().y() == hAbsI:
-                # TODO : can you create an input port over an existing input port?
                 print("Found an existing input port")
-                print(i.pos().y())
-                port1 = i
+                # port1 = i
+
             if i.pos().y() == hAbsO:
                 print("Can't create a new output over an existing input")
                 # port2 = i
+
+
 
         if port1 is None:
             port1 = PortItem('i', sideNr, self)
@@ -641,11 +639,20 @@ class StorageTank(BlockItem):
 
         # Add heat exchanger
         for h in i["HxList"]:
+            # print(kwargs)
+            # sys.exit()
+            # connsysConnId=kwargs["editor"].idGen.getTrnsysID()
             hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
                                 QPointF(h["Offset"][0], h["Offset"][1]),
                                 self, h["DisplayName"] + "New",
                                 port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                                connTrnsysID=kwargs["editor"].idGen.getTrnsysID(), loadedHx=True)
+                                connTrnsysID=h['connTrnsysID'], loadedHx=True)
+
+            # hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
+            #                     QPointF(h["Offset"][0], h["Offset"][1]),
+            #                     self, h["DisplayName"] + "New",
+            #                     port1ID=h['Port1ID'], port2ID=h['Port2ID'],
+            #                     connTrnsysID=kwargs["editor"].idGen.getTrnsysID(), loadedHx=True)
 
             # hEx.setId(["ID"])
             hEx.port1.id = h['Port1ID']
@@ -656,11 +663,19 @@ class StorageTank(BlockItem):
             print("Printing port pair")
             print(x)
 
+            # trnsysConnId=kwargs["editor"].idGen.getTrnsysID()
             conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
                                         fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
-                                        connId=kwargs["editor"].idGen.getID(), connCid=kwargs["editor"].idGen.getConnID(),
+                                        connId=x["ConnID"], connCid=x["ConnCID"],
                                         connDispName=x["ConnDisName"] + "New",
-                                        trnsysConnId=kwargs["editor"].idGen.getTrnsysID(), loadedConn=True)
+                                        trnsysConnId=x["trnsysID"], loadedConn=True)
+
+            # conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
+            #                               fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
+            #                               connId=kwargs["editor"].idGen.getID(),
+            #                               connCid=kwargs["editor"].idGen.getConnID(),
+            #                               connDispName=x["ConnDisName"] + "New",
+            #                               trnsysConnId=kwargs["editor"].idGen.getTrnsysID(), loadedConn=True)
 
             resConnList.append(conn)
         resBlockList.append(self)

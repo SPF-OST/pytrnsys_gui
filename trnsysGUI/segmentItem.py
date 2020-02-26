@@ -241,7 +241,7 @@ class segmentItem(QGraphicsLineItem):
                     self.dragInMode0(newPos)
 
             elif self.parent.parent.editorMode == 1:
-                print(len(self.parent.segments))
+                # print(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                     if self.isVertical():
                         print("Segment is vertical")
@@ -351,15 +351,19 @@ class segmentItem(QGraphicsLineItem):
                 if self.isHorizontal():
                     if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                             nextHorizSeg = self.parent.segments[self.parent.segments.index(self) + 2]
-                            if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
-                                    self.endNode.parent.pos().y()):
+                            # if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
+                            #         self.endNode.parent.pos().y()): # TODO : Edit here to combine segment
                                 # print("Next h seg could be deleted")
+                            if nextHorizSeg.isHorizontal() and \
+                                    int(self.endNode.parent.pos().y()-10) <= int(nextHorizSeg.line().p2().y()) <= int(
+                                    self.endNode.parent.pos().y()+10):
                                 self.deleteNextHorizSeg(False, nextHorizSeg)
                                 return
 
                             prevHorizSeg = self.parent.segments[self.parent.segments.index(self) - 2]
-                            if prevHorizSeg.isHorizontal() and int(prevHorizSeg.line().p2().y()) == int(
-                                    self.startNode.parent.pos().y()):
+                            if prevHorizSeg.isHorizontal() and \
+                                    int(self.startNode.parent.pos().y()-10) <= int(prevHorizSeg.line().p2().y()) <= int(
+                                    self.startNode.parent.pos().y() + 10):
                                 # print("Prev h seg could be deleted")
                                 self.deletePrevHorizSeg(False, prevHorizSeg)
                                 return

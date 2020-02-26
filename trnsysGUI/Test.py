@@ -4,10 +4,32 @@ import sys
 
 
 class Test(object):
-
+    """
+    Just a class that contains the method for testing.
+    No need to declare or pass anything.
+    """
     testPassed = True
 
     def retrieveFiles(self, exportedFilepath, originalFilePath, exportedFileList, originalFileList):
+        """
+
+        Parameters
+        ----------
+        exportedFilepath : Folder where files are exported to
+        originalFilePath : Folder containing the reference files
+        exportedFileList : List of files inside the exported folder
+        originalFileList : List of files inside the reference folder
+
+        1.Access the exported folder
+        2.Retrieve all exported files and add into a list
+        3.Access the reference folder
+        4.Retrieve all reference files and add into a list
+        5.Sort the two lists
+
+        Returns
+        -------
+
+        """
         for efiles in os.listdir(exportedFilepath):
             if efiles != '.keepMe':
                 # exportedFile = exportedFilepath + efiles
@@ -23,9 +45,25 @@ class Test(object):
 
         self.sortList(exportedFileList, originalFileList)
 
-    def checkFileExists(self, exportedFileList, originalFileList):
+    def checkFileExists(self, exportedFile, originalFileList):
+        """
+
+        Parameters
+        ----------
+        exportedFile : ONE FILE from the export_test folder
+        originalFileList : list of files inside the reference folder
+
+        1.Check if the individual files inside the export_test folder can be found
+        inside the reference folder as well.
+        2.If found, return true.
+        3.Else, return false.
+
+        Returns
+        -------
+
+        """
         i = 0
-        exportedFile = exportedFileList.split('\\')
+        exportedFile = exportedFile.split('\\')
         while i < len(originalFileList):
             referenceFile = originalFileList[i].split('\\')
             if exportedFile[-1] == referenceFile[-1]:
@@ -34,6 +72,23 @@ class Test(object):
         return False
 
     def checkFiles(self, exportedFileList, originalFileList):
+        """
+
+        Parameters
+        ----------
+        exportedFileList : All files inside the export_test folder
+        originalFileList : All files inside the reference folder
+
+        1.Check each exported file against the reference file of the same name
+        2.If two files of the same name from both folders are found, check their contents
+        3.If the contents are not the same, append the file index(order inside the folder) into fileErrorList
+          and set testPassed to False
+        4.Return fileErrorList and testPassed attribute
+
+        Returns
+        -------
+
+        """
         i = 0
         fileErrorList = []
         found = False
@@ -59,6 +114,18 @@ class Test(object):
         # return i, self.testPassed
 
     def deleteFiles(self, fileDirectory):
+        """
+
+        Parameters
+        ----------
+        fileDirectory : A specified file directory
+
+        1.Delete every files inside the specified file directory
+
+        Returns
+        -------
+
+        """
         for dfiles in os.listdir(fileDirectory):
             # deleteFiles = fileDirectory + dfiles
             deleteFiles = os.path.join(fileDirectory, dfiles)
@@ -67,6 +134,22 @@ class Test(object):
 
 
     def showDifference(self, file1, file2):
+        """
+
+        Parameters
+        ----------
+        file1 : exported file
+        file2 : reference file
+
+        1.Read a line from exported file and reference file
+        2.Compare the two lines, if they are identical, go to next line.
+        3.Else, Append the lines with their line number into two separate list.
+        4.Close the files and return the two lists.
+
+        Returns
+        -------
+
+        """
         line = 1
         fileOne = open(file1)
         fileTwo = open(file2)
@@ -81,8 +164,8 @@ class Test(object):
             if fileOneLine != fileTwoLine:
                 print("Error found at line %d\n" % line)
                 print("Exported file: %s \nReference file: %s \n" % (fileOneLine, fileTwoLine))
-                file1Str = str(line) + ',' + fileOneLine
-                file2Str = str(line) + ',' + fileTwoLine
+                file1Str = str(line) + ':' + fileOneLine
+                file2Str = str(line) + ':' + fileTwoLine
                 file1List.append(file1Str)
                 file2List.append(file2Str)
             fileOneLine = fileOne.readline()
