@@ -29,6 +29,7 @@ from PyQt5.QtWidgets import QUndoCommand
 # from trnsysGUI.TeePiece import TeePiece
 # from trnsysGUI.WTap import WTap
 # from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.TVentilDlg import TVentilDlg
 
 global FilePath
@@ -82,17 +83,21 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedV = False
         self.flippedH = False
         self.rotationN = 0
-        self.flippedHInt = 1
+        self.flippedHInt = -1
 
+        # TODO : need change to the svg code when all images are updated to SVG
+        #  right now when decoding a diagram, it loads png images and will cause
+        #  image to have wrong dimensions
+        self.imageSource = "images/" + self.name + ".png"
         self.image = QImage("images/" + self.name)
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         # To use svg instead of png for blocks:
         # self.imageSource = "images/" + self.name + ".svg"
-        # self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
-        # self.setPixmap(self.image)
-        # self.pixmap = self.image
+        # self.image = QImage(self.imageSource)
+        # self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+        # self.pixmap = QPixmap(self.image)
 
         # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
@@ -398,6 +403,37 @@ class BlockItem(QGraphicsPixmapItem):
             for cl in o.connectionList:
                 c.append(cl)
         return c
+
+
+    # Scaling related
+    def mousePressEvent(self, event):  # create resizer
+        try:
+            self.resizer
+        except AttributeError:
+            self.resizer = ResizerItem(self)
+            self.resizer.setPos(self.w, self.h)
+            self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
+        else:
+            return
+
+    def setItemSize(self, w, h):
+        self.w, self.h = w, h
+
+    def updateImage(self):
+        if self.imageSource[-3:] == "svg":
+            self.image = QImage(self.imageSource)
+            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+            self.updateFlipStateH(self.flippedH)
+            self.updateFlipStateV(self.flippedV)
+
+        elif self.imageSource[-3:] == "png":
+            self.image = QImage(self.imageSource)
+            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+            self.updateFlipStateH(self.flippedH)
+            self.updateFlipStateV(self.flippedV)
+
+    def deleteResizer(self):
+        del self.resizer
 
 
     # Debug

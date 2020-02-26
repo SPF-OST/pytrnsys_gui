@@ -1356,10 +1356,10 @@
             "trnsysID": 294
         },
         "IDs": {
-            "GlobalId": 1463,
+            "GlobalId": 1545,
             "__idDct__": true,
-            "globalConnID": 427,
-            "trnsysID": 556
+            "globalConnID": 445,
+            "trnsysID": 582
         },
         "Strings": {
             "DiagramName": "GSHP+Tes",

@@ -683,8 +683,6 @@ class DiagramScene(QGraphicsScene):
         # TODO : item() returns a list of all items inside the scene
         super(DiagramScene, self).mousePressEvent(event)
 
-        # if self.selectedItem is not None:
-        #     self.selectedItem.clear()
         if len(self.items(event.scenePos())) > 0:
             self.selectedItem = self.items(event.scenePos())
 
