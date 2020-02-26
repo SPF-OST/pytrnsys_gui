@@ -15,6 +15,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.w = 100.0
         self.h = 100.0
         self.parent = parent
+        self.resizeMode = False
         self.id = self.parent.parent().idGen.getID()
 
         # self.trnsysId = self.parent.parent().idGen.getTrnsysID()
@@ -33,7 +34,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
-        self.resizer = ResizerItem(self)
+        # self.resizer = ResizerItem(self)
 
         # if kwargs == {}:
         #     self.parent.parent().graphicalObj.append(self)
@@ -128,3 +129,18 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.parent.scene().removeItem(self)
         del self
 
+    def mousePressEvent(self, event):
+        try:
+            self.resizer
+        except AttributeError:
+            self.resizer = ResizerItem(self)
+            self.resizer.setPos(self.w, self.h)
+            self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
+        else:
+            return
+        # self.resizer = ResizerItem(self)
+        # self.resizer.setPos(self.w, self.h)
+        # self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
+
+    def deleteResizer(self):
+        del self.resizer

@@ -1,5 +1,8 @@
 import re
 import string
+import sys
+
+from PyQt5.QtWidgets import QMessageBox
 
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Pump import Pump
@@ -11,6 +14,7 @@ class Export(object):
     def __init__(self, objList, editor):
         self.trnsysObj = objList
         self.editor = editor
+        self.maxChar = 20
 
     def exportBlackBox(self):
         f = "*** Black box component temperatures" + "\n"
@@ -81,9 +85,35 @@ class Export(object):
         f += str(lineNr) + "\n"
 
         # exportConnsString: i/o i/o 0 0
-
+        tempObjList = []
+        nameString = ''
         for t in self.trnsysObj:
-            f += t.exportParametersFlowSolver(descConnLength)[0]
+
+            ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
+            f += ObjToCheck
+            ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
+
+            # f += t.exportParametersFlowSolver(descConnLength)[0]
+
+            # if ObjToCheck in tempObjList and ObjToCheck != '\n' and ObjToCheck != '' and ObjToCheck != ' ':
+            #     msgBox = QMessageBox()
+            #     msgBox.setText("Variable name <b>%s</b> already exists! Please try again after renaming." % ObjToCheck)
+            #     msgBox.exec_()
+            #     # return False
+            # else:
+            #     tempObjList.append(ObjToCheck)
+
+            if len(ObjToCheck) > self.maxChar-5:
+                nameString += ObjToCheck + '\n'
+                # return False
+
+            # print(ObjToCheck)
+            # print(len(ObjToCheck))
+        if nameString != '':
+            msgBox = QMessageBox()
+            msgBox.setText(
+                "The following variable names :\n%shas longer than %d characters!" % (nameString, self.maxChar - 5))
+            msgBox.exec_()
 
         tempS = f
         print("param solver text is ")

@@ -393,7 +393,7 @@ class Type1924_TesPlugFlow():
 
             else:
                 line = "zero zero zero\n"
-            lines = lines + line
+                lines = lines + line
         lines = lines + "****************\nTroomStore" #This adds one input
         lines = lines + "\n***************** 6 HX INPUTS ******************\n"
 

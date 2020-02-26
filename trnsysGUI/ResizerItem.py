@@ -1,16 +1,17 @@
 from PyQt5 import QtCore
-from PyQt5.QtCore import QRectF, QSize, QPointF
+from PyQt5.QtCore import QRectF, QSize, QPointF, Qt
 from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 
 class ResizerItem(QGraphicsEllipseItem):
     def __init__(self, parent):
-        QGraphicsEllipseItem.__init__(self, QRectF(-8, -8, 16.0, 16.0), parent)
+        QGraphicsEllipseItem.__init__(self, QRectF(-4, -4, 8, 8), parent)
         self.parent = parent
         self.setPos(self.parent.w, self.parent.h)
-        self.setBrush(QBrush(QtCore.Qt.black))
-        p1 = QPen(QColor(0,0,0))
+        self.setBrush(Qt.transparent)
+        p1 = QPen()
+        p1.setStyle(Qt.DotLine)
         self.setPen(p1)
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
         self.setFlag(self.ItemSendsScenePositionChanges, True)
@@ -32,3 +33,5 @@ class ResizerItem(QGraphicsEllipseItem):
     #     self.setPos(event.pos().x(), event.pos().x())
     #     print("sdfhs")
     #     super(ResizerItem, self).dragMoveEvent(event)
+    def delete(self):
+        del self

@@ -196,9 +196,10 @@ class PortItem(QGraphicsEllipseItem):
         self.parent.parent.parent().listV.clear()
 
     def mouseDoubleClickEvent(self, event):
-        print("double clicked")
-        if hasattr(self.parent, 'heatExchangers') and not self.isFromHx:
-            self.deleteDirectPortPair()
+        pass
+        # print("double clicked")
+        # if hasattr(self.parent, 'heatExchangers') and not self.isFromHx:
+        #     self.deleteDirectPortPair()
 
     def deleteDirectPortPair(self):
 
@@ -236,8 +237,8 @@ class PortItem(QGraphicsEllipseItem):
 
         obj.parent.directPortConnsForList = [c for c in obj.parent.directPortConnsForList if c.fromPort != self and c.toPort != self]
 
-        # if obj in obj.parent.leftSide and self.side == 0:
-        #     obj.parent.leftSide.remove(obj)
-        # if obj in obj.parent.rightSide and self.side == 2:
-        #     obj.parent.rightSide.remove(obj)
+        if obj in obj.parent.leftSide and self.side == 0:
+            obj.parent.leftSide.remove(obj)
+        if obj in obj.parent.rightSide and self.side == 2:
+            obj.parent.rightSide.remove(obj)
 
