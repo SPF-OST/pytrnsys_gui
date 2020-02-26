@@ -18,7 +18,7 @@ class Type1924_TesPlugFlow():
         self.sLine="*****************************************************\n"
         self.extension="ddck"
 
-    def setInputs(self,inputs,connectorsPort,connectorsHx,connectorAux):
+    def setInputs(self,inputs,connectorsPort,connectorsHx,connectorsAux):
 
         self.inputs=inputs
         self.connectorsPort=connectorsPort
@@ -384,7 +384,7 @@ class Type1924_TesPlugFlow():
 
             else:
                 line = "zero zero zero\n"
-            lines = lines + line
+                lines = lines + line
         lines = lines + "****************\nTroomStore"
         lines = lines + "\n***************** 6 HX INPUTS ******************\n"
 
