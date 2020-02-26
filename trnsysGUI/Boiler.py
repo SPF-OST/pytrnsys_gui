@@ -9,20 +9,22 @@ from trnsysGUI.ResizerItem import ResizerItem
 class Boiler(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Boiler, self).__init__(trnsysType, parent, **kwargs)
-        factor = 0.63
+        factor = 0.63 #0.63 for png
         self.w = factor * 100
         self.h = 100
         self.portOffset = 5
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
+        self.imageSource = "images/" + "Boiler" + ".svg"
 
-        self.pixmap = QPixmap(self.image)
+        self.pixmap = QPixmap(QImage(self.imageSource))
+        # self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         self.changeSize()
 
     def changeSize(self):
-        # print("passing through c change size")
+        print("passing through c change size")
         w = self.w
         h = self.h
 
@@ -52,6 +54,8 @@ class Boiler(BlockItem):
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
+        print(self.outputs[0].pos())
+
         return w, h
 
     # For resizing, need set imageSource
@@ -70,8 +74,10 @@ class Boiler(BlockItem):
     #
     # def updateImage(self):
     #     if self.imageSource[-3:] == "svg":
-    #         self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
-    #         self.setPixmap(self.image)
+    #         self.image = QImage(self.imageSource)
+    #         self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+    #         self.updateFlipStateH(self.flippedH)
+    #         self.updateFlipStateV(self.flippedV)
     #
     #     elif self.imageSource[-3:] == "png":
     #         self.image = QImage(self.imageSource)

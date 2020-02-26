@@ -188,7 +188,6 @@ class DifferenceDlg(QDialog):
         print("finish running")
 
     def updateChangelog(self):
-        # TODO : write reason and changelog along with date into a file
         linesToAppend = []
 
         ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -200,12 +199,18 @@ class DifferenceDlg(QDialog):
         Divider = "==============================================================\n"
         fileName = self.fileName
         updatedLines = self.updatedLines
+        reasonHeader = "Reason for change:"
+        differenceHeader = "Differences:"
+        fileNameHeader = "Name of file:"
 
         linesToAppend.append(Divider)
-        linesToAppend.append(dt_string + '\n')
-        linesToAppend.append(fileName + '\n')
+        linesToAppend.append(dt_string + '\n' + '\n')
+        linesToAppend.append(fileNameHeader + '\n')
+        linesToAppend.append(fileName + '\n' + '\n')
+        linesToAppend.append(differenceHeader + '\n')
         for lines in updatedLines:
             linesToAppend.append(lines)
+        linesToAppend.append('\n' + reasonHeader + '\n')
         linesToAppend.append(reason + '\n')
         linesToAppend.append(Divider)
 

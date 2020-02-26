@@ -1,32 +1,28 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "Block-1": {
+        "Block-5": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Kollektor1",
-            "BlockName": "Kollektor",
-            "BlockPosition": [
-                -893.0,
-                -623.0
-            ],
+            "BlockDisplayName": "StorageTank1COPY",
+            "BlockName": "StorageTank",
             "FlippedH": false,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 1,
-            "PortsIDIn": [
-                2
+            "HxList": [],
+            "ID": 5,
+            "PortPairList": [],
+            "StoragePosition": [
+                -997.0,
+                -552.0
             ],
-            "PortsIDOut": [
-                3
-            ],
-            "RotationN": 0,
-            "trnsysID": 1
+            "size_h": 100.0,
+            "trnsysID": 5
         },
         "IDs": {
-            "GlobalId": 4,
+            "GlobalId": 6,
             "__idDct__": true,
-            "globalConnID": 1,
-            "trnsysID": 2
+            "globalConnID": 3,
+            "trnsysID": 6
         },
         "Strings": {
             "DiagramName": "COPYGROUP",

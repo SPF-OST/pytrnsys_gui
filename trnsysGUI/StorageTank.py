@@ -91,7 +91,6 @@ class StorageTank(BlockItem):
             sideNr = 2
 
         # Check first if there is already a port at entered position:
-        # TODO : need to check if the exact same port pair is created
         for i in tempSideList:
             if i.pos().y() == hAbsI:
                 print("Found an existing input port")
