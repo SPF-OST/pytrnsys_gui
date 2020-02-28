@@ -27,11 +27,12 @@ EQUATIONS 3
  cpWat=4200
  tRoomStore=20
 
-EQUATIONS 3
+EQUATIONS 4
 *** Black box component temperatures
 TCollector=1 
-THxDhw=1
 THxSolar=1
+TDhwPortRight100=1
+TDhwPortRight0=1
 
 EQUATIONS 3
 *** Pump outlet temperatures
@@ -64,22 +65,22 @@ xFracMixDhw =  1.-[441,5]
 UNIT 450 TYPE 935
 PARAMETERS 65
 16
-15 9 0 0       !1 : Collector
-16 9 0 1       !2 : PuCol
-10 12 7 3      !3 : MixDhw
+12 9 0 0       !1 : Collector
+13 9 0 1       !2 : PuCol
+10 15 7 3      !3 : MixDhw
 10 0 0 5       !4 : WTapTop
 8 0 0 4        !5 : WTapBottom
-13 8 7 2       !6 : TPiece
+16 8 7 2       !6 : TPiece
 6 3 0 0        !7 : PiDhwMix
 5 6 0 0        !8 : PiDhwMains
 2 1 0 0        !9 : PiColIn
 3 4 0 0        !10 : PiDhwDemand
-12 13 0 0      !11 : HxDhw
-11 3 0 0       !12 : PiTesDhwOut
-6 11 0 0       !13 : PiTesDhwIn
-15 16 0 0      !14 : HxSolar
-1 14 0 0       !15 : PiColOut
-2 14 0 0       !16 : PiTesToCol
+12 13 0 0      !11 : HxSolar
+1 11 0 0       !12 : PiColOut
+2 11 0 0       !13 : PiTesToCol
+15 16 0 0      !14 : ConnDhwR820
+14 3 0 0       !15 : PiTesDhwOut
+6 14 0 0       !16 : PiTesDhwIn
 INPUTS 16! for Type 935
 0,0  MfrPuCol  xFracMixDhw 0,0  MfrWTapBottom 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
@@ -111,18 +112,18 @@ MfrPiColIn_A=[450,25]
 MfrPiColIn_B=[450,26]
 MfrPiDhwDemand_A=[450,28]
 MfrPiDhwDemand_B=[450,29]
-MfrHxDhw_A=[450,31]
-MfrHxDhw_B=[450,32]
-MfrPiTesDhwOut_A=[450,34]
-MfrPiTesDhwOut_B=[450,35]
-MfrPiTesDhwIn_A=[450,37]
-MfrPiTesDhwIn_B=[450,38]
-MfrHxSolar_A=[450,40]
-MfrHxSolar_B=[450,41]
-MfrPiColOut_A=[450,43]
-MfrPiColOut_B=[450,44]
-MfrPiTesToCol_A=[450,46]
-MfrPiTesToCol_B=[450,47]
+MfrHxSolar_A=[450,31]
+MfrHxSolar_B=[450,32]
+MfrPiColOut_A=[450,34]
+MfrPiColOut_B=[450,35]
+MfrPiTesToCol_A=[450,37]
+MfrPiTesToCol_B=[450,38]
+MfrConnDhwR820_A=[450,40]
+MfrConnDhwR820_B=[450,41]
+MfrPiTesDhwOut_A=[450,43]
+MfrPiTesDhwOut_B=[450,44]
+MfrPiTesDhwIn_A=[450,46]
+MfrPiTesDhwIn_B=[450,47]
 
 
 UNIT 451 TYPE 929
@@ -244,50 +245,6 @@ PPiDhwDemand_kW= [456,3]/3600 !kW
 MfrPiDhwDemand= MfrPiDhwDemand_A
 
 UNIT 457 TYPE 931
-!PiTesDhwOut
-PARAMETERS 6
-diPiTesDhwOut
-LPiTesDhwOut
-UPiTesDhwOut
-RhoWat
-CPWat
-20
-INPUTS 4
-THxDhw
-MfrPiTesDhwOut_A
-TRoomStore
-TMixDhw
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-TPiTesDhwOut= [457,1]
-PPiTesDhwOut_kW= [457,3]/3600 !kW
-MfrPiTesDhwOut= MfrPiTesDhwOut_A
-
-UNIT 458 TYPE 931
-!PiTesDhwIn
-PARAMETERS 6
-diPiTesDhwIn
-LPiTesDhwIn
-UPiTesDhwIn
-RhoWat
-CPWat
-20
-INPUTS 4
-TTPiece
-MfrPiTesDhwIn_A
-TRoomStore
-THxDhw
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-TPiTesDhwIn= [458,1]
-PPiTesDhwIn_kW= [458,3]/3600 !kW
-MfrPiTesDhwIn= MfrPiTesDhwIn_A
-
-UNIT 459 TYPE 931
 !PiColOut
 PARAMETERS 6
 diPiColOut
@@ -305,11 +262,11 @@ THxSolar
 20 0.0 20 20
 
 EQUATIONS 3
-TPiColOut= [459,1]
-PPiColOut_kW= [459,3]/3600 !kW
+TPiColOut= [457,1]
+PPiColOut_kW= [457,3]/3600 !kW
 MfrPiColOut= MfrPiColOut_A
 
-UNIT 460 TYPE 931
+UNIT 458 TYPE 931
 !PiTesToCol
 PARAMETERS 6
 diPiTesToCol
@@ -327,9 +284,53 @@ THxSolar
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTesToCol= [460,1]
-PPiTesToCol_kW= [460,3]/3600 !kW
+TPiTesToCol= [458,1]
+PPiTesToCol_kW= [458,3]/3600 !kW
 MfrPiTesToCol= MfrPiTesToCol_A
+
+UNIT 459 TYPE 931
+!PiTesDhwOut
+PARAMETERS 6
+diPiTesDhwOut
+LPiTesDhwOut
+UPiTesDhwOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight100
+MfrPiTesDhwOut_A
+TRoomStore
+TMixDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwOut= [459,1]
+PPiTesDhwOut_kW= [459,3]/3600 !kW
+MfrPiTesDhwOut= MfrPiTesDhwOut_A
+
+UNIT 460 TYPE 931
+!PiTesDhwIn
+PARAMETERS 6
+diPiTesDhwIn
+LPiTesDhwIn
+UPiTesDhwIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTPiece
+MfrPiTesDhwIn_A
+TRoomStore
+TDhwPortRight0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwIn= [460,1]
+PPiTesDhwIn_kW= [460,3]/3600 !kW
+MfrPiTesDhwIn= MfrPiTesDhwIn_A
 
 CONSTANTS 3
 ** Fluid Loop : defaultGroup

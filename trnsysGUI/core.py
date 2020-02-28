@@ -39,7 +39,7 @@ from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TVentilDlg import TVentilDlg
-from trnsysGUI.Test import Test
+from trnsysGUI.Test_Export import Test_Export
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
@@ -707,6 +707,9 @@ class DiagramScene(QGraphicsScene):
             if self.selectedItem is not None:
                 for items in self.selectedItem:
                     if isinstance(items, GraphicalItem) and hasattr(items, 'resizer'):
+                        self.removeItem(items.resizer)
+                        items.deleteResizer()
+                    if isinstance(items, BlockItem) and hasattr(items, 'resizer'):
                         self.removeItem(items.resizer)
                         items.deleteResizer()
                     if isinstance(items, ResizerItem):
@@ -2442,7 +2445,7 @@ class DiagramEditor(QWidget):
         """
 
         i = 0
-        self.tester = Test()
+        self.tester = Test_Export()
         self.testPassed = True
         msg = QMessageBox(self)
         msg.setWindowTitle('Test Result')
@@ -3017,7 +3020,7 @@ class MainWindow(QMainWindow):
         exportPath = self.centralWidget.exportData()
         cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
         os.system(cmd)
-        mfrFile = os.path.splitext(exportPath)[0]+'_Mfr.prt'
+        mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
         if not os.path.isfile(mfrFile):
             msgb = QMessageBox(self)
             msgb.setText("Trnsys not succesfully executed")

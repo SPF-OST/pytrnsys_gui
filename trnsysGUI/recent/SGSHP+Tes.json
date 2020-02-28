@@ -1547,28 +1547,11 @@
             "isVirtualConn": false,
             "trnsysID": 301
         },
-        "GraphicalItem-777": {
-            ".__BlockDict__": true,
-            "BlockName": "GraphicalItem",
-            "BlockPosition": [
-                -830.0,
-                -497.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "ID": 777,
-            "ImageSource": "C:/Daten/spfPackages/GIT/TrnsysGUI/trnsysGUI/images/ElectricRod.svg",
-            "RotationN": 0,
-            "Size": [
-                68.0,
-                68.0
-            ]
-        },
         "IDs": {
-            "GlobalId": 1510,
+            "GlobalId": 1610,
             "__idDct__": true,
-            "globalConnID": 435,
-            "trnsysID": 569
+            "globalConnID": 457,
+            "trnsysID": 601
         },
         "Strings": {
             "DiagramName": "SGSHP+Tes",

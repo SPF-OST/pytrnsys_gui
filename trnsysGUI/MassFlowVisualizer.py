@@ -1,4 +1,5 @@
 import re
+import sys
 
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QSlider, QDialog, QLineEdit, QPushButton, QHBoxLayout, QLabel, QGridLayout
@@ -14,7 +15,7 @@ class MassFlowVisualizer(QDialog):
         super(MassFlowVisualizer, self).__init__(parent)
         self.dataFilePath = mfrFile
         self.loadedFile = False
-
+        # self.identicalAtallTimeSteps = True
         self.loadFile()
 
         self.setMinimumSize(1000, 200)
@@ -140,7 +141,12 @@ class MassFlowVisualizer(QDialog):
         self.slider.setMaximum(self.timeSteps)
         self.slider.setTickInterval(1)
         self.slider.setTickPosition(2)
-        self.slider.setVisible(True)
+        if self.checkTimeStep():
+            self.slider.setVisible(True)
+            self.slider.setEnabled(False)
+        else:
+            self.slider.setVisible(True)
+            self.slider.setEnabled(True)
 
     def testValChange(self):
         val = self.slider.value()
@@ -153,6 +159,18 @@ class MassFlowVisualizer(QDialog):
         self.currentStepLabel.setText("Step :" + str(val))
         self.timeStep = val
         self.advance()
+
+    def checkTimeStep(self):
+        """
+        Check individual columns, if every row in every column is identical. Return False
+        Else, return True
+
+        """
+        for items in self.massFlowData.nunique().iteritems():
+            if items[0] != 'TIME':
+                if items[1] > 1:
+                    return False
+        return True
 
     def pressedSlider(self):
         self.pauseVis()

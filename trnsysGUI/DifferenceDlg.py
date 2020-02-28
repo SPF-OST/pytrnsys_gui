@@ -132,18 +132,24 @@ class DifferenceDlg(QDialog):
 
 
     def acceptChangeAll(self):
+        # TODO : to speed up update, pass in a list of lineNo instead of one by one
+
         items = []
+        lineNoList = []
+        stringList = []
         i = 0
         while i < self.listWL.count():
             items.append(self.listWL.item(i))
             i += 1
 
-
         for item in items:
             lineNo = item.text()[:item.text().find(":")]
             string = item.text()[item.text().find(":") + 1:]
+            lineNoList.append(lineNo)
+            stringList.append(string)
             self.updatedLines.append(item.text())
-            self.updateReferenceFile(lineNo, string)
+            # self.updateReferenceFile(lineNo, string)
+        self.updateAllChanges(lineNoList, stringList)
 
         self.updateChangelog()
         msg = QMessageBox()
@@ -171,6 +177,7 @@ class DifferenceDlg(QDialog):
         -------
 
         """
+
         ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         originalFilePath = os.path.join(ROOT_DIR, 'Reference')
         fileToUpdate = os.path.join(originalFilePath, self.fileName)
@@ -180,12 +187,59 @@ class DifferenceDlg(QDialog):
             # print(lines)
 
         stringToAdd = string
+
+        try:
+            lines[int(lineNo)-1]
+        except IndexError:
+            lines.append("")
+
         lines[int(lineNo)-1] = stringToAdd
 
         with open(fileToUpdate, 'w') as file:
             file.writelines(lines)
 
         print("finish running")
+
+    def updateAllChanges(self, lineNoList, stringList):
+        """
+
+        Parameters
+        ----------
+        lineNo : the line number of the unmatch string
+        string : the correct string
+
+        1.Access the reference folder
+        2.read from the error file
+        3.Update the error lines
+        4.write to the error file
+
+        Returns
+        -------
+
+        """
+
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        originalFilePath = os.path.join(ROOT_DIR, 'Reference')
+        fileToUpdate = os.path.join(originalFilePath, self.fileName)
+
+        with open(fileToUpdate, 'r') as file:
+            lines = file.readlines()
+
+        i = 0
+        while i < len(lineNoList):
+            try:
+                lines[int(lineNoList[i])-1]
+            except IndexError:
+                lines.append("")
+
+            lines[int(lineNoList[i])-1] = stringList[i]
+            i += 1
+
+        with open(fileToUpdate, 'w') as file:
+            file.writelines(lines)
+
+        print("finish running")
+
 
     def updateChangelog(self):
         linesToAppend = []

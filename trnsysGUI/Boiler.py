@@ -10,7 +10,7 @@ class Boiler(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Boiler, self).__init__(trnsysType, parent, **kwargs)
         factor = 0.63 #0.63 for png
-        self.w = factor * 100
+        self.w = 1 * 100
         self.h = 100
         self.portOffset = 5
         self.inputs.append(PortItem('i', 2, self))

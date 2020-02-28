@@ -1,9 +1,8 @@
 import filecmp
 import os
-import sys
 
 
-class Test(object):
+class Test_Export(object):
     """
     Just a class that contains the method for testing.
     No need to declare or pass anything.

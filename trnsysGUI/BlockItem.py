@@ -6,9 +6,7 @@ from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
-from trnsysGUI.BlockDlg import BlockDlg
 # from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
-import trnsysGUI.DeleteBlockCommand
 
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
@@ -407,6 +405,21 @@ class BlockItem(QGraphicsPixmapItem):
 
     # Scaling related
     def mousePressEvent(self, event):  # create resizer
+        """
+        Using try catch to avoid creating extra resizers.
+
+        When an item is clicked on, it will check if a resizer already existed. If
+        there exist a resizer, returns. else, creates one.
+
+        Resizer will not be created for GenericBlock due to complications in the code.
+        Resizer will not be created for storageTank as there's already a built in function for it in the storageTank
+        dialog.
+
+        Resizers are deleted inside mousePressEvent function inside core.py
+
+        """
+        if self.name == 'GenericBlock' or self.name == 'StorageTank':
+            return
         try:
             self.resizer
         except AttributeError:
