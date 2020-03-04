@@ -92,6 +92,8 @@ class Connection(object):
         self.cornersLoad = None
         self.labelPosLoad = None
 
+        self.mass = 0 # comment out
+
         # A new connection is created if there are no kwargs
         if kwargs == {}:
             # print("New connection being created")
@@ -132,13 +134,25 @@ class Connection(object):
         for s in self.segments:
             s.label.setPlainText(newName)
 
+    # comment out
+    def setMass(self, mass):
+        self.mass = mass
+        for s in self.segments:
+            s.labelMass.setPlainText(self.mass)
+
+
     def setDisplayName(self, newName):
         self.displayName = newName
         self.updateSegLabels()
 
     def setLabelPos(self, tup):
         if len(self.segments) > 0:
-            self.segments[0].label.setPos(tup[0], tup[1])
+            self.segments[0].label.setPos(tup[0]+10, tup[1]+10)
+
+    # comment out
+    def setMassLabelPos(self, tup):
+        if len(self.segments) > 0:
+            self.segments[0].labelMass.setPos(tup[0], tup[1])
 
     def setStartPort(self, newStartPort):
         self.fromPort = newStartPort
@@ -162,6 +176,32 @@ class Connection(object):
                 col = QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
                 col = QColor(142, 142, 142) # Gray
+            elif kwargs["mfr"] == "minToLower":
+                col = QColor(134, 189, 255)  # light blue
+            elif kwargs["mfr"] == "lowerToMedian":
+                col = QColor(186, 216, 255)  # teal
+            elif kwargs["mfr"] == "medianToUpper":
+                col = QColor(255, 180, 180)  # pink
+            elif kwargs["mfr"] == "upperToMax":
+                col = QColor(255, 103, 103)  # lighter red
+            elif kwargs["mfr"] == "min":
+                col = QColor(0, 0, 255)  # blue
+            elif kwargs["mfr"] == "max":
+                col = QColor(255, 0, 0)  # red
+            elif kwargs["mfr"] == "test":
+                col = QColor(191, 252, 186)  # red
+            # elif kwargs["mfr"] == "negMinToLower":
+            #     col = QColor(0, 0, 0)  # Black
+            # elif kwargs["mfr"] == "negLowerToMedian":
+            #     col = QColor(47, 47, 73)  # Lighter black
+            # elif kwargs["mfr"] == "negMedianToUpper":
+            #     col = QColor(78, 78, 97)  # even lighter black
+            # elif kwargs["mfr"] == "negUpperToMax":
+            #     col = QColor(100, 100, 114)  # even even lighter black
+            # elif kwargs["mfr"] == "negMaxToZero":
+            #     col = QColor(115, 115, 124)  # darker than gray
+            # elif kwargs["mfr"] == "zeroToMin":
+            #     col = QColor(156, 156, 164)  # lighter than gray
             else:
                 # PosMfr
                 col = QColor(255, 0, 0)
@@ -286,6 +326,7 @@ class Connection(object):
 
         if self.labelPosLoad is not None:
             self.setLabelPos(self.labelPosLoad)
+            self.setMassLabelPos(self.labelPosLoad) # comment out
 
         # Still not tested
         # self.correctPorts()

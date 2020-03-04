@@ -8,9 +8,9 @@ from trnsysGUI.PortItem import PortItem
 class WTap(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(WTap, self).__init__(trnsysType, parent, **kwargs)
-        factor = 0.5
+        factor = 0.3
         self.w = 100 * factor
-        self.h = 61.8 * factor
+        self.h = 100 * factor
         self.inputs.append(PortItem('i', 0, self))
 
         self.pixmap = QPixmap(self.image)

@@ -7,7 +7,6 @@ from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
 # from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
-
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.MoveCommand import MoveCommand
@@ -83,19 +82,17 @@ class BlockItem(QGraphicsPixmapItem):
         self.rotationN = 0
         self.flippedHInt = -1
 
-        # TODO : need change to the svg code when all images are updated to SVG
-        #  right now when decoding a diagram, it loads png images and will cause
-        #  image to have wrong dimensions
-        self.imageSource = "images/" + self.name + ".png"
-        self.image = QImage("images/" + self.name)
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        # TODO : the current SVG images have a lot of white spaces around the image
+        # self.imageSource = "images/" + self.name + ".png"
+        # self.image = QImage("images/" + self.name)
+        # self.pixmap = QPixmap(self.image)
+        # self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         # To use svg instead of png for blocks:
-        # self.imageSource = "images/" + self.name + ".svg"
-        # self.image = QImage(self.imageSource)
-        # self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-        # self.pixmap = QPixmap(self.image)
+        self.imageSource = "images/" + self.name + ".svg"
+        self.image = QImage(self.imageSource)
+        self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+        self.pixmap = QPixmap(self.image)
 
         # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
@@ -436,14 +433,16 @@ class BlockItem(QGraphicsPixmapItem):
         if self.imageSource[-3:] == "svg":
             self.image = QImage(self.imageSource)
             self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+            # self.setPixmap(QPixmap(self.image))
+            self.pixmap = QPixmap(self.image)
             self.updateFlipStateH(self.flippedH)
             self.updateFlipStateV(self.flippedV)
 
-        elif self.imageSource[-3:] == "png":
-            self.image = QImage(self.imageSource)
-            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-            self.updateFlipStateH(self.flippedH)
-            self.updateFlipStateV(self.flippedV)
+        # elif self.imageSource[-3:] == "png":
+        #     self.image = QImage(self.imageSource)
+        #     self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+        #     self.updateFlipStateH(self.flippedH)
+        #     self.updateFlipStateV(self.flippedV)
 
     def deleteResizer(self):
         del self.resizer

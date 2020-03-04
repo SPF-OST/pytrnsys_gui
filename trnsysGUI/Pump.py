@@ -9,9 +9,9 @@ class Pump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Pump, self).__init__(trnsysType, parent, **kwargs)
         # factor = 0.6 for old pump
-        # factor = 1
+        # factor = 0.5
         # self.w = 100 * factor
-        # self.h = 82 * factor
+        # self.h = 100 * factor
         self.w = 30
         self.h = 30
         self.typeNumber = 1
@@ -47,6 +47,7 @@ class Pump(BlockItem):
         # Update port positions:
         self.inputs[0].setPos(self.flippedH * w - 2* delta + 2 * delta * self.flippedH, h / 2)
         self.outputs[0].setPos(w - self.flippedH * w - 2* delta * self.flippedH, h / 2)
+        # self.outputs[0].setPos(w - self.flippedH * w - 2 * delta * self.flippedH + 2 * delta, h / 2)
         # self.inputs[0].side = 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4

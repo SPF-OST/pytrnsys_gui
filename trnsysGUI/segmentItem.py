@@ -79,7 +79,10 @@ class segmentItem(QGraphicsLineItem):
         self.label.setVisible(False)
         self.label.setFlag(self.ItemIsMovable, True)
 
-        self.oldX = None
+        self.labelMass = QGraphicsTextItem(self.parent.fromPort)
+        self.labelMass.setVisible(False)
+        self.labelMass.setFlag(self.ItemIsMovable, True)
+
         self.setToolTip(self.parent.displayName)
 
     def segLength(self):

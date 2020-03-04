@@ -148,21 +148,6 @@
             "GroupName": "defaultGroup",
             "HxList": [
                 {
-                    "DisplayName": "HxDhw",
-                    "Height": 160.0,
-                    "ID": 752,
-                    "Offset": [
-                        100.0,
-                        0.0
-                    ],
-                    "ParentID": 745,
-                    "Port1ID": 753,
-                    "Port2ID": 754,
-                    "SideNr": 2,
-                    "Width": 40,
-                    "connTrnsysID": 319
-                },
-                {
                     "DisplayName": "HxSolar",
                     "Height": 40.0,
                     "ID": 758,
@@ -179,7 +164,19 @@
                 }
             ],
             "ID": 745,
-            "PortPairList": [],
+            "PortPairList": [
+                {
+                    "ConnCID": 273,
+                    "ConnDisName": "UntitledConn273",
+                    "ConnID": 801,
+                    "Port1ID": 799,
+                    "Port1offset": 0.0,
+                    "Port2ID": 800,
+                    "Port2offset": 160.0,
+                    "Side": false,
+                    "trnsysID": 336
+                }
+            ],
             "StoragePosition": [
                 -793.0,
                 -494.0
@@ -477,18 +474,18 @@
             "isVirtualConn": false,
             "trnsysID": 322
         },
-        "Connection-770": {
+        "Connection-804": {
             ".__ConnectionDict__": true,
-            "ConnCID": 263,
+            "ConnCID": 274,
             "ConnDisplayName": "PiTesDhwIn",
-            "ConnID": 770,
+            "ConnID": 804,
             "CornerPositions": [
                 [
-                    -622.5,
+                    -625.5,
                     -334.575
                 ],
                 [
-                    -622.5,
+                    -625.5,
                     -334.0
                 ]
             ],
@@ -498,42 +495,42 @@
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 19,
-            "PortToID": 754,
+            "PortToID": 800,
             "SegmentPositions": [
                 [
                     -566.0,
                     -334.575,
-                    -622.5,
+                    -625.5,
                     -334.575
                 ],
                 [
-                    -622.5,
+                    -625.5,
                     -334.575,
-                    -622.5,
+                    -625.5,
                     -334.0
                 ],
                 [
-                    -622.5,
+                    -625.5,
                     -334.0,
                     -685.0,
                     -334.0
                 ]
             ],
             "isVirtualConn": false,
-            "trnsysID": 323
+            "trnsysID": 337
         },
-        "Connection-773": {
+        "Connection-807": {
             ".__ConnectionDict__": true,
-            "ConnCID": 264,
+            "ConnCID": 275,
             "ConnDisplayName": "PiTesDhwOut",
-            "ConnID": 773,
+            "ConnID": 807,
             "CornerPositions": [
                 [
-                    -597.5,
+                    -625.5,
                     -494.0
                 ],
                 [
-                    -597.5,
+                    -625.5,
                     -492.77777777777777
                 ]
             ],
@@ -542,30 +539,30 @@
                 0.0
             ],
             "GroupName": "defaultGroup",
-            "PortFromID": 753,
+            "PortFromID": 799,
             "PortToID": 11,
             "SegmentPositions": [
                 [
                     -685.0,
                     -494.0,
-                    -597.5,
+                    -625.5,
                     -494.0
                 ],
                 [
-                    -597.5,
+                    -625.5,
                     -494.0,
-                    -597.5,
+                    -625.5,
                     -492.77777777777777
                 ],
                 [
-                    -597.5,
+                    -625.5,
                     -492.77777777777777,
                     -566.0,
                     -492.77777777777777
                 ]
             ],
             "isVirtualConn": false,
-            "trnsysID": 324
+            "trnsysID": 338
         },
         "GraphicalItem-777": {
             ".__BlockDict__": true,
@@ -585,10 +582,10 @@
             ]
         },
         "IDs": {
-            "GlobalId": 799,
+            "GlobalId": 955,
             "__idDct__": true,
-            "globalConnID": 273,
-            "trnsysID": 335
+            "globalConnID": 309,
+            "trnsysID": 388
         },
         "Strings": {
             "DiagramName": "DHWSolar+Tes",
