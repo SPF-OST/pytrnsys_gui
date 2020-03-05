@@ -37,7 +37,8 @@ def calcDist(p1, p2):
     norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
     return norm
 
-
+# TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
+#  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
 
     def __init__(self, trnsysType, parent, **kwargs):
@@ -82,7 +83,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.rotationN = 0
         self.flippedHInt = -1
 
-        # TODO : the current SVG images have a lot of white spaces around the image
         # self.imageSource = "images/" + self.name + ".png"
         # self.image = QImage("images/" + self.name)
         # self.pixmap = QPixmap(self.image)

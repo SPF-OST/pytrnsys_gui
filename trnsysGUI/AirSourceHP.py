@@ -12,8 +12,8 @@ class AirSourceHP(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(AirSourceHP, self).__init__(trnsysType, parent, **kwargs)
         factor = 0.65
-        self.w = 100
-        self.h = 100
+        self.w = 100 * factor
+        self.h = 100 * factor
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
 

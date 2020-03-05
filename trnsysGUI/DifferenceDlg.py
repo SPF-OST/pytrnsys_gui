@@ -132,7 +132,6 @@ class DifferenceDlg(QDialog):
 
 
     def acceptChangeAll(self):
-        # TODO : to speed up update, pass in a list of lineNo instead of one by one
 
         items = []
         lineNoList = []

@@ -1,3 +1,5 @@
+import sys
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QIcon
 

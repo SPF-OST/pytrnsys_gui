@@ -10,11 +10,6 @@ import pandas as pd
 import itertools
 import numpy as np
 
-# TODO : problem with current code. Slider has 1 more timestep than actual. The view is showing the connections of
-#  the previous timestep instead of the current one. Program crashes when slider reach the last timestep and move.
-#  solution:
-#  self.timeSteps = len(self.massFlowData.index) -1
-#  move self.advance() from moveValues() to testchangeValues() instead.
 class MassFlowVisualizer(QDialog):
 
     def __init__(self, parent,mfrFile):

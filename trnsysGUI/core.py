@@ -680,7 +680,6 @@ class DiagramScene(QGraphicsScene):
     def mousePressEvent(self, event):
         # self.parent().mousePressEvent(event)
         # TODO : remove resizer when click on other block items
-        # TODO : item() returns a list of all items inside the scene
         super(DiagramScene, self).mousePressEvent(event)
 
         if len(self.items(event.scenePos())) > 0:

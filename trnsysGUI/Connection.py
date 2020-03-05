@@ -762,8 +762,6 @@ class Connection(object):
                             self.parent.diagramScene.addItem(s.secondChild)
 
                             # print("Points are " + str(qp1) + str(qp2) + str(qp1_) + str(qp2_))
-
-                            # TODO: Fix division through zero
                             # eps1 = 1
                             # if (abs(qp2.x() - qp1.x()) > eps1) and (abs(qp2_.x() - qp1_.x()) > eps1) :
 
