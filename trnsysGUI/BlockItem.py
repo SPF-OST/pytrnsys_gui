@@ -431,7 +431,7 @@ class BlockItem(QGraphicsPixmapItem):
 
     def updateImage(self):
         if self.imageSource[-3:] == "svg":
-            self.image = QImage(self.imageSource)
+            # self.image = QImage(self.imageSource)
             self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
             # self.setPixmap(QPixmap(self.image))
             self.pixmap = QPixmap(self.image)

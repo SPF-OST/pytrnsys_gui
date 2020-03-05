@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QTransform
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
@@ -14,6 +14,9 @@ class HeatPump(BlockItem):
         self.outputs.append(PortItem('o', 0, self))
         self.outputs.append(PortItem('o', 2, self))
 
+        my_transform = QTransform()
+        my_transform.rotate(90)
+        self.image = self.image.transformed(my_transform)
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 

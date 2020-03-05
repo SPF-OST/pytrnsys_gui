@@ -247,6 +247,10 @@ class segmentItem(QGraphicsLineItem):
             elif self.parent.parent.editorMode == 1:
                 # print(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
+                    if not self.startNode.parent.isVisible():
+                        self.startNode.parent.setVisible(True)
+                    if not self.endNode.parent.isVisible():
+                        self.endNode.parent.setVisible(True)
                     if self.isVertical():
                         print("Segment is vertical")
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
