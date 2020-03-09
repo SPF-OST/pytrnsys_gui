@@ -761,10 +761,11 @@ class DiagramScene(QGraphicsScene):
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     res.append(o)
 
-            # if isinstance(o, GraphicalItem):
-            #     print("Checking graphic item to group")
-            #     if self.isInRect(o.scenePos()):
-            #         res.append(o)
+        for o in self.parent().graphicalObj:
+            if isinstance(o, GraphicalItem):
+                print("Checking graphic item to group")
+                if self.isInRect(o.scenePos()):
+                    res.append(o)
 
         return res
 
@@ -781,10 +782,11 @@ class DiagramScene(QGraphicsScene):
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     return True
 
-            # if isinstance(o, GraphicalItem):
-            #     print("Checking graphic item to group")
-            #     if self.isInRect(o.scenePos()):
-            #         return True
+        for o in self.parent().graphicalObj:
+            if isinstance(o, GraphicalItem):
+                print("Checking graphic item to group")
+                if self.isInRect(o.scenePos()):
+                    return True
 
         return False
 
@@ -1919,8 +1921,8 @@ class DiagramEditor(QWidget):
         for t in selectionList:
             if isinstance(t, BlockItem):
                 self.selectionGroupList.addToGroup(t)
-            # if isinstance(t, GraphicalItem):
-            #     self.selectionGroupList.addToGroup(t)
+            if isinstance(t, GraphicalItem):
+                self.selectionGroupList.addToGroup(t)
 
         self.multipleSelectedMode = False
         self.selectionMode = False
@@ -2998,6 +3000,7 @@ class MainWindow(QMainWindow):
     def deleteMultiple(self):
         # print("pressed del")
         temp = []
+        print("Child Items")
         print(self.centralWidget.selectionGroupList.childItems())
 
         for t in self.centralWidget.selectionGroupList.childItems():
@@ -3009,8 +3012,8 @@ class MainWindow(QMainWindow):
                 t.deleteBlock()
             elif isinstance(t, Connection):
                 t.deleteConn()
-            # elif isinstance(t, GraphicalItem):
-            #     t.deleteBlock()
+            elif isinstance(t, GraphicalItem):
+                t.deleteBlock()
             else:
                 print("Neiter a Block nor Connection in copyGroupList ")
 

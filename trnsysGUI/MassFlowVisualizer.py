@@ -187,9 +187,12 @@ class MassFlowVisualizer(QDialog):
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.minValue:
                             t.setColor(mfr="min")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-                        # elif self.medianValue <= abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.upperQuarter:
-                        #     t.setColor(mfr="medianToUpper")
-                        #     t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
+                        elif self.minValue < abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) <= self.medianValue:
+                            t.setColor(mfr="minToMedian")
+                            t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
+                        elif self.medianValue < abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.maxValue:
+                            t.setColor(mfr="medianToMax")
+                            t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
                         else:
                             # TODO  need include colour for values between min and max
                             t.setColor(mfr="test")
@@ -248,6 +251,7 @@ class MassFlowVisualizer(QDialog):
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
 
+
     def checkTimeStep(self):
         """
         Check individual columns of the data frame, If a column has rows with different values, return False.
@@ -287,13 +291,15 @@ class MassFlowVisualizer(QDialog):
         data = list(itertools.chain.from_iterable(data))  # nested list combined into one list
         cleanedData = [x for x in data if str(x) != 'nan']  # remove nan from list
         cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
-        nonZeroData = [x for x in cleanedData if x > 1]
+        nonZeroData = [x for x in cleanedData if x > 1]  # a work around to remove the 1 values from the data frame
+        noDuplicateData = list(dict.fromkeys(nonZeroData))
 
-        self.medianValue = np.percentile(cleanedData, 50)  # median value / 50th percentile
-        self.lowerQuarter = np.percentile(cleanedData, 25)  # 25th percentile
-        self.upperQuarter = np.percentile(cleanedData, 75)   # 75th percentile
-        self.minValue = np.min(nonZeroData)  # minimum value excluding 0
-        self.maxValue = np.max(cleanedData)  # max value
+        self.medianValue = np.percentile(noDuplicateData, 50)  # median value / 50th percentile
+        self.lowerQuarter = np.percentile(noDuplicateData, 25)  # 25th percentile
+        self.upperQuarter = np.percentile(noDuplicateData, 75)   # 75th percentile
+        self.minValue = np.min(noDuplicateData)  # minimum value excluding 0
+        self.maxValue = np.max(noDuplicateData)  # max value
+
 
 
 

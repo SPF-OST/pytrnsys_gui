@@ -82,6 +82,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedH = False
         self.rotationN = 0
         self.flippedHInt = -1
+        self.flippedVInt = -1
 
         # self.imageSource = "images/" + self.name + ".png"
         # self.image = QImage("images/" + self.name)
@@ -280,6 +281,10 @@ class BlockItem(QGraphicsPixmapItem):
         self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
+        if state == False:
+            self.flippedVInt = -1
+        else:
+            self.flippedVInt = 1
         self.changeSize()
 
     def updateSide(self, port, n):
@@ -415,6 +420,7 @@ class BlockItem(QGraphicsPixmapItem):
         Resizers are deleted inside mousePressEvent function inside core.py
 
         """
+        print("Inside Block Item mouse click")
         if self.name == 'GenericBlock' or self.name == 'StorageTank':
             return
         try:
@@ -427,9 +433,15 @@ class BlockItem(QGraphicsPixmapItem):
             return
 
     def setItemSize(self, w, h):
+        print("Inside block item set item size")
         self.w, self.h = w, h
+        # if h < 20:
+        #     self.h = 20
+        # if w < 40:
+        #     self.w = 40
 
     def updateImage(self):
+        print("Inside block item update image")
         if self.imageSource[-3:] == "svg":
             # self.image = QImage(self.imageSource)
             self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))

@@ -14,8 +14,8 @@ class Pump(BlockItem):
         # factor = 0.5
         # self.w = 100 * factor
         # self.h = 100 * factor
-        self.w = 30
-        self.h = 30
+        self.w = 35
+        self.h = 35
         self.typeNumber = 1
 
         self.exportInitialInput = 0.0

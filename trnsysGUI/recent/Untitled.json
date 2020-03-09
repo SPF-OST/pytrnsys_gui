@@ -13,11 +13,59 @@
             ]
         },
         ".__BlockDct__": true,
+        "Block-44": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "HP44",
+            "BlockName": "HP",
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "HeatPumpPosition": [
+                -922.0,
+                -575.0
+            ],
+            "ID": 44,
+            "PortsIDIn": [
+                45,
+                46
+            ],
+            "PortsIDOut": [
+                47,
+                48
+            ],
+            "RotationN": 0,
+            "childIds": [
+                18,
+                19
+            ],
+            "trnsysID": 18
+        },
+        "Block-49": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "AirSourceHP49",
+            "BlockName": "AirSourceHP",
+            "BlockPosition": [
+                -553.0,
+                -299.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 49,
+            "PortsIDIn": [
+                50
+            ],
+            "PortsIDOut": [
+                51
+            ],
+            "RotationN": 0,
+            "trnsysID": 20
+        },
         "IDs": {
-            "GlobalId": 1,
+            "GlobalId": 52,
             "__idDct__": true,
             "globalConnID": 1,
-            "trnsysID": 1
+            "trnsysID": 21
         },
         "Strings": {
             "DiagramName": "Untitled",

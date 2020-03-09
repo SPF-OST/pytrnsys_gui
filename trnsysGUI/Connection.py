@@ -176,20 +176,16 @@ class Connection(object):
                 col = QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
                 col = QColor(142, 142, 142) # Gray
-            elif kwargs["mfr"] == "minToLower":
-                col = QColor(134, 189, 255)  # light blue
-            elif kwargs["mfr"] == "lowerToMedian":
-                col = QColor(186, 216, 255)  # teal
-            elif kwargs["mfr"] == "medianToUpper":
-                col = QColor(255, 180, 180)  # pink
-            elif kwargs["mfr"] == "upperToMax":
-                col = QColor(255, 103, 103)  # lighter red
+            elif kwargs["mfr"] == "minToMedian":
+                col = QColor(140, 255, 255)  # light blue
+            elif kwargs["mfr"] == "medianToMax":
+                col = QColor(255, 140, 140)  # pink
             elif kwargs["mfr"] == "min":
                 col = QColor(0, 0, 255)  # blue
             elif kwargs["mfr"] == "max":
                 col = QColor(255, 0, 0)  # red
             elif kwargs["mfr"] == "test":
-                col = QColor(191, 252, 186)  # red
+                col = QColor(255, 255, 255)  # red
             # elif kwargs["mfr"] == "negMinToLower":
             #     col = QColor(0, 0, 0)  # Black
             # elif kwargs["mfr"] == "negLowerToMedian":
@@ -1368,6 +1364,9 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
+
+
+
 
 
 class DeleteConnectionCommand(QUndoCommand):

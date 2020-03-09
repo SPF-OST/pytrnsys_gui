@@ -1,28 +1,28 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "Block-5": {
+        "GraphicalItem-56": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "StorageTank1COPY",
-            "BlockName": "StorageTank",
+            "BlockName": "GraphicalItem",
+            "BlockPosition": [
+                -628.0,
+                -136.0
+            ],
             "FlippedH": false,
             "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "HxList": [],
-            "ID": 5,
-            "PortPairList": [],
-            "StoragePosition": [
-                -997.0,
-                -552.0
-            ],
-            "size_h": 100.0,
-            "trnsysID": 5
+            "ID": 56,
+            "ImageSource": "gear.svg",
+            "RotationN": 0,
+            "Size": [
+                100.0,
+                100.0
+            ]
         },
         "IDs": {
-            "GlobalId": 6,
+            "GlobalId": 57,
             "__idDct__": true,
-            "globalConnID": 3,
-            "trnsysID": 6
+            "globalConnID": 1,
+            "trnsysID": 21
         },
         "Strings": {
             "DiagramName": "COPYGROUP",

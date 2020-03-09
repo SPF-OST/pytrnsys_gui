@@ -281,6 +281,9 @@ class segmentItem(QGraphicsLineItem):
             else:
                 print("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
+    def mouseDoubleClickEvent(self, event):
+        self.parent.deleteConn()
+
     def deleteNextHorizSeg(self, b, nextS):
         if b:
             pass
