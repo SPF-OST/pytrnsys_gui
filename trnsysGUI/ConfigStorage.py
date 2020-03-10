@@ -14,7 +14,7 @@ class ConfigStorage(QDialog):
         self.m = 0
 
         # Parameters:
-        self.w_hx = 40
+        self.w_hx = 10
         self.h_hx = 100
 
         spacerHeight = 15
@@ -497,16 +497,18 @@ class ConfigStorage(QDialog):
     # self.storage.h -= self.h_hx
     # self.storage.updateImage(-self.h_hx)
     def incrSize(self):
-        self.storage.updatePortPositions(self.h_hx)
+        self.storage.updatePortPositionsHW(self.h_hx, self.w_hx)
         self.storage.updateHxLines(self.h_hx)
         self.storage.h += self.h_hx
+        self.storage.w += self.w_hx
         self.storage.updateImage()
 
     # Unused
     def decrSize(self):
-        self.storage.updatePortPositionsDec(self.h_hx)
+        self.storage.updatePortPositionsDecHW(self.h_hx, self.w_hx)
         self.storage.updateHxLines(-self.h_hx)
         self.storage.h -= self.h_hx
+        self.storage.w -= self.w_hx
         self.storage.updateImage()
 
     def acceptedEdit(self):

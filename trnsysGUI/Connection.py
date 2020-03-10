@@ -148,13 +148,13 @@ class Connection(object):
     def setLabelPos(self, tup):
         posOffset = 10
         if len(self.segments) > 0:
-            self.segments[0].label.setPos(tup[0]+10, tup[1]+10)
+            self.segments[0].label.setPos(tup[0]+10, tup[1]+posOffset)
 
     # comment out
     def setMassLabelPos(self, tup):
         posOffset = 10
         if len(self.segments) > 0:
-            self.segments[0].labelMass.setPos(tup[0], tup[1]+10)
+            self.segments[0].labelMass.setPos(tup[0], tup[1]+posOffset)
 
     def setStartPort(self, newStartPort):
         self.fromPort = newStartPort

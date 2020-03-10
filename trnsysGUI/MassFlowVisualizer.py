@@ -110,7 +110,7 @@ class MassFlowVisualizer(QDialog):
 
         for t in self.parent.centralWidget.trnsysObj:
             if isinstance(t, Connection):
-                if not self.showMass:
+                if self.showMass:
                     t.firstS.labelMass.setVisible(True)
                 else:
                     t.firstS.labelMass.setVisible(False)
@@ -184,6 +184,7 @@ class MassFlowVisualizer(QDialog):
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.maxValue:
                             t.setColor(mfr="max")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
+                            # todo : set temperature here
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.minValue:
                             t.setColor(mfr="min")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
@@ -194,7 +195,6 @@ class MassFlowVisualizer(QDialog):
                             t.setColor(mfr="medianToMax")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
                         else:
-                            # TODO  need include colour for values between min and max
                             t.setColor(mfr="test")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
                         i += 1
@@ -309,6 +309,11 @@ class MassFlowVisualizer(QDialog):
         self.pauseVis()
 
     def closeEvent(self, a0):
+        for t in self.parent.centralWidget.trnsysObj:
+            if isinstance(t, Connection):
+                t.firstS.labelMass.setVisible(False)
+
         self.pauseVis()
         self.parent.centralWidget.updateConnGrads()
+
         super(MassFlowVisualizer, self).closeEvent(a0)

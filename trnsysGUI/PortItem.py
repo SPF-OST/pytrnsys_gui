@@ -121,14 +121,17 @@ class PortItem(QGraphicsEllipseItem):
                         seg = conn.segments[0]  # first segment
                         seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
                         if len(conn.segments)>1:
+                            verSeg = conn.segments[1]
                             nextSeg = conn.segments[2]
                         if nextSeg.isHorizontal() and seg.isHorizontal():
                             if int(seg.endNode.parent.pos().y()-0) <= int(nextSeg.line().p2().y()) <= int(
                                     seg.endNode.parent.pos().y()+0):
                                 print("both segments are horizontal from fromport")
                                 self.hideCorners(conn)
+                                verSeg.setVisible(False)
                             else:
                                 self.showCorners(conn)
+                                verSeg.setVisible(True)
 
 
 
@@ -141,14 +144,17 @@ class PortItem(QGraphicsEllipseItem):
                         seg = conn.segments[-1]
                         seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
                         if len(conn.segments)>1:
+                            verSeg = conn.segments[-2]
                             nextSeg = conn.segments[-3]
                         if nextSeg.isHorizontal() and seg.isHorizontal():
                             if int(nextSeg.endNode.parent.pos().y() - 0) <= int(seg.line().p2().y()) <= int(
                                     nextSeg.endNode.parent.pos().y() + 0):
                                 print("both segments are horizontal from toport")
                                 self.hideCorners(conn)
+                                verSeg.setVisible(False)
                             else:
                                 self.showCorners(conn)
+                                verSeg.setVisible(True)
 
                 else:
                     print("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
