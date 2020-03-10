@@ -6,6 +6,8 @@ from PyQt5.QtGui import QPixmap, QIcon
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
 
+import numpy as np
+
 
 class Pump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
@@ -65,7 +67,7 @@ class Pump(BlockItem):
         return f, equationNr
 
     def exportMassFlows(self):
-        resStr = "Mfr" + self.displayName + " = 1000" + "\n"
+        resStr = "Mfr" + self.displayName + " = " + str(np.random.randint(0, 1000)) + "\n"
         equationNr = 1
         return resStr, equationNr
 

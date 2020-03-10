@@ -684,6 +684,17 @@ class DiagramScene(QGraphicsScene):
 
         if len(self.items(event.scenePos())) > 0:
             self.selectedItem = self.items(event.scenePos())
+            # for items in self.items():
+            #     if items != self.selectedItem[0]:
+            #         if isinstance(items, ResizerItem):
+            #             break
+            #         else:
+            #             if hasattr(items, 'resizer'):
+            #                 self.removeItem(items.resizer)
+            #                 items.deleteResizer()
+            #     else:
+            #         print(items)
+            #         print(self.selectedItem[0])
 
         """For selection when clicking on empty space"""
         if len(self.items(event.scenePos())) == 0:
@@ -1663,6 +1674,9 @@ class DiagramEditor(QWidget):
 
         while len(self.groupList) > 1:
             self.groupList[-1].deleteGroup()
+
+        while len(self.graphicalObj) > 0:
+            self.graphicalObj[0].deleteBlock()
 
         print("Groups are " + str(self.groupList))
 
@@ -2967,11 +2981,16 @@ class MainWindow(QMainWindow):
             os.remove(fileToDelete)
 
         print(latest_file)
-        if latest_file != '':
-            self.centralWidget.delBlocks()
-            self.centralWidget.decodeDiagram(latest_file)
+        try:
+            latest_file
+        except FileNotFoundError:
+            print("File not found")
         else:
-            print("No filename available")
+            if latest_file != '':
+                self.centralWidget.delBlocks()
+                self.centralWidget.decodeDiagram(latest_file)
+            else:
+                print("No filename available")
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState

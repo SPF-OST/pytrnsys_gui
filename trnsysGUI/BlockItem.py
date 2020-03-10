@@ -457,7 +457,12 @@ class BlockItem(QGraphicsPixmapItem):
         #     self.updateFlipStateV(self.flippedV)
 
     def deleteResizer(self):
-        del self.resizer
+        try:
+            self.resizer
+        except AttributeError:
+            print("No resizer")
+        else:
+            del self.resizer
 
 
     # Debug

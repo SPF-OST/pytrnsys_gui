@@ -13,40 +13,19 @@
             ]
         },
         ".__BlockDct__": true,
-        "Block-1": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "Collector",
-            "BlockName": "Kollektor",
-            "BlockPosition": [
-                -1156.0,
-                -248.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 1,
-            "PortsIDIn": [
-                2
-            ],
-            "PortsIDOut": [
-                3
-            ],
-            "RotationN": 0,
-            "trnsysID": 1
-        },
         "Block-10": {
             ".__BlockDict__": true,
             "BlockDisplayName": "MixDhw",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -458.0,
-                -519.0
+                -456.0,
+                -656.0
             ],
             "FlippedH": false,
             "FlippedV": true,
             "GroupName": "defaultGroup",
             "ID": 10,
-            "IsTempering": 0,
+            "IsTempering": 2,
             "PortsIDIn": [
                 11,
                 12
@@ -63,8 +42,8 @@
             "BlockDisplayName": "PuBoiler",
             "BlockName": "Pump",
             "BlockPosition": [
-                -939.0,
-                -363.0
+                -947.0,
+                -455.0
             ],
             "FlippedH": true,
             "FlippedV": false,
@@ -84,8 +63,8 @@
             "BlockDisplayName": "WTapTop",
             "BlockName": "WTap",
             "BlockPosition": [
-                -192.0,
-                -510.0
+                -190.0,
+                -647.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -103,8 +82,8 @@
             "BlockDisplayName": "WTapBottom",
             "BlockName": "WTap_main",
             "BlockPosition": [
-                -193.0,
-                -412.0
+                -191.0,
+                -541.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -122,8 +101,8 @@
             "BlockDisplayName": "TPiece",
             "BlockName": "TeePiece",
             "BlockPosition": [
-                -460.0,
-                -421.0
+                -458.0,
+                -550.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -144,8 +123,8 @@
             "BlockDisplayName": "RadFloor",
             "BlockName": "Radiator",
             "BlockPosition": [
-                -186.0,
-                -53.0
+                -189.0,
+                -399.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -165,14 +144,14 @@
             "BlockDisplayName": "MixSh",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -474.0,
-                -146.0
+                -461.0,
+                -417.0
             ],
             "FlippedH": false,
             "FlippedV": true,
             "GroupName": "defaultGroup",
             "ID": 323,
-            "IsTempering": 0,
+            "IsTempering": 2,
             "PortsIDIn": [
                 324,
                 325
@@ -189,8 +168,8 @@
             "BlockDisplayName": "TeeSh",
             "BlockName": "TeePiece",
             "BlockPosition": [
-                -500.0,
-                -119.0
+                -494.0,
+                -279.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -211,8 +190,8 @@
             "BlockDisplayName": "PuSh",
             "BlockName": "Pump",
             "BlockPosition": [
-                -365.0,
-                -102.0
+                -345.0,
+                -320.0
             ],
             "FlippedH": true,
             "FlippedV": false,
@@ -227,34 +206,13 @@
             "RotationN": 0,
             "trnsysID": 186
         },
-        "Block-4": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "PuCol",
-            "BlockName": "Pump",
-            "BlockPosition": [
-                -953.0,
-                -173.0
-            ],
-            "FlippedH": true,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 4,
-            "PortsIDIn": [
-                5
-            ],
-            "PortsIDOut": [
-                6
-            ],
-            "RotationN": 0,
-            "trnsysID": 2
-        },
         "Block-599": {
             ".__BlockDict__": true,
             "BlockDisplayName": "Hp",
             "BlockName": "AirSourceHP",
             "BlockPosition": [
-                -1164.0,
-                -502.0
+                -1161.0,
+                -638.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -291,21 +249,6 @@
                     "SideNr": 2,
                     "Width": 40,
                     "connTrnsysID": 288
-                },
-                {
-                    "DisplayName": "HxSolar",
-                    "Height": 80.0,
-                    "ID": 694,
-                    "Offset": [
-                        0.0,
-                        238.0
-                    ],
-                    "ParentID": 602,
-                    "Port1ID": 695,
-                    "Port2ID": 696,
-                    "SideNr": 0,
-                    "Width": 40,
-                    "connTrnsysID": 299
                 }
             ],
             "ID": 602,
@@ -346,7 +289,7 @@
             ],
             "StoragePosition": [
                 -676.0,
-                -497.0
+                -633.0
             ],
             "size_h": 340.0,
             "trnsysID": 270
@@ -356,8 +299,8 @@
             "BlockDisplayName": "DivHp",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -876.0,
-                -516.0
+                -873.0,
+                -652.0
             ],
             "FlippedH": true,
             "FlippedV": true,
@@ -380,8 +323,8 @@
             "BlockDisplayName": "DivHpRt",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -855.0,
-                -338.0
+                -854.0,
+                -468.0
             ],
             "FlippedH": true,
             "FlippedV": false,
@@ -395,7 +338,7 @@
             "PortsIDOut": [
                 641
             ],
-            "PositionForMassFlowSolver": 0.0,
+            "PositionForMassFlowSolver": 1.0,
             "RotationN": 0,
             "trnsysID": 281
         },
@@ -407,11 +350,11 @@
             "CornerPositions": [
                 [
                     -432.0,
-                    -429.0
+                    -558.0
                 ],
                 [
                     -432.0,
-                    -461.0
+                    -598.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -423,22 +366,22 @@
             "PortToID": 12,
             "SegmentPositions": [
                 [
-                    -435.0,
-                    -429.0,
+                    -438.0,
+                    -558.0,
                     -432.0,
-                    -429.0
+                    -558.0
                 ],
                 [
                     -432.0,
-                    -429.0,
+                    -558.0,
                     -432.0,
-                    -461.0
+                    -598.0
                 ],
                 [
-                    -433.0,
-                    -461.0,
                     -432.0,
-                    -461.0
+                    -598.0,
+                    -431.0,
+                    -598.0
                 ]
             ],
             "isVirtualConn": false,
@@ -452,11 +395,11 @@
             "CornerPositions": [
                 [
                     -385.0,
-                    -387.0
+                    -516.0
                 ],
                 [
                     -385.0,
-                    -387.575
+                    -516.575
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -468,22 +411,22 @@
             "PortToID": 20,
             "SegmentPositions": [
                 [
-                    -201.0,
-                    -387.0,
+                    -199.0,
+                    -516.0,
                     -385.0,
-                    -387.0
+                    -516.0
                 ],
                 [
                     -385.0,
-                    -387.0,
+                    -516.0,
                     -385.0,
-                    -387.575
+                    -516.575
                 ],
                 [
-                    -402.0,
-                    -387.575,
                     -385.0,
-                    -387.575
+                    -516.575,
+                    -410.0,
+                    -515.875
                 ]
             ],
             "isVirtualConn": false,
@@ -497,11 +440,11 @@
             "CornerPositions": [
                 [
                     -879.0,
-                    -348.0
+                    -440.0
                 ],
                 [
                     -879.0,
-                    -310.22222222222223
+                    -440.22222222222223
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -513,22 +456,22 @@
             "PortToID": 641,
             "SegmentPositions": [
                 [
-                    -899.0,
-                    -348.0,
+                    -907.0,
+                    -437.5,
                     -879.0,
-                    -348.0
+                    -440.0
                 ],
                 [
                     -879.0,
-                    -348.0,
+                    -440.0,
                     -879.0,
-                    -310.22222222222223
+                    -440.22222222222223
                 ],
                 [
-                    -863.0,
-                    -310.22222222222223,
                     -879.0,
-                    -310.22222222222223
+                    -440.22222222222223,
+                    -862.0,
+                    -440.22222222222223
                 ]
             ],
             "isVirtualConn": false,
@@ -542,19 +485,19 @@
             "CornerPositions": [
                 [
                     -785.0,
-                    -310.22222222222223
+                    -440.22222222222223
                 ],
                 [
                     -785.0,
                     -352.0
                 ],
                 [
-                    -738.5,
+                    -783.0,
                     -352.0
                 ],
                 [
-                    -738.5,
-                    -157.0
+                    -783.0,
+                    -293.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -566,34 +509,34 @@
             "PortToID": 615,
             "SegmentPositions": [
                 [
-                    -797.0,
-                    -310.22222222222223,
+                    -796.0,
+                    -440.22222222222223,
                     -785.0,
-                    -310.22222222222223
+                    -440.22222222222223
                 ],
                 [
                     -785.0,
-                    -310.22222222222223,
+                    -440.22222222222223,
                     -785.0,
                     -352.0
                 ],
                 [
                     -785.0,
                     -352.0,
-                    -738.5,
+                    -783.0,
                     -352.0
                 ],
                 [
-                    -738.5,
+                    -783.0,
                     -352.0,
-                    -738.5,
-                    -157.0
+                    -783.0,
+                    -293.0
                 ],
                 [
+                    -783.0,
+                    -293.0,
                     -684.0,
-                    -157.0,
-                    -738.5,
-                    -157.0
+                    -293.0
                 ]
             ],
             "isVirtualConn": false,
@@ -607,11 +550,11 @@
             "CornerPositions": [
                 [
                     -749.0,
-                    -493.77777777777777
+                    -629.7777777777778
                 ],
                 [
                     -749.0,
-                    -493.5999999999999
+                    -629.5999999999999
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -623,22 +566,22 @@
             "PortToID": 609,
             "SegmentPositions": [
                 [
-                    -818.0,
-                    -493.77777777777777,
+                    -815.0,
+                    -629.7777777777778,
                     -749.0,
-                    -493.77777777777777
+                    -629.7777777777778
                 ],
                 [
                     -749.0,
-                    -493.77777777777777,
+                    -629.7777777777778,
                     -749.0,
-                    -493.5999999999999
+                    -629.5999999999999
                 ],
                 [
+                    -749.0,
+                    -629.5999999999999,
                     -684.0,
-                    -493.5999999999999,
-                    -749.0,
-                    -493.5999999999999
+                    -629.5999999999999
                 ]
             ],
             "isVirtualConn": false,
@@ -652,11 +595,11 @@
             "CornerPositions": [
                 [
                     -968.0,
-                    -495.5
+                    -631.5
                 ],
                 [
                     -968.0,
-                    -493.77777777777777
+                    -629.7777777777778
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -668,71 +611,26 @@
             "PortToID": 631,
             "SegmentPositions": [
                 [
-                    -1056.0,
-                    -495.5,
+                    -1073.0,
+                    -626.6,
                     -968.0,
-                    -495.5
+                    -631.5
                 ],
                 [
                     -968.0,
-                    -495.5,
+                    -631.5,
                     -968.0,
-                    -493.77777777777777
+                    -629.7777777777778
                 ],
                 [
-                    -884.0,
-                    -493.77777777777777,
                     -968.0,
-                    -493.77777777777777
+                    -629.7777777777778,
+                    -881.0,
+                    -629.7777777777778
                 ]
             ],
             "isVirtualConn": false,
             "trnsysID": 487
-        },
-        "Connection-310": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 150,
-            "ConnDisplayName": "PiColIn",
-            "ConnID": 310,
-            "CornerPositions": [
-                [
-                    -1000.0,
-                    -158.0
-                ],
-                [
-                    -1000.0,
-                    -158.0
-                ]
-            ],
-            "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 6,
-            "PortToID": 3,
-            "SegmentPositions": [
-                [
-                    -961.0,
-                    -158.0,
-                    -1000.0,
-                    -158.0
-                ],
-                [
-                    -1000.0,
-                    -158.0,
-                    -1000.0,
-                    -158.0
-                ],
-                [
-                    -1048.0,
-                    -158.0,
-                    -1000.0,
-                    -158.0
-                ]
-            ],
-            "isVirtualConn": false,
-            "trnsysID": 172
         },
         "Connection-327": {
             ".__ConnectionDict__": true,
@@ -742,11 +640,11 @@
             "CornerPositions": [
                 [
                     -395.0,
-                    -123.77777777777777
+                    -394.77777777777777
                 ],
                 [
                     -395.0,
-                    -48.0
+                    -394.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -758,22 +656,22 @@
             "PortToID": 321,
             "SegmentPositions": [
                 [
-                    -416.0,
-                    -123.77777777777777,
+                    -403.0,
+                    -394.77777777777777,
                     -395.0,
-                    -123.77777777777777
+                    -394.77777777777777
                 ],
                 [
                     -395.0,
-                    -123.77777777777777,
+                    -394.77777777777777,
                     -395.0,
-                    -48.0
+                    -394.0
                 ],
                 [
-                    -194.0,
-                    -48.0,
                     -395.0,
-                    -48.0
+                    -394.0,
+                    -197.0,
+                    -394.0
                 ]
             ],
             "isVirtualConn": false,
@@ -786,12 +684,12 @@
             "ConnID": 340,
             "CornerPositions": [
                 [
-                    -476.0,
-                    -127.0
+                    -471.0,
+                    -287.0
                 ],
                 [
-                    -476.0,
-                    -88.0
+                    -471.0,
+                    -359.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -803,22 +701,22 @@
             "PortToID": 325,
             "SegmentPositions": [
                 [
-                    -475.0,
-                    -127.0,
-                    -476.0,
-                    -127.0
+                    -474.0,
+                    -287.0,
+                    -471.0,
+                    -287.0
                 ],
                 [
-                    -476.0,
-                    -127.0,
-                    -476.0,
-                    -88.0
+                    -471.0,
+                    -287.0,
+                    -471.0,
+                    -359.0
                 ],
                 [
-                    -449.0,
-                    -88.0,
-                    -476.0,
-                    -88.0
+                    -471.0,
+                    -359.0,
+                    -436.0,
+                    -359.0
                 ]
             ],
             "isVirtualConn": false,
@@ -832,11 +730,11 @@
             "CornerPositions": [
                 [
                     -313.0,
-                    -496.77777777777777
+                    -633.7777777777778
                 ],
                 [
                     -313.0,
-                    -496.095
+                    -633.095
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -848,22 +746,22 @@
             "PortToID": 15,
             "SegmentPositions": [
                 [
-                    -400.0,
-                    -496.77777777777777,
+                    -398.0,
+                    -633.7777777777778,
                     -313.0,
-                    -496.77777777777777
+                    -633.7777777777778
                 ],
                 [
                     -313.0,
-                    -496.77777777777777,
+                    -633.7777777777778,
                     -313.0,
-                    -496.095
+                    -633.095
                 ],
                 [
-                    -200.0,
-                    -496.095,
                     -313.0,
-                    -496.095
+                    -633.095,
+                    -198.0,
+                    -633.5
                 ]
             ],
             "isVirtualConn": false,
@@ -877,11 +775,11 @@
             "CornerPositions": [
                 [
                     -289.0,
-                    42.0
+                    -304.0
                 ],
                 [
                     -289.0,
-                    -87.0
+                    -305.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -893,22 +791,22 @@
             "PortToID": 350,
             "SegmentPositions": [
                 [
-                    -194.0,
-                    42.0,
+                    -197.0,
+                    -304.0,
                     -289.0,
-                    42.0
+                    -304.0
                 ],
                 [
                     -289.0,
-                    42.0,
+                    -304.0,
                     -289.0,
-                    -87.0
+                    -305.0
                 ],
                 [
-                    -325.0,
-                    -87.0,
                     -289.0,
-                    -87.0
+                    -305.0,
+                    -305.0,
+                    -302.5
                 ]
             ],
             "isVirtualConn": false,
@@ -922,11 +820,11 @@
             "CornerPositions": [
                 [
                     -428.5,
-                    -87.0
+                    -305.0
                 ],
                 [
                     -428.5,
-                    -85.57499999999999
+                    -245.575
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -938,22 +836,22 @@
             "PortToID": 335,
             "SegmentPositions": [
                 [
-                    -373.0,
-                    -87.0,
+                    -353.0,
+                    -302.5,
                     -428.5,
-                    -87.0
+                    -305.0
                 ],
                 [
                     -428.5,
-                    -87.0,
+                    -305.0,
                     -428.5,
-                    -85.57499999999999
+                    -245.575
                 ],
                 [
-                    -442.0,
-                    -85.57499999999999,
                     -428.5,
-                    -85.57499999999999
+                    -245.575,
+                    -446.0,
+                    -244.875
                 ]
             ],
             "isVirtualConn": false,
@@ -967,11 +865,11 @@
             "CornerPositions": [
                 [
                     -998.5,
-                    -348.0
+                    -440.0
                 ],
                 [
                     -998.5,
-                    -443.5
+                    -579.5
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -983,22 +881,22 @@
             "PortToID": 601,
             "SegmentPositions": [
                 [
-                    -947.0,
-                    -348.0,
+                    -955.0,
+                    -437.5,
                     -998.5,
-                    -348.0
+                    -440.0
                 ],
                 [
                     -998.5,
-                    -348.0,
+                    -440.0,
                     -998.5,
-                    -443.5
+                    -579.5
                 ],
                 [
-                    -1056.0,
-                    -443.5,
                     -998.5,
-                    -443.5
+                    -579.5,
+                    -1073.0,
+                    -580.4
                 ]
             ],
             "isVirtualConn": false,
@@ -1011,12 +909,12 @@
             "ConnID": 645,
             "CornerPositions": [
                 [
-                    -801.0,
-                    -385.72727272727275
+                    -831.0,
+                    -521.7272727272727
                 ],
                 [
-                    -801.0,
-                    -346.0
+                    -831.0,
+                    -476.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -1029,21 +927,21 @@
             "SegmentPositions": [
                 [
                     -684.0,
-                    -385.72727272727275,
-                    -801.0,
-                    -385.72727272727275
+                    -521.7272727272727,
+                    -831.0,
+                    -521.7272727272727
                 ],
                 [
-                    -801.0,
-                    -385.72727272727275,
-                    -801.0,
-                    -346.0
+                    -831.0,
+                    -521.7272727272727,
+                    -831.0,
+                    -476.0
                 ],
                 [
-                    -830.0,
-                    -346.0,
-                    -801.0,
-                    -346.0
+                    -831.0,
+                    -476.0,
+                    -829.0,
+                    -476.0
                 ]
             ],
             "isVirtualConn": false,
@@ -1057,11 +955,11 @@
             "CornerPositions": [
                 [
                     -767.5,
-                    -310.0
+                    -446.0
                 ],
                 [
                     -767.5,
-                    -458.0
+                    -594.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -1074,21 +972,21 @@
             "SegmentPositions": [
                 [
                     -684.0,
-                    -310.0,
+                    -446.0,
                     -767.5,
-                    -310.0
+                    -446.0
                 ],
                 [
                     -767.5,
-                    -310.0,
+                    -446.0,
                     -767.5,
-                    -458.0
+                    -594.0
                 ],
                 [
-                    -851.0,
-                    -458.0,
                     -767.5,
-                    -458.0
+                    -594.0,
+                    -848.0,
+                    -594.0
                 ]
             ],
             "isVirtualConn": false,
@@ -1102,11 +1000,11 @@
             "CornerPositions": [
                 [
                     -521.0,
-                    -496.77777777777777
+                    -633.7777777777778
                 ],
                 [
                     -521.0,
-                    -497.0
+                    -633.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -1118,22 +1016,22 @@
             "PortToID": 661,
             "SegmentPositions": [
                 [
-                    -466.0,
-                    -496.77777777777777,
+                    -464.0,
+                    -633.7777777777778,
                     -521.0,
-                    -496.77777777777777
+                    -633.7777777777778
                 ],
                 [
                     -521.0,
-                    -496.77777777777777,
+                    -633.7777777777778,
                     -521.0,
-                    -497.0
+                    -633.0
                 ],
                 [
+                    -521.0,
+                    -633.0,
                     -568.0,
-                    -497.0,
-                    -521.0,
-                    -497.0
+                    -633.0
                 ]
             ],
             "isVirtualConn": false,
@@ -1147,11 +1045,11 @@
             "CornerPositions": [
                 [
                     -499.0,
-                    -387.575
+                    -516.575
                 ],
                 [
                     -499.0,
-                    -157.0
+                    -293.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -1163,22 +1061,22 @@
             "PortToID": 662,
             "SegmentPositions": [
                 [
-                    -468.0,
-                    -387.575,
+                    -466.0,
+                    -515.875,
                     -499.0,
-                    -387.575
+                    -516.575
                 ],
                 [
                     -499.0,
-                    -387.575,
+                    -516.575,
                     -499.0,
-                    -157.0
+                    -293.0
                 ],
                 [
+                    -499.0,
+                    -293.0,
                     -568.0,
-                    -157.0,
-                    -499.0,
-                    -157.0
+                    -293.0
                 ]
             ],
             "isVirtualConn": false,
@@ -1192,11 +1090,11 @@
             "CornerPositions": [
                 [
                     -523.0,
-                    -123.77777777777777
+                    -394.77777777777777
                 ],
                 [
                     -523.0,
-                    -259.0
+                    -395.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -1208,22 +1106,22 @@
             "PortToID": 672,
             "SegmentPositions": [
                 [
-                    -482.0,
-                    -123.77777777777777,
+                    -469.0,
+                    -394.77777777777777,
                     -523.0,
-                    -123.77777777777777
+                    -394.77777777777777
                 ],
                 [
                     -523.0,
-                    -123.77777777777777,
+                    -394.77777777777777,
                     -523.0,
-                    -259.0
+                    -395.0
                 ],
                 [
+                    -523.0,
+                    -395.0,
                     -568.0,
-                    -259.0,
-                    -523.0,
-                    -259.0
+                    -395.0
                 ]
             ],
             "isVirtualConn": false,
@@ -1237,11 +1135,11 @@
             "CornerPositions": [
                 [
                     -539.0,
-                    -85.57499999999999
+                    -245.575
                 ],
                 [
                     -539.0,
-                    -174.0
+                    -310.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -1253,125 +1151,52 @@
             "PortToID": 673,
             "SegmentPositions": [
                 [
-                    -508.0,
-                    -85.57499999999999,
+                    -502.0,
+                    -244.875,
                     -539.0,
-                    -85.57499999999999
+                    -245.575
                 ],
                 [
                     -539.0,
-                    -85.57499999999999,
+                    -245.575,
                     -539.0,
-                    -174.0
+                    -310.0
                 ],
                 [
+                    -539.0,
+                    -310.0,
                     -568.0,
-                    -174.0,
-                    -539.0,
-                    -174.0
+                    -310.0
                 ]
             ],
             "isVirtualConn": false,
             "trnsysID": 294
         },
-        "Connection-700": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 245,
-            "ConnDisplayName": "PiColOut",
-            "ConnID": 700,
-            "CornerPositions": [
-                [
-                    -866.0,
-                    -259.0
-                ],
-                [
-                    -866.0,
-                    -238.0
-                ]
+        "GraphicalItem-1330": {
+            ".__BlockDict__": true,
+            "BlockName": "GraphicalItem",
+            "BlockPosition": [
+                -1304.0,
+                -324.0
             ],
-            "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 695,
-            "PortToID": 2,
-            "SegmentPositions": [
-                [
-                    -684.0,
-                    -259.0,
-                    -866.0,
-                    -259.0
-                ],
-                [
-                    -866.0,
-                    -259.0,
-                    -866.0,
-                    -238.0
-                ],
-                [
-                    -1048.0,
-                    -238.0,
-                    -866.0,
-                    -238.0
-                ]
-            ],
-            "isVirtualConn": false,
-            "trnsysID": 300
-        },
-        "Connection-703": {
-            ".__ConnectionDict__": true,
-            "ConnCID": 246,
-            "ConnDisplayName": "PiTesToCol",
-            "ConnID": 703,
-            "CornerPositions": [
-                [
-                    -792.0,
-                    -158.0
-                ],
-                [
-                    -792.0,
-                    -179.0
-                ]
-            ],
-            "FirstSegmentLabelPos": [
-                20.0,
-                0.0
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 5,
-            "PortToID": 696,
-            "SegmentPositions": [
-                [
-                    -913.0,
-                    -158.0,
-                    -792.0,
-                    -158.0
-                ],
-                [
-                    -792.0,
-                    -158.0,
-                    -792.0,
-                    -179.0
-                ],
-                [
-                    -684.0,
-                    -179.0,
-                    -792.0,
-                    -179.0
-                ]
-            ],
-            "isVirtualConn": false,
-            "trnsysID": 301
+            "FlippedH": false,
+            "FlippedV": false,
+            "ID": 1330,
+            "ImageSource": "gear.svg",
+            "RotationN": 0,
+            "Size": [
+                100.0,
+                100.0
+            ]
         },
         "IDs": {
-            "GlobalId": 1325,
+            "GlobalId": 1331,
             "__idDct__": true,
-            "globalConnID": 390,
-            "trnsysID": 505
+            "globalConnID": 395,
+            "trnsysID": 510
         },
         "Strings": {
-            "DiagramName": "SASHP+Tes",
+            "DiagramName": "test",
             "__nameDct__": true
         }
     }

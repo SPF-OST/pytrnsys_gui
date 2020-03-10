@@ -187,10 +187,10 @@ class MassFlowVisualizer(QDialog):
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.minValue:
                             t.setColor(mfr="min")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-                        elif self.minValue < abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) <= self.medianValue:
+                        elif self.minValue < round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) <= self.medianValue:
                             t.setColor(mfr="minToMedian")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-                        elif self.medianValue < abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.maxValue:
+                        elif self.medianValue < round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) < self.maxValue:
                             t.setColor(mfr="medianToMax")
                             t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
                         else:
