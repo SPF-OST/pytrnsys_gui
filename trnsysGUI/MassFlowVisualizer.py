@@ -332,5 +332,6 @@ class MassFlowVisualizer(QDialog):
 
         self.pauseVis()
         self.parent.centralWidget.updateConnGrads()
+        self.parent.massFlowEnabled = False
 
         super(MassFlowVisualizer, self).closeEvent(a0)

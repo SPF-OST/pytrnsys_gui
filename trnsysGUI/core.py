@@ -705,7 +705,8 @@ class DiagramScene(QGraphicsScene):
             self.parent().groupMode = False
             self.parent().multipleSelectMode = True
             for c in self.parent().connectionList:
-                c.unhighlightConn()
+                if not self.parent().parent().massFlowEnabled:
+                    c.unhighlightConn()
 
             self.parent().alignYLineItem.setVisible(False)
 
@@ -2612,6 +2613,7 @@ class MainWindow(QMainWindow):
         self.centralWidget = DiagramEditor(self)
         self.setCentralWidget(self.centralWidget)
         self.labelVisState = False
+        self.massFlowEnabled = False
 
         # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
@@ -2945,6 +2947,7 @@ class MainWindow(QMainWindow):
     def visualizeMf(self):
         mfrFile, tempFile = self.runMassflowSolver()
         MassFlowVisualizer(self,mfrFile, tempFile)
+        self.massFlowEnabled = True
 
     def openFile(self):
         print("Opening diagram")
@@ -3048,6 +3051,7 @@ class MainWindow(QMainWindow):
 
     def runMassflowSolver(self):
         print("Running massflow solver...")
+
         exportPath = self.centralWidget.exportData()
         self.exportedTo = exportPath
         cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
@@ -3075,6 +3079,7 @@ class MainWindow(QMainWindow):
             mfrFile = os.path.splitext(str(self.exportedTo))[0]+'_Mfr.prt'
             tempFile = os.path.splitext(str(self.exportedTo))[0] + '_T.prt'
             MassFlowVisualizer(self, mfrFile, tempFile)
+            self.massFlowEnabled = True
 
 
 
