@@ -14,10 +14,10 @@
         },
         ".__BlockDct__": true,
         "IDs": {
-            "GlobalId": 10,
+            "GlobalId": 1,
             "__idDct__": true,
             "globalConnID": 1,
-            "trnsysID": 4
+            "trnsysID": 1
         },
         "Strings": {
             "DiagramName": "Untitled",

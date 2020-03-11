@@ -2614,6 +2614,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
         self.labelVisState = False
         self.massFlowEnabled = False
+        self.calledByVisualizeMf = False
 
         # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
@@ -2945,6 +2946,7 @@ class MainWindow(QMainWindow):
         # dIns = DeepInspector(self.centralWidget)
 
     def visualizeMf(self):
+        self.calledByVisualizeMf = True
         mfrFile, tempFile = self.runMassflowSolver()
         MassFlowVisualizer(self,mfrFile, tempFile)
         self.massFlowEnabled = True
@@ -3064,8 +3066,10 @@ class MainWindow(QMainWindow):
             msgb.exec()
             del self.exportedTo
         else:
-            msgb.setText("Trnsys successfully executed")
-            msgb.exec()
+            if not self.calledByVisualizeMf:
+                msgb.setText("Trnsys successfully executed")
+                msgb.exec()
+        self.calledByVisualizeMf = False
         return mfrFile, tempFile
 
     def loadVisualization(self):
