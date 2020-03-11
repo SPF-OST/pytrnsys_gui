@@ -2688,6 +2688,9 @@ class MainWindow(QMainWindow):
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
+        loadVisual = QAction(QIcon('images/hard-drive.png'), "Load MRF", self)
+        loadVisual.triggered.connect(self.loadVisualization)
+
         testAppAction = QAction("Test", self)
         testAppAction.triggered.connect(self.testApp)
         testAppAction.setShortcut("Ctrl+t")
@@ -2712,6 +2715,7 @@ class MainWindow(QMainWindow):
         # tb.addAction(selectMultipleAction)
         tb.addAction(openVisualizerAction)
         tb.addAction(runMassflowSolverAction)
+        tb.addAction(loadVisual)
         tb.addAction(trnsysList)
 
         # Menu bar actions
@@ -2939,8 +2943,8 @@ class MainWindow(QMainWindow):
         # dIns = DeepInspector(self.centralWidget)
 
     def visualizeMf(self):
-        mfrFile = self.runMassflowSolver()
-        MassFlowVisualizer(self,mfrFile)
+        mfrFile, tempFile = self.runMassflowSolver()
+        MassFlowVisualizer(self,mfrFile, tempFile)
 
     def openFile(self):
         print("Opening diagram")
@@ -2952,6 +2956,12 @@ class MainWindow(QMainWindow):
             self.centralWidget.decodeDiagram(fileName)
         else:
             print("No filename chosen")
+        try:
+            self.exportedTo
+        except AttributeError:
+            pass
+        else:
+            del self.exportedTo
 
     def openFileAtStartUp(self):
         """
@@ -3039,14 +3049,33 @@ class MainWindow(QMainWindow):
     def runMassflowSolver(self):
         print("Running massflow solver...")
         exportPath = self.centralWidget.exportData()
+        self.exportedTo = exportPath
         cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
         os.system(cmd)
         mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
-        if not os.path.isfile(mfrFile):
-            msgb = QMessageBox(self)
+        tempFile = os.path.splitext(str(exportPath))[0]+'_T.prt'
+        msgb = QMessageBox(self)
+        if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
             msgb.setText("Trnsys not succesfully executed")
             msgb.exec()
-        return mfrFile
+            del self.exportedTo
+        else:
+            msgb.setText("Trnsys successfully executed")
+            msgb.exec()
+        return mfrFile, tempFile
+
+    def loadVisualization(self):
+        try:
+            self.exportedTo
+        except AttributeError:
+            msgb = QMessageBox(self)
+            msgb.setText("Please run the mass flow solver before loading the visualization!")
+            msgb.exec()
+        else:
+            mfrFile = os.path.splitext(str(self.exportedTo))[0]+'_Mfr.prt'
+            tempFile = os.path.splitext(str(self.exportedTo))[0] + '_T.prt'
+            MassFlowVisualizer(self, mfrFile, tempFile)
+
 
 
 

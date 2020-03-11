@@ -1,3 +1,4 @@
+import sys
 from math import atan, sqrt, acos
 
 from PyQt5.QtCore import QLineF, QPointF
@@ -93,6 +94,7 @@ class Connection(object):
         self.labelPosLoad = None
 
         self.mass = 0 # comment out
+        self.temperature = 0
 
         # A new connection is created if there are no kwargs
         if kwargs == {}:
@@ -140,6 +142,12 @@ class Connection(object):
         for s in self.segments:
             s.labelMass.setPlainText(self.mass)
 
+    def setMassAndTemperature(self, mass, temp):
+        self.mass = mass
+        self.temperature = temp
+        for s in self.segments:
+            s.labelMass.setPlainText("M: %s   T: %s" % (self.mass, self.temperature))
+
 
     def setDisplayName(self, newName):
         self.displayName = newName
@@ -148,13 +156,26 @@ class Connection(object):
     def setLabelPos(self, tup):
         posOffset = 10
         if len(self.segments) > 0:
-            self.segments[0].label.setPos(tup[0]+10, tup[1]+posOffset)
+            self.segments[0].label.setPos(tup[0]+posOffset, tup[1]+posOffset)
 
     # comment out
     def setMassLabelPos(self, tup):
-        posOffset = 10
+        posOffset = 15
         if len(self.segments) > 0:
-            self.segments[0].labelMass.setPos(tup[0], tup[1]+posOffset)
+            if self.fromPort.side == 1:
+                self.segments[0].labelMass.setPos(tup[0], tup[1] - posOffset)
+            elif self.fromPort.side == 0:
+                if self.fromPort.parent.flippedV:
+                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
+                else:
+                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
+            elif self.fromPort.side == 2:
+                if self.fromPort.parent.flippedH:
+                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
+                else:
+                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
+            else:
+                self.segments[0].labelMass.setPos(tup[0], tup[1])
 
     def setStartPort(self, newStartPort):
         self.fromPort = newStartPort

@@ -12,12 +12,15 @@ import numpy as np
 
 class MassFlowVisualizer(QDialog):
 
-    def __init__(self, parent,mfrFile):
+    def __init__(self, parent,mfrFile, tempFile):
 
         super(MassFlowVisualizer, self).__init__(parent)
         self.dataFilePath = mfrFile
+        self.tempDatafilePath = tempFile
         self.loadedFile = False
+        self.tempLoadedFile = False
         self.loadFile()
+        self.loadTempFile()
         self.maxTimeStep = 5 # todo change this to the number of rows in the file
         self.showMass = False
 
@@ -123,6 +126,11 @@ class MassFlowVisualizer(QDialog):
                 columns=lambda x: x.strip())
         self.loadedFile = True
 
+    def loadTempFile(self):
+        if not self.tempLoadedFile:
+            self.tempMassFlowData = pd.read_csv(self.tempDatafilePath, sep='\t').rename(
+                columns=lambda x: x.strip())
+        self.tempLoadedFile = True
 
     def start(self):
 
@@ -175,28 +183,28 @@ class MassFlowVisualizer(QDialog):
 
             for t in self.parent.centralWidget.trnsysObj:
                 if isinstance(t, Connection):
-                    if 'Mfr'+t.displayName in self.massFlowData.columns:
+                    if 'Mfr'+t.displayName in self.massFlowData.columns and 'T'+t.displayName in self.tempMassFlowData:
+                        mass = str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep]))
+                        temperature = str(round(self.tempMassFlowData['T' + t.displayName].iloc[self.timeStep]))
                         print("Found connection in ts " + str(self.timeStep) + " " + str(i))
                         print("mass flow value of %s : " % t.displayName)
-                        print((abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])))
                         if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
                             t.setColor(mfr="ZeroMfr")
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.maxValue:
                             t.setColor(mfr="max")
-                            t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-                            # todo : set temperature here
+                            t.setMassAndTemperature(mass, temperature)
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.minValue:
                             t.setColor(mfr="min")
-                            t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
+                            t.setMassAndTemperature(mass, temperature)
                         elif self.minValue < round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) <= self.medianValue:
                             t.setColor(mfr="minToMedian")
-                            t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
+                            t.setMassAndTemperature(mass, temperature)
                         elif self.medianValue < round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) < self.maxValue:
                             t.setColor(mfr="medianToMax")
-                            t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
+                            t.setMassAndTemperature(mass, temperature)
                         else:
                             t.setColor(mfr="test")
-                            t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
+                            t.setMassAndTemperature(mass, temperature)
                         i += 1
 
         else:
@@ -219,9 +227,10 @@ class MassFlowVisualizer(QDialog):
         self.slider.setMaximum(self.timeSteps)
         self.slider.setTickInterval(1)
         self.slider.setTickPosition(2)
-        if self.checkTimeStep():
+        if self.checkTimeStep and self.checkTempTimeStep():
             self.slider.setVisible(True)
             self.slider.setEnabled(False)
+            self.increaseValue()
         else:
             self.slider.setVisible(True)
             self.slider.setEnabled(True)
@@ -267,7 +276,15 @@ class MassFlowVisualizer(QDialog):
             if items[0] != 'TIME':
                 if items[1] > 1:
                     return False
-        self.increaseValue()
+        return True
+
+    def checkTempTimeStep(self):
+        tempMassFlowDataDup = self.tempMassFlowData
+        tempMassFlowDataDup = tempMassFlowDataDup.drop(tempMassFlowDataDup.index[0])
+        for items in tempMassFlowDataDup.nunique().iteritems():
+            if items[0] != 'TIME':
+                if items[1] > 1:
+                    return False
         return True
 
     def getThresholdValues(self):
