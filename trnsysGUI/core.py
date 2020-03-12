@@ -39,9 +39,8 @@ from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TVentilDlg import TVentilDlg
-from trnsysGUI.Test import Test
+from trnsysGUI.Test_Export import Test_Export
 from trnsysGUI.TestDlg import TestDlg
-from trnsysGUI.closeDlg import closeDlg
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
@@ -71,6 +70,7 @@ from trnsysGUI.copyGroup import copyGroup
 from trnsysGUI.IdGenerator import IdGenerator
 from trnsysGUI.Connection import Connection
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
+from trnsysGUI.ResizerItem import ResizerItem
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import *
@@ -568,6 +568,8 @@ class DiagramScene(QGraphicsScene):
         self.addItem(self.viewRect1)
         self.addItem(self.viewRect2)
 
+        self.selectedItem = None
+
         # self.viewRect1.setPos(-1300, -100)
         # self.viewRect2.setPos(-1300, -100)
 
@@ -677,7 +679,22 @@ class DiagramScene(QGraphicsScene):
 
     def mousePressEvent(self, event):
         # self.parent().mousePressEvent(event)
+        # TODO : remove resizer when click on other block items
         super(DiagramScene, self).mousePressEvent(event)
+
+        if len(self.items(event.scenePos())) > 0:
+            self.selectedItem = self.items(event.scenePos())
+            # for items in self.items():
+            #     if items != self.selectedItem[0]:
+            #         if isinstance(items, ResizerItem):
+            #             break
+            #         else:
+            #             if hasattr(items, 'resizer'):
+            #                 self.removeItem(items.resizer)
+            #                 items.deleteResizer()
+            #     else:
+            #         print(items)
+            #         print(self.selectedItem[0])
 
         """For selection when clicking on empty space"""
         if len(self.items(event.scenePos())) == 0:
@@ -688,7 +705,8 @@ class DiagramScene(QGraphicsScene):
             self.parent().groupMode = False
             self.parent().multipleSelectMode = True
             for c in self.parent().connectionList:
-                c.unhighlightConn()
+                if not self.parent().parent().massFlowEnabled:
+                    c.unhighlightConn()
 
             self.parent().alignYLineItem.setVisible(False)
 
@@ -696,6 +714,21 @@ class DiagramScene(QGraphicsScene):
                 if isinstance(st, StorageTank):
                     for hx in st.heatExchangers:
                         hx.unhighlightHx()
+
+            if self.selectedItem is not None:
+                for items in self.selectedItem:
+                    if isinstance(items, GraphicalItem) and hasattr(items, 'resizer'):
+                        self.removeItem(items.resizer)
+                        items.deleteResizer()
+                    if isinstance(items, BlockItem) and hasattr(items, 'resizer'):
+                        self.removeItem(items.resizer)
+                        items.deleteResizer()
+                    if isinstance(items, ResizerItem):
+                        self.removeItem(items)
+                        items.parent.deleteResizer()
+
+            if self.selectedItem is not None:
+                self.selectedItem.clear()
 
         # global selectionMode
         if self.parent().selectionMode:
@@ -740,10 +773,11 @@ class DiagramScene(QGraphicsScene):
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     res.append(o)
 
-            # if isinstance(o, GraphicalItem):
-            #     print("Checking graphic item to group")
-            #     if self.isInRect(o.scenePos()):
-            #         res.append(o)
+        for o in self.parent().graphicalObj:
+            if isinstance(o, GraphicalItem):
+                print("Checking graphic item to group")
+                if self.isInRect(o.scenePos()):
+                    res.append(o)
 
         return res
 
@@ -760,10 +794,11 @@ class DiagramScene(QGraphicsScene):
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     return True
 
-            # if isinstance(o, GraphicalItem):
-            #     print("Checking graphic item to group")
-            #     if self.isInRect(o.scenePos()):
-            #         return True
+        for o in self.parent().graphicalObj:
+            if isinstance(o, GraphicalItem):
+                print("Checking graphic item to group")
+                if self.isInRect(o.scenePos()):
+                    return True
 
         return False
 
@@ -940,6 +975,7 @@ class DiagramView(QGraphicsView):
         command = DeleteBlockCommand(bl, "Delete block command")
         print("Deleted block")
         self.parent().parent().undoStack.push(command)
+
 
 
 class DiagramEditor(QWidget):
@@ -1640,6 +1676,9 @@ class DiagramEditor(QWidget):
         while len(self.groupList) > 1:
             self.groupList[-1].deleteGroup()
 
+        while len(self.graphicalObj) > 0:
+            self.graphicalObj[0].deleteBlock()
+
         print("Groups are " + str(self.groupList))
 
     def newDiagram(self):
@@ -1748,8 +1787,8 @@ class DiagramEditor(QWidget):
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
                     self.diagramScene.addItem(k)
-                    k.resizer.setPos(k.w, k.h)
-                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+                    # k.resizer.setPos(k.w, k.h)
+                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
 
                 if isinstance(k, dict):
                     if "__idDct__" in k:
@@ -1816,6 +1855,8 @@ class DiagramEditor(QWidget):
         with open(filename, 'w') as jsonfile:
             json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
 
+        print("Copy complete!")
+
     def pasteFromClipBoard(self):
         filename = 'clipboard.json'
 
@@ -1852,8 +1893,8 @@ class DiagramEditor(QWidget):
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
                     self.diagramScene.addItem(k)
-                    k.resizer.setPos(k.w, k.h)
-                    k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+                    # k.resizer.setPos(k.w, k.h)
+                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
 
                 if isinstance(k, Connection):
                     print("Almost done with loading a connection")
@@ -1895,8 +1936,8 @@ class DiagramEditor(QWidget):
         for t in selectionList:
             if isinstance(t, BlockItem):
                 self.selectionGroupList.addToGroup(t)
-            # if isinstance(t, GraphicalItem):
-            #     self.selectionGroupList.addToGroup(t)
+            if isinstance(t, GraphicalItem):
+                self.selectionGroupList.addToGroup(t)
 
         self.multipleSelectedMode = False
         self.selectionMode = False
@@ -2420,7 +2461,7 @@ class DiagramEditor(QWidget):
         """
 
         i = 0
-        self.tester = Test()
+        self.tester = Test_Export()
         self.testPassed = True
         msg = QMessageBox(self)
         msg.setWindowTitle('Test Result')
@@ -2447,6 +2488,7 @@ class DiagramEditor(QWidget):
 
         msg.setText("Test in progress")
         msg.show()
+
         QCoreApplication.processEvents()
 
         # Clear the window
@@ -2491,7 +2533,7 @@ class DiagramEditor(QWidget):
         # i, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
 
         if self.testPassed:
-            msg.setText("%d files tested, no discrepancy found" % i)
+            msg.setText("All files tested, no discrepancy found")
             msg.exec_()
         else:
             for fileNo in fileNoList:
@@ -2499,7 +2541,7 @@ class DiagramEditor(QWidget):
                 errorList1, errorList2 = self.tester.showDifference(exportedFileList[fileNo], originalFileList[fileNo])
                 msg.setText("%d files tested, discrepancy found in %s" % ((fileNo + 1), errorFile))
                 msg.exec_()
-                DifferenceDlg(self, errorList1, errorList2)
+                DifferenceDlg(self, errorList1, errorList2, originalFileList[fileNo])
             # errorFile = originalFileList[i]
             # errorList1, errorList2 = self.tester.showDifference(exportedFileList[i], originalFileList[i])
             # msg.setText("%d files tested, discrepancy found in %s" % ((i + 1), errorFile))
@@ -2571,6 +2613,8 @@ class MainWindow(QMainWindow):
         self.centralWidget = DiagramEditor(self)
         self.setCentralWidget(self.centralWidget)
         self.labelVisState = False
+        self.massFlowEnabled = False
+        self.calledByVisualizeMf = False
 
         # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
@@ -2605,11 +2649,11 @@ class MainWindow(QMainWindow):
 
         copyAction = QAction(QIcon('images/clipboard.png'), "Copy to clipboard", self)
         copyAction.triggered.connect(self.copySelection)
-        copyAction.setShortcut("c")
+        copyAction.setShortcut("Ctrl+c")
 
         pasteAction = QAction(QIcon('images/puzzle-piece.png'), "Paste from clipboard", self)
         pasteAction.triggered.connect(self.pasteSelection)
-        pasteAction.setShortcut("v")
+        pasteAction.setShortcut("Ctrl+v")
 
         toggleConnLabels = QAction(QIcon('images/labelToggle.png'), "Toggle pipe labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
@@ -2647,6 +2691,9 @@ class MainWindow(QMainWindow):
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
+        loadVisual = QAction(QIcon('images/hard-drive.png'), "Load MRF", self)
+        loadVisual.triggered.connect(self.loadVisualization)
+
         testAppAction = QAction("Test", self)
         testAppAction.triggered.connect(self.testApp)
         testAppAction.setShortcut("Ctrl+t")
@@ -2660,17 +2707,18 @@ class MainWindow(QMainWindow):
         tb.addAction(renameDiaAction)
         tb.addAction(deleteDiaAction)
         tb.addAction(groupNewAction)
-        tb.addAction(autoArrangeAction)
+        # tb.addAction(autoArrangeAction)
         tb.addAction(zoomInAction)
         tb.addAction(zoomOutAction)
-        tb.addAction(zoom0Action)
-        tb.addAction(copyAction)
-        tb.addAction(pasteAction)
+        # tb.addAction(zoom0Action)
+        # tb.addAction(copyAction)
+        # tb.addAction(pasteAction)
         tb.addAction(toggleConnLabels)
         tb.addAction(editGroupsAction)
-        tb.addAction(selectMultipleAction)
+        # tb.addAction(selectMultipleAction)
         tb.addAction(openVisualizerAction)
         tb.addAction(runMassflowSolverAction)
+        tb.addAction(loadVisual)
         tb.addAction(trnsysList)
 
         # Menu bar actions
@@ -2719,6 +2767,8 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
         self.editMenu.addAction(movePortAction)
+        self.editMenu.addAction(copyAction)
+        self.editMenu.addAction(pasteAction)
         self.editMenu.addAction(testAppAction)
 
 
@@ -2767,6 +2817,7 @@ class MainWindow(QMainWindow):
 
 
     def newDia(self):
+        # TODO : Check if the current diagram is saved, if not, ask user whether to save or not
         print("Creating new diagram")
         # self.centralWidget.newDiagram()
         self.centralWidget.delBlocks()
@@ -2845,6 +2896,8 @@ class MainWindow(QMainWindow):
         self.centralWidget.groupMode = False
         self.centralWidget.multipleSelectMode = False
 
+        self.centralWidget.copyElements()
+
     def pasteSelection(self):
         print("Pasting selection")
         self.centralWidget.pasteFromClipBoard()
@@ -2893,8 +2946,10 @@ class MainWindow(QMainWindow):
         # dIns = DeepInspector(self.centralWidget)
 
     def visualizeMf(self):
-        mfrFile = self.runMassflowSolver()
-        MassFlowVisualizer(self,mfrFile)
+        self.calledByVisualizeMf = True
+        mfrFile, tempFile = self.runMassflowSolver()
+        MassFlowVisualizer(self,mfrFile, tempFile)
+        self.massFlowEnabled = True
 
     def openFile(self):
         print("Opening diagram")
@@ -2906,6 +2961,12 @@ class MainWindow(QMainWindow):
             self.centralWidget.decodeDiagram(fileName)
         else:
             print("No filename chosen")
+        try:
+            self.exportedTo
+        except AttributeError:
+            pass
+        else:
+            del self.exportedTo
 
     def openFileAtStartUp(self):
         """
@@ -2935,11 +2996,16 @@ class MainWindow(QMainWindow):
             os.remove(fileToDelete)
 
         print(latest_file)
-        if latest_file != '':
-            self.centralWidget.delBlocks()
-            self.centralWidget.decodeDiagram(latest_file)
+        try:
+            latest_file
+        except FileNotFoundError:
+            print("File not found")
         else:
-            print("No filename available")
+            if latest_file != '':
+                self.centralWidget.delBlocks()
+                self.centralWidget.decodeDiagram(latest_file)
+            else:
+                print("No filename available")
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
@@ -2968,6 +3034,7 @@ class MainWindow(QMainWindow):
     def deleteMultiple(self):
         # print("pressed del")
         temp = []
+        print("Child Items")
         print(self.centralWidget.selectionGroupList.childItems())
 
         for t in self.centralWidget.selectionGroupList.childItems():
@@ -2979,22 +3046,45 @@ class MainWindow(QMainWindow):
                 t.deleteBlock()
             elif isinstance(t, Connection):
                 t.deleteConn()
-            # elif isinstance(t, GraphicalItem):
-            #     t.deleteBlock()
+            elif isinstance(t, GraphicalItem):
+                t.deleteBlock()
             else:
                 print("Neiter a Block nor Connection in copyGroupList ")
 
     def runMassflowSolver(self):
         print("Running massflow solver...")
+
         exportPath = self.centralWidget.exportData()
+        self.exportedTo = exportPath
         cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
         os.system(cmd)
-        mfrFile = os.path.splitext(exportPath)[0]+'_Mfr.prt'
-        if not os.path.isfile(mfrFile):
-            msgb = QMessageBox(self)
+        mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
+        tempFile = os.path.splitext(str(exportPath))[0]+'_T.prt'
+        msgb = QMessageBox(self)
+        if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
             msgb.setText("Trnsys not succesfully executed")
             msgb.exec()
-        return mfrFile
+            del self.exportedTo
+        else:
+            if not self.calledByVisualizeMf:
+                msgb.setText("Trnsys successfully executed")
+                msgb.exec()
+        self.calledByVisualizeMf = False
+        return mfrFile, tempFile
+
+    def loadVisualization(self):
+        try:
+            self.exportedTo
+        except AttributeError:
+            msgb = QMessageBox(self)
+            msgb.setText("Please run the mass flow solver before loading the visualization!")
+            msgb.exec()
+        else:
+            mfrFile = os.path.splitext(str(self.exportedTo))[0]+'_Mfr.prt'
+            tempFile = os.path.splitext(str(self.exportedTo))[0] + '_T.prt'
+            MassFlowVisualizer(self, mfrFile, tempFile)
+            self.massFlowEnabled = True
+
 
 
 
@@ -3032,6 +3122,7 @@ class MainWindow(QMainWindow):
         msgb.exec()
 
     def testApp(self):
+        self.newDia()
         self.centralWidget.testFunction()
         self.newDia()
 

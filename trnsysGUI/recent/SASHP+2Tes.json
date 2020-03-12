@@ -1360,28 +1360,11 @@
             "isVirtualConn": false,
             "trnsysID": 330
         },
-        "GraphicalItem-782": {
-            ".__BlockDict__": true,
-            "BlockName": "GraphicalItem",
-            "BlockPosition": [
-                -1150.0,
-                -54.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "ID": 782,
-            "ImageSource": "gear.svg",
-            "RotationN": 0,
-            "Size": [
-                100.0,
-                100.0
-            ]
-        },
         "IDs": {
-            "GlobalId": 783,
+            "GlobalId": 1275,
             "__idDct__": true,
-            "globalConnID": 269,
-            "trnsysID": 332
+            "globalConnID": 379,
+            "trnsysID": 497
         },
         "Strings": {
             "DiagramName": "SASHP+2Tes",

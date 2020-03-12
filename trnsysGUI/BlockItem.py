@@ -6,10 +6,7 @@ from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
-from trnsysGUI.BlockDlg import BlockDlg
 # from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
-import trnsysGUI.DeleteBlockCommand
-
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.MoveCommand import MoveCommand
@@ -29,6 +26,7 @@ from PyQt5.QtWidgets import QUndoCommand
 # from trnsysGUI.TeePiece import TeePiece
 # from trnsysGUI.WTap import WTap
 # from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.TVentilDlg import TVentilDlg
 
 global FilePath
@@ -39,7 +37,8 @@ def calcDist(p1, p2):
     norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
     return norm
 
-
+# TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
+#  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
 
     def __init__(self, trnsysType, parent, **kwargs):
@@ -82,16 +81,19 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedV = False
         self.flippedH = False
         self.rotationN = 0
+        self.flippedHInt = -1
+        self.flippedVInt = -1
 
-        self.image = QImage("images/" + self.name)
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        # self.imageSource = "images/" + self.name + ".png"
+        # self.image = QImage("images/" + self.name)
+        # self.pixmap = QPixmap(self.image)
+        # self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         # To use svg instead of png for blocks:
-        # self.imageSource = "images/" + self.name + ".svg"
-        # self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
-        # self.setPixmap(self.image)
-        # self.pixmap = self.image
+        self.imageSource = "images/" + self.name + ".svg"
+        self.image = QImage(self.imageSource)
+        self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+        self.pixmap = QPixmap(self.image)
 
         # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
@@ -269,12 +271,20 @@ class BlockItem(QGraphicsPixmapItem):
         self.pixmap = QPixmap(self.image.mirrored(bool(state), self.flippedV))
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedH = bool(state)
+        if state == False:
+            self.flippedHInt = -1
+        else:
+            self.flippedHInt = 1
         self.changeSize()
 
     def updateFlipStateV(self, state):
         self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
+        if state == False:
+            self.flippedVInt = -1
+        else:
+            self.flippedVInt = 1
         self.changeSize()
 
     def updateSide(self, port, n):
@@ -393,6 +403,66 @@ class BlockItem(QGraphicsPixmapItem):
             for cl in o.connectionList:
                 c.append(cl)
         return c
+
+
+    # Scaling related
+    def mousePressEvent(self, event):  # create resizer
+        """
+        Using try catch to avoid creating extra resizers.
+
+        When an item is clicked on, it will check if a resizer already existed. If
+        there exist a resizer, returns. else, creates one.
+
+        Resizer will not be created for GenericBlock due to complications in the code.
+        Resizer will not be created for storageTank as there's already a built in function for it in the storageTank
+        dialog.
+
+        Resizers are deleted inside mousePressEvent function inside core.py
+
+        """
+        print("Inside Block Item mouse click")
+        if self.name == 'GenericBlock' or self.name == 'StorageTank':
+            return
+        try:
+            self.resizer
+        except AttributeError:
+            self.resizer = ResizerItem(self)
+            self.resizer.setPos(self.w, self.h)
+            self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
+        else:
+            return
+
+    def setItemSize(self, w, h):
+        print("Inside block item set item size")
+        self.w, self.h = w, h
+        # if h < 20:
+        #     self.h = 20
+        # if w < 40:
+        #     self.w = 40
+
+    def updateImage(self):
+        print("Inside block item update image")
+        if self.imageSource[-3:] == "svg":
+            # self.image = QImage(self.imageSource)
+            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+            # self.setPixmap(QPixmap(self.image))
+            self.pixmap = QPixmap(self.image)
+            self.updateFlipStateH(self.flippedH)
+            self.updateFlipStateV(self.flippedV)
+
+        # elif self.imageSource[-3:] == "png":
+        #     self.image = QImage(self.imageSource)
+        #     self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+        #     self.updateFlipStateH(self.flippedH)
+        #     self.updateFlipStateV(self.flippedV)
+
+    def deleteResizer(self):
+        try:
+            self.resizer
+        except AttributeError:
+            print("No resizer")
+        else:
+            del self.resizer
 
 
     # Debug

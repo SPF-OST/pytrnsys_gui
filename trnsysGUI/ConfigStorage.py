@@ -14,8 +14,8 @@ class ConfigStorage(QDialog):
         self.m = 0
 
         # Parameters:
-        self.w_hx = 40
-        self.h_hx = 60
+        self.w_hx = 10
+        self.h_hx = 100
 
         spacerHeight = 15
 
@@ -360,8 +360,8 @@ class ConfigStorage(QDialog):
 
                     self.storage.inputs.remove(i.fromPort)
                     self.storage.outputs.remove(i.toPort)
-                    # self.storage.leftSide.remove(i.fromPort)
-                    # self.storage.leftSide.remove(i.toPort)
+                    self.storage.leftSide.remove(i.fromPort)
+                    self.storage.leftSide.remove(i.toPort)
 
                     self.storage.parent.scene().removeItem(i.fromPort)
                     self.storage.parent.scene().removeItem(i.toPort)
@@ -393,8 +393,8 @@ class ConfigStorage(QDialog):
 
                     self.storage.inputs.remove(i.fromPort)
                     self.storage.outputs.remove(i.toPort)
-                    # self.storage.rightSide.remove(i.fromPort)
-                    # self.storage.rightSide.remove(i.toPort)
+                    self.storage.rightSide.remove(i.fromPort)
+                    self.storage.rightSide.remove(i.toPort)
 
                     self.storage.parent.scene().removeItem(i.fromPort)
                     self.storage.parent.scene().removeItem(i.toPort)
@@ -463,7 +463,7 @@ class ConfigStorage(QDialog):
         # print("\nRight: ")
         # print(self.listWR.selectedItems())
         if len(self.listWL.selectedItems()) == 0 and len(self.listWR.selectedItems()) == 0:
-            pass
+            return
         else:
             if self.rButton.isChecked() or self.lButton.isChecked():
                 self.addHx()
@@ -471,30 +471,44 @@ class ConfigStorage(QDialog):
                 self.removeHxR()
 
     def modifyPort(self):
-        xValue = 0
-        if self.listWL2.selectedItems() is not None:
+        # xValue = 0
+        # if self.listWL2.selectedItems() is not None:
+        #     self.manRemovePortPairLeft()
+        #     xValue += 1
+        #     print("1st if is ran")
+        #     print(self.listWL2.selectedItems())
+        # if self.listWR2.selectedItems() is not None:
+        #     self.manRemovePortPairRight()
+        #     xValue += 1
+        #     print("2nd if is ran")
+        #     print(self.listWR2.selectedItems())
+        # if xValue != 0:
+        #     self.manAddPortPair()
+
+        if len(self.listWL2.selectedItems()) == 0 and len(self.listWR2.selectedItems()) == 0:
+            return
+        elif len(self.listWL2.selectedItems()) > 0:
             self.manRemovePortPairLeft()
-            xValue += 1
-        if self.listWR2.selectedItems() is not None:
+        elif len(self.listWR2.selectedItems()) > 0:
             self.manRemovePortPairRight()
-            xValue += 1
-        if xValue != 0:
-            self.manAddPortPair()
+        self.manAddPortPair()
 
 
     # self.storage.h -= self.h_hx
     # self.storage.updateImage(-self.h_hx)
     def incrSize(self):
-        self.storage.updatePortPositions(self.h_hx)
+        self.storage.updatePortPositionsHW(self.h_hx, self.w_hx)
         self.storage.updateHxLines(self.h_hx)
         self.storage.h += self.h_hx
+        self.storage.w += self.w_hx
         self.storage.updateImage()
 
     # Unused
     def decrSize(self):
-        self.storage.updatePortPositionsDec(self.h_hx)
+        self.storage.updatePortPositionsDecHW(self.h_hx, self.w_hx)
         self.storage.updateHxLines(-self.h_hx)
         self.storage.h -= self.h_hx
+        self.storage.w -= self.w_hx
         self.storage.updateImage()
 
     def acceptedEdit(self):

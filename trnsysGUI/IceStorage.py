@@ -9,7 +9,7 @@ class IceStorage(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(IceStorage, self).__init__(trnsysType, parent, **kwargs)
         self.w = 100
-        self.h = 95
+        self.h = 100
         self.inputs.append(PortItem('i', 1, self))
         self.outputs.append(PortItem('o', 1, self))
 

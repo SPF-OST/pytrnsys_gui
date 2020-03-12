@@ -10,7 +10,7 @@ class PV(BlockItem):
         super(PV, self).__init__(trnsysType, parent, **kwargs)
         factor = 0.97
         self.w = 100
-        self.h = factor*100
+        self.h = 100
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
 

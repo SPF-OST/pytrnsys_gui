@@ -1,19 +1,23 @@
+import sys
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QIcon
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
 
+import numpy as np
+
 
 class Pump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Pump, self).__init__(trnsysType, parent, **kwargs)
         # factor = 0.6 for old pump
-        # factor = 1
+        # factor = 0.5
         # self.w = 100 * factor
-        # self.h = 82 * factor
-        self.w = 30
-        self.h = 30
+        # self.h = 100 * factor
+        self.w = 33
+        self.h = 33
         self.typeNumber = 1
 
         self.exportInitialInput = 0.0
@@ -47,6 +51,7 @@ class Pump(BlockItem):
         # Update port positions:
         self.inputs[0].setPos(self.flippedH * w - 2* delta + 2 * delta * self.flippedH, h / 2)
         self.outputs[0].setPos(w - self.flippedH * w - 2* delta * self.flippedH, h / 2)
+        # self.outputs[0].setPos(w - self.flippedH * w - 2 * delta * self.flippedH + 2 * delta, h / 2)
         # self.inputs[0].side = 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
@@ -62,7 +67,7 @@ class Pump(BlockItem):
         return f, equationNr
 
     def exportMassFlows(self):
-        resStr = "Mfr" + self.displayName + " = 1000" + "\n"
+        resStr = "Mfr" + self.displayName + " = " + str(np.random.randint(0, 1000)) + "\n"
         equationNr = 1
         return resStr, equationNr
 

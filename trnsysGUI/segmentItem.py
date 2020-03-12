@@ -1,3 +1,4 @@
+import sys
 from math import sqrt
 
 from PyQt5 import Qt, QtGui, QtCore
@@ -10,7 +11,6 @@ from trnsysGUI.CornerItem import CornerItem
 # from trnsysGUI.deleteConnectionCommand import DeleteConnectionCommand
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 from trnsysGUI.segmentDlg import segmentDlg
-# TODO : combine segments when horizontal
 
 def calcDist(p1, p2):
     vec = p1 - p2
@@ -80,7 +80,10 @@ class segmentItem(QGraphicsLineItem):
         self.label.setVisible(False)
         self.label.setFlag(self.ItemIsMovable, True)
 
-        self.oldX = None
+        self.labelMass = QGraphicsTextItem(self.parent.fromPort)
+        self.labelMass.setVisible(False)
+        self.labelMass.setFlag(self.ItemIsMovable, True)
+
         self.setToolTip(self.parent.displayName)
 
     def segLength(self):
@@ -230,6 +233,7 @@ class segmentItem(QGraphicsLineItem):
         # print("mouse moved")
         # print(str(e.button()))
 
+        print(self.parent.parent.editorMode)
         if self.keyPr == 1:
             print("moved with button 1")
             newPos = e.pos()
@@ -241,8 +245,12 @@ class segmentItem(QGraphicsLineItem):
                     self.dragInMode0(newPos)
 
             elif self.parent.parent.editorMode == 1:
-                print(len(self.parent.segments))
+                # print(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
+                    if not self.startNode.parent.isVisible():
+                        self.startNode.parent.setVisible(True)
+                    if not self.endNode.parent.isVisible():
+                        self.endNode.parent.setVisible(True)
                     if self.isVertical():
                         print("Segment is vertical")
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
@@ -273,6 +281,9 @@ class segmentItem(QGraphicsLineItem):
             else:
                 print("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
+    def mouseDoubleClickEvent(self, event):
+        self.parent.deleteConn()
+
     def deleteNextHorizSeg(self, b, nextS):
         if b:
             pass
@@ -284,6 +295,7 @@ class segmentItem(QGraphicsLineItem):
             self.startNode.setNext(self.endNode)
             self.endNode.setPrev(self.startNode)
 
+            # x-position of the ending point of the next segment line
             posx1 = self.parent.segments[self.parent.segments.index(self) + 2].line().p2().x()
 
             self.parent.parent.diagramScene.removeItem(nextS)
@@ -351,17 +363,23 @@ class segmentItem(QGraphicsLineItem):
                 if self.isHorizontal():
                     if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                             nextHorizSeg = self.parent.segments[self.parent.segments.index(self) + 2]
-                            if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
-                                    self.endNode.parent.pos().y()):
+                            # if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
+                            #         self.endNode.parent.pos().y()): # TODO : Edit here to combine segment
                                 # print("Next h seg could be deleted")
+                            if nextHorizSeg.isHorizontal() and \
+                                    int(self.endNode.parent.pos().y()-10) <= int(nextHorizSeg.line().p2().y()) <= int(
+                                    self.endNode.parent.pos().y()+10):
                                 self.deleteNextHorizSeg(False, nextHorizSeg)
+                                print("next horizontal")
                                 return
 
                             prevHorizSeg = self.parent.segments[self.parent.segments.index(self) - 2]
-                            if prevHorizSeg.isHorizontal() and int(prevHorizSeg.line().p2().y()) == int(
-                                    self.startNode.parent.pos().y()):
+                            if prevHorizSeg.isHorizontal() and \
+                                    int(self.startNode.parent.pos().y()-10) <= int(prevHorizSeg.line().p2().y()) <= int(
+                                    self.startNode.parent.pos().y() + 10):
                                 # print("Prev h seg could be deleted")
                                 self.deletePrevHorizSeg(False, prevHorizSeg)
+                                print("previous horizontal")
                                 return
 
                 if self.secondCorner is not None:

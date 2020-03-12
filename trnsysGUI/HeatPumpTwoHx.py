@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QTransform
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
@@ -16,6 +16,10 @@ class HeatPumpTwoHx(BlockItem):
         self.outputs.append(PortItem('o', 0, self))
         self.outputs.append(PortItem('o', 2, self))
         self.outputs.append(PortItem('o', 2, self))
+
+        my_transform = QTransform()
+        my_transform.rotate(90)
+        self.image = self.image.transformed(my_transform)
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -48,8 +52,8 @@ class HeatPumpTwoHx(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 4 * h / 15 - 4* h / 15 * self.flippedV + 11/16 * h *self.flippedV)
-        self.inputs[1].setPos(20 +2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.2 * h - 0.2 * h * self.flippedV + 0.8 * h * self.flippedV)
+        self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 4 * h / 15 - 4 * h / 15 * self.flippedV + 11/16 * h *self.flippedV)
+        self.inputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.2 * h - 0.2 * h * self.flippedV + 0.8 * h * self.flippedV)
         self.inputs[2].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.4 * h - 0.4 * h * self.flippedV + 0.6 * h * self.flippedV)
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.inputs[1].side = 2 - 2 * self.flippedH

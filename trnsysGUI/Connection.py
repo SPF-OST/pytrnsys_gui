@@ -1,3 +1,4 @@
+import sys
 from math import atan, sqrt, acos
 
 from PyQt5.QtCore import QLineF, QPointF
@@ -92,6 +93,9 @@ class Connection(object):
         self.cornersLoad = None
         self.labelPosLoad = None
 
+        self.mass = 0 # comment out
+        self.temperature = 0
+
         # A new connection is created if there are no kwargs
         if kwargs == {}:
             # print("New connection being created")
@@ -132,13 +136,46 @@ class Connection(object):
         for s in self.segments:
             s.label.setPlainText(newName)
 
+    # comment out
+    def setMass(self, mass):
+        self.mass = mass
+        for s in self.segments:
+            s.labelMass.setPlainText(self.mass)
+
+    def setMassAndTemperature(self, mass, temp):
+        self.mass = mass
+        self.temperature = temp
+        for s in self.segments:
+            s.labelMass.setPlainText("M: %s   T: %s" % (self.mass, self.temperature))
+
+
     def setDisplayName(self, newName):
         self.displayName = newName
         self.updateSegLabels()
 
     def setLabelPos(self, tup):
+        posOffset = 10
         if len(self.segments) > 0:
-            self.segments[0].label.setPos(tup[0], tup[1])
+            self.segments[0].label.setPos(tup[0]+posOffset, tup[1]+posOffset)
+
+    # comment out
+    def setMassLabelPos(self, tup):
+        posOffset = 15
+        if len(self.segments) > 0:
+            if self.fromPort.side == 1:
+                self.segments[0].labelMass.setPos(tup[0], tup[1] - posOffset)
+            elif self.fromPort.side == 0:
+                if self.fromPort.parent.flippedV:
+                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
+                else:
+                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
+            elif self.fromPort.side == 2:
+                if self.fromPort.parent.flippedH:
+                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
+                else:
+                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
+            else:
+                self.segments[0].labelMass.setPos(tup[0], tup[1])
 
     def setStartPort(self, newStartPort):
         self.fromPort = newStartPort
@@ -162,6 +199,28 @@ class Connection(object):
                 col = QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
                 col = QColor(142, 142, 142) # Gray
+            elif kwargs["mfr"] == "minToMedian":
+                col = QColor(140, 255, 255)  # light blue
+            elif kwargs["mfr"] == "medianToMax":
+                col = QColor(255, 140, 140)  # pink
+            elif kwargs["mfr"] == "min":
+                col = QColor(0, 0, 255)  # blue
+            elif kwargs["mfr"] == "max":
+                col = QColor(255, 0, 0)  # red
+            elif kwargs["mfr"] == "test":
+                col = QColor(255, 255, 255)  # red
+            # elif kwargs["mfr"] == "negMinToLower":
+            #     col = QColor(0, 0, 0)  # Black
+            # elif kwargs["mfr"] == "negLowerToMedian":
+            #     col = QColor(47, 47, 73)  # Lighter black
+            # elif kwargs["mfr"] == "negMedianToUpper":
+            #     col = QColor(78, 78, 97)  # even lighter black
+            # elif kwargs["mfr"] == "negUpperToMax":
+            #     col = QColor(100, 100, 114)  # even even lighter black
+            # elif kwargs["mfr"] == "negMaxToZero":
+            #     col = QColor(115, 115, 124)  # darker than gray
+            # elif kwargs["mfr"] == "zeroToMin":
+            #     col = QColor(156, 156, 164)  # lighter than gray
             else:
                 # PosMfr
                 col = QColor(255, 0, 0)
@@ -286,6 +345,7 @@ class Connection(object):
 
         if self.labelPosLoad is not None:
             self.setLabelPos(self.labelPosLoad)
+            self.setMassLabelPos(self.labelPosLoad) # comment out
 
         # Still not tested
         # self.correctPorts()
@@ -721,8 +781,6 @@ class Connection(object):
                             self.parent.diagramScene.addItem(s.secondChild)
 
                             # print("Points are " + str(qp1) + str(qp2) + str(qp1_) + str(qp2_))
-
-                            # TODO: Fix division through zero
                             # eps1 = 1
                             # if (abs(qp2.x() - qp1.x()) > eps1) and (abs(qp2_.x() - qp1_.x()) > eps1) :
 
@@ -1329,6 +1387,9 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
+
+
+
 
 
 class DeleteConnectionCommand(QUndoCommand):
