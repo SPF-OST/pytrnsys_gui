@@ -8,6 +8,7 @@ class TVentilDlg(QDialog):
         super(TVentilDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
         self.block = block
+        self.valvePosition = self.block.positionForMassFlowSolver
         self.le = QLineEdit(self.block.label.toPlainText())
         self.setWindowIcon(QIcon(block.pixmap))
         self.okButton = QPushButton("OK")
@@ -36,6 +37,10 @@ class TVentilDlg(QDialog):
         flipLayout.addWidget(self.complexDivLabel)
         flipLayout.addWidget(self.complexDiv)
 
+        textLayout = QHBoxLayout()
+        self.warningLabel = QLabel("<b>Selecting tempering valve will always set Valve Position to 0.</b>")
+        textLayout.addWidget(self.warningLabel)
+
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.okButton)
@@ -44,13 +49,14 @@ class TVentilDlg(QDialog):
         tab1Layout.addWidget(nameLabel, 0, 0)
         tab1Layout.addWidget(self.le, 0, 1)
         tab1Layout.addLayout(flipLayout, 1, 0, 3, 0)
+        tab1Layout.addLayout(textLayout, 3, 0, 3, 0)
 
         positionLayout = QHBoxLayout()
         self.positionMassFlowSolverLabel = QLabel("Valve Position")
         self.positionMassFlowSolver = QDoubleSpinBox()
         self.positionMassFlowSolver.setDecimals(1)
         self.positionMassFlowSolver.setSingleStep(0.1)
-        self.positionMassFlowSolver.setProperty("value", 1.0)
+        self.positionMassFlowSolver.setProperty("value", self.valvePosition)
         self.positionMassFlowSolver.setRange(0,1.0)
         self.positionMassFlowSolver.valueChanged.connect(self.positionMassFlowSolverChanged)
         positionLayout.addWidget(self.positionMassFlowSolverLabel)
@@ -75,7 +81,7 @@ class TVentilDlg(QDialog):
         self.layout2.addLayout(buttonLayout, 2, 0, 3, 0)
         self.setLayout(self.layout2)
 
-        self.setFixedSize(340, 180)
+        self.setFixedSize(400, 180)
 
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
@@ -90,6 +96,8 @@ class TVentilDlg(QDialog):
         newName = self.le.text()
         self.block.label.setPlainText(newName)
         self.block.displayName = newName
+        if self.block.isTempering:
+            self.block.setPositionForMassFlowSolver(0)
         self.close()
 
     def setNewFlipStateH(self, state):
@@ -102,7 +110,11 @@ class TVentilDlg(QDialog):
         self.block.setComplexDiv(state)
 
     def positionMassFlowSolverChanged(self,value):
-        self.block.setPositionForMassFlowSolver(value)
+        if self.block.isTempering:
+            self.block.setPositionForMassFlowSolver(0)
+        else:
+            self.block.setPositionForMassFlowSolver(value)
+
 
     def cancel(self):
         self.close()

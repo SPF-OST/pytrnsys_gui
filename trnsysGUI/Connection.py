@@ -661,6 +661,39 @@ class Connection(object):
             corner3.setPos(p3)
             corner4.setPos(p4)
 
+        # elif self.fromPort.side == 1:
+        #     print("NiceConn from 1")
+        #     portOffset = 30
+        #     self.clearConn()
+        #
+        #     corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
+        #
+        #     seg1 = segmentItem(self.startNode, corner1.node, self)
+        #     seg2 = segmentItem(corner1.node, self.endNode, self)
+        #
+        #     self.startNode.setNext(corner1.node)
+        #     self.endNode.setPrev(corner1.node)
+        #
+        #     self.parent.diagramScene.addItem(seg1)
+        #     self.parent.diagramScene.addItem(seg2)
+        #     self.parent.diagramScene.addItem(corner1)
+        #
+        #     pos1 = self.fromPort.scenePos()
+        #     pos2 = self.toPort.scenePos()
+        #
+        #     p1 = QPointF(pos1.x(), pos2.y())  # position of the connecting node
+        #
+        #     seg1.setLine(QLineF(pos1, p1))
+        #     seg2.setLine(QLineF(p1, pos2))
+        #
+        #     corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+        #     corner1.setZValue(100)
+        #     self.fromPort.setZValue(100)
+        #     self.toPort.setZValue(100)
+        #
+        #     corner1.setPos(p1)
+        #     self.firstS = self.getFirstSeg()
+
         else:
         # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
         #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
