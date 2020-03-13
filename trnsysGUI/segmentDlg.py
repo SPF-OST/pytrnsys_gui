@@ -33,7 +33,8 @@ class segmentDlg(QDialog):
         newName = self.le.text()
         if newName != "" and not self.nameExists(newName):
             self.seg.parent.setDisplayName(newName)
-            self.seg.setToolTip(newName)
+            for segment in self.seg.parent.segments:
+                segment.setToolTip(newName)
             self.close()
         elif newName == "":
             msgb = QMessageBox()
