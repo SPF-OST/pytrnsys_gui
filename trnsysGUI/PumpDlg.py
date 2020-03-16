@@ -63,7 +63,6 @@ class PumpDlg(QDialog):
         self.layout2.addLayout(buttonLayout, 2, 0, 3, 0)
         self.setLayout(self.layout2)
 
-        self.setFixedSize(300, 150)
 
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
