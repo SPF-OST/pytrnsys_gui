@@ -19,6 +19,8 @@ class Pump(BlockItem):
         self.w = 33
         self.h = 33
         self.typeNumber = 1
+        self.rndPwr = np.random.randint(0, 1000)
+        self.resStr = "Mfr" + self.displayName + " = " + str(self.rndPwr) + "\n"
 
         self.exportInitialInput = 0.0
 
@@ -67,9 +69,8 @@ class Pump(BlockItem):
         return f, equationNr
 
     def exportMassFlows(self):
-        resStr = "Mfr" + self.displayName + " = " + str(np.random.randint(0, 1000)) + "\n"
         equationNr = 1
-        return resStr, equationNr
+        return self.resStr, equationNr
 
     def exportInputsFlowSolver1(self):
         temp1 = "Mfr" + self.displayName

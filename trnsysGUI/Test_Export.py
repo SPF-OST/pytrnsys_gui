@@ -6,6 +6,8 @@ class Test_Export(object):
     """
     Just a class that contains the method for testing.
     No need to declare or pass anything.
+    Parameters should be passed into the individual functions to avoid unnecessary instantiotion
+    of class.
     """
     testPassed = True
 
@@ -105,7 +107,6 @@ class Test_Export(object):
                     break
             if found:
                 if not filecmp.cmp(exportedFileList[i], originalFileList[j], shallow=False):
-                    # TODO : check the first 5 characters of the differences here
                     fileOne = open(exportedFileList[i])
                     fileTwo = open(originalFileList[j])
 
@@ -117,6 +118,7 @@ class Test_Export(object):
                             if fileOneLine.split(' = ')[0][:5] != 'MfrPu':
                                 self.testPassed = False
                                 fileErrorList.append(i)
+                                break
 
                         fileOneLine = fileOne.readline()
                         fileTwoLine = fileTwo.readline()

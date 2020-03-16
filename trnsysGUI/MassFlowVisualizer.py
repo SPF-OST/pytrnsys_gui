@@ -188,23 +188,19 @@ class MassFlowVisualizer(QDialog):
                         temperature = str(round(self.tempMassFlowData['T' + t.displayName].iloc[self.timeStep]))
                         print("Found connection in ts " + str(self.timeStep) + " " + str(i))
                         print("mass flow value of %s : " % t.displayName)
+                        t.setMassAndTemperature(mass, temperature)
                         if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
                             t.setColor(mfr="ZeroMfr")
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.maxValue:
                             t.setColor(mfr="max")
-                            t.setMassAndTemperature(mass, temperature)
                         elif round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) == self.minValue:
                             t.setColor(mfr="min")
-                            t.setMassAndTemperature(mass, temperature)
                         elif self.minValue < round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) <= self.medianValue:
                             t.setColor(mfr="minToMedian")
-                            t.setMassAndTemperature(mass, temperature)
                         elif self.medianValue < round(abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep])) < self.maxValue:
                             t.setColor(mfr="medianToMax")
-                            t.setMassAndTemperature(mass, temperature)
                         else:
                             t.setColor(mfr="test")
-                            t.setMassAndTemperature(mass, temperature)
                         i += 1
 
         else:

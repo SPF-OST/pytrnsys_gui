@@ -160,12 +160,13 @@ class Connection(object):
 
     # comment out
     def setMassLabelPos(self, tup):
-        posOffset = 15
+        posOffset = 50
+        posOffsetY = 15
         if len(self.segments) > 0:
             if self.fromPort.side == 1:
-                self.segments[0].labelMass.setPos(tup[0], tup[1] - posOffset)
+                self.segments[0].labelMass.setPos(tup[0], tup[1] - posOffsetY)
             elif self.fromPort.side == 0:
-                if self.fromPort.parent.flippedV:
+                if self.fromPort.parent.flippedH:
                     self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
                 else:
                     self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])

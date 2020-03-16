@@ -221,6 +221,8 @@ class BlockItem(QGraphicsPixmapItem):
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
             dia = self.parent.parent().showTVentilDlg(self)
+        elif self.name == 'Pump':
+            dia = self.parent.parent().showPumpDlg(self)
         else:
             dia = self.parent.parent().showBlockDlg(self)
 

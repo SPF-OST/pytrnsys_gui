@@ -19,6 +19,7 @@ from pathlib import Path
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.DeepInspector import DeepInspector
@@ -2112,6 +2113,9 @@ class DiagramEditor(QWidget):
     def showBlockDlg(self, bl):
         c = BlockDlg(bl, self)
 
+    def showPumpDlg(self, bl):
+        c = PumpDlg(bl, self)
+
     def showDiagramDlg(self):
         c = diagramDlg(self)
 
@@ -2995,7 +2999,6 @@ class MainWindow(QMainWindow):
             fileToDelete = min(list_of_files, key=os.path.getmtime)
             os.remove(fileToDelete)
 
-        print(latest_file)
         try:
             latest_file
         except FileNotFoundError:
