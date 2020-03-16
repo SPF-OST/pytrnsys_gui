@@ -49,3 +49,245 @@ Differences:
 Reason for change:
 test
 ==============================================================
+==============================================================
+16/03/2020 10:51:09
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\ASHP+Tes.dck
+
+Differences:
+30:EQUATIONS 10
+32:TsupplyWater = TCW
+33:TRadFloor=1 
+34:THp=1 
+35:THxDhw=1
+36:TPortLeft98=1
+37:TPortLeft44=1
+38:TPortRight30=1
+39:TPortLeft67=1
+40:TPortLeft0=1
+41:TPortRight5=1
+42:
+43:EQUATIONS 3
+44:*** Pump outlet temperatures
+45:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:15
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\Combi+1Tes.dck
+
+Differences:
+30:EQUATIONS 7
+33:TsupplyWater = TCW
+34:TRadFloor=1 
+35:THxDhw=1
+36:THxSolar=1
+37:TPortRight30=1
+38:TPortRight5=1
+39:
+40:EQUATIONS 3
+41:*** Pump outlet temperatures
+42:TPuCol = TPiTesToCol
+43:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:20
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\Combi+2Tes.dck
+
+Differences:
+30:EQUATIONS 12
+33:TsupplyWater = TCW
+34:TRadFloor=1 
+35:TBoiler=1 
+36:TShPortLeft100=1
+37:TShPortRight100=1
+38:TShPortLeft0=1
+39:TShPortRight0=1
+40:T642=1
+41:T689=1
+42:TDhwPortLeft90=1
+43:TDhwPortLeft70=1
+44:
+45:EQUATIONS 4
+46:*** Pump outlet temperatures
+47:TPuCol = TPiTesToCol
+48:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:26
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\DHWSolar+Tes.dck
+
+Differences:
+30:EQUATIONS 5
+33:TsupplyWater = TCW
+34:THxSolar=1
+35:TDhwPortRight100=1
+36:TDhwPortRight0=1
+37:
+38:EQUATIONS 2
+39:*** Pump outlet temperatures
+40:TPuCol = TPiTesToCol
+41:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:31
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\GSHP+Tes.dck
+
+Differences:
+30:EQUATIONS 12
+32:TsupplyWater = TCW
+33:TRadFloor=1 
+34:THxDhw=1
+35:TPortLeft98=1
+36:TPortLeft44=1
+37:TPortRight30=1
+38:TPortLeft67=1
+39:TPortLeft0=1
+40:TPortRight5=1
+41:THpX0=1 
+42:THpX1=1 
+43:TGhx=1 
+44:
+45:EQUATIONS 4
+46:*** Pump outlet temperatures
+47:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:36
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\SASHP+2Tes.dck
+
+Differences:
+30:EQUATIONS 12
+33:TsupplyWater = TCW
+34:TRadFloor=1 
+35:TShPortLeft100=1
+36:TShPortRight100=1
+37:TShPortLeft0=1
+38:TShPortRight0=1
+39:T642=1
+40:T689=1
+41:TDhwPortLeft90=1
+42:TDhwPortLeft70=1
+43:THp=1 
+44:
+45:EQUATIONS 4
+46:*** Pump outlet temperatures
+47:TPuCol = TPiTesToCol
+48:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:40
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\SASHP+Tes.dck
+
+Differences:
+30:EQUATIONS 12
+33:TsupplyWater = TCW
+34:TRadFloor=1 
+35:THp=1 
+36:THxDhw=1
+37:THxSolar=1
+38:TPortLeft98=1
+39:TPortLeft44=1
+40:TPortRight30=1
+41:TPortLeft67=1
+42:TPortLeft0=1
+43:TPortRight5=1
+44:
+45:EQUATIONS 4
+46:*** Pump outlet temperatures
+47:TPuCol = TPiTesToCol
+48:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:45
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\SGSHP+2Tes.dck
+
+Differences:
+30:EQUATIONS 14
+33:TsupplyWater = TCW
+34:TRadFloor=1 
+35:TShPortLeft100=1
+36:TShPortRight100=1
+37:TShPortLeft0=1
+38:TShPortRight0=1
+39:THxSolar=1
+40:THxDhw=1
+41:TDhwPortLeft90=1
+42:TDhwPortLeft70=1
+43:THPX0=1 
+44:THPX1=1 
+45:TGhx=1 
+46:
+47:EQUATIONS 5
+48:*** Pump outlet temperatures
+49:TPuCol = TPiTesToCol
+50:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================
+==============================================================
+16/03/2020 10:51:50
+
+Name of file:
+U:\Desktop\TrnsysGUI\trnsysGUI\Reference\SGSHP+Tes.dck
+
+Differences:
+30:EQUATIONS 14
+33:TsupplyWater = TCW
+34:TRadFloor=1 
+35:THxDhw=1
+36:THxSolar=1
+37:TPortLeft98=1
+38:TPortLeft44=1
+39:TPortRight30=1
+40:TPortLeft67=1
+41:TPortLeft0=1
+42:TPortRight5=1
+43:THpX0=1 
+44:THpX1=1 
+45:TGhx=1 
+46:
+47:EQUATIONS 5
+48:*** Pump outlet temperatures
+49:TPuCol = TPiTesToCol
+50:TWTapTop = TPiDhwDemand
+
+Reason for change:
+After cold water temperature export problem fixed
+==============================================================

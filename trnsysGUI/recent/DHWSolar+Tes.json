@@ -184,6 +184,39 @@
             "size_h": 160.0,
             "trnsysID": 317
         },
+        "Block-811": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "StorageTank811",
+            "BlockName": "StorageTank",
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "HxList": [
+                {
+                    "DisplayName": "812",
+                    "Height": 60.0,
+                    "ID": 812,
+                    "Offset": [
+                        0.0,
+                        40.0
+                    ],
+                    "ParentID": 811,
+                    "Port1ID": 813,
+                    "Port2ID": 814,
+                    "SideNr": 0,
+                    "Width": 40,
+                    "connTrnsysID": 341
+                }
+            ],
+            "ID": 811,
+            "PortPairList": [],
+            "StoragePosition": [
+                -875.0,
+                -107.0
+            ],
+            "size_h": 100.0,
+            "trnsysID": 340
+        },
         "Connection-109": {
             ".__ConnectionDict__": true,
             "ConnCID": 102,
@@ -200,15 +233,15 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                13.0,
-                -53.0
+                23.0,
+                -43.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 21,
             "PortToID": 12,
             "SegmentPositions": [
                 [
-                    -533.0,
+                    -538.0,
                     -376.0,
                     -533.0,
                     -376.0
@@ -245,8 +278,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -84.0,
-                -33.0
+                -74.0,
+                -23.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 17,
@@ -267,8 +300,8 @@
                 [
                     -385.0,
                     -334.575,
-                    -500.0,
-                    -334.575
+                    -510.0,
+                    -333.875
                 ]
             ],
             "isVirtualConn": false,
@@ -290,8 +323,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 6,
@@ -299,7 +332,7 @@
             "SegmentPositions": [
                 [
                     -951.0,
-                    -350.0,
+                    -348.5,
                     -1000.0,
                     -350.0
                 ],
@@ -335,8 +368,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 13,
@@ -358,7 +391,7 @@
                     -313.0,
                     -493.095,
                     -342.0,
-                    -493.095
+                    -493.5
                 ]
             ],
             "isVirtualConn": false,
@@ -380,8 +413,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 5,
@@ -389,7 +422,7 @@
             "SegmentPositions": [
                 [
                     -903.0,
-                    -350.0,
+                    -348.5,
                     -852.0,
                     -350.0
                 ],
@@ -433,8 +466,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                36.0,
-                -25.0
+                46.0,
+                -15.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 2,
@@ -490,8 +523,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 19,
@@ -499,7 +532,7 @@
             "SegmentPositions": [
                 [
                     -566.0,
-                    -334.575,
+                    -333.875,
                     -625.5,
                     -334.575
                 ],
@@ -535,8 +568,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 799,
@@ -582,10 +615,10 @@
             ]
         },
         "IDs": {
-            "GlobalId": 955,
+            "GlobalId": 818,
             "__idDct__": true,
-            "globalConnID": 309,
-            "trnsysID": 388
+            "globalConnID": 278,
+            "trnsysID": 342
         },
         "Strings": {
             "DiagramName": "DHWSolar+Tes",

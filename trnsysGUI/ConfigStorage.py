@@ -14,7 +14,8 @@ class ConfigStorage(QDialog):
         self.m = 0
 
         # Parameters:
-        self.w_hx = 10
+        self.w_hx = 40
+        self.w_inc = 10
         self.h_hx = 100
 
         spacerHeight = 15
@@ -272,6 +273,12 @@ class ConfigStorage(QDialog):
         -------
 
         """
+        if float(self.offsetLeI.text()) > 100:
+            self.offsetLeI.setText('100')
+
+        if float(self.offsetLeO.text()) < 0:
+            self.offsetLeO.setText('0')
+
         if self.minOffsetDistance() and float(self.offsetLeI.text()) > float(self.offsetLeO.text() and self.offsetsInRange()):
             print("Adding hx")
             if self.rButton.isChecked():
@@ -328,6 +335,12 @@ class ConfigStorage(QDialog):
         self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%d" %(float(self.offsetLeI.text())) + "%")
 
     def manAddPortPair(self):
+        if float(self.manPortLeI.text()) > 100:
+            self.manPortLeI.setText('100')
+
+        if float(self.manPortLeO.text()) < 0:
+            self.manPortLeO.setText('0')
+
         if float(self.manPortLeI.text()) > float(self.offsetLeO.text()):
             self.storage.setSideManualPair(self.manlButton.isChecked(),
                                            (1 - 1 / 100 * float(self.manPortLeI.text())) * self.storage.h,
@@ -497,18 +510,18 @@ class ConfigStorage(QDialog):
     # self.storage.h -= self.h_hx
     # self.storage.updateImage(-self.h_hx)
     def incrSize(self):
-        self.storage.updatePortPositionsHW(self.h_hx, self.w_hx)
+        self.storage.updatePortPositionsHW(self.h_hx, self.w_inc)
         self.storage.updateHxLines(self.h_hx)
         self.storage.h += self.h_hx
-        self.storage.w += self.w_hx
+        self.storage.w += self.w_inc
         self.storage.updateImage()
 
     # Unused
     def decrSize(self):
-        self.storage.updatePortPositionsDecHW(self.h_hx, self.w_hx)
+        self.storage.updatePortPositionsDecHW(self.h_hx, self.w_inc)
         self.storage.updateHxLines(-self.h_hx)
         self.storage.h -= self.h_hx
-        self.storage.w -= self.w_hx
+        self.storage.w -= self.w_inc
         self.storage.updateImage()
 
     def acceptedEdit(self):
