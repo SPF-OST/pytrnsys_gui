@@ -18,8 +18,11 @@ class Type1924_TesPlugFlow():
         self.sLine="*****************************************************\n"
         self.extension="ddck"
 
+<<<<<<< HEAD
         self.setDefault()
 
+=======
+>>>>>>> d565a89725f340f8bf81de0ab4bc92aff9a0bf73
     def setInputs(self,inputs,connectorsPort,connectorsHx,connectorsAux):
 
         self.inputs=inputs
@@ -68,8 +71,8 @@ class Type1924_TesPlugFlow():
 
         lines = "*********Constant of DIRECT PORT=%d***********\n" % (idPort + 1)
 
-        line = "CONSTANTS 1\n";lines=lines+line
-        # line = "cpDp%d_Tes%d=zero \n"%(idPort+1,nTes);lines=lines+line
+        line = "CONSTANTS 2\n";lines=lines+line
+        line = "cpDp%d_Tes%d=zero \n"%(idPort+1,nTes);lines=lines+line
         line = "Dp%dStrat_Tes%d=0 ! 0: no forced stratification ; 1: force to stratify\n"%(idPort+1,nTes);lines=lines+line
 
 
@@ -136,7 +139,7 @@ class Type1924_TesPlugFlow():
         line = "dUaMfrHx%d_Tes%d=0.375 ! only if modHx%d=0\n"%(idHx,nTes,idHx);lines=lines+line
         line = "dUadTHx%d_Tes%d=0.0 ! only if modHx%d=0\n"%(idHx,nTes,idHx);lines=lines+line
         line = "dUaTHx%d_Tes%d=0.458 ! only if modHx%d=0\n"%(idHx,nTes,idHx);lines=lines+line
-        line = "UaHx%d_Tes%d=1105*ratioTes ! kJ/hK only if modHx%d=0\n"%(idHx,nTes,idHx);lines=lines+line
+        line = "UaHx%d_Tes%d=1105 ! kJ/hK only if modHx%d=0\n"%(idHx,nTes,idHx);lines=lines+line
 
         line = "startUpHx%d_Tes%d=0. ! only if modHx%d=0\n"%(idHx,nTes,idHx);lines=lines+line
 
@@ -299,14 +302,13 @@ class Type1924_TesPlugFlow():
 
         lines=""
         line=self.sLine+"************ AUXILIAR HEATING**********\n"
-        if(nHeatSources>0):
-            line="CONSTANTS %d\n"%(nHeatSources*2);lines=lines+line
+        line="CONSTANTS %d\n"%(nHeatSources*2);lines=lines+line
 
-            for i in range(nHeatSources):
-                line="zAux%d_Tes%d=%.2f !connectDDck\n" %(i+1,nTes,connectorAux[i]["zAux"]);lines=lines+line
-                line="qAux%d_Tes%d=%.2f !connectDDck\n" %(i+1,nTes,connectorAux[i]["qAux"]);lines=lines+line
+        for i in range(nHeatSources):
+            line="zAux%d_Tes%d=%.2f !connectDDck\n" %(i+1,nTes,connectorAux[i]["zAux"]);lines=lines+line
+            line="qAux%d_Tes%d=%.2f !connectDDck\n" %(i+1,nTes,connectorAux[i]["qAux"]);lines=lines+line
 
-            line = "\n";lines = lines + line
+        line = "\n";lines = lines + line
 
         return lines
 
@@ -379,14 +381,13 @@ class Type1924_TesPlugFlow():
 
     def getInputs(self,inputs):
 
-        nInputs=69
         nHx=inputs["nHx"]
         nTes=inputs["nTes"]
         nPorts=inputs["nPorts"]
         nHeatSources=inputs["nHeatSources"]
 
         lines=""
-        line = "INPUTS %d\n"%nInputs;lines=lines+line
+        line = "INPUTS 69\n";lines=lines+line
         line = "************10 DIRECT PORTS INPUTS***************\n";lines=lines+line
 
         for idPort in range(self.nMaxPorts): #This adds 30 inputs
@@ -395,8 +396,13 @@ class Type1924_TesPlugFlow():
 
             else:
                 line = "zero zero zero\n"
+<<<<<<< HEAD
             lines = lines + line
         lines = lines + "****************\nTroomStore" #This adds one input
+=======
+                lines = lines + line
+        lines = lines + "****************\nTroomStore"
+>>>>>>> d565a89725f340f8bf81de0ab4bc92aff9a0bf73
         lines = lines + "\n***************** 6 HX INPUTS ******************\n"
 
         for idHx in range(self.nMaxHx): #This adds 18 inputs
@@ -415,15 +421,12 @@ class Type1924_TesPlugFlow():
             lines = lines + line
         lines = lines + "\n"
 
-        lines = lines + "****************** INTIAL INPUTS***********************\n"
+        line = lines + "****************** INTIAL INPUTS"
 
         for i in range(69):
             line = "zero "; lines=lines+line
             if(i==9 or i==19 or i==29 or i==39 or i==49 or i==59 or i==69):
                 line="\n"; lines=lines+line
-
-        line = "\n";
-        lines = lines + line
 
         return lines
 
@@ -469,8 +472,7 @@ class Type1924_TesPlugFlow():
         #     counter=counter+1
 
         nEq = nHx*2
-        if(nEq>0):
-            line="EQUATIONS %d\n"%nEq;lines=lines+line
+        line="EQUATIONS %d\n"%nEq;lines=lines+line
 
         counter=102
         for idHx in range(nHx):
@@ -566,10 +568,8 @@ class Type1924_TesPlugFlow():
         line  = self.sLine+"**************** Parameters of Type1924 ********************\n"+self.sLine
         lines = lines+line
 
-        lines = lines + "CONSTANTS 3\n"
-        line = "TRoomStore=15 ! @userDefined\n";lines = lines+line
-        line = "VStoreRef = 0.763\n";lines = lines+line
-        line = "ratioTes = Vol_Tes%d / VStoreRef\n"%(nTes);lines = lines+line
+        lines = lines + "CONSTANTS 1\n"
+        line="TRoomStore=15 ! @userDefined\n";lines = lines+line
 
         for idPort in range(self.nMaxPorts):
             if (idPort <= nPorts - 1):
