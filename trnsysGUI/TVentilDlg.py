@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget,QVBoxLayout,QWidget, QDoubleSpinBox
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget, \
+    QVBoxLayout, QWidget, QDoubleSpinBox, QMessageBox
 from PyQt5.QtGui import QIcon
 
 
@@ -94,11 +95,21 @@ class TVentilDlg(QDialog):
     def acceptedEdit(self):
         print("Changing displayName")
         newName = self.le.text()
-        self.block.label.setPlainText(newName)
-        self.block.displayName = newName
         if self.block.isTempering:
             self.block.setPositionForMassFlowSolver(0)
-        self.close()
+        if newName != "" and not self.nameExists(newName):
+            # self.block.setName(newName)
+            self.block.label.setPlainText(newName)
+            self.block.displayName = newName
+            self.close()
+        elif newName == "":
+            msgb = QMessageBox()
+            msgb.setText("Please Enter a name!")
+            msgb.exec()
+        elif self.nameExists(newName):
+            msgb = QMessageBox()
+            msgb.setText("Name already exist!")
+            msgb.exec()
 
     def setNewFlipStateH(self, state):
         self.block.updateFlipStateH(state)
@@ -118,3 +129,9 @@ class TVentilDlg(QDialog):
 
     def cancel(self):
         self.close()
+
+    def nameExists(self, n):
+        for t in self.parent().trnsysObj:
+            if str(t.displayName).lower() == n.lower():
+                return True
+        return False
