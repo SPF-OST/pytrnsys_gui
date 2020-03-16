@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QTransform
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
@@ -22,6 +22,10 @@ class TVentil(BlockItem):
         self.inputs.append(PortItem('o', 0, self))
         self.inputs.append(PortItem('o', 1, self))
         self.outputs.append(PortItem('i', 2, self))
+
+        my_transform = QTransform()
+        my_transform.rotate(180)
+        self.image = self.image.transformed(my_transform)
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))

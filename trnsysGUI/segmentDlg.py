@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QMessageBox
 
 
 class segmentDlg(QDialog):
@@ -33,15 +33,24 @@ class segmentDlg(QDialog):
         newName = self.le.text()
         if newName != "" and not self.nameExists(newName):
             self.seg.parent.setDisplayName(newName)
-            self.seg.setToolTip(newName)
-        self.close()
+            for segment in self.seg.parent.segments:
+                segment.setToolTip(newName)
+            self.close()
+        elif newName == "":
+            msgb = QMessageBox()
+            msgb.setText("Please Enter a name!")
+            msgb.exec()
+        elif self.nameExists(newName):
+            msgb = QMessageBox()
+            msgb.setText("Name already exist!")
+            msgb.exec()
 
     def cancel(self):
         self.close()
 
     def nameExists(self, n):
         for t in self.parent().trnsysObj:
-            if t.displayName == n:
+            if str(t.displayName).lower() == n.lower():
                 return True
         return False
 

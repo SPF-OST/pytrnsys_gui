@@ -1,3 +1,4 @@
+import sys
 from math import sqrt
 
 from PyQt5 import Qt, QtGui, QtCore
@@ -232,6 +233,7 @@ class segmentItem(QGraphicsLineItem):
         # print("mouse moved")
         # print(str(e.button()))
 
+        print(self.parent.parent.editorMode)
         if self.keyPr == 1:
             print("moved with button 1")
             newPos = e.pos()
@@ -245,6 +247,10 @@ class segmentItem(QGraphicsLineItem):
             elif self.parent.parent.editorMode == 1:
                 # print(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
+                    if not self.startNode.parent.isVisible():
+                        self.startNode.parent.setVisible(True)
+                    if not self.endNode.parent.isVisible():
+                        self.endNode.parent.setVisible(True)
                     if self.isVertical():
                         print("Segment is vertical")
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
@@ -275,6 +281,9 @@ class segmentItem(QGraphicsLineItem):
             else:
                 print("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
+    def mouseDoubleClickEvent(self, event):
+        self.parent.deleteConn()
+
     def deleteNextHorizSeg(self, b, nextS):
         if b:
             pass
@@ -286,6 +295,7 @@ class segmentItem(QGraphicsLineItem):
             self.startNode.setNext(self.endNode)
             self.endNode.setPrev(self.startNode)
 
+            # x-position of the ending point of the next segment line
             posx1 = self.parent.segments[self.parent.segments.index(self) + 2].line().p2().x()
 
             self.parent.parent.diagramScene.removeItem(nextS)
@@ -360,6 +370,7 @@ class segmentItem(QGraphicsLineItem):
                                     int(self.endNode.parent.pos().y()-10) <= int(nextHorizSeg.line().p2().y()) <= int(
                                     self.endNode.parent.pos().y()+10):
                                 self.deleteNextHorizSeg(False, nextHorizSeg)
+                                print("next horizontal")
                                 return
 
                             prevHorizSeg = self.parent.segments[self.parent.segments.index(self) - 2]
@@ -368,6 +379,7 @@ class segmentItem(QGraphicsLineItem):
                                     self.startNode.parent.pos().y() + 10):
                                 # print("Prev h seg could be deleted")
                                 self.deletePrevHorizSeg(False, prevHorizSeg)
+                                print("previous horizontal")
                                 return
 
                 if self.secondCorner is not None:

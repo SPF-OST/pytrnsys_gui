@@ -46,10 +46,22 @@ class WTap_main(BlockItem):
 
         return w, h
 
+    # def exportPumpOutlets(self):
+    #     return "", 0
+
+    # TODO : problem with running trnsys
     def exportPumpOutlets(self):
         resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
         equationNr = 1
         return resStr, equationNr
+        return "", 0
+
+    # def exportBlackBox(self):
+    #     # resStr = "T" + self.displayName + "HeatPump" + "=1 \n"
+    #     # resStr += "T" + self.displayName + "Evap" + "=1 \n"
+    #     resStr = "TsupplyWater = TCW\n"
+    #     eqNb = 1
+    #     return resStr, eqNb
 
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"

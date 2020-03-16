@@ -37,7 +37,8 @@ def calcDist(p1, p2):
     norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
     return norm
 
-
+# TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
+#  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
 
     def __init__(self, trnsysType, parent, **kwargs):
@@ -81,8 +82,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedH = False
         self.rotationN = 0
         self.flippedHInt = -1
+        self.flippedVInt = -1
 
-        # TODO : the current SVG images have a lot of white spaces around the image
         # self.imageSource = "images/" + self.name + ".png"
         # self.image = QImage("images/" + self.name)
         # self.pixmap = QPixmap(self.image)
@@ -220,6 +221,8 @@ class BlockItem(QGraphicsPixmapItem):
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
             dia = self.parent.parent().showTVentilDlg(self)
+        elif self.name == 'Pump':
+            dia = self.parent.parent().showPumpDlg(self)
         else:
             dia = self.parent.parent().showBlockDlg(self)
 
@@ -280,6 +283,10 @@ class BlockItem(QGraphicsPixmapItem):
         self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
+        if state == False:
+            self.flippedVInt = -1
+        else:
+            self.flippedVInt = 1
         self.changeSize()
 
     def updateSide(self, port, n):
@@ -415,6 +422,7 @@ class BlockItem(QGraphicsPixmapItem):
         Resizers are deleted inside mousePressEvent function inside core.py
 
         """
+        print("Inside Block Item mouse click")
         if self.name == 'GenericBlock' or self.name == 'StorageTank':
             return
         try:
@@ -427,11 +435,17 @@ class BlockItem(QGraphicsPixmapItem):
             return
 
     def setItemSize(self, w, h):
+        print("Inside block item set item size")
         self.w, self.h = w, h
+        # if h < 20:
+        #     self.h = 20
+        # if w < 40:
+        #     self.w = 40
 
     def updateImage(self):
+        print("Inside block item update image")
         if self.imageSource[-3:] == "svg":
-            self.image = QImage(self.imageSource)
+            # self.image = QImage(self.imageSource)
             self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
             # self.setPixmap(QPixmap(self.image))
             self.pixmap = QPixmap(self.image)
@@ -445,7 +459,12 @@ class BlockItem(QGraphicsPixmapItem):
         #     self.updateFlipStateV(self.flippedV)
 
     def deleteResizer(self):
-        del self.resizer
+        try:
+            self.resizer
+        except AttributeError:
+            print("No resizer")
+        else:
+            del self.resizer
 
 
     # Debug

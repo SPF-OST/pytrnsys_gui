@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QMessageBox
 from PyQt5.QtGui import QIcon
 
 class BlockDlg(QDialog):
@@ -55,7 +55,15 @@ class BlockDlg(QDialog):
             self.block.setName(newName)
             # self.block.label.setPlainText(newName)
             # self.block.displayName = newName
-        self.close()
+            self.close()
+        elif newName == "":
+            msgb = QMessageBox()
+            msgb.setText("Please Enter a name!")
+            msgb.exec()
+        elif self.nameExists(newName):
+            msgb = QMessageBox()
+            msgb.setText("Name already exist!")
+            msgb.exec()
 
     def setNewFlipStateH(self, state):
         self.block.updateFlipStateH(state)
@@ -68,6 +76,6 @@ class BlockDlg(QDialog):
 
     def nameExists(self, n):
         for t in self.parent().trnsysObj:
-            if t.displayName == n:
+            if str(t.displayName).lower() == n.lower():
                 return True
         return False

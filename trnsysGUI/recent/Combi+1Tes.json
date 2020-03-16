@@ -58,6 +58,72 @@
             "RotationN": 0,
             "trnsysID": 4
         },
+        "Block-1382": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "StorageTank1382",
+            "BlockName": "StorageTank",
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "HxList": [
+                {
+                    "DisplayName": "1383",
+                    "Height": 90.0,
+                    "ID": 1383,
+                    "Offset": [
+                        0.0,
+                        10.0
+                    ],
+                    "ParentID": 1382,
+                    "Port1ID": 1384,
+                    "Port2ID": 1385,
+                    "SideNr": 0,
+                    "Width": 10,
+                    "connTrnsysID": 526
+                }
+            ],
+            "ID": 1382,
+            "PortPairList": [],
+            "StoragePosition": [
+                -749.0,
+                -464.0
+            ],
+            "size_h": 100.0,
+            "trnsysID": 525
+        },
+        "Block-1396": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "StorageTank1396",
+            "BlockName": "StorageTank",
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "HxList": [
+                {
+                    "DisplayName": "1397",
+                    "Height": 60.0,
+                    "ID": 1397,
+                    "Offset": [
+                        0.0,
+                        40.0
+                    ],
+                    "ParentID": 1396,
+                    "Port1ID": 1398,
+                    "Port2ID": 1399,
+                    "SideNr": 0,
+                    "Width": 10,
+                    "connTrnsysID": 530
+                }
+            ],
+            "ID": 1396,
+            "PortPairList": [],
+            "StoragePosition": [
+                -1033.0,
+                -725.0
+            ],
+            "size_h": 100.0,
+            "trnsysID": 529
+        },
         "Block-14": {
             ".__BlockDict__": true,
             "BlockDisplayName": "WTapTop",
@@ -303,15 +369,15 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                60.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 21,
             "PortToID": 12,
             "SegmentPositions": [
                 [
-                    -433.0,
+                    -438.0,
                     -558.0,
                     -432.0,
                     -558.0
@@ -348,8 +414,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 17,
@@ -370,8 +436,8 @@
                 [
                     -385.0,
                     -516.575,
-                    -400.0,
-                    -516.575
+                    -410.0,
+                    -515.875
                 ]
             ],
             "isVirtualConn": false,
@@ -393,8 +459,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 6,
@@ -402,7 +468,7 @@
             "SegmentPositions": [
                 [
                     -959.0,
-                    -287.0,
+                    -285.5,
                     -1000.0,
                     -287.0
                 ],
@@ -438,8 +504,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                60.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 326,
@@ -483,15 +549,15 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                60.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 336,
             "PortToID": 325,
             "SegmentPositions": [
                 [
-                    -475.0,
+                    -480.0,
                     -127.0,
                     -476.0,
                     -127.0
@@ -528,8 +594,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                60.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 13,
@@ -551,7 +617,7 @@
                     -313.0,
                     -625.095,
                     -198.0,
-                    -625.095
+                    -625.5
                 ]
             ],
             "isVirtualConn": false,
@@ -573,8 +639,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 322,
@@ -596,7 +662,7 @@
                     -289.0,
                     -87.0,
                     -325.0,
-                    -87.0
+                    -85.5
                 ]
             ],
             "isVirtualConn": false,
@@ -618,8 +684,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 351,
@@ -627,7 +693,7 @@
             "SegmentPositions": [
                 [
                     -373.0,
-                    -87.0,
+                    -85.5,
                     -428.5,
                     -87.0
                 ],
@@ -640,8 +706,8 @@
                 [
                     -428.5,
                     -85.57499999999999,
-                    -442.0,
-                    -85.57499999999999
+                    -452.0,
+                    -84.875
                 ]
             ],
             "isVirtualConn": false,
@@ -663,8 +729,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 11,
@@ -708,8 +774,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 19,
@@ -717,7 +783,7 @@
             "SegmentPositions": [
                 [
                     -466.0,
-                    -516.575,
+                    -515.875,
                     -499.0,
                     -516.575
                 ],
@@ -753,8 +819,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 324,
@@ -798,8 +864,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 334,
@@ -807,7 +873,7 @@
             "SegmentPositions": [
                 [
                     -508.0,
-                    -85.57499999999999,
+                    -84.875,
                     -539.0,
                     -85.57499999999999
                 ],
@@ -843,8 +909,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -20.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 695,
@@ -888,8 +954,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                60.0,
+                40.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 5,
@@ -897,7 +963,7 @@
             "SegmentPositions": [
                 [
                     -911.0,
-                    -287.0,
+                    -285.5,
                     -792.0,
                     -287.0
                 ],
@@ -921,7 +987,7 @@
             ".__BlockDict__": true,
             "BlockName": "GraphicalItem",
             "BlockPosition": [
-                -594.0,
+                -595.0,
                 -558.0
             ],
             "FlippedH": false,
@@ -934,28 +1000,11 @@
                 69.0
             ]
         },
-        "GraphicalItem-777": {
-            ".__BlockDict__": true,
-            "BlockName": "GraphicalItem",
-            "BlockPosition": [
-                -830.0,
-                -497.0
-            ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "ID": 777,
-            "ImageSource": "C:/Daten/spfPackages/GIT/TrnsysGUI/trnsysGUI/images/ElectricRod.svg",
-            "RotationN": 0,
-            "Size": [
-                29.0,
-                29.0
-            ]
-        },
         "IDs": {
-            "GlobalId": 1328,
+            "GlobalId": 1403,
             "__idDct__": true,
-            "globalConnID": 392,
-            "trnsysID": 507
+            "globalConnID": 407,
+            "trnsysID": 531
         },
         "Strings": {
             "DiagramName": "Combi+1Tes",

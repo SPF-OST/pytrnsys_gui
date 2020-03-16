@@ -27,9 +27,10 @@ EQUATIONS 3
  cpWat=4200
  tRoomStore=20
 
-EQUATIONS 11
+EQUATIONS 12
 *** Black box component temperatures
 TCollector=1 
+TsupplyWater = TCW
 TRadFloor=1 
 THp=1 
 THxDhw=1
@@ -41,11 +42,10 @@ TPortLeft67=1
 TPortLeft0=1
 TPortRight5=1
 
-EQUATIONS 5
+EQUATIONS 4
 *** Pump outlet temperatures
 TPuCol = TPiTesToCol
 TWTapTop = TPiDhwDemand
-TWTapBottom = TPiDhwMains
 TPuBoiler = TPiDivHpToHp
 TPuSh = TPiRadFloorOut
 

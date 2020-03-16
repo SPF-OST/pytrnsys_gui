@@ -1,11 +1,28 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
+        "GraphicalItem-56": {
+            ".__BlockDict__": true,
+            "BlockName": "GraphicalItem",
+            "BlockPosition": [
+                -628.0,
+                -136.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "ID": 56,
+            "ImageSource": "gear.svg",
+            "RotationN": 0,
+            "Size": [
+                100.0,
+                100.0
+            ]
+        },
         "IDs": {
-            "GlobalId": 1393,
+            "GlobalId": 57,
             "__idDct__": true,
-            "globalConnID": 407,
-            "trnsysID": 526
+            "globalConnID": 1,
+            "trnsysID": 21
         },
         "Strings": {
             "DiagramName": "COPYGROUP",

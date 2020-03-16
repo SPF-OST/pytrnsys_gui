@@ -6,6 +6,8 @@ class Test_Export(object):
     """
     Just a class that contains the method for testing.
     No need to declare or pass anything.
+    Parameters should be passed into the individual functions to avoid unnecessary instantiotion
+    of class.
     """
     testPassed = True
 
@@ -105,8 +107,21 @@ class Test_Export(object):
                     break
             if found:
                 if not filecmp.cmp(exportedFileList[i], originalFileList[j], shallow=False):
-                    self.testPassed = False
-                    fileErrorList.append(i)
+                    fileOne = open(exportedFileList[i])
+                    fileTwo = open(originalFileList[j])
+
+                    fileOneLine = fileOne.readline()
+                    fileTwoLine = fileTwo.readline()
+
+                    while fileOneLine:
+                        if fileOneLine != fileTwoLine:
+                            if fileOneLine.split(' = ')[0][:5] != 'MfrPu':
+                                self.testPassed = False
+                                fileErrorList.append(i)
+                                break
+
+                        fileOneLine = fileOne.readline()
+                        fileTwoLine = fileTwo.readline()
                     # break
             i += 1
         return fileErrorList, self.testPassed
@@ -163,10 +178,11 @@ class Test_Export(object):
             if fileOneLine != fileTwoLine:
                 print("Error found at line %d\n" % line)
                 print("Exported file: %s \nReference file: %s \n" % (fileOneLine, fileTwoLine))
-                file1Str = str(line) + ':' + fileOneLine
-                file2Str = str(line) + ':' + fileTwoLine
-                file1List.append(file1Str)
-                file2List.append(file2Str)
+                if fileOneLine.split(' = ')[0][:5] != 'MfrPu':
+                    file1Str = str(line) + ':' + fileOneLine
+                    file2Str = str(line) + ':' + fileTwoLine
+                    file1List.append(file1Str)
+                    file2List.append(file2Str)
             fileOneLine = fileOne.readline()
             fileTwoLine = fileTwo.readline()
             line += 1

@@ -1,3 +1,4 @@
+import sys
 from math import atan, sqrt, acos
 
 from PyQt5.QtCore import QLineF, QPointF
@@ -93,6 +94,7 @@ class Connection(object):
         self.labelPosLoad = None
 
         self.mass = 0 # comment out
+        self.temperature = 0
 
         # A new connection is created if there are no kwargs
         if kwargs == {}:
@@ -140,19 +142,41 @@ class Connection(object):
         for s in self.segments:
             s.labelMass.setPlainText(self.mass)
 
+    def setMassAndTemperature(self, mass, temp):
+        self.mass = mass
+        self.temperature = temp
+        for s in self.segments:
+            s.labelMass.setPlainText("M: %s   T: %s" % (self.mass, self.temperature))
+
 
     def setDisplayName(self, newName):
         self.displayName = newName
         self.updateSegLabels()
 
     def setLabelPos(self, tup):
+        posOffset = 10
         if len(self.segments) > 0:
-            self.segments[0].label.setPos(tup[0]+10, tup[1]+10)
+            self.segments[0].label.setPos(tup[0]+posOffset, tup[1]+posOffset)
 
     # comment out
     def setMassLabelPos(self, tup):
+        posOffset = 50
+        posOffsetY = 15
         if len(self.segments) > 0:
-            self.segments[0].labelMass.setPos(tup[0], tup[1])
+            if self.fromPort.side == 1:
+                self.segments[0].labelMass.setPos(tup[0], tup[1] - posOffsetY)
+            elif self.fromPort.side == 0:
+                if self.fromPort.parent.flippedH:
+                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
+                else:
+                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
+            elif self.fromPort.side == 2:
+                if self.fromPort.parent.flippedH:
+                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
+                else:
+                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
+            else:
+                self.segments[0].labelMass.setPos(tup[0], tup[1])
 
     def setStartPort(self, newStartPort):
         self.fromPort = newStartPort
@@ -176,20 +200,16 @@ class Connection(object):
                 col = QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
                 col = QColor(142, 142, 142) # Gray
-            elif kwargs["mfr"] == "minToLower":
-                col = QColor(134, 189, 255)  # light blue
-            elif kwargs["mfr"] == "lowerToMedian":
-                col = QColor(186, 216, 255)  # teal
-            elif kwargs["mfr"] == "medianToUpper":
-                col = QColor(255, 180, 180)  # pink
-            elif kwargs["mfr"] == "upperToMax":
-                col = QColor(255, 103, 103)  # lighter red
+            elif kwargs["mfr"] == "minToMedian":
+                col = QColor(140, 255, 255)  # light blue
+            elif kwargs["mfr"] == "medianToMax":
+                col = QColor(255, 140, 140)  # pink
             elif kwargs["mfr"] == "min":
                 col = QColor(0, 0, 255)  # blue
             elif kwargs["mfr"] == "max":
                 col = QColor(255, 0, 0)  # red
             elif kwargs["mfr"] == "test":
-                col = QColor(191, 252, 186)  # red
+                col = QColor(255, 255, 255)  # red
             # elif kwargs["mfr"] == "negMinToLower":
             #     col = QColor(0, 0, 0)  # Black
             # elif kwargs["mfr"] == "negLowerToMedian":
@@ -642,6 +662,39 @@ class Connection(object):
             corner3.setPos(p3)
             corner4.setPos(p4)
 
+        # elif self.fromPort.side == 1:
+        #     print("NiceConn from 1")
+        #     portOffset = 30
+        #     self.clearConn()
+        #
+        #     corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
+        #
+        #     seg1 = segmentItem(self.startNode, corner1.node, self)
+        #     seg2 = segmentItem(corner1.node, self.endNode, self)
+        #
+        #     self.startNode.setNext(corner1.node)
+        #     self.endNode.setPrev(corner1.node)
+        #
+        #     self.parent.diagramScene.addItem(seg1)
+        #     self.parent.diagramScene.addItem(seg2)
+        #     self.parent.diagramScene.addItem(corner1)
+        #
+        #     pos1 = self.fromPort.scenePos()
+        #     pos2 = self.toPort.scenePos()
+        #
+        #     p1 = QPointF(pos1.x(), pos2.y())  # position of the connecting node
+        #
+        #     seg1.setLine(QLineF(pos1, p1))
+        #     seg2.setLine(QLineF(p1, pos2))
+        #
+        #     corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+        #     corner1.setZValue(100)
+        #     self.fromPort.setZValue(100)
+        #     self.toPort.setZValue(100)
+        #
+        #     corner1.setPos(p1)
+        #     self.firstS = self.getFirstSeg()
+
         else:
         # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
         #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
@@ -762,8 +815,6 @@ class Connection(object):
                             self.parent.diagramScene.addItem(s.secondChild)
 
                             # print("Points are " + str(qp1) + str(qp2) + str(qp1_) + str(qp2_))
-
-                            # TODO: Fix division through zero
                             # eps1 = 1
                             # if (abs(qp2.x() - qp1.x()) > eps1) and (abs(qp2_.x() - qp1_.x()) > eps1) :
 
@@ -1370,6 +1421,9 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
+
+
+
 
 
 class DeleteConnectionCommand(QUndoCommand):

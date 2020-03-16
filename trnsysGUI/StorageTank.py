@@ -455,7 +455,7 @@ class StorageTank(BlockItem):
         return w, h
 
     def updateImage(self):
-        self.pixmap = self.pixmap.scaled(100, self.h)
+        self.pixmap = self.pixmap.scaled(self.w, self.h)
         self.setPixmap(self.pixmap)
         self.label.setPos(self.label.pos().x(), self.h)
 
@@ -465,10 +465,27 @@ class StorageTank(BlockItem):
             p.setPos(p.pos().x(), rel_h_old * (self.h + h))
             # p.setPos(rel_h_old, p.pos().x() * (self.h + h))
 
+    def updatePortPositionsHW(self, h, w):
+        for p in self.inputs + self.outputs:
+            rel_h_old = p.pos().y() / self.h
+            if p.side == 0:
+                p.setPos(p.pos().x(), rel_h_old * (self.h + h))
+            else:
+                p.setPos(p.pos().x() + w, rel_h_old * (self.h + h))
+            # p.setPos(rel_h_old, p.pos().x() * (self.h + h))
+
     def updatePortPositionsDec(self, h):
         for p in self.inputs + self.outputs:
             rel_h_old = p.pos().y() / self.h
             p.setPos(p.pos().x(), rel_h_old * (self.h - h))
+
+    def updatePortPositionsDecHW(self, h, w):
+        for p in self.inputs + self.outputs:
+            rel_h_old = p.pos().y() / self.h
+            if p.side == 0:
+                p.setPos(p.pos().x(), rel_h_old * (self.h - h))
+            else:
+                p.setPos(p.pos().x() - w, rel_h_old * (self.h - h))
 
     def updateHxLines(self, h):
         for hx in self.heatExchangers:

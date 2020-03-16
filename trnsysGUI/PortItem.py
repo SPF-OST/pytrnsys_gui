@@ -1,3 +1,5 @@
+import sys
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QRectF, Qt, QPointF
 from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
@@ -67,7 +69,7 @@ class PortItem(QGraphicsEllipseItem):
         self.setParentItem(p)
 
     def itemChange(self, change, value):
-
+        # TODO : here to merge segments when moving blockitems
         if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
             if not self.savePos is None:
                 print("val is " + str(value))
@@ -77,6 +79,7 @@ class PortItem(QGraphicsEllipseItem):
                 return QPointF(self.savePos.x(), value.y())
 
         if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 0:
+            print("editor mode = 0")
             for conn in self.connectionList:
                 conn.positionLabel()
 
@@ -115,8 +118,24 @@ class PortItem(QGraphicsEllipseItem):
                         cor = conn.getCorners()[0]
                         cor.setPos(cor.pos().x(), self.scenePos().y())
 
-                        seg = conn.segments[0]
+                        seg = conn.segments[0]  # first segment
                         seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                        if len(conn.segments)>1:
+                            verSeg = conn.segments[1]
+                            nextSeg = conn.segments[2]
+                        if nextSeg.isHorizontal() and seg.isHorizontal():
+                            if int(seg.endNode.parent.pos().y()-0) <= int(nextSeg.line().p2().y()) <= int(
+                                    seg.endNode.parent.pos().y()+0):
+                                print("both segments are horizontal from fromport")
+                                self.hideCorners(conn)
+                                verSeg.setVisible(False)
+                            else:
+                                self.showCorners(conn)
+                                verSeg.setVisible(True)
+
+
+
+
                 elif conn.toPort is self:
                     if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                         cor = conn.getCorners()[-1]
@@ -124,8 +143,21 @@ class PortItem(QGraphicsEllipseItem):
 
                         seg = conn.segments[-1]
                         seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                        if len(conn.segments)>1:
+                            verSeg = conn.segments[-2]
+                            nextSeg = conn.segments[-3]
+                        if nextSeg.isHorizontal() and seg.isHorizontal():
+                            if int(nextSeg.endNode.parent.pos().y() - 0) <= int(seg.line().p2().y()) <= int(
+                                    nextSeg.endNode.parent.pos().y() + 0):
+                                print("both segments are horizontal from toport")
+                                self.hideCorners(conn)
+                                verSeg.setVisible(False)
+                            else:
+                                self.showCorners(conn)
+                                verSeg.setVisible(True)
+
                 else:
-                    print("Error: In Mode 1, moving a portItem, portItem is wether from nor toPort")
+                    print("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
 
         if change == self.ItemScenePositionHasChanged:
             for cb in self.posCallbacks:
@@ -242,3 +274,17 @@ class PortItem(QGraphicsEllipseItem):
         if obj in obj.parent.rightSide and self.side == 2:
             obj.parent.rightSide.remove(obj)
 
+    def hideCorners(self, connection):
+        # TODO : the vertical segment connecting the two horizontal ones are still there
+        #  need delete the vertical segment. And connect the end node of one segment
+        #  to the start node of the other segment.
+        cor = connection.getCorners()[0]
+        cor2 = connection.getCorners()[-1]
+        cor.setVisible(False)
+        cor2.setVisible(False)
+
+    def showCorners(self, connection):
+        cor = connection.getCorners()[0]
+        cor2 = connection.getCorners()[-1]
+        cor.setVisible(True)
+        cor2.setVisible(True)

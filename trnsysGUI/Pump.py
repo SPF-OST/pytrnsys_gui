@@ -1,8 +1,12 @@
+import sys
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QIcon
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
+
+import numpy as np
 
 
 class Pump(BlockItem):
@@ -12,9 +16,11 @@ class Pump(BlockItem):
         # factor = 0.5
         # self.w = 100 * factor
         # self.h = 100 * factor
-        self.w = 30
-        self.h = 30
+        self.w = 33
+        self.h = 33
         self.typeNumber = 1
+        self.rndPwr = np.random.randint(0, 1000)
+        self.resStr = "Mfr" + self.displayName + " = " + str(self.rndPwr) + "\n"
 
         self.exportInitialInput = 0.0
 
@@ -63,9 +69,8 @@ class Pump(BlockItem):
         return f, equationNr
 
     def exportMassFlows(self):
-        resStr = "Mfr" + self.displayName + " = 1000" + "\n"
         equationNr = 1
-        return resStr, equationNr
+        return self.resStr, equationNr
 
     def exportInputsFlowSolver1(self):
         temp1 = "Mfr" + self.displayName
