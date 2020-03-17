@@ -1173,10 +1173,10 @@
             "trnsysID": 294
         },
         "IDs": {
-            "GlobalId": 1371,
+            "GlobalId": 1330,
             "__idDct__": true,
-            "globalConnID": 404,
-            "trnsysID": 523
+            "globalConnID": 395,
+            "trnsysID": 510
         },
         "Strings": {
             "DiagramName": "ASHP+Tes",

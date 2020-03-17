@@ -76,7 +76,9 @@ class PumpDlg(QDialog):
         print("Changing displayName")
         newName = self.le.text()
         self.setPumpPower()
-        if newName != "" and not self.nameExists(newName):
+        if newName.lower() == str(self.block.displayName).lower():
+            self.close()
+        elif newName != "" and not self.nameExists(newName):
             # self.block.setName(newName)
             self.block.label.setPlainText(newName)
             self.block.displayName = newName
