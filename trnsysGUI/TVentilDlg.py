@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget,QVBoxLayout,QWidget, QDoubleSpinBox
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget, \
+    QVBoxLayout, QWidget, QDoubleSpinBox, QMessageBox
 from PyQt5.QtGui import QIcon
 
 
@@ -118,3 +119,5 @@ class TVentilDlg(QDialog):
 
     def cancel(self):
         self.close()
+
+
