@@ -442,7 +442,7 @@ class Type1924_TesPlugFlow():
         counter=1
         for idPort in range(nPorts):
             line="Tdp%dOut_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,counter);lines=lines+line
-            line="Qdp%d_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,counter+30);lines=lines+line
+            line="Qdp%d_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,30+idPort+1);lines=lines+line
             counter=counter+2
 
         nEq = 21
