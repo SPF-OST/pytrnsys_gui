@@ -217,13 +217,19 @@ class Type1924_TesPlugFlow():
 
         lines = ""
         myList =[]
-        line = "CONSTANTS 5\n";lines=lines+line
+        line = "CONSTANTS 10\n";lines=lines+line
 
-        line = "UaBot_Tes%d= %.2f ! @userDefined W/k \n"%(nTes,Ua[0]);lines=lines+line
-        line = "Uaz1_Tes%d = %.2f ! @userDefined W/k\n"%(nTes,Ua[1]);lines=lines+line
-        line = "Uaz2_Tes%d = %.2f ! @userDefined W/k\n"%(nTes,Ua[2]);lines=lines+line
-        line = "Uaz3_Tes%d = %.2f ! @userDefined W/k\n"%(nTes,Ua[3]);lines=lines+line
-        line = "UaTop_Tes%d = %.2f ! @userDefined W/k\n"%(nTes,Ua[4]);lines=lines+line
+        line = "Ufoam_Tes%d= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n"%(nTes);lines=lines+line
+        line = "Ubot_Tes%d = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)\n"%(nTes);lines=lines+line
+        line = "Atop_Tes%d = Vol_Tes%d/Heigh_Tes%d ! m2\n"%(nTes,nTes,nTes);lines=lines+line
+        line = "Diameter_Tes%d = (4*ATop_Tes%d/PI)^0.5 ! m \n"%(nTes,nTes);lines=lines+line
+        line = "ALat_Tes%d = Heigh_Tes%d*PI*Diameter_Tes%d ! m2\n"%(nTes,nTes,nTes);lines=lines+line
+
+        line = "UaBot_Tes%d= Ubot_Tes%d*ATop_Tes%d ! @userDefined W/k \n"%(nTes,nTes,nTes);lines=lines+line
+        line = "Uaz1_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 ! @userDefined W/k\n"%(nTes,nTes,nTes);lines=lines+line
+        line = "Uaz2_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 ! @userDefined W/k\n"%(nTes,nTes,nTes);lines=lines+line
+        line = "Uaz3_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 ! @userDefined W/k\n"%(nTes,nTes,nTes);lines=lines+line
+        line = "UaTop_Tes%d = Ufoam_Tes%d*ATop_Tes%d ! @userDefined W/k\n"%(nTes,nTes,nTes);lines=lines+line
 
         return lines
 
@@ -492,6 +498,44 @@ class Type1924_TesPlugFlow():
 
         return lines
 
+
+    def getMonthyPrinter(self,nTes,nUnit,inputs):
+
+        nPrinterUnit = nUnit+1
+        lines = ""
+        line = "CONSTANTS 1 \n"; lines=lines+line
+        line = "unitPrinter_Tes%d = %d \n"%(nTes,nPrinterUnit); lines=lines+line
+        line = "ASSIGN temp\TES%d_MO.Prt unitPrinter_Tes%d\n"%(nTes,nTes); lines=lines+line
+        line = "UNIT %d TYPE 46\n"%nPrinterUnit; lines=lines+line
+        line = "PARAMETERS 5\n"; lines = lines + line
+        line = "unitPrinter_Tes%d ! 1: Logical unit number, -\n"%nTes; lines = lines + line
+        line = "-1  ! 2: Logical unit for monthly summaries\n"; lines = lines + line
+        line = "1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations\n"; lines = lines + line
+        line = "-1  ! 4: Printing & integrating interval, h. -1 for monthly integration\n"; lines = lines + line
+        line = "0  ! 5: Number of inputs to avoid integration\n"; lines = lines + line
+        #line = "0  ! 6: Number of inputs to avoid integration\n"; lines = lines + line
+        nInputs = 5 + inputs["nPorts"]+inputs["nHx"]+1 # +inputs["nHeatSources"]
+
+        line = "INPUTS %d\n"%nInputs; lines = lines + line
+        line = "sumQv_Tes1 sumQLoss_Tes1 sumQAcum_Tes1 sumQPorts_Tes1 Imb_Tes1 "; lines = lines + line
+        for i in range(inputs["nPorts"]):
+            line = "Qdp%d_Tes%d "%(i+1,nTes); lines = lines + line
+
+        for i in range(inputs["nHx"]):
+            line = "Qhx%dOut_Tes%d "%(i+1,nTes); lines = lines + line
+
+        # for i in range(inputs["nHeatSources"]):
+        #     line = "qHeatSource_Tes%d "%(nTes); lines = lines + line
+        line = "qHeatSource_Tes%d "%(nTes); lines = lines + line
+
+        lines = lines + "\n"
+
+        for i in range(nInputs):
+            line = "zero "; lines = lines + line
+
+        lines = lines + "\n"
+
+        return lines
     def getParameters(self,inputs):
 
         nUnit=inputs["nUnit"]
@@ -521,6 +565,7 @@ class Type1924_TesPlugFlow():
         lines=lines+self.getPositionOfHeatSources(nTes,nHeatSources)
         lines=lines + self.getInputs(inputs)
         lines=lines + self.getOutputs(inputs)
+        lines=lines + self.getMonthyPrinter(nTes,nUnit,inputs)
 
         return lines
 

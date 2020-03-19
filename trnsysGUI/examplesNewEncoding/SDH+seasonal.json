@@ -317,8 +317,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                6.0,
+                -32.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 2,
@@ -337,9 +337,9 @@
                     -606.0
                 ],
                 [
-                    -1049.7777777777778,
-                    -606.0,
                     -1048.0,
+                    -606.0,
+                    -1049.7777777777778,
                     -606.0
                 ]
             ],
@@ -362,8 +362,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                -96.0,
+                -141.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1342,
@@ -407,8 +407,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                30.0,
-                10.0
+                33.0,
+                -27.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1355,
@@ -452,8 +452,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                30.0,
-                10.0
+                46.0,
+                102.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1356,
@@ -497,7 +497,7 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -50.0,
+                -84.0,
                 10.0
             ],
             "GroupName": "defaultGroup",
@@ -542,8 +542,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -50.0,
-                10.0
+                -98.0,
+                -30.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 324,
@@ -587,8 +587,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -89.0,
+                -24.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1533,
@@ -607,9 +607,9 @@
                     -165.0
                 ],
                 [
-                    -812.0,
-                    -165.0,
                     -759.5,
+                    -165.0,
+                    -812.0,
                     -165.0
                 ]
             ],
@@ -632,8 +632,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                -59.0,
+                -62.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1775,
@@ -677,8 +677,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -50.0,
-                10.0
+                -28.0,
+                83.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1513,
@@ -722,8 +722,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -50.0,
-                10.0
+                -77.0,
+                -39.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1788,
@@ -775,8 +775,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -99.0,
+                -64.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1528,
@@ -832,8 +832,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
-                0.0
+                9.0,
+                -91.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 1343,
@@ -885,8 +885,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
-                0.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 6,
@@ -917,9 +917,9 @@
                     -333.0
                 ],
                 [
-                    -1130.0,
-                    -333.0,
                     -1082.0,
+                    -333.0,
+                    -1130.0,
                     -333.0
                 ]
             ],
@@ -942,8 +942,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                30.0,
-                10.0
+                72.0,
+                -30.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 326,
@@ -987,8 +987,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                30.0,
-                10.0
+                79.0,
+                -46.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 336,
@@ -1032,8 +1032,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -50.0,
-                10.0
+                -97.0,
+                -35.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 322,
@@ -1077,8 +1077,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -50.0,
-                10.0
+                -14.0,
+                68.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 351,
@@ -1124,10 +1124,10 @@
             ]
         },
         "IDs": {
-            "GlobalId": 2558,
+            "GlobalId": 2559,
             "__idDct__": true,
-            "globalConnID": 670,
-            "trnsysID": 902
+            "globalConnID": 671,
+            "trnsysID": 903
         },
         "Strings": {
             "DiagramName": "SDH+seasonal",
