@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QTransform
+from PyQt5.QtWidgets import QGraphicsTextItem
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
@@ -16,6 +17,7 @@ class TVentil(BlockItem):
         self.typeNumber = 3
         self.isTempering = False
         self.positionForMassFlowSolver = 1.0
+        self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
 
         self.exportInitialInput = 0.0
 
@@ -51,6 +53,7 @@ class TVentil(BlockItem):
         deltaH = self.h / 18
 
         self.label.setPos(lx, h - self.flippedV*(h+h/2))
+        self.posLabel.setPos(lx+5, -15)
 
         self.inputs[0].setPos(- 2 * delta + 4 * self.flippedH * delta + w * self.flippedH,
                               h / 2 + deltaH - 2 * deltaH * self.flippedV)
