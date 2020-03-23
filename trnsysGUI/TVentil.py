@@ -24,7 +24,7 @@ class TVentil(BlockItem):
         self.outputs.append(PortItem('i', 2, self))
 
         my_transform = QTransform()
-        my_transform.rotate(180)
+        my_transform.scale(1, -1)
         self.image = self.image.transformed(my_transform)
 
         self.pixmap = QPixmap(self.image)
