@@ -226,6 +226,13 @@ class MassFlowVisualizer(QDialog):
                         else:
                             t.setColor(mfr="test")
                         i += 1
+                else:
+                    if 'xFrac'+t.displayName in self.massFlowData.columns:
+                        valvePosition = str(self.massFlowData['xFrac' + t.displayName].iloc[self.timeStep])
+                        t.setPositionForMassFlowSolver(valvePosition)
+                        t.posLabel.setPlainText(valvePosition)
+                        print('valve position:', valvePosition)
+
 
         else:
             return

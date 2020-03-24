@@ -1,0 +1,2274 @@
+Version 17
+CONSTANTS 2
+dtSim = 1.
+dtSimFile = 1.
+CONSTANTS 3
+FrInte_Tol = 0.003
+FrConv_Tol = 0.001
+PI = 3.1415927
+EQUATIONS 3
+START = 0            !744  !4350   ! 744
+STOP  = 5 !END
+Nix = 0.0
+SIMULATION START STOP dtSim
+TOLERANCES    FrInte_Tol  FrConv_Tol
+LIMITS 30 2000 25                 ! Max iterations   Max warnings    Trace limit      ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ 1      ! TRNSYS numerical integration solver method
+WIDTH 132          ! TRNSYS output file width, number of characters
+LIST             ! NOLIST statement
+! MAP statement
+SOLVER 0 1 1      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK 0     ! Nan DEBUG statement
+OVERWRITE_CHECK 0     ! Overwrite DEBUG statement
+EQSOLVER 0     ! EQUATION SOLVER statement
+TIME_REPORT 1  ! 1 time report is used 0 is not used
+EQUATIONS 3
+ rhoWat=1000
+ cpWat=4200
+ tRoomStore=20
+
+EQUATIONS 22
+*** Black box component temperatures
+TColl=1 
+TRadiatorSH=1 
+TsupplyWater = 1
+TIceStorage123=1 
+THPX0=1 
+THPX1=1 
+THxCoolX0=1 
+THxCoolX1=1 
+THxDHWX0=1 
+THxDHWX1=1 
+TSolar1976=1
+TDhwPortLeft95=1
+TDhwPortRight95=1
+TDhwPortRight90=1
+TDhwPortLeft5=1
+TDhwPortRight5=1
+TDhwPortRight70=1
+TSolarTesHx2279=1
+TSHPortLeft95=1
+TSHPortRight95=1
+TSHPortLeft5=1
+TSHPortRight5=1
+
+EQUATIONS 8
+*** Pump outlet temperatures
+TPuSH = TPiSHOutMix
+TtapWater = TPiDhwDemand
+TPuCool = TPiPuCoolIn
+TPuCol = TPiColPuIn
+TPuDHW = TPiHxDhwOut
+TPuCirc = TPiPuCircIn
+TPuHpEvap = TPiHpEvapOut
+TPuHpCond = TPiHpInPu
+
+EQUATIONS 14
+*** Massflowrates
+MfrPuSH = 991
+MfrsupplyWater = 1000
+xFracDivHp = 1.0
+MfrPuCool = 567
+xFracDivSHCool = 1.0
+xFracMixHxTes = 1.0
+MfrPuCol = 932
+MfrPuDHW = 736
+MfrPuCirc = 9
+MfrPuHpEvap = 935
+MfrPuHpCond = 162
+xFracDivSolarDhwSh = 1.0
+xFracDivDhw = None
+xFracDivDhwOut = None
+
+CONSTANTS 2
+T_set_DivSH=50
+T_set_DivHpEvap=50
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiDivSHCool
+TPiSHInMix
+MfrPiRadOut
+T_set_DivSH
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivSH
+EQUATIONS 1
+xFracDivSH =  1.-[441,5] 
+
+UNIT 442 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiIceToHp
+TPiHpEvapMix
+MfrPiHpEvapIn
+T_set_DivHpEvap
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivHpEvap
+EQUATIONS 1
+xFracDivHpEvap =  1.-[442,5] 
+
+
+UNIT 450 TYPE 935
+PARAMETERS 401
+100
+58 39 0 0      !1 : Coll
+4 6 0 0        !2 : RadiatorSH
+8 4 0 1        !3 : PuSH
+3 2 0 0        !4 : PiRadIn
+6 43 9 3       !5 : DivSH
+5 2 0 0        !6 : PiRadOut
+41 8 9 2       !7 : TeeMixSH
+7 3 0 0        !8 : PiSHOutMix
+5 7 0 0        !9 : PiSHInMix
+69 0 0 5       !10 : tapWater
+72 0 0 4       !11 : supplyWater
+78 77 0 0      !12 : IceStorage123
+50 33 59 2     !13 : TeeOutIce
+38 34 32 2     !14 : TeeColToHp
+30 32 31 3     !15 : DivHpEvap
+59 52 31 2     !16 : TeeHpEvap
+30 53 0 0      !17 : HPHeatPump
+60 55 0 0      !18 : HPEvap
+60 83 96 3     !19 : DivHp
+36 37 0 0      !20 : HxCoolSide1
+40 42 0 0      !21 : HxCoolSide2
+35 36 0 1      !22 : PuCool
+43 100 40 3    !23 : DivSHCool
+99 42 41 2     !24 : TeeCoolRadIn
+58 62 38 2     !25 : TeeDivTes
+49 57 50 3     !26 : MixHxTes
+49 39 0 1      !27 : PuCol
+77 37 34 2     !28 : TeeCoolBriOut
+78 35 33 2     !29 : TeeCoolBriIn
+15 17 0 0      !30 : PiHpEvapIn
+16 15 0 0      !31 : PiHpEvapMix
+14 15 0 0      !32 : PiIceToHp
+13 29 0 0      !33 : PiTeeOutIceIn
+14 28 0 0      !34 : PiTeeColToHpIn
+29 22 0 0      !35 : PiPuCoolIn
+22 20 0 0      !36 : PiHxCoolBriIn
+20 28 0 0      !37 : PiHxCoolBriOut
+14 25 0 0      !38 : PiColToIce
+27 1 0 0       !39 : PiColIn
+23 21 0 0      !40 : PiHxCoolWatIn
+7 24 0 0       !41 : PiTeeMixSHIn
+24 21 0 0      !42 : PiHxCoolWatOut
+23 5 0 0       !43 : PiDivSHCool
+76 47 0 0      !44 : HxDHWSide1
+70 71 0 0      !45 : HxDHWSide2
+47 64 0 1      !46 : PuDHW
+44 46 0 0      !47 : PiHxDhwOut
+68 66 0 1      !48 : PuCirc
+26 27 0 0      !49 : PiColPuIn
+26 13 0 0      !50 : PiIceToCol
+53 52 0 1      !51 : PuHpEvap
+51 16 0 0      !52 : PiHpOutPu
+51 17 0 0      !53 : PiHpEvapOut
+74 55 0 1      !54 : PuHpCond
+54 18 0 0      !55 : PiHpCondIn
+57 81 94 3     !56 : DivSolarDhwSh
+26 56 0 0      !57 : PiDivDhwShCol
+25 1 0 0       !58 : PiColOut
+13 16 0 0      !59 : PiHpOutDiv
+18 19 0 0      !60 : PiHpCondOut
+62 80 93 2     !61 : TeeSolarDhwSh
+25 61 0 0      !62 : PiColDivDhwSh
+64 87 90 3     !63 : DivDhw
+46 63 0 0      !64 : PiPuDhwOut
+71 72 66 2     !65 : TeePieceCirc2
+48 65 0 0      !66 : PiPuCircOut
+70 69 68 2     !67 : TeePieceCirc1
+48 67 0 0      !68 : PiPuCircIn
+67 10 0 0      !69 : PiDhwDemand
+67 45 0 0      !70 : PiDhwSecOut
+45 65 0 0      !71 : PiHxDhwSecIn
+65 11 0 0      !72 : PiDhwMains
+74 97 84 2     !73 : TeePieceHpRt
+73 54 0 0      !74 : PiHpInPu
+76 86 89 3     !75 : DivDhwOut
+75 44 0 0      !76 : PiHxDhwIn
+12 28 0 0      !77 : PiIceOut
+29 12 0 0      !78 : PiIceIn
+80 81 0 0      !79 : Solar1976
+61 79 0 0      !80 : PiInHxTes
+56 79 0 0      !81 : PiOutHxTes
+83 84 0 0      !82 : ConnDhwL3770
+19 82 0 0      !83 : PiHpToTesDhwIn
+73 82 0 0      !84 : PiHpToTesDHWOut
+86 87 91 2     !85 : TPieceTesDhwR3779
+75 85 0 0      !86 : PiTesDhwOut
+85 63 0 0      !87 : PiTesDhwIn
+89 90 91 2     !88 : TPieceTesDhwR3789
+75 88 0 0      !89 : PiCircOut
+88 63 0 0      !90 : PiCircIn
+88 85 0 0      !91 : PiTesRDhw_851
+93 94 0 0      !92 : SolarTesHx2279
+61 92 0 0      !93 : PiInHxTesSh
+56 92 0 0      !94 : PiOutHxTesSh
+96 97 0 0      !95 : ConnSHL3811
+19 95 0 0      !96 : PiHptoTesSHIn
+73 95 0 0      !97 : PiHpToTesSHOut
+99 100 0 0     !98 : ConnSHR3820
+98 24 0 0      !99 : PiTesDhwToSh
+23 98 0 0      !100 : PiShTesOut
+INPUTS 100! for Type 935
+0,0 0,0  MfrPuSH 0,0  xFracDivSH 0,0 0,0 0,0 0,0 
+0,0  MfrsupplyWater 0,0 0,0 0,0  xFracDivHpEvap 0,0 0,0 0,0 
+ xFracDivHp 0,0 0,0  MfrPuCool  xFracDivSHCool 0,0 0,0  xFracMixHxTes  MfrPuCol 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+ MfrPuDHW 0,0  MfrPuCirc 0,0 0,0  MfrPuHpEvap 0,0 0,0  MfrPuHpCond 
+0,0  xFracDivSolarDhwSh 0,0 0,0 0,0 0,0 0,0 0,0  xFracDivDhw 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0  xFracDivDhwOut 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 
+
+*** Initial Inputs *
+-1 -1 0.0 -1 0.0 -1 -1 -1 -1 
+-1 0.0 -1 -1 -1 0.0 -1  -1 -1 
+0.0  -1 -1 0.0 0.0 -1 -1 0.0 0.0 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1  -1 -1 
+0.0 -1 0.0 -1 -1 0.0 -1 -1 0.0 
+-1 0.0 -1 -1 -1 -1 -1 -1 0.0 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 0.0 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 
+
+EQUATIONS 216	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrColl_A=[450,1]
+MfrColl_B=[450,2]
+MfrRadiatorSH_A=[450,4]
+MfrRadiatorSH_B=[450,5]
+MfrPuSH_A=[450,7]
+MfrPuSH_B=[450,8]
+MfrPiRadIn_A=[450,10]
+MfrPiRadIn_B=[450,11]
+MfrDivSH_A=[450,13]
+MfrDivSH_B=[450,14]
+MfrDivSH_C=[450,15]
+MfrPiRadOut_A=[450,16]
+MfrPiRadOut_B=[450,17]
+MfrTeeMixSH_A=[450,19]
+MfrTeeMixSH_B=[450,20]
+MfrTeeMixSH_C=[450,21]
+MfrPiSHOutMix_A=[450,22]
+MfrPiSHOutMix_B=[450,23]
+MfrPiSHInMix_A=[450,25]
+MfrPiSHInMix_B=[450,26]
+MfrtapWater_A=[450,28]
+MfrtapWater_B=[450,29]
+MfrsupplyWater_A=[450,31]
+MfrsupplyWater_B=[450,32]
+MfrIceStorage123_A=[450,34]
+MfrIceStorage123_B=[450,35]
+MfrTeeOutIce_A=[450,37]
+MfrTeeOutIce_B=[450,38]
+MfrTeeOutIce_C=[450,39]
+MfrTeeColToHp_A=[450,40]
+MfrTeeColToHp_B=[450,41]
+MfrTeeColToHp_C=[450,42]
+MfrDivHpEvap_A=[450,43]
+MfrDivHpEvap_B=[450,44]
+MfrDivHpEvap_C=[450,45]
+MfrTeeHpEvap_A=[450,46]
+MfrTeeHpEvap_B=[450,47]
+MfrTeeHpEvap_C=[450,48]
+MfrHP-Hp-Side0_A=[450,49]
+MfrHP-Hp-Side0_B=[450,50]
+MfrHP-Hp-Side1_A=[450,52]
+MfrHP-Hp-Side1_B=[450,53]
+MfrDivHp_A=[450,55]
+MfrDivHp_B=[450,56]
+MfrDivHp_C=[450,57]
+MfrHxCool-Side0_A=[450,58]
+MfrHxCool-Side0_B=[450,59]
+MfrHxCool-Side1_A=[450,61]
+MfrHxCool-Side1_B=[450,62]
+MfrPuCool_A=[450,64]
+MfrPuCool_B=[450,65]
+MfrDivSHCool_A=[450,67]
+MfrDivSHCool_B=[450,68]
+MfrDivSHCool_C=[450,69]
+MfrTeeCoolRadIn_A=[450,70]
+MfrTeeCoolRadIn_B=[450,71]
+MfrTeeCoolRadIn_C=[450,72]
+MfrTeeDivTes_A=[450,73]
+MfrTeeDivTes_B=[450,74]
+MfrTeeDivTes_C=[450,75]
+MfrMixHxTes_A=[450,76]
+MfrMixHxTes_B=[450,77]
+MfrMixHxTes_C=[450,78]
+MfrPuCol_A=[450,79]
+MfrPuCol_B=[450,80]
+MfrTeeCoolBriOut_A=[450,82]
+MfrTeeCoolBriOut_B=[450,83]
+MfrTeeCoolBriOut_C=[450,84]
+MfrTeeCoolBriIn_A=[450,85]
+MfrTeeCoolBriIn_B=[450,86]
+MfrTeeCoolBriIn_C=[450,87]
+MfrPiHpEvapIn_A=[450,88]
+MfrPiHpEvapIn_B=[450,89]
+MfrPiHpEvapMix_A=[450,91]
+MfrPiHpEvapMix_B=[450,92]
+MfrPiIceToHp_A=[450,94]
+MfrPiIceToHp_B=[450,95]
+MfrPiTeeOutIceIn_A=[450,97]
+MfrPiTeeOutIceIn_B=[450,98]
+MfrPiTeeColToHpIn_A=[450,100]
+MfrPiTeeColToHpIn_B=[450,101]
+MfrPiPuCoolIn_A=[450,103]
+MfrPiPuCoolIn_B=[450,104]
+MfrPiHxCoolBriIn_A=[450,106]
+MfrPiHxCoolBriIn_B=[450,107]
+MfrPiHxCoolBriOut_A=[450,109]
+MfrPiHxCoolBriOut_B=[450,110]
+MfrPiColToIce_A=[450,112]
+MfrPiColToIce_B=[450,113]
+MfrPiColIn_A=[450,115]
+MfrPiColIn_B=[450,116]
+MfrPiHxCoolWatIn_A=[450,118]
+MfrPiHxCoolWatIn_B=[450,119]
+MfrPiTeeMixSHIn_A=[450,121]
+MfrPiTeeMixSHIn_B=[450,122]
+MfrPiHxCoolWatOut_A=[450,124]
+MfrPiHxCoolWatOut_B=[450,125]
+MfrPiDivSHCool_A=[450,127]
+MfrPiDivSHCool_B=[450,128]
+MfrHxDHW-Side0_A=[450,130]
+MfrHxDHW-Side0_B=[450,131]
+MfrHxDHW-Side1_A=[450,133]
+MfrHxDHW-Side1_B=[450,134]
+MfrPuDHW_A=[450,136]
+MfrPuDHW_B=[450,137]
+MfrPiHxDhwOut_A=[450,139]
+MfrPiHxDhwOut_B=[450,140]
+MfrPuCirc_A=[450,142]
+MfrPuCirc_B=[450,143]
+MfrPiColPuIn_A=[450,145]
+MfrPiColPuIn_B=[450,146]
+MfrPiIceToCol_A=[450,148]
+MfrPiIceToCol_B=[450,149]
+MfrPuHpEvap_A=[450,151]
+MfrPuHpEvap_B=[450,152]
+MfrPiHpOutPu_A=[450,154]
+MfrPiHpOutPu_B=[450,155]
+MfrPiHpEvapOut_A=[450,157]
+MfrPiHpEvapOut_B=[450,158]
+MfrPuHpCond_A=[450,160]
+MfrPuHpCond_B=[450,161]
+MfrPiHpCondIn_A=[450,163]
+MfrPiHpCondIn_B=[450,164]
+MfrDivSolarDhwSh_A=[450,166]
+MfrDivSolarDhwSh_B=[450,167]
+MfrDivSolarDhwSh_C=[450,168]
+MfrPiDivDhwShCol_A=[450,169]
+MfrPiDivDhwShCol_B=[450,170]
+MfrPiColOut_A=[450,172]
+MfrPiColOut_B=[450,173]
+MfrPiHpOutDiv_A=[450,175]
+MfrPiHpOutDiv_B=[450,176]
+MfrPiHpCondOut_A=[450,178]
+MfrPiHpCondOut_B=[450,179]
+MfrTeeSolarDhwSh_A=[450,181]
+MfrTeeSolarDhwSh_B=[450,182]
+MfrTeeSolarDhwSh_C=[450,183]
+MfrPiColDivDhwSh_A=[450,184]
+MfrPiColDivDhwSh_B=[450,185]
+MfrDivDhw_A=[450,187]
+MfrDivDhw_B=[450,188]
+MfrDivDhw_C=[450,189]
+MfrPiPuDhwOut_A=[450,190]
+MfrPiPuDhwOut_B=[450,191]
+MfrTeePieceCirc2_A=[450,193]
+MfrTeePieceCirc2_B=[450,194]
+MfrTeePieceCirc2_C=[450,195]
+MfrPiPuCircOut_A=[450,196]
+MfrPiPuCircOut_B=[450,197]
+MfrTeePieceCirc1_A=[450,199]
+MfrTeePieceCirc1_B=[450,200]
+MfrTeePieceCirc1_C=[450,201]
+MfrPiPuCircIn_A=[450,202]
+MfrPiPuCircIn_B=[450,203]
+MfrPiDhwDemand_A=[450,205]
+MfrPiDhwDemand_B=[450,206]
+MfrPiDhwSecOut_A=[450,208]
+MfrPiDhwSecOut_B=[450,209]
+MfrPiHxDhwSecIn_A=[450,211]
+MfrPiHxDhwSecIn_B=[450,212]
+MfrPiDhwMains_A=[450,214]
+MfrPiDhwMains_B=[450,215]
+MfrTeePieceHpRt_A=[450,217]
+MfrTeePieceHpRt_B=[450,218]
+MfrTeePieceHpRt_C=[450,219]
+MfrPiHpInPu_A=[450,220]
+MfrPiHpInPu_B=[450,221]
+MfrDivDhwOut_A=[450,223]
+MfrDivDhwOut_B=[450,224]
+MfrDivDhwOut_C=[450,225]
+MfrPiHxDhwIn_A=[450,226]
+MfrPiHxDhwIn_B=[450,227]
+MfrPiIceOut_A=[450,229]
+MfrPiIceOut_B=[450,230]
+MfrPiIceIn_A=[450,232]
+MfrPiIceIn_B=[450,233]
+MfrSolar1976_A=[450,235]
+MfrSolar1976_B=[450,236]
+MfrPiInHxTes_A=[450,238]
+MfrPiInHxTes_B=[450,239]
+MfrPiOutHxTes_A=[450,241]
+MfrPiOutHxTes_B=[450,242]
+MfrConnDhwL3770_A=[450,244]
+MfrConnDhwL3770_B=[450,245]
+MfrPiHpToTesDhwIn_A=[450,247]
+MfrPiHpToTesDhwIn_B=[450,248]
+MfrPiHpToTesDHWOut_A=[450,250]
+MfrPiHpToTesDHWOut_B=[450,251]
+MfrPiTesDhwOut_A=[450,256]
+MfrPiTesDhwOut_B=[450,257]
+MfrPiTesDhwIn_A=[450,259]
+MfrPiTesDhwIn_B=[450,260]
+MfrPiCircOut_A=[450,265]
+MfrPiCircOut_B=[450,266]
+MfrPiCircIn_A=[450,268]
+MfrPiCircIn_B=[450,269]
+MfrPiTesRDhw_851_A=[450,271]
+MfrPiTesRDhw_851_B=[450,272]
+MfrSolarTesHx2279_A=[450,274]
+MfrSolarTesHx2279_B=[450,275]
+MfrPiInHxTesSh_A=[450,277]
+MfrPiInHxTesSh_B=[450,278]
+MfrPiOutHxTesSh_A=[450,280]
+MfrPiOutHxTesSh_B=[450,281]
+MfrConnSHL3811_A=[450,283]
+MfrConnSHL3811_B=[450,284]
+MfrPiHptoTesSHIn_A=[450,286]
+MfrPiHptoTesSHIn_B=[450,287]
+MfrPiHpToTesSHOut_A=[450,289]
+MfrPiHpToTesSHOut_B=[450,290]
+MfrConnSHR3820_A=[450,292]
+MfrConnSHR3820_B=[450,293]
+MfrPiTesDhwToSh_A=[450,295]
+MfrPiTesDhwToSh_B=[450,296]
+MfrPiShTesOut_A=[450,298]
+MfrPiShTesOut_B=[450,299]
+
+
+UNIT 451 TYPE 931
+!PiRadIn
+PARAMETERS 6
+diPiRadIn
+LPiRadIn
+UPiRadIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuSH
+MfrPiRadIn_A
+TRoomStore
+TRadiatorSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiRadIn= [451,1]
+PPiRadIn_kW= [451,3]/3600 !kW
+MfrPiRadIn= MfrPiRadIn_A
+
+UNIT 452 TYPE 929
+!DivSH
+PARAMETERS 0
+INPUTS 6
+MfrDivSH_A
+MfrDivSH_B
+MfrDivSH_C
+TPiRadOut
+TPiDivSHCool
+TPiSHInMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivSH= [452,1]
+
+UNIT 453 TYPE 931
+!PiRadOut
+PARAMETERS 6
+diPiRadOut
+LPiRadOut
+UPiRadOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSH
+MfrPiRadOut_A
+TRoomStore
+TRadiatorSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiRadOut= [453,1]
+PPiRadOut_kW= [453,3]/3600 !kW
+MfrPiRadOut= MfrPiRadOut_A
+
+UNIT 454 TYPE 929
+!TeeMixSH
+PARAMETERS 0
+INPUTS 6
+MfrTeeMixSH_A
+MfrTeeMixSH_B
+MfrTeeMixSH_C
+TPiTeeMixSHIn
+TPiSHOutMix
+TPiSHInMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeMixSH= [454,1]
+
+UNIT 455 TYPE 931
+!PiSHOutMix
+PARAMETERS 6
+diPiSHOutMix
+LPiSHOutMix
+UPiSHOutMix
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeMixSH
+MfrPiSHOutMix_A
+TRoomStore
+TPuSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiSHOutMix= [455,1]
+PPiSHOutMix_kW= [455,3]/3600 !kW
+MfrPiSHOutMix= MfrPiSHOutMix_A
+
+UNIT 456 TYPE 931
+!PiSHInMix
+PARAMETERS 6
+diPiSHInMix
+LPiSHInMix
+UPiSHInMix
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSH
+MfrPiSHInMix_A
+TRoomStore
+TTeeMixSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiSHInMix= [456,1]
+PPiSHInMix_kW= [456,3]/3600 !kW
+MfrPiSHInMix= MfrPiSHInMix_A
+
+UNIT 457 TYPE 929
+!TeeOutIce
+PARAMETERS 0
+INPUTS 6
+MfrTeeOutIce_A
+MfrTeeOutIce_B
+MfrTeeOutIce_C
+TPiIceToCol
+TPiTeeOutIceIn
+TPiHpOutDiv
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeOutIce= [457,1]
+
+UNIT 458 TYPE 929
+!TeeColToHp
+PARAMETERS 0
+INPUTS 6
+MfrTeeColToHp_A
+MfrTeeColToHp_B
+MfrTeeColToHp_C
+TPiColToIce
+TPiTeeColToHpIn
+TPiIceToHp
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeColToHp= [458,1]
+
+UNIT 459 TYPE 929
+!DivHpEvap
+PARAMETERS 0
+INPUTS 6
+MfrDivHpEvap_A
+MfrDivHpEvap_B
+MfrDivHpEvap_C
+TPiHpEvapIn
+TPiIceToHp
+TPiHpEvapMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivHpEvap= [459,1]
+
+UNIT 460 TYPE 929
+!TeeHpEvap
+PARAMETERS 0
+INPUTS 6
+MfrTeeHpEvap_A
+MfrTeeHpEvap_B
+MfrTeeHpEvap_C
+TPiHpOutDiv
+TPiHpOutPu
+TPiHpEvapMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeHpEvap= [460,1]
+
+UNIT 461 TYPE 929
+!DivHp
+PARAMETERS 0
+INPUTS 6
+MfrDivHp_A
+MfrDivHp_B
+MfrDivHp_C
+TPiHpCondOut
+TPiHpToTesDhwIn
+TPiHptoTesSHIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivHp= [461,1]
+
+UNIT 462 TYPE 929
+!DivSHCool
+PARAMETERS 0
+INPUTS 6
+MfrDivSHCool_A
+MfrDivSHCool_B
+MfrDivSHCool_C
+TPiDivSHCool
+TPiShTesOut
+TPiHxCoolWatIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivSHCool= [462,1]
+
+UNIT 463 TYPE 929
+!TeeCoolRadIn
+PARAMETERS 0
+INPUTS 6
+MfrTeeCoolRadIn_A
+MfrTeeCoolRadIn_B
+MfrTeeCoolRadIn_C
+TPiTesDhwToSh
+TPiHxCoolWatOut
+TPiTeeMixSHIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeCoolRadIn= [463,1]
+
+UNIT 464 TYPE 929
+!TeeDivTes
+PARAMETERS 0
+INPUTS 6
+MfrTeeDivTes_A
+MfrTeeDivTes_B
+MfrTeeDivTes_C
+TPiColOut
+TPiColDivDhwSh
+TPiColToIce
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeDivTes= [464,1]
+
+UNIT 465 TYPE 929
+!MixHxTes
+PARAMETERS 0
+INPUTS 6
+MfrMixHxTes_A
+MfrMixHxTes_B
+MfrMixHxTes_C
+TPiColPuIn
+TPiDivDhwShCol
+TPiIceToCol
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixHxTes= [465,1]
+
+UNIT 466 TYPE 929
+!TeeCoolBriOut
+PARAMETERS 0
+INPUTS 6
+MfrTeeCoolBriOut_A
+MfrTeeCoolBriOut_B
+MfrTeeCoolBriOut_C
+TPiIceOut
+TPiHxCoolBriOut
+TPiTeeColToHpIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeCoolBriOut= [466,1]
+
+UNIT 467 TYPE 929
+!TeeCoolBriIn
+PARAMETERS 0
+INPUTS 6
+MfrTeeCoolBriIn_A
+MfrTeeCoolBriIn_B
+MfrTeeCoolBriIn_C
+TPiIceIn
+TPiPuCoolIn
+TPiTeeOutIceIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeCoolBriIn= [467,1]
+
+UNIT 468 TYPE 931
+!PiHpEvapIn
+PARAMETERS 6
+diPiHpEvapIn
+LPiHpEvapIn
+UPiHpEvapIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivHpEvap
+MfrPiHpEvapIn_A
+TRoomStore
+THPX0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpEvapIn= [468,1]
+PPiHpEvapIn_kW= [468,3]/3600 !kW
+MfrPiHpEvapIn= MfrPiHpEvapIn_A
+
+UNIT 469 TYPE 931
+!PiHpEvapMix
+PARAMETERS 6
+diPiHpEvapMix
+LPiHpEvapMix
+UPiHpEvapMix
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeHpEvap
+MfrPiHpEvapMix_A
+TRoomStore
+TDivHpEvap
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpEvapMix= [469,1]
+PPiHpEvapMix_kW= [469,3]/3600 !kW
+MfrPiHpEvapMix= MfrPiHpEvapMix_A
+
+UNIT 470 TYPE 931
+!PiIceToHp
+PARAMETERS 6
+diPiIceToHp
+LPiIceToHp
+UPiIceToHp
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeColToHp
+MfrPiIceToHp_A
+TRoomStore
+TDivHpEvap
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceToHp= [470,1]
+PPiIceToHp_kW= [470,3]/3600 !kW
+MfrPiIceToHp= MfrPiIceToHp_A
+
+UNIT 471 TYPE 931
+!PiTeeOutIceIn
+PARAMETERS 6
+diPiTeeOutIceIn
+LPiTeeOutIceIn
+UPiTeeOutIceIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeOutIce
+MfrPiTeeOutIceIn_A
+TRoomStore
+TTeeCoolBriIn
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTeeOutIceIn= [471,1]
+PPiTeeOutIceIn_kW= [471,3]/3600 !kW
+MfrPiTeeOutIceIn= MfrPiTeeOutIceIn_A
+
+UNIT 472 TYPE 931
+!PiTeeColToHpIn
+PARAMETERS 6
+diPiTeeColToHpIn
+LPiTeeColToHpIn
+UPiTeeColToHpIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeColToHp
+MfrPiTeeColToHpIn_A
+TRoomStore
+TTeeCoolBriOut
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTeeColToHpIn= [472,1]
+PPiTeeColToHpIn_kW= [472,3]/3600 !kW
+MfrPiTeeColToHpIn= MfrPiTeeColToHpIn_A
+
+UNIT 473 TYPE 931
+!PiPuCoolIn
+PARAMETERS 6
+diPiPuCoolIn
+LPiPuCoolIn
+UPiPuCoolIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeCoolBriIn
+MfrPiPuCoolIn_A
+TRoomStore
+TPuCool
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPuCoolIn= [473,1]
+PPiPuCoolIn_kW= [473,3]/3600 !kW
+MfrPiPuCoolIn= MfrPiPuCoolIn_A
+
+UNIT 474 TYPE 931
+!PiHxCoolBriIn
+PARAMETERS 6
+diPiHxCoolBriIn
+LPiHxCoolBriIn
+UPiHxCoolBriIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCool
+MfrPiHxCoolBriIn_A
+TRoomStore
+THxCoolX0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxCoolBriIn= [474,1]
+PPiHxCoolBriIn_kW= [474,3]/3600 !kW
+MfrPiHxCoolBriIn= MfrPiHxCoolBriIn_A
+
+UNIT 475 TYPE 931
+!PiHxCoolBriOut
+PARAMETERS 6
+diPiHxCoolBriOut
+LPiHxCoolBriOut
+UPiHxCoolBriOut
+RhoWat
+CPWat
+20
+INPUTS 4
+THxCoolX0
+MfrPiHxCoolBriOut_A
+TRoomStore
+TTeeCoolBriOut
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxCoolBriOut= [475,1]
+PPiHxCoolBriOut_kW= [475,3]/3600 !kW
+MfrPiHxCoolBriOut= MfrPiHxCoolBriOut_A
+
+UNIT 476 TYPE 931
+!PiColToIce
+PARAMETERS 6
+diPiColToIce
+LPiColToIce
+UPiColToIce
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeColToHp
+MfrPiColToIce_A
+TRoomStore
+TTeeDivTes
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColToIce= [476,1]
+PPiColToIce_kW= [476,3]/3600 !kW
+MfrPiColToIce= MfrPiColToIce_A
+
+UNIT 477 TYPE 931
+!PiColIn
+PARAMETERS 6
+diPiColIn
+LPiColIn
+UPiColIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCol
+MfrPiColIn_A
+TRoomStore
+TColl
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColIn= [477,1]
+PPiColIn_kW= [477,3]/3600 !kW
+MfrPiColIn= MfrPiColIn_A
+
+UNIT 478 TYPE 931
+!PiHxCoolWatIn
+PARAMETERS 6
+diPiHxCoolWatIn
+LPiHxCoolWatIn
+UPiHxCoolWatIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSHCool
+MfrPiHxCoolWatIn_A
+TRoomStore
+THxCoolX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxCoolWatIn= [478,1]
+PPiHxCoolWatIn_kW= [478,3]/3600 !kW
+MfrPiHxCoolWatIn= MfrPiHxCoolWatIn_A
+
+UNIT 479 TYPE 931
+!PiTeeMixSHIn
+PARAMETERS 6
+diPiTeeMixSHIn
+LPiTeeMixSHIn
+UPiTeeMixSHIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeMixSH
+MfrPiTeeMixSHIn_A
+TRoomStore
+TTeeCoolRadIn
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTeeMixSHIn= [479,1]
+PPiTeeMixSHIn_kW= [479,3]/3600 !kW
+MfrPiTeeMixSHIn= MfrPiTeeMixSHIn_A
+
+UNIT 480 TYPE 931
+!PiHxCoolWatOut
+PARAMETERS 6
+diPiHxCoolWatOut
+LPiHxCoolWatOut
+UPiHxCoolWatOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeCoolRadIn
+MfrPiHxCoolWatOut_A
+TRoomStore
+THxCoolX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxCoolWatOut= [480,1]
+PPiHxCoolWatOut_kW= [480,3]/3600 !kW
+MfrPiHxCoolWatOut= MfrPiHxCoolWatOut_A
+
+UNIT 481 TYPE 931
+!PiDivSHCool
+PARAMETERS 6
+diPiDivSHCool
+LPiDivSHCool
+UPiDivSHCool
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSHCool
+MfrPiDivSHCool_A
+TRoomStore
+TDivSH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDivSHCool= [481,1]
+PPiDivSHCool_kW= [481,3]/3600 !kW
+MfrPiDivSHCool= MfrPiDivSHCool_A
+
+UNIT 482 TYPE 931
+!PiHxDhwOut
+PARAMETERS 6
+diPiHxDhwOut
+LPiHxDhwOut
+UPiHxDhwOut
+RhoWat
+CPWat
+20
+INPUTS 4
+THxDHWX0
+MfrPiHxDhwOut_A
+TRoomStore
+TPuDHW
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxDhwOut= [482,1]
+PPiHxDhwOut_kW= [482,3]/3600 !kW
+MfrPiHxDhwOut= MfrPiHxDhwOut_A
+
+UNIT 483 TYPE 931
+!PiColPuIn
+PARAMETERS 6
+diPiColPuIn
+LPiColPuIn
+UPiColPuIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TMixHxTes
+MfrPiColPuIn_A
+TRoomStore
+TPuCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColPuIn= [483,1]
+PPiColPuIn_kW= [483,3]/3600 !kW
+MfrPiColPuIn= MfrPiColPuIn_A
+
+UNIT 484 TYPE 931
+!PiIceToCol
+PARAMETERS 6
+diPiIceToCol
+LPiIceToCol
+UPiIceToCol
+RhoWat
+CPWat
+20
+INPUTS 4
+TMixHxTes
+MfrPiIceToCol_A
+TRoomStore
+TTeeOutIce
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceToCol= [484,1]
+PPiIceToCol_kW= [484,3]/3600 !kW
+MfrPiIceToCol= MfrPiIceToCol_A
+
+UNIT 485 TYPE 931
+!PiHpOutPu
+PARAMETERS 6
+diPiHpOutPu
+LPiHpOutPu
+UPiHpOutPu
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuHpEvap
+MfrPiHpOutPu_A
+TRoomStore
+TTeeHpEvap
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpOutPu= [485,1]
+PPiHpOutPu_kW= [485,3]/3600 !kW
+MfrPiHpOutPu= MfrPiHpOutPu_A
+
+UNIT 486 TYPE 931
+!PiHpEvapOut
+PARAMETERS 6
+diPiHpEvapOut
+LPiHpEvapOut
+UPiHpEvapOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuHpEvap
+MfrPiHpEvapOut_A
+TRoomStore
+THPX0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpEvapOut= [486,1]
+PPiHpEvapOut_kW= [486,3]/3600 !kW
+MfrPiHpEvapOut= MfrPiHpEvapOut_A
+
+UNIT 487 TYPE 931
+!PiHpCondIn
+PARAMETERS 6
+diPiHpCondIn
+LPiHpCondIn
+UPiHpCondIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuHpCond
+MfrPiHpCondIn_A
+TRoomStore
+THPX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpCondIn= [487,1]
+PPiHpCondIn_kW= [487,3]/3600 !kW
+MfrPiHpCondIn= MfrPiHpCondIn_A
+
+UNIT 488 TYPE 929
+!DivSolarDhwSh
+PARAMETERS 0
+INPUTS 6
+MfrDivSolarDhwSh_A
+MfrDivSolarDhwSh_B
+MfrDivSolarDhwSh_C
+TPiDivDhwShCol
+TPiOutHxTes
+TPiOutHxTesSh
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivSolarDhwSh= [488,1]
+
+UNIT 489 TYPE 931
+!PiDivDhwShCol
+PARAMETERS 6
+diPiDivDhwShCol
+LPiDivDhwShCol
+UPiDivDhwShCol
+RhoWat
+CPWat
+20
+INPUTS 4
+TMixHxTes
+MfrPiDivDhwShCol_A
+TRoomStore
+TDivSolarDhwSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDivDhwShCol= [489,1]
+PPiDivDhwShCol_kW= [489,3]/3600 !kW
+MfrPiDivDhwShCol= MfrPiDivDhwShCol_A
+
+UNIT 490 TYPE 931
+!PiColOut
+PARAMETERS 6
+diPiColOut
+LPiColOut
+UPiColOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeDivTes
+MfrPiColOut_A
+TRoomStore
+TColl
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColOut= [490,1]
+PPiColOut_kW= [490,3]/3600 !kW
+MfrPiColOut= MfrPiColOut_A
+
+UNIT 491 TYPE 931
+!PiHpOutDiv
+PARAMETERS 6
+diPiHpOutDiv
+LPiHpOutDiv
+UPiHpOutDiv
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeOutIce
+MfrPiHpOutDiv_A
+TRoomStore
+TTeeHpEvap
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpOutDiv= [491,1]
+PPiHpOutDiv_kW= [491,3]/3600 !kW
+MfrPiHpOutDiv= MfrPiHpOutDiv_A
+
+UNIT 492 TYPE 931
+!PiHpCondOut
+PARAMETERS 6
+diPiHpCondOut
+LPiHpCondOut
+UPiHpCondOut
+RhoWat
+CPWat
+20
+INPUTS 4
+THPX1
+MfrPiHpCondOut_A
+TRoomStore
+TDivHp
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpCondOut= [492,1]
+PPiHpCondOut_kW= [492,3]/3600 !kW
+MfrPiHpCondOut= MfrPiHpCondOut_A
+
+UNIT 493 TYPE 929
+!TeeSolarDhwSh
+PARAMETERS 0
+INPUTS 6
+MfrTeeSolarDhwSh_A
+MfrTeeSolarDhwSh_B
+MfrTeeSolarDhwSh_C
+TPiColDivDhwSh
+TPiInHxTes
+TPiInHxTesSh
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeSolarDhwSh= [493,1]
+
+UNIT 494 TYPE 931
+!PiColDivDhwSh
+PARAMETERS 6
+diPiColDivDhwSh
+LPiColDivDhwSh
+UPiColDivDhwSh
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeDivTes
+MfrPiColDivDhwSh_A
+TRoomStore
+TTeeSolarDhwSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColDivDhwSh= [494,1]
+PPiColDivDhwSh_kW= [494,3]/3600 !kW
+MfrPiColDivDhwSh= MfrPiColDivDhwSh_A
+
+UNIT 495 TYPE 929
+!DivDhw
+PARAMETERS 0
+INPUTS 6
+MfrDivDhw_A
+MfrDivDhw_B
+MfrDivDhw_C
+TPiPuDhwOut
+TPiTesDhwIn
+TPiCircIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivDhw= [495,1]
+
+UNIT 496 TYPE 931
+!PiPuDhwOut
+PARAMETERS 6
+diPiPuDhwOut
+LPiPuDhwOut
+UPiPuDhwOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuDHW
+MfrPiPuDhwOut_A
+TRoomStore
+TDivDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPuDhwOut= [496,1]
+PPiPuDhwOut_kW= [496,3]/3600 !kW
+MfrPiPuDhwOut= MfrPiPuDhwOut_A
+
+UNIT 497 TYPE 929
+!TeePieceCirc2
+PARAMETERS 0
+INPUTS 6
+MfrTeePieceCirc2_A
+MfrTeePieceCirc2_B
+MfrTeePieceCirc2_C
+TPiHxDhwSecIn
+TPiDhwMains
+TPiPuCircOut
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeePieceCirc2= [497,1]
+
+UNIT 498 TYPE 931
+!PiPuCircOut
+PARAMETERS 6
+diPiPuCircOut
+LPiPuCircOut
+UPiPuCircOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCirc
+MfrPiPuCircOut_A
+TRoomStore
+TTeePieceCirc2
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPuCircOut= [498,1]
+PPiPuCircOut_kW= [498,3]/3600 !kW
+MfrPiPuCircOut= MfrPiPuCircOut_A
+
+UNIT 499 TYPE 929
+!TeePieceCirc1
+PARAMETERS 0
+INPUTS 6
+MfrTeePieceCirc1_A
+MfrTeePieceCirc1_B
+MfrTeePieceCirc1_C
+TPiDhwSecOut
+TPiDhwDemand
+TPiPuCircIn
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeePieceCirc1= [499,1]
+
+UNIT 500 TYPE 931
+!PiPuCircIn
+PARAMETERS 6
+diPiPuCircIn
+LPiPuCircIn
+UPiPuCircIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCirc
+MfrPiPuCircIn_A
+TRoomStore
+TTeePieceCirc1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPuCircIn= [500,1]
+PPiPuCircIn_kW= [500,3]/3600 !kW
+MfrPiPuCircIn= MfrPiPuCircIn_A
+
+UNIT 501 TYPE 931
+!PiDhwDemand
+PARAMETERS 6
+diPiDhwDemand
+LPiDhwDemand
+UPiDhwDemand
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePieceCirc1
+MfrPiDhwDemand_A
+TRoomStore
+TtapWater
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwDemand= [501,1]
+PPiDhwDemand_kW= [501,3]/3600 !kW
+MfrPiDhwDemand= MfrPiDhwDemand_A
+
+UNIT 502 TYPE 931
+!PiDhwSecOut
+PARAMETERS 6
+diPiDhwSecOut
+LPiDhwSecOut
+UPiDhwSecOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePieceCirc1
+MfrPiDhwSecOut_A
+TRoomStore
+THxDHWX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwSecOut= [502,1]
+PPiDhwSecOut_kW= [502,3]/3600 !kW
+MfrPiDhwSecOut= MfrPiDhwSecOut_A
+
+UNIT 503 TYPE 931
+!PiHxDhwSecIn
+PARAMETERS 6
+diPiHxDhwSecIn
+LPiHxDhwSecIn
+UPiHxDhwSecIn
+RhoWat
+CPWat
+20
+INPUTS 4
+THxDHWX1
+MfrPiHxDhwSecIn_A
+TRoomStore
+TTeePieceCirc2
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxDhwSecIn= [503,1]
+PPiHxDhwSecIn_kW= [503,3]/3600 !kW
+MfrPiHxDhwSecIn= MfrPiHxDhwSecIn_A
+
+UNIT 504 TYPE 931
+!PiDhwMains
+PARAMETERS 6
+diPiDhwMains
+LPiDhwMains
+UPiDhwMains
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePieceCirc2
+MfrPiDhwMains_A
+TRoomStore
+TsupplyWater
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwMains= [504,1]
+PPiDhwMains_kW= [504,3]/3600 !kW
+MfrPiDhwMains= MfrPiDhwMains_A
+
+UNIT 505 TYPE 929
+!TeePieceHpRt
+PARAMETERS 0
+INPUTS 6
+MfrTeePieceHpRt_A
+MfrTeePieceHpRt_B
+MfrTeePieceHpRt_C
+TPiHpInPu
+TPiHpToTesSHOut
+TPiHpToTesDHWOut
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeePieceHpRt= [505,1]
+
+UNIT 506 TYPE 931
+!PiHpInPu
+PARAMETERS 6
+diPiHpInPu
+LPiHpInPu
+UPiHpInPu
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePieceHpRt
+MfrPiHpInPu_A
+TRoomStore
+TPuHpCond
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpInPu= [506,1]
+PPiHpInPu_kW= [506,3]/3600 !kW
+MfrPiHpInPu= MfrPiHpInPu_A
+
+UNIT 507 TYPE 929
+!DivDhwOut
+PARAMETERS 0
+INPUTS 6
+MfrDivDhwOut_A
+MfrDivDhwOut_B
+MfrDivDhwOut_C
+TPiHxDhwIn
+TPiTesDhwOut
+TPiCircOut
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivDhwOut= [507,1]
+
+UNIT 508 TYPE 931
+!PiHxDhwIn
+PARAMETERS 6
+diPiHxDhwIn
+LPiHxDhwIn
+UPiHxDhwIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivDhwOut
+MfrPiHxDhwIn_A
+TRoomStore
+THxDHWX0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHxDhwIn= [508,1]
+PPiHxDhwIn_kW= [508,3]/3600 !kW
+MfrPiHxDhwIn= MfrPiHxDhwIn_A
+
+UNIT 509 TYPE 931
+!PiIceOut
+PARAMETERS 6
+diPiIceOut
+LPiIceOut
+UPiIceOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TIceStorage123
+MfrPiIceOut_A
+TRoomStore
+TTeeCoolBriOut
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceOut= [509,1]
+PPiIceOut_kW= [509,3]/3600 !kW
+MfrPiIceOut= MfrPiIceOut_A
+
+UNIT 510 TYPE 931
+!PiIceIn
+PARAMETERS 6
+diPiIceIn
+LPiIceIn
+UPiIceIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeCoolBriIn
+MfrPiIceIn_A
+TRoomStore
+TIceStorage123
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiIceIn= [510,1]
+PPiIceIn_kW= [510,3]/3600 !kW
+MfrPiIceIn= MfrPiIceIn_A
+
+UNIT 511 TYPE 931
+!PiInHxTes
+PARAMETERS 6
+diPiInHxTes
+LPiInHxTes
+UPiInHxTes
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeSolarDhwSh
+MfrPiInHxTes_A
+TRoomStore
+TSolar1976
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiInHxTes= [511,1]
+PPiInHxTes_kW= [511,3]/3600 !kW
+MfrPiInHxTes= MfrPiInHxTes_A
+
+UNIT 512 TYPE 931
+!PiOutHxTes
+PARAMETERS 6
+diPiOutHxTes
+LPiOutHxTes
+UPiOutHxTes
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSolarDhwSh
+MfrPiOutHxTes_A
+TRoomStore
+TSolar1976
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiOutHxTes= [512,1]
+PPiOutHxTes_kW= [512,3]/3600 !kW
+MfrPiOutHxTes= MfrPiOutHxTes_A
+
+UNIT 513 TYPE 931
+!PiHpToTesDhwIn
+PARAMETERS 6
+diPiHpToTesDhwIn
+LPiHpToTesDhwIn
+UPiHpToTesDhwIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivHp
+MfrPiHpToTesDhwIn_A
+TRoomStore
+TDhwPortLeft95
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpToTesDhwIn= [513,1]
+PPiHpToTesDhwIn_kW= [513,3]/3600 !kW
+MfrPiHpToTesDhwIn= MfrPiHpToTesDhwIn_A
+
+UNIT 514 TYPE 931
+!PiHpToTesDHWOut
+PARAMETERS 6
+diPiHpToTesDHWOut
+LPiHpToTesDHWOut
+UPiHpToTesDHWOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePieceHpRt
+MfrPiHpToTesDHWOut_A
+TRoomStore
+TDhwPortLeft5
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpToTesDHWOut= [514,1]
+PPiHpToTesDHWOut_kW= [514,3]/3600 !kW
+MfrPiHpToTesDHWOut= MfrPiHpToTesDHWOut_A
+
+UNIT 515 TYPE 931
+!PiTesDhwOut
+PARAMETERS 6
+diPiTesDhwOut
+LPiTesDhwOut
+UPiTesDhwOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivDhwOut
+MfrPiTesDhwOut_A
+TRoomStore
+TDhwPortRight95
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwOut= [515,1]
+PPiTesDhwOut_kW= [515,3]/3600 !kW
+MfrPiTesDhwOut= MfrPiTesDhwOut_A
+
+UNIT 516 TYPE 931
+!PiTesDhwIn
+PARAMETERS 6
+diPiTesDhwIn
+LPiTesDhwIn
+UPiTesDhwIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight5
+MfrPiTesDhwIn_A
+TRoomStore
+TDivDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwIn= [516,1]
+PPiTesDhwIn_kW= [516,3]/3600 !kW
+MfrPiTesDhwIn= MfrPiTesDhwIn_A
+
+UNIT 517 TYPE 931
+!PiCircOut
+PARAMETERS 6
+diPiCircOut
+LPiCircOut
+UPiCircOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivDhwOut
+MfrPiCircOut_A
+TRoomStore
+TDhwPortRight90
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiCircOut= [517,1]
+PPiCircOut_kW= [517,3]/3600 !kW
+MfrPiCircOut= MfrPiCircOut_A
+
+UNIT 518 TYPE 931
+!PiCircIn
+PARAMETERS 6
+diPiCircIn
+LPiCircIn
+UPiCircIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight70
+MfrPiCircIn_A
+TRoomStore
+TDivDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiCircIn= [518,1]
+PPiCircIn_kW= [518,3]/3600 !kW
+MfrPiCircIn= MfrPiCircIn_A
+
+UNIT 519 TYPE 931
+!PiInHxTesSh
+PARAMETERS 6
+diPiInHxTesSh
+LPiInHxTesSh
+UPiInHxTesSh
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeeSolarDhwSh
+MfrPiInHxTesSh_A
+TRoomStore
+TSolarTesHx2279
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiInHxTesSh= [519,1]
+PPiInHxTesSh_kW= [519,3]/3600 !kW
+MfrPiInHxTesSh= MfrPiInHxTesSh_A
+
+UNIT 520 TYPE 931
+!PiOutHxTesSh
+PARAMETERS 6
+diPiOutHxTesSh
+LPiOutHxTesSh
+UPiOutHxTesSh
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSolarDhwSh
+MfrPiOutHxTesSh_A
+TRoomStore
+TSolarTesHx2279
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiOutHxTesSh= [520,1]
+PPiOutHxTesSh_kW= [520,3]/3600 !kW
+MfrPiOutHxTesSh= MfrPiOutHxTesSh_A
+
+UNIT 521 TYPE 931
+!PiHptoTesSHIn
+PARAMETERS 6
+diPiHptoTesSHIn
+LPiHptoTesSHIn
+UPiHptoTesSHIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivHp
+MfrPiHptoTesSHIn_A
+TRoomStore
+TSHPortLeft95
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHptoTesSHIn= [521,1]
+PPiHptoTesSHIn_kW= [521,3]/3600 !kW
+MfrPiHptoTesSHIn= MfrPiHptoTesSHIn_A
+
+UNIT 522 TYPE 931
+!PiHpToTesSHOut
+PARAMETERS 6
+diPiHpToTesSHOut
+LPiHpToTesSHOut
+UPiHpToTesSHOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePieceHpRt
+MfrPiHpToTesSHOut_A
+TRoomStore
+TSHPortLeft5
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiHpToTesSHOut= [522,1]
+PPiHpToTesSHOut_kW= [522,3]/3600 !kW
+MfrPiHpToTesSHOut= MfrPiHpToTesSHOut_A
+
+UNIT 523 TYPE 931
+!PiTesDhwToSh
+PARAMETERS 6
+diPiTesDhwToSh
+LPiTesDhwToSh
+UPiTesDhwToSh
+RhoWat
+CPWat
+20
+INPUTS 4
+TSHPortRight95
+MfrPiTesDhwToSh_A
+TRoomStore
+TTeeCoolRadIn
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwToSh= [523,1]
+PPiTesDhwToSh_kW= [523,3]/3600 !kW
+MfrPiTesDhwToSh= MfrPiTesDhwToSh_A
+
+UNIT 524 TYPE 931
+!PiShTesOut
+PARAMETERS 6
+diPiShTesOut
+LPiShTesOut
+UPiShTesOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDivSHCool
+MfrPiShTesOut_A
+TRoomStore
+TSHPortRight5
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiShTesOut= [524,1]
+PPiShTesOut_kW= [524,3]/3600 !kW
+MfrPiShTesOut= MfrPiShTesOut_A
+
+CONSTANTS 9
+** Fluid Loop : defaultGroup
+di_loop_0=0.2
+L_loop_0=2
+U_loop_0=10
+
+** Fluid Loop : CircnLoop
+di_loop_1=0.2
+L_loop_1=2
+U_loop_1=10
+
+** Fluid Loop : ShLoop
+di_loop_2=0.2
+L_loop_2=2
+U_loop_2=10
+
+
+EQUATIONS 162
+** Fluid Loop : defaultGroup
+**di_loop_0=0.2
+**L_loop_0=2
+**U_loop_0=10
+*** PiHpCondIn
+diPiHpCondIn=di_loop_0
+LPiHpCondIn=L_loop_0
+UPiHpCondIn=U_loop_0
+*** PiHpToTesDhwIn
+diPiHpToTesDhwIn=di_loop_0
+LPiHpToTesDhwIn=L_loop_0
+UPiHpToTesDhwIn=U_loop_0
+*** PiHptoTesSHIn
+diPiHptoTesSHIn=di_loop_0
+LPiHptoTesSHIn=L_loop_0
+UPiHptoTesSHIn=U_loop_0
+*** PiTesDhwToSh
+diPiTesDhwToSh=di_loop_0
+LPiTesDhwToSh=L_loop_0
+UPiTesDhwToSh=U_loop_0
+*** PiShTesOut
+diPiShTesOut=di_loop_0
+LPiShTesOut=L_loop_0
+UPiShTesOut=U_loop_0
+*** PiHpEvapIn
+diPiHpEvapIn=di_loop_0
+LPiHpEvapIn=L_loop_0
+UPiHpEvapIn=U_loop_0
+*** PiHpEvapMix
+diPiHpEvapMix=di_loop_0
+LPiHpEvapMix=L_loop_0
+UPiHpEvapMix=U_loop_0
+*** PiIceToHp
+diPiIceToHp=di_loop_0
+LPiIceToHp=L_loop_0
+UPiIceToHp=U_loop_0
+*** PiDivDhwShCol
+diPiDivDhwShCol=di_loop_0
+LPiDivDhwShCol=L_loop_0
+UPiDivDhwShCol=U_loop_0
+*** PiTeeOutIceIn
+diPiTeeOutIceIn=di_loop_0
+LPiTeeOutIceIn=L_loop_0
+UPiTeeOutIceIn=U_loop_0
+*** PiOutHxTes
+diPiOutHxTes=di_loop_0
+LPiOutHxTes=L_loop_0
+UPiOutHxTes=U_loop_0
+*** PiColOut
+diPiColOut=di_loop_0
+LPiColOut=L_loop_0
+UPiColOut=U_loop_0
+*** PiHpOutDiv
+diPiHpOutDiv=di_loop_0
+LPiHpOutDiv=L_loop_0
+UPiHpOutDiv=U_loop_0
+*** PiHpCondOut
+diPiHpCondOut=di_loop_0
+LPiHpCondOut=L_loop_0
+UPiHpCondOut=U_loop_0
+*** PiOutHxTesSh
+diPiOutHxTesSh=di_loop_0
+LPiOutHxTesSh=L_loop_0
+UPiOutHxTesSh=U_loop_0
+*** PiColDivDhwSh
+diPiColDivDhwSh=di_loop_0
+LPiColDivDhwSh=L_loop_0
+UPiColDivDhwSh=U_loop_0
+*** PiInHxTes
+diPiInHxTes=di_loop_0
+LPiInHxTes=L_loop_0
+UPiInHxTes=U_loop_0
+*** PiInHxTesSh
+diPiInHxTesSh=di_loop_0
+LPiInHxTesSh=L_loop_0
+UPiInHxTesSh=U_loop_0
+*** PiTeeColToHpIn
+diPiTeeColToHpIn=di_loop_0
+LPiTeeColToHpIn=L_loop_0
+UPiTeeColToHpIn=U_loop_0
+*** PiPuCoolIn
+diPiPuCoolIn=di_loop_0
+LPiPuCoolIn=L_loop_0
+UPiPuCoolIn=U_loop_0
+*** PiHxCoolBriIn
+diPiHxCoolBriIn=di_loop_0
+LPiHxCoolBriIn=L_loop_0
+UPiHxCoolBriIn=U_loop_0
+*** PiHxCoolBriOut
+diPiHxCoolBriOut=di_loop_0
+LPiHxCoolBriOut=L_loop_0
+UPiHxCoolBriOut=U_loop_0
+*** PiColToIce
+diPiColToIce=di_loop_0
+LPiColToIce=L_loop_0
+UPiColToIce=U_loop_0
+*** PiColIn
+diPiColIn=di_loop_0
+LPiColIn=L_loop_0
+UPiColIn=U_loop_0
+*** PiPuDhwOut
+diPiPuDhwOut=di_loop_0
+LPiPuDhwOut=L_loop_0
+UPiPuDhwOut=U_loop_0
+*** PiCircIn
+diPiCircIn=di_loop_0
+LPiCircIn=L_loop_0
+UPiCircIn=U_loop_0
+*** PiTesDhwIn
+diPiTesDhwIn=di_loop_0
+LPiTesDhwIn=L_loop_0
+UPiTesDhwIn=U_loop_0
+*** PiPuCircOut
+diPiPuCircOut=di_loop_0
+LPiPuCircOut=L_loop_0
+UPiPuCircOut=U_loop_0
+*** PiPuCircIn
+diPiPuCircIn=di_loop_0
+LPiPuCircIn=L_loop_0
+UPiPuCircIn=U_loop_0
+*** PiDhwDemand
+diPiDhwDemand=di_loop_0
+LPiDhwDemand=L_loop_0
+UPiDhwDemand=U_loop_0
+*** PiDhwSecOut
+diPiDhwSecOut=di_loop_0
+LPiDhwSecOut=L_loop_0
+UPiDhwSecOut=U_loop_0
+*** PiHxDhwSecIn
+diPiHxDhwSecIn=di_loop_0
+LPiHxDhwSecIn=L_loop_0
+UPiHxDhwSecIn=U_loop_0
+*** PiDhwMains
+diPiDhwMains=di_loop_0
+LPiDhwMains=L_loop_0
+UPiDhwMains=U_loop_0
+*** PiHpToTesSHOut
+diPiHpToTesSHOut=di_loop_0
+LPiHpToTesSHOut=L_loop_0
+UPiHpToTesSHOut=U_loop_0
+*** PiHpToTesDHWOut
+diPiHpToTesDHWOut=di_loop_0
+LPiHpToTesDHWOut=L_loop_0
+UPiHpToTesDHWOut=U_loop_0
+*** PiHpInPu
+diPiHpInPu=di_loop_0
+LPiHpInPu=L_loop_0
+UPiHpInPu=U_loop_0
+*** PiHxDhwOut
+diPiHxDhwOut=di_loop_0
+LPiHxDhwOut=L_loop_0
+UPiHxDhwOut=U_loop_0
+*** PiTesDhwOut
+diPiTesDhwOut=di_loop_0
+LPiTesDhwOut=L_loop_0
+UPiTesDhwOut=U_loop_0
+*** PiHxDhwIn
+diPiHxDhwIn=di_loop_0
+LPiHxDhwIn=L_loop_0
+UPiHxDhwIn=U_loop_0
+*** PiCircOut
+diPiCircOut=di_loop_0
+LPiCircOut=L_loop_0
+UPiCircOut=U_loop_0
+*** PiIceOut
+diPiIceOut=di_loop_0
+LPiIceOut=L_loop_0
+UPiIceOut=U_loop_0
+*** PiIceIn
+diPiIceIn=di_loop_0
+LPiIceIn=L_loop_0
+UPiIceIn=U_loop_0
+*** PiColPuIn
+diPiColPuIn=di_loop_0
+LPiColPuIn=L_loop_0
+UPiColPuIn=U_loop_0
+*** PiIceToCol
+diPiIceToCol=di_loop_0
+LPiIceToCol=L_loop_0
+UPiIceToCol=U_loop_0
+*** PiHpOutPu
+diPiHpOutPu=di_loop_0
+LPiHpOutPu=L_loop_0
+UPiHpOutPu=U_loop_0
+*** PiHpEvapOut
+diPiHpEvapOut=di_loop_0
+LPiHpEvapOut=L_loop_0
+UPiHpEvapOut=U_loop_0
+
+** Fluid Loop : CircnLoop
+**di_loop_1=0.2
+**L_loop_1=2
+**U_loop_1=10
+*** PiHxCoolWatIn
+diPiHxCoolWatIn=di_loop_1
+LPiHxCoolWatIn=L_loop_1
+UPiHxCoolWatIn=U_loop_1
+*** PiTeeMixSHIn
+diPiTeeMixSHIn=di_loop_1
+LPiTeeMixSHIn=L_loop_1
+UPiTeeMixSHIn=U_loop_1
+*** PiHxCoolWatOut
+diPiHxCoolWatOut=di_loop_1
+LPiHxCoolWatOut=L_loop_1
+UPiHxCoolWatOut=U_loop_1
+*** PiDivSHCool
+diPiDivSHCool=di_loop_1
+LPiDivSHCool=L_loop_1
+UPiDivSHCool=U_loop_1
+*** PiRadIn
+diPiRadIn=di_loop_1
+LPiRadIn=L_loop_1
+UPiRadIn=U_loop_1
+*** PiRadOut
+diPiRadOut=di_loop_1
+LPiRadOut=L_loop_1
+UPiRadOut=U_loop_1
+*** PiSHOutMix
+diPiSHOutMix=di_loop_1
+LPiSHOutMix=L_loop_1
+UPiSHOutMix=U_loop_1
+*** PiSHInMix
+diPiSHInMix=di_loop_1
+LPiSHInMix=L_loop_1
+UPiSHInMix=U_loop_1
+
+** Fluid Loop : ShLoop
+**di_loop_2=0.2
+**L_loop_2=2
+**U_loop_2=10
+
+
+EQUATIONS 4
+PipeLoss0=PPiHpCondIn_kW+PPiHpToTesDhwIn_kW+PPiHptoTesSHIn_kW+PPiTesDhwToSh_kW+PPiShTesOut_kW+PPiHpEvapIn_kW+PPiHpEvapMix_kW+PPiIceToHp_kW+PPiDivDhwShCol_kW+PPiTeeOutIceIn_kW+PPiOutHxTes_kW+PPiColOut_kW+PPiHpOutDiv_kW+PPiHpCondOut_kW+PPiOutHxTesSh_kW+PPiColDivDhwSh_kW+PPiInHxTes_kW+PPiInHxTesSh_kW+PPiTeeColToHpIn_kW+PPiPuCoolIn_kW+PPiHxCoolBriIn_kW+PPiHxCoolBriOut_kW+PPiColToIce_kW+PPiColIn_kW+PPiPuDhwOut_kW+PPiCircIn_kW+PPiTesDhwIn_kW+PPiPuCircOut_kW+PPiPuCircIn_kW+PPiDhwDemand_kW+PPiDhwSecOut_kW+PPiHxDhwSecIn_kW+PPiDhwMains_kW+PPiHpToTesSHOut_kW+PPiHpToTesDHWOut_kW+PPiHpInPu_kW+PPiHxDhwOut_kW+PPiTesDhwOut_kW+PPiHxDhwIn_kW+PPiCircOut_kW+PPiIceOut_kW+PPiIceIn_kW+PPiColPuIn_kW+PPiIceToCol_kW+PPiHpOutPu_kW+PPiHpEvapOut_kW
+PipeLoss1=PPiHxCoolWatIn_kW+PPiTeeMixSHIn_kW+PPiHxCoolWatOut_kW+PPiDivSHCool_kW+PPiRadIn_kW+PPiRadOut_kW+PPiSHOutMix_kW+PPiSHInMix_kW
+PipeLoss2
+PipeLossTotal=PipeLoss0+PipeLoss1+PipeLoss2
+
+ASSIGN BigIceTwoStorages_Mfr.prt 525
+
+UNIT 525 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+525! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 62
+MfrPiRadIn xFracDivSH MfrPiRadOut MfrPiSHOutMix MfrPiSHInMix xFracDivHpEvap xFracDivHp 
+xFracDivSHCool xFracMixHxTes MfrPiHpEvapIn MfrPiHpEvapMix MfrPiIceToHp MfrPiTeeOutIceIn MfrPiTeeColToHpIn MfrPiPuCoolIn 
+MfrPiHxCoolBriIn MfrPiHxCoolBriOut MfrPiColToIce MfrPiColIn MfrPiHxCoolWatIn MfrPiTeeMixSHIn MfrPiHxCoolWatOut MfrPiDivSHCool 
+MfrPiHxDhwOut MfrPiColPuIn MfrPiIceToCol MfrPiHpOutPu MfrPiHpEvapOut MfrPiHpCondIn MfrPiHpToTesDhwIn MfrPiHptoTesSHIn 
+MfrPiTesDhwToSh MfrPiShTesOut xFracDivSolarDhwSh MfrPiDivDhwShCol MfrPiOutHxTes MfrPiColOut MfrPiHpOutDiv MfrPiHpCondOut 
+MfrPiOutHxTesSh MfrPiColDivDhwSh MfrPiInHxTes MfrPiInHxTesSh xFracDivDhw MfrPiPuDhwOut MfrPiCircIn MfrPiTesDhwIn 
+MfrPiPuCircOut MfrPiPuCircIn MfrPiDhwDemand MfrPiDhwSecOut MfrPiHxDhwSecIn MfrPiDhwMains MfrPiHpToTesSHOut MfrPiHpToTesDHWOut 
+MfrPiHpInPu xFracDivDhwOut MfrPiTesDhwOut MfrPiHxDhwIn MfrPiCircOut MfrPiIceOut MfrPiIceIn 
+***
+MfrPiRadIn xFracDivSH MfrPiRadOut MfrPiSHOutMix MfrPiSHInMix xFracDivHpEvap xFracDivHp 
+xFracDivSHCool xFracMixHxTes MfrPiHpEvapIn MfrPiHpEvapMix MfrPiIceToHp MfrPiTeeOutIceIn MfrPiTeeColToHpIn MfrPiPuCoolIn 
+MfrPiHxCoolBriIn MfrPiHxCoolBriOut MfrPiColToIce MfrPiColIn MfrPiHxCoolWatIn MfrPiTeeMixSHIn MfrPiHxCoolWatOut MfrPiDivSHCool 
+MfrPiHxDhwOut MfrPiColPuIn MfrPiIceToCol MfrPiHpOutPu MfrPiHpEvapOut MfrPiHpCondIn MfrPiHpToTesDhwIn MfrPiHptoTesSHIn 
+MfrPiTesDhwToSh MfrPiShTesOut xFracDivSolarDhwSh MfrPiDivDhwShCol MfrPiOutHxTes MfrPiColOut MfrPiHpOutDiv MfrPiHpCondOut 
+MfrPiOutHxTesSh MfrPiColDivDhwSh MfrPiInHxTes MfrPiInHxTesSh xFracDivDhw MfrPiPuDhwOut MfrPiCircIn MfrPiTesDhwIn 
+MfrPiPuCircOut MfrPiPuCircIn MfrPiDhwDemand MfrPiDhwSecOut MfrPiHxDhwSecIn MfrPiDhwMains MfrPiHpToTesSHOut MfrPiHpToTesDHWOut 
+MfrPiHpInPu xFracDivDhwOut MfrPiTesDhwOut MfrPiHxDhwIn MfrPiCircOut MfrPiIceOut MfrPiIceIn 
+
+ASSIGN BigIceTwoStorages_T.prt 526
+
+UNIT 526 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+526! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 54
+TPiRadIn TPiRadOut TPiSHOutMix TPiSHInMix TPiHpEvapIn TPiHpEvapMix TPiIceToHp 
+TPiTeeOutIceIn TPiTeeColToHpIn TPiPuCoolIn TPiHxCoolBriIn TPiHxCoolBriOut TPiColToIce TPiColIn TPiHxCoolWatIn 
+TPiTeeMixSHIn TPiHxCoolWatOut TPiDivSHCool TPiHxDhwOut TPiColPuIn TPiIceToCol TPiHpOutPu TPiHpEvapOut 
+TPiHpCondIn TPiHpToTesDhwIn TPiHptoTesSHIn TPiTesDhwToSh TPiShTesOut TPiDivDhwShCol TPiOutHxTes TPiColOut 
+TPiHpOutDiv TPiHpCondOut TPiOutHxTesSh TPiColDivDhwSh TPiInHxTes TPiInHxTesSh TPiPuDhwOut TPiCircIn 
+TPiTesDhwIn TPiPuCircOut TPiPuCircIn TPiDhwDemand TPiDhwSecOut TPiHxDhwSecIn TPiDhwMains TPiHpToTesSHOut 
+TPiHpToTesDHWOut TPiHpInPu TPiTesDhwOut TPiHxDhwIn TPiCircOut TPiIceOut TPiIceIn 
+***
+TPiRadIn TPiRadOut TPiSHOutMix TPiSHInMix TPiHpEvapIn TPiHpEvapMix TPiIceToHp 
+TPiTeeOutIceIn TPiTeeColToHpIn TPiPuCoolIn TPiHxCoolBriIn TPiHxCoolBriOut TPiColToIce TPiColIn TPiHxCoolWatIn 
+TPiTeeMixSHIn TPiHxCoolWatOut TPiDivSHCool TPiHxDhwOut TPiColPuIn TPiIceToCol TPiHpOutPu TPiHpEvapOut 
+TPiHpCondIn TPiHpToTesDhwIn TPiHptoTesSHIn TPiTesDhwToSh TPiShTesOut TPiDivDhwShCol TPiOutHxTes TPiColOut 
+TPiHpOutDiv TPiHpCondOut TPiOutHxTesSh TPiColDivDhwSh TPiInHxTes TPiInHxTesSh TPiPuDhwOut TPiCircIn 
+TPiTesDhwIn TPiPuCircOut TPiPuCircIn TPiDhwDemand TPiDhwSecOut TPiHxDhwSecIn TPiDhwMains TPiHpToTesSHOut 
+TPiHpToTesDHWOut TPiHpInPu TPiTesDhwOut TPiHxDhwIn TPiCircOut TPiIceOut TPiIceIn 
+
+ENDS

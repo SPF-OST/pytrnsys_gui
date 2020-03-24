@@ -114,47 +114,70 @@ class PortItem(QGraphicsEllipseItem):
                 conn.positionLabel()
 
                 if conn.fromPort is self:
-                    if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
-                        cor = conn.getCorners()[0]
-                        cor.setPos(cor.pos().x(), self.scenePos().y())
+                    if self.side != 1 or conn.segments[0].isHorizontal():
+                        if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
+                            cor = conn.getCorners()[0]
+                            cor.setPos(cor.pos().x(), self.scenePos().y())
 
-                        seg = conn.segments[0]  # first segment
-                        seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
-                        if len(conn.segments)>1:
-                            verSeg = conn.segments[1]
-                            nextSeg = conn.segments[2]
-                        if nextSeg.isHorizontal() and seg.isHorizontal():
-                            if int(seg.endNode.parent.pos().y()-0) <= int(nextSeg.line().p2().y()) <= int(
-                                    seg.endNode.parent.pos().y()+0):
-                                print("both segments are horizontal from fromport")
-                                self.hideCorners(conn)
-                                verSeg.setVisible(False)
-                            else:
-                                self.showCorners(conn)
-                                verSeg.setVisible(True)
+                            seg = conn.segments[0]  # first segment
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            if len(conn.segments)>2:
+                                verSeg = conn.segments[1]
+                                nextSeg = conn.segments[2]
+                                if nextSeg.isHorizontal() and seg.isHorizontal():
+                                    if int(seg.endNode.parent.pos().y()-0) <= int(nextSeg.line().p2().y()) <= int(
+                                            seg.endNode.parent.pos().y()+0):
+                                        print("both segments are horizontal from fromport")
+                                        self.hideCorners(conn)
+                                        verSeg.setVisible(False)
+                                    else:
+                                        self.showCorners(conn)
+                                        verSeg.setVisible(True)
+                    else:
+                        if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
+                            cor = conn.getCorners()[0]
+                            cor.setPos(self.scenePos().x(), cor.pos().y())
 
-
-
+                            seg = conn.segments[0]  # first segment
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
 
                 elif conn.toPort is self:
-                    if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
-                        cor = conn.getCorners()[-1]
-                        cor.setPos(cor.pos().x(), self.scenePos().y())
+                    if conn.fromPort.side != 1 or conn.segments[0].isHorizontal():
+                        if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
+                            cor = conn.getCorners()[-1]
+                            cor.setPos(cor.pos().x(), self.scenePos().y())
 
-                        seg = conn.segments[-1]
-                        seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
-                        if len(conn.segments)>1:
-                            verSeg = conn.segments[-2]
-                            nextSeg = conn.segments[-3]
-                        if nextSeg.isHorizontal() and seg.isHorizontal():
-                            if int(nextSeg.endNode.parent.pos().y() - 0) <= int(seg.line().p2().y()) <= int(
-                                    nextSeg.endNode.parent.pos().y() + 0):
-                                print("both segments are horizontal from toport")
-                                self.hideCorners(conn)
-                                verSeg.setVisible(False)
-                            else:
-                                self.showCorners(conn)
-                                verSeg.setVisible(True)
+                            seg = conn.segments[-1]
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            if len(conn.segments)>2:
+                                verSeg = conn.segments[-2]
+                                nextSeg = conn.segments[-3]
+                                if nextSeg.isHorizontal() and seg.isHorizontal():
+                                    if int(nextSeg.endNode.parent.pos().y() - 0) <= int(seg.line().p2().y()) <= int(
+                                            nextSeg.endNode.parent.pos().y() + 0):
+                                        print("both segments are horizontal from toport")
+                                        self.hideCorners(conn)
+                                        verSeg.setVisible(False)
+                                    else:
+                                        self.showCorners(conn)
+                                        verSeg.setVisible(True)
+                    else:
+                        if len(conn.getCorners()) == 1 and len(conn.segments) > 0:
+                            cor = conn.getCorners()[-1]
+                            cor.setPos(cor.pos().x(), self.scenePos().y())
+                            print("Inside 2nd")
+
+                            seg = conn.segments[-1]  # last segment
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
+                                        cor.scenePos().y())
+                        elif len(conn.getCorners()) == 2 and len(conn.segments) > 0:
+                            cor = conn.getCorners()[-1]
+                            cor.setPos(self.scenePos().x(), cor.pos().y())
+                            print("Inside 3rd")
+
+                            seg = conn.segments[-1]  # last segment
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
+                                        cor.scenePos().y())
 
                 else:
                     print("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
