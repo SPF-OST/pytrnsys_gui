@@ -124,7 +124,7 @@ class MassFlowVisualizer(QDialog):
     def cancel(self):
         self.pauseVis()
         self.close()
-        self.parent.updateConnGrads()
+        self.parent.centralWidget.updateConnGrads()
 
     # comment out
     def showMassBtn(self):

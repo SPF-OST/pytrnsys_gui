@@ -1542,9 +1542,11 @@ class DiagramEditor(QWidget):
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
             if ret == QMessageBox.Save:
+                self.canceled = False
                 print("Overwriting")
                 # continue
             else:
+                self.canceled = True
                 print("Canceling")
                 return
         else:
@@ -3059,21 +3061,23 @@ class MainWindow(QMainWindow):
 
         exportPath = self.centralWidget.exportData()
         self.exportedTo = exportPath
-        cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
-        os.system(cmd)
-        mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
-        tempFile = os.path.splitext(str(exportPath))[0]+'_T.prt'
-        msgb = QMessageBox(self)
-        if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
-            msgb.setText("Trnsys not succesfully executed")
-            msgb.exec()
-            del self.exportedTo
-        else:
-            if not self.calledByVisualizeMf:
-                msgb.setText("Trnsys successfully executed")
+        print(exportPath)
+        if exportPath != 'None':
+            cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
+            os.system(cmd)
+            mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
+            tempFile = os.path.splitext(str(exportPath))[0]+'_T.prt'
+            msgb = QMessageBox(self)
+            if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
+                msgb.setText("Trnsys not succesfully executed")
                 msgb.exec()
-        self.calledByVisualizeMf = False
-        return mfrFile, tempFile
+                del self.exportedTo
+            else:
+                if not self.calledByVisualizeMf:
+                    msgb.setText("Trnsys successfully executed")
+                    msgb.exec()
+            self.calledByVisualizeMf = False
+            return mfrFile, tempFile
 
     def loadVisualization(self):
         try:

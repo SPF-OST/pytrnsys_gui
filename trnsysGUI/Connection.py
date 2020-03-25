@@ -568,7 +568,7 @@ class Connection(object):
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
-            baseline_h = max(pos1.y(), pos2.y()) + 100
+            baseline_h = max(pos1.y(), pos2.y()) + 100.6
 
             p1 = QPointF(pos1.x() + portOffset, pos1.y())
             p2 = QPointF(p1.x(), baseline_h)
@@ -633,7 +633,7 @@ class Connection(object):
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
-            baseline_h = max(pos1.y(), pos2.y()) + 100
+            baseline_h = max(pos1.y(), pos2.y()) + 100.6
 
             # p1 = QPointF(pos1.x() + 50, pos1.y())
             p1 = QPointF(pos1.x() - portOffset, pos1.y())

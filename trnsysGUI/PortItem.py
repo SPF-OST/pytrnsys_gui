@@ -128,6 +128,7 @@ class PortItem(QGraphicsEllipseItem):
                                     if int(seg.endNode.parent.pos().y()-0) <= int(nextSeg.line().p2().y()) <= int(
                                             seg.endNode.parent.pos().y()+0):
                                         print("both segments are horizontal from fromport")
+                                        # verSeg.deleteSegment()
                                         self.hideCorners(conn)
                                         verSeg.setVisible(False)
                                     else:
@@ -311,3 +312,5 @@ class PortItem(QGraphicsEllipseItem):
         cor2 = connection.getCorners()[-1]
         cor.setVisible(True)
         cor2.setVisible(True)
+
+
