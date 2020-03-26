@@ -96,13 +96,16 @@ class TVentilDlg(QDialog):
         print("Changing displayName")
         newName = self.le.text()
         if self.block.isTempering:
-            self.block.setPositionForMassFlowSolver(0)
+            self.block.setPositionForMassFlowSolver(0.0)
+            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
         if newName.lower() == str(self.block.displayName).lower():
+            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
             self.close()
         elif newName != "" and not self.nameExists(newName) and newName != self.name:
             # self.block.setName(newName)
             self.block.label.setPlainText(newName)
             self.block.displayName = newName
+            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
             self.close()
         elif newName == "":
             msgb = QMessageBox()
@@ -121,10 +124,11 @@ class TVentilDlg(QDialog):
 
     def setNewComplexState(self, state):
         self.block.setComplexDiv(state)
+        self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
 
     def positionMassFlowSolverChanged(self,value):
         if self.block.isTempering:
-            self.block.setPositionForMassFlowSolver(0)
+            self.block.setPositionForMassFlowSolver(0.0)
         else:
             self.block.setPositionForMassFlowSolver(value)
 

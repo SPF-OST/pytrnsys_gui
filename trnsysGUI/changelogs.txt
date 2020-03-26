@@ -291,3 +291,111 @@ Differences:
 Reason for change:
 After cold water temperature export problem fixed
 ==============================================================
+==============================================================
+24/03/2020 23:32:35
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\ASHP+Tes.dck
+
+Differences:
+32:TWTapBottom = 1
+
+Reason for change:
+Supplywater
+==============================================================
+==============================================================
+24/03/2020 23:32:42
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\Combi+1Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:46
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\Combi+2Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:49
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\DHWSolar+Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:53
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\GSHP+Tes.dck
+
+Differences:
+32:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:56
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SASHP+2Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:59
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SASHP+Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:33:02
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SGSHP+2Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:33:05
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SGSHP+Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================

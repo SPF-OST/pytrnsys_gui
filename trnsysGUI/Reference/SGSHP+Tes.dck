@@ -30,7 +30,7 @@ EQUATIONS 3
 EQUATIONS 14
 *** Black box component temperatures
 TCollector=1 
-TsupplyWater = TCW
+TWTapBottom = 1
 TRadFloor=1 
 THxDhw=1
 THxSolar=1
