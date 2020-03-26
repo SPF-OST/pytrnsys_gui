@@ -91,10 +91,13 @@ class BlockDlg(QDialog):
     def loadFile(self):
         print("Opening diagram")
         # self.centralWidget.delBlocks()
-        fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="")[0]
+        fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.txt")[0]
         if fileName != '':
-            os.system("notepad.exe " + fileName)
-            print(fileName)
+            if len(self.block.propertyFile) < 2:
+                self.block.propertyFile.append(fileName)
+            else:
+                self.block.propertyFile.clear()
+                self.block.propertyFile.append(fileName)
         else:
             print("No filename chosen")
         pass

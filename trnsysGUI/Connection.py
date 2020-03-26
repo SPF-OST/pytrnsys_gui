@@ -524,7 +524,7 @@ class Connection(object):
             return
 
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 4
+        rad = 4 # 4
 
         print(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
