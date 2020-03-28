@@ -114,7 +114,7 @@ class PortItem(QGraphicsEllipseItem):
                 conn.positionLabel()
 
                 if conn.fromPort is self:
-                    if self.side != 1 or conn.segments[0].isHorizontal():
+                    if (self.side != 1 and self.side != 3) or conn.segments[0].isHorizontal():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[0]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
@@ -143,7 +143,7 @@ class PortItem(QGraphicsEllipseItem):
                             seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
 
                 elif conn.toPort is self:
-                    if conn.fromPort.side != 1 or conn.segments[0].isHorizontal():
+                    if (conn.fromPort.side != 1 and conn.fromPort.side != 3) or conn.segments[0].isHorizontal():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
