@@ -684,7 +684,7 @@ class Connection(object):
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(corner1)
 
-                p1 = QPointF(pos1.x(), pos2.y())  # position of the connecting node
+                p1 = QPointF(pos1.x(), pos2.y()-0.333)  # position of the connecting node
 
                 seg1.setLine(QLineF(pos1, p1))
                 seg2.setLine(QLineF(p1, pos2))

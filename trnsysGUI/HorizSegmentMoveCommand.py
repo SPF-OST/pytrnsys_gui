@@ -9,9 +9,21 @@ class HorizSegmentMoveCommand(QUndoCommand):
         self.seg = segment
 
     def redo(self):
-        self.seg.startNode.parent.setPos(self.newX, self.seg.startNode.parent.scenePos().y())
-        self.seg.endNode.parent.setPos(self.newX, self.seg.endNode.parent.scenePos().y())
+        try:
+            self.seg.startNode.parent.scenePos().y()
+            self.seg.endNode.parent.scenePos().y()
+        except AttributeError:
+            pass
+        else:
+            self.seg.startNode.parent.setPos(self.newX, self.seg.startNode.parent.scenePos().y())
+            self.seg.endNode.parent.setPos(self.newX, self.seg.endNode.parent.scenePos().y())
 
     def undo(self):
-        self.seg.startNode.parent.setPos(self.oldX, self.seg.startNode.parent.scenePos().y())
-        self.seg.endNode.parent.setPos(self.oldX, self.seg.endNode.parent.scenePos().y())
+        try:
+            self.seg.startNode.parent.scenePos().y()
+            self.seg.endNode.parent.scenePos().y()
+        except AttributeError:
+            pass
+        else:
+            self.seg.startNode.parent.setPos(self.oldX, self.seg.startNode.parent.scenePos().y())
+            self.seg.endNode.parent.setPos(self.oldX, self.seg.endNode.parent.scenePos().y())

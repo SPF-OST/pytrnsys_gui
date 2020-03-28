@@ -272,17 +272,21 @@ class segmentItem(QGraphicsLineItem):
                         self.endNode.parent.setPos(self.endNode.parent.scenePos().x(), newPos.y())
                         self.startNode.parent.setPos(self.startNode.parent.scenePos().x(), newPos.y())
 
+                elif type(self.endNode.parent) is CornerItem and self.isVertical():
+                    print("Segment is vertical and can't be moved")
+
+
                 # if type(self.startNode.parent) is Connection and self.startNode.prevN() is None:
                 #     print("We begin at the fromPort")
 
-                if hasattr(self.endNode.parent, "fromPort") and self.endNode.nextN() is None:
+                if hasattr(self.endNode.parent, "fromPort") and self.endNode.nextN() is None and not self.isVertical():
                     print("We end at toPort")
                     if not self.inited:
                         self.initInMode1(False)
                     else:
                         self.dragInMode1(False, newPos)
 
-                if hasattr(self.startNode.parent, "fromPort") and self.startNode.prevN() is None:
+                elif hasattr(self.startNode.parent, "fromPort") and self.startNode.prevN() is None and not self.isVertical():
                     print("We end at fromPort")
                     if not self.inited:
                         self.initInMode1(True)
@@ -381,9 +385,14 @@ class segmentItem(QGraphicsLineItem):
             elif self.parent.parent.editorMode == 1:
                 # if self.parent.segments[0].isVertical() == False and self.parent.segments[2].isVertical() == False:
                 if self.isVertical():
-                    command = HorizSegmentMoveCommand(self, self.oldX, "Moving segment command")
-                    self.parent.parent.parent().undoStack.push(command)
-                    self.oldX = self.scenePos().x()
+                    try:
+                        self.oldX
+                    except AttributeError:
+                        pass
+                    else:
+                        command = HorizSegmentMoveCommand(self, self.oldX, "Moving segment command")
+                        self.parent.parent.parent().undoStack.push(command)
+                        self.oldX = self.scenePos().x()
 
                 if self.isHorizontal():
                     if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
