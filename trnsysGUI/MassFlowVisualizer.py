@@ -410,7 +410,9 @@ class MassFlowVisualizer(QDialog):
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Up:
+            print("Up is pressed")
             self.increaseValue()
         elif e.key() == Qt.Key_Down:
+            print("Down is pressed")
             self.decreaseValue()
 
