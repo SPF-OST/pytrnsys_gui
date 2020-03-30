@@ -502,7 +502,7 @@ class segmentItem(QGraphicsLineItem):
         else:
             self.end = self.endNode
 
-        rad = 4
+        rad = 2
 
         self.cornerChild = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.start, self.end, self.parent)
         self.firstChild = segmentItem(self.start, self.cornerChild.node, self.parent)
@@ -523,7 +523,7 @@ class segmentItem(QGraphicsLineItem):
 
     def initInMode1(self, b):
 
-        rad = 4
+        rad = 2
 
         if b:
             if (hasattr(self.startNode.parent, "fromPort")) and (self.startNode.prevN() is None):

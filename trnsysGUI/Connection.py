@@ -404,7 +404,7 @@ class Connection(object):
 
         print("start node has nn " + str(tempNode.nextNode))
         print(" ")
-        rad = 4
+        rad = 2
 
         for x in range(len(self.cornersLoad)):
             cor = CornerItem(- rad, - rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -524,7 +524,7 @@ class Connection(object):
             return
 
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 4 # 4
+        rad = 2 # 4
 
         print(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
@@ -663,6 +663,7 @@ class Connection(object):
             corner4.setPos(p4)
 
         elif self.fromPort.side == 1:
+            # todo :  when rotated, it cause a problem because side gets changed
 
             print("NiceConn from 1")
             portOffset = 30
