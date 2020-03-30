@@ -404,7 +404,7 @@ class Connection(object):
 
         print("start node has nn " + str(tempNode.nextNode))
         print(" ")
-        rad = 4
+        rad = 2
 
         for x in range(len(self.cornersLoad)):
             cor = CornerItem(- rad, - rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -524,7 +524,7 @@ class Connection(object):
             return
 
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 4
+        rad = 2 # 4
 
         print(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
@@ -663,6 +663,7 @@ class Connection(object):
             corner4.setPos(p4)
 
         elif self.fromPort.side == 1:
+            # todo :  when rotated, it cause a problem because side gets changed
 
             print("NiceConn from 1")
             portOffset = 30
@@ -684,7 +685,7 @@ class Connection(object):
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(corner1)
 
-                p1 = QPointF(pos1.x(), pos2.y())  # position of the connecting node
+                p1 = QPointF(pos1.x(), pos2.y()-0.333)  # position of the connecting node
 
                 seg1.setLine(QLineF(pos1, p1))
                 seg2.setLine(QLineF(p1, pos2))
@@ -696,6 +697,7 @@ class Connection(object):
 
                 corner1.setPos(p1)
                 self.firstS = self.getFirstSeg()
+
             else:
                 print("To port below from port")
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
@@ -719,6 +721,84 @@ class Connection(object):
                 self.parent.diagramScene.addItem(corner2)
 
                 offsetPoint = pos1.y()-15.666
+
+                help_point_1 = QPointF(pos1.x(), offsetPoint)
+                help_point_2 = QPointF(pos2.x(), offsetPoint)
+
+                seg1.setLine(QLineF(pos1, help_point_1))
+                seg2.setLine(QLineF(help_point_1, help_point_2))
+                seg3.setLine(QLineF(help_point_2, pos2))
+
+                corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+                corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
+
+                corner1.setZValue(100)
+                corner2.setZValue(100)
+                self.fromPort.setZValue(100)
+                self.toPort.setZValue(100)
+                print("Here in niceconn")
+
+                corner1.setPos(help_point_1)
+                corner2.setPos(help_point_2)
+                self.firstS = self.getFirstSeg()
+
+        elif self.fromPort.side == 3:
+
+            print("NiceConn from 1")
+            portOffset = 30
+            self.clearConn()
+
+            pos1 = self.fromPort.scenePos()
+            pos2 = self.toPort.scenePos()
+
+            if pos2.y() >= pos1.y():
+                corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
+
+                seg1 = segmentItem(self.startNode, corner1.node, self)
+                seg2 = segmentItem(corner1.node, self.endNode, self)
+
+                self.startNode.setNext(corner1.node)
+                self.endNode.setPrev(corner1.node)
+
+                self.parent.diagramScene.addItem(seg1)
+                self.parent.diagramScene.addItem(seg2)
+                self.parent.diagramScene.addItem(corner1)
+
+                p1 = QPointF(pos1.x(), pos2.y()-0.333)  # position of the connecting node
+
+                seg1.setLine(QLineF(pos1, p1))
+                seg2.setLine(QLineF(p1, pos2))
+
+                corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+                corner1.setZValue(100)
+                self.fromPort.setZValue(100)
+                self.toPort.setZValue(100)
+
+                corner1.setPos(p1)
+                self.firstS = self.getFirstSeg()
+            else:
+                print("To port above from port")
+                corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+                corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+
+                corner1.node.setNext(corner2.node)
+
+                seg1 = segmentItem(self.startNode, corner1.node, self)
+                seg2 = segmentItem(corner1.node, corner2.node, self)
+                seg3 = segmentItem(corner2.node, self.endNode, self)
+
+                self.startNode.setNext(corner1.node)
+                self.endNode.setPrev(corner2.node)
+
+                self.printConnNodes()
+                self.parent.diagramScene.addItem(seg1)
+                self.parent.diagramScene.addItem(seg2)
+                self.parent.diagramScene.addItem(seg3)
+
+                self.parent.diagramScene.addItem(corner1)
+                self.parent.diagramScene.addItem(corner2)
+
+                offsetPoint = pos1.y()+15.666
 
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)

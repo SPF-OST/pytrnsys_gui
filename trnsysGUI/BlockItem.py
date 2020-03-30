@@ -48,6 +48,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.h = 100.0
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
+        self.propertyFile = []
 
         if "displayName" in kwargs:
             self.displayName = kwargs["displayName"]
@@ -225,6 +226,9 @@ class BlockItem(QGraphicsPixmapItem):
             dia = self.parent.parent().showPumpDlg(self)
         else:
             dia = self.parent.parent().showBlockDlg(self)
+            if len(self.propertyFile) > 0:
+                for files in self.propertyFile:
+                    os.startfile(files, 'open')
 
     def mouseReleaseEvent(self, event):
         # print("Released mouse over block")
