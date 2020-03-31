@@ -3,7 +3,7 @@ import sys
 
 import numpy
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPainter, QBrush, QColor
 from PyQt5.QtWidgets import QSlider, QDialog, QLineEdit, QPushButton, QHBoxLayout, QLabel, QGridLayout, QWidget
 
@@ -45,7 +45,7 @@ class MassFlowVisualizer(QDialog):
         self.setSlider()
         self.slider.sliderReleased.connect(self.testValChange)
         self.slider.sliderPressed.connect(self.pressedSlider)
-        self.slider.sliderMoved.connect(self.moveValues)
+        self.slider.valueChanged.connect(self.moveValues)
         self.slider.setTickInterval(24)
 
         self.qtm = QTimer(parent)
@@ -124,7 +124,7 @@ class MassFlowVisualizer(QDialog):
     def cancel(self):
         self.pauseVis()
         self.close()
-        self.parent.updateConnGrads()
+        self.parent.centralWidget.updateConnGrads()
 
     # comment out
     def showMassBtn(self):
@@ -226,6 +226,13 @@ class MassFlowVisualizer(QDialog):
                         else:
                             t.setColor(mfr="test")
                         i += 1
+                else:
+                    if 'xFrac'+t.displayName in self.massFlowData.columns:
+                        valvePosition = str(self.massFlowData['xFrac' + t.displayName].iloc[self.timeStep])
+                        t.setPositionForMassFlowSolver(valvePosition)
+                        t.posLabel.setPlainText(valvePosition)
+                        print('valve position:', valvePosition)
+
 
         else:
             return
@@ -258,7 +265,6 @@ class MassFlowVisualizer(QDialog):
     def testValChange(self):
         val = self.slider.value()
         print("Slider value has changed to " + str(val))
-        # TODO : need to get time from file, val = row inside file
         time = self.getTime(val)
         self.currentStepLabel.setText("Time :" + str(time))
         self.timeStep = val
@@ -268,10 +274,10 @@ class MassFlowVisualizer(QDialog):
 
         val = self.slider.value()
         print("Slider value is still: " + str(val))
-        # TODO : need to get time from file, val = row inside file
         time = self.getTime(val)
         self.currentStepLabel.setText("Time :" + str(time))
         self.timeStep = val
+        self.advance()
 
     def increaseValue(self):
         """
@@ -280,9 +286,20 @@ class MassFlowVisualizer(QDialog):
         """
 
         self.timeStep += 1
-        self.slider.setValue(self.timeStep)
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
+        self.slider.setValue(self.timeStep)
+
+    def decreaseValue(self):
+        """
+        For automatic slider movement
+
+        """
+
+        self.timeStep -= 1
+        if self.timeStep < 0:
+            self.timeStep = self.maxTimeStep
+        self.slider.setValue(self.timeStep)
 
 
     def checkTimeStep(self):
@@ -390,4 +407,12 @@ class MassFlowVisualizer(QDialog):
         self.parent.massFlowEnabled = False
 
         super(MassFlowVisualizer, self).closeEvent(a0)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Up:
+            print("Up is pressed")
+            self.increaseValue()
+        elif e.key() == Qt.Key_Down:
+            print("Down is pressed")
+            self.decreaseValue()
 

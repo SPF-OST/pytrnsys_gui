@@ -221,10 +221,12 @@ class ConfigStorage(QDialog):
         for h in self.storage.heatExchangers:
             if h.sSide == 0:
                 self.listWL.addItem(
-                    h.displayName + ", y_offset = " + "%.2f" %(100 - 100 * h.offset.y() / self.storage.h) + "%")
+                    h.displayName + ", y_offset = " + "%d" %(100 - 100 * h.offset.y() / self.storage.h) + "%" \
+                    + " to " + "%d" % h.output + "%")
             if h.sSide == 2:
                 self.listWR.addItem(
-                    h.displayName + ", y_offset = " + "%.2f" %(100 - 100 * h.offset.y() / self.storage.h) + "%")
+                    h.displayName + ", y_offset = " + "%d" %(100 - 100 * h.offset.y() / self.storage.h) + "%" \
+                    + " to " + "%d" % h.output + "%")
 
     def loadDirPorts(self):
         for c in self.storage.directPortConnsForList:
@@ -313,7 +315,10 @@ class ConfigStorage(QDialog):
                                 self.hxNameLe.text())
 
         # Add HeatExchanger string to list
-        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%d" %(float(self.offsetLeI.text())) + "%")
+        output = float(self.offsetLeO.text())
+        hx_temp.output = output
+        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%d" %(float(self.offsetLeI.text())) + "%" \
+                    + " to " + "%d" % output + "%")
 
     def addHxR(self):
         """
@@ -332,7 +337,10 @@ class ConfigStorage(QDialog):
                                 self.storage,
                                 self.hxNameLe.text())
         # Add HeatExchanger string to list
-        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%d" %(float(self.offsetLeI.text())) + "%")
+        output = float(self.offsetLeO.text())
+        hx_temp.output = output
+        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%d" %(float(self.offsetLeI.text())) + "%" \
+                    + " to " + "%d" % output + "%")
 
     def manAddPortPair(self):
         if float(self.manPortLeI.text()) > 100:

@@ -90,6 +90,7 @@ class Test_Export(object):
         -------
 
         """
+
         i = 0
         fileErrorList = []
         found = False
@@ -107,6 +108,7 @@ class Test_Export(object):
                     break
             if found:
                 if not filecmp.cmp(exportedFileList[i], originalFileList[j], shallow=False):
+                    # todo : can maybe simplify this part is not using random number for pump power
                     fileOne = open(exportedFileList[i])
                     fileTwo = open(originalFileList[j])
 

@@ -17,6 +17,7 @@ class HeatExchanger(QGraphicsItemGroup):
         super(HeatExchanger, self).__init__(parent)
         self.parent = parent
         self.offset = offset  # QPointF
+        self.output = 0
         self.lines = []
         self.w = sizeW
         self.h = sizeH

@@ -1,28 +1,32 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "GraphicalItem-56": {
+        "Block-1624": {
             ".__BlockDict__": true,
-            "BlockName": "GraphicalItem",
+            "BlockDisplayName": "Kollektor1624",
+            "BlockName": "Kollektor",
             "BlockPosition": [
-                -628.0,
-                -136.0
+                -1222.0,
+                -120.0
             ],
             "FlippedH": false,
             "FlippedV": false,
-            "ID": 56,
-            "ImageSource": "gear.svg",
+            "GroupName": "defaultGroup",
+            "ID": 1624,
+            "PortsIDIn": [
+                1625
+            ],
+            "PortsIDOut": [
+                1626
+            ],
             "RotationN": 0,
-            "Size": [
-                100.0,
-                100.0
-            ]
+            "trnsysID": 604
         },
         "IDs": {
-            "GlobalId": 57,
+            "GlobalId": 1627,
             "__idDct__": true,
-            "globalConnID": 1,
-            "trnsysID": 21
+            "globalConnID": 454,
+            "trnsysID": 605
         },
         "Strings": {
             "DiagramName": "COPYGROUP",
