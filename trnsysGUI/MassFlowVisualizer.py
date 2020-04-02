@@ -23,7 +23,7 @@ class MassFlowVisualizer(QDialog):
         self.tempLoadedFile = False
         self.loadFile()
         self.loadTempFile()
-        self.maxTimeStep = 5 # todo change this to the number of rows in the file
+        self.maxTimeStep = len(self.massFlowData.index)  - 1
         self.showMass = False
 
         self.setMinimumSize(1000, 200)
@@ -161,7 +161,7 @@ class MassFlowVisualizer(QDialog):
         self.paused = False
         self.qtm = QTimer(self.parent)
         self.qtm.timeout.connect(self.advance)
-        # self.qtm.timeout.connect(self.increaseValue)
+        self.qtm.timeout.connect(self.increaseValue)
         self.qtm.start(1000)
 
     def advance(self):

@@ -1,32 +1,32 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "Block-1624": {
+        "Block-100": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Kollektor1624",
-            "BlockName": "Kollektor",
+            "BlockDisplayName": "PuBoiler",
+            "BlockName": "Pump",
             "BlockPosition": [
-                -1222.0,
-                -120.0
+                -947.0,
+                -456.0
             ],
-            "FlippedH": false,
+            "FlippedH": true,
             "FlippedV": false,
             "GroupName": "defaultGroup",
-            "ID": 1624,
+            "ID": 100,
             "PortsIDIn": [
-                1625
+                101
             ],
             "PortsIDOut": [
-                1626
+                102
             ],
             "RotationN": 0,
-            "trnsysID": 604
+            "trnsysID": 100
         },
         "IDs": {
-            "GlobalId": 1627,
+            "GlobalId": 1378,
             "__idDct__": true,
-            "globalConnID": 454,
-            "trnsysID": 605
+            "globalConnID": 401,
+            "trnsysID": 526
         },
         "Strings": {
             "DiagramName": "COPYGROUP",
