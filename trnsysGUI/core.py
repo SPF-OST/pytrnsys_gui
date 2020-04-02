@@ -2094,6 +2094,10 @@ class DiagramEditor(QWidget):
         for c in self.trnsysObj:
             if isinstance(c, Connection) and not c.isVirtualConn:
                 c.showLabel(b)
+            if isinstance(c, BlockItem):
+                c.label.setVisible(b)
+            if isinstance(c, TVentil):
+                c.posLabel.setVisible(b)
         # Faster alternative, untested
         # for c in self.connectionList:
         #     if not c.isVirtualConn:

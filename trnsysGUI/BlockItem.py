@@ -102,6 +102,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
         self.label = QGraphicsTextItem(self.displayName, self)
+        self.label.setVisible(False)
 
         if self.name == 'Bvi':
             self.inputs.append(PortItem('i', 0, self))
