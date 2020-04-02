@@ -192,7 +192,7 @@ class Connection(object):
     def setEndPos(self):
         pass
 
-    def setColor(self, **kwargs):
+    def setColor(self, value, **kwargs):
         col = QColor(0, 0, 0)
 
         if "mfr" in kwargs:
@@ -227,7 +227,8 @@ class Connection(object):
                 col = QColor(255, 0, 0)
 
             for s in self.segments:
-                pen1 = QPen(col, 2)
+                print("Value: ", value)
+                pen1 = QPen(col, value)
                 s.setPen(pen1)
 
         else:
