@@ -41,6 +41,9 @@ class MassFlowVisualizer(QDialog):
 
         self.getTempThresholdValues()
 
+        self.jumpValue = QLabel("Jump by:")
+        self.jumpValueLE = QLineEdit("1")
+
         self.slider = QSlider(parent)
         self.setSlider()
         self.slider.sliderReleased.connect(self.testValChange)
@@ -86,6 +89,8 @@ class MassFlowVisualizer(QDialog):
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
+        buttonLayout.addWidget(self.jumpValue)
+        buttonLayout.addWidget(self.jumpValueLE)
         buttonLayout.addWidget(self.showMassButton)  # comment out
         buttonLayout.addWidget(self.togglePauseButton)
         buttonLayout.addWidget(self.cancelButton)
@@ -285,7 +290,7 @@ class MassFlowVisualizer(QDialog):
 
         """
 
-        self.timeStep += 1
+        self.timeStep += int(self.jumpValueLE.text())
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
         self.slider.setValue(self.timeStep)
@@ -296,7 +301,7 @@ class MassFlowVisualizer(QDialog):
 
         """
 
-        self.timeStep -= 1
+        self.timeStep -= int(self.jumpValueLE.text())
         if self.timeStep < 0:
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)

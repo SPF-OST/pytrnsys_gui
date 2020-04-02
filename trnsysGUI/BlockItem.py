@@ -225,6 +225,8 @@ class BlockItem(QGraphicsPixmapItem):
             dia = self.parent.parent().showTVentilDlg(self)
         elif self.name == 'Pump':
             dia = self.parent.parent().showPumpDlg(self)
+        elif self.name == 'TeePiece' or self.name == 'WTap_main' :
+            dia = self.parent.parent().showBlockDlg(self)
         else:
             dia = self.parent.parent().showBlockDlg(self)
             if len(self.propertyFile) > 0:

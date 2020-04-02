@@ -52,6 +52,7 @@ class BlockDlg(QDialog):
         self.hFlipBox.stateChanged.connect(self.setNewFlipStateH)
         self.vFlipBox.stateChanged.connect(self.setNewFlipStateV)
         self.setWindowTitle("Properties")
+        self.disableLoad()
         self.show()
 
     def acceptedEdit(self):
@@ -101,3 +102,7 @@ class BlockDlg(QDialog):
         else:
             print("No filename chosen")
         pass
+
+    def disableLoad(self):
+        if self.block.name == 'TeePiece' or self.block.name == 'WTap_main':
+            self.loadButton.setDisabled(True)
