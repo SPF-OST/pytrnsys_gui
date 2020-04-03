@@ -1,5 +1,6 @@
 import re
 import sys
+from datetime import timedelta, datetime, MINYEAR
 
 import numpy
 from PyQt5 import QtCore, QtGui
@@ -23,14 +24,14 @@ class MassFlowVisualizer(QDialog):
         self.tempLoadedFile = False
         self.loadFile()
         self.loadTempFile()
-        self.maxTimeStep = len(self.massFlowData.index)  - 1
+        self.maxTimeStep = len(self.massFlowData.index) - 1
         self.showMass = False
 
         self.setMinimumSize(1000, 200)
 
         self.parent = parent
         self.timeStep = 0
-        self.timeSteps = len(self.massFlowData.index)  - 1    # 0 to 364
+        self.timeSteps = len(self.massFlowData.index) - 1    # 0 to 364
 
         # threshold values for positive list
         self.medianValue = 0
@@ -48,7 +49,7 @@ class MassFlowVisualizer(QDialog):
         self.getThresholdValues()
         self.getTempThresholdValues()
 
-        self.jumpValue = QLabel("Jump by:")
+        self.jumpValue = QLabel("Jump by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )")
         self.jumpValueLE = QLineEdit("1")
 
         self.slider = QSlider(parent)
@@ -65,7 +66,7 @@ class MassFlowVisualizer(QDialog):
         self.paused = True
 
         nameLabel = QLabel("Name:")
-        self.currentStepLabel = QLabel("Time: " + str(self.getTime(0)))
+        self.currentStepLabel = QLabel("Time: " + str(self.convertTime(self.getTime(0))))
         self.le = QLineEdit("NONE")
 
         self.showMassButton = QPushButton("Show mass")  # comment out
@@ -177,7 +178,7 @@ class MassFlowVisualizer(QDialog):
         self.qtm.start(1000)
 
     def advance(self):
-        if self.timeStep == 364:
+        if self.timeStep == self.maxTimeStep:
             print("reached end of data, returning")
             self.qtm.stop()
             return
@@ -280,7 +281,7 @@ class MassFlowVisualizer(QDialog):
         val = self.slider.value()
         print("Slider value has changed to " + str(val))
         time = self.getTime(val)
-        self.currentStepLabel.setText("Time :" + str(time))
+        self.currentStepLabel.setText("Time :" + str(self.convertTime(time)))
         self.timeStep = val
         self.advance()
 
@@ -289,7 +290,7 @@ class MassFlowVisualizer(QDialog):
         val = self.slider.value()
         print("Slider value is still: " + str(val))
         time = self.getTime(val)
-        self.currentStepLabel.setText("Time :" + str(time))
+        self.currentStepLabel.setText("Time :" + str(self.convertTime(time)))
         self.timeStep = val
         self.advance()
 
@@ -299,7 +300,7 @@ class MassFlowVisualizer(QDialog):
 
         """
 
-        self.timeStep += int(self.jumpValueLE.text())
+        self.timeStep += float(self.jumpValueLE.text())
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
         self.slider.setValue(self.timeStep)
@@ -310,7 +311,7 @@ class MassFlowVisualizer(QDialog):
 
         """
 
-        self.timeStep -= int(self.jumpValueLE.text())
+        self.timeStep -= float(self.jumpValueLE.text())
         if self.timeStep < 0:
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)
@@ -371,8 +372,7 @@ class MassFlowVisualizer(QDialog):
         self.maxValueMfr = np.max(noDuplicateData)  # max value
 
     def getThickness(self, mass):
-        mass = abs(int(float(mass)))
-        print("Search this", mass, self.minValueMfr, self.medianValueMfr, self.maxValueMfr)
+        mass = float(mass)
         if mass == self.minValueMfr:
             return 2
         elif self.minValueMfr < mass <= self.medianValueMfr:
@@ -417,6 +417,13 @@ class MassFlowVisualizer(QDialog):
         timeColumn = data[data.columns[0]]
         print(timeColumn[row])
         return timeColumn[row]
+
+    def convertTime(self, time):
+        noOfHours = 8760
+        decHour = float(time) / float(noOfHours)
+        base = datetime(MINYEAR, 1, 1)
+        result = base + timedelta(seconds=(base.replace(year=base.year + 1) - base).total_seconds() * decHour)
+        return str(result)
 
 
     def pressedSlider(self):
