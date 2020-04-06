@@ -300,9 +300,6 @@ class PortItem(QGraphicsEllipseItem):
             obj.parent.rightSide.remove(obj)
 
     def hideCorners(self, connection):
-        # TODO : the vertical segment connecting the two horizontal ones are still there
-        #  need delete the vertical segment. And connect the end node of one segment
-        #  to the start node of the other segment.
         cor = connection.getCorners()[0]
         cor2 = connection.getCorners()[-1]
         cor.setVisible(False)

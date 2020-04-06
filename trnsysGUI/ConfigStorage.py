@@ -316,7 +316,9 @@ class ConfigStorage(QDialog):
 
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
+        input = float(self.offsetLeI.text())
         hx_temp.output = output
+        hx_temp.input = input
         self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%d" %(float(self.offsetLeI.text())) + "%" \
                     + " to " + "%d" % output + "%")
 
@@ -338,7 +340,9 @@ class ConfigStorage(QDialog):
                                 self.hxNameLe.text())
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
+        input = float(self.offsetLeI.text())
         hx_temp.output = output
+        hx_temp.input = input
         self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%d" %(float(self.offsetLeI.text())) + "%" \
                     + " to " + "%d" % output + "%")
 

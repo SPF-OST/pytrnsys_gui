@@ -372,7 +372,7 @@ class MassFlowVisualizer(QDialog):
         self.maxValueMfr = np.max(noDuplicateData)  # max value
 
     def getThickness(self, mass):
-        mass = float(mass)
+        mass = abs(float(mass))
         if mass == self.minValueMfr:
             return 2
         elif self.minValueMfr < mass <= self.medianValueMfr:
