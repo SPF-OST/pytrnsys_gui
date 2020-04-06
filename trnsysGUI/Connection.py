@@ -146,7 +146,7 @@ class Connection(object):
         self.mass = mass
         self.temperature = temp
         for s in self.segments:
-            s.labelMass.setPlainText("M: %s   T: %s" % (self.mass, self.temperature))
+            s.labelMass.setPlainText("M: %s Kg/Hr   T: %s\u2103" % (self.mass, self.temperature))
 
 
     def setDisplayName(self, newName):
@@ -192,7 +192,7 @@ class Connection(object):
     def setEndPos(self):
         pass
 
-    def setColor(self, **kwargs):
+    def setColor(self, value, **kwargs):
         col = QColor(0, 0, 0)
 
         if "mfr" in kwargs:
@@ -227,7 +227,8 @@ class Connection(object):
                 col = QColor(255, 0, 0)
 
             for s in self.segments:
-                pen1 = QPen(col, 2)
+                print("Value: ", value)
+                pen1 = QPen(col, value)
                 s.setPen(pen1)
 
         else:

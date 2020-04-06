@@ -17,7 +17,6 @@ class HeatExchanger(QGraphicsItemGroup):
         super(HeatExchanger, self).__init__(parent)
         self.parent = parent
         self.offset = offset  # QPointF
-        self.output = 0
         self.lines = []
         self.w = sizeW
         self.h = sizeH
@@ -58,6 +57,19 @@ class HeatExchanger(QGraphicsItemGroup):
                 print("Loading existing HeatExchanger")
                 self.displayName = name
                 self.loadedConnTrId = kwargs["connTrnsysID"]
+
+        self.output = 100-100*self.port2.pos().y()/self.parent.h
+        self.input = 100-100*self.port1.pos().y()/self.parent.h
+
+        if self.output > 100:
+            self.output = 100
+        elif self.output < 0:
+            self.output = 0
+
+        if self.input > 100:
+            self.input = 100
+        elif self.input < 0:
+            self.input = 0
 
     def initNew(self):
 

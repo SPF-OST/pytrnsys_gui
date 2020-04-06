@@ -43,7 +43,7 @@ TSolar1976=1
 TDhwPortLeft95=1
 TDhwPortRight95=1
 TDhwPortRight90=1
-TDhwPortLeft5=1
+TDhwPortLeft35=1
 TDhwPortRight5=1
 TDhwPortRight70=1
 TSolarTesHx2279=1
@@ -195,23 +195,23 @@ PARAMETERS 401
 80 81 0 0      !79 : Solar1976
 61 79 0 0      !80 : PiInHxTes
 56 79 0 0      !81 : PiOutHxTes
-83 84 0 0      !82 : ConnDhwL3770
+83 84 0 0      !82 : ConnDhwL3772
 19 82 0 0      !83 : PiHpToTesDhwIn
 73 82 0 0      !84 : PiHpToTesDHWOut
-86 87 91 2     !85 : TPieceTesDhwR3779
+86 87 91 2     !85 : TPieceTesDhwR3781
 75 85 0 0      !86 : PiTesDhwOut
 85 63 0 0      !87 : PiTesDhwIn
-89 90 91 2     !88 : TPieceTesDhwR3789
+89 90 91 2     !88 : TPieceTesDhwR3791
 75 88 0 0      !89 : PiCircOut
 88 63 0 0      !90 : PiCircIn
-88 85 0 0      !91 : PiTesRDhw_851
+88 85 0 0      !91 : PiTesRDhw_853
 93 94 0 0      !92 : SolarTesHx2279
 61 92 0 0      !93 : PiInHxTesSh
 56 92 0 0      !94 : PiOutHxTesSh
-96 97 0 0      !95 : ConnSHL3811
+96 97 0 0      !95 : ConnSHL3813
 19 95 0 0      !96 : PiHptoTesSHIn
 73 95 0 0      !97 : PiHpToTesSHOut
-99 100 0 0     !98 : ConnSHR3820
+99 100 0 0     !98 : ConnSHR3822
 98 24 0 0      !99 : PiTesDhwToSh
 23 98 0 0      !100 : PiShTesOut
 INPUTS 100! for Type 935
@@ -425,8 +425,8 @@ MfrPiInHxTes_A=[450,238]
 MfrPiInHxTes_B=[450,239]
 MfrPiOutHxTes_A=[450,241]
 MfrPiOutHxTes_B=[450,242]
-MfrConnDhwL3770_A=[450,244]
-MfrConnDhwL3770_B=[450,245]
+MfrConnDhwL3772_A=[450,244]
+MfrConnDhwL3772_B=[450,245]
 MfrPiHpToTesDhwIn_A=[450,247]
 MfrPiHpToTesDhwIn_B=[450,248]
 MfrPiHpToTesDHWOut_A=[450,250]
@@ -439,22 +439,22 @@ MfrPiCircOut_A=[450,265]
 MfrPiCircOut_B=[450,266]
 MfrPiCircIn_A=[450,268]
 MfrPiCircIn_B=[450,269]
-MfrPiTesRDhw_851_A=[450,271]
-MfrPiTesRDhw_851_B=[450,272]
+MfrPiTesRDhw_853_A=[450,271]
+MfrPiTesRDhw_853_B=[450,272]
 MfrSolarTesHx2279_A=[450,274]
 MfrSolarTesHx2279_B=[450,275]
 MfrPiInHxTesSh_A=[450,277]
 MfrPiInHxTesSh_B=[450,278]
 MfrPiOutHxTesSh_A=[450,280]
 MfrPiOutHxTesSh_B=[450,281]
-MfrConnSHL3811_A=[450,283]
-MfrConnSHL3811_B=[450,284]
+MfrConnSHL3813_A=[450,283]
+MfrConnSHL3813_B=[450,284]
 MfrPiHptoTesSHIn_A=[450,286]
 MfrPiHptoTesSHIn_B=[450,287]
 MfrPiHpToTesSHOut_A=[450,289]
 MfrPiHpToTesSHOut_B=[450,290]
-MfrConnSHR3820_A=[450,292]
-MfrConnSHR3820_B=[450,293]
+MfrConnSHR3822_A=[450,292]
+MfrConnSHR3822_B=[450,293]
 MfrPiTesDhwToSh_A=[450,295]
 MfrPiTesDhwToSh_B=[450,296]
 MfrPiShTesOut_A=[450,298]
@@ -1720,7 +1720,7 @@ INPUTS 4
 TTeePieceHpRt
 MfrPiHpToTesDHWOut_A
 TRoomStore
-TDhwPortLeft5
+TDhwPortLeft35
 ***Initial values
 20 0.0 20 20
 

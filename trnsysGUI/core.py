@@ -2038,6 +2038,7 @@ class DiagramEditor(QWidget):
                 self.saveAsPath = Path(self.saveAsPath.stem[0:self.saveAsPath.name.index(self.diagramName)] + newName)
 
         self.diagramName = newName
+        self.parent().currentFile = newName
 
         # print("Path is now: " + str(self.saveAsPath))
         # print("Diagram name is: " + self.diagramName)
@@ -2093,6 +2094,10 @@ class DiagramEditor(QWidget):
         for c in self.trnsysObj:
             if isinstance(c, Connection) and not c.isVirtualConn:
                 c.showLabel(b)
+            if isinstance(c, BlockItem):
+                c.label.setVisible(b)
+            if isinstance(c, TVentil):
+                c.posLabel.setVisible(b)
         # Faster alternative, untested
         # for c in self.connectionList:
         #     if not c.isVirtualConn:
@@ -2621,6 +2626,7 @@ class MainWindow(QMainWindow):
         self.labelVisState = False
         self.massFlowEnabled = False
         self.calledByVisualizeMf = False
+        self.currentFile = None
 
         # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
@@ -2831,6 +2837,7 @@ class MainWindow(QMainWindow):
 
         self.centralWidget = DiagramEditor()
         self.setCentralWidget(self.centralWidget)
+        self.currentFile = ''
 
     def saveDia(self):
         print("Saving diagram")
@@ -2963,6 +2970,7 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0]
         print(fileName)
         if fileName != '':
+            self.currentFile = fileName
             self.centralWidget.delBlocks()
             self.centralWidget.decodeDiagram(fileName)
         else:
@@ -3007,6 +3015,7 @@ class MainWindow(QMainWindow):
             print("File not found")
         else:
             if latest_file != '':
+                self.currentFile = latest_file
                 self.centralWidget.delBlocks()
                 self.centralWidget.decodeDiagram(latest_file)
             else:
@@ -3080,17 +3089,27 @@ class MainWindow(QMainWindow):
             return mfrFile, tempFile
 
     def loadVisualization(self):
-        try:
-            self.exportedTo
-        except AttributeError:
-            msgb = QMessageBox(self)
-            msgb.setText("Please run the mass flow solver before loading the visualization!")
-            msgb.exec()
+
+        currentFilePath = self.currentFile
+        if '\\' in currentFilePath:
+            diaName = currentFilePath.split('\\')[-1][:-5]
+        elif '/' in currentFilePath:
+            diaName = currentFilePath.split('/')[-1][:-5]
         else:
-            mfrFile = os.path.splitext(str(self.exportedTo))[0]+'_Mfr.prt'
-            tempFile = os.path.splitext(str(self.exportedTo))[0] + '_T.prt'
-            MassFlowVisualizer(self, mfrFile, tempFile)
+            diaName = currentFilePath
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(ROOT_DIR, 'exports')
+        MfrFilePath = os.path.join(filePath, diaName + '_Mfr.prt')
+        TempFilePath = os.path.join(filePath, diaName + '_T.prt')
+        print(MfrFilePath, TempFilePath)
+
+        if os.path.exists(MfrFilePath) and os.path.exists(TempFilePath):
+            MassFlowVisualizer(self, MfrFilePath, TempFilePath)
             self.massFlowEnabled = True
+        else:
+            msgb = QMessageBox(self)
+            msgb.setText("MFR or Temperature file does not exist!")
+            msgb.exec()
 
 
 
