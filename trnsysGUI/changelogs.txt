@@ -291,3 +291,138 @@ Differences:
 Reason for change:
 After cold water temperature export problem fixed
 ==============================================================
+==============================================================
+24/03/2020 23:32:35
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\ASHP+Tes.dck
+
+Differences:
+32:TWTapBottom = 1
+
+Reason for change:
+Supplywater
+==============================================================
+==============================================================
+24/03/2020 23:32:42
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\Combi+1Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:46
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\Combi+2Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:49
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\DHWSolar+Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:53
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\GSHP+Tes.dck
+
+Differences:
+32:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:56
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SASHP+2Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:32:59
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SASHP+Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:33:02
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SGSHP+2Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+24/03/2020 23:33:05
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\SGSHP+Tes.dck
+
+Differences:
+33:TWTapBottom = 1
+
+Reason for change:
+
+==============================================================
+==============================================================
+03/04/2020 15:17:07
+
+Name of file:
+C:\Users\User\Desktop\TrnsysGUI\trnsysGUI\Reference\BigIceTwoStorages.dck
+
+Differences:
+46:TDhwPortLeft35=1
+198:83 84 0 0      !82 : ConnDhwL3772
+201:86 87 91 2     !85 : TPieceTesDhwR3781
+204:89 90 91 2     !88 : TPieceTesDhwR3791
+207:88 85 0 0      !91 : PiTesRDhw_853
+211:96 97 0 0      !95 : ConnSHL3813
+214:99 100 0 0     !98 : ConnSHR3822
+428:MfrConnDhwL3772_A=[450,244]
+429:MfrConnDhwL3772_B=[450,245]
+442:MfrPiTesRDhw_853_A=[450,271]
+443:MfrPiTesRDhw_853_B=[450,272]
+450:MfrConnSHL3813_A=[450,283]
+451:MfrConnSHL3813_B=[450,284]
+456:MfrConnSHR3822_A=[450,292]
+457:MfrConnSHR3822_B=[450,293]
+1723:TDhwPortLeft35
+
+Reason for change:
+changed port heights in big ice template
+==============================================================

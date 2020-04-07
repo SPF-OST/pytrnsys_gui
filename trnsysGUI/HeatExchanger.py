@@ -58,6 +58,19 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.displayName = name
                 self.loadedConnTrId = kwargs["connTrnsysID"]
 
+        self.output = 100-100*self.port2.pos().y()/self.parent.h
+        self.input = 100-100*self.port1.pos().y()/self.parent.h
+
+        if self.output > 100:
+            self.output = 100
+        elif self.output < 0:
+            self.output = 0
+
+        if self.input > 100:
+            self.input = 100
+        elif self.input < 0:
+            self.input = 0
+
     def initNew(self):
 
         self.conn = Connection(self.port1, self.port2, True, self.parent.parent.parent())

@@ -1,28 +1,32 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "GraphicalItem-56": {
+        "Block-100": {
             ".__BlockDict__": true,
-            "BlockName": "GraphicalItem",
+            "BlockDisplayName": "PuBoiler",
+            "BlockName": "Pump",
             "BlockPosition": [
-                -628.0,
-                -136.0
+                -947.0,
+                -456.0
             ],
-            "FlippedH": false,
+            "FlippedH": true,
             "FlippedV": false,
-            "ID": 56,
-            "ImageSource": "gear.svg",
+            "GroupName": "defaultGroup",
+            "ID": 100,
+            "PortsIDIn": [
+                101
+            ],
+            "PortsIDOut": [
+                102
+            ],
             "RotationN": 0,
-            "Size": [
-                100.0,
-                100.0
-            ]
+            "trnsysID": 100
         },
         "IDs": {
-            "GlobalId": 57,
+            "GlobalId": 1378,
             "__idDct__": true,
-            "globalConnID": 1,
-            "trnsysID": 21
+            "globalConnID": 401,
+            "trnsysID": 526
         },
         "Strings": {
             "DiagramName": "COPYGROUP",

@@ -1,9 +1,10 @@
+import os
 import random
 import sys
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import QMenu, QMessageBox
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
@@ -758,6 +759,10 @@ class StorageTank(BlockItem):
 
         e2 = menu.addAction('Print port nb')
         e2.triggered.connect(self.printPortNb)
+
+        # e3 = menu.addAction('Export dck')
+        # e3.triggered.connect(self.exportDck)
+
         menu.exec_(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
@@ -839,3 +844,26 @@ class StorageTank(BlockItem):
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
         return "", equationNumber, 0
+
+    def exportDck(self):
+        nPorts = len(self.directPortConnsForList)
+        nHx = len(self.heatExchangers)
+
+        # currentFilePath = self.parent.parent().parent().currentFile
+        # if '\\' in currentFilePath:
+        #     diaName = currentFilePath.split('\\')[-1][:-5]
+        # else:
+        #     diaName = currentFilePath.split('/')[-1][:-5]
+        # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        # filePath = os.path.join(ROOT_DIR, 'exports')
+        # MfrFilePath = os.path.join(filePath, diaName+'_Mfr.prt')
+        # TempFilePath = os.path.join(filePath, diaName+'_T.prt')
+        #
+        # if not os.path.isfile(MfrFilePath) or not os.path.isfile(TempFilePath):
+        #     msgb = QMessageBox(self)
+        #     msgb.setText("No Mfr or temp file found!")
+        #     msgb.exec()
+        # else:
+        #     # todo : access file here and get properties
+        #     print(os.path.isfile(MfrFilePath))
+        #     print(os.path.isfile(TempFilePath))

@@ -18,6 +18,7 @@ class TVentil(BlockItem):
         self.isTempering = False
         self.positionForMassFlowSolver = 1.0
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
+        self.posLabel.setVisible(False)
 
         self.exportInitialInput = 0.0
 

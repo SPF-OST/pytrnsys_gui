@@ -48,6 +48,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.h = 100.0
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
+        self.propertyFile = []
 
         if "displayName" in kwargs:
             self.displayName = kwargs["displayName"]
@@ -101,6 +102,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
         self.label = QGraphicsTextItem(self.displayName, self)
+        self.label.setVisible(False)
 
         if self.name == 'Bvi':
             self.inputs.append(PortItem('i', 0, self))
@@ -223,8 +225,13 @@ class BlockItem(QGraphicsPixmapItem):
             dia = self.parent.parent().showTVentilDlg(self)
         elif self.name == 'Pump':
             dia = self.parent.parent().showPumpDlg(self)
+        elif self.name == 'TeePiece' or self.name == 'WTap_main' :
+            dia = self.parent.parent().showBlockDlg(self)
         else:
             dia = self.parent.parent().showBlockDlg(self)
+            if len(self.propertyFile) > 0:
+                for files in self.propertyFile:
+                    os.startfile(files, 'open')
 
     def mouseReleaseEvent(self, event):
         # print("Released mouse over block")

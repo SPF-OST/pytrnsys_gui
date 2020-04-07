@@ -1,9 +1,10 @@
 import re
 import sys
+from datetime import timedelta, datetime, MINYEAR
 
 import numpy
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QPainter, QBrush, QColor
 from PyQt5.QtWidgets import QSlider, QDialog, QLineEdit, QPushButton, QHBoxLayout, QLabel, QGridLayout, QWidget
 
@@ -23,14 +24,14 @@ class MassFlowVisualizer(QDialog):
         self.tempLoadedFile = False
         self.loadFile()
         self.loadTempFile()
-        self.maxTimeStep = 5 # todo change this to the number of rows in the file
+        self.maxTimeStep = len(self.massFlowData.index) - 1
         self.showMass = False
 
         self.setMinimumSize(1000, 200)
 
         self.parent = parent
         self.timeStep = 0
-        self.timeSteps = len(self.massFlowData.index)  - 1    # 0 to 364
+        self.timeSteps = len(self.massFlowData.index) - 1    # 0 to 364
 
         # threshold values for positive list
         self.medianValue = 0
@@ -39,13 +40,23 @@ class MassFlowVisualizer(QDialog):
         self.minValue = 0
         self.maxValue = 0
 
+        self.medianValueMfr = 0
+        self.lowerQuarterMfr = 0
+        self.upperQuarterMfr = 0
+        self.minValueMfr = 0
+        self.maxValueMfr = 0
+
+        self.getThresholdValues()
         self.getTempThresholdValues()
+
+        self.jumpValue = QLabel("Jump by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )")
+        self.jumpValueLE = QLineEdit("1")
 
         self.slider = QSlider(parent)
         self.setSlider()
         self.slider.sliderReleased.connect(self.testValChange)
         self.slider.sliderPressed.connect(self.pressedSlider)
-        self.slider.sliderMoved.connect(self.moveValues)
+        self.slider.valueChanged.connect(self.moveValues)
         self.slider.setTickInterval(24)
 
         self.qtm = QTimer(parent)
@@ -55,7 +66,7 @@ class MassFlowVisualizer(QDialog):
         self.paused = True
 
         nameLabel = QLabel("Name:")
-        self.currentStepLabel = QLabel("Time: " + str(self.getTime(0)))
+        self.currentStepLabel = QLabel("Time: " + str(self.convertTime(self.getTime(0))))
         self.le = QLineEdit("NONE")
 
         self.showMassButton = QPushButton("Show mass")  # comment out
@@ -86,6 +97,8 @@ class MassFlowVisualizer(QDialog):
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
+        buttonLayout.addWidget(self.jumpValue)
+        buttonLayout.addWidget(self.jumpValueLE)
         buttonLayout.addWidget(self.showMassButton)  # comment out
         buttonLayout.addWidget(self.togglePauseButton)
         buttonLayout.addWidget(self.cancelButton)
@@ -124,7 +137,7 @@ class MassFlowVisualizer(QDialog):
     def cancel(self):
         self.pauseVis()
         self.close()
-        self.parent.updateConnGrads()
+        self.parent.centralWidget.updateConnGrads()
 
     # comment out
     def showMassBtn(self):
@@ -161,11 +174,11 @@ class MassFlowVisualizer(QDialog):
         self.paused = False
         self.qtm = QTimer(self.parent)
         self.qtm.timeout.connect(self.advance)
-        # self.qtm.timeout.connect(self.increaseValue)
+        self.qtm.timeout.connect(self.increaseValue)
         self.qtm.start(1000)
 
     def advance(self):
-        if self.timeStep == 364:
+        if self.timeStep == self.maxTimeStep:
             print("reached end of data, returning")
             self.qtm.stop()
             return
@@ -213,19 +226,28 @@ class MassFlowVisualizer(QDialog):
                         print("Found connection in ts " + str(self.timeStep) + " " + str(i))
                         print("mass flow value of %s : " % t.displayName)
                         t.setMassAndTemperature(mass, temperature)
+                        thickValue = self.getThickness(mass)
+                        print("Thickvalue: ", thickValue)
                         if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
-                            t.setColor(mfr="ZeroMfr")
+                            t.setColor(thickValue, mfr="ZeroMfr")
                         elif round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) == self.maxValue:
-                            t.setColor(mfr="max")
+                            t.setColor(thickValue, mfr="max")
                         elif round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) == self.minValue:
-                            t.setColor(mfr="min")
+                            t.setColor(thickValue, mfr="min")
                         elif self.minValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.medianValue:
-                            t.setColor(mfr="minToMedian")
+                            t.setColor(thickValue, mfr="minToMedian")
                         elif self.medianValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) < self.maxValue:
-                            t.setColor(mfr="medianToMax")
+                            t.setColor(thickValue, mfr="medianToMax")
                         else:
-                            t.setColor(mfr="test")
+                            t.setColor(thickValue, mfr="test")
                         i += 1
+                else:
+                    if 'xFrac'+t.displayName in self.massFlowData.columns:
+                        valvePosition = str(self.massFlowData['xFrac' + t.displayName].iloc[self.timeStep])
+                        t.setPositionForMassFlowSolver(valvePosition)
+                        t.posLabel.setPlainText(valvePosition)
+                        print('valve position:', valvePosition)
+
 
         else:
             return
@@ -258,9 +280,8 @@ class MassFlowVisualizer(QDialog):
     def testValChange(self):
         val = self.slider.value()
         print("Slider value has changed to " + str(val))
-        # TODO : need to get time from file, val = row inside file
         time = self.getTime(val)
-        self.currentStepLabel.setText("Time :" + str(time))
+        self.currentStepLabel.setText("Time :" + str(self.convertTime(time)))
         self.timeStep = val
         self.advance()
 
@@ -268,10 +289,10 @@ class MassFlowVisualizer(QDialog):
 
         val = self.slider.value()
         print("Slider value is still: " + str(val))
-        # TODO : need to get time from file, val = row inside file
         time = self.getTime(val)
-        self.currentStepLabel.setText("Time :" + str(time))
+        self.currentStepLabel.setText("Time :" + str(self.convertTime(time)))
         self.timeStep = val
+        self.advance()
 
     def increaseValue(self):
         """
@@ -279,10 +300,21 @@ class MassFlowVisualizer(QDialog):
 
         """
 
-        self.timeStep += 1
-        self.slider.setValue(self.timeStep)
+        self.timeStep += float(self.jumpValueLE.text())
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
+        self.slider.setValue(self.timeStep)
+
+    def decreaseValue(self):
+        """
+        For automatic slider movement
+
+        """
+
+        self.timeStep -= float(self.jumpValueLE.text())
+        if self.timeStep < 0:
+            self.timeStep = self.maxTimeStep
+        self.slider.setValue(self.timeStep)
 
 
     def checkTimeStep(self):
@@ -311,35 +343,47 @@ class MassFlowVisualizer(QDialog):
                     return False
         return True
 
-    # def getThresholdValues(self):
-    #     """
-    #     Access the data frame, convert into a nested list.
-    #     Merge the nested list into one single list.
-    #     Remove 'nan' from the list.
-    #     Convert the values inside the list into absolute values then round them off.
-    #     Split the list into two for negative and positive values.
-    #     Get the minimum value, the 25th percentile, the median value, the 75th percentile and
-    #     the max value from the lists.
-    #     Returns
-    #     -------
-    #     """
-    #     # TODO : maybe dun include the non-connection columns into the list,  delete those columns before hand
-    #     #  need to know which columns are not connections
-    #
-    #     data = self.massFlowData.values.tolist()    # data frame converted to nested list
-    #     for sublist in data:  # delete the time column from the list
-    #         del sublist[0]
-    #     data = list(itertools.chain.from_iterable(data))  # nested list combined into one list
-    #     cleanedData = [x for x in data if str(x) != 'nan']  # remove nan from list
-    #     cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
-    #     nonZeroData = [x for x in cleanedData if x > 1]  # a work around to remove the 1 values from the data frame
-    #     noDuplicateData = list(dict.fromkeys(nonZeroData))
-    #
-    #     self.medianValue = np.percentile(noDuplicateData, 50)  # median value / 50th percentile
-    #     self.lowerQuarter = np.percentile(noDuplicateData, 25)  # 25th percentile
-    #     self.upperQuarter = np.percentile(noDuplicateData, 75)   # 75th percentile
-    #     self.minValue = np.min(noDuplicateData)  # minimum value excluding 0
-    #     self.maxValue = np.max(noDuplicateData)  # max value
+    def getThresholdValues(self):
+        """
+        Access the data frame, convert into a nested list.
+        Merge the nested list into one single list.
+        Remove 'nan' from the list.
+        Convert the values inside the list into absolute values then round them off.
+        Split the list into two for negative and positive values.
+        Get the minimum value, the 25th percentile, the median value, the 75th percentile and
+        the max value from the lists.
+        Returns
+        -------
+        """
+
+        data = self.massFlowData.values.tolist()    # data frame converted to nested list
+        for sublist in data:  # delete the time column from the list
+            del sublist[0]
+        data = list(itertools.chain.from_iterable(data))  # nested list combined into one list
+        cleanedData = [x for x in data if str(x) != 'nan']  # remove nan from list
+        cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
+        nonZeroData = [x for x in cleanedData if x > 1]  # a work around to remove the 1 values from the data frame
+        noDuplicateData = list(dict.fromkeys(nonZeroData))
+
+        self.medianValueMfr = np.percentile(noDuplicateData, 50)  # median value / 50th percentile
+        self.lowerQuarterMfr = np.percentile(noDuplicateData, 25)  # 25th percentile
+        self.upperQuarterMfr = np.percentile(noDuplicateData, 75)   # 75th percentile
+        self.minValueMfr = np.min(noDuplicateData)  # minimum value excluding 0
+        self.maxValueMfr = np.max(noDuplicateData)  # max value
+
+    def getThickness(self, mass):
+        mass = abs(float(mass))
+        if mass == self.minValueMfr:
+            return 2
+        elif self.minValueMfr < mass <= self.medianValueMfr:
+            return 3
+        elif self.medianValueMfr < mass < self.maxValueMfr:
+            return 4
+        elif mass == self.maxValueMfr:
+            return 5
+        else:
+            return 2
+
 
     def getTempThresholdValues(self):
         """
@@ -353,8 +397,6 @@ class MassFlowVisualizer(QDialog):
         Returns
         -------
         """
-        # TODO : maybe dun include the non-connection columns into the list,  delete those columns before hand
-        #  need to know which columns are not connections
 
         data = self.tempMassFlowData.values.tolist()    # data frame converted to nested list
         for sublist in data:  # delete the time column from the list
@@ -376,6 +418,13 @@ class MassFlowVisualizer(QDialog):
         print(timeColumn[row])
         return timeColumn[row]
 
+    def convertTime(self, time):
+        noOfHours = 8760
+        decHour = float(time) / float(noOfHours)
+        base = datetime(MINYEAR, 1, 1)
+        result = base + timedelta(seconds=(base.replace(year=base.year + 1) - base).total_seconds() * decHour)
+        return str(result)
+
 
     def pressedSlider(self):
         self.pauseVis()
@@ -390,4 +439,12 @@ class MassFlowVisualizer(QDialog):
         self.parent.massFlowEnabled = False
 
         super(MassFlowVisualizer, self).closeEvent(a0)
+
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Up:
+            print("Up is pressed")
+            self.increaseValue()
+        elif e.key() == Qt.Key_Down:
+            print("Down is pressed")
+            self.decreaseValue()
 

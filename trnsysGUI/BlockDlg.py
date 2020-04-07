@@ -1,4 +1,7 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QMessageBox
+import os
+
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QMessageBox, \
+    QFileDialog
 from PyQt5.QtGui import QIcon
 
 class BlockDlg(QDialog):
@@ -8,6 +11,7 @@ class BlockDlg(QDialog):
         self.block = block
         self.le = QLineEdit(self.block.label.toPlainText())
         self.setWindowIcon(QIcon(block.pixmap))
+        self.loadButton = QPushButton("Load")
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
@@ -30,6 +34,7 @@ class BlockDlg(QDialog):
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
+        buttonLayout.addWidget(self.loadButton)
         buttonLayout.addWidget(self.okButton)
         buttonLayout.addWidget(self.cancelButton)
         layout = QGridLayout()
@@ -41,11 +46,13 @@ class BlockDlg(QDialog):
 
         self.setFixedSize(300, 150)
 
+        self.loadButton.clicked.connect(self.loadFile)
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
         self.hFlipBox.stateChanged.connect(self.setNewFlipStateH)
         self.vFlipBox.stateChanged.connect(self.setNewFlipStateV)
         self.setWindowTitle("Properties")
+        self.disableLoad()
         self.show()
 
     def acceptedEdit(self):
@@ -81,3 +88,21 @@ class BlockDlg(QDialog):
             if str(t.displayName).lower() == n.lower():
                 return True
         return False
+
+    def loadFile(self):
+        print("Opening diagram")
+        # self.centralWidget.delBlocks()
+        fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.txt")[0]
+        if fileName != '':
+            if len(self.block.propertyFile) < 2:
+                self.block.propertyFile.append(fileName)
+            else:
+                self.block.propertyFile.clear()
+                self.block.propertyFile.append(fileName)
+        else:
+            print("No filename chosen")
+        pass
+
+    def disableLoad(self):
+        if self.block.name == 'TeePiece' or self.block.name == 'WTap_main':
+            self.loadButton.setDisabled(True)
