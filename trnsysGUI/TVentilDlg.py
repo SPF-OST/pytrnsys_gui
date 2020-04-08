@@ -101,7 +101,7 @@ class TVentilDlg(QDialog):
         if newName.lower() == str(self.block.displayName).lower():
             self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
             self.close()
-        elif newName != "" and not self.nameExists(newName) and newName != self.name:
+        elif newName != "" and not self.nameExists(newName) and newName != self.block.displayName:
             # self.block.setName(newName)
             self.block.label.setPlainText(newName)
             self.block.displayName = newName
