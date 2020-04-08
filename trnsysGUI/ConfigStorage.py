@@ -29,7 +29,16 @@ class ConfigStorage(QDialog):
         self.tabs.addTab(self.tab2, "Direct ports")
 
         # VBoxLayout
+        h0 = QHBoxLayout()
         description = QLabel("Please configure the storage tank:")
+        exportButton = QPushButton("Export ddck")
+        exportButton.clicked.connect(self.storage.exportDck)
+        loadButton = QPushButton("Load ddck")
+        loadButton.clicked.connect(self.storage.loadDck)
+        h0.addWidget(description)
+        h0.addWidget(loadButton)
+        h0.addWidget(exportButton)
+
         tankNameLabel = QLabel()
         tankNameLabel.setText("<b>Tank name: </b>")
         self.le = QLineEdit(self.storage.label.toPlainText())
@@ -173,7 +182,7 @@ class ConfigStorage(QDialog):
         self.cancelButton.clicked.connect(self.cancel)
 
         L = QVBoxLayout()
-        L.addWidget(description)
+        L.addLayout(h0)
         L.addWidget(tankNameLabel)
         L.addWidget(self.le)
 

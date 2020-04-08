@@ -2970,6 +2970,7 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0]
         print(fileName)
         if fileName != '':
+            self.centralWidget.idGen.reset()
             self.currentFile = fileName
             self.centralWidget.delBlocks()
             self.centralWidget.decodeDiagram(fileName)
@@ -3006,8 +3007,12 @@ class MainWindow(QMainWindow):
             latest_file = ''
 
         while len(list_of_files) > 10:
-            fileToDelete = min(list_of_files, key=os.path.getmtime)
-            os.remove(fileToDelete)
+            try:
+                fileToDelete = min(list_of_files, key=os.path.getmtime)
+            except FileNotFoundError:
+                print("File not found")
+            else:
+                os.remove(fileToDelete)
 
         try:
             latest_file

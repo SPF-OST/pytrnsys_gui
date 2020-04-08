@@ -13,6 +13,7 @@ from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.Connection import Connection
+from trnsysGUI.Types.createType1924 import Type1924_TesPlugFlow
 
 
 class StorageTank(BlockItem):
@@ -38,6 +39,9 @@ class StorageTank(BlockItem):
         self.hxInsideConnsRight = []
 
         self.directPortConnsForList = []
+
+        self.nTes = self.parent.parent().idGen.getStoragenTes()
+        self.storageType = self.parent.parent().idGen.getStorageType()
 
         self.changeSize()
 
@@ -760,8 +764,8 @@ class StorageTank(BlockItem):
         e2 = menu.addAction('Print port nb')
         e2.triggered.connect(self.printPortNb)
 
-        # e3 = menu.addAction('Export dck')
-        # e3.triggered.connect(self.exportDck)
+        e3 = menu.addAction('Export dck')
+        e3.triggered.connect(self.exportDck)
 
         menu.exec_(event.screenPos())
 
@@ -849,21 +853,91 @@ class StorageTank(BlockItem):
         nPorts = len(self.directPortConnsForList)
         nHx = len(self.heatExchangers)
 
-        # currentFilePath = self.parent.parent().parent().currentFile
-        # if '\\' in currentFilePath:
-        #     diaName = currentFilePath.split('\\')[-1][:-5]
-        # else:
-        #     diaName = currentFilePath.split('/')[-1][:-5]
-        # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-        # filePath = os.path.join(ROOT_DIR, 'exports')
-        # MfrFilePath = os.path.join(filePath, diaName+'_Mfr.prt')
-        # TempFilePath = os.path.join(filePath, diaName+'_T.prt')
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(ROOT_DIR, 'ddck')
+        fileName = self.parent.parent().parent().currentFile
+
+        if '\\' in fileName:
+            name = fileName.split('\\')[-1][:-5]
+        elif '/' in fileName:
+            name = fileName.split('/')[-1][:-5]
+        else:
+            name = fileName
+
+        # how to pass into script?
+        # for i in self.directPortConnsForList:
+        #     inputPos = 100-100*i.fromPort.pos().y()/self.h
+        #     outputPos = 100-100*i.toPort.pos().y()/self.h
+        #     inputConn = i.fromPort.connectionList[1].displayName
+        #     outputConn = i.toPort.connectionList[1].displayName
+        #     print("input pos:", inputPos, "Output pos:", outputPos, "Input conn:", inputConn, "Output conn:", outputConn)
         #
-        # if not os.path.isfile(MfrFilePath) or not os.path.isfile(TempFilePath):
-        #     msgb = QMessageBox(self)
-        #     msgb.setText("No Mfr or temp file found!")
-        #     msgb.exec()
-        # else:
-        #     # todo : access file here and get properties
-        #     print(os.path.isfile(MfrFilePath))
-        #     print(os.path.isfile(TempFilePath))
+        # #left side hx has input on top while right side hx has input below? same as direct ports?
+        # for h in self.heatExchangers:
+        #     inputPos = h.input
+        #     outputPos = h.output
+        #     inputConn = h.port1.connectionList[1].displayName
+        #     outputConn = h.port2.connectionList[1].displayName
+        #     print("Input:", inputPos, "output:", outputPos, "Input conn:", inputConn, "Output conn:", outputConn)
+
+        print("Storage Type:", self.storageType)
+        print("nTes:", self.nTes)
+        print("nPorts:", nPorts)
+        print("nHx:", nHx)
+
+        tool = Type1924_TesPlugFlow()
+
+        inputs = {"nUnit": 50,
+                  "nType": self.storageType,
+                  "nTes": self.nTes,
+                  "nPorts": nPorts,
+                  "nHx": nHx,
+                  "nHeatSources": 1
+                  }
+        dictInput = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0}
+        dictInputHx = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0, "cp": 0.0, "rho": 0.0}
+        dictInputAux = {"zAux": 0.0, "qAux": 0.0}
+
+        connectorsPort = []
+        connectorsHx = []
+        connectorsAux = []
+
+        # *dck TRNSYS file that you can execute
+        # *ddck text file wchich reporesents a peice of dck
+
+        for i in range(inputs["nPorts"]):
+            connectorsPort.append(dictInput)
+
+        for i in range(inputs["nHx"]):
+            connectorsHx.append(dictInputHx)
+
+        for i in range(inputs["nHeatSources"]):
+            connectorsAux.append(dictInputAux)
+
+        for i in range(inputs["nPorts"]):
+            Tname = "T" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
+            Mfrname = "Mfr" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
+            Trev = "T" + self.directPortConnsForList[i].toPort.connectionList[1].displayName
+            inputPos = 100-100*self.directPortConnsForList[i].fromPort.pos().y()/self.h
+            outputPos = 100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h
+            connectorsPort[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
+            print(connectorsPort)
+
+        for i in range(inputs["nHx"]):
+            Tname = "T" + self.heatExchangers[i].port1.connectionList[1].displayName
+            Mfrname = "Mfr" + self.heatExchangers[i].port1.connectionList[1].displayName
+            Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
+            inputPos = self.heatExchangers[i].input
+            outputPos = self.heatExchangers[i].output
+            connectorsHx[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
+            print(connectorsHx)
+
+        tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
+
+        tool.createDDck(filePath, name, typeFile="dck")
+
+    def loadDck(self):
+        pass
+
+    def assign_nType_nTes(self):
+        pass
