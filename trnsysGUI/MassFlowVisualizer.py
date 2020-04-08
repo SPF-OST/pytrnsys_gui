@@ -155,6 +155,8 @@ class MassFlowVisualizer(QDialog):
                 else:
                     t.firstS.labelMass.setVisible(False)
 
+        print(self.minValue, self.medianValue, self.maxValue)
+
 
 
     def loadFile(self):
@@ -234,10 +236,14 @@ class MassFlowVisualizer(QDialog):
                             t.setColor(thickValue, mfr="max")
                         elif round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) == self.minValue:
                             t.setColor(thickValue, mfr="min")
-                        elif self.minValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.medianValue:
-                            t.setColor(thickValue, mfr="minToMedian")
-                        elif self.medianValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) < self.maxValue:
-                            t.setColor(thickValue, mfr="medianToMax")
+                        elif self.minValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.lowerQuarter:
+                            t.setColor(thickValue, mfr="minTo25")
+                        elif self.lowerQuarter < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.medianValue:
+                            t.setColor(thickValue, mfr="25To50")
+                        elif self.medianValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.upperQuarter:
+                            t.setColor(thickValue, mfr="50To75")
+                        elif self.upperQuarter < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) < self.maxValue:
+                            t.setColor(thickValue, mfr="75ToMax")
                         else:
                             t.setColor(thickValue, mfr="test")
                         i += 1
@@ -376,11 +382,11 @@ class MassFlowVisualizer(QDialog):
         if mass == self.minValueMfr:
             return 2
         elif self.minValueMfr < mass <= self.medianValueMfr:
-            return 3
-        elif self.medianValueMfr < mass < self.maxValueMfr:
             return 4
+        elif self.medianValueMfr < mass < self.maxValueMfr:
+            return 6
         elif mass == self.maxValueMfr:
-            return 5
+            return 8
         else:
             return 2
 
@@ -411,6 +417,9 @@ class MassFlowVisualizer(QDialog):
         self.upperQuarter = np.percentile(noDuplicateData, 75)   # 75th percentile
         self.minValue = np.min(noDuplicateData)  # minimum value excluding 0
         self.maxValue = np.max(noDuplicateData)  # max value
+
+        # print(noDuplicateData)
+        # sys.exit()
 
     def getTime(self, row):
         data = self.massFlowData

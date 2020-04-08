@@ -200,16 +200,18 @@ class Connection(object):
                 col = QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
                 col = QColor(142, 142, 142) # Gray
-            elif kwargs["mfr"] == "minToMedian":
-                col = QColor(140, 255, 255)  # light blue
-            elif kwargs["mfr"] == "medianToMax":
-                col = QColor(255, 140, 140)  # pink
             elif kwargs["mfr"] == "min":
-                col = QColor(0, 0, 255)  # blue
+                col = QColor(0, 0, 204)  # deep blue
             elif kwargs["mfr"] == "max":
-                col = QColor(255, 0, 0)  # red
-            elif kwargs["mfr"] == "test":
-                col = QColor(255, 255, 255)  # red
+                col = QColor(153, 0, 0)  # deep red
+            elif kwargs["mfr"] == "minTo25":
+                col = QColor(0, 128, 255)  # blue
+            elif kwargs["mfr"] == "25To50":
+                col = QColor(102, 255, 255)  # light blue
+            elif kwargs["mfr"] == "50To75":
+                col = QColor(255, 153, 153)  # light red
+            elif kwargs["mfr"] == "75ToMax":
+                col = QColor(255, 51, 51)  # red
             # elif kwargs["mfr"] == "negMinToLower":
             #     col = QColor(0, 0, 0)  # Black
             # elif kwargs["mfr"] == "negLowerToMedian":

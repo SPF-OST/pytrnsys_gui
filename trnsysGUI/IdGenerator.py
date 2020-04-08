@@ -8,10 +8,14 @@ class IdGenerator(object):
         self.trnsysIds = []
         self.connIds = []
         self.blockIds = []
+        self.storageTes = []
+        self.storageType = []
         self.idCounter = count(1)
         self.trnsysIdCounter = count(1)
         self.connIdCounter = count(1)
         self.blockIdCounter = count(1)
+        self.storagenTesCounter = count(1)
+        self.storageTypeCounter = count(1924)
 
     def getUUID(self):
         x = uuid.uuid1().int
@@ -38,6 +42,16 @@ class IdGenerator(object):
         self.blockIds.append(id)
         return id
 
+    def getStoragenTes(self):
+        id = next(self.storagenTesCounter)
+        self.storageTes.append(id)
+        return id
+
+    def getStorageType(self):
+        id = next(self.storageTypeCounter)
+        self.storageType.append(id)
+        return id
+
     def setBlockID(self, id):
         self.blockIdCounter = count(id)
 
@@ -54,10 +68,15 @@ class IdGenerator(object):
         self.ids = []
         self.trnsysIds = []
         self.connIds = []
+        self.blockIds = []
+        self.storageTes = []
+        self.storageType = []
         self.idCounter = count(1)
         self.trnsysIdCounter = count(1)
         self.connIdCounter = count(1)
         self.blockIdCounter = count(1)
+        self.storagenTesCounter = count(1)
+        self.storageTypeCounter = count(1924)
 
 
 

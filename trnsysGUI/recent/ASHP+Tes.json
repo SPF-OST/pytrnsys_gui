@@ -33,7 +33,7 @@
             "PortsIDOut": [
                 13
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": 1.0,
             "RotationN": 0,
             "trnsysID": 4
         },
@@ -42,8 +42,8 @@
             "BlockDisplayName": "PuBoiler",
             "BlockName": "Pump",
             "BlockPosition": [
-                -948.0,
-                -454.0
+                -947.0,
+                -455.0
             ],
             "FlippedH": true,
             "FlippedV": false,
@@ -159,7 +159,7 @@
             "PortsIDOut": [
                 326
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": 1.0,
             "RotationN": 0,
             "trnsysID": 178
         },
@@ -212,7 +212,7 @@
             "BlockName": "AirSourceHP",
             "BlockPosition": [
                 -1161.0,
-                -639.0
+                -638.0
             ],
             "FlippedH": false,
             "FlippedV": false,
@@ -314,7 +314,7 @@
             "PortsIDOut": [
                 631
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": 1.0,
             "RotationN": 0,
             "trnsysID": 278
         },
@@ -323,8 +323,8 @@
             "BlockDisplayName": "DivHpRt",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -855.0,
-                -467.0
+                -854.0,
+                -468.0
             ],
             "FlippedH": true,
             "FlippedV": false,
@@ -338,7 +338,7 @@
             "PortsIDOut": [
                 641
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": 1.0,
             "RotationN": 0,
             "trnsysID": 281
         },
@@ -358,8 +358,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                40.0,
-                20.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 21,
@@ -403,8 +403,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 17,
@@ -440,11 +440,11 @@
             "CornerPositions": [
                 [
                     -879.0,
-                    -437.5
+                    -440.0
                 ],
                 [
                     -879.0,
-                    -439.22222222222223
+                    -440.22222222222223
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -456,22 +456,22 @@
             "PortToID": 641,
             "SegmentPositions": [
                 [
-                    -908.0,
-                    -437.5,
+                    -907.0,
+                    -438.5,
                     -879.0,
-                    -437.5
+                    -440.0
                 ],
                 [
                     -879.0,
-                    -437.5,
+                    -440.0,
                     -879.0,
-                    -439.22222222222223
+                    -440.22222222222223
                 ],
                 [
                     -879.0,
-                    -439.22222222222223,
-                    -863.0,
-                    -439.22222222222223
+                    -440.22222222222223,
+                    -862.0,
+                    -440.22222222222223
                 ]
             ],
             "isVirtualConn": false,
@@ -485,7 +485,7 @@
             "CornerPositions": [
                 [
                     -785.0,
-                    -439.22222222222223
+                    -440.22222222222223
                 ],
                 [
                     -785.0,
@@ -509,14 +509,14 @@
             "PortToID": 615,
             "SegmentPositions": [
                 [
-                    -797.0,
-                    -439.22222222222223,
+                    -796.0,
+                    -440.22222222222223,
                     -785.0,
-                    -439.22222222222223
+                    -440.22222222222223
                 ],
                 [
                     -785.0,
-                    -439.22222222222223,
+                    -440.22222222222223,
                     -785.0,
                     -352.0
                 ],
@@ -558,8 +558,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                40.0,
-                20.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 629,
@@ -595,7 +595,7 @@
             "CornerPositions": [
                 [
                     -968.0,
-                    -627.6
+                    -631.5
                 ],
                 [
                     -968.0,
@@ -612,13 +612,13 @@
             "SegmentPositions": [
                 [
                     -1073.0,
-                    -627.6,
+                    -626.6,
                     -968.0,
-                    -627.6
+                    -631.5
                 ],
                 [
                     -968.0,
-                    -627.6,
+                    -631.5,
                     -968.0,
                     -629.7777777777778
                 ],
@@ -648,8 +648,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                40.0,
-                20.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 326,
@@ -693,8 +693,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                40.0,
-                20.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 336,
@@ -738,8 +738,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                40.0,
-                20.0
+                30.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 13,
@@ -783,8 +783,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 322,
@@ -828,8 +828,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 351,
@@ -865,11 +865,11 @@
             "CornerPositions": [
                 [
                     -998.5,
-                    -437.5
+                    -440.0
                 ],
                 [
                     -998.5,
-                    -581.4
+                    -579.5
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -881,22 +881,22 @@
             "PortToID": 601,
             "SegmentPositions": [
                 [
-                    -956.0,
-                    -437.5,
+                    -955.0,
+                    -438.5,
                     -998.5,
-                    -437.5
+                    -440.0
                 ],
                 [
                     -998.5,
-                    -437.5,
+                    -440.0,
                     -998.5,
-                    -581.4
+                    -579.5
                 ],
                 [
                     -998.5,
-                    -581.4,
+                    -579.5,
                     -1073.0,
-                    -581.4
+                    -580.4
                 ]
             ],
             "isVirtualConn": false,
@@ -914,7 +914,7 @@
                 ],
                 [
                     -831.0,
-                    -475.0
+                    -476.0
                 ]
             ],
             "FirstSegmentLabelPos": [
@@ -935,13 +935,13 @@
                     -831.0,
                     -521.7272727272727,
                     -831.0,
-                    -475.0
+                    -476.0
                 ],
                 [
                     -831.0,
-                    -475.0,
-                    -830.0,
-                    -475.0
+                    -476.0,
+                    -829.0,
+                    -476.0
                 ]
             ],
             "isVirtualConn": false,
@@ -963,8 +963,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 614,
@@ -1008,8 +1008,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 11,
@@ -1053,8 +1053,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 19,
@@ -1098,8 +1098,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 324,
@@ -1143,8 +1143,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -40.0,
-                20.0
+                -50.0,
+                10.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 334,
@@ -1173,10 +1173,10 @@
             "trnsysID": 294
         },
         "IDs": {
-            "GlobalId": 1371,
+            "GlobalId": 1335,
             "__idDct__": true,
-            "globalConnID": 404,
-            "trnsysID": 523
+            "globalConnID": 396,
+            "trnsysID": 512
         },
         "Strings": {
             "DiagramName": "ASHP+Tes",

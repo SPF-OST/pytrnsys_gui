@@ -2970,6 +2970,7 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0]
         print(fileName)
         if fileName != '':
+            self.centralWidget.idGen.reset()
             self.currentFile = fileName
             self.centralWidget.delBlocks()
             self.centralWidget.decodeDiagram(fileName)
