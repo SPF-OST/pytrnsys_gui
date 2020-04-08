@@ -1,0 +1,715 @@
+Version 17
+CONSTANTS 2
+dtSim = 1.
+dtSimFile = 1.
+CONSTANTS 3
+FrInte_Tol = 0.003
+FrConv_Tol = 0.001
+PI = 3.1415927
+EQUATIONS 3
+START = 0            !744  !4350   ! 744
+STOP  = 5 !END
+Nix = 0.0
+SIMULATION START STOP dtSim
+TOLERANCES    FrInte_Tol  FrConv_Tol
+LIMITS 30 2000 25                 ! Max iterations   Max warnings    Trace limit      ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ 1      ! TRNSYS numerical integration solver method
+WIDTH 132          ! TRNSYS output file width, number of characters
+LIST             ! NOLIST statement
+! MAP statement
+SOLVER 0 1 1      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK 0     ! Nan DEBUG statement
+OVERWRITE_CHECK 0     ! Overwrite DEBUG statement
+EQSOLVER 0     ! EQUATION SOLVER statement
+TIME_REPORT 1  ! 1 time report is used 0 is not used
+EQUATIONS 3
+ rhoWat=1000
+ cpWat=4200
+ tRoomStore=20
+
+EQUATIONS 9
+*** Black box component temperatures
+TCollector=1 
+TWTapBottom = 1
+THxSolar=1
+TDhwPortRight100=1
+TDhwPortRight95=1
+TDhwPortRight0=1
+TDhwPortRight65=1
+TExternalHx828X0=1 
+TExternalHx828X1=1 
+
+EQUATIONS 4
+*** Pump outlet temperatures
+TPuCol = TPiTesToCol
+TWTapTop = TUntitledConn287
+TPump816 = TUntitledConn288
+TPump847 = TUntitledConn291
+
+EQUATIONS 6
+*** Massflowrates
+MfrPuCol = 943
+MfrWTapBottom = 1000
+MfrPump816 = 849
+MfrPump847 = 130
+xFracTVentil868 = 1.0
+xFracTVentil881 = 1.0
+
+
+UNIT 450 TYPE 935
+PARAMETERS 129
+32
+24 7 0 0       !1 : Collector
+25 7 0 1       !2 : PuCol
+16 0 0 5       !3 : WTapTop
+6 0 0 4        !4 : WTapBottom
+15 6 10 2      !5 : TPiece
+4 5 0 0        !6 : PiDhwMains
+2 1 0 0        !7 : PiColIn
+14 16 17 2     !8 : TeePiece812
+17 10 0 1      !9 : Pump816
+9 5 0 0        !10 : UntitledConn280
+18 22 0 0      !11 : ExternalHx828Side1
+14 15 0 0      !12 : ExternalHx828Side2
+20 18 0 1      !13 : Pump847
+12 8 0 0       !14 : UntitledConn285
+5 12 0 0       !15 : UntitledConn286
+8 3 0 0        !16 : UntitledConn287
+8 9 0 0        !17 : UntitledConn288
+13 11 0 0      !18 : UntitledConn290
+20 27 30 3     !19 : TVentil868
+19 13 0 0      !20 : UntitledConn291
+22 28 31 3     !21 : TVentil881
+11 21 0 0      !22 : UntitledConn294
+24 25 0 0      !23 : HxSolar
+1 23 0 0       !24 : PiColOut
+2 23 0 0       !25 : PiTesToCol
+27 28 32 2     !26 : TPieceTesDhwR903
+19 26 0 0      !27 : UntitledConn292
+26 21 0 0      !28 : UntitledConn295
+30 31 32 2     !29 : TPieceTesDhwR913
+19 29 0 0      !30 : UntitledConn293
+29 21 0 0      !31 : UntitledConn296
+29 26 0 0      !32 : PiTesRDhw_303
+INPUTS 32! for Type 935
+0,0  MfrPuCol 0,0  MfrWTapBottom 0,0 0,0 0,0 0,0  MfrPump816 
+0,0 0,0 0,0  MfrPump847 0,0 0,0 0,0 0,0 0,0 
+ xFracTVentil868 0,0  xFracTVentil881 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 
+
+*** Initial Inputs *
+-1 0.0 -1 0.0 -1 -1 -1 -1 0.0 
+-1  -1 -1 0.0 -1 -1 -1 -1 -1 
+0.0 -1 0.0 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 
+
+EQUATIONS 64	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrCollector_A=[450,1]
+MfrCollector_B=[450,2]
+MfrPuCol_A=[450,4]
+MfrPuCol_B=[450,5]
+MfrWTapTop_A=[450,7]
+MfrWTapTop_B=[450,8]
+MfrWTapBottom_A=[450,10]
+MfrWTapBottom_B=[450,11]
+MfrTPiece_A=[450,13]
+MfrTPiece_B=[450,14]
+MfrTPiece_C=[450,15]
+MfrPiDhwMains_A=[450,16]
+MfrPiDhwMains_B=[450,17]
+MfrPiColIn_A=[450,19]
+MfrPiColIn_B=[450,20]
+MfrTeePiece812_A=[450,22]
+MfrTeePiece812_B=[450,23]
+MfrTeePiece812_C=[450,24]
+MfrPump816_A=[450,25]
+MfrPump816_B=[450,26]
+MfrUntitledConn280_A=[450,28]
+MfrUntitledConn280_B=[450,29]
+MfrExternalHx828-Side0_A=[450,31]
+MfrExternalHx828-Side0_B=[450,32]
+MfrExternalHx828-Side1_A=[450,34]
+MfrExternalHx828-Side1_B=[450,35]
+MfrPump847_A=[450,37]
+MfrPump847_B=[450,38]
+MfrUntitledConn285_A=[450,40]
+MfrUntitledConn285_B=[450,41]
+MfrUntitledConn286_A=[450,43]
+MfrUntitledConn286_B=[450,44]
+MfrUntitledConn287_A=[450,46]
+MfrUntitledConn287_B=[450,47]
+MfrUntitledConn288_A=[450,49]
+MfrUntitledConn288_B=[450,50]
+MfrUntitledConn290_A=[450,52]
+MfrUntitledConn290_B=[450,53]
+MfrTVentil868_A=[450,55]
+MfrTVentil868_B=[450,56]
+MfrTVentil868_C=[450,57]
+MfrUntitledConn291_A=[450,58]
+MfrUntitledConn291_B=[450,59]
+MfrTVentil881_A=[450,61]
+MfrTVentil881_B=[450,62]
+MfrTVentil881_C=[450,63]
+MfrUntitledConn294_A=[450,64]
+MfrUntitledConn294_B=[450,65]
+MfrHxSolar_A=[450,67]
+MfrHxSolar_B=[450,68]
+MfrPiColOut_A=[450,70]
+MfrPiColOut_B=[450,71]
+MfrPiTesToCol_A=[450,73]
+MfrPiTesToCol_B=[450,74]
+MfrUntitledConn292_A=[450,79]
+MfrUntitledConn292_B=[450,80]
+MfrUntitledConn295_A=[450,82]
+MfrUntitledConn295_B=[450,83]
+MfrUntitledConn293_A=[450,88]
+MfrUntitledConn293_B=[450,89]
+MfrUntitledConn296_A=[450,91]
+MfrUntitledConn296_B=[450,92]
+MfrPiTesRDhw_303_A=[450,94]
+MfrPiTesRDhw_303_B=[450,95]
+
+
+UNIT 451 TYPE 929
+!TPiece
+PARAMETERS 0
+INPUTS 6
+MfrTPiece_A
+MfrTPiece_B
+MfrTPiece_C
+TUntitledConn286
+TPiDhwMains
+TUntitledConn280
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTPiece= [451,1]
+
+UNIT 452 TYPE 931
+!PiDhwMains
+PARAMETERS 6
+diPiDhwMains
+LPiDhwMains
+UPiDhwMains
+RhoWat
+CPWat
+20
+INPUTS 4
+TWTapBottom
+MfrPiDhwMains_A
+TRoomStore
+TTPiece
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwMains= [452,1]
+PPiDhwMains_kW= [452,3]/3600 !kW
+MfrPiDhwMains= MfrPiDhwMains_A
+
+UNIT 453 TYPE 931
+!PiColIn
+PARAMETERS 6
+diPiColIn
+LPiColIn
+UPiColIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCol
+MfrPiColIn_A
+TRoomStore
+TCollector
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColIn= [453,1]
+PPiColIn_kW= [453,3]/3600 !kW
+MfrPiColIn= MfrPiColIn_A
+
+UNIT 454 TYPE 929
+!TeePiece812
+PARAMETERS 0
+INPUTS 6
+MfrTeePiece812_A
+MfrTeePiece812_B
+MfrTeePiece812_C
+TUntitledConn285
+TUntitledConn287
+TUntitledConn288
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeePiece812= [454,1]
+
+UNIT 455 TYPE 931
+!UntitledConn280
+PARAMETERS 6
+diUntitledConn280
+LUntitledConn280
+UUntitledConn280
+RhoWat
+CPWat
+20
+INPUTS 4
+TPump816
+MfrUntitledConn280_A
+TRoomStore
+TTPiece
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn280= [455,1]
+PUntitledConn280_kW= [455,3]/3600 !kW
+MfrUntitledConn280= MfrUntitledConn280_A
+
+UNIT 456 TYPE 931
+!UntitledConn285
+PARAMETERS 6
+diUntitledConn285
+LUntitledConn285
+UUntitledConn285
+RhoWat
+CPWat
+20
+INPUTS 4
+TExternalHx828X1
+MfrUntitledConn285_A
+TRoomStore
+TTeePiece812
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn285= [456,1]
+PUntitledConn285_kW= [456,3]/3600 !kW
+MfrUntitledConn285= MfrUntitledConn285_A
+
+UNIT 457 TYPE 931
+!UntitledConn286
+PARAMETERS 6
+diUntitledConn286
+LUntitledConn286
+UUntitledConn286
+RhoWat
+CPWat
+20
+INPUTS 4
+TTPiece
+MfrUntitledConn286_A
+TRoomStore
+TExternalHx828X1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn286= [457,1]
+PUntitledConn286_kW= [457,3]/3600 !kW
+MfrUntitledConn286= MfrUntitledConn286_A
+
+UNIT 458 TYPE 931
+!UntitledConn287
+PARAMETERS 6
+diUntitledConn287
+LUntitledConn287
+UUntitledConn287
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePiece812
+MfrUntitledConn287_A
+TRoomStore
+TWTapTop
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn287= [458,1]
+PUntitledConn287_kW= [458,3]/3600 !kW
+MfrUntitledConn287= MfrUntitledConn287_A
+
+UNIT 459 TYPE 931
+!UntitledConn288
+PARAMETERS 6
+diUntitledConn288
+LUntitledConn288
+UUntitledConn288
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePiece812
+MfrUntitledConn288_A
+TRoomStore
+TPump816
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn288= [459,1]
+PUntitledConn288_kW= [459,3]/3600 !kW
+MfrUntitledConn288= MfrUntitledConn288_A
+
+UNIT 460 TYPE 931
+!UntitledConn290
+PARAMETERS 6
+diUntitledConn290
+LUntitledConn290
+UUntitledConn290
+RhoWat
+CPWat
+20
+INPUTS 4
+TPump847
+MfrUntitledConn290_A
+TRoomStore
+TExternalHx828X0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn290= [460,1]
+PUntitledConn290_kW= [460,3]/3600 !kW
+MfrUntitledConn290= MfrUntitledConn290_A
+
+UNIT 461 TYPE 929
+!TVentil868
+PARAMETERS 0
+INPUTS 6
+MfrTVentil868_A
+MfrTVentil868_B
+MfrTVentil868_C
+TUntitledConn291
+TUntitledConn292
+TUntitledConn293
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTVentil868= [461,1]
+
+UNIT 462 TYPE 931
+!UntitledConn291
+PARAMETERS 6
+diUntitledConn291
+LUntitledConn291
+UUntitledConn291
+RhoWat
+CPWat
+20
+INPUTS 4
+TTVentil868
+MfrUntitledConn291_A
+TRoomStore
+TPump847
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn291= [462,1]
+PUntitledConn291_kW= [462,3]/3600 !kW
+MfrUntitledConn291= MfrUntitledConn291_A
+
+UNIT 463 TYPE 929
+!TVentil881
+PARAMETERS 0
+INPUTS 6
+MfrTVentil881_A
+MfrTVentil881_B
+MfrTVentil881_C
+TUntitledConn294
+TUntitledConn295
+TUntitledConn296
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTVentil881= [463,1]
+
+UNIT 464 TYPE 931
+!UntitledConn294
+PARAMETERS 6
+diUntitledConn294
+LUntitledConn294
+UUntitledConn294
+RhoWat
+CPWat
+20
+INPUTS 4
+TExternalHx828X0
+MfrUntitledConn294_A
+TRoomStore
+TTVentil881
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn294= [464,1]
+PUntitledConn294_kW= [464,3]/3600 !kW
+MfrUntitledConn294= MfrUntitledConn294_A
+
+UNIT 465 TYPE 931
+!PiColOut
+PARAMETERS 6
+diPiColOut
+LPiColOut
+UPiColOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TCollector
+MfrPiColOut_A
+TRoomStore
+THxSolar
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColOut= [465,1]
+PPiColOut_kW= [465,3]/3600 !kW
+MfrPiColOut= MfrPiColOut_A
+
+UNIT 466 TYPE 931
+!PiTesToCol
+PARAMETERS 6
+diPiTesToCol
+LPiTesToCol
+UPiTesToCol
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCol
+MfrPiTesToCol_A
+TRoomStore
+THxSolar
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesToCol= [466,1]
+PPiTesToCol_kW= [466,3]/3600 !kW
+MfrPiTesToCol= MfrPiTesToCol_A
+
+UNIT 467 TYPE 931
+!UntitledConn292
+PARAMETERS 6
+diUntitledConn292
+LUntitledConn292
+UUntitledConn292
+RhoWat
+CPWat
+20
+INPUTS 4
+TTVentil868
+MfrUntitledConn292_A
+TRoomStore
+TDhwPortRight100
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn292= [467,1]
+PUntitledConn292_kW= [467,3]/3600 !kW
+MfrUntitledConn292= MfrUntitledConn292_A
+
+UNIT 468 TYPE 931
+!UntitledConn295
+PARAMETERS 6
+diUntitledConn295
+LUntitledConn295
+UUntitledConn295
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight0
+MfrUntitledConn295_A
+TRoomStore
+TTVentil881
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn295= [468,1]
+PUntitledConn295_kW= [468,3]/3600 !kW
+MfrUntitledConn295= MfrUntitledConn295_A
+
+UNIT 469 TYPE 931
+!UntitledConn293
+PARAMETERS 6
+diUntitledConn293
+LUntitledConn293
+UUntitledConn293
+RhoWat
+CPWat
+20
+INPUTS 4
+TTVentil868
+MfrUntitledConn293_A
+TRoomStore
+TDhwPortRight95
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn293= [469,1]
+PUntitledConn293_kW= [469,3]/3600 !kW
+MfrUntitledConn293= MfrUntitledConn293_A
+
+UNIT 470 TYPE 931
+!UntitledConn296
+PARAMETERS 6
+diUntitledConn296
+LUntitledConn296
+UUntitledConn296
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight65
+MfrUntitledConn296_A
+TRoomStore
+TTVentil881
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TUntitledConn296= [470,1]
+PUntitledConn296_kW= [470,3]/3600 !kW
+MfrUntitledConn296= MfrUntitledConn296_A
+
+CONSTANTS 3
+** Fluid Loop : defaultGroup
+di_loop_0=0.2
+L_loop_0=2
+U_loop_0=10
+
+
+EQUATIONS 48
+** Fluid Loop : defaultGroup
+**di_loop_0=0.2
+**L_loop_0=2
+**U_loop_0=10
+*** PiDhwMains
+diPiDhwMains=di_loop_0
+LPiDhwMains=L_loop_0
+UPiDhwMains=U_loop_0
+*** PiColIn
+diPiColIn=di_loop_0
+LPiColIn=L_loop_0
+UPiColIn=U_loop_0
+*** PiTesToCol
+diPiTesToCol=di_loop_0
+LPiTesToCol=L_loop_0
+UPiTesToCol=U_loop_0
+*** PiColOut
+diPiColOut=di_loop_0
+LPiColOut=L_loop_0
+UPiColOut=U_loop_0
+*** UntitledConn280
+diUntitledConn280=di_loop_0
+LUntitledConn280=L_loop_0
+UUntitledConn280=U_loop_0
+*** UntitledConn285
+diUntitledConn285=di_loop_0
+LUntitledConn285=L_loop_0
+UUntitledConn285=U_loop_0
+*** UntitledConn286
+diUntitledConn286=di_loop_0
+LUntitledConn286=L_loop_0
+UUntitledConn286=U_loop_0
+*** UntitledConn287
+diUntitledConn287=di_loop_0
+LUntitledConn287=L_loop_0
+UUntitledConn287=U_loop_0
+*** UntitledConn288
+diUntitledConn288=di_loop_0
+LUntitledConn288=L_loop_0
+UUntitledConn288=U_loop_0
+*** UntitledConn290
+diUntitledConn290=di_loop_0
+LUntitledConn290=L_loop_0
+UUntitledConn290=U_loop_0
+*** UntitledConn291
+diUntitledConn291=di_loop_0
+LUntitledConn291=L_loop_0
+UUntitledConn291=U_loop_0
+*** UntitledConn292
+diUntitledConn292=di_loop_0
+LUntitledConn292=L_loop_0
+UUntitledConn292=U_loop_0
+*** UntitledConn293
+diUntitledConn293=di_loop_0
+LUntitledConn293=L_loop_0
+UUntitledConn293=U_loop_0
+*** UntitledConn294
+diUntitledConn294=di_loop_0
+LUntitledConn294=L_loop_0
+UUntitledConn294=U_loop_0
+*** UntitledConn295
+diUntitledConn295=di_loop_0
+LUntitledConn295=L_loop_0
+UUntitledConn295=U_loop_0
+*** UntitledConn296
+diUntitledConn296=di_loop_0
+LUntitledConn296=L_loop_0
+UUntitledConn296=U_loop_0
+
+
+EQUATIONS 2
+PipeLoss0=PPiDhwMains_kW+PPiColIn_kW+PPiTesToCol_kW+PPiColOut_kW+PUntitledConn280_kW+PUntitledConn285_kW+PUntitledConn286_kW+PUntitledConn287_kW+PUntitledConn288_kW+PUntitledConn290_kW+PUntitledConn291_kW+PUntitledConn292_kW+PUntitledConn293_kW+PUntitledConn294_kW+PUntitledConn295_kW+PUntitledConn296_kW
+PipeLossTotal=PipeLoss0
+
+ASSIGN DHWSolar+Tes+HEX_Mfr.prt 471
+
+UNIT 471 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+471! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 18
+MfrPiDhwMains MfrPiColIn MfrPiTesToCol MfrPiColOut MfrUntitledConn280 MfrUntitledConn285 MfrUntitledConn286 
+MfrUntitledConn287 MfrUntitledConn288 MfrUntitledConn290 xFracTVentil868 MfrUntitledConn291 MfrUntitledConn292 MfrUntitledConn293 xFracTVentil881 
+MfrUntitledConn294 MfrUntitledConn295 MfrUntitledConn296 
+***
+MfrPiDhwMains MfrPiColIn MfrPiTesToCol MfrPiColOut MfrUntitledConn280 MfrUntitledConn285 MfrUntitledConn286 
+MfrUntitledConn287 MfrUntitledConn288 MfrUntitledConn290 xFracTVentil868 MfrUntitledConn291 MfrUntitledConn292 MfrUntitledConn293 xFracTVentil881 
+MfrUntitledConn294 MfrUntitledConn295 MfrUntitledConn296 
+
+ASSIGN DHWSolar+Tes+HEX_T.prt 472
+
+UNIT 472 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+472! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 16
+TPiDhwMains TPiColIn TPiTesToCol TPiColOut TUntitledConn280 TUntitledConn285 TUntitledConn286 
+TUntitledConn287 TUntitledConn288 TUntitledConn290 TUntitledConn291 TUntitledConn292 TUntitledConn293 TUntitledConn294 TUntitledConn295 
+TUntitledConn296 
+***
+TPiDhwMains TPiColIn TPiTesToCol TPiColOut TUntitledConn280 TUntitledConn285 TUntitledConn286 
+TUntitledConn287 TUntitledConn288 TUntitledConn290 TUntitledConn291 TUntitledConn292 TUntitledConn293 TUntitledConn294 TUntitledConn295 
+TUntitledConn296 
+
+ENDS

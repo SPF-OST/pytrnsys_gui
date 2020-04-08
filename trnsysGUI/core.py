@@ -3007,8 +3007,12 @@ class MainWindow(QMainWindow):
             latest_file = ''
 
         while len(list_of_files) > 10:
-            fileToDelete = min(list_of_files, key=os.path.getmtime)
-            os.remove(fileToDelete)
+            try:
+                fileToDelete = min(list_of_files, key=os.path.getmtime)
+            except FileNotFoundError:
+                print("File not found")
+            else:
+                os.remove(fileToDelete)
 
         try:
             latest_file
