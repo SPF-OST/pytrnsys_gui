@@ -29,7 +29,7 @@ class Boiler(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = -4
         deltaH = self.h / 10
 
         # Limit the block size:

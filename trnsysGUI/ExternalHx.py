@@ -36,7 +36,7 @@ class ExternalHx(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = 3
 
         # Limit the block size:
         if h < 20:

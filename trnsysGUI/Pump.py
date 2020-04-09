@@ -37,7 +37,7 @@ class Pump(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = 2
 
         # Limit the block size:
         if h < 20:

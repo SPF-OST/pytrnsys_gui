@@ -39,7 +39,7 @@ class HeatPumpTwoHx(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = 1
 
         # Limit the block size:
         if h < 20:

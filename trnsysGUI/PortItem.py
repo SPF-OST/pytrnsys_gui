@@ -29,9 +29,9 @@ class PortItem(QGraphicsEllipseItem):
         self.ashColorR = QColor(239, 57, 75)
         self.ashColorB = QColor(20, 83, 245)
 
-        QGraphicsEllipseItem.__init__(self, QRectF(-8, -8, 16.0, 16.0), parent)
+        QGraphicsEllipseItem.__init__(self, QRectF(-7, -7, 7.0, 7.0), parent)
 
-        self.innerCircle = QGraphicsEllipseItem(-4, -4, 7, 7, self)
+        self.innerCircle = QGraphicsEllipseItem(-4, -4, 6, 6, self)
         self.innerCircle.setPen(QPen(QColor(0, 0, 0, 0), 0))
 
         self.visibleColor = QColor(0, 0, 0)
@@ -222,8 +222,8 @@ class PortItem(QGraphicsEllipseItem):
         # print("Leaving hover")
 
         # self.setRect(-6, -6, 12, 12)
-        self.setRect(-7, -7, 14, 14)
-        self.innerCircle.setRect(-4, -4, 8, 8)
+        self.setRect(-7, -7, 7, 7)
+        self.innerCircle.setRect(-4, -4, 6.5, 6.5)
         if len(self.connectionList) == 0:
             if self.name == 'i':
                 # self.setBrush(Qt.red)

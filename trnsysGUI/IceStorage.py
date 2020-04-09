@@ -24,7 +24,7 @@ class IceStorage(BlockItem):
         deltaH = self.h / 13
 
         """ Resize block function """
-        delta = 4
+        delta = 1
 
         # Limit the block size:
         if h < 20:
