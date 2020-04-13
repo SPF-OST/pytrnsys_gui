@@ -11,7 +11,7 @@ class PortItem(QGraphicsEllipseItem):
         self.parent = parent
         self.name = name
         self.side = side
-        self.originalSide = side
+        self.createdAtSide = side
         self.posCallbacks = []
         self.connectionList = []
         self.id = self.parent.parent.parent().idGen.getID()
@@ -115,7 +115,7 @@ class PortItem(QGraphicsEllipseItem):
                 conn.positionLabel()
 
                 if conn.fromPort is self:
-                    if (self.originalSide != 1 and self.originalSide != 3) or not conn.segments[0].isVertical():
+                    if (self.createdAtSide != 1 and self.createdAtSide != 3) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[0]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
@@ -144,7 +144,7 @@ class PortItem(QGraphicsEllipseItem):
                             seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
 
                 elif conn.toPort is self:
-                    if (conn.fromPort.originalSide != 1 and conn.fromPort.originalSide != 3) or not conn.segments[0].isVertical():
+                    if (conn.fromPort.createdAtSide != 1 and conn.fromPort.createdAtSide != 3) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
@@ -246,7 +246,7 @@ class PortItem(QGraphicsEllipseItem):
             self.parent.parent.parent().listV.addItem(c.displayName)
         self.parent.parent.parent().listV.addItem("Flipped state (H,V):" + str(self.parent.flippedH) + ", " + str(self.parent.flippedV))
         self.parent.parent.parent().listV.addItem("Side: " + str(self.side))
-        self.parent.parent.parent().listV.addItem("OriginalSide: " + str(self.originalSide))
+        self.parent.parent.parent().listV.addItem("createdAtSide: " + str(self.createdAtSide))
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
         self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)
 
