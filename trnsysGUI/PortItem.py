@@ -117,11 +117,12 @@ class PortItem(QGraphicsEllipseItem):
                 if conn.fromPort is self:
                     if (self.createdAtSide != 1 and self.createdAtSide != 3) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
+                            print("inside here")
                             cor = conn.getCorners()[0]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
                             seg = conn.segments[0]  # first segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x() + 0.6, cor.scenePos().y() + 0.6)
                             if len(conn.segments)>2:
                                 verSeg = conn.segments[1]
                                 nextSeg = conn.segments[2]
@@ -136,6 +137,7 @@ class PortItem(QGraphicsEllipseItem):
                                         self.showCorners(conn)
                                         verSeg.setVisible(True)
                     else:
+                        print("inside else")
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[0]
                             cor.setPos(self.scenePos().x(), cor.pos().y())
@@ -150,7 +152,7 @@ class PortItem(QGraphicsEllipseItem):
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
                             seg = conn.segments[-1]
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x()+ 0.6, cor.scenePos().y()+ 0.6)
                             if len(conn.segments)>2:
                                 verSeg = conn.segments[-2]
                                 nextSeg = conn.segments[-3]

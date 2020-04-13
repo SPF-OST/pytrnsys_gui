@@ -6,9 +6,9 @@ Tdp1In_Tes2 = TPiHptoTesSHIn ! @connectDdck
 Mfrdp1_Tes2 = MfrPiHptoTesSHIn ! @connectDdck
 Tdp1InRev_Tes2 = TPiHpToTesSHOut ! @connectDdck
 EQUATIONS 3
-Tdp2In_Tes2 = TPiTesDhwToSh ! @connectDdck
-Mfrdp2_Tes2 = MfrPiTesDhwToSh ! @connectDdck
-Tdp2InRev_Tes2 = TPiShTesOut ! @connectDdck
+Tdp2In_Tes2 = TPiShTesOut ! @connectDdck
+Mfrdp2_Tes2 = MfrPiShTesOut ! @connectDdck
+Tdp2InRev_Tes2 = TPiTesDhwToSh ! @connectDdck
 EQUATIONS 3
 Thx1In_Tes2 = TPiInHxTesSh ! @connectDdck
 Mfrhx1_Tes2 = MfrPiInHxTesSh ! @connectDdck
@@ -30,8 +30,8 @@ zInDp1_Tes2=95.00 ! @connectDdck
 zOutDp1_Tes2=5.00 ! @connectDdck 
 *********Connecting values of DIRECT PORT=2***********
 CONSTANTS 2
-zInDp2_Tes2=95.00 ! @connectDdck 
-zOutDp2_Tes2=5.00 ! @connectDdck 
+zInDp2_Tes2=5.00 ! @connectDdck 
+zOutDp2_Tes2=95.00 ! @connectDdck 
 *********Connecting values of HX=1***********
 CONSTANTS 4
 zInhx1_Tes2=30.00  ! @connectDdck

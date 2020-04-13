@@ -127,9 +127,9 @@ class ConfigStorage(QDialog):
 
         manPortLabel = QLabel("<b>Set port manually</b>")
         manPortLabel2 = QLabel("Enter height in percent: ")
-        portlabelUpper = QLabel("Upper port")
+        portlabelUpper = QLabel("Inlet (Upper port)")
         self.manPortLeI = QLineEdit("0")
-        portlabelLower = QLabel("Lower port")
+        portlabelLower = QLabel("Outlet (Lower port)")
         self.manPortLeO = QLineEdit("0")
 
         qhbl3 = QHBoxLayout()
