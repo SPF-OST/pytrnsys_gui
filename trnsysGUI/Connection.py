@@ -534,7 +534,7 @@ class Connection(object):
         print(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
 
-        if (self.fromPort.side == 2) and (self.toPort.side == 2):
+        if (self.fromPort.originalSide == 2) and (self.toPort.originalSide == 2):
             print("NiceConn 2 to 2")
             portOffset = 30
             self.clearConn()
@@ -599,7 +599,7 @@ class Connection(object):
             corner3.setPos(p3)
             corner4.setPos(p4)
 
-        elif (self.fromPort.side == 0) and (self.toPort.side == 0):
+        elif (self.fromPort.originalSide == 0) and (self.toPort.originalSide == 0):
             print("NiceConn 0 to 0")
             portOffset = 30
             self.clearConn()
@@ -665,7 +665,7 @@ class Connection(object):
             corner3.setPos(p3)
             corner4.setPos(p4)
 
-        elif self.fromPort.side == 1:
+        elif self.fromPort.originalSide == 1:
             # todo :  when rotated, it cause a problem because side gets changed
 
             print("NiceConn from 1")
@@ -745,7 +745,7 @@ class Connection(object):
                 corner2.setPos(help_point_2)
                 self.firstS = self.getFirstSeg()
 
-        elif self.fromPort.side == 3:
+        elif self.fromPort.originalSide == 3:
 
             print("NiceConn from 1")
             portOffset = 30

@@ -921,7 +921,6 @@ class StorageTank(BlockItem):
             inputPos = 100-100*self.directPortConnsForList[i].fromPort.pos().y()/self.h
             outputPos = 100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h
             connectorsPort[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
-            print(connectorsPort)
 
         for i in range(inputs["nHx"]):
             Tname = "T" + self.heatExchangers[i].port1.connectionList[1].displayName
@@ -929,15 +928,11 @@ class StorageTank(BlockItem):
             Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
             inputPos = self.heatExchangers[i].input
             outputPos = self.heatExchangers[i].output
-            connectorsHx[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
-            print(connectorsHx)
+            connectorsHx[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
 
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
 
-        tool.createDDck(filePath, name, typeFile="dck")
+        tool.createDDck(filePath, name, typeFile="ddck")
 
     def loadDck(self):
-        pass
-
-    def assign_nType_nTes(self):
         pass
