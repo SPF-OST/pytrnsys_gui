@@ -143,10 +143,11 @@ class Connection(object):
             s.labelMass.setPlainText(self.mass)
 
     def setMassAndTemperature(self, mass, temp):
-        self.mass = mass
+        self.mass = int(float(mass))
+        self.mass = '{:,}'.format(self.mass)
         self.temperature = temp
         for s in self.segments:
-            s.labelMass.setPlainText("M: %s Kg/Hr   T: %s\u2103" % (self.mass, self.temperature))
+            s.labelMass.setPlainText("M: %s kg/Hr   T: %s\u2103" % (self.mass.replace(',', '\''), self.temperature))
 
 
     def setDisplayName(self, newName):

@@ -4,7 +4,7 @@ import sys
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QMenu, QMessageBox
+from PyQt5.QtWidgets import QMenu, QMessageBox, QFileDialog
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
@@ -22,6 +22,7 @@ class StorageTank(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
         self.parent = parent
+        self.dckFilePath = ''
 
         self.leftSide = []
         self.rightSide = []
@@ -770,7 +771,7 @@ class StorageTank(BlockItem):
         menu.exec_(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
-        dia = ConfigStorage(self, self.scene().parent())
+        self.dia = ConfigStorage(self, self.scene().parent())
 
     def hasManPortById(self, idFind):
 
@@ -935,4 +936,10 @@ class StorageTank(BlockItem):
         tool.createDDck(filePath, name, typeFile="ddck")
 
     def loadDck(self):
-        pass
+        print("Opening diagram")
+        # self.centralWidget.delBlocks()
+        fileName = QFileDialog.getOpenFileName(self.dia, "Open diagram", filter="*.ddck")[0]
+        if fileName != '':
+            self.dckFilePath = fileName
+        else:
+            print("No filename chosen")
