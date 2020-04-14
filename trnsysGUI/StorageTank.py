@@ -868,6 +868,7 @@ class StorageTank(BlockItem):
             name = fileName.split('/')[-1][:-5]
         else:
             name = fileName
+        name = name + '_nTes' + str(self.nTes)
 
         print("Storage Type:", self.storageType)
         print("nTes:", self.nTes)
