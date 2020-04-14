@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+from pathlib import Path
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QIcon, QColor
@@ -768,6 +769,9 @@ class StorageTank(BlockItem):
         e3 = menu.addAction('Export dck')
         e3.triggered.connect(self.exportDck)
 
+        e4 = menu.addAction('Debug Connection')
+        e4.triggered.connect(self.debugConn)
+
         menu.exec_(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
@@ -865,22 +869,6 @@ class StorageTank(BlockItem):
         else:
             name = fileName
 
-        # how to pass into script?
-        # for i in self.directPortConnsForList:
-        #     inputPos = 100-100*i.fromPort.pos().y()/self.h
-        #     outputPos = 100-100*i.toPort.pos().y()/self.h
-        #     inputConn = i.fromPort.connectionList[1].displayName
-        #     outputConn = i.toPort.connectionList[1].displayName
-        #     print("input pos:", inputPos, "Output pos:", outputPos, "Input conn:", inputConn, "Output conn:", outputConn)
-        #
-        # #left side hx has input on top while right side hx has input below? same as direct ports?
-        # for h in self.heatExchangers:
-        #     inputPos = h.input
-        #     outputPos = h.output
-        #     inputConn = h.port1.connectionList[1].displayName
-        #     outputConn = h.port2.connectionList[1].displayName
-        #     print("Input:", inputPos, "output:", outputPos, "Input conn:", inputConn, "Output conn:", outputConn)
-
         print("Storage Type:", self.storageType)
         print("nTes:", self.nTes)
         print("nPorts:", nPorts)
@@ -919,17 +907,36 @@ class StorageTank(BlockItem):
             Tname = "T" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
             Mfrname = "Mfr" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
             Trev = "T" + self.directPortConnsForList[i].toPort.connectionList[1].displayName
-            inputPos = 100-100*self.directPortConnsForList[i].fromPort.pos().y()/self.h
-            outputPos = 100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h
+            inputPos = (100-100*self.directPortConnsForList[i].fromPort.pos().y()/self.h)/100
+            outputPos = (100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h)/100
             connectorsPort[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
 
         for i in range(inputs["nHx"]):
             Tname = "T" + self.heatExchangers[i].port1.connectionList[1].displayName
             Mfrname = "Mfr" + self.heatExchangers[i].port1.connectionList[1].displayName
             Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
-            inputPos = self.heatExchangers[i].input
-            outputPos = self.heatExchangers[i].output
+            inputPos = self.heatExchangers[i].input / 100
+            outputPos = self.heatExchangers[i].output / 100
             connectorsHx[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
+
+        exportPath = os.path.join(filePath, name+'.ddck')
+        print(exportPath)
+        if Path(exportPath).exists():
+            qmb = QMessageBox()
+            qmb.setText("Warning: " +
+                        "An export file exists already. Do you want to overwrite or cancel?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == QMessageBox.Save:
+                print("Overwriting")
+                # continue
+            else:
+                print("Canceling")
+                return
+        else:
+            # Export file does not exist yet
+            pass
 
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
 
@@ -943,3 +950,32 @@ class StorageTank(BlockItem):
             self.dckFilePath = fileName
         else:
             print("No filename chosen")
+
+    def debugConn(self):
+        print("Debugging conn")
+        for i in range(len(self.directPortConnsForList)):
+            stFromPort = self.directPortConnsForList[i].fromPort
+            stToPort = self.directPortConnsForList[i].toPort
+            toPort1 = self.directPortConnsForList[i].fromPort.connectionList[1].toPort
+            toPort2 = self.directPortConnsForList[i].toPort.connectionList[1].toPort
+            fromPort1 = self.directPortConnsForList[i].fromPort.connectionList[1].fromPort
+            fromPort2 = self.directPortConnsForList[i].toPort.connectionList[1].fromPort
+            connName1 = self.directPortConnsForList[i].fromPort.connectionList[1].displayName
+            connName2 = self.directPortConnsForList[i].toPort.connectionList[1].displayName
+
+            # if toPort1 == stFromPort and toPort2 == stToPort:
+            #     msgBox = QMessageBox()
+            #     msgBox.setText("both %s and %s are input ports" % (connName1, connName2))
+            #     msgBox.exec_()
+            # elif fromPort1 == stFromPort and fromPort2 == stToPort:
+            #     msgBox = QMessageBox()
+            #     msgBox.setText("both %s and %s are output ports" % (connName1, connName2))
+            #     msgBox.exec_()
+            if stFromPort != toPort1:
+                msgBox = QMessageBox()
+                msgBox.setText("%s is suppose to be an inlet" % (connName1))
+                msgBox.exec_()
+            if stToPort != fromPort2:
+                msgBox = QMessageBox()
+                msgBox.setText("%s is suppose to be an outlet" % (connName2))
+                msgBox.exec_()

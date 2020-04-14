@@ -2718,7 +2718,7 @@ class MainWindow(QMainWindow):
         tb.addAction(exportTrnsysAction)
         tb.addAction(renameDiaAction)
         tb.addAction(deleteDiaAction)
-        tb.addAction(groupNewAction)
+        # tb.addAction(groupNewAction)
         # tb.addAction(autoArrangeAction)
         tb.addAction(zoomInAction)
         tb.addAction(zoomOutAction)
@@ -2726,7 +2726,7 @@ class MainWindow(QMainWindow):
         # tb.addAction(copyAction)
         # tb.addAction(pasteAction)
         tb.addAction(toggleConnLabels)
-        tb.addAction(editGroupsAction)
+        # tb.addAction(editGroupsAction)
         # tb.addAction(selectMultipleAction)
         tb.addAction(openVisualizerAction)
         tb.addAction(runMassflowSolverAction)
@@ -2837,7 +2837,7 @@ class MainWindow(QMainWindow):
 
         self.centralWidget = DiagramEditor()
         self.setCentralWidget(self.centralWidget)
-        self.currentFile = ''
+        self.currentFile = 'Untitled'
 
     def saveDia(self):
         print("Saving diagram")

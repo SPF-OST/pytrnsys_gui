@@ -26,16 +26,16 @@ VStoreRef = 0.763
 ratioTes = Vol_Tes2 / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
-zInDp1_Tes2=95.00 ! @connectDdck 
-zOutDp1_Tes2=5.00 ! @connectDdck 
+zInDp1_Tes2=0.95 ! @connectDdck 
+zOutDp1_Tes2=0.05 ! @connectDdck 
 *********Connecting values of DIRECT PORT=2***********
 CONSTANTS 2
-zInDp2_Tes2=95.00 ! @connectDdck 
-zOutDp2_Tes2=5.00 ! @connectDdck 
+zInDp2_Tes2=0.95 ! @connectDdck 
+zOutDp2_Tes2=0.05 ! @connectDdck 
 *********Connecting values of HX=1***********
 CONSTANTS 4
-zInhx1_Tes2=30.00  ! @connectDdck
-zOuthx1_Tes2=11.82 ! @connectDdck
+zInhx1_Tes2=0.30  ! @connectDdck
+zOuthx1_Tes2=0.12 ! @connectDdck
 Cphx1_Tes2=cpwat     ! @connectDdck
 Rhohx1_Tes2=rhowat    ! @connectDdck
 *********Constant of DIRECT PORT=1***********

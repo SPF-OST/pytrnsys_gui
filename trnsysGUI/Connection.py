@@ -143,7 +143,7 @@ class Connection(object):
             s.labelMass.setPlainText(self.mass)
 
     def setMassAndTemperature(self, mass, temp):
-        self.mass = int(float(mass))
+        self.mass = float(mass)
         self.mass = '{:,}'.format(self.mass)
         self.temperature = temp
         for s in self.segments:

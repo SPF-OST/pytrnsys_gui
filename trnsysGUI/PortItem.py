@@ -122,7 +122,7 @@ class PortItem(QGraphicsEllipseItem):
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
                             seg = conn.segments[0]  # first segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x() + 0.6, cor.scenePos().y() + 0.6)
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x() + 0.6, cor.scenePos().y())
                             if len(conn.segments)>2:
                                 verSeg = conn.segments[1]
                                 nextSeg = conn.segments[2]
@@ -205,8 +205,8 @@ class PortItem(QGraphicsEllipseItem):
 
         print(self.parent)
 
-        self.setRect(-4, -4, 14.0, 14.0)
-        self.innerCircle.setRect(-7, -7, 14.0, 14.0)
+        self.setRect(-4, -4, 10, 10)
+        self.innerCircle.setRect(-4, -4, 10, 10)
         if self.name == 'i':
             # self.setBrush(Qt.red)
             # self.innerCircle.setBrush(Qt.red)

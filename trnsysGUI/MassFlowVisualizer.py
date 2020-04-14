@@ -224,10 +224,11 @@ class MassFlowVisualizer(QDialog):
                 if isinstance(t, Connection):
                     if 'Mfr'+t.displayName in self.massFlowData.columns and 'T'+t.displayName in self.tempMassFlowData:
                         mass = str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep]))
+                        mass1Dp = str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep], 1))
                         temperature = str(round(self.tempMassFlowData['T' + t.displayName].iloc[self.timeStep]))
                         print("Found connection in ts " + str(self.timeStep) + " " + str(i))
                         print("mass flow value of %s : " % t.displayName)
-                        t.setMassAndTemperature(mass, temperature)
+                        t.setMassAndTemperature(mass1Dp, temperature)
                         thickValue = self.getThickness(mass)
                         print("Thickvalue: ", thickValue)
                         if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
