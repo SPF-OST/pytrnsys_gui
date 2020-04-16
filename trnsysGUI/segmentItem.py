@@ -685,19 +685,19 @@ class segmentItem(QGraphicsLineItem):
         a3 = menu.addAction('Invert this connection')
         a3.triggered.connect(self.parent.invertConnection)
 
-        b1 = menu.addAction('Set group ')
-        b1.triggered.connect(self.configGroup)
-        a4 = menu.addAction('Print end and start items')
-        a4.triggered.connect(self.printItemsAt)
-
-        a5 = menu.addAction('Print corners')
-        a5.triggered.connect(self.parent.getCorners)
-
-        a6 = menu.addAction('Print group')
-        a6.triggered.connect(self.printGroup)
-
-        a7 = menu.addAction('Inspect')
-        a7.triggered.connect(self.inspect)
+        # b1 = menu.addAction('Set group ')
+        # b1.triggered.connect(self.configGroup)
+        # a4 = menu.addAction('Print end and start items')
+        # a4.triggered.connect(self.printItemsAt)
+        #
+        # a5 = menu.addAction('Print corners')
+        # a5.triggered.connect(self.parent.getCorners)
+        #
+        # a6 = menu.addAction('Print group')
+        # a6.triggered.connect(self.printGroup)
+        #
+        # a7 = menu.addAction('Inspect')
+        # a7.triggered.connect(self.inspect)
         menu.exec_(event.screenPos())
 
     def configGroup(self):

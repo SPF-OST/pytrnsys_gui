@@ -754,23 +754,23 @@ class StorageTank(BlockItem):
         c1.triggered.connect(self.deleteBlockCom)
 
         # sG = QIcon('')
-        c2 = menu.addAction("Set group")
-        c2.triggered.connect(self.configGroup)
+        # c2 = menu.addAction("Set group")
+        # c2.triggered.connect(self.configGroup)
+        #
+        # d1 = menu.addAction('Dump information')
+        # d1.triggered.connect(self.dumpBlockInfo)
+        #
+        # e1 = menu.addAction('Inspect')
+        # e1.triggered.connect(self.inspectBlock)
+        #
+        # e2 = menu.addAction('Print port nb')
+        # e2.triggered.connect(self.printPortNb)
 
-        d1 = menu.addAction('Dump information')
-        d1.triggered.connect(self.dumpBlockInfo)
-
-        e1 = menu.addAction('Inspect')
-        e1.triggered.connect(self.inspectBlock)
-
-        e2 = menu.addAction('Print port nb')
-        e2.triggered.connect(self.printPortNb)
-
-        e3 = menu.addAction('Export dck')
+        e3 = menu.addAction('Export ddck')
         e3.triggered.connect(self.exportDck)
 
-        e4 = menu.addAction('Debug Connection')
-        e4.triggered.connect(self.debugConn)
+        # e4 = menu.addAction('Debug Connection')
+        # e4.triggered.connect(self.debugConn)
 
         menu.exec_(event.screenPos())
 
@@ -855,6 +855,22 @@ class StorageTank(BlockItem):
         return "", equationNumber, 0
 
     def exportDck(self):
+
+        noError = self.debugConn()
+
+        if not noError:
+            qmb = QMessageBox()
+            qmb.setText("Ignore connection errors and continue with export?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == QMessageBox.Save:
+                print("Overwriting")
+                # continue
+            else:
+                print("Canceling")
+                return
+
         nPorts = len(self.directPortConnsForList)
         nHx = len(self.heatExchangers)
 
@@ -954,6 +970,7 @@ class StorageTank(BlockItem):
 
     def debugConn(self):
         print("Debugging conn")
+        errorConnList = ''
         for i in range(len(self.directPortConnsForList)):
             stFromPort = self.directPortConnsForList[i].fromPort
             stToPort = self.directPortConnsForList[i].toPort
@@ -973,10 +990,15 @@ class StorageTank(BlockItem):
             #     msgBox.setText("both %s and %s are output ports" % (connName1, connName2))
             #     msgBox.exec_()
             if stFromPort != toPort1:
-                msgBox = QMessageBox()
-                msgBox.setText("%s is suppose to be an inlet" % (connName1))
-                msgBox.exec_()
+                errorConnList = errorConnList + connName1 + '\n'
             if stToPort != fromPort2:
-                msgBox = QMessageBox()
-                msgBox.setText("%s is suppose to be an outlet" % (connName2))
-                msgBox.exec_()
+                errorConnList = errorConnList + connName2 + '\n'
+        if errorConnList !='':
+            msgBox = QMessageBox()
+            msgBox.setText("%sis connected wrongly, right click StorageTank to invert connection." % (errorConnList))
+            msgBox.exec()
+            noError = False
+        else:
+            noError = True
+
+        return noError

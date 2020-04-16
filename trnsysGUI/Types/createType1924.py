@@ -581,14 +581,20 @@ class Type1924_TesPlugFlow():
         lines=""
         if(typeFile=="ddck"):
             self.extension="ddck"
+            lines = lines + "*************************************\n"
+            lines = lines + ("**BEGIN %s.ddck\n" % name)
+            lines = lines + "*************************************\n\n"
+            lines = lines + "*******************************************\n"
+            lines = lines + "** Plug-Flow Model exported from TRNSYS GUI\n"
+            lines = lines + "*******************************************\n\n"
             lines = lines + "******************************************************************************************\n"
             lines = lines + "** outputs to energy balance in kWh\n"
             lines = lines + "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
             lines = lines + "******************************************************************************************\n"
             lines = lines + "EQUATIONS 3\n"
-            lines = lines + ("qSysOut_Tes%sLoss = sumQLoss_Tes1\n" % tankName)
-            lines = lines + ("qSysOut_Tes%sAcum = sumQAcum_Tes1\n" % tankName)
-            lines = lines + ("elSysIn_Q_Tes%sAux = qHeatSource_Tes1\n" % tankName)
+            lines = lines + ("qSysOut_Tes%sLoss = sumQLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
+            lines = lines + ("qSysOut_Tes%sAcum = sumQAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
+            lines = lines + ("elSysIn_Q_Tes%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
 
         elif(typeFile=="dck"):
             self.extension="dck"
