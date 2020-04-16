@@ -698,5 +698,5 @@ if __name__ == '__main__':
 
     tool.setInputs(inputs,connectorsPort,connectorsHx,connectorsAux)
 
-    tool.createDDck(path,name,typeFile="dck")
+    tool.createDDck(path,name,typeFile="ddck")
 
