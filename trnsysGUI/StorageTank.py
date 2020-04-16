@@ -1,10 +1,11 @@
 import os
 import random
 import sys
+from pathlib import Path
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QMenu, QMessageBox
+from PyQt5.QtWidgets import QMenu, QMessageBox, QFileDialog
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
@@ -13,6 +14,7 @@ from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.Connection import Connection
+from trnsysGUI.Types.createType1924 import Type1924_TesPlugFlow
 
 
 class StorageTank(BlockItem):
@@ -21,6 +23,7 @@ class StorageTank(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
         self.parent = parent
+        self.dckFilePath = ''
 
         self.leftSide = []
         self.rightSide = []
@@ -38,6 +41,9 @@ class StorageTank(BlockItem):
         self.hxInsideConnsRight = []
 
         self.directPortConnsForList = []
+
+        self.nTes = self.parent.parent().idGen.getStoragenTes()
+        self.storageType = self.parent.parent().idGen.getStorageType()
 
         self.changeSize()
 
@@ -748,25 +754,28 @@ class StorageTank(BlockItem):
         c1.triggered.connect(self.deleteBlockCom)
 
         # sG = QIcon('')
-        c2 = menu.addAction("Set group")
-        c2.triggered.connect(self.configGroup)
+        # c2 = menu.addAction("Set group")
+        # c2.triggered.connect(self.configGroup)
+        #
+        # d1 = menu.addAction('Dump information')
+        # d1.triggered.connect(self.dumpBlockInfo)
+        #
+        # e1 = menu.addAction('Inspect')
+        # e1.triggered.connect(self.inspectBlock)
+        #
+        # e2 = menu.addAction('Print port nb')
+        # e2.triggered.connect(self.printPortNb)
 
-        d1 = menu.addAction('Dump information')
-        d1.triggered.connect(self.dumpBlockInfo)
+        e3 = menu.addAction('Export ddck')
+        e3.triggered.connect(self.exportDck)
 
-        e1 = menu.addAction('Inspect')
-        e1.triggered.connect(self.inspectBlock)
-
-        e2 = menu.addAction('Print port nb')
-        e2.triggered.connect(self.printPortNb)
-
-        # e3 = menu.addAction('Export dck')
-        # e3.triggered.connect(self.exportDck)
+        # e4 = menu.addAction('Debug Connection')
+        # e4.triggered.connect(self.debugConn)
 
         menu.exec_(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
-        dia = ConfigStorage(self, self.scene().parent())
+        self.dia = ConfigStorage(self, self.scene().parent())
 
     def hasManPortById(self, idFind):
 
@@ -846,24 +855,150 @@ class StorageTank(BlockItem):
         return "", equationNumber, 0
 
     def exportDck(self):
+
+        noError = self.debugConn()
+
+        if not noError:
+            qmb = QMessageBox()
+            qmb.setText("Ignore connection errors and continue with export?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == QMessageBox.Save:
+                print("Overwriting")
+                # continue
+            else:
+                print("Canceling")
+                return
+
         nPorts = len(self.directPortConnsForList)
         nHx = len(self.heatExchangers)
 
-        # currentFilePath = self.parent.parent().parent().currentFile
-        # if '\\' in currentFilePath:
-        #     diaName = currentFilePath.split('\\')[-1][:-5]
-        # else:
-        #     diaName = currentFilePath.split('/')[-1][:-5]
-        # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-        # filePath = os.path.join(ROOT_DIR, 'exports')
-        # MfrFilePath = os.path.join(filePath, diaName+'_Mfr.prt')
-        # TempFilePath = os.path.join(filePath, diaName+'_T.prt')
-        #
-        # if not os.path.isfile(MfrFilePath) or not os.path.isfile(TempFilePath):
-        #     msgb = QMessageBox(self)
-        #     msgb.setText("No Mfr or temp file found!")
-        #     msgb.exec()
-        # else:
-        #     # todo : access file here and get properties
-        #     print(os.path.isfile(MfrFilePath))
-        #     print(os.path.isfile(TempFilePath))
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(ROOT_DIR, 'ddck')
+        fileName = self.parent.parent().parent().currentFile
+
+        if '\\' in fileName:
+            name = fileName.split('\\')[-1][:-5]
+        elif '/' in fileName:
+            name = fileName.split('/')[-1][:-5]
+        else:
+            name = fileName
+        name = name + '_nTes' + str(self.nTes)
+
+        print("Storage Type:", self.storageType)
+        print("nTes:", self.nTes)
+        print("nPorts:", nPorts)
+        print("nHx:", nHx)
+
+        tool = Type1924_TesPlugFlow()
+
+        inputs = {"nUnit": 50,
+                  "nType": self.storageType,
+                  "nTes": self.nTes,
+                  "nPorts": nPorts,
+                  "nHx": nHx,
+                  "nHeatSources": 1
+                  }
+        dictInput = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0}
+        dictInputHx = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0, "cp": 0.0, "rho": 0.0}
+        dictInputAux = {"zAux": 0.0, "qAux": 0.0}
+
+        connectorsPort = []
+        connectorsHx = []
+        connectorsAux = []
+
+        # *dck TRNSYS file that you can execute
+        # *ddck text file wchich reporesents a peice of dck
+
+        for i in range(inputs["nPorts"]):
+            connectorsPort.append(dictInput)
+
+        for i in range(inputs["nHx"]):
+            connectorsHx.append(dictInputHx)
+
+        for i in range(inputs["nHeatSources"]):
+            connectorsAux.append(dictInputAux)
+
+        for i in range(inputs["nPorts"]):
+            Tname = "T" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
+            Mfrname = "Mfr" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
+            Trev = "T" + self.directPortConnsForList[i].toPort.connectionList[1].displayName
+            inputPos = (100-100*self.directPortConnsForList[i].fromPort.pos().y()/self.h)/100
+            outputPos = (100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h)/100
+            connectorsPort[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
+
+        for i in range(inputs["nHx"]):
+            Tname = "T" + self.heatExchangers[i].port1.connectionList[1].displayName
+            Mfrname = "Mfr" + self.heatExchangers[i].port1.connectionList[1].displayName
+            Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
+            inputPos = self.heatExchangers[i].input / 100
+            outputPos = self.heatExchangers[i].output / 100
+            connectorsHx[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
+
+        exportPath = os.path.join(filePath, name+'.ddck')
+        print(exportPath)
+        if Path(exportPath).exists():
+            qmb = QMessageBox()
+            qmb.setText("Warning: " +
+                        "An export file exists already. Do you want to overwrite or cancel?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == QMessageBox.Save:
+                print("Overwriting")
+                # continue
+            else:
+                print("Canceling")
+                return
+        else:
+            # Export file does not exist yet
+            pass
+
+        tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
+
+        tool.createDDck(filePath, name, self.displayName, typeFile="ddck")
+
+    def loadDck(self):
+        print("Opening diagram")
+        # self.centralWidget.delBlocks()
+        fileName = QFileDialog.getOpenFileName(self.dia, "Open diagram", filter="*.ddck")[0]
+        if fileName != '':
+            self.dckFilePath = fileName
+        else:
+            print("No filename chosen")
+
+    def debugConn(self):
+        print("Debugging conn")
+        errorConnList = ''
+        for i in range(len(self.directPortConnsForList)):
+            stFromPort = self.directPortConnsForList[i].fromPort
+            stToPort = self.directPortConnsForList[i].toPort
+            toPort1 = self.directPortConnsForList[i].fromPort.connectionList[1].toPort
+            toPort2 = self.directPortConnsForList[i].toPort.connectionList[1].toPort
+            fromPort1 = self.directPortConnsForList[i].fromPort.connectionList[1].fromPort
+            fromPort2 = self.directPortConnsForList[i].toPort.connectionList[1].fromPort
+            connName1 = self.directPortConnsForList[i].fromPort.connectionList[1].displayName
+            connName2 = self.directPortConnsForList[i].toPort.connectionList[1].displayName
+
+            # if toPort1 == stFromPort and toPort2 == stToPort:
+            #     msgBox = QMessageBox()
+            #     msgBox.setText("both %s and %s are input ports" % (connName1, connName2))
+            #     msgBox.exec_()
+            # elif fromPort1 == stFromPort and fromPort2 == stToPort:
+            #     msgBox = QMessageBox()
+            #     msgBox.setText("both %s and %s are output ports" % (connName1, connName2))
+            #     msgBox.exec_()
+            if stFromPort != toPort1:
+                errorConnList = errorConnList + connName1 + '\n'
+            if stToPort != fromPort2:
+                errorConnList = errorConnList + connName2 + '\n'
+        if errorConnList !='':
+            msgBox = QMessageBox()
+            msgBox.setText("%sis connected wrongly, right click StorageTank to invert connection." % (errorConnList))
+            msgBox.exec()
+            noError = False
+        else:
+            noError = True
+
+        return noError

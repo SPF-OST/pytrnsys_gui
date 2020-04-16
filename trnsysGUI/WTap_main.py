@@ -27,7 +27,7 @@ class WTap_main(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = 0
         deltaHF = 0.45
 
         # Limit the block size:

@@ -204,14 +204,14 @@ class BlockItem(QGraphicsPixmapItem):
         c1.triggered.connect(self.deleteBlockCom)
 
         # sG = QIcon('')
-        c2 = menu.addAction("Set group")
-        c2.triggered.connect(self.configGroup)
-
-        d1 = menu.addAction('Dump information')
-        d1.triggered.connect(self.dumpBlockInfo)
-
-        e1 = menu.addAction('Inspect')
-        e1.triggered.connect(self.inspectBlock)
+        # c2 = menu.addAction("Set group")
+        # c2.triggered.connect(self.configGroup)
+        #
+        # d1 = menu.addAction('Dump information')
+        # d1.triggered.connect(self.dumpBlockInfo)
+        #
+        # e1 = menu.addAction('Inspect')
+        # e1.triggered.connect(self.inspectBlock)
 
         menu.exec_(event.screenPos())
 

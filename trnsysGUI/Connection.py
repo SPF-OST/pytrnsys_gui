@@ -143,10 +143,11 @@ class Connection(object):
             s.labelMass.setPlainText(self.mass)
 
     def setMassAndTemperature(self, mass, temp):
-        self.mass = mass
+        self.mass = float(mass)
+        self.mass = '{:,}'.format(self.mass)
         self.temperature = temp
         for s in self.segments:
-            s.labelMass.setPlainText("M: %s Kg/Hr   T: %s\u2103" % (self.mass, self.temperature))
+            s.labelMass.setPlainText("M: %s kg/Hr   T: %s\u2103" % (self.mass.replace(',', '\''), self.temperature))
 
 
     def setDisplayName(self, newName):
@@ -200,16 +201,18 @@ class Connection(object):
                 col = QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
                 col = QColor(142, 142, 142) # Gray
-            elif kwargs["mfr"] == "minToMedian":
-                col = QColor(140, 255, 255)  # light blue
-            elif kwargs["mfr"] == "medianToMax":
-                col = QColor(255, 140, 140)  # pink
             elif kwargs["mfr"] == "min":
-                col = QColor(0, 0, 255)  # blue
+                col = QColor(0, 0, 204)  # deep blue
             elif kwargs["mfr"] == "max":
-                col = QColor(255, 0, 0)  # red
-            elif kwargs["mfr"] == "test":
-                col = QColor(255, 255, 255)  # red
+                col = QColor(153, 0, 0)  # deep red
+            elif kwargs["mfr"] == "minTo25":
+                col = QColor(0, 128, 255)  # blue
+            elif kwargs["mfr"] == "25To50":
+                col = QColor(102, 255, 255)  # light blue
+            elif kwargs["mfr"] == "50To75":
+                col = QColor(255, 153, 153)  # light red
+            elif kwargs["mfr"] == "75ToMax":
+                col = QColor(255, 51, 51)  # red
             # elif kwargs["mfr"] == "negMinToLower":
             #     col = QColor(0, 0, 0)  # Black
             # elif kwargs["mfr"] == "negLowerToMedian":
@@ -533,6 +536,8 @@ class Connection(object):
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
+            self.fromPort.createdAtSide = 2
+            self.toPort.createdAtSide = 2
             print("NiceConn 2 to 2")
             portOffset = 30
             self.clearConn()
@@ -598,6 +603,8 @@ class Connection(object):
             corner4.setPos(p4)
 
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
+            self.fromPort.createdAtSide = 0
+            self.toPort.createdAtSide = 0
             print("NiceConn 0 to 0")
             portOffset = 30
             self.clearConn()
@@ -664,6 +671,7 @@ class Connection(object):
             corner4.setPos(p4)
 
         elif self.fromPort.side == 1:
+            self.fromPort.createdAtSide = 1
             # todo :  when rotated, it cause a problem because side gets changed
 
             print("NiceConn from 1")
@@ -744,6 +752,7 @@ class Connection(object):
                 self.firstS = self.getFirstSeg()
 
         elif self.fromPort.side == 3:
+            self.fromPort.createdAtSide = 3
 
             print("NiceConn from 1")
             portOffset = 30
@@ -826,6 +835,8 @@ class Connection(object):
         #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
         #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
 
+            self.fromPort.createdAtSide = self.fromPort.side
+            self.toPort.createdAtSide = self.toPort.side
             print("Ports are directed to each other")
             self.clearConn()
 

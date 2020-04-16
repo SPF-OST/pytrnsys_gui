@@ -10,8 +10,8 @@ class IceStorage(BlockItem):
         super(IceStorage, self).__init__(trnsysType, parent, **kwargs)
         self.w = 100
         self.h = 100
-        self.inputs.append(PortItem('i', 1, self))
-        self.outputs.append(PortItem('o', 1, self))
+        self.inputs.append(PortItem('i', 2, self))
+        self.outputs.append(PortItem('o', 2, self))
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -24,7 +24,7 @@ class IceStorage(BlockItem):
         deltaH = self.h / 13
 
         """ Resize block function """
-        delta = 4
+        delta = 1
 
         # Limit the block size:
         if h < 20:
@@ -51,5 +51,5 @@ class IceStorage(BlockItem):
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 1 - 1 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 1 - 1 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h

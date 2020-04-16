@@ -27,7 +27,7 @@ class GroundSourceHx(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = -1
         deltaH = self.h / 3.5
 
         # Limit the block size:

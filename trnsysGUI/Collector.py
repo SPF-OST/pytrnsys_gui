@@ -23,7 +23,7 @@ class Collector(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = 2
         deltaH = self.h / 10
 
         # Limit the block size:

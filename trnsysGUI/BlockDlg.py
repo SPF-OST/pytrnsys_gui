@@ -52,6 +52,7 @@ class BlockDlg(QDialog):
         self.hFlipBox.stateChanged.connect(self.setNewFlipStateH)
         self.vFlipBox.stateChanged.connect(self.setNewFlipStateV)
         self.setWindowTitle("Properties")
+        self.loadButton.setDisabled(True)
         self.disableLoad()
         self.show()
 
@@ -90,9 +91,10 @@ class BlockDlg(QDialog):
         return False
 
     def loadFile(self):
+        # TODO : show file loaded on the dialog
         print("Opening diagram")
         # self.centralWidget.delBlocks()
-        fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.txt")[0]
+        fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.ddck")[0]
         if fileName != '':
             if len(self.block.propertyFile) < 2:
                 self.block.propertyFile.append(fileName)

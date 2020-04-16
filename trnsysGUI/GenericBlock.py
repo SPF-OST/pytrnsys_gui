@@ -182,8 +182,8 @@ class GenericBlock(BlockItem):
         c1.triggered.connect(self.deleteBlock)
 
         # sG = QIcon('')
-        c2 = menu.addAction("Set group")
-        c2.triggered.connect(self.configGroup)
+        # c2 = menu.addAction("Set group")
+        # c2.triggered.connect(self.configGroup)
 
         c3 = menu.addAction("Set image")
         c3.triggered.connect(self.changeImage)
@@ -192,11 +192,11 @@ class GenericBlock(BlockItem):
             c4 = menu.addAction("Add port")
             c4.triggered.connect(self.addPortDlg)
 
-        d1 = menu.addAction('Dump information')
-        d1.triggered.connect(self.dumpBlockInfo)
-
-        e1 = menu.addAction('Inspect')
-        e1.triggered.connect(self.inspectBlock)
+        # d1 = menu.addAction('Dump information')
+        # d1.triggered.connect(self.dumpBlockInfo)
+        #
+        # e1 = menu.addAction('Inspect')
+        # e1.triggered.connect(self.inspectBlock)
 
         menu.exec_(event.screenPos())
 

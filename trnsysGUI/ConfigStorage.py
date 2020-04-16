@@ -29,7 +29,17 @@ class ConfigStorage(QDialog):
         self.tabs.addTab(self.tab2, "Direct ports")
 
         # VBoxLayout
+        h0 = QHBoxLayout()
         description = QLabel("Please configure the storage tank:")
+        exportButton = QPushButton("Export ddck")
+        exportButton.clicked.connect(self.storage.exportDck)
+        loadButton = QPushButton("Load ddck")
+        loadButton.clicked.connect(self.storage.loadDck)
+        h0.addWidget(description)
+        h0.addWidget(loadButton)
+        h0.addWidget(exportButton)
+        loadButton.setEnabled(False)
+
         tankNameLabel = QLabel()
         tankNameLabel.setText("<b>Tank name: </b>")
         self.le = QLineEdit(self.storage.label.toPlainText())
@@ -118,9 +128,9 @@ class ConfigStorage(QDialog):
 
         manPortLabel = QLabel("<b>Set port manually</b>")
         manPortLabel2 = QLabel("Enter height in percent: ")
-        portlabelUpper = QLabel("Upper port")
+        portlabelUpper = QLabel("Inlet")
         self.manPortLeI = QLineEdit("0")
-        portlabelLower = QLabel("Lower port")
+        portlabelLower = QLabel("Outlet")
         self.manPortLeO = QLineEdit("0")
 
         qhbl3 = QHBoxLayout()
@@ -157,10 +167,6 @@ class ConfigStorage(QDialog):
         manPortLay.addLayout(qhbl3)
         manPortLay.addLayout(addRemoveButtons)
         manPortLay.addWidget(warning)
-        # manPortLay.addWidget(self.manAddButton)
-        # manPortLay.addItem(spaceManPort)
-        # manPortLay.addWidget(self.manRemovebutton)
-        # manPortLay.addItem(spaceManPort2)
 
         increaseSizeButton = QPushButton("Increase size")
         decreaseSizeButton = QPushButton("Decrease size")
@@ -173,7 +179,7 @@ class ConfigStorage(QDialog):
         self.cancelButton.clicked.connect(self.cancel)
 
         L = QVBoxLayout()
-        L.addWidget(description)
+        L.addLayout(h0)
         L.addWidget(tankNameLabel)
         L.addWidget(self.le)
 
@@ -496,20 +502,6 @@ class ConfigStorage(QDialog):
                 self.removeHxR()
 
     def modifyPort(self):
-        # xValue = 0
-        # if self.listWL2.selectedItems() is not None:
-        #     self.manRemovePortPairLeft()
-        #     xValue += 1
-        #     print("1st if is ran")
-        #     print(self.listWL2.selectedItems())
-        # if self.listWR2.selectedItems() is not None:
-        #     self.manRemovePortPairRight()
-        #     xValue += 1
-        #     print("2nd if is ran")
-        #     print(self.listWR2.selectedItems())
-        # if xValue != 0:
-        #     self.manAddPortPair()
-
         if len(self.listWL2.selectedItems()) == 0 and len(self.listWR2.selectedItems()) == 0:
             return
         elif len(self.listWL2.selectedItems()) > 0:
@@ -518,9 +510,6 @@ class ConfigStorage(QDialog):
             self.manRemovePortPairRight()
         self.manAddPortPair()
 
-
-    # self.storage.h -= self.h_hx
-    # self.storage.updateImage(-self.h_hx)
     def incrSize(self):
         self.storage.updatePortPositionsHW(self.h_hx, self.w_inc)
         self.storage.updateHxLines(self.h_hx)

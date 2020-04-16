@@ -24,3 +24,6 @@ docs/_build/
 
 docs/trnsysGUI.uml
 /trnsysGUI/massflowData/flows.txt
+
+trnsysGUI/clipboard.json
+/trnsysGUI/recent/

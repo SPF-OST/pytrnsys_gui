@@ -16,7 +16,7 @@ class Radiator(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 4
+        delta = 1
         deltaH = self.h / 20
 
         # Limit the block size:

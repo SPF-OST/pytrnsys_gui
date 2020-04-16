@@ -11,7 +11,7 @@ class PortItem(QGraphicsEllipseItem):
         self.parent = parent
         self.name = name
         self.side = side
-        self.originalSide = side
+        self.createdAtSide = side
         self.posCallbacks = []
         self.connectionList = []
         self.id = self.parent.parent.parent().idGen.getID()
@@ -29,9 +29,9 @@ class PortItem(QGraphicsEllipseItem):
         self.ashColorR = QColor(239, 57, 75)
         self.ashColorB = QColor(20, 83, 245)
 
-        QGraphicsEllipseItem.__init__(self, QRectF(-8, -8, 16.0, 16.0), parent)
+        QGraphicsEllipseItem.__init__(self, QRectF(-4, -4, 7.0, 7.0), parent)
 
-        self.innerCircle = QGraphicsEllipseItem(-4, -4, 7, 7, self)
+        self.innerCircle = QGraphicsEllipseItem(-4, -4, 6, 6, self)
         self.innerCircle.setPen(QPen(QColor(0, 0, 0, 0), 0))
 
         self.visibleColor = QColor(0, 0, 0)
@@ -115,13 +115,14 @@ class PortItem(QGraphicsEllipseItem):
                 conn.positionLabel()
 
                 if conn.fromPort is self:
-                    if (self.originalSide != 1 and self.originalSide != 3) or conn.segments[0].isHorizontal():
+                    if (self.createdAtSide != 1 and self.createdAtSide != 3) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
+                            print("inside here")
                             cor = conn.getCorners()[0]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
                             seg = conn.segments[0]  # first segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x() + 0.6, cor.scenePos().y())
                             if len(conn.segments)>2:
                                 verSeg = conn.segments[1]
                                 nextSeg = conn.segments[2]
@@ -136,6 +137,7 @@ class PortItem(QGraphicsEllipseItem):
                                         self.showCorners(conn)
                                         verSeg.setVisible(True)
                     else:
+                        print("inside else")
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[0]
                             cor.setPos(self.scenePos().x(), cor.pos().y())
@@ -144,13 +146,13 @@ class PortItem(QGraphicsEllipseItem):
                             seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
 
                 elif conn.toPort is self:
-                    if (conn.fromPort.originalSide != 1 and conn.fromPort.originalSide != 3) or conn.segments[0].isHorizontal():
+                    if (conn.fromPort.createdAtSide != 1 and conn.fromPort.createdAtSide != 3) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
                             seg = conn.segments[-1]
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x()+ 0.6, cor.scenePos().y()+ 0.6)
                             if len(conn.segments)>2:
                                 verSeg = conn.segments[-2]
                                 nextSeg = conn.segments[-3]
@@ -203,8 +205,8 @@ class PortItem(QGraphicsEllipseItem):
 
         print(self.parent)
 
-        self.setRect(-7, -7, 14.0, 14.0)
-        self.innerCircle.setRect(-7, -7, 14.0, 14.0)
+        self.setRect(-4, -4, 10, 10)
+        self.innerCircle.setRect(-4, -4, 10, 10)
         if self.name == 'i':
             # self.setBrush(Qt.red)
             # self.innerCircle.setBrush(Qt.red)
@@ -222,8 +224,8 @@ class PortItem(QGraphicsEllipseItem):
         # print("Leaving hover")
 
         # self.setRect(-6, -6, 12, 12)
-        self.setRect(-7, -7, 14, 14)
-        self.innerCircle.setRect(-4, -4, 8, 8)
+        self.setRect(-4, -4, 7, 7)
+        self.innerCircle.setRect(-4, -4, 6.5, 6.5)
         if len(self.connectionList) == 0:
             if self.name == 'i':
                 # self.setBrush(Qt.red)
@@ -246,6 +248,7 @@ class PortItem(QGraphicsEllipseItem):
             self.parent.parent.parent().listV.addItem(c.displayName)
         self.parent.parent.parent().listV.addItem("Flipped state (H,V):" + str(self.parent.flippedH) + ", " + str(self.parent.flippedV))
         self.parent.parent.parent().listV.addItem("Side: " + str(self.side))
+        self.parent.parent.parent().listV.addItem("createdAtSide: " + str(self.createdAtSide))
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
         self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)
 
