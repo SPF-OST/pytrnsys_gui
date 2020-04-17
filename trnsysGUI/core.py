@@ -19,6 +19,7 @@ from pathlib import Path
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.PathSetUp import PathSetUp
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.BlockDlg import BlockDlg
@@ -2773,6 +2774,10 @@ class MainWindow(QMainWindow):
         movePortAction.triggered.connect(self.movePorts)
         movePortAction.setShortcut("ctrl+m")
 
+        setPathAction = QAction("Set Paths", self)
+        setPathAction.triggered.connect(self.setPaths)
+        self.fileMenu.addAction(setPathAction)
+
         self.editMenu = QMenu("Edit")
         # self.editMenu.addAction(toggleEditorModeAction)
         self.editMenu.addAction(multipleDeleteAction)
@@ -3172,6 +3177,9 @@ class MainWindow(QMainWindow):
         self.centralWidget.saveAtClose()
         e.accept()
 
+    def setPaths(self):
+        pathDialog = PathSetUp(self)
+
     # def exportEMF(self):
     #     self.centralWidget.printEMF()
 
@@ -3181,7 +3189,7 @@ if __name__ == '__main__':
     app.setApplicationName("Diagram Creator")
     form = MainWindow()
     form.showMaximized()
-    form.openFileAtStartUp()
+    # form.openFileAtStartUp()
     form.show()
     # app.setStyleSheet(cssSs_)
 
