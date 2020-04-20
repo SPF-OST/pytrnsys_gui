@@ -1,4 +1,5 @@
 import os
+import sys
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget, \
@@ -181,7 +182,15 @@ class PathSetUp(QDialog):
         read from filepath.txt to get current paths.
         returns export path and diagram path.
         """
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        print("File:", __file__)
+        # TODO : replace all ROOT_DIR with the following code
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+
+        # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        print("root_dir:", ROOT_DIR)
         filepath = os.path.join(ROOT_DIR, 'filepaths')
         exportPath = ''
         diagramPath = ''
@@ -213,7 +222,10 @@ class PathSetUp(QDialog):
         return exportPath, diagramPath, ddckPath
 
     def writeIntoFile(self, string1, string2, string3):
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
         filepath = os.path.join(ROOT_DIR, 'filepaths')
         with open(filepath, 'r') as file:
             data = file.readlines()

@@ -177,7 +177,10 @@ class DifferenceDlg(QDialog):
 
         """
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
         originalFilePath = os.path.join(ROOT_DIR, 'Reference')
         fileToUpdate = os.path.join(originalFilePath, self.fileName)
 
@@ -217,7 +220,10 @@ class DifferenceDlg(QDialog):
 
         """
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
         originalFilePath = os.path.join(ROOT_DIR, 'Reference')
         fileToUpdate = os.path.join(originalFilePath, self.fileName)
 
@@ -243,7 +249,10 @@ class DifferenceDlg(QDialog):
     def updateChangelog(self):
         linesToAppend = []
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
         changelogfile = os.path.join(ROOT_DIR, 'changelogs.txt')
 
         reason = self.reasonInput.text()

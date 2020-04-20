@@ -1534,7 +1534,10 @@ class DiagramEditor(QWidget):
                 self.diagramName + '.dck')
         else:
             # exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
-            ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+            if getattr(sys, 'frozen', False):
+                ROOT_DIR = os.path.dirname(sys.executable)
+            elif __file__:
+                ROOT_DIR = os.path.dirname(__file__)
             filepaths = os.path.join(ROOT_DIR, 'filepaths')
             with open(filepaths, 'r') as file:
                 data = file.readlines()
@@ -1974,8 +1977,12 @@ class DiagramEditor(QWidget):
         """
         print("saveaspath is " + str(self.saveAsPath))
         if self.saveAsPath.name == '':
-            ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+            if getattr(sys, 'frozen', False):
+                ROOT_DIR = os.path.dirname(sys.executable)
+            elif __file__:
+                ROOT_DIR = os.path.dirname(__file__)
             filepaths = os.path.join(ROOT_DIR, 'filepaths')
+            print(ROOT_DIR, filepaths)
             with open(filepaths, 'r') as file:
                 data = file.readlines()
             filepath = Path(data[1][:-1])
@@ -1990,7 +1997,7 @@ class DiagramEditor(QWidget):
                     print("Overwriting")
                     self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
                     msgb = QMessageBox(self)
-                    msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                    msgb.setText("Saved diagram at %s" % str(filepath.joinpath(self.diagramName + '.json')))
                     msgb.exec()
 
                 else:
@@ -2489,7 +2496,10 @@ class DiagramEditor(QWidget):
         # exportedFilePath = fileDir + 'export_test/'
         # originalFilePath = fileDir + 'Reference/'
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)  # This is your Project Root
         examplesFilePath = os.path.join(ROOT_DIR, 'examplesNewEncoding')
         exportedFilePath = os.path.join(ROOT_DIR, 'export_test')
         originalFilePath = os.path.join(ROOT_DIR, 'Reference')
@@ -3008,7 +3018,10 @@ class MainWindow(QMainWindow):
 
         # list_of_files = glob.glob('U:/Desktop/TrnsysGUI/trnsysGUI/recent/*')
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
         filePath = os.path.join(ROOT_DIR, 'recent')
         filePath = os.path.join(filePath, '*')
         list_of_files = glob.glob(filePath)
@@ -3115,7 +3128,10 @@ class MainWindow(QMainWindow):
             diaName = currentFilePath.split('/')[-1][:-5]
         else:
             diaName = currentFilePath
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
         filePath = os.path.join(ROOT_DIR, 'exports')
         MfrFilePath = os.path.join(filePath, diaName + '_Mfr.prt')
         TempFilePath = os.path.join(filePath, diaName + '_T.prt')
@@ -3187,8 +3203,16 @@ class MainWindow(QMainWindow):
     def setPaths(self):
         pathDialog = PathSetUp(self)
 
-    # def exportEMF(self):
-    #     self.centralWidget.printEMF()
+    def checkFilePaths(self):
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+        filepath = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepath, 'r') as file:
+            data = file.readlines()
+        if len(data) < 3:
+            pathSetUpDialog = PathSetUp(self)
 
 if __name__ == '__main__':
     cssSs_ = cssSs.read()
@@ -3198,7 +3222,7 @@ if __name__ == '__main__':
     form.showMaximized()
     # form.openFileAtStartUp()
     form.show()
-    print(form.currentFile)
+    form.checkFilePaths()
     # app.setStyleSheet(cssSs_)
 
     # match = re.compile(r'\d{1,} {1,}\d{1,}')
