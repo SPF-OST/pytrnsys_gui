@@ -2983,8 +2983,11 @@ class MainWindow(QMainWindow):
     def visualizeMf(self):
         self.calledByVisualizeMf = True
         mfrFile, tempFile = self.runMassflowSolver()
-        MassFlowVisualizer(self,mfrFile, tempFile)
-        self.massFlowEnabled = True
+        if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
+            MassFlowVisualizer(self,mfrFile, tempFile)
+            self.massFlowEnabled = True
+        else:
+            print("No mfrFile or tempFile found!")
 
     def openFile(self):
         print("Opening diagram")
