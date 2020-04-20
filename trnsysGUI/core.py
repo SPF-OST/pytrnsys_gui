@@ -3132,7 +3132,12 @@ class MainWindow(QMainWindow):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        filePath = os.path.join(ROOT_DIR, 'exports')
+
+        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepaths, 'r') as file:
+            data = file.readlines()
+
+        filePath = data[0][:-1]
         MfrFilePath = os.path.join(filePath, diaName + '_Mfr.prt')
         TempFilePath = os.path.join(filePath, diaName + '_T.prt')
         print(MfrFilePath, TempFilePath)
