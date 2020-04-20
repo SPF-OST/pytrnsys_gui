@@ -875,8 +875,13 @@ class StorageTank(BlockItem):
         nHx = len(self.heatExchangers)
 
         ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-        filePath = os.path.join(ROOT_DIR, 'ddck')
+        # filePath = os.path.join(ROOT_DIR, 'ddck')
+        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepaths, 'r') as file:
+            data = file.readlines()
+        filePath = (data[2][:-1])
         fileName = self.parent.parent().parent().currentFile
+        print(fileName)
 
         if '\\' in fileName:
             name = fileName.split('\\')[-1][:-5]

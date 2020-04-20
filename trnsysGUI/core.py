@@ -1533,7 +1533,12 @@ class DiagramEditor(QWidget):
             exportPath = Path(Path(__file__).resolve().parent.joinpath("Reference")).joinpath(
                 self.diagramName + '.dck')
         else:
-            exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+            # exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+            ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+            filepaths = os.path.join(ROOT_DIR, 'filepaths')
+            with open(filepaths, 'r') as file:
+                data = file.readlines()
+            exportPath = Path(data[0][:-1]).joinpath(self.diagramName + '.dck')
 
         if Path(exportPath).exists():
             qmb = QMessageBox(self)
@@ -1969,9 +1974,11 @@ class DiagramEditor(QWidget):
         """
         print("saveaspath is " + str(self.saveAsPath))
         if self.saveAsPath.name == '':
-
-            filepath = Path(Path(__file__).resolve().parent.joinpath("diagrams"))
-
+            ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+            filepaths = os.path.join(ROOT_DIR, 'filepaths')
+            with open(filepaths, 'r') as file:
+                data = file.readlines()
+            filepath = Path(data[1][:-1])
             if Path(filepath.joinpath(self.diagramName + '.json')).exists():
                 qmb = QMessageBox(self)
                 qmb.setText("Warning: " +
@@ -2627,7 +2634,7 @@ class MainWindow(QMainWindow):
         self.labelVisState = False
         self.massFlowEnabled = False
         self.calledByVisualizeMf = False
-        self.currentFile = None
+        self.currentFile = 'Untitled'
 
         # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
@@ -3191,6 +3198,7 @@ if __name__ == '__main__':
     form.showMaximized()
     # form.openFileAtStartUp()
     form.show()
+    print(form.currentFile)
     # app.setStyleSheet(cssSs_)
 
     # match = re.compile(r'\d{1,} {1,}\d{1,}')
