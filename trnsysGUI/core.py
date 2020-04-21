@@ -2017,7 +2017,15 @@ class DiagramEditor(QWidget):
                 msgb.exec()
 
     def saveAs(self):
-        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepaths, 'r') as file:
+            data = file.readlines()
+        defaultDir = (data[1][:-1])
+        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", defaultDir, filter="*.json")[0])
         if str(pickedPath) == ".":
             msgb = QMessageBox(self)
             msgb.setText("No valid path selected, aborting save as")
