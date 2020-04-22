@@ -1315,3 +1315,15 @@ Differences:
 Reason for change:
 changes in SASHP+Tes.json
 ==============================================================
+==============================================================
+20/04/2020 12:49:05
+
+Name of file:
+C:\Users\parad\OneDrive\Desktop\TrnsysGUI\trnsysGUI\Reference\ASHP+Tes.dck
+
+Differences:
+2:CONSTANTS 2
+
+Reason for change:
+test
+==============================================================

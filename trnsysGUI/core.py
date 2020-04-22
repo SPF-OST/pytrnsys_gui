@@ -1533,7 +1533,15 @@ class DiagramEditor(QWidget):
             exportPath = Path(Path(__file__).resolve().parent.joinpath("Reference")).joinpath(
                 self.diagramName + '.dck')
         else:
-            exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+            # exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
+            if getattr(sys, 'frozen', False):
+                ROOT_DIR = os.path.dirname(sys.executable)
+            elif __file__:
+                ROOT_DIR = os.path.dirname(__file__)
+            filepaths = os.path.join(ROOT_DIR, 'filepaths')
+            with open(filepaths, 'r') as file:
+                data = file.readlines()
+            exportPath = Path(data[0][:-1]).joinpath(self.diagramName + '.dck')
 
         if Path(exportPath).exists():
             qmb = QMessageBox(self)
@@ -1969,9 +1977,15 @@ class DiagramEditor(QWidget):
         """
         print("saveaspath is " + str(self.saveAsPath))
         if self.saveAsPath.name == '':
-
-            filepath = Path(Path(__file__).resolve().parent.joinpath("diagrams"))
-
+            if getattr(sys, 'frozen', False):
+                ROOT_DIR = os.path.dirname(sys.executable)
+            elif __file__:
+                ROOT_DIR = os.path.dirname(__file__)
+            filepaths = os.path.join(ROOT_DIR, 'filepaths')
+            print(ROOT_DIR, filepaths)
+            with open(filepaths, 'r') as file:
+                data = file.readlines()
+            filepath = Path(data[1][:-1])
             if Path(filepath.joinpath(self.diagramName + '.json')).exists():
                 qmb = QMessageBox(self)
                 qmb.setText("Warning: " +
@@ -1983,7 +1997,7 @@ class DiagramEditor(QWidget):
                     print("Overwriting")
                     self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
                     msgb = QMessageBox(self)
-                    msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
+                    msgb.setText("Saved diagram at %s" % str(filepath.joinpath(self.diagramName + '.json')))
                     msgb.exec()
 
                 else:
@@ -2003,7 +2017,15 @@ class DiagramEditor(QWidget):
                 msgb.exec()
 
     def saveAs(self):
-        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", filter="*.json")[0])
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepaths, 'r') as file:
+            data = file.readlines()
+        defaultDir = (data[1][:-1])
+        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", defaultDir, filter="*.json")[0])
         if str(pickedPath) == ".":
             msgb = QMessageBox(self)
             msgb.setText("No valid path selected, aborting save as")
@@ -2482,7 +2504,10 @@ class DiagramEditor(QWidget):
         # exportedFilePath = fileDir + 'export_test/'
         # originalFilePath = fileDir + 'Reference/'
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))  # This is your Project Root
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)  # This is your Project Root
         examplesFilePath = os.path.join(ROOT_DIR, 'examplesNewEncoding')
         exportedFilePath = os.path.join(ROOT_DIR, 'export_test')
         originalFilePath = os.path.join(ROOT_DIR, 'Reference')
@@ -2627,7 +2652,7 @@ class MainWindow(QMainWindow):
         self.labelVisState = False
         self.massFlowEnabled = False
         self.calledByVisualizeMf = False
-        self.currentFile = None
+        self.currentFile = 'Untitled'
 
         # Toolbar actions
         saveDiaAction = QAction(QIcon('images/inbox.png'), "Save system diagram", self)
@@ -2966,8 +2991,11 @@ class MainWindow(QMainWindow):
     def visualizeMf(self):
         self.calledByVisualizeMf = True
         mfrFile, tempFile = self.runMassflowSolver()
-        MassFlowVisualizer(self,mfrFile, tempFile)
-        self.massFlowEnabled = True
+        if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
+            MassFlowVisualizer(self,mfrFile, tempFile)
+            self.massFlowEnabled = True
+        else:
+            print("No mfrFile or tempFile found!")
 
     def openFile(self):
         print("Opening diagram")
@@ -3001,7 +3029,10 @@ class MainWindow(QMainWindow):
 
         # list_of_files = glob.glob('U:/Desktop/TrnsysGUI/trnsysGUI/recent/*')
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
         filePath = os.path.join(ROOT_DIR, 'recent')
         filePath = os.path.join(filePath, '*')
         list_of_files = glob.glob(filePath)
@@ -3108,8 +3139,16 @@ class MainWindow(QMainWindow):
             diaName = currentFilePath.split('/')[-1][:-5]
         else:
             diaName = currentFilePath
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-        filePath = os.path.join(ROOT_DIR, 'exports')
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+
+        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepaths, 'r') as file:
+            data = file.readlines()
+
+        filePath = data[0][:-1]
         MfrFilePath = os.path.join(filePath, diaName + '_Mfr.prt')
         TempFilePath = os.path.join(filePath, diaName + '_T.prt')
         print(MfrFilePath, TempFilePath)
@@ -3180,8 +3219,16 @@ class MainWindow(QMainWindow):
     def setPaths(self):
         pathDialog = PathSetUp(self)
 
-    # def exportEMF(self):
-    #     self.centralWidget.printEMF()
+    def checkFilePaths(self):
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+        filepath = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepath, 'r') as file:
+            data = file.readlines()
+        if len(data) < 3:
+            pathSetUpDialog = PathSetUp(self)
 
 if __name__ == '__main__':
     cssSs_ = cssSs.read()
@@ -3191,6 +3238,7 @@ if __name__ == '__main__':
     form.showMaximized()
     # form.openFileAtStartUp()
     form.show()
+    form.checkFilePaths()
     # app.setStyleSheet(cssSs_)
 
     # match = re.compile(r'\d{1,} {1,}\d{1,}')
