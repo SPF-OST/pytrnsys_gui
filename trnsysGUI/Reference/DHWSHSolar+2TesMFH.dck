@@ -58,13 +58,13 @@ TPuDHW = TPiHxDhwOutCOPY
 
 EQUATIONS 9
 *** Massflowrates
-MfrPuCol = 499
-MfrPuAux = 964
-MfrPuSh = 345
+MfrPuCol = 590
+MfrPuAux = 798
+MfrPuSh = 998
 xFracMixAux = 1.0
 MfrsupplyWater = 1000
-MfrPuCirc = 760
-MfrPuDHW = 468
+MfrPuCirc = 474
+MfrPuDHW = 391
 xFracDivDhwOut = 1.0
 xFracDivDhw = 1.0
 
@@ -137,10 +137,10 @@ PARAMETERS 225
 48 49 0 0      !47 : ConnDhwL880
 14 47 0 0      !48 : PiAuxToTesDhw
 47 16 0 0      !49 : PiTesDhwtoAux
-51 52 56 2     !50 : TPieceTesDhwR889
+51 52 56 2     !50 : TeeTesDhwR889
 27 50 0 0      !51 : PiTesDhwOut
 50 28 0 0      !52 : PiTesDhwIn
-54 55 56 2     !53 : TPieceTesDhwR899
+54 55 56 2     !53 : TeeTesDhwR899
 27 53 0 0      !54 : PiCircOut
 53 28 0 0      !55 : PiCircIn
 53 50 0 0      !56 : PiTesRDhw_292

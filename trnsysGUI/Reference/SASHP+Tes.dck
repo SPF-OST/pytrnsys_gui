@@ -51,10 +51,10 @@ TPuSh = TPiRadFloorOut
 
 EQUATIONS 6
 *** Massflowrates
-MfrPuCol = 1000
+MfrPuCol = 454
 MfrWTapBottom = 1000
-MfrWTapBottom = 1000
-MfrPuBoiler = 1000
+MfrPuAux = 910
+MfrPuSh = 285
 xFracDivHp = 0.0
 xFracDivHpRt = 0.0
 
@@ -123,10 +123,10 @@ PARAMETERS 165
 30 31 0 0      !29 : HxSolar
 29 1 0 0       !30 : PiColOut
 2 29 0 0       !31 : PiTesToCol
-33 34 38 2     !32 : TPieceTesL1703
+33 34 38 2     !32 : TeeTesL1703
 21 32 0 0      !33 : PiHpToTesDhwIn
 32 22 0 0      !34 : PiHpToTesDhwOut
-36 37 38 2     !35 : TPieceTesL1713
+36 37 38 2     !35 : TeeTesL1713
 21 35 0 0      !36 : PiHpToTesShIn
 35 22 0 0      !37 : PiHpToTesShOut
 35 32 0 0      !38 : PiTesL_479
@@ -150,8 +150,8 @@ INPUTS 41! for Type 935
 EQUATIONS 84	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrCollector_A=[450,1]
 MfrCollector_B=[450,2]
-MfrTeeSh_B=[450,41]
-MfrTeeSh_C=[450,42]
+MfrPuCol_A=[450,4]
+MfrPuCol_B=[450,5]
 MfrMixDhw_A=[450,7]
 MfrMixDhw_B=[450,8]
 MfrMixDhw_C=[450,9]
@@ -162,8 +162,8 @@ MfrWTapBottom_B=[450,14]
 MfrTPiece_A=[450,16]
 MfrTPiece_B=[450,17]
 MfrTPiece_C=[450,18]
-MfrHp_A=[450,58]
-MfrHp_B=[450,59]
+MfrPuAux_A=[450,19]
+MfrPuAux_B=[450,20]
 MfrPiDhwMix_A=[450,22]
 MfrPiDhwMix_B=[450,23]
 MfrPiDhwMains_A=[450,25]
@@ -184,8 +184,8 @@ MfrPiShMix_A=[450,43]
 MfrPiShMix_B=[450,44]
 MfrPiDhwDemand_A=[450,46]
 MfrPiDhwDemand_B=[450,47]
-MfrPiColOut_A=[450,88]
-MfrPiColOut_B=[450,89]
+MfrPuSh_A=[450,49]
+MfrPuSh_B=[450,50]
 MfrPiRadFloorOut_A=[450,52]
 MfrPiRadFloorOut_B=[450,53]
 MfrPiShPuToMix_A=[450,55]

@@ -51,10 +51,10 @@ TPuSh = TPiRadFloorOut
 
 EQUATIONS 5
 *** Massflowrates
-MfrPuCol = 801
+MfrPuCol = 856
 MfrWTapBottom = 1000
-MfrPuAux = 504
-MfrPuSh = 576
+MfrPuAux = 204
+MfrPuSh = 370
 xFracMixAux = 1.0
 
 CONSTANTS 2

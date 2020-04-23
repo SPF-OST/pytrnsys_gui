@@ -2508,7 +2508,7 @@ class DiagramEditor(QWidget):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)  # This is your Project Root
-        examplesFilePath = os.path.join(ROOT_DIR, 'examplesNewEncoding')
+        examplesFilePath = os.path.join(ROOT_DIR, 'examples')
         exportedFilePath = os.path.join(ROOT_DIR, 'export_test')
         originalFilePath = os.path.join(ROOT_DIR, 'Reference')
 
