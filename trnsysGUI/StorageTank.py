@@ -311,7 +311,7 @@ class StorageTank(BlockItem):
 
             for i in range(0, x, 2):
                 tpiece = TeePiece("TeePiece", self.parent)
-                tpiece.displayName = "TPieceTes" + self.displayName + sideVar + str(tpiece.id)
+                tpiece.displayName = "TeeTes" + self.displayName + sideVar + str(tpiece.id)
                 tpiece.setVisible(False)
                 self.parent.scene().addItem(tpiece)
                 tpList.append(tpiece)

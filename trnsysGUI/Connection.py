@@ -311,7 +311,7 @@ class Connection(object):
         # Global
         self.parent.trnsysObj.append(self)
 
-        self.displayName = 'UntitledConn' + str(self.connId)
+        self.displayName = 'Conn' + str(self.connId)
 
         # global editorMode
         if self.parent.editorMode == 0:

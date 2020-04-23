@@ -426,7 +426,7 @@ class BlockItem(QGraphicsPixmapItem):
         Resizer will not be created for storageTank as there's already a built in function for it in the storageTank
         dialog.
 
-        Resizers are deleted inside mousePressEvent function inside core.py
+        Resizers are deleted inside mousePressEvent function inside GUI.py
 
         """
         print("Inside Block Item mouse click")

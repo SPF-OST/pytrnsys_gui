@@ -11,8 +11,8 @@ class PV(BlockItem):
         factor = 0.97
         self.w = 100
         self.h = 100
-        self.inputs.append(PortItem('i', 2, self))
-        self.outputs.append(PortItem('o', 2, self))
+        # self.inputs.append(PortItem('i', 2, self))
+        # self.outputs.append(PortItem('o', 2, self))
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -40,12 +40,12 @@ class PV(BlockItem):
         self.label.setPos(lx, h)
 
         # Update port positions:
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                               h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                              h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
+        # self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
+        #                        h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
+        # self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
+        #                       h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
-        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        # self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        # self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h

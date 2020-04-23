@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['core.py'],
+a = Analysis(['GUI.py'],
              pathex=['C:\\Users\\parad\\OneDrive\\Desktop\\TrnsysGUI\\trnsysGUI'],
              binaries=[],
              datas=[],
