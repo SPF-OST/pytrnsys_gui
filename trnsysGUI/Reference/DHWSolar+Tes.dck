@@ -42,7 +42,7 @@ TWTapTop = TPiDhwDemand
 
 EQUATIONS 2
 *** Massflowrates
-MfrPuCol = 1000
+MfrPuCol = 756
 MfrWTapBottom = 1000
 
 CONSTANTS 1

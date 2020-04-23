@@ -45,11 +45,11 @@ TPuSh = TPiRadFloorOut
 
 EQUATIONS 5
 *** Massflowrates
-MfrPuCol = 1000
+MfrPuCol = 297
 xFracMixDhw = 1.0
 MfrWTapBottom = 1000
 xFracMixSh = 1.0
-MfrPuSh = 1000
+MfrPuSh = 213
 
 
 UNIT 450 TYPE 935

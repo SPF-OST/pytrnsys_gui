@@ -48,10 +48,10 @@ TPuDHW = TPiHxDhwOut
 
 EQUATIONS 6
 *** Massflowrates
-MfrPuCol = 370
+MfrPuCol = 292
 MfrsupplyWater = 1000
-MfrPuCirc = 89
-MfrPuDHW = 236
+MfrPuCirc = 1
+MfrPuDHW = 290
 xFracDivDhwOut = 1.0
 xFracDivDhw = 1.0
 
@@ -84,10 +84,10 @@ PARAMETERS 129
 24 25 0 0      !23 : HxSolar
 1 23 0 0       !24 : PiColOut
 2 23 0 0       !25 : PiTesToCol
-27 28 32 2     !26 : TPieceTesDhwR920
+27 28 32 2     !26 : TeeTesDhwR920
 17 26 0 0      !27 : PiTesDhwOut
 26 18 0 0      !28 : PiTesDhwIn
-30 31 32 2     !29 : TPieceTesDhwR930
+30 31 32 2     !29 : TeeTesDhwR930
 17 29 0 0      !30 : PiCircOut
 29 18 0 0      !31 : PiCircIn
 29 26 0 0      !32 : PiTesRDhw_310

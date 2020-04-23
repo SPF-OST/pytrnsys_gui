@@ -49,8 +49,8 @@ TPuSh = TPiRadFloorOut
 EQUATIONS 5
 *** Massflowrates
 MfrWTapBottom = 1000
-MfrPuBoiler = 1000
-MfrPuSh = 1000
+MfrPuBoiler = 134
+MfrPuSh = 804
 xFracDivHp = 1.0
 xFracDivHpRt = 1.0
 
@@ -113,10 +113,10 @@ PARAMETERS 141
 24 25 0 0      !23 : HxDhw
 1 23 0 0       !24 : PiTesDhwOut
 4 23 0 0       !25 : PiTesDhwIn
-27 28 32 2     !26 : TPieceTesL1339
+27 28 32 2     !26 : TeeTesL1339
 19 26 0 0      !27 : PiHpToTesDhwIn
 26 20 0 0      !28 : PiHpToTesDhwOut
-30 31 32 2     !29 : TPieceTesL1349
+30 31 32 2     !29 : TeeTesL1349
 19 29 0 0      !30 : PiHpToTesShIn
 29 20 0 0      !31 : PiHpToTesShOut
 29 26 0 0      !32 : PiTesL_401

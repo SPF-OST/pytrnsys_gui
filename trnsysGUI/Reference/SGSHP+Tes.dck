@@ -54,13 +54,13 @@ TPuGhx = TPiHpEvapOut
 
 EQUATIONS 7
 *** Massflowrates
-MfrPuCol = 1000
+MfrPuCol = 41
 MfrWTapBottom = 1000
-MfrPuCond = 1000
-MfrPuSh = 1000
+MfrPuCond = 871
+MfrPuSh = 24
 xFracDivHp = 1.0
 xFracDivHpRt = 1.0
-MfrPuGhx = 1000
+MfrPuGhx = 615
 
 CONSTANTS 2
 T_set_MixDhw=50
@@ -133,10 +133,10 @@ PARAMETERS 189
 36 37 0 0      !35 : HxSolar
 35 1 0 0       !36 : PiColOut
 2 35 0 0       !37 : PiTesToCol
-39 40 44 2     !38 : TPieceTesL1478
+39 40 44 2     !38 : TeeTesL1478
 20 38 0 0      !39 : PiHpToTesDhwIn
 38 21 0 0      !40 : PiHpToTesDhwOut
-42 43 44 2     !41 : TPieceTesL1488
+42 43 44 2     !41 : TeeTesL1488
 20 41 0 0      !42 : PiHpToTesShIn
 41 21 0 0      !43 : PiHpToTesShOut
 41 38 0 0      !44 : PiTesL_432

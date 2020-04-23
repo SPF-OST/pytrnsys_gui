@@ -65,17 +65,17 @@ TPuHpCond = TPiHpInPu
 
 EQUATIONS 14
 *** Massflowrates
-MfrPuSH = 991
+MfrPuSH = 760
 MfrsupplyWater = 1000
 xFracDivHp = 1.0
-MfrPuCool = 567
+MfrPuCool = 246
 xFracDivSHCool = 1.0
 xFracMixHxTes = 1.0
-MfrPuCol = 932
-MfrPuDHW = 736
-MfrPuCirc = 9
-MfrPuHpEvap = 935
-MfrPuHpCond = 162
+MfrPuCol = 65
+MfrPuDHW = 440
+MfrPuCirc = 258
+MfrPuHpEvap = 642
+MfrPuHpCond = 252
 xFracDivSolarDhwSh = 1.0
 xFracDivDhw = None
 xFracDivDhwOut = None
@@ -198,10 +198,10 @@ PARAMETERS 401
 83 84 0 0      !82 : ConnDhwL3772
 19 82 0 0      !83 : PiHpToTesDhwIn
 73 82 0 0      !84 : PiHpToTesDHWOut
-86 87 91 2     !85 : TPieceTesDhwR3781
+86 87 91 2     !85 : TeeTesDhwR3781
 75 85 0 0      !86 : PiTesDhwOut
 85 63 0 0      !87 : PiTesDhwIn
-89 90 91 2     !88 : TPieceTesDhwR3791
+89 90 91 2     !88 : TeeTesDhwR3791
 75 88 0 0      !89 : PiCircOut
 88 63 0 0      !90 : PiCircIn
 88 85 0 0      !91 : PiTesRDhw_853
