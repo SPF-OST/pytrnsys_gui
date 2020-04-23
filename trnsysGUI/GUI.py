@@ -1527,17 +1527,18 @@ class DiagramEditor(QWidget):
 
         fullExportText = ''
 
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+
         if self.testEnabled:
-            exportPath = Path(Path(__file__).resolve().parent.joinpath("export_test")).joinpath(self.diagramName + '.dck')
+            exportPath = os.path.join(ROOT_DIR, 'export_test')
+            exportPath = os.path.join(exportPath, self.diagramName + '.dck')
         elif not self.existReference:
-            exportPath = Path(Path(__file__).resolve().parent.joinpath("Reference")).joinpath(
-                self.diagramName + '.dck')
+            exportPath = os.path.join(ROOT_DIR, 'Reference')
+            exportPath = os.path.join(exportPath, self.diagramName + '.dck')
         else:
-            # exportPath = Path(Path(__file__).resolve().parent.joinpath("exports")).joinpath(self.diagramName + '.dck')
-            if getattr(sys, 'frozen', False):
-                ROOT_DIR = os.path.dirname(sys.executable)
-            elif __file__:
-                ROOT_DIR = os.path.dirname(__file__)
             filepaths = os.path.join(ROOT_DIR, 'filepaths')
             with open(filepaths, 'r') as file:
                 data = file.readlines()
