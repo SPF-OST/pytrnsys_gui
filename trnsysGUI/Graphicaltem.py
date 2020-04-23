@@ -26,7 +26,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.flippedV = False
         self.rotationN = 0
         # Initial icon
-        self.imageSource = "gear.svg"
+        self.imageSource = "images/gear.svg"
         self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
         self.setPixmap(self.image)
 

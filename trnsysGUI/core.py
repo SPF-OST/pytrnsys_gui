@@ -3213,7 +3213,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, e):
         """Saves the current diagram into the Diagram Folder"""
-        self.centralWidget.saveAtClose()
+        # self.centralWidget.saveAtClose()
         e.accept()
 
     def setPaths(self):
