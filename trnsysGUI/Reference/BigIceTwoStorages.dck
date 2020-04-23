@@ -2260,14 +2260,4 @@ TPiHpOutDiv TPiHpCondOut TPiOutHxTesSh TPiColDivDhwSh TPiInHxTes TPiInHxTesSh TP
 TPiTesDhwIn TPiPuCircOut TPiPuCircIn TPiDhwDemand TPiDhwSecOut TPiHxDhwSecIn TPiDhwMains TPiHpToTesSHOut 
 TPiHpToTesDHWOut TPiHpInPu TPiTesDhwOut TPiHxDhwIn TPiCircOut TPiIceOut TPiIceIn 
 
-ENDSTPiHpToTesDHWOut TPiHpInPu TPiTesDhwOut TPiHxDhwIn TPiCircOut TPiIceOut TPiIceIn 
-***
-TPiRadIn TPiRadOut TPiSHOutMix TPiSHInMix TPiHpEvapIn TPiHpEvapMix TPiIceToHp 
-TPiTeeOutIceIn TPiTeeColToHpIn TPiPuCoolIn TPiHxCoolBriIn TPiHxCoolBriOut TPiColToIce TPiColIn TPiHxCoolWatIn 
-TPiTeeMixSHIn TPiHxCoolWatOut TPiDivSHCool TPiHxDhwOut TPiColPuIn TPiIceToCol TPiHpOutPu TPiHpEvapOut 
-TPiHpCondIn TPiHpToTesDhwIn TPiHptoTesSHIn TPiTesDhwToSh TPiShTesOut TPiDivDhwShCol TPiOutHxTes TPiColOut 
-TPiHpOutDiv TPiHpCondOut TPiOutHxTesSh TPiColDivDhwSh TPiInHxTes TPiInHxTesSh TPiPuDhwOut TPiCircIn 
-TPiTesDhwIn TPiPuCircOut TPiPuCircIn TPiDhwDemand TPiDhwSecOut TPiHxDhwSecIn TPiDhwMains TPiHpToTesSHOut 
-TPiHpToTesDHWOut TPiHpInPu TPiTesDhwOut TPiHxDhwIn TPiCircOut TPiIceOut TPiIceIn 
-
 ENDS
