@@ -3167,7 +3167,17 @@ class MainWindow(QMainWindow):
 
     def loadVisualization(self):
         MfrFile = QFileDialog.getOpenFileName(self, "Select Mfr File", "exports", filter="*_Mfr.prt")[0]
+        if MfrFile == '':
+            msgb = QMessageBox(self)
+            msgb.setText("No Mfr file chosen!")
+            msgb.exec()
+            return
         TempFile = QFileDialog.getOpenFileName(self, "Select Temperature File", "exports", filter="*_T.prt")[0]
+        if TempFile == '':
+            msgb = QMessageBox(self)
+            msgb.setText("No Temperature file chosen!")
+            msgb.exec()
+            return
 
         selectedMfrFileName = str(MfrFile).split("/")[-1][:-8]
         selectedTempFileName = str(TempFile).split("/")[-1][:-6]
