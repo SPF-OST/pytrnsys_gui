@@ -3228,8 +3228,18 @@ class MainWindow(QMainWindow):
         filepath = os.path.join(ROOT_DIR, 'filepaths')
         with open(filepath, 'r') as file:
             data = file.readlines()
-        if len(data) < 3:
+        if len(data) < 4:
             pathSetUpDialog = PathSetUp(self)
+
+    def setTrnsysPath(self):
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepaths, 'r') as file:
+            data = file.readlines()
+        self.centralWidget.trnsysPath = os.path.join(data[3][:-1], 'TRNExe.exe')
 
 if __name__ == '__main__':
     cssSs_ = cssSs.read()
@@ -3240,6 +3250,9 @@ if __name__ == '__main__':
     # form.openFileAtStartUp()
     form.show()
     form.checkFilePaths()
+    form.setTrnsysPath()
+
+
     # app.setStyleSheet(cssSs_)
 
     # match = re.compile(r'\d{1,} {1,}\d{1,}')

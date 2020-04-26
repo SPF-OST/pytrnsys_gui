@@ -12,10 +12,11 @@ class PathSetUp(QDialog):
     def __init__(self, parent=None):
         super(PathSetUp, self).__init__(parent)
 
-        self.currentExportPath, self.currentDiagramPath, self.currentDdckPath = self.getCurrentPaths()
+        self.currentExportPath, self.currentDiagramPath, self.currentDdckPath, self.currentTrnsysPath = self.getCurrentPaths()
         self.exportPath = ''
         self.diagramPath = ''
         self.ddckPath = ''
+        self.trnsysPath = ''
 
         exportPathLabel = QLabel("Export Path:")
         self.le = QLineEdit(self.currentExportPath)
@@ -29,12 +30,18 @@ class PathSetUp(QDialog):
         self.le3 = QLineEdit(self.currentDdckPath)
         self.le3.setDisabled(True)
 
+        trnsysPathLabel = QLabel("Trnsys Path:")
+        self.le4 = QLineEdit(self.currentTrnsysPath)
+        self.le4.setDisabled(True)
+
         self.setExportPathButton = QPushButton("Set Export Path")
         self.setDiagramPathButton = QPushButton("Set Diagram Path")
         self.setDdckPathButton = QPushButton("Set ddck Path")
+        self.setTrnsysPathButton = QPushButton("Set Trnsys Path")
         self.setExportPathButton.setFixedWidth(100)
         self.setDiagramPathButton.setFixedWidth(100)
         self.setDdckPathButton.setFixedWidth(100)
+        self.setTrnsysPathButton.setFixedWidth(100)
 
         exportLayout = QHBoxLayout()
         exportLayout.addWidget(exportPathLabel)
@@ -51,6 +58,11 @@ class PathSetUp(QDialog):
         ddckLayout.addWidget(self.le3)
         ddckLayout.addWidget(self.setDdckPathButton)
 
+        trnsysLayout = QHBoxLayout()
+        trnsysLayout.addWidget(trnsysPathLabel)
+        trnsysLayout.addWidget(self.le4)
+        trnsysLayout.addWidget(self.setTrnsysPathButton)
+
         self.okButton = QPushButton("Done")
         self.okButton.setFixedWidth(50)
         buttonLayout = QHBoxLayout()
@@ -60,6 +72,7 @@ class PathSetUp(QDialog):
         overallLayout.addLayout(exportLayout)
         overallLayout.addLayout(diagramLayout)
         overallLayout.addLayout(ddckLayout)
+        overallLayout.addLayout(trnsysLayout)
         overallLayout.addLayout(buttonLayout)
         self.setLayout(overallLayout)
         self.setFixedWidth(800)
@@ -68,8 +81,9 @@ class PathSetUp(QDialog):
         self.setExportPathButton.clicked.connect(self.setExportPath)
         self.setDiagramPathButton.clicked.connect(self.setDiagramPath)
         self.setDdckPathButton.clicked.connect(self.setDdckPath)
+        self.setTrnsysPathButton.clicked.connect(self.setTrnsysPath)
         self.setWindowTitle("Set Paths")
-        self.show()
+        self.exec()
 
     def doneEdit(self):
         """
@@ -78,42 +92,7 @@ class PathSetUp(QDialog):
         self.exportFlag = False
         self.diagramFlag = False
         self.ddckFlag = False
-
-        # if self.exportPath == '' and self.diagramPath == '':
-        #     if self.currentExportPath == 'None' or self.currentDiagramPath == 'None':
-        #         msgBox = QMessageBox()
-        #         msgBox.setText("Please set both paths!")
-        #         msgBox.exec()
-        #     elif self.currentExportPath == 'None':
-        #         msgBox = QMessageBox()
-        #         msgBox.setText("Please set export path!")
-        #         msgBox.exec()
-        #     elif self.currentDiagramPath == 'None':
-        #         msgBox = QMessageBox()
-        #         msgBox.setText("Please set diagram path!")
-        #         msgBox.exec()
-        #     else:
-        #         self.close()
-        # elif self.exportPath == '':
-        #     if self.currentExportPath == 'None':
-        #         msgBox = QMessageBox()
-        #         msgBox.setText("Please set export path!")
-        #         msgBox.exec()
-        #     else:
-        #         self.writeIntoFile(self.exportPath, self.diagramPath)
-        #         self.close()
-        # elif self.diagramPath == '':
-        #     if self.currentDiagramPath == 'None':
-        #         msgBox = QMessageBox()
-        #         msgBox.setText("Please set diagram path!")
-        #         msgBox.exec()
-        #     else:
-        #         self.writeIntoFile(self.exportPath, self.diagramPath)
-        #         self.close()
-        # else:
-        #     self.writeIntoFile(self.exportPath, self.diagramPath)
-        #     self.close()
-
+        self.trnsysFlag = False
 
         if self.exportPath == '':
             if self.currentExportPath == '':
@@ -144,9 +123,20 @@ class PathSetUp(QDialog):
                 self.ddckFlag = True
         else:
             self.ddckFlag = True
-        print(self.exportFlag, self.diagramFlag, self.ddckFlag)
-        if self.exportFlag and self.diagramFlag and self.ddckFlag:
-            self.writeIntoFile(self.exportPath, self.diagramPath, self.ddckPath)
+
+        if self.trnsysPath == '':
+            if self.currentTrnsysPath == '':
+                msgBox = QMessageBox()
+                msgBox.setText("Please set Trnsys path!")
+                msgBox.exec()
+            else:
+                self.trnsysFlag = True
+        else:
+            self.trnsysFlag = True
+
+        print(self.exportFlag, self.diagramFlag, self.ddckFlag, self.trnsysFlag)
+        if self.exportFlag and self.diagramFlag and self.ddckFlag and self.trnsysFlag:
+            self.writeIntoFile(self.exportPath, self.diagramPath, self.ddckPath, self.trnsysPath)
             self.close()
 
 
@@ -177,6 +167,12 @@ class PathSetUp(QDialog):
             self.le3.setText(self.ddckPath)
         pass
 
+    def setTrnsysPath(self):
+        self.trnsysPath = str(QFileDialog.getExistingDirectory(self, "Select Trnsys Path"))
+        if self.trnsysPath != '':
+            self.le4.setText(self.trnsysPath)
+        pass
+
     def getCurrentPaths(self):
         """
         read from filepath.txt to get current paths.
@@ -195,6 +191,7 @@ class PathSetUp(QDialog):
         exportPath = ''
         diagramPath = ''
         ddckPath = ''
+        trnsysPath = ''
         with open(filepath, 'r') as file:
             data = file.readlines()
 
@@ -219,9 +216,16 @@ class PathSetUp(QDialog):
         else:
             ddckPath = data[2]
 
-        return exportPath, diagramPath, ddckPath
+        try:
+            data[3]
+        except IndexError:
+            print("Empty file")
+        else:
+            trnsysPath = data[3]
 
-    def writeIntoFile(self, string1, string2, string3):
+        return exportPath, diagramPath, ddckPath, trnsysPath
+
+    def writeIntoFile(self, string1, string2, string3, string4):
         if getattr(sys, 'frozen', False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
@@ -250,6 +254,14 @@ class PathSetUp(QDialog):
                 data.append(string3 + '\n')
             else:
                 data[2] = string3 + '\n'
+        if string4 != '':
+            try:
+                data[3]
+            except IndexError:
+                data.append(string4 + '\n')
+            else:
+                data[3] = string4 + '\n'
+
         print(data)
         with open(filepath, 'w') as file:
             file.writelines(data)
