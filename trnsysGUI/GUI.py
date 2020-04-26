@@ -80,6 +80,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 import os
+import sys
+
+
 
 __version__ = "1.0.0"
 __author__ = "Stefano Marti"
@@ -3001,7 +3004,7 @@ class MainWindow(QMainWindow):
     def openFile(self):
         print("Opening diagram")
         # self.centralWidget.delBlocks()
-        fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0]
+        fileName = QFileDialog.getOpenFileName(self, "Open diagram", "examples", filter="*.json")[0]
         print(fileName)
         if fileName != '':
             self.centralWidget.idGen.reset()
@@ -3131,7 +3134,43 @@ class MainWindow(QMainWindow):
             self.calledByVisualizeMf = False
             return mfrFile, tempFile
 
+    # def loadVisualization(self):
+    #
+    #     currentFilePath = self.currentFile
+    #     if '\\' in currentFilePath:
+    #         diaName = currentFilePath.split('\\')[-1][:-5]
+    #     elif '/' in currentFilePath:
+    #         diaName = currentFilePath.split('/')[-1][:-5]
+    #     else:
+    #         diaName = currentFilePath
+    #     if getattr(sys, 'frozen', False):
+    #         ROOT_DIR = os.path.dirname(sys.executable)
+    #     elif __file__:
+    #         ROOT_DIR = os.path.dirname(__file__)
+    #
+    #     filepaths = os.path.join(ROOT_DIR, 'filepaths')
+    #     with open(filepaths, 'r') as file:
+    #         data = file.readlines()
+    #
+    #     filePath = data[0][:-1]
+    #     MfrFilePath = os.path.join(filePath, diaName + '_Mfr.prt')
+    #     TempFilePath = os.path.join(filePath, diaName + '_T.prt')
+    #     print(MfrFilePath, TempFilePath)
+    #
+    #     if os.path.exists(MfrFilePath) and os.path.exists(TempFilePath):
+    #         MassFlowVisualizer(self, MfrFilePath, TempFilePath)
+    #         self.massFlowEnabled = True
+    #     else:
+    #         msgb = QMessageBox(self)
+    #         msgb.setText("MFR or Temperature file does not exist!")
+    #         msgb.exec()
+
     def loadVisualization(self):
+        MfrFile = QFileDialog.getOpenFileName(self, "Select Mfr File", "exports", filter="*_Mfr.prt")[0]
+        TempFile = QFileDialog.getOpenFileName(self, "Select Temperature File", "exports", filter="*_T.prt")[0]
+
+        selectedMfrFileName = str(MfrFile).split("/")[-1][:-8]
+        selectedTempFileName = str(TempFile).split("/")[-1][:-6]
 
         currentFilePath = self.currentFile
         if '\\' in currentFilePath:
@@ -3140,32 +3179,15 @@ class MainWindow(QMainWindow):
             diaName = currentFilePath.split('/')[-1][:-5]
         else:
             diaName = currentFilePath
-        if getattr(sys, 'frozen', False):
-            ROOT_DIR = os.path.dirname(sys.executable)
-        elif __file__:
-            ROOT_DIR = os.path.dirname(__file__)
 
-        filepaths = os.path.join(ROOT_DIR, 'filepaths')
-        with open(filepaths, 'r') as file:
-            data = file.readlines()
-
-        filePath = data[0][:-1]
-        MfrFilePath = os.path.join(filePath, diaName + '_Mfr.prt')
-        TempFilePath = os.path.join(filePath, diaName + '_T.prt')
-        print(MfrFilePath, TempFilePath)
-
-        if os.path.exists(MfrFilePath) and os.path.exists(TempFilePath):
-            MassFlowVisualizer(self, MfrFilePath, TempFilePath)
+        if selectedMfrFileName == selectedTempFileName == diaName:
+            MassFlowVisualizer(self, MfrFile, TempFile)
             self.massFlowEnabled = True
         else:
+            print(selectedMfrFileName, selectedTempFileName, diaName)
             msgb = QMessageBox(self)
-            msgb.setText("MFR or Temperature file does not exist!")
+            msgb.setText("MFR or Temperature file does not correspond to current diagram!")
             msgb.exec()
-
-
-
-
-
 
 
 
@@ -3242,6 +3264,7 @@ class MainWindow(QMainWindow):
         self.centralWidget.trnsysPath = os.path.join(data[3][:-1], 'TRNExe.exe')
 
 if __name__ == '__main__':
+    # sys.stdout = open('errorLog', 'w')
     cssSs_ = cssSs.read()
     app = QApplication(sys.argv)
     app.setApplicationName("Diagram Creator")
