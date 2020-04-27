@@ -179,7 +179,6 @@ class PathSetUp(QDialog):
         returns export path and diagram path.
         """
         print("File:", __file__)
-        # TODO : replace all ROOT_DIR with the following code
         if getattr(sys, 'frozen', False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
