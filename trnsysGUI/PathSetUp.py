@@ -137,6 +137,7 @@ class PathSetUp(QDialog):
         print(self.exportFlag, self.diagramFlag, self.ddckFlag, self.trnsysFlag)
         if self.exportFlag and self.diagramFlag and self.ddckFlag and self.trnsysFlag:
             self.writeIntoFile(self.exportPath, self.diagramPath, self.ddckPath, self.trnsysPath)
+            self.parent().setTrnsysPath()
             self.close()
 
 

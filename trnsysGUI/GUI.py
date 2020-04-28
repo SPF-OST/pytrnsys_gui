@@ -3118,11 +3118,16 @@ class MainWindow(QMainWindow):
         self.exportedTo = exportPath
         print(exportPath)
         if exportPath != 'None':
+            msgb = QMessageBox(self)
+            if not os.path.isfile(self.centralWidget.trnsysPath):
+                msgb.setText("TRNExe.exe not found!")
+                msgb.exec()
+                return 0, 0
+            print("trnsyspath:", self.centralWidget.trnsysPath)
             cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
             os.system(cmd)
             mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
             tempFile = os.path.splitext(str(exportPath))[0]+'_T.prt'
-            msgb = QMessageBox(self)
             if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
                 msgb.setText("Trnsys not succesfully executed")
                 msgb.exec()
