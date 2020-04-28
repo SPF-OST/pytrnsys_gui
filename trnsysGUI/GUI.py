@@ -2807,6 +2807,10 @@ class MainWindow(QMainWindow):
         setPathAction.triggered.connect(self.setPaths)
         self.fileMenu.addAction(setPathAction)
 
+        debugConnections = QAction("Debug Conn", self)
+        debugConnections.triggered.connect(self.debugConns)
+        self.fileMenu.addAction(debugConnections)
+
         self.editMenu = QMenu("Edit")
         # self.editMenu.addAction(toggleEditorModeAction)
         self.editMenu.addAction(multipleDeleteAction)
@@ -3277,6 +3281,32 @@ class MainWindow(QMainWindow):
         with open(filepaths, 'r') as file:
             data = file.readlines()
         self.centralWidget.trnsysPath = os.path.join(data[3][:-1], 'TRNExe.exe')
+
+    def debugConns(self):
+        print("trnsysObjs:", self.centralWidget.trnsysObj)
+        for o in self.centralWidget.trnsysObj:
+            print(o)
+            if isinstance(o, BlockItem) and len(o.outputs) == 1 and len(o.inputs) == 1:
+                print("Checking block connections", o.displayName)
+                objInput = o.inputs[0]
+                objOutput = o.outputs[0]
+                connToInputToPort = objInput.connectionList[0].toPort
+                connToOutputToPort = objOutput.connectionList[0].toPort
+                connToInputFromPort = objInput.connectionList[0].fromPort
+                connToOutputFromPort = objOutput.connectionList[0].fromPort
+                connName1 = objInput.connectionList[0].displayName
+                connName2 = objOutput.connectionList[0].displayName
+                objName = o.displayName
+
+                if objInput == connToInputToPort and objOutput == connToOutputToPort:
+                    msgBox = QMessageBox()
+                    msgBox.setText("both %s and %s are input ports into %s" % (connName1, connName2, objName))
+                    msgBox.exec_()
+
+                elif objInput == connToInputFromPort and objOutput == connToOutputFromPort:
+                    msgBox = QMessageBox()
+                    msgBox.setText("both %s and %s are output ports from %s" % (connName1, connName2, objName))
+                    msgBox.exec_()
 
 if __name__ == '__main__':
     # sys.stdout = open('errorLog', 'w')
