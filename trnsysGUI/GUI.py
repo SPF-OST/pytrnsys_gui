@@ -1160,8 +1160,20 @@ class DiagramEditor(QWidget):
         self.vertL.addWidget(self.listV)
         self.vertL.setStretchFactor(self.listV, 1)
 
+        self.fileBrowserLayout = QVBoxLayout()
+        # self.path = os.path.dirname(__file__)
+        # self.model = QFileSystemModel()
+        # self.model.setRootPath(os.path.dirname(__file__))
+        # self.tree = QTreeView()
+        # self.tree.setModel(self.model)
+        # self.tree2 = QTreeView()
+        # self.tree2.setModel(self.model)
+        # self.fileBrowserLayout.addWidget(self.tree)
+        # self.fileBrowserLayout.addWidget(self.tree2)
+
         self.horizontalLayout.addLayout(self.vertL)
         self.horizontalLayout.addWidget(self.diagramView)
+        self.horizontalLayout.addLayout(self.fileBrowserLayout)
         self.horizontalLayout.setStretchFactor(self.diagramView, 5)
         self.horizontalLayout.setStretchFactor(self.libraryBrowserView, 1)
 
@@ -2899,6 +2911,19 @@ class MainWindow(QMainWindow):
 
     def exportTrnsys(self):
         print("Exporting Trnsys file...")
+        noErrorExists = self.debugConns()
+        if not noErrorExists:
+            qmb = QMessageBox()
+            qmb.setText("Ignore connection errors and continue with export?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == QMessageBox.Save:
+                print("Overwriting")
+                # continue
+            else:
+                print("Canceling")
+                return
         self.centralWidget.exportData()
 
     def renameDia(self):
@@ -3284,6 +3309,7 @@ class MainWindow(QMainWindow):
 
     def debugConns(self):
         print("trnsysObjs:", self.centralWidget.trnsysObj)
+        self.noErrorConns = True
         for o in self.centralWidget.trnsysObj:
             print(o)
             if isinstance(o, BlockItem) and len(o.outputs) == 1 and len(o.inputs) == 1:
@@ -3302,11 +3328,14 @@ class MainWindow(QMainWindow):
                     msgBox = QMessageBox()
                     msgBox.setText("both %s and %s are input ports into %s" % (connName1, connName2, objName))
                     msgBox.exec_()
+                    self.noErrorConns = False
 
                 elif objInput == connToInputFromPort and objOutput == connToOutputFromPort:
                     msgBox = QMessageBox()
                     msgBox.setText("both %s and %s are output ports from %s" % (connName1, connName2, objName))
                     msgBox.exec_()
+                    self.noErrorConns = False
+        return self.noErrorConns
 
 if __name__ == '__main__':
     # sys.stdout = open('errorLog', 'w')
