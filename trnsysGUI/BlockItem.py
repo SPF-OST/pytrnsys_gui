@@ -4,7 +4,7 @@ from math import sqrt
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
+from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
 # from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.PortItem import PortItem
@@ -380,6 +380,13 @@ class BlockItem(QGraphicsPixmapItem):
         print("deleting block " + str(self) + self.displayName)
         # print("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        try:
+            widgetToRemove.hide()
+        except AttributeError:
+            print("Widget doesnt exist!")
+        else:
+            print("Deleted widget")
         del self
 
     def deleteBlockCom(self):

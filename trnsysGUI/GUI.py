@@ -19,6 +19,7 @@ from pathlib import Path
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.PathSetUp import PathSetUp
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.DifferenceDlg import DifferenceDlg
@@ -1160,16 +1161,18 @@ class DiagramEditor(QWidget):
         self.vertL.addWidget(self.listV)
         self.vertL.setStretchFactor(self.listV, 1)
 
+        # todo : use the following code to add treeView when a blockitem is created
         self.fileBrowserLayout = QVBoxLayout()
-        # self.path = os.path.dirname(__file__)
-        # self.model = QFileSystemModel()
-        # self.model.setRootPath(os.path.dirname(__file__))
-        # self.tree = QTreeView()
-        # self.tree.setModel(self.model)
-        # self.tree2 = QTreeView()
-        # self.tree2.setModel(self.model)
-        # self.fileBrowserLayout.addWidget(self.tree)
-        # self.fileBrowserLayout.addWidget(self.tree2)
+        self.scroll = QScrollArea()
+        # self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.splitter = QSplitter(Qt.Vertical)
+        self.splitter.setChildrenCollapsible(False)
+        self.scroll.setWidget(self.splitter)
+        self.scroll.setFixedWidth(300)
+        self.fileBrowserLayout.addWidget(self.scroll)
+
 
         self.horizontalLayout.addLayout(self.vertL)
         self.horizontalLayout.addWidget(self.diagramView)

@@ -1,9 +1,12 @@
+import os
 import sys
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.ResizerItem import ResizerItem
 
@@ -21,6 +24,7 @@ class AirSourceHP(BlockItem):
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h), Qt.IgnoreAspectRatio))
 
         self.changeSize()
+        self.addTree()
 
     def changeSize(self):
         # print("passing through c change size")
@@ -54,3 +58,15 @@ class AirSourceHP(BlockItem):
 
         return w, h
 
+    def addTree(self):
+        print(self.parent.parent())
+        self.path = os.path.dirname(__file__)
+        self.model = MyQFileSystemModel()
+        self.model.setRootPath(os.path.dirname(__file__))
+        self.model.setName(self.displayName)
+        self.tree = QTreeView()
+        self.tree.setModel(self.model)
+        self.tree.setObjectName("%sTree" % self.displayName)
+        self.tree.setMinimumHeight(200)
+        print(self.tree.objectName())
+        self.parent.parent().splitter.addWidget(self.tree)
