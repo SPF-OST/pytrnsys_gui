@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
+from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.ResizerItem import ResizerItem
 
@@ -64,9 +65,14 @@ class AirSourceHP(BlockItem):
         self.model = MyQFileSystemModel()
         self.model.setRootPath(os.path.dirname(__file__))
         self.model.setName(self.displayName)
-        self.tree = QTreeView()
+        self.tree = MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
+        self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
         self.tree.setMinimumHeight(200)
+        self.tree.setSortingEnabled(True)
         print(self.tree.objectName())
         self.parent.parent().splitter.addWidget(self.tree)
+
+    def loadFile(self, filePath):
+        self.filePath = filePath
