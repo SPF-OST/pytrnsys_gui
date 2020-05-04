@@ -40,9 +40,9 @@ class MyQTreeView(QTreeView):
             msg.exec_()
 
     def loadFile(self):
-        filePath = self.getFilePath()
+        file = self.getFilePath()
         print("Loading file")
-        self.item.loadFile(filePath)
+        self.item.loadFile(file)
 
     def getFilePath(self):
         index = self.currentIndex()

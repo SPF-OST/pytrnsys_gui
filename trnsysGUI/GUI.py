@@ -1161,8 +1161,18 @@ class DiagramEditor(QWidget):
         self.vertL.addWidget(self.listV)
         self.vertL.setStretchFactor(self.listV, 1)
 
-        # todo : use the following code to add treeView when a blockitem is created
+        # for file browser
+        self.projectPath = ''
         self.fileBrowserLayout = QVBoxLayout()
+        self.pathLayout = QHBoxLayout()
+        self.projectPathLabel = QLabel("Project Path:")
+        self.PPL = QLineEdit("")
+        self.PPL.setDisabled(True)
+        self.setProjectPathButton = QPushButton("Set path")
+        self.setProjectPathButton.clicked.connect(self.setProjectPath)
+        self.pathLayout.addWidget(self.projectPathLabel)
+        self.pathLayout.addWidget(self.PPL)
+        self.pathLayout.addWidget(self.setProjectPathButton)
         self.scroll = QScrollArea()
         # self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         # self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -1171,6 +1181,7 @@ class DiagramEditor(QWidget):
         self.splitter.setChildrenCollapsible(False)
         self.scroll.setWidget(self.splitter)
         self.scroll.setFixedWidth(300)
+        self.fileBrowserLayout.addLayout(self.pathLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
 
 
@@ -2625,6 +2636,11 @@ class DiagramEditor(QWidget):
             self.diagramScene.render(painter)
             painter.end()
             print("File exported to %s" % fn)
+
+    def setProjectPath(self):
+        self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
+        if self.projectPath !='':
+            self.PPL.setText(self.projectPath)
 
     # def printEMF(self):
     #     """

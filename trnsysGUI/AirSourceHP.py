@@ -1,9 +1,10 @@
 import os
 import sys
+import shutil
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QTreeView
+from PyQt5.QtWidgets import QTreeView, QMessageBox
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
@@ -74,5 +75,12 @@ class AirSourceHP(BlockItem):
         print(self.tree.objectName())
         self.parent.parent().splitter.addWidget(self.tree)
 
-    def loadFile(self, filePath):
-        self.filePath = filePath
+    def loadFile(self, file):
+        filePath = self.parent.parent().projectPath
+        msgB = QMessageBox()
+        if filePath == '':
+            msgB.setText("Please select a project path before loading!")
+            msgB.exec_()
+        else:
+            print("file loaded into %s" % filePath)
+            shutil.copy(file, filePath)
