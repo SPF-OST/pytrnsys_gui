@@ -47,11 +47,11 @@ TPuSh = TPiRadFloorOut
 
 EQUATIONS 7
 *** Massflowrates
-MfrPuCol = 672
+MfrPuCol = 427
 xFracMixDhw = 1.0
 MfrWTapBottom = 1000
 xFracMixSh = 1.0
-MfrPuSh = 829
+MfrPuSh = 694
 xFracDivSolarUp = 1.0
 xFracDivSolarMid = 1.0
 

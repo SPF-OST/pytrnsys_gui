@@ -10,7 +10,7 @@ class GroundSourceHx(BlockItem):
         print("sdf")
         super(GroundSourceHx, self).__init__(trnsysType, parent, **kwargs)
         print("c gs")
-        factor = 0.60
+        factor = 0.80
         self.w = factor * 100
         self.h = factor * 100
         self.inputs.append(PortItem('i', 0, self))

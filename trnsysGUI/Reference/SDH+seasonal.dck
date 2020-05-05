@@ -47,8 +47,8 @@ TPuSh = TPiRadFloorOut
 
 EQUATIONS 6
 *** Massflowrates
-MfrPuCol = 962
-MfrPuSh = 779
+MfrPuCol = 901
+MfrPuSh = 723
 xFracDivSolarTop = 0.0
 xFracDivSolarMid = 1.0
 xFracMixSolarTop = 0.0
@@ -93,16 +93,16 @@ PARAMETERS 141
 15 16 0 0      !17 : PisolarMixToMix
 16 2 0 0       !18 : PiSolarMixToPu
 12 14 0 0      !19 : PiDivTopToMid
-21 22 32 2     !20 : TPieceTesL2559
+21 22 32 2     !20 : TeeTesL2559
 14 20 0 0      !21 : PiSolarToTesBot
 20 16 0 0      !22 : PiTesToSolarBot
-24 25 30 2     !23 : TPieceTesL2569
+24 25 30 2     !23 : TeeTesL2569
 12 23 0 0      !24 : PiSolarToTesTop
 23 15 0 0      !25 : PiTesToSolarTop
-27 28 31 2     !26 : TPieceTesL2579
+27 28 31 2     !26 : TeeTesL2579
 14 26 0 0      !27 : PiSolartoTesMid
 26 15 0 0      !28 : PiTesToSolarMid
-30 31 32 2     !29 : TPieceTesL2589
+30 31 32 2     !29 : TeeTesL2589
 23 29 0 0      !30 : PiTesL_677
 29 26 0 0      !31 : PiTesL_678
 29 20 0 0      !32 : PiTesL_679

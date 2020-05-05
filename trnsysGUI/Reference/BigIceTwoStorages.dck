@@ -65,20 +65,20 @@ TPuHpCond = TPiHpInPu
 
 EQUATIONS 14
 *** Massflowrates
-MfrPuSH = 991
+MfrPuSH = 760
 MfrsupplyWater = 1000
 xFracDivHp = 1.0
-MfrPuCool = 567
+MfrPuCool = 246
 xFracDivSHCool = 1.0
 xFracMixHxTes = 1.0
-MfrPuCol = 932
-MfrPuDHW = 736
-MfrPuCirc = 9
-MfrPuHpEvap = 935
-MfrPuHpCond = 162
+MfrPuCol = 65
+MfrPuDHW = 440
+MfrPuCirc = 258
+MfrPuHpEvap = 642
+MfrPuHpCond = 252
 xFracDivSolarDhwSh = 1.0
-xFracDivDhw = None
-xFracDivDhwOut = None
+xFracDivDhw = 1.0
+xFracDivDhwOut = 1.0
 
 CONSTANTS 2
 T_set_DivSH=50
@@ -195,23 +195,23 @@ PARAMETERS 401
 80 81 0 0      !79 : Solar1976
 61 79 0 0      !80 : PiInHxTes
 56 79 0 0      !81 : PiOutHxTes
-83 84 0 0      !82 : ConnDhwL3772
+83 84 0 0      !82 : ConnDhwL3908
 19 82 0 0      !83 : PiHpToTesDhwIn
 73 82 0 0      !84 : PiHpToTesDHWOut
-86 87 91 2     !85 : TPieceTesDhwR3781
+86 87 91 2     !85 : TeeTesDhwR3917
 75 85 0 0      !86 : PiTesDhwOut
 85 63 0 0      !87 : PiTesDhwIn
-89 90 91 2     !88 : TPieceTesDhwR3791
+89 90 91 2     !88 : TeeTesDhwR3927
 75 88 0 0      !89 : PiCircOut
 88 63 0 0      !90 : PiCircIn
-88 85 0 0      !91 : PiTesRDhw_853
+88 85 0 0      !91 : PiTesRDhw_883
 93 94 0 0      !92 : SolarTesHx2279
 61 92 0 0      !93 : PiInHxTesSh
 56 92 0 0      !94 : PiOutHxTesSh
-96 97 0 0      !95 : ConnSHL3813
+96 97 0 0      !95 : ConnSHL3949
 19 95 0 0      !96 : PiHptoTesSHIn
 73 95 0 0      !97 : PiHpToTesSHOut
-99 100 0 0     !98 : ConnSHR3822
+99 100 0 0     !98 : ConnSHR3958
 98 24 0 0      !99 : PiTesDhwToSh
 23 98 0 0      !100 : PiShTesOut
 INPUTS 100! for Type 935
@@ -425,8 +425,8 @@ MfrPiInHxTes_A=[450,238]
 MfrPiInHxTes_B=[450,239]
 MfrPiOutHxTes_A=[450,241]
 MfrPiOutHxTes_B=[450,242]
-MfrConnDhwL3772_A=[450,244]
-MfrConnDhwL3772_B=[450,245]
+MfrConnDhwL3908_A=[450,244]
+MfrConnDhwL3908_B=[450,245]
 MfrPiHpToTesDhwIn_A=[450,247]
 MfrPiHpToTesDhwIn_B=[450,248]
 MfrPiHpToTesDHWOut_A=[450,250]
@@ -439,22 +439,22 @@ MfrPiCircOut_A=[450,265]
 MfrPiCircOut_B=[450,266]
 MfrPiCircIn_A=[450,268]
 MfrPiCircIn_B=[450,269]
-MfrPiTesRDhw_853_A=[450,271]
-MfrPiTesRDhw_853_B=[450,272]
+MfrPiTesRDhw_883_A=[450,271]
+MfrPiTesRDhw_883_B=[450,272]
 MfrSolarTesHx2279_A=[450,274]
 MfrSolarTesHx2279_B=[450,275]
 MfrPiInHxTesSh_A=[450,277]
 MfrPiInHxTesSh_B=[450,278]
 MfrPiOutHxTesSh_A=[450,280]
 MfrPiOutHxTesSh_B=[450,281]
-MfrConnSHL3813_A=[450,283]
-MfrConnSHL3813_B=[450,284]
+MfrConnSHL3949_A=[450,283]
+MfrConnSHL3949_B=[450,284]
 MfrPiHptoTesSHIn_A=[450,286]
 MfrPiHptoTesSHIn_B=[450,287]
 MfrPiHpToTesSHOut_A=[450,289]
 MfrPiHpToTesSHOut_B=[450,290]
-MfrConnSHR3822_A=[450,292]
-MfrConnSHR3822_B=[450,293]
+MfrConnSHR3958_A=[450,292]
+MfrConnSHR3958_B=[450,293]
 MfrPiTesDhwToSh_A=[450,295]
 MfrPiTesDhwToSh_B=[450,296]
 MfrPiShTesOut_A=[450,298]
@@ -1949,7 +1949,7 @@ TPiShTesOut= [524,1]
 PPiShTesOut_kW= [524,3]/3600 !kW
 MfrPiShTesOut= MfrPiShTesOut_A
 
-CONSTANTS 9
+CONSTANTS 6
 ** Fluid Loop : defaultGroup
 di_loop_0=0.2
 L_loop_0=2
@@ -1959,11 +1959,6 @@ U_loop_0=10
 di_loop_1=0.2
 L_loop_1=2
 U_loop_1=10
-
-** Fluid Loop : ShLoop
-di_loop_2=0.2
-L_loop_2=2
-U_loop_2=10
 
 
 EQUATIONS 162
@@ -2193,17 +2188,11 @@ diPiSHInMix=di_loop_1
 LPiSHInMix=L_loop_1
 UPiSHInMix=U_loop_1
 
-** Fluid Loop : ShLoop
-**di_loop_2=0.2
-**L_loop_2=2
-**U_loop_2=10
 
-
-EQUATIONS 4
+EQUATIONS 3
 PipeLoss0=PPiHpCondIn_kW+PPiHpToTesDhwIn_kW+PPiHptoTesSHIn_kW+PPiTesDhwToSh_kW+PPiShTesOut_kW+PPiHpEvapIn_kW+PPiHpEvapMix_kW+PPiIceToHp_kW+PPiDivDhwShCol_kW+PPiTeeOutIceIn_kW+PPiOutHxTes_kW+PPiColOut_kW+PPiHpOutDiv_kW+PPiHpCondOut_kW+PPiOutHxTesSh_kW+PPiColDivDhwSh_kW+PPiInHxTes_kW+PPiInHxTesSh_kW+PPiTeeColToHpIn_kW+PPiPuCoolIn_kW+PPiHxCoolBriIn_kW+PPiHxCoolBriOut_kW+PPiColToIce_kW+PPiColIn_kW+PPiPuDhwOut_kW+PPiCircIn_kW+PPiTesDhwIn_kW+PPiPuCircOut_kW+PPiPuCircIn_kW+PPiDhwDemand_kW+PPiDhwSecOut_kW+PPiHxDhwSecIn_kW+PPiDhwMains_kW+PPiHpToTesSHOut_kW+PPiHpToTesDHWOut_kW+PPiHpInPu_kW+PPiHxDhwOut_kW+PPiTesDhwOut_kW+PPiHxDhwIn_kW+PPiCircOut_kW+PPiIceOut_kW+PPiIceIn_kW+PPiColPuIn_kW+PPiIceToCol_kW+PPiHpOutPu_kW+PPiHpEvapOut_kW
 PipeLoss1=PPiHxCoolWatIn_kW+PPiTeeMixSHIn_kW+PPiHxCoolWatOut_kW+PPiDivSHCool_kW+PPiRadIn_kW+PPiRadOut_kW+PPiSHOutMix_kW+PPiSHInMix_kW
-PipeLoss2
-PipeLossTotal=PipeLoss0+PipeLoss1+PipeLoss2
+PipeLossTotal=PipeLoss0+PipeLoss1
 
 ASSIGN BigIceTwoStorages_Mfr.prt 525
 

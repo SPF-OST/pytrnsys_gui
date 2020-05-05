@@ -311,7 +311,7 @@ class StorageTank(BlockItem):
 
             for i in range(0, x, 2):
                 tpiece = TeePiece("TeePiece", self.parent)
-                tpiece.displayName = "TPieceTes" + self.displayName + sideVar + str(tpiece.id)
+                tpiece.displayName = "TeeTes" + self.displayName + sideVar + str(tpiece.id)
                 tpiece.setVisible(False)
                 self.parent.scene().addItem(tpiece)
                 tpList.append(tpiece)
@@ -874,9 +874,17 @@ class StorageTank(BlockItem):
         nPorts = len(self.directPortConnsForList)
         nHx = len(self.heatExchangers)
 
-        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-        filePath = os.path.join(ROOT_DIR, 'ddck')
+        if getattr(sys, 'frozen', False):
+            ROOT_DIR = os.path.dirname(sys.executable)
+        elif __file__:
+            ROOT_DIR = os.path.dirname(__file__)
+        # filePath = os.path.join(ROOT_DIR, 'ddck')
+        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        with open(filepaths, 'r') as file:
+            data = file.readlines()
+        filePath = (data[2][:-1])
         fileName = self.parent.parent().parent().currentFile
+        print(fileName)
 
         if '\\' in fileName:
             name = fileName.split('\\')[-1][:-5]
