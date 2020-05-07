@@ -1,9 +1,7 @@
 import os
+import shutil
 
-from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QTreeView, QMenu, QMessageBox
+from PyQt5.QtWidgets import QTreeView, QMenu, QMessageBox, QFileDialog
 
 
 class MyQTreeView(QTreeView):
@@ -21,8 +19,8 @@ class MyQTreeView(QTreeView):
     def contextMenuEvent(self, event):
         menu = QMenu()
 
-        open = menu.addAction("Open")
-        open.triggered.connect(self.openFile)
+        # open = menu.addAction("Open")
+        # open.triggered.connect(self.openFile)
 
         load = menu.addAction("Load")
         load.triggered.connect(self.loadFile)
@@ -40,9 +38,12 @@ class MyQTreeView(QTreeView):
             msg.exec_()
 
     def loadFile(self):
-        file = self.getFilePath()
-        print("Loading file")
-        self.item.loadFile(file)
+        fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
+        filePath = self.model.rootPath()
+        print(filePath)
+        if fileName != '':
+            print("file loaded into %s" % filePath)
+            shutil.copy(fileName, filePath)
 
     def getFilePath(self):
         index = self.currentIndex()

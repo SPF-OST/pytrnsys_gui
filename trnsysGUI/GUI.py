@@ -1163,10 +1163,12 @@ class DiagramEditor(QWidget):
 
         # for file browser
         self.projectPath = ''
+        self.tempPath = os.path.dirname(__file__)
+        self.tempPath = os.path.join(self.tempPath, 'project')
         self.fileBrowserLayout = QVBoxLayout()
         self.pathLayout = QHBoxLayout()
         self.projectPathLabel = QLabel("Project Path:")
-        self.PPL = QLineEdit("")
+        self.PPL = QLineEdit(self.tempPath)
         self.PPL.setDisabled(True)
         self.setProjectPathButton = QPushButton("Set path")
         self.setProjectPathButton.clicked.connect(self.setProjectPath)
@@ -2641,6 +2643,10 @@ class DiagramEditor(QWidget):
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
         if self.projectPath !='':
             self.PPL.setText(self.projectPath)
+            for o in self.trnsysObj:
+                if hasattr(o, 'updateTreePath'):
+                    o.updateTreePath(self.projectPath)
+
 
     # def printEMF(self):
     #     """
