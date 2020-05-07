@@ -7,10 +7,11 @@ conda create -n myenv python=3.5
 
 conda activate myenv
 
-conda install pyqt5
+conda install pyqt
 
 #####Installing
-Clone the repository and run TrnsysGUI/trnsysGUI/core.py
+Clone the repository and run trnsysGUI/GUI.py using the python interpreter of the newly created conda environment myenv.
+
 #####Dev Notes
 General structure
 A diagram has Blocks and Connections.
