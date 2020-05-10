@@ -65,7 +65,7 @@ class AirSourceHP(BlockItem):
         pathName = 'HP_' + self.displayName
         if self.parent.parent().projectPath =='':
             self.path = os.path.dirname(__file__)
-            self.path = os.path.join(self.path, 'project')
+            self.path = os.path.join(self.path, 'default')
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, 'ddck')

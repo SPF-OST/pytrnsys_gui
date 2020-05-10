@@ -2,6 +2,7 @@
 # import random
 import glob
 import re
+import shutil
 import string
 from math import sqrt, acos, pi, degrees, atan
 
@@ -20,6 +21,7 @@ from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
+from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PathSetUp import PathSetUp
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.DifferenceDlg import DifferenceDlg
@@ -1164,7 +1166,7 @@ class DiagramEditor(QWidget):
         # for file browser
         self.projectPath = ''
         self.tempPath = os.path.dirname(__file__)
-        self.tempPath = os.path.join(self.tempPath, 'project')
+        self.tempPath = os.path.join(self.tempPath, 'default')
         self.fileBrowserLayout = QVBoxLayout()
         self.pathLayout = QHBoxLayout()
         self.projectPathLabel = QLabel("Project Path:")
@@ -1175,6 +1177,19 @@ class DiagramEditor(QWidget):
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
         self.pathLayout.addWidget(self.setProjectPathButton)
+        # self.addButton = QPushButton()
+        # self.addButton.clicked.connect(self.addFile)
+        # self.addButton.setIcon(QIcon('images/plus.png'))
+        # self.addButton.setIconSize(QSize(25,25))
+        # self.addButton.setDisabled(True)
+        # self.delButton = QPushButton()
+        # self.delButton.clicked.connect(self.delFile)
+        # self.delButton.setIcon(QIcon('images/close.png'))
+        # self.delButton.setIconSize(QSize(25, 25))
+        # self.delButton.setDisabled(True)
+        # self.buttonLayout = QHBoxLayout()
+        # self.buttonLayout.addWidget(self.addButton)
+        # self.buttonLayout.addWidget(self.delButton)
         self.scroll = QScrollArea()
         # self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         # self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -1184,6 +1199,7 @@ class DiagramEditor(QWidget):
         self.scroll.setWidget(self.splitter)
         self.scroll.setFixedWidth(300)
         self.fileBrowserLayout.addLayout(self.pathLayout)
+        # self.fileBrowserLayout.addLayout(self.buttonLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
 
 
@@ -2643,11 +2659,49 @@ class DiagramEditor(QWidget):
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
         if self.projectPath !='':
             self.PPL.setText(self.projectPath)
+            # self.addButton.setEnabled(True)
+            # self.delButton.setEnabled(True)
+
+            loadPath = os.path.join(self.projectPath, 'ddck')
+            if not os.path.exists(loadPath):
+                os.makedirs(loadPath)
+
+            self.model = MyQFileSystemModel()
+            self.model.setRootPath(loadPath)
+            self.model.setName('ddck')
+            self.tree = MyQTreeView(self.model, self)
+            self.tree.setModel(self.model)
+            self.tree.setRootIndex(self.model.index(loadPath))
+            self.tree.setObjectName("ddck")
+            self.tree.setMinimumHeight(600)
+            self.tree.setSortingEnabled(True)
+            self.splitter.addWidget(self.tree)
+
             for o in self.trnsysObj:
                 if hasattr(o, 'updateTreePath'):
                     o.updateTreePath(self.projectPath)
 
-
+    # def addFile(self):
+    #     fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
+    #     simpFileName = fileName.split('/')[-1]
+    #     loadPath = os.path.join(self.projectPath, 'ddck')
+    #     loadPath = os.path.join(loadPath, simpFileName)
+    #     if fileName != '':
+    #         print("file loaded into %s" % loadPath)
+    #         if Path(loadPath).exists():
+    #             qmb = QMessageBox()
+    #             qmb.setText("Warning: " +
+    #                         "A file with the same name exists already. Do you want to overwrite or cancel?")
+    #             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+    #             qmb.setDefaultButton(QMessageBox.Cancel)
+    #             ret = qmb.exec()
+    #             if ret == QMessageBox.Save:
+    #                 print("Overwriting")
+    #                 # continue
+    #             else:
+    #                 print("Canceling")
+    #                 return
+    #         shutil.copy(fileName, loadPath)
     # def printEMF(self):
     #     """
     #                 ---------------------------------------------
