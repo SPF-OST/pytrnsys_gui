@@ -45,7 +45,8 @@ class MyQTreeView(QTreeView):
         print("Opening file")
         filePath = self.getFilePath()
         try:
-            os.startfile(filePath)
+            if os.path.isfile(filePath):
+                os.startfile(filePath)
         except OSError:
             msg = QMessageBox()
             msg.setText("No application is associated with the specified file for this operation")

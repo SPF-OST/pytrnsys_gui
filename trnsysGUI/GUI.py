@@ -4,6 +4,7 @@ import glob
 import re
 import shutil
 import string
+from datetime import datetime
 from math import sqrt, acos, pi, degrees, atan
 
 import sys
@@ -1165,8 +1166,7 @@ class DiagramEditor(QWidget):
 
         # for file browser
         self.projectPath = ''
-        self.tempPath = os.path.dirname(__file__)
-        self.tempPath = os.path.join(self.tempPath, 'default')
+        self.tempPath = self.createProjectFolder()
         self.fileBrowserLayout = QVBoxLayout()
         self.pathLayout = QHBoxLayout()
         self.projectPathLabel = QLabel("Project Path:")
@@ -1201,6 +1201,7 @@ class DiagramEditor(QWidget):
         self.fileBrowserLayout.addLayout(self.pathLayout)
         # self.fileBrowserLayout.addLayout(self.buttonLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
+        self.createDdckTree(self.tempPath)
 
 
         self.horizontalLayout.addLayout(self.vertL)
@@ -2110,6 +2111,11 @@ class DiagramEditor(QWidget):
 
         self.diagramName = newName
         self.parent().currentFile = newName
+        # fromPath = self.tempPath
+        # destPath = os.path.dirname(__file__)
+        # destPath = os.path.join(destPath, 'default')
+        # destPath = os.path.join(destPath, newName)
+        # os.rename(fromPath, destPath)
 
         # print("Path is now: " + str(self.saveAsPath))
         # print("Diagram name is: " + self.diagramName)
@@ -2672,20 +2678,44 @@ class DiagramEditor(QWidget):
             if not os.path.exists(loadPath):
                 os.makedirs(loadPath)
 
-            self.model = MyQFileSystemModel()
-            self.model.setRootPath(loadPath)
-            self.model.setName('ddck')
-            self.tree = MyQTreeView(self.model, self)
-            self.tree.setModel(self.model)
-            self.tree.setRootIndex(self.model.index(loadPath))
-            self.tree.setObjectName("ddck")
-            self.tree.setMinimumHeight(600)
-            self.tree.setSortingEnabled(True)
-            self.splitter.addWidget(self.tree)
+            self.createDdckTree(loadPath)
 
             for o in self.trnsysObj:
                 if hasattr(o, 'updateTreePath'):
                     o.updateTreePath(self.projectPath)
+
+    def createDdckTree(self, loadPath):
+        treeToRemove = self.findChild(QTreeView, 'ddck')
+        try:
+            # treeToRemove.hide()
+            treeToRemove.deleteLater()
+        except AttributeError:
+            print("Widget doesnt exist!")
+        else:
+            print("Deleted widget")
+        if self.projectPath == '':
+            loadPath = os.path.join(loadPath, 'ddck')
+        if not os.path.exists(loadPath):
+            os.makedirs(loadPath)
+        self.model = MyQFileSystemModel()
+        self.model.setRootPath(loadPath)
+        self.model.setName('ddck')
+        self.tree = MyQTreeView(self.model, self)
+        self.tree.setModel(self.model)
+        self.tree.setRootIndex(self.model.index(loadPath))
+        self.tree.setObjectName("ddck")
+        self.tree.setMinimumHeight(600)
+        self.tree.setSortingEnabled(True)
+        self.splitter.addWidget(self.tree)
+
+    def createProjectFolder(self):
+        self.date_time = datetime.now().strftime("%Y%m%d%H%M%S")
+        projectPath = os.path.dirname(__file__)
+        projectPath = os.path.join(projectPath, 'project')
+        projectPath = os.path.join(projectPath, self.date_time)
+        if not os.path.exists(projectPath):
+            os.makedirs(projectPath)
+        return projectPath
 
     # def addFile(self):
     #     fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
@@ -2973,6 +3003,7 @@ class MainWindow(QMainWindow):
         self.centralWidget = DiagramEditor()
         self.setCentralWidget(self.centralWidget)
         self.currentFile = 'Untitled'
+
 
     def saveDia(self):
         print("Saving diagram")
@@ -3366,6 +3397,19 @@ class MainWindow(QMainWindow):
     def closeEvent(self, e):
         """Saves the current diagram into the Diagram Folder"""
         # self.centralWidget.saveAtClose()
+        # print(self.centralWidget.tempPath)
+        # qmb = QMessageBox()
+        # qmb.setText("Save all loaded files?")
+        # qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+        # qmb.setDefaultButton(QMessageBox.Cancel)
+        # ret = qmb.exec()
+        # if ret == QMessageBox.Save:
+        #     print("Saving")
+        #     # continue
+        # else:
+        #     print("Removing files")
+        #     self.centralWidget.fileBrowserLayout.deleteLater()
+        #     shutil.rmtree(self.centralWidget.tempPath)
         e.accept()
 
     def setPaths(self):

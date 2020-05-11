@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+from datetime import datetime
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QImage
@@ -68,8 +69,12 @@ class AirSourceHP(BlockItem):
         print(self.parent.parent())
         pathName = 'HP_' + self.displayName
         if self.parent.parent().projectPath =='':
-            self.path = os.path.dirname(__file__)
-            self.path = os.path.join(self.path, 'default')
+            # self.path = os.path.dirname(__file__)
+            # self.path = os.path.join(self.path, 'default')
+            self.path = self.parent.parent().tempPath
+            # now = datetime.now()
+            # self.fileName = now.strftime("%Y%m%d%H%M%S")
+            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, 'ddck')
