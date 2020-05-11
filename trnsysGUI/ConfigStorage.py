@@ -489,6 +489,9 @@ class ConfigStorage(QDialog):
                     self.storage.parent.scene().removeItem(i)
 
     def modifyHx(self):
+        """
+        Modify Hx by deleting the old Hx and creating a new one according to user input
+        """
         # print("Left: ")
         # print(self.listWL.selectedItems())
         # print("\nRight: ")
@@ -502,6 +505,9 @@ class ConfigStorage(QDialog):
                 self.removeHxR()
 
     def modifyPort(self):
+        """
+        Modify existing ports by deleting old ports and creating new ports according to user input.
+        """
         if len(self.listWL2.selectedItems()) == 0 and len(self.listWR2.selectedItems()) == 0:
             return
         elif len(self.listWL2.selectedItems()) > 0:

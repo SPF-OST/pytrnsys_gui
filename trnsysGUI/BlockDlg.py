@@ -90,8 +90,8 @@ class BlockDlg(QDialog):
                 return True
         return False
 
+    # unused
     def loadFile(self):
-        # TODO : show file loaded on the dialog
         print("Opening diagram")
         # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.ddck")[0]

@@ -285,6 +285,9 @@ class MassFlowVisualizer(QDialog):
             self.slider.setEnabled(True)
 
     def testValChange(self):
+        """
+        Updates mass flow visualizer after releasing the mouse
+        """
         val = self.slider.value()
         print("Slider value has changed to " + str(val))
         time = self.getTime(val)
@@ -293,7 +296,9 @@ class MassFlowVisualizer(QDialog):
         self.advance()
 
     def moveValues(self):
-
+        """
+        Updates mass flow visualizer when moving the mouse
+        """
         val = self.slider.value()
         print("Slider value is still: " + str(val))
         time = self.getTime(val)
@@ -423,12 +428,18 @@ class MassFlowVisualizer(QDialog):
         # sys.exit()
 
     def getTime(self, row):
+        """
+        Gets the time of the current time step
+        """
         data = self.massFlowData
         timeColumn = data[data.columns[0]]
         print(timeColumn[row])
         return timeColumn[row]
 
     def convertTime(self, time):
+        """
+        Convert the time into YYYY--MM--DD HH:MM:SS format
+        """
         noOfHours = 8760
         decHour = float(time) / float(noOfHours)
         base = datetime(MINYEAR, 1, 1)

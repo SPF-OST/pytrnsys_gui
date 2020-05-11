@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import QTreeView, QMenu, QMessageBox, QFileDialog
 
 class MyQTreeView(QTreeView):
     def __init__(self, model, blockitem):
+        """
+        Self defined QTreeView that contains operations related to the file explorer
+        """
         super(QTreeView, self).__init__()
         self.setContextMenuPolicy(True)
         self.customContextMenuRequested.connect(self.contextMenuEvent)
@@ -16,6 +19,10 @@ class MyQTreeView(QTreeView):
     def mouseDoubleClickEvent(self, event):
         print("Double clicked")
         self.openFile()
+
+    def mousePressEvent(self,event):
+        self.clearSelection()
+        QTreeView.mousePressEvent(self, event)
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -32,6 +39,9 @@ class MyQTreeView(QTreeView):
         menu.exec_(event.globalPos())
 
     def openFile(self):
+        """
+        When double click on a row, this method is called to open the double clicked file
+        """
         print("Opening file")
         filePath = self.getFilePath()
         try:
@@ -42,6 +52,10 @@ class MyQTreeView(QTreeView):
             msg.exec_()
 
     def loadFile(self):
+        """
+        Loads a file into the project path defined by the user.
+        Checks if file already exists and allows user to override or cancel the load.
+        """
         filePath = self.model.rootPath()
         fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
         simpFileName = fileName.split('/')[-1]
@@ -65,6 +79,9 @@ class MyQTreeView(QTreeView):
             shutil.copy(fileName, filePath)
 
     def delFile(self):
+        """
+        Deletes the selected file from the folder
+        """
         print("Deleting file")
         filePath = self.getSelectedFile()
         if filePath == 0:
@@ -77,10 +94,17 @@ class MyQTreeView(QTreeView):
             msg.exec_()
 
     def getFilePath(self):
+        """
+        Get the index of the selected file.
+        If nothing is selected, get the index of the top file
+        """
         index = self.currentIndex()
         return self.model.filePath(index)
 
     def getSelectedFile(self):
+        """
+        Gets the selected file, used for delection.
+        """
         try:
             index = self.selectedIndexes()[0]
         except IndexError:

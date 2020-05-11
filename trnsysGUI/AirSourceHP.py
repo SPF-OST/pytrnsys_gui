@@ -61,6 +61,10 @@ class AirSourceHP(BlockItem):
         return w, h
 
     def addTree(self):
+        """
+        When a blockitem is added to the main window.
+        A file explorer for that item is added to the right of the main window by calling this method
+        """
         print(self.parent.parent())
         pathName = 'HP_' + self.displayName
         if self.parent.parent().projectPath =='':
@@ -95,6 +99,10 @@ class AirSourceHP(BlockItem):
     #         shutil.copy(file, filePath)
 
     def updateTreePath(self, path):
+        """
+        When the user chooses the project path for the file explorers, this method is called
+        to update the root path.
+        """
         pathName = 'HP_' + self.displayName
         self.path = os.path.join(path, "ddck")
         self.path = os.path.join(self.path, pathName)

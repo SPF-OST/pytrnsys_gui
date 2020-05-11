@@ -2656,6 +2656,12 @@ class DiagramEditor(QWidget):
             print("File exported to %s" % fn)
 
     def setProjectPath(self):
+        """
+        This method is called when the 'Set Path' button for the file explorers is clicked.
+        It sets the project path to the one defined by the user and updates the root path of every
+        item inside the main window.
+        If the path defined by the user doesn't exist. Creates that path.
+        """
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
         if self.projectPath !='':
             self.PPL.setText(self.projectPath)
@@ -3363,9 +3369,15 @@ class MainWindow(QMainWindow):
         e.accept()
 
     def setPaths(self):
+        """
+        Sets the export, diagram, ddck and trnsys path.
+        """
         pathDialog = PathSetUp(self)
 
     def checkFilePaths(self):
+        """
+        Checks if all file paths have been set. If not, call setPaths
+        """
         if getattr(sys, 'frozen', False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
@@ -3377,6 +3389,9 @@ class MainWindow(QMainWindow):
             pathSetUpDialog = PathSetUp(self)
 
     def setTrnsysPath(self):
+        """
+        Sets the trnsys path during start up, after user has defined it.
+        """
         if getattr(sys, 'frozen', False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
@@ -3387,6 +3402,10 @@ class MainWindow(QMainWindow):
         self.centralWidget.trnsysPath = os.path.join(data[3][:-1], 'TRNExe.exe')
 
     def debugConns(self):
+        """
+        Check each block items for error connections.
+        Returns warning message if blockitem contains two input connections or two output connections
+        """
         print("trnsysObjs:", self.centralWidget.trnsysObj)
         self.noErrorConns = True
         for o in self.centralWidget.trnsysObj:

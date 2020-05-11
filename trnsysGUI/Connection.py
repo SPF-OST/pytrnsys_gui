@@ -143,6 +143,9 @@ class Connection(object):
             s.labelMass.setPlainText(self.mass)
 
     def setMassAndTemperature(self, mass, temp):
+        """
+        To show the mass and temperature during mass flow visualization
+        """
         self.mass = float(mass)
         self.mass = '{:,}'.format(self.mass)
         self.temperature = temp

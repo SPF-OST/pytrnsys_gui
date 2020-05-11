@@ -10,6 +10,9 @@ from PyQt5.QtGui import QIcon
 class PathSetUp(QDialog):
 
     def __init__(self, parent=None):
+        """
+        A dialog box that allows user to choose the paths for export, diagrams, ddcks and trnsys
+        """
         super(PathSetUp, self).__init__(parent)
 
         self.currentExportPath, self.currentDiagramPath, self.currentDdckPath, self.currentTrnsysPath = self.getCurrentPaths()
@@ -88,6 +91,9 @@ class PathSetUp(QDialog):
     def doneEdit(self):
         """
         Saves the paths into filepath.txt
+        Checks if any paths is not set, if there are any unset paths, prompt the user to set it by popping up
+        error messages.
+        Only when all paths are set will it save into filepath.txt
         """
         self.exportFlag = False
         self.diagramFlag = False
@@ -163,12 +169,18 @@ class PathSetUp(QDialog):
         pass
 
     def setDdckPath(self):
+        """
+        Lets user choose a directory for exporting ddcks
+        """
         self.ddckPath = str(QFileDialog.getExistingDirectory(self, "Select Ddck Path"))
         if self.ddckPath != '':
             self.le3.setText(self.ddckPath)
         pass
 
     def setTrnsysPath(self):
+        """
+        Lets user choose the directory when TRNExe.exe is found
+        """
         self.trnsysPath = str(QFileDialog.getExistingDirectory(self, "Select Trnsys Path"))
         if self.trnsysPath != '':
             self.le4.setText(self.trnsysPath)
@@ -177,7 +189,7 @@ class PathSetUp(QDialog):
     def getCurrentPaths(self):
         """
         read from filepath.txt to get current paths.
-        returns export path and diagram path.
+        returns all the paths.
         """
         print("File:", __file__)
         if getattr(sys, 'frozen', False):
@@ -226,6 +238,12 @@ class PathSetUp(QDialog):
         return exportPath, diagramPath, ddckPath, trnsysPath
 
     def writeIntoFile(self, string1, string2, string3, string4):
+        """
+        Writes to filepath.txt
+        Checks if the strings passed in are empty, if not empty, check if filepath contains an existing
+        entry for tht string (regardless of it being empty or not). If no, create an entry and append the string
+        to that entry. If yes, override the existing entry.
+        """
         if getattr(sys, 'frozen', False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
