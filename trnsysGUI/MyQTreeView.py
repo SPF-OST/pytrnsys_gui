@@ -2,7 +2,8 @@ import os
 import shutil
 from pathlib import Path
 
-from PyQt5.QtWidgets import QTreeView, QMenu, QMessageBox, QFileDialog
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTreeView, QMenu, QMessageBox, QFileDialog, QInputDialog
 
 
 class MyQTreeView(QTreeView):
@@ -35,6 +36,9 @@ class MyQTreeView(QTreeView):
 
         dele = menu.addAction("Delete")
         dele.triggered.connect(self.delFile)
+
+        editP = menu.addAction("Edit priority")
+        editP.triggered.connect(self.editPriority)
 
         menu.exec_(event.globalPos())
 
@@ -94,6 +98,12 @@ class MyQTreeView(QTreeView):
             msg.setText("Cannot delete folder!")
             msg.exec_()
 
+    def editPriority(self):
+        priority = self.getInteger()
+        index = self.currentIndex()
+        self.model.setData(index, priority, Qt.DisplayRole)
+        print(self.model.itemData(index))
+
     def getFilePath(self):
         """
         Get the index of the selected file.
@@ -115,3 +125,9 @@ class MyQTreeView(QTreeView):
             return 0
         else:
             return self.model.filePath(index)
+
+    def getInteger(self):
+        i, okPressed = QInputDialog.getInt(self, "Get integer", "Value:", 28, 0, 100, 1)
+        if okPressed:
+            return i
+

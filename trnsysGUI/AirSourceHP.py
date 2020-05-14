@@ -5,7 +5,7 @@ from datetime import datetime
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QTreeView, QMessageBox
+from PyQt5.QtWidgets import QTreeView, QMessageBox, QFileDialog
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
@@ -89,6 +89,8 @@ class AirSourceHP(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
+        for i in range(1, self.model.columnCount()-1):
+            self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
