@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QHBoxLayout, QListWidget, QPushButton, QSpacerItem, \
-    QVBoxLayout, QRadioButton, QDialog, QTabWidget, QWidget
+    QVBoxLayout, QRadioButton, QDialog, QTabWidget, QWidget, QMessageBox
 
 from trnsysGUI.HeatExchanger import HeatExchanger
 
@@ -281,13 +281,13 @@ class ConfigStorage(QDialog):
         -------
 
         """
-        if float(self.offsetLeI.text()) > 100:
-            self.offsetLeI.setText('100')
+        # if float(self.offsetLeI.text()) > 100:
+        #     self.offsetLeI.setText('100')
+        #
+        # if float(self.offsetLeO.text()) < 0:
+        #     self.offsetLeO.setText('0')
 
-        if float(self.offsetLeO.text()) < 0:
-            self.offsetLeO.setText('0')
-
-        if self.minOffsetDistance() and float(self.offsetLeI.text()) > float(self.offsetLeO.text() and self.offsetsInRange()):
+        if self.minOffsetDistance() and float(self.offsetLeI.text()) > float(self.offsetLeO.text()) and self.offsetsInRange():
             print("Adding hx")
             if self.rButton.isChecked():
                 print("addhxr")
@@ -296,13 +296,15 @@ class ConfigStorage(QDialog):
                 print("addhxl")
                 self.addHxL()
         else:
-            print("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
+            msgb = QMessageBox()
+            msgb.setText("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
+            msgb.exec_()
 
     def minOffsetDistance(self):
         return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 20
 
     def offsetsInRange(self):
-        return (0 < float(self.offsetLeI.text()) < 100) and (0 < float(self.offsetLeO.text()) < 100)
+        return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
 
     def addHxL(self):
         """

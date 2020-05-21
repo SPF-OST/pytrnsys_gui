@@ -860,6 +860,11 @@ class StorageTank(BlockItem):
 
     def exportDck(self):
 
+        if not self.checkConnExists():
+            msgb = QMessageBox()
+            msgb.setText("Please connect all ports before exporting!")
+            msgb.exec_()
+            return
         noError = self.debugConn()
 
         if not noError:
@@ -1018,6 +1023,23 @@ class StorageTank(BlockItem):
             noError = True
 
         return noError
+
+    def checkConnExists(self):
+        for hx in self.heatExchangers:
+            if len(hx.port1.connectionList) < 2:
+                return False
+            if len(hx.port2.connectionList) < 2:
+                return False
+
+        for ports in self.leftSide:
+            if len(ports.connectionList) < 2:
+                return False
+
+        for ports in self.rightSide:
+            if len(ports.connectionList) < 2:
+                return False
+
+        return True
 
     def addTree(self):
         """
