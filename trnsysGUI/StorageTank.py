@@ -1,16 +1,19 @@
 import os
 import random
+import shutil
 import sys
 from pathlib import Path
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QMenu, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QMenu, QMessageBox, QFileDialog, QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
 from trnsysGUI.Connector import Connector
 from trnsysGUI.HeatExchanger import HeatExchanger
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
+from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.Connection import Connection
@@ -46,6 +49,7 @@ class StorageTank(BlockItem):
         self.storageType = self.parent.parent().idGen.getStorageType()
 
         self.changeSize()
+        self.addTree()
 
     # Setter functions
     def setParent(self, p):
@@ -966,15 +970,19 @@ class StorageTank(BlockItem):
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
 
         tool.createDDck(filePath, name, self.displayName, typeFile="ddck")
+        self.loadedTo = exportPath
 
     def loadDck(self):
         print("Opening diagram")
         # self.centralWidget.delBlocks()
-        fileName = QFileDialog.getOpenFileName(self.dia, "Open diagram", filter="*.ddck")[0]
-        if fileName != '':
-            self.dckFilePath = fileName
-        else:
-            print("No filename chosen")
+        # fileName = QFileDialog.getOpenFileName(self.dia, "Open diagram", filter="*.ddck")[0]
+        # if fileName != '':
+        #     self.dckFilePath = fileName
+        # else:
+        #     print("No filename chosen")
+        self.exportDck()
+        filePath = self.model.rootPath()
+        shutil.copy(self.loadedTo, filePath)
 
     def debugConn(self):
         print("Debugging conn")
@@ -1010,3 +1018,96 @@ class StorageTank(BlockItem):
             noError = True
 
         return noError
+
+    def addTree(self):
+        """
+        When a blockitem is added to the main window.
+        A file explorer for that item is added to the right of the main window by calling this method
+        """
+        print(self.parent.parent())
+        pathName = 'Tes_' + self.displayName
+        if self.parent.parent().projectPath =='':
+            # self.path = os.path.dirname(__file__)
+            # self.path = os.path.join(self.path, 'default')
+            self.path = self.parent.parent().tempPath
+            # now = datetime.now()
+            # self.fileName = now.strftime("%Y%m%d%H%M%S")
+            # self.path = os.path.join(self.path, self.fileName)
+        else:
+            self.path = self.parent.parent().projectPath
+        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, pathName)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+
+        self.model = MyQFileSystemModel()
+        self.model.setRootPath(self.path)
+        self.model.setName(self.displayName)
+        self.tree = MyQTreeView(self.model, self)
+        self.tree.setModel(self.model)
+        self.tree.setRootIndex(self.model.index(self.path))
+        self.tree.setObjectName("%sTree" % self.displayName)
+        # for i in range(1, self.model.columnCount()-1):
+        #     self.tree.hideColumn(i)
+        self.tree.setMinimumHeight(200)
+        self.tree.setSortingEnabled(True)
+        self.parent.parent().splitter.addWidget(self.tree)
+
+    # def loadFile(self, file):
+    #     filePath = self.parent.parent().projectPath
+    #     msgB = QMessageBox()
+    #     if filePath == '':
+    #         msgB.setText("Please select a project path before loading!")
+    #         msgB.exec_()
+    #     else:
+    #         print("file loaded into %s" % filePath)
+    #         shutil.copy(file, filePath)
+
+    def updateTreePath(self, path):
+        """
+        When the user chooses the project path for the file explorers, this method is called
+        to update the root path.
+        """
+        pathName = 'Tes_' + self.displayName
+        self.path = os.path.join(path, "ddck")
+        self.path = os.path.join(self.path, pathName)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        self.model.setRootPath(self.path)
+        self.tree.setRootIndex(self.model.index(self.path))
+
+    def deleteBlock(self):
+        """
+                Overridden method to also delete folder
+        """
+        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.deleteConns()
+        # print("self.parent.parent" + str(self.parent.parent()))
+        self.parent.parent().trnsysObj.remove(self)
+        print("deleting block " + str(self) + self.displayName)
+        # print("self.scene is" + str(self.parent.scene()))
+        self.parent.scene().removeItem(self)
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        shutil.rmtree(self.path)
+        try:
+            widgetToRemove.hide()
+        except AttributeError:
+            print("Widget doesnt exist!")
+        else:
+            print("Deleted widget")
+        del self
+
+    def setName(self, newName):
+        """
+        Overridden method to also change folder name
+        """
+        self.displayName = newName
+        self.label.setPlainText(newName)
+        self.model.setName(self.displayName)
+        self.tree.setObjectName("%sTree" % self.displayName)
+        print(os.path.dirname(self.path))
+        destPath = str(os.path.dirname(self.path))+'\\Tes_'+self.displayName
+        if os.path.exists(self.path):
+            os.rename(self.path, destPath)
+            self.path = destPath
+            print(self.path)

@@ -67,7 +67,7 @@ class AirSourceHP(BlockItem):
         A file explorer for that item is added to the right of the main window by calling this method
         """
         print(self.parent.parent())
-        pathName = 'HP_' + self.displayName
+        pathName = 'AirSourceHP_' + self.displayName
         if self.parent.parent().projectPath =='':
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
@@ -89,28 +89,18 @@ class AirSourceHP(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
-            self.tree.hideColumn(i)
+        # for i in range(1, self.model.columnCount()-1):
+        #     self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         print("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
 
     def updateTreePath(self, path):
         """
         When the user chooses the project path for the file explorers, this method is called
         to update the root path.
         """
-        pathName = 'HP_' + self.displayName
+        pathName = 'AirSourceHP_' + self.displayName
         self.path = os.path.join(path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
@@ -148,7 +138,7 @@ class AirSourceHP(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         print(os.path.dirname(self.path))
-        destPath = str(os.path.dirname(self.path))+'\\HP_'+self.displayName
+        destPath = str(os.path.dirname(self.path))+'\\AirSourceHP_'+self.displayName
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

@@ -17,6 +17,11 @@ class MyQTreeView(QTreeView):
         self.model = model
         self.item = blockitem
 
+        # for i in range(1, self.model.columnCount()-1):
+        #     print('Is column %i hidden : %r' % (i, self.isColumnHidden(i)))
+        #     self.hideColumn(i)
+        #     print('Is column %i hidden : %r' % (i, self.isColumnHidden(i)))
+
     def mouseDoubleClickEvent(self, event):
         print("Double clicked")
         self.openFile()
@@ -62,7 +67,7 @@ class MyQTreeView(QTreeView):
         Checks if file already exists and allows user to override or cancel the load.
         """
         filePath = self.model.rootPath()
-        fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
+        fileName = QFileDialog.getOpenFileName(self, "Load file", "/Users/parad/OneDrive/Desktop/pytrnsys/pytrnsys/ddck", filter="*.ddck")[0]
         simpFileName = fileName.split('/')[-1]
         loadPath = os.path.join(filePath, simpFileName)
         print(loadPath)
@@ -82,21 +87,36 @@ class MyQTreeView(QTreeView):
                     print("Canceling")
                     return
             shutil.copy(fileName, filePath)
+            # self.item.parent().centralWidget.fileList.append(filePath)
+            try:
+                fileList = self.item.parent.parent().fileList
+            except AttributeError:
+                fileList = self.item.parent().centralWidget.fileList
+            fileList.append(loadPath)
 
     def delFile(self):
         """
         Deletes the selected file from the folder
         """
         print("Deleting file")
-        filePath = self.getSelectedFile()
+        filePath = self.rreplace(str(self.getSelectedFile()), "/", "\\", 1)
         if filePath == 0:
             return
         try:
             os.remove(filePath)
+            try:
+                self.item.parent.parent().fileList.remove(str(filePath))
+            except AttributeError:
+                print("find this", self.item.parent().centralWidget.fileList[0], filePath)
+                self.item.parent().centralWidget.fileList.remove(str(filePath))
         except OSError:
             msg = QMessageBox()
             msg.setText("Cannot delete folder!")
             msg.exec_()
+
+    def rreplace(self, string, old, new, occurrence):
+        li = string.rsplit(old, occurrence)
+        return new.join(li)
 
     def editPriority(self):
         priority = self.getInteger()

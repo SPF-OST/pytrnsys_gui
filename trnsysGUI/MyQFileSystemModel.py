@@ -22,29 +22,20 @@ class MyQFileSystemModel(QFileSystemModel):
             return super(QFileSystemModel, self).headerData(section, orientation, role)
 
     def columnCount(self, parent=QModelIndex()):
-        return super(MyQFileSystemModel, self).columnCount() + 1
+        # return super(MyQFileSystemModel, self).columnCount() + 1
+        return 1
 
-    def data(self, index, role):
-        if index.column() == self.columnCount() - 1:
-            if role == Qt.DisplayRole:
-                return "0"
-            if role == Qt.TextAlignmentRole:
-                return Qt.AlignHCenter
-        return super(MyQFileSystemModel, self).data(index, role)
-
-    def setData(self, index, value, role):
-        print("This is ran0")
-        print(self.columnCount() - 1, index.column(), value)
-        if index.column() == 4:
-            print("This is ran1")
-            if role == Qt.DisplayRole:
-                print("This is ran2")
-                return value
-        return super(MyQFileSystemModel, self).setData(index, value, role)
-    # def setData(self, index, value, role):
-    #     if index.column() == 0:
+    # def data(self, index, role):
+    #     if index.column() == self.columnCount() - 1:
     #         if role == Qt.DisplayRole:
-    #             return value
+    #             return "0"
     #         if role == Qt.TextAlignmentRole:
     #             return Qt.AlignHCenter
+    #     return super(MyQFileSystemModel, self).data(index, role)
+
+    # def setData(self, index, value, role):
+    #     print(self.columnCount() - 1, index.column(), value)
+    #     if index.column() == self.columnCount() - 1:
+    #         if role == Qt.DisplayRole:
+    #             return value
     #     return super(MyQFileSystemModel, self).setData(index, value, role)

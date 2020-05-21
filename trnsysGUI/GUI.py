@@ -21,6 +21,7 @@ from pathlib import Path
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PathSetUp import PathSetUp
@@ -1166,6 +1167,7 @@ class DiagramEditor(QWidget):
 
         # for file browser
         self.projectPath = ''
+        self.fileList = []
         self.tempPath = self.createProjectFolder()
         self.fileBrowserLayout = QVBoxLayout()
         self.pathLayout = QHBoxLayout()
@@ -1194,7 +1196,7 @@ class DiagramEditor(QWidget):
         # self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         # self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setWidgetResizable(True)
-        self.splitter = QSplitter(Qt.Vertical)
+        self.splitter = QSplitter(Qt.Vertical,)
         self.splitter.setChildrenCollapsible(False)
         self.scroll.setWidget(self.splitter)
         self.scroll.setFixedWidth(300)
@@ -1202,6 +1204,8 @@ class DiagramEditor(QWidget):
         # self.fileBrowserLayout.addLayout(self.buttonLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
         self.createDdckTree(self.tempPath)
+        self.createConfigBrowser(self.tempPath)
+        self.copyGenericFolder(self.tempPath)
 
 
         self.horizontalLayout.addLayout(self.vertL)
@@ -2678,6 +2682,8 @@ class DiagramEditor(QWidget):
             if not os.path.exists(loadPath):
                 os.makedirs(loadPath)
 
+            self.createConfigBrowser(self.projectPath)
+            self.copyGenericFolder(self.projectPath)
             self.createDdckTree(loadPath)
 
             for o in self.trnsysObj:
@@ -2706,7 +2712,42 @@ class DiagramEditor(QWidget):
         self.tree.setObjectName("ddck")
         self.tree.setMinimumHeight(600)
         self.tree.setSortingEnabled(True)
-        self.splitter.addWidget(self.tree)
+        self.splitter.insertWidget(0, self.tree)
+
+    def createConfigBrowser(self, loadPath):
+        self.layoutToRemove = self.findChild(QHBoxLayout, 'Config_Layout')
+        try:
+            # treeToRemove.hide()
+            self.layoutToRemove.deleteLater()
+        except AttributeError:
+            print("Widget doesnt exist!")
+        else:
+            print("Deleted widget")
+        configPath = os.path.dirname(__file__)
+        configPath = os.path.join(configPath, 'project')
+        configPath = os.path.join(configPath, 'keepMe')
+        self.emptyConfig = os.path.join(configPath, 'run.config')
+        # projectPath = os.path.join(configPath, self.date_time)
+        shutil.copy(self.emptyConfig, loadPath)
+        self.HBox = QHBoxLayout()
+        self.refreshButton = QPushButton(self)
+        self.refreshButton.setIcon(QIcon('images/rotate-to-right.png'))
+        self.refreshButton.clicked.connect(self.refreshConfig)
+        self.model = MyQFileSystemModel()
+        self.model.setRootPath(loadPath)
+        self.model.setName('Config File')
+        self.model.setFilter(QDir.Files)
+        self.tree = MyQTreeView(self.model, self)
+        self.tree.setModel(self.model)
+        self.tree.setRootIndex(self.model.index(loadPath))
+        self.tree.setObjectName("config")
+        self.tree.setFixedHeight(60)
+        self.tree.setSortingEnabled(False)
+        self.HBox.addWidget(self.refreshButton)
+        self.HBox.addWidget(self.tree)
+        self.HBox.setObjectName("Config_Layout")
+        self.fileBrowserLayout.addLayout(self.HBox)
+        print(self.emptyConfig)
 
     def createProjectFolder(self):
         self.date_time = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -2716,6 +2757,57 @@ class DiagramEditor(QWidget):
         if not os.path.exists(projectPath):
             os.makedirs(projectPath)
         return projectPath
+
+    def refreshConfig(self):
+        # configPath = os.path.dirname(__file__)
+        # configPath = os.path.join(configPath, 'project')
+        # configPath = os.path.join(configPath, self.date_time)
+        # emptyConfig = os.path.join(configPath, 'run.config')
+        if self.projectPath == '':
+            localPath = self.tempPath
+        else:
+            localPath = self.projectPath
+
+        self.configToEdit = os.path.join(localPath, 'run.config')
+        os.remove(self.configToEdit)
+        shutil.copy(self.emptyConfig, localPath)
+        self.configToEdit = os.path.join(localPath, 'run.config')
+
+        localDdckPath = os.path.join(localPath, "ddck")
+        with open(self.configToEdit, 'r') as file:
+            lines = file.readlines()
+        localPathStr = "string LOCAL$ %s" % str(localDdckPath)
+        # localPathStr.replace('/', '\\')
+        lines[21] = localPathStr + '\n'
+
+        with open(self.configToEdit, 'w') as file:
+            file.writelines(lines)
+
+        # print(localPathStr)
+        self.userInputList()
+
+    def userInputList(self):
+        print(self.fileList)
+        dia = FileOrderingDialog(self.fileList, self)
+
+    def copyGenericFolder(self, loadPath):
+
+        genericPath = os.path.dirname(__file__)
+        genericPath = os.path.join(genericPath, 'project')
+        genericPath = os.path.join(genericPath, 'keepMe')
+        genericPath = os.path.join(genericPath, 'generic')
+        self.headerFile = os.path.join(genericPath, 'head.ddck')
+        self.endFile = os.path.join(genericPath, 'end.ddck')
+
+        self.genericFolder = os.path.join(loadPath, 'ddck')
+        self.genericFolder = os.path.join(self.genericFolder, 'generic')
+
+        if not os.path.exists(self.genericFolder):
+            os.makedirs(self.genericFolder)
+
+        shutil.copy(self.headerFile, self.genericFolder)
+        shutil.copy(self.endFile, self.genericFolder)
+        pass
 
     # def addFile(self):
     #     fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]

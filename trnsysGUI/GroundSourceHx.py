@@ -146,7 +146,7 @@ class GroundSourceHx(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         print(os.path.dirname(self.path))
-        destPath = str(os.path.dirname(self.path))+'\\Ground_Hx'+self.displayName
+        destPath = str(os.path.dirname(self.path))+'\\Ground_Hx_'+self.displayName
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

@@ -38,7 +38,7 @@ class ConfigStorage(QDialog):
         h0.addWidget(description)
         h0.addWidget(loadButton)
         h0.addWidget(exportButton)
-        loadButton.setEnabled(False)
+        # loadButton.setEnabled(False)
 
         tankNameLabel = QLabel()
         tankNameLabel.setText("<b>Tank name: </b>")
