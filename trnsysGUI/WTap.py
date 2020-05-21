@@ -18,6 +18,7 @@ class WTap(BlockItem):
         self.w = 100 * factor
         self.h = 100 * factor
         self.inputs.append(PortItem('i', 0, self))
+        self.loadedFiles = []
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -162,6 +163,7 @@ class WTap(BlockItem):
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
         shutil.rmtree(self.path)
+        self.deleteLoadedFile()
         try:
             widgetToRemove.hide()
         except AttributeError:
@@ -184,3 +186,11 @@ class WTap(BlockItem):
             os.rename(self.path, destPath)
             self.path = destPath
             print(self.path)
+
+    def deleteLoadedFile(self):
+        for items in self.loadedFiles:
+            try:
+                self.parent.parent().fileList.remove(str(items))
+            except AttributeError:
+                print("find this", self.item.parent().centralWidget.fileList[0], items)
+                self.parent().centralWidget.fileList.remove(str(items))

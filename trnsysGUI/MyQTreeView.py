@@ -93,6 +93,12 @@ class MyQTreeView(QTreeView):
             except AttributeError:
                 fileList = self.item.parent().centralWidget.fileList
             fileList.append(loadPath)
+            try:
+                self.item.loadedFiles.append(loadPath)
+            except AttributeError:
+                print("This is the general file browser")
+            else:
+                print("This is the blockitem file browser")
 
     def delFile(self):
         """

@@ -15,6 +15,7 @@ class Radiator(BlockItem):
 
         self.inputs.append(PortItem('i', 0, self))
         self.outputs.append(PortItem('o', 0, self))
+        self.loadedFiles = []
 
         self.changeSize()
         self.addTree()
@@ -117,6 +118,7 @@ class Radiator(BlockItem):
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
         shutil.rmtree(self.path)
+        self.deleteLoadedFile()
         try:
             widgetToRemove.hide()
         except AttributeError:
@@ -140,3 +142,10 @@ class Radiator(BlockItem):
             self.path = destPath
             print(self.path)
 
+    def deleteLoadedFile(self):
+        for items in self.loadedFiles:
+            try:
+                self.parent.parent().fileList.remove(str(items))
+            except AttributeError:
+                print("find this", self.item.parent().centralWidget.fileList[0], items)
+                self.parent().centralWidget.fileList.remove(str(items))

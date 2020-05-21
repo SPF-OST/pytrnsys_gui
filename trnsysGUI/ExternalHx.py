@@ -20,6 +20,7 @@ class ExternalHx(BlockItem):
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 0, self))
         self.outputs.append(PortItem('o', 2, self))
+        self.loadedFiles = []
 
         my_transform = QTransform()
         my_transform.rotate(90)
@@ -296,6 +297,7 @@ class ExternalHx(BlockItem):
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
         shutil.rmtree(self.path)
+        self.deleteLoadedFile()
         try:
             widgetToRemove.hide()
         except AttributeError:
@@ -318,3 +320,11 @@ class ExternalHx(BlockItem):
             os.rename(self.path, destPath)
             self.path = destPath
             print(self.path)
+
+    def deleteLoadedFile(self):
+        for items in self.loadedFiles:
+            try:
+                self.parent.parent().fileList.remove(str(items))
+            except AttributeError:
+                print("find this", self.item.parent().centralWidget.fileList[0], items)
+                self.parent().centralWidget.fileList.remove(str(items))
