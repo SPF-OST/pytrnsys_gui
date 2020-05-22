@@ -3263,6 +3263,9 @@ class MainWindow(QMainWindow):
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
         filepath = os.path.join(ROOT_DIR, 'filepaths')
+
+        if not os.path.isfile(filepath):
+            open(filepath,'w+')
         with open(filepath, 'r') as file:
             data = file.readlines()
         if len(data) < 4:
