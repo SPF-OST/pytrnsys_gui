@@ -24,11 +24,13 @@ class FileOrderingDialog(QDialog):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.table.setItem(i, 0, item)
 
+        self.tipText = QLabel("Input 0 to omit from run.config")
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
+        buttonLayout.addWidget(self.tipText)
         buttonLayout.addWidget(self.okButton)
         buttonLayout.addWidget(self.cancelButton)
         layout.addWidget(self.table)
@@ -74,7 +76,16 @@ class FileOrderingDialog(QDialog):
 
     def customSortPaths(self):
         self.sortedPaths = [x for _, x in sorted(zip(self.changed_items, self.fileList))]
+        self.deleteUnwanted()
         print(self.sortedPaths)
+
+    def deleteUnwanted(self):
+        zeroCounts = 0
+        print("self.changeditems:", self.changed_items)
+        for value in self.changed_items:
+            if int(value) == 0:
+                zeroCounts += 1
+        self.finalPathList = self.sortedPaths[zeroCounts:]
 
     def updateConfig(self):
         config = self.parent().configToEdit
@@ -87,7 +98,7 @@ class FileOrderingDialog(QDialog):
         end = "LOCAL$ generic\end.ddck"
 
         lines.append(header)
-        for items in self.sortedPaths:
+        for items in self.finalPathList:
             item = items.replace("/", "\\")
             item = item.split('ddck\\')[-1]
             print("Item:", item)

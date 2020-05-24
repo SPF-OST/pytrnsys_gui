@@ -17,6 +17,8 @@ class Control(BlockItem):
         self.loadedFiles = []
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+
+        self.parent.parent().controlExists += 1
         self.createControlDir()
 
     def createControlDir(self):
@@ -25,10 +27,10 @@ class Control(BlockItem):
         else:
             projectPath = self.parent.parent().projectPath
 
-        self.controlDir = os.path.join(projectPath, 'ddck')
-        self.controlDir = os.path.join(self.controlDir, 'control')
-        if not os.path.exists(self.controlDir):
-            os.makedirs(self.controlDir)
+        self.parent.parent().controlDirectory = os.path.join(projectPath, 'ddck')
+        self.parent.parent().controlDirectory = os.path.join(self.parent.parent().controlDirectory, 'control')
+        if not os.path.exists(self.parent.parent().controlDirectory):
+            os.makedirs(self.parent.parent().controlDirectory)
 
     def deleteBlock(self):
         """
@@ -42,7 +44,10 @@ class Control(BlockItem):
         # print("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + 'Tree')
-        shutil.rmtree(self.controlDir)
+        self.parent.parent().controlExists -= 1
+        if self.parent.parent().controlExists == 0:
+            shutil.rmtree(self.parent.parent().controlDirectory)
+
         # self.deleteLoadedFile()
         try:
             widgetToRemove.hide()

@@ -1102,6 +1102,9 @@ class DiagramEditor(QWidget):
         self.testEnabled = False
         self.existReference = True
 
+        self.controlExists = 0
+        self.controlDirectory = ''
+
         self.selectionMode = False
         self.groupMode = False
         self.copyMode = False
@@ -1594,7 +1597,7 @@ class DiagramEditor(QWidget):
         if Path(exportPath).exists():
             qmb = QMessageBox(self)
             qmb.setText("Warning: " +
-                        "An export file exists already. Do you want to overwrite or cancel?")
+                        "An export file exists already inside export. Do you want to overwrite or cancel?")
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
@@ -1680,6 +1683,170 @@ class DiagramEditor(QWidget):
         self.cleanUpExportedElements()
         self.tearDownStorageInnerConns()
         return exportPath
+
+    def exportToHydraulics(self):
+        self.setUpStorageInnerConns()
+        self.sortTrnsysObj()
+
+        fullExportText = ''
+        exportPath = os.path.join(self.hydraulicFolder, self.diagramName + '_Hydraulic.dck')
+        i = 1
+
+        while(Path(exportPath).exists()):
+            if Path(exportPath).exists():
+                qmb = QMessageBox(self)
+                qmb.setText("Warning: " +
+                            "An export file of the same name already exists inside hydraulics. Do you want to overwrite or cancel?")
+                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                qmb.setDefaultButton(QMessageBox.Cancel)
+                ret = qmb.exec()
+                if ret == QMessageBox.Save:
+                    self.canceled = False
+                    self.fileList.remove(exportPath)
+                    break
+                else:
+                    self.canceled = True
+                    exportPath = os.path.join(self.hydraulicFolder, self.diagramName + '_Hydraulic(%i).dck' % i)
+                    i += 1
+            else:
+                print("Exported to %s" % str(exportPath))
+
+        print("Printing the TRNSYS file... \n")
+
+        simulationUnit = 450
+        simulationType = 935
+        descConnLength = 20
+
+        parameters = 0
+
+        # This has to be changed
+        for t in self.trnsysObj:
+            if type(t) is StorageTank:
+                continue
+            if type(t) is Connection and (
+                    type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
+                continue
+            if type(t) is HeatPump:
+                parameters += 2
+                continue
+            if type(t) is GenericBlock:
+                parameters += len(t.inputs)
+                continue
+            if type(t) is ExternalHx:
+                parameters += 2
+                continue
+            if type(t) is HeatPumpTwoHx:
+                parameters += 3
+                continue
+
+            parameters += 1
+
+        lineNrParameters = parameters
+        parameters = parameters * 4 + 1
+
+        exporter = Export(self.trnsysObj, self)
+
+        fullExportText += exporter.exportBlackBox()
+        fullExportText += exporter.exportPumpOutlets()
+        # fullExportText += exporter.exportMassFlows()
+        # fullExportText += exporter.exportDivSetting(simulationUnit - 10)
+
+        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength,
+                                                              parameters, lineNrParameters)
+        fullExportText += exporter.exportInputsFlowSolver(lineNrParameters)
+        fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
+        fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
+
+        fullExportText += exporter.exportPrintLoops()
+        fullExportText += exporter.exportPrintPipeLoops()
+        fullExportText += exporter.exportPrintPipeLosses()
+
+        # unitnr should maybe be variable in exportData()
+
+        fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
+        fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)
+
+        print("------------------------> END OF EXPORT <------------------------")
+
+        f = open(str(exportPath), 'w')
+        f.truncate(0)
+        f.write(fullExportText)
+        f.close()
+
+        self.cleanUpExportedElements()
+        self.tearDownStorageInnerConns()
+        self.fileList.append(exportPath)
+
+    def exportToControl(self):
+        self.setUpStorageInnerConns()
+        self.sortTrnsysObj()
+
+        fullExportText = ''
+        exportPath = os.path.join(self.controlDirectory, self.diagramName + '_Control.dck')
+        i = 1
+
+        while (Path(exportPath).exists()):
+            if Path(exportPath).exists():
+                qmb = QMessageBox(self)
+                qmb.setText("Warning: " +
+                            "An export file of the same name already exists inside control. Do you want to overwrite or cancel?")
+                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                qmb.setDefaultButton(QMessageBox.Cancel)
+                ret = qmb.exec()
+                if ret == QMessageBox.Save:
+                    self.canceled = False
+                    self.fileList.remove(exportPath)
+                    break
+                else:
+                    self.canceled = True
+                    exportPath = os.path.join(self.controlDirectory, self.diagramName + '_Control(%i).dck' % i)
+                    i += 1
+            else:
+                print("Exported to %s" % str(exportPath))
+
+        print("Printing the TRNSYS file... \n")
+
+        simulationUnit = 450
+
+        parameters = 0
+
+        # This has to be changed
+        for t in self.trnsysObj:
+            if type(t) is StorageTank:
+                continue
+            if type(t) is Connection and (
+                    type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
+                continue
+            if type(t) is HeatPump:
+                parameters += 2
+                continue
+            if type(t) is GenericBlock:
+                parameters += len(t.inputs)
+                continue
+            if type(t) is ExternalHx:
+                parameters += 2
+                continue
+            if type(t) is HeatPumpTwoHx:
+                parameters += 3
+                continue
+
+            parameters += 1
+
+        exporter = Export(self.trnsysObj, self)
+
+        fullExportText += exporter.exportMassFlows()
+        fullExportText += exporter.exportDivSetting(simulationUnit - 10)
+        print("------------------------> END OF EXPORT <------------------------")
+
+        f = open(str(exportPath), 'w')
+        f.truncate(0)
+        f.write(fullExportText)
+        f.close()
+
+        self.cleanUpExportedElements()
+        self.tearDownStorageInnerConns()
+        self.fileList.append(exportPath)
+
 
     def cleanUpExportedElements(self):
         for t in self.trnsysObj:
@@ -3125,8 +3292,12 @@ class MainWindow(QMainWindow):
     def exportTrnsys(self):
         print("Exporting Trnsys file...")
         noErrorExists = self.debugConns()
+        qmb = QMessageBox()
+        if self.centralWidget.controlExists < 1:
+            qmb.setText("Please create control before exporting!")
+            qmb.exec_()
+            return
         if not noErrorExists:
-            qmb = QMessageBox()
             qmb.setText("Ignore connection errors and continue with export?")
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
@@ -3138,6 +3309,8 @@ class MainWindow(QMainWindow):
                 print("Canceling")
                 return
         self.centralWidget.exportData()
+        self.centralWidget.exportToHydraulics()
+        self.centralWidget.exportToControl()
 
     def renameDia(self):
         print("Renaming diagram...")

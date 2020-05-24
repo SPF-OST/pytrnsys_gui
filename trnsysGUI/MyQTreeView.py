@@ -67,7 +67,7 @@ class MyQTreeView(QTreeView):
         Checks if file already exists and allows user to override or cancel the load.
         """
         filePath = self.model.rootPath()
-        fileName = QFileDialog.getOpenFileName(self, "Load file", "/Users/parad/OneDrive/Desktop/pytrnsys/pytrnsys/ddck", filter="*.ddck")[0]
+        fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
         simpFileName = fileName.split('/')[-1]
         loadPath = os.path.join(filePath, simpFileName)
         print(loadPath)
@@ -113,8 +113,10 @@ class MyQTreeView(QTreeView):
             try:
                 self.item.parent.parent().fileList.remove(str(filePath))
             except AttributeError:
-                print("find this", self.item.parent().centralWidget.fileList[0], filePath)
-                self.item.parent().centralWidget.fileList.remove(str(filePath))
+                try:
+                    self.item.parent().centralWidget.fileList.remove(str(filePath))
+                except ValueError:
+                    self.item.parent().centralWidget.fileList.remove(str(filePath).replace('/', '\\'))
         except OSError:
             msg = QMessageBox()
             msg.setText("Cannot delete folder!")

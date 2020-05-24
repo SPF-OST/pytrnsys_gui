@@ -157,5 +157,4 @@ class PV(BlockItem):
             try:
                 self.parent.parent().fileList.remove(str(items))
             except AttributeError:
-                print("find this", self.item.parent().centralWidget.fileList[0], items)
                 self.parent().centralWidget.fileList.remove(str(items))
