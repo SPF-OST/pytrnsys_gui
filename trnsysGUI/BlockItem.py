@@ -92,6 +92,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         # To use svg instead of png for blocks:
         self.imageSource = "images/" + self.name + ".svg"
+        if not os.path.exists(self.imageSource):
+            self.imageSource = "images/" + self.name + ".png"
         self.image = QImage(self.imageSource)
         self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
         self.pixmap = QPixmap(self.image)

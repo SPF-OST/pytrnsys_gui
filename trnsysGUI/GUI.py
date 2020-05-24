@@ -21,6 +21,7 @@ from pathlib import Path
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
+from trnsysGUI.Control import Control
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -225,6 +226,9 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                             displayName=i["BlockDisplayName"], loaded=True)
+                        elif i["BlockName"] == 'Control':
+                            bl = Control(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loaded=True)
                         # new encoding ---]
 
                         else:
@@ -398,6 +402,9 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'Control':
+                            bl = Control(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
                         # --- new encoding]
 
                         elif i["BlockName"] == "GraphicalItem":
@@ -913,6 +920,8 @@ class DiagramView(QGraphicsView):
                 bl = ExternalHx(name, self)
             elif name == 'GenericItem':
                 bl = GraphicalItem(self)
+            elif name == 'Control':
+                bl = Control(name, self)
             else:
                 bl = BlockItem(name, self)
 
@@ -1146,6 +1155,7 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'control')), 'Control'))
 
         for i in self.libItems:
             self.libraryModel.appendRow(i)
@@ -1179,33 +1189,18 @@ class DiagramEditor(QWidget):
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
         self.pathLayout.addWidget(self.setProjectPathButton)
-        # self.addButton = QPushButton()
-        # self.addButton.clicked.connect(self.addFile)
-        # self.addButton.setIcon(QIcon('images/plus.png'))
-        # self.addButton.setIconSize(QSize(25,25))
-        # self.addButton.setDisabled(True)
-        # self.delButton = QPushButton()
-        # self.delButton.clicked.connect(self.delFile)
-        # self.delButton.setIcon(QIcon('images/close.png'))
-        # self.delButton.setIconSize(QSize(25, 25))
-        # self.delButton.setDisabled(True)
-        # self.buttonLayout = QHBoxLayout()
-        # self.buttonLayout.addWidget(self.addButton)
-        # self.buttonLayout.addWidget(self.delButton)
         self.scroll = QScrollArea()
-        # self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        # self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setWidgetResizable(True)
         self.splitter = QSplitter(Qt.Vertical,)
         self.splitter.setChildrenCollapsible(False)
         self.scroll.setWidget(self.splitter)
         self.scroll.setFixedWidth(300)
         self.fileBrowserLayout.addLayout(self.pathLayout)
-        # self.fileBrowserLayout.addLayout(self.buttonLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
         self.createDdckTree(self.tempPath)
         self.createConfigBrowser(self.tempPath)
         self.copyGenericFolder(self.tempPath)
+        self.createHydraulicDir(self.tempPath)
 
 
         self.horizontalLayout.addLayout(self.vertL)
@@ -2684,11 +2679,14 @@ class DiagramEditor(QWidget):
 
             self.createConfigBrowser(self.projectPath)
             self.copyGenericFolder(self.projectPath)
+            self.createHydraulicDir(self.projectPath)
             self.createDdckTree(loadPath)
 
             for o in self.trnsysObj:
                 if hasattr(o, 'updateTreePath'):
                     o.updateTreePath(self.projectPath)
+                elif hasattr(o, 'createControlDir'):
+                    o.createControlDir()
 
     def createDdckTree(self, loadPath):
         treeToRemove = self.findChild(QTreeView, 'ddck')
@@ -2807,7 +2805,14 @@ class DiagramEditor(QWidget):
 
         shutil.copy(self.headerFile, self.genericFolder)
         shutil.copy(self.endFile, self.genericFolder)
-        pass
+
+    def createHydraulicDir(self, projectPath):
+
+        self.hydraulicFolder = os.path.join(projectPath, 'ddck')
+        self.hydraulicFolder = os.path.join(self.hydraulicFolder, 'hydraulic')
+
+        if not os.path.exists(self.hydraulicFolder):
+            os.makedirs(self.hydraulicFolder)
 
     # def addFile(self):
     #     fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
