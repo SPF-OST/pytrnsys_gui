@@ -3131,6 +3131,9 @@ class MainWindow(QMainWindow):
         testAppAction.triggered.connect(self.testApp)
         testAppAction.setShortcut("Ctrl+t")
 
+        runAction = QAction(QIcon('images/rotate-to-right.png'), "Run", self)
+        runAction.triggered.connect(self.runApp)
+
         # Tool bar
         tb = self.addToolBar('Main Toolbar...')
         tb.setObjectName('Toolbar')
@@ -3153,6 +3156,7 @@ class MainWindow(QMainWindow):
         tb.addAction(runMassflowSolverAction)
         tb.addAction(loadVisual)
         tb.addAction(trnsysList)
+        tb.addAction(runAction)
 
         # Menu bar actions
         self.fileMenu = QMenu("File")
@@ -3748,6 +3752,9 @@ class MainWindow(QMainWindow):
                     msgBox.exec_()
                     self.noErrorConns = False
         return self.noErrorConns
+
+    def runApp(self):
+        exec(open('C:\\Users\\parad\\OneDrive\\Desktop\\pytrnsys\\pytrnsys\\examples\\RunMain.py').read())
 
 if __name__ == '__main__':
     # sys.stdout = open('errorLog', 'w')
