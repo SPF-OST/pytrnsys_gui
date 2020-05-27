@@ -22,6 +22,7 @@ from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 
 from trnsysGUI.Control import Control
+from trnsysGUI.MasterControl import MasterControl
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -46,6 +47,7 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
+from trnsysGUI.RunMain import RunMain
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.Test_Export import Test_Export
 from trnsysGUI.TestDlg import TestDlg
@@ -226,6 +228,9 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                             displayName=i["BlockDisplayName"], loaded=True)
+                        elif i["BlockName"] == 'MasterControl':
+                            bl = MasterControl(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'Control':
                             bl = Control(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loaded=True)
@@ -402,6 +407,9 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'MasterControl':
+                            bl = MasterControl(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
                         elif i["BlockName"] == 'Control':
                             bl = Control(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                            loadedBlock=True)
@@ -920,6 +928,8 @@ class DiagramView(QGraphicsView):
                 bl = ExternalHx(name, self)
             elif name == 'GenericItem':
                 bl = GraphicalItem(self)
+            elif name == 'MasterControl':
+                bl = MasterControl(name, self)
             elif name == 'Control':
                 bl = Control(name, self)
             else:
@@ -1158,6 +1168,7 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'MasterControl')), 'MasterControl'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'control')), 'Control'))
 
         for i in self.libItems:
@@ -1782,14 +1793,14 @@ class DiagramEditor(QWidget):
         self.sortTrnsysObj()
 
         fullExportText = ''
-        exportPath = os.path.join(self.controlDirectory, self.diagramName + '_Control.dck')
+        exportPath = os.path.join(self.controlDirectory, self.diagramName + '_MasterControl.dck')
         i = 1
 
         while (Path(exportPath).exists()):
             if Path(exportPath).exists():
                 qmb = QMessageBox(self)
                 qmb.setText("Warning: " +
-                            "An export file of the same name already exists inside control. Do you want to overwrite or cancel?")
+                            "An export file of the same name already exists inside Master control. Do you want to overwrite or cancel?")
                 qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
                 qmb.setDefaultButton(QMessageBox.Cancel)
                 ret = qmb.exec()
@@ -1799,7 +1810,7 @@ class DiagramEditor(QWidget):
                     break
                 else:
                     self.canceled = True
-                    exportPath = os.path.join(self.controlDirectory, self.diagramName + '_Control(%i).dck' % i)
+                    exportPath = os.path.join(self.controlDirectory, self.diagramName + '_MasterControl(%i).dck' % i)
                     i += 1
             else:
                 print("Exported to %s" % str(exportPath))
@@ -3754,7 +3765,13 @@ class MainWindow(QMainWindow):
         return self.noErrorConns
 
     def runApp(self):
-        exec(open('C:\\Users\\parad\\OneDrive\\Desktop\\pytrnsys\\pytrnsys\\examples\\RunMain.py').read())
+        runApp = RunMain()
+        if self.centralWidget.projectPath == '':
+            print("Temp path:", self.centralWidget.tempPath)
+            runApp.runAction(self.centralWidget.tempPath)
+        else:
+            print("Project path:", self.centralWidget.projectPath)
+            runApp.runAction(self.centralWidget.projectPath)
 
 if __name__ == '__main__':
     # sys.stdout = open('errorLog', 'w')

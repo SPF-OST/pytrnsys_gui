@@ -813,3 +813,11 @@ class BlockItem(QGraphicsPixmapItem):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
+
+    def deleteLoadedFile(self):
+        for items in self.loadedFiles:
+            try:
+                self.parent.parent().fileList.remove(str(items))
+            except ValueError:
+                print("File already deleted from file list.")
+                print("filelist:", self.parent.parent().fileList)

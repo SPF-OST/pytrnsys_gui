@@ -145,10 +145,3 @@ class AirSourceHP(BlockItem):
             os.rename(self.path, destPath)
             self.path = destPath
             print(self.path)
-
-    def deleteLoadedFile(self):
-        for items in self.loadedFiles:
-            try:
-                self.parent.parent().fileList.remove(str(items))
-            except AttributeError:
-                self.parent().centralWidget.fileList.remove(str(items))
