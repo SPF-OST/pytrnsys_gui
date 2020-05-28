@@ -974,8 +974,8 @@ class StorageTank(BlockItem):
 
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
 
-        tool.createDDck(filePath, name, self.displayName, typeFile="ddck")
-        self.loadedTo = exportPath
+        tool.createDDck(self.path, name, self.displayName, typeFile="ddck")
+        self.loadedTo = self.path
 
     def loadDck(self):
         print("Opening diagram")

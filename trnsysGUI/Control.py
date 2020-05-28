@@ -20,7 +20,6 @@ class Control(BlockItem):
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
-        self.parent.parent().controlExists += 1
         self.addTree()
 
     def addTree(self):
