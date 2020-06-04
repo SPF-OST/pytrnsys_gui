@@ -1600,7 +1600,7 @@ class DiagramEditor(QWidget):
             exportPath = os.path.join(ROOT_DIR, 'Reference')
             exportPath = os.path.join(exportPath, self.diagramName + '.dck')
         else:
-            filepaths = os.path.join(ROOT_DIR, 'filepaths')
+            filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
             with open(filepaths, 'r') as file:
                 data = file.readlines()
             exportPath = Path(data[0][:-1]).joinpath(self.diagramName + '.dck')
@@ -2207,7 +2207,7 @@ class DiagramEditor(QWidget):
                 ROOT_DIR = os.path.dirname(sys.executable)
             elif __file__:
                 ROOT_DIR = os.path.dirname(__file__)
-            filepaths = os.path.join(ROOT_DIR, 'filepaths')
+            filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
             print(ROOT_DIR, filepaths)
             with open(filepaths, 'r') as file:
                 data = file.readlines()
@@ -2247,7 +2247,7 @@ class DiagramEditor(QWidget):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
         with open(filepaths, 'r') as file:
             data = file.readlines()
         defaultDir = (data[1][:-1])
@@ -3711,7 +3711,9 @@ class MainWindow(QMainWindow):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        filepath = os.path.join(ROOT_DIR, 'filepaths')
+        filepath = os.path.join(ROOT_DIR, 'filepaths.txt')
+        if not os.path.isfile(filepath):
+            open(filepath, 'w+')
         with open(filepath, 'r') as file:
             data = file.readlines()
         if len(data) < 4:
@@ -3725,7 +3727,7 @@ class MainWindow(QMainWindow):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
         with open(filepaths, 'r') as file:
             data = file.readlines()
         self.centralWidget.trnsysPath = os.path.join(data[3][:-1], 'TRNExe.exe')

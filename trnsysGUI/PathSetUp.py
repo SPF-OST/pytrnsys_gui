@@ -199,7 +199,7 @@ class PathSetUp(QDialog):
 
         # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         print("root_dir:", ROOT_DIR)
-        filepath = os.path.join(ROOT_DIR, 'filepaths')
+        filepath = os.path.join(ROOT_DIR, 'filepaths.txt')
         exportPath = ''
         diagramPath = ''
         ddckPath = ''
@@ -248,7 +248,7 @@ class PathSetUp(QDialog):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        filepath = os.path.join(ROOT_DIR, 'filepaths')
+        filepath = os.path.join(ROOT_DIR, 'filepaths.txt')
         with open(filepath, 'r') as file:
             data = file.readlines()
         if string1 != '':

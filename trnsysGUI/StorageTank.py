@@ -888,7 +888,7 @@ class StorageTank(BlockItem):
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
         # filePath = os.path.join(ROOT_DIR, 'ddck')
-        filepaths = os.path.join(ROOT_DIR, 'filepaths')
+        filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
         with open(filepaths, 'r') as file:
             data = file.readlines()
         filePath = (data[2][:-1])
