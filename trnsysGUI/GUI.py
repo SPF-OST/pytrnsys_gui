@@ -1198,17 +1198,20 @@ class DiagramEditor(QWidget):
         self.projectPathLabel = QLabel("Project Path:")
         self.PPL = QLineEdit(self.tempPath)
         self.PPL.setDisabled(True)
-        self.setProjectPathButton = QPushButton("Set path")
+        self.setProjectPathButton = QPushButton("Change path")
         self.setProjectPathButton.clicked.connect(self.setProjectPath)
+        self.openProjectButton = QPushButton("Open Project")
+        self.openProjectButton.clicked.connect(self.openProject)
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
         self.pathLayout.addWidget(self.setProjectPathButton)
+        self.pathLayout.addWidget(self.openProjectButton)
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.splitter = QSplitter(Qt.Vertical,)
         self.splitter.setChildrenCollapsible(False)
         self.scroll.setWidget(self.splitter)
-        self.scroll.setFixedWidth(300)
+        self.scroll.setFixedWidth(350)
         self.fileBrowserLayout.addLayout(self.pathLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
         self.createDdckTree(self.tempPath)
@@ -2266,6 +2269,9 @@ class DiagramEditor(QWidget):
 
         self.encodeDiagram(str(self.saveAsPath))
 
+    def saveToProject(self):
+        projectPath = self.projectPath
+
     def renameDiagram(self, newName):
         """
 
@@ -2865,6 +2871,21 @@ class DiagramEditor(QWidget):
                     o.updateTreePath(self.projectPath)
                 elif hasattr(o, 'createControlDir'):
                     o.createControlDir()
+
+    def openProject(self):
+        self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
+        if self.projectPath !='':
+
+            self.parent().newDia()
+            self.PPL.setText(self.projectPath)
+            loadPath = os.path.join(self.projectPath, 'ddck')
+
+            self.createConfigBrowser(self.projectPath)
+            self.copyGenericFolder(self.projectPath)
+            self.createHydraulicDir(self.projectPath)
+            self.createDdckTree(loadPath)
+            # todo : open diagram
+            # todo : add files into list
 
     def createDdckTree(self, loadPath):
         treeToRemove = self.findChild(QTreeView, 'ddck')
@@ -3723,6 +3744,7 @@ class MainWindow(QMainWindow):
         """
         Sets the trnsys path during start up, after user has defined it.
         """
+        noOfRequiredPaths = 4
         if getattr(sys, 'frozen', False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
@@ -3730,7 +3752,8 @@ class MainWindow(QMainWindow):
         filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
         with open(filepaths, 'r') as file:
             data = file.readlines()
-        self.centralWidget.trnsysPath = os.path.join(data[3][:-1], 'TRNExe.exe')
+        if len(data) == noOfRequiredPaths:
+            self.centralWidget.trnsysPath = os.path.join(data[3][:-1], 'TRNExe.exe')
 
     def debugConns(self):
         """

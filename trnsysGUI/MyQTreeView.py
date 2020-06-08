@@ -39,11 +39,11 @@ class MyQTreeView(QTreeView):
         load = menu.addAction("Load")
         load.triggered.connect(self.loadFile)
 
+        editP = menu.addAction("Load profile")
+        editP.triggered.connect(self.loadProfile)
+
         dele = menu.addAction("Delete")
         dele.triggered.connect(self.delFile)
-
-        editP = menu.addAction("Edit priority")
-        editP.triggered.connect(self.editPriority)
 
         menu.exec_(event.globalPos())
 
@@ -67,7 +67,7 @@ class MyQTreeView(QTreeView):
         Checks if file already exists and allows user to override or cancel the load.
         """
         filePath = self.model.rootPath()
-        fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
+        fileName = QFileDialog.getOpenFileName(self, "Load file")[0]
         simpFileName = fileName.split('/')[-1]
         loadPath = os.path.join(filePath, simpFileName)
         print(loadPath)
@@ -126,11 +126,39 @@ class MyQTreeView(QTreeView):
         li = string.rsplit(old, occurrence)
         return new.join(li)
 
-    def editPriority(self):
-        priority = self.getInteger()
-        index = self.currentIndex()
-        self.model.setData(index, priority, Qt.DisplayRole)
-        print(self.model.itemData(index))
+    def loadProfile(self):
+        filePath = self.model.rootPath()
+        fileName = QFileDialog.getOpenFileName(self, "Load file")[0]
+        print("filepath:", filePath)
+        simpFileName = fileName.split("/ddck/")[-1]
+        profileName = fileName.split("/")[-1]
+        print("simpefilename:", simpFileName)
+        loadPath = os.path.join(filePath, simpFileName)
+        print("loadpath:", loadPath)
+        directory = loadPath.split(profileName)[0]
+        print("directory:", directory)
+        if fileName != '':
+            print("profile loaded into %s" % filePath)
+            if Path(loadPath).exists():
+                qmb = QMessageBox()
+                qmb.setText("Warning: " +
+                            "A profile with the same name exists already. Do you want to overwrite or cancel?")
+                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                qmb.setDefaultButton(QMessageBox.Cancel)
+                ret = qmb.exec()
+                if ret == QMessageBox.Save:
+                    print("Overwriting")
+                    shutil.copy(fileName, loadPath)
+                    # continue
+                else:
+                    print("Canceling")
+                    return
+            else:
+                if not os.path.exists(directory):
+                    os.makedirs(directory)
+                shutil.copy(fileName, loadPath)
+
+            # self.item.parent().centralWidget.fileList.append(filePath)
 
     def getFilePath(self):
         """
