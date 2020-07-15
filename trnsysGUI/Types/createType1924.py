@@ -552,7 +552,8 @@ class Type1924_TesPlugFlow():
         line = "0     ! 2 Nb. of right-axis variables\n"; lines=lines+line
         line = "0     ! 3 Left axis minimum \n"; lines = lines + line
         line = "100     ! 4 Left axis maximum -\n"; lines = lines + line
-        line = "0     ! 5 Right axis minimum0     ! 6 Right axis maximum \n"; lines = lines + line
+        line = "0     ! 5 Right axis minimum"; lines = lines + line
+        line = "100     ! 6 Right axis maximum \n"; lines = lines + line
         line = "nPlotsPerSim     ! 7 Number of plots per simulation \n"; lines = lines + line
         line = "12     ! 8 X-axis gridpoints\n"; lines = lines + line
         line = "1     ! 9 Shut off Online w/o removing \n"; lines = lines + line

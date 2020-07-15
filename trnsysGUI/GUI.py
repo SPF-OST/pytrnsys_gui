@@ -29,6 +29,7 @@ from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Export import Export
 from trnsysGUI.ExternalHx import ExternalHx
+from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
@@ -217,6 +218,9 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         elif i["BlockName"] == 'ExternalHx':
                             bl = ExternalHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loaded=True)
+                        elif i["BlockName"] == 'IceStorageTwoHx':
+                            bl = IceStorageTwoHx(i["BlockName"], self.editor.diagramView,
+                                                displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                             displayName=i["BlockDisplayName"], loaded=True)
@@ -390,6 +394,9 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'ExternalHx':
                             bl = ExternalHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'IceStorageTwoHx':
+                            bl = IceStorageTwoHx(i["BlockName"], self.editor.diagramView,
+                                                displayName=i["BlockDisplayName"], loadedBlock=True)
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
@@ -906,6 +913,8 @@ class DiagramView(QGraphicsView):
                 bl = GroundSourceHx(name, self)
             elif name == 'ExternalHx':
                 bl = ExternalHx(name, self)
+            elif name == 'IceStorageTwoHx':
+                bl = IceStorageTwoHx(name, self)
             elif name == 'GenericItem':
                 bl = GraphicalItem(self)
             else:
@@ -1139,6 +1148,7 @@ class DiagramEditor(QWidget):
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'PV')), 'PV'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GroundSourceHx')), 'GroundSourceHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
+        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'IceStorageTwoHx')), 'IceStorageTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
 
@@ -1593,6 +1603,9 @@ class DiagramEditor(QWidget):
                 parameters += len(t.inputs)
                 continue
             if type(t) is ExternalHx:
+                parameters += 2
+                continue
+            if type(t) is IceStorageTwoHx:
                 parameters += 2
                 continue
             if type(t) is HeatPumpTwoHx:
