@@ -16,7 +16,7 @@ class Radiator(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 1
+        delta = 20
         deltaH = self.h / 20
 
         # Limit the block size:
@@ -30,10 +30,8 @@ class Radiator(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w,
-                               h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w,
-                              h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
+        self.outputs[0].setPos(0,h-delta)
+        self.inputs[0].setPos(0,delta)
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.outputs[0].side = 0 + 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4

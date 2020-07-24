@@ -9,9 +9,8 @@ from trnsysGUI.ResizerItem import ResizerItem
 class Boiler(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Boiler, self).__init__(trnsysType, parent, **kwargs)
-        factor = 0.667  # 0.63 for png
-        self.w = 100
-        self.h = 100
+        self.w = 80
+        self.h = 120
         self.portOffset = 5
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
@@ -29,7 +28,7 @@ class Boiler(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = -4
+        delta = 20
         deltaH = self.h / 10
 
         # Limit the block size:
@@ -44,10 +43,8 @@ class Boiler(BlockItem):
         self.label.setPos(lx, h)
 
         # Update port positions:
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w + self.flippedHInt * self.portOffset,
-                               h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w + self.flippedHInt * self.portOffset,
-                              h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
+        self.outputs[0].setPos(w,h-delta)
+        self.inputs[0].setPos(w,delta)
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4

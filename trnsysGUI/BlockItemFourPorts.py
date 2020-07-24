@@ -8,8 +8,8 @@ from trnsysGUI.PortItem import PortItem
 class BlockItemFourPorts(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(BlockItemFourPorts, self).__init__(trnsysType, parent, **kwargs)
-        self.h = 100
-        self.w = 100
+        self.h = 120
+        self.w = 120
         self.inputs.append(PortItem('i', 0, self))
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 0, self))

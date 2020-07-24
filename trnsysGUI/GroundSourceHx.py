@@ -10,9 +10,8 @@ class GroundSourceHx(BlockItem):
         print("sdf")
         super(GroundSourceHx, self).__init__(trnsysType, parent, **kwargs)
         print("c gs")
-        factor = 0.80
-        self.w = factor * 100
-        self.h = factor * 100
+        self.w = 60
+        self.h = 80
         self.inputs.append(PortItem('i', 0, self))
         self.outputs.append(PortItem('o', 2, self))
 
@@ -27,7 +26,7 @@ class GroundSourceHx(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = -1
+        delta = 20
         deltaH = self.h / 3.5
 
         # Limit the block size:
@@ -42,9 +41,8 @@ class GroundSourceHx(BlockItem):
         self.label.setPos(lx, h)
 
         # Update port positions:
-        self.outputs[0].setPos(w - w * self.flippedH - deltaH + 2 * deltaH * self.flippedH, -2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
-        self.inputs[0].setPos(h * self.flippedH + deltaH - 2 * deltaH * self.flippedH,
-                              - 2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
+        self.outputs[0].setPos(delta,0)
+        self.inputs[0].setPos(w-delta,0)
         # self.inputs[0].side = 1 + 2 * self.flippedV
         # self.outputs[0].side = 1 + 2 * self.flippedV
         self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4

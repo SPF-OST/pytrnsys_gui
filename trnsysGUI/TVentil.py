@@ -9,11 +9,8 @@ from trnsysGUI.PortItem import PortItem
 class TVentil(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(TVentil, self).__init__(trnsysType, parent, **kwargs)
-        # factor = 0.6
-        # self.w = 100 * factor
-        # self.h = 61.14 * factor
-        self.h = 50
-        self.w = 50
+        self.h = 40
+        self.w = 40
         self.typeNumber = 3
         self.isTempering = False
         self.positionForMassFlowSolver = 1.0
@@ -39,7 +36,7 @@ class TVentil(BlockItem):
         w = self.w
         h = self.h
 
-        delta = 3
+        delta = 20
         # Limit the block size:
         if h < 20:
             h = 20
@@ -56,11 +53,9 @@ class TVentil(BlockItem):
         self.label.setPos(lx, h - self.flippedV*(h+h/2))
         self.posLabel.setPos(lx+5, -15)
 
-        self.inputs[0].setPos(- 2 * delta + 4 * self.flippedH * delta + w * self.flippedH,
-                              h / 2 + deltaH - 2 * deltaH * self.flippedV)
-        self.inputs[1].setPos(w / 2, -2 * delta + 4 * delta * self.flippedV + h * self.flippedV)
-        self.outputs[0].setPos(w + 2 * delta - self.flippedH * w - 4 * self.flippedH * delta,
-                               h / 2 + deltaH - 2 * deltaH * self.flippedV)
+        self.inputs[0].setPos(0,delta)
+        self.inputs[1].setPos(delta,0)
+        self.outputs[0].setPos(w,delta)
 
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.inputs[1].side = 1 + 2 * self.flippedV

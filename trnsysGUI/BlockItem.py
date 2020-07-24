@@ -44,8 +44,8 @@ class BlockItem(QGraphicsPixmapItem):
     def __init__(self, trnsysType, parent, **kwargs):
 
         super(BlockItem, self).__init__(None)
-        self.w = 100.0
-        self.h = 100.0
+        self.w = 120.0
+        self.h = 120.0
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
         self.propertyFile = []

@@ -17,10 +17,6 @@ class HeatPumpTwoHx(BlockItem):
         self.outputs.append(PortItem('o', 2, self))
         self.outputs.append(PortItem('o', 2, self))
 
-        my_transform = QTransform()
-        my_transform.rotate(90)
-        self.image = self.image.transformed(my_transform)
-
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
@@ -39,7 +35,7 @@ class HeatPumpTwoHx(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 1
+        delta = 20
 
         # Limit the block size:
         if h < 20:
@@ -52,9 +48,9 @@ class HeatPumpTwoHx(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 4 * h / 15 - 4 * h / 15 * self.flippedV + 11/16 * h *self.flippedV)
-        self.inputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.2 * h - 0.2 * h * self.flippedV + 0.8 * h * self.flippedV)
-        self.inputs[2].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.52 * h - 0.04 * h * self.flippedV)
+        self.inputs[0].setPos(0,delta)
+        self.inputs[1].setPos(w,delta)
+        self.inputs[2].setPos(w,h-2*delta)
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.inputs[1].side = 2 - 2 * self.flippedH
         # self.inputs[2].side = 2 - 2 * self.flippedH  0.4 * h - 0.4 * h * self.flippedV + 0.6 * h * self.flippedV
@@ -62,9 +58,9 @@ class HeatPumpTwoHx(BlockItem):
         self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.inputs[2].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
-        self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3 - 1/3 * h * self.flippedV)
-        self.outputs[1].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.4 * h - 0.4 * h * self.flippedV + 0.6 * h * self.flippedV)
-        self.outputs[2].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w, 0.72 * h - 0.44 * h * self.flippedV)
+        self.outputs[0].setPos(0,h-delta)
+        self.outputs[1].setPos(w,2*delta)
+        self.outputs[2].setPos(w,h-delta)
         # self.outputs[0].side = 0 + 2 * self.flippedH
         # self.outputs[1].side = 2 - 2 * self.flippedH
         # self.outputs[2].side = 2 - 2 * self.flippedH

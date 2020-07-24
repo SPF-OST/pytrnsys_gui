@@ -11,9 +11,7 @@ from trnsysGUI.ResizerItem import ResizerItem
 class AirSourceHP(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(AirSourceHP, self).__init__(trnsysType, parent, **kwargs)
-        factor = 0.8
-        self.w = 100 * factor
-        self.h = 80 * factor
+
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
 
@@ -28,7 +26,7 @@ class AirSourceHP(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 2
+        delta = 20
         deltaH = self.h / 10
 
         # Limit the block size:
@@ -43,10 +41,8 @@ class AirSourceHP(BlockItem):
         self.label.setPos(lx, h)
 
         # Update port positions:
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                               h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                              h * self.flippedV + deltaH - 2 * deltaH * self.flippedV - self.flippedVInt * 5)
+        self.outputs[0].setPos(w,h-delta)
+        self.inputs[0].setPos(w,delta)
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
