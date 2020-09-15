@@ -31,7 +31,7 @@ class Collector(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 2
+        delta = 20
         deltaH = self.h / 10
 
         # Limit the block size:
@@ -46,10 +46,8 @@ class Collector(BlockItem):
         self.label.setPos(lx, h)
 
         # Update port positions:
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                               h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-                              h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
+        self.outputs[0].setPos(w,delta)
+        self.inputs[0].setPos(w,h-delta)
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4

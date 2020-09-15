@@ -536,6 +536,46 @@ class Type1924_TesPlugFlow():
         lines = lines + "\n"
 
         return lines
+
+
+    def getOnlinePlotter(self,nTes,nUnit,inputs):
+
+        nPrinterUnit = nUnit+1
+        lines = ""
+        line = "*****************************\n"; lines=lines+line
+        line = "******* Online Plotter *******\n"; lines=lines+line
+        line = "*****************************\n"; lines=lines+line
+        line = "\n"; lines=lines+line
+        line = "UNIT 501 TYPE 65     ! Online Plotter HX \n"; lines=lines+line
+        line = "PARAMETERS 12   \n"; lines=lines+line
+        line = "10     ! 1 Nb. of left-axis variables \n"; lines=lines+line
+        line = "0     ! 2 Nb. of right-axis variables\n"; lines=lines+line
+        line = "0     ! 3 Left axis minimum \n"; lines = lines + line
+        line = "100     ! 4 Left axis maximum -\n"; lines = lines + line
+        line = "0     ! 5 Right axis minimum"; lines = lines + line
+        line = "100     ! 6 Right axis maximum \n"; lines = lines + line
+        line = "nPlotsPerSim     ! 7 Number of plots per simulation \n"; lines = lines + line
+        line = "12     ! 8 X-axis gridpoints\n"; lines = lines + line
+        line = "1     ! 9 Shut off Online w/o removing \n"; lines = lines + line
+        line = "-1     ! 10 Logical unit for output file \n";lines = lines + line
+        line = "0     ! 11 Output file units\n";lines = lines + line
+        line = "0     ! 12 Output file delimiter\n";lines = lines + line
+        line = "INPUTS 10     \n";lines = lines + line
+        line = "T1_Tes%d T2_Tes%d T3_Tes%d T4_Tes%d T5_Tes%d T6_Tes%d T7_Tes%d T8_Tes%d T9_Tes%d T10_Tes%d \n"%(nTes,nTes,nTes,nTes,nTes,nTes,nTes,nTes,nTes,nTes);lines = lines + line
+        line = "T1_Tes%d T2_Tes%d T3_Tes%d T4_Tes%d T5_Tes%d T6_Tes%d T7_Tes%d T8_Tes%d T9_Tes%d T10_Tes%d \n"%(nTes,nTes,nTes,nTes,nTes,nTes,nTes,nTes,nTes,nTes);lines = lines + line
+        line = "LABELS  3         \n";lines = lines + line
+        line = "Temperatures  \n";lines = lines + line
+        line = "MassFlows  \n";lines = lines + line
+        line = "Tes%d \n";lines = lines + line
+        #line = "0  ! 6: Number of inputs to avoid integration\n"; lines = lines + line
+
+        lines = lines + "\n"
+
+        lines = lines + "\n"
+
+        return lines
+
+
     def getParameters(self,inputs):
 
         nUnit=inputs["nUnit"]
@@ -566,7 +606,7 @@ class Type1924_TesPlugFlow():
         lines=lines + self.getInputs(inputs)
         lines=lines + self.getOutputs(inputs)
         lines=lines + self.getMonthyPrinter(nTes,nUnit,inputs)
-
+        lines = lines + self.getOnlinePlotter(nTes, nUnit, inputs)
         return lines
 
     def getHead(self):
@@ -586,6 +626,11 @@ class Type1924_TesPlugFlow():
             lines = lines + "*************************************\n\n"
             lines = lines + "*******************************************\n"
             lines = lines + "** Plug-Flow Model exported from TRNSYS GUI\n"
+            lines = lines + "*******************************************\n\n"
+            lines = lines + "*******************************************\n"
+            lines = lines + "** To be checked: \n"
+            lines = lines + "** check cp and rho values for the cirquits \n"
+            lines = lines + "** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used \n"
             lines = lines + "*******************************************\n\n"
             lines = lines + "******************************************************************************************\n"
             lines = lines + "** outputs to energy balance in kWh\n"
@@ -712,5 +757,5 @@ if __name__ == '__main__':
 
     tool.setInputs(inputs,connectorsPort,connectorsHx,connectorsAux)
 
-    tool.createDDck(path,name,typeFile="dck")
+    tool.createDDck(path,name,typeFile="ddck")
 

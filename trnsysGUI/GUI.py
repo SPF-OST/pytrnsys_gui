@@ -19,7 +19,7 @@ from pathlib import Path
 # from trnsysGUI.CircularDep import *
 # from trnsysGUI.Connection import Connection
 from PyQt5.QtPrintSupport import QPrinter
-from PyQt5.QtSvg import QSvgGenerator
+from PyQt5.QtSvg import QSvgGenerator, QSvgWidget
 
 from trnsysGUI.Control import Control
 from trnsysGUI.MasterControl import MasterControl
@@ -36,6 +36,7 @@ from trnsysGUI.Boiler import Boiler
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Export import Export
 from trnsysGUI.ExternalHx import ExternalHx
+from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
@@ -225,6 +226,9 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         elif i["BlockName"] == 'ExternalHx':
                             bl = ExternalHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loaded=True)
+                        elif i["BlockName"] == 'IceStorageTwoHx':
+                            bl = IceStorageTwoHx(i["BlockName"], self.editor.diagramView,
+                                                displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                             displayName=i["BlockDisplayName"], loaded=True)
@@ -404,6 +408,9 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'ExternalHx':
                             bl = ExternalHx(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'IceStorageTwoHx':
+                            bl = IceStorageTwoHx(i["BlockName"], self.editor.diagramView,
+                                                displayName=i["BlockDisplayName"], loadedBlock=True)
                         elif i["BlockName"] == 'GenericBlock':
                             bl = GenericBlock(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
@@ -926,6 +933,8 @@ class DiagramView(QGraphicsView):
                 bl = GroundSourceHx(name, self)
             elif name == 'ExternalHx':
                 bl = ExternalHx(name, self)
+            elif name == 'IceStorageTwoHx':
+                bl = IceStorageTwoHx(name, self)
             elif name == 'GenericItem':
                 bl = GraphicalItem(self)
             elif name == 'MasterControl':
@@ -1131,7 +1140,7 @@ class DiagramEditor(QWidget):
 
         # Related to the grid blocks can snap to
         self.snapGrid = False
-        self.snapSize = 50
+        self.snapSize = 20
 
         self.trnsysPath = 'C:\Trnsys17\Exe\TRNExe.exe'
 
@@ -1147,27 +1156,11 @@ class DiagramEditor(QWidget):
 
         # Resource folder for library icons
         r_folder = "images/"
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Pump')),  'Pump'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Kollektor')),  'Kollektor'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TVentil')), 'TVentil'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'StorageTank')), 'StorageTank'))
-
-        # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Bvi')), 'Bvi'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TeePiece')), 'TeePiece'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HP')), 'HP'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'IceStorage')), 'IceStorage'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'WTap')), 'WTap'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'WTap_main')), 'WTap_main'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Radiator')), 'Radiator'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Connector')), 'Connector'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericBlock')), 'GenericBlock'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Boiler')), 'Boiler'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'AirSourceHP')), 'AirSourceHP'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'PV')), 'PV'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GroundSourceHx')), 'GroundSourceHx'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
+        componentsList = ['Connector','TeePiece','TVentil','WTap_main','WTap','Pump','Kollektor','GroundSourceHx','PV',
+                          'HP','HPTwoHx','AirSourceHP','StorageTank','IceStorage','IceStorageTwoHx','ExternalHx',
+                          'Radiator','Boiler','GenericBlock','GenericItem']
+        for component in componentsList:
+            self.libItems.append(QtGui.QStandardItem(QIcon(r_folder+component),component))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'MasterControl')), 'MasterControl'))
         self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'control')), 'Control'))
 
@@ -1654,6 +1647,9 @@ class DiagramEditor(QWidget):
                 parameters += len(t.inputs)
                 continue
             if type(t) is ExternalHx:
+                parameters += 2
+                continue
+            if type(t) is IceStorageTwoHx:
                 parameters += 2
                 continue
             if type(t) is HeatPumpTwoHx:
@@ -3457,6 +3453,12 @@ class MainWindow(QMainWindow):
         # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", "examples", filter="*.json")[0]
         print(fileName)
+        try:
+            self.statusBar().removeWidget(self.fileNameDisplay)
+        except:
+            pass
+        self.fileNameDisplay = QLabel("Opened from " + fileName)
+        self.statusBar().addWidget(self.fileNameDisplay)
         if fileName != '':
             self.centralWidget.idGen.reset()
             self.currentFile = fileName
@@ -3735,6 +3737,7 @@ class MainWindow(QMainWindow):
         filepath = os.path.join(ROOT_DIR, 'filepaths.txt')
         if not os.path.isfile(filepath):
             open(filepath, 'w+')
+            open(filepath,'w+')
         with open(filepath, 'r') as file:
             data = file.readlines()
         if len(data) < 4:

@@ -14,13 +14,9 @@ from trnsysGUI.PortItem import PortItem
 class TeePiece(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(TeePiece, self).__init__(trnsysType, parent, **kwargs)
-        self.sizeFactor = 0.39
-        self.w = 100 * self.sizeFactor
-        self.h = 100 * self.sizeFactor
+        self.w = 40
+        self.h = 40
 
-        # self.sizeFactor = 1
-        # self.w = 100 * self.sizeFactor
-        # self.h = 100 * self.sizeFactor
         self.typeNumber = 2
 
         self.inputs.append(PortItem('i', 0, self))
@@ -37,7 +33,7 @@ class TeePiece(BlockItem):
         w = self.w
         h = self.h
 
-        delta = 2
+        delta = 20
         # Limit the block size:
         if h < 20:
             h = 20
@@ -53,11 +49,9 @@ class TeePiece(BlockItem):
 
         self.label.setPos(lx, h - self.flippedV*(h+h/2))
 
-        self.inputs[0].setPos(- 2 * delta + 4 * self.flippedH * delta + w * self.flippedH,
-                              h - deltaH + 2 * deltaH * self.flippedV - h * self.flippedV)
-        self.inputs[1].setPos(w + 2 * delta - self.flippedH * w - 4 * self.flippedH * delta,
-                              h - deltaH + 2 * deltaH * self.flippedV - h * self.flippedV)
-        self.outputs[0].setPos(w / 2, -2 * delta + 4 * delta * self.flippedV + h * self.flippedV)
+        self.inputs[0].setPos(0,delta)
+        self.inputs[1].setPos(w,delta)
+        self.outputs[0].setPos(delta,0)
 
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.inputs[1].side = 2 - 2 * self.flippedH

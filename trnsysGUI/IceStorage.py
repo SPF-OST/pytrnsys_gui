@@ -14,8 +14,8 @@ from trnsysGUI.PortItem import PortItem
 class IceStorage(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(IceStorage, self).__init__(trnsysType, parent, **kwargs)
-        self.w = 100
-        self.h = 100
+        self.w = 120
+        self.h = 120
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
         self.loadedFiles = []
@@ -32,7 +32,7 @@ class IceStorage(BlockItem):
         deltaH = self.h / 13
 
         """ Resize block function """
-        delta = 1
+        delta = 20
 
         # Limit the block size:
         if h < 20:
@@ -52,10 +52,8 @@ class IceStorage(BlockItem):
         # self.outputs[0].side = 1 + 2 * self.flippedV
 
         # If inputs are on the (right per default) side
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta + w - self.flippedH * w,
-                               h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta + w - self.flippedH * w,
-                              h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
+        self.outputs[0].setPos(w,h-delta)
+        self.inputs[0].setPos(w,delta)
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 1 - 1 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4

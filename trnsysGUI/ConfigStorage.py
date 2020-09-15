@@ -301,7 +301,7 @@ class ConfigStorage(QDialog):
             msgb.exec_()
 
     def minOffsetDistance(self):
-        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 20
+        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 5
 
     def offsetsInRange(self):
         return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)

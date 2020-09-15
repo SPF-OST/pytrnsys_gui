@@ -9,8 +9,8 @@ class Connector(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Connector, self).__init__(trnsysType, parent, **kwargs)
         self.sizeFactor = 0.5
-        self.w = 100 * self.sizeFactor
-        self.h = 76.4 * self.sizeFactor
+        self.w = 40
+        self.h = 40
 
         self.inputs.append(PortItem('i', 0, self))
         self.outputs.append(PortItem('o', 2, self))
@@ -25,7 +25,7 @@ class Connector(BlockItem):
         w = self.w
         h = self.h
 
-        delta = 1
+        delta = 20
         # Limit the block size:
         if h < 20:
             h = 20
@@ -39,9 +39,8 @@ class Connector(BlockItem):
         self.label.setPos(lx, h)
 
         deltaH = self.h / 8
-        self.inputs[0].setPos(- 2 * delta + 4 * self.flippedH * delta + w * self.flippedH,
-                              h/2)
-        self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta + w - self.flippedH * w, h/2)
+        self.inputs[0].setPos(0,delta)
+        self.outputs[0].setPos(w,delta)
 
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
