@@ -1962,7 +1962,7 @@ class DiagramEditor(QWidget):
         -------
 
         """
-        print("filename is at encoder" + str(filename))
+        print("filename is at encoder " + str(filename))
         # if filename != "":
         with open(filename, 'w') as jsonfile:
             json.dump(self, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)

@@ -66,9 +66,9 @@ class MyQTreeView(QTreeView):
         Loads a file into the project path defined by the user.
         Checks if file already exists and allows user to override or cancel the load.
         """
-        filePath = self.model.rootPath()
+        filePath = self.getFilePath()
         fileName = QFileDialog.getOpenFileName(self, "Load file")[0]
-        simpFileName = fileName.split('/')[-1]
+        simpFileName = os.path.split(fileName)[-1]
         loadPath = os.path.join(filePath, simpFileName)
         print(loadPath)
         if fileName != '':
