@@ -7,16 +7,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:export-ydpi="96"
-   inkscape:export-xdpi="96"
-   inkscape:export-filename="C:\Daten\GIT\pytrnsys_gui\trnsysGUI\images\Kollektor.png"
-   width="120mm"
-   height="120mm"
-   viewBox="0 0 120 120"
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
    version="1.1"
    id="svg103"
    inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
-   sodipodi:docname="Kollektor.svg">
+   sodipodi:docname="Template_100_x_100.svg">
   <defs
      id="defs97" />
   <sodipodi:namedview
@@ -26,9 +23,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.2893527"
-     inkscape:cx="292.31289"
-     inkscape:cy="226.77165"
+     inkscape:zoom="1.979899"
+     inkscape:cx="47.030962"
+     inkscape:cy="179.41329"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -50,7 +47,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -58,28 +55,48 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-34.494049,-73.803574)">
-    <path
-       id="path863"
-       d="M 154.61081,173.80357 H 134.06163"
-       style="fill:none;stroke:#000000;stroke-width:3.53;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:3.53;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 154.56715,93.796698 H 134.01797"
-       id="path865" />
+     transform="translate(-44.494049,-83.803574)">
     <rect
-       style="fill:#cccccc;stroke:#000000;stroke-width:0.694088"
-       id="rect110"
-       width="108.70148"
-       height="108.70148"
-       x="35.896496"
-       y="79.439346" />
+       style="fill:#0000ff;fill-rule:evenodd;stroke-width:0.345536"
+       id="rect105"
+       width="100"
+       height="100"
+       x="44.494049"
+       y="83.803574" />
     <rect
-       y="85.478317"
-       x="41.935471"
-       height="96.623535"
-       width="96.623535"
-       id="rect114"
-       style="fill:#000080;stroke:#000000;stroke-width:0.616966" />
+       y="133.80357"
+       x="44.494049"
+       height="50"
+       width="50"
+       id="rect108"
+       style="fill:#ffff00;fill-rule:evenodd;stroke:none;stroke-width:0.172768" />
+    <rect
+       y="83.803574"
+       x="44.494049"
+       height="20"
+       width="20"
+       id="rect107"
+       style="fill:#00ff00;fill-rule:evenodd;stroke-width:0.0691072" />
+    <rect
+       style="fill:#00ff00;fill-rule:evenodd;stroke-width:0.0691072"
+       id="rect118"
+       width="20"
+       height="20"
+       x="44.494049"
+       y="163.80357" />
+    <rect
+       y="83.803574"
+       x="124.49405"
+       height="20"
+       width="20"
+       id="rect120"
+       style="fill:#00ff00;fill-rule:evenodd;stroke-width:0.0691072" />
+    <rect
+       style="fill:#00ff00;fill-rule:evenodd;stroke-width:0.0691072"
+       id="rect122"
+       width="20"
+       height="20"
+       x="124.49405"
+       y="163.80357" />
   </g>
 </svg>

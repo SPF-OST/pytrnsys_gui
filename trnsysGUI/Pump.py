@@ -12,12 +12,8 @@ import numpy as np
 class Pump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Pump, self).__init__(trnsysType, parent, **kwargs)
-        # factor = 0.6 for old pump
-        # factor = 0.5
-        # self.w = 100 * factor
-        # self.h = 100 * factor
-        self.w = 33
-        self.h = 33
+        self.w = 40
+        self.h = 40
         self.typeNumber = 1
         self.rndPwr = np.random.randint(0, 1000)
         self.resStr = "Mfr" + self.displayName + " = " + str(self.rndPwr) + "\n"
@@ -37,7 +33,7 @@ class Pump(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 2
+        delta = 20
 
         # Limit the block size:
         if h < 20:
@@ -51,8 +47,8 @@ class Pump(BlockItem):
         self.label.setPos(lx, h)
 
         # Update port positions:
-        self.inputs[0].setPos(self.flippedH * w - 2* delta + 2 * delta * self.flippedH, h / 2)
-        self.outputs[0].setPos(w - self.flippedH * w - 2* delta * self.flippedH, h / 2)
+        self.inputs[0].setPos(0,delta)
+        self.outputs[0].setPos(w,delta)
         # self.outputs[0].setPos(w - self.flippedH * w - 2 * delta * self.flippedH + 2 * delta, h / 2)
         # self.inputs[0].side = 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH

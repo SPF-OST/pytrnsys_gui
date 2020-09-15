@@ -2,7 +2,6 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.PortItem import PortItem
 
 
 class PV(BlockItem):

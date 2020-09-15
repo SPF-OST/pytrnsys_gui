@@ -8,9 +8,8 @@ from trnsysGUI.PortItem import PortItem
 class WTap_main(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(WTap_main, self).__init__(trnsysType, parent, **kwargs)
-        factor = 0.5
-        self.w = 100 * factor
-        self.h = 100 * factor
+        self.w = 40
+        self.h = 40
         self.inputs.append(PortItem('i', 0, self))
 
         self.exportInitialInput = 0.0
@@ -27,8 +26,7 @@ class WTap_main(BlockItem):
         h = self.h
 
         """ Resize block function """
-        delta = 0
-        deltaHF = 0.45
+        delta = 20
 
         # Limit the block size:
         if h < 20:
@@ -41,7 +39,7 @@ class WTap_main(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(-2 * delta + (4 * delta + w) * self.flippedH, h / 2)
+        self.inputs[0].setPos(0,delta)
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h

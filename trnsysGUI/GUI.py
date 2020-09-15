@@ -1113,7 +1113,7 @@ class DiagramEditor(QWidget):
 
         # Related to the grid blocks can snap to
         self.snapGrid = False
-        self.snapSize = 50
+        self.snapSize = 20
 
         self.trnsysPath = 'C:\Trnsys17\Exe\TRNExe.exe'
 
@@ -1129,28 +1129,12 @@ class DiagramEditor(QWidget):
 
         # Resource folder for library icons
         r_folder = "images/"
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Pump')),  'Pump'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Kollektor')),  'Kollektor'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TVentil')), 'TVentil'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'StorageTank')), 'StorageTank'))
-
-        # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Bvi')), 'Bvi'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'TeePiece')), 'TeePiece'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HP')), 'HP'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'IceStorage')), 'IceStorage'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'WTap')), 'WTap'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'WTap_main')), 'WTap_main'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Radiator')), 'Radiator'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Connector')), 'Connector'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericBlock')), 'GenericBlock'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'Boiler')), 'Boiler'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'AirSourceHP')), 'AirSourceHP'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'PV')), 'PV'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GroundSourceHx')), 'GroundSourceHx'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'ExternalHx')), 'ExternalHx'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'IceStorageTwoHx')), 'IceStorageTwoHx'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'HPTwoHx')), 'HPTwoHx'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'GenericItem')), 'GenericItem'))
+        componentsList = ['Connector', 'TeePiece', 'TVentil', 'WTap_main', 'WTap', 'Pump', 'Kollektor',
+                          'GroundSourceHx', 'PV',
+                          'HP', 'HPTwoHx', 'AirSourceHP', 'StorageTank', 'IceStorage', 'IceStorageTwoHx', 'ExternalHx',
+                          'Radiator', 'Boiler', 'GenericBlock', 'GenericItem']
+        for component in componentsList:
+            self.libItems.append(QtGui.QStandardItem(QIcon(r_folder + component), component))
 
         for i in self.libItems:
             self.libraryModel.appendRow(i)

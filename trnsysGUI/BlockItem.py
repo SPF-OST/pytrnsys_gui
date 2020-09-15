@@ -6,28 +6,9 @@ from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu
 
-# from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.MoveCommand import MoveCommand
-
-from PyQt5.QtWidgets import QUndoCommand
-
-# from trnsysGUI.Collector import Collector
-# from trnsysGUI.Connector import Connector
-# from trnsysGUI.GenericBlock import GenericBlock
-# from trnsysGUI.HeatPump import HeatPump
-# from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
-# from trnsysGUI.IceStorage import IceStorage
-# from trnsysGUI.Pump import Pump
-# from trnsysGUI.Radiator import Radiator
-# from trnsysGUI.StorageTank import StorageTank
-# from trnsysGUI.TVentil import TVentil
-# from trnsysGUI.TeePiece import TeePiece
-# from trnsysGUI.WTap import WTap
-# from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.ResizerItem import ResizerItem
-from trnsysGUI.TVentilDlg import TVentilDlg
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -44,8 +25,8 @@ class BlockItem(QGraphicsPixmapItem):
     def __init__(self, trnsysType, parent, **kwargs):
 
         super(BlockItem, self).__init__(None)
-        self.w = 100.0
-        self.h = 100.0
+        self.w = 120.0
+        self.h = 120.0
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
         self.propertyFile = []
@@ -92,6 +73,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         # To use svg instead of png for blocks:
         self.imageSource = "images/" + self.name + ".svg"
+        if not os.path.exists(self.imageSource):
+            self.imageSource = "images/" + self.name + ".png"
         self.image = QImage(self.imageSource)
         self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
         self.pixmap = QPixmap(self.image)
