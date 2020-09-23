@@ -231,7 +231,7 @@ class HeatPump(BlockItem):
         if self.parent.parent().projectPath =='':
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
-            self.path = self.parent.parent().tempPath
+            self.path = self.parent.parent().projectFolder
             # now = datetime.now()
             # self.fileName = now.strftime("%Y%m%d%H%M%S")
             # self.path = os.path.join(self.path, self.fileName)

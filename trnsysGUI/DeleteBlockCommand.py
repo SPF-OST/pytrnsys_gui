@@ -55,7 +55,7 @@ class DeleteBlockCommand(QUndoCommand):
             bl = trnsysGUI.TVentil.TVentil(name, self.blParent)
         elif name == 'Pump':
             bl = trnsysGUI.Pump.Pump(name, self.blParent)
-        elif name == 'Kollektor':
+        elif name == 'Collector':
             bl = trnsysGUI.Collector.Collector(name, self.blParent)
         elif name == 'HP':
             bl = trnsysGUI.HeatPump.HeatPump(name, self.blParent)

@@ -23,7 +23,7 @@ class MasterControl(BlockItem):
 
     def createControlDir(self):
         if self.parent.parent().projectPath == '':
-            projectPath = self.parent.parent().tempPath
+            projectPath = self.parent.parent().projectFolder
         else:
             projectPath = self.parent.parent().projectPath
 

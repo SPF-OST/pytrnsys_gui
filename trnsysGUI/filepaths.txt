@@ -1,4 +1,2 @@
-C:/Daten/gui_testing/gui_export
-C:/Daten/gui_testing/gui_diagram
-C:/Daten/gui_testing/gui_ddck
+C:/Daten/GIT/pytrnsys/pytrnsys_ddck
 C:/Trnsys17

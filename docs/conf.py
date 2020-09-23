@@ -35,8 +35,11 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-	'recommonmark'
+	'recommonmark',
+    'rst2pdf.pdfbuilder'
 ]
+
+pdf_documents = [('index', u'pytrnsys_GUI_doc', u'Documentation of pytrnsys_GUI', u'Martin Neugebauer'),]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

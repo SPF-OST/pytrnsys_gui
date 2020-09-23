@@ -883,25 +883,26 @@ class StorageTank(BlockItem):
         nPorts = len(self.directPortConnsForList)
         nHx = len(self.heatExchangers)
 
-        if getattr(sys, 'frozen', False):
-            ROOT_DIR = os.path.dirname(sys.executable)
-        elif __file__:
-            ROOT_DIR = os.path.dirname(__file__)
-        # filePath = os.path.join(ROOT_DIR, 'ddck')
-        filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
-        with open(filepaths, 'r') as file:
-            data = file.readlines()
-        filePath = (data[2][:-1])
-        fileName = self.parent.parent().parent().currentFile
-        print(fileName)
+        # if getattr(sys, 'frozen', False):
+        #     ROOT_DIR = os.path.dirname(sys.executable)
+        # elif __file__:
+        #     ROOT_DIR = os.path.dirname(__file__)
+        # # filePath = os.path.join(ROOT_DIR, 'ddck')
+        # filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
+        # with open(filepaths, 'r') as file:
+        #     data = file.readlines()
+        # filePath = (data[2][:-1])
 
-        if '\\' in fileName:
-            name = fileName.split('\\')[-1][:-5]
-        elif '/' in fileName:
-            name = fileName.split('/')[-1][:-5]
-        else:
-            name = fileName
-        name = name + '_nTes' + str(self.nTes)
+        # fileName = self.parent.parent().parent().currentFile
+        # print(fileName)
+        #
+        # if '\\' in fileName:
+        #     name = fileName.split('\\')[-1][:-5]
+        # elif '/' in fileName:
+        #     name = fileName.split('/')[-1][:-5]
+        # else:
+        #     name = fileName
+        # name = name + '_nTes' + str(self.nTes)
 
         print("Storage Type:", self.storageType)
         print("nTes:", self.nTes)
@@ -953,7 +954,8 @@ class StorageTank(BlockItem):
             outputPos = self.heatExchangers[i].output / 100
             connectorsHx[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
 
-        exportPath = os.path.join(filePath, name+'.ddck')
+        # exportPath = os.path.join(filePath, name+'.ddck')
+        exportPath = os.path.join(self.path,self.displayName + '.ddck')
         print(exportPath)
         if Path(exportPath).exists():
             qmb = QMessageBox()
@@ -974,7 +976,7 @@ class StorageTank(BlockItem):
 
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
 
-        tool.createDDck(self.path, name, self.displayName, typeFile="ddck")
+        tool.createDDck(self.path, self.displayName, self.displayName, typeFile="ddck")
         self.loadedTo = self.path
 
     def loadDck(self):
@@ -1051,7 +1053,7 @@ class StorageTank(BlockItem):
         if self.parent.parent().projectPath =='':
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
-            self.path = self.parent.parent().tempPath
+            self.path = self.parent.parent().projectFolder
             # now = datetime.now()
             # self.fileName = now.strftime("%Y%m%d%H%M%S")
             # self.path = os.path.join(self.path, self.fileName)
