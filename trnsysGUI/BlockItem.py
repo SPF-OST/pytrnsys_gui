@@ -53,7 +53,8 @@ class BlockItem(QGraphicsPixmapItem):
         if "displayName" in kwargs:
             self.displayName = kwargs["displayName"]
         else:
-            self.displayName = trnsysType + str(self.id)
+            self.displayName = trnsysType + '_' + str(self.id)
+
 
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)

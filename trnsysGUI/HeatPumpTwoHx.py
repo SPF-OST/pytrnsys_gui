@@ -243,7 +243,7 @@ class HeatPumpTwoHx(BlockItem):
         A file explorer for that item is added to the right of the main window by calling this method
         """
         print(self.parent.parent())
-        pathName = 'HPTwoHx_' + self.displayName
+        pathName = self.displayName
         if self.parent.parent().projectPath =='':
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
@@ -286,7 +286,7 @@ class HeatPumpTwoHx(BlockItem):
         When the user chooses the project path for the file explorers, this method is called
         to update the root path.
         """
-        pathName = 'HPTwoHx_' + self.displayName
+        pathName = self.displayName
         self.path = os.path.join(path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
@@ -325,7 +325,8 @@ class HeatPumpTwoHx(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         print(os.path.dirname(self.path))
-        destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
+        # destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
+        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

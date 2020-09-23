@@ -2016,11 +2016,14 @@ class DiagramEditor(QWidget):
         -------
 
         """
-        try:
-            with open(filename, 'r') as jsonfile:
-                blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)  # Working
-        except:
-            print("No such file: " + filename)
+        # try:
+        #     with open(filename, 'r') as jsonfile:
+        #         blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)  # Working
+        # except:
+        #     print("No such file: " + filename)
+
+        with open(filename, 'r') as jsonfile:
+            blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)
 
         if len(self.groupList) == 0:
             print("self.group is empty, adding default group")
@@ -2037,7 +2040,8 @@ class DiagramEditor(QWidget):
                     k.setParent(self.diagramView)
                     k.changeSize()
                     self.diagramScene.addItem(k)
-                    blockFolderNames.append(k.name + '_' + k.displayName)
+                    blockFolderNames.append(k.displayName)
+                    # blockFolderNames.append(k.name + '_' + k.displayName)
                     # k.setBlockToGroup("defaultGroup")
 
                 if isinstance(k, StorageTank):
@@ -2093,7 +2097,7 @@ class DiagramEditor(QWidget):
         additionalFolders = []
 
         for folder in ddckFolders:
-            if folder not in blockFolderNames and 'Tes' not in folder:
+            if folder not in blockFolderNames and 'StorageTank' not in folder:
                 additionalFolders.append(folder)
 
         if len(additionalFolders) > 0:
