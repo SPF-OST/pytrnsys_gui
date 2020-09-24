@@ -8,6 +8,7 @@ from trnsysGUI.Connection import Connection
 from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.StorageTank import StorageTank
 
 
 class Export(object):
@@ -15,6 +16,27 @@ class Export(object):
         self.trnsysObj = objList
         self.editor = editor
         self.maxChar = 20
+
+        self.lineNumOfPar = 0
+        for component in self.trnsysObj:
+            numOfRelPorts = 0
+            if isinstance(component,StorageTank) or (isinstance(component,Connection) and (type(component.fromPort.parent) is StorageTank or type(component.toPort.parent) is StorageTank)):
+                pass
+            else:
+                try:
+                    numOutputs = len(component.outputs)
+                except:
+                    pass
+                try:
+                    numInputs = len(component.inputs)
+                except:
+                    pass
+                if numOutputs + numInputs <= 1:
+                    numOfRelPorts = numOutputs + numInputs
+                else:
+                    numOfRelPorts = min(numOutputs,numInputs)
+            self.lineNumOfPar += numOfRelPorts
+        self.numOfPar = 4*self.lineNumOfPar+1
 
     def exportBlackBox(self):
         f = "*** Black box component temperatures" + "\n"
@@ -76,22 +98,27 @@ class Export(object):
 
         return f + "\n"
 
-    def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength, parameters, lineNr):
+    def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength):
         # If not all ports of an object are connected, less than 4 numbers will show up
         # TrnsysConn is a list containing the fromPort and twoPort in order as they appear in the export of connections
         f = ""
         f += "UNIT " + str(simulationUnit) + " TYPE " + str(simulationType) + "\n"
-        f += "PARAMETERS " + str(parameters) + "\n"
-        f += str(lineNr) + "\n"
+        f += "PARAMETERS " + str(self.numOfPar) + "\n"
+        f += str(self.lineNumOfPar) + "\n"
 
         # exportConnsString: i/o i/o 0 0
         tempObjList = []
         nameString = ''
         for t in self.trnsysObj:
 
-            ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
-            f += ObjToCheck
-            ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
+            noHydraulicConnection = isinstance(t,StorageTank) or (not(isinstance(t, Connection)) and not t.outputs and not t.inputs)
+
+            if noHydraulicConnection:
+                continue
+            else:
+                ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
+                f += ObjToCheck
+                ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
 
             # f += t.exportParametersFlowSolver(descConnLength)[0]
 
@@ -103,8 +130,8 @@ class Export(object):
             # else:
             #     tempObjList.append(ObjToCheck)
 
-            if len(ObjToCheck) > self.maxChar-5:
-                nameString += ObjToCheck + '\n'
+                if len(ObjToCheck) > self.maxChar-5:
+                    nameString += ObjToCheck + '\n'
                 # return False
 
             # print(ObjToCheck)
@@ -181,10 +208,10 @@ class Export(object):
         # fileCopy = [l[1:None] for l in fileCopy]
         return '\n'.join(fileCopy)
 
-    def exportInputsFlowSolver(self, inputNr):
+    def exportInputsFlowSolver(self):
         #  add a string to block and connection for exportPrintInput
         f = ''
-        f += "INPUTS " + str(inputNr) + "! for Type 935\n"
+        f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 935\n"
 
         counter = 0
 

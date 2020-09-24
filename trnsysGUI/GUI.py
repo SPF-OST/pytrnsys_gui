@@ -1304,11 +1304,12 @@ class DiagramEditor(QWidget):
         self.alignXLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignXLineItem)
 
-        if parent.loadValue == 'load':
+        test = os.path.join(self.projectFolder,self.diagramName)
+
+        if parent.loadValue == 'load' or parent.loadValue == 'copy':
             self.decodeDiagram(os.path.join(self.projectFolder,self.diagramName),loadValue=parent.loadValue)
         elif parent.loadValue == 'json':
             self.decodeDiagram(parent.jsonPath,loadValue=parent.loadValue)
-
 
         # #Search related lists
         # self.bfs_visitedNodes = []
@@ -1669,31 +1670,31 @@ class DiagramEditor(QWidget):
         parameters = 0
 
         # This has to be changed
-        for t in self.trnsysObj:
-            if type(t) is StorageTank:
-                continue
-            if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-                continue
-            if type(t) is HeatPump:
-                parameters += 2
-                continue
-            if type(t) is GenericBlock:
-                parameters += len(t.inputs)
-                continue
-            if type(t) is ExternalHx:
-                parameters += 2
-                continue
-            if type(t) is IceStorageTwoHx:
-                parameters += 2
-                continue
-            if type(t) is HeatPumpTwoHx:
-                parameters += 3
-                continue
-
-            parameters += 1
-
-        lineNrParameters = parameters
-        parameters = parameters * 4 + 1
+        # for t in self.trnsysObj:
+        #     if type(t) is StorageTank:
+        #         continue
+        #     if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
+        #         continue
+        #     if type(t) is HeatPump:
+        #         parameters += 2
+        #         continue
+        #     if type(t) is GenericBlock:
+        #         parameters += len(t.inputs)
+        #         continue
+        #     if type(t) is ExternalHx:
+        #         parameters += 2
+        #         continue
+        #     if type(t) is IceStorageTwoHx:
+        #         parameters += 2
+        #         continue
+        #     if type(t) is HeatPumpTwoHx:
+        #         parameters += 3
+        #         continue
+        #
+        #     parameters += 1
+        #
+        # lineNrParameters = parameters
+        # parameters = parameters * 4 + 1
 
         exporter = Export(self.trnsysObj, self)
 
@@ -1702,8 +1703,8 @@ class DiagramEditor(QWidget):
         fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
-        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength, parameters, lineNrParameters)
-        fullExportText += exporter.exportInputsFlowSolver(lineNrParameters)
+        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength)#, parameters, lineNrParameters)
+        fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit+1)   # DC-ERROR
 
@@ -3489,7 +3490,7 @@ class MainWindow(QMainWindow):
     def copyToNew(self):
         print("Copying project to new folder")
 
-        self.loadValue = 'load'
+        self.loadValue = 'copy'
         pathDialog = FolderSetUp(self)
         self.projectFolder = pathDialog.projectFolder
 
