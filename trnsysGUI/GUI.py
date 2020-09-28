@@ -1717,9 +1717,9 @@ class DiagramEditor(QWidget):
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr+1, 15)
 
-        tes = open(os.path.join(ddckFolder, "Tes\\Tes.ddck"), "r")
-        fullExportText += tes.read()
-        tes.close()
+        # tes = open(os.path.join(ddckFolder, "Tes\\Tes.ddck"), "r")
+        # fullExportText += tes.read()
+        # tes.close()
 
         fullExportText += "ENDS"
 
