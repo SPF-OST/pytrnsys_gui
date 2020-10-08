@@ -1,4 +1,5 @@
 import os
+import glob
 from math import sqrt
 
 from PyQt5 import QtCore
@@ -729,15 +730,40 @@ class BlockItem(QGraphicsPixmapItem):
 
         return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-    def exportBlackBox(self):
-        # if len(t.inputs + t.outputs) == 2 and not isinstance(self, Connector):
-        if len(self.inputs + self.outputs) == 2 and self.isVisible():
-            resStr = "T" + self.displayName + "=1 \n"
-            equationNr = 1
+    # def exportBlackBox(self):
+    #     # if len(t.inputs + t.outputs) == 2 and not isinstance(self, Connector):
+    #     if len(self.inputs + self.outputs) == 2 and self.isVisible():
+    #         resStr = "T" + self.displayName + "=1 \n"
+    #         equationNr = 1
+    #
+    #         return resStr, equationNr
+    #     else:
+    #         return "", 0
 
-            return resStr, equationNr
+    def exportBlackBox(self):
+        equation = []
+        if len(self.inputs + self.outputs) == 2 and self.isVisible():
+            files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
+            if not(files):
+                status = 'noDdckFile'
+            else:
+                status = 'noDdckEntry'
+            lines = []
+            for file in files:
+                infile = open(file, 'r')
+                lines += infile.readlines()
+            for i in range(len(lines)):
+                if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
+                    for j in range(i, len(lines) - i):
+                        if lines[j][0] == "T":
+                            outputT = lines[j].split("=")[0].replace(" ", "")
+                            status = 'success'
+                            break
+                    equation = ["T" + self.displayName + "=" + outputT]
+                    break
         else:
-            return "", 0
+            status = 'noBlackBoxOutput'
+        return status, equation
 
     def exportPumpOutlets(self):
         return "", 0

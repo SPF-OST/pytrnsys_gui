@@ -1,5 +1,6 @@
 import os
 import shutil
+import glob
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
@@ -153,3 +154,25 @@ class Collector(BlockItem):
             os.rename(self.path, destPath)
             self.path = destPath
             print(self.path)
+
+    # def exportBlackBox(self):
+    #     equation = []
+    #     if len(self.inputs + self.outputs) == 2 and self.isVisible():
+    #         files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
+    #         lines = []
+    #         for file in files:
+    #             infile = open(file, 'r')
+    #             lines += infile.readlines()
+    #         for i in range(len(lines)):
+    #             if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
+    #                 for j in range(i, len(lines) - i):
+    #                     if lines[j][0] == "T":
+    #                         outputT = lines[j].split("=")[0].replace(" ", "")
+    #                         break
+    #                 break
+    #         equation = ["T" + self.displayName + "=" + outputT + "\n"]
+    #     return equation
+
+
+
+

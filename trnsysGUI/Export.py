@@ -1,5 +1,6 @@
 import re
 import string
+import os
 import sys
 
 from PyQt5.QtWidgets import QMessageBox
@@ -9,6 +10,9 @@ from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.StorageTank import StorageTank
+from trnsysGUI.Connector import Connector
+from trnsysGUI.TeePiece import TeePiece
+from trnsysGUI.Collector import Collector
 
 
 class Export(object):
@@ -38,17 +42,84 @@ class Export(object):
             self.lineNumOfPar += numOfRelPorts
         self.numOfPar = 4*self.lineNumOfPar+1
 
-    def exportBlackBox(self):
+    def connectionExplorer(self):
+        connectionDict = {}
+        connectionDictNum = {}
+
+        numOfStorageTanks = 0
+        for t in self.trnsysObj:
+            # if isinstance(t,StorageTank):
+            #     numOfStorageTanks += 1
+            #     tesName = "Tes_%s" % numOfStorageTanks
+            #     connectionDict[tesName] =  [t.trnsysId, '','']
+            #     connectionDictNum[str(t.trnsysId)] = tesName
+            #     for p in t.inputs + t.outputs:
+            #         if not(p.isFromHx):
+            #             if p.side == 0:
+            #                 lr = "Left"
+            #             else:
+            #                 lr = "Right"
+            #             displayName = t.displayName + "Port" + lr + str(
+            #                 int(100 * (1 - (p.scenePos().y() - p.parent.scenePos().y()) / p.parent.h)))
+            #             for
+            #
+            #             if p.name == 'i':
+            #                 connectionDict[displayName] = [t.trnsysId,p.connectionList[0].toPortId, p.connectionList[0].toPortId]
+            #             elif p.name == 'o':
+            #                 connectionDict[displayName] = [t.trnsysId, p.connectionList[0].toPortId,p.connectionList[0].toPortId]
+            if not isinstance(t, StorageTank):
+                toElement = ''
+                try:
+                    toElement = t.toPort.parent.trnsysId
+                except:
+                    pass
+
+                fromElement = ''
+                try:
+                    fromElement = t.fromPort.parent.trnsysId
+                except:
+                    pass
+
+                connectionDict[t.displayName] =  [t.trnsysId,toElement,fromElement]
+                connectionDictNum[str(t.trnsysId)] = t.displayName
+        return connectionDict, connectionDictNum
+
+    def exportBlackBox(self,exportTo='ddck'):
         f = "*** Black box component temperatures" + "\n"
         equationNr = 0
+        problemEncountered = False
 
         for t in self.trnsysObj:
-            f += t.exportBlackBox()[0]
-            equationNr += t.exportBlackBox()[1]
+            status, equations = t.exportBlackBox()
+            if status == 'success':
+                for equation in equations:
+                    f += equation + "\n"
+                equationNr += len(equations)
+            elif status == 'noDdckFile' or status == 'noDdckEntry':
+                problemEncountered = True
+                if status == 'noDdckFile':
+                    messageText = 'No ddck-file was found in the folder of ' + t.displayName + '.'
+                elif status == 'noDdckEntry':
+                    messageText = 'No output temperature entry was found in the ddck-file(s) of ' + t.displayName + '.'
+                messageText = messageText + ' This issue needs to be addressed before a file can be exported.'
+                qmb = QMessageBox()
+                qmb.setText(messageText)
+                qmb.setStandardButtons(QMessageBox.Ok)
+                qmb.setDefaultButton(QMessageBox.Ok)
+                qmb.exec()
+                break
+
+        if exportTo == 'mfs':
+            lines = f.split("\n")
+            f = ''
+            for i in range(len(lines)):
+                if "=" in lines[i]:
+                    lines[i] = lines[i].split("=")[0] + "=1"
+                f += lines[i] + "\n"
 
         f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
-        return f
+        return problemEncountered,f
 
     def exportPumpOutlets(self):
         f = "*** Pump outlet temperatures" + "\n"
@@ -72,31 +143,55 @@ class Export(object):
 
         return f
 
-    def exportDivSetting(self, unit):
+    def exportDivSetting(self, unit, exportTo='hydraulics'):
         """
 
         :param unit: the index of the previous unit number used.
         :return:
         """
+        canceled = False
+        if exportTo == 'hydraulics':
+            ddckPath = os.path.join(self.editor.projectFolder,'ddck\\control')
+            if os.path.isfile(ddckPath + '\\valve_control.ddck'):
+                qmb = QMessageBox()
+                qmb.setText("Warning: " +
+                            "The file control\\valve_control.ddck already exists. Do you want to overwrite it or cancel?")
+                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                qmb.setDefaultButton(QMessageBox.Cancel)
+                ret = qmb.exec()
+                if ret == QMessageBox.Cancel:
+                    canceled = True
 
-        nUnit = unit
-        f = ""
-        constants = 0
-        f2 = ""
-        for t in self.trnsysObj:
-            f2 += t.exportDivSetting1()[0]
-            constants += t.exportDivSetting1()[1]
+        f = ''
 
-        if constants > 0:
-            f = "CONSTANTS " + str(constants) + "\n"
-            f += f2 + "\n"
+        if not canceled:
+            nUnit = unit
+            constants = 0
+            f2 = ''
+            for t in self.trnsysObj:
+                f2 += t.exportDivSetting1()[0]
+                constants += t.exportDivSetting1()[1]
 
-        for t in self.trnsysObj:
-            res = t.exportDivSetting2(nUnit)
-            f += res[0]
-            nUnit = res[1]
+            if constants > 0:
+                f = "CONSTANTS " + str(constants) + "\n"
+                f += f2 + "\n"
 
-        return f + "\n"
+            for t in self.trnsysObj:
+                res = t.exportDivSetting2(nUnit)
+                f += res[0]
+                nUnit = res[1]
+
+            if f != '' and exportTo == 'hydraulics':
+                header = "*************************************\n"
+                header += "**BEGIN valve_control.ddck\n"
+                header += "*************************************\n\n"
+                f = header + f
+
+                outfile = open(ddckPath + '\\valve_control.ddck', 'w')
+                outfile.writelines(f)
+                outfile.close()
+
+        return canceled, f
 
     def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength):
         # If not all ports of an object are connected, less than 4 numbers will show up
@@ -343,10 +438,15 @@ class Export(object):
             #             t.exportEquations.append(temp)
             #             nEqUsed += 1 #DC
             #         equationNumber += 1#DC-ERROR it should count anyway
-            res = t.exportOutputsFlowSolver(prefix, abc, equationNumber, simulationUnit)
-            tot += res[0]
-            equationNumber = res[1]
-            nEqUsed += res[2]
+            noHydraulicConnection = isinstance(t, StorageTank) or (not (isinstance(t, Connection)) and not t.outputs and not t.inputs)
+
+            if noHydraulicConnection:
+                continue
+            else:
+                res = t.exportOutputsFlowSolver(prefix, abc, equationNumber, simulationUnit)
+                tot += res[0]
+                equationNumber = res[1]
+                nEqUsed += res[2]
 
         head = "EQUATIONS {0}	! Output up to three (A,B,C) mass flow rates of each component, positive = " \
                "input/inlet, negative = output/outlet ".format(nEqUsed-1)
@@ -631,7 +731,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName + "_Mfr.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self.editor.diagramName.split('.')[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -685,7 +785,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName + "_T.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self.editor.diagramName.split('.')[0] + "_T.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"

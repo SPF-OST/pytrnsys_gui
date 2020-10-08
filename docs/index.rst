@@ -12,7 +12,7 @@ Table of contents
 .. toctree::
    :maxdepth: 2
 
-   guide/index
+   guide/fileTree
    guide/interface
    CodeReference
 

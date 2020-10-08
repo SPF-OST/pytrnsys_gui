@@ -50,4 +50,4 @@ class Connector(BlockItem):
         return w, h
 
     def exportBlackBox(self):
-        return "", 0
+        return 'noBlackBoxOutput', []

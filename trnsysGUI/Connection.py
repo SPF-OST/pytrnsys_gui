@@ -78,6 +78,9 @@ class Connection(object):
         self.exportEquations = []
         self.trnsysConn = []
 
+        # For functions in storage tank
+        self.side = ''
+
         # Global
         self.id = self.parent.idGen.getID()
         self.connId = self.parent.idGen.getConnID()
@@ -1325,7 +1328,7 @@ class Connection(object):
 
     # Export related
     def exportBlackBox(self):
-        return "", 0
+        return 'noBlackBoxOutput', []
 
     def exportPumpOutlets(self):
         return "", 0
@@ -1472,8 +1475,10 @@ class Connection(object):
                     else:
                         lr = "Right"
 
-                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
-                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                        # (100 - 100 * self.directPortConnsForList[i].fromPort.pos().y() / self.h) / 100
+
+                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * round((1 - (
+                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h),2))) + "\n"
                 elif hasattr(self.trnsysConn[0], "subBlockCounter"):
                     unitText += "T" + self.trnsysConn[0].displayName + "X" + str(self.trnsysConn[0].getSubBlockOffset(self)) + "\n"
                 else:
@@ -1509,8 +1514,8 @@ class Connection(object):
                     else:
                         lr = "Right"
 
-                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
-                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
+                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * round((1 - (
+                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h),2))) + "\n"
                 elif hasattr(self.trnsysConn[1], "subBlockCounter"):
                     unitText += "T" + self.trnsysConn[1].displayName + "X" + str(self.trnsysConn[1].getSubBlockOffset(self)) + "\n"
                 else:

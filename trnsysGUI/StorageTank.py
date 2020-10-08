@@ -1,4 +1,5 @@
 import os
+import glob
 import random
 import shutil
 import sys
@@ -21,7 +22,6 @@ from trnsysGUI.Types.createType1924 import Type1924_TesPlugFlow
 
 
 class StorageTank(BlockItem):
-    delta = 4
 
     def __init__(self, trnsysType, parent, **kwargs):
         super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
@@ -44,6 +44,8 @@ class StorageTank(BlockItem):
         self.hxInsideConnsRight = []
 
         self.directPortConnsForList = []
+
+        self.blackBoxEquations = []
 
         self.nTes = self.parent.parent().idGen.getStoragenTes()
         self.storageType = self.parent.parent().idGen.getStorageType()
@@ -73,19 +75,17 @@ class StorageTank(BlockItem):
         if left:
             if s == 'i':
                 self.inputs.append(PortItem('i', 0, self))
-                self.inputs[-1].setPos(-2 * StorageTank.delta,
-                                       hAbs)  # Not sure if this is the correct access to class variables
+                self.inputs[-1].setPos(0.,hAbs)  # Not sure if this is the correct access to class variables
             else:
                 self.outputs.append(PortItem('i', 0, self))
-                self.outputs[-1].setPos(-2 * StorageTank.delta,
-                                        hAbs)
+                self.outputs[-1].setPos(0.,hAbs)
         else:
             if s == 'o':
                 self.inputs.append(PortItem('o', 0, self))
-                self.inputs[-1].setPos(self.w + 2 * StorageTank.delta, hAbs)
+                self.inputs[-1].setPos(self.w, hAbs)
             else:
                 self.outputs.append(PortItem('o', 0, self))
-                self.outputs[-1].setPos(self.w + 2 * StorageTank.delta, hAbs)
+                self.outputs[-1].setPos(self.w,hAbs)
 
 
     # Ports related
@@ -128,13 +128,13 @@ class StorageTank(BlockItem):
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
         if left:
-            port1.setPos(-2 * StorageTank.delta, hAbsI)
-            port2.setPos(-2 * StorageTank.delta, hAbsO)
+            port1.setPos(0., hAbsI)
+            port2.setPos(0., hAbsO)
             port1.side = 0
             port2.side = 0
         else:
-            port1.setPos(self.w + 2 * StorageTank.delta, hAbsI)
-            port2.setPos(self.w + 2 * StorageTank.delta, hAbsO)
+            port1.setPos(self.w, hAbsI)
+            port2.setPos(self.w, hAbsO)
             port1.side = 2
             port2.side = 2
 
@@ -158,6 +158,10 @@ class StorageTank(BlockItem):
             c.id = kwargs["connId"]
             c.connId = kwargs["connCid"]
             c.trnsysId = kwargs["trnsysConnId"]
+            if port1.side == 0:
+                c.side = 'Left'
+            elif port1.side == 2:
+                c.side = 'Right'
             self.directPortConnsForList.append(c)
             return c
 
@@ -807,44 +811,17 @@ class StorageTank(BlockItem):
 
     # Export related
     def exportBlackBox(self):
-        equationNr = 0
-        resStr = ""
-
-        for p in self.inputs + self.outputs:
-            if not p.isFromHx:
-                if p.side == 0:
-                    lr = "Left"
-                else:
-                    lr = "Right"
-                resStr += "T" + self.displayName + "Port" + lr + str(
-                    int(100 * (1 - (p.scenePos().y() - p.parent.scenePos().y()) / p.parent.h))) + "=1\n"
-                equationNr += 1
-                continue
-            else:
-                # Check if there is at least one internal connection
-                # p.name == i to only allow one temperature entry per hx
-                # Prints the name of the Hx Connector element.
-                # Assumes that the Other port has no connection except to the storage
-                if len(p.connectionList) > 0 and p.name == 'i':
-                    # f += "T" + p.connectionList[1].displayName + "=1\n"
-                    print("dds " + p.connectionList[1].displayName)
-                    print("dds " + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName)
-                    print("dds " + p.connectionList[1].fromPort.connectionList[1].fromPort.parent.displayName)
-                    # print("dds " + p.connectionList[2].displayName)
-
-                    # p is a hx port; the external port has two connections, so the second one yields the hx connector
-
-                    # Here the Hx name is printed.
-                    if p.connectionList[1].fromPort is p:
-                        # resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
-                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
-                    else:
-                        # resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
-                        resStr += "T" + p.connectionList[0].displayName + "=1\n"
-
-                    equationNr += 1
-
-        return resStr, equationNr
+        ddcxPath = os.path.join(self.path,self.displayName)
+        ddcxPath = ddcxPath + ".ddcx"
+        if not os.path.isfile(ddcxPath):
+            self.exportDck()
+        infile=open(ddcxPath,'r')
+        lines=infile.readlines()
+        equations = []
+        for line in lines:
+            if line[0] == "T":
+                equations.append(line.replace("\n",""))
+        return 'success', equations
 
     def exportParametersFlowSolver(self, descConnLength):
         return "", 0
@@ -940,19 +917,21 @@ class StorageTank(BlockItem):
 
         for i in range(inputs["nPorts"]):
             Tname = "T" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
+            side = self.directPortConnsForList[i].side
             Mfrname = "Mfr" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
             Trev = "T" + self.directPortConnsForList[i].toPort.connectionList[1].displayName
             inputPos = (100-100*self.directPortConnsForList[i].fromPort.pos().y()/self.h)/100
             outputPos = (100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h)/100
-            connectorsPort[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
+            connectorsPort[i] = {"T": Tname, "side": side, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
 
         for i in range(inputs["nHx"]):
+            HxName = self.heatExchangers[i].displayName
             Tname = "T" + self.heatExchangers[i].port1.connectionList[1].displayName
             Mfrname = "Mfr" + self.heatExchangers[i].port1.connectionList[1].displayName
             Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
             inputPos = self.heatExchangers[i].input / 100
             outputPos = self.heatExchangers[i].output / 100
-            connectorsHx[i] = {"T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
+            connectorsHx[i] = {"Name": HxName, "T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
 
         # exportPath = os.path.join(filePath, name+'.ddck')
         exportPath = os.path.join(self.path,self.displayName + '.ddck')

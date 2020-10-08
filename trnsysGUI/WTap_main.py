@@ -1,3 +1,6 @@
+import glob
+import os
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
@@ -10,7 +13,8 @@ class WTap_main(BlockItem):
         super(WTap_main, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
         self.h = 40
-        self.inputs.append(PortItem('i', 0, self))
+        # self.inputs.append(PortItem('i', 0, self))
+        self.outputs.append(PortItem('o', 0, self))
 
         self.exportInitialInput = 0.0
 
@@ -39,16 +43,28 @@ class WTap_main(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(0,delta)
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        # self.inputs[0].setPos(0,delta)
+        # self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+
+        self.outputs[0].setPos(0,delta)
+        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h
 
-
-    def exportBlackBox(self):
-        resStr = "T"+ self.displayName + " = 1\n"
-        eqNb = 1
-        return resStr, eqNb
+    # def exportBlackBox(self):
+    #     files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
+    #     lines = []
+    #     for file in files:
+    #         infile = open(file, 'r')
+    #         lines += infile.readlines()
+    #     for i in range(len(lines)):
+    #         if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
+    #             for j in range(i, len(lines) - i):
+    #                 if lines[j][0] == "T":
+    #                     outputT = lines[j].split("=")[0].replace(" ", "")
+    #                     break
+    #             break
+    #     return ["T" + self.displayName + "=" + outputT + "\n"]
 
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"
@@ -93,3 +109,8 @@ class WTap_main(BlockItem):
         temp1 = "Mfr" + self.displayName
         self.exportInputName = " " + temp1 + " "
         return self.exportInputName, 1
+
+    def exportPumpOutlets(self):
+        resStr = "T" + self.displayName + " = " + "T" + self.outputs[0].connectionList[0].displayName + "\n"
+        equationNr = 1
+        return resStr, equationNr

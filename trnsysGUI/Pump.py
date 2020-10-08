@@ -57,7 +57,7 @@ class Pump(BlockItem):
         return w, h
 
     def exportBlackBox(self):
-        return "", 0
+        return 'noBlackBoxOutput', []
 
     def exportPumpOutlets(self):
         f = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"

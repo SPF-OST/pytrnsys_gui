@@ -4,6 +4,7 @@ import glob
 import re
 import shutil
 import string
+import pandas as pd
 from datetime import datetime
 from math import sqrt, acos, pi, degrees, atan
 
@@ -83,6 +84,7 @@ from trnsysGUI.IdGenerator import IdGenerator
 from trnsysGUI.Connection import Connection
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.configFile import configFile
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import *
@@ -1070,6 +1072,8 @@ class DiagramEditor(QWidget):
 
     Attributes
     ----------
+    projectFolder : str
+        Path to the folder of the project
     diagramName : str
         Name used for saving the diagram
     saveAsPath : :obj:`Path`
@@ -1179,8 +1183,8 @@ class DiagramEditor(QWidget):
                           'Radiator','Boiler','GenericBlock','GenericItem']
         for component in componentsList:
             self.libItems.append(QtGui.QStandardItem(QIcon(r_folder+component),component))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'MasterControl')), 'MasterControl'))
-        self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'control')), 'Control'))
+        #self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'MasterControl')), 'MasterControl'))
+        #self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'control')), 'Control'))
 
         for i in self.libItems:
             self.libraryModel.appendRow(i)
@@ -1231,12 +1235,12 @@ class DiagramEditor(QWidget):
         self.fileBrowserLayout.addLayout(self.pathLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
         self.createDdckTree(self.projectFolder)
-        self.createConfigBrowser(self.projectFolder)
 
         if parent.loadValue == 'new' or parent.loadValue == 'json':
+            self.createConfigBrowser(self.projectFolder)
             self.copyGenericFolder(self.projectFolder)
             self.createHydraulicDir(self.projectFolder)
-            self.createWeatherDir(self.projectFolder)
+            self.createWeatherAndControlDirs(self.projectFolder)
 
         self.horizontalLayout.addLayout(self.vertL)
         self.horizontalLayout.addWidget(self.diagramView)
@@ -1605,109 +1609,154 @@ class DiagramEditor(QWidget):
 
         # self.setTrnsysIdBack()
 
-    def exportData(self):
+    def connectionPrinter(self):
+        # name = []
+        # fromPort1 = []
+        # fromPort2 = []
+        # toPort1 = []
+        # toPort2 = []
+        # for obj in self.trnsysObj:
+        #     if isinstance(obj,Connection):
+        #         name.append(obj.displayName)
+        #         fromPort1.append(obj.fromPort.connectionList[0].displayName)
+        #         toPort1.append(obj.toPort.connectionList[0].displayName)
+        #         if len(obj.fromPort.connectionList) == 2:
+        #             fromPort2.append(obj.fromPort.connectionList[1].displayName)
+        #         else:
+        #             fromPort2.append('')
+        #         if len(obj.toPort.connectionList) == 2:
+        #             toPort2.append(obj.toPort.connectionList[1].displayName)
+        #         else:
+        #             toPort2.append('')
+        # table = {
+        #         'Name': name,
+        #         'from 1': fromPort1,
+        #         'from 2': fromPort2,
+        #         'to 1': toPort1,
+        #         'to 2': toPort2
+        #         }
+        # df = pd.DataFrame(table, columns=['Name','from 1','from 2','to 1','to 2'])
+
+        name = []
+        in1 = []
+        in2 = []
+        out1 = []
+        out2 = []
+        for obj in self.trnsysObj:
+            if not isinstance(obj,Connection):
+                name.append(obj.displayName)
+                try:
+                    in1.append(obj.inputs[0].connectionList[0].displayName)
+                except:
+                    in1.append('')
+                try:
+                    in2.append(obj.inputs[1].connectionList[0].displayName)
+                except:
+                    in2.append('')
+                try:
+                    out1.append(obj.outputs[0].connectionList[0].displayName)
+                except:
+                    out1.append('')
+                try:
+                    out2.append(obj.outputs[1].connectionList[0].displayName)
+                except:
+                    out2.append('')
+        table = {
+                'Name': name,
+                'in 1': in1,
+                'in 2': in2,
+                'out 1': out1,
+                'out 2': out2
+                }
+        df = pd.DataFrame(table, columns=['Name','in 1','in 2','out 1','out 2'])
+
+    def exportData(self,exportTo='hydraulics'):
         print("------------------------> START OF EXPORT <------------------------")
 
-        # Main trnsys export function
         self.setUpStorageInnerConns()
 
         self.sortTrnsysObj()
 
         fullExportText = ''
 
-        # if getattr(sys, 'frozen', False):
-        #     ROOT_DIR = os.path.dirname(sys.executable)
-        # elif __file__:
-        #     ROOT_DIR = os.path.dirname(__file__)
-        #
-        # if self.testEnabled:
-        #     exportPath = os.path.join(ROOT_DIR, 'export_test')
-        #     exportPath = os.path.join(exportPath, self.diagramName + '.dck')
-        # elif not self.existReference:
-        #     exportPath = os.path.join(ROOT_DIR, 'Reference')
-        #     exportPath = os.path.join(exportPath, self.diagramName + '.dck')
-        # else:
-        #     filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
-        #     with open(filepaths, 'r') as file:
-        #         data = file.readlines()
-        #     exportPath = Path(data[0][:-1]).joinpath(self.diagramName + '.dck')
-
-        exportPath = os.path.join(self.projectFolder,self.diagramName.replace('json','dck'))
         ddckFolder = os.path.join(self.projectFolder,'ddck')
 
-        if Path(exportPath).exists():
-            qmb = QMessageBox(self)
-            qmb.setText("Warning: " +
-                        "A dck-file already exists in the folder of this project. Do you want to overwrite it or cancel?")
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
-            ret = qmb.exec()
-            if ret == QMessageBox.Save:
-                self.canceled = False
-                print("Overwriting")
-                # continue
+        if exportTo == 'mfs':
+            mfsFileName = self.diagramName.split('.')[0] + '_mfs.dck'
+            exportPath = os.path.join(self.projectFolder,mfsFileName)
+            if Path(exportPath).exists():
+                qmb = QMessageBox(self)
+                qmb.setText("Warning: " + exportPath + " already exists. Do you want to overwrite it or cancel?")
+                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                qmb.setDefaultButton(QMessageBox.Cancel)
+                ret = qmb.exec()
+                if ret == QMessageBox.Save:
+                    self.canceled = False
+                    print("Overwriting")
+                    # continue
+                else:
+                    self.canceled = True
+                    print("Canceling")
+                    return
             else:
-                self.canceled = True
-                print("Canceling")
-                return
-        else:
-            # Export file does not exist yet
-            pass
+                # Export file does not exist yet
+                pass
+        elif exportTo == 'hydraulics':
+            hydraulicsPath = os.path.join(ddckFolder,"hydraulic\\hydraulic.ddck")
+            if Path(hydraulicsPath).exists():
+                qmb = QMessageBox(self)
+                qmb.setText("Warning: " +
+                            "A ddck-file already exists in the hydraulic folder. Do you want to overwrite it or cancel?")
+                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+                qmb.setDefaultButton(QMessageBox.Cancel)
+                ret = qmb.exec()
+                if ret == QMessageBox.Save:
+                    self.canceled = False
+                    print("Overwriting")
+                    # continue
+                else:
+                    self.canceled = True
+                    print("Canceling")
+                    return
+            else:
+                # Export file does not exist yet
+                pass
 
         print("Printing the TRNSYS file... \n")
 
-        #header = open("res/Constants.txt", "r")
-        header = open(os.path.join(ddckFolder,"generic\\head.ddck"),"r")
-        fullExportText += header.read()
-        header.close()
-
-        print("\n")
+        if exportTo == "mfs":
+            header = open(os.path.join(ddckFolder,"generic\\head.ddck"),"r")
+            fullExportText += header.read()
+            header.close()
+            print("\n")
+        elif exportTo == "hydraulics":
+            fullExportText += "*************************************\n"
+            fullExportText += "**BEGIN hydraulic.ddck\n"
+            fullExportText += "*************************************\n"
 
         simulationUnit = 450
         simulationType = 935
         descConnLength = 20
 
-        parameters = 0
-
-        # This has to be changed
-        # for t in self.trnsysObj:
-        #     if type(t) is StorageTank:
-        #         continue
-        #     if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-        #         continue
-        #     if type(t) is HeatPump:
-        #         parameters += 2
-        #         continue
-        #     if type(t) is GenericBlock:
-        #         parameters += len(t.inputs)
-        #         continue
-        #     if type(t) is ExternalHx:
-        #         parameters += 2
-        #         continue
-        #     if type(t) is IceStorageTwoHx:
-        #         parameters += 2
-        #         continue
-        #     if type(t) is HeatPumpTwoHx:
-        #         parameters += 3
-        #         continue
-        #
-        #     parameters += 1
-        #
-        # lineNrParameters = parameters
-        # parameters = parameters * 4 + 1
-
         exporter = Export(self.trnsysObj, self)
 
-        fullExportText += exporter.exportBlackBox()
+        blackBoxProblem, blackBoxText = exporter.exportBlackBox(exportTo=exportTo)
+        if blackBoxProblem:
+            return
+        fullExportText += blackBoxText
         fullExportText += exporter.exportPumpOutlets()
         fullExportText += exporter.exportMassFlows()
-        fullExportText += exporter.exportDivSetting(simulationUnit - 10)
+        exportCancelled, divSettingText = exporter.exportDivSetting(simulationUnit - 10,exportTo=exportTo)
+        if exportCancelled:
+            return
+        if exportTo == 'mfs':
+            fullExportText += divSettingText
+        # fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength)#, parameters, lineNrParameters)
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit+1)   # DC-ERROR
-
         fullExportText += exporter.exportPrintLoops()
         fullExportText += exporter.exportPrintPipeLoops()
         fullExportText += exporter.exportPrintPipeLosses()
@@ -1720,19 +1769,31 @@ class DiagramEditor(QWidget):
         # tes = open(os.path.join(ddckFolder, "Tes\\Tes.ddck"), "r")
         # fullExportText += tes.read()
         # tes.close()
-
-        fullExportText += "ENDS"
+        if exportTo == 'dck' or exportTo == 'mfs':
+            fullExportText += "ENDS"
 
         print("------------------------> END OF EXPORT <------------------------")
 
-        f = open(str(exportPath), 'w')
-        f.truncate(0)
-        f.write(fullExportText)
-        f.close()
+        if exportTo == 'mfs':
+            f = open(str(exportPath), 'w')
+            f.truncate(0)
+            f.write(fullExportText)
+            f.close()
+        elif exportTo == 'hydraulics':
+            if fullExportText[:1] == "\n":
+                fullExportText = fullExportText[1:]
+            f = open(str(hydraulicsPath), 'w')
+            f.truncate(0)
+            f.write(fullExportText)
+            f.close()
 
         self.cleanUpExportedElements()
         self.tearDownStorageInnerConns()
-        return exportPath
+
+        if exportTo == 'mfs':
+            return exportPath
+        elif exportTo == 'hydraulics':
+            return hydraulicsPath
 
     def exportToHydraulics(self):
         self.setUpStorageInnerConns()
@@ -1796,7 +1857,10 @@ class DiagramEditor(QWidget):
 
         exporter = Export(self.trnsysObj, self)
 
-        fullExportText += exporter.exportBlackBox()
+        blackBoxProblem, blackBoxText = exporter.exportBlackBox()
+        if blackBoxProblem:
+            return
+        fullExportText += blackBoxText
         fullExportText += exporter.exportPumpOutlets()
         # fullExportText += exporter.exportMassFlows()
         # fullExportText += exporter.exportDivSetting(simulationUnit - 10)
@@ -2097,6 +2161,7 @@ class DiagramEditor(QWidget):
         blockFolderNames.append('generic')
         blockFolderNames.append('hydraulic')
         blockFolderNames.append('weather')
+        blockFolderNames.append('control')
 
         ddckFolder = os.path.join(self.projectFolder,'ddck')
         ddckFolders = os.listdir(ddckFolder)
@@ -2949,7 +3014,7 @@ class DiagramEditor(QWidget):
             self.createConfigBrowser(self.projectPath)
             self.copyGenericFolder(self.projectPath)
             self.createHydraulicDir(self.projectPath)
-            self.createWeatherDir(self.projectPath)
+            self.createWeatherAndControlDirs(self.projectPath)
             self.createDdckTree(loadPath)
 
             for o in self.trnsysObj:
@@ -2996,7 +3061,7 @@ class DiagramEditor(QWidget):
             self.createConfigBrowser(self.projectPath)
             self.copyGenericFolder(self.projectPath)
             self.createHydraulicDir(self.projectPath)
-            self.createWeatherDir(self.projectPath)
+            self.createWeatherAndControlDirs(self.projectPath)
             self.createDdckTree(loadPath)
             # todo : open diagram
             # todo : add files into list
@@ -3131,13 +3196,17 @@ class DiagramEditor(QWidget):
         if not os.path.exists(self.hydraulicFolder):
             os.makedirs(self.hydraulicFolder)
 
-    def createWeatherDir(self,projectPath):
+    def createWeatherAndControlDirs(self,projectPath):
 
-        self.weatherFolder = os.path.join(projectPath, 'ddck')
-        self.weatherFolder = os.path.join(self.weatherFolder, 'weather')
+        ddckFolder = os.path.join(projectPath, 'ddck')
+        weatherFolder = os.path.join(ddckFolder, 'weather')
+        controlFolder = os.path.join(ddckFolder, 'control')
 
-        if not os.path.exists(self.weatherFolder):
-            os.makedirs(self.weatherFolder)
+        if not os.path.exists(weatherFolder):
+            os.makedirs(weatherFolder)
+
+        if not os.path.exists(controlFolder):
+            os.makedirs(controlFolder)
 
     # def addFile(self):
     #     fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
@@ -3195,6 +3264,26 @@ class MainWindow(QMainWindow):
     Shortcuts can be assigned to QActions.
     They get included into the application either by being added to a menu or a tool bar.
 
+    Attributes
+    ----------
+    loadValue : str
+        Indicates whether a new project was created, an old one loaded or the process was cancelled
+    centralWidget : DiagramEditor
+
+    labelVisState : bool
+
+    massFlowEnabled : bool
+
+    calledByVisualizeMf : bool
+
+    currentFile : str
+        Probably obsolete (NEM 07.10.2020)
+    fileMenu : QMenu
+
+    editMenu : QMenu
+
+    helpMenu : QMenu
+
     """
 
     def __init__(self, parent=None):
@@ -3236,29 +3325,35 @@ class MainWindow(QMainWindow):
         loadDiaAction = QAction(QIcon('images/outbox.png'), "Open", self)
         loadDiaAction.triggered.connect(self.loadDia)
 
-        exportTrnsysAction = QAction(QIcon('images/font-file.png'), "Export trnsys file", self)
-        exportTrnsysAction.triggered.connect(self.exportTrnsys)
+        # exportTrnsysAction = QAction(QIcon('images/font-file.png'), "Export trnsys file", self)
+        # exportTrnsysAction.triggered.connect(self.exportTrnsys)
+
+        updateConfigAction = QAction(QIcon('images/updateConfig.png'), "Update run.config", self)
+        updateConfigAction.triggered.connect(self.updateRun)
+
+        runSimulationAction = QAction(QIcon('images/runSimulation.png'), "Run simulation", self)
+        runSimulationAction.triggered.connect(self.runSimulation)
 
         # renameDiaAction = QAction(QIcon('images/text-label.png'), "Rename system diagram", self)
         # renameDiaAction.triggered.connect(self.renameDia)
 
-        deleteDiaAction = QAction(QIcon('images/trash.png'), "Delete system diagram", self)
+        deleteDiaAction = QAction(QIcon('images/trash.png'), "Delete diagram", self)
         deleteDiaAction.triggered.connect(self.deleteDia)
 
-        groupNewAction = QAction(QIcon('images/add-square.png'), "Create Group", self)
-        groupNewAction.triggered.connect(self.createGroup)
+        # groupNewAction = QAction(QIcon('images/add-square.png'), "Create Group", self)
+        # groupNewAction.triggered.connect(self.createGroup)
 
-        autoArrangeAction = QAction(QIcon('images/site-map.png'), "Tidy up connections", self)
-        autoArrangeAction.triggered.connect(self.tidyUp)
+        # autoArrangeAction = QAction(QIcon('images/site-map.png'), "Tidy up connections", self)
+        # autoArrangeAction.triggered.connect(self.tidyUp)
 
         zoomInAction = QAction(QIcon('images/zoom-in.png'), "Zoom in", self)
         zoomInAction.triggered.connect(self.setZoomIn)
 
-        zoomOutAction = QAction(QIcon('images/zoom-Out.png'), "Zoom Out", self)
+        zoomOutAction = QAction(QIcon('images/zoom-Out.png'), "Zoom out", self)
         zoomOutAction.triggered.connect(self.setZoomOut)
 
-        zoom0Action = QAction(QIcon('images/zoom-0.png'), "Reset zoom", self)
-        zoom0Action.triggered.connect(self.setZoom0)
+        # zoom0Action = QAction(QIcon('images/zoom-0.png'), "Reset zoom", self)
+        # zoom0Action.triggered.connect(self.setZoom0)
 
         #copyAction = QAction(QIcon('images/clipboard.png'), "Copy to clipboard", self)
         #copyAction.triggered.connect(self.copySelection)
@@ -3268,8 +3363,11 @@ class MainWindow(QMainWindow):
         #pasteAction.triggered.connect(self.pasteSelection)
         #pasteAction.setShortcut("Ctrl+v")
 
-        toggleConnLabels = QAction(QIcon('images/labelToggle.png'), "Toggle pipe labels", self)
+        toggleConnLabels = QAction(QIcon('images/labelToggle.png'), "Toggle labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
+
+        exportHydraulicsAction = QAction(QIcon('images/exportHydraulics.png'), "Export hydraulic.ddck", self)
+        exportHydraulicsAction.triggered.connect(self.exportHydraulicsDdck)
 
         editGroupsAction = QAction(QIcon('images/modal-list.png'), "Edit groups/loops", self)
         editGroupsAction.triggered.connect(self.editGroups)
@@ -3295,7 +3393,7 @@ class MainWindow(QMainWindow):
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
 
-        openVisualizerAction = QAction(QIcon('images/controller.png'), "Start visualization of mass flows", self)
+        openVisualizerAction = QAction(QIcon('images/runMfs.png'), "Start visualization of mass flows", self)
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
         runMassflowSolverAction = QAction(QIcon('images/gear.png'), "Run the massflow solver", self)
@@ -3319,24 +3417,28 @@ class MainWindow(QMainWindow):
         tb.setObjectName('Toolbar')
         tb.addAction(saveDiaAction)
         tb.addAction(loadDiaAction)
-        tb.addAction(exportTrnsysAction)
-        # tb.addAction(renameDiaAction)
-        tb.addAction(deleteDiaAction)
-        # tb.addAction(groupNewAction)
-        # tb.addAction(autoArrangeAction)
         tb.addAction(zoomInAction)
         tb.addAction(zoomOutAction)
+        tb.addAction(toggleConnLabels)
+        tb.addAction(openVisualizerAction)
+        tb.addAction(exportHydraulicsAction)
+        tb.addAction(updateConfigAction)
+        tb.addAction(runSimulationAction)
+        #tb.addAction(exportTrnsysAction)
+        # tb.addAction(renameDiaAction)
+        # tb.addAction(groupNewAction)
+        # tb.addAction(autoArrangeAction)
         # tb.addAction(zoom0Action)
         # tb.addAction(copyAction)
         # tb.addAction(pasteAction)
-        tb.addAction(toggleConnLabels)
         # tb.addAction(editGroupsAction)
         # tb.addAction(selectMultipleAction)
-        tb.addAction(openVisualizerAction)
-        tb.addAction(runMassflowSolverAction)
-        tb.addAction(loadVisual)
-        tb.addAction(trnsysList)
-        tb.addAction(runAction)
+        #tb.addAction(runMassflowSolverAction)
+        #tb.addAction(loadVisual)
+        #tb.addAction(trnsysList)
+        #tb.addAction(runAction)
+        tb.addAction(deleteDiaAction)
+
 
         # Menu bar actions
         self.fileMenu = QMenu("File")
@@ -3517,6 +3619,76 @@ class MainWindow(QMainWindow):
         print("Loading diagram")
         self.openFile()
 
+    def updateRun(self):
+        print("Updating run.config")
+        configPath = os.path.join(self.projectFolder, 'run.config')
+        runConfig = configFile(configPath,self.centralWidget)
+        runConfig.updateConfig()
+
+    def runSimulation(self):
+        ddckPath = os.path.join(self.projectFolder,"ddck")
+
+        #   Check hydraulic.ddck
+        hydraulicPath = os.path.join(ddckPath,"hydraulic\\hydraulic.ddck")
+        if not os.path.isfile(hydraulicPath):
+            self.exportHydraulicsDdck()
+        infile = open(hydraulicPath, 'r')
+        hydraulicLines = infile.readlines()
+        blackBoxLines = []
+        for i in range(len(hydraulicLines)):
+            if "Black box component temperatures" in hydraulicLines[i]:
+                j = i+1
+                while hydraulicLines[j] != '\n':
+                    blackBoxLines.append(hydraulicLines[j])
+                    j +=1
+                break
+        messageText = "Is this correct?\n\n"
+        for line in blackBoxLines:
+            messageText += line
+        qmb = QMessageBox()
+        qmb.setText(messageText)
+        qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        qmb.setDefaultButton(QMessageBox.No)
+        ret = qmb.exec()
+        if ret == QMessageBox.No:
+            qmb = QMessageBox()
+            qmb.setText(
+                "Please make sure the black box component temperatures are correct in hydraulic.ddck before starting a simluation.")
+            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.setDefaultButton(QMessageBox.Ok)
+            qmb.exec()
+            return
+
+        #   Check ddcks of storage tanks
+        storageWithoutFile = []
+        for object in self.centralWidget.trnsysObj:
+            if isinstance(object,StorageTank):
+                storageTankFile = os.path.join(object.displayName,object.displayName + ".ddck")
+                storageTankPath = os.path.join(ddckPath,storageTankFile)
+                if not(os.path.isfile(storageTankPath)):
+                    storageWithoutFile.append(object.displayName + "\n")
+
+        if not(not(storageWithoutFile)):
+            messageText = "The following storage tank(s) do(es) not have a corresponding ddck:\n\n"
+            for storage in storageWithoutFile:
+                messageText += storage
+            messageText += "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
+            qmb = QMessageBox()
+            qmb.setText(messageText)
+            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.setDefaultButton(QMessageBox.Ok)
+            qmb.exec()
+            return
+
+        #   Update run.config
+        self.updateRun()
+
+        #   Start simulation
+        runApp = RunMain()
+        runApp.runAction(self.centralWidget.projectFolder)
+
+        return
+
     def exportTrnsys(self):
         print("Exporting Trnsys file...")
         noErrorExists = self.debugConns()
@@ -3570,11 +3742,17 @@ class MainWindow(QMainWindow):
         self.centralWidget.showDiagramDlg()
 
     def deleteDia(self):
-        print("Deleting diagram")
-        self.centralWidget.delBlocks()
-        msgb = QMessageBox(self)
-        msgb.setText("Deleted diagram (Path: " + str(self.centralWidget.saveAsPath) + ")[" + str(len(self.centralWidget.trnsysObj)) + "]")
-        msgb.exec()
+        qmb = QMessageBox()
+        qmb.setText("Are you sure you want to delete the diagram? (There is no possibility to \"undo\".)")
+        qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        qmb.setDefaultButton(QMessageBox.Cancel)
+        ret = qmb.exec()
+        if ret == QMessageBox.Yes:
+            print("Deleting diagram")
+            self.centralWidget.delBlocks()
+        else:
+            print("Canceling")
+            return
 
     def createGroup(self):
         # print("Tb createGroup pressed")
@@ -3700,6 +3878,9 @@ class MainWindow(QMainWindow):
         else:
             return
 
+
+
+
     def openFileAtStartUp(self):
         """
         Opens the most recently modified file from the recent folder
@@ -3751,6 +3932,9 @@ class MainWindow(QMainWindow):
         self.labelVisState = not self.labelVisState
         self.centralWidget.setConnLabelVis(self.labelVisState)
 
+    def exportHydraulicsDdck(self):
+        self.centralWidget.exportData(exportTo='hydraulics')
+
     def toggleEditorMode(self):
         print("Toggling editor mode")
         self.centralWidget.editorMode = (self.centralWidget.editorMode + 1) % 2
@@ -3794,7 +3978,7 @@ class MainWindow(QMainWindow):
     def runMassflowSolver(self):
         print("Running massflow solver...")
 
-        exportPath = self.centralWidget.exportData()
+        exportPath = self.centralWidget.exportData(exportTo='mfs')
         self.exportedTo = exportPath
         print(exportPath)
         if exportPath != 'None':
@@ -3809,12 +3993,12 @@ class MainWindow(QMainWindow):
             mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
             tempFile = os.path.splitext(str(exportPath))[0]+'_T.prt'
             if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
-                msgb.setText("Trnsys not succesfully executed")
+                msgb.setText("Execution of Trnsys NOT succesful")
                 msgb.exec()
                 del self.exportedTo
             else:
                 if not self.calledByVisualizeMf:
-                    msgb.setText("Trnsys successfully executed")
+                    msgb.setText("Execution of Trnsys succesful")
                     msgb.exec()
             self.calledByVisualizeMf = False
             return mfrFile, tempFile

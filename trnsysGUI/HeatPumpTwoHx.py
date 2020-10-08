@@ -155,11 +155,11 @@ class HeatPumpTwoHx(BlockItem):
         resBlockList.append(self)
 
     def exportBlackBox(self):
-        resStr = "T" + self.displayName + "X0" + "=1 \n"
-        resStr += "T" + self.displayName + "X1" + "=1 \n"
-        resStr += "T" + self.displayName + "X2" + "=1 \n"
-        eqNb = 3
-        return resStr, eqNb
+        equations = ["T" + self.displayName + "X0" + "=1"]
+        equations.append("T" + self.displayName + "X1" + "=1")
+        equations.append("T" + self.displayName + "X2" + "=1")
+        status = 'success'
+        return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20

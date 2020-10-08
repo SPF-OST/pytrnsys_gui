@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'TrnsysGUI'
-copyright = '2019, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia'
-author = 'Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia'
+copyright = '2020, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia, Martin Neugebauer'
+author = 'Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia, Martin Neugebauer'
 
 # The full version, including alpha/beta/rc tags
 release = '2020'
@@ -35,9 +35,9 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-	'recommonmark',
-    'rst2pdf.pdfbuilder'
-]
+	'recommonmark']#,
+    #'rst2pdf.pdfbuilder'
+#]
 
 pdf_documents = [('index', u'pytrnsys_GUI_doc', u'Documentation of pytrnsys_GUI', u'Martin Neugebauer'),]
 
