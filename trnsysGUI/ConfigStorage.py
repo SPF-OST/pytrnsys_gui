@@ -33,10 +33,10 @@ class ConfigStorage(QDialog):
         description = QLabel("Please configure the storage tank:")
         exportButton = QPushButton("Export ddck")
         exportButton.clicked.connect(self.storage.exportDck)
-        loadButton = QPushButton("Load ddck")
-        loadButton.clicked.connect(self.storage.loadDck)
+        # loadButton = QPushButton("Load ddck")
+        # loadButton.clicked.connect(self.storage.loadDck)
         h0.addWidget(description)
-        h0.addWidget(loadButton)
+        # h0.addWidget(loadButton)
         h0.addWidget(exportButton)
         # loadButton.setEnabled(False)
 

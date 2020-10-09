@@ -28,6 +28,7 @@ from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PathSetUp import PathSetUp
+from trnsysGUI.CheckBlackBox import CheckBlackBox
 from trnsysGUI.FolderSetUp import FolderSetUp
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.DifferenceDlg import DifferenceDlg
@@ -85,6 +86,8 @@ from trnsysGUI.Connection import Connection
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.configFile import configFile
+
+import trnsysGUI.buildDck as dckBuilder
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import *
@@ -1740,6 +1743,7 @@ class DiagramEditor(QWidget):
 
         exporter = Export(self.trnsysObj, self)
 
+
         blackBoxProblem, blackBoxText = exporter.exportBlackBox(exportTo=exportTo)
         if blackBoxProblem:
             return
@@ -1769,7 +1773,8 @@ class DiagramEditor(QWidget):
         # tes = open(os.path.join(ddckFolder, "Tes\\Tes.ddck"), "r")
         # fullExportText += tes.read()
         # tes.close()
-        if exportTo == 'dck' or exportTo == 'mfs':
+        if exportTo == 'mfs':
+            fullExportText += "EQUATIONS 1\nTRoomStore=1\n"
             fullExportText += "ENDS"
 
         print("------------------------> END OF EXPORT <------------------------")
@@ -3369,6 +3374,9 @@ class MainWindow(QMainWindow):
         exportHydraulicsAction = QAction(QIcon('images/exportHydraulics.png'), "Export hydraulic.ddck", self)
         exportHydraulicsAction.triggered.connect(self.exportHydraulicsDdck)
 
+        exportDckAction = QAction(QIcon('images/exportDck.png'), "Export dck", self)
+        exportDckAction.triggered.connect(self.exportDck)
+
         editGroupsAction = QAction(QIcon('images/modal-list.png'), "Edit groups/loops", self)
         editGroupsAction.triggered.connect(self.editGroups)
 
@@ -3423,6 +3431,7 @@ class MainWindow(QMainWindow):
         tb.addAction(openVisualizerAction)
         tb.addAction(exportHydraulicsAction)
         tb.addAction(updateConfigAction)
+        tb.addAction(exportDckAction)
         tb.addAction(runSimulationAction)
         #tb.addAction(exportTrnsysAction)
         # tb.addAction(renameDiaAction)
@@ -3933,7 +3942,15 @@ class MainWindow(QMainWindow):
         self.centralWidget.setConnLabelVis(self.labelVisState)
 
     def exportHydraulicsDdck(self):
+        statusQuo = self.labelVisState
+        if not statusQuo:
+            self.toggleConnLabels()
         self.centralWidget.exportData(exportTo='hydraulics')
+        if not statusQuo:
+            self.toggleConnLabels()
+
+    def exportDck(self):
+        dckBuilder.buildDck(self.projectFolder)
 
     def toggleEditorMode(self):
         print("Toggling editor mode")
@@ -3990,8 +4007,8 @@ class MainWindow(QMainWindow):
             print("trnsyspath:", self.centralWidget.trnsysPath)
             cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
             os.system(cmd)
-            mfrFile = os.path.splitext(str(exportPath))[0]+'_Mfr.prt'
-            tempFile = os.path.splitext(str(exportPath))[0]+'_T.prt'
+            mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1]  + '_Mfr.prt')
+            tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1]  + '_T.prt')
             if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
                 msgb.setText("Execution of Trnsys NOT succesful")
                 msgb.exec()

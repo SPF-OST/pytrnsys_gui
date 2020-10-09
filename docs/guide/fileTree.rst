@@ -7,17 +7,18 @@ Opening or creating a project
 -----------------------------
 
 Each project that can be edited with the GUI is connected to a folder, which in the
-follwing will be called ``SPF_awesome`` as an example. When the GUI is started the user
-is asked whether they want to create a new project or open an exisiting one. When a new
-project is created a dialogue guides the user through the creation of a new project
-folder. Saving a diagram is accomplished through the generation of a json-file inside
-``SPF_awesome``, that has the same name. This means that in order to open the existing
-project of the name ``SPF_awesome`` the following file needs to be opened::
+follwing will be called ``[project name]``, where the square brackets indicate a
+placeholder for an actual name. When the GUI is started the user is asked whether they
+want to create a new project or open an exisiting one. When a new project is created a
+dialogue guides the user through the creation of a new project folder. Saving a diagram
+is accomplished through the generation of a json-file inside ``[project name]``, that
+has the same name. This means that in order to open the existing ``[project name]``
+the following file needs to be opened::
 
-    ..\SPF_awesome\SPF_awesome.json
+    ..\[project name]\[project name].json
 
 All files that need to be loaded for the project or which are generated from the GUI are
-saved in ``SPF_awesome``.
+saved in ``[project name]``.
 
 Default file structure
 ----------------------
@@ -40,7 +41,7 @@ ddck folders
 
 In the following different folders are described, which can be found in::
 
-    .\SPF_awesome\ddck
+    ..\[project name]\ddck
 
 Square brackets indicate place holders for component names.
 
@@ -57,8 +58,8 @@ Square brackets indicate place holders for component names.
     ddck-file of the storage tank is exported, it will build the following two
     files::
 
-        .\ddck\[storage tank]\[storage tank].ddck
-        .\ddck\[storage tank]\[storage tank].ddcx
+        ..\ddck\[storage tank]\[storage tank].ddck
+        ..\ddck\[storage tank]\[storage tank].ddcx
 
     Here the file with the extension ``.ddck`` contains the information of the storage
     tank, that is needed to build the dck-file. Meanwhile, the file with the extension
@@ -81,4 +82,7 @@ Square brackets indicate place holders for component names.
 ``control``
 
     This folder is created when a project is initialized. The user should load all
-    ddck-files which represent control features into this folder.
+    ddck-files which represent control features into this folder. When
+    ``hydraulic.ddck`` is exported all statements concerning valves are exported to::
+
+        ..\ddck\control\valve_control.ddck

@@ -53,9 +53,22 @@ class TVentil(BlockItem):
         self.label.setPos(lx, h - self.flippedV*(h+h/2))
         self.posLabel.setPos(lx+5, -15)
 
-        self.inputs[0].setPos(0,delta)
-        self.inputs[1].setPos(delta,0)
-        self.outputs[0].setPos(w,delta)
+        if not(self.flippedV) and not(self.flippedH):
+            self.inputs[0].setPos(0,delta)
+            self.inputs[1].setPos(delta,0)
+            self.outputs[0].setPos(w,delta)
+        elif self.flippedV and not(self.flippedH):
+            self.inputs[0].setPos(0,delta)
+            self.inputs[1].setPos(delta,h)
+            self.outputs[0].setPos(w,delta)
+        elif not(self.flippedV) and self.flippedH:
+            self.inputs[0].setPos(w,delta)
+            self.inputs[1].setPos(delta,0)
+            self.outputs[0].setPos(0,delta)
+        elif self.flippedV and self.flippedH:
+            self.inputs[0].setPos(w,delta)
+            self.inputs[1].setPos(delta,h)
+            self.outputs[0].setPos(0,delta)
 
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.inputs[1].side = 1 + 2 * self.flippedV
@@ -279,3 +292,4 @@ class TVentil(BlockItem):
             return f, unitNumber
         else:
             return "", startingUnit
+

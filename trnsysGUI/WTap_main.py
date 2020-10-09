@@ -51,20 +51,9 @@ class WTap_main(BlockItem):
 
         return w, h
 
-    # def exportBlackBox(self):
-    #     files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-    #     lines = []
-    #     for file in files:
-    #         infile = open(file, 'r')
-    #         lines += infile.readlines()
-    #     for i in range(len(lines)):
-    #         if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
-    #             for j in range(i, len(lines) - i):
-    #                 if lines[j][0] == "T":
-    #                     outputT = lines[j].split("=")[0].replace(" ", "")
-    #                     break
-    #             break
-    #     return ["T" + self.displayName + "=" + outputT + "\n"]
+    def exportBlackBox(self):
+        equation = ["T" + self.displayName + "=Tcw"]
+        return 'success', equation
 
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"
@@ -109,8 +98,3 @@ class WTap_main(BlockItem):
         temp1 = "Mfr" + self.displayName
         self.exportInputName = " " + temp1 + " "
         return self.exportInputName, 1
-
-    def exportPumpOutlets(self):
-        resStr = "T" + self.displayName + " = " + "T" + self.outputs[0].connectionList[0].displayName + "\n"
-        equationNr = 1
-        return resStr, equationNr

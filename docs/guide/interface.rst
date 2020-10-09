@@ -69,8 +69,12 @@ The toolbar
         :width: 50
         :alt: visualize mass flows
 
-    Creates a dck-file for the diagram and runs TRNSYS from it, and then shows a
-    visualization of the mass flows in the diagram.
+    Creates the following file for the diagram::
+
+        ..\[project name]\[project name]_mfs.dck
+
+    Afterwards, it runs TRNSYS from this file, and then shows a visualization of the
+    mass flows in the diagram.
 
 ``Export hydraulic.ddck``
 
@@ -78,14 +82,57 @@ The toolbar
         :width: 50
         :alt: export hydraulic.ddck
 
-    Exports the following file::
+    Exports the following files::
 
         ..\ddck\hydraulic\hydraulic.ddck
+        ..\ddck\control\valve_control.ddck
 
-    This file contains the information
+    These files contain the information about the hydraulics of the system. The
+    so-called black box component output equations are loaded to ``hydraulic.ddck``
+    from::
 
-    Here, ``hydraulic.ddck`` contains the information of the hydraulics of the
-    diagram, while ``nameOfStorageTank.ddcx``::
+        ..\ddck\[storage tank]\[storage tank].ddcx
 
-        ..\ddck\nameOfStorageTank\nameOfStorageTank.ddcx
+    If this file does not exist yet, when ``hydraulic.ddck`` is exported, the export
+    of the storage tank will be triggered.
 
+``Update run.config``
+
+    .. image:: C:/Daten/GIT/pytrnsys_gui/trnsysGUI/images/updateConfig.png
+        :width: 50
+        :alt: update run.config
+
+    Updates the following entries in ``run.config``::
+
+        string PROJECT$
+        string projectPath
+
+    and the used ddcks (from the current content of the ``ddck``-folder).
+
+``Export dck``
+
+    .. image:: C:/Daten/GIT/pytrnsys_gui/trnsysGUI/images/exportDck.png
+        :width: 50
+        :alt: export dck
+
+    Exports::
+
+        ..\[project name]\[project name].dck
+
+    according to what is specified in ``run.config``.
+
+``Run simulation``
+
+    .. image:: C:/Daten/GIT/pytrnsys_gui/trnsysGUI/images/runSimulation.png
+        :width: 50
+        :alt: run simulation
+
+    Exports the dck-file like above and launches a simulation with Trnsys.
+
+``Delete diagram``
+
+    .. image:: C:/Daten/GIT/pytrnsys_gui/trnsysGUI/images/trash.png
+        :width: 50
+        :alt: delete diagram
+
+    Deletes the current diagram.
