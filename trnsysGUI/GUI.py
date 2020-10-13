@@ -4131,21 +4131,6 @@ class MainWindow(QMainWindow):
         self.centralWidget.printPDF()
 
     def closeEvent(self, e):
-        """Saves the current diagram into the Diagram Folder"""
-        # self.centralWidget.saveAtClose()
-        # print(self.centralWidget.projectFolder)
-        # qmb = QMessageBox()
-        # qmb.setText("Save all loaded files?")
-        # qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-        # qmb.setDefaultButton(QMessageBox.Cancel)
-        # ret = qmb.exec()
-        # if ret == QMessageBox.Save:
-        #     print("Saving")
-        #     # continue
-        # else:
-        #     print("Removing files")
-        #     self.centralWidget.fileBrowserLayout.deleteLater()
-        #     shutil.rmtree(self.centralWidget.projectFolder)
         qmb = QMessageBox()
         qmb.setText("Do you want to save the current state of the project before closing the program?")
         qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Close | QMessageBox.Cancel)

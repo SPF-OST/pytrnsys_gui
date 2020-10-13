@@ -165,6 +165,24 @@ class StorageTank(BlockItem):
             self.directPortConnsForList.append(c)
             return c
 
+    def modifyPortPosition(self,connectionName,newHeights):
+        for i in range(len(self.directPortConnsForList)):
+            if self.directPortConnsForList[i].displayName == connectionName:
+                if self.directPortConnsForList[i].fromPort.side == 0:
+                    if newHeights[0] != '':
+                        absoluteHeight = (1.-newHeights[0]/100.)*self.h
+                        self.directPortConnsForList[i].fromPort.setPos(0.,absoluteHeight)
+                    if newHeights[1] != '':
+                        absoluteHeight = (1.-newHeights[1]/100.)*self.h
+                        self.directPortConnsForList[i].toPort.setPos(0.,absoluteHeight)
+                elif self.directPortConnsForList[i].fromPort.side == 2:
+                    if newHeights[0] != '':
+                        absoluteHeight = (1.-newHeights[0]/100.)*self.h
+                        self.directPortConnsForList[i].fromPort.setPos(self.w,absoluteHeight)
+                    if newHeights[1] != '':
+                        absoluteHeight = (1.-newHeights[1]/100.)*self.h
+                        self.directPortConnsForList[i].toPort.setPos(self.w,absoluteHeight)
+
     def checkConnectInside(self, port1, port2, maxhops, d):
         """
         Was used to check if connectInside works
