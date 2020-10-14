@@ -3,10 +3,10 @@
 The user interface
 ==================
 
-The user interface consists of a menu bar, a tool bar, and three main widgets. The
-center and the main widget of the interface is the diagram. Here different components
-can be placed and connected. The available components can be found in the widget on
-the lefthand side and can simply be dragged into the diagram to be placed. On the
+The user interface consists of a menu bar, a tool bar, and three widgets. The center
+and the main widget of the interface is the diagram. Here different components can be
+placed and connected. The available components can be found in the widget on the
+lefthand side and can simply be dragged into the diagram to be placed. On the
 righthand widget the file tree of the ``ddck``-folder can be seen. For each component
 dropped into the diagram an additional folder is created in this tree.
 
@@ -17,11 +17,68 @@ dropped into the diagram an additional folder is created in this tree.
 Making a diagram
 ----------------
 
+Components are simply added to a diagram by dragging the respective item from the
+library on the left into the central widget. It is recommded to toggle the snap grid
+for placing components to ease the alignment of them:
+
+.. image:: ./resources/snap.png
+        :width: 500
+        :alt: snap grid
+
+Connections can be created by moving the cursor over a port, pressing the mouse, and
+dragging the cursor to the port that is supposed to be connected, and release the
+mouse there.
+
 Loading ddck-files
 ------------------
 
-The toolbar
------------
+When dropping a component that is supposed to be represented by a ddck, a folder is
+created in the ddck-folder of the project that dynamically changes its name with the
+name of the component. All files that are needed to represent the respective
+component when building a dck should be loaded into this component folder.
+
+The menu bar
+------------
+File
+****
+
+``New``
+
+    Create a new project.
+
+``Open``
+
+    Open an existing project.
+
+``Save``
+
+    Save a json of the current diagram.
+
+``Copy to new folder``
+
+    Copy the complete content of the current project folder to a new one.
+
+``Export as PDF``
+
+    Export the current diagram as a pdf.
+
+``Debug Conn``
+
+    TBD
+
+Edit
+****
+
+``Toggle snap grid``
+
+    Toggle a grid to which the components can snap to ease placing them.
+
+``Toggle align mode``
+
+    TBD
+
+The tool bar
+------------
 
 ``Save``
 
@@ -88,8 +145,8 @@ The toolbar
         ..\ddck\control\valve_control.ddck
 
     These files contain the information about the hydraulics of the system. The
-    so-called black box component output equations are loaded to ``hydraulic.ddck``
-    from::
+    so-called black box component output equations originating from the storage tank
+    are loaded to ``hydraulic.ddck`` from::
 
         ..\ddck\[storage tank]\[storage tank].ddcx
 
