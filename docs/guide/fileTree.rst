@@ -1,7 +1,7 @@
 .. _file-tree:
 
 The file structure of a project
-*******************************
+===============================
 
 Opening or creating a project
 -----------------------------
