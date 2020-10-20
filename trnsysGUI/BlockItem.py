@@ -674,6 +674,12 @@ class BlockItem(QGraphicsPixmapItem):
         self.setBlockToGroup(i["GroupName"])
 
         print(len(self.inputs))
+
+        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
+            temp = i["PortsIDIn"]
+            i["PortsIDIn"] = i["PortsIDOut"]
+            i["PortsIDOut"] = temp
+
         for x in range(len(self.inputs)):
             self.inputs[x].id = i["PortsIDIn"][x]
 
