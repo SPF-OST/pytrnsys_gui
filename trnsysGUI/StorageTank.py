@@ -1128,7 +1128,11 @@ class StorageTank(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         print(os.path.dirname(self.path))
         destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
-            self.path = destPath
-            print(self.path)
+        test = os.path.split(self.path)
+        if os.path.split(self.path)[-1] == '' or os.path.split(self.path)[-1] == 'ddck':
+            os.makedirs(destPath)
+        else:
+            if os.path.exists(self.path):
+                os.rename(self.path, destPath)
+        self.path = destPath
+        print(self.path)

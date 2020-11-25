@@ -47,9 +47,12 @@ class HeatExchanger(QGraphicsItemGroup):
             self.port1.setPos(self.offset + QPointF(2 * delta, 0))
             self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
 
-        if kwargs == {}:
+        if kwargs == {} or 'tempHx' in kwargs:
             print("Creating new HeatExchanger")
-            self.displayName = name + str(self.id)
+            if kwargs == {}:
+                self.displayName = name + str(self.id)
+            elif 'tempHx' in kwargs:
+                self.displayName = name
             self.initNew()
             self.loadedConnTrId = None  # Should not be used
         else:

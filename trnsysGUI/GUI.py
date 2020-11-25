@@ -52,6 +52,7 @@ from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.RunMain import RunMain
+from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.Test_Export import Test_Export
 from trnsysGUI.TestDlg import TestDlg
@@ -70,7 +71,9 @@ from trnsysGUI.Connector import Connector
 from trnsysGUI.Group import Group
 from trnsysGUI.HeatPump import HeatPump
 from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
+from trnsysGUI.HPDoubleDual import HPDoubleDual
 from trnsysGUI.IceStorage import IceStorage
+from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.Pump import Pump
 from trnsysGUI.Radiator import Radiator
@@ -185,11 +188,18 @@ class DiagramDecoderPaste(json.JSONDecoder):
                         elif i["BlockName"] == 'Collector':
                             bl = Collector(i["BlockName"], self.editor.diagramView,
                                            displayName=i["BlockDisplayName"], loaded=True)
+                        elif i["BlockName"] == 'Kollektor':
+                            i["BlockName"] = 'Collector'
+                            bl = Collector(i["BlockName"], self.editor.diagramView,
+                                           displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'HP':
                             bl = HeatPump(i["BlockName"], self.editor.diagramView,
                                           displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'IceStorage':
                             bl = IceStorage(i["BlockName"], self.editor.diagramView,
+                                            displayName=i["BlockDisplayName"], loaded=True)
+                        elif i["BlockName"] == 'PitStorage':
+                            bl = PitStorage(i["BlockName"], self.editor.diagramView,
                                             displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'Radiator':
                             bl = Radiator(i["BlockName"], self.editor.diagramView,
@@ -228,6 +238,9 @@ class DiagramDecoderPaste(json.JSONDecoder):
                                                displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loaded=True)
+                        elif i["BlockName"] == 'HPDoubleDual':
+                            bl = HPDoubleDual(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loaded=True)
                         elif i["BlockName"] == 'ExternalHx':
                             bl = ExternalHx(i["BlockName"], self.editor.diagramView,
@@ -376,6 +389,9 @@ class DiagramDecoder(json.JSONDecoder):
                         elif i["BlockName"] == 'IceStorage':
                             bl = IceStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                             loadedBlock=True)
+                        elif i["BlockName"] == 'PitStorage':
+                            bl = PitStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                            loadedBlock=True)
                         elif i["BlockName"] == 'Radiator':
                             bl = Radiator(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                           loadedBlock=True)
@@ -410,6 +426,9 @@ class DiagramDecoder(json.JSONDecoder):
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
                         elif i["BlockName"] == 'HPTwoHx':
                             bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
+                                               displayName=i["BlockDisplayName"], loadedBlock=True)
+                        elif i["BlockName"] == 'HPDoubleDual':
+                            bl = HPDoubleDual(i["BlockName"], self.editor.diagramView,
                                                displayName=i["BlockDisplayName"], loadedBlock=True)
                         elif i["BlockName"] == 'ExternalHx':
                             bl = ExternalHx(i["BlockName"], self.editor.diagramView,
@@ -915,6 +934,8 @@ class DiagramView(QGraphicsView):
                 bl = HeatPump(name, self)
             elif name == 'IceStorage':
                 bl = IceStorage(name, self)
+            elif name == 'PitStorage':
+                bl = PitStorage(name, self)
             elif name == 'Radiator':
                 bl = Radiator(name, self)
             elif name == 'WTap':
@@ -929,6 +950,8 @@ class DiagramView(QGraphicsView):
                 self.parent().showGenericPortPairDlg(bl)
             elif name == 'HPTwoHx':
                 bl = HeatPumpTwoHx(name, self)
+            elif name == 'HPDoubleDual':
+                bl = HPDoubleDual(name, self)
             elif name == 'Boiler':
                 bl = Boiler(name, self)
             elif name == 'AirSourceHP':
@@ -1182,8 +1205,8 @@ class DiagramEditor(QWidget):
         # Resource folder for library icons
         r_folder = "images/"
         componentsList = ['Connector','TeePiece','TVentil','WTap_main','WTap','Pump','Collector','GroundSourceHx','PV',
-                          'HP','HPTwoHx','AirSourceHP','StorageTank','IceStorage','IceStorageTwoHx','ExternalHx',
-                          'Radiator','Boiler','GenericBlock','GenericItem']
+                          'HP','HPTwoHx','HPDoubleDual','AirSourceHP','StorageTank','IceStorage','PitStorage',
+                          'IceStorageTwoHx','ExternalHx','Radiator','Boiler','GenericBlock','GenericItem']
         for component in componentsList:
             self.libItems.append(QtGui.QStandardItem(QIcon(r_folder+component),component))
         #self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'MasterControl')), 'MasterControl'))
@@ -1774,7 +1797,7 @@ class DiagramEditor(QWidget):
         # fullExportText += tes.read()
         # tes.close()
         if exportTo == 'mfs':
-            fullExportText += "EQUATIONS 1\nTRoomStore=1\n"
+            # fullExportText += "EQUATIONS 1\nTRoomStore=1\n"
             fullExportText += "ENDS"
 
         print("------------------------> END OF EXPORT <------------------------")
@@ -1852,6 +1875,9 @@ class DiagramEditor(QWidget):
                 parameters += 2
                 continue
             if type(t) is HeatPumpTwoHx:
+                parameters += 3
+                continue
+            if type(t) is HPDoubleDual:
                 parameters += 3
                 continue
 
@@ -1946,6 +1972,9 @@ class DiagramEditor(QWidget):
                 parameters += 2
                 continue
             if type(t) is HeatPumpTwoHx:
+                parameters += 3
+                continue
+            if type(t) is HPDoubleDual:
                 parameters += 3
                 continue
 
@@ -2130,12 +2159,18 @@ class DiagramEditor(QWidget):
                     # print("Printing storage tank" + str(k))
 
                 if isinstance(k, Connection):
+                    if k.toPort == None or k.fromPort == None:
+                        continue
+                    # name = k.displayName
+                    # testFrom = k.fromPort
+                    # testTo = k.toPort
                     print("Almost done with loading a connection")
                     # print("Connection displ name " + str(k.displayName))
                     # print("Connection fromPort" + str(k.fromPort))
                     # print("Connection toPort" + str(k.toPort))
                     # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
                     k.initLoad()
+                    a = 1
                     # k.setConnToGroup("defaultGroup")
 
                 if isinstance(k, GraphicalItem):
@@ -3318,6 +3353,8 @@ class MainWindow(QMainWindow):
 
         self.centralWidget = DiagramEditor(self)
         self.setCentralWidget(self.centralWidget)
+        if self.loadValue == 'json':
+            self.centralWidget.save()
         self.labelVisState = False
         self.massFlowEnabled = False
         self.calledByVisualizeMf = False
@@ -3338,6 +3375,9 @@ class MainWindow(QMainWindow):
 
         runSimulationAction = QAction(QIcon('images/runSimulation.png'), "Run simulation", self)
         runSimulationAction.triggered.connect(self.runSimulation)
+
+        processSimulationAction = QAction(QIcon('images/processSimulation.png'), "Process data", self)
+        processSimulationAction.triggered.connect(self.processSimulation)
 
         # renameDiaAction = QAction(QIcon('images/text-label.png'), "Rename system diagram", self)
         # renameDiaAction.triggered.connect(self.renameDia)
@@ -3433,6 +3473,7 @@ class MainWindow(QMainWindow):
         tb.addAction(updateConfigAction)
         tb.addAction(exportDckAction)
         tb.addAction(runSimulationAction)
+        tb.addAction(processSimulationAction)
         #tb.addAction(exportTrnsysAction)
         # tb.addAction(renameDiaAction)
         # tb.addAction(groupNewAction)
@@ -3696,6 +3737,20 @@ class MainWindow(QMainWindow):
         runApp = RunMain()
         runApp.runAction(self.centralWidget.projectFolder)
 
+        return
+
+    def processSimulation(self):
+        processPath = os.path.join(self.projectFolder, "process.config")
+        if not os.path.isfile(processPath):
+            messageText = "No such file:\n" + processPath
+            qmb = QMessageBox()
+            qmb.setText(messageText)
+            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.setDefaultButton(QMessageBox.Ok)
+            qmb.exec()
+            return
+        processApp = ProcessMain()
+        processApp.processAction(self.centralWidget.projectFolder)
         return
 
     def exportTrnsys(self):

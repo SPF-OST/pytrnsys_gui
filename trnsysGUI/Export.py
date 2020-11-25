@@ -26,6 +26,8 @@ class Export(object):
             numOfRelPorts = 0
             if isinstance(component,StorageTank) or (isinstance(component,Connection) and (type(component.fromPort.parent) is StorageTank or type(component.toPort.parent) is StorageTank)):
                 pass
+            elif isinstance(component,Connection):
+                numOfRelPorts = 1
             else:
                 try:
                     numOutputs = len(component.outputs)
@@ -701,25 +703,29 @@ class Export(object):
         f = ''
         lossText = ''
         strVar = 'PipeLoss'
+        totalLeftText = strVar + "Total="
+        totalRightText = ''
+        equationCounter = 0
 
         for g in self.editor.groupList:
-            lossText += strVar + str(self.editor.groupList.index(g)) + "="
+            leftText = strVar + str(self.editor.groupList.index(g)) + "="
+            rightText = ''
+            rightCounter = 0
 
             for i in g.itemList:
                 if isinstance(i, Connection) and not i.isVirtualConn:
-                    lossText += "P" + i.displayName + "_kW" + "+"
+                    rightText += "P" + i.displayName + "_kW" + "+"
+                    rightCounter += 1
 
-            lossText = lossText[:-1]
-            lossText += "\n"
+            if rightCounter > 0:
+                rightText = rightText[:-1]
+                lossText += leftText + rightText + '\n'
+                totalRightText += strVar + str(self.editor.groupList.index(g)) + "+"
+                equationCounter += 1
 
-        lossText += strVar + "Total="
+        totalRightText = totalRightText[:-1]
 
-        for g in self.editor.groupList:
-            lossText += strVar + str(self.editor.groupList.index(g)) + "+"
-
-        lossText = lossText[:-1]
-
-        f += "EQUATIONS " + str(len(self.editor.groupList) + 1) + "\n" + lossText + "\n\n"
+        f += "EQUATIONS " + str(equationCounter + 1) + "\n" + lossText + totalLeftText + totalRightText +  "\n\n"
         return f
 
     def exportMassFlowPrinter(self, unitnr, descLen):

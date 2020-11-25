@@ -341,12 +341,13 @@ class ConfigStorage(QDialog):
        -------
 
         """
+        test = self.hxNameLe.text()
         hx_temp = HeatExchanger(2, self.w_hx, abs(
             1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
                                 QPointF(self.storage.w,
                                         self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
                                 self.storage,
-                                self.hxNameLe.text())
+                                self.hxNameLe.text(),tempHx=True)
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
         input = float(self.offsetLeI.text())
@@ -552,13 +553,13 @@ class ConfigStorage(QDialog):
         side = ''
         noSelection = True
         try:
-            hxName, residualInfo = self.listWL2.selectedItems()[0].text().split(",")
+            connectionName, residualInfo = self.listWL2.selectedItems()[0].text().split(",")
             side = 'Left'
             noSelection = False
         except:
             pass
         try:
-            hxName, residualInfo = self.listWR2.selectedItems()[0].text().split(",")
+            connectionName, residualInfo = self.listWR2.selectedItems()[0].text().split(",")
             side = 'Right'
             noSelection = False
         except:
@@ -615,6 +616,14 @@ class ConfigStorage(QDialog):
 
     def acceptedEdit(self):
         # print("Changing displayName")
+        test = self.le.text()
+        if self.le.text() == '':
+            qmb = QMessageBox()
+            qmb.setText('Please set a name for this storage tank.')
+            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.setDefaultButton(QMessageBox.Ok)
+            qmb.exec()
+            return
         self.storage.setName(self.le.text())
         self.close()
 

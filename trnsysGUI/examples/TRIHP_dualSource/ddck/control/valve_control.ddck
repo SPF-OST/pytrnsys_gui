@@ -1,0 +1,34 @@
+*************************************
+**BEGIN valve_control.ddck
+*************************************
+
+CONSTANTS 2
+T_set_DivSH=50
+T_set_DivHpEvap=50
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiDivSHCool
+TPiSHInMix
+MfrPiRadOut
+T_set_DivSH
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivSH
+EQUATIONS 1
+xFracDivSH =  1.-[441,5] 
+
+UNIT 442 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiHPEvapIn
+TPiHpEvapMix
+MfrPiPuGhxOut
+T_set_DivHpEvap
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivHpEvap
+EQUATIONS 1
+xFracDivHpEvap =  1.-[442,5] 
+
