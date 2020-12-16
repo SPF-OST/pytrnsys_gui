@@ -1,0 +1,46 @@
+UNIT	TYPE	Name
+  10	   1	Unknown
+  11	  46	Monthly integrator (TRNSYS)
+  12	  46	Monthly integrator (TRNSYS)
+  13	  65	Online plotter (TRNSYS)
+  17	   2	Collector controller (TRNSYS)
+  18	   2	Collector controller (TRNSYS)
+  16	 993	Recall
+  19	  65	Online plotter (TRNSYS)
+  20	 811	Tempering valve (SPF)
+  21	1924	Plug-flow TES (SPF)
+  22	  46	Monthly integrator (TRNSYS)
+  23	  65	Online plotter (TRNSYS)
+  25	 935	Flow solver (SPF)
+  26	 929	TeePiece (SPF)
+  27	 929	TeePiece (SPF)
+  28	 931	Type 931 CHECK (SPF)
+  29	 931	Type 931 CHECK (SPF)
+  30	 931	Type 931 CHECK (SPF)
+  31	 931	Type 931 CHECK (SPF)
+  32	 931	Type 931 CHECK (SPF)
+  33	 931	Type 931 CHECK (SPF)
+  34	 931	Type 931 CHECK (SPF)
+  35	 931	Type 931 CHECK (SPF)
+  36	  25	User defined printer (TRNSYS)
+  37	  25	User defined printer (TRNSYS)
+  42	 109	Weather data processor (TRNSYS)
+  43	  33	Psychrometrics
+  41	  69	Sky temperature
+  44	  46	Monthly integrator (TRNSYS)
+  46	   9	Data reader (TRNSYS)
+  47	  65	Online plotter (TRNSYS)
+  48	  46	Monthly integrator (TRNSYS)
+  49	  46	Monthly integrator (TRNSYS)
+unitPrintSol	 14	temp\SOLAR_MO.Prt
+unitHourlyCol	 15	temp\SOLAR_HR.Prt
+unitPrinter_Tes1	 24	temp\TES1_MO.Prt
+461	None	solar_dhw_GUI_Mfr.prt
+462	None	solar_dhw_GUI_T.prt
+unitWeatherData	 38	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\solar_dhw_GUI\ddck\weather\SMA_hourly.99"
+unitWeatherData2	 39	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\solar_dhw_GUI\ddck\weather\SMA_hourly.99"
+unitWeatherData3	 40	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\solar_dhw_GUI\ddck\weather\SMA_hourly.99"
+unitPrinterWeather	 45	temp\WEATHER_BASE_MO.Prt
+unitReadDhw	 50	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\solar_dhw_GUI\ddck\WTap\T44A38_DHW_load_year_V3.txt"
+unitPrinterDHW	 51	temp\DHW_MO.Prt
+unitHourlyDHW	 52	temp\DHW_HR.Prt

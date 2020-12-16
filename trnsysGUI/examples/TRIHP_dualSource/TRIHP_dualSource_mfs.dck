@@ -136,20 +136,20 @@ TPuCirc = TPiPuCircIn
 
 EQUATIONS 14
 *** Massflowrates
-MfrPuSH = 523
+MfrPuSH = 379
 MfrsupplyWater = 1000
 xFracDivCondTOTesDhw = 1.0
 xFracDivSHCool = 0.0
-MfrPuHpEvap = 659
-MfrPuHpShCond = 998
+MfrPuHpEvap = 924
+MfrPuHpShCond = 971
 xFracDivDhw = 1.0
 xFracDivDhwOut = 1.0
 xFracDivCool = 1.0
-MfrPuHpDhwCond = 677
+MfrPuHpDhwCond = 521
 xFracDivTesDhwOut = 1.0
 xFracDivHp = 1.0
-MfrPump_5955 = 585
-MfrPuCirc = 484
+MfrPump_5955 = 947
+MfrPuCirc = 529
 
 CONSTANTS 2
 T_set_DivSH=50
