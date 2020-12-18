@@ -97,7 +97,7 @@ class Export(object):
                 for equation in equations:
                     f += equation + "\n"
                 equationNr += len(equations)
-            elif status == 'noDdckFile' or status == 'noDdckEntry':
+            elif exportTo == 'ddck' and (status == 'noDdckFile' or status == 'noDdckEntry'):
                 problemEncountered = True
                 if status == 'noDdckFile':
                     messageText = 'No ddck-file was found in the folder of ' + t.displayName + '.'
