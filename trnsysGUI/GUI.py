@@ -1752,7 +1752,12 @@ class DiagramEditor(QWidget):
 
         if exportTo == "mfs":
             header = open(os.path.join(ddckFolder,"generic\\head.ddck"),"r")
-            fullExportText += header.read()
+            headerLines = header.readlines()
+            for line in headerLines:
+                if line[:4] == "STOP":
+                    fullExportText += "STOP = 1 \n"
+                else:
+                    fullExportText += line
             header.close()
             print("\n")
         elif exportTo == "hydraulics":
@@ -3441,11 +3446,14 @@ class MainWindow(QMainWindow):
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
 
-        openVisualizerAction = QAction(QIcon('images/runMfs.png'), "Start visualization of mass flows", self)
+        runMassflowSolverAction = QAction(QIcon('images/runMfs.png'), "Run the massflow solver", self)
+        runMassflowSolverAction.triggered.connect(self.runAndVisMf)
+
+        openVisualizerAction = QAction(QIcon('images/visMfs.png'), "Start visualization of mass flows", self)
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
-        runMassflowSolverAction = QAction(QIcon('images/gear.png'), "Run the massflow solver", self)
-        runMassflowSolverAction.triggered.connect(self.runMassflowSolver)
+        # runMassflowSolverAction = QAction(QIcon('images/gear.png'), "Run the massflow solver", self)
+        # runMassflowSolverAction.triggered.connect(self.runMassflowSolver)
 
         trnsysList = QAction(QIcon('images/bug-1.png'), "Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
@@ -3468,6 +3476,7 @@ class MainWindow(QMainWindow):
         tb.addAction(zoomInAction)
         tb.addAction(zoomOutAction)
         tb.addAction(toggleConnLabels)
+        tb.addAction(runMassflowSolverAction)
         tb.addAction(openVisualizerAction)
         tb.addAction(exportHydraulicsAction)
         tb.addAction(updateConfigAction)
@@ -3901,9 +3910,25 @@ class MainWindow(QMainWindow):
 
         # dIns = DeepInspector(self.centralWidget)
 
-    def visualizeMf(self):
+    def runAndVisMf(self):
         self.calledByVisualizeMf = True
         mfrFile, tempFile = self.runMassflowSolver()
+        if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
+            MassFlowVisualizer(self,mfrFile, tempFile)
+            self.massFlowEnabled = True
+        else:
+            print("No mfrFile or tempFile found!")
+
+    def visualizeMf(self):
+        qmb = QMessageBox()
+        qmb.setText("Please select the mass flow rate prt-file that you want to visualize.")
+        qmb.setStandardButtons(QMessageBox.Ok)
+        qmb.setDefaultButton(QMessageBox.Ok)
+        qmb.exec()
+
+        mfrFile = QFileDialog.getOpenFileName(self, "Open diagram", filter="*Mfr.prt")[0].replace('/', '\\')
+        tempFile = mfrFile.replace("Mfr", "T")
+        self.calledByVisualizeMf = True
         if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
             MassFlowVisualizer(self,mfrFile, tempFile)
             self.massFlowEnabled = True

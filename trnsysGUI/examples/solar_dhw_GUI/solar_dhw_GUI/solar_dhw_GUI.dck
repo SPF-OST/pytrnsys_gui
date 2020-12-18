@@ -559,8 +559,8 @@ EQUATIONS 2
 TPuCol = TPiTesToColl
 TWTap = TPiDhwDemand
 EQUATIONS 2
-MfrWTap_main = 1000
-MfrPuColl = 313
+MfrWTap_main = MfrDHWreal
+MfrPuColl = TdhwSetProfile
 UNIT 25 TYPE 935 !Changed automatically
 PARAMETERS 65
 16

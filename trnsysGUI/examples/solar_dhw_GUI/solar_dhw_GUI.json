@@ -78,7 +78,7 @@
             "PortsIDOut": [
                 252
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": "0.0",
             "RotationN": 0,
             "trnsysID": 84
         },
@@ -196,8 +196,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                70.0,
-                50.0
+                90.0,
+                70.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 33,
@@ -235,8 +235,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -10.0,
-                50.0
+                10.0,
+                70.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 31,
@@ -280,8 +280,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                70.0,
-                50.0
+                90.0,
+                70.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 20,
@@ -325,8 +325,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                70.0,
-                50.0
+                90.0,
+                70.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 252,
@@ -370,8 +370,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -10.0,
-                50.0
+                10.0,
+                70.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 44,
@@ -415,8 +415,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -10.0,
-                50.0
+                10.0,
+                70.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 26,
@@ -460,8 +460,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                50.0,
-                30.0
+                70.0,
+                50.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 47,
@@ -505,8 +505,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -30.0,
-                30.0
+                -10.0,
+                50.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 35,

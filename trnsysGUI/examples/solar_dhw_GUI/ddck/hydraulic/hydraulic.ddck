@@ -17,8 +17,8 @@ TWTap = TPiDhwDemand
 
 EQUATIONS 2
 *** Massflowrates
-MfrWTap_main = 1000
-MfrPuColl = 313
+MfrWTap_main = MfrDHWreal
+MfrPuColl = TdhwSetProfile
 
 UNIT 450 TYPE 935
 PARAMETERS 65
