@@ -317,11 +317,16 @@ class ConfigStorage(QDialog):
         -------
 
         """
+        if self.hxNameLe.text() == '':
+            msgb = QMessageBox()
+            msgb.setText("Please specify the name of the heat exchanger that you want to add.")
+            msgb.exec_()
+            return
+
         hx_temp = HeatExchanger(0, self.w_hx, abs(
             1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
                                 QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
-                                self.storage,
-                                self.hxNameLe.text())
+                                self.storage, self.hxNameLe.text(), tempHx=True)
 
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
@@ -341,13 +346,17 @@ class ConfigStorage(QDialog):
        -------
 
         """
-        test = self.hxNameLe.text()
+        if self.hxNameLe.text() == '':
+            msgb = QMessageBox()
+            msgb.setText("Please specify the name of the heat exchanger that you want to add.")
+            msgb.exec_()
+            return
+
         hx_temp = HeatExchanger(2, self.w_hx, abs(
             1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
                                 QPointF(self.storage.w,
                                         self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
-                                self.storage,
-                                self.hxNameLe.text(),tempHx=True)
+                                self.storage, self.hxNameLe.text(), tempHx=True)
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
         input = float(self.offsetLeI.text())

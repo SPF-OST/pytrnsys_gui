@@ -110,16 +110,20 @@ class MyQTreeView(QTreeView):
             return
         try:
             os.remove(filePath)
-            try:
-                self.item.parent.parent().fileList.remove(str(filePath))
-            except AttributeError:
-                try:
-                    self.item.parent().centralWidget.fileList.remove(str(filePath))
-                except ValueError:
-                    self.item.parent().centralWidget.fileList.remove(str(filePath).replace('/', '\\'))
+            # try:
+            #     self.item.parent.parent().fileList.remove(str(filePath))
+            # except AttributeError:
+            #     try:
+            #         self.item.parent().centralWidget.fileList.remove(str(filePath))
+            #     except ValueError:
+            #         try:
+            #             self.item.parent().centralWidget.fileList.remove(str(filePath).replace('/', '\\'))
+            #         except:
+            #             pass
+
         except OSError:
             msg = QMessageBox()
-            msg.setText("Cannot delete folder!")
+            msg.setText("Cannot delete file!")
             msg.exec_()
 
     def rreplace(self, string, old, new, occurrence):
