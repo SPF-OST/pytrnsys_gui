@@ -3,6 +3,8 @@ import numpy as num
 import os
 import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
 import pytrnsys.utils.log as log
+import logging
+logger = logging.getLogger('root')
 
 class buildDck():
 
@@ -64,6 +66,8 @@ class buildDck():
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
+        if deck.abortedByUser:
+            return
         self.overwriteForcedByUser=deck.overwriteForcedByUser
 
         deck.checkTrnsysDeck(deck.nameDeck,check=self.inputs["checkDeck"])
@@ -124,9 +128,9 @@ class buildDck():
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path,name,self.inputs,parseFileCreated=parseFileCreated,controlDataType=False)
-        self.logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
+        # logger = log.setup_custom_logger('root', self.inputs['outputLevel'])
         # stop propagting to root logger
-        self.logger.propagate = False
+        # logger.propagate = False
         if 'pathBaseSimulations' in self.inputs:
             self.path = self.inputs['pathBaseSimulations']
         if(self.inputs["addResultsFolder"]==False):
