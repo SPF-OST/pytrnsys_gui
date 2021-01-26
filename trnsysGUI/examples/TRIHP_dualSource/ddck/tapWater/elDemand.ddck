@@ -92,7 +92,7 @@ CONSTANTS 1
 unitReadEl_3=20
 
 
-ASSIGN  PATH$\demands\electricity\profiles\MFH30\20191107_MFH_30_electricity_profile_2min.txt unitReadEl_3
+ASSIGN  PATH$\tapWater\20191107_MFH_30_electricity_profile_2min.txt unitReadEl_3
 
 UNIT 77 TYPE 9    !, Data Reader Household Electricity
 PARAMETERS 10

@@ -1,0 +1,611 @@
+*******************************
+**BEGIN Head.ddck
+*******************************
+    
+*****************************************
+** Contact person: Dani Carbonell        
+** Date: 30.09.2016
+*****************************************
+
+***************************************************************************
+** Description: 
+** Basic TRNSYS variables including fluid properties
+***************************************************************************
+
+VERSION 17    
+
+************************************** 
+***Simulation time              ******
+**************************************
+
+CONSTANTS 3
+START = 0     
+STOP = 1 
+dtSim = 1/30.  ! time step in hours
+
+************************************** 
+***TRNSYS SIMULATION  constants ******
+**************************************
+
+CONSTANTS 13
+nIteTrnsys = 30      ! TRNSYS Limit of iterations
+nWarnTrnsys = 12000  ! TRNSYS Limit of warnings
+nCallTraceTrnys = 31 ! TRNSYS limit of calls to a component before it will be traced
+FrInte_Tol = 0.003   ! TRNSYS solver tolerances      
+FrConv_Tol = 0.0005  ! TRNSYS solver tolerances    
+nan_check_bool = 1   ! TRNSYS nan check boolean
+time_report = 1      ! TRNSYS time report
+solver_equation = 0  ! TRNSYS EQUATION SOLVER statement
+debug_statement = 0  ! TRNSYS Overwrite DEBUG statement
+solver_statement = 0 ! TRNSYS Solver statement
+min_relax_factor = 1 ! TRNSYS Minimum relaxation factor
+max_relac_factor = 1 ! TRNSYS Maximum relaxation factor 
+solver_integration = 1    ! TRNSYS numerical integration solver method
+
+
+************************************** 
+***TRNSYS SIMULATION SET-UP     ******
+**************************************
+
+SIMULATION START STOP dtSim     
+TOLERANCES    FrInte_Tol  FrConv_Tol     
+LIMITS nIteTrnsys nWarnTrnsys nCallTraceTrnys ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ solver_integration                        ! TRNSYS numerical integration solver method
+WIDTH 132                                     ! TRNSYS output file width, number of characters
+LIST                                          ! NOLIST statement
+
+SOLVER solver_statement min_relax_factor max_relac_factor      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK nan_check_bool  ! Nan DEBUG statement
+OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
+EQSOLVER solver_equation           ! EQUATION SOLVER statement
+TIME_REPORT time_report
+
+************************************** 
+***User defined printer settings******
+**************************************
+ 
+CONSTANTS 3    
+ 
+tStrtUser = START     ! START start time of user defined printer
+tEndUser  = STOP      ! END time of user defined printer
+dtPrUser  = dtSim     ! timestep of user defined printer
+
+************************************** 
+***Generic Constants            ******
+**************************************
+
+CONSTANTS 7 
+versionDeck = 1 !can be changed from config file to adapt processes and so on
+PI   = 3.1415926     
+Zero = 0
+Nix  = 0
+notused  = 0
+NPlotsPerSim = 18
+TRoomStore = 20
+
+************************************** 
+***Constant fluid properties    ******
+**************************************
+
+CONSTANTS 7 
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 °C
+RHOWAT = 998.0   ! density of Water  [kg/m³] at20 °C
+LAMWAT = 0.58    ! heat conductivity W/(mK) 
+CPWAT_SI = CPWAT*1000 ! J/(kgK)    
+CPBRI_SI = CPBRI*1000 ! J/(kgK)    
+
+*******************************
+**END Head.dck
+*******************************
+
+EQUATIONS 4
+*** Black box component temperatures
+TWTapBottom=1
+TDhwPortRight100=1
+TDhwPortRight0=1
+THxSolar=1
+
+
+EQUATIONS 2
+*** Pump outlet temperatures
+TPuCol = TPiColIn
+TWTapTop = TPiDhwDemand
+
+EQUATIONS 2
+*** Massflowrates
+MfrPuCol = 891
+MfrWTapBottom = 1000
+
+CONSTANTS 1
+T_set_MixDhw=50
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiTesDhwOut
+TPiDhwMix
+MfrPiDhwDemand
+T_set_MixDhw
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixDhw
+EQUATIONS 1
+xFracMixDhw =  1.-[441,5] 
+
+UNIT 450 TYPE 935
+PARAMETERS 89
+22
+10 13 19 0     !1 : PuCol
+8 21 15 342    !2 : MixDhw
+8 0 0 5        !3 : WTapTop
+6 0 0 4        !4 : WTapBottom
+16 22 6 342    !5 : TPiece
+4 5 0 0        !6 : PiDhwMains
+5 2 0 0        !7 : PiDhwMix
+2 3 0 0        !8 : PiDhwDemand
+10 12 18 0     !9 : Collector
+1 9 0 0        !10 : PiColIn
+12 13 0 0      !11 : HxSolar
+9 11 0 0       !12 : PiColOut
+11 1 0 0       !13 : PiTesToCol
+15 16 0 0      !14 : ConnDhwR873
+14 2 0 0       !15 : PiTesDhwOut
+5 14 0 0       !16 : PiTesDhwIn
+18 19 0 0      !17 : HxSolar
+9 17 0 0       !18 : PiColOut
+17 1 0 0       !19 : PiTesToCol
+21 22 0 0      !20 : ConnDhwR891
+20 2 0 0       !21 : PiTesDhwOut
+5 20 0 0       !22 : PiTesDhwIn
+INPUTS 22! for Type 935
+ MfrPuCol  xFracMixDhw 0,0  MfrWTapBottom 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 
+
+*** Initial Inputs *
+0.0 0.0 -1 0.0 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 
+
+EQUATIONS 46	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrPuCol_A=[450,1]
+MfrPuCol_B=[450,2]
+MfrMixDhw_A=[450,4]
+MfrMixDhw_B=[450,5]
+MfrMixDhw_C=[450,6]
+MfrWTapTop_A=[450,7]
+MfrWTapTop_B=[450,8]
+MfrWTapBottom_A=[450,10]
+MfrWTapBottom_B=[450,11]
+MfrTPiece_A=[450,13]
+MfrTPiece_B=[450,14]
+MfrTPiece_C=[450,15]
+MfrPiDhwMains_A=[450,16]
+MfrPiDhwMains_B=[450,17]
+MfrPiDhwMix_A=[450,19]
+MfrPiDhwMix_B=[450,20]
+MfrPiDhwDemand_A=[450,22]
+MfrPiDhwDemand_B=[450,23]
+MfrCollector_A=[450,25]
+MfrCollector_B=[450,26]
+MfrPiColIn_A=[450,28]
+MfrPiColIn_B=[450,29]
+MfrHxSolar_A=[450,31]
+MfrHxSolar_B=[450,32]
+MfrPiColOut_A=[450,34]
+MfrPiColOut_B=[450,35]
+MfrPiTesToCol_A=[450,37]
+MfrPiTesToCol_B=[450,38]
+MfrConnDhwR873_A=[450,40]
+MfrConnDhwR873_B=[450,41]
+MfrPiTesDhwOut_A=[450,43]
+MfrPiTesDhwOut_B=[450,44]
+MfrPiTesDhwIn_A=[450,46]
+MfrPiTesDhwIn_B=[450,47]
+MfrHxSolar_A=[450,49]
+MfrHxSolar_B=[450,50]
+MfrPiColOut_A=[450,52]
+MfrPiColOut_B=[450,53]
+MfrPiTesToCol_A=[450,55]
+MfrPiTesToCol_B=[450,56]
+MfrConnDhwR891_A=[450,58]
+MfrConnDhwR891_B=[450,59]
+MfrPiTesDhwOut_A=[450,61]
+MfrPiTesDhwOut_B=[450,62]
+MfrPiTesDhwIn_A=[450,64]
+MfrPiTesDhwIn_B=[450,65]
+
+
+UNIT 451 TYPE 929
+!MixDhw
+PARAMETERS 0
+INPUTS 6
+MfrMixDhw_A
+MfrMixDhw_B
+MfrMixDhw_C
+TPiDhwDemand
+TPiTesDhwOut
+TPiTesDhwOut
+TPiDhwMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixDhw= [451,1]
+
+UNIT 452 TYPE 929
+!TPiece
+PARAMETERS 0
+INPUTS 6
+MfrTPiece_A
+MfrTPiece_B
+MfrTPiece_C
+TPiTesDhwIn
+TPiTesDhwIn
+TPiDhwMains
+TPiDhwMix
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTPiece= [452,1]
+
+UNIT 453 TYPE 931
+!PiDhwMains
+PARAMETERS 6
+diPiDhwMains
+LPiDhwMains
+UPiDhwMains
+RhoWat
+CPWat
+20
+INPUTS 4
+TWTapBottom
+MfrPiDhwMains_A
+TRoomStore
+TTPiece
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwMains= [453,1]
+PPiDhwMains_kW= [453,3]/3600 !kW
+MfrPiDhwMains= MfrPiDhwMains_A
+
+UNIT 454 TYPE 931
+!PiDhwMix
+PARAMETERS 6
+diPiDhwMix
+LPiDhwMix
+UPiDhwMix
+RhoWat
+CPWat
+20
+INPUTS 4
+TTPiece
+MfrPiDhwMix_A
+TRoomStore
+TMixDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwMix= [454,1]
+PPiDhwMix_kW= [454,3]/3600 !kW
+MfrPiDhwMix= MfrPiDhwMix_A
+
+UNIT 455 TYPE 931
+!PiDhwDemand
+PARAMETERS 6
+diPiDhwDemand
+LPiDhwDemand
+UPiDhwDemand
+RhoWat
+CPWat
+20
+INPUTS 4
+TMixDhw
+MfrPiDhwDemand_A
+TRoomStore
+TWTapTop
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwDemand= [455,1]
+PPiDhwDemand_kW= [455,3]/3600 !kW
+MfrPiDhwDemand= MfrPiDhwDemand_A
+
+UNIT 456 TYPE 931
+!PiColIn
+PARAMETERS 6
+diPiColIn
+LPiColIn
+UPiColIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCol
+MfrPiColIn_A
+TRoomStore
+TCollector
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColIn= [456,1]
+PPiColIn_kW= [456,3]/3600 !kW
+MfrPiColIn= MfrPiColIn_A
+
+UNIT 457 TYPE 931
+!PiColOut
+PARAMETERS 6
+diPiColOut
+LPiColOut
+UPiColOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TCollector
+MfrPiColOut_A
+TRoomStore
+THxSolar
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColOut= [457,1]
+PPiColOut_kW= [457,3]/3600 !kW
+MfrPiColOut= MfrPiColOut_A
+
+UNIT 458 TYPE 931
+!PiTesToCol
+PARAMETERS 6
+diPiTesToCol
+LPiTesToCol
+UPiTesToCol
+RhoWat
+CPWat
+20
+INPUTS 4
+THxSolar
+MfrPiTesToCol_A
+TRoomStore
+TPuCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesToCol= [458,1]
+PPiTesToCol_kW= [458,3]/3600 !kW
+MfrPiTesToCol= MfrPiTesToCol_A
+
+UNIT 459 TYPE 931
+!PiTesDhwOut
+PARAMETERS 6
+diPiTesDhwOut
+LPiTesDhwOut
+UPiTesDhwOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight100
+MfrPiTesDhwOut_A
+TRoomStore
+TMixDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwOut= [459,1]
+PPiTesDhwOut_kW= [459,3]/3600 !kW
+MfrPiTesDhwOut= MfrPiTesDhwOut_A
+
+UNIT 460 TYPE 931
+!PiTesDhwIn
+PARAMETERS 6
+diPiTesDhwIn
+LPiTesDhwIn
+UPiTesDhwIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTPiece
+MfrPiTesDhwIn_A
+TRoomStore
+TDhwPortRight0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwIn= [460,1]
+PPiTesDhwIn_kW= [460,3]/3600 !kW
+MfrPiTesDhwIn= MfrPiTesDhwIn_A
+
+UNIT 461 TYPE 931
+!PiColOut
+PARAMETERS 6
+diPiColOut
+LPiColOut
+UPiColOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TCollector
+MfrPiColOut_A
+TRoomStore
+THxSolar
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColOut= [461,1]
+PPiColOut_kW= [461,3]/3600 !kW
+MfrPiColOut= MfrPiColOut_A
+
+UNIT 462 TYPE 931
+!PiTesToCol
+PARAMETERS 6
+diPiTesToCol
+LPiTesToCol
+UPiTesToCol
+RhoWat
+CPWat
+20
+INPUTS 4
+THxSolar
+MfrPiTesToCol_A
+TRoomStore
+TPuCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesToCol= [462,1]
+PPiTesToCol_kW= [462,3]/3600 !kW
+MfrPiTesToCol= MfrPiTesToCol_A
+
+UNIT 463 TYPE 931
+!PiTesDhwOut
+PARAMETERS 6
+diPiTesDhwOut
+LPiTesDhwOut
+UPiTesDhwOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight100
+MfrPiTesDhwOut_A
+TRoomStore
+TMixDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwOut= [463,1]
+PPiTesDhwOut_kW= [463,3]/3600 !kW
+MfrPiTesDhwOut= MfrPiTesDhwOut_A
+
+UNIT 464 TYPE 931
+!PiTesDhwIn
+PARAMETERS 6
+diPiTesDhwIn
+LPiTesDhwIn
+UPiTesDhwIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTPiece
+MfrPiTesDhwIn_A
+TRoomStore
+TDhwPortRight0
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwIn= [464,1]
+PPiTesDhwIn_kW= [464,3]/3600 !kW
+MfrPiTesDhwIn= MfrPiTesDhwIn_A
+
+CONSTANTS 3
+** Fluid Loop : defaultGroup
+di_loop_0=0.2
+L_loop_0=2
+U_loop_0=10
+
+
+EQUATIONS 24
+** Fluid Loop : defaultGroup
+**di_loop_0=0.2
+**L_loop_0=2
+**U_loop_0=10
+*** PiDhwMains
+diPiDhwMains=di_loop_0
+LPiDhwMains=L_loop_0
+UPiDhwMains=U_loop_0
+*** PiDhwMix
+diPiDhwMix=di_loop_0
+LPiDhwMix=L_loop_0
+UPiDhwMix=U_loop_0
+*** PiDhwDemand
+diPiDhwDemand=di_loop_0
+LPiDhwDemand=L_loop_0
+UPiDhwDemand=U_loop_0
+*** PiTesDhwOut
+diPiTesDhwOut=di_loop_0
+LPiTesDhwOut=L_loop_0
+UPiTesDhwOut=U_loop_0
+*** PiTesDhwIn
+diPiTesDhwIn=di_loop_0
+LPiTesDhwIn=L_loop_0
+UPiTesDhwIn=U_loop_0
+*** PiTesToCol
+diPiTesToCol=di_loop_0
+LPiTesToCol=L_loop_0
+UPiTesToCol=U_loop_0
+*** PiColIn
+diPiColIn=di_loop_0
+LPiColIn=L_loop_0
+UPiColIn=U_loop_0
+*** PiColOut
+diPiColOut=di_loop_0
+LPiColOut=L_loop_0
+UPiColOut=U_loop_0
+
+
+EQUATIONS 2
+PipeLoss0=PPiDhwMains_kW+PPiDhwMix_kW+PPiDhwDemand_kW+PPiTesDhwOut_kW+PPiTesDhwIn_kW+PPiTesToCol_kW+PPiColIn_kW+PPiColOut_kW
+PipeLossTotal=PipeLoss0
+
+ASSIGN SolTherm2050_2_SolarDhwSfh_Mfr.prt 465
+
+UNIT 465 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+465! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 9
+xFracMixDhw MfrPiDhwMains MfrPiDhwMix MfrPiDhwDemand MfrPiTesDhwOut MfrPiTesDhwIn MfrPiTesToCol 
+MfrPiColIn MfrPiColOut 
+***
+xFracMixDhw MfrPiDhwMains MfrPiDhwMix MfrPiDhwDemand MfrPiTesDhwOut MfrPiTesDhwIn MfrPiTesToCol 
+MfrPiColIn MfrPiColOut 
+
+ASSIGN SolTherm2050_2_SolarDhwSfh_T.prt 466
+
+UNIT 466 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+466! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 8
+TPiDhwMains TPiDhwMix TPiDhwDemand TPiTesDhwOut TPiTesDhwIn TPiTesToCol TPiColIn 
+TPiColOut 
+***
+TPiDhwMains TPiDhwMix TPiDhwDemand TPiTesDhwOut TPiTesDhwIn TPiTesToCol TPiColIn 
+TPiColOut 
+
+ENDS

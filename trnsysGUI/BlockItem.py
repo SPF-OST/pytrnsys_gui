@@ -45,6 +45,9 @@ class BlockItem(QGraphicsPixmapItem):
     def __init__(self, trnsysType, parent, **kwargs):
 
         super(BlockItem, self).__init__(None)
+        
+        self.logger = parent.logger
+
         self.w = 120.0
         self.h = 120.0
         self.parent = parent
@@ -116,7 +119,7 @@ class BlockItem(QGraphicsPixmapItem):
             # Inputs get appended in ConfigStorage
             pass
 
-        print("Block name is " + str(self.name))
+        self.logger.debug("Block name is " + str(self.name))
 
         # Update size for generic block:
         if self.name == 'Bvi':
@@ -134,7 +137,7 @@ class BlockItem(QGraphicsPixmapItem):
 
         if self not in self.parent.parent().trnsysObj:
             self.parent.parent().trnsysObj.append(self)
-            # print("trnsysObj are " + str(self.parent.parent().trnsysObj))
+            # self.logger.debug("trnsysObj are " + str(self.parent.parent().trnsysObj))
 
     def setDefaultGroup(self):
         """
@@ -156,18 +159,18 @@ class BlockItem(QGraphicsPixmapItem):
         -------
 
         """
-        # print("In setBlockToGroup")
+        # self.logger.debug("In setBlockToGroup")
         if newGroupName == self.groupName:
-            print("Block " + str(self) + str(self.displayName) + "is already in this group")
+            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
             return
         else:
-            # print("groups is " + str(self.parent.parent().groupList))
+            # self.logger.debug("groups is " + str(self.parent.parent().groupList))
             for g in self.parent.parent().groupList:
                 if g.displayName == self.groupName:
-                    print("Found the old group " + self.groupName)
+                    self.logger.debug("Found the old group " + self.groupName)
                     g.itemList.remove(self)
                 if g.displayName == newGroupName:
-                    # print("Found the new group " + newGroupName)
+                    # self.logger.debug("Found the new group " + newGroupName)
                     g.itemList.append(self)
 
             self.groupName = newGroupName
@@ -220,7 +223,7 @@ class BlockItem(QGraphicsPixmapItem):
         menu.exec_(event.screenPos())
 
     def launchNotepadFile(self):
-        print("Launching notpad")
+        self.logger.debug("Launching notpad")
         global FilePath
         os.system('start notepad++ ' + FilePath)
 
@@ -238,13 +241,13 @@ class BlockItem(QGraphicsPixmapItem):
                     os.startfile(files, 'open')
 
     def mouseReleaseEvent(self, event):
-        # print("Released mouse over block")
+        # self.logger.debug("Released mouse over block")
         if self.oldPos is None:
-            print("For Undo Framework: oldPos is None")
+            self.logger.debug("For Undo Framework: oldPos is None")
         else:
             if self.scenePos() != self.oldPos:
-                print("Block was dragged")
-                print("Old pos is" + str(self.oldPos))
+                self.logger.debug("Block was dragged")
+                self.logger.debug("Old pos is" + str(self.oldPos))
                 command = MoveCommand(self, self.oldPos, "Move BlockItem")
                 self.parent.parent().parent().undoStack.push(command)
                 self.oldPos = self.scenePos()
@@ -302,7 +305,7 @@ class BlockItem(QGraphicsPixmapItem):
 
     def updateSide(self, port, n):
         port.side = (port.side + n) % 4
-        # print("Port side is " + str(port.side))
+        # self.logger.debug("Port side is " + str(port.side))
 
     def rotateBlockCW(self):
         # Rotate block clockwise
@@ -310,8 +313,9 @@ class BlockItem(QGraphicsPixmapItem):
         # self.setTransformOriginPoint(self.w/2, self.h/2)
         self.setTransformOriginPoint(0, 0)
         self.setRotation((self.rotationN + 1) * 90)
+        self.label.setRotation(-(self.rotationN + 1) * 90)
         self.rotationN += 1
-        print("rotated by " + str(self.rotationN))
+        self.logger.debug("rotated by " + str(self.rotationN))
 
         for p in self.inputs:
             p.itemChange(27, p.scenePos())
@@ -334,8 +338,9 @@ class BlockItem(QGraphicsPixmapItem):
         # self.setTransformOriginPoint(50, 50)
         self.setTransformOriginPoint(0, 0)
         self.setRotation((self.rotationN - 1) * 90)
+        self.label.setRotation(-(self.rotationN - 1) * 90)
         self.rotationN -= 1
-        print("rotated by " + str(self.rotationN))
+        self.logger.debug("rotated by " + str(self.rotationN))
 
         for p in self.inputs:
             p.itemChange(27, p.scenePos())
@@ -346,23 +351,23 @@ class BlockItem(QGraphicsPixmapItem):
             self.updateSide(p, -1)
 
     def resetRotation(self):
-        print("Resetting rotation...")
+        self.logger.debug("Resetting rotation...")
         self.setRotation(0)
 
         for p in self.inputs:
             p.itemChange(27, p.scenePos())
             self.updateSide(p, -self.rotationN)
-            # print("Portside of port " + str(p) + " is " + str(p.portSide))
+            # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
 
         for p in self.outputs:
             p.itemChange(27, p.scenePos())
             self.updateSide(p, -self.rotationN)
-            # print("Portside of port " + str(p) + " is " + str(p.portSide))
+            # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
 
         self.rotationN = 0
 
     def printRotation(self):
-        print("Rotation is " + str(self.rotationN))
+        self.logger.debug("Rotation is " + str(self.rotationN))
 
 
     # Deletion related
@@ -377,20 +382,20 @@ class BlockItem(QGraphicsPixmapItem):
                 p.connectionList[0].deleteConn()
 
     def deleteBlock(self):
-        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # print("self.parent.parent" + str(self.parent.parent()))
+        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
-        print("deleting block " + str(self) + self.displayName)
-        # print("self.scene is" + str(self.parent.scene()))
+        self.logger.debug("deleting block " + str(self) + self.displayName)
+        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
         try:
             widgetToRemove.hide()
         except AttributeError:
-            print("Widget doesnt exist!")
+            self.logger.debug("Widget doesnt exist!")
         else:
-            print("Deleted widget")
+            self.logger.debug("Deleted widget")
         del self
 
     def deleteBlockCom(self):
@@ -440,7 +445,7 @@ class BlockItem(QGraphicsPixmapItem):
         Resizers are deleted inside mousePressEvent function inside GUI.py
 
         """
-        print("Inside Block Item mouse click")
+        self.logger.debug("Inside Block Item mouse click")
         if self.name == 'GenericBlock' or self.name == 'StorageTank':
             return
         try:
@@ -453,7 +458,7 @@ class BlockItem(QGraphicsPixmapItem):
             return
 
     def setItemSize(self, w, h):
-        print("Inside block item set item size")
+        self.logger.debug("Inside block item set item size")
         self.w, self.h = w, h
         # if h < 20:
         #     self.h = 20
@@ -461,7 +466,7 @@ class BlockItem(QGraphicsPixmapItem):
         #     self.w = 40
 
     def updateImage(self):
-        print("Inside block item update image")
+        self.logger.debug("Inside block item update image")
         if self.imageSource[-3:] == "svg":
             # self.image = QImage(self.imageSource)
             self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
@@ -480,7 +485,7 @@ class BlockItem(QGraphicsPixmapItem):
         try:
             self.resizer
         except AttributeError:
-            print("No resizer")
+            self.logger.debug("No resizer")
         else:
             del self.resizer
 
@@ -488,31 +493,31 @@ class BlockItem(QGraphicsPixmapItem):
     # Debug
     def dumpBlockInfo(self):
         # for a in inspect.getMembers(self):
-        #     print(str(a))
+        #     self.logger.debug(str(a))
 
-        print("This is a dump of " + str(self))
-        print("Name = " + str(self.displayName))
-        print("TrnsysType = " + str(self.name))
-        print("TrnsysTypeNumber = " + str(self.typeNumber))
-        print("Size = " + str(self.w) + " * " + str(self.h))
+        self.logger.debug("This is a dump of " + str(self))
+        self.logger.debug("Name = " + str(self.displayName))
+        self.logger.debug("TrnsysType = " + str(self.name))
+        self.logger.debug("TrnsysTypeNumber = " + str(self.typeNumber))
+        self.logger.debug("Size = " + str(self.w) + " * " + str(self.h))
 
         self.printIds()
         self.printConnections()
 
     def printIds(self):
-        print("ID:" + str(self.id))
-        print("TrnsysID: " + str(self.trnsysId))
+        self.logger.debug("ID:" + str(self.id))
+        self.logger.debug("TrnsysID: " + str(self.trnsysId))
 
         for inp in self.inputs:
-            print("Has input with ID " + str(inp.id))
+            self.logger.debug("Has input with ID " + str(inp.id))
 
         for out in self.outputs:
-            print("Has output with ID " + str(out.id))
+            self.logger.debug("Has output with ID " + str(out.id))
 
     def printConnections(self):
-        print("Connections are:")
+        self.logger.debug("Connections are:")
         for c in self.getConnections():
-            print(c.displayName + " with ID " + str(c.id))
+            self.logger.debug(c.displayName + " with ID " + str(c.id))
 
     def inspectBlock(self):
         self.parent.parent().listV.clear()
@@ -528,14 +533,14 @@ class BlockItem(QGraphicsPixmapItem):
 
     # AlignMode related
     def itemChange(self, change, value):
-        # print(change, value)
+        # self.logger.debug(change, value)
         # Snap grid excludes alignment
 
         if change == self.ItemPositionChange:
             if self.parent.parent().snapGrid:
                 snapSize = self.parent.parent().snapSize
-                print("itemchange")
-                print(type(value))
+                self.logger.debug("itemchange")
+                self.logger.debug(type(value))
                 value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
                 return value
             else:
@@ -673,7 +678,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.groupName = "defaultGroup"
         self.setBlockToGroup(i["GroupName"])
 
-        print(len(self.inputs))
+        self.logger.debug(len(self.inputs))
 
         if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
             temp = i["PortsIDIn"]
@@ -852,5 +857,5 @@ class BlockItem(QGraphicsPixmapItem):
             try:
                 self.parent.parent().fileList.remove(str(items))
             except ValueError:
-                print("File already deleted from file list.")
-                print("filelist:", self.parent.parent().fileList)
+                self.logger.debug("File already deleted from file list.")
+                self.logger.debug("filelist:", self.parent.parent().fileList)

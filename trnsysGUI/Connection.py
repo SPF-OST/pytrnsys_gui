@@ -1,5 +1,6 @@
 import sys
 from math import atan, sqrt, acos
+import numpy as np
 
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
@@ -57,7 +58,9 @@ class Connection(object):
 
     """
     def __init__(self, fromPort, toPort, isVirtual, parent, **kwargs):
-        # print("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
+        # self.logger.debug("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
+        self.logger = parent.logger
+
         self.fromPort = fromPort
         self.toPort = toPort
         self.isVirtualConn = isVirtual
@@ -101,13 +104,13 @@ class Connection(object):
 
         # A new connection is created if there are no kwargs
         if kwargs == {}:
-            # print("New connection being created")
+            # self.logger.debug("New connection being created")
             self.fromPortId = self.parent.idGen.getID()
             self.toPortId = self.parent.idGen.getID()
             self.initNew(parent)
         else:
             if "loadedConn" in kwargs:
-                print("Connection being loaded")
+                self.logger.debug("Connection being loaded")
                 self.fromPortId = kwargs["fromPortId"]
                 self.toPortId = kwargs["toPortId"]
                 self.segmentsLoad = kwargs["segmentsLoad"]
@@ -116,7 +119,7 @@ class Connection(object):
                 if "labelPos" in kwargs:
                     self.labelPosLoad = kwargs["labelPos"]
 
-                # print("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
+                # self.logger.debug("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
                 # self.initLoad()
 
         # Unused. For dfs1
@@ -163,7 +166,9 @@ class Connection(object):
     def setLabelPos(self, tup):
         posOffset = 10
         if len(self.segments) > 0:
-            self.segments[0].label.setPos(tup[0]+posOffset, tup[1]+posOffset)
+            # self.segments[0].label.setPos(tup[0]+posOffset, tup[1]+posOffset)
+            self.segments[0].label.setPos(0, 0)
+            self.segments[0].label.setRotation(0)
 
     # comment out
     def setMassLabelPos(self, tup):
@@ -236,12 +241,12 @@ class Connection(object):
                 col = QColor(255, 0, 0)
 
             for s in self.segments:
-                print("Value: ", value)
+                self.logger.debug("Value: " + str(value))
                 pen1 = QPen(col, value)
                 s.setPen(pen1)
 
         else:
-            print("No color to set in Connection.setColor()")
+            self.logger.debug("No color to set in Connection.setColor()")
 
 
     # Getters
@@ -257,9 +262,9 @@ class Connection(object):
 
         for i in range(len(corners)):
             if corners[i] == searchCorner:
-                # print("Found a corner")
+                # self.logger.debug("Found a corner")
                 return i
-        print("corner not found is " + str(searchCorner))
+        self.logger.debug("corner not found is " + str(searchCorner))
 
         return 0
         # Alternative
@@ -278,7 +283,7 @@ class Connection(object):
             res.append(tempNode.parent)
             tempNode = tempNode.nextN()
 
-        # print("getcorners gives " + str(res))
+        # self.logger.debug("getcorners gives " + str(res))
         return res
 
     # To correct the direction of a connection, unused
@@ -312,7 +317,7 @@ class Connection(object):
     def initNew(self, parent):
 
         self.parent = parent
-        # print("Parent is " + str(self.parent))
+        # self.logger.debug("Parent is " + str(self.parent))
 
         # Global
         self.parent.trnsysObj.append(self)
@@ -321,13 +326,13 @@ class Connection(object):
 
         # global editorMode
         if self.parent.editorMode == 0:
-            print("Creating a new connection in mode 0")
+            self.logger.debug("Creating a new connection in mode 0")
             self.initSegmentM0()
         elif self.parent.editorMode == 1:
-            print("Creating a new connection in mode 1")
+            self.logger.debug("Creating a new connection in mode 1")
             self.initSegmentM1()
         else:
-            print("No valid mode during creating of connection")
+            self.logger.debug("No valid mode during creating of connection")
 
         self.parent.connectionList.append(self)
         self.fromPort.connectionList.append(self)
@@ -338,9 +343,9 @@ class Connection(object):
     def initLoad(self):
         # Called by DiagramEditor when loading connection
 
-        print("self is " + str(self.isVirtualConn))
-        print("Port 1 is " + str(self.fromPort) + "has Id" + str(self.fromPort.id))
-        print("Port 2 is " + str(self.toPort))
+        self.logger.debug("self is " + str(self.isVirtualConn))
+        self.logger.debug("Port 1 is " + str(self.fromPort) + "has Id" + str(self.fromPort.id))
+        self.logger.debug("Port 2 is " + str(self.toPort))
 
         # self.parent = loadParent
         self.initSegmentM1()
@@ -396,7 +401,7 @@ class Connection(object):
 
         if self.isVirtualConn:
             # if self.displayName == "UntitledConn189":
-            #     print("PiTesRCombiTes_189XXXXXXXX is now set invisible")
+            #     self.logger.debug("PiTesRCombiTes_189XXXXXXXX is now set invisible")
             self.firstS.setVisible(False)
 
         self.parent.diagramScene.addItem(self.firstS)
@@ -408,18 +413,18 @@ class Connection(object):
     def loadSegments(self):
         self.clearConn()
 
-        print("cornerLoads is " + str(self.cornersLoad))
+        self.logger.debug("cornerLoads is " + str(self.cornersLoad))
 
         tempNode = self.startNode
 
-        print("start node has nn " + str(tempNode.nextNode))
-        print(" ")
+        self.logger.debug("start node has nn " + str(tempNode.nextNode))
+        self.logger.debug(" ")
         rad = 2
 
         for x in range(len(self.cornersLoad)):
             cor = CornerItem(- rad, - rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
-            # print("items are now " + str(self.parent.diagramScene.items()))
-            print("Corner" + str(cor) + " has  " + str(cor.node))
+            # self.logger.debug("items are now " + str(self.parent.diagramScene.items()))
+            self.logger.debug("Corner" + str(cor) + " has  " + str(cor.node))
 
             cor.setPos(float(self.cornersLoad[x][0]), float(self.cornersLoad[x][1]))
             # cor.setFlags(cor.ItemIsSelectable | cor.ItemIsMovable)
@@ -449,22 +454,22 @@ class Connection(object):
             pos2 = None
 
             if isinstance(s.startNode.parent, Connection) and s.startNode.prevNode is None:
-                # print("startnode is at connection")
+                # self.logger.debug("startnode is at connection")
                 pos1 = s.startNode.parent.fromPort.scenePos().x(), s.startNode.parent.fromPort.scenePos().y()
             if isinstance(s.endNode.parent, Connection) and s.endNode.nextNode is None:
-                # print("endnode is at connection")
+                # self.logger.debug("endnode is at connection")
                 pos2 = s.endNode.parent.toPort.scenePos().x(), s.endNode.parent.toPort.scenePos().y()
 
             if type(s.startNode.parent) is CornerItem:
-                # print("startnode is at corner")
-                print(str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos()))
+                # self.logger.debug("startnode is at corner")
+                self.logger.debug(str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos()))
                 pos1 = s.startNode.parent.scenePos().x(), s.startNode.parent.scenePos().y()
             if type(s.endNode.parent) is CornerItem:
-                # print("endnode is at corner")
+                # self.logger.debug("endnode is at corner")
                 pos2 = s.endNode.parent.scenePos().x(), s.endNode.parent.scenePos().y()
 
-            print("pos1 is " + str(pos1))
-            print("pos2 is " + str(pos2))
+            self.logger.debug("pos1 is " + str(pos1))
+            self.logger.debug("pos2 is " + str(pos2))
 
             s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
 
@@ -481,6 +486,16 @@ class Connection(object):
     # Label related
     def showLabel(self, b):
         if b:
+            # # vec1 = np.array(self.segmentsLoad[0][:2])
+            # # vec2 = np.array(self.segmentsLoad[0][2:])
+            # vec = vec2-vec1
+            # # uVec1 = vec1/np.linalg.norm(vec1)
+            # # uVec2 = vec2/np.linalg.norm(vec2)
+            # uVec = vec/np.linalg.norm(vec)
+            # dotProduct = np.dot(np.array([1.,0]),uVec)
+            # angle = np.rad2deg(np.arccos(dotProduct))
+            # if np.isnan(angle):
+            #     angle = 0
             self.firstS.label.setVisible(True)
         else:
             self.firstS.label.setVisible(False)
@@ -511,7 +526,7 @@ class Connection(object):
             self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
 
         elif self.parent.editorMode == 1:
-            # print("changing label pos in editor mode 1")
+            # self.logger.debug("changing label pos in editor mode 1")
             if self.fromPort.side == 0:
                 self.firstS.label.setPos(QPointF(-60, 0))
 
@@ -520,6 +535,18 @@ class Connection(object):
                 self.firstS.label.setPos(QPointF(20, 0))
         else:
             pass
+        if self.segmentsLoad:
+            vec1 = np.array(self.segmentsLoad[0][:2])
+            vec2 = np.array(self.segmentsLoad[0][2:])
+            vec = vec2-vec1
+            # uVec1 = vec1/np.linalg.norm(vec1)
+            # uVec2 = vec2/np.linalg.norm(vec2)
+            uVec = vec/np.linalg.norm(vec)
+            dotProduct = np.dot(np.array([1.,0]),uVec)
+            angle = np.rad2deg(np.arccos(dotProduct))
+            if np.isnan(angle):
+                angle = 0
+            self.firstS.label.setRotation(-angle)
 
 
     # Makes 90deg angles of connection
@@ -536,15 +563,15 @@ class Connection(object):
         # Here different cases can be implemented using self.PORT.side as sketched on paper
         rad = 2 # 4
 
-        print(
+        self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
-        print(
+        self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
             self.fromPort.createdAtSide = 2
             self.toPort.createdAtSide = 2
-            print("NiceConn 2 to 2")
+            self.logger.debug("NiceConn 2 to 2")
             portOffset = 30
             self.clearConn()
 
@@ -611,7 +638,7 @@ class Connection(object):
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
             self.fromPort.createdAtSide = 0
             self.toPort.createdAtSide = 0
-            print("NiceConn 0 to 0")
+            self.logger.debug("NiceConn 0 to 0")
             portOffset = 30
             self.clearConn()
 
@@ -680,7 +707,7 @@ class Connection(object):
             self.fromPort.createdAtSide = 1
             # todo :  when rotated, it cause a problem because side gets changed
 
-            print("NiceConn from 1")
+            self.logger.debug("NiceConn from 1")
             portOffset = 30
             self.clearConn()
 
@@ -714,7 +741,7 @@ class Connection(object):
                 self.firstS = self.getFirstSeg()
 
             else:
-                print("To port below from port")
+                self.logger.debug("To port below from port")
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
                 corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
@@ -751,7 +778,7 @@ class Connection(object):
                 corner2.setZValue(100)
                 self.fromPort.setZValue(100)
                 self.toPort.setZValue(100)
-                print("Here in niceconn")
+                self.logger.debug("Here in niceconn")
 
                 corner1.setPos(help_point_1)
                 corner2.setPos(help_point_2)
@@ -760,7 +787,7 @@ class Connection(object):
         elif self.fromPort.side == 3:
             self.fromPort.createdAtSide = 3
 
-            print("NiceConn from 1")
+            self.logger.debug("NiceConn from 1")
             portOffset = 30
             self.clearConn()
 
@@ -793,7 +820,7 @@ class Connection(object):
                 corner1.setPos(p1)
                 self.firstS = self.getFirstSeg()
             else:
-                print("To port above from port")
+                self.logger.debug("To port above from port")
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
                 corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
@@ -830,7 +857,7 @@ class Connection(object):
                 corner2.setZValue(100)
                 self.fromPort.setZValue(100)
                 self.toPort.setZValue(100)
-                print("Here in niceconn")
+                self.logger.debug("Here in niceconn")
 
                 corner1.setPos(help_point_1)
                 corner2.setPos(help_point_2)
@@ -843,7 +870,7 @@ class Connection(object):
 
             self.fromPort.createdAtSide = self.fromPort.side
             self.toPort.createdAtSide = self.toPort.side
-            print("Ports are directed to each other")
+            self.logger.debug("Ports are directed to each other")
             self.clearConn()
 
             corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
@@ -858,7 +885,7 @@ class Connection(object):
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner2.node)
 
-            # print("niceConn...")
+            # self.logger.debug("niceConn...")
             self.printConnNodes()
             self.parent.diagramScene.addItem(seg1)
             self.parent.diagramScene.addItem(seg2)
@@ -886,37 +913,37 @@ class Connection(object):
             corner2.setZValue(100)
             self.fromPort.setZValue(100)
             self.toPort.setZValue(100)
-            print("Here in niceconn")
+            self.logger.debug("Here in niceconn")
 
             corner1.setPos(help_point_1)
             corner2.setPos(help_point_2)
             self.firstS = self.getFirstSeg()
 
-            print("Conn has now " + str(self.firstS))
+            self.logger.debug("Conn has now " + str(self.firstS))
     # Unused
     def buildBridges(self):
         # This function finds the colliding line segments and creates the interrupted line effect
 
         # Debug:
-        # print("Segments in brigdes function is " + str(self.segments))
-        # print("Length of segments is " + str(len(self.segments)))
+        # self.logger.debug("Segments in brigdes function is " + str(self.segments))
+        # self.logger.debug("Length of segments is " + str(len(self.segments)))
         for s in self.segments:
             col = s.collidingItems()
             # Why do the child segments have again colliding Items?
-            # print("Start and end of loop segment is " + str(s.startNode) + " and " + str(s.endNode))
-            # print("Col items are " + str(col))
+            # self.logger.debug("Start and end of loop segment is " + str(s.startNode) + " and " + str(s.endNode))
+            # self.logger.debug("Col items are " + str(col))
 
             for c in col:
                 if type(c) is segmentItem:
-                    # print("There is a segment colliding....")
-                    # print("c.hasBridge is " + str(c.hasBridge))
-                    # print("s.hasBridge is " + str(s.hasBridge))
+                    # self.logger.debug("There is a segment colliding....")
+                    # self.logger.debug("c.hasBridge is " + str(c.hasBridge))
+                    # self.logger.debug("s.hasBridge is " + str(s.hasBridge))
 
                     # Both have no bridge and do not collide at the endpoints:
                     # if (s.hasBridge == False) and (c.hasBridge == False) and (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
                     if (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
 
-                        # print("Self has startnode " + str(s.startNode) + " and endnode " + str(
+                        # self.logger.debug("Self has startnode " + str(s.startNode) + " and endnode " + str(
                         #     s.endNode) + " c has startNode " + str(c.startNode) + " and endnode " + str(c.endNode))
 
                         qp1 = s.line().p1()
@@ -926,7 +953,7 @@ class Connection(object):
 
                         eps2 = 5
                         if abs(qp1.x() - qp2.x()) < eps2 or abs(qp1_.x() - qp2_.x()) < eps2:
-                            print("Can't build bridge because one segment is almost verical")
+                            self.logger.debug("Can't build bridge because one segment is almost verical")
 
                         else:
 
@@ -957,7 +984,7 @@ class Connection(object):
                             self.parent.diagramScene.addItem(s.firstChild)
                             self.parent.diagramScene.addItem(s.secondChild)
 
-                            # print("Points are " + str(qp1) + str(qp2) + str(qp1_) + str(qp2_))
+                            # self.logger.debug("Points are " + str(qp1) + str(qp2) + str(qp1_) + str(qp2_))
                             # eps1 = 1
                             # if (abs(qp2.x() - qp1.x()) > eps1) and (abs(qp2_.x() - qp1_.x()) > eps1) :
 
@@ -967,7 +994,7 @@ class Connection(object):
                             m1 = (qp2.y() - qp1.y()) / (qp2.x() - qp1.x())
                             m2 = (qp2_.y() - qp1_.y()) / (qp2_.x() - qp1_.x())
 
-                            # print("division by " + str(m1) + "    " + str(m2))
+                            # self.logger.debug("division by " + str(m1) + "    " + str(m2))
                             collisionPos = QPointF((n1 - n2) / (m2 - m1), m1 * (n1 - n2) / (m2 - m1) + n1)
 
                             vecp2p1 = qp2 - qp1
@@ -979,19 +1006,19 @@ class Connection(object):
                             # Compute angle between lines
                             scalarProd = vecp2p1.x() * vecp2p1_.x() + vecp2p1.y() + vecp2p1_.y()
                             angleBetween = acos(scalarProd / (normVec * normVec_))
-                            # print(str(degrees(angleBetween)))
+                            # self.logger.debug(str(degrees(angleBetween)))
 
                             # Almost working: if line approaches 90 deg or if lines touch because too steep, problem
                             f = 10
                             distFactor = max(f * 1 / angleBetween, f)
-                            # print("distFactor " +  str(distFactor))
+                            # self.logger.debug("distFactor " +  str(distFactor))
 
                             # normalVec = QPointF(-distFactor/normVec * vecp2p1.y(), distFactor/normVec * vecp2p1.x())
                             normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(),
                                                   distFactor / normVec * vecp2p1.y())
 
-                            # print("vector is " + str(normVecp2p1))
-                            # print("collisionpos is " + str(collisionPos))
+                            # self.logger.debug("vector is " + str(normVecp2p1))
+                            # self.logger.debug("collisionpos is " + str(collisionPos))
                             # newPos1 = collisionPos - normalVec
                             # newPos2 = collisionPos + normalVec
 
@@ -1009,15 +1036,15 @@ class Connection(object):
                             self.parent.diagramScene.removeItem(s)
                             self.segments.remove(s)
 
-                            # print("s.bridged element is " + str(s.bridgedSegment))
-                            # print("c.bridged element is " + str(c.bridgedSegment))
-                            # print(len(self.segments))
+                            # self.logger.debug("s.bridged element is " + str(s.bridgedSegment))
+                            # self.logger.debug("c.bridged element is " + str(c.bridgedSegment))
+                            # self.logger.debug(len(self.segments))
 
 
     # Delete a connection
     def clearConn(self):
         # Deletes all segments and corners in connection
-        # print("Connection was before: ")
+        # self.logger.debug("Connection was before: ")
         # self.printConnNodes()
 
         walker = self.endNode
@@ -1027,12 +1054,12 @@ class Connection(object):
         for it in items:
             if type(it) is segmentItem:
                 if it.startNode.lastNode() is self.endNode or it.startNode.firstNode() is self.startNode:
-                    # print("Del segment")
+                    # self.logger.debug("Del segment")
                     self.parent.diagramScene.removeItem(it)
             if type(it) is QGraphicsTextItem:
                 if type(it.parent) is PortItem:
-                    print("it has " + str(it.parent()))
-                    print("Deleting it")
+                    self.logger.debug("it has " + str(it.parent()))
+                    self.logger.debug("Deleting it")
                     self.parent.diagramScene.removeItem(it)
 
         for seg in self.segments:
@@ -1044,53 +1071,53 @@ class Connection(object):
             walker = walker.prevN()
 
             while walker.prevN() is not self.startNode:
-                # print("Del corner...")
+                # self.logger.debug("Del corner...")
                 if type(walker.parent) is not Connection:
                     self.parent.diagramScene.removeItem(walker.parent)
                 else:
-                    print("Caution, this is a disrupt.")
+                    self.logger.debug("Caution, this is a disrupt.")
                 walker = walker.prevN()
                 # del (walker.nextN())
 
             if type(walker.parent) is not Connection:
                 self.parent.diagramScene.removeItem(walker.parent)
             else:
-                print("Caution.")
+                self.logger.debug("Caution.")
                 # del walker
 
             self.startNode.setNext(self.endNode)
             self.endNode.setPrev(self.startNode)
 
-        # print("Connection is now: ")
+        # self.logger.debug("Connection is now: ")
         # self.printConnNodes()
 
     def deleteConn(self):
-        print("Deleting connection " + self.displayName + " " + str(self))
-        print("fromPort is at " + str(self.fromPort.parent.displayName))
-        print("toPort is at " + str(self.toPort.parent.displayName))
+        self.logger.debug("Deleting connection " + self.displayName + " " + str(self))
+        self.logger.debug("fromPort is at " + str(self.fromPort.parent.displayName))
+        self.logger.debug("toPort is at " + str(self.toPort.parent.displayName))
 
         self.clearConn()
         self.fromPort.connectionList.remove(self)
 
-        # print("Connectionlist of fromPort after removal is:")
-        # [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.fromPort.connectionList ]
+        # self.logger.debug("Connectionlist of fromPort after removal is:")
+        # [self.logger.debug(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.fromPort.connectionList ]
 
         self.toPort.connectionList.remove(self)
 
-        # print("Connectionlist of toPort after removal is:")
-        # [print(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.toPort.connectionList ]
+        # self.logger.debug("Connectionlist of toPort after removal is:")
+        # [self.logger.debug(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.toPort.connectionList ]
 
         if self in self.parent.trnsysObj:
             self.parent.trnsysObj.remove(self)
         else:
-            print("-------> tr obj are " + str(self.parent.trnsysObj))
-            print(self.id)
-            print([i.id for i in self.parent.trnsysObj])
+            self.logger.debug("-------> tr obj are " + str(self.parent.trnsysObj))
+            self.logger.debug(self.id)
+            self.logger.debug([i.id for i in self.parent.trnsysObj])
             return
 
         self.removeConnFromGroup()
 
-        print("Removing trnsysObj " + str(self))
+        self.logger.debug("Removing trnsysObj " + str(self))
         self.parent.connectionList.remove(self)
         del self
 
@@ -1113,18 +1140,18 @@ class Connection(object):
         # Returns the cummulative length of line up to given node
         # Assumes that segments is ordered correctly!
         res = 0
-        # print("Segments has len " + str(len(self.segments)))
+        # self.logger.debug("Segments has len " + str(len(self.segments)))
         if node == self.startNode:
             return res
 
         for i in self.segments:
-            # print("Adding " + str(calcDist(i.line().p1(), i.line().p2())))
+            # self.logger.debug("Adding " + str(calcDist(i.line().p1(), i.line().p2())))
             res += calcDist(i.line().p1(), i.line().p2())
             if i.endNode == node:
-                # print("Breaking")
+                # self.logger.debug("Breaking")
                 break
 
-        # print("Node " + str(node) + " has pL " + str(res) + "\n")
+        # self.logger.debug("Node " + str(node) + " has pL " + str(res) + "\n")
         return res
 
     def updateSegGrads(self):
@@ -1185,19 +1212,19 @@ class Connection(object):
         self.setConnToGroup("defaultGroup")
 
     def setConnToGroup(self, newGroupName):
-        print("In setConnToGroup")
+        self.logger.debug("In setConnToGroup")
         if newGroupName == self.groupName:
-            print("Block " + str(self) + str(self.displayName) + "is already in this group")
+            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
             return
         else:
-            # print("groups is " + str(self.parent.groupList))
+            # self.logger.debug("groups is " + str(self.parent.groupList))
             for g in self.parent.groupList:
-                print("At group " + str(g.displayName))
+                self.logger.debug("At group " + str(g.displayName))
                 if g.displayName == self.groupName:
-                    print("Found the old group")
+                    self.logger.debug("Found the old group")
                     g.itemList.remove(self)
                 if g.displayName == newGroupName:
-                    print("Found the new group")
+                    self.logger.debug("Found the new group")
                     g.itemList.append(self)
 
             self.groupName = newGroupName
@@ -1208,9 +1235,9 @@ class Connection(object):
                 if self in g.itemList:
                     g.itemList.remove(self)
                 else:
-                    print("While removing conn from group, groupName is invalid")
+                    self.logger.debug("While removing conn from group, groupName is invalid")
             else:
-                print("While removeing conn from group, no group with conn.groupName")
+                self.logger.debug("While removeing conn from group, no group with conn.groupName")
 
 
     # Highlight when clicked, unhighlight when clicked elsewhere
@@ -1242,41 +1269,41 @@ class Connection(object):
         self.parent.listV.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
 
     def printConn(self):
-        print("------------------------------------")
-        print("This is the printout of connection: " + self.displayName + str(self))
-        print("It has fromPort " + str(self.fromPort))
-        print("It has toPort " + str(self.toPort))
-        print("It has startNode " + str(self.startNode))
-        print("It has endNode " + str(self.endNode))
+        self.logger.debug("------------------------------------")
+        self.logger.debug("This is the printout of connection: " + self.displayName + str(self))
+        self.logger.debug("It has fromPort " + str(self.fromPort))
+        self.logger.debug("It has toPort " + str(self.toPort))
+        self.logger.debug("It has startNode " + str(self.startNode))
+        self.logger.debug("It has endNode " + str(self.endNode))
 
         # self.printConnNodes()
-        print("\n")
+        self.logger.debug("\n")
         # self.printConnSegs()
-        print("It goes from " + self.fromPort.parent.displayName + " to " + self.toPort.parent.displayName)
-        print("------------------------------------")
+        self.logger.debug("It goes from " + self.fromPort.parent.displayName + " to " + self.toPort.parent.displayName)
+        self.logger.debug("------------------------------------")
 
     def printConnNodes(self):
-        print("These are the nodes: ")
+        self.logger.debug("These are the nodes: ")
 
         element = self.startNode
         while element.nextN() is not None:
-            print("Node is " + str(element) + " has nextNode " + str(element.nextN()) + " has pL " + str(
+            self.logger.debug("Node is " + str(element) + " has nextNode " + str(element.nextN()) + " has pL " + str(
                 self.partialLength(element)))
             element = element.nextN()
 
-        print("Node is " + str(element) + " has nextNode " + str(element.nextN()))
+        self.logger.debug("Node is " + str(element) + " has nextNode " + str(element.nextN()))
 
     def printConnSegs(self):
-        print("These are the segments in order")
+        self.logger.debug("These are the segments in order")
         for s in self.segments:
-            print("Segment is " + str(s) + " has global id " + str(s.id) + " has startnode " + str(
+            self.logger.debug("Segment is " + str(s) + " has global id " + str(s.id) + " has startnode " + str(
                 s.startNode) + " endnode " + str(s.endNode))
 
 
     # Saving / Loading
     def encode(self):
         if not self.isVirtualConn:
-            print("Encoding a connection")
+            self.logger.debug("Encoding a connection")
 
             dct = {}
             dct['.__ConnectionDict__'] = True
@@ -1294,12 +1321,12 @@ class Connection(object):
             for s in self.segments:
                 segmentTupel = (s.line().p1().x(), s.line().p1().y(), s.line().p2().x(), s.line().p2().y())
                 segments.append(segmentTupel)
-            # print("Segments in encoder is " + str(segments))
+            # self.logger.debug("Segments in encoder is " + str(segments))
             dct['SegmentPositions'] = segments
             if len(self.segments) > 0:
                 dct['FirstSegmentLabelPos'] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
             else:
-                print("This connection has no segment")
+                self.logger.debug("This connection has no segment")
                 dct['FirstSegmentLabelPos'] = self.fromPort.pos().x(), self.fromPort.pos().y()
 
             corners = []
@@ -1313,7 +1340,7 @@ class Connection(object):
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        print("Loading a connection in Decoder")
+        self.logger.debug("Loading a connection in Decoder")
 
         self.id = i["ConnID"]
         self.connId = i["ConnCID"]
@@ -1467,7 +1494,7 @@ class Connection(object):
                                 else:
                                     portToPrint = self.fromPort.connectionList[0].fromPort
                     if portToPrint is None:
-                        print("Error: No portToprint found when printing UNIT of " + self.displayName)
+                        self.logger.debug("Error: No portToprint found when printing UNIT of " + self.displayName)
                         return
 
                     if portToPrint.side == 0:
@@ -1506,7 +1533,7 @@ class Connection(object):
                                     portToPrint = self.fromPort.connectionList[0].fromPort
 
                     if portToPrint is None:
-                        print("Error: No portToprint found when printing UNIT of " + self.displayName)
+                        self.logger.debug("Error: No portToprint found when printing UNIT of " + self.displayName)
                         return
 
                     if portToPrint.side == 0:

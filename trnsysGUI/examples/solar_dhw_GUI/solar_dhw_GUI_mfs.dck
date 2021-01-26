@@ -116,7 +116,7 @@ TWTap = TPiDhwDemand
 EQUATIONS 2
 *** Massflowrates
 MfrWTap_main = 1000
-MfrPuCol = 371
+MfrPuCol = 141
 
 CONSTANTS 1
 T_set_MixDhw=50
@@ -150,7 +150,7 @@ PARAMETERS 65
 12 13 0 0      !11 : TesHx24
 4 11 0 0       !12 : PiColOut
 11 3 0 0       !13 : PiTesToCol
-15 16 0 0      !14 : ConnDhwR581
+15 16 0 0      !14 : ConnDhwR545
 1 14 0 0       !15 : PiTesDhwIn
 14 5 0 0       !16 : PiTesDhwOut
 INPUTS 16! for Type 935
@@ -190,8 +190,8 @@ MfrPiColOut_A=[450,34]
 MfrPiColOut_B=[450,35]
 MfrPiTesToCol_A=[450,37]
 MfrPiTesToCol_B=[450,38]
-MfrConnDhwR581_A=[450,40]
-MfrConnDhwR581_B=[450,41]
+MfrConnDhwR545_A=[450,40]
+MfrConnDhwR545_B=[450,41]
 MfrPiTesDhwIn_A=[450,43]
 MfrPiTesDhwIn_B=[450,44]
 MfrPiTesDhwOut_A=[450,46]
@@ -498,6 +498,4 @@ TPiDhwMains
 TPiCirc TPiTesDhwIn TPiTesDhwOut TPiDhwDemand TPiColIn TPiTesToCol TPiColOut 
 TPiDhwMains 
 
-EQUATIONS 1
-TRoomStore=1
 ENDS

@@ -198,9 +198,10 @@ mySenTesSolarBot = Tsen1_Tes1 !@dependencyDdck
 mySenTesAux = Tsen8_Tes1 !@dependencyDdck
 tSetAux = 50
 TdhwSet = 45
-CONSTANTS 2
+CONSTANTS 3
 dtAuxOn = -3     ! Upper dead band coll. pump ON
 dtAuxOff = -7     ! Lower dead band coll. pump OFF
+sizeAux=3.0 ! value changed from original by executeTrnsys.py
 UNIT 17 TYPE 2   !Changed automatically
 PARAMETERS 2     
 5     ! 1 No. of oscillations

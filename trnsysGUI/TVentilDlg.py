@@ -8,6 +8,9 @@ class TVentilDlg(QDialog):
     def __init__(self, block, parent=None):
         super(TVentilDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
+
+        self.logger = parent.logger
+        
         self.block = block
         self.valvePosition = self.block.positionForMassFlowSolver
         self.le = QLineEdit(self.block.label.toPlainText())
@@ -27,7 +30,7 @@ class TVentilDlg(QDialog):
         self.hFlipBox.setCheckState(self.block.flippedH * 2)
         self.vFlipBox.setCheckState(self.block.flippedV * 2)
         self.complexDiv.setTristate(False)
-        print("complexdiv is " + str(self.block.isTempering))
+        self.logger.debug("complexdiv is " + str(self.block.isTempering))
         self.complexDiv.setCheckState(self.block.isTempering * 2)
 
         flipLayout = QHBoxLayout()
@@ -93,7 +96,7 @@ class TVentilDlg(QDialog):
         self.show()
 
     def acceptedEdit(self):
-        print("Changing displayName")
+        self.logger.debug("Changing displayName")
         newName = self.le.text()
         if self.block.isTempering:
             self.block.setPositionForMassFlowSolver(0.0)

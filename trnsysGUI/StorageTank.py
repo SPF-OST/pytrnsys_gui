@@ -25,6 +25,7 @@ class StorageTank(BlockItem):
 
     def __init__(self, trnsysType, parent, **kwargs):
         super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
+
         self.parent = parent
         self.dckFilePath = ''
 
@@ -55,7 +56,7 @@ class StorageTank(BlockItem):
 
     # Setter functions
     def setParent(self, p):
-        print("Setting parent of Storage Tank (and its hx)")
+        self.logger.debug("Setting parent of Storage Tank (and its hx)")
         self.parent = p
 
         if self not in self.parent.parent().trnsysObj:
@@ -104,11 +105,11 @@ class StorageTank(BlockItem):
         # Check first if there is already a port at entered position:
         for i in tempSideList:
             if i.pos().y() == hAbsI:
-                print("Found an existing input port")
+                self.logger.debug("Found an existing input port")
                 # port1 = i
 
             if i.pos().y() == hAbsO:
-                print("Can't create a new output over an existing input")
+                self.logger.debug("Can't create a new output over an existing input")
                 # port2 = i
 
 
@@ -200,23 +201,23 @@ class StorageTank(BlockItem):
         """
         port1.visited = True
 
-        print(" " * 3 * d + "In port1 " + str(port1) + "at depth " + str(d))
-        print(" " * 3 * d + "Connection list is " + str(port1.connectionList))
-        print(" " * 3 * d + "Parent is " + str(port1.parent))
+        self.logger.debug(" " * 3 * d + "In port1 " + str(port1) + "at depth " + str(d))
+        self.logger.debug(" " * 3 * d + "Connection list is " + str(port1.connectionList))
+        self.logger.debug(" " * 3 * d + "Parent is " + str(port1.parent))
 
         if port1 is port2:
-            print(" " * 3 * d + "Found a connection between port 1 and port 2")
+            self.logger.debug(" " * 3 * d + "Found a connection between port 1 and port 2")
 
         if d == maxhops:
-            print(" " * 3 * d + "Port + " + str(port1) + " is returning.")
+            self.logger.debug(" " * 3 * d + "Port + " + str(port1) + " is returning.")
             return
 
         if port1.parent.name == 'TeePiece.png':
-            # print("We are at T piece " + str(port1.parent))
+            # self.logger.debug("We are at T piece " + str(port1.parent))
             conns = port1.parent.getConnections()
-            # print("Connections of T piece are " + str(conns))
+            # self.logger.debug("Connections of T piece are " + str(conns))
             for c in conns:
-                print(" " * 3 * d + "Conns")
+                self.logger.debug(" " * 3 * d + "Conns")
                 if c.fromPort.parent is port1.parent:
                     if (not c.fromPort.visited) and (not c.toPort.visited):
                         c.fromPort.visited = True
@@ -228,27 +229,27 @@ class StorageTank(BlockItem):
                         self.checkConnectInside(c.fromPort, port2, maxhops, d + 1)
 
         if port1.parent.name == 'StorageTank':
-            # print("We are at " + str(port1.parent))
+            # self.logger.debug("We are at " + str(port1.parent))
 
             if d > 1:
-                print(" " * 3 * d + "port1 " + str(port1) + " at StorageTank is returning.")
+                self.logger.debug(" " * 3 * d + "port1 " + str(port1) + " at StorageTank is returning.")
                 return
 
             for j in port1.connectionList:
                 if j.toPort is port1:
-                    print(" " * 3 * d + "toPort is port1 is " + str(port1))
-                    print(" " * 3 * d + "fromPort is " + str(j.fromPort) + "\n")
+                    self.logger.debug(" " * 3 * d + "toPort is port1 is " + str(port1))
+                    self.logger.debug(" " * 3 * d + "fromPort is " + str(j.fromPort) + "\n")
                     if not j.fromPort.visited:
                         self.checkConnectInside(j.fromPort, port2, maxhops, d + 1)
                     else:
-                        print(" " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank")
+                        self.logger.debug(" " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank")
                 if j.fromPort is port1:
-                    print(" " * 3 * d + "fromPort is port1" + str(port1))
-                    print(" " * 3 * d + "toPort is " + str(j.toPort) + "\n")
+                    self.logger.debug(" " * 3 * d + "fromPort is port1" + str(port1))
+                    self.logger.debug(" " * 3 * d + "toPort is " + str(j.toPort) + "\n")
                     if not j.toPort.visited:
                         self.checkConnectInside(j.toPort, port2, maxhops, d + 1)
                     else:
-                        print(" " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank")
+                        self.logger.debug(" " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank")
 
     def connectInside(self, side, side2, tpList, sideVar):
         """
@@ -274,7 +275,7 @@ class StorageTank(BlockItem):
         # Side should be list of all ports to the same side
         # Side is used in this function to store the nodes of one layer
         for si in side:
-            print("side element" + si.parent.displayName)
+            self.logger.debug("side element" + si.parent.displayName)
         tempArrConn = []
 
         # Copy of the corresponding ports
@@ -282,12 +283,12 @@ class StorageTank(BlockItem):
 
         # Assert that the storage has at least 2 ports at side
         if len(side) < 2:
-            print("Error: storage needs at least 2 ports on a side")
+            self.logger.debug("Error: storage needs at least 2 ports on a side")
             return
 
         if len(side) == 2:
-            print("Only 2 ports in side list")
-            print("ports have " + str(side[0].parent) + str(side[1].parent))
+            self.logger.debug("Only 2 ports in side list")
+            self.logger.debug("ports have " + str(side[0].parent) + str(side[1].parent))
 
             connector = Connector("Connector", self.parent, storagePorts=side2)
             connector.displayName = "Conn" + self.displayName + sideVar + str(connector.id)
@@ -323,17 +324,17 @@ class StorageTank(BlockItem):
             return
 
         h = 20
-        # print("Self.parent.parent()" + str(self.parent.parent()))
+        # self.logger.debug("Self.parent.parent()" + str(self.parent.parent()))
         layer = 1
         while len(side) > 2:
             mem = []
             if len(side) % 2 == 0:
                 x = len(side)
-                print("Even number of ports in side")
+                self.logger.debug("Even number of ports in side")
             else:
                 x = len(side) - 1
                 mem.append(side[x])
-                # print("Uneven " + side(x))
+                # self.logger.debug("Uneven " + side(x))
 
             for i in range(0, x, 2):
                 tpiece = TeePiece("TeePiece", self.parent)
@@ -344,8 +345,8 @@ class StorageTank(BlockItem):
 
                 c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent())
                 c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent())
-                print("c1 is from " + side[i].parent.displayName + " to " + tpiece.inputs[0].parent.displayName)
-                print("c2 is from " + tpiece.inputs[1].parent.displayName + " to " + side[i+1].parent.displayName)
+                self.logger.debug("c1 is from " + side[i].parent.displayName + " to " + tpiece.inputs[0].parent.displayName)
+                self.logger.debug("c2 is from " + tpiece.inputs[1].parent.displayName + " to " + side[i+1].parent.displayName)
                 if layer>1:
                     c1.firstS.setVisible(False)
                     c2.firstS.setVisible(False)
@@ -357,9 +358,9 @@ class StorageTank(BlockItem):
                     if j.isdigit():
                         resId += str(j)
 
-                # print("c1 name before is " + c1.displayName)
+                # self.logger.debug("c1 name before is " + c1.displayName)
                 c1.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
-                # print("c1 name is " + c1.displayName)
+                # self.logger.debug("c1 name is " + c1.displayName)
 
                 resId = ""
 
@@ -382,11 +383,11 @@ class StorageTank(BlockItem):
             side = mem
             layer+=1
             h += 20
-            # print(str(len(side)))
+            # self.logger.debug(str(len(side)))
 
         lastC = Connection(side[0], side[1], True, self.parent.parent())
         lastC.firstS.setVisible(False)
-        print("lastc is from " + side[0].parent.displayName + " to " + side[1].parent.displayName)
+        self.logger.debug("lastc is from " + side[0].parent.displayName + " to " + side[1].parent.displayName)
         resId = ""
         for j in lastC.displayName:
             if j.isdigit():
@@ -401,12 +402,12 @@ class StorageTank(BlockItem):
         for s in side_test:
             for t in tempArrConn:
                 if t.fromPort is s or t.toPort is s:
-                    print("This is a real connection " + str(t.displayName))
+                    self.logger.debug("This is a real connection " + str(t.displayName))
                     if len(s.connectionList) > 0:
                         t.displayName = s.connectionList[0].displayName # + "GEN"
                         t.setClone(True)
                     else:
-                        print("Found a port outside that has no connection to inside")
+                        self.logger.debug("Found a port outside that has no connection to inside")
 
         # If tpieces were generated, the first len(side_test) ones have to be marked as firstRow
         for x in tpList[:len(side_test)]:
@@ -437,7 +438,7 @@ class StorageTank(BlockItem):
 
         """
 
-        print("ports have " + str(side[0].parent) + str(side[1].parent))
+        self.logger.debug("ports have " + str(side[0].parent) + str(side[1].parent))
 
         connector = Connector("Connector", self.parent, storagePorts=side2)
         connector.displayName = heatX.displayName
@@ -532,7 +533,7 @@ class StorageTank(BlockItem):
     # Encoding
     def encode(self):
         if self.isVisible():
-            print("Encoding a storage tank")
+            self.logger.debug("Encoding a storage tank")
 
             hxList = []
             for hx in self.heatExchangers:
@@ -554,18 +555,18 @@ class StorageTank(BlockItem):
 
             for manP in self.leftSide + self.rightSide:
                 manP.portPairVisited = True
-                print("This port is part of a manual port pair ")
+                self.logger.debug("This port is part of a manual port pair ")
                 for innerC in manP.connectionList:
-                    print("There is a connection")
+                    self.logger.debug("There is a connection")
                     if innerC.fromPort is manP and type(innerC.toPort.parent) is StorageTank \
                             and not innerC.toPort.portPairVisited:
-                        print("Found the corresponding port")
+                        self.logger.debug("Found the corresponding port")
 
                         portPairDct = {"Port1ID": manP.id}
 
                         b = self.hasManPortById(manP.id)
 
-                        print("side encoded is" + str(b))
+                        self.logger.debug("side encoded is" + str(b))
 
                         portPairDct["Side"] = b
                         portPairDct["Port1offset"] = float(manP.scenePos().y() - self.scenePos().y())
@@ -583,13 +584,13 @@ class StorageTank(BlockItem):
                     elif innerC.toPort is manP and type(innerC.fromPort.parent) is StorageTank \
                             and not innerC.fromPort.portPairVisited:
 
-                        print("Found the corresponding port")
+                        self.logger.debug("Found the corresponding port")
 
                         portPairDct = {"Port2ID": manP.id}
 
                         b = self.hasManPortById(manP.id)
 
-                        print("side encoded is" + str(b))
+                        self.logger.debug("side encoded is" + str(b))
 
                         portPairDct["Side"] = b
                         portPairDct["Port2offset"] = float(manP.scenePos().y() - self.scenePos().y())
@@ -600,13 +601,13 @@ class StorageTank(BlockItem):
                         portPairDct["ConnCID"] = innerC.connId
                         portPairDct["trnsysID"] = innerC.trnsysId
 
-                        # print("Portpairlist is " + str(portPairDct))
+                        # self.logger.debug("Portpairlist is " + str(portPairDct))
                         portPairList.append(portPairDct)
 
                         # innerC.deleteConn()
 
                     else:
-                        print("Did not found the corresponding (inner) port")
+                        self.logger.debug("Did not found the corresponding (inner) port")
 
             for manP in self.leftSide + self.rightSide:
                 manP.portPairVisited = False
@@ -630,7 +631,7 @@ class StorageTank(BlockItem):
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        print("Loading a Storage in Decoder")
+        self.logger.debug("Loading a Storage in Decoder")
         
         self.flippedH = i["FlippedH"]
         # self.flippedV = i["FlippedV"] # No support for vertical flip
@@ -663,8 +664,8 @@ class StorageTank(BlockItem):
 
         # Add manual inputs
         for x in i["PortPairList"]:
-            print("Printing port pair")
-            print(x)
+            self.logger.debug("Printing port pair")
+            self.logger.debug(x)
 
             conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
                                         fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
@@ -688,7 +689,7 @@ class StorageTank(BlockItem):
 
         # Add heat exchanger
         for h in i["HxList"]:
-            # print(kwargs)
+            # self.logger.debug(kwargs)
             # sys.exit()
             # connsysConnId=kwargs["editor"].idGen.getTrnsysID()
             hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
@@ -709,8 +710,8 @@ class StorageTank(BlockItem):
 
         # Add manual inputs
         for x in i["PortPairList"]:
-            print("Printing port pair")
-            print(x)
+            self.logger.debug("Printing port pair")
+            self.logger.debug(x)
 
             # trnsysConnId=kwargs["editor"].idGen.getTrnsysID()
             conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
@@ -732,25 +733,25 @@ class StorageTank(BlockItem):
 
     # Debug
     def dumpBlockInfo(self):
-        print("storage input list " + str(self.inputs))
-        print("storage outputs list " + str(self.outputs))
-        print("storage leftside " + str(self.leftSide))
-        print("storage rightside " + str(self.rightSide))
+        self.logger.debug("storage input list " + str(self.inputs))
+        self.logger.debug("storage outputs list " + str(self.outputs))
+        self.logger.debug("storage leftside " + str(self.leftSide))
+        self.logger.debug("storage rightside " + str(self.rightSide))
         self.parent.parent().dumpInformation()
 
     def deleteBlockDebug(self):
-        print("Listing all connections")
+        self.logger.debug("Listing all connections")
         conns = []
         for p in self.inputs + self.outputs:
             for c in p.connectionList:
                 conns.append(c)
 
-        [print(
+        [self.logger.debug(
             c.displayName + ", fromPort: " + c.fromPort.parent.displayName + ", toPort: " + c.toPort.parent.displayName)
          for c in conns]
 
     def printPortNb(self):
-        print("ST has "+ str(self.inputs) + " and " + str(self.outputs))
+        self.logger.debug("ST has "+ str(self.inputs) + " and " + str(self.outputs))
 
     # Misc
     def contextMenuEvent(self, event):
@@ -817,12 +818,12 @@ class StorageTank(BlockItem):
         return res
 
     def deleteBlock(self):
-        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        print("self.parent.parent" + str(self.parent.parent()))
+        self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
-        print("deleting block " + str(self) + self.displayName)
-        print("self.scene is" + str(self.parent.scene()))
+        self.logger.debug("deleting block " + str(self) + self.displayName)
+        self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         del self
 
@@ -869,10 +870,10 @@ class StorageTank(BlockItem):
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
             if ret == QMessageBox.Save:
-                print("Overwriting")
+                self.logger.debug("Overwriting")
                 # continue
             else:
-                print("Canceling")
+                self.logger.debug("Canceling")
                 return
 
         nPorts = len(self.directPortConnsForList)
@@ -889,7 +890,7 @@ class StorageTank(BlockItem):
         # filePath = (data[2][:-1])
 
         # fileName = self.parent.parent().parent().currentFile
-        # print(fileName)
+        # self.logger.debug(fileName)
         #
         # if '\\' in fileName:
         #     name = fileName.split('\\')[-1][:-5]
@@ -899,10 +900,10 @@ class StorageTank(BlockItem):
         #     name = fileName
         # name = name + '_nTes' + str(self.nTes)
 
-        print("Storage Type:", self.storageType)
-        print("nTes:", self.nTes)
-        print("nPorts:", nPorts)
-        print("nHx:", nHx)
+        self.logger.debug("Storage Type:", self.storageType)
+        self.logger.debug("nTes:", self.nTes)
+        self.logger.debug("nPorts:", nPorts)
+        self.logger.debug("nHx:", nHx)
 
         tool = Type1924_TesPlugFlow()
 
@@ -953,7 +954,7 @@ class StorageTank(BlockItem):
 
         # exportPath = os.path.join(filePath, name+'.ddck')
         exportPath = os.path.join(self.path,self.displayName + '.ddck')
-        print(exportPath)
+        self.logger.debug(exportPath)
         if Path(exportPath).exists():
             qmb = QMessageBox()
             qmb.setText("Warning: " +
@@ -962,10 +963,10 @@ class StorageTank(BlockItem):
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
             if ret == QMessageBox.Save:
-                print("Overwriting")
+                self.logger.debug("Overwriting")
                 # continue
             else:
-                print("Canceling")
+                self.logger.debug("Canceling")
                 return
         else:
             # Export file does not exist yet
@@ -977,19 +978,19 @@ class StorageTank(BlockItem):
         self.loadedTo = self.path
 
     def loadDck(self):
-        print("Opening diagram")
+        self.logger.debug("Opening diagram")
         # self.centralWidget.delBlocks()
         # fileName = QFileDialog.getOpenFileName(self.dia, "Open diagram", filter="*.ddck")[0]
         # if fileName != '':
         #     self.dckFilePath = fileName
         # else:
-        #     print("No filename chosen")
+        #     self.logger.debug("No filename chosen")
         self.exportDck()
         filePath = self.model.rootPath()
         shutil.copy(self.loadedTo, filePath)
 
     def debugConn(self):
-        print("Debugging conn")
+        self.logger.debug("Debugging conn")
         errorConnList = ''
         for i in range(len(self.directPortConnsForList)):
             stFromPort = self.directPortConnsForList[i].fromPort
@@ -1045,7 +1046,7 @@ class StorageTank(BlockItem):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        print(self.parent.parent())
+        self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath =='':
             # self.path = os.path.dirname(__file__)
@@ -1081,7 +1082,7 @@ class StorageTank(BlockItem):
     #         msgB.setText("Please select a project path before loading!")
     #         msgB.exec_()
     #     else:
-    #         print("file loaded into %s" % filePath)
+    #         self.logger.debug("file loaded into %s" % filePath)
     #         shutil.copy(file, filePath)
 
     def updateTreePath(self, path):
@@ -1101,21 +1102,21 @@ class StorageTank(BlockItem):
         """
                 Overridden method to also delete folder
         """
-        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # print("self.parent.parent" + str(self.parent.parent()))
+        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
-        print("deleting block " + str(self) + self.displayName)
-        # print("self.scene is" + str(self.parent.scene()))
+        self.logger.debug("deleting block " + str(self) + self.displayName)
+        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
         shutil.rmtree(self.path)
         try:
             widgetToRemove.hide()
         except AttributeError:
-            print("Widget doesnt exist!")
+            self.logger.debug("Widget doesnt exist!")
         else:
-            print("Deleted widget")
+            self.logger.debug("Deleted widget")
         del self
 
     def setName(self, newName):
@@ -1126,7 +1127,7 @@ class StorageTank(BlockItem):
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
-        print(os.path.dirname(self.path))
+        self.logger.debug(os.path.dirname(self.path))
         destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
         test = os.path.split(self.path)
         if os.path.split(self.path)[-1] == '' or os.path.split(self.path)[-1] == 'ddck':
@@ -1135,4 +1136,4 @@ class StorageTank(BlockItem):
             if os.path.exists(self.path):
                 os.rename(self.path, destPath)
         self.path = destPath
-        print(self.path)
+        self.logger.debug(self.path)

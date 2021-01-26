@@ -729,10 +729,13 @@ class Type1924_TesPlugFlow():
         line  = self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine
         lines = lines+line
 
-        lines = lines + "CONSTANTS 3\n"
-        line = "TRoomStore=15 ! @userDefined\n";lines = lines+line
-        line = "VStoreRef = 0.763\n";lines = lines+line
-        line = "ratioTes = Vol_Tes%d / VStoreRef\n"%(nTes);lines = lines+line
+        if nTes == 1:
+            lines = lines + "CONSTANTS 3\n"
+            line = "TRoomStore=15 ! @userDefined\n";lines = lines+line
+            line = "VStoreRef = 0.763\n";lines = lines+line
+        else:
+            lines = lines + "CONSTANTS 1\n"
+        line = "ratioTes%d = Vol_Tes%d / VStoreRef\n"%(nTes,nTes);lines = lines+line
 
         for idPort in range(self.nMaxPorts):
             if (idPort <= nPorts - 1):

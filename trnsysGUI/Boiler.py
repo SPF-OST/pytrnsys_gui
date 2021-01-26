@@ -31,7 +31,7 @@ class Boiler(BlockItem):
         self.addTree()
 
     def changeSize(self):
-        print("passing through c change size")
+        self.logger.debug("passing through c change size")
         w = self.w
         h = self.h
 
@@ -58,7 +58,7 @@ class Boiler(BlockItem):
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
-        print(self.outputs[0].pos())
+        self.logger.debug(self.outputs[0].pos())
 
         return w, h
 
@@ -67,7 +67,7 @@ class Boiler(BlockItem):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        print(self.parent.parent())
+        self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath =='':
             # self.path = os.path.dirname(__file__)
@@ -113,12 +113,12 @@ class Boiler(BlockItem):
         """
                 Overridden method to also delete folder
         """
-        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # print("self.parent.parent" + str(self.parent.parent()))
+        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
-        print("deleting block " + str(self) + self.displayName)
-        # print("self.scene is" + str(self.parent.scene()))
+        self.logger.debug("deleting block " + str(self) + self.displayName)
+        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
         shutil.rmtree(self.path)
@@ -126,9 +126,9 @@ class Boiler(BlockItem):
         try:
             widgetToRemove.hide()
         except AttributeError:
-            print("Widget doesnt exist!")
+            self.logger.debug("Widget doesnt exist!")
         else:
-            print("Deleted widget")
+            self.logger.debug("Deleted widget")
         del self
 
     def setName(self, newName):
@@ -139,10 +139,10 @@ class Boiler(BlockItem):
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
-        print(os.path.dirname(self.path))
+        self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\Boiler_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath
-            print(self.path)
+            self.logger.debug(self.path)

@@ -59,7 +59,7 @@ MfrDHWset = dtDhwCorrect*MfrDHWreal
 CONSTANTS 1
 unitReadDhw=21
 **ASSIGN PATH$\ddck\demands\dhw\profiles\DhwForMFH6appartments_2min_tset55.dat unitReadDhw     ! water draw profile
-ASSIGN PATH$\demands\dhw\profiles\DhwForMFH6appartments_2min_tset55.dat unitReadDhw     ! water draw profile
+ASSIGN PATH$\tapWater\DhwForMFH6appartments_2min_tset55.dat unitReadDhw     ! water draw profile
 
 CONSTANTS 2
 scaleDHW = 1

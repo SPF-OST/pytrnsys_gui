@@ -9,6 +9,7 @@ from trnsysGUI.PortItem import PortItem
 class TVentil(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(TVentil, self).__init__(trnsysType, parent, **kwargs)
+
         self.h = 40
         self.w = 40
         self.typeNumber = 3
@@ -95,7 +96,7 @@ class TVentil(BlockItem):
     def decode(self, i, resConnList, resBlockList):
         super(TVentil, self).decode(i, resConnList, resBlockList)
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
-            print("Old version of diagram")
+            self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
@@ -104,7 +105,7 @@ class TVentil(BlockItem):
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         super(TVentil, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
         if "IsTempering" or "PositionForMassFlowSolver" not in i:
-            print("Old version of diagram")
+            self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]

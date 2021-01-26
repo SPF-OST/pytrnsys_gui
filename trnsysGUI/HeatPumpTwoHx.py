@@ -79,7 +79,7 @@ class HeatPumpTwoHx(BlockItem):
 
     def encode(self):
         if self.isVisible():
-            print("Encoding a HeatPump")
+            self.logger.debug("Encoding a HeatPump")
 
             portListInputs = []
             portListOutputs = []
@@ -117,11 +117,11 @@ class HeatPumpTwoHx(BlockItem):
 
         for x in range(len(self.inputs)):
             self.inputs[x].id = i["PortsIDIn"][x]
-            print("Input at heatExchanger")
+            self.logger.debug("Input at heatExchanger")
 
         for x in range(len(self.outputs)):
             self.outputs[x].id = i["PortsIDOut"][x]
-            print("Output at heatExchanger")
+            self.logger.debug("Output at heatExchanger")
 
         self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
         self.trnsysId = i["trnsysID"]
@@ -140,11 +140,11 @@ class HeatPumpTwoHx(BlockItem):
 
         for x in range(len(self.inputs)):
             self.inputs[x].id = i["PortsIDIn"][x]
-            print("Input at heatExchanger")
+            self.logger.debug("Input at heatExchanger")
 
         for x in range(len(self.outputs)):
             self.outputs[x].id = i["PortsIDOut"][x]
-            print("Output at heatExchanger")
+            self.logger.debug("Output at heatExchanger")
 
         self.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1] + offset_y))
         # self.trnsysId = i["trnsysID"]
@@ -242,7 +242,7 @@ class HeatPumpTwoHx(BlockItem):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        print(self.parent.parent())
+        self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath =='':
             # self.path = os.path.dirname(__file__)
@@ -278,7 +278,7 @@ class HeatPumpTwoHx(BlockItem):
     #         msgB.setText("Please select a project path before loading!")
     #         msgB.exec_()
     #     else:
-    #         print("file loaded into %s" % filePath)
+    #         self.logger.debug("file loaded into %s" % filePath)
     #         shutil.copy(file, filePath)
 
     def updateTreePath(self, path):
@@ -298,12 +298,12 @@ class HeatPumpTwoHx(BlockItem):
         """
                 Overridden method to also delete folder
         """
-        print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # print("self.parent.parent" + str(self.parent.parent()))
+        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
-        print("deleting block " + str(self) + self.displayName)
-        # print("self.scene is" + str(self.parent.scene()))
+        self.logger.debug("deleting block " + str(self) + self.displayName)
+        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
         shutil.rmtree(self.path)
@@ -311,9 +311,9 @@ class HeatPumpTwoHx(BlockItem):
         try:
             widgetToRemove.hide()
         except AttributeError:
-            print("Widget doesnt exist!")
+            self.logger.debug("Widget doesnt exist!")
         else:
-            print("Deleted widget")
+            self.logger.debug("Deleted widget")
         del self
 
     def setName(self, newName):
@@ -324,10 +324,10 @@ class HeatPumpTwoHx(BlockItem):
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
-        print(os.path.dirname(self.path))
+        self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath
-            print(self.path)
+            self.logger.debug(self.path)

@@ -25,9 +25,9 @@ unitWeatherData=38
 unitWeatherData2=39
 unitWeatherData3=40
 
-ASSIGN PATH$\weather\SIA\Normal\SMA_dryN_hourly.99 unitWeatherData
-ASSIGN PATH$\weather\SIA\Normal\SMA_dryN_hourly.99 unitWeatherData2
-ASSIGN PATH$\weather\SIA\Normal\SMA_dryN_hourly.99 unitWeatherData3
+ASSIGN PATH$\weather\SMA_dryN_hourly.99 unitWeatherData
+ASSIGN PATH$\weather\SMA_dryN_hourly.99 unitWeatherData2
+ASSIGN PATH$\weather\SMA_dryN_hourly.99 unitWeatherData3
 
 
 *******************************

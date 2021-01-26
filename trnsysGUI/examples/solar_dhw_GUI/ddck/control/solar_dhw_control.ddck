@@ -31,9 +31,10 @@ TdhwSet = 45
 ** Begin TYPE AUXILIAR CONTROLLER
 ***********************************
 
-CONSTANTS 2
+CONSTANTS 3
 dtAuxOn = -3     ! Upper dead band coll. pump ON
 dtAuxOff = -7     ! Lower dead band coll. pump OFF
+sizeAux = 1
 
 UNIT 27 TYPE 2  ! Tset - UDB < Tmonitored < Tset - LDB
 PARAMETERS 2     

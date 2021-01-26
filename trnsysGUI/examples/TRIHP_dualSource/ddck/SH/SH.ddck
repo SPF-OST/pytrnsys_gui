@@ -47,10 +47,8 @@ Tdp2Out_Tes2=[50,3] !
 *************************************
 ****** Parameters of Type1924 *******
 *************************************
-CONSTANTS 3
-TRoomStore=15 ! @userDefined
-VStoreRef = 0.763
-ratioTes = Vol_Tes2 / VStoreRef
+CONSTANTS 1
+ratioTes2 = Vol_Tes2 / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
 zInDp1_Tes2=0.95 ! @connectDdck 
@@ -274,7 +272,8 @@ PARAMETERS 12
 0     ! 2 Nb. of right-axis variables
 0     ! 3 Left axis minimum 
 100     ! 4 Left axis maximum -
-0     ! 5 Right axis minimum100     ! 6 Right axis maximum 
+0     ! 5 Right axis minimum 
+100     ! 6 Right axis maximum 
 nPlotsPerSim     ! 7 Number of plots per simulation 
 12     ! 8 X-axis gridpoints
 1     ! 9 Shut off Online w/o removing 

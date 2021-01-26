@@ -17,6 +17,8 @@ from trnsysGUI.Collector import Collector
 
 class Export(object):
     def __init__(self, objList, editor):
+        self.logger = editor.logger
+        
         self.trnsysObj = objList
         self.editor = editor
         self.maxChar = 20
@@ -145,55 +147,30 @@ class Export(object):
 
         return f
 
-    def exportDivSetting(self, unit, exportTo='hydraulics'):
+    def exportDivSetting(self, unit):
         """
-
         :param unit: the index of the previous unit number used.
         :return:
         """
-        canceled = False
-        if exportTo == 'hydraulics':
-            ddckPath = os.path.join(self.editor.projectFolder,'ddck\\control')
-            if os.path.isfile(ddckPath + '\\valve_control.ddck'):
-                qmb = QMessageBox()
-                qmb.setText("Warning: " +
-                            "The file control\\valve_control.ddck already exists. Do you want to overwrite it or cancel?")
-                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-                qmb.setDefaultButton(QMessageBox.Cancel)
-                ret = qmb.exec()
-                if ret == QMessageBox.Cancel:
-                    canceled = True
-
         f = ''
 
-        if not canceled:
-            nUnit = unit
-            constants = 0
-            f2 = ''
-            for t in self.trnsysObj:
-                f2 += t.exportDivSetting1()[0]
-                constants += t.exportDivSetting1()[1]
+        nUnit = unit
+        constants = 0
+        f2 = ''
+        for t in self.trnsysObj:
+            f2 += t.exportDivSetting1()[0]
+            constants += t.exportDivSetting1()[1]
 
-            if constants > 0:
-                f = "CONSTANTS " + str(constants) + "\n"
-                f += f2 + "\n"
+        if constants > 0:
+            f = "CONSTANTS " + str(constants) + "\n"
+            f += f2 + "\n"
 
-            for t in self.trnsysObj:
-                res = t.exportDivSetting2(nUnit)
-                f += res[0]
-                nUnit = res[1]
+        for t in self.trnsysObj:
+            res = t.exportDivSetting2(nUnit)
+            f += res[0]
+            nUnit = res[1]
 
-            if f != '' and exportTo == 'hydraulics':
-                header = "*************************************\n"
-                header += "**BEGIN valve_control.ddck\n"
-                header += "*************************************\n\n"
-                f = header + f
-
-                outfile = open(ddckPath + '\\valve_control.ddck', 'w')
-                outfile.writelines(f)
-                outfile.close()
-
-        return canceled, f
+        return f
 
     def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength):
         # If not all ports of an object are connected, less than 4 numbers will show up
@@ -231,8 +208,8 @@ class Export(object):
                     nameString += ObjToCheck + '\n'
                 # return False
 
-            # print(ObjToCheck)
-            # print(len(ObjToCheck))
+            # self.logger.debug(ObjToCheck)
+            # self.logger.debug(len(ObjToCheck))
         if nameString != '':
             msgBox = QMessageBox()
             msgBox.setText(
@@ -240,10 +217,10 @@ class Export(object):
             msgBox.exec_()
 
         tempS = f
-        print("param solver text is ")
-        print(f)
+        self.logger.debug("param solver text is ")
+        self.logger.debug(f)
         t = self.convertToStringList(tempS)
-        print("And now the ids come")
+        self.logger.debug("And now the ids come")
 
         f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
 
@@ -263,12 +240,12 @@ class Export(object):
 
     def findId(self, s):
         a = s[s.find("!") + 1:s.find(" ", s.find("!"))]
-        print(a)
+        self.logger.debug(a)
         return a
 
     def correctIds(self, lineList):
         fileCopy = lineList[:]
-        print("fds" + str(fileCopy))
+        self.logger.debug("fds" + str(fileCopy))
         fileCopy = [" " + l for l in fileCopy]
 
         matchNumber = re.compile(r'\d+')
@@ -282,10 +259,10 @@ class Export(object):
                 descConnlen = 15
                 res = fileCopy[:]
                 for l in range(len(fileCopy)):
-                    # print("In filecopy...")
+                    # self.logger.debug("In filecopy...")
                     ids = matchNumber.findall(fileCopy[l])
-                    # print("ids are " + str(ids) + " k is " + str(k))
-                    # print(res[l])
+                    # self.logger.debug("ids are " + str(ids) + " k is " + str(k))
+                    # self.logger.debug(res[l])
                     for i in range(3):
                         if ids[i] == str(k):
                             ids[i] = str(counter)
@@ -294,7 +271,7 @@ class Export(object):
                     rest = fileCopyTempLine[fileCopyTempLine.find("!"):]
                     res[l] = ids[0] + " " + ids[1] + " " + ids[2] + " " + ids[3]
                     res[l] += " "*(descConnlen - len(res[l])) + rest
-                    # print(res[l])
+                    # self.logger.debug(res[l])
 
                 fileCopy = res
                 fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
@@ -555,7 +532,7 @@ class Export(object):
             #                             else:
             #                                 portToPrint = t.fromPort.connectionList[0].fromPort
             #                 if portToPrint is None:
-            #                     print("Error: No portToprint found when printing UNIT of " + t.displayName)
+            #                     self.logger.debug("Error: No portToprint found when printing UNIT of " + t.displayName)
             #                     return
             #
             #                 if portToPrint.side == 0:
@@ -589,7 +566,7 @@ class Export(object):
             #                                 portToPrint = t.fromPort.connectionList[0].fromPort
             #
             #                 if portToPrint is None:
-            #                     print("Error: No portToprint found when printing UNIT of " + t.displayName)
+            #                     self.logger.debug("Error: No portToprint found when printing UNIT of " + t.displayName)
             #                     return
             #
             #                 if portToPrint.side == 0:

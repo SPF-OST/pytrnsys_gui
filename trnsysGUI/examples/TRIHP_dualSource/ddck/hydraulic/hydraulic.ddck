@@ -6,8 +6,8 @@ EQUATIONS 20
 *** Black box component temperatures
 TRadiatorSH=TRdRt
 TsupplyWater=Tcw
-THxCoolX0=1
-THxCoolX1=1
+THxCoolX0=TsourceOut
+THxCoolX1=TLoadOut
 THxDHWX0=TsourceDHWHXOut
 THxDHWX1=TLoadDHWHXOut
 TDhwPortLeft95=Tdp1In_Tes1
@@ -22,42 +22,15 @@ TSHPortLeft5=Tdp1Out_Tes2
 TSHPortRight95=Tdp2Out_Tes2
 TGhx=TGhxOut
 THPX0=THpEvapOut
-THPX1=ThpCondOut
-THPX2=1
-
-EQUATIONS 7
-*** Pump outlet temperatures
-TPuSH = TPiSHOutMix
-TtapWater = TPiDhwDemand
-TPuHpEvap = TPiGhxOut
-TPuHpShCond = TPiPuHpShIn
-TPuHpDhwCond = TPiPuHpDhwIn
-TPump_5955 = TConn1446
-TPuCirc = TPiPuCircIn
-
-EQUATIONS 14
-*** Massflowrates
-MfrPuSH = 213
-MfrsupplyWater = 1000
-xFracDivCondTOTesDhw = 1.0
-xFracDivSHCool = 0.0
-MfrPuHpEvap = 537
-MfrPuHpShCond = 323
-xFracDivDhw = 1.0
-xFracDivDhwOut = 1.0
-xFracDivCool = 1.0
-MfrPuHpDhwCond = 250
-xFracDivTesDhwOut = 1.0
-xFracDivHp = 1.0
-MfrPump_5955 = 32
-MfrPuCirc = 51
+THPX1=THpCondOut
+THPX2=THpDesOut
 
 UNIT 450 TYPE 935
 PARAMETERS 357
 89
 37 72 0 0      !1 : RadiatorSH
 70 37 0 1      !2 : PuSH
-72 73 36 3     !3 : DivSH
+72 73 36 3     !3 : DivSh
 33 0 0 5       !4 : tapWater
 65 0 0 4       !5 : supplyWater
 50 58 51 3     !6 : DivHpEvap
@@ -80,7 +53,7 @@ PARAMETERS 357
 63 86 38 2     !23 : TeeTesShOut
 76 62 38 3     !24 : DivTesDhwOut
 55 61 40 3     !25 : DivHp
-67 68 0 1      !26 : Pump_5955
+67 68 0 1      !26 : PuDhw
 19 13 0 0      !27 : PiHxDhwIn
 33 30 31 2     !28 : TeePieceCirc1
 31 32 0 1      !29 : PuCirc
@@ -128,26 +101,26 @@ PARAMETERS 357
 10 12 0 0      !71 : Conn1455
 1 3 0 0        !72 : PiRadOut
 3 11 0 0       !73 : PiDivSHCool
-75 76 0 0      !74 : ConnDhwL6353
+75 76 0 0      !74 : ConnDhwL6605
 22 74 0 0      !75 : PiHpToTesDhwIn
 74 24 0 0      !76 : PiHpToTesDhwOut
-78 79 83 2     !77 : TeeTesDhwR6362
+78 79 83 2     !77 : TeeTesDhwR6614
 17 77 0 0      !78 : PiTesDhwIn
 77 19 0 0      !79 : PiTesDhwOut
-81 82 83 2     !80 : TeeTesDhwR6372
+81 82 83 2     !80 : TeeTesDhwR6624
 17 80 0 0      !81 : PiCircIn
 80 19 0 0      !82 : PiCircOut
-80 77 0 0      !83 : PiTesRDhw_1479
-85 86 0 0      !84 : ConnSHL6385
+80 77 0 0      !83 : PiTesRDhw_1536
+85 86 0 0      !84 : ConnSHL6637
 16 84 0 0      !85 : PiHpToTesShIn
 84 23 0 0      !86 : PiHpToTesShOut
-88 89 0 0      !87 : ConnSHR6394
+88 89 0 0      !87 : ConnSHR6646
 11 87 0 0      !88 : PiTesShIn
 87 12 0 0      !89 : PiTesShOut
 INPUTS 89! for Type 935
-0,0  MfrPuSH  xFracDivSH 0,0  MfrsupplyWater  xFracDivHpEvap 0,0  xFracDivCondTOTesDhw 0,0 0,0 
+0,0  MfrPuSH  xFracDivSh 0,0  MfrsupplyWater  xFracDivHpEvap 0,0  xFracDivCondTOTesDhw 0,0 0,0 
  xFracDivSHCool 0,0 0,0 0,0  MfrPuHpEvap  MfrPuHpShCond  xFracDivDhw 0,0  xFracDivDhwOut 
- xFracDivCool 0,0  MfrPuHpDhwCond 0,0  xFracDivTesDhwOut  xFracDivHp  MfrPump_5955 0,0 0,0 
+ xFracDivCool 0,0  MfrPuHpDhwCond 0,0  xFracDivTesDhwOut  xFracDivHp  MfrPuDhw 0,0 0,0 
  MfrPuCirc 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
@@ -173,9 +146,9 @@ MfrRadiatorSH_A=[450,1]
 MfrRadiatorSH_B=[450,2]
 MfrPuSH_A=[450,4]
 MfrPuSH_B=[450,5]
-MfrDivSH_A=[450,7]
-MfrDivSH_B=[450,8]
-MfrDivSH_C=[450,9]
+MfrDivSh_A=[450,7]
+MfrDivSh_B=[450,8]
+MfrDivSh_C=[450,9]
 MfrtapWater_A=[450,10]
 MfrtapWater_B=[450,11]
 MfrsupplyWater_A=[450,13]
@@ -232,8 +205,8 @@ MfrDivTesDhwOut_C=[450,72]
 MfrDivHp_A=[450,73]
 MfrDivHp_B=[450,74]
 MfrDivHp_C=[450,75]
-MfrPump_5955_A=[450,76]
-MfrPump_5955_B=[450,77]
+MfrPuDhw_A=[450,76]
+MfrPuDhw_B=[450,77]
 MfrPiHxDhwIn_A=[450,79]
 MfrPiHxDhwIn_B=[450,80]
 MfrTeePieceCirc1_A=[450,82]
@@ -333,8 +306,8 @@ MfrPiRadOut_A=[450,214]
 MfrPiRadOut_B=[450,215]
 MfrPiDivSHCool_A=[450,217]
 MfrPiDivSHCool_B=[450,218]
-MfrConnDhwL6353_A=[450,220]
-MfrConnDhwL6353_B=[450,221]
+MfrConnDhwL6605_A=[450,220]
+MfrConnDhwL6605_B=[450,221]
 MfrPiHpToTesDhwIn_A=[450,223]
 MfrPiHpToTesDhwIn_B=[450,224]
 MfrPiHpToTesDhwOut_A=[450,226]
@@ -347,16 +320,16 @@ MfrPiCircIn_A=[450,241]
 MfrPiCircIn_B=[450,242]
 MfrPiCircOut_A=[450,244]
 MfrPiCircOut_B=[450,245]
-MfrPiTesRDhw_1479_A=[450,247]
-MfrPiTesRDhw_1479_B=[450,248]
-MfrConnSHL6385_A=[450,250]
-MfrConnSHL6385_B=[450,251]
+MfrPiTesRDhw_1536_A=[450,247]
+MfrPiTesRDhw_1536_B=[450,248]
+MfrConnSHL6637_A=[450,250]
+MfrConnSHL6637_B=[450,251]
 MfrPiHpToTesShIn_A=[450,253]
 MfrPiHpToTesShIn_B=[450,254]
 MfrPiHpToTesShOut_A=[450,256]
 MfrPiHpToTesShOut_B=[450,257]
-MfrConnSHR6394_A=[450,259]
-MfrConnSHR6394_B=[450,260]
+MfrConnSHR6646_A=[450,259]
+MfrConnSHR6646_B=[450,260]
 MfrPiTesShIn_A=[450,262]
 MfrPiTesShIn_B=[450,263]
 MfrPiTesShOut_A=[450,265]
@@ -364,19 +337,19 @@ MfrPiTesShOut_B=[450,266]
 
 
 UNIT 451 TYPE 929
-!DivSH
+!DivSh
 PARAMETERS 0
 INPUTS 6
-MfrDivSH_A
-MfrDivSH_B
-MfrDivSH_C
+MfrDivSh_A
+MfrDivSh_B
+MfrDivSh_C
 TPiRadOut
 TPiDivSHCool
 TPiSHInMix
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivSH= [451,1]
+TDivSh= [451,1]
 
 UNIT 452 TYPE 929
 !DivHpEvap
@@ -733,7 +706,7 @@ INPUTS 4
 TTeePiece_6032
 MfrPiSHInMix_A
 TRoomStore
-TDivSH
+TDivSh
 ***Initial values
 20 0.0 20 20
 
@@ -1328,7 +1301,7 @@ INPUTS 4
 THxDHWX0
 MfrConn1446_A
 TRoomStore
-TPump_5955
+TPuDhw
 ***Initial values
 20 0.0 20 20
 
@@ -1347,7 +1320,7 @@ RhoWat
 CPWat
 20
 INPUTS 4
-TPump_5955
+TPuDhw
 MfrPiPuDhwOut_A
 TRoomStore
 TDivDhw
@@ -1438,7 +1411,7 @@ INPUTS 4
 TRadiatorSH
 MfrPiRadOut_A
 TRoomStore
-TDivSH
+TDivSh
 ***Initial values
 20 0.0 20 20
 
@@ -1457,7 +1430,7 @@ RhoWat
 CPWat
 20
 INPUTS 4
-TDivSH
+TDivSh
 MfrPiDivSHCool_A
 TRoomStore
 TDivSHCool
@@ -1925,7 +1898,7 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 57
-xFracDivSH xFracDivHpEvap xFracDivCondTOTesDhw xFracDivSHCool xFracDivDhw xFracDivDhwOut xFracDivCool 
+xFracDivSh xFracDivHpEvap xFracDivCondTOTesDhw xFracDivSHCool xFracDivDhw xFracDivDhwOut xFracDivCool 
 MfrPiHpToTesShIn xFracDivTesDhwOut xFracDivHp MfrPiHxDhwIn MfrPiDhwSecOut MfrPiPuCircIn MfrPiPuCircOut MfrPiDhwDemand 
 MfrPiHxCoolWatIn MfrPiSHInMix MfrPiRadIn MfrPiTesDhwCond MfrPiTesDhwToDes MfrPiHpToTesDhwIn MfrPiDesToCond MfrPiHxCoolBriOut 
 MfrPiHxCoolBriIn MfrPiDivCool MfrPiGhxIn MfrPiDivCooltoHp MfrPiGhxOut MfrPiPuGhxOut MfrPiHpEvapMix MfrPiHpCondOut 
@@ -1934,7 +1907,7 @@ MfrPiPuHpShIn MfrPiHpTeeToDiv MfrPiCondToDes MfrPiHpToTesShOut MfrPiHpCondIn Mfr
 MfrConn1446 MfrPiPuDhwOut MfrPiTesDhwOut MfrPiTesShOut MfrPiTeeMixSHIn MfrPiSHOutMix MfrConn1455 MfrPiTesShIn 
 MfrPiRadOut MfrPiDivSHCool 
 ***
-xFracDivSH xFracDivHpEvap xFracDivCondTOTesDhw xFracDivSHCool xFracDivDhw xFracDivDhwOut xFracDivCool 
+xFracDivSh xFracDivHpEvap xFracDivCondTOTesDhw xFracDivSHCool xFracDivDhw xFracDivDhwOut xFracDivCool 
 MfrPiHpToTesShIn xFracDivTesDhwOut xFracDivHp MfrPiHxDhwIn MfrPiDhwSecOut MfrPiPuCircIn MfrPiPuCircOut MfrPiDhwDemand 
 MfrPiHxCoolWatIn MfrPiSHInMix MfrPiRadIn MfrPiTesDhwCond MfrPiTesDhwToDes MfrPiHpToTesDhwIn MfrPiDesToCond MfrPiHxCoolBriOut 
 MfrPiHxCoolBriIn MfrPiDivCool MfrPiGhxIn MfrPiDivCooltoHp MfrPiGhxOut MfrPiPuGhxOut MfrPiHpEvapMix MfrPiHpCondOut 
