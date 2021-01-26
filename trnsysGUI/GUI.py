@@ -2236,7 +2236,7 @@ class DiagramEditor(QWidget):
 
 
     # Saving related
-    def save(self):
+    def save(self, showWarning=True):
         """
         If saveas has not been used, diagram will be saved in "/diagrams"
         If saveas has been used, diagram will be saved in self.saveAsPath
@@ -2259,7 +2259,7 @@ class DiagramEditor(QWidget):
         self.diagramName = os.path.split(self.projectFolder)[-1] + '.json'
         diagramPath = os.path.join(self.projectFolder,self.diagramName)
 
-        if os.path.isfile(diagramPath):
+        if os.path.isfile(diagramPath) and showWarning:
             qmb = QMessageBox(self)
             qmb.setText("Warning: " +
                         "This diagram name exists already. Do you want to overwrite or cancel?")
@@ -3536,8 +3536,11 @@ class MainWindow(QMainWindow):
         jsonNew = os.path.split(self.projectFolder)[-1] + '.json'
         os.rename(os.path.join(self.projectFolder,jsonOld),os.path.join(self.projectFolder,jsonNew))
 
+        jsonPath = os.path.join(self.projectFolder, jsonNew)
+
         self.centralWidget = DiagramEditor(self)
         self.setCentralWidget(self.centralWidget)
+        self.centralWidget.save(showWarning=False)
 
     def saveDiaAs(self):
         self.logger.info("Saving diagram as...")
