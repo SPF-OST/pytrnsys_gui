@@ -8,6 +8,9 @@ from trnsysGUI.PortItem import PortItem
 class BlockItemFourPorts(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(BlockItemFourPorts, self).__init__(trnsysType, parent, **kwargs)
+        
+        self.logger = parent.logger
+
         self.h = 120
         self.w = 120
         self.inputs.append(PortItem('i', 0, self))
@@ -28,7 +31,7 @@ class BlockItemFourPorts(BlockItem):
 
     def encode(self):
         if self.isVisible():
-            print("Encoding a %s block" % self.name)
+            self.logger.debug("Encoding a %s block" % self.name)
 
             # childIdList = []
 
@@ -60,7 +63,7 @@ class BlockItemFourPorts(BlockItem):
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        print("Loading a %s block" % self.name)
+        self.logger.debug("Loading a %s block" % self.name)
 
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
@@ -70,11 +73,11 @@ class BlockItemFourPorts(BlockItem):
 
         for x in range(len(self.inputs)):
             self.inputs[x].id = i["PortsIDIn"][x]
-            print("Input at %s" % self.name)
+            self.logger.debug("Input at %s" % self.name)
 
         for x in range(len(self.outputs)):
             self.outputs[x].id = i["PortsIDOut"][x]
-            print("Output at %s" % self.name)
+            self.logger.debug("Output at %s" % self.name)
 
         self.setPos(float(i[self.name+"Position"][0]), float(i[self.name+"Position"][1]))
         self.trnsysId = i["trnsysID"]
@@ -86,17 +89,17 @@ class BlockItemFourPorts(BlockItem):
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        print("Loading a %s block in Decoder" % self.name)
+        self.logger.debug("Loading a %s block in Decoder" % self.name)
 
         self.changeSize()
 
         for x in range(len(self.inputs)):
             self.inputs[x].id = i["PortsIDIn"][x]
-            print("Input at %s" % self.name)
+            self.logger.debug("Input at %s" % self.name)
 
         for x in range(len(self.outputs)):
             self.outputs[x].id = i["PortsIDOut"][x]
-            print("Output at %s" % self.name)
+            self.logger.debug("Output at %s" % self.name)
 
         self.setPos(float(i[self.name + "Position"][0]) + offset_x, float(i[self.name + "Position"][1] + offset_y))
         self.groupName = "defaultGroup"
@@ -105,10 +108,10 @@ class BlockItemFourPorts(BlockItem):
         resBlockList.append(self)
 
     def exportBlackBox(self):
-        resStr = "T" + self.displayName + "X0" + "=1 \n"
-        resStr += "T" + self.displayName + "X1" + "=1 \n"
-        eqNb = 2
-        return resStr, eqNb
+        equations = ["T" + self.displayName + "X0" + "=1"]
+        equations.append("T" + self.displayName + "X1" + "=1")
+        status = 'success'
+        return status,equations
 
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20

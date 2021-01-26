@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QHBoxLayout, QListWidget, QPushButton, QSpacerItem, \
-    QVBoxLayout, QRadioButton, QDialog, QTabWidget, QWidget
+    QVBoxLayout, QRadioButton, QDialog, QTabWidget, QWidget, QMessageBox
 
 from trnsysGUI.HeatExchanger import HeatExchanger
 
@@ -33,12 +34,12 @@ class ConfigStorage(QDialog):
         description = QLabel("Please configure the storage tank:")
         exportButton = QPushButton("Export ddck")
         exportButton.clicked.connect(self.storage.exportDck)
-        loadButton = QPushButton("Load ddck")
-        loadButton.clicked.connect(self.storage.loadDck)
+        # loadButton = QPushButton("Load ddck")
+        # loadButton.clicked.connect(self.storage.loadDck)
         h0.addWidget(description)
-        h0.addWidget(loadButton)
+        # h0.addWidget(loadButton)
         h0.addWidget(exportButton)
-        loadButton.setEnabled(False)
+        # loadButton.setEnabled(False)
 
         tankNameLabel = QLabel()
         tankNameLabel.setText("<b>Tank name: </b>")
@@ -281,13 +282,13 @@ class ConfigStorage(QDialog):
         -------
 
         """
-        if float(self.offsetLeI.text()) > 100:
-            self.offsetLeI.setText('100')
+        # if float(self.offsetLeI.text()) > 100:
+        #     self.offsetLeI.setText('100')
+        #
+        # if float(self.offsetLeO.text()) < 0:
+        #     self.offsetLeO.setText('0')
 
-        if float(self.offsetLeO.text()) < 0:
-            self.offsetLeO.setText('0')
-
-        if self.minOffsetDistance() and float(self.offsetLeI.text()) > float(self.offsetLeO.text() and self.offsetsInRange()):
+        if self.minOffsetDistance() and float(self.offsetLeI.text()) > float(self.offsetLeO.text()) and self.offsetsInRange():
             print("Adding hx")
             if self.rButton.isChecked():
                 print("addhxr")
@@ -296,13 +297,15 @@ class ConfigStorage(QDialog):
                 print("addhxl")
                 self.addHxL()
         else:
-            print("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
+            msgb = QMessageBox()
+            msgb.setText("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
+            msgb.exec_()
 
     def minOffsetDistance(self):
         return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 5
 
     def offsetsInRange(self):
-        return (0 < float(self.offsetLeI.text()) < 100) and (0 < float(self.offsetLeO.text()) < 100)
+        return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
 
     def addHxL(self):
         """
@@ -314,11 +317,16 @@ class ConfigStorage(QDialog):
         -------
 
         """
+        if self.hxNameLe.text() == '':
+            msgb = QMessageBox()
+            msgb.setText("Please specify the name of the heat exchanger that you want to add.")
+            msgb.exec_()
+            return
+
         hx_temp = HeatExchanger(0, self.w_hx, abs(
             1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
                                 QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
-                                self.storage,
-                                self.hxNameLe.text())
+                                self.storage, self.hxNameLe.text(), tempHx=True)
 
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
@@ -338,12 +346,17 @@ class ConfigStorage(QDialog):
        -------
 
         """
+        if self.hxNameLe.text() == '':
+            msgb = QMessageBox()
+            msgb.setText("Please specify the name of the heat exchanger that you want to add.")
+            msgb.exec_()
+            return
+
         hx_temp = HeatExchanger(2, self.w_hx, abs(
             1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
                                 QPointF(self.storage.w,
                                         self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
-                                self.storage,
-                                self.hxNameLe.text())
+                                self.storage, self.hxNameLe.text(), tempHx=True)
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
         input = float(self.offsetLeI.text())
@@ -489,26 +502,111 @@ class ConfigStorage(QDialog):
                     self.storage.parent.scene().removeItem(i)
 
     def modifyHx(self):
-        # print("Left: ")
-        # print(self.listWL.selectedItems())
-        # print("\nRight: ")
-        # print(self.listWR.selectedItems())
-        if len(self.listWL.selectedItems()) == 0 and len(self.listWR.selectedItems()) == 0:
+        """
+        Modify Hx.
+        """
+        side = ''
+        noSelection = True
+        try:
+            hxName, residualInfo = self.listWL.selectedItems()[0].text().split(",")
+            side = 'Left'
+            noSelection = False
+        except:
+            pass
+        try:
+            hxName, residualInfo = self.listWR.selectedItems()[0].text().split(",")
+            side = 'Right'
+            noSelection = False
+        except:
+            pass
+
+        if noSelection:
             return
+
+        residualInfo = residualInfo.split(" ")
+        inputHeight = residualInfo[3]
+        outputHeight = residualInfo[5]
+
+        dialogResult = modifyDialog(inputHeight,outputHeight)
+
+        if dialogResult.cancelled:
+            return
+
+        for i in range(len(self.storage.heatExchangers)):
+            if self.storage.heatExchangers[i].displayName == hxName:
+                self.storage.heatExchangers[i].modifyPosition(dialogResult.newPortHeights)
+
+        textPorts = dialogResult.newPortHeights
+
+        if str(textPorts[0]) == '':
+            textPorts[0] = inputHeight
         else:
-            if self.rButton.isChecked() or self.lButton.isChecked():
-                self.addHx()
-                self.removeHxL()
-                self.removeHxR()
+            textPorts[0] = str(round(textPorts[0])) + "%"
+        if str(textPorts[1]) == '':
+            textPorts[1] = outputHeight
+        else:
+            textPorts[1] = str(round(textPorts[1])) + "%"
+
+        listText = hxName + "," + residualInfo[0] + " " + residualInfo[1] + " " + residualInfo[2] + " " + \
+                   textPorts[0] + " " + residualInfo[4] + " " + textPorts[1]
+
+        if side == 'Left':
+            self.listWL.selectedItems()[0].setText(listText)
+        elif side == 'Right':
+            self.listWR.selectedItems()[0].setText(listText)
 
     def modifyPort(self):
-        if len(self.listWL2.selectedItems()) == 0 and len(self.listWR2.selectedItems()) == 0:
+        """
+        Modify existing ports.
+        """
+        side = ''
+        noSelection = True
+        try:
+            connectionName, residualInfo = self.listWL2.selectedItems()[0].text().split(",")
+            side = 'Left'
+            noSelection = False
+        except:
+            pass
+        try:
+            connectionName, residualInfo = self.listWR2.selectedItems()[0].text().split(",")
+            side = 'Right'
+            noSelection = False
+        except:
+            pass
+
+        if noSelection:
             return
-        elif len(self.listWL2.selectedItems()) > 0:
-            self.manRemovePortPairLeft()
-        elif len(self.listWR2.selectedItems()) > 0:
-            self.manRemovePortPairRight()
-        self.manAddPortPair()
+
+        residualInfo = residualInfo.split(" ")
+        inputHeight = residualInfo[3]
+        outputHeight = residualInfo[5]
+
+        dialogResult = modifyDialog(inputHeight,outputHeight)
+
+        if dialogResult.cancelled:
+            return
+
+        self.storage.modifyPortPosition(connectionName,dialogResult.newPortHeights)
+
+        textPorts = dialogResult.newPortHeights
+
+        if str(textPorts[0]) == '':
+            textPorts[0] = inputHeight
+        else:
+            textPorts[0] = str(round(textPorts[0])) + "%"
+        if str(textPorts[1]) == '':
+            textPorts[1] = outputHeight
+        else:
+            textPorts[1] = str(round(textPorts[1])) + "%"
+
+        listText = connectionName + "," + residualInfo[0] + " " + residualInfo[1] + " " + residualInfo[2] + " " + \
+                   textPorts[0] + " " + residualInfo[4] + " " + textPorts[1]
+
+        if side == 'Left':
+            self.listWL2.selectedItems()[0].setText(listText)
+        elif side == 'Right':
+            self.listWR2.selectedItems()[0].setText(listText)
+
 
     def incrSize(self):
         self.storage.updatePortPositionsHW(self.h_hx, self.w_inc)
@@ -527,8 +625,97 @@ class ConfigStorage(QDialog):
 
     def acceptedEdit(self):
         # print("Changing displayName")
+        test = self.le.text()
+        if self.le.text() == '':
+            qmb = QMessageBox()
+            qmb.setText('Please set a name for this storage tank.')
+            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.setDefaultButton(QMessageBox.Ok)
+            qmb.exec()
+            return
         self.storage.setName(self.le.text())
         self.close()
 
     def cancel(self):
         self.close()
+
+class modifyDialog(QDialog):
+    """
+    A dialog box lets the user choose the path and the name of folder for a new project
+    """
+
+    def __init__(self, inputHeight, outputHeight, parent=None):
+
+        super(modifyDialog, self).__init__(parent)
+
+        self.executed = False
+        self.cancelled = True
+
+        self.enteredPortHeights = ['','']
+        self.newPortHeights = []
+
+        newInputHeight = QLabel("Input currently at\t" + inputHeight + "\tnew (%):")
+        self.line1 = QLineEdit()
+
+        newOutputHeight = QLabel("Output currently at\t" + outputHeight + "\tnew (%):")
+        self.line2 = QLineEdit()
+
+        inputHeightLayout = QHBoxLayout()
+        inputHeightLayout.addWidget(newInputHeight)
+        inputHeightLayout.addWidget(self.line1)
+
+        newOutputLayout = QHBoxLayout()
+        newOutputLayout.addWidget(newOutputHeight)
+        newOutputLayout.addWidget(self.line2)
+
+        self.okButton = QPushButton("Done")
+        self.okButton.setFixedWidth(50)
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(self.okButton, alignment=Qt.AlignCenter)
+
+        overallLayout = QVBoxLayout()
+        overallLayout.addLayout(inputHeightLayout)
+        overallLayout.addLayout(newOutputLayout)
+        overallLayout.addLayout(buttonLayout)
+        self.setLayout(overallLayout)
+        self.setFixedWidth(400)
+
+        self.okButton.clicked.connect(self.doneEdit)
+        self.setWindowTitle("Modify direct port couple")
+        self.exec()
+
+
+    def doneEdit(self):
+
+        self.projectPathFlag = False
+        self.folderNameFlag = False
+        self.overwriteFolder = True
+
+        self.enteredPortHeights = [self.line1.text(),self.line2.text()]
+        portNames = ['Input','Output']
+
+        for i in range(0,2):
+            if self.enteredPortHeights[i] != '':
+                try:
+                    portHeight = int(self.enteredPortHeights[i])
+                    if portHeight < 1 or portHeight > 100:
+                        msgBox = QMessageBox()
+                        msgBox.setText(portNames[i] + " needs to be between 1 and 100 %.")
+                        msgBox.exec()
+                        return
+                    else:
+                        self.enteredPortHeights[i] = portHeight
+                except:
+                    msgBox = QMessageBox()
+                    msgBox.setText("Invalid value for " + portNames[i].lower() + " port height.")
+                    msgBox.exec()
+                    return
+
+        self.newPortHeights = self.enteredPortHeights
+        self.executed = True
+        self.close()
+
+    def closeEvent(self, e):
+        if self.executed:
+            self.cancelled = False
+        e.accept()

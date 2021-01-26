@@ -1,0 +1,20 @@
+*************************************
+**BEGIN valve_control.ddck
+*************************************
+
+CONSTANTS 1
+T_set_MixDhw=50
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiTesDhwOut
+TPiCirc
+MfrPiDhwDemand
+T_set_MixDhw
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixDhw
+EQUATIONS 1
+xFracMixDhw =  1.-[441,5] 
+

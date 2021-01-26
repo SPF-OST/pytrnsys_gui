@@ -1,11 +1,15 @@
+import os
+import shutil
 from pathlib import Path
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QImage, QIcon
-from PyQt5.QtWidgets import QMenu, QFileDialog
+from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
+from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 # from trnsysGUI.newPortDlg import newPortDlg
 
@@ -16,6 +20,7 @@ class GenericBlock(BlockItem):
 
         self.inputs.append(PortItem('i', 2, self))
         self.outputs.append(PortItem('o', 2, self))
+        self.loadedFiles = []
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -32,9 +37,10 @@ class GenericBlock(BlockItem):
         self.isSet = True
 
         self.changeSize()
+        self.addTree()
 
     def changeSize(self):
-        # print("passing through c change size")
+        # self.logger.debug("passing through c change size")
         w = self.w
         h = self.h
         delta = 4
@@ -91,7 +97,7 @@ class GenericBlock(BlockItem):
 
             # if i.side == 0:
             #     distBetweenPorts = (self.h - 4*delta) / (2 * self.getPairNb(0) - 1)
-            #     print("distance betw ports " + str(distBetweenPorts))
+            #     self.logger.debug("distance betw ports " + str(distBetweenPorts))
             #     i.setPos(- 2*delta + 4 * self.flippedH * delta + self.flippedH * w,
             #               2*delta + distBetweenPorts * portNb[0])
             #     i.side = 0 + 2 * self.flippedH
@@ -104,7 +110,7 @@ class GenericBlock(BlockItem):
             #
             # if i.side == 1:
             #     distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(1) - 1)
-            #     print("distance betw ports " + str(distBetweenPorts))
+            #     self.logger.debug("distance betw ports " + str(distBetweenPorts))
             #     i.setPos(2 * delta + distBetweenPorts * portNb[1],
             #              - 2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
             #     i.side = 1 + 2 * self.flippedV
@@ -122,7 +128,7 @@ class GenericBlock(BlockItem):
             if i.side == side:
                 res += 1
 
-        print("there are " + str(res) + " pairs on the side "+ str(side))
+        self.logger.debug("there are " + str(res) + " pairs on the side "+ str(side))
         return res
 
     def addPortDlg(self):
@@ -131,11 +137,11 @@ class GenericBlock(BlockItem):
         self.parent.parent().showGenericPortPairDlg(self)
 
     def addPort(self, io, relH):
-        print(io)
-        print(relH)
+        self.logger.debug(io)
+        self.logger.debug(relH)
 
     def setImage(self, name):
-        print("Setting image with name" + name)
+        self.logger.debug("Setting image with name" + name)
         self.image = QImage(name)
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -147,7 +153,7 @@ class GenericBlock(BlockItem):
             self.setImage(name)
             self.setImagesource(name)
         else:
-            print("No image picked, name is " + name)
+            self.logger.debug("No image picked, name is " + name)
 
     def setImagesource(self, name):
         self.imagesource = name
@@ -202,7 +208,7 @@ class GenericBlock(BlockItem):
 
     def encode(self):
         if self.isVisible():
-            print("Encoding a Generic Block")
+            self.logger.debug("Encoding a Generic Block")
 
             portListInputs = []
             portListOutputs = []
@@ -232,7 +238,7 @@ class GenericBlock(BlockItem):
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        print("Portpair is " + str(i['PortPairsNb']))
+        self.logger.debug("Portpair is " + str(i['PortPairsNb']))
         correcter = 0
         for j in range(4):
             if j == 2:
@@ -258,7 +264,7 @@ class GenericBlock(BlockItem):
         h = self.h
         w = self.w
         delta = 4
-        print("side is " + str(side))
+        self.logger.debug("side is " + str(side))
         self.inputs.append(PortItem("i", side, self))
         self.outputs.append(PortItem("o", side, self))
         # Allocate id
@@ -268,7 +274,7 @@ class GenericBlock(BlockItem):
         for i in self.inputs:
             if i.side == 0:
                 distBetweenPorts = (self.h - 4*delta) / (2 * self.getPairNb(0) - 1)
-                print("distance betw ports " + str(distBetweenPorts))
+                self.logger.debug("distance betw ports " + str(distBetweenPorts))
                 i.setPos(- 2*delta,
                           2 * delta + distBetweenPorts * portNb[0])
                 portNb[0] += 1
@@ -285,22 +291,22 @@ class GenericBlock(BlockItem):
                 portNb[1] += 1
 
             elif i.side == 2:
-                print("side == 2")
+                self.logger.debug("side == 2")
                 distBetweenPorts = (self.h - 4 * delta) / (2 * self.getPairNb(2) - 1)
-                print("side 2 dist betw ports is " + str(distBetweenPorts))
+                self.logger.debug("side 2 dist betw ports is " + str(distBetweenPorts))
                 i.setPos(2 * delta + w,
                          2 * delta + distBetweenPorts * portNb[2])
-                print(2 * delta + distBetweenPorts * portNb[2])
+                self.logger.debug(2 * delta + distBetweenPorts * portNb[2])
                 portNb[2] += 1
 
                 self.outputs[self.inputs.index(i)].setPos(2 * delta + w,
                                                           2 * delta + distBetweenPorts * portNb[2])
-                print(2 * delta + distBetweenPorts * portNb[2])
+                self.logger.debug(2 * delta + distBetweenPorts * portNb[2])
                 portNb[2] += 1
 
             else:
                 distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(3) - 1)
-                print("distance betw ports " + str(distBetweenPorts))
+                self.logger.debug("distance betw ports " + str(distBetweenPorts))
                 i.setPos(2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
                 portNb[3] += 1
 
@@ -329,12 +335,12 @@ class GenericBlock(BlockItem):
         self.flippedV = bool(state)
         self.updatePortPos()
 
-    def exportBlackBox(self):
-        resStr = ""
-        for i in range(len(self.inputs)):
-            resStr += "T" + self.displayName + "X" + str(i) + "=1 \n"
-        eqNb = len(self.inputs)
-        return resStr, eqNb
+    # def exportBlackBox(self):
+    #     resStr = ""
+    #     for i in range(len(self.inputs)):
+    #         resStr += "T" + self.displayName + "X" + str(i) + "=1 \n"
+    #     eqNb = len(self.inputs)
+    #     return resStr, eqNb
 
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20
@@ -387,3 +393,98 @@ class GenericBlock(BlockItem):
         for i in range(len(self.inputs)):
             if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
                 return i
+
+    def addTree(self):
+        """
+        When a blockitem is added to the main window.
+        A file explorer for that item is added to the right of the main window by calling this method
+        """
+        self.logger.debug(self.parent.parent())
+        pathName = self.displayName
+        if self.parent.parent().projectPath =='':
+            # self.path = os.path.dirname(__file__)
+            # self.path = os.path.join(self.path, 'default')
+            self.path = self.parent.parent().projectFolder
+            # now = datetime.now()
+            # self.fileName = now.strftime("%Y%m%d%H%M%S")
+            # self.path = os.path.join(self.path, self.fileName)
+        else:
+            self.path = self.parent.parent().projectPath
+        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, pathName)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+
+        self.model = MyQFileSystemModel()
+        self.model.setRootPath(self.path)
+        self.model.setName(self.displayName)
+        self.tree = MyQTreeView(self.model, self)
+        self.tree.setModel(self.model)
+        self.tree.setRootIndex(self.model.index(self.path))
+        self.tree.setObjectName("%sTree" % self.displayName)
+        for i in range(1, self.model.columnCount()-1):
+            self.tree.hideColumn(i)
+        self.tree.setMinimumHeight(200)
+        self.tree.setSortingEnabled(True)
+        self.parent.parent().splitter.addWidget(self.tree)
+
+    # def loadFile(self, file):
+    #     filePath = self.parent.parent().projectPath
+    #     msgB = QMessageBox()
+    #     if filePath == '':
+    #         msgB.setText("Please select a project path before loading!")
+    #         msgB.exec_()
+    #     else:
+    #         self.logger.debug("file loaded into %s" % filePath)
+    #         shutil.copy(file, filePath)
+
+    def updateTreePath(self, path):
+        """
+        When the user chooses the project path for the file explorers, this method is called
+        to update the root path.
+        """
+        pathName = self.displayName
+        self.path = os.path.join(path, "ddck")
+        self.path = os.path.join(self.path, pathName)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        self.model.setRootPath(self.path)
+        self.tree.setRootIndex(self.model.index(self.path))
+
+    def deleteBlock(self):
+        """
+                Overridden method to also delete folder
+        """
+        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.deleteConns()
+        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
+        self.parent.parent().trnsysObj.remove(self)
+        self.logger.debug("deleting block " + str(self) + self.displayName)
+        # self.logger.debug("self.scene is" + str(self.parent.scene()))
+        self.parent.scene().removeItem(self)
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        shutil.rmtree(self.path)
+        self.deleteLoadedFile()
+        try:
+            widgetToRemove.hide()
+        except AttributeError:
+            self.logger.debug("Widget doesnt exist!")
+        else:
+            self.logger.debug("Deleted widget")
+        del self
+
+    def setName(self, newName):
+        """
+        Overridden method to also change folder name
+        """
+        self.displayName = newName
+        self.label.setPlainText(newName)
+        self.model.setName(self.displayName)
+        self.tree.setObjectName("%sTree" % self.displayName)
+        self.logger.debug(os.path.dirname(self.path))
+        # destPath = str(os.path.dirname(self.path))+'\\Generic_'+self.displayName
+        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        if os.path.exists(self.path):
+            os.rename(self.path, destPath)
+            self.path = destPath
+            self.logger.debug(self.path)

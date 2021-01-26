@@ -15,7 +15,7 @@ class Type1924_TesPlugFlow():
         self.nMaxSensor=10
         self.nMaxAvgSensor=5
 
-        self.sLine="*****************************************************\n"
+        self.sLine="*************************************\n"
         self.extension="ddck"
 
         self.setDefault()
@@ -442,14 +442,14 @@ class Type1924_TesPlugFlow():
 
         lines="*****************OUTPUTS****************\n"
 
-        nEq = nPorts*2
+        nEq = nPorts
         line="EQUATIONS %d\n"%nEq;lines=lines+line
 
-        counter=1
+        # counter=1
         for idPort in range(nPorts):
-            line="Tdp%dOut_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,counter);lines=lines+line
+            # line="Tdp%dOut_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,counter);lines=lines+line
             line="Qdp%d_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,30+idPort+1);lines=lines+line
-            counter=counter+2
+            # counter=counter+2
 
         nEq = 21
         line="EQUATIONS %d\n"%nEq;lines=lines+line
@@ -474,13 +474,13 @@ class Type1924_TesPlugFlow():
         #     line ="**TsenAvg%d_Tes%d =[%d,%d] !temperature at average sensor zsenAvg%d_Tes%d"%(i+1,nTes,nUnit,counter,i+1,nTes)
         #     counter=counter+1
 
-        nEq = nHx*2
+        nEq = nHx
         if(nEq>0):
             line="EQUATIONS %d\n"%nEq;lines=lines+line
 
         counter=102
         for idHx in range(nHx):
-            line="Thx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter);lines=lines+line
+            # line="Thx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter);lines=lines+line
             line="Qhx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter+2);lines=lines+line
             counter=counter+10
 
@@ -542,9 +542,9 @@ class Type1924_TesPlugFlow():
 
         nPrinterUnit = nUnit+1
         lines = ""
-        line = "*****************************\n"; lines=lines+line
-        line = "******* Online Plotter *******\n"; lines=lines+line
-        line = "*****************************\n"; lines=lines+line
+        lines = lines + self.sLine
+        line = "********** Online Plotter ***********\n"; lines=lines+line
+        lines = lines + self.sLine
         line = "\n"; lines=lines+line
         line = "UNIT 501 TYPE 65     ! Online Plotter HX \n"; lines=lines+line
         line = "PARAMETERS 12   \n"; lines=lines+line
@@ -552,7 +552,7 @@ class Type1924_TesPlugFlow():
         line = "0     ! 2 Nb. of right-axis variables\n"; lines=lines+line
         line = "0     ! 3 Left axis minimum \n"; lines = lines + line
         line = "100     ! 4 Left axis maximum -\n"; lines = lines + line
-        line = "0     ! 5 Right axis minimum"; lines = lines + line
+        line = "0     ! 5 Right axis minimum \n"; lines = lines + line
         line = "100     ! 6 Right axis maximum \n"; lines = lines + line
         line = "nPlotsPerSim     ! 7 Number of plots per simulation \n"; lines = lines + line
         line = "12     ! 8 X-axis gridpoints\n"; lines = lines + line
@@ -587,7 +587,7 @@ class Type1924_TesPlugFlow():
 
         Ua=[1,1,1,1]
 
-        lines=self.sLine+"**************** TYPE DEFINITION ********************\n"+self.sLine
+        lines = self.sLine + "********** TYPE DEFINITION **********\n" + self.sLine
 
         lines=lines+"UNIT %d TYPE %d     ! plug flow tank\n"%(nUnit,nType)
         lines = lines + "PARAMETERS 219 \n"
@@ -621,21 +621,21 @@ class Type1924_TesPlugFlow():
         lines=""
         if(typeFile=="ddck"):
             self.extension="ddck"
-            lines = lines + "*************************************\n"
+            lines = lines + self.sLine
             lines = lines + ("**BEGIN %s.ddck\n" % name)
-            lines = lines + "*************************************\n\n"
-            lines = lines + "*******************************************\n"
+            lines = lines + self.sLine + "\n"
+            lines = lines + self.sLine
             lines = lines + "** Plug-Flow Model exported from TRNSYS GUI\n"
-            lines = lines + "*******************************************\n\n"
-            lines = lines + "*******************************************\n"
+            lines = lines + self.sLine + "\n"
+            lines = lines + self.sLine
             lines = lines + "** To be checked: \n"
             lines = lines + "** check cp and rho values for the cirquits \n"
             lines = lines + "** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used \n"
-            lines = lines + "*******************************************\n\n"
-            lines = lines + "******************************************************************************************\n"
+            lines = lines + self.sLine + "\n"
+            lines = lines + self.sLine
             lines = lines + "** outputs to energy balance in kWh\n"
             lines = lines + "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
-            lines = lines + "******************************************************************************************\n"
+            lines = lines + self.sLine
             lines = lines + "EQUATIONS 3\n"
             lines = lines + ("qSysOut_Tes%sLoss = sumQLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
             lines = lines + ("qSysOut_Tes%sAcum = sumQAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
@@ -647,17 +647,24 @@ class Type1924_TesPlugFlow():
         else:
             raise ValueError("typeFile %s unknown (Must be dck or ddck)")
 
-        lines=lines+self.sLine+"**************** Inputs from hydraulic solver ********************\n"+self.sLine
+        lines = lines + "\n" + self.sLine + "*** Inputs from hydraulic solver ****\n" + self.sLine
 
         nTes = self.inputs["nTes"]
         nHxs = self.inputs["nHx"]
         nPorts = self.inputs["nPorts"]
         nAux = self.inputs["nHeatSources"]
+        nUnit = self.inputs["nUnit"]
+
+        ddcxLines = ''
 
         for idPort in range(self.nMaxPorts):
             if (idPort <= nPorts - 1):
                 line = self.getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
                 lines = lines + line
+                inputTemperature = line.split("\n")[1].split('=')[0].replace(" ","")
+                ddcxLine = "T" + name + "Port" + self.connectorsPort[idPort]['side'] + str(
+                    int(self.connectorsPort[idPort]['zIn'] * 100)) + "=" + inputTemperature + "\n"
+                ddcxLines = ddcxLines + ddcxLine
 
         for idHx in range(self.nMaxHx):
             if (idHx <= nHxs - 1):
@@ -667,13 +674,68 @@ class Type1924_TesPlugFlow():
         line=self.getHeatSourcesValues(nTes, nAux, self.connectorsAux)
         lines = lines + line
 
-        line  = self.sLine+"**************** Parameters of Type1924 ********************\n"+self.sLine
+        lines = lines + self.sLine + "**** Outputs to hydraulic solver ****\n" + self.sLine
+
+        nEq = nPorts
+        if(nEq>0):
+            line="EQUATIONS %d\n"%nEq;lines=lines+line
+            line = "*** direct port outputs\n";lines = lines + line
+
+        counter=1
+        for idPort in range(nPorts):
+            outputTemperature = "Tdp%dOut_Tes%d"%(idPort+1,nTes)
+            line = outputTemperature + "=[%d,%d] ! \n"%(nUnit,counter);lines=lines+line
+            ddcxLine = "T" + name + "Port" + self.connectorsPort[idPort]['side'] + str(
+                int(self.connectorsPort[idPort]['zOut'] * 100)) + "=" + outputTemperature + "\n"
+            ddcxLines = ddcxLines + ddcxLine
+            #line="Qdp%d_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,30+idPort+1);lines=lines+line
+            counter=counter+2
+
+        nEq = nHxs
+        if(nEq>0):
+            line="EQUATIONS %d\n"%nEq;lines=lines+line
+            line = "*** heat exchanger outputs\n";lines = lines + line
+
+        # if len(p.connectionList) > 0 and p.name == 'i':
+        #     if p.connectionList[1].fromPort is p:
+        #         # resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
+        #         equations.append("T" + p.connectionList[0].displayName + "=1")
+        #         status = 'success'
+        #     else:
+        #         # resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
+        #         equations.append("T" + p.connectionList[0].displayName + "=1")
+        #         status = 'success'
+
+        counter=102
+        for idHx in range(nHxs):
+            outputTemperature = "Thx%dOut_Tes%d"%(idHx+1,nTes)
+            line = outputTemperature + "=[%d,%d] ! \n"%(nUnit,counter);lines=lines+line
+            ddcxLine = "T" + self.connectorsHx[idHx]['Name'] + "=" + outputTemperature + "\n"
+            ddcxLines = ddcxLines + ddcxLine
+            # line="Qhx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter+2);lines=lines+line
+            counter=counter+10
+
+        if ddcxLines != '':
+            header = self.sLine + "**BEGIN " + name + ".ddcx\n" + self.sLine
+            header = header + "** This file is used to store the black box component outputs of " + name + "\n\n"
+            ddcxLines = header + ddcxLines
+            outfileDdcxPath = os.path.join(path,name)
+            outfileDdcx = open(outfileDdcxPath+'.ddcx', 'w')
+            outfileDdcx.writelines(ddcxLines)
+            outfileDdcx.close()
+
+        lines = lines + "\n"
+
+        line  = self.sLine + "****** Parameters of Type1924 *******\n" + self.sLine
         lines = lines+line
 
-        lines = lines + "CONSTANTS 3\n"
-        line = "TRoomStore=15 ! @userDefined\n";lines = lines+line
-        line = "VStoreRef = 0.763\n";lines = lines+line
-        line = "ratioTes = Vol_Tes%d / VStoreRef\n"%(nTes);lines = lines+line
+        if nTes == 1:
+            lines = lines + "CONSTANTS 3\n"
+            line = "TRoomStore=15 ! @userDefined\n";lines = lines+line
+            line = "VStoreRef = 0.763\n";lines = lines+line
+        else:
+            lines = lines + "CONSTANTS 1\n"
+        line = "ratioTes%d = Vol_Tes%d / VStoreRef\n"%(nTes,nTes);lines = lines+line
 
         for idPort in range(self.nMaxPorts):
             if (idPort <= nPorts - 1):

@@ -3,15 +3,24 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. include:: ./source
-
-Welcome to pytrnsys's documentation!
+Graphical user interface of pytrnsys
 ====================================
 
+This package was developed at the `SPF - Institute for Solar Technology <https://www.spf.ch/>`_ at the `OST - Eastern
+Switzerland University of Applied Sciences <https://www.ost.ch/>`_.
+
+.. image:: ./guide/resources/logos.svg
+      :width: 600
+      :alt: logos
+
+Table of contents
+=================
 .. toctree::
    :maxdepth: 2
 
-   guide/index
+   guide/fileTree
+   guide/interface
+   guide/example_procedure
    CodeReference
 
 

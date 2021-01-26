@@ -47,9 +47,12 @@ class HeatExchanger(QGraphicsItemGroup):
             self.port1.setPos(self.offset + QPointF(2 * delta, 0))
             self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
 
-        if kwargs == {}:
+        if kwargs == {} or 'tempHx' in kwargs:
             print("Creating new HeatExchanger")
-            self.displayName = name + str(self.id)
+            if kwargs == {}:
+                self.displayName = name + str(self.id)
+            elif 'tempHx' in kwargs:
+                self.displayName = name
             self.initNew()
             self.loadedConnTrId = None  # Should not be used
         else:
@@ -309,3 +312,27 @@ class HeatExchanger(QGraphicsItemGroup):
         self.highlightHx()
         print("pressed")
         # super(HeatExchanger, self).keyPressEvent(event)
+
+    def modifyPosition(self,newHeights):
+        if newHeights[0] == '':
+            newHeights[0] = self.input
+        if newHeights[1] == '':
+            newHeights[1] = self.output
+
+        self.h = abs(1 / 100 * self.parent.h * (newHeights[1] - newHeights[0]))
+
+        delta = 4
+        if self.sSide == 0:
+            self.offset = QPointF(0., self.parent.h - 1/100 * newHeights[0] * self.parent.h)
+            self.port1.setPos(self.offset + QPointF(-2 * delta, 0))
+            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * delta, 0))
+        if self.sSide == 2:
+            self.offset = QPointF(self.parent.w, self.parent.h - 1/100 * newHeights[0] * self.parent.h)
+            self.port1.setPos(self.offset + QPointF(2 * delta, 0))
+            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
+
+        self.output = 100 - 100 * self.port2.pos().y() / self.parent.h
+        self.input = 100 - 100 * self.port1.pos().y() / self.parent.h
+
+        self.removeLines()
+        self.drawHx(6, 0.4)

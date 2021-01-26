@@ -1,0 +1,125 @@
+**************************************
+**BEGIN Control-customDualSource.ddck 
+*************************************
+    
+*****************************************
+** Contact person : Mattia Battaglia      
+** Creation date  : 31.03.2020
+** Last changes   : 15.04.2020 DC
+*****************************************
+
+***************************************************************************
+** Description: 
+** Custom control for a dual-souce air/ground heat pump system
+***************************************************************************
+
+***********************************
+** Connectors with hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+***********************************
+** outputs to other ddck
+***********************************
+
+***************************************************
+******** In future here will be the centralized control
+***************************************************
+**
+**Control Dual Source system
+*******************************
+    
+*****************************************
+** Author: Mattia Battaglia        
+** Date:  31.03.2020    
+******************************************
+***************************************************
+******** In future here will be the centralized control***************************
+***************************************************
+*** Control modes
+EQUATIONS 7
+BoAuxWWon = HpForDHWIsNeeded ! Boolean value - DHW charging is needed
+BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon) ! Boolean value - SH charging is needed
+CoolingOn = 0 ! Cooling mode on
+HpIsOn = OR(BoAuxWWonRc,BoAuxSHonRc) ! HP is on
+qAuxStoreDHW_KW = 0 ! No internal heat source dhw storage
+qAuxStoreSH_KW = 0 ! No internal heat source sh storage
+BoDHWTapping = GT(MfrDHWset,0) ! Bo DHW water tapped in this timestep
+
+EQUATIONS 4
+TdhwSet = TdhwSetProfile		! Tset DHW storage
+TTesDhwAuxOff = T9_Tes2		! Temperature sensor DHW charging off
+TTesDhwAuxOn  = T2_Tes2			! Temperature sensor DHW charging on
+TsensorTesSh = T8_Tes1			! Temperature sensor SH charging on
+
+
+
+EQUATIONS 6
+*** Massflowrates
+MfrPuSh = MfrBuiRd
+MfrsupplyWater = MfrDHWset
+MfrPuCirc = NOT(BoDHWTapping)*150
+MfrPuDHW = MfrSrcDHWHXUsed*BoDHWTapping+NOT(BoDHWTapping)*MfrSrcDHWHXUsed
+MfrPuHpCond = MfrHpCondNom*hpIsOnRc
+MfrPuHpEvap = MfrHpEvapNom*hpIsOnRc
+
+EQUATIONS 3
+xFracDivHp=NOT(BoAuxWWon)
+xFracDivDhwOut = NOT(BoDHWTapping)
+xFracDivDhw = NOT(BoDHWTapping)
+
+EQUATIONS 2
+T_set_MixSh=TRdSet
+T_set_MixHpEvap=25
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiTesShOut
+TPiShMix
+MfrPiRadIn
+T_set_MixSh
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixSh
+EQUATIONS 1
+xFracMixSh =  1.-[441,5] 
+
+UNIT 442 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiGhxOut
+TConn323
+MfrPiHpEvapIn
+T_set_MixHpEvap
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixHpEvap
+EQUATIONS 1
+xFracMixHpEvap =  1.-[442,5] 
+
+
+UNIT 82 TYPE 993      ! Input value recall (element RcA) DC CHANGED
+PARAMETERS 1     
+4    ! 1: number of variables to be remembered
+INPUTS 4    
+HpIsOn BoAuxWWon BoAuxSHon CoolingOn  !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh     
+0 0  0  0 !0 0 0  
+     
+EQUATIONS 4
+HpIsOnRc = [82,1]         
+BoAuxWWonRc = [82,2]     
+BoAuxSHonRc = [82,3] 
+CoolingOnRc  = [82,4]

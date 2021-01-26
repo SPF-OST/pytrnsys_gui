@@ -1,0 +1,386 @@
+*************************************
+**BEGIN hydraulic.ddck
+*************************************
+
+EQUATIONS 5
+*** Black box component temperatures
+TDhwPortRight1=Tdp1In_Tes1
+TDhwPortRight99=Tdp1Out_Tes1
+TTesHx24=Thx1Out_Tes1
+TWTap_main=Tcw
+TCollector=TCollOut
+
+EQUATIONS 2
+*** Pump outlet temperatures
+TPuCol = TPiTesToColl
+TWTap = TPiDhwDemand
+
+EQUATIONS 2
+*** Massflowrates
+MfrWTap_main = MfrDHWreal
+MfrPuColl = TdhwSetProfile
+
+UNIT 450 TYPE 935
+PARAMETERS 65
+16
+15 10 7 2      !1 : TeePiece
+10 0 0 4       !2 : WTap_main
+13 9 0 1       !3 : PuCol
+9 12 0 0       !4 : Collector
+8 16 7 3       !5 : MixDhw
+8 0 0 5        !6 : WTap
+1 5 0 0        !7 : PiCirc
+5 6 0 0        !8 : PiDhwDemand
+3 4 0 0        !9 : PiColIn
+2 1 0 0        !10 : PiDhwMains
+12 13 0 0      !11 : TesHx24
+4 11 0 0       !12 : PiColOut
+11 3 0 0       !13 : PiTesToColl
+15 16 0 0      !14 : ConnDhwR452
+1 14 0 0       !15 : PiTesDhwIn
+14 5 0 0       !16 : PiTesDhwOut
+INPUTS 16! for Type 935
+0,0  MfrWTap_main  MfrPuCol 0,0  xFracMixDhw 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+
+*** Initial Inputs *
+-1 0.0 0.0 -1 0.0 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 
+
+EQUATIONS 34	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrTeePiece_A=[450,1]
+MfrTeePiece_B=[450,2]
+MfrTeePiece_C=[450,3]
+MfrWTap_main_A=[450,4]
+MfrWTap_main_B=[450,5]
+MfrPuCol_A=[450,7]
+MfrPuCol_B=[450,8]
+MfrCollector_A=[450,10]
+MfrCollector_B=[450,11]
+MfrMixDhw_A=[450,13]
+MfrMixDhw_B=[450,14]
+MfrMixDhw_C=[450,15]
+MfrWTap_A=[450,16]
+MfrWTap_B=[450,17]
+MfrPiCirc_A=[450,19]
+MfrPiCirc_B=[450,20]
+MfrPiDhwDemand_A=[450,22]
+MfrPiDhwDemand_B=[450,23]
+MfrPiColIn_A=[450,25]
+MfrPiColIn_B=[450,26]
+MfrPiDhwMains_A=[450,28]
+MfrPiDhwMains_B=[450,29]
+MfrTesHx24_A=[450,31]
+MfrTesHx24_B=[450,32]
+MfrPiColOut_A=[450,34]
+MfrPiColOut_B=[450,35]
+MfrPiTesToColl_A=[450,37]
+MfrPiTesToColl_B=[450,38]
+MfrConnDhwR452_A=[450,40]
+MfrConnDhwR452_B=[450,41]
+MfrPiTesDhwIn_A=[450,43]
+MfrPiTesDhwIn_B=[450,44]
+MfrPiTesDhwOut_A=[450,46]
+MfrPiTesDhwOut_B=[450,47]
+
+
+UNIT 451 TYPE 929
+!TeePiece
+PARAMETERS 0
+INPUTS 6
+MfrTeePiece_A
+MfrTeePiece_B
+MfrTeePiece_C
+TPiTesDhwIn
+TPiDhwMains
+TPiCirc
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeePiece= [451,1]
+
+UNIT 452 TYPE 929
+!MixDhw
+PARAMETERS 0
+INPUTS 6
+MfrMixDhw_A
+MfrMixDhw_B
+MfrMixDhw_C
+TPiDhwDemand
+TPiTesDhwOut
+TPiCirc
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixDhw= [452,1]
+
+UNIT 453 TYPE 931
+!PiCirc
+PARAMETERS 6
+diPiCirc
+LPiCirc
+UPiCirc
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePiece
+MfrPiCirc_A
+TRoomStore
+TMixDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiCirc= [453,1]
+PPiCirc_kW= [453,3]/3600 !kW
+MfrPiCirc= MfrPiCirc_A
+
+UNIT 454 TYPE 931
+!PiDhwDemand
+PARAMETERS 6
+diPiDhwDemand
+LPiDhwDemand
+UPiDhwDemand
+RhoWat
+CPWat
+20
+INPUTS 4
+TMixDhw
+MfrPiDhwDemand_A
+TRoomStore
+TWTap
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwDemand= [454,1]
+PPiDhwDemand_kW= [454,3]/3600 !kW
+MfrPiDhwDemand= MfrPiDhwDemand_A
+
+UNIT 455 TYPE 931
+!PiColIn
+PARAMETERS 6
+diPiColIn
+LPiColIn
+UPiColIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TPuCol
+MfrPiColIn_A
+TRoomStore
+TCollector
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColIn= [455,1]
+PPiColIn_kW= [455,3]/3600 !kW
+MfrPiColIn= MfrPiColIn_A
+
+UNIT 456 TYPE 931
+!PiDhwMains
+PARAMETERS 6
+diPiDhwMains
+LPiDhwMains
+UPiDhwMains
+RhoWat
+CPWat
+20
+INPUTS 4
+TWTap_main
+MfrPiDhwMains_A
+TRoomStore
+TTeePiece
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiDhwMains= [456,1]
+PPiDhwMains_kW= [456,3]/3600 !kW
+MfrPiDhwMains= MfrPiDhwMains_A
+
+UNIT 457 TYPE 931
+!PiColOut
+PARAMETERS 6
+diPiColOut
+LPiColOut
+UPiColOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TCollector
+MfrPiColOut_A
+TRoomStore
+TTesHx24
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiColOut= [457,1]
+PPiColOut_kW= [457,3]/3600 !kW
+MfrPiColOut= MfrPiColOut_A
+
+UNIT 458 TYPE 931
+!PiTesToColl
+PARAMETERS 6
+diPiTesToColl
+LPiTesToColl
+UPiTesToColl
+RhoWat
+CPWat
+20
+INPUTS 4
+TTesHx24
+MfrPiTesToColl_A
+TRoomStore
+TPuCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesToColl= [458,1]
+PPiTesToColl_kW= [458,3]/3600 !kW
+MfrPiTesToColl= MfrPiTesToColl_A
+
+UNIT 459 TYPE 931
+!PiTesDhwIn
+PARAMETERS 6
+diPiTesDhwIn
+LPiTesDhwIn
+UPiTesDhwIn
+RhoWat
+CPWat
+20
+INPUTS 4
+TTeePiece
+MfrPiTesDhwIn_A
+TRoomStore
+TDhwPortRight1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwIn= [459,1]
+PPiTesDhwIn_kW= [459,3]/3600 !kW
+MfrPiTesDhwIn= MfrPiTesDhwIn_A
+
+UNIT 460 TYPE 931
+!PiTesDhwOut
+PARAMETERS 6
+diPiTesDhwOut
+LPiTesDhwOut
+UPiTesDhwOut
+RhoWat
+CPWat
+20
+INPUTS 4
+TDhwPortRight99
+MfrPiTesDhwOut_A
+TRoomStore
+TMixDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTesDhwOut= [460,1]
+PPiTesDhwOut_kW= [460,3]/3600 !kW
+MfrPiTesDhwOut= MfrPiTesDhwOut_A
+
+CONSTANTS 3
+** Fluid Loop : defaultGroup
+di_loop_0=0.2
+L_loop_0=2
+U_loop_0=10
+
+
+EQUATIONS 24
+** Fluid Loop : defaultGroup
+**di_loop_0=0.2
+**L_loop_0=2
+**U_loop_0=10
+*** PiCirc
+diPiCirc=di_loop_0
+LPiCirc=L_loop_0
+UPiCirc=U_loop_0
+*** PiTesDhwIn
+diPiTesDhwIn=di_loop_0
+LPiTesDhwIn=L_loop_0
+UPiTesDhwIn=U_loop_0
+*** PiTesDhwOut
+diPiTesDhwOut=di_loop_0
+LPiTesDhwOut=L_loop_0
+UPiTesDhwOut=U_loop_0
+*** PiDhwDemand
+diPiDhwDemand=di_loop_0
+LPiDhwDemand=L_loop_0
+UPiDhwDemand=U_loop_0
+*** PiColIn
+diPiColIn=di_loop_0
+LPiColIn=L_loop_0
+UPiColIn=U_loop_0
+*** PiTesToColl
+diPiTesToColl=di_loop_0
+LPiTesToColl=L_loop_0
+UPiTesToColl=U_loop_0
+*** PiColOut
+diPiColOut=di_loop_0
+LPiColOut=L_loop_0
+UPiColOut=U_loop_0
+*** PiDhwMains
+diPiDhwMains=di_loop_0
+LPiDhwMains=L_loop_0
+UPiDhwMains=U_loop_0
+
+
+EQUATIONS 2
+PipeLoss0=PPiCirc_kW+PPiTesDhwIn_kW+PPiTesDhwOut_kW+PPiDhwDemand_kW+PPiColIn_kW+PPiTesToColl_kW+PPiColOut_kW+PPiDhwMains_kW
+PipeLossTotal=PipeLoss0
+
+ASSIGN solar_dhw_GUI_Mfr.prt 461
+
+UNIT 461 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+461! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 9
+xFracMixDhw MfrPiCirc MfrPiTesDhwIn MfrPiTesDhwOut MfrPiDhwDemand MfrPiColIn MfrPiTesToColl 
+MfrPiColOut MfrPiDhwMains 
+***
+xFracMixDhw MfrPiCirc MfrPiTesDhwIn MfrPiTesDhwOut MfrPiDhwDemand MfrPiColIn MfrPiTesToColl 
+MfrPiColOut MfrPiDhwMains 
+
+ASSIGN solar_dhw_GUI_T.prt 462
+
+UNIT 462 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+462! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 8
+TPiCirc TPiTesDhwIn TPiTesDhwOut TPiDhwDemand TPiColIn TPiTesToColl TPiColOut 
+TPiDhwMains 
+***
+TPiCirc TPiTesDhwIn TPiTesDhwOut TPiDhwDemand TPiColIn TPiTesToColl TPiColOut 
+TPiDhwMains 
+

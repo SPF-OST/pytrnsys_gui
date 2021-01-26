@@ -18,6 +18,9 @@ class MassFlowVisualizer(QDialog):
     def __init__(self, parent,mfrFile, tempFile):
 
         super(MassFlowVisualizer, self).__init__(parent)
+        
+        self.logger = parent.logger
+        
         self.dataFilePath = mfrFile
         self.tempDatafilePath = tempFile
         self.loadedFile = False
@@ -155,7 +158,7 @@ class MassFlowVisualizer(QDialog):
                 else:
                     t.firstS.labelMass.setVisible(False)
 
-        print(self.minValue, self.medianValue, self.maxValue)
+        self.logger.debug("%s %s %s" %(str(self.minValue), str(self.medianValue), str(self.maxValue)))
 
 
 
@@ -181,7 +184,7 @@ class MassFlowVisualizer(QDialog):
 
     def advance(self):
         if self.timeStep == self.maxTimeStep:
-            print("reached end of data, returning")
+            self.logger.debug("reached end of data, returning")
             self.qtm.stop()
             return
 
@@ -226,11 +229,11 @@ class MassFlowVisualizer(QDialog):
                         mass = str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep]))
                         mass1Dp = str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep], 1))
                         temperature = str(round(self.tempMassFlowData['T' + t.displayName].iloc[self.timeStep]))
-                        print("Found connection in ts " + str(self.timeStep) + " " + str(i))
-                        print("mass flow value of %s : " % t.displayName)
+                        self.logger.debug("Found connection in ts " + str(self.timeStep) + " " + str(i))
+                        self.logger.debug("mass flow value of %s : " % t.displayName)
                         t.setMassAndTemperature(mass1Dp, temperature)
                         thickValue = self.getThickness(mass)
-                        print("Thickvalue: ", thickValue)
+                        self.logger.debug("Thickvalue: " + str(thickValue))
                         if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
                             t.setColor(thickValue, mfr="ZeroMfr")
                         elif round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) == self.maxValue:
@@ -253,7 +256,7 @@ class MassFlowVisualizer(QDialog):
                         valvePosition = str(self.massFlowData['xFrac' + t.displayName].iloc[self.timeStep])
                         t.setPositionForMassFlowSolver(valvePosition)
                         t.posLabel.setPlainText(valvePosition)
-                        print('valve position:', valvePosition)
+                        self.logger.debug('valve position: ' +str(valvePosition))
 
 
         else:
@@ -285,17 +288,22 @@ class MassFlowVisualizer(QDialog):
             self.slider.setEnabled(True)
 
     def testValChange(self):
+        """
+        Updates mass flow visualizer after releasing the mouse
+        """
         val = self.slider.value()
-        print("Slider value has changed to " + str(val))
+        self.logger.debug("Slider value has changed to " + str(val))
         time = self.getTime(val)
         self.currentStepLabel.setText("Time :" + str(self.convertTime(time)))
         self.timeStep = val
         self.advance()
 
     def moveValues(self):
-
+        """
+        Updates mass flow visualizer when moving the mouse
+        """
         val = self.slider.value()
-        print("Slider value is still: " + str(val))
+        self.logger.debug("Slider value is still: " + str(val))
         time = self.getTime(val)
         self.currentStepLabel.setText("Time :" + str(self.convertTime(time)))
         self.timeStep = val
@@ -423,12 +431,18 @@ class MassFlowVisualizer(QDialog):
         # sys.exit()
 
     def getTime(self, row):
+        """
+        Gets the time of the current time step
+        """
         data = self.massFlowData
         timeColumn = data[data.columns[0]]
-        print(timeColumn[row])
+        self.logger.debug(str(timeColumn[row]))
         return timeColumn[row]
 
     def convertTime(self, time):
+        """
+        Convert the time into YYYY--MM--DD HH:MM:SS format
+        """
         noOfHours = 8760
         decHour = float(time) / float(noOfHours)
         base = datetime(MINYEAR, 1, 1)
@@ -452,9 +466,9 @@ class MassFlowVisualizer(QDialog):
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Up:
-            print("Up is pressed")
+            self.logger.debug("Up is pressed")
             self.increaseValue()
         elif e.key() == Qt.Key_Down:
-            print("Down is pressed")
+            self.logger.debug("Down is pressed")
             self.decreaseValue()
 

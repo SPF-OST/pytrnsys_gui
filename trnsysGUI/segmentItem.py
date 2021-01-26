@@ -31,6 +31,8 @@ class segmentItem(QGraphicsLineItem):
         """
 
         super(segmentItem, self).__init__(None)
+        
+        self.logger = parent.logger
 
         self.setFlag(self.ItemIsSelectable, True)
 
@@ -166,15 +168,15 @@ class segmentItem(QGraphicsLineItem):
         partLen1 = self.parent.partialLength(self.startNode)
         partLen2 = self.parent.partialLength(self.endNode)
 
-        # print("totlenconn is " + str(totLenConn))
-        # print("partlen1 is " + str(partLen1) + "(node1)" + str(self.startNode))
-        # print("partlen2  is " + str(partLen2) + "(node2)" + str(self.endNode) +"\n")
+        # self.logger.debug("totlenconn is " + str(totLenConn))
+        # self.logger.debug("partlen1 is " + str(partLen1) + "(node1)" + str(self.startNode))
+        # self.logger.debug("partlen2  is " + str(partLen2) + "(node2)" + str(self.endNode) +"\n")
 
         # TODO: Dont forget that disr segments can also have parent type not CornerItem
 
         if type(self.startNode.parent) is CornerItem:
-            # print("In updategrad, startnode parent is corner")
-            # print("I have a corner parent, self is " + str(self))
+            # self.logger.debug("In updategrad, startnode parent is corner")
+            # self.logger.debug("I have a corner parent, self is " + str(self))
 
             startGradP = QPointF(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y())
         elif self.startNode.prevN() is None:
@@ -184,8 +186,8 @@ class segmentItem(QGraphicsLineItem):
             startGradP = QPointF(self.line().p1().x(), self.line().p1().y())
 
         if type(self.endNode.parent) is CornerItem:
-            # print("In update grad, endnode parent is corner")
-            # print("I have a corner parent, self is " + str(self))
+            # self.logger.debug("In update grad, endnode parent is corner")
+            # self.logger.debug("I have a corner parent, self is " + str(self))
             endGradP = QPointF(self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
         elif self.endNode.nextN() is None:
             endGradP = QPointF(self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
@@ -226,7 +228,7 @@ class segmentItem(QGraphicsLineItem):
 
         if e.button() == 1:
             self.keyPr = 1
-            print("Setting key to 1")
+            self.logger.debug("Setting key to 1")
 
             self.parent.highlightConn()
 
@@ -236,15 +238,15 @@ class segmentItem(QGraphicsLineItem):
                 except AttributeError:
                     pass
                 else:
-                    print("set oldx")
+                    self.logger.debug("set oldx")
 
     def mouseMoveEvent(self, e):
-        # print("mouse moved")
-        # print(str(e.button()))
+        # self.logger.debug("mouse moved")
+        # self.logger.debug(str(e.button()))
 
-        print(self.parent.parent.editorMode)
+        self.logger.debug(self.parent.parent.editorMode)
         if self.keyPr == 1:
-            print("moved with button 1")
+            self.logger.debug("moved with button 1")
             newPos = e.pos()
 
             if self.parent.parent.editorMode == 0:
@@ -255,45 +257,45 @@ class segmentItem(QGraphicsLineItem):
 
             elif self.parent.parent.editorMode == 1:
                 # if self.parent.segments[0].isVertical() == False and self.parent.segments[2].isVertical() == False:
-                # print(len(self.parent.segments))
+                # self.logger.debug(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                     if not self.startNode.parent.isVisible():
                         self.startNode.parent.setVisible(True)
                     if not self.endNode.parent.isVisible():
                         self.endNode.parent.setVisible(True)
                     if self.isVertical():
-                        print("Segment is vertical", self.parent.segments.index(self))
+                        self.logger.debug("Segment is vertical", self.parent.segments.index(self))
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
                         self.startNode.parent.setPos(newPos.x(), self.startNode.parent.scenePos().y())
                         self.updateGrad()
 
                     if self.isHorizontal():
-                        print("Segment is horizontal")
+                        self.logger.debug("Segment is horizontal")
                         self.endNode.parent.setPos(self.endNode.parent.scenePos().x(), newPos.y())
                         self.startNode.parent.setPos(self.startNode.parent.scenePos().x(), newPos.y())
 
                 elif type(self.endNode.parent) is CornerItem and self.isVertical():
-                    print("Segment is vertical and can't be moved")
+                    self.logger.debug("Segment is vertical and can't be moved")
 
 
                 # if type(self.startNode.parent) is Connection and self.startNode.prevN() is None:
-                #     print("We begin at the fromPort")
+                #     self.logger.debug("We begin at the fromPort")
 
                 if hasattr(self.endNode.parent, "fromPort") and self.endNode.nextN() is None and not self.isVertical():
-                    print("We end at toPort")
+                    self.logger.debug("We end at toPort")
                     if not self.inited:
                         self.initInMode1(False)
                     else:
                         self.dragInMode1(False, newPos)
 
                 elif hasattr(self.startNode.parent, "fromPort") and self.startNode.prevN() is None and not self.isVertical():
-                    print("We end at fromPort")
+                    self.logger.debug("We end at fromPort")
                     if not self.inited:
                         self.initInMode1(True)
                     else:
                         self.dragInMode1(True, newPos)
             else:
-                print("Unrecognized editorMode in segmentItem mouseMoveEvent")
+                self.logger.debug("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
     def mouseDoubleClickEvent(self, event):
         self.parent.deleteConn()
@@ -400,28 +402,28 @@ class segmentItem(QGraphicsLineItem):
                             nextHorizSeg = self.parent.segments[self.parent.segments.index(self) + 2]
                             prevHorizSeg = self.parent.segments[self.parent.segments.index(self) - 2]
                         except IndexError:
-                            print("no next or prev segments")
+                            self.logger.debug("no next or prev segments")
                         else:
                             # if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
                             #         self.endNode.parent.pos().y()): # TODO : Edit here to combine segment
-                                # print("Next h seg could be deleted")
+                                # self.logger.debug("Next h seg could be deleted")
                             if nextHorizSeg.isHorizontal() and \
                                     int(self.endNode.parent.pos().y()-10) <= int(nextHorizSeg.line().p2().y()) <= int(
                                     self.endNode.parent.pos().y()+10):
                                 self.deleteNextHorizSeg(False, nextHorizSeg)
-                                print("next horizontal")
+                                self.logger.debug("next horizontal")
                                 return
 
                             if prevHorizSeg.isHorizontal() and \
                                     int(self.startNode.parent.pos().y()-10) <= int(prevHorizSeg.line().p2().y()) <= int(
                                     self.startNode.parent.pos().y() + 10):
-                                # print("Prev h seg could be deleted")
+                                # self.logger.debug("Prev h seg could be deleted")
                                 self.deletePrevHorizSeg(False, prevHorizSeg)
-                                print("previous horizontal")
+                                self.logger.debug("previous horizontal")
                                 return
 
                 if self.secondCorner is not None:
-                    print("Second corner is not none")
+                    self.logger.debug("Second corner is not none")
                     # if PortItem
                     if hasattr(self.endNode.parent, "fromPort"):
                         # self.hide()
@@ -464,10 +466,10 @@ class segmentItem(QGraphicsLineItem):
                         self.inited = False
 
                     else:
-                        print("getting no start or end")
+                        self.logger.debug("getting no start or end")
 
                 else:
-                    print("Second corner is none")
+                    self.logger.debug("Second corner is none")
             else:
                 pass
 
@@ -554,7 +556,7 @@ class segmentItem(QGraphicsLineItem):
                 self.parent.parent.diagramScene.addItem(self.thirdCorner)
                 self.parent.parent.diagramScene.addItem(self.firstLine)
                 self.parent.parent.diagramScene.addItem(self.secondLine)
-                print("inited")
+                self.logger.debug("inited")
 
                 self.inited = True
         else:
@@ -586,7 +588,7 @@ class segmentItem(QGraphicsLineItem):
                 self.parent.parent.diagramScene.addItem(self.thirdCorner)
                 self.parent.parent.diagramScene.addItem(self.firstLine)
                 self.parent.parent.diagramScene.addItem(self.secondLine)
-                print("inited")
+                self.logger.debug("inited")
 
                 self.inited = True
 
@@ -619,7 +621,7 @@ class segmentItem(QGraphicsLineItem):
             self.cornerChild.setVisible(True)
 
     def dragInMode1(self, b, newPos):
-        print("after inited")
+        self.logger.debug("after inited")
 
         if b:
             self.thirdCorner.setPos(newPos.x() - 10, newPos.y())
@@ -667,11 +669,11 @@ class segmentItem(QGraphicsLineItem):
         self.scene().parent().showSegmentDlg(self)
         
     def printItemsAt(self):
-        print("Items at startnode are " + str(self.scene().items(self.line().p1())))
-        print("Items at endnode are " + str(self.scene().items(self.line().p2())))
+        self.logger.debug("Items at startnode are " + str(self.scene().items(self.line().p1())))
+        self.logger.debug("Items at endnode are " + str(self.scene().items(self.line().p2())))
 
         for s in self.parent.segments:
-            print("Segment in list is" + str(s) + " has startnode" + str(s.startNode.parent) + " endnode " + str(
+            self.logger.debug("Segment in list is" + str(s) + " has startnode" + str(s.startNode.parent) + " endnode " + str(
                 s.endNode.parent))
 
     def contextMenuEvent(self, event):
@@ -704,7 +706,7 @@ class segmentItem(QGraphicsLineItem):
         GroupChooserConnDlg(self.parent, self.parent.parent)
 
     def printGroup(self):
-        print(self.parent.groupName)
+        self.logger.debug(self.parent.groupName)
 
     def inspect(self):
         self.parent.highlightConn()

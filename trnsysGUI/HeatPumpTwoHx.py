@@ -1,7 +1,13 @@
+import os
+import shutil
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QTransform
+from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
+from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 
 
@@ -16,6 +22,7 @@ class HeatPumpTwoHx(BlockItem):
         self.outputs.append(PortItem('o', 0, self))
         self.outputs.append(PortItem('o', 2, self))
         self.outputs.append(PortItem('o', 2, self))
+        self.loadedFiles = []
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -29,6 +36,7 @@ class HeatPumpTwoHx(BlockItem):
         self.subBlockCounter = 0
 
         self.changeSize()
+        self.addTree()
 
     def changeSize(self):
         w = self.w
@@ -71,7 +79,7 @@ class HeatPumpTwoHx(BlockItem):
 
     def encode(self):
         if self.isVisible():
-            print("Encoding a HeatPump")
+            self.logger.debug("Encoding a HeatPump")
 
             portListInputs = []
             portListOutputs = []
@@ -109,11 +117,11 @@ class HeatPumpTwoHx(BlockItem):
 
         for x in range(len(self.inputs)):
             self.inputs[x].id = i["PortsIDIn"][x]
-            print("Input at heatExchanger")
+            self.logger.debug("Input at heatExchanger")
 
         for x in range(len(self.outputs)):
             self.outputs[x].id = i["PortsIDOut"][x]
-            print("Output at heatExchanger")
+            self.logger.debug("Output at heatExchanger")
 
         self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
         self.trnsysId = i["trnsysID"]
@@ -132,11 +140,11 @@ class HeatPumpTwoHx(BlockItem):
 
         for x in range(len(self.inputs)):
             self.inputs[x].id = i["PortsIDIn"][x]
-            print("Input at heatExchanger")
+            self.logger.debug("Input at heatExchanger")
 
         for x in range(len(self.outputs)):
             self.outputs[x].id = i["PortsIDOut"][x]
-            print("Output at heatExchanger")
+            self.logger.debug("Output at heatExchanger")
 
         self.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1] + offset_y))
         # self.trnsysId = i["trnsysID"]
@@ -147,11 +155,11 @@ class HeatPumpTwoHx(BlockItem):
         resBlockList.append(self)
 
     def exportBlackBox(self):
-        resStr = "T" + self.displayName + "X0" + "=1 \n"
-        resStr += "T" + self.displayName + "X1" + "=1 \n"
-        resStr += "T" + self.displayName + "X2" + "=1 \n"
-        eqNb = 3
-        return resStr, eqNb
+        equations = ["T" + self.displayName + "X0" + "=1"]
+        equations.append("T" + self.displayName + "X1" + "=1")
+        equations.append("T" + self.displayName + "X2" + "=1")
+        status = 'success'
+        return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20
@@ -228,3 +236,98 @@ class HeatPumpTwoHx(BlockItem):
         for i in range(3):
             if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
                 return i
+
+    def addTree(self):
+        """
+        When a blockitem is added to the main window.
+        A file explorer for that item is added to the right of the main window by calling this method
+        """
+        self.logger.debug(self.parent.parent())
+        pathName = self.displayName
+        if self.parent.parent().projectPath =='':
+            # self.path = os.path.dirname(__file__)
+            # self.path = os.path.join(self.path, 'default')
+            self.path = self.parent.parent().projectFolder
+            # now = datetime.now()
+            # self.fileName = now.strftime("%Y%m%d%H%M%S")
+            # self.path = os.path.join(self.path, self.fileName)
+        else:
+            self.path = self.parent.parent().projectPath
+        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, pathName)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+
+        self.model = MyQFileSystemModel()
+        self.model.setRootPath(self.path)
+        self.model.setName(self.displayName)
+        self.tree = MyQTreeView(self.model, self)
+        self.tree.setModel(self.model)
+        self.tree.setRootIndex(self.model.index(self.path))
+        self.tree.setObjectName("%sTree" % self.displayName)
+        for i in range(1, self.model.columnCount()-1):
+            self.tree.hideColumn(i)
+        self.tree.setMinimumHeight(200)
+        self.tree.setSortingEnabled(True)
+        self.parent.parent().splitter.addWidget(self.tree)
+
+    # def loadFile(self, file):
+    #     filePath = self.parent.parent().projectPath
+    #     msgB = QMessageBox()
+    #     if filePath == '':
+    #         msgB.setText("Please select a project path before loading!")
+    #         msgB.exec_()
+    #     else:
+    #         self.logger.debug("file loaded into %s" % filePath)
+    #         shutil.copy(file, filePath)
+
+    def updateTreePath(self, path):
+        """
+        When the user chooses the project path for the file explorers, this method is called
+        to update the root path.
+        """
+        pathName = self.displayName
+        self.path = os.path.join(path, "ddck")
+        self.path = os.path.join(self.path, pathName)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+        self.model.setRootPath(self.path)
+        self.tree.setRootIndex(self.model.index(self.path))
+
+    def deleteBlock(self):
+        """
+                Overridden method to also delete folder
+        """
+        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.deleteConns()
+        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
+        self.parent.parent().trnsysObj.remove(self)
+        self.logger.debug("deleting block " + str(self) + self.displayName)
+        # self.logger.debug("self.scene is" + str(self.parent.scene()))
+        self.parent.scene().removeItem(self)
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        shutil.rmtree(self.path)
+        self.deleteLoadedFile()
+        try:
+            widgetToRemove.hide()
+        except AttributeError:
+            self.logger.debug("Widget doesnt exist!")
+        else:
+            self.logger.debug("Deleted widget")
+        del self
+
+    def setName(self, newName):
+        """
+        Overridden method to also change folder name
+        """
+        self.displayName = newName
+        self.label.setPlainText(newName)
+        self.model.setName(self.displayName)
+        self.tree.setObjectName("%sTree" % self.displayName)
+        self.logger.debug(os.path.dirname(self.path))
+        # destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
+        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        if os.path.exists(self.path):
+            os.rename(self.path, destPath)
+            self.path = destPath
+            self.logger.debug(self.path)

@@ -9,6 +9,9 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QMenu
 class PortItem(QGraphicsEllipseItem):
     def __init__(self, name, side, parent):
         self.parent = parent
+        
+        self.logger = parent.logger
+        
         self.name = name
         self.side = side
         self.createdAtSide = side
@@ -73,32 +76,32 @@ class PortItem(QGraphicsEllipseItem):
         # TODO : here to merge segments when moving blockitems
         if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
             if not self.savePos is None:
-                print("val is " + str(value))
+                self.logger.debug("val is " + str(value))
                 value.setY(max(value.y(), 0))
                 value.setY(min(value.y(), self.parent.h))
 
                 return QPointF(self.savePos.x(), value.y())
 
         if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 0:
-            print("editor mode = 0")
+            self.logger.debug("editor mode = 0")
             for conn in self.connectionList:
                 conn.positionLabel()
 
                 if conn.fromPort is self:
-                    # print("This port is the starting port of connection")
+                    # self.logger.debug("This port is the starting port of connection")
                     # nextNodeInConn = conn.startNode.nextN()
-                    # print("Type of parent is " + str(type(nextNodeInConn.parent)))
+                    # self.logger.debug("Type of parent is " + str(type(nextNodeInConn.parent)))
 
                     e = conn.segments[0]
                     e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(),
                               e.line().p2().y())
 
                 if conn.toPort is self:
-                    # print("This port is the ending port of connection")
+                    # self.logger.debug("This port is the ending port of connection")
                     # nextNodeInConn = conn.endNode.prevN()
-                    # print("nextnodeinconn is " + str(conn.endNode.prevN()))
-                    # print("nextNode is " + str(nextNodeInConn))
-                    # print("Type of parent is " + str(type(nextNodeInConn.parent)))
+                    # self.logger.debug("nextnodeinconn is " + str(conn.endNode.prevN()))
+                    # self.logger.debug("nextNode is " + str(nextNodeInConn))
+                    # self.logger.debug("Type of parent is " + str(type(nextNodeInConn.parent)))
 
                     # New
                     e = conn.segments[-1]
@@ -117,7 +120,7 @@ class PortItem(QGraphicsEllipseItem):
                 if conn.fromPort is self:
                     if (self.createdAtSide != 1 and self.createdAtSide != 3) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
-                            print("inside here")
+                            self.logger.debug("inside here")
                             cor = conn.getCorners()[0]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
@@ -129,7 +132,7 @@ class PortItem(QGraphicsEllipseItem):
                                 if nextSeg.isHorizontal() and seg.isHorizontal():
                                     if int(seg.endNode.parent.pos().y()-0) <= int(nextSeg.line().p2().y()) <= int(
                                             seg.endNode.parent.pos().y()+0):
-                                        print("both segments are horizontal from fromport")
+                                        self.logger.debug("both segments are horizontal from fromport")
                                         # verSeg.deleteSegment()
                                         self.hideCorners(conn)
                                         verSeg.setVisible(False)
@@ -137,7 +140,7 @@ class PortItem(QGraphicsEllipseItem):
                                         self.showCorners(conn)
                                         verSeg.setVisible(True)
                     else:
-                        print("inside else")
+                        self.logger.debug("inside else")
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[0]
                             cor.setPos(self.scenePos().x(), cor.pos().y())
@@ -159,7 +162,7 @@ class PortItem(QGraphicsEllipseItem):
                                 if nextSeg.isHorizontal() and seg.isHorizontal():
                                     if int(nextSeg.endNode.parent.pos().y() - 0) <= int(seg.line().p2().y()) <= int(
                                             nextSeg.endNode.parent.pos().y() + 0):
-                                        print("both segments are horizontal from toport")
+                                        self.logger.debug("both segments are horizontal from toport")
                                         self.hideCorners(conn)
                                         verSeg.setVisible(False)
                                     else:
@@ -169,7 +172,7 @@ class PortItem(QGraphicsEllipseItem):
                         if len(conn.getCorners()) == 1 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
-                            print("Inside 2nd")
+                            self.logger.debug("Inside 2nd")
 
                             seg = conn.segments[-1]  # last segment
                             seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
@@ -177,14 +180,14 @@ class PortItem(QGraphicsEllipseItem):
                         elif len(conn.getCorners()) == 2 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(self.scenePos().x(), cor.pos().y())
-                            print("Inside 3rd")
+                            self.logger.debug("Inside 3rd")
 
                             seg = conn.segments[-1]  # last segment
                             seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
                                         cor.scenePos().y())
 
                 else:
-                    print("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
+                    self.logger.debug("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
 
         if change == self.ItemScenePositionHasChanged:
             for cb in self.posCallbacks:
@@ -201,9 +204,9 @@ class PortItem(QGraphicsEllipseItem):
             self.scene().parent().startConnection(self)
 
     def hoverEnterEvent(self, event):
-        # print("Hovering")
+        # self.logger.debug("Hovering")
 
-        print(self.parent)
+        self.logger.debug(self.parent)
 
         self.setRect(-4, -4, 10, 10)
         self.innerCircle.setRect(-4, -4, 10, 10)
@@ -218,10 +221,10 @@ class PortItem(QGraphicsEllipseItem):
             # self.innerCircle.setBrush(QColor(0, 0, 0))
             self.innerCircle.setBrush(self.visibleColor)
 
-        self._debugPrint()
+        self._debugprint()
 
     def hoverLeaveEvent(self, event):
-        # print("Leaving hover")
+        # self.logger.debug("Leaving hover")
 
         # self.setRect(-6, -6, 12, 12)
         self.setRect(-4, -4, 7, 7)
@@ -241,7 +244,7 @@ class PortItem(QGraphicsEllipseItem):
 
         self._debugClear()
 
-    def _debugPrint(self):
+    def _debugprint(self):
         self.parent.parent.parent().listV.addItem("This is a PortItem")
         self.parent.parent.parent().listV.addItem("Connections:")
         for c in self.connectionList:
@@ -257,7 +260,7 @@ class PortItem(QGraphicsEllipseItem):
 
     def mouseDoubleClickEvent(self, event):
         pass
-        # print("double clicked")
+        # self.logger.debug("double clicked")
         # if hasattr(self.parent, 'heatExchangers') and not self.isFromHx:
         #     self.deleteDirectPortPair()
 
@@ -268,7 +271,7 @@ class PortItem(QGraphicsEllipseItem):
         # elif self.connectionList[0].toPort is self:
         #     self.deletePort(self.connectionList[0].fromPort)
         # else:
-        #     print("Something wrong")
+        #     self.logger.debug("Something wrong")
         # self.deletePort(self)
 
         if len(self.connectionList) > 0:
@@ -277,11 +280,11 @@ class PortItem(QGraphicsEllipseItem):
             elif self.connectionList[0].toPort is self:
                 self.deletePort(self.connectionList[0].fromPort)
             else:
-                print("Something wrong")
+                self.logger.debug("Something wrong")
         self.deletePort(self)
         #
-        # print("After delete: ")
-        # print(self.connectionList)
+        # self.logger.debug("After delete: ")
+        # self.logger.debug(self.connectionList)
 
     def deletePort(self, obj):
         while len(obj.connectionList) > 0:

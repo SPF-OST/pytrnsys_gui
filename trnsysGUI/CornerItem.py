@@ -28,7 +28,10 @@ class CornerItem(QGraphicsEllipseItem):
         parent
         """
         super(CornerItem, self).__init__(x, y, r1, r2, None)
-        print("init pos is " + str(self.pos()))
+
+        self.logger = parent.logger
+
+        self.logger.debug("init pos is " + str(self.pos()))
         self.parent = parent
         self.setBrush(QBrush(QtCore.Qt.black))
         self.node = Node(self, prevNode, nextNode)
@@ -36,11 +39,11 @@ class CornerItem(QGraphicsEllipseItem):
         self.posCallbacks = []
 
     def itemChange(self, change, value):
-        # print("Change is " + str(change))
+        # self.logger.debug("Change is " + str(change))
         if change == self.ItemScenePositionHasChanged:
-            # print("pos change")
-            # print("self has partial lenght " + str(self.parent.partialLength(self)))
-            # print("Self is at " + str(self.parent.partialLength(self.node) / (self.parent.totalLength())) + "% of the whole connection")
+            # self.logger.debug("pos change")
+            # self.logger.debug("self has partial lenght " + str(self.parent.partialLength(self)))
+            # self.logger.debug("Self is at " + str(self.parent.partialLength(self.node) / (self.parent.totalLength())) + "% of the whole connection")
 
             nNode = self.node.nextN()
             pNode = self.node.prevN()
@@ -50,7 +53,7 @@ class CornerItem(QGraphicsEllipseItem):
             segBefore = self.parent.segments[positionInArr]
             segAfter = self.parent.segments[positionInArr + 1]
 
-            # print("Position in arr is" + str(positionInArr))
+            # self.logger.debug("Position in arr is" + str(positionInArr))
 
             if type(nNode.parent) is CornerItem:
                 segAfter.setLine(self.scenePos().x(), self.scenePos().y(), segAfter.line().p2().x(),
@@ -61,8 +64,8 @@ class CornerItem(QGraphicsEllipseItem):
                                   self.scenePos().y())
 
             if hasattr(nNode.parent, "fromPort"):
-                # print("The moving node (cornerItem) is " + str(self.node))
-                # print("type of nNode is conn")
+                # self.logger.debug("The moving node (cornerItem) is " + str(self.node))
+                # self.logger.debug("type of nNode is conn")
 
                 # We have two options: either nNode is at a port or at a disrupted segment
                 if nNode.nextN() is not None:
@@ -80,7 +83,7 @@ class CornerItem(QGraphicsEllipseItem):
                     #         s2 = x
                     #
                     # if s is None or s2 is None:
-                    #     print("Error, there shouldn't be a empty s or s2")
+                    #     self.logger.debug("Error, there shouldn't be a empty s or s2")
                     #
                     # s.startNode.setNext(s2.endNode)
                     # s2.endNode.setPrev(s.startNode)
@@ -90,20 +93,20 @@ class CornerItem(QGraphicsEllipseItem):
                     # s.parent.parent.diagramScene.addItem(newS)
                     #
                     # if type(s2.endNode.parent) is Connection:
-                    #     print("Line of s is " + str(s.line()))
-                    #     print("Line of s2 is " + str(s2.line()))
+                    #     self.logger.debug("Line of s is " + str(s.line()))
+                    #     self.logger.debug("Line of s2 is " + str(s2.line()))
                     #     newS.setLine(self.scenePos().x(),
                     #                  self.scenePos().y(),
                     #                  s2.line().p2().x(),
                     #                  s2.line().p2().y())
-                    #     print("Set pos node to Connection")
+                    #     self.logger.debug("Set pos node to Connection")
                     #
                     # elif type(s2.endNode.parent) is CornerItem:
                     #     newS.setLine(self.scenePos().x(),
                     #                  self.scenePos().y(),
                     #                  s2.line().p2().x(),
                     #                  s2.line().p2().y())
-                    #     print("Set pos node to node")
+                    #     self.logger.debug("Set pos node to node")
                     #
                     # else:
                     #     pass
@@ -113,7 +116,7 @@ class CornerItem(QGraphicsEllipseItem):
                     # s2.hide()
                     # s.parent.segments.remove(s2)
                     # s.parent.segments.remove(s)
-                    # # print("Length of segments is " + str(len(segments)))
+                    # # self.logger.debug("Length of segments is " + str(len(segments)))
                     #
                     # del s2.endNode
                     # del s.endNode
@@ -126,14 +129,14 @@ class CornerItem(QGraphicsEllipseItem):
                 else:
 
                     if self.node.lastNode() is nNode:
-                        print("nNode is at toPort")
+                        self.logger.debug("nNode is at toPort")
                         t = self.parent.segments[-1]
                         t.setLine(self.scenePos().x(), self.scenePos().y(), nNode.parent.toPort.scenePos().x(),
                                               nNode.parent.toPort.scenePos().y())
 
             if hasattr(pNode.parent, "fromPort"):
-                # print("The moving node (cornerItem) is " + str(self.node))
-                # print("type of pNode is conn")
+                # self.logger.debug("The moving node (cornerItem) is " + str(self.node))
+                # self.logger.debug("type of pNode is conn")
 
                 if pNode.prevN() is not None:
                     # We are at a disrupted segment
@@ -150,7 +153,7 @@ class CornerItem(QGraphicsEllipseItem):
                     #         s = x
                     #
                     # if s is None or s2 is None:
-                    #     print("Error, there shouldn't be a empty s or s2")
+                    #     self.logger.debug("Error, there shouldn't be a empty s or s2")
                     #
                     # s.startNode.setNext(s2.endNode)
                     # s2.endNode.setPrev(s.startNode)
@@ -160,17 +163,17 @@ class CornerItem(QGraphicsEllipseItem):
                     # s.parent.parent.diagramScene.addItem(newS)
                     #
                     # if type(s2.endNode.parent) is Connection:
-                    #     print("Line of s is " + str(s.line()))
-                    #     print("Line of s2 is " + str(s2.line()))
+                    #     self.logger.debug("Line of s is " + str(s.line()))
+                    #     self.logger.debug("Line of s2 is " + str(s2.line()))
                     #     newS.setLine(s.line().p2().x(),
                     #                  s.line().p2().y(), self.scenePos().x(), self.scenePos().y())
                     #
-                    #     print("Set pos node to Connection")
+                    #     self.logger.debug("Set pos node to Connection")
                     #
                     # elif type(s2.endNode.parent) is CornerItem:
                     #     newS.setLine(s.line().p1().x(),
                     #                  s.line().p1().y(), self.scenePos().x(), self.scenePos().y())
-                    #     print("Set pos node to node")
+                    #     self.logger.debug("Set pos node to node")
                     #
                     # else:
                     #     pass
@@ -180,7 +183,7 @@ class CornerItem(QGraphicsEllipseItem):
                     # s2.hide()
                     # s.parent.segments.remove(s2)
                     # s.parent.segments.remove(s)
-                    # # print("Length of segments is " + str(len(segments)))
+                    # # self.logger.debug("Length of segments is " + str(len(segments)))
                     #
                     # del s2.endNode
                     # del s.endNode
@@ -192,7 +195,7 @@ class CornerItem(QGraphicsEllipseItem):
 
                 else:
                     if self.node.firstNode() is pNode:
-                        print("pNode is at fromPort")
+                        self.logger.debug("pNode is at fromPort")
                         f = self.parent.segments[0]
                         f.setLine(pNode.parent.fromPort.scenePos().x(), pNode.parent.fromPort.scenePos().y(),
                                   self.scenePos().x(), self.scenePos().y())

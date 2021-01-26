@@ -1,3 +1,6 @@
+import glob
+import os
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
@@ -10,7 +13,8 @@ class WTap_main(BlockItem):
         super(WTap_main, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
         self.h = 40
-        self.inputs.append(PortItem('i', 0, self))
+        # self.inputs.append(PortItem('i', 0, self))
+        self.outputs.append(PortItem('o', 0, self))
 
         self.exportInitialInput = 0.0
 
@@ -39,16 +43,17 @@ class WTap_main(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(0,delta)
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        # self.inputs[0].setPos(0,delta)
+        # self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+
+        self.outputs[0].setPos(0,delta)
+        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h
 
-
     def exportBlackBox(self):
-        resStr = "T"+ self.displayName + " = 1\n"
-        eqNb = 1
-        return resStr, eqNb
+        equation = ["T" + self.displayName + "=Tcw"]
+        return 'success', equation
 
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"

@@ -9,6 +9,7 @@ from trnsysGUI.PortItem import PortItem
 class TVentil(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(TVentil, self).__init__(trnsysType, parent, **kwargs)
+
         self.h = 40
         self.w = 40
         self.typeNumber = 3
@@ -53,9 +54,22 @@ class TVentil(BlockItem):
         self.label.setPos(lx, h - self.flippedV*(h+h/2))
         self.posLabel.setPos(lx+5, -15)
 
-        self.inputs[0].setPos(0,delta)
-        self.inputs[1].setPos(delta,0)
-        self.outputs[0].setPos(w,delta)
+        if not(self.flippedV) and not(self.flippedH):
+            self.inputs[0].setPos(0,delta)
+            self.inputs[1].setPos(delta,0)
+            self.outputs[0].setPos(w,delta)
+        elif self.flippedV and not(self.flippedH):
+            self.inputs[0].setPos(0,delta)
+            self.inputs[1].setPos(delta,h)
+            self.outputs[0].setPos(w,delta)
+        elif not(self.flippedV) and self.flippedH:
+            self.inputs[0].setPos(w,delta)
+            self.inputs[1].setPos(delta,0)
+            self.outputs[0].setPos(0,delta)
+        elif self.flippedV and self.flippedH:
+            self.inputs[0].setPos(w,delta)
+            self.inputs[1].setPos(delta,h)
+            self.outputs[0].setPos(0,delta)
 
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.inputs[1].side = 1 + 2 * self.flippedV
@@ -82,7 +96,7 @@ class TVentil(BlockItem):
     def decode(self, i, resConnList, resBlockList):
         super(TVentil, self).decode(i, resConnList, resBlockList)
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
-            print("Old version of diagram")
+            self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
@@ -91,7 +105,7 @@ class TVentil(BlockItem):
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         super(TVentil, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
         if "IsTempering" or "PositionForMassFlowSolver" not in i:
-            print("Old version of diagram")
+            self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
@@ -279,3 +293,4 @@ class TVentil(BlockItem):
             return f, unitNumber
         else:
             return "", startingUnit
+
