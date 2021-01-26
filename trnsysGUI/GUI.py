@@ -901,7 +901,7 @@ class DiagramView(QGraphicsView):
         """Here, the dropped icons create BlockItems/GraphicalItems"""
         if event.mimeData().hasFormat('component/name'):
             name = str(event.mimeData().data('component/name'), encoding='utf-8')
-            print("name is " + name)
+            self.logger.debug("name is " + name)
             if name == 'StorageTank':
                 bl = StorageTank(name, self)
                 # c = ConfigStorage(bl, self)
