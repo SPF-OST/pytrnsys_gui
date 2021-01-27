@@ -24,13 +24,14 @@ MfrCondIn = ABS(MfrPiHpCondIn)
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
-EQUATIONS 4
-**THpDesOut = [162,1]     ! 
+EQUATIONS 3
+THpDesOut = [162,3]     ! 
 **THpDesOut = HpDesIsOn*[163,3] + NOT(HpDesIsOn)*THpDesIn     ! Temperature of the condenser (heat sink) outlet
 THpEvapOut = [162,1]     ! 
-THpCondOut = THpCondIn+PauxCond_kW*3600/(MfrCondIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
-THpDesOut = THpDesIn+PauxDes_kW*3600/(MfrDesIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
-HpDesIsOn = 0
+THpCondOut = [162,3]
+**THpCondOut = THpCondIn+PauxCond_kW*3600/(MfrCondIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
+**THpDesOut = THpDesIn+PauxDes_kW*3600/(MfrDesIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
+**HpDesIsOn = 0
 
 ******************************************************************************************
 ** outputs to energy balance in kWh
@@ -215,7 +216,7 @@ PARAMETERS 12
 -10   ! 3 Left axis minimum
 70    ! 4 Left axis maximum
 0     ! 5 Right axis minimum
-100   ! 6 Right axis maximum
+7000   ! 6 Right axis maximum
 nPlotsPerSim ! 7 Number of plots per simulation
 12    ! 8 X-axis gridpoints
 1     ! 9 Shut off Online w/o removing
@@ -223,16 +224,15 @@ nPlotsPerSim ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 20     
-ThpEvapIn Nix THpDesIn THpDesOut HpIsOn HpIsBlock BoAuxWWOn THpCondIn  THpCondOut Nix
-MfrEvapIn MfrDesIn MfrPiHpToTesDHWOut MfrPiHpToTesDHWIn THpCondIn  THpCondOut Nix nix  Nix Nix
+ThpEvapIn THpCondIn THpDesIn THpEvapOut THpCondOut THpDesOut HpIsOn Nix Nix Nix
+MfrEvapIn MfrCondIn MfrDesIn MfrPiHpToTesDHWIn Nix Nix Nix Nix Nix Nix 
 **
-ThpEvapIn Nix THpDesIn THpDesOut HpIsOn HpIsBlock BoAuxWWOn nix  Nix Nix
-MfrEvapIn MfrDesIn MfrPiHpToTesDHWOut MfrPiHpToTesDHWIn    nix  Nix Nix nix  Nix Nix
+ThpEvapIn THpCondIn THpDesIn THpEvapOut THpCondOut THpDesOut HpIsOn Nix Nix Nix
+MfrEvapIn MfrCondIn MfrDesIn MfrPiHpToTesDHWIn Nix Nix Nix Nix Nix Nix 
 LABELS  3     
 Temperatures     
 massFlow_and_Heat_transf     
 HPDHW    
-
 
 *******************************
 **END BW-HeatPump.dck

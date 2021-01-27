@@ -1,0 +1,143 @@
+UNIT	TYPE	Name
+  11	 811	Tempering valve (SPF)
+  12	 811	Tempering valve (SPF)
+  10	 993	Recall
+  13	 888	General Controller (SPF)
+  14	 816	Averaging
+  15	  65	Online plotter (TRNSYS)
+  16	1924	Plug-flow TES (SPF)
+  17	  46	Monthly integrator (TRNSYS)
+  18	  65	Online plotter (TRNSYS)
+  20	  46	Monthly integrator (TRNSYS)
+  22	  25	User defined printer (TRNSYS)
+  26	 951	EWS with integrated g-functions (SPF)
+  28	  46	Monthly integrator (TRNSYS)
+  25	  46	Monthly integrator (TRNSYS)
+  27	  65	Online plotter (TRNSYS)
+  32	 977	Parameter fit heat pump (SPF)
+  33	 817	Time delay
+  31	  65	Online plotter (TRNSYS)
+  34	  91	Unknown
+  36	 652	Unknown
+  37	 652	Unknown
+  35	 993	Recall
+  38	 935	Flow solver (SPF)
+  39	 929	TeePiece (SPF)
+  40	 929	TeePiece (SPF)
+  41	 929	TeePiece (SPF)
+  42	 929	TeePiece (SPF)
+  43	 929	TeePiece (SPF)
+  44	 929	TeePiece (SPF)
+  45	 929	TeePiece (SPF)
+  46	 929	TeePiece (SPF)
+  47	 929	TeePiece (SPF)
+  48	 929	TeePiece (SPF)
+  49	 929	TeePiece (SPF)
+  50	 929	TeePiece (SPF)
+  51	 929	TeePiece (SPF)
+  52	 931	Type 931 CHECK (SPF)
+  53	 929	TeePiece (SPF)
+  54	 931	Type 931 CHECK (SPF)
+  55	 931	Type 931 CHECK (SPF)
+  56	 931	Type 931 CHECK (SPF)
+  57	 931	Type 931 CHECK (SPF)
+  58	 931	Type 931 CHECK (SPF)
+  59	 929	TeePiece (SPF)
+  60	 931	Type 931 CHECK (SPF)
+  61	 931	Type 931 CHECK (SPF)
+  62	 929	TeePiece (SPF)
+  63	 931	Type 931 CHECK (SPF)
+  64	 929	TeePiece (SPF)
+  65	 931	Type 931 CHECK (SPF)
+  66	 931	Type 931 CHECK (SPF)
+  67	 929	TeePiece (SPF)
+  68	 931	Type 931 CHECK (SPF)
+  69	 931	Type 931 CHECK (SPF)
+  70	 931	Type 931 CHECK (SPF)
+  71	 931	Type 931 CHECK (SPF)
+  72	 931	Type 931 CHECK (SPF)
+  73	 931	Type 931 CHECK (SPF)
+  74	 931	Type 931 CHECK (SPF)
+  75	 931	Type 931 CHECK (SPF)
+  76	 931	Type 931 CHECK (SPF)
+  77	 931	Type 931 CHECK (SPF)
+  78	 931	Type 931 CHECK (SPF)
+  79	 931	Type 931 CHECK (SPF)
+  80	 931	Type 931 CHECK (SPF)
+  81	 931	Type 931 CHECK (SPF)
+  82	 931	Type 931 CHECK (SPF)
+  83	 931	Type 931 CHECK (SPF)
+  84	 931	Type 931 CHECK (SPF)
+  85	 931	Type 931 CHECK (SPF)
+  86	 931	Type 931 CHECK (SPF)
+  87	 931	Type 931 CHECK (SPF)
+  88	 931	Type 931 CHECK (SPF)
+  89	 931	Type 931 CHECK (SPF)
+  90	 931	Type 931 CHECK (SPF)
+  91	 931	Type 931 CHECK (SPF)
+  92	 931	Type 931 CHECK (SPF)
+  93	 931	Type 931 CHECK (SPF)
+  94	 931	Type 931 CHECK (SPF)
+  95	 931	Type 931 CHECK (SPF)
+  96	 931	Type 931 CHECK (SPF)
+  97	 931	Type 931 CHECK (SPF)
+  98	 931	Type 931 CHECK (SPF)
+  99	 931	Type 931 CHECK (SPF)
+ 100	 931	Type 931 CHECK (SPF)
+ 101	 931	Type 931 CHECK (SPF)
+ 102	 931	Type 931 CHECK (SPF)
+ 103	 931	Type 931 CHECK (SPF)
+ 104	 931	Type 931 CHECK (SPF)
+ 105	  25	User defined printer (TRNSYS)
+ 106	  25	User defined printer (TRNSYS)
+ 107	 320	PID controller
+ 109	 320	PID controller
+ 108	1792	Radiant floor (SPF)
+ 111	  46	Monthly integrator (TRNSYS)
+ 112	  46	Monthly integrator (TRNSYS)
+ 110	  65	Online plotter (TRNSYS)
+ 115	1925	Plug-flow TES (SPF)
+ 116	  46	Monthly integrator (TRNSYS)
+ 117	  65	Online plotter (TRNSYS)
+ 119	   9	Data reader (TRNSYS)
+ 121	  46	Monthly integrator (TRNSYS)
+ 122	  46	Monthly integrator (TRNSYS)
+ 120	  65	Online plotter (TRNSYS)
+ 126	   9	Data reader (TRNSYS)
+ 131	   9	Data reader (TRNSYS)
+ 133	 816	Averaging
+ 134	   2	Collector controller (TRNSYS)
+ 137	   2	Collector controller (TRNSYS)
+ 135	   2	Collector controller (TRNSYS)
+ 136	   2	Collector controller (TRNSYS)
+ 138	   2	Collector controller (TRNSYS)
+ 139	5998	Building ISO (SPF)
+ 140	 993	Recall
+ 141	  46	Monthly integrator (TRNSYS)
+ 142	  46	Monthly integrator (TRNSYS)
+ 146	 109	Weather data processor (TRNSYS)
+ 147	  33	Psychrometrics
+ 145	  69	Sky temperature
+ 148	  46	Monthly integrator (TRNSYS)
+unitPrinter_Tes1	 19	temp\TES1_MO.Prt
+unitPrinterEl	 21	temp\ELECTRIC_MO.Prt
+unitPrinterQvsT	 23	temp\QVsT.Plt
+unitGhxGfunc	 24	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\TRIHP_dualSource\ddck\Ghx\g_functions\2x2_5m.txt"
+unitPrinterGhx	 29	temp\GHX_MO.Prt
+unitPrinterGhxHr	 30	temp\GHX_HR.Prt
+517	None	TRIHP_dualSource_Mfr.prt
+518	None	TRIHP_dualSource_T.prt
+unitPrinterHeat	 113	temp\HEATING_DISTR_MO.Prt
+unitPrinterHeatHr	 114	temp\HEATING_DISTR_HR.hr
+unitPrinter_Tes2	 118	temp\TES2_MO.Prt
+unitReadDhw	 123	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\TRIHP_dualSource\ddck\tapWater\DhwForMFH6appartments_2min_tset55.dat"
+unitPrinterDHW	 124	temp\DHW_MO.Prt
+unitHourlyDHW	 125	temp\DHW_HR.Prt
+unitReadEl_3	 127	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\TRIHP_dualSource\ddck\tapWater\20191107_MFH_30_electricity_profile_2min.txt"
+unitWeatherData	 128	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99"
+unitWeatherData2	 129	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99"
+unitWeatherData3	 130	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99"
+unitReadIntGain	 132	"C:\Daten\GIT\pytrnsys_gui\trnsysGUI\examples\TRIHP_dualSource\ddck\weather\int_gains_mfb_2019.txt"
+unitPrinterBui	 143	temp\BUILDING_MO.Prt
+unitPrintHouVar	 144	temp\Building_HR.hr
+unitPrinterWeather	 149	temp\WEATHER_BASE_MO.Prt
