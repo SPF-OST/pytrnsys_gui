@@ -38,8 +38,8 @@ xFracDivSHCool = CoolingOnRc
 xFracDivDhw = NOT(BoDHWTapping)
 xFracDivDhwOut = NOT(BoDHWTapping)
 xFracDivCool = NOT(CoolingOnRc)
-xFracDivHp = 1
-xFracDivTesDhwOut = 1
+xFracDivHp = 0
+xFracDivTesDhwOut = BoAuxSHon
 
 EQUATIONS 4
 TdhwSet = TdhwSetProfile		! Tset DHW storage
