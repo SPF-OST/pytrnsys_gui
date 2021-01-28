@@ -1779,7 +1779,7 @@ class DiagramEditor(QWidget):
         # fullExportText += tes.read()
         # tes.close()
         if exportTo == 'mfs':
-            fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
+        #     fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
             fullExportText += "ENDS"
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
