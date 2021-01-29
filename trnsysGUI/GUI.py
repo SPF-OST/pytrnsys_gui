@@ -1779,7 +1779,7 @@ class DiagramEditor(QWidget):
         # fullExportText += tes.read()
         # tes.close()
         if exportTo == 'mfs':
-        #     fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
+            fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
             fullExportText += "ENDS"
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
@@ -3974,7 +3974,7 @@ class MainWindow(QMainWindow):
                 msgb.setText("TRNExe.exe not found!")
                 msgb.exec()
                 return 0, 0
-            self.logger.info("trnsyspath:", self.centralWidget.trnsysPath)
+            self.logger.info("trnsyspath: " + self.centralWidget.trnsysPath)
             cmd = self.centralWidget.trnsysPath + ' ' + str(exportPath) + r' /H'
             os.system(cmd)
             mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1]  + '_Mfr.prt')
@@ -4204,7 +4204,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     # sys.stdout = open('errorLog', 'w')
-    logger = log.setup_custom_logger('root', 'INFO')
+    logger = log.setup_custom_logger('root', 'DEBUG')
     cssSs_ = cssSs.read()
     app = QApplication(sys.argv)
     app.setApplicationName("Diagram Creator")

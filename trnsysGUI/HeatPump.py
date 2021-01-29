@@ -148,6 +148,8 @@ class HeatPump(BlockItem):
         files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
         if not(files):
             status = 'noDdckFile'
+            for i in range(0,2):
+                equation.append("T" + self.displayName + "X" + str(i) + "=1")
         else:
             status = 'noDdckEntry'
         lines = []

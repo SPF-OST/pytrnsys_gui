@@ -13,7 +13,8 @@
 *** Control modes
 EQUATIONS 7
 BoAuxWWon = HpForDHWIsNeeded ! Boolean value - DHW charging is needed
-BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon) ! Boolean value - SH charging is needed
+**BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon) ! Boolean value - SH charging is needed
+BoAuxSHon = NOT(BoAuxWWon)
 CoolingOn = CoolingNeeded*NOT(BoAuxWWon) ! Cooling mode on
 HpIsOn = OR(BoAuxWWonRc,BoAuxSHonRc) ! HP is on
 qAuxStoreDHW_KW = 0 ! No internal heat source dhw storage

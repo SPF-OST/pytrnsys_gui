@@ -95,7 +95,7 @@ class Export(object):
 
         for t in self.trnsysObj:
             status, equations = t.exportBlackBox()
-            if status == 'success':
+            if status == 'success' or exportTo == 'mfs':
                 for equation in equations:
                     f += equation + "\n"
                 equationNr += len(equations)

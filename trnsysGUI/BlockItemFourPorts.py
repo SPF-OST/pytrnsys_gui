@@ -111,7 +111,7 @@ class BlockItemFourPorts(BlockItem):
         equations = ["T" + self.displayName + "X0" + "=1"]
         equations.append("T" + self.displayName + "X1" + "=1")
         status = 'success'
-        return status,equations
+        return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20

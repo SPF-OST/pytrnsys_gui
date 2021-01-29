@@ -16,6 +16,7 @@ class HeatExchanger(QGraphicsItemGroup):
     def __init__(self, side, sizeW, sizeH, offset, parent, name='Untitled', **kwargs):
         super(HeatExchanger, self).__init__(parent)
         self.parent = parent
+        self.logger = parent.logger
         self.offset = offset  # QPointF
         self.lines = []
         self.w = sizeW
@@ -48,7 +49,7 @@ class HeatExchanger(QGraphicsItemGroup):
             self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
 
         if kwargs == {} or 'tempHx' in kwargs:
-            print("Creating new HeatExchanger")
+            self.logger.debug("Creating new HeatExchanger")
             if kwargs == {}:
                 self.displayName = name + str(self.id)
             elif 'tempHx' in kwargs:
@@ -57,7 +58,7 @@ class HeatExchanger(QGraphicsItemGroup):
             self.loadedConnTrId = None  # Should not be used
         else:
             if "loadedHx" in kwargs:
-                print("Loading existing HeatExchanger")
+                self.logger.debug("Loading existing HeatExchanger")
                 self.displayName = name
                 self.loadedConnTrId = kwargs["connTrnsysID"]
 
@@ -92,9 +93,9 @@ class HeatExchanger(QGraphicsItemGroup):
         self.drawHx(6, 0.4)
 
     def initLoad(self):
-        print("Finishing up HeatExchanger loading")
-        print("self port1 is " + str(self.port1))
-        print("self port2  is " + str(self.port2))
+        self.logger.debug("Finishing up HeatExchanger loading")
+        self.logger.debug("self port1 is " + str(self.port1))
+        self.logger.debug("self port2  is " + str(self.port2))
 
         self.conn = Connection(self.port1, self.port2, True, self.parent.parent.parent())
         self.conn.displayName = self.displayName
@@ -119,10 +120,10 @@ class HeatExchanger(QGraphicsItemGroup):
         self.parent = p
 
         if p.name is "StorageTank":
-            print("p is a StorageTank")
+            self.logger.debug("p is a StorageTank")
             self.setParentItem(p)
         else:
-            print("A non-Storage-Tank block is trying to set parent of heatExchanger")
+            self.logger.debug("A non-Storage-Tank block is trying to set parent of heatExchanger")
 
     def drawHx(self, param, factor):
         if self.sSide == 0:
@@ -164,7 +165,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
             times = self.h / HeatExchanger.partH
             param = times / 2
-            print("Times is " + str(times))
+            self.logger.debug("Times is " + str(times))
 
             for i in range(int(times)):
                 # line = QGraphicsLineItem(s.x() + self.w - factor * (sw % 2) * self.w, s.y() + i * self.h / param,
@@ -224,7 +225,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
             times = self.h / HeatExchanger.partH
             param = times / 2
-            print("Times is " + str(times))
+            self.logger.debug("Times is " + str(times))
 
             for i in range(int(times)):
                 # line = QGraphicsLineItem(s.x() + self.w - factor * (sw % 2) * self.w, s.y() + i * self.h / param,
@@ -310,7 +311,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def mousePressEvent(self, event):
         self.highlightHx()
-        print("pressed")
+        self.logger.debug("pressed")
         # super(HeatExchanger, self).keyPressEvent(event)
 
     def modifyPosition(self,newHeights):
