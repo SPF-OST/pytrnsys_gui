@@ -3482,22 +3482,27 @@ class MainWindow(QMainWindow):
     def loadDialogue(self):
         self.projectFolder, projectFile = os.path.split(QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0].replace('/', '\\'))
 
-        properProjectCheck1 = os.path.split(self.projectFolder)[-1] == projectFile.replace('.json', '')
-        properProjectCheck2 = 'ddck' in os.listdir(self.projectFolder)
-        if properProjectCheck1 and properProjectCheck2:
-            self.loadValue = 'load'
-        else:
-            projectMB = QMessageBox(self)
-            projectMB.setText("The json you are opening does not have a proper project folder environment. Do you want to continue and create one?")
-            projectMB.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-            projectMB.setDefaultButton(QMessageBox.Cancel)
-            projectRet = projectMB.exec()
-
-            if projectRet == QMessageBox.Cancel:
-                self.loadValue = 'cancel'
+        if projectFile != '':
+            properProjectCheck1 = os.path.split(self.projectFolder)[-1] == projectFile.replace('.json', '')
+            properProjectCheck2 = 'ddck' in os.listdir(self.projectFolder)
+            if properProjectCheck1 and properProjectCheck2:
+                self.loadValue = 'load'
             else:
-                self.loadValue = 'json'
-                self.jsonPath = os.path.join(self.projectFolder, projectFile)
+                projectMB = QMessageBox(self)
+                projectMB.setText("The json you are opening does not have a proper project folder environment. Do you want to continue and create one?")
+                projectMB.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+                projectMB.setDefaultButton(QMessageBox.Cancel)
+                projectRet = projectMB.exec()
+
+                if projectRet == QMessageBox.Cancel:
+                    self.loadValue = 'cancel'
+                else:
+                    self.loadValue = 'json'
+                    self.jsonPath = os.path.join(self.projectFolder, projectFile)
+            return False
+        else:
+            self.logger.info('Aborted opening another project')
+            return True
 
     def newDia(self):
         qmb = QMessageBox()
@@ -3831,7 +3836,9 @@ class MainWindow(QMainWindow):
         ret = qmb.exec()
 
         if ret == QMessageBox.Yes:
-            self.loadDialogue()
+            loadingAborted = self.loadDialogue()
+            if loadingAborted:
+                return
             self.centralWidget.idGen.reset()
             self.centralWidget.delBlocks()
 
