@@ -757,7 +757,6 @@ class BlockItem(QGraphicsPixmapItem):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not(files):
                 status = 'noDdckFile'
-                equation.append("T" + self.displayName + "=1")
             else:
                 status = 'noDdckEntry'
             lines = []
@@ -775,6 +774,10 @@ class BlockItem(QGraphicsPixmapItem):
                     break
         else:
             status = 'noBlackBoxOutput'
+
+        if status == 'noDdckFile' or status == 'noDdckEntry':
+            equation.append("T" + self.displayName + "=1")
+
         return status, equation
 
     def exportPumpOutlets(self):

@@ -1,3 +1,6 @@
+import glob
+import os
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QTransform
 
@@ -108,9 +111,33 @@ class BlockItemFourPorts(BlockItem):
         resBlockList.append(self)
 
     def exportBlackBox(self):
-        equations = ["T" + self.displayName + "X0" + "=1"]
-        equations.append("T" + self.displayName + "X1" + "=1")
-        status = 'success'
+        equations = []
+        files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
+        if not(files):
+            status = 'noDdckFile'
+        else:
+            status = 'noDdckEntry'
+        lines = []
+        for file in files:
+            infile = open(file, 'r')
+            lines += infile.readlines()
+        for i in range(len(lines)):
+            if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
+                counter = 0
+                for j in range(i, len(lines) - i):
+                    if lines[j][0] == "T":
+                        outputT = lines[j].split("=")[0].replace(" ", "")
+                        equations.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
+                        counter += 1
+                    if counter == 2:
+                        status = 'success'
+                        break
+                break
+
+        if status == 'noDdckFile' or status == 'noDdckEntry':
+            equations.append("T" + self.displayName + "X0" + "=1")
+            equations.append("T" + self.displayName + "X1" + "=1")
+
         return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
