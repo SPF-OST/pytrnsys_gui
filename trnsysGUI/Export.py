@@ -95,23 +95,26 @@ class Export(object):
 
         for t in self.trnsysObj:
             status, equations = t.exportBlackBox()
-            if status == 'success' or exportTo == 'mfs':
-                for equation in equations:
-                    f += equation + "\n"
-                equationNr += len(equations)
-            elif exportTo == 'ddck' and (status == 'noDdckFile' or status == 'noDdckEntry'):
-                problemEncountered = True
-                if status == 'noDdckFile':
-                    messageText = 'No ddck-file was found in the folder of ' + t.displayName + '.'
-                elif status == 'noDdckEntry':
-                    messageText = 'No output temperature entry was found in the ddck-file(s) of ' + t.displayName + '.'
-                messageText = messageText + ' This issue needs to be addressed before a file can be exported.'
-                qmb = QMessageBox()
-                qmb.setText(messageText)
-                qmb.setStandardButtons(QMessageBox.Ok)
-                qmb.setDefaultButton(QMessageBox.Ok)
-                qmb.exec()
-                break
+            # if status == 'success' or exportTo == 'mfs':
+            #     for equation in equations:
+            #         f += equation + "\n"
+            #     equationNr += len(equations)
+            # elif exportTo == 'ddck' and (status == 'noDdckFile' or status == 'noDdckEntry'):
+            #     problemEncountered = True
+            #     if status == 'noDdckFile':
+            #         messageText = 'No ddck-file was found in the folder of ' + t.displayName + '.'
+            #     elif status == 'noDdckEntry':
+            #         messageText = 'No output temperature entry was found in the ddck-file(s) of ' + t.displayName + '.'
+            #     messageText = messageText + ' This issue needs to be addressed before a file can be exported.'
+            #     qmb = QMessageBox()
+            #     qmb.setText(messageText)
+            #     qmb.setStandardButtons(QMessageBox.Ok)
+            #     qmb.setDefaultButton(QMessageBox.Ok)
+            #     qmb.exec()
+            #     break
+            for equation in equations:
+                f += equation + "\n"
+            equationNr += len(equations)
 
         if exportTo == 'mfs':
             lines = f.split("\n")

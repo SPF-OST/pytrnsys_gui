@@ -1684,7 +1684,7 @@ class DiagramEditor(QWidget):
                 }
         df = pd.DataFrame(table, columns=['Name','in 1','in 2','out 1','out 2'])
 
-    def exportData(self,exportTo='hydraulics'):
+    def exportData(self,exportTo='ddck'):
         self.logger.info("------------------------> START OF EXPORT <------------------------")
 
         self.setUpStorageInnerConns()
@@ -1713,7 +1713,7 @@ class DiagramEditor(QWidget):
                     self.logger.info("Canceling")
                     return
 
-        elif exportTo == 'hydraulics':
+        elif exportTo == 'ddck':
             hydraulicsPath = os.path.join(ddckFolder,"hydraulic\\hydraulic.ddck")
             if Path(hydraulicsPath).exists():
                 qmb = QMessageBox(self)
@@ -1742,7 +1742,7 @@ class DiagramEditor(QWidget):
                 else:
                     fullExportText += line
             header.close()
-        elif exportTo == "hydraulics":
+        elif exportTo == "ddck":
             fullExportText += "*************************************\n"
             fullExportText += "**BEGIN hydraulic.ddck\n"
             fullExportText += "*************************************\n"
@@ -1789,7 +1789,7 @@ class DiagramEditor(QWidget):
             f.truncate(0)
             f.write(fullExportText)
             f.close()
-        elif exportTo == 'hydraulics':
+        elif exportTo == 'ddck':
             if fullExportText[:1] == "\n":
                 fullExportText = fullExportText[1:]
             f = open(str(hydraulicsPath), 'w')
@@ -1802,7 +1802,7 @@ class DiagramEditor(QWidget):
 
         if exportTo == 'mfs':
             return exportPath
-        elif exportTo == 'hydraulics':
+        elif exportTo == 'ddck':
             return hydraulicsPath
 
     def exportHydraulicControl(self):
@@ -3912,7 +3912,7 @@ class MainWindow(QMainWindow):
         statusQuo = self.labelVisState
         if not statusQuo:
             self.toggleConnLabels()
-        self.centralWidget.exportData(exportTo='hydraulics')
+        self.centralWidget.exportData(exportTo='ddck')
         if not statusQuo:
             self.toggleConnLabels()
 
