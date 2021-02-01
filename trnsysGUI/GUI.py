@@ -1792,6 +1792,9 @@ class DiagramEditor(QWidget):
         elif exportTo == 'ddck':
             if fullExportText[:1] == "\n":
                 fullExportText = fullExportText[1:]
+            hydraulicFolder = os.path.split(hydraulicsPath)[0]
+            if not (os.path.isdir(hydraulicFolder)):
+                os.makedirs(hydraulicFolder)
             f = open(str(hydraulicsPath), 'w')
             f.truncate(0)
             f.write(fullExportText)
@@ -1850,6 +1853,9 @@ class DiagramEditor(QWidget):
 
         if fullExportText[:1] == "\n":
             fullExportText = fullExportText[1:]
+        controlFolder = os.path.split(hydCtrlPath)[0]
+        if not(os.path.isdir(controlFolder)):
+            os.makedirs(controlFolder)
         f = open(str(hydCtrlPath), 'w')
         f.truncate(0)
         f.write(fullExportText)
