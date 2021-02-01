@@ -1322,8 +1322,6 @@ class DiagramEditor(QWidget):
         self.alignXLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignXLineItem)
 
-        test = os.path.join(self.projectFolder,self.diagramName)
-
         if parent.loadValue == 'load' or parent.loadValue == 'copy':
             self.decodeDiagram(os.path.join(self.projectFolder,self.diagramName),loadValue=parent.loadValue)
         elif parent.loadValue == 'json':
@@ -2062,7 +2060,7 @@ class DiagramEditor(QWidget):
                         self.logger.debug("Found the name dict while loading")
                         if loadValue == 'load':
                             self.diagramName = k["DiagramName"]
-                            self.projectFolder = k["ProjectFolder"]
+                            # self.projectFolder = k["ProjectFolder"]
 
         blockFolderNames.append('generic')
         blockFolderNames.append('hydraulic')
@@ -2098,7 +2096,6 @@ class DiagramEditor(QWidget):
             self.logger.debug("Tr obj is" + str(t) + " " + str(t.trnsysId))
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " +str(t.isTempering))
-        # tempList = []
 
     def exportSvg(self):
         """
