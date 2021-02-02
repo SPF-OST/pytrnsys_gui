@@ -45,11 +45,14 @@ class AirSourceHP(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        # Update port positions:
-        self.outputs[0].setPos(w,h-delta)
-        self.inputs[0].setPos(w,delta)
-        # self.inputs[0].side = 2 - 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
+        self.origInputsPos = [[w,delta]]
+        self.origOutputsPos = [[w,h-delta]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 

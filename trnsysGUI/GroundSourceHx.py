@@ -47,9 +47,14 @@ class GroundSourceHx(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        # Update port positions:
-        self.outputs[0].setPos(delta,0)
-        self.inputs[0].setPos(w-delta,0)
+        self.origInputsPos = [[w-delta,0]]
+        self.origOutputsPos = [[delta,0]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         # self.inputs[0].side = 1 + 2 * self.flippedV
         # self.outputs[0].side = 1 + 2 * self.flippedV
         self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4

@@ -54,22 +54,31 @@ class TVentil(BlockItem):
         self.label.setPos(lx, h - self.flippedV*(h+h/2))
         self.posLabel.setPos(lx+5, -15)
 
-        if not(self.flippedV) and not(self.flippedH):
-            self.inputs[0].setPos(0,delta)
-            self.inputs[1].setPos(delta,0)
-            self.outputs[0].setPos(w,delta)
-        elif self.flippedV and not(self.flippedH):
-            self.inputs[0].setPos(0,delta)
-            self.inputs[1].setPos(delta,h)
-            self.outputs[0].setPos(w,delta)
-        elif not(self.flippedV) and self.flippedH:
-            self.inputs[0].setPos(w,delta)
-            self.inputs[1].setPos(delta,0)
-            self.outputs[0].setPos(0,delta)
-        elif self.flippedV and self.flippedH:
-            self.inputs[0].setPos(w,delta)
-            self.inputs[1].setPos(delta,h)
-            self.outputs[0].setPos(0,delta)
+        self.origInputsPos = [[0,delta], [delta, 0]]
+        self.origOutputsPos = [[w, delta]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
+        # if not(self.flippedV) and not(self.flippedH):
+        #     self.inputs[0].setPos(0,delta)
+        #     self.inputs[1].setPos(delta,0)
+        #     self.outputs[0].setPos(w,delta)
+        # elif self.flippedV and not(self.flippedH):
+        #     self.inputs[0].setPos(0,delta)
+        #     self.inputs[1].setPos(delta,h)
+        #     self.outputs[0].setPos(w,delta)
+        # elif not(self.flippedV) and self.flippedH:
+        #     self.inputs[0].setPos(w,delta)
+        #     self.inputs[1].setPos(delta,0)
+        #     self.outputs[0].setPos(0,delta)
+        # elif self.flippedV and self.flippedH:
+        #     self.inputs[0].setPos(w,delta)
+        #     self.inputs[1].setPos(delta,h)
+        #     self.outputs[0].setPos(0,delta)
 
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.inputs[1].side = 1 + 2 * self.flippedV

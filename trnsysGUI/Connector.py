@@ -39,8 +39,14 @@ class Connector(BlockItem):
         self.label.setPos(lx, h)
 
         deltaH = self.h / 8
-        self.inputs[0].setPos(0,delta)
-        self.outputs[0].setPos(w,delta)
+
+        self.origInputsPos = [[0,delta]]
+        self.origOutputsPos = [[w, delta]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
 
         # self.inputs[0].side = 0 + 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH

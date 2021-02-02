@@ -57,22 +57,22 @@ class HPDoubleDual(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(0,h-2*delta)
-        self.inputs[1].setPos(w,delta)
-        self.inputs[2].setPos(w,h-2*delta)
-        # self.inputs[0].side = 0 + 2 * self.flippedH
-        # self.inputs[1].side = 2 - 2 * self.flippedH
-        # self.inputs[2].side = 2 - 2 * self.flippedH  0.4 * h - 0.4 * h * self.flippedV + 0.6 * h * self.flippedV
+        self.origInputsPos = [[0,h-2*delta], [w,delta],[w,h-2*delta]]
+        self.origOutputsPos = [[0,h-delta],[w,2*delta],[w,h-delta]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
+        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
+        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.inputs[2].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
-        self.outputs[0].setPos(0,h-delta)
-        self.outputs[1].setPos(w,2*delta)
-        self.outputs[2].setPos(w,h-delta)
-        # self.outputs[0].side = 0 + 2 * self.flippedH
-        # self.outputs[1].side = 2 - 2 * self.flippedH
-        # self.outputs[2].side = 2 - 2 * self.flippedH
         self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.outputs[2].side = (self.rotationN + 2 - 2 * self.flippedH) % 4

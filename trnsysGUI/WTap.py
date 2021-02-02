@@ -46,16 +46,20 @@ class WTap(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(0,delta)
-        # self.inputs[0].side = 0 + 2 * self.flippedH
+        self.origInputsPos = [[0, delta]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h
 
-    def exportPumpOutlets(self):
-        resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
-        equationNr = 1
-        return resStr, equationNr
+    # def exportPumpOutlets(self):
+    #     resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
+    #     equationNr = 1
+    #     return resStr, equationNr
 
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20

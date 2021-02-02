@@ -45,17 +45,14 @@ class IceStorage(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        # If inputs should be on top side:
-        # self.inputs[0].setPos(1 / 3 * w + 1 / 3 * w * self.flippedH, h * self.flippedV)
-        # self.outputs[0].setPos(2 / 3 * w - 1 / 3 * w * self.flippedH, h * self.flippedV)
-        # self.inputs[0].side = 1 + 2 * self.flippedV
-        # self.outputs[0].side = 1 + 2 * self.flippedV
+        self.origInputsPos = [[w,delta]]
+        self.origOutputsPos = [[w,h-delta]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
-        # If inputs are on the (right per default) side
-        self.outputs[0].setPos(w,h-delta)
-        self.inputs[0].setPos(w,delta)
-        # self.inputs[0].side = 2 - 2 * self.flippedH
-        # self.outputs[0].side = 1 - 1 * self.flippedH
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h

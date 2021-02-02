@@ -291,7 +291,22 @@ class BlockItem(QGraphicsPixmapItem):
             self.flippedHInt = -1
         else:
             self.flippedHInt = 1
-        self.changeSize()
+
+        if self.flippedH:
+            for i in range(0,len(self.inputs)):
+                distanceToMirrorAxis = self.w/2. - self.origInputsPos[i][0]
+                self.inputs[i].setPos(self.origInputsPos[i][0]+2.*distanceToMirrorAxis, self.inputs[i].pos().y())
+
+            for i in range(0, len(self.outputs)):
+                distanceToMirrorAxis = self.w/2. - self.origOutputsPos[i][0]
+                self.outputs[i].setPos(self.origOutputsPos[i][0]+2.*distanceToMirrorAxis, self.outputs[i].pos().y())
+
+        else:
+            for i in range(0, len(self.inputs)):
+                self.inputs[i].setPos(self.origInputsPos[i][0], self.inputs[i].pos().y())
+
+            for i in range(0, len(self.outputs)):
+                self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
 
     def updateFlipStateV(self, state):
         self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
@@ -301,7 +316,26 @@ class BlockItem(QGraphicsPixmapItem):
             self.flippedVInt = -1
         else:
             self.flippedVInt = 1
-        self.changeSize()
+
+        if self.flippedV:
+            for i in range(0,len(self.inputs)):
+                test1 = self.h/2.
+                test2 = self.origInputsPos[i][1]
+                distanceToMirrorAxis = self.h/2. - self.origInputsPos[i][1]
+                self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1]+2.*distanceToMirrorAxis)
+
+            for i in range(0, len(self.outputs)):
+                test1 = self.h/2.
+                test2 = self.origOutputsPos[i][1]
+                distanceToMirrorAxis = self.h/2. - self.origOutputsPos[i][1]
+                self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1]+2.*distanceToMirrorAxis)
+
+        else:
+            for i in range(0, len(self.inputs)):
+                self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1])
+
+            for i in range(0, len(self.outputs)):
+                self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1])
 
     def updateSide(self, port, n):
         port.side = (port.side + n) % 4

@@ -8,6 +8,7 @@ class BlockDlg(QDialog):
     def __init__(self, block, parent=None):
         super(BlockDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
+        self.logger = parent.logger
         self.block = block
         self.le = QLineEdit(self.block.label.toPlainText())
         self.setWindowIcon(QIcon(block.pixmap))
@@ -57,7 +58,7 @@ class BlockDlg(QDialog):
         self.show()
 
     def acceptedEdit(self):
-        print("Changing displayName")
+        self.logger.debug("Changing displayName")
         newName = self.le.text()
         if newName.lower() == str(self.block.displayName).lower():
             self.close()
@@ -92,7 +93,7 @@ class BlockDlg(QDialog):
 
     # unused
     def loadFile(self):
-        print("Opening diagram")
+        self.logger.debug("Opening diagram")
         # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.ddck")[0]
         if fileName != '':
@@ -102,7 +103,7 @@ class BlockDlg(QDialog):
                 self.block.propertyFile.clear()
                 self.block.propertyFile.append(fileName)
         else:
-            print("No filename chosen")
+            self.logger.debug("No filename chosen")
         pass
 
     def disableLoad(self):

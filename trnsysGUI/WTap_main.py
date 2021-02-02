@@ -43,10 +43,12 @@ class WTap_main(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        # self.inputs[0].setPos(0,delta)
-        # self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.origOutputsPos = [[0,delta]]
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
-        self.outputs[0].setPos(0,delta)
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
 
         return w, h
@@ -98,3 +100,5 @@ class WTap_main(BlockItem):
         temp1 = "Mfr" + self.displayName
         self.exportInputName = " " + temp1 + " "
         return self.exportInputName, 1
+
+

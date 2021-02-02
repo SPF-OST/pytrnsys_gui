@@ -36,13 +36,19 @@ class PitStorage(BlockItemFourPorts):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.inputs[0].setPos(5*delta,0)
-        self.inputs[1].setPos(w-3*delta,0)
+        self.origInputsPos = [[5*delta,0], [w-3*delta,0]]
+        self.origOutputsPos = [[3*delta,0], [w-5*delta,0]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         self.inputs[0].side = (self.rotationN +2 * self.flippedH) % 4
         self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
-        self.outputs[0].setPos(3*delta,0)
-        self.outputs[1].setPos(w-5*delta,0)
         self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 

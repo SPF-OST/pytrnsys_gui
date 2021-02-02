@@ -46,9 +46,21 @@ class Pump(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
+        self.origInputsPos = [[0,delta]]
+        self.origOutputsPos = [[w, delta]]
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+
+        self.updateFlipStateH(self.flippedH)
+        self.updateFlipStateV(self.flippedV)
+
         # Update port positions:
-        self.inputs[0].setPos(0,delta)
-        self.outputs[0].setPos(w,delta)
+        # if self.flippedH:
+        #     self.inputs[0].setPos(w, delta)
+        #     self.outputs[0].setPos(0, delta)
+        # else:
+        #     self.inputs[0].setPos(0, delta)
+        #     self.outputs[0].setPos(w, delta)
         # self.outputs[0].setPos(w - self.flippedH * w - 2 * delta * self.flippedH + 2 * delta, h / 2)
         # self.inputs[0].side = 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
@@ -60,7 +72,7 @@ class Pump(BlockItem):
         return 'noBlackBoxOutput', []
 
     def exportPumpOutlets(self):
-        f = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
+        f = "T" + self.displayName + " = " + "T" + self.outputs[0].connectionList[0].displayName + "\n"
         equationNr = 1
         return f, equationNr
 
