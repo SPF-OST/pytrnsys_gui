@@ -1,8 +1,0 @@
-*************************************
-**BEGIN SH.ddcx
-*************************************
-** This file is used to store the black box component outputs of SH
-
-TSHPortRight95=Tdp1In_Tes2
-TSHPortRight5=Tdp1Out_Tes2
-TSolarTesShHx=Thx1Out_Tes2
