@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>trnsysGUI.TVentil &mdash; TrnsysGUI 2020 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> TrnsysGUI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide/fileTree.html">The file structure of a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guide/interface.html">The user interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guide/example_procedure.html">Complete procedure example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CodeReference.html">Code Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TrnsysGUI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>trnsysGUI.TVentil</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for trnsysGUI.TVentil</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QSize</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="kn">import</span> <span class="n">QPixmap</span><span class="p">,</span> <span class="n">QTransform</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QGraphicsTextItem</span>
+
+<span class="kn">from</span> <span class="nn">trnsysGUI.BlockItem</span> <span class="kn">import</span> <span class="n">BlockItem</span>
+<span class="kn">from</span> <span class="nn">trnsysGUI.PortItem</span> <span class="kn">import</span> <span class="n">PortItem</span>
+
+
+<div class="viewcode-block" id="TVentil"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil">[docs]</a><span class="k">class</span> <span class="nc">TVentil</span><span class="p">(</span><span class="n">BlockItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trnsysType</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TVentil</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">trnsysType</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">typeNumber</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posLabel</span> <span class="o">=</span> <span class="n">QGraphicsTextItem</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posLabel</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">exportInitialInput</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PortItem</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PortItem</span><span class="p">(</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PortItem</span><span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+
+        <span class="n">my_transform</span> <span class="o">=</span> <span class="n">QTransform</span><span class="p">()</span>
+        <span class="n">my_transform</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span><span class="n">my_transform</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pixmap</span> <span class="o">=</span> <span class="n">QPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pixmap</span><span class="o">.</span><span class="n">scaled</span><span class="p">(</span><span class="n">QSize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">changeSize</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TVentil.changeSize"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.changeSize">[docs]</a>    <span class="k">def</span> <span class="nf">changeSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span>
+
+        <span class="n">delta</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="c1"># Limit the block size:</span>
+        <span class="k">if</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="mi">40</span>
+
+        <span class="c1"># center label:</span>
+        <span class="n">rect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span>
+        <span class="n">lw</span><span class="p">,</span> <span class="n">lh</span> <span class="o">=</span> <span class="n">rect</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">rect</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+        <span class="n">lx</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">lw</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">deltaH</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">/</span> <span class="mi">18</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">lx</span><span class="p">,</span> <span class="n">h</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedV</span><span class="o">*</span><span class="p">(</span><span class="n">h</span><span class="o">+</span><span class="n">h</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posLabel</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">lx</span><span class="o">+</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flippedV</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flippedH</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedV</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flippedH</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span><span class="n">h</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flippedV</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedH</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedV</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedH</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span><span class="n">h</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">delta</span><span class="p">)</span>
+
+        <span class="c1"># self.inputs[0].side = 0 + 2 * self.flippedH</span>
+        <span class="c1"># self.inputs[1].side = 1 + 2 * self.flippedV</span>
+        <span class="c1"># self.outputs[0].side = 2 - 2 * self.flippedH</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">side</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotationN</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedH</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">side</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotationN</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedV</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">side</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rotationN</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">flippedH</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span>
+
+        <span class="k">return</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span></div>
+
+<div class="viewcode-block" id="TVentil.setComplexDiv"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.setComplexDiv">[docs]</a>    <span class="k">def</span> <span class="nf">setComplexDiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TVentil.setPositionForMassFlowSolver"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.setPositionForMassFlowSolver">[docs]</a>    <span class="k">def</span> <span class="nf">setPositionForMassFlowSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span> <span class="o">=</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="TVentil.encode"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dictName</span><span class="p">,</span> <span class="n">dct</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TVentil</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;IsTempering&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span>
+        <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;PositionForMassFlowSolver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span>
+        <span class="k">return</span> <span class="n">dictName</span><span class="p">,</span> <span class="n">dct</span></div>
+
+<div class="viewcode-block" id="TVentil.decode"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">resConnList</span><span class="p">,</span> <span class="n">resBlockList</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TVentil</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">resConnList</span><span class="p">,</span> <span class="n">resBlockList</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;IsTempering&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">i</span> <span class="ow">or</span> <span class="s2">&quot;PositionForMassFlowSolver&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Old version of diagram&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;IsTempering&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;PositionForMassFlowSolver&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TVentil.decodePaste"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.decodePaste">[docs]</a>    <span class="k">def</span> <span class="nf">decodePaste</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span><span class="p">,</span> <span class="n">resConnList</span><span class="p">,</span> <span class="n">resBlockList</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TVentil</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">decodePaste</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span><span class="p">,</span> <span class="n">resConnList</span><span class="p">,</span> <span class="n">resBlockList</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;IsTempering&quot;</span> <span class="ow">or</span> <span class="s2">&quot;PositionForMassFlowSolver&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Old version of diagram&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;IsTempering&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="s1">&#39;PositionForMassFlowSolver&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TVentil.exportParameterSolver"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportParameterSolver">[docs]</a>    <span class="k">def</span> <span class="nf">exportParameterSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descConnLength</span><span class="p">):</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+            <span class="c1"># ConnectionList lenght should be max offset</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;heatExchangers&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;heatExchangers&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">trnsysId</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trnsysConn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="c1"># Either left or right</span>
+            <span class="n">tempArr</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># On same hight as output</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="ow">or</span> <span class="n">i</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">():</span>
+                        <span class="n">tempArr</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">tempArr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">tempArr</span><span class="p">:</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">trnsysId</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trnsysConn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+
+            <span class="n">temp</span> <span class="o">+=</span> <span class="s2">&quot;0 &quot;</span>
+
+            <span class="n">temp</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typeNumber</span><span class="p">)</span>
+            <span class="n">temp</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">descConnLength</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exportConnsString</span> <span class="o">=</span> <span class="n">temp</span>
+
+            <span class="k">return</span> <span class="n">temp</span> <span class="o">+</span> <span class="s2">&quot;!&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trnsysId</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">displayName</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="TVentil.exportMassFlows"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportMassFlows">[docs]</a>    <span class="k">def</span> <span class="nf">exportMassFlows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span><span class="p">:</span>
+            <span class="n">resStr</span> <span class="o">=</span> <span class="s2">&quot;xFrac&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot; = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positionForMassFlowSolver</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">equationNr</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">resStr</span><span class="p">,</span> <span class="n">equationNr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="TVentil.exportDivSetting1"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportDivSetting1">[docs]</a>    <span class="k">def</span> <span class="nf">exportDivSetting1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span><span class="p">:</span>
+            <span class="n">constants</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="s2">&quot;T_set_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;=50</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">constants</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="TVentil.exportDivSetting2"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportDivSetting2">[docs]</a>    <span class="k">def</span> <span class="nf">exportDivSetting2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nUnit</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTempering</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">nUnit</span> <span class="o">=</span> <span class="n">nUnit</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;UNIT </span><span class="si">%d</span><span class="s2"> TYPE 811 ! Passive Divider for heating </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">nUnit</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;PARAMETERS 1&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;5 !Nb.of iterations before fixing the value </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;INPUTS 4 </span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">():</span>
+                <span class="n">first</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">second</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;T&quot;</span> <span class="o">+</span> <span class="n">first</span><span class="o">.</span><span class="n">connectionList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;T&quot;</span> <span class="o">+</span> <span class="n">second</span><span class="o">.</span><span class="n">connectionList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;Mfr&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">connectionList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;T_set_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;*** INITIAL INPUT VALUES&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;35.0 21.0 800.0 T_set_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;EQUATIONS 1</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="s2">&quot;xFrac&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot; =  1.-[</span><span class="si">%d</span><span class="s2">,5] </span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">nUnit</span>
+
+            <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">nUnit</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">nUnit</span></div>
+
+<div class="viewcode-block" id="TVentil.exportParametersFlowSolver"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportParametersFlowSolver">[docs]</a>    <span class="k">def</span> <span class="nf">exportParametersFlowSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">descConnLength</span><span class="p">):</span>
+        <span class="c1"># descConnLength = 20</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># This is to assert that the input in front of the output is always printed before the third one</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+            <span class="c1"># ConnectionList lenght should be max offset</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;heatExchangers&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;heatExchangers&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">trnsysId</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">trnsysConn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="c1"># Either left or right</span>
+            <span class="n">tempArr</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">connectionList</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">fromPort</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;heatExchangers&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">toPort</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;heatExchangers&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">i</span><span class="o">.</span><span class="n">connectionList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># On same hight as output</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">x</span><span class="p">()</span> <span class="ow">or</span> <span class="n">i</span><span class="o">.</span><span class="n">pos</span><span class="p">()</span><span class="o">.</span><span class="n">y</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">():</span>
+                        <span class="n">tempArr</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">tempArr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">tempArr</span><span class="p">:</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">trnsysId</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trnsysConn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+
+        <span class="n">temp</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typeNumber</span><span class="p">)</span>
+        <span class="n">temp</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">descConnLength</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">temp</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exportConnsString</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">+</span> <span class="s2">&quot;!&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trnsysId</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; : &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">displayName</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="TVentil.exportInputsFlowSolver1"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportInputsFlowSolver1">[docs]</a>    <span class="k">def</span> <span class="nf">exportInputsFlowSolver1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">temp1</span> <span class="o">=</span> <span class="s2">&quot;xFrac&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exportInputName</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">temp1</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exportInputName</span><span class="p">,</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="TVentil.exportOutputsFlowSolver"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportOutputsFlowSolver">[docs]</a>    <span class="k">def</span> <span class="nf">exportOutputsFlowSolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">abc</span><span class="p">,</span> <span class="n">equationNumber</span><span class="p">,</span> <span class="n">simulationUnit</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isVisible</span><span class="p">():</span>
+            <span class="n">tot</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">temp</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">abc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;=[&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">simulationUnit</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> \
+                       <span class="nb">str</span><span class="p">(</span><span class="n">equationNumber</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="n">tot</span> <span class="o">+=</span> <span class="n">temp</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">exportEquations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+                <span class="c1"># nEqUsed += 1  # DC</span>
+                <span class="n">equationNumber</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># DC-ERR</span>
+            <span class="k">return</span> <span class="n">tot</span><span class="p">,</span> <span class="n">equationNumber</span><span class="p">,</span> <span class="mi">3</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">equationNumber</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="TVentil.exportPipeAndTeeTypesForTemp"><a class="viewcode-back" href="../../trnsysGUI.html#trnsysGUI.TVentil.TVentil.exportPipeAndTeeTypesForTemp">[docs]</a>    <span class="k">def</span> <span class="nf">exportPipeAndTeeTypesForTemp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startingUnit</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isVisible</span><span class="p">():</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">unitNumber</span> <span class="o">=</span> <span class="n">startingUnit</span>
+            <span class="n">tNr</span> <span class="o">=</span> <span class="mi">929</span>  <span class="c1"># Temperature calculation from a tee-piece</span>
+
+            <span class="n">unitText</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">ambientT</span> <span class="o">=</span> <span class="mi">20</span>
+
+            <span class="n">equationConstant</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;UNIT &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unitNumber</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; TYPE &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tNr</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;!&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;PARAMETERS 0</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;INPUTS 6</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exportEquations</span><span class="p">:</span>
+                <span class="n">unitText</span> <span class="o">+=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">s</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)]</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trnsysConn</span><span class="p">:</span>
+                <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;T&quot;</span> <span class="o">+</span> <span class="n">it</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;***Initial values</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="mi">3</span> <span class="o">*</span> <span class="s2">&quot;0 &quot;</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ambientT</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;EQUATIONS 1</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">unitText</span> <span class="o">+=</span> <span class="s2">&quot;T&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayName</span> <span class="o">+</span> <span class="s2">&quot;= [&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unitNumber</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">equationConstant</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="n">unitNumber</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">f</span> <span class="o">+=</span> <span class="n">unitText</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">unitNumber</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">startingUnit</span></div></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia, Martin Neugebauer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

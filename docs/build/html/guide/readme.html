@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Trnsys GUI &mdash; TrnsysGUI 2020 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> TrnsysGUI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="fileTree.html">The file structure of a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interface.html">The user interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_procedure.html">Complete procedure example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeReference.html">Code Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TrnsysGUI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Trnsys GUI</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/guide/readme.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="trnsys-gui">
+<h1>Trnsys GUI<a class="headerlink" href="#trnsys-gui" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<p>Python 3.5 and PyQt (for example installed with Anaconda).</p>
+</div>
+<div class="section" id="installing">
+<h3>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h3>
+<p>Clone the repository and run TrnsysGUI/trnsysGUI/core.py</p>
+</div>
+</div>
+<div class="section" id="running-the-tests">
+<h2>Running the tests<a class="headerlink" href="#running-the-tests" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dev-notes">
+<h3>Dev Notes<a class="headerlink" href="#dev-notes" title="Permalink to this headline">¶</a></h3>
+<p>A diagram has Blocks and Connections.
+Each Block has two lists, inputs and outputs, of PortItems.</p>
+<p>Connections go from a <em>fromPort</em> PortItem to a <em>toPort</em> PortItem.</p>
+<p>The editor has two modes: One, in which the connection can be clicked and dragged to form segments, and one which mantains
+always 90 degree angles.</p>
+<p>The underlying structure of the visual connections is a double linked list, and each connection has a sorted list of
+segments and a method to get the nodes in order.</p>
+<p>Nodes know their previous and next nodes.
+They can have either a cornerItem or a connection as parent.
+In the latter case, they are either at the Ports or at a <em>disrupted segment</em>
+To update the segments adjacent to a corner, two methods can be used:</p>
+<ul class="simple">
+<li><p>Check the neighborhood of the segments for corners/ports</p></li>
+<li><p>Use the index of the nodes and segments</p></li>
+</ul>
+<p>The gradient of a connection is a full interpolation between start and end color.</p>
+<p>The diagramEditor also has a list of Groups, which contain a list of Connections and Blocks, <em>groupList</em>. One can create new groups, name them and they appear as loop in the trnsys export.</p>
+<div class="section" id="usage-notes">
+<h4>Usage notes:<a class="headerlink" href="#usage-notes" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>Dont drag on a line and release afterwards on the line (segment will break)</p></li>
+</ul>
+</div>
+<div class="section" id="shortcuts">
+<h4>Shortcuts<a class="headerlink" href="#shortcuts" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><p>“c”       : start copying</p></li>
+<li><p>“v”       : paste</p></li>
+<li><p>“s”       : start selecting multiple items</p></li>
+<li><p>“Ctrl+d”  : Delete selection</p></li>
+<li><p>“m”       : Toggle editor/connection mode</p></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia, Martin Neugebauer
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
