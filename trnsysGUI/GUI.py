@@ -4249,5 +4249,3 @@ if __name__ == '__main__':
 # There is a mess introduced with kwargs because the dencoder returns objects, which cannot have any
 # connection to the "outside" of the decoder. This could maybe be improved by returning just the dict
 # to the DiagramEditor class, which then can easily create the objects correctly.
-
-# mock push
