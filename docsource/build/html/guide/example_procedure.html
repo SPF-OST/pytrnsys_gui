@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Complete procedure example &mdash; pytrnsys GUI 2021 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Code Reference" href="../CodeReference.html" />
+    <link rel="prev" title="The user interface" href="interface.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> pytrnsys GUI
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fileTree.html">The file structure of a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interface.html">The user interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Complete procedure example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initialize-a-project">1. Initialize a project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build-a-diagram">2. Build a diagram</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#i-set-up-storage-tank">(i) Set up storage tank</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ii-place-components">(ii) Place components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iii-connect-ports">(iii) Connect ports</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#load-ddck-files">3. Load ddck files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#export-files-and-launch-trnsys-simulation">4. Export files and launch TRNSYS simulation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#i-export-tes-ddck">(i) Export Tes.ddck</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ii-export-hydraulic-ddck">(ii) Export hydraulic.ddck</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iii-export-dck">(iii) Export dck</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeReference.html">Code Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pytrnsys GUI</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Complete procedure example</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/guide/example_procedure.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="complete-procedure-example">
+<span id="example-procedure"></span><h1>Complete procedure example<a class="headerlink" href="#complete-procedure-example" title="Permalink to this headline">¶</a></h1>
+<p>In the following the step by step procedure for starting with an empty diagram to launching a TRNSYS simulation is
+presented. The full diagram of the demonstrated example looks like:</p>
+<a class="reference internal image-reference" href="../_images/example_diagram.png"><img alt="interface" src="../_images/example_diagram.png" style="width: 600px;" /></a>
+<div class="section" id="initialize-a-project">
+<h2>1. Initialize a project<a class="headerlink" href="#initialize-a-project" title="Permalink to this headline">¶</a></h2>
+<p>When a new project is initialized the following dialogue is opened to build a folder for the project:</p>
+<a class="reference internal image-reference" href="../_images/new_dialog.png"><img alt="new dialogue" src="../_images/new_dialog.png" style="width: 600px;" /></a>
+<p>This creates the following file tree:</p>
+<a class="reference internal image-reference" href="../_images/example_file_tree.png"><img alt="file tree" src="../_images/example_file_tree.png" style="width: 300px;" /></a>
+</div>
+<div class="section" id="build-a-diagram">
+<h2>2. Build a diagram<a class="headerlink" href="#build-a-diagram" title="Permalink to this headline">¶</a></h2>
+<p>To make the placement of the components easier the snap grid is toggled.</p>
+<div class="section" id="i-set-up-storage-tank">
+<h3>(i) Set up storage tank<a class="headerlink" href="#i-set-up-storage-tank" title="Permalink to this headline">¶</a></h3>
+<p>First, a storage tank is dropped in the diagram. This opens the following dialogue:</p>
+<a class="reference internal image-reference" href="../_images/Tes_1.png"><img alt="Tes 1" src="../_images/Tes_1.png" style="width: 500px;" /></a>
+<p>To make the diagram better arranged, the size of the storage is increased. Furthermore, its name is changed to ‘’Tes’’.
+Then a heat exchanger with its input at 40 % and its output at 10 % height of the storage tank on the left side is
+added and named ‘’Tes_Hx’’:</p>
+<a class="reference internal image-reference" href="../_images/Tes_2.png"><img alt="Tes 2" src="../_images/Tes_2.png" style="width: 500px;" /></a>
+<p>Additionally, a pair of direct ports is added on the right side with the input at 1 % and its output at 99 % height of
+the storage tank:</p>
+<a class="reference internal image-reference" href="../_images/Tes_3.png"><img alt="Tes 3" src="../_images/Tes_3.png" style="width: 500px;" /></a>
+</div>
+<div class="section" id="ii-place-components">
+<h3>(ii) Place components<a class="headerlink" href="#ii-place-components" title="Permalink to this headline">¶</a></h3>
+<p>Next, the components are placed one by one. They can be rotated when they are right-clicked, which is needed in the
+current example for the pump.</p>
+<a class="reference internal image-reference" href="../_images/rotate.png"><img alt="rotation" src="../_images/rotate.png" style="width: 300px;" /></a>
+<p>Furthermore, when double-clicking components they can be re-named, which will also change the name of their respective
+folder in the ddck-directory.</p>
+<a class="reference internal image-reference" href="../_images/rename.png"><img alt="rename" src="../_images/rename.png" style="width: 400px;" /></a>
+<p>When a three-way valve is placed, the darker connector indicates the port through which there is always flow, when
+there is flow at all. In our case this needs to be towards the warm water tap, since the three-way valve placed is
+supposed to be the mixing valve for the warm water demand. To access the valve settings the component is simply
+double-clicked. In the opened dialogue “vertical flip” is ticked for the correct orientation of the valve and
+“tempering valve” to make it one.</p>
+<a class="reference internal image-reference" href="../_images/valveFlip.png"><img alt="valve dialogue" src="../_images/valveFlip.png" style="width: 400px;" /></a>
+</div>
+<div class="section" id="iii-connect-ports">
+<h3>(iii) Connect ports<a class="headerlink" href="#iii-connect-ports" title="Permalink to this headline">¶</a></h3>
+<p>After placing all components they can be connected. A connection is made from a port by holding the left mouse key and
+dragging the cursor to another port, where the mouse is released.</p>
+<a class="reference internal image-reference" href="../_images/connect.png"><img alt="connect" src="../_images/connect.png" style="width: 500px;" /></a>
+<p>The dialogue for a connection can be opened by right-clicking it.</p>
+<a class="reference internal image-reference" href="../_images/connectionDialogue.png"><img alt="connection" src="../_images/connectionDialogue.png" style="width: 300px;" /></a>
+</div>
+</div>
+<div class="section" id="load-ddck-files">
+<h2>3. Load ddck files<a class="headerlink" href="#load-ddck-files" title="Permalink to this headline">¶</a></h2>
+<p>Many components need to be represented by ddck- or other files in the simulation. These files need to be loaded to the
+individual component folders in the ddck-directory. This is done by right-clicking the respective folder in the file
+tree.</p>
+<a class="reference internal image-reference" href="../_images/loadDdcks.png"><img alt="load" src="../_images/loadDdcks.png" style="width: 300px;" /></a>
+</div>
+<div class="section" id="export-files-and-launch-trnsys-simulation">
+<h2>4. Export files and launch TRNSYS simulation<a class="headerlink" href="#export-files-and-launch-trnsys-simulation" title="Permalink to this headline">¶</a></h2>
+<p>Once the component files are loaded, different files needed for the simulation can be exported from the diagram.</p>
+<div class="section" id="i-export-tes-ddck">
+<h3>(i) Export Tes.ddck<a class="headerlink" href="#i-export-tes-ddck" title="Permalink to this headline">¶</a></h3>
+<p>First, the ddck of the thermal storage tank needs to be exported. This is done by opening the storage tank dialogue by
+double-clicking the component and then hitting the respective button on this dialogue.</p>
+</div>
+<div class="section" id="ii-export-hydraulic-ddck">
+<h3>(ii) Export hydraulic.ddck<a class="headerlink" href="#ii-export-hydraulic-ddck" title="Permalink to this headline">¶</a></h3>
+<p>Next, the ddck representing the hydraulics of the system needs to be exported. This is done by hitting the respective
+button in the tool bar.</p>
+<a class="reference internal image-reference" href="../_images/exportHydraulics.png"><img alt="export hydraulic.ddck" src="../_images/exportHydraulics.png" style="width: 50px;" /></a>
+</div>
+<div class="section" id="iii-export-dck">
+<h3>(iii) Export dck<a class="headerlink" href="#iii-export-dck" title="Permalink to this headline">¶</a></h3>
+<p>When all files needed are loaded and/or exported the dck-file (TRNSYS) can be built. Either this is done without
+launching a simulation directly afterwards to just generate the file by pressing the respective button in the tool
+bar</p>
+<a class="reference internal image-reference" href="../_images/exportDck.png"><img alt="export dck" src="../_images/exportDck.png" style="width: 50px;" /></a>
+<p>or a simulation is launched directly through hitting</p>
+<a class="reference internal image-reference" href="../_images/runSimulation.png"><img alt="run simulation" src="../_images/runSimulation.png" style="width: 50px;" /></a>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../CodeReference.html" class="btn btn-neutral float-right" title="Code Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="interface.html" class="btn btn-neutral float-left" title="The user interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia, Martin Neugebauer
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
