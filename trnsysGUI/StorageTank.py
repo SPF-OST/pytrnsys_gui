@@ -830,17 +830,21 @@ class StorageTank(BlockItem):
 
     # Export related
     def exportBlackBox(self):
+        equations = []
         ddcxPath = os.path.join(self.path,self.displayName)
         ddcxPath = ddcxPath + ".ddcx"
         if not os.path.isfile(ddcxPath):
             self.exportDck()
-        infile=open(ddcxPath,'r')
-        lines=infile.readlines()
-        equations = []
-        for line in lines:
-            if line[0] == "T":
-                equations.append(line.replace("\n",""))
-        return 'success', equations
+        if os.path.isfile(ddcxPath):
+            infile=open(ddcxPath,'r')
+            lines=infile.readlines()
+            for line in lines:
+                if line[0] == "T":
+                    equations.append(line.replace("\n",""))
+            return 'success', equations
+        else:
+            self.logger.warning('No file at ' + ddcxPath)
+            return 'noDdckFile', equations
 
     def exportParametersFlowSolver(self, descConnLength):
         return "", 0
@@ -900,10 +904,10 @@ class StorageTank(BlockItem):
         #     name = fileName
         # name = name + '_nTes' + str(self.nTes)
 
-        self.logger.debug("Storage Type:", self.storageType)
-        self.logger.debug("nTes:", self.nTes)
-        self.logger.debug("nPorts:", nPorts)
-        self.logger.debug("nHx:", nHx)
+        self.logger.debug("Storage Type: " + str(self.storageType))
+        self.logger.debug("nTes: " + str(self.nTes))
+        self.logger.debug("nPorts: " + str(nPorts))
+        self.logger.debug("nHx: " + str(nHx))
 
         tool = Type1924_TesPlugFlow()
 
@@ -1016,7 +1020,7 @@ class StorageTank(BlockItem):
                 errorConnList = errorConnList + connName2 + '\n'
         if errorConnList !='':
             msgBox = QMessageBox()
-            msgBox.setText("%sis connected wrongly, right click StorageTank to invert connection." % (errorConnList))
+            msgBox.setText("%s is connected wrongly, right click StorageTank to invert connection." % (errorConnList))
             msgBox.exec()
             noError = False
         else:
