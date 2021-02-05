@@ -6,6 +6,7 @@ import shutil
 import sys
 from math import sqrt
 from pathlib import Path
+import argparse
 
 import pandas as pd
 from PyQt5 import QtGui
@@ -4188,9 +4189,25 @@ class MainWindow(QMainWindow):
             self.logger.info("Project path:", self.centralWidget.projectPath)
             runApp.runAction(self.centralWidget.projectPath)
 
+
+def getLogLevelOrExit():
+    logLevels = "CRITICAL ERROR WARNING INFO DEBUG".split()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-l", "--log", type=str, default="INFO",
+                        choices=logLevels, help="Set the log level", metavar="LEVEL")
+
+    namespace = parser.parse_args()
+    logLevel = namespace.log
+
+    return logLevel
+
+
 if __name__ == '__main__':
-    # sys.stdout = open('errorLog', 'w')
-    logger = log.setup_custom_logger('root', 'INFO')
+    logLevel = getLogLevelOrExit()
+    logger = log.setup_custom_logger('root', logLevel)
+
+
     cssSs_ = cssSs.read()
     app = QApplication(sys.argv)
     app.setApplicationName("Diagram Creator")
