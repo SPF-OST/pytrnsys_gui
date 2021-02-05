@@ -45,7 +45,7 @@
             "PortsIDOut": [
                 137
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": "0.0",
             "RotationN": 0,
             "trnsysID": 40
         },
@@ -491,7 +491,7 @@
             "BlockDisplayName": "DivTesDhwOut",
             "BlockName": "TVentil",
             "BlockPosition": [
-                -780.0,
+                -778.0,
                 -418.0
             ],
             "FlippedH": true,
@@ -506,7 +506,7 @@
             "PortsIDOut": [
                 4289
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": "0.0",
             "RotationN": 0,
             "trnsysID": 1387
         },
@@ -660,7 +660,7 @@
             "PortsIDOut": [
                 63
             ],
-            "PositionForMassFlowSolver": "1.0",
+            "PositionForMassFlowSolver": "0.0",
             "RotationN": 0,
             "trnsysID": 18
         },
@@ -1226,8 +1226,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -23.0,
-                -39.0
+                0.0,
+                0.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 3804,
@@ -2111,8 +2111,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -16.0,
-                5.0
+                0.0,
+                0.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 4283,
@@ -2516,8 +2516,8 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                6.0,
-                12.0
+                0.0,
+                0.0
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 6033,
@@ -2733,11 +2733,11 @@
             "CornerPositions": [
                 [
                     -759.0,
-                    -378.333
+                    -378.0
                 ]
             ],
             "FirstSegmentLabelPos": [
-                20.0,
+                0.0,
                 0.0
             ],
             "GroupName": "defaultGroup",
@@ -2748,12 +2748,12 @@
                     -759.0,
                     -91.0,
                     -759.0,
-                    -378.333
+                    -378.0
                 ],
                 [
                     -759.0,
-                    -378.333,
-                    -760.0,
+                    -378.0,
+                    -758.0,
                     -378.0
                 ]
             ],
@@ -2776,7 +2776,7 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
+                0.0,
                 0.0
             ],
             "GroupName": "defaultGroup",
@@ -2798,7 +2798,7 @@
                 [
                     -720.0,
                     -398.0,
-                    -740.0,
+                    -738.0,
                     -398.0
                 ]
             ],
@@ -2821,7 +2821,7 @@
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -60.0,
+                0.0,
                 0.0
             ],
             "GroupName": "defaultGroup",
@@ -2829,7 +2829,7 @@
             "PortToID": 6072,
             "SegmentPositions": [
                 [
-                    -780.0,
+                    -778.0,
                     -398.0,
                     -860.0,
                     -398.0
@@ -2851,10 +2851,10 @@
             "trnsysID": 2191
         },
         "IDs": {
-            "GlobalId": 7014,
+            "GlobalId": 7414,
             "__idDct__": true,
-            "globalConnID": 1621,
-            "trnsysID": 2288
+            "globalConnID": 1709,
+            "trnsysID": 2416
         },
         "Strings": {
             "DiagramName": "TRIHP_dualSource.json",

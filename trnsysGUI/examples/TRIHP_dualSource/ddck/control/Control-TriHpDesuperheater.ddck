@@ -13,10 +13,9 @@
 *** Control modes
 EQUATIONS 7
 BoAuxWWon = HpForDHWIsNeeded ! Boolean value - DHW charging is needed
-**BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon) ! Boolean value - SH charging is needed
-BoAuxSHon = NOT(BoAuxWWon)
+BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon) ! Boolean value - SH charging is needed
 CoolingOn = CoolingNeeded*NOT(BoAuxWWon) ! Cooling mode on
-HpIsOn = OR(BoAuxWWonRc,BoAuxSHonRc) ! HP is on
+HpIsOn = OR(BoAuxWWon,BoAuxSHon) ! HP is on
 qAuxStoreDHW_KW = 0 ! No internal heat source dhw storage
 qAuxStoreSH_KW = 0 ! No internal heat source sh storage
 BoDHWTapping = GT(MfrDHWset,0) ! Bo DHW water tapped in this timestep
@@ -28,9 +27,9 @@ MfrPuSH = MfrBuiRd				! Mfr control pump SH-loop
 MfrsupplyWater = MfrDHWset		! Mfr tapping water
 MfrPuDHW = MfrSrcDHWHXUsed*BoDHWTapping+NOT(BoDHWTapping)*MfrSrcDHWHXUsed	! Mfr DHW water external heat exchanger source side
 MfrPuCirc = NOT(BoDHWTapping)*150	! Mfr circulation loop
-MfrPuHpEvap = MfrHpEvapNom*hpIsOnRc	! Mfr control pump ground source loop
-MfrPuHpShCond = MfrHpCondNom*BoAuxSHOnRc	! Mfr pump heat pump SH part
-MfrPuHpDhwCond = MfrHpCondNom*BoAuxWWOnRc	! Mfr pump heat pump DHW part
+MfrPuHpEvap = MfrHpEvapNom*hpIsOn	! Mfr control pump ground source loop
+MfrPuHpShCond = MfrHpCondNom*BoAuxSHOn	! Mfr pump heat pump SH part
+MfrPuHpDhwCond = MfrHpCondNom*BoAuxWWOn! Mfr pump heat pump DHW part
 
 *** Valve positions
 EQUATIONS 7
@@ -45,7 +44,7 @@ xFracDivTesDhwOut = BoAuxSHon
 EQUATIONS 4
 TdhwSet = TdhwSetProfile		! Tset DHW storage
 TTesDhwAuxOff = T9_Tes1		! Temperature sensor DHW charging off
-TTesDhwAuxOn  = T2_Tes1			! Temperature sensor DHW charging on
+TTesDhwAuxOn  = T7_Tes1			! Temperature sensor DHW charging on
 TsensorTesSh = T8_Tes2			! Temperature sensor SH charging on
 
 
