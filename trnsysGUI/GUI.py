@@ -2380,18 +2380,14 @@ class DiagramEditor(QWidget):
     def editGroups(self):
         self.showGroupsEditor()
 
-    def setConnLabelVis(self, b):
+    def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
             if isinstance(c, Connection) and not c.isVirtualConn:
-                c.showLabel(b)
+                c.setLabelVisible(isVisible)
             if isinstance(c, BlockItem):
-                c.label.setVisible(b)
+                c.label.setVisible(isVisible)
             if isinstance(c, TVentil):
-                c.posLabel.setVisible(b)
-        # Faster alternative, untested
-        # for c in self.connectionList:
-        #     if not c.isVirtualConn:
-        #         c.showLabel(b)
+                c.posLabel.setVisible(isVisible)
 
     def updateConnGrads(self):
         for t in self.trnsysObj:

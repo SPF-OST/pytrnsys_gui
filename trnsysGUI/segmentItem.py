@@ -1,4 +1,5 @@
 from math import sqrt
+import typing as tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPointF, QLineF
@@ -9,6 +10,10 @@ from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 
+# This is needed to avoid a circular import but still be able to type check
+if tp.TYPE_CHECKING:
+    from trnsysGUI.Connection import Connection
+
 
 def calcDist(p1, p2):
     vec = p1 - p2
@@ -18,7 +23,7 @@ def calcDist(p1, p2):
 
 class segmentItem(QGraphicsLineItem):
 
-    def __init__(self, startNode, endNode, parent):
+    def __init__(self, startNode, endNode, parent: "Connection"):
         """
         A connection is displayed as a chain of segmentItems (stored in Connection.segments)
         Parameters.
@@ -686,8 +691,11 @@ class segmentItem(QGraphicsLineItem):
         a3 = menu.addAction('Invert this connection')
         a3.triggered.connect(self.parent.invertConnection)
 
-        a4 = menu.addAction('Toggle mass flow')
-        a4.triggered.connect(self.parent.toggleMassFlowLabelVisibility)
+        a4 = menu.addAction('Toggle name')
+        a4.triggered.connect(self.parent.toggleLabelVisible)
+
+        a5 = menu.addAction('Toggle mass flow')
+        a5.triggered.connect(self.parent.toggleMassFlowLabelVisible)
 
         # b1 = menu.addAction('Set group ')
         # b1.triggered.connect(self.configGroup)
@@ -714,10 +722,19 @@ class segmentItem(QGraphicsLineItem):
         self.parent.highlightConn()
         self.parent.inspectConn()
 
-    def toggleMassFlowLabelVisibility(self) -> None:
-        previousVisibility = self.labelMass.isVisible()
-        newVisibility = not previousVisibility
-        self.labelMass.setVisible(newVisibility)
+    def setLabelVisible(self, isVisible: bool) -> None:
+        self.label.setVisible(isVisible)
+
+    def toggleLabelVisible(self) -> None:
+        wasVisible = self.label.isVisible()
+        self.setLabelVisible(not wasVisible)
+
+    def setMassFlowLabelVisible(self, isVisible: bool) -> None:
+        self.labelMass.setVisible(isVisible)
+
+    def toggleMassFlowLabelVisible(self) -> None:
+        wasVisible = self.labelMass.isVisible()
+        self.setMassFlowLabelVisible(not wasVisible)
 
     def setHighlight(self, isHighlight: bool) -> None:
         if isHighlight:

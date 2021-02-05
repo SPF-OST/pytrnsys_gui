@@ -483,23 +483,12 @@ class Connection(object):
 
         self.positionLabel()
 
-
     # Label related
-    def showLabel(self, b):
-        if b:
-            # # vec1 = np.array(self.segmentsLoad[0][:2])
-            # # vec2 = np.array(self.segmentsLoad[0][2:])
-            # vec = vec2-vec1
-            # # uVec1 = vec1/np.linalg.norm(vec1)
-            # # uVec2 = vec2/np.linalg.norm(vec2)
-            # uVec = vec/np.linalg.norm(vec)
-            # dotProduct = np.dot(np.array([1.,0]),uVec)
-            # angle = np.rad2deg(np.arccos(dotProduct))
-            # if np.isnan(angle):
-            #     angle = 0
-            self.firstS.label.setVisible(True)
-        else:
-            self.firstS.label.setVisible(False)
+    def setLabelVisible(self, isVisible: bool) -> None:
+        self.firstS.setLabelVisible(isVisible)
+
+    def toggleLabelVisible(self) -> None:
+        self.firstS.toggleLabelVisible()
 
     def updateSegLabels(self):
         for s in self.segments:
@@ -549,9 +538,11 @@ class Connection(object):
                 angle = 0
             self.firstS.label.setRotation(-angle)
 
-    def toggleMassFlowLabelVisibility(self):
-        self.firstS.toggleMassFlowLabelVisibility()
+    def setMassFlowLabelVisible(self, isVisible: bool) -> None:
+        self.firstS.setMassFlowLabelVisible(isVisible)
 
+    def toggleMassFlowLabelVisible(self) -> None:
+        self.firstS.toggleMassFlowLabelVisible()
 
     # Makes 90deg angles of connection
     def niceConn(self):
