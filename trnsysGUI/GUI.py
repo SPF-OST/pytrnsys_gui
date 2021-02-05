@@ -1,107 +1,83 @@
 #!/usr/bin/python
-# import random
 import glob
-import re
-import shutil
-import string
-import pandas as pd
-from datetime import datetime
-from math import sqrt, acos, pi, degrees, atan
-
-import sys
-# import os
 import json
+import os
+import shutil
+import sys
+from math import sqrt
 from pathlib import Path
 
-# import qrc_resources
-# import platform
-# import inspect
-
-# from trnsysGUI.CircularDep import *
-# from trnsysGUI.Connection import Connection
+import pandas as pd
+from PyQt5 import QtGui
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from PyQt5.QtPrintSupport import QPrinter
-from PyQt5.QtSvg import QSvgGenerator, QSvgWidget
+from PyQt5.QtSvg import QSvgGenerator
+from PyQt5.QtWidgets import *
+from pytrnsys.utils import log
 
-from trnsysGUI.Control import Control
-from trnsysGUI.MasterControl import MasterControl
-from trnsysGUI.FileOrderingDialog import FileOrderingDialog
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PathSetUp import PathSetUp
-from trnsysGUI.CheckBlackBox import CheckBlackBox
-from trnsysGUI.FolderSetUp import FolderSetUp
-from trnsysGUI.PumpDlg import PumpDlg
-from trnsysGUI.DifferenceDlg import DifferenceDlg
-from trnsysGUI.BlockDlg import BlockDlg
-from trnsysGUI.DeepInspector import DeepInspector
-from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
-from trnsysGUI.Boiler import Boiler
+import trnsysGUI.buildDck as dckBuilder
 from trnsysGUI.AirSourceHP import AirSourceHP
+from trnsysGUI.BlockDlg import BlockDlg
+from trnsysGUI.BlockItem import BlockItem
+from trnsysGUI.Boiler import Boiler
+from trnsysGUI.Collector import Collector
+from trnsysGUI.ConfigStorage import ConfigStorage
+from trnsysGUI.Connection import Connection
+from trnsysGUI.Connector import Connector
+from trnsysGUI.Control import Control
+from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
+from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
+from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.Export import Export
 from trnsysGUI.ExternalHx import ExternalHx
-from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
+from trnsysGUI.FileOrderingDialog import FileOrderingDialog
+from trnsysGUI.FolderSetUp import FolderSetUp
+from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
+from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.GroundSourceHx import GroundSourceHx
+from trnsysGUI.Group import Group
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
-from trnsysGUI.PV import PV
-
-from trnsysGUI.GenericBlock import GenericBlock
-from trnsysGUI.Graphicaltem import GraphicalItem
+from trnsysGUI.HPDoubleDual import HPDoubleDual
+from trnsysGUI.HeatPump import HeatPump
+from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
+from trnsysGUI.IceStorage import IceStorage
+from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
+from trnsysGUI.IdGenerator import IdGenerator
+from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
+from trnsysGUI.MasterControl import MasterControl
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
+from trnsysGUI.MyQTreeView import MyQTreeView
+from trnsysGUI.PV import PV
+from trnsysGUI.PathSetUp import PathSetUp
 from trnsysGUI.PipeDataHandler import PipeDataHandler
+from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.RunMain import RunMain
 from trnsysGUI.ProcessMain import ProcessMain
+from trnsysGUI.Pump import Pump
+from trnsysGUI.PumpDlg import PumpDlg
+from trnsysGUI.Radiator import Radiator
+from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.RunMain import RunMain
+from trnsysGUI.StorageTank import StorageTank
+from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
-from trnsysGUI.Test_Export import Test_Export
+from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.TestDlg import TestDlg
+from trnsysGUI.Test_Export import Test_Export
+from trnsysGUI.WTap import WTap
+from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.configFile import configFile
+from trnsysGUI.copyGroup import copyGroup
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.settingsDlg import settingsDlg
-
-from trnsysGUI.BlockItem import BlockItem
-
-from trnsysGUI.Collector import Collector
-from trnsysGUI.ConfigStorage import ConfigStorage
-from trnsysGUI.Connector import Connector
-from trnsysGUI.Group import Group
-from trnsysGUI.HeatPump import HeatPump
-from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
-from trnsysGUI.HPDoubleDual import HPDoubleDual
-from trnsysGUI.IceStorage import IceStorage
-from trnsysGUI.PitStorage import PitStorage
-from trnsysGUI.LibraryModel import LibraryModel
-from trnsysGUI.Pump import Pump
-from trnsysGUI.Radiator import Radiator
-from trnsysGUI.StorageTank import StorageTank
-from trnsysGUI.HeatExchanger import HeatExchanger
-from trnsysGUI.TVentil import TVentil
-from trnsysGUI.TeePiece import TeePiece
-from trnsysGUI.WTap import WTap
-from trnsysGUI.WTap_main import WTap_main
-from trnsysGUI.copyGroup import copyGroup
-from trnsysGUI.IdGenerator import IdGenerator
-from trnsysGUI.Connection import Connection
-from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
-from trnsysGUI.ResizerItem import ResizerItem
-from trnsysGUI.configFile import configFile
-
-import trnsysGUI.buildDck as dckBuilder
-
-from PyQt5 import QtGui
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-
-from pytrnsys.utils import log
-
-import os
-import sys
-
 
 
 __version__ = "1.0.0"
