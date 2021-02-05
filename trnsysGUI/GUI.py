@@ -4223,7 +4223,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     # sys.stdout = open('errorLog', 'w')
-    logger = log.setup_custom_logger('root', 'DEBUG')
+    logger = log.setup_custom_logger('root', 'INFO')
     cssSs_ = cssSs.read()
     app = QApplication(sys.argv)
     app.setApplicationName("Diagram Creator")

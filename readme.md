@@ -1,49 +1,52 @@
-## Trnsys GUI
-####Getting started
-#####Prerequisites
-Python 3.5 and PyQt (for example installed with Anaconda):
+Graphical user interface for pytrnsys
+=====================================
 
-conda create -n myenv python=3.5
+Documentation
+-------------
 
-conda activate myenv
+You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/ 
 
-conda install pyqt
+Prerequisites
+-------------
 
-#####Installing
-Clone the repository and run trnsysGUI/GUI.py using the python interpreter of the newly created conda environment myenv.
+Compulsive:
+* A local clone of https://github.com/SPF-OST/pytrnsys.git
 
-#####Dev Notes
-General structure
-A diagram has Blocks and Connections.
-Each Block has two lists, inputs and outputs, of PortItems.
+Assumed for the instructions in the following (different frameworks can be used individually):
+* Anaconda installation
+* PyCharm editor
 
-Connections go from a _fromPort_ PortItem to a _toPort_ PortItem.
+Getting started
+---------------
 
-The editor has two modes: One, in which the connection can be clicked and dragged to form segments, and one which mantains 
-always 90 degree angles. Mode one is disabled.
+Open an Anaconda prompt and navigate to your local pytrnsys_gui repository:
+````
+cd ...\GIT\pytrnsys_gui
+````
+Then enter the following:
+````
+conda env create -f gui_env.yml
+````
+This will create a virtual environment 'trnsys3.7'. Next, enter:
+````
+conda info --envs
+````
+This will show you your virtual environments for python. Note where 'trnsys3.7' is located.
+
+Now launch PyCharm and open your pyrtnsys_gui repository. Then go to File > Settings > Project: pytrnsys_gui > Project 
+Interpreter. Click on the gearwheel icon on the right of the dropdown menu and select 'Add...'. In the window that opens
+select 'Existing environment'. In the line 'Interpreter' browse to the folder of 'trnsys3.7' (noted from before) and 
+select 'python.exe' from within this folder. This will set up 'trnsys3.7' as the virtual environment for your local 
+pytrnsys_gui repository.
+
+Go back to the Project Interpreter menu, click again on the gearwheel icon, and select 'Show All...'. Select 'trnsys3.7'
+ on the list that opens and click on the path icon on the right ('Show paths for the selected interpreter'). In the 
+ window that opens click on the '+' and select the folder of your local repository of 
+ https://github.com/SPF-OST/pytrnsys.git:
+ ````
+...\GIT\pytrnsys
+````
  
-The underlying structure of the visual connections is a double linked list, and Connection has a sorted list of 
-segments and a method to get the nodes in order.
-
-Nodes know their previous and next nodes.
-They can have either a cornerItem or a Connection as parent.
-If the parent is a Connection, then the node belongs to a PortItem
-
-The gradient of a connection is a full interpolation between start and end color.
-
-The diagramEditor also has a list of Groups, which contain a list of Connections and Blocks, _groupList_. 
-One can create new groups, name them and they appear as loop in the trnsys export. Also, one can inspect which blocks 
-are in which group.
-
-
-
-######Shortcuts
-- "c"       : start copying
-- "v"       : paste
-- "s"       : start selecting multiple items
-- "Ctrl+d"  : Delete selection
-- "ctrl+m"  : Move Storage direct ports
-- "ctrl+z"  : Undo (few actions allowed)
-- "ctrl+y"  : Redo
-- "a"       : Toggle snap grid
-- "q"       : Start align mode
+Now your virtual environment to run the graphical user interface is set. Run 'GUI.py'. This should open the graphical 
+user interface. Sometimes the opening dialogue is behind other windows, so make sure to check behind those, if you don't
+ see it immediately.
