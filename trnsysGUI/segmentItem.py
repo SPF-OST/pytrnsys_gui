@@ -688,6 +688,9 @@ class segmentItem(QGraphicsLineItem):
         a3 = menu.addAction('Invert this connection')
         a3.triggered.connect(self.parent.invertConnection)
 
+        a4 = menu.addAction('Toggle mass flow')
+        a4.triggered.connect(self.parent.toggleMassFlowLabelVisibility)
+
         # b1 = menu.addAction('Set group ')
         # b1.triggered.connect(self.configGroup)
         # a4 = menu.addAction('Print end and start items')
@@ -712,3 +715,9 @@ class segmentItem(QGraphicsLineItem):
     def inspect(self):
         self.parent.highlightConn()
         self.parent.inspectConn()
+
+    def toggleMassFlowLabelVisibility(self):
+        previousVisibility = self.labelMass.isVisible()
+        newVisibility = not previousVisibility
+        self.labelMass.setVisible(newVisibility)
+

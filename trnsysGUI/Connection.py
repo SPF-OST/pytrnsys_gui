@@ -548,6 +548,9 @@ class Connection(object):
                 angle = 0
             self.firstS.label.setRotation(-angle)
 
+    def toggleMassFlowLabelVisibility(self):
+        self.firstS.toggleMassFlowLabelVisibility()
+
 
     # Makes 90deg angles of connection
     def niceConn(self):
