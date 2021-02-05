@@ -2,7 +2,7 @@ from math import sqrt
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPointF, QLineF
-from PyQt5.QtGui import QColor, QLinearGradient, QBrush
+from PyQt5.QtGui import QColor, QLinearGradient, QBrush, QPen
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QMenu
 
 from trnsysGUI.CornerItem import CornerItem
@@ -29,7 +29,7 @@ class segmentItem(QGraphicsLineItem):
         """
 
         super(segmentItem, self).__init__(None)
-        
+
         self.logger = parent.logger
 
         self.setFlag(self.ItemIsSelectable, True)
@@ -714,8 +714,21 @@ class segmentItem(QGraphicsLineItem):
         self.parent.highlightConn()
         self.parent.inspectConn()
 
-    def toggleMassFlowLabelVisibility(self):
+    def toggleMassFlowLabelVisibility(self) -> None:
         previousVisibility = self.labelMass.isVisible()
         newVisibility = not previousVisibility
         self.labelMass.setVisible(newVisibility)
 
+    def setHighlight(self, isHighlight: bool) -> None:
+        if isHighlight:
+            highlightPen = self._createHighlightPen()
+            self.setPen(highlightPen)
+        else:
+            self.updateGrad()
+
+    @staticmethod
+    def _createHighlightPen() -> QPen:
+        color = QColor(125, 242, 189)
+        width = 4
+        highlightPen = QPen(color, width)
+        return highlightPen

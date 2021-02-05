@@ -1,6 +1,7 @@
 import sys
 from math import atan, sqrt, acos
 import numpy as np
+import typing as tp
 
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
@@ -89,11 +90,11 @@ class Connection(object):
         self.connId = self.parent.idGen.getConnID()
         self.trnsysId = self.parent.idGen.getTrnsysID()
 
-        self.segments = []
+        self.segments: tp.List[segmentItem] = []
 
         self.startNode = Node()
         self.endNode = Node()
-        self.firstS = None
+        self.firstS: tp.Optional[segmentItem] = None
 
         self.segmentsLoad = None
         self.cornersLoad = None
@@ -1248,8 +1249,9 @@ class Connection(object):
         self.unhighlightOtherConns()
 
         for s in self.segments:
-            pen1 = QPen(QColor(125, 242, 189), 4)
-            s.setPen(pen1)
+            s.setHighlight(True)
+
+        self.setLabelsHighlight(True)
 
     def unhighlightOtherConns(self):
         for c in self.parent.connectionList:
@@ -1259,6 +1261,17 @@ class Connection(object):
         for s in self.segments:
             s.updateGrad()
 
+        self.setLabelsHighlight(False)
+
+    def setLabelsHighlight(self, isHighlight: bool) -> None:
+        self._setBold(self.firstS.label, isHighlight)
+        self._setBold(self.firstS.labelMass, isHighlight)
+
+    @staticmethod
+    def _setBold(label: QGraphicsTextItem, isBold: bool) -> None:
+        originalFontCopy = label.font()
+        originalFontCopy.setBold(isBold)
+        label.setFont(originalFontCopy)
 
     # Debug
     def inspectConn(self):
@@ -1596,8 +1609,6 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
-
-
 
 
 
