@@ -13,6 +13,17 @@ import sys
 import json
 from pathlib import Path
 
+
+directory = Path(__file__).parent.absolute()
+
+gui_dir = directory.parent
+pytrnsys_dir = gui_dir.parent / "pytrnsys"
+
+sys.path.append(str(gui_dir))
+sys.path.append(str(pytrnsys_dir))
+
+print(sys.path)
+
 # import qrc_resources
 # import platform
 # import inspect
@@ -100,8 +111,6 @@ from PyQt5.QtWidgets import *
 from pytrnsys.utils import log
 
 import os
-import sys
-
 
 
 __version__ = "1.0.0"
