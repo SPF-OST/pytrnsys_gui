@@ -7,6 +7,7 @@ import sys
 from math import sqrt
 from pathlib import Path
 import argparse
+import typing as tp
 
 import pandas as pd
 from PyQt5 import QtGui
@@ -304,7 +305,7 @@ class DiagramDecoder(json.JSONDecoder):
         kwargs.pop("editor")
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
-    def object_hook(self, arr):
+    def object_hook(self, arr: tp.Mapping[str, tp.Mapping[str, tp.Any]]) -> tp.Any:
         """
         This is the decoding function. object_hook seems to get executed for every sub dictionary in the json file.
         By looking for the specific key containing the name of dict elements, one can extract the needed dict.
@@ -323,160 +324,170 @@ class DiagramDecoder(json.JSONDecoder):
         if ".__BlockDct__" in arr:
 
             resConnList = []
-            self.logger.debug("keys are " + str(sorted((arr.keys()))))
-            for k in sorted((arr.keys())):
-                if type(arr[k]) is dict:
 
-                    if ".__GroupDict__" in arr[k]:
-                        self.logger.debug("Found the group dict")
-                        i = arr[k]
-                        self.logger.debug("Decoding group " + str(i["GroupName"]))
+            sorted_items = sorted(arr.items(), key=lambda t: t[0])
 
-                        groupListNames = [g.displayName for g in self.editor.groupList]
+            sorted_keys: tp.Sequence[str]
+            sorted_values: tp.Sequence[tp.Mapping[str, tp.Any]]
+            sorted_keys, sorted_values = zip(*sorted_items)
 
-                        if i["GroupName"] not in groupListNames:
-                            g = Group(i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1],
-                                      self.editor.diagramScene)
-                            g.setName(i["GroupName"])
+            formatted_sorted_keys = ", ".join(sorted_keys)
+            self.logger.debug("keys are %s", formatted_sorted_keys)
 
-                    # Adding the blocks to the scene could also be done inside Decoder now (before not possible because
-                    # no way of accessing the diagramView)
+            for i in sorted_values:
+                if type(i) is not dict:
+                    continue
 
-                    elif ".__BlockDict__" in arr[k]:
-                        self.logger.debug("Found a block ")
-                        i = arr[k]
+                if ".__GroupDict__" in i:
+                    self.logger.debug("Found the group dict")
+                    self.logger.debug("Decoding group " + str(i["GroupName"]))
 
-                        if i["BlockName"] == 'TeePiece':
-                            bl = TeePiece(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                          loadedBlock=True)
-                        elif i["BlockName"] == 'TVentil':
-                            bl = TVentil(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                         loadedBlock=True)
-                        elif i["BlockName"] == 'Pump':
-                            bl = Pump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                    groupListNames = [g.displayName for g in self.editor.groupList]
+
+                    if i["GroupName"] not in groupListNames:
+                        g = Group(i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1],
+                                  self.editor.diagramScene)
+                        g.setName(i["GroupName"])
+
+                # Adding the blocks to the scene could also be done inside Decoder now (before not possible because
+                # no way of accessing the diagramView)
+
+                elif ".__BlockDict__" in i:
+                    self.logger.debug("Found a block ")
+                    if i["BlockName"] == 'TeePiece':
+                        bl = TeePiece(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                       loadedBlock=True)
-                        elif i["BlockName"] == 'Collector':
-                            bl = Collector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                           loadedBlock=True)
-                        elif i["BlockName"] == 'HP':
-                            bl = HeatPump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                          loadedBlock=True)
-                        elif i["BlockName"] == 'IceStorage':
-                            bl = IceStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                            loadedBlock=True)
-                        elif i["BlockName"] == 'PitStorage':
-                            bl = PitStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                            loadedBlock=True)
-                        elif i["BlockName"] == 'Radiator':
-                            bl = Radiator(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                          loadedBlock=True)
-                        elif i["BlockName"] == 'WTap':
-                            bl = WTap(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                    elif i["BlockName"] == 'TVentil':
+                        bl = TVentil(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                     loadedBlock=True)
+                    elif i["BlockName"] == 'Pump':
+                        bl = Pump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                  loadedBlock=True)
+                    elif i["BlockName"] == 'Collector':
+                        bl = Collector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                       loadedBlock=True)
+                    elif i["BlockName"] == 'HP':
+                        bl = HeatPump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                       loadedBlock=True)
-                        elif i["BlockName"] == 'WTap_main':
-                            bl = WTap_main(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                           loadedBlock=True)
-                        elif i["BlockName"] == 'Connector':
-                            bl = Connector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                           loadedBlock=True)
-                        elif i["BlockName"] == 'Boiler':
-                            bl = Boiler(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                    elif i["BlockName"] == 'IceStorage':
+                        bl = IceStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                         loadedBlock=True)
-                        elif i["BlockName"] == 'AirSourceHP':
-                            bl = AirSourceHP(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                             loadedBlock=True)
-                        elif i["BlockName"] == 'PV':
-                            bl = PV(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                    elif i["BlockName"] == 'PitStorage':
+                        bl = PitStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                        loadedBlock=True)
+                    elif i["BlockName"] == 'Radiator':
+                        bl = Radiator(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                      loadedBlock=True)
+                    elif i["BlockName"] == 'WTap':
+                        bl = WTap(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                  loadedBlock=True)
+                    elif i["BlockName"] == 'WTap_main':
+                        bl = WTap_main(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                       loadedBlock=True)
+                    elif i["BlockName"] == 'Connector':
+                        bl = Connector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                       loadedBlock=True)
+                    elif i["BlockName"] == 'Boiler':
+                        bl = Boiler(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                     loadedBlock=True)
-                        elif i["BlockName"] == 'GroundSourceHx':
-                            bl = GroundSourceHx(i["BlockName"], self.editor.diagramView,
-                                                displayName=i["BlockDisplayName"],
-                                                loadedBlock=True)
-
-                        # [--- new encoding
-                        elif i["BlockName"] == 'StorageTank':
-                            bl = StorageTank(i["BlockName"], self.editor.diagramView,
-                                             displayName=i["BlockDisplayName"], loadedBlock=True)
-                        elif i["BlockName"] == 'HeatPump':
-                            bl = HeatPump(i["BlockName"], self.editor.diagramView,
-                                          displayName=i["BlockDisplayName"], loadedBlock=True)
-                        elif i["BlockName"] == 'HPTwoHx':
-                            bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
-                                               displayName=i["BlockDisplayName"], loadedBlock=True)
-                        elif i["BlockName"] == 'HPDoubleDual':
-                            bl = HPDoubleDual(i["BlockName"], self.editor.diagramView,
-                                              displayName=i["BlockDisplayName"], loadedBlock=True)
-                        elif i["BlockName"] == 'ExternalHx':
-                            bl = ExternalHx(i["BlockName"], self.editor.diagramView,
-                                            displayName=i["BlockDisplayName"], loadedBlock=True)
-                        elif i["BlockName"] == 'IceStorageTwoHx':
-                            bl = IceStorageTwoHx(i["BlockName"], self.editor.diagramView,
-                                                 displayName=i["BlockDisplayName"], loadedBlock=True)
-                        elif i["BlockName"] == 'GenericBlock':
-                            bl = GenericBlock(i["BlockName"], self.editor.diagramView,
-                                              displayName=i["BlockDisplayName"], loadedBlock=True)
-                        elif i["BlockName"] == 'MasterControl':
-                            bl = MasterControl(i["BlockName"], self.editor.diagramView,
-                                               displayName=i["BlockDisplayName"],
-                                               loadedBlock=True)
-                        elif i["BlockName"] == 'Control':
-                            bl = Control(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                    elif i["BlockName"] == 'AirSourceHP':
+                        bl = AirSourceHP(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
                                          loadedBlock=True)
-                        # --- new encoding]
+                    elif i["BlockName"] == 'PV':
+                        bl = PV(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                loadedBlock=True)
+                    elif i["BlockName"] == 'GroundSourceHx':
+                        bl = GroundSourceHx(i["BlockName"], self.editor.diagramView,
+                                            displayName=i["BlockDisplayName"],
+                                            loadedBlock=True)
 
-                        elif i["BlockName"] == "GraphicalItem":
-                            bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
+                    # [--- new encoding
+                    elif i["BlockName"] == 'StorageTank':
+                        bl = StorageTank(i["BlockName"], self.editor.diagramView,
+                                         displayName=i["BlockDisplayName"], loadedBlock=True)
+                    elif i["BlockName"] == 'HeatPump':
+                        bl = HeatPump(i["BlockName"], self.editor.diagramView,
+                                      displayName=i["BlockDisplayName"], loadedBlock=True)
+                    elif i["BlockName"] == 'HPTwoHx':
+                        bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
+                                           displayName=i["BlockDisplayName"], loadedBlock=True)
+                    elif i["BlockName"] == 'HPDoubleDual':
+                        bl = HPDoubleDual(i["BlockName"], self.editor.diagramView,
+                                          displayName=i["BlockDisplayName"], loadedBlock=True)
+                    elif i["BlockName"] == 'ExternalHx':
+                        bl = ExternalHx(i["BlockName"], self.editor.diagramView,
+                                        displayName=i["BlockDisplayName"], loadedBlock=True)
+                    elif i["BlockName"] == 'IceStorageTwoHx':
+                        bl = IceStorageTwoHx(i["BlockName"], self.editor.diagramView,
+                                             displayName=i["BlockDisplayName"], loadedBlock=True)
+                    elif i["BlockName"] == 'GenericBlock':
+                        bl = GenericBlock(i["BlockName"], self.editor.diagramView,
+                                          displayName=i["BlockDisplayName"], loadedBlock=True)
+                    elif i["BlockName"] == 'MasterControl':
+                        bl = MasterControl(i["BlockName"], self.editor.diagramView,
+                                           displayName=i["BlockDisplayName"],
+                                           loadedBlock=True)
+                    elif i["BlockName"] == 'Control':
+                        bl = Control(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
+                                     loadedBlock=True)
+                    # --- new encoding]
 
-                        else:
-                            bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
+                    elif i["BlockName"] == "GraphicalItem":
+                        bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
 
-                        bl.decode(i, resConnList, resBlockList)
-
-                    elif ".__ConnectionDict__" in arr[k]:
-                        i = arr[k]
-
-                        fport = None
-                        tPort = None
-
-                        # Looking for the ports the connection is connected to
-                        for connBl in resBlockList:
-                            for p in connBl.inputs + connBl.outputs:
-                                if p.id == i["PortFromID"]:
-                                    fport = p
-                                if p.id == i["PortToID"]:
-                                    tPort = p
-
-                        if fport is None:
-                            self.logger.debug("Error: Did not found a fromPort")
-
-                        if tPort is None:
-                            self.logger.debug("Error: Did not found a toPort")
-
-                        # To allow loading json files without FirstSegmentPos (old version of encoding)
-                        if "FirstSegmentLabelPos" in i:
-                            c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
-                                           fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"],
-                                           labelPos=i["FirstSegmentLabelPos"], loadedConn=True)
-                        else:
-                            c = Connection(fport, tPort, i["isVirtualConn"], self.editor,
-                                           fromPortId=i["PortFromID"], toPortId=i["PortToID"],
-                                           segmentsLoad=i["SegmentPositions"], cornersLoad=i["CornerPositions"],
-                                           loadedConn=True)
-
-                        c.decode(i, resConnList, resBlockList)
-
-                    elif "__idDct__" in arr[k]:
-                        resBlockList.append(arr[k])
-                    elif "__nameDct__" in arr[k]:
-                        resBlockList.append(arr[k])
                     else:
-                        self.logger.debug("Error: Not recognized object in decoder, " + str(arr[k]))
+                        bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
+
+                    bl.decode(i, resConnList, resBlockList)
+
+                elif ".__ConnectionDict__" in i:
+                    fromPort = None
+                    toPort = None
+
+                    # Looking for the ports the connection is connected to
+                    for connBl in resBlockList:
+                        for p in connBl.inputs + connBl.outputs:
+                            if p.id == i["PortFromID"]:
+                                fromPort = p
+                            if p.id == i["PortToID"]:
+                                toPort = p
+
+                    if fromPort is None:
+                        self.logger.debug("Error: Did not found a fromPort")
+
+                    if toPort is None:
+                        self.logger.debug("Error: Did not found a toPort")
+
+                    connectionKwargs = self.create_connection_kwargs(i)
+
+                    c = Connection(fromPort, toPort, i["isVirtualConn"], self.editor, **connectionKwargs)
+
+                    c.decode(i, resConnList, resBlockList)
+
+                elif "__idDct__" in i:
+                    resBlockList.append(i)
+                elif "__nameDct__" in i:
+                    resBlockList.append(i)
+                else:
+                    self.logger.debug("Error: Not recognized object in decoder, " + str(i))
 
             # return resBlockList, resConnList, resStorageConnList
             return resBlockList, resConnList
 
         return arr
+
+    @staticmethod
+    def create_connection_kwargs(item: tp.Mapping[str, tp.Any]) -> tp.Mapping[str, tp.Any]:
+        connectionKwargs = dict(loadedConn=True, fromPortId=item["PortFromID"], toPortId=item["PortToID"],
+                                segmentsLoad=item["SegmentPositions"], cornersLoad=item["CornerPositions"])
+
+        if "FirstSegmentLabelPos" in item:
+            connectionKwargs["labelPos"] = tuple(item["FirstSegmentLabelPos"])
+
+        if "FirstSegmentMassFlowLabelPos" in item:
+            connectionKwargs["labelMassPos"] = tuple(item["FirstSegmentMassFlowLabelPos"])
+
+        return connectionKwargs
 
 
 class DiagramEncoder(json.JSONEncoder):
@@ -509,7 +520,7 @@ class DiagramEncoder(json.JSONEncoder):
             blockDct = {".__BlockDct__": True}
 
             for t in obj.trnsysObj:
-                if isinstance(t, BlockItem) and t.isVisible() is False:
+                if isinstance(t, BlockItem) and not t.isVisible():
                     logger.debug("Invisible block [probably an insideBlock?]" + str(t) + str(t.displayName))
                     continue
                 if isinstance(t, Connection) and t.isVirtualConn:
@@ -3462,7 +3473,8 @@ class MainWindow(QMainWindow):
             else:
                 projectMB = QMessageBox(self)
                 projectMB.setText(
-                    "The json you are opening does not have a proper project folder environment. Do you want to continue and create one?")
+                    "The json you are opening does not have a proper project folder environment. "
+                    "Do you want to continue and create one?")
                 projectMB.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
                 projectMB.setDefaultButton(QMessageBox.Cancel)
                 projectRet = projectMB.exec()

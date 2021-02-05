@@ -99,13 +99,13 @@ class Connection(object):
         self.segmentsLoad = None
         self.cornersLoad = None
         self.labelPosLoad = None
+        self.labelMassPosLoad = None
 
-        self.mass = 0 # comment out
+        self.mass = 0  # comment out
         self.temperature = 0
 
         # A new connection is created if there are no kwargs
-        if kwargs == {}:
-            # self.logger.debug("New connection being created")
+        if not kwargs:
             self.fromPortId = self.parent.idGen.getID()
             self.toPortId = self.parent.idGen.getID()
             self.initNew(parent)
@@ -120,11 +120,8 @@ class Connection(object):
                 if "labelPos" in kwargs:
                     self.labelPosLoad = kwargs["labelPos"]
 
-                # self.logger.debug("There are " + str(len(self.segmentsLoad)) + " segements loaded for this connection")
-                # self.initLoad()
-
-        # Unused. For dfs1
-        # self.traversed = False
+                if "labelMassPos" in kwargs:
+                    self.labelMassPosLoad = kwargs["labelMassPos"]
 
     def isVisible(self):
         res = True
@@ -159,37 +156,22 @@ class Connection(object):
         for s in self.segments:
             s.labelMass.setPlainText("M: %s kg/Hr   T: %s\u2103" % (self.mass.replace(',', '\''), self.temperature))
 
-
     def setDisplayName(self, newName):
         self.displayName = newName
         self.updateSegLabels()
 
-    def setLabelPos(self, tup):
-        posOffset = 10
-        if len(self.segments) > 0:
-            # self.segments[0].label.setPos(tup[0]+posOffset, tup[1]+posOffset)
-            self.segments[0].label.setPos(0, 0)
-            self.segments[0].label.setRotation(0)
+    def setLabelPos(self, tup: tp.Tuple[float, float]) -> None:
+        pos = self._toPoint(tup)
+        self.firstS.label.setPos(pos)
 
-    # comment out
-    def setMassLabelPos(self, tup):
-        posOffset = 50
-        posOffsetY = 15
-        if len(self.segments) > 0:
-            if self.fromPort.side == 1:
-                self.segments[0].labelMass.setPos(tup[0], tup[1] - posOffsetY)
-            elif self.fromPort.side == 0:
-                if self.fromPort.parent.flippedH:
-                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
-                else:
-                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
-            elif self.fromPort.side == 2:
-                if self.fromPort.parent.flippedH:
-                    self.segments[0].labelMass.setPos(tup[0] - posOffset, tup[1])
-                else:
-                    self.segments[0].labelMass.setPos(tup[0] + posOffset, tup[1])
-            else:
-                self.segments[0].labelMass.setPos(tup[0], tup[1])
+    def setMassLabelPos(self, tup: tp.Tuple[float, float]) -> None:
+        pos = self._toPoint(tup)
+        self.firstS.labelMass.setPos(pos)
+
+    @staticmethod
+    def _toPoint(tup):
+        pos = QPointF(tup[0], tup[1])
+        return pos
 
     def setStartPort(self, newStartPort):
         self.fromPort = newStartPort
@@ -360,9 +342,11 @@ class Connection(object):
         if len(self.cornersLoad) > 0:
             self.loadSegments()
 
-        if self.labelPosLoad is not None:
+        if self.labelPosLoad:
             self.setLabelPos(self.labelPosLoad)
-            self.setMassLabelPos(self.labelPosLoad) # comment out
+
+        if self.labelMassPosLoad:
+            self.setMassLabelPos(self.labelMassPosLoad)
 
         # Still not tested
         # self.correctPorts()
@@ -1306,7 +1290,6 @@ class Connection(object):
             self.logger.debug("Segment is " + str(s) + " has global id " + str(s.id) + " has startnode " + str(
                 s.startNode) + " endnode " + str(s.endNode))
 
-
     # Saving / Loading
     def encode(self):
         if not self.isVirtualConn:
@@ -1332,9 +1315,13 @@ class Connection(object):
             dct['SegmentPositions'] = segments
             if len(self.segments) > 0:
                 dct['FirstSegmentLabelPos'] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+                dct['FirstSegmentMassFlowLabelPos'] = \
+                    self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
             else:
                 self.logger.debug("This connection has no segment")
-                dct['FirstSegmentLabelPos'] = self.fromPort.pos().x(), self.fromPort.pos().y()
+                defaultPosition = self.fromPort.pos().x(), self.fromPort.pos().y()
+                dct['FirstSegmentLabelPos'] = defaultPosition
+                dct['FirstSegmentMassFlowLabelPos'] = defaultPosition
 
             corners = []
 
@@ -1355,7 +1342,6 @@ class Connection(object):
         self.setName(i["ConnDisplayName"])
         self.groupName = "defaultGroup"
         self.setConnToGroup(i["GroupName"])
-        # self.setLabelPos(i["FirstSegmentLabelPos"])
 
         resConnList.append(self)
 
