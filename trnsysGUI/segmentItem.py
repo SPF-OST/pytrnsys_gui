@@ -1,16 +1,14 @@
-import sys
 from math import sqrt
 
-from PyQt5 import Qt, QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPointF, QLineF
 from PyQt5.QtGui import QColor, QLinearGradient, QBrush
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QMenu
 
-from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.CornerItem import CornerItem
-# from trnsysGUI.deleteConnectionCommand import DeleteConnectionCommand
+from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
-from trnsysGUI.segmentDlg import segmentDlg
+
 
 def calcDist(p1, p2):
     vec = p1 - p2
