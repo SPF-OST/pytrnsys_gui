@@ -9,7 +9,7 @@ You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/
 Prerequisites
 -------------
 
-Compulsive:
+Compulsory:
 * A local clone of https://github.com/SPF-OST/pytrnsys.git
 
 Assumed for the instructions in the following (different frameworks can be used individually):
