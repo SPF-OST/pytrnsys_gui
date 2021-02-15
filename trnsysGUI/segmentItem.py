@@ -267,7 +267,7 @@ class segmentItem(QGraphicsLineItem):
                     if not self.endNode.parent.isVisible():
                         self.endNode.parent.setVisible(True)
                     if self.isVertical():
-                        self.logger.debug("Segment is vertical", self.parent.segments.index(self))
+                        self.logger.debug("Segment is vertical: %s", self.parent.segments.index(self))
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
                         self.startNode.parent.setPos(newPos.x(), self.startNode.parent.scenePos().y())
                         self.updateGrad()
@@ -673,12 +673,12 @@ class segmentItem(QGraphicsLineItem):
         self.scene().parent().showSegmentDlg(self)
         
     def printItemsAt(self):
-        self.logger.debug("Items at startnode are " + str(self.scene().items(self.line().p1())))
-        self.logger.debug("Items at endnode are " + str(self.scene().items(self.line().p2())))
+        self.logger.debug("Items at startnode are %s", str(self.scene().items(self.line().p1())))
+        self.logger.debug("Items at endnode are %s", str(self.scene().items(self.line().p2())))
 
         for s in self.parent.segments:
-            self.logger.debug("Segment in list is" + str(s) + " has startnode" + str(s.startNode.parent) + " endnode " + str(
-                s.endNode.parent))
+            self.logger.debug("Segment in list is %s has startnode %s endnode %s",
+                              str(s), str(s.startNode.parent), str(s.endNode.parent))
 
     def contextMenuEvent(self, event):
         menu = QMenu()

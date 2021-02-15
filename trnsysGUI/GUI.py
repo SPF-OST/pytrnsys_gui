@@ -4,10 +4,9 @@ import json
 import os
 import shutil
 import sys
+import typing as tp
 from math import sqrt
 from pathlib import Path
-import argparse
-import typing as tp
 
 import pandas as pd
 from PyQt5 import QtGui
@@ -18,6 +17,7 @@ from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import *
 from pytrnsys.utils import log
 
+import trnsysGUI.arguments as args
 import trnsysGUI.buildDck as dckBuilder
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.BlockDlg import BlockDlg
@@ -64,7 +64,9 @@ from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.Radiator import Radiator
 from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.RunMain import RunMain
+from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.StorageTank import StorageTank
+import trnsysGUI.tracing as trc
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.TeePiece import TeePiece
@@ -86,9 +88,8 @@ __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
-from trnsysGUI.segmentDlg import segmentDlg
-
 # CSS file
+
 cssSs = open("res/style.txt", "r")
 
 
@@ -4187,23 +4188,11 @@ class MainWindow(QMainWindow):
             runApp.runAction(self.centralWidget.projectPath)
 
 
-def getLogLevelOrExit():
-    logLevels = "CRITICAL ERROR WARNING INFO DEBUG".split()
+def main():
+    global logger
+    arguments = args.getArgsOrExit()
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-l", "--log", type=str, default="INFO",
-                        choices=logLevels, help="Set the log level", metavar="LEVEL")
-
-    namespace = parser.parse_args()
-    logLevel = namespace.log
-
-    return logLevel
-
-
-if __name__ == '__main__':
-    logLevel = getLogLevelOrExit()
-    logger = log.setup_custom_logger('root', logLevel)
-
+    logger = log.setup_custom_logger('root', arguments.logLevel)
     cssSs_ = cssSs.read()
     app = QApplication(sys.argv)
     app.setApplicationName("Diagram Creator")
@@ -4213,16 +4202,20 @@ if __name__ == '__main__':
     form.show()
     form.checkFilePaths()
     form.setTrnsysPath()
-
     # app.setStyleSheet(cssSs_)
-
     # match = re.compile(r'\d{1,} {1,}\d{1,}')
     # match2 = re.compile(r'\d+')
     # x = match.sub("AAAA" ,"29 12 0 0         !1 : Collector", count=1)
     # x = match2.findall("29 12 0 0         !1 : Collector")
     # print(x)
     # print(type(x))
-    app.exec_()
+
+    tracer = trc.createTracer(arguments.shallTrace)
+    tracer.run(lambda: app.exec())
+
+
+if __name__ == '__main__':
+    main()
 
 # Found bug: when dragging bridging connection over another segment, crash
 # Found glitch: when having a disr segment, gradient is not correct anymore
