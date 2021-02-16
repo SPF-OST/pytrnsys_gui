@@ -284,12 +284,12 @@ class segmentItem(QGraphicsLineItem):
                     isLastSegment = hasattr(self.endNode.parent, "fromPort") and not self.endNode.nextN()
 
                     if isLastSegment:
-                        self.logger.debug("We end at toPort")
+                        self.logger.debug("A last segment is being dragged.")
                         if not self._isDraggingInProgress:
                             self._initInMode1(False)
                         self._dragInMode1(False, newPos)
                     elif isFirstSegment:
-                        self.logger.debug("We end at fromPort")
+                        self.logger.debug("A first segment is being dragged.")
                         if not self._isDraggingInProgress:
                             self._initInMode1(True)
                         self._dragInMode1(True, newPos)
