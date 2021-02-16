@@ -2,6 +2,7 @@ import trace as _trc
 import typing as _tp
 import abc as _abc
 import logging as _log
+import sys as _sys
 
 _TCo = _tp.TypeVar('_TCo')
 
@@ -23,7 +24,8 @@ class _DummyTracer(TracerBase):
 
 class _Tracer(TracerBase):
     def __init__(self):
-        self._trace = _trc.Trace(count=False, trace=True, timing=True)
+        ignoredirs=[_sys.prefix]
+        self._trace = _trc.Trace(count=False, trace=True, timing=True, ignoredirs=ignoredirs)
 
     def run(self, func: _tp.Callable[[], _TCo]) -> _TCo:
         return self._trace.runfunc(func)
