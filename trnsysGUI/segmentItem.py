@@ -69,12 +69,11 @@ class segmentItem(QGraphicsLineItem):
         self.secondLine = None
         self.secondCorner = None
         self.thirdCorner = None
-        self.firstLine = None
-        self.secondLine = None
+
 
         self.keyPr = 0
         # Used to only create the child objects once
-        self.inited = False
+        self._isDraggingInProgress = False
 
         self.linearGrad = None
 
@@ -253,7 +252,7 @@ class segmentItem(QGraphicsLineItem):
             newPos = e.pos()
 
             if self.parent.parent.editorMode == 0:
-                if not self.inited:
+                if not self._isDraggingInProgress:
                     self.initInMode0()
                 else:
                     self.dragInMode0(newPos)
@@ -280,23 +279,20 @@ class segmentItem(QGraphicsLineItem):
                 elif type(self.endNode.parent) is CornerItem and self.isVertical():
                     self.logger.debug("Segment is vertical and can't be moved")
 
+                if self.isHorizontal():
+                    isFirstSegment = hasattr(self.startNode.parent, "fromPort") and not self.startNode.prevN()
+                    isLastSegment = hasattr(self.endNode.parent, "fromPort") and not self.endNode.nextN()
 
-                # if type(self.startNode.parent) is Connection and self.startNode.prevN() is None:
-                #     self.logger.debug("We begin at the fromPort")
-
-                if hasattr(self.endNode.parent, "fromPort") and self.endNode.nextN() is None and not self.isVertical():
-                    self.logger.debug("We end at toPort")
-                    if not self.inited:
-                        self.initInMode1(False)
-                    else:
-                        self.dragInMode1(False, newPos)
-
-                elif hasattr(self.startNode.parent, "fromPort") and self.startNode.prevN() is None and not self.isVertical():
-                    self.logger.debug("We end at fromPort")
-                    if not self.inited:
-                        self.initInMode1(True)
-                    else:
-                        self.dragInMode1(True, newPos)
+                    if isLastSegment:
+                        self.logger.debug("A last segment is being dragged.")
+                        if not self._isDraggingInProgress:
+                            self._initInMode1(False)
+                        self._dragInMode1(False, newPos)
+                    elif isFirstSegment:
+                        self.logger.debug("A first segment is being dragged.")
+                        if not self._isDraggingInProgress:
+                            self._initInMode1(True)
+                        self._dragInMode1(True, newPos)
             else:
                 self.logger.debug("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
@@ -381,7 +377,7 @@ class segmentItem(QGraphicsLineItem):
             self.keyPr = 0
 
             if self.parent.parent.editorMode == 0:
-                if self.inited:
+                if self._isDraggingInProgress:
                     self.cornerChild.setFlag(self.ItemSendsScenePositionChanges, True)
 
                     self.hide()
@@ -448,7 +444,7 @@ class segmentItem(QGraphicsLineItem):
                         self.thirdCorner = None
                         self.firstLine = None
                         self.secondLine = None
-                        self.inited = False
+                        self._isDraggingInProgress = False
 
                     # if PortItem
                     elif hasattr(self.startNode.parent, "fromPort"):
@@ -467,7 +463,7 @@ class segmentItem(QGraphicsLineItem):
                         self.thirdCorner = None
                         self.firstLine = None
                         self.secondLine = None
-                        self.inited = False
+                        self._isDraggingInProgress = False
 
                     else:
                         self.logger.debug("getting no start or end")
@@ -525,9 +521,9 @@ class segmentItem(QGraphicsLineItem):
         self.parent.parent.diagramScene.addItem(self.secondChild)
         self.parent.parent.diagramScene.addItem(self.cornerChild)
 
-        self.inited = True
+        self._isDraggingInProgress = True
 
-    def initInMode1(self, b):
+    def _initInMode1(self, b):
 
         rad = 2
 
@@ -562,7 +558,7 @@ class segmentItem(QGraphicsLineItem):
                 self.parent.parent.diagramScene.addItem(self.secondLine)
                 self.logger.debug("inited")
 
-                self.inited = True
+                self._isDraggingInProgress = True
         else:
             if (hasattr(self.endNode.parent, "fromPort")) and (self.endNode.nextN() is None):
                 # We are at the toPort.
@@ -594,7 +590,7 @@ class segmentItem(QGraphicsLineItem):
                 self.parent.parent.diagramScene.addItem(self.secondLine)
                 self.logger.debug("inited")
 
-                self.inited = True
+                self._isDraggingInProgress = True
 
     def isVertical(self):
         return self.line().p1().x() == self.line().p2().x()
@@ -624,7 +620,7 @@ class segmentItem(QGraphicsLineItem):
             self.secondChild.setVisible(True)
             self.cornerChild.setVisible(True)
 
-    def dragInMode1(self, b, newPos):
+    def _dragInMode1(self, b, newPos):
         self.logger.debug("after inited")
 
         if b:
