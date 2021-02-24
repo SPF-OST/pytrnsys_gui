@@ -254,10 +254,10 @@ UNIT 86 TYPE 65     ! Onlint Plotter Ground Heat Exchanger
 PARAMETERS 12     
 5   ! 1 Nb. of left-axis variables
 3     ! 2 Nb. of right-axis variables
--20     ! 3 Left axis minimum
-60     ! 4 Left axis maximum
-0     ! 5 Right axis minimum
-4000     ! 6 Right axis maximum
+-1     ! 3 Left axis minimum
+2     ! 4 Left axis maximum
+-70     ! 5 Right axis minimum
+40     ! 6 Right axis maximum
 24     ! 7 Number of plots per simulation
 12     ! 8 X-axis gridpoints
 1     ! 9 Shut off Online w/o removing
@@ -266,9 +266,9 @@ PARAMETERS 12
 0     ! 12 Output file delimiter
 INPUTS 8
 **  1     2     3       4      5          
-TGHXout TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
+TGHXout TRT TGhxIn   CoolingOn  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
 ****
-TGHXout TRT TGhxIn   TGHXmon1  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
+TGHXout TRT TGhxIn   CoolingOn  TGHXmon5 MfrGHX  MfrGHXout Qghx_kW  
 ** INPUT LABELS     
 LABELS  3
 Temperatures     

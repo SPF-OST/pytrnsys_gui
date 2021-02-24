@@ -24,9 +24,9 @@ unitPrinterEl     ! 1: Logical unit number, -
 1     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration    
 INPUTS 9    
-Time  PelAuxTot_kW  PelPuAuxBri_kW  PelPuSh_kW    PelContr_kW  PelAuxComp_kW  PelPuAuxSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
+Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
 *******     
-Time  PelAuxTot_kW  PelPuAuxBri_kW  PelPuSh_kW    PelContr_kW  PelAuxComp_kW  PelPuAuxSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
+Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
 
                     
     

@@ -12,10 +12,10 @@
 
 *** Control modes
 EQUATIONS 7
-BoAuxWWon = HpForDHWIsNeeded ! Boolean value - DHW charging is needed
-BoAuxSHon = HpForSHIsNeeded*NOT(BoAuxWWon) ! Boolean value - SH charging is needed
-CoolingOn = CoolingNeeded*NOT(BoAuxWWon) ! Cooling mode on
-HpIsOn = OR(BoAuxWWon,BoAuxSHon) ! HP is on
+BoHpWWon = HpForDHWIsNeeded ! Boolean value - DHW charging is needed
+BoHpSHon = HpForSHIsNeeded*NOT(BoHpWWon) ! Boolean value - SH charging is needed
+CoolingOn = CoolingNeeded*NOT(BoHpWWon) ! Cooling mode on
+HpIsOn = OR(BoHpWWon,BoHpSHon) ! HP is on
 qAuxStoreDHW_KW = 0 ! No internal heat source dhw storage
 qAuxStoreSH_KW = 0 ! No internal heat source sh storage
 BoDHWTapping = GT(MfrDHWset,0) ! Bo DHW water tapped in this timestep
@@ -27,9 +27,9 @@ MfrPuSH = MfrBuiRd				! Mfr control pump SH-loop
 MfrsupplyWater = MfrDHWset		! Mfr tapping water
 MfrPuDHW = MfrSrcDHWHXUsed*BoDHWTapping+NOT(BoDHWTapping)*MfrSrcDHWHXUsed	! Mfr DHW water external heat exchanger source side
 MfrPuCirc = NOT(BoDHWTapping)*150	! Mfr circulation loop
-MfrPuHpEvap = MfrHpEvapNom*hpIsOn	! Mfr control pump ground source loop
-MfrPuHpShCond = MfrHpCondNom*BoAuxSHOn	! Mfr pump heat pump SH part
-MfrPuHpDhwCond = MfrHpCondNom*BoAuxWWOn! Mfr pump heat pump DHW part
+MfrPuHpEvap = MfrHpEvapNom*hpIsOn+MfrPuSH*CoolingOn	! Mfr control pump ground source loop
+MfrPuHpShCond = MfrHpCondNom*BoHpSHOn	! Mfr pump heat pump SH part
+MfrPuHpDhwCond = MfrHpCondNom*BoHpWWOn! Mfr pump heat pump DHW part
 
 *** Valve positions
 EQUATIONS 7
@@ -37,9 +37,9 @@ xFracDivCondTOTesDhw = 1		!
 xFracDivSHCool = CoolingOnRc
 xFracDivDhw = NOT(BoDHWTapping)
 xFracDivDhwOut = NOT(BoDHWTapping)
-xFracDivCool = NOT(CoolingOnRc)
+xFracDivCool = 0!NOT(CoolingOnRc)
 xFracDivHp = 0
-xFracDivTesDhwOut = BoAuxSHon
+xFracDivTesDhwOut = BoHpSHon
 
 EQUATIONS 4
 TdhwSet = TdhwSetProfile		! Tset DHW storage
@@ -76,20 +76,20 @@ T_set_DivHpEvap
 *** INITIAL INPUT VALUES
 35.0 21.0 800.0 T_set_DivHpEvap
 EQUATIONS 1
-xFracDivHpEvap =  1.-[442,5] 
+xFracDivHpEvap =  CoolingOn!1.-[442,5] 
 
 
 UNIT 82 TYPE 993      ! Input value recall (element RcA) DC CHANGED
 PARAMETERS 1     
 4    ! 1: number of variables to be remembered
 INPUTS 4    
-HpIsOn BoAuxWWon BoAuxSHon CoolingOn  !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh     
+HpIsOn BoHpWWon BoHpSHon CoolingOn  !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh     
 0 0  0  0 !0 0 0  
      
 EQUATIONS 4
 HpIsOnRc = [82,1]         
-BoAuxWWonRc = [82,2]     
-BoAuxSHonRc = [82,3] 
+BoHpWWonRc = [82,2]     
+BoHpSHonRc = [82,3] 
 CoolingOnRc  = [82,4]
 
 EQUATIONS 1
@@ -102,5 +102,5 @@ TtapWater = TPiDhwDemand
 TPuHpEvap = TPiGhxOut
 TPuHpShCond = TPiPuHpShIn
 TPuHpDhwCond = TPiPuHpDhwIn
-TPuDhw = TConn1446
+TPuDhw = TPiHxDhwOut
 TPuCirc = TPiPuCircIn
