@@ -63,27 +63,6 @@ class TVentil(BlockItem):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        # if not(self.flippedV) and not(self.flippedH):
-        #     self.inputs[0].setPos(0,delta)
-        #     self.inputs[1].setPos(delta,0)
-        #     self.outputs[0].setPos(w,delta)
-        # elif self.flippedV and not(self.flippedH):
-        #     self.inputs[0].setPos(0,delta)
-        #     self.inputs[1].setPos(delta,h)
-        #     self.outputs[0].setPos(w,delta)
-        # elif not(self.flippedV) and self.flippedH:
-        #     self.inputs[0].setPos(w,delta)
-        #     self.inputs[1].setPos(delta,0)
-        #     self.outputs[0].setPos(0,delta)
-        # elif self.flippedV and self.flippedH:
-        #     self.inputs[0].setPos(w,delta)
-        #     self.inputs[1].setPos(delta,h)
-        #     self.outputs[0].setPos(0,delta)
-
-        # self.inputs[0].side = 0 + 2 * self.flippedH
-        # self.inputs[1].side = 1 + 2 * self.flippedV
-        # self.outputs[0].side = 2 - 2 * self.flippedH
-
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.inputs[1].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
