@@ -21,9 +21,9 @@ class Group(QGraphicsRectItem):
         # List of items part of this group
         self.itemList = []
 
-        self.exportDi = 0.2
-        self.exportL = 2
-        self.exportU = 10
+        self.exportDi = 0.05    # [m]
+        self.exportL = 2        # [m]
+        self.exportU = 10   # DC will calculate proper default value
 
         self.label = QGraphicsTextItem(self)
         self.label.setPlainText(self.displayName)

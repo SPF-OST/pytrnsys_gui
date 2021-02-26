@@ -28,8 +28,8 @@ EQUATIONS 4
 **THpDesOut = [162,1]     ! 
 **THpDesOut = HpDesIsOn*[163,3] + NOT(HpDesIsOn)*THpDesIn     ! Temperature of the condenser (heat sink) outlet
 THpEvapOut = [162,1]     ! 
-THpCondOut = THpCondIn+PauxCond_kW*3600/(MfrCondIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
-THpDesOut = THpDesIn+PauxDes_kW*3600/(MfrDesIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
+THpCondOut = -1000 !THpCondIn+QHpCond_kW*3600/(MfrCondIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
+THpDesOut = [162,3]!THpDesIn+QHpDes_kW*3600/(MfrDesIn*cpWat+0.0000000001)     ! Temperature of the condenser (heat sink) outlet
 HpDesIsOn = 0
 
 ******************************************************************************************
@@ -37,9 +37,9 @@ HpDesIsOn = 0
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 ******************************************************************************************
 EQUATIONS 3
-elSysIn_Q_HpComp  = PelAuxComp_kW 
-elSysOut_PuCond = PelPuAuxSH_kW
-elSysOut_PuEvap = PelPuAuxBri_kW
+elSysIn_Q_HpComp  = ElHpComp_kW 
+elSysOut_PuCond = PelPuHpSH_kW
+elSysOut_PuEvap = PelPuHpBri_kW
 
 *************************************************************************************************
 ** Dependencies with other types
@@ -60,7 +60,7 @@ elSysOut_PuEvap = PelPuAuxBri_kW
 ***********************************
 
 EQUATIONS 1
-shareCondenser = 0.7
+shareCondenser = 0!0.7
 
 CONSTANTS 7  ! Heat Pump: Size              
 sizeHpUsed = sizeHpNom ! change this to scale the heat pump   
@@ -101,7 +101,7 @@ tauWPstop = 20
 TWPEvapIce = -100
 EtaDefrost = 0.4
 PelWPVen = 0
-PelAuxCtr_kW = 0
+ElHpCtr_kW = 0
 
 UNIT 162 TYPE 977     ! Compression Heat Pump Model v401
 PARAMETERS 28     
@@ -122,7 +122,7 @@ tauWPstop     ! 14: tau_stop, s
 TWPEvapIce     ! 14: tevapIce, ?C
 EtaDefrost     ! 15: eta_defrost, -
 PelWPVen     ! 16: ventilator electricity consumption, kW
-PelAuxCtr_kW     ! 17: controller electricity consumption, kW
+ElHpCtr_kW     ! 17: controller electricity consumption, kW
 TminEvapTout   ! 18: tevap,min, ?C
 TEvapMaxHp     ! 19: tevap,max, ?C
 0     ! 20: tcond,min, ?C
@@ -145,21 +145,20 @@ frCond     !8
 frCOP     !9
 0  0  0  0  0  0.5 21 1 1     
     
-EQUATIONS 14     ! Heat Pump: Outputs
-MfrAuxEvapOut = [162,2]     ! mass flow rate of evaporator outlet
+EQUATIONS 13     ! Heat Pump: Outputs
+MfrHpEvapOut = [162,2]     ! mass flow rate of evaporator outlet
 HpIsBlock = BrineTooColdTimer ! OR([162,18],BrineTooColdTimer) !      
 BrineTooCold = OR(LT(THpEvapIn,TMinEvapTin),(LT(THpEvapOut,TMinEvapTout)))
-MfrAuxOut = [162,4]*NOT(HpIsBlock)     ! ! Mass flow rate of the condenser (heat sink) outlet
-PelAuxComp_kW = [162,5]     ! ! electricity consumption of compressor, kW
-PelAuxTot_kW = [162,6]     ! ! electricity consumption total, kW
-PauxEvap_kW = [162,7]     ! 
-PauxCond_kW = [162,8]*shareCondenser     ! ! Heat output condenser, kW
-COPAux = [162,9]     ! 
-PAuxLossStart_kW = [162,10]     ! ! Start losses, kW
-PAuxDefrost_kW = [162,11]     ! ! Defrosting losses, kW
-QShFromHp  = 0 ! EQL(HpIsOn,1)*PRdIn_kW     !CHANGED DC     
-QShFromTes = PRdIn_kW ! EQL(HpIsOn,0)*PRdIn_kW   !CHANGED DC     
-PauxDes_kW = [162,8]*(1-shareCondenser)
+MfrHpOut = [162,4]*NOT(HpIsBlock)     ! ! Mass flow rate of the condenser (heat sink) outlet
+ElHpComp_kW = [162,5]     ! ! electricity consumption of compressor, kW
+ElHpTot_kW = [162,6]     ! ! electricity consumption total, kW
+QHpEvap_kW = [162,7]     ! 
+QHpCond_kW = [162,8]*shareCondenser     ! ! Heat output condenser, kW
+COQHp = [162,9]     ! 
+QHpLossStart_kW = [162,10]     ! ! Start losses, kW
+QHpDefrost_kW = [162,11]     ! ! Defrosting losses, kW     
+QHpDes_kW = [162,8]*(1-shareCondenser)
+QHpTot = QHpCond_kW+QHpDes_kW
 
 
 UNIT 164 TYPE 817     ! Timer or time delay FIXED TO 5 VARIABLES. WE CAN'T CHANGE IT !!
@@ -182,33 +181,55 @@ BrineTooColdTimer = [164,1]
       
 
 EQUATIONS 4  
-BoAuxStart = HpIsOn*NOT(HpIsOnRc)     
-AuxStartPerH = BoAuxStart/dtsim     
-AuxDHWStartPerH = AuxStartPerH*BoAuxWWOn       
-PauxCondSh_kW = PauxCond_kW*BoAuxSHon      
+BoHpStart = HpIsOn*NOT(HpIsOnRc)     
+HpStartPerH = BoHpStart/dtsim     
+HpDHWStartPerH = HpStartPerH*BoHpWWOn       
+QHpCondSh_kW = QHpCond_kW*BoHpSHon      
   
 ** TO BE DELETED. Pump consumption should come from GUI export 
 EQUATIONS 9 ! 16     
-dpAuxSH_bar = 0.2     ! according to MacSheep report 7.2 
-PflowAuxSH_W = ((MfrAuxOut/3600)/RhoWat)*dpAuxSH_bar*100000     ! required power to drive the flow, W
-etaPuAuxSh = 0.35     ! Assumption
-PelPuAuxSH_kW = (PflowAuxSH_W/1000)/etaPuAuxSH     ! required pump electric power, kW
-dpAuxBrine_bar = 0.3     ! assumption (pressure drop is a mix between SH- and Borehole-Loop according to MacSheep report 7.2)
-PflowAuxBrine_W = ((MfrAuxEvapOut/3600)/RhoBri)*dpAuxBrine_bar*100000     ! required power to drive the flow, W
-etaPuAuxBrine = 0.35     ! Assumption
-PelPuAuxBrine_kW = (PflowAuxBrine_W/1000)/etaPuAuxBrine     ! required pump electric power, kW
-PelPuAuxBri_kW=GT(MfrEvapIn,0.1)*PelPuAuxBrine_kW     ! GT(MfrcondIn,0.1)*PelPuAuxBrine_kW          ! naming could be better?
+dpHpSH_bar = 0.2     ! according to MacSheep report 7.2 
+PflowHpSH_W = ((MfrHpOut/3600)/RhoWat)*dpHpSH_bar*100000     ! required power to drive the flow, W
+etaPuHpSh = 0.35     ! Assumption
+PelPuHpSH_kW = (PflowHpSH_W/1000)/etaPuHpSH     ! required pump electric power, kW
+dpHpBrine_bar = 0.3     ! assumption (pressure drop is a mix between SH- and Borehole-Loop according to MacSheep report 7.2)
+PflowHpBrine_W = ((MfrHpEvapOut/3600)/RhoBri)*dpHpBrine_bar*100000     ! required power to drive the flow, W
+etaPuHpBrine = 0.35     ! Assumption
+PelPuHpBrine_kW = (PflowHpBrine_W/1000)/etaPuHpBrine     ! required pump electric power, kW
+PelPuHpBri_kW=GT(MfrEvapIn,0.1)*PelPuHpBrine_kW     ! GT(MfrcondIn,0.1)*PelPuHpBrine_kW          ! naming could be better?
 	 
 EQUATIONS 2
 dtEvap = ThpEvapIn-THpEvapOut
 dtCond = THpCondOut-THpCondIn
 
+***********************************
+** Monthly printer
+***********************************
+
+CONSTANTS 1
+unitPrinterHp=88
+
+ASSIGN    temp\HP_MO.Prt      unitPrinterHp     
+UNIT 88 Type 46     ! Printegrator Monthly Values for System
+PARAMETERS 7    
+unitPrinterHp     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+2     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+2     ! 7: Output number to avoid integration 
+INPUTS 5     
+Time  TRT ElHpComp_kW   QHpEvap_kW	QHpDes_kW   
+**  
+Time  TRT ElHpComp_kW   QHpEvap_kW	QHpDes_kW
 
 
 
-
-
-UNIT 89 TYPE 65     ! Online Plotter Auxiliary (Element Hp)
+***********************************
+** Online plotter
+***********************************
+UNIT 89 TYPE 65     ! Online Plotter Hpiliary (Element Hp)
 PARAMETERS 12     
 10    ! 1 Nb. of left-axis variables
 10    ! 2 Nb. of right-axis variables
@@ -223,10 +244,10 @@ nPlotsPerSim ! 7 Number of plots per simulation
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
 INPUTS 20     
-ThpEvapIn THpDesIn THpDesOut HpIsOn HpForDHWIsNeeded HpForSHIsNeeded BoAuxWWon BoAuxSHon  THpCondOut Nix 
+ThpEvapIn THpDesIn THpDesOut HpIsOn HpForDHWIsNeeded HpForSHIsNeeded BoHpWWon BoHpSHon  THpCondOut Nix 
 MfrEvapIn MfrDesIn MfrPiHpToTesDHWOut MfrPiHpToTesDHWIn THpCondIn  THpCondOut Nix nix  Nix Nix
 **
-ThpEvapIn THpDesIn THpDesOut HpIsOn HpForDHWIsNeeded HpForSHIsNeeded BoAuxWWon BoAuxSHon  THpCondOut Nix
+ThpEvapIn THpDesIn THpDesOut HpIsOn HpForDHWIsNeeded HpForSHIsNeeded BoHpWWon BoHpSHon  THpCondOut Nix
 MfrEvapIn MfrDesIn MfrPiHpToTesDHWOut MfrPiHpToTesDHWIn    nix  Nix Nix nix  Nix Nix
 LABELS  3     
 Temperatures     

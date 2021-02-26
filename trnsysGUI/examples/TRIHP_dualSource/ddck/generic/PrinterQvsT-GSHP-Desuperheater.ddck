@@ -30,10 +30,10 @@ unitPrinterQvsT     ! 4 Logical unit
 0     ! 9 Delimiter
 1     ! 10 Print labels
 INPUTS 16
-PauxEvap_kW  ThpEvapIn  PauxCond_kW  THpCondOut PauxDes_kW  THpDesOut  PRdIn_kW  TRdFl  TRdRt     
+QHpEvap_kW  ThpEvapIn  QHpCond_kW  THpCondOut QHpDes_kW  THpDesOut  PRdIn_kW  TRdFl  TRdRt     
 Pdhw_kW TPiDHWDemand TLoadDHWHXOut TLoadDHWHXIn PPiCircLoss_kW   TGHXout Qghx_kW
 ******     
-PauxEvap_kW  ThpEvapIn  PauxCond_kW  THpCondOut PauxDes_kW  THpDesOut  PRdIn_kW  TRdFl  TRdRt     
+QHpEvap_kW  ThpEvapIn  QHpCond_kW  THpCondOut QHpDes_kW  THpDesOut  PRdIn_kW  TRdFl  TRdRt     
 Pdhw_kW TPiDHWDemand TLoadDHWHXOut TLoadDHWHXIn PPiCircLoss_kW   TGHXout Qghx_kW
 
 **ASSIGN temp\MassFlows.Plt   225    
