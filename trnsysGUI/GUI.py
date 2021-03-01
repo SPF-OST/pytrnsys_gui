@@ -1746,8 +1746,14 @@ class DiagramEditor(QWidget):
             header.close()
         elif exportTo == "ddck":
             fullExportText += "*************************************\n"
-            fullExportText += "**BEGIN hydraulic.ddck\n"
+            fullExportText += "** BEGIN hydraulic.ddck\n"
+            fullExportText += "*************************************\n\n"
             fullExportText += "*************************************\n"
+            fullExportText += "** Outputs to energy balance in kWh\n"
+            fullExportText += "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
+            fullExportText += "*************************************\n"
+            fullExportText += "EQUATIONS 1\n"
+            fullExportText += "qSysOut_PipeLoss = PipeLossTot\n"
 
         simulationUnit = 450
         simulationType = 935

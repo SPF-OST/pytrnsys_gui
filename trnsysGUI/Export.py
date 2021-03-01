@@ -682,30 +682,20 @@ class Export(object):
     def exportPrintPipeLosses(self):
         f = ''
         lossText = ''
-        strVar = 'PipeLoss'
-        totalLeftText = strVar + "Total="
-        totalRightText = ''
-        equationCounter = 0
+        rightCounter = 0
 
-        for g in self.editor.groupList:
-            leftText = strVar + str(self.editor.groupList.index(g)) + "="
-            rightText = ''
-            rightCounter = 0
+        for i in self.editor.groupList[0].itemList:
+            if isinstance(i, Connection) and not i.isVirtualConn:
+                if rightCounter == 0:
+                    lossText += "P" + i.displayName + "_kW"
+                else:
+                    lossText += "+" + "P" + i.displayName + "_kW"
+                rightCounter += 1
 
-            for i in g.itemList:
-                if isinstance(i, Connection) and not i.isVirtualConn:
-                    rightText += "P" + i.displayName + "_kW" + "+"
-                    rightCounter += 1
+        if rightCounter == 0:
+            lossText += "0"
 
-            if rightCounter > 0:
-                rightText = rightText[:-1]
-                lossText += leftText + rightText + '\n'
-                totalRightText += strVar + str(self.editor.groupList.index(g)) + "+"
-                equationCounter += 1
-
-        totalRightText = totalRightText[:-1]
-
-        f += "EQUATIONS " + str(equationCounter + 1) + "\n" + lossText + totalLeftText + totalRightText +  "\n\n"
+        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText +"\n\n"
         return f
 
     def exportMassFlowPrinter(self, unitnr, descLen):
