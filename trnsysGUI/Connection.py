@@ -15,7 +15,6 @@ from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.segmentItem import segmentItem
 
-
 def calcDist(p1, p2):
     vec = p1 - p2
     norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
@@ -83,7 +82,12 @@ class Connection(object):
         self.trnsysConn = []
 
         # For functions in storage tank
-        self.side = ''
+        if isVirtual and fromPort.side == 0:
+            self.side = 'Left'
+        elif isVirtual and fromPort.side == 2:
+            self.side = 'Right'
+        else:
+            self.side = ''
 
         # Global
         self.id = self.parent.idGen.getID()
@@ -1496,7 +1500,6 @@ class Connection(object):
                         lr = "Right"
 
                         # (100 - 100 * self.directPortConnsForList[i].fromPort.pos().y() / self.h) / 100
-
                     unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * round((1 - (
                             portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h),2))) + "\n"
                 elif hasattr(self.trnsysConn[0], "subBlockCounter"):

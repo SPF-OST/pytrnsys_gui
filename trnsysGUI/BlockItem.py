@@ -319,14 +319,10 @@ class BlockItem(QGraphicsPixmapItem):
 
         if self.flippedV:
             for i in range(0,len(self.inputs)):
-                test1 = self.h/2.
-                test2 = self.origInputsPos[i][1]
                 distanceToMirrorAxis = self.h/2. - self.origInputsPos[i][1]
                 self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1]+2.*distanceToMirrorAxis)
 
             for i in range(0, len(self.outputs)):
-                test1 = self.h/2.
-                test2 = self.origOutputsPos[i][1]
                 distanceToMirrorAxis = self.h/2. - self.origOutputsPos[i][1]
                 self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1]+2.*distanceToMirrorAxis)
 

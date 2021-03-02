@@ -662,8 +662,9 @@ class Type1924_TesPlugFlow():
                 line = self.getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
                 lines = lines + line
                 inputTemperature = line.split("\n")[1].split('=')[0].replace(" ","")
-                ddcxLine = "T" + name + "Port" + self.connectorsPort[idPort]['side'] + str(
-                    int(self.connectorsPort[idPort]['zIn'] * 100)) + "=" + inputTemperature + "\n"
+                ddcxLine = "T" + name + "Port" + self.connectorsPort[idPort]['side']\
+                           + str(int(round(self.connectorsPort[idPort]['zIn']*100, 0))) + "=" + inputTemperature + "\n"
+
                 ddcxLines = ddcxLines + ddcxLine
 
         for idHx in range(self.nMaxHx):
