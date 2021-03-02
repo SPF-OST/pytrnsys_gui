@@ -6,7 +6,7 @@ import shutil
 import sys
 import typing as tp
 from math import sqrt
-from pathlib import Path
+import pathlib as pl
 
 import pandas as pd
 from PyQt5 import QtGui
@@ -87,10 +87,6 @@ __version__ = "1.0.0"
 __author__ = "Stefano Marti"
 __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
-
-# CSS file
-
-cssSs = open("res/style.txt", "r")
 
 
 def calcDist(p1, p2):
@@ -1147,7 +1143,7 @@ class DiagramEditor(QWidget):
         self.projectFolder = parent.projectFolder
 
         self.diagramName = os.path.split(self.projectFolder)[-1] + '.json'
-        self.saveAsPath = Path()
+        self.saveAsPath = pl.Path()
         self.idGen = IdGenerator()
 
         # Generator for massflow display testing
@@ -1700,7 +1696,7 @@ class DiagramEditor(QWidget):
         if exportTo == 'mfs':
             mfsFileName = self.diagramName.split('.')[0] + '_mfs.dck'
             exportPath = os.path.join(self.projectFolder, mfsFileName)
-            if Path(exportPath).exists():
+            if pl.Path(exportPath).exists():
                 qmb = QMessageBox(self)
                 qmb.setText("Warning: " + exportPath + " already exists. Do you want to overwrite it or cancel?")
                 qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
@@ -1717,7 +1713,7 @@ class DiagramEditor(QWidget):
 
         elif exportTo == 'ddck':
             hydraulicsPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
-            if Path(hydraulicsPath).exists():
+            if pl.Path(hydraulicsPath).exists():
                 qmb = QMessageBox(self)
                 qmb.setText("Warning: " +
                             "A ddck-file already exists in the hydraulic folder. Do you want to overwrite it or cancel?")
@@ -1823,7 +1819,7 @@ class DiagramEditor(QWidget):
         ddckFolder = os.path.join(self.projectFolder, 'ddck')
 
         hydCtrlPath = os.path.join(ddckFolder, "control\\hydraulic_control.ddck")
-        if Path(hydCtrlPath).exists():
+        if pl.Path(hydCtrlPath).exists():
             qmb = QMessageBox(self)
             qmb.setText("Warning: " +
                         "The file hydraulic_control.ddck already exists in the control folder. Do you want to overwrite it or cancel?")
@@ -2307,7 +2303,7 @@ class DiagramEditor(QWidget):
         with open(filepaths, 'r') as file:
             data = file.readlines()
         defaultDir = (data[1][:-1])
-        pickedPath = Path(QFileDialog.getSaveFileName(self, "Save diagram", defaultDir, filter="*.json")[0])
+        pickedPath = pl.Path(QFileDialog.getSaveFileName(self, "Save diagram", defaultDir, filter="*.json")[0])
         if str(pickedPath) == ".":
             msgb = QMessageBox(self)
             msgb.setText("No valid path selected, aborting save as")
@@ -2343,7 +2339,7 @@ class DiagramEditor(QWidget):
                 QMessageBox(self, "Warning", "This diagram name exists already in the directory."
                                              " Please rename this diagram")
             else:
-                self.saveAsPath = Path(self.saveAsPath.stem[0:self.saveAsPath.name.index(self.diagramName)] + newName)
+                self.saveAsPath = pl.Path(self.saveAsPath.stem[0:self.saveAsPath.name.index(self.diagramName)] + newName)
 
         self.diagramName = newName
         self.parent().currentFile = newName
@@ -2361,7 +2357,7 @@ class DiagramEditor(QWidget):
 
         # closeDialog = closeDlg()
         # if closeDialog.closeBool:
-        filepath = Path(Path(__file__).resolve().parent.joinpath("recent"))
+        filepath = pl.Path(pl.Path(__file__).resolve().parent.joinpath("recent"))
         self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
 
     # Mode related
@@ -4193,22 +4189,13 @@ def main():
     arguments = args.getArgsOrExit()
 
     logger = log.setup_custom_logger('root', arguments.logLevel)
-    cssSs_ = cssSs.read()
     app = QApplication(sys.argv)
     app.setApplicationName("Diagram Creator")
     form = MainWindow(logger)
     form.showMaximized()
-    # form.openFileAtStartUp()
     form.show()
     form.checkFilePaths()
     form.setTrnsysPath()
-    # app.setStyleSheet(cssSs_)
-    # match = re.compile(r'\d{1,} {1,}\d{1,}')
-    # match2 = re.compile(r'\d+')
-    # x = match.sub("AAAA" ,"29 12 0 0         !1 : Collector", count=1)
-    # x = match2.findall("29 12 0 0         !1 : Collector")
-    # print(x)
-    # print(type(x))
 
     tracer = trc.createTracer(arguments.shallTrace)
     tracer.run(lambda: app.exec())
