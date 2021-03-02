@@ -2,30 +2,20 @@ trnsysGUI/_pycache_/
 trnsysGUI/export.dck
 trnsysGUI/diagrams/*.json
 trnsysGUI/exports/*.dck
-*.xml
-*.pyc
-**/.idea/workspace.xml
-**/.idea/tasks.xml
-/.idea/
-*.log
-*.lst
-/.idea/misc.xml
-/.idea/TrnsysGUI.iml
-<<<<<<< HEAD
-
-=======
-/.idea/TrnsysGUI.iml
-*prt
->>>>>>> 8ab45024bfe762a5b3ff904d9ac1cc992d457e04
 trnsysGUI/massflowData/flows.txt
 trnsysGUI/VectorGraphicsExport.svg
+trnsysGUI/clipboard.json
+trnsysGUI/recent/
+trnsysGUI/filepaths.txt
+
+*.xml
+*.pyc
+*.log
+*.lst
+
+/.idea/
+/venv/
 
 docs/_build/
-
 docs/trnsysGUI.uml
-/trnsysGUI/massflowData/flows.txt
 
-trnsysGUI/clipboard.json
-/trnsysGUI/recent/
-
-trnsysGUI/filepaths.txt
