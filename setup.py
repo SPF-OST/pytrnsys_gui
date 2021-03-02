@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="stefano-marti", # Replace with your own username
+    name="pytrnsys-gui",
     version="0.0.1",
     author="Stefano Marti",
     author_email="stefano-marti@spf.ch",
@@ -17,6 +17,14 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
+    ],
+    install_requires=[
+        'pytrnsys',
+        'PyQT5',
+        'matplotlib',
+        'numpy',
+        'pandas',
+        'bokeh'
     ],
     python_requires='>=3.5',
 )

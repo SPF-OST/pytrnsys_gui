@@ -1,0 +1,11 @@
+wheel
+
+pip-tools
+black
+
+sphinx
+
+PyQT5-stubs
+
+-r ../test/requirements.in
+-e file:../pytrnsys#egg=pytrnsys
