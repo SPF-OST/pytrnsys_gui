@@ -155,9 +155,9 @@ class HeatPumpTwoHx(BlockItem):
         resBlockList.append(self)
 
     def exportBlackBox(self):
-        equations = ["T" + self.displayName + "X0" + "=1"]
-        equations.append("T" + self.displayName + "X1" + "=1")
+        equations = ["T" + self.displayName + "X1" + "=1"]
         equations.append("T" + self.displayName + "X2" + "=1")
+        equations.append("T" + self.displayName + "X3" + "=1")
         status = 'success'
         return status, equations
 

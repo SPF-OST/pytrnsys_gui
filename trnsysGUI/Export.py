@@ -52,25 +52,6 @@ class Export(object):
 
         numOfStorageTanks = 0
         for t in self.trnsysObj:
-            # if isinstance(t,StorageTank):
-            #     numOfStorageTanks += 1
-            #     tesName = "Tes_%s" % numOfStorageTanks
-            #     connectionDict[tesName] =  [t.trnsysId, '','']
-            #     connectionDictNum[str(t.trnsysId)] = tesName
-            #     for p in t.inputs + t.outputs:
-            #         if not(p.isFromHx):
-            #             if p.side == 0:
-            #                 lr = "Left"
-            #             else:
-            #                 lr = "Right"
-            #             displayName = t.displayName + "Port" + lr + str(
-            #                 int(100 * (1 - (p.scenePos().y() - p.parent.scenePos().y()) / p.parent.h)))
-            #             for
-            #
-            #             if p.name == 'i':
-            #                 connectionDict[displayName] = [t.trnsysId,p.connectionList[0].toPortId, p.connectionList[0].toPortId]
-            #             elif p.name == 'o':
-            #                 connectionDict[displayName] = [t.trnsysId, p.connectionList[0].toPortId,p.connectionList[0].toPortId]
             if not isinstance(t, StorageTank):
                 toElement = ''
                 try:
@@ -95,23 +76,7 @@ class Export(object):
 
         for t in self.trnsysObj:
             status, equations = t.exportBlackBox()
-            # if status == 'success' or exportTo == 'mfs':
-            #     for equation in equations:
-            #         f += equation + "\n"
-            #     equationNr += len(equations)
-            # elif exportTo == 'ddck' and (status == 'noDdckFile' or status == 'noDdckEntry'):
-            #     problemEncountered = True
-            #     if status == 'noDdckFile':
-            #         messageText = 'No ddck-file was found in the folder of ' + t.displayName + '.'
-            #     elif status == 'noDdckEntry':
-            #         messageText = 'No output temperature entry was found in the ddck-file(s) of ' + t.displayName + '.'
-            #     messageText = messageText + ' This issue needs to be addressed before a file can be exported.'
-            #     qmb = QMessageBox()
-            #     qmb.setText(messageText)
-            #     qmb.setStandardButtons(QMessageBox.Ok)
-            #     qmb.setDefaultButton(QMessageBox.Ok)
-            #     qmb.exec()
-            #     break
+
             for equation in equations:
                 f += equation + "\n"
             equationNr += len(equations)
@@ -197,22 +162,9 @@ class Export(object):
                 f += ObjToCheck
                 ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
 
-            # f += t.exportParametersFlowSolver(descConnLength)[0]
-
-            # if ObjToCheck in tempObjList and ObjToCheck != '\n' and ObjToCheck != '' and ObjToCheck != ' ':
-            #     msgBox = QMessageBox()
-            #     msgBox.setText("Variable name <b>%s</b> already exists! Please try again after renaming." % ObjToCheck)
-            #     msgBox.exec_()
-            #     # return False
-            # else:
-            #     tempObjList.append(ObjToCheck)
-
                 if len(ObjToCheck) > self.maxChar-5:
                     nameString += ObjToCheck + '\n'
-                # return False
 
-            # self.logger.debug(ObjToCheck)
-            # self.logger.debug(len(ObjToCheck))
         if nameString != '':
             msgBox = QMessageBox()
             msgBox.setText(
@@ -262,10 +214,7 @@ class Export(object):
                 descConnlen = 15
                 res = fileCopy[:]
                 for l in range(len(fileCopy)):
-                    # self.logger.debug("In filecopy...")
                     ids = matchNumber.findall(fileCopy[l])
-                    # self.logger.debug("ids are " + str(ids) + " k is " + str(k))
-                    # self.logger.debug(res[l])
                     for i in range(3):
                         if ids[i] == str(k):
                             ids[i] = str(counter)
@@ -274,51 +223,19 @@ class Export(object):
                     rest = fileCopyTempLine[fileCopyTempLine.find("!"):]
                     res[l] = ids[0] + " " + ids[1] + " " + ids[2] + " " + ids[3]
                     res[l] += " "*(descConnlen - len(res[l])) + rest
-                    # self.logger.debug(res[l])
 
                 fileCopy = res
                 fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
 
-                # fileCopy = [l.replace(" " + str(k) + " ", " " + str(counter) + " ") for l in fileCopy]
-                # fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
-
-        # fileCopy = [l[1:None] for l in fileCopy]
         return '\n'.join(fileCopy)
 
     def exportInputsFlowSolver(self):
-        #  add a string to block and connection for exportPrintInput
         f = ''
         f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 935\n"
 
         counter = 0
 
         for t in self.trnsysObj:
-            # if type(t) is StorageTank:
-            #     continue
-            # if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-            #     continue
-            #
-            # if t.typeNumber in [1, 4]:
-            #     temp1 = pump_prefix + t.displayName
-            #     t.exportInputName = " " + temp1 + " "
-            #     temp += t.exportInputName
-            #     t.exportInitialInput = 0.0
-            # elif t.typeNumber == 3:
-            #     temp1 = mix_prefix + t.displayName
-            #     t.exportInputName = " " + temp1 + " "
-            #     temp += t.exportInputName
-            #     t.exportInitialInput = 0.0
-            # else:
-            #     temp += " 0,0 "
-            #     # Because a HeatPump appears twice in the hydraulic export
-            #     # Same for the generic block
-            #     if type(t) is HeatPump:
-            #         temp += " 0,0 "
-            #         counter += 1
-            #     if type(t) is GenericBlock:
-            #         for i in range(len(t.inputs)-1):
-            #             temp += " 0,0 "
-            #             counter += 1
             res = t.exportInputsFlowSolver1()
             f += res[0]
             counter += res[1]
@@ -331,22 +248,6 @@ class Export(object):
 
         counter2 = 0
         for t in self.trnsysObj:
-            # if type(t) is StorageTank:
-            #     continue
-            # if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-            #     continue
-            # if type(t) is HeatPump:
-            #     # 100120 Why only one exportInitialInput for Heatpump? => what for Generic Block
-            #     f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-            #     f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-            #     counter2 += 1
-            #     continue
-            #
-            # if type(t) is GenericBlock:
-            #     for i in range(len(t.inputs)):
-            #         f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-            #         counter2 += 1
-            #     continue
             res = t.exportInputsFlowSolver2()
             f += res[0]
             counter2 += res[1]
@@ -370,56 +271,7 @@ class Export(object):
 
         tot = ""
 
-        # counter = 1
         for t in self.trnsysObj:
-            # for i in range(0, (1 + int((t.typeNumber == 2) or (t.typeNumber == 3))))
-            # if type(t) is StorageTank:
-            #     continue
-            # if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-            #     continue
-            # #if type(t) is GenericBlock:
-            #     # pass
-            # if type(t) is HeatPump:
-            #     for i in range(0, 3):
-            #
-            #         if i < 2:
-            #             temp = prefix + t.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," +\
-            #                    str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #         equationNumber += 1 #DC-ERROR it should count anyway
-            #
-            #     for i in range(0, 3):
-            #
-            #         if i < 2:
-            #             temp = prefix + t.displayName + "_Evap" + "_" + abc[i] + "=[" + \
-            #                    str(simulationUnit) + "," + str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #         equationNumber += 1 #DC-ERROR it should count anyway
-            #     continue
-            #
-            # for i in range(0, 3):
-            #     if t.typeNumber == 2 or t.typeNumber == 3:
-            #         if(t.isVisible()):
-            #             temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-            #                    str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #
-            #         equationNumber += 1 #DC-ERROR this needs to add even of is virtual. We don't print it but it exist in the flow solver
-            #
-            #     else:
-            #         if i < 2:
-            #             temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-            #                    str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #         equationNumber += 1#DC-ERROR it should count anyway
             noHydraulicConnection = isinstance(t, StorageTank) or (not (isinstance(t, Connection)) and not t.outputs and not t.inputs)
 
             if noHydraulicConnection:
@@ -478,13 +330,7 @@ class Export(object):
             loopText += diLp + "=" + str(g.exportDi) + "\n"
             loopText += LLp + "=" + str(g.exportL) + "\n"
             loopText += ULp + "=" + str(g.exportU) + "\n"
-            # loopText += LLp + suffix1 + " = " "Mfr_" + "loop_" + str(loopNr) + "_nom*" + string1 + "((" + \
-            #             diLp + "/2)^2*" + Pi + ")\n"
-
-            # loopText += ULp + suffix1 + " = " + str(g.exportU) + "*" + LLp + suffix1
-
             constsNr += 3
-
             loopText += "\n"
 
         f += constString + str(constsNr) + "\n"
@@ -645,9 +491,3 @@ class Export(object):
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
-
-
-
-
-
-

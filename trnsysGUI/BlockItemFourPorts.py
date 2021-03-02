@@ -123,20 +123,20 @@ class BlockItemFourPorts(BlockItem):
             lines += infile.readlines()
         for i in range(len(lines)):
             if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
-                counter = 0
+                counter = 1
                 for j in range(i, len(lines) - i):
                     if lines[j][0] == "T":
                         outputT = lines[j].split("=")[0].replace(" ", "")
                         equations.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
                         counter += 1
-                    if counter == 2:
+                    if counter == 3:
                         status = 'success'
                         break
                 break
 
         if status == 'noDdckFile' or status == 'noDdckEntry':
-            equations.append("T" + self.displayName + "X0" + "=1")
             equations.append("T" + self.displayName + "X1" + "=1")
+            equations.append("T" + self.displayName + "X2" + "=1")
 
         return status, equations
 

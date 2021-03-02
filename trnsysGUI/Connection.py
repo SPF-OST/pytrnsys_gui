@@ -1473,7 +1473,6 @@ class Connection(object):
             unitText += "INPUTS " + str(inputNumbers) + "\n"
 
             if len(self.trnsysConn) == 2:
-                # If trnsysConn[0] is a block and it is virtual (generated):
                 if hasattr(self.trnsysConn[0], "rotationN") and not self.trnsysConn[0].isVisible():
                     portToPrint = None
                     for p in self.trnsysConn[0].inputs + self.trnsysConn[0].outputs:
@@ -1499,11 +1498,10 @@ class Connection(object):
                     else:
                         lr = "Right"
 
-                        # (100 - 100 * self.directPortConnsForList[i].fromPort.pos().y() / self.h) / 100
                     unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * round((1 - (
                             portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h),2))) + "\n"
                 elif hasattr(self.trnsysConn[0], "subBlockCounter"):
-                    unitText += "T" + self.trnsysConn[0].displayName + "X" + str(self.trnsysConn[0].getSubBlockOffset(self)) + "\n"
+                    unitText += "T" + self.trnsysConn[0].displayName + "X" + str(self.trnsysConn[0].getSubBlockOffset(self)+1) + "\n"
                 else:
                     unitText += "T" + self.trnsysConn[0].displayName + "\n"
 
@@ -1540,7 +1538,7 @@ class Connection(object):
                     unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * round((1 - (
                             portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h),2))) + "\n"
                 elif hasattr(self.trnsysConn[1], "subBlockCounter"):
-                    unitText += "T" + self.trnsysConn[1].displayName + "X" + str(self.trnsysConn[1].getSubBlockOffset(self)) + "\n"
+                    unitText += "T" + self.trnsysConn[1].displayName + "X" + str(self.trnsysConn[1].getSubBlockOffset(self)+1) + "\n"
                 else:
                     unitText += "T" + self.trnsysConn[1].displayName + "\n"
 
