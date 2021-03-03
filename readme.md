@@ -8,7 +8,6 @@ You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/
 
 ### Required:
 
-1. Microsoft Windows
 1. [Python 3.9](https://www.python.org/downloads/)
 1. Local clones of the following GIT repositories:
     1. `github.com/SPF-OST/pytrnsys.git`
@@ -26,7 +25,8 @@ You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/
 
 ## Getting started
 
-All the following commands should be run from the `pytrnsys_gui` directory.
+All the following commands should be run from the `pytrnsys_gui` directory. The commands
+specified are for a Windows environment. They are very similar for Linux.
 
 1. Create a virtual environment:
     ```commandline
