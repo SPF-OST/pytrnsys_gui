@@ -52,25 +52,6 @@ class Export(object):
 
         numOfStorageTanks = 0
         for t in self.trnsysObj:
-            # if isinstance(t,StorageTank):
-            #     numOfStorageTanks += 1
-            #     tesName = "Tes_%s" % numOfStorageTanks
-            #     connectionDict[tesName] =  [t.trnsysId, '','']
-            #     connectionDictNum[str(t.trnsysId)] = tesName
-            #     for p in t.inputs + t.outputs:
-            #         if not(p.isFromHx):
-            #             if p.side == 0:
-            #                 lr = "Left"
-            #             else:
-            #                 lr = "Right"
-            #             displayName = t.displayName + "Port" + lr + str(
-            #                 int(100 * (1 - (p.scenePos().y() - p.parent.scenePos().y()) / p.parent.h)))
-            #             for
-            #
-            #             if p.name == 'i':
-            #                 connectionDict[displayName] = [t.trnsysId,p.connectionList[0].toPortId, p.connectionList[0].toPortId]
-            #             elif p.name == 'o':
-            #                 connectionDict[displayName] = [t.trnsysId, p.connectionList[0].toPortId,p.connectionList[0].toPortId]
             if not isinstance(t, StorageTank):
                 toElement = ''
                 try:
@@ -95,23 +76,7 @@ class Export(object):
 
         for t in self.trnsysObj:
             status, equations = t.exportBlackBox()
-            # if status == 'success' or exportTo == 'mfs':
-            #     for equation in equations:
-            #         f += equation + "\n"
-            #     equationNr += len(equations)
-            # elif exportTo == 'ddck' and (status == 'noDdckFile' or status == 'noDdckEntry'):
-            #     problemEncountered = True
-            #     if status == 'noDdckFile':
-            #         messageText = 'No ddck-file was found in the folder of ' + t.displayName + '.'
-            #     elif status == 'noDdckEntry':
-            #         messageText = 'No output temperature entry was found in the ddck-file(s) of ' + t.displayName + '.'
-            #     messageText = messageText + ' This issue needs to be addressed before a file can be exported.'
-            #     qmb = QMessageBox()
-            #     qmb.setText(messageText)
-            #     qmb.setStandardButtons(QMessageBox.Ok)
-            #     qmb.setDefaultButton(QMessageBox.Ok)
-            #     qmb.exec()
-            #     break
+
             for equation in equations:
                 f += equation + "\n"
             equationNr += len(equations)
@@ -197,22 +162,9 @@ class Export(object):
                 f += ObjToCheck
                 ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
 
-            # f += t.exportParametersFlowSolver(descConnLength)[0]
-
-            # if ObjToCheck in tempObjList and ObjToCheck != '\n' and ObjToCheck != '' and ObjToCheck != ' ':
-            #     msgBox = QMessageBox()
-            #     msgBox.setText("Variable name <b>%s</b> already exists! Please try again after renaming." % ObjToCheck)
-            #     msgBox.exec_()
-            #     # return False
-            # else:
-            #     tempObjList.append(ObjToCheck)
-
                 if len(ObjToCheck) > self.maxChar-5:
                     nameString += ObjToCheck + '\n'
-                # return False
 
-            # self.logger.debug(ObjToCheck)
-            # self.logger.debug(len(ObjToCheck))
         if nameString != '':
             msgBox = QMessageBox()
             msgBox.setText(
@@ -262,10 +214,7 @@ class Export(object):
                 descConnlen = 15
                 res = fileCopy[:]
                 for l in range(len(fileCopy)):
-                    # self.logger.debug("In filecopy...")
                     ids = matchNumber.findall(fileCopy[l])
-                    # self.logger.debug("ids are " + str(ids) + " k is " + str(k))
-                    # self.logger.debug(res[l])
                     for i in range(3):
                         if ids[i] == str(k):
                             ids[i] = str(counter)
@@ -274,51 +223,19 @@ class Export(object):
                     rest = fileCopyTempLine[fileCopyTempLine.find("!"):]
                     res[l] = ids[0] + " " + ids[1] + " " + ids[2] + " " + ids[3]
                     res[l] += " "*(descConnlen - len(res[l])) + rest
-                    # self.logger.debug(res[l])
 
                 fileCopy = res
                 fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
 
-                # fileCopy = [l.replace(" " + str(k) + " ", " " + str(counter) + " ") for l in fileCopy]
-                # fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
-
-        # fileCopy = [l[1:None] for l in fileCopy]
         return '\n'.join(fileCopy)
 
     def exportInputsFlowSolver(self):
-        #  add a string to block and connection for exportPrintInput
         f = ''
         f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 935\n"
 
         counter = 0
 
         for t in self.trnsysObj:
-            # if type(t) is StorageTank:
-            #     continue
-            # if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-            #     continue
-            #
-            # if t.typeNumber in [1, 4]:
-            #     temp1 = pump_prefix + t.displayName
-            #     t.exportInputName = " " + temp1 + " "
-            #     temp += t.exportInputName
-            #     t.exportInitialInput = 0.0
-            # elif t.typeNumber == 3:
-            #     temp1 = mix_prefix + t.displayName
-            #     t.exportInputName = " " + temp1 + " "
-            #     temp += t.exportInputName
-            #     t.exportInitialInput = 0.0
-            # else:
-            #     temp += " 0,0 "
-            #     # Because a HeatPump appears twice in the hydraulic export
-            #     # Same for the generic block
-            #     if type(t) is HeatPump:
-            #         temp += " 0,0 "
-            #         counter += 1
-            #     if type(t) is GenericBlock:
-            #         for i in range(len(t.inputs)-1):
-            #             temp += " 0,0 "
-            #             counter += 1
             res = t.exportInputsFlowSolver1()
             f += res[0]
             counter += res[1]
@@ -331,22 +248,6 @@ class Export(object):
 
         counter2 = 0
         for t in self.trnsysObj:
-            # if type(t) is StorageTank:
-            #     continue
-            # if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-            #     continue
-            # if type(t) is HeatPump:
-            #     # 100120 Why only one exportInitialInput for Heatpump? => what for Generic Block
-            #     f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-            #     f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-            #     counter2 += 1
-            #     continue
-            #
-            # if type(t) is GenericBlock:
-            #     for i in range(len(t.inputs)):
-            #         f += " " + str(t.exportInitialInput) + " " + str(t.exportInitialInput) + " "
-            #         counter2 += 1
-            #     continue
             res = t.exportInputsFlowSolver2()
             f += res[0]
             counter2 += res[1]
@@ -370,56 +271,7 @@ class Export(object):
 
         tot = ""
 
-        # counter = 1
         for t in self.trnsysObj:
-            # for i in range(0, (1 + int((t.typeNumber == 2) or (t.typeNumber == 3))))
-            # if type(t) is StorageTank:
-            #     continue
-            # if type(t) is Connection and (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank):
-            #     continue
-            # #if type(t) is GenericBlock:
-            #     # pass
-            # if type(t) is HeatPump:
-            #     for i in range(0, 3):
-            #
-            #         if i < 2:
-            #             temp = prefix + t.displayName + "-HeatPump" + "_" + abc[i] + "=[" + str(simulationUnit) + "," +\
-            #                    str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #         equationNumber += 1 #DC-ERROR it should count anyway
-            #
-            #     for i in range(0, 3):
-            #
-            #         if i < 2:
-            #             temp = prefix + t.displayName + "_Evap" + "_" + abc[i] + "=[" + \
-            #                    str(simulationUnit) + "," + str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #         equationNumber += 1 #DC-ERROR it should count anyway
-            #     continue
-            #
-            # for i in range(0, 3):
-            #     if t.typeNumber == 2 or t.typeNumber == 3:
-            #         if(t.isVisible()):
-            #             temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-            #                    str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #
-            #         equationNumber += 1 #DC-ERROR this needs to add even of is virtual. We don't print it but it exist in the flow solver
-            #
-            #     else:
-            #         if i < 2:
-            #             temp = prefix + t.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-            #                    str(equationNumber) + "]\n"
-            #             tot += temp
-            #             t.exportEquations.append(temp)
-            #             nEqUsed += 1 #DC
-            #         equationNumber += 1#DC-ERROR it should count anyway
             noHydraulicConnection = isinstance(t, StorageTank) or (not (isinstance(t, Connection)) and not t.outputs and not t.inputs)
 
             if noHydraulicConnection:
@@ -449,160 +301,6 @@ class Export(object):
 
         for t in self.trnsysObj:
 
-            # unitText = ""
-            # ambientT = 20
-            #
-            # densityVar = "RhoWat"
-            # specHeatVar = "CPWat"
-            #
-            # equationConstant1 = 1
-            # equationConstant2 = 3
-            #
-            # # T-Pieces and Mixers
-            # if (t.typeNumber == 2 or t.typeNumber == 3) and t.isVisible():  # DC-ERROR added isVisible
-            #     unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr1) + "\n"
-            #     unitText += "!" + t.displayName + "\n"
-            #     unitText += "PARAMETERS 0\n"
-            #     unitText += "INPUTS 6\n"
-            #
-            #     for s in t.exportEquations:
-            #         unitText += s[0:s.find('=')] + "\n"
-            #
-            #     for it in t.trnsysConn:
-            #         unitText += "T" + it.displayName + "\n"
-            #
-            #     unitText += "***Initial values\n"
-            #     unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
-            #
-            #     unitText += "EQUATIONS 1\n"
-            #     unitText += "T" + t.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-            #
-            #     unitNumber += 1
-            #     f += unitText + "\n"
-            #
-            # # Pipes DC-ERROR added isVisible below. The fromPort toPort StorageTank does not work to detect if it is virtual.
-            # if type(t) is Connection and not (type(t.fromPort.parent) is StorageTank or type(t.toPort.parent) is StorageTank) and not t.hiddenGenerated:
-            # # if type(t) is Connection and t.firstS.isVisible:
-            #     # if t.isVirtualConn and t.isStorageIO:
-            #     # DC-ERROR Connections don't have isVisble(), but we need to avoid printing the virtual ones here
-            #     # if t.firstS.isVisible(): #DC-ERROR still not working. Adding the isVisble also ignores (besides the virtaul ones) those pipes connected to the TEs t.isVisible():
-            #     if True:
-            #         parameterNumber = 6
-            #         inputNumbers = 4
-            #
-            #         # Fixed strings
-            #         diameterPrefix = "di"
-            #         lengthPrefix = "L"
-            #         lossPrefix = "U"
-            #         tempRoomVar = "TRoomStore"
-            #         initialValueS = "20 0.0 20 20"
-            #         powerPrefix = "P"
-            #
-            #         # Momentarily hardcoded
-            #         equationNr = 3
-            #
-            #         unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-            #         unitText += "!" + t.displayName + "\n"
-            #         unitText += "PARAMETERS " + str(parameterNumber) + "\n"
-            #
-            #         unitText += diameterPrefix + t.displayName + "\n"
-            #         unitText += lengthPrefix + t.displayName + "\n"
-            #         unitText += lossPrefix + t.displayName + "\n"
-            #         unitText += densityVar + "\n"
-            #         unitText += specHeatVar + "\n"
-            #         unitText += str(ambientT) + "\n"
-            #
-            #         unitText += "INPUTS " + str(inputNumbers) + "\n"
-            #
-            #         if len(t.trnsysConn) == 2:
-            #             # if isinstance(Connector, t.trnsysConn[0]) and not t.trnsysConn[0].isVisible() and firstGenerated:
-            #             # or if it is tpiece and not visible and firstGenerated
-            #             if isinstance(t.trnsysConn[0], BlockItem) and not t.trnsysConn[0].isVisible():
-            #                 # This is the case for a generated TPiece
-            #                 portToPrint = None
-            #                 for p in t.trnsysConn[0].inputs + t.trnsysConn[0].outputs:
-            #                     if t in p.connectionList:
-            #                         # Found the port of the generated block adjacent to this pipe
-            #                         # Assumes 1st connection is with storageTank
-            #                         if t.fromPort == p:
-            #                             if t.toPort.connectionList[0].fromPort == t.toPort:
-            #                                 portToPrint = t.toPort.connectionList[0].toPort
-            #                             else:
-            #                                 portToPrint = t.toPort.connectionList[0].fromPort
-            #                         else:
-            #                             if t.fromPort.connectionList[0].fromPort == t.fromPort:
-            #                                 portToPrint = t.fromPort.connectionList[0].toPort
-            #                             else:
-            #                                 portToPrint = t.fromPort.connectionList[0].fromPort
-            #                 if portToPrint is None:
-            #                     self.logger.debug("Error: No portToprint found when printing UNIT of " + t.displayName)
-            #                     return
-            #
-            #                 if portToPrint.side == 0:
-            #                     lr = "Left"
-            #                 else:
-            #                     lr = "Right"
-            #
-            #                 unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
-            #                             portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
-            #             else:
-            #                 unitText += "T" + t.trnsysConn[0].displayName + "\n"
-            #
-            #             unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
-            #             unitText += tempRoomVar + "\n"
-            #
-            #             if isinstance(t.trnsysConn[1], BlockItem) and not t.trnsysConn[1].isVisible():
-            #                 portToPrint = None
-            #                 for p in t.trnsysConn[1].inputs + t.trnsysConn[1].outputs:
-            #                     if t in p.connectionList:
-            #                         # Found the port of the generated block adjacent to this pipe
-            #                         # Assumes 1st connection is with storageTank
-            #                         if t.fromPort == p:
-            #                             if t.toPort.connectionList[0].fromPort == t.toPort:
-            #                                 portToPrint = t.toPort.connectionList[0].toPort
-            #                             else:
-            #                                 portToPrint = t.toPort.connectionList[0].fromPort
-            #                         else:
-            #                             if t.fromPort.connectionList[0].fromPort == t.fromPort:
-            #                                 portToPrint = t.fromPort.connectionList[0].toPort
-            #                             else:
-            #                                 portToPrint = t.fromPort.connectionList[0].fromPort
-            #
-            #                 if portToPrint is None:
-            #                     self.logger.debug("Error: No portToprint found when printing UNIT of " + t.displayName)
-            #                     return
-            #
-            #                 if portToPrint.side == 0:
-            #                     lr = "Left"
-            #                 else:
-            #                     lr = "Right"
-            #
-            #                 unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * (1 - (
-            #                         portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h))) + "\n"
-            #             else:
-            #                 unitText += "T" + t.trnsysConn[1].displayName + "\n"
-            #
-            #             # unitText += "T" + t.trnsysConn[0].displayName + "\n"
-            #             # unitText += t.exportEquations[0][0:t.exportEquations[0].find("=")] + "\n"
-            #             # unitText += tempRoomVar + "\n"
-            #             # unitText += "T" + t.trnsysConn[1].displayName + "\n"
-            #         else:
-            #             f += "Error: NO VALUE\n" * 3 + "at connection with parents " + str(t.fromPort.parent) + str(t.toPort.parent) + "\n"
-            #
-            #         unitText += "***Initial values\n"
-            #         unitText += initialValueS + "\n\n"
-            #
-            #         unitText += "EQUATIONS " + str(equationNr) + "\n"
-            #         unitText += "T" + t.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-            #         unitText += powerPrefix + t.displayName + "_kW" + "= [" + str(unitNumber) + "," + str(
-            #             equationConstant2) + "]/3600 !kW\n"
-            #         unitText += "Mfr" + t.displayName + "= " + "Mfr" + t.displayName + "_A" "\n"
-            #
-            #         unitNumber += 1
-            #         unitText += "\n"
-            #         f += unitText
-            #     else:
-            #         pass # virtual element
             res = t.exportPipeAndTeeTypesForTemp(unitNumber)
             f += res[0]
             unitNumber = res[1]
@@ -632,13 +330,7 @@ class Export(object):
             loopText += diLp + "=" + str(g.exportDi) + "\n"
             loopText += LLp + "=" + str(g.exportL) + "\n"
             loopText += ULp + "=" + str(g.exportU) + "\n"
-            # loopText += LLp + suffix1 + " = " "Mfr_" + "loop_" + str(loopNr) + "_nom*" + string1 + "((" + \
-            #             diLp + "/2)^2*" + Pi + ")\n"
-
-            # loopText += ULp + suffix1 + " = " + str(g.exportU) + "*" + LLp + suffix1
-
             constsNr += 3
-
             loopText += "\n"
 
         f += constString + str(constsNr) + "\n"
@@ -682,30 +374,20 @@ class Export(object):
     def exportPrintPipeLosses(self):
         f = ''
         lossText = ''
-        strVar = 'PipeLoss'
-        totalLeftText = strVar + "Total="
-        totalRightText = ''
-        equationCounter = 0
+        rightCounter = 0
 
-        for g in self.editor.groupList:
-            leftText = strVar + str(self.editor.groupList.index(g)) + "="
-            rightText = ''
-            rightCounter = 0
+        for i in self.editor.groupList[0].itemList:
+            if isinstance(i, Connection) and not i.isVirtualConn:
+                if rightCounter == 0:
+                    lossText += "P" + i.displayName + "_kW"
+                else:
+                    lossText += "+" + "P" + i.displayName + "_kW"
+                rightCounter += 1
 
-            for i in g.itemList:
-                if isinstance(i, Connection) and not i.isVirtualConn:
-                    rightText += "P" + i.displayName + "_kW" + "+"
-                    rightCounter += 1
+        if rightCounter == 0:
+            lossText += "0"
 
-            if rightCounter > 0:
-                rightText = rightText[:-1]
-                lossText += leftText + rightText + '\n'
-                totalRightText += strVar + str(self.editor.groupList.index(g)) + "+"
-                equationCounter += 1
-
-        totalRightText = totalRightText[:-1]
-
-        f += "EQUATIONS " + str(equationCounter + 1) + "\n" + lossText + totalLeftText + totalRightText +  "\n\n"
+        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText +"\n\n"
         return f
 
     def exportMassFlowPrinter(self, unitnr, descLen):
@@ -809,9 +491,3 @@ class Export(object):
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
-
-
-
-
-
-
