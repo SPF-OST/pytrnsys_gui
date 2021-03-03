@@ -1,82 +1,57 @@
 *************************************
-**BEGIN Dhw.ddck
+**BEGIN BigIceTwoStorages2_nTes2.ddck
 *************************************
 
-*************************************
+*******************************************
 ** Plug-Flow Model exported from TRNSYS GUI
-*************************************
+*******************************************
 
-*************************************
-** To be checked: 
-** check cp and rho values for the cirquits 
-** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
-*************************************
-
-*************************************
+******************************************************************************************
 ** outputs to energy balance in kWh
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
-*************************************
+******************************************************************************************
 EQUATIONS 3
-qSysOut_TesDhwLoss = sumQLoss_Tes2
-qSysOut_TesDhwAcum = sumQAcum_Tes2
-elSysIn_Q_TesDhwAux = qHeatSource_Tes2
-
-*************************************
-*** Inputs from hydraulic solver ****
-*************************************
+qSysOut_TesSHLoss = sumQLoss_Tes2
+qSysOut_TesSHAcum = sumQAcum_Tes2
+elSysIn_Q_TesSHAux = qHeatSource_Tes2
+*****************************************************
+**************** Inputs from hydraulic solver ********************
+*****************************************************
 EQUATIONS 3
-Tdp1In_Tes2 = TPiAuxToTesDhw ! @connectDdck
-Mfrdp1_Tes2 = MfrPiAuxToTesDhw ! @connectDdck
-Tdp1InRev_Tes2 = TPiTesDhwtoAux ! @connectDdck
+Tdp1In_Tes2 = TPiHptoTesSHIn ! @connectDdck
+Mfrdp1_Tes2 = MfrPiHptoTesSHIn ! @connectDdck
+Tdp1InRev_Tes2 = TPiHpToTesSHOut ! @connectDdck
 EQUATIONS 3
-Tdp2In_Tes2 = TPiTesDhwIn ! @connectDdck
-Mfrdp2_Tes2 = MfrPiTesDhwIn ! @connectDdck
-Tdp2InRev_Tes2 = TPiTesDhwOut ! @connectDdck
+Tdp2In_Tes2 = TPiTesDhwToSh ! @connectDdck
+Mfrdp2_Tes2 = MfrPiTesDhwToSh ! @connectDdck
+Tdp2InRev_Tes2 = TPiShTesOut ! @connectDdck
 EQUATIONS 3
-Tdp3In_Tes2 = TPiCircIn ! @connectDdck
-Mfrdp3_Tes2 = MfrPiCircIn ! @connectDdck
-Tdp3InRev_Tes2 = TPiCircOut ! @connectDdck
-EQUATIONS 3
-Thx1In_Tes2 = TColToTESFl ! @connectDdck
-Mfrhx1_Tes2 = MfrColToTESFl ! @connectDdck
-Thx1InRev_Tes2 = TColToTESout ! @connectDdck
+Thx1In_Tes2 = TPiInHxTesSh ! @connectDdck
+Mfrhx1_Tes2 = MfrPiInHxTesSh ! @connectDdck
+Thx1InRev_Tes2 = TPiOutHxTesSh ! @connectDdck
 CONSTANTS 2
 zAux1_Tes2=0.00 !connectDDck
 qAux1_Tes2=0.00 !connectDDck
 
-*************************************
-**** Outputs to hydraulic solver ****
-*************************************
-EQUATIONS 3
-*** direct port outputs
-Tdp1Out_Tes2=[50,1] ! 
-Tdp2Out_Tes2=[50,3] ! 
-Tdp3Out_Tes2=[50,5] ! 
-EQUATIONS 1
-*** heat exchanger outputs
-Thx1Out_Tes2=[50,102] ! 
-
-*************************************
-****** Parameters of Type1924 *******
-*************************************
-CONSTANTS 1
-ratioTes2 = Vol_Tes2 / VStoreRef
+*****************************************************
+**************** Parameters of Type1924 ********************
+*****************************************************
+CONSTANTS 3
+TRoomStore=15 ! @userDefined
+VStoreRef = 0.763
+ratioTes = Vol_Tes2 / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
-zInDp1_Tes2=0.90 ! @connectDdck 
-zOutDp1_Tes2=0.70 ! @connectDdck 
+zInDp1_Tes2=0.95 ! @connectDdck 
+zOutDp1_Tes2=0.05 ! @connectDdck 
 *********Connecting values of DIRECT PORT=2***********
 CONSTANTS 2
-zInDp2_Tes2=0.01 ! @connectDdck 
-zOutDp2_Tes2=1.00 ! @connectDdck 
-*********Connecting values of DIRECT PORT=3***********
-CONSTANTS 2
-zInDp3_Tes2=0.65 ! @connectDdck 
-zOutDp3_Tes2=0.95 ! @connectDdck 
+zInDp2_Tes2=0.95 ! @connectDdck 
+zOutDp2_Tes2=0.05 ! @connectDdck 
 *********Connecting values of HX=1***********
 CONSTANTS 4
 zInhx1_Tes2=0.30  ! @connectDdck
-zOuthx1_Tes2=0.05 ! @connectDdck
+zOuthx1_Tes2=0.12 ! @connectDdck
 Cphx1_Tes2=cpwat     ! @connectDdck
 Rhohx1_Tes2=rhowat    ! @connectDdck
 *********Constant of DIRECT PORT=1***********
@@ -85,9 +60,6 @@ Dp1Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
 *********Constant of DIRECT PORT=2***********
 CONSTANTS 1
 Dp2Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
-*********Constant of DIRECT PORT=3***********
-CONSTANTS 1
-Dp3Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
 ********** HEAT EXCHANGER CONSTANTS*******
 CONSTANTS 1
 nHxUsed_Tes2=1 
@@ -108,9 +80,9 @@ dUadTHx1_Tes2=0.0 ! only if modHx1=0
 dUaTHx1_Tes2=0.458 ! only if modHx1=0
 UaHx1_Tes2=1105*ratioTes ! kJ/hK only if modHx1=0
 startUpHx1_Tes2=0. ! only if modHx1=0
-*************************************
+*****************************************************
 ** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
-*************************************
+*****************************************************
 CONSTANTS 10
 zSen1_Tes2=0.05
 zSen2_Tes2=0.15
@@ -122,9 +94,9 @@ zSen7_Tes2=0.65
 zSen8_Tes2=0.75
 zSen9_Tes2=0.85
 zSen10_Tes2=0.95
-*************************************
+*****************************************************
 ** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
-*************************************
+*****************************************************
 CONSTANTS 10
 zSenAvgBot1_Tes2 = 0.05
 zSenAvgTop1_Tes2 = 0.15
@@ -166,9 +138,9 @@ MoInsPlate_Tes2=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside T
 zInsPlate_Tes2=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
 TinsPlate_Tes2=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
 UAinsPlate_Tes2=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
-*************************************
-********** TYPE DEFINITION **********
-*************************************
+*****************************************************
+**************** TYPE DEFINITION ********************
+*****************************************************
 UNIT 50 TYPE 1925     ! plug flow tank
 PARAMETERS 219 
 Vol_Tes2     ! 1: m3, volume of store
@@ -191,7 +163,7 @@ tMax_Tes2
 0	0	0 ! 17-20 unsused parameters
 zInDp1_Tes2 zOutDp1_Tes2 zero Dp1Strat_Tes2 ! 21 - 25: zIn, zOut, cp, strat
 zInDp2_Tes2 zOutDp2_Tes2 zero Dp2Strat_Tes2 ! 26 - 30: zIn, zOut, cp, strat
-zInDp3_Tes2 zOutDp3_Tes2 zero Dp3Strat_Tes2 ! 31 - 35: zIn, zOut, cp, strat
+-1 -1 zero zero ! 31 - 35: zIn, zOut, cp, strat
 -1 -1 zero zero ! 36 - 40: zIn, zOut, cp, strat
 -1 -1 zero zero ! 41 - 45: zIn, zOut, cp, strat
 -1 -1 zero zero ! 46 - 50: zIn, zOut, cp, strat
@@ -228,7 +200,7 @@ INPUTS 69
 ************10 DIRECT PORTS INPUTS***************
 Tdp1In_Tes2 Mfrdp1_Tes2 Tdp1InRev_Tes2
 Tdp2In_Tes2 Mfrdp2_Tes2 Tdp2InRev_Tes2
-Tdp3In_Tes2 Mfrdp3_Tes2 Tdp3InRev_Tes2
+zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
@@ -256,10 +228,11 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
 *****************OUTPUTS****************
-EQUATIONS 3
+EQUATIONS 4
+Tdp1Out_Tes2=[50,1] ! 
 Qdp1_Tes2=[50,31] ! 
+Tdp2Out_Tes2=[50,3] ! 
 Qdp2_Tes2=[50,32] ! 
-Qdp3_Tes2=[50,33] ! 
 EQUATIONS 21
 TAvg_Tes2 = [50,180] ! Average storage temperature 
 ***Temperatures at 10 equallay distributed height 
@@ -284,7 +257,8 @@ Tsen7_Tes2 =[50,77] ! temperature at user defined sensor height Tsen7_Tes2
 Tsen8_Tes2 =[50,78] ! temperature at user defined sensor height Tsen8_Tes2 
 Tsen9_Tes2 =[50,79] ! temperature at user defined sensor height Tsen9_Tes2 
 Tsen10_Tes2 =[50,80] ! temperature at user defined sensor height Tsen10_Tes2 
-EQUATIONS 1
+EQUATIONS 2
+Thx1Out_Tes2=[50,102] ! 
 Qhx1Out_Tes2=[50,104] ! 
 EQUATIONS 1
 qHeatSource_Tes2 = [50,181] ! Heat input of all auxiliary heat sources [kW]
@@ -304,33 +278,6 @@ unitPrinter_Tes2 ! 1: Logical unit number, -
 1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 -1  ! 4: Printing & integrating interval, h. -1 for monthly integration
 0  ! 5: Number of inputs to avoid integration
-INPUTS 10
-sumQv_Tes1 sumQLoss_Tes1 sumQAcum_Tes1 sumQPorts_Tes1 Imb_Tes1 Qdp1_Tes2 Qdp2_Tes2 Qdp3_Tes2 Qhx1Out_Tes2 qHeatSource_Tes2 
-zero zero zero zero zero zero zero zero zero zero 
-*************************************
-********** Online Plotter ***********
-*************************************
-
-UNIT 501 TYPE 65     ! Online Plotter HX 
-PARAMETERS 12   
-10     ! 1 Nb. of left-axis variables 
-0     ! 2 Nb. of right-axis variables
-0     ! 3 Left axis minimum 
-100     ! 4 Left axis maximum -
-0     ! 5 Right axis minimum 
-100     ! 6 Right axis maximum 
-nPlotsPerSim     ! 7 Number of plots per simulation 
-12     ! 8 X-axis gridpoints
-1     ! 9 Shut off Online w/o removing 
--1     ! 10 Logical unit for output file 
-0     ! 11 Output file units
-0     ! 12 Output file delimiter
-INPUTS 10     
-T1_Tes2 T2_Tes2 T3_Tes2 T4_Tes2 T5_Tes2 T6_Tes2 T7_Tes2 T8_Tes2 T9_Tes2 T10_Tes2 
-T1_Tes2 T2_Tes2 T3_Tes2 T4_Tes2 T5_Tes2 T6_Tes2 T7_Tes2 T8_Tes2 T9_Tes2 T10_Tes2 
-LABELS  3         
-Temperatures  
-MassFlows  
-Tes%d 
-
-
+INPUTS 9
+sumQv_Tes1 sumQLoss_Tes1 sumQAcum_Tes1 sumQPorts_Tes1 Imb_Tes1 Qdp1_Tes2 Qdp2_Tes2 Qhx1Out_Tes2 qHeatSource_Tes2 
+zero zero zero zero zero zero zero zero zero 
