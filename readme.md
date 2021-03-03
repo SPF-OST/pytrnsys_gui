@@ -1,52 +1,49 @@
-Graphical user interface for pytrnsys
-=====================================
+# Graphical user interface for pytrnsys
 
-Documentation
--------------
+## Documentation
 
 You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/ 
 
-Prerequisites
--------------
+## Prerequisites
 
-Compulsory:
-* A local clone of https://github.com/SPF-OST/pytrnsys.git
+### Required:
 
-Assumed for the instructions in the following (different frameworks can be used individually):
-* Anaconda installation
-* PyCharm editor
+1. [Python 3.9](https://www.python.org/downloads/)
+1. Local clones of the following GIT repositories:
+    1. `github.com/SPF-OST/pytrnsys.git`
+    1. `github.com/SPF-OST/pytrnsys_gui.git`
 
-Getting started
----------------
+    They should be next to each other and be called `pytrnsys` and `pytrnsys_gui` like so:
+    ```
+    parent/
+      pytrnsys/
+      pytrnsys_gui/
+    ```
 
-Open an Anaconda prompt and navigate to your local pytrnsys_gui repository:
-````
-cd ...\GIT\pytrnsys_gui
-````
-Then enter the following:
-````
-conda env create -f gui_env.yml
-````
-This will create a virtual environment 'trnsys3.7'. Next, enter:
-````
-conda info --envs
-````
-This will show you your virtual environments for python. Note where 'trnsys3.7' is located.
+### Recommended
+* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/downloa)
 
-Now launch PyCharm and open your pyrtnsys_gui repository. Then go to File > Settings > Project: pytrnsys_gui > Project 
-Interpreter. Click on the gearwheel icon on the right of the dropdown menu and select 'Add...'. In the window that opens
-select 'Existing environment'. In the line 'Interpreter' browse to the folder of 'trnsys3.7' (noted from before) and 
-select 'python.exe' from within this folder. This will set up 'trnsys3.7' as the virtual environment for your local 
-pytrnsys_gui repository.
+## Getting started
 
-Go back to the Project Interpreter menu, click again on the gearwheel icon, and select 'Show All...'. Select 'trnsys3.7'
- on the list that opens and click on the path icon on the right ('Show paths for the selected interpreter'). In the 
- window that opens click on the '+' and select the folder of your local repository of 
- https://github.com/SPF-OST/pytrnsys.git:
- ````
-...\GIT\pytrnsys
-````
- 
-Now your virtual environment to run the graphical user interface is set. Run 'GUI.py'. This should open the graphical 
-user interface. Sometimes the opening dialogue is behind other windows, so make sure to check behind those, if you don't
- see it immediately.
+All the following commands should be run from the `pytrnsys_gui` directory. The commands
+specified are for a Windows environment. They are very similar for Linux.
+
+1. Create a virtual environment:
+    ```commandline
+    py -3.9 -m venv venv
+    ```
+1. Activate it:
+    ```commandline
+    venv\Scripts\activate
+    ```
+1. Install the requirements:
+    ```commandline
+    pip install wheel
+    pip install -r requirements\dev\requirements.txt
+    ```
+1. Run `pytrnsys_gui`!
+    ```commandline
+    cd trnsysGUI
+    python GUI.py
+    ```
+
