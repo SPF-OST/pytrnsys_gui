@@ -69,20 +69,7 @@ class Type1924_TesPlugFlow():
         lines = "*********Constant of DIRECT PORT=%d***********\n" % (idPort + 1)
 
         line = "CONSTANTS 1\n";lines=lines+line
-        # line = "cpDp%d_Tes%d=zero \n"%(idPort+1,nTes);lines=lines+line
         line = "Dp%dStrat_Tes%d=0 ! 0: no forced stratification ; 1: force to stratify\n"%(idPort+1,nTes);lines=lines+line
-
-
-        # count=0
-        # for line in myList:
-        #     splitEqual=line.split("=")
-        #     if(len(splitEqual)>1):
-        #         par = splitEqual[0]
-        #         if(count==0):
-        #             self.listParPort[nPort-1]=par
-        #         else:
-        #             self.listParPort[nPort-1] = self.listParPort[nPort-1] + " " + par
-        #         count=count+1
 
         return lines
 
@@ -114,7 +101,6 @@ class Type1924_TesPlugFlow():
 
     def getOneHxParValues(self, nTes, idHx):
 
-
         lines = "*********Constant values of HX=%d***********\n"%idHx
 
         line = "CONSTANTS 15\n";lines=lines+line
@@ -141,20 +127,6 @@ class Type1924_TesPlugFlow():
         line = "startUpHx%d_Tes%d=0. ! only if modHx%d=0\n"%(idHx,nTes,idHx);lines=lines+line
 
         return lines
-
-        # count=0
-        # self.listParHx[idHx-1]=""
-        #
-        # for line in myList:
-        #     splitEqual=line.split("=")
-        #     if(len(splitEqual)>1):
-        #         par = splitEqual[0]
-        #         if(count==0):
-        #             self.listParHx[idHx-1]=par
-        #         else:
-        #             self.listParHx[idHx-1] = self.listParHx[idHx-1] + " " + par
-        #         count=count+1
-
 
     def getHxParValues(self, nTes, nHx):
 
@@ -189,17 +161,6 @@ class Type1924_TesPlugFlow():
                 lines=lines+"! Heax exchanger %d\n"%(idHx)
 
         return lines
-
-    # def getOnePortPar(self,nTes,nPort):
-    #
-    #     lines = ""
-    #
-    #     line = "EQUATIONS 3\n";lines=lines+line
-    #     line = "Tdp%d_Tes%d = @connect\n"%(nPort,nTes);lines=lines+line
-    #     line = "Mfrdp%d_Tes%d = @connect\n"%(nPort,nTes);lines=lines+line
-    #     line = "TdpRev%d_Tes%d = @connect\n"%(nPort,nTes);lines=lines+line
-    #
-    #     return lines
 
     def getUaPar(self,nTes):
 
@@ -445,11 +406,8 @@ class Type1924_TesPlugFlow():
         nEq = nPorts
         line="EQUATIONS %d\n"%nEq;lines=lines+line
 
-        # counter=1
         for idPort in range(nPorts):
-            # line="Tdp%dOut_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,counter);lines=lines+line
             line="Qdp%d_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,30+idPort+1);lines=lines+line
-            # counter=counter+2
 
         nEq = 21
         line="EQUATIONS %d\n"%nEq;lines=lines+line
@@ -468,19 +426,12 @@ class Type1924_TesPlugFlow():
             line ="Tsen%d_Tes%d =[%d,%d] ! temperature at user defined sensor height Tsen%d_Tes%d \n"%(i+1,nTes,nUnit,counter,i+1,nTes);lines=lines+line
             counter=counter+1
 
-        # line="***Temperatures at 5 sensor averaged user defined height\n";lines=lines+line
-        # counter=81
-        # for i in range(10):
-        #     line ="**TsenAvg%d_Tes%d =[%d,%d] !temperature at average sensor zsenAvg%d_Tes%d"%(i+1,nTes,nUnit,counter,i+1,nTes)
-        #     counter=counter+1
-
         nEq = nHx
         if(nEq>0):
             line="EQUATIONS %d\n"%nEq;lines=lines+line
 
         counter=102
         for idHx in range(nHx):
-            # line="Thx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter);lines=lines+line
             line="Qhx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter+2);lines=lines+line
             counter=counter+10
 
@@ -524,8 +475,6 @@ class Type1924_TesPlugFlow():
         for i in range(inputs["nHx"]):
             line = "Qhx%dOut_Tes%d "%(i+1,nTes); lines = lines + line
 
-        # for i in range(inputs["nHeatSources"]):
-        #     line = "qHeatSource_Tes%d "%(nTes); lines = lines + line
         line = "qHeatSource_Tes%d "%(nTes); lines = lines + line
 
         lines = lines + "\n"
@@ -567,7 +516,6 @@ class Type1924_TesPlugFlow():
         line = "Temperatures  \n";lines = lines + line
         line = "MassFlows  \n";lines = lines + line
         line = "Tes%d \n";lines = lines + line
-        #line = "0  ! 6: Number of inputs to avoid integration\n"; lines = lines + line
 
         lines = lines + "\n"
 
@@ -689,23 +637,12 @@ class Type1924_TesPlugFlow():
             ddcxLine = "T" + name + "Port" + self.connectorsPort[idPort]['side'] + str(
                 int(self.connectorsPort[idPort]['zOut'] * 100)) + "=" + outputTemperature + "\n"
             ddcxLines = ddcxLines + ddcxLine
-            #line="Qdp%d_Tes%d=[%d,%d] ! \n"%(idPort+1,nTes,nUnit,30+idPort+1);lines=lines+line
             counter=counter+2
 
         nEq = nHxs
         if(nEq>0):
             line="EQUATIONS %d\n"%nEq;lines=lines+line
             line = "*** heat exchanger outputs\n";lines = lines + line
-
-        # if len(p.connectionList) > 0 and p.name == 'i':
-        #     if p.connectionList[1].fromPort is p:
-        #         # resStr += "T" + p.connectionList[1].toPort.connectionList[1].toPort.parent.displayName + "=1\n"
-        #         equations.append("T" + p.connectionList[0].displayName + "=1")
-        #         status = 'success'
-        #     else:
-        #         # resStr += "T" + p.connectionList[1].fromPort.connectionList[1].toPort.parent.displayName + "=1\n"
-        #         equations.append("T" + p.connectionList[0].displayName + "=1")
-        #         status = 'success'
 
         counter=102
         for idHx in range(nHxs):
@@ -821,4 +758,3 @@ if __name__ == '__main__':
     tool.setInputs(inputs,connectorsPort,connectorsHx,connectorsAux)
 
     tool.createDDck(path,name,typeFile="ddck")
-

@@ -833,8 +833,7 @@ class StorageTank(BlockItem):
         equations = []
         ddcxPath = os.path.join(self.path,self.displayName)
         ddcxPath = ddcxPath + ".ddcx"
-        if not os.path.isfile(ddcxPath):
-            self.exportDck()
+        self.exportDck()
         if os.path.isfile(ddcxPath):
             infile=open(ddcxPath,'r')
             lines=infile.readlines()
@@ -938,22 +937,22 @@ class StorageTank(BlockItem):
         # exportPath = os.path.join(filePath, name+'.ddck')
         exportPath = os.path.join(self.path,self.displayName + '.ddck')
         self.logger.debug(exportPath)
-        if Path(exportPath).exists():
-            qmb = QMessageBox()
-            qmb.setText("Warning: " +
-                        "An export file exists already. Do you want to overwrite or cancel?")
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
-            ret = qmb.exec()
-            if ret == QMessageBox.Save:
-                self.logger.debug("Overwriting")
-                # continue
-            else:
-                self.logger.debug("Canceling")
-                return
-        else:
-            # Export file does not exist yet
-            pass
+        # if Path(exportPath).exists():
+        #     qmb = QMessageBox()
+        #     qmb.setText("Warning: " +
+        #                 "An export file exists already. Do you want to overwrite or cancel?")
+        #     qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+        #     qmb.setDefaultButton(QMessageBox.Cancel)
+        #     ret = qmb.exec()
+        #     if ret == QMessageBox.Save:
+        #         self.logger.debug("Overwriting")
+        #         # continue
+        #     else:
+        #         self.logger.debug("Canceling")
+        #         return
+        # else:
+        #     # Export file does not exist yet
+        #     pass
 
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
 
