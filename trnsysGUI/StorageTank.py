@@ -833,8 +833,7 @@ class StorageTank(BlockItem):
         equations = []
         ddcxPath = os.path.join(self.path,self.displayName)
         ddcxPath = ddcxPath + ".ddcx"
-        if not os.path.isfile(ddcxPath):
-            self.exportDck()
+        self.exportDck()
         if os.path.isfile(ddcxPath):
             infile=open(ddcxPath,'r')
             lines=infile.readlines()
@@ -935,25 +934,8 @@ class StorageTank(BlockItem):
             outputPos = self.heatExchangers[i].output / 100
             connectorsHx[i] = {"Name": HxName, "T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
 
-        # exportPath = os.path.join(filePath, name+'.ddck')
         exportPath = os.path.join(self.path,self.displayName + '.ddck')
         self.logger.debug(exportPath)
-        if Path(exportPath).exists():
-            qmb = QMessageBox()
-            qmb.setText("Warning: " +
-                        "An export file exists already. Do you want to overwrite or cancel?")
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
-            ret = qmb.exec()
-            if ret == QMessageBox.Save:
-                self.logger.debug("Overwriting")
-                # continue
-            else:
-                self.logger.debug("Canceling")
-                return
-        else:
-            # Export file does not exist yet
-            pass
 
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
 
@@ -962,12 +944,6 @@ class StorageTank(BlockItem):
 
     def loadDck(self):
         self.logger.debug("Opening diagram")
-        # self.centralWidget.delBlocks()
-        # fileName = QFileDialog.getOpenFileName(self.dia, "Open diagram", filter="*.ddck")[0]
-        # if fileName != '':
-        #     self.dckFilePath = fileName
-        # else:
-        #     self.logger.debug("No filename chosen")
         self.exportDck()
         filePath = self.model.rootPath()
         shutil.copy(self.loadedTo, filePath)
@@ -985,14 +961,6 @@ class StorageTank(BlockItem):
             connName1 = self.directPortConnsForList[i].fromPort.connectionList[1].displayName
             connName2 = self.directPortConnsForList[i].toPort.connectionList[1].displayName
 
-            # if toPort1 == stFromPort and toPort2 == stToPort:
-            #     msgBox = QMessageBox()
-            #     msgBox.setText("both %s and %s are input ports" % (connName1, connName2))
-            #     msgBox.exec_()
-            # elif fromPort1 == stFromPort and fromPort2 == stToPort:
-            #     msgBox = QMessageBox()
-            #     msgBox.setText("both %s and %s are output ports" % (connName1, connName2))
-            #     msgBox.exec_()
             if stFromPort != toPort1:
                 errorConnList = errorConnList + connName1 + '\n'
             if stToPort != fromPort2:
@@ -1057,16 +1025,6 @@ class StorageTank(BlockItem):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
 
     def updateTreePath(self, path):
         """
