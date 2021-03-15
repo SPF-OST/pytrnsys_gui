@@ -47,5 +47,5 @@ specified are for a Windows environment. They are very similar for Linux.
     python GUI.py
     ```
     
-Beware that the GUI can only be started from within the virtual environment you created in step 1, i.e., whenever you open an new console window from which you want to start the GUI you first need to active the environment (step 2. above)
+Beware that the GUI can only be started from within the virtual environment you created in step 1, i.e., whenever you open an new console window from which you want to start the GUI you first need to active the environment (step 2. above).
 
