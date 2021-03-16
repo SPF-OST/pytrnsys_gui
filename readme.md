@@ -10,8 +10,8 @@ You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/
 
 1. [Python 3.9](https://www.python.org/downloads/)
 1. Local clones of the following GIT repositories:
-    1. `github.com/SPF-OST/pytrnsys.git`
-    1. `github.com/SPF-OST/pytrnsys_gui.git`
+    1. `https://github.com/SPF-OST/pytrnsys.git`
+    1. `https://github.com/SPF-OST/pytrnsys_gui.git`
 
     They should be next to each other and be called `pytrnsys` and `pytrnsys_gui` like so:
     ```
