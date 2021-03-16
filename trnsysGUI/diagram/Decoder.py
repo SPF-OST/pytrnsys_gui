@@ -30,7 +30,7 @@ from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 
 
-class DiagramDecoder(json.JSONDecoder):
+class Decoder(json.JSONDecoder):
     """
     Decodes the diagram
     """

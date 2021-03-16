@@ -9,9 +9,9 @@ from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.StorageTank import StorageTank
 
 
-class DiagramScene(QGraphicsScene):
+class Scene(QGraphicsScene):
     """
-    This class serves as container for QGraphicsItems and is used in combination with the DiagramView to display the
+    This class serves as container for QGraphicsItems and is used in combination with the View to display the
     diagram.
     It contains a rectangle for copy-paste or selecting multiple items.
 
@@ -27,9 +27,9 @@ class DiagramScene(QGraphicsScene):
     selectionRect : :obj:`QGraphicsRectItem`
         Rectangle that displays the selection
     viewRect1 : :obj:`QGraphicsRectItem`
-        Used to set the initial DiagramScene size to approximately DiagramView size
+        Used to set the initial Scene size to approximately View size
     viewRect2 : :obj:`QGraphicsRectItem`
-            Used to set the initial DiagramScene size to approximately DiagramView size
+            Used to set the initial Scene size to approximately View size
     released : bool
         Enables the display of the selectionRect
     pressed : bool
@@ -40,11 +40,11 @@ class DiagramScene(QGraphicsScene):
 
     def __init__(self, parent=None):
         # Static size
-        # super(DiagramScene, self).__init__(QRectF(0, 0, parent.height(), 1500), parent)
+        # super(Scene, self).__init__(QRectF(0, 0, parent.height(), 1500), parent)
         # self.setSceneRect(0, 0, parent.height(), parent.width())
 
         # Dynamic size, but "zero" at beginning
-        super(DiagramScene, self).__init__(parent)
+        super(Scene, self).__init__(parent)
 
         self.logger = parent.logger
 
@@ -80,7 +80,7 @@ class DiagramScene(QGraphicsScene):
 
     def mouseMoveEvent(self, mouseEvent):
         self.parent().sceneMouseMoveEvent(mouseEvent)
-        super(DiagramScene, self).mouseMoveEvent(mouseEvent)
+        super(Scene, self).mouseMoveEvent(mouseEvent)
 
         if self.parent().selectionMode and not self.released and self.pressed:
             self.selectionRect.setVisible(True)
@@ -101,9 +101,9 @@ class DiagramScene(QGraphicsScene):
                 self.selectionRect.setRect(rectangleR1)
 
     def mouseReleaseEvent(self, mouseEvent):
-        self.logger.debug("Releasing mouse in DiagramScene...")
+        self.logger.debug("Releasing mouse in Scene...")
         self.parent().sceneMouseReleaseEvent(mouseEvent)
-        super(DiagramScene, self).mouseReleaseEvent(mouseEvent)
+        super(Scene, self).mouseReleaseEvent(mouseEvent)
         self.parent().moveDirectPorts = False
         if self.parent().pasting:
             # Dismantle group
@@ -155,7 +155,7 @@ class DiagramScene(QGraphicsScene):
             for x in points:
                 painter.drawPoint(x)
         else:
-            super(DiagramScene, self).drawBackground(painter, rect)
+            super(Scene, self).drawBackground(painter, rect)
 
     def keyPressEvent(self, event):
         pass
@@ -166,7 +166,7 @@ class DiagramScene(QGraphicsScene):
     def mousePressEvent(self, event):
         # self.parent().mousePressEvent(event)
         # TODO : remove resizer when click on other block items
-        super(DiagramScene, self).mousePressEvent(event)
+        super(Scene, self).mousePressEvent(event)
 
         if len(self.items(event.scenePos())) > 0:
             self.selectedItem = self.items(event.scenePos())

@@ -1,12 +1,12 @@
 import json
 
-from trnsysGUI.diagram import DiagramEditor as _de
+from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Connection import Connection
 from trnsysGUI.copyGroup import copyGroup
 
 
-class DiagramEncoder(json.JSONEncoder):
+class Encoder(json.JSONEncoder):
     """
     This class encodes the diagram (entire diagram or clipboard)
     obj is passed along to get some of the diagram editor porperties, for instance the id-generator
@@ -29,7 +29,7 @@ class DiagramEncoder(json.JSONEncoder):
         """
         logger = obj.logger
 
-        if isinstance(obj, _de.DiagramEditor) or isinstance(obj, copyGroup):
+        if isinstance(obj, _de.Editor) or isinstance(obj, copyGroup):
             logger.debug("Is diagram or copygroup")
 
             res = {}
@@ -69,5 +69,5 @@ class DiagramEncoder(json.JSONEncoder):
 
             return res
         else:
-            logger.debug("This is a strange object in DiagramEncoder" + type(obj))
+            logger.debug("This is a strange object in Encoder" + type(obj))
             # return super().default(obj)

@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import *
 
 from pytrnsys.utils import log
 
-import trnsysGUI.diagram.DiagramEditor as _de
+import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.arguments as args
 import trnsysGUI.buildDck as dckBuilder
 from trnsysGUI.BlockItem import BlockItem
@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
             self.logger.info("Cancelled opening or loading a project")
             self.loadValue = 'cancel'
 
-        self.centralWidget = _de.DiagramEditor(self)
+        self.centralWidget = _de.Editor(self)
         self.setCentralWidget(self.centralWidget)
         if self.loadValue == 'json':
             self.centralWidget.save()
@@ -424,7 +424,7 @@ class MainWindow(QMainWindow):
             pathDialog = FolderSetUp(self)
             self.projectFolder = pathDialog.projectFolder
 
-            self.centralWidget = _de.DiagramEditor(self)
+            self.centralWidget = _de.Editor(self)
             self.setCentralWidget(self.centralWidget)
         else:
             self.logger.info("Canceling")
@@ -450,7 +450,7 @@ class MainWindow(QMainWindow):
 
         jsonPath = os.path.join(self.projectFolder, jsonNew)
 
-        self.centralWidget = _de.DiagramEditor(self)
+        self.centralWidget = _de.Editor(self)
         self.setCentralWidget(self.centralWidget)
         self.centralWidget.save(showWarning=False)
 
@@ -751,7 +751,7 @@ class MainWindow(QMainWindow):
                 pathDialog = FolderSetUp(self)
                 self.projectFolder = pathDialog.projectFolder
 
-            self.centralWidget = _de.DiagramEditor(self)
+            self.centralWidget = _de.Editor(self)
             self.setCentralWidget(self.centralWidget)
 
             if self.loadValue == 'json':

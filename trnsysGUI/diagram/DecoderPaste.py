@@ -27,7 +27,7 @@ from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 
 
-class DiagramDecoderPaste(json.JSONDecoder):
+class DecoderPaste(json.JSONDecoder):
     """
     Decodes the clipboard.
     It creates the copied blocks with suffix COPY, it does not set the ids forward.

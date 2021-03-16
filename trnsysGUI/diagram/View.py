@@ -29,9 +29,9 @@ from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 
 
-class DiagramView(QGraphicsView):
+class View(QGraphicsView):
     """
-    Displays the items from the DiagramScene. Here, the drag and drop from the library to the View is implemented.
+    Displays the items from the Scene. Here, the drag and drop from the library to the View is implemented.
 
     """
 
@@ -149,10 +149,10 @@ class DiagramView(QGraphicsView):
         #     t.setPos(t.pos())
         # #     self.parent().alignYLineItem.setVisible(False)
 
-        super(DiagramView, self).mouseReleaseEvent(mouseEvent)
+        super(View, self).mouseReleaseEvent(mouseEvent)
 
     def wheelEvent(self, event):
-        super(DiagramView, self).wheelEvent(event)
+        super(View, self).wheelEvent(event)
         # 67108864(dez) = 100000000000000000000000000(bin)
         if int(event.modifiers()) == 67108864:
             if event.angleDelta().y() > 0:
@@ -169,7 +169,7 @@ class DiagramView(QGraphicsView):
         #     if isinstance(t, BlockItem):
         #         t.itemChange(t.ItemPositionChange, t.pos())
 
-        super(DiagramView, self).mousePressEvent(event)
+        super(View, self).mousePressEvent(event)
 
     def deleteBlockCom(self, bl):
         """

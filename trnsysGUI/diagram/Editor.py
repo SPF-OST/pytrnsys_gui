@@ -22,11 +22,11 @@ from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
-from trnsysGUI.diagram.DiagramDecoderPaste import DiagramDecoderPaste
-from trnsysGUI.diagram.DiagramDecoder import DiagramDecoder
-from trnsysGUI.diagram.DiagramEncoder import DiagramEncoder
-from trnsysGUI.diagram.DiagramView import DiagramView
-from trnsysGUI.diagram.DiagramScene import DiagramScene
+from trnsysGUI.diagram.DecoderPaste import DecoderPaste
+from trnsysGUI.diagram.Decoder import Decoder
+from trnsysGUI.diagram.Encoder import Encoder
+from trnsysGUI.diagram.View import View
+from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
@@ -54,7 +54,7 @@ from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
 
 
-class DiagramEditor(QWidget):
+class Editor(QWidget):
     """
     This class is the central widget of the MainWindow.
     It contains the items library, diagram graphics scene and graphics view, and the inspector widget
@@ -101,9 +101,9 @@ class DiagramEditor(QWidget):
     idGen : :obj:`IdGenerator`
         Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
     selectionMode : bool
-        Enables/disables selection rectangle in DiagramScene
+        Enables/disables selection rectangle in Scene
     groupMode : bool
-        Enables creation of a new group in DiagramScene
+        Enables creation of a new group in Scene
     copyMode : bool
         Enables copying elements in the selection rectangle
     multipleSelectedMode : bool
@@ -219,8 +219,8 @@ class DiagramEditor(QWidget):
         self.libraryBrowserView.setViewMode(self.libraryBrowserView.IconMode)
         self.libraryBrowserView.setDragDropMode(self.libraryBrowserView.DragOnly)
 
-        self.diagramScene = DiagramScene(self)
-        self.diagramView = DiagramView(self.diagramScene, self)
+        self.diagramScene = Scene(self)
+        self.diagramView = View(self.diagramScene, self)
 
         # For list view
         self.vertL = QVBoxLayout()
@@ -358,7 +358,7 @@ class DiagramEditor(QWidget):
             self.logger.debug(str(t))
         self.logger.debug("")
 
-        self.logger.debug("DiagramScene items are:")
+        self.logger.debug("Scene items are:")
         sItems = self.diagramScene.items()
         for it in sItems:
             self.logger.info(str(it))
@@ -974,7 +974,7 @@ class DiagramEditor(QWidget):
 
         """
         with open(filename, 'w') as jsonfile:
-            json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
+            json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
     def encodeDiagram(self, filename):
         """
@@ -991,7 +991,7 @@ class DiagramEditor(QWidget):
         self.logger.info("filename is at encoder " + str(filename))
         # if filename != "":
         with open(filename, 'w') as jsonfile:
-            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
+            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
     def decodeDiagram(self, filename, loadValue='load'):
         """
@@ -1011,7 +1011,7 @@ class DiagramEditor(QWidget):
 
         self.logger.info("Decoding " + filename)
         with open(filename, 'r') as jsonfile:
-            blocklist = json.load(jsonfile, cls=DiagramDecoder, editor=self)
+            blocklist = json.load(jsonfile, cls=Decoder, editor=self)
 
         if len(self.groupList) == 0:
             self.logger.debug("self.group is empty, adding default group")
@@ -1157,7 +1157,7 @@ class DiagramEditor(QWidget):
         filename = 'clipboard.json'
 
         with open(filename, 'w') as jsonfile:
-            json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=DiagramEncoder)
+            json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
         self.logger.debug("Copy complete!")
 
@@ -1165,7 +1165,7 @@ class DiagramEditor(QWidget):
         filename = 'clipboard.json'
 
         with open(filename, 'r') as jsonfile:
-            blocklist = json.load(jsonfile, cls=DiagramDecoderPaste, editor=self)
+            blocklist = json.load(jsonfile, cls=DecoderPaste, editor=self)
 
         for j in blocklist["Blocks"]:
             # print("J is " + str(j))
