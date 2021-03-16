@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
             self.logger.info("Cancelled opening or loading a project")
             self.loadValue = 'cancel'
 
-        self.centralWidget = _de.Editor(self)
+        self.centralWidget = self._createDiagramEditor()
         self.setCentralWidget(self.centralWidget)
         if self.loadValue == 'json':
             self.centralWidget.save()
@@ -424,7 +424,7 @@ class MainWindow(QMainWindow):
             pathDialog = FolderSetUp(self)
             self.projectFolder = pathDialog.projectFolder
 
-            self.centralWidget = _de.Editor(self)
+            self.centralWidget = self._createDiagramEditor()
             self.setCentralWidget(self.centralWidget)
         else:
             self.logger.info("Canceling")
@@ -450,7 +450,7 @@ class MainWindow(QMainWindow):
 
         jsonPath = os.path.join(self.projectFolder, jsonNew)
 
-        self.centralWidget = _de.Editor(self)
+        self.centralWidget = self._createDiagramEditor()
         self.setCentralWidget(self.centralWidget)
         self.centralWidget.save(showWarning=False)
 
@@ -751,7 +751,7 @@ class MainWindow(QMainWindow):
                 pathDialog = FolderSetUp(self)
                 self.projectFolder = pathDialog.projectFolder
 
-            self.centralWidget = _de.Editor(self)
+            self.centralWidget = self._createDiagramEditor()
             self.setCentralWidget(self.centralWidget)
 
             if self.loadValue == 'json':
@@ -1107,6 +1107,9 @@ class MainWindow(QMainWindow):
         else:
             self.logger.info("Project path:", self.centralWidget.projectPath)
             runApp.runAction(self.centralWidget.projectPath)
+
+    def _createDiagramEditor(self):
+        return _de.Editor(self, self.projectFolder, self.jsonPath, self.loadValue, self.logger)
 
 
 def main():

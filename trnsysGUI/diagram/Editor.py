@@ -149,14 +149,14 @@ class Editor(QWidget):
 
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
         QWidget.__init__(self, parent)
 
-        self.logger = parent.logger
+        self.logger = logger
 
         self.logger.info("Initializing the diagram editor")
 
-        self.projectFolder = parent.projectFolder
+        self.projectFolder = projectFolder
 
         self.diagramName = os.path.split(self.projectFolder)[-1] + '.json'
         self.saveAsPath = pl.Path()
@@ -234,7 +234,7 @@ class Editor(QWidget):
         self.projectPath = ''  # XXX
         self.fileList = []  # XXX
 
-        if parent.loadValue == 'new' or parent.loadValue == 'json':
+        if loadValue == 'new' or loadValue == 'json':
             self.createProjectFolder()
 
         self.fileBrowserLayout = QVBoxLayout()
@@ -262,7 +262,7 @@ class Editor(QWidget):
         self.fileBrowserLayout.addWidget(self.scroll)
         self.createDdckTree(self.projectFolder)
 
-        if parent.loadValue == 'new' or parent.loadValue == 'json':
+        if loadValue == 'new' or loadValue == 'json':
             self.createConfigBrowser(self.projectFolder)
             self.copyGenericFolder(self.projectFolder)
             self.createHydraulicDir(self.projectFolder)
@@ -334,10 +334,10 @@ class Editor(QWidget):
         self.alignXLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignXLineItem)
 
-        if parent.loadValue == 'load' or parent.loadValue == 'copy':
-            self.decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=parent.loadValue)
-        elif parent.loadValue == 'json':
-            self.decodeDiagram(parent.jsonPath, loadValue=parent.loadValue)
+        if loadValue == 'load' or loadValue == 'copy':
+            self.decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
+        elif loadValue == 'json':
+            self.decodeDiagram(jsonPath, loadValue=loadValue)
 
         # #Search related lists
         # self.bfs_visitedNodes = []
