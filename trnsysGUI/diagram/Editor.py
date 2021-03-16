@@ -712,38 +712,14 @@ class Editor(QWidget):
         if exportTo == 'mfs':
             mfsFileName = self.diagramName.split('.')[0] + '_mfs.dck'
             exportPath = os.path.join(self.projectFolder, mfsFileName)
-            if pl.Path(exportPath).exists():
-                qmb = QMessageBox(self)
-                qmb.setText("Warning: " + exportPath + " already exists. Do you want to overwrite it or cancel?")
-                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-                qmb.setDefaultButton(QMessageBox.Cancel)
-                ret = qmb.exec()
-                if ret == QMessageBox.Save:
-                    self.canceled = False
-                    self.logger.info("Overwriting")
-                    # continue
-                else:
-                    self.canceled = True
-                    self.logger.info("Canceling")
-                    return
+            if self._doesFileExistAndDontOverwrite(exportPath):
+                return None
 
         elif exportTo == 'ddck':
             hydraulicsPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
-            if pl.Path(hydraulicsPath).exists():
-                qmb = QMessageBox(self)
-                qmb.setText("Warning: " +
-                            "A ddck-file already exists in the hydraulic folder. Do you want to overwrite it or cancel?")
-                qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-                qmb.setDefaultButton(QMessageBox.Cancel)
-                ret = qmb.exec()
-                if ret == QMessageBox.Save:
-                    self.canceled = False
-                    self.logger.info("Overwriting")
-                    # continue
-                else:
-                    self.canceled = True
-                    self.logger.info("Canceling")
-                    return
+
+            if self._doesFileExistAndDontOverwrite(hydraulicsPath):
+                return None
 
         self.logger.info("Printing the TRNSYS file...")
 
@@ -828,6 +804,25 @@ class Editor(QWidget):
             return exportPath
         elif exportTo == 'ddck':
             return hydraulicsPath
+
+    def _doesFileExistAndDontOverwrite(self, folderPath):
+        if not pl.Path(folderPath).exists():
+            return False
+
+        qmb = QMessageBox(self)
+        qmb.setText(f"Warning: {folderPath} already exists. Do you want to overwrite it or cancel?")
+        qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+        qmb.setDefaultButton(QMessageBox.Cancel)
+        ret = qmb.exec()
+
+        if ret == QMessageBox.Cancel:
+            self.canceled = True
+            self.logger.info("Canceling")
+            return True
+
+        self.canceled = False
+        self.logger.info("Overwriting")
+        return False
 
     def exportHydraulicControl(self):
         self.logger.info("------------------------> START OF EXPORT <------------------------")
