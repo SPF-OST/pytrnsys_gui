@@ -17,7 +17,8 @@ class TestEditor:
         _ = widgets.QApplication([])
 
         logger = log.Logger('root')
-        editor = de.Editor(None, str(helper.projectFolderPath), jsonPath=None, loadValue='load', logger=logger)
+        editor = de.Editor(parent=None, projectFolder=str(helper.projectFolderPath),
+                           jsonPath=None, loadValue='load', logger=logger)
         editor.exportData(exportTo='mfs')
 
         helper.ensureDckFilesAreEqualIgnoringRandomizedFlowRateValues()
