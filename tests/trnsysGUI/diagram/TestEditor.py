@@ -46,7 +46,7 @@ class _Helper:
         expectedContent = self._expectedDckFile.read_text()
 
         actualContentWithoutRandomizedValues = \
-            self._replaceRandomizeValuesWithPlaceHolder(actualContent, placeholder='XXX')
+            self._replaceRandomizeValuesWithPlaceholder(actualContent, placeholder='XXX')
 
         assert actualContentWithoutRandomizedValues == expectedContent
 
@@ -59,7 +59,7 @@ class _Helper:
 
         sh.copytree(exampleFolderPath, self.projectFolderPath)
 
-    def _replaceRandomizeValuesWithPlaceHolder(self, actualContent, placeholder):
+    def _replaceRandomizeValuesWithPlaceholder(self, actualContent, placeholder):
         for massFlow in self.RANDOMIZED_FLOW_RATES:
             pattern = rf"^{massFlow} = [^=\n]+$"
             actualContent = re.sub(pattern, f"{massFlow} = {placeholder}", actualContent, flags=re.MULTILINE)
