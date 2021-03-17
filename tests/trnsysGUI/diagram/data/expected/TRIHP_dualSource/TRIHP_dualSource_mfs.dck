@@ -125,22 +125,22 @@ THPX3=1
 
 EQUATIONS 16
 *** Massflowrates
-MfrPuSH = 414
+MfrPuSH = XXX
 xFracDivSh = 0.0
 MfrsupplyWater = 1000
 xFracDivHpEvap = 0.0
 xFracDivCondTOTesDhw = 1.0
 xFracDivSHCool = 0.0
-MfrPuHpEvap = 293
-MfrPuHpShCond = 965
+MfrPuHpEvap = XXX
+MfrPuHpShCond = XXX
 xFracDivDhw = 1.0
 xFracDivDhwOut = 1.0
 xFracDivCool = 0.0
-MfrPuHpDhwCond = 872
+MfrPuHpDhwCond = XXX
 xFracDivTesDhwOut = 0.0
 xFracDivHp = 0.0
-MfrPuDhw = 206
-MfrPuCirc = 7
+MfrPuDhw = XXX
+MfrPuCirc = XXX
 
 EQUATIONS 7
 *** Pump outlet temperatures

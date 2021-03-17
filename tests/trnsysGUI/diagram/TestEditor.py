@@ -1,6 +1,7 @@
 import logging as log
 import pathlib as pl
 import shutil as sh
+import regex as re
 
 import PyQt5.QtWidgets as widgets
 
@@ -19,17 +20,12 @@ class TestEditor:
         editor = de.Editor(None, str(helper.projectFolderPath), jsonPath=None, loadValue='load', logger=logger)
         editor.exportData(exportTo='mfs')
 
-        self._assertFileEquals(helper.actualDckFile, helper.expectedDckFile)
-
-    @staticmethod
-    def _assertFileEquals(actualFilePath, expectedFilePath):
-        actualContent = actualFilePath.read_text()
-        expectedContent = expectedFilePath.read_text()
-
-        assert actualContent == expectedContent
+        helper.ensureDckFilesAreEqualIgnoringRandomizedFlowRateValues()
 
 
 class _Helper:
+    RANDOMIZED_FLOW_RATES = "MfrPuSH MfrPuHpEvap MfrPuHpShCond MfrPuHpDhwCond MfrPuDhw MfrPuCirc".split()
+
     def __init__(self):
         dataFolderPath = pl.Path(__file__).parent / 'data'
 
@@ -38,11 +34,20 @@ class _Helper:
         self.projectFolderPath = self._actualFolderPath / 'TRIHP_dualSource'
         expectedProjectFolderPath = dataFolderPath / 'expected' / 'TRIHP_dualSource'
 
-        self.actualDckFile = self.projectFolderPath / 'TRIHP_dualSource_mfs.dck'
-        self.expectedDckFile = expectedProjectFolderPath / 'TRIHP_dualSource_mfs.dck'
+        self._actualDckFile = self.projectFolderPath / 'TRIHP_dualSource_mfs.dck'
+        self._expectedDckFile = expectedProjectFolderPath / 'TRIHP_dualSource_mfs.dck'
 
     def setup(self):
         self._copyExampleToTestInputFolder()
+
+    def ensureDckFilesAreEqualIgnoringRandomizedFlowRateValues(self):
+        actualContent = self._actualDckFile.read_text()
+        expectedContent = self._expectedDckFile.read_text()
+
+        actualContentWithoutRandomizedValues = \
+            self._replaceRandomizeValuesWithPlaceHolder(actualContent, placeholder='XXX')
+
+        assert actualContentWithoutRandomizedValues == expectedContent
 
     def _copyExampleToTestInputFolder(self):
         if self._actualFolderPath.exists():
@@ -53,3 +58,9 @@ class _Helper:
 
         sh.copytree(exampleFolderPath, self.projectFolderPath)
 
+    def _replaceRandomizeValuesWithPlaceHolder(self, actualContent, placeholder):
+        for massFlow in self.RANDOMIZED_FLOW_RATES:
+            pattern = rf"^{massFlow} = [^=\n]+$"
+            actualContent = re.sub(pattern, f"{massFlow} = {placeholder}", actualContent, flags=re.MULTILINE)
+
+        return actualContent
