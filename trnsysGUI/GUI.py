@@ -104,6 +104,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent)
 
         self.loadValue = ''
+        self.jsonPath = None
         self.logger = logger
 
         qmb = NewOrLoadWindow(self)
