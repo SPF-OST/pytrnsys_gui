@@ -61,7 +61,7 @@ class _Helper:
 
     def _replaceRandomizeValuesWithPlaceholder(self, actualContent, placeholder):
         for massFlow in self.RANDOMIZED_FLOW_RATES:
-            pattern = rf"^{massFlow} = [^=\n]+$"
+            pattern = rf"^{massFlow} = [0-9\.]+"
             actualContent = re.sub(pattern, f"{massFlow} = {placeholder}", actualContent, flags=re.MULTILINE)
 
         return actualContent
