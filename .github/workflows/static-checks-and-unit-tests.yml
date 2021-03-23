@@ -19,6 +19,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install Xvfb
+      run: |
+        sudo apt-get install xvfb
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -37,4 +40,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest tests
+        xvfb-run --auto-servernum pytest tests
