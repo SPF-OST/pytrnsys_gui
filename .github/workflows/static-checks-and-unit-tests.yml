@@ -19,9 +19,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install Xvfb
+    - name: Install Xvfb and required X.org libraries
       run: |
         sudo apt-get install xvfb
+        # See https://forum.qt.io/topic/115418/test-under-xvfb-fail-after-upgrade-to-qt-5-15-0-for-python
+        sudo apt-get install libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 \
+          libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
