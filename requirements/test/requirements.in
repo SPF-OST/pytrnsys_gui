@@ -3,6 +3,6 @@ wheel
 pytest
 pytest-cov
 mypy
-pylint
+flake8
 
 -e file:.#egg=pytrnsys-gui
