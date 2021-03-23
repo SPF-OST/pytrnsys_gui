@@ -1,7 +1,7 @@
 import logging as log
 import pathlib as pl
 import shutil as sh
-import regex as re
+import re
 
 import PyQt5.QtWidgets as widgets
 
