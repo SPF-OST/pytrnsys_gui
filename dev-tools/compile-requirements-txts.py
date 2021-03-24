@@ -30,7 +30,7 @@ baseArgs = ['pip-compile', *sys.argv[1:]]
 
 DIRS = [
     "requirements/dev",
-    "requirements/test"
+    "requirements/ci/test"
 ]
 
 
