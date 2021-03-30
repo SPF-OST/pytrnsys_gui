@@ -5,7 +5,6 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pytrnsys_gui",
-    version="0.0.1",
     author="Stefano Marti",
     author_email="stefano-marti@spf.ch",
     description="A GUI for Trnsys",
@@ -19,5 +18,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=["pytrnsys", "PyQT5", "matplotlib", "numpy", "pandas", "bokeh"],
+    setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.5",
 )
