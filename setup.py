@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pytrnsys-gui",
-    author="Stefano Marti",
+    author="Martin Neugebauer",
     version_config=True,
-    author_email="stefano-marti@spf.ch",
+    author_email="martin.neugebauer@ost.ch",
     description="A GUI for Trnsys",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/SPF-OST/pytrnsys",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
