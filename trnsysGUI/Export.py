@@ -18,7 +18,7 @@ from trnsysGUI.Collector import Collector
 class Export(object):
     def __init__(self, objList, editor):
         self.logger = editor.logger
-        
+
         self.trnsysObj = objList
         self.editor = editor
         self.maxChar = 20
@@ -26,9 +26,12 @@ class Export(object):
         self.lineNumOfPar = 0
         for component in self.trnsysObj:
             numOfRelPorts = 0
-            if isinstance(component,StorageTank) or (isinstance(component,Connection) and (type(component.fromPort.parent) is StorageTank or type(component.toPort.parent) is StorageTank)):
+            if isinstance(component, StorageTank) or (
+                isinstance(component, Connection)
+                and (type(component.fromPort.parent) is StorageTank or type(component.toPort.parent) is StorageTank)
+            ):
                 pass
-            elif isinstance(component,Connection):
+            elif isinstance(component, Connection):
                 numOfRelPorts = 1
             else:
                 try:
@@ -42,9 +45,9 @@ class Export(object):
                 if numOutputs + numInputs <= 1:
                     numOfRelPorts = numOutputs + numInputs
                 else:
-                    numOfRelPorts = min(numOutputs,numInputs)
+                    numOfRelPorts = min(numOutputs, numInputs)
             self.lineNumOfPar += numOfRelPorts
-        self.numOfPar = 4*self.lineNumOfPar+1
+        self.numOfPar = 4 * self.lineNumOfPar + 1
 
     def connectionExplorer(self):
         connectionDict = {}
@@ -53,23 +56,23 @@ class Export(object):
         numOfStorageTanks = 0
         for t in self.trnsysObj:
             if not isinstance(t, StorageTank):
-                toElement = ''
+                toElement = ""
                 try:
                     toElement = t.toPort.parent.trnsysId
                 except:
                     pass
 
-                fromElement = ''
+                fromElement = ""
                 try:
                     fromElement = t.fromPort.parent.trnsysId
                 except:
                     pass
 
-                connectionDict[t.displayName] =  [t.trnsysId,toElement,fromElement]
+                connectionDict[t.displayName] = [t.trnsysId, toElement, fromElement]
                 connectionDictNum[str(t.trnsysId)] = t.displayName
         return connectionDict, connectionDictNum
 
-    def exportBlackBox(self,exportTo='ddck'):
+    def exportBlackBox(self, exportTo="ddck"):
         f = "*** Black box component temperatures" + "\n"
         equationNr = 0
         problemEncountered = False
@@ -81,9 +84,9 @@ class Export(object):
                 f += equation + "\n"
             equationNr += len(equations)
 
-        if exportTo == 'mfs':
+        if exportTo == "mfs":
             lines = f.split("\n")
-            f = ''
+            f = ""
             for i in range(len(lines)):
                 if "=" in lines[i]:
                     lines[i] = lines[i].split("=")[0] + "=1"
@@ -91,7 +94,7 @@ class Export(object):
 
         f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
-        return problemEncountered,f
+        return problemEncountered, f
 
     def exportPumpOutlets(self):
         f = "*** Pump outlet temperatures" + "\n"
@@ -103,7 +106,7 @@ class Export(object):
         f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
         return f
 
-    def exportMassFlows(self): # What the controller should give
+    def exportMassFlows(self):  # What the controller should give
         f = "*** Massflowrates" + "\n"
         equationNr = 0
 
@@ -120,11 +123,11 @@ class Export(object):
         :param unit: the index of the previous unit number used.
         :return:
         """
-        f = ''
+        f = ""
 
         nUnit = unit
         constants = 0
-        f2 = ''
+        f2 = ""
         for t in self.trnsysObj:
             f2 += t.exportDivSetting1()[0]
             constants += t.exportDivSetting1()[1]
@@ -150,25 +153,28 @@ class Export(object):
 
         # exportConnsString: i/o i/o 0 0
         tempObjList = []
-        nameString = ''
+        nameString = ""
         for t in self.trnsysObj:
 
-            noHydraulicConnection = isinstance(t,StorageTank) or (not(isinstance(t, Connection)) and not t.outputs and not t.inputs)
+            noHydraulicConnection = isinstance(t, StorageTank) or (
+                not (isinstance(t, Connection)) and not t.outputs and not t.inputs
+            )
 
             if noHydraulicConnection:
                 continue
             else:
                 ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
                 f += ObjToCheck
-                ObjToCheck = str(ObjToCheck).split(': ')[-1].rstrip()
+                ObjToCheck = str(ObjToCheck).split(": ")[-1].rstrip()
 
-                if len(ObjToCheck) > self.maxChar-5:
-                    nameString += ObjToCheck + '\n'
+                if len(ObjToCheck) > self.maxChar - 5:
+                    nameString += ObjToCheck + "\n"
 
-        if nameString != '':
+        if nameString != "":
             msgBox = QMessageBox()
             msgBox.setText(
-                "The following variable names :\n%shas longer than %d characters!" % (nameString, self.maxChar - 5))
+                "The following variable names :\n%shas longer than %d characters!" % (nameString, self.maxChar - 5)
+            )
             msgBox.exec_()
 
         tempS = f
@@ -194,7 +200,7 @@ class Export(object):
         return res
 
     def findId(self, s):
-        a = s[s.find("!") + 1:s.find(" ", s.find("!"))]
+        a = s[s.find("!") + 1 : s.find(" ", s.find("!"))]
         self.logger.debug(a)
         return a
 
@@ -203,7 +209,7 @@ class Export(object):
         self.logger.debug("fds" + str(fileCopy))
         fileCopy = [" " + l for l in fileCopy]
 
-        matchNumber = re.compile(r'\d+')
+        matchNumber = re.compile(r"\d+")
 
         counter = 0
         for line in lineList:
@@ -220,17 +226,17 @@ class Export(object):
                             ids[i] = str(counter)
 
                     fileCopyTempLine = fileCopy[l]
-                    rest = fileCopyTempLine[fileCopyTempLine.find("!"):]
+                    rest = fileCopyTempLine[fileCopyTempLine.find("!") :]
                     res[l] = ids[0] + " " + ids[1] + " " + ids[2] + " " + ids[3]
-                    res[l] += " "*(descConnlen - len(res[l])) + rest
+                    res[l] += " " * (descConnlen - len(res[l])) + rest
 
                 fileCopy = res
                 fileCopy = [l.replace("!" + str(k) + " ", "!" + str(counter) + " ") for l in fileCopy]
 
-        return '\n'.join(fileCopy)
+        return "\n".join(fileCopy)
 
     def exportInputsFlowSolver(self):
-        f = ''
+        f = ""
         f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 935\n"
 
         counter = 0
@@ -261,18 +267,20 @@ class Export(object):
         return f
 
     def exportOutputsFlowSolver(self, simulationUnit):
-        f = ''
+        f = ""
 
         abc = list(string.ascii_uppercase)[0:3]
 
         prefix = "Mfr"
         equationNumber = 1
-        nEqUsed = 1 # DC
+        nEqUsed = 1  # DC
 
         tot = ""
 
         for t in self.trnsysObj:
-            noHydraulicConnection = isinstance(t, StorageTank) or (not (isinstance(t, Connection)) and not t.outputs and not t.inputs)
+            noHydraulicConnection = isinstance(t, StorageTank) or (
+                not (isinstance(t, Connection)) and not t.outputs and not t.inputs
+            )
 
             if noHydraulicConnection:
                 continue
@@ -282,8 +290,10 @@ class Export(object):
                 equationNumber = res[1]
                 nEqUsed += res[2]
 
-        head = "EQUATIONS {0}	! Output up to three (A,B,C) mass flow rates of each component, positive = " \
-               "input/inlet, negative = output/outlet ".format(nEqUsed-1)
+        head = (
+            "EQUATIONS {0}	! Output up to three (A,B,C) mass flow rates of each component, positive = "
+            "input/inlet, negative = output/outlet ".format(nEqUsed - 1)
+        )
 
         f += head + "\n"
         f += tot + "\n"
@@ -294,7 +304,7 @@ class Export(object):
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         # Prints the part of the export where the pipes, tp and div Units are printed
 
-        f = ''
+        f = ""
         unitNumber = startingUnit
         # typeNr1 = 929 # Temperature calculation from a tee-piece
         # typeNr2 = 931 # Temperature calculation from a pipe
@@ -310,8 +320,8 @@ class Export(object):
         return f
 
     def exportPrintLoops(self):
-        f = ''
-        loopText = ''
+        f = ""
+        loopText = ""
         constsNr = 0
         constString = "CONSTANTS "
         suffix1 = "_save"
@@ -339,7 +349,7 @@ class Export(object):
         return f
 
     def exportPrintPipeLoops(self):
-        f = ''
+        f = ""
         loopText = ""
         equationString = "EQUATIONS "
         equationNr = 0
@@ -372,8 +382,8 @@ class Export(object):
         return f
 
     def exportPrintPipeLosses(self):
-        f = ''
-        lossText = ''
+        f = ""
+        lossText = ""
         rightCounter = 0
 
         for i in self.editor.groupList[0].itemList:
@@ -387,7 +397,7 @@ class Export(object):
         if rightCounter == 0:
             lossText += "0"
 
-        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText +"\n\n"
+        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText + "\n\n"
         return f
 
     def exportMassFlowPrinter(self, unitnr, descLen):
@@ -399,7 +409,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName.split('.')[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self.editor.diagramName.split(".")[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -426,7 +436,7 @@ class Export(object):
         f += " " * (descLen - len(f)) + "! 10 Print labels" + "\n"
         f += "\n"
 
-        s = ''
+        s = ""
         breakline = 0
         for t in self.trnsysObj:
             if isinstance(t, Connection) and not t.isVirtualConn:
@@ -453,7 +463,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName.split('.')[0] + "_T.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self.editor.diagramName.split(".")[0] + "_T.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -480,7 +490,7 @@ class Export(object):
         f += " " * (descLen - len(f)) + "! 10 Print labels" + "\n"
         f += "\n"
 
-        s = ''
+        s = ""
         breakline = 0
         for t in self.trnsysObj:
             if isinstance(t, Connection) and not t.isVirtualConn:

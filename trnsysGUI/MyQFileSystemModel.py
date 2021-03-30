@@ -17,7 +17,7 @@ class MyQFileSystemModel(QFileSystemModel):
         if section == 0 and role == Qt.DisplayRole:
             return self.name
         if section == 4 and role == Qt.DisplayRole:
-            return 'Priority'
+            return "Priority"
         else:
             return super(QFileSystemModel, self).headerData(section, orientation, role)
 

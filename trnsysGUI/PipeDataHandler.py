@@ -9,15 +9,14 @@ class PipeDataHandler(object):
         self.timeSteps = 365
         self.diagramEditor = diagramEditor
 
-
     def clearFile(self):
-        f = open(self.massflowFilePath, 'w')
+        f = open(self.massflowFilePath, "w")
         f.truncate(0)
         f.close()
 
     def generateData(self):
         self.clearFile()
-        f = open(self.massflowFilePath, 'w')
+        f = open(self.massflowFilePath, "w")
         for ts in range(self.timeSteps):
             for t in self.diagramEditor.trnsysObj:
                 if isinstance(t, Connection):
@@ -26,9 +25,9 @@ class PipeDataHandler(object):
                     else:
                         a = 0
 
-                    if a < 1/3:
+                    if a < 1 / 3:
                         a = -1e3
-                    elif 1/3 <= a <= 2/3:
+                    elif 1 / 3 <= a <= 2 / 3:
                         a = 0
                     else:
                         a = 1e3

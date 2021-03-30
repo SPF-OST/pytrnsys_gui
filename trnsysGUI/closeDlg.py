@@ -14,7 +14,7 @@ class closeDlg(QDialog):
 
         self.setWindowTitle("Closing!")
         self.dlgMessage = QLabel()
-        self.strMessage = ("Do you want to retain the current template for when you next open the application?" )
+        self.strMessage = "Do you want to retain the current template for when you next open the application?"
         self.dlgMessage.setText(self.strMessage)
 
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel

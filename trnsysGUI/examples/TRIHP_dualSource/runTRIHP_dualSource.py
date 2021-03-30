@@ -9,8 +9,8 @@ import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 
 import os
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-    pathConfig  = os.getcwd()
+    pathConfig = os.getcwd()
     configFile = "run.config"
-    runTool = runTrnsys.RunParallelTrnsys(pathConfig,configFile=configFile)
+    runTool = runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)

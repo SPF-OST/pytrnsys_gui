@@ -1,4 +1,4 @@
-class copyGroup():
+class copyGroup:
     def __init__(self, editor):
         self.diagramName = "COPYGROUP"
         # self.diagramEditor = editor

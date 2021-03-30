@@ -2,13 +2,14 @@ import os
 import glob
 from PyQt5.QtWidgets import *
 
+
 class configFile:
     def __init__(self, configPath, editor):
         self.projectFolder = os.path.split(configPath)[0]
         self.editor = editor
         self.configPath = configPath
         if os.path.isfile(self.configPath):
-            infile = open(self.configPath, 'r')
+            infile = open(self.configPath, "r")
             self.lines = infile.readlines()
             self.fileExists = True
             self.updateConfig()
@@ -20,7 +21,7 @@ class configFile:
             qmb.setDefaultButton(QMessageBox.Ok)
             qmb.exec()
 
-    def statementChecker(self,keyword):
+    def statementChecker(self, keyword):
         for i in range(len(self.lines)):
             if keyword in self.lines[i]:
                 return i
@@ -41,8 +42,8 @@ class configFile:
         originalNumberOfLines = len(self.lines)
         for i in range(originalNumberOfLines):
             try:
-                if self.lines[originalNumberOfLines-1-i][:9] == "PROJECT$ ":
-                    del self.lines[originalNumberOfLines-1-i]
+                if self.lines[originalNumberOfLines - 1 - i][:9] == "PROJECT$ ":
+                    del self.lines[originalNumberOfLines - 1 - i]
             except:
                 pass
 
@@ -50,45 +51,51 @@ class configFile:
 
         linePaths = self.statementChecker("#PATHS#")
         if linePaths == -1:
-            self.lines += ["\n", "##################PATHS##################", "\n", "\n","string PROJECT$ \"%s\"\n" % ddckPath]
+            self.lines += [
+                "\n",
+                "##################PATHS##################",
+                "\n",
+                "\n",
+                'string PROJECT$ "%s"\n' % ddckPath,
+            ]
         else:
             lineProjectPathDdck = self.statementChecker("PROJECT$ ")
             if lineProjectPathDdck == -1:
-                self.lines.insert(linePaths +2,"string PROJECT$ \"%s\"\n" % ddckPath)
+                self.lines.insert(linePaths + 2, 'string PROJECT$ "%s"\n' % ddckPath)
             else:
-                self.lines[lineProjectPathDdck] = "string PROJECT$ \"%s\"\n" % ddckPath
+                self.lines[lineProjectPathDdck] = 'string PROJECT$ "%s"\n' % ddckPath
 
         lineNameRef = self.statementChecker("string nameRef")
         if lineNameRef != -1:
-            self.lines[lineNameRef] = "string nameRef \"%s\"\n" % os.path.split(self.projectFolder)[-1]
+            self.lines[lineNameRef] = 'string nameRef "%s"\n' % os.path.split(self.projectFolder)[-1]
 
         lineProjectPath = self.statementChecker("string projectPath")
         if lineProjectPath == -1:
-            self.lines.insert(lineNameRef,"string projectPath \"%s\"\n" %self.projectFolder)
+            self.lines.insert(lineNameRef, 'string projectPath "%s"\n' % self.projectFolder)
         else:
-            self.lines[lineProjectPath] = "string projectPath \"%s\"\n" %self.projectFolder
+            self.lines[lineProjectPath] = 'string projectPath "%s"\n' % self.projectFolder
 
         lineDdck = self.statementChecker("USED DDCKs")
         if lineDdck == -1:
-            self.lines += ["\n","#############USED DDCKs##################","\n","\n","\n"]
+            self.lines += ["\n", "#############USED DDCKs##################", "\n", "\n", "\n"]
             lineDdck = len(self.lines) - 2
 
         ddckFiles = glob.glob(os.path.join(ddckPath, "**/*.ddck"), recursive=True)
         for i in range(len(ddckFiles)):
             ddckFiles[i] = ddckFiles[i].replace(ddckPath + "\\", "")
-            ddckFiles[i] = ddckFiles[i].replace(".ddck","")
+            ddckFiles[i] = ddckFiles[i].replace(".ddck", "")
         for i in range(len(ddckFiles)):
             if "head" in ddckFiles[i]:
-                ddckFiles.insert(0,ddckFiles.pop(i))
+                ddckFiles.insert(0, ddckFiles.pop(i))
         for i in range(len(ddckFiles)):
             if "end" in ddckFiles[i]:
-                ddckFiles.insert(len(ddckFiles)-1,ddckFiles.pop(i))
+                ddckFiles.insert(len(ddckFiles) - 1, ddckFiles.pop(i))
         ddcksEntered = 0
         for ddck in ddckFiles:
-            self.lines.insert(lineDdck+2+ddcksEntered,"PROJECT$ "+ddck+"\n")
+            self.lines.insert(lineDdck + 2 + ddcksEntered, "PROJECT$ " + ddck + "\n")
             ddcksEntered += 1
 
-        outfile = open(self.configPath, 'w')
+        outfile = open(self.configPath, "w")
         outfile.writelines(self.lines)
         outfile.close()
 

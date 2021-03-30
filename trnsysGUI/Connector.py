@@ -12,8 +12,8 @@ class Connector(BlockItem):
         self.w = 40
         self.h = 40
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
+        self.inputs.append(PortItem("i", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -40,7 +40,7 @@ class Connector(BlockItem):
 
         deltaH = self.h / 8
 
-        self.origInputsPos = [[0,delta]]
+        self.origInputsPos = [[0, delta]]
         self.origOutputsPos = [[w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -56,4 +56,4 @@ class Connector(BlockItem):
         return w, h
 
     def exportBlackBox(self):
-        return 'noBlackBoxOutput', []
+        return "noBlackBoxOutput", []

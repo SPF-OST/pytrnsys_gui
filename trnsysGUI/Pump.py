@@ -20,8 +20,8 @@ class Pump(BlockItem):
 
         self.exportInitialInput = 0.0
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
+        self.inputs.append(PortItem("i", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -46,7 +46,7 @@ class Pump(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0,delta]]
+        self.origInputsPos = [[0, delta]]
         self.origOutputsPos = [[w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -69,7 +69,7 @@ class Pump(BlockItem):
         return w, h
 
     def exportBlackBox(self):
-        return 'noBlackBoxOutput', []
+        return "noBlackBoxOutput", []
 
     def exportPumpOutlets(self):
         f = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
@@ -84,5 +84,3 @@ class Pump(BlockItem):
         temp1 = "Mfr" + self.displayName
         self.exportInputName = " " + temp1 + " "
         return self.exportInputName, 1
-
-

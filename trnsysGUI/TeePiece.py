@@ -20,9 +20,9 @@ class TeePiece(BlockItem):
 
         self.typeNumber = 2
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.inputs.append(PortItem('i', 2, self))
-        self.outputs.append(PortItem('o', 1, self))
+        self.inputs.append(PortItem("i", 0, self))
+        self.inputs.append(PortItem("i", 2, self))
+        self.outputs.append(PortItem("o", 1, self))
 
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
@@ -49,11 +49,10 @@ class TeePiece(BlockItem):
 
         deltaH = self.h / 8
 
-        self.label.setPos(lx, h - self.flippedV*(h+h/2))
+        self.label.setPos(lx, h - self.flippedV * (h + h / 2))
 
-
-        self.origInputsPos = [[0,delta], [w,delta]]
-        self.origOutputsPos = [[delta,0]]
+        self.origInputsPos = [[0, delta], [w, delta]]
+        self.origOutputsPos = [[delta, 0]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -72,9 +71,15 @@ class TeePiece(BlockItem):
         for i in self.inputs:
             # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow:
+                if (
+                    hasattr(c.fromPort.parent, "heatExchangers")
+                    and i.connectionList.index(c) == 0
+                    and not self.inFirstRow
+                ):
                     continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow:
+                elif (
+                    hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow
+                ):
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
@@ -83,9 +88,15 @@ class TeePiece(BlockItem):
         for o in self.outputs:
             # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow:
+                if (
+                    hasattr(c.fromPort.parent, "heatExchangers")
+                    and o.connectionList.index(c) == 0
+                    and not self.inFirstRow
+                ):
                     continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow:
+                elif (
+                    hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow
+                ):
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
@@ -103,8 +114,17 @@ class TeePiece(BlockItem):
         if self.isVisible():
             tot = ""
             for i in range(0, 3):
-                temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                       str(equationNumber) + "]\n"
+                temp = (
+                    prefix
+                    + self.displayName
+                    + "_"
+                    + abc[i]
+                    + "=["
+                    + str(simulationUnit)
+                    + ","
+                    + str(equationNumber)
+                    + "]\n"
+                )
                 tot += temp
                 self.exportEquations.append(temp)
                 # nEqUsed += 1  # DC
@@ -115,7 +135,7 @@ class TeePiece(BlockItem):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
-            f = ''
+            f = ""
             unitNumber = startingUnit
             tNr = 929  # Temperature calculation from a tee-piece
 
@@ -130,7 +150,7 @@ class TeePiece(BlockItem):
             unitText += "INPUTS 6\n"
 
             for s in self.exportEquations:
-                unitText += s[0:s.find('=')] + "\n"
+                unitText += s[0 : s.find("=")] + "\n"
 
             for it in self.trnsysConn:
                 unitText += "T" + it.displayName + "\n"

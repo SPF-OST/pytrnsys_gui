@@ -15,6 +15,7 @@ from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.segmentItem import segmentItem
 
+
 def calcDist(p1, p2):
     vec = p1 - p2
     norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
@@ -57,6 +58,7 @@ class Connection(object):
     trnsysConn : :obj:`List` of :obj:`BlockItem`
 
     """
+
     def __init__(self, fromPort, toPort, isVirtual, parent, **kwargs):
         # self.logger.debug("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
         self.logger = parent.logger
@@ -70,7 +72,7 @@ class Connection(object):
         self.isClone = False
 
         self.parent = parent
-        self.groupName = ''
+        self.groupName = ""
         self.setDefaultGroup()
 
         # Export related
@@ -83,11 +85,11 @@ class Connection(object):
 
         # For functions in storage tank
         if isVirtual and fromPort.side == 0:
-            self.side = 'Left'
+            self.side = "Left"
         elif isVirtual and fromPort.side == 2:
-            self.side = 'Right'
+            self.side = "Right"
         else:
-            self.side = ''
+            self.side = ""
 
         # Global
         self.id = self.parent.idGen.getID()
@@ -155,10 +157,10 @@ class Connection(object):
         To show the mass and temperature during mass flow visualization
         """
         self.mass = float(mass)
-        self.mass = '{:,}'.format(self.mass)
+        self.mass = "{:,}".format(self.mass)
         self.temperature = temp
         for s in self.segments:
-            s.labelMass.setPlainText("M: %s kg/Hr   T: %s\u2103" % (self.mass.replace(',', '\''), self.temperature))
+            s.labelMass.setPlainText("M: %s kg/Hr   T: %s\u2103" % (self.mass.replace(",", "'"), self.temperature))
 
     def setDisplayName(self, newName):
         self.displayName = newName
@@ -198,7 +200,7 @@ class Connection(object):
             if kwargs["mfr"] == "NegMfr":
                 col = QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
-                col = QColor(142, 142, 142) # Gray
+                col = QColor(142, 142, 142)  # Gray
             elif kwargs["mfr"] == "min":
                 col = QColor(0, 0, 204)  # deep blue
             elif kwargs["mfr"] == "max":
@@ -234,7 +236,6 @@ class Connection(object):
 
         else:
             self.logger.debug("No color to set in Connection.setColor()")
-
 
     # Getters
     def getStartPoint(self):
@@ -276,19 +277,19 @@ class Connection(object):
     # To correct the direction of a connection, unused
     def correctPorts(self):
         if isinstance(self.fromPort.parent, Pump):
-            if self.fromPort.name == 'i':
+            if self.fromPort.name == "i":
                 self.switchPorts()
 
         if isinstance(self.toPort.parent, Pump):
-            if self.toPort.name == 'o':
+            if self.toPort.name == "o":
                 self.switchPorts()
 
         if isinstance(self.fromPort, Collector):
-            if self.fromPort.name == 'i':
+            if self.fromPort.name == "i":
                 self.switchPorts()
 
         if isinstance(self.toPort, Collector):
-            if self.toPort.name == 'o':
+            if self.toPort.name == "o":
                 self.switchPorts()
 
         if isinstance(self.fromPort.parent, TVentil):
@@ -299,7 +300,6 @@ class Connection(object):
         self.fromPort = self.toPort
         self.toPort = temp
 
-
     # Initialization
     def initNew(self, parent):
 
@@ -309,7 +309,7 @@ class Connection(object):
         # Global
         self.parent.trnsysObj.append(self)
 
-        self.displayName = 'Conn' + str(self.connId)
+        self.displayName = "Conn" + str(self.connId)
 
         # global editorMode
         if self.parent.editorMode == 0:
@@ -386,8 +386,6 @@ class Connection(object):
 
         self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
 
-
-
         if self.isVirtualConn:
             # if self.displayName == "UntitledConn189":
             #     self.logger.debug("PiTesRCombiTes_189XXXXXXXX is now set invisible")
@@ -411,7 +409,7 @@ class Connection(object):
         rad = 2
 
         for x in range(len(self.cornersLoad)):
-            cor = CornerItem(- rad, - rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
+            cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
             # self.logger.debug("items are now " + str(self.parent.diagramScene.items()))
             self.logger.debug("Corner" + str(cor) + " has  " + str(cor.node))
 
@@ -451,7 +449,9 @@ class Connection(object):
 
             if type(s.startNode.parent) is CornerItem:
                 # self.logger.debug("startnode is at corner")
-                self.logger.debug(str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos()))
+                self.logger.debug(
+                    str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos())
+                )
                 pos1 = s.startNode.parent.scenePos().x(), s.startNode.parent.scenePos().y()
             if type(s.endNode.parent) is CornerItem:
                 # self.logger.debug("endnode is at corner")
@@ -499,8 +499,7 @@ class Connection(object):
             if d1 == 0:
                 d1 = eps
 
-            vec3 = QPointF(-5 * angleBetween * vec1.y() / d1,
-                           5 * angleBetween * vec1.x() / d1)
+            vec3 = QPointF(-5 * angleBetween * vec1.y() / d1, 5 * angleBetween * vec1.x() / d1)
             self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
 
         elif self.parent.editorMode == 1:
@@ -516,11 +515,11 @@ class Connection(object):
         if self.segmentsLoad:
             vec1 = np.array(self.segmentsLoad[0][:2])
             vec2 = np.array(self.segmentsLoad[0][2:])
-            vec = vec2-vec1
+            vec = vec2 - vec1
             # uVec1 = vec1/np.linalg.norm(vec1)
             # uVec2 = vec2/np.linalg.norm(vec2)
-            uVec = vec/np.linalg.norm(vec)
-            dotProduct = np.dot(np.array([1.,0]),uVec)
+            uVec = vec / np.linalg.norm(vec)
+            dotProduct = np.dot(np.array([1.0, 0]), uVec)
             angle = np.rad2deg(np.arccos(dotProduct))
             if np.isnan(angle):
                 angle = 0
@@ -544,12 +543,14 @@ class Connection(object):
             return
 
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 2 # 4
+        rad = 2  # 4
 
         self.logger.debug(
-            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
+            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
+        )
         self.logger.debug(
-            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name))
+            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
+        )
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
             self.fromPort.createdAtSide = 2
@@ -710,7 +711,7 @@ class Connection(object):
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(corner1)
 
-                p1 = QPointF(pos1.x(), pos2.y()-0.333)  # position of the connecting node
+                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
                 seg1.setLine(QLineF(pos1, p1))
                 seg2.setLine(QLineF(p1, pos2))
@@ -745,7 +746,7 @@ class Connection(object):
                 self.parent.diagramScene.addItem(corner1)
                 self.parent.diagramScene.addItem(corner2)
 
-                offsetPoint = pos1.y()-15.666
+                offsetPoint = pos1.y() - 15.666
 
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
@@ -790,7 +791,7 @@ class Connection(object):
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(corner1)
 
-                p1 = QPointF(pos1.x(), pos2.y()-0.333)  # position of the connecting node
+                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
                 seg1.setLine(QLineF(pos1, p1))
                 seg2.setLine(QLineF(p1, pos2))
@@ -824,7 +825,7 @@ class Connection(object):
                 self.parent.diagramScene.addItem(corner1)
                 self.parent.diagramScene.addItem(corner2)
 
-                offsetPoint = pos1.y()+15.666
+                offsetPoint = pos1.y() + 15.666
 
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
@@ -847,9 +848,9 @@ class Connection(object):
                 self.firstS = self.getFirstSeg()
 
         else:
-        # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
-        #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
-        #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
+            # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
+            #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
+            #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
 
             self.fromPort.createdAtSide = self.fromPort.side
             self.toPort.createdAtSide = self.toPort.side
@@ -903,6 +904,7 @@ class Connection(object):
             self.firstS = self.getFirstSeg()
 
             self.logger.debug("Conn has now " + str(self.firstS))
+
     # Unused
     def buildBridges(self):
         # This function finds the colliding line segments and creates the interrupted line effect
@@ -997,8 +999,7 @@ class Connection(object):
                             # self.logger.debug("distFactor " +  str(distFactor))
 
                             # normalVec = QPointF(-distFactor/normVec * vecp2p1.y(), distFactor/normVec * vecp2p1.x())
-                            normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(),
-                                                  distFactor / normVec * vecp2p1.y())
+                            normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(), distFactor / normVec * vecp2p1.y())
 
                             # self.logger.debug("vector is " + str(normVecp2p1))
                             # self.logger.debug("collisionpos is " + str(collisionPos))
@@ -1022,7 +1023,6 @@ class Connection(object):
                             # self.logger.debug("s.bridged element is " + str(s.bridgedSegment))
                             # self.logger.debug("c.bridged element is " + str(c.bridgedSegment))
                             # self.logger.debug(len(self.segments))
-
 
     # Delete a connection
     def clearConn(self):
@@ -1108,7 +1108,6 @@ class Connection(object):
         command = DeleteConnectionCommand(self, "Delete conn comand")
         self.parent.parent().undoStack.push(command)
 
-
     # Gradient related
     def totalLength(self):
         s = self.startNode
@@ -1189,7 +1188,6 @@ class Connection(object):
         element.setNext(pr)
         element.setPrev(ne)
 
-
     # Group related
     def setDefaultGroup(self):
         self.setConnToGroup("defaultGroup")
@@ -1221,7 +1219,6 @@ class Connection(object):
                     self.logger.debug("While removing conn from group, groupName is invalid")
             else:
                 self.logger.debug("While removeing conn from group, no group with conn.groupName")
-
 
     # Highlight when clicked, unhighlight when clicked elsewhere
     def highlightConn(self):
@@ -1282,8 +1279,14 @@ class Connection(object):
 
         element = self.startNode
         while element.nextN() is not None:
-            self.logger.debug("Node is " + str(element) + " has nextNode " + str(element.nextN()) + " has pL " + str(
-                self.partialLength(element)))
+            self.logger.debug(
+                "Node is "
+                + str(element)
+                + " has nextNode "
+                + str(element.nextN())
+                + " has pL "
+                + str(self.partialLength(element))
+            )
             element = element.nextN()
 
         self.logger.debug("Node is " + str(element) + " has nextNode " + str(element.nextN()))
@@ -1291,8 +1294,16 @@ class Connection(object):
     def printConnSegs(self):
         self.logger.debug("These are the segments in order")
         for s in self.segments:
-            self.logger.debug("Segment is " + str(s) + " has global id " + str(s.id) + " has startnode " + str(
-                s.startNode) + " endnode " + str(s.endNode))
+            self.logger.debug(
+                "Segment is "
+                + str(s)
+                + " has global id "
+                + str(s.id)
+                + " has startnode "
+                + str(s.startNode)
+                + " endnode "
+                + str(s.endNode)
+            )
 
     # Saving / Loading
     def encode(self):
@@ -1300,15 +1311,15 @@ class Connection(object):
             self.logger.debug("Encoding a connection")
 
             dct = {}
-            dct['.__ConnectionDict__'] = True
-            dct['PortFromID'] = self.fromPort.id
-            dct['PortToID'] = self.toPort.id
-            dct['isVirtualConn'] = self.isVirtualConn
-            dct['ConnDisplayName'] = self.displayName
-            dct['ConnID'] = self.id
-            dct['ConnCID'] = self.connId
-            dct['trnsysID'] = self.trnsysId
-            dct['GroupName'] = self.groupName
+            dct[".__ConnectionDict__"] = True
+            dct["PortFromID"] = self.fromPort.id
+            dct["PortToID"] = self.toPort.id
+            dct["isVirtualConn"] = self.isVirtualConn
+            dct["ConnDisplayName"] = self.displayName
+            dct["ConnID"] = self.id
+            dct["ConnCID"] = self.connId
+            dct["trnsysID"] = self.trnsysId
+            dct["GroupName"] = self.groupName
 
             segments = []  # Not used, but instead corners[]
 
@@ -1316,23 +1327,25 @@ class Connection(object):
                 segmentTupel = (s.line().p1().x(), s.line().p1().y(), s.line().p2().x(), s.line().p2().y())
                 segments.append(segmentTupel)
             # self.logger.debug("Segments in encoder is " + str(segments))
-            dct['SegmentPositions'] = segments
+            dct["SegmentPositions"] = segments
             if len(self.segments) > 0:
-                dct['FirstSegmentLabelPos'] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-                dct['FirstSegmentMassFlowLabelPos'] = \
-                    self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
+                dct["FirstSegmentLabelPos"] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+                dct["FirstSegmentMassFlowLabelPos"] = (
+                    self.segments[0].labelMass.pos().x(),
+                    self.segments[0].labelMass.pos().y(),
+                )
             else:
                 self.logger.debug("This connection has no segment")
                 defaultPosition = self.fromPort.pos().x(), self.fromPort.pos().y()
-                dct['FirstSegmentLabelPos'] = defaultPosition
-                dct['FirstSegmentMassFlowLabelPos'] = defaultPosition
+                dct["FirstSegmentLabelPos"] = defaultPosition
+                dct["FirstSegmentMassFlowLabelPos"] = defaultPosition
 
             corners = []
 
             for s in self.getCorners():
                 cornerTupel = (s.pos().x(), s.pos().y())
                 corners.append(cornerTupel)
-            dct['CornerPositions'] = corners
+            dct["CornerPositions"] = corners
             dictName = "Connection-"
 
             return dictName, dct
@@ -1349,10 +1362,9 @@ class Connection(object):
 
         resConnList.append(self)
 
-
     # Export related
     def exportBlackBox(self):
-        return 'noBlackBoxOutput', []
+        return "noBlackBoxOutput", []
 
     def exportPumpOutlets(self):
         return "", 0
@@ -1421,8 +1433,17 @@ class Connection(object):
             tot = ""
             for i in range(0, 3):
                 if i < 2:
-                    temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                           str(equationNumber) + "]\n"
+                    temp = (
+                        prefix
+                        + self.displayName
+                        + "_"
+                        + abc[i]
+                        + "=["
+                        + str(simulationUnit)
+                        + ","
+                        + str(equationNumber)
+                        + "]\n"
+                    )
                     tot += temp
                     self.exportEquations.append(temp)
                     # nEqUsed += 1  # DC
@@ -1431,8 +1452,11 @@ class Connection(object):
             return tot, equationNumber, 2
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        if not (hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers")) and not self.hiddenGenerated:
-            f = ''
+        if (
+            not (hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"))
+            and not self.hiddenGenerated
+        ):
+            f = ""
             unitNumber = startingUnit
             typeNr2 = 931  # Temperature calculation from a pipe
 
@@ -1498,14 +1522,38 @@ class Connection(object):
                     else:
                         lr = "Right"
 
-                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * round((1 - (
-                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h),2))) + "\n"
+                    unitText += (
+                        "T"
+                        + portToPrint.parent.displayName
+                        + "Port"
+                        + lr
+                        + str(
+                            int(
+                                100
+                                * round(
+                                    (
+                                        1
+                                        - (portToPrint.scenePos().y() - portToPrint.parent.scenePos().y())
+                                        / portToPrint.parent.h
+                                    ),
+                                    2,
+                                )
+                            )
+                        )
+                        + "\n"
+                    )
                 elif hasattr(self.trnsysConn[0], "subBlockCounter"):
-                    unitText += "T" + self.trnsysConn[0].displayName + "X" + str(self.trnsysConn[0].getSubBlockOffset(self)+1) + "\n"
+                    unitText += (
+                        "T"
+                        + self.trnsysConn[0].displayName
+                        + "X"
+                        + str(self.trnsysConn[0].getSubBlockOffset(self) + 1)
+                        + "\n"
+                    )
                 else:
                     unitText += "T" + self.trnsysConn[0].displayName + "\n"
 
-                unitText += self.exportEquations[0][0:self.exportEquations[0].find("=")] + "\n"
+                unitText += self.exportEquations[0][0 : self.exportEquations[0].find("=")] + "\n"
                 unitText += tempRoomVar + "\n"
 
                 # if isinstance(self.trnsysConn[1], BlockItem) and not self.trnsysConn[1].isVisible():
@@ -1535,24 +1583,61 @@ class Connection(object):
                     else:
                         lr = "Right"
 
-                    unitText += "T" + portToPrint.parent.displayName + "Port" + lr + str(int(100 * round((1 - (
-                            portToPrint.scenePos().y() - portToPrint.parent.scenePos().y()) / portToPrint.parent.h),2))) + "\n"
+                    unitText += (
+                        "T"
+                        + portToPrint.parent.displayName
+                        + "Port"
+                        + lr
+                        + str(
+                            int(
+                                100
+                                * round(
+                                    (
+                                        1
+                                        - (portToPrint.scenePos().y() - portToPrint.parent.scenePos().y())
+                                        / portToPrint.parent.h
+                                    ),
+                                    2,
+                                )
+                            )
+                        )
+                        + "\n"
+                    )
                 elif hasattr(self.trnsysConn[1], "subBlockCounter"):
-                    unitText += "T" + self.trnsysConn[1].displayName + "X" + str(self.trnsysConn[1].getSubBlockOffset(self)+1) + "\n"
+                    unitText += (
+                        "T"
+                        + self.trnsysConn[1].displayName
+                        + "X"
+                        + str(self.trnsysConn[1].getSubBlockOffset(self) + 1)
+                        + "\n"
+                    )
                 else:
                     unitText += "T" + self.trnsysConn[1].displayName + "\n"
 
             else:
-                f += "Error: NO VALUE\n" * 3 + "at connection with parents " + str(self.fromPort.parent) + str(
-                    self.toPort.parent) + "\n"
+                f += (
+                    "Error: NO VALUE\n" * 3
+                    + "at connection with parents "
+                    + str(self.fromPort.parent)
+                    + str(self.toPort.parent)
+                    + "\n"
+                )
 
             unitText += "***Initial values\n"
             unitText += initialValueS + "\n\n"
 
             unitText += "EQUATIONS " + str(equationNr) + "\n"
             unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-            unitText += powerPrefix + self.displayName + "_kW" + "= [" + str(unitNumber) + "," + str(
-                equationConstant2) + "]/3600 !kW\n"
+            unitText += (
+                powerPrefix
+                + self.displayName
+                + "_kW"
+                + "= ["
+                + str(unitNumber)
+                + ","
+                + str(equationConstant2)
+                + "]/3600 !kW\n"
+            )
             unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
 
             unitNumber += 1
@@ -1587,7 +1672,6 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
-
 
 
 class DeleteConnectionCommand(QUndoCommand):

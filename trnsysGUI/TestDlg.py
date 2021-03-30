@@ -14,7 +14,7 @@ class TestDlg(QDialog):
 
         self.setWindowTitle("Error!")
         self.dlgMessage = QLabel()
-        self.strMessage = ("%s not found inside Reference folder, add the file into Reference folder?" % exportedFile)
+        self.strMessage = "%s not found inside Reference folder, add the file into Reference folder?" % exportedFile
         self.dlgMessage.setText(self.strMessage)
 
         QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
@@ -32,4 +32,3 @@ class TestDlg(QDialog):
     def acceptExport(self):
         self.exportBool = True
         self.accept()
-

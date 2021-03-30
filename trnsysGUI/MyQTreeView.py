@@ -27,7 +27,7 @@ class MyQTreeView(QTreeView):
         self.logger.debug("Double clicked")
         self.openFile()
 
-    def mousePressEvent(self,event):
+    def mousePressEvent(self, event):
         self.clearSelection()
         QTreeView.mousePressEvent(self, event)
 
@@ -72,12 +72,13 @@ class MyQTreeView(QTreeView):
         simpFileName = os.path.split(fileName)[-1]
         loadPath = os.path.join(filePath, simpFileName)
         self.logger.debug(loadPath)
-        if fileName != '':
+        if fileName != "":
             self.logger.info("file loaded into %s" % filePath)
             if Path(loadPath).exists():
                 qmb = QMessageBox()
-                qmb.setText("Warning: " +
-                            "A file with the same name exists already. Do you want to overwrite or cancel?")
+                qmb.setText(
+                    "Warning: " + "A file with the same name exists already. Do you want to overwrite or cancel?"
+                )
                 qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
                 qmb.setDefaultButton(QMessageBox.Cancel)
                 ret = qmb.exec()
@@ -193,4 +194,3 @@ class MyQTreeView(QTreeView):
         i, okPressed = QInputDialog.getInt(self, "Get integer", "Value:", 28, 0, 100, 1)
         if okPressed:
             return i
-

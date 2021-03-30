@@ -77,6 +77,3 @@ class IdGenerator(object):
         self.blockIdCounter = count(1)
         self.storagenTesCounter = count(1)
         self.storageTypeCounter = count(1924)
-
-
-

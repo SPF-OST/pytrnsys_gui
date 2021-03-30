@@ -2,13 +2,25 @@ import os
 import sys
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget, \
-    QVBoxLayout, QWidget, QDoubleSpinBox, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import (
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QCheckBox,
+    QHBoxLayout,
+    QGridLayout,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+    QDoubleSpinBox,
+    QMessageBox,
+    QFileDialog,
+)
 from PyQt5.QtGui import QIcon
 
 
 class CheckBlackBox(QDialog):
-
     def __init__(self, path, parent=None):
         """
         A dialog box that allows user to choose the paths for export, diagrams, ddcks and trnsys
@@ -19,8 +31,8 @@ class CheckBlackBox(QDialog):
         self.currentDdckPath, self.currentTrnsysPath = self.getCurrentPaths()
         # self.exportPath = ''
         # self.diagramPath = ''
-        self.ddckPath = ''
-        self.trnsysPath = ''
+        self.ddckPath = ""
+        self.trnsysPath = ""
 
         # exportPathLabel = QLabel("Export Path:")
         # self.le = QLineEdit(self.currentExportPath)
@@ -121,8 +133,8 @@ class CheckBlackBox(QDialog):
         # else:
         #     self.diagramFlag = True
 
-        if self.ddckPath == '':
-            if self.currentDdckPath == '':
+        if self.ddckPath == "":
+            if self.currentDdckPath == "":
                 msgBox = QMessageBox()
                 msgBox.setText("Please set ddck path!")
                 msgBox.exec()
@@ -131,8 +143,8 @@ class CheckBlackBox(QDialog):
         else:
             self.ddckFlag = True
 
-        if self.trnsysPath == '':
-            if self.currentTrnsysPath == '':
+        if self.trnsysPath == "":
+            if self.currentTrnsysPath == "":
                 msgBox = QMessageBox()
                 msgBox.setText("Please set Trnsys path!")
                 msgBox.exec()
@@ -153,7 +165,6 @@ class CheckBlackBox(QDialog):
             self.parent().setTrnsysPath()
             self.close()
 
-
     def cancel(self):
         self.close()
 
@@ -162,7 +173,7 @@ class CheckBlackBox(QDialog):
         Lets user choose a directory for exporting
         """
         self.exportPath = str(QFileDialog.getExistingDirectory(self, "Select Export Path"))
-        if self.exportPath !='':
+        if self.exportPath != "":
             self.le.setText(self.exportPath)
         pass
 
@@ -171,7 +182,7 @@ class CheckBlackBox(QDialog):
         Lets user choose a directory for saving diagrams
         """
         self.diagramPath = str(QFileDialog.getExistingDirectory(self, "Select Diagram Path"))
-        if self.diagramPath !='':
+        if self.diagramPath != "":
             self.le2.setText(self.diagramPath)
         pass
 
@@ -180,7 +191,7 @@ class CheckBlackBox(QDialog):
         Lets user choose a directory for exporting ddcks
         """
         self.ddckPath = str(QFileDialog.getExistingDirectory(self, "Select Ddck Path"))
-        if self.ddckPath != '':
+        if self.ddckPath != "":
             self.le3.setText(self.ddckPath)
         pass
 
@@ -189,7 +200,7 @@ class CheckBlackBox(QDialog):
         Lets user choose the directory when TRNExe.exe is found
         """
         self.trnsysPath = str(QFileDialog.getExistingDirectory(self, "Select Trnsys Path"))
-        if self.trnsysPath != '':
+        if self.trnsysPath != "":
             self.le4.setText(self.trnsysPath)
         pass
 
@@ -199,19 +210,19 @@ class CheckBlackBox(QDialog):
         returns all the paths.
         """
         print("File:", __file__)
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
 
         # ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         print("root_dir:", ROOT_DIR)
-        filepath = os.path.join(ROOT_DIR, 'filepaths.txt')
+        filepath = os.path.join(ROOT_DIR, "filepaths.txt")
         # exportPath = ''
         # diagramPath = ''
-        ddckPath = ''
-        trnsysPath = ''
-        with open(filepath, 'r') as file:
+        ddckPath = ""
+        trnsysPath = ""
+        with open(filepath, "r") as file:
             data = file.readlines()
 
         try:
@@ -247,34 +258,34 @@ class CheckBlackBox(QDialog):
         # return exportPath, diagramPath, ddckPath, trnsysPath
         return ddckPath, trnsysPath
 
-    def writeIntoFile(self, string1, string2):#, string3, string4):
+    def writeIntoFile(self, string1, string2):  # , string3, string4):
         """
         Writes to filepath.txt
         Checks if the strings passed in are empty, if not empty, check if filepath contains an existing
         entry for tht string (regardless of it being empty or not). If no, create an entry and append the string
         to that entry. If yes, override the existing entry.
         """
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        filepath = os.path.join(ROOT_DIR, 'filepaths.txt')
-        with open(filepath, 'r') as file:
+        filepath = os.path.join(ROOT_DIR, "filepaths.txt")
+        with open(filepath, "r") as file:
             data = file.readlines()
-        if string1 != '':
+        if string1 != "":
             try:
                 data[0]
             except IndexError:
-                data.append(string1 + '\n')
+                data.append(string1 + "\n")
             else:
-                data[0] = string1 + '\n'
-        if string2 != '':
+                data[0] = string1 + "\n"
+        if string2 != "":
             try:
                 data[1]
             except IndexError:
-                data.append(string2 + '\n')
+                data.append(string2 + "\n")
             else:
-                data[1] = string2 + '\n'
+                data[1] = string2 + "\n"
         # if string3 != '':
         #     try:
         #         data[2]
@@ -291,5 +302,5 @@ class CheckBlackBox(QDialog):
         #         data[3] = string4 + '\n'
 
         print(data)
-        with open(filepath, 'w') as file:
+        with open(filepath, "w") as file:
             file.writelines(data)

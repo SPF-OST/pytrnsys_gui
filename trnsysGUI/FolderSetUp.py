@@ -3,6 +3,7 @@ import os
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QHBoxLayout, QVBoxLayout, QMessageBox, QFileDialog
 
+
 class FolderSetUp(QDialog):
     """
     A dialog box lets the user choose the path and the name of folder for a new project
@@ -12,8 +13,8 @@ class FolderSetUp(QDialog):
 
         super(FolderSetUp, self).__init__(parent)
 
-        self.projectPath = ''
-        self.folderName = ''
+        self.projectPath = ""
+        self.folderName = ""
 
         projectPathLabel = QLabel("Path to the project folder:")
         self.line1 = QLineEdit()
@@ -59,21 +60,21 @@ class FolderSetUp(QDialog):
 
         self.folderName = self.line2.text()
 
-        if self.projectPath == '':
+        if self.projectPath == "":
             msgBox = QMessageBox()
             msgBox.setText("Please set the path to the project folder.")
             msgBox.exec()
         else:
             self.projectPathFlag = True
 
-        if self.folderName == '':
+        if self.folderName == "":
             msgBox = QMessageBox()
             msgBox.setText("Please define the name of the project folder.")
             msgBox.exec()
         else:
             self.folderNameFlag = True
 
-        self.projectFolder = os.path.join(self.projectPath.replace('/', '\\'), self.folderName)
+        self.projectFolder = os.path.join(self.projectPath.replace("/", "\\"), self.folderName)
 
         if os.path.isdir(self.projectFolder):
 
@@ -97,6 +98,6 @@ class FolderSetUp(QDialog):
         Path to the project file as user input by choosing an existing directory
         """
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
-        if self.projectPath !='':
+        if self.projectPath != "":
             self.line1.setText(self.projectPath)
         pass

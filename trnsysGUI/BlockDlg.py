@@ -1,8 +1,18 @@
 import os
 
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QMessageBox, \
-    QFileDialog
+from PyQt5.QtWidgets import (
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QCheckBox,
+    QHBoxLayout,
+    QGridLayout,
+    QMessageBox,
+    QFileDialog,
+)
 from PyQt5.QtGui import QIcon
+
 
 class BlockDlg(QDialog):
     def __init__(self, block, parent=None):
@@ -96,7 +106,7 @@ class BlockDlg(QDialog):
         self.logger.debug("Opening diagram")
         # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.ddck")[0]
-        if fileName != '':
+        if fileName != "":
             if len(self.block.propertyFile) < 2:
                 self.block.propertyFile.append(fileName)
             else:
@@ -107,5 +117,5 @@ class BlockDlg(QDialog):
         pass
 
     def disableLoad(self):
-        if self.block.name == 'TeePiece' or self.block.name == 'WTap_main':
+        if self.block.name == "TeePiece" or self.block.name == "WTap_main":
             self.loadButton.setDisabled(True)

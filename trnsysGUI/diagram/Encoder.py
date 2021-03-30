@@ -45,8 +45,12 @@ class Encoder(json.JSONEncoder):
                 dictName, dct = t.encode()
                 blockDct[dictName + str(t.id)] = dct
 
-            idDict = {"__idDct__": True, "GlobalId": obj.idGen.getID(), "trnsysID": obj.idGen.getTrnsysID(),
-                      "globalConnID": obj.idGen.getConnID()}
+            idDict = {
+                "__idDct__": True,
+                "GlobalId": obj.idGen.getID(),
+                "trnsysID": obj.idGen.getTrnsysID(),
+                "globalConnID": obj.idGen.getConnID(),
+            }
             blockDct["IDs"] = idDict
 
             nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName, "ProjectFolder": obj.projectFolder}

@@ -1,9 +1,21 @@
 import os
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QMessageBox, \
-    QFileDialog, QVBoxLayout, QTableWidget, QTableWidgetItem
-from PyQt5.QtGui import  QColor
+from PyQt5.QtWidgets import (
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QCheckBox,
+    QHBoxLayout,
+    QGridLayout,
+    QMessageBox,
+    QFileDialog,
+    QVBoxLayout,
+    QTableWidget,
+    QTableWidgetItem,
+)
+from PyQt5.QtGui import QColor
 
 
 class FileOrderingDialog(QDialog):
@@ -16,8 +28,8 @@ class FileOrderingDialog(QDialog):
         self.table = QTableWidget(len(fileList), 2)
         self.table.setMinimumSize(800, 200)
         self.table.setColumnWidth(0, 700)
-        self.table.setHorizontalHeaderItem(0, QTableWidgetItem('File'))
-        self.table.setHorizontalHeaderItem(1, QTableWidgetItem('Priority'))
+        self.table.setHorizontalHeaderItem(0, QTableWidgetItem("File"))
+        self.table.setHorizontalHeaderItem(1, QTableWidgetItem("Priority"))
 
         for i in range(0, len(self.fileList)):
             item = QTableWidgetItem(self.fileList[i])
@@ -71,7 +83,7 @@ class FileOrderingDialog(QDialog):
         self.changed_items.clear()
         for i in range(0, self.table.rowCount()):
             data = self.table.item(i, 1)
-            if not data == None and not data == '':
+            if not data == None and not data == "":
                 self.changed_items.append(data.text())
 
     def customSortPaths(self):
@@ -90,7 +102,7 @@ class FileOrderingDialog(QDialog):
     def updateConfig(self):
         config = self.parent().configToEdit
 
-        with open(config, 'r') as file:
+        with open(config, "r") as file:
             lines = file.readlines()
             lines.append("\n")
 
@@ -100,14 +112,14 @@ class FileOrderingDialog(QDialog):
         lines.append(header)
         for items in self.finalPathList:
             item = items.replace("/", "\\")
-            item = item.split('ddck\\')[-1]
+            item = item.split("ddck\\")[-1]
             print("Item:", item)
             stringToAppend = item
             print(stringToAppend)
-            lines.append("LOCAL$ " + stringToAppend + '\n')
+            lines.append("LOCAL$ " + stringToAppend + "\n")
         lines.append(end)
 
-        with open(config, 'w') as file:
+        with open(config, "w") as file:
             file.writelines(lines)
 
     def checkAllAreIntegers(self, list):
@@ -121,7 +133,6 @@ class FileOrderingDialog(QDialog):
             return True
         else:
             return False
-
 
     # def log_change(self, item):
     #     self.table.blockSignals(True)
@@ -140,6 +151,3 @@ class FileOrderingDialog(QDialog):
     #
     # def writeToDatabase(self, item):
     #     text, col, row = item.text(), item.column(), item.row()
-
-
-

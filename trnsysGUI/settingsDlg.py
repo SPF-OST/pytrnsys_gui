@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QDialog, QLineEdit, QHBoxLayout, QPushButton, QGridLayout, QLabel
 from PyQt5 import QtCore
 
+
 class settingsDlg(QDialog):
-    def __init__(self,parent):
+    def __init__(self, parent):
         super(settingsDlg, self).__init__(parent)
         self.setModal(True)
         self.parent = parent
@@ -17,7 +18,7 @@ class settingsDlg(QDialog):
         buttonLayout.addWidget(self.okButton)
         buttonLayout.addWidget(self.cancelButton)
         layout = QGridLayout()
-        layout.setColumnMinimumWidth( 1,300)
+        layout.setColumnMinimumWidth(1, 300)
         layout.addWidget(nameLabel, 0, 0)
         layout.addWidget(self.le, 0, 1)
         layout.addLayout(buttonLayout, 1, 0, 2, 0)
@@ -36,4 +37,3 @@ class settingsDlg(QDialog):
 
     def cancel(self):
         self.close()
-

@@ -8,7 +8,6 @@ from trnsysGUI.ResizerItem import ResizerItem
 
 
 class GraphicalItem(QGraphicsPixmapItem):
-
     def __init__(self, parent, **kwargs):
 
         super(GraphicalItem, self).__init__(None)
@@ -80,15 +79,15 @@ class GraphicalItem(QGraphicsPixmapItem):
     def encode(self):
         dct = {}
 
-        dct['.__BlockDict__'] = True
-        dct['BlockName'] = "GraphicalItem"
-        dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
-        dct['ID'] = self.id
-        dct['Size'] = self.w, self.h
-        dct['ImageSource'] = self.imageSource
-        dct['FlippedH'] = self.flippedH
-        dct['FlippedV'] = self.flippedV
-        dct['RotationN'] = self.rotationN
+        dct[".__BlockDict__"] = True
+        dct["BlockName"] = "GraphicalItem"
+        dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
+        dct["ID"] = self.id
+        dct["Size"] = self.w, self.h
+        dct["ImageSource"] = self.imageSource
+        dct["FlippedH"] = self.flippedH
+        dct["FlippedV"] = self.flippedV
+        dct["RotationN"] = self.rotationN
 
         dictName = "GraphicalItem-"
         return dictName, dct
@@ -109,8 +108,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.setPos(float(i["BlockPosition"][0] + offset_x),
-                    float(i["BlockPosition"][1] + offset_y))
+        self.setPos(float(i["BlockPosition"][0] + offset_x), float(i["BlockPosition"][1] + offset_y))
 
         # self.updateFlipStateH(i["FlippedH"])
         # self.updateFlipStateV(i["FlippedV"])
