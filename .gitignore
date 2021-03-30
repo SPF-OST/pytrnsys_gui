@@ -8,6 +8,10 @@ trnsysGUI/clipboard.json
 trnsysGUI/recent/
 trnsysGUI/filepaths.txt
 
+# Test results and code coverage files
+/test-results/
+/.coverage
+
 *.xml
 *.pyc
 *.log
