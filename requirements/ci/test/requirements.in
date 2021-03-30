@@ -2,7 +2,8 @@ wheel
 
 pytest
 pytest-cov
+pytest-html
 mypy
-flake8
+pylint
 
 -e file:.#egg=pytrnsys-gui
