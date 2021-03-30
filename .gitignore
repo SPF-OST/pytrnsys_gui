@@ -12,6 +12,8 @@ trnsysGUI/filepaths.txt
 /test-results/
 /.coverage
 
+/.eggs/
+
 *.xml
 *.pyc
 *.log
