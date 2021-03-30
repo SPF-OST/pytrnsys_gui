@@ -19,5 +19,5 @@ setuptools.setup(
     ],
     install_requires=["pytrnsys", "PyQT5", "matplotlib", "numpy", "pandas", "bokeh"],
     setup_requires=["setuptools-git-versioning"],
-    python_requires=">=3.5",
+    python_requires=">=3.9",
 )
