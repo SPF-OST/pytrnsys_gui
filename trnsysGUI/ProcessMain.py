@@ -1,5 +1,6 @@
 import sys
-sys.path.append('C:\\Users\\parad\\OneDrive\\Desktop\\pytrnsys\\pytrnsys')
+
+sys.path.append("C:\\Users\\parad\\OneDrive\\Desktop\\pytrnsys\\pytrnsys")
 import pytrnsys.rsim.runParallelTrnsys as runTrnsys
 import pytrnsys.psim.processParallelTrnsys as processTrnsys
 
@@ -7,7 +8,6 @@ import os
 
 
 class ProcessMain:
-
     def processAction(self, logger, path):
         pathConfig = path
         configFile = "process.config"
@@ -20,7 +20,7 @@ class ProcessMain:
             processTool.readConfig(pathConfig, configFile)
         except ValueError as e:
             logger.error("EXCEPTION WHILE TRYING TO EXECUTE ProcessParallelTrnsys.readConfig")
-            errorStatement = ''
+            errorStatement = ""
             for words in e.args:
                 errorStatement += str(words)
             return True, errorStatement
@@ -29,15 +29,15 @@ class ProcessMain:
             return True, str(e)
         except:
             logger.error("UNDEFINED EXCEPTION WHILE TRYING TO EXECUTE ProcessParallelTrnsys.readConfig")
-            return True, ''
+            return True, ""
 
         try:
             processTool.process()
             logger.info("Successfully executed ProcessParallelTrnsys with " + fullPath)
-            return False, ''
+            return False, ""
         except ValueError as e:
             logger.error("EXCEPTION WHILE TRYING TO EXECUTE ProcessParallelTrnsys.process")
-            errorStatement = ''
+            errorStatement = ""
             for words in e.args:
                 errorStatement += str(words)
             return True, errorStatement
@@ -46,4 +46,4 @@ class ProcessMain:
             return True, str(e)
         except:
             logger.error("UNDEFINED EXCEPTION WHILE TRYING TO EXECUTE ProcessParallelTrnsys.process")
-            return True, ''
+            return True, ""

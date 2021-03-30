@@ -49,69 +49,69 @@ class View(QGraphicsView):
         self.setRenderHint(QPainter.Antialiasing)
 
     def dragEnterEvent(self, event):
-        if event.mimeData().hasFormat('component/name'):
+        if event.mimeData().hasFormat("component/name"):
             event.accept()
 
     def dragMoveEvent(self, event):
-        if event.mimeData().hasFormat('component/name'):
+        if event.mimeData().hasFormat("component/name"):
             event.accept()
 
     def dropEvent(self, event):
         """Here, the dropped icons create BlockItems/GraphicalItems"""
-        if event.mimeData().hasFormat('component/name'):
-            name = str(event.mimeData().data('component/name'), encoding='utf-8')
+        if event.mimeData().hasFormat("component/name"):
+            name = str(event.mimeData().data("component/name"), encoding="utf-8")
             self.logger.debug("name is " + name)
-            if name == 'StorageTank':
+            if name == "StorageTank":
                 bl = StorageTank(name, self)
                 # c = ConfigStorage(bl, self)
                 self.parent().showConfigStorageDlg(bl)
-            elif name == 'TeePiece':
+            elif name == "TeePiece":
                 bl = TeePiece(name, self)
-            elif name == 'TVentil':
+            elif name == "TVentil":
                 bl = TVentil(name, self)
-            elif name == 'Pump':
+            elif name == "Pump":
                 bl = Pump(name, self)
-            elif name == 'Collector':
+            elif name == "Collector":
                 bl = Collector(name, self)
-            elif name == 'HP':
+            elif name == "HP":
                 bl = HeatPump(name, self)
-            elif name == 'IceStorage':
+            elif name == "IceStorage":
                 bl = IceStorage(name, self)
-            elif name == 'PitStorage':
+            elif name == "PitStorage":
                 bl = PitStorage(name, self)
-            elif name == 'Radiator':
+            elif name == "Radiator":
                 bl = Radiator(name, self)
-            elif name == 'WTap':
+            elif name == "WTap":
                 bl = WTap(name, self)
-            elif name == 'WTap_main':
+            elif name == "WTap_main":
                 bl = WTap_main(name, self)
-            elif name == 'Connector':
+            elif name == "Connector":
                 bl = Connector(name, self)
-            elif name == 'GenericBlock':
+            elif name == "GenericBlock":
                 bl = GenericBlock(name, self)
                 # c = GenericPortPairDlg(bl, self)
                 self.parent().showGenericPortPairDlg(bl)
-            elif name == 'HPTwoHx':
+            elif name == "HPTwoHx":
                 bl = HeatPumpTwoHx(name, self)
-            elif name == 'HPDoubleDual':
+            elif name == "HPDoubleDual":
                 bl = HPDoubleDual(name, self)
-            elif name == 'Boiler':
+            elif name == "Boiler":
                 bl = Boiler(name, self)
-            elif name == 'AirSourceHP':
+            elif name == "AirSourceHP":
                 bl = AirSourceHP(name, self)
-            elif name == 'PV':
+            elif name == "PV":
                 bl = PV(name, self)
-            elif name == 'GroundSourceHx':
+            elif name == "GroundSourceHx":
                 bl = GroundSourceHx(name, self)
-            elif name == 'ExternalHx':
+            elif name == "ExternalHx":
                 bl = ExternalHx(name, self)
-            elif name == 'IceStorageTwoHx':
+            elif name == "IceStorageTwoHx":
                 bl = IceStorageTwoHx(name, self)
-            elif name == 'GenericItem':
+            elif name == "GenericItem":
                 bl = GraphicalItem(self)
-            elif name == 'MasterControl':
+            elif name == "MasterControl":
                 bl = MasterControl(name, self)
-            elif name == 'Control':
+            elif name == "Control":
                 bl = Control(name, self)
             else:
                 bl = BlockItem(name, self)

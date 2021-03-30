@@ -22,12 +22,11 @@ from trnsysGUI.Types.createType1924 import Type1924_TesPlugFlow
 
 
 class StorageTank(BlockItem):
-
     def __init__(self, trnsysType, parent, **kwargs):
         super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
 
         self.parent = parent
-        self.dckFilePath = ''
+        self.dckFilePath = ""
 
         self.leftSide = []
         self.rightSide = []
@@ -70,24 +69,22 @@ class StorageTank(BlockItem):
         self.label.setPlainText(newName)
         self.displayName = newName
 
-
     # Unused
     def setSideManual(self, left, s, hAbs):
         if left:
-            if s == 'i':
-                self.inputs.append(PortItem('i', 0, self))
-                self.inputs[-1].setPos(0.,hAbs)  # Not sure if this is the correct access to class variables
+            if s == "i":
+                self.inputs.append(PortItem("i", 0, self))
+                self.inputs[-1].setPos(0.0, hAbs)  # Not sure if this is the correct access to class variables
             else:
-                self.outputs.append(PortItem('i', 0, self))
-                self.outputs[-1].setPos(0.,hAbs)
+                self.outputs.append(PortItem("i", 0, self))
+                self.outputs[-1].setPos(0.0, hAbs)
         else:
-            if s == 'o':
-                self.inputs.append(PortItem('o', 0, self))
+            if s == "o":
+                self.inputs.append(PortItem("o", 0, self))
                 self.inputs[-1].setPos(self.w, hAbs)
             else:
-                self.outputs.append(PortItem('o', 0, self))
-                self.outputs[-1].setPos(self.w,hAbs)
-
+                self.outputs.append(PortItem("o", 0, self))
+                self.outputs[-1].setPos(self.w, hAbs)
 
     # Ports related
     def setSideManualPair(self, left, hAbsI, hAbsO, **kwargs):
@@ -112,16 +109,14 @@ class StorageTank(BlockItem):
                 self.logger.debug("Can't create a new output over an existing input")
                 # port2 = i
 
-
-
         if port1 is None:
-            port1 = PortItem('i', sideNr, self)
+            port1 = PortItem("i", sideNr, self)
             port1.setZValue(100)
             self.inputs.append(port1)
             tempSideList.append(port1)
 
         if port2 is None:
-            port2 = PortItem('o', sideNr, self)
+            port2 = PortItem("o", sideNr, self)
             port2.setZValue(100)
             self.outputs.append(port2)
             tempSideList.append(port2)
@@ -129,8 +124,8 @@ class StorageTank(BlockItem):
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
         if left:
-            port1.setPos(0., hAbsI)
-            port2.setPos(0., hAbsO)
+            port1.setPos(0.0, hAbsI)
+            port2.setPos(0.0, hAbsO)
             port1.side = 0
             port2.side = 0
         else:
@@ -153,36 +148,45 @@ class StorageTank(BlockItem):
             port1.id = kwargs["fromPortId"]
             port2.id = kwargs["toPortId"]
 
-            c = Connection(port1, port2, True, self.parent.parent(), fromPortId=kwargs["fromPortId"], toPortId=kwargs["toPortId"],
-                           segmentsLoad=[], cornersLoad=[], loadedConn=True)
+            c = Connection(
+                port1,
+                port2,
+                True,
+                self.parent.parent(),
+                fromPortId=kwargs["fromPortId"],
+                toPortId=kwargs["toPortId"],
+                segmentsLoad=[],
+                cornersLoad=[],
+                loadedConn=True,
+            )
             c.displayName = kwargs["connDispName"]
             c.id = kwargs["connId"]
             c.connId = kwargs["connCid"]
             c.trnsysId = kwargs["trnsysConnId"]
             if port1.side == 0:
-                c.side = 'Left'
+                c.side = "Left"
             elif port1.side == 2:
-                c.side = 'Right'
+                c.side = "Right"
             self.directPortConnsForList.append(c)
             return c
 
-    def modifyPortPosition(self,connectionName,newHeights):
+    def modifyPortPosition(self, connectionName, newHeights):
         for i in range(len(self.directPortConnsForList)):
             if self.directPortConnsForList[i].displayName == connectionName:
                 if self.directPortConnsForList[i].fromPort.side == 0:
-                    if newHeights[0] != '':
-                        absoluteHeight = (1.-newHeights[0]/100.)*self.h
-                        self.directPortConnsForList[i].fromPort.setPos(0.,absoluteHeight)
-                    if newHeights[1] != '':
-                        absoluteHeight = (1.-newHeights[1]/100.)*self.h
-                        self.directPortConnsForList[i].toPort.setPos(0.,absoluteHeight)
+                    if newHeights[0] != "":
+                        absoluteHeight = (1.0 - newHeights[0] / 100.0) * self.h
+                        self.directPortConnsForList[i].fromPort.setPos(0.0, absoluteHeight)
+                    if newHeights[1] != "":
+                        absoluteHeight = (1.0 - newHeights[1] / 100.0) * self.h
+                        self.directPortConnsForList[i].toPort.setPos(0.0, absoluteHeight)
                 elif self.directPortConnsForList[i].fromPort.side == 2:
-                    if newHeights[0] != '':
-                        absoluteHeight = (1.-newHeights[0]/100.)*self.h
-                        self.directPortConnsForList[i].fromPort.setPos(self.w,absoluteHeight)
-                    if newHeights[1] != '':
-                        absoluteHeight = (1.-newHeights[1]/100.)*self.h
-                        self.directPortConnsForList[i].toPort.setPos(self.w,absoluteHeight)
+                    if newHeights[0] != "":
+                        absoluteHeight = (1.0 - newHeights[0] / 100.0) * self.h
+                        self.directPortConnsForList[i].fromPort.setPos(self.w, absoluteHeight)
+                    if newHeights[1] != "":
+                        absoluteHeight = (1.0 - newHeights[1] / 100.0) * self.h
+                        self.directPortConnsForList[i].toPort.setPos(self.w, absoluteHeight)
 
     def checkConnectInside(self, port1, port2, maxhops, d):
         """
@@ -212,7 +216,7 @@ class StorageTank(BlockItem):
             self.logger.debug(" " * 3 * d + "Port + " + str(port1) + " is returning.")
             return
 
-        if port1.parent.name == 'TeePiece.png':
+        if port1.parent.name == "TeePiece.png":
             # self.logger.debug("We are at T piece " + str(port1.parent))
             conns = port1.parent.getConnections()
             # self.logger.debug("Connections of T piece are " + str(conns))
@@ -228,7 +232,7 @@ class StorageTank(BlockItem):
                         c.toPort.visited = True
                         self.checkConnectInside(c.fromPort, port2, maxhops, d + 1)
 
-        if port1.parent.name == 'StorageTank':
+        if port1.parent.name == "StorageTank":
             # self.logger.debug("We are at " + str(port1.parent))
 
             if d > 1:
@@ -242,14 +246,18 @@ class StorageTank(BlockItem):
                     if not j.fromPort.visited:
                         self.checkConnectInside(j.fromPort, port2, maxhops, d + 1)
                     else:
-                        self.logger.debug(" " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank")
+                        self.logger.debug(
+                            " " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank"
+                        )
                 if j.fromPort is port1:
                     self.logger.debug(" " * 3 * d + "fromPort is port1" + str(port1))
                     self.logger.debug(" " * 3 * d + "toPort is " + str(j.toPort) + "\n")
                     if not j.toPort.visited:
                         self.checkConnectInside(j.toPort, port2, maxhops, d + 1)
                     else:
-                        self.logger.debug(" " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank")
+                        self.logger.debug(
+                            " " * 3 * d + "Port was already visited, at depth " + str(d) + " at Storage Tank"
+                        )
 
     def connectInside(self, side, side2, tpList, sideVar):
         """
@@ -345,9 +353,13 @@ class StorageTank(BlockItem):
 
                 c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent())
                 c2 = Connection(tpiece.inputs[1], side[i + 1], True, self.parent.parent())
-                self.logger.debug("c1 is from " + side[i].parent.displayName + " to " + tpiece.inputs[0].parent.displayName)
-                self.logger.debug("c2 is from " + tpiece.inputs[1].parent.displayName + " to " + side[i+1].parent.displayName)
-                if layer>1:
+                self.logger.debug(
+                    "c1 is from " + side[i].parent.displayName + " to " + tpiece.inputs[0].parent.displayName
+                )
+                self.logger.debug(
+                    "c2 is from " + tpiece.inputs[1].parent.displayName + " to " + side[i + 1].parent.displayName
+                )
+                if layer > 1:
                     c1.firstS.setVisible(False)
                     c2.firstS.setVisible(False)
                     c1.hiddenGenerated = True
@@ -381,7 +393,7 @@ class StorageTank(BlockItem):
                     mem.insert(-1, tpiece.outputs[0])
 
             side = mem
-            layer+=1
+            layer += 1
             h += 20
             # self.logger.debug(str(len(side)))
 
@@ -404,13 +416,13 @@ class StorageTank(BlockItem):
                 if t.fromPort is s or t.toPort is s:
                     self.logger.debug("This is a real connection " + str(t.displayName))
                     if len(s.connectionList) > 0:
-                        t.displayName = s.connectionList[0].displayName # + "GEN"
+                        t.displayName = s.connectionList[0].displayName  # + "GEN"
                         t.setClone(True)
                     else:
                         self.logger.debug("Found a port outside that has no connection to inside")
 
         # If tpieces were generated, the first len(side_test) ones have to be marked as firstRow
-        for x in tpList[:len(side_test)]:
+        for x in tpList[: len(side_test)]:
             x.inFirstRow = True
 
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
@@ -466,7 +478,6 @@ class StorageTank(BlockItem):
 
     def deletePorts(self, displayName):
         pass
-
 
     # Transform related
     def changeSize(self):
@@ -529,7 +540,6 @@ class StorageTank(BlockItem):
         for hx in self.heatExchangers:
             hx.updateLines(-h)
 
-
     # Encoding
     def encode(self):
         if self.isVisible():
@@ -538,16 +548,16 @@ class StorageTank(BlockItem):
             hxList = []
             for hx in self.heatExchangers:
                 hxDct = {"DisplayName": hx.displayName}
-                hxDct['ID'] = hx.id
-                hxDct['ParentID'] = hx.parent.id
-                hxDct['connTrnsysID'] = hx.conn.trnsysId
+                hxDct["ID"] = hx.id
+                hxDct["ParentID"] = hx.parent.id
+                hxDct["connTrnsysID"] = hx.conn.trnsysId
                 # hxDct['connDispName'] = hx.conn.diplayName    # Both are set in initNew
-                hxDct['Offset'] = (hx.offset.x(), hx.offset.y())
-                hxDct['Width'] = hx.w
-                hxDct['Height'] = hx.h
-                hxDct['SideNr'] = hx.sSide
-                hxDct['Port1ID'] = hx.port1.id
-                hxDct['Port2ID'] = hx.port2.id
+                hxDct["Offset"] = (hx.offset.x(), hx.offset.y())
+                hxDct["Width"] = hx.w
+                hxDct["Height"] = hx.h
+                hxDct["SideNr"] = hx.sSide
+                hxDct["Port1ID"] = hx.port1.id
+                hxDct["Port2ID"] = hx.port2.id
 
                 hxList.append(hxDct)
 
@@ -558,8 +568,11 @@ class StorageTank(BlockItem):
                 self.logger.debug("This port is part of a manual port pair ")
                 for innerC in manP.connectionList:
                     self.logger.debug("There is a connection")
-                    if innerC.fromPort is manP and type(innerC.toPort.parent) is StorageTank \
-                            and not innerC.toPort.portPairVisited:
+                    if (
+                        innerC.fromPort is manP
+                        and type(innerC.toPort.parent) is StorageTank
+                        and not innerC.toPort.portPairVisited
+                    ):
                         self.logger.debug("Found the corresponding port")
 
                         portPairDct = {"Port1ID": manP.id}
@@ -581,8 +594,11 @@ class StorageTank(BlockItem):
 
                         # innerC.deleteConn()
 
-                    elif innerC.toPort is manP and type(innerC.fromPort.parent) is StorageTank \
-                            and not innerC.fromPort.portPairVisited:
+                    elif (
+                        innerC.toPort is manP
+                        and type(innerC.fromPort.parent) is StorageTank
+                        and not innerC.fromPort.portPairVisited
+                    ):
 
                         self.logger.debug("Found the corresponding port")
 
@@ -612,18 +628,18 @@ class StorageTank(BlockItem):
             for manP in self.leftSide + self.rightSide:
                 manP.portPairVisited = False
             dct = {}
-            dct['.__BlockDict__'] = True
-            dct['BlockName'] = self.name
-            dct['BlockDisplayName'] = self.displayName
-            dct['StoragePosition'] = (float(self.pos().x()), float(self.pos().y()))
-            dct['ID'] = self.id
-            dct['trnsysID'] = self.trnsysId
-            dct['HxList'] = hxList
-            dct['PortPairList'] = portPairList
-            dct['FlippedH'] = self.flippedH
-            dct['FlippedV'] = self.flippedH
-            dct['GroupName'] = self.groupName
-            dct['size_h'] = self.h
+            dct[".__BlockDict__"] = True
+            dct["BlockName"] = self.name
+            dct["BlockDisplayName"] = self.displayName
+            dct["StoragePosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["ID"] = self.id
+            dct["trnsysID"] = self.trnsysId
+            dct["HxList"] = hxList
+            dct["PortPairList"] = portPairList
+            dct["FlippedH"] = self.flippedH
+            dct["FlippedV"] = self.flippedH
+            dct["GroupName"] = self.groupName
+            dct["size_h"] = self.h
 
             # dct['RotationN'] = t.rotationN
             dictName = "Block-"
@@ -632,7 +648,7 @@ class StorageTank(BlockItem):
 
     def decode(self, i, resConnList, resBlockList):
         self.logger.debug("Loading a Storage in Decoder")
-        
+
         self.flippedH = i["FlippedH"]
         # self.flippedV = i["FlippedV"] # No support for vertical flip
         self.displayName = i["BlockDisplayName"]
@@ -650,14 +666,22 @@ class StorageTank(BlockItem):
 
         # Add heat exchangers
         for h in i["HxList"]:
-            hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
-                                QPointF(h["Offset"][0], h["Offset"][1]), self, h["DisplayName"],
-                                port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                                connTrnsysID=h['connTrnsysID'], loadedHx=True)
+            hEx = HeatExchanger(
+                h["SideNr"],
+                h["Width"],
+                h["Height"],
+                QPointF(h["Offset"][0], h["Offset"][1]),
+                self,
+                h["DisplayName"],
+                port1ID=h["Port1ID"],
+                port2ID=h["Port2ID"],
+                connTrnsysID=h["connTrnsysID"],
+                loadedHx=True,
+            )
 
             hEx.setId(h["ID"])
-            hEx.port1.id = h['Port1ID']
-            hEx.port2.id = h['Port2ID']
+            hEx.port1.id = h["Port1ID"]
+            hEx.port2.id = h["Port2ID"]
 
             # hxDct['ParentID'] = hx.parent.id
             # hxDct['Port2ID'] = hx.port2.id
@@ -667,10 +691,18 @@ class StorageTank(BlockItem):
             self.logger.debug("Printing port pair")
             self.logger.debug(x)
 
-            conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
-                                        fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
-                                        connId=x["ConnID"], connCid=x["ConnCID"],
-                                        connDispName=x["ConnDisName"], trnsysConnId=x["trnsysID"], loadedConn=True)
+            conn = self.setSideManualPair(
+                x["Side"],
+                x["Port1offset"],
+                x["Port2offset"],
+                fromPortId=x["Port1ID"],
+                toPortId=x["Port2ID"],
+                connId=x["ConnID"],
+                connCid=x["ConnCID"],
+                connDispName=x["ConnDisName"],
+                trnsysConnId=x["trnsysID"],
+                loadedConn=True,
+            )
             conn.id = x["ConnID"]
             conn.connId = x["ConnCID"]
             conn.trnsysId = x["trnsysID"]
@@ -692,11 +724,18 @@ class StorageTank(BlockItem):
             # self.logger.debug(kwargs)
             # sys.exit()
             # connsysConnId=kwargs["editor"].idGen.getTrnsysID()
-            hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
-                                QPointF(h["Offset"][0], h["Offset"][1]),
-                                self, h["DisplayName"] + "New",
-                                port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-                                connTrnsysID=h['connTrnsysID'], loadedHx=True)
+            hEx = HeatExchanger(
+                h["SideNr"],
+                h["Width"],
+                h["Height"],
+                QPointF(h["Offset"][0], h["Offset"][1]),
+                self,
+                h["DisplayName"] + "New",
+                port1ID=h["Port1ID"],
+                port2ID=h["Port2ID"],
+                connTrnsysID=h["connTrnsysID"],
+                loadedHx=True,
+            )
 
             # hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
             #                     QPointF(h["Offset"][0], h["Offset"][1]),
@@ -705,8 +744,8 @@ class StorageTank(BlockItem):
             #                     connTrnsysID=kwargs["editor"].idGen.getTrnsysID(), loadedHx=True)
 
             # hEx.setId(["ID"])
-            hEx.port1.id = h['Port1ID']
-            hEx.port2.id = h['Port2ID']
+            hEx.port1.id = h["Port1ID"]
+            hEx.port2.id = h["Port2ID"]
 
         # Add manual inputs
         for x in i["PortPairList"]:
@@ -714,11 +753,18 @@ class StorageTank(BlockItem):
             self.logger.debug(x)
 
             # trnsysConnId=kwargs["editor"].idGen.getTrnsysID()
-            conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
-                                        fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
-                                        connId=x["ConnID"], connCid=x["ConnCID"],
-                                        connDispName=x["ConnDisName"] + "New",
-                                        trnsysConnId=x["trnsysID"], loadedConn=True)
+            conn = self.setSideManualPair(
+                x["Side"],
+                x["Port1offset"],
+                x["Port2offset"],
+                fromPortId=x["Port1ID"],
+                toPortId=x["Port2ID"],
+                connId=x["ConnID"],
+                connCid=x["ConnCID"],
+                connDispName=x["ConnDisName"] + "New",
+                trnsysConnId=x["trnsysID"],
+                loadedConn=True,
+            )
 
             # conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
             #                               fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
@@ -729,7 +775,6 @@ class StorageTank(BlockItem):
 
             resConnList.append(conn)
         resBlockList.append(self)
-
 
     # Debug
     def dumpBlockInfo(self):
@@ -746,38 +791,45 @@ class StorageTank(BlockItem):
             for c in p.connectionList:
                 conns.append(c)
 
-        [self.logger.debug(
-            c.displayName + ", fromPort: " + c.fromPort.parent.displayName + ", toPort: " + c.toPort.parent.displayName)
-         for c in conns]
+        [
+            self.logger.debug(
+                c.displayName
+                + ", fromPort: "
+                + c.fromPort.parent.displayName
+                + ", toPort: "
+                + c.toPort.parent.displayName
+            )
+            for c in conns
+        ]
 
     def printPortNb(self):
-        self.logger.debug("ST has "+ str(self.inputs) + " and " + str(self.outputs))
+        self.logger.debug("ST has " + str(self.inputs) + " and " + str(self.outputs))
 
     # Misc
     def contextMenuEvent(self, event):
         menu = QMenu()
 
-        lNtp = QIcon('images/Notebook.png')
-        a1 = menu.addAction(lNtp, 'Launch NotePad++')
+        lNtp = QIcon("images/Notebook.png")
+        a1 = menu.addAction(lNtp, "Launch NotePad++")
         a1.triggered.connect(self.launchNotepadFile)
 
-        rr = QIcon('images/rotate-to-right.png')
-        a2 = menu.addAction(rr, 'Rotate Block clockwise')
+        rr = QIcon("images/rotate-to-right.png")
+        a2 = menu.addAction(rr, "Rotate Block clockwise")
         a2.triggered.connect(self.rotateBlockCW)
 
-        ll = QIcon('images/rotate-left.png')
-        a3 = menu.addAction(ll, 'Rotate Block counter-clockwise')
+        ll = QIcon("images/rotate-left.png")
+        a3 = menu.addAction(ll, "Rotate Block counter-clockwise")
         a3.triggered.connect(self.rotateBlockCCW)
 
-        rRot = QIcon('images/move-left.png')
-        a4 = menu.addAction(rRot, 'Reset Rotation')
+        rRot = QIcon("images/move-left.png")
+        a4 = menu.addAction(rRot, "Reset Rotation")
         a4.triggered.connect(self.resetRotation)
 
-        b1 = menu.addAction('Print Rotation')
+        b1 = menu.addAction("Print Rotation")
         b1.triggered.connect(self.printRotation)
 
-        dB = QIcon('images/close.png')
-        c1 = menu.addAction(dB, 'Delete this Block')
+        dB = QIcon("images/close.png")
+        c1 = menu.addAction(dB, "Delete this Block")
         c1.triggered.connect(self.deleteBlockCom)
 
         # sG = QIcon('')
@@ -793,7 +845,7 @@ class StorageTank(BlockItem):
         # e2 = menu.addAction('Print port nb')
         # e2.triggered.connect(self.printPortNb)
 
-        e3 = menu.addAction('Export ddck')
+        e3 = menu.addAction("Export ddck")
         e3.triggered.connect(self.exportDck)
 
         # e4 = menu.addAction('Debug Connection')
@@ -827,23 +879,22 @@ class StorageTank(BlockItem):
         self.parent.scene().removeItem(self)
         del self
 
-
     # Export related
     def exportBlackBox(self):
         equations = []
-        ddcxPath = os.path.join(self.path,self.displayName)
+        ddcxPath = os.path.join(self.path, self.displayName)
         ddcxPath = ddcxPath + ".ddcx"
         self.exportDck()
         if os.path.isfile(ddcxPath):
-            infile=open(ddcxPath,'r')
-            lines=infile.readlines()
+            infile = open(ddcxPath, "r")
+            lines = infile.readlines()
             for line in lines:
                 if line[0] == "T":
-                    equations.append(line.replace("\n",""))
-            return 'success', equations
+                    equations.append(line.replace("\n", ""))
+            return "success", equations
         else:
-            self.logger.warning('No file at ' + ddcxPath)
-            return 'noDdckFile', equations
+            self.logger.warning("No file at " + ddcxPath)
+            return "noDdckFile", equations
 
     def exportParametersFlowSolver(self, descConnLength):
         return "", 0
@@ -889,13 +940,14 @@ class StorageTank(BlockItem):
 
         tool = Type1924_TesPlugFlow()
 
-        inputs = {"nUnit": 50,
-                  "nType": self.storageType,
-                  "nTes": self.nTes,
-                  "nPorts": nPorts,
-                  "nHx": nHx,
-                  "nHeatSources": 1
-                  }
+        inputs = {
+            "nUnit": 50,
+            "nType": self.storageType,
+            "nTes": self.nTes,
+            "nPorts": nPorts,
+            "nHx": nHx,
+            "nHeatSources": 1,
+        }
         dictInput = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0}
         dictInputHx = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0, "cp": 0.0, "rho": 0.0}
         dictInputAux = {"zAux": 0.0, "qAux": 0.0}
@@ -921,9 +973,16 @@ class StorageTank(BlockItem):
             side = self.directPortConnsForList[i].side
             Mfrname = "Mfr" + self.directPortConnsForList[i].fromPort.connectionList[1].displayName
             Trev = "T" + self.directPortConnsForList[i].toPort.connectionList[1].displayName
-            inputPos = (100-100*self.directPortConnsForList[i].fromPort.pos().y()/self.h)/100
-            outputPos = (100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h)/100
-            connectorsPort[i] = {"T": Tname, "side": side, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos}
+            inputPos = (100 - 100 * self.directPortConnsForList[i].fromPort.pos().y() / self.h) / 100
+            outputPos = (100 - 100 * self.directPortConnsForList[i].toPort.pos().y() / self.h) / 100
+            connectorsPort[i] = {
+                "T": Tname,
+                "side": side,
+                "Mfr": Mfrname,
+                "Trev": Trev,
+                "zIn": inputPos,
+                "zOut": outputPos,
+            }
 
         for i in range(inputs["nHx"]):
             HxName = self.heatExchangers[i].displayName
@@ -932,9 +991,18 @@ class StorageTank(BlockItem):
             Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
             inputPos = self.heatExchangers[i].input / 100
             outputPos = self.heatExchangers[i].output / 100
-            connectorsHx[i] = {"Name": HxName, "T": Tname, "Mfr": Mfrname, "Trev": Trev, "zIn": inputPos, "zOut": outputPos, "cp": "cpwat", "rho": "rhowat"}
+            connectorsHx[i] = {
+                "Name": HxName,
+                "T": Tname,
+                "Mfr": Mfrname,
+                "Trev": Trev,
+                "zIn": inputPos,
+                "zOut": outputPos,
+                "cp": "cpwat",
+                "rho": "rhowat",
+            }
 
-        exportPath = os.path.join(self.path,self.displayName + '.ddck')
+        exportPath = os.path.join(self.path, self.displayName + ".ddck")
         self.logger.debug(exportPath)
 
         tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
@@ -950,7 +1018,7 @@ class StorageTank(BlockItem):
 
     def debugConn(self):
         self.logger.debug("Debugging conn")
-        errorConnList = ''
+        errorConnList = ""
         for i in range(len(self.directPortConnsForList)):
             stFromPort = self.directPortConnsForList[i].fromPort
             stToPort = self.directPortConnsForList[i].toPort
@@ -962,10 +1030,10 @@ class StorageTank(BlockItem):
             connName2 = self.directPortConnsForList[i].toPort.connectionList[1].displayName
 
             if stFromPort != toPort1:
-                errorConnList = errorConnList + connName1 + '\n'
+                errorConnList = errorConnList + connName1 + "\n"
             if stToPort != fromPort2:
-                errorConnList = errorConnList + connName2 + '\n'
-        if errorConnList !='':
+                errorConnList = errorConnList + connName2 + "\n"
+        if errorConnList != "":
             msgBox = QMessageBox()
             msgBox.setText("%s is connected wrongly, right click StorageTank to invert connection." % (errorConnList))
             msgBox.exec()
@@ -999,7 +1067,7 @@ class StorageTank(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -1008,7 +1076,7 @@ class StorageTank(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -1041,7 +1109,7 @@ class StorageTank(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -1050,7 +1118,7 @@ class StorageTank(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         try:
             widgetToRemove.hide()
@@ -1069,9 +1137,9 @@ class StorageTank(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         test = os.path.split(self.path)
-        if os.path.split(self.path)[-1] == '' or os.path.split(self.path)[-1] == 'ddck':
+        if os.path.split(self.path)[-1] == "" or os.path.split(self.path)[-1] == "ddck":
             os.makedirs(destPath)
         else:
             if os.path.exists(self.path):

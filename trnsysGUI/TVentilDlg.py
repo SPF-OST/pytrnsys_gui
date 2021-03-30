@@ -1,16 +1,27 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget, \
-    QVBoxLayout, QWidget, QDoubleSpinBox, QMessageBox
+from PyQt5.QtWidgets import (
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QCheckBox,
+    QHBoxLayout,
+    QGridLayout,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+    QDoubleSpinBox,
+    QMessageBox,
+)
 from PyQt5.QtGui import QIcon
 
 
 class TVentilDlg(QDialog):
-
     def __init__(self, block, parent=None):
         super(TVentilDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
 
         self.logger = parent.logger
-        
+
         self.block = block
         self.valvePosition = self.block.positionForMassFlowSolver
         self.le = QLineEdit(self.block.label.toPlainText())
@@ -61,7 +72,7 @@ class TVentilDlg(QDialog):
         self.positionMassFlowSolver.setDecimals(1)
         self.positionMassFlowSolver.setSingleStep(0.1)
         self.positionMassFlowSolver.setProperty("value", self.valvePosition)
-        self.positionMassFlowSolver.setRange(0,1.0)
+        self.positionMassFlowSolver.setRange(0, 1.0)
         self.positionMassFlowSolver.valueChanged.connect(self.positionMassFlowSolverChanged)
         positionLayout.addWidget(self.positionMassFlowSolverLabel)
         positionLayout.addWidget(self.positionMassFlowSolver)
@@ -75,13 +86,12 @@ class TVentilDlg(QDialog):
         self.tabs.addTab(self.tab2, "Mass Flow Solver")
         self.tab1.setLayout(tab1Layout)
         self.tab2.setLayout(positionLayout)
-        #self.tab2 = layout
-        #self.tabs.resize(300, 200)
+        # self.tab2 = layout
+        # self.tabs.resize(300, 200)
 
-
-        #self.tabs.addTab(self.tab2, "Tab 2")
+        # self.tabs.addTab(self.tab2, "Tab 2")
         self.layout2 = QGridLayout(self)
-        self.layout2.addWidget(self.tabs,0,0)
+        self.layout2.addWidget(self.tabs, 0, 0)
         self.layout2.addLayout(buttonLayout, 2, 0, 3, 0)
         self.setLayout(self.layout2)
 
@@ -129,12 +139,11 @@ class TVentilDlg(QDialog):
         self.block.setComplexDiv(state)
         self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
 
-    def positionMassFlowSolverChanged(self,value):
+    def positionMassFlowSolverChanged(self, value):
         if self.block.isTempering:
             self.block.setPositionForMassFlowSolver(0.0)
         else:
             self.block.setPositionForMassFlowSolver(value)
-
 
     def cancel(self):
         self.close()

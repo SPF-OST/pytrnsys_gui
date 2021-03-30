@@ -82,8 +82,9 @@ class Decoder(json.JSONDecoder):
                     groupListNames = [g.displayName for g in self.editor.groupList]
 
                     if i["GroupName"] not in groupListNames:
-                        g = Group(i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1],
-                                  self.editor.diagramScene)
+                        g = Group(
+                            i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1], self.editor.diagramScene
+                        )
                         g.setName(i["GroupName"])
 
                 # Adding the blocks to the scene could also be done inside Decoder now (before not possible because
@@ -91,82 +92,104 @@ class Decoder(json.JSONDecoder):
 
                 elif ".__BlockDict__" in i:
                     self.logger.debug("Found a block ")
-                    if i["BlockName"] == 'TeePiece':
-                        bl = TeePiece(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                      loadedBlock=True)
-                    elif i["BlockName"] == 'TVentil':
-                        bl = TVentil(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                     loadedBlock=True)
-                    elif i["BlockName"] == 'Pump':
-                        bl = Pump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                  loadedBlock=True)
-                    elif i["BlockName"] == 'Collector':
-                        bl = Collector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                       loadedBlock=True)
-                    elif i["BlockName"] == 'HP':
-                        bl = HeatPump(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                      loadedBlock=True)
-                    elif i["BlockName"] == 'IceStorage':
-                        bl = IceStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                        loadedBlock=True)
-                    elif i["BlockName"] == 'PitStorage':
-                        bl = PitStorage(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                        loadedBlock=True)
-                    elif i["BlockName"] == 'Radiator':
-                        bl = Radiator(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                      loadedBlock=True)
-                    elif i["BlockName"] == 'WTap':
-                        bl = WTap(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                  loadedBlock=True)
-                    elif i["BlockName"] == 'WTap_main':
-                        bl = WTap_main(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                       loadedBlock=True)
-                    elif i["BlockName"] == 'Connector':
-                        bl = Connector(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                       loadedBlock=True)
-                    elif i["BlockName"] == 'Boiler':
-                        bl = Boiler(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                    loadedBlock=True)
-                    elif i["BlockName"] == 'AirSourceHP':
-                        bl = AirSourceHP(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                         loadedBlock=True)
-                    elif i["BlockName"] == 'PV':
-                        bl = PV(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                loadedBlock=True)
-                    elif i["BlockName"] == 'GroundSourceHx':
-                        bl = GroundSourceHx(i["BlockName"], self.editor.diagramView,
-                                            displayName=i["BlockDisplayName"],
-                                            loadedBlock=True)
+                    if i["BlockName"] == "TeePiece":
+                        bl = TeePiece(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "TVentil":
+                        bl = TVentil(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Pump":
+                        bl = Pump(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Collector":
+                        bl = Collector(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "HP":
+                        bl = HeatPump(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "IceStorage":
+                        bl = IceStorage(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "PitStorage":
+                        bl = PitStorage(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Radiator":
+                        bl = Radiator(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "WTap":
+                        bl = WTap(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "WTap_main":
+                        bl = WTap_main(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Connector":
+                        bl = Connector(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Boiler":
+                        bl = Boiler(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "AirSourceHP":
+                        bl = AirSourceHP(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "PV":
+                        bl = PV(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "GroundSourceHx":
+                        bl = GroundSourceHx(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
 
                     # [--- new encoding
-                    elif i["BlockName"] == 'StorageTank':
-                        bl = StorageTank(i["BlockName"], self.editor.diagramView,
-                                         displayName=i["BlockDisplayName"], loadedBlock=True)
-                    elif i["BlockName"] == 'HeatPump':
-                        bl = HeatPump(i["BlockName"], self.editor.diagramView,
-                                      displayName=i["BlockDisplayName"], loadedBlock=True)
-                    elif i["BlockName"] == 'HPTwoHx':
-                        bl = HeatPumpTwoHx(i["BlockName"], self.editor.diagramView,
-                                           displayName=i["BlockDisplayName"], loadedBlock=True)
-                    elif i["BlockName"] == 'HPDoubleDual':
-                        bl = HPDoubleDual(i["BlockName"], self.editor.diagramView,
-                                          displayName=i["BlockDisplayName"], loadedBlock=True)
-                    elif i["BlockName"] == 'ExternalHx':
-                        bl = ExternalHx(i["BlockName"], self.editor.diagramView,
-                                        displayName=i["BlockDisplayName"], loadedBlock=True)
-                    elif i["BlockName"] == 'IceStorageTwoHx':
-                        bl = IceStorageTwoHx(i["BlockName"], self.editor.diagramView,
-                                             displayName=i["BlockDisplayName"], loadedBlock=True)
-                    elif i["BlockName"] == 'GenericBlock':
-                        bl = GenericBlock(i["BlockName"], self.editor.diagramView,
-                                          displayName=i["BlockDisplayName"], loadedBlock=True)
-                    elif i["BlockName"] == 'MasterControl':
-                        bl = MasterControl(i["BlockName"], self.editor.diagramView,
-                                           displayName=i["BlockDisplayName"],
-                                           loadedBlock=True)
-                    elif i["BlockName"] == 'Control':
-                        bl = Control(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"],
-                                     loadedBlock=True)
+                    elif i["BlockName"] == "StorageTank":
+                        bl = StorageTank(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "HeatPump":
+                        bl = HeatPump(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "HPTwoHx":
+                        bl = HeatPumpTwoHx(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "HPDoubleDual":
+                        bl = HPDoubleDual(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "ExternalHx":
+                        bl = ExternalHx(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "IceStorageTwoHx":
+                        bl = IceStorageTwoHx(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "GenericBlock":
+                        bl = GenericBlock(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "MasterControl":
+                        bl = MasterControl(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Control":
+                        bl = Control(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
                     # --- new encoding]
 
                     elif i["BlockName"] == "GraphicalItem":
@@ -215,8 +238,13 @@ class Decoder(json.JSONDecoder):
 
     @staticmethod
     def create_connection_kwargs(item: tp.Mapping[str, tp.Any]) -> tp.Mapping[str, tp.Any]:
-        connectionKwargs = dict(loadedConn=True, fromPortId=item["PortFromID"], toPortId=item["PortToID"],
-                                segmentsLoad=item["SegmentPositions"], cornersLoad=item["CornerPositions"])
+        connectionKwargs = dict(
+            loadedConn=True,
+            fromPortId=item["PortFromID"],
+            toPortId=item["PortToID"],
+            segmentsLoad=item["SegmentPositions"],
+            cornersLoad=item["CornerPositions"],
+        )
 
         if "FirstSegmentLabelPos" in item:
             connectionKwargs["labelPos"] = tuple(item["FirstSegmentLabelPos"])

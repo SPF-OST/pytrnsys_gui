@@ -11,6 +11,7 @@ from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+
 # from trnsysGUI.newPortDlg import newPortDlg
 
 
@@ -18,8 +19,8 @@ class GenericBlock(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(GenericBlock, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem('i', 2, self))
-        self.outputs.append(PortItem('o', 2, self))
+        self.inputs.append(PortItem("i", 2, self))
+        self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
 
         self.pixmap = QPixmap(self.image)
@@ -30,7 +31,7 @@ class GenericBlock(BlockItem):
 
         self.subBlockCounter = 0
 
-        self.imagesource = ("images/" + self.name)
+        self.imagesource = "images/" + self.name
 
         # Disallow adding port pairs later, because the trnsysIDs of the generated port pairs have to be
         # consecutive to be correctly printed out in the export
@@ -48,7 +49,6 @@ class GenericBlock(BlockItem):
 
         """ Resize block function """
 
-
         # Limit the block size:
         if h < 20:
             h = 20
@@ -60,10 +60,8 @@ class GenericBlock(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.outputs[0].setPos(2 * delta + w,
-                               h - 2 * delta)
-        self.inputs[0].setPos(2 * delta + w,
-                              2 * delta)
+        self.outputs[0].setPos(2 * delta + w, h - 2 * delta)
+        self.inputs[0].setPos(2 * delta + w, 2 * delta)
         # self.inputs[0].side = 2 - 2 * self.flippedH
         # self.outputs[0].side = 2 - 2 * self.flippedH
 
@@ -128,7 +126,7 @@ class GenericBlock(BlockItem):
             if i.side == side:
                 res += 1
 
-        self.logger.debug("there are " + str(res) + " pairs on the side "+ str(side))
+        self.logger.debug("there are " + str(res) + " pairs on the side " + str(side))
         return res
 
     def addPortDlg(self):
@@ -145,7 +143,6 @@ class GenericBlock(BlockItem):
         self.image = QImage(name)
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
 
     def changeImage(self):
         name = str(self.pickImage().resolve())
@@ -164,27 +161,27 @@ class GenericBlock(BlockItem):
     def contextMenuEvent(self, event):
         menu = QMenu()
 
-        lNtp = QIcon('images/Notebook.png')
-        a1 = menu.addAction(lNtp, 'Launch NotePad++')
+        lNtp = QIcon("images/Notebook.png")
+        a1 = menu.addAction(lNtp, "Launch NotePad++")
         a1.triggered.connect(self.launchNotepadFile)
 
-        rr = QIcon('images/rotate-to-right.png')
-        a2 = menu.addAction(rr, 'Rotate Block clockwise')
+        rr = QIcon("images/rotate-to-right.png")
+        a2 = menu.addAction(rr, "Rotate Block clockwise")
         a2.triggered.connect(self.rotateBlockCW)
 
-        ll = QIcon('images/rotate-left.png')
-        a3 = menu.addAction(ll, 'Rotate Block counter-clockwise')
+        ll = QIcon("images/rotate-left.png")
+        a3 = menu.addAction(ll, "Rotate Block counter-clockwise")
         a3.triggered.connect(self.rotateBlockCCW)
 
-        rRot = QIcon('images/move-left.png')
-        a4 = menu.addAction(rRot, 'Reset Rotation')
+        rRot = QIcon("images/move-left.png")
+        a4 = menu.addAction(rRot, "Reset Rotation")
         a4.triggered.connect(self.resetRotation)
 
-        b1 = menu.addAction('Print Rotation')
+        b1 = menu.addAction("Print Rotation")
         b1.triggered.connect(self.printRotation)
 
-        dB = QIcon('images/close.png')
-        c1 = menu.addAction(dB, 'Delete this Block')
+        dB = QIcon("images/close.png")
+        c1 = menu.addAction(dB, "Delete this Block")
         c1.triggered.connect(self.deleteBlock)
 
         # sG = QIcon('')
@@ -219,31 +216,31 @@ class GenericBlock(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            dct['.__BlockDict__'] = True
-            dct['BlockName'] = self.name
-            dct['BlockDisplayName'] = self.displayName
-            dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
-            dct['ID'] = self.id
-            dct['trnsysID'] = self.trnsysId
-            dct['PortsIDIn'] = portListInputs
-            dct['PortsIDOut'] = portListOutputs
-            dct['FlippedH'] = self.flippedH
-            dct['FlippedV'] = self.flippedV
-            dct['RotationN'] = self.rotationN
-            dct['GroupName'] = self.groupName
-            dct['Imagesource'] = self.imagesource
-            dct['PortPairsNb'] = [self.getPairNb(i) for i in range(4)]
+            dct[".__BlockDict__"] = True
+            dct["BlockName"] = self.name
+            dct["BlockDisplayName"] = self.displayName
+            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["ID"] = self.id
+            dct["trnsysID"] = self.trnsysId
+            dct["PortsIDIn"] = portListInputs
+            dct["PortsIDOut"] = portListOutputs
+            dct["FlippedH"] = self.flippedH
+            dct["FlippedV"] = self.flippedV
+            dct["RotationN"] = self.rotationN
+            dct["GroupName"] = self.groupName
+            dct["Imagesource"] = self.imagesource
+            dct["PortPairsNb"] = [self.getPairNb(i) for i in range(4)]
 
             dictName = "Block-"
             return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        self.logger.debug("Portpair is " + str(i['PortPairsNb']))
+        self.logger.debug("Portpair is " + str(i["PortPairsNb"]))
         correcter = 0
         for j in range(4):
             if j == 2:
                 correcter = -1
-            for k in range(i['PortPairsNb'][j] + correcter):
+            for k in range(i["PortPairsNb"][j] + correcter):
                 self.addPortPair(j)
 
         super(GenericBlock, self).decode(i, resConnList, resBlockList)
@@ -254,7 +251,7 @@ class GenericBlock(BlockItem):
         for j in range(4):
             if j == 2:
                 correcter = -1
-            for k in range(i['PortPairsNb'][j] + correcter):
+            for k in range(i["PortPairsNb"][j] + correcter):
                 self.addPortPair(j)
 
         super(GenericBlock, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
@@ -273,34 +270,30 @@ class GenericBlock(BlockItem):
         portNb = [0, 0, 0, 0]
         for i in self.inputs:
             if i.side == 0:
-                distBetweenPorts = (self.h - 4*delta) / (2 * self.getPairNb(0) - 1)
+                distBetweenPorts = (self.h - 4 * delta) / (2 * self.getPairNb(0) - 1)
                 self.logger.debug("distance betw ports " + str(distBetweenPorts))
-                i.setPos(- 2*delta,
-                          2 * delta + distBetweenPorts * portNb[0])
+                i.setPos(-2 * delta, 2 * delta + distBetweenPorts * portNb[0])
                 portNb[0] += 1
 
-                self.outputs[self.inputs.index(i)].setPos(- 2*delta,
-                           2*delta + distBetweenPorts * portNb[0])
+                self.outputs[self.inputs.index(i)].setPos(-2 * delta, 2 * delta + distBetweenPorts * portNb[0])
                 portNb[0] += 1
             elif i.side == 1:
                 distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(1) - 1)
                 i.setPos(2 * delta + distBetweenPorts * portNb[1], -2 * delta)
                 portNb[1] += 1
 
-                self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[1], - 2 * delta)
+                self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[1], -2 * delta)
                 portNb[1] += 1
 
             elif i.side == 2:
                 self.logger.debug("side == 2")
                 distBetweenPorts = (self.h - 4 * delta) / (2 * self.getPairNb(2) - 1)
                 self.logger.debug("side 2 dist betw ports is " + str(distBetweenPorts))
-                i.setPos(2 * delta + w,
-                         2 * delta + distBetweenPorts * portNb[2])
+                i.setPos(2 * delta + w, 2 * delta + distBetweenPorts * portNb[2])
                 self.logger.debug(2 * delta + distBetweenPorts * portNb[2])
                 portNb[2] += 1
 
-                self.outputs[self.inputs.index(i)].setPos(2 * delta + w,
-                                                          2 * delta + distBetweenPorts * portNb[2])
+                self.outputs[self.inputs.index(i)].setPos(2 * delta + w, 2 * delta + distBetweenPorts * portNb[2])
                 self.logger.debug(2 * delta + distBetweenPorts * portNb[2])
                 portNb[2] += 1
 
@@ -310,7 +303,7 @@ class GenericBlock(BlockItem):
                 i.setPos(2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
                 portNb[3] += 1
 
-                self.outputs[self.inputs.index(i)].setPos( 2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
+                self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[3], 2 * delta + h)
                 portNb[3] += 1
 
     def removePortPairOnSide(self, side):
@@ -345,7 +338,7 @@ class GenericBlock(BlockItem):
     def exportParametersFlowSolver(self, descConnLength):
         # descConnLength = 20
         equationNr = 0
-        f = ''
+        f = ""
         for i in range(len(self.inputs)):
             temp = ""
             c = self.inputs[i].connectionList[0]
@@ -354,8 +347,9 @@ class GenericBlock(BlockItem):
             elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                 continue
             else:
-                temp = str(c.trnsysId) + " " + str(
-                    self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
+                temp = (
+                    str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                )  # + str(t.childIds[0])
                 temp += " " * (descConnLength - len(temp))
 
                 # Generic block will have a 2n-liner exportConnString
@@ -380,8 +374,19 @@ class GenericBlock(BlockItem):
             for i in range(0, 3):
 
                 if i < 2:
-                    temp = prefix + self.displayName + "-X" + str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                           str(equationNumber) + "]\n"
+                    temp = (
+                        prefix
+                        + self.displayName
+                        + "-X"
+                        + str(j)
+                        + "_"
+                        + abc[i]
+                        + "=["
+                        + str(simulationUnit)
+                        + ","
+                        + str(equationNumber)
+                        + "]\n"
+                    )
                     tot += temp
                     self.exportEquations.append(temp)
                     # nEqUsed += 1  # DC
@@ -391,7 +396,12 @@ class GenericBlock(BlockItem):
 
     def getSubBlockOffset(self, c):
         for i in range(len(self.inputs)):
-            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+            if (
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
+            ):
                 return i
 
     def addTree(self):
@@ -401,7 +411,7 @@ class GenericBlock(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -410,7 +420,7 @@ class GenericBlock(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -422,7 +432,7 @@ class GenericBlock(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
+        for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
@@ -453,7 +463,7 @@ class GenericBlock(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -462,7 +472,7 @@ class GenericBlock(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -483,7 +493,7 @@ class GenericBlock(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\Generic_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

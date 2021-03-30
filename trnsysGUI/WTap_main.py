@@ -14,7 +14,7 @@ class WTap_main(BlockItem):
         self.w = 40
         self.h = 40
         # self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem('o', 0, self))
+        self.outputs.append(PortItem("o", 0, self))
 
         self.exportInitialInput = 0.0
 
@@ -43,7 +43,7 @@ class WTap_main(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origOutputsPos = [[0,delta]]
+        self.origOutputsPos = [[0, delta]]
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
         self.updateFlipStateH(self.flippedH)
@@ -55,7 +55,7 @@ class WTap_main(BlockItem):
 
     def exportBlackBox(self):
         equation = ["T" + self.displayName + "=Tcw"]
-        return 'success', equation
+        return "success", equation
 
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"
@@ -100,5 +100,3 @@ class WTap_main(BlockItem):
         temp1 = "Mfr" + self.displayName
         self.exportInputName = " " + temp1 + " "
         return self.exportInputName, 1
-
-

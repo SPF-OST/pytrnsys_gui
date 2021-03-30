@@ -16,14 +16,14 @@ class Group(QGraphicsRectItem):
         self.w = w
         self.h = h
 
-        self.displayName = 'Untitled'
+        self.displayName = "Untitled"
 
         # List of items part of this group
         self.itemList = []
 
-        self.exportDi = 0.05    # [m]
-        self.exportL = 2        # [m]
-        self.exportU = 10   # DC will calculate proper default value
+        self.exportDi = 0.05  # [m]
+        self.exportL = 2  # [m]
+        self.exportU = 10  # DC will calculate proper default value
 
         self.label = QGraphicsTextItem(self)
         self.label.setPlainText(self.displayName)
@@ -72,8 +72,12 @@ class Group(QGraphicsRectItem):
 
         center = QPointF(1 / blockitems * center.x(), 1 / blockitems * center.y())
 
-        return center.x() - (max_x - min_x) / 2 * factor, center.y() - (max_y - min_y) / 2 * factor, (
-                    max_x - min_x) * factor, (max_y - min_y) * factor
+        return (
+            center.x() - (max_x - min_x) / 2 * factor,
+            center.y() - (max_y - min_y) / 2 * factor,
+            (max_x - min_x) * factor,
+            (max_y - min_y) * factor,
+        )
 
     def setItemsGroup(self, itemList):
         """
@@ -137,8 +141,12 @@ class Group(QGraphicsRectItem):
 
     def printGroup(self):
         print("Printout of group " + str(self) + str(self.displayName))
-        print("There are " + len([t for t in self.parent.parent().trnsysObj if type(t) is BlockItem]) +
-              " blocks and " + len([t for t in self.parent.parent().trnsysObj if type(t) is Connection]) +
-              " connections")
+        print(
+            "There are "
+            + len([t for t in self.parent.parent().trnsysObj if type(t) is BlockItem])
+            + " blocks and "
+            + len([t for t in self.parent.parent().trnsysObj if type(t) is Connection])
+            + " connections"
+        )
 
         print("The elements are " + [t.displayName for t in self.parent.parent().trnsysObj])

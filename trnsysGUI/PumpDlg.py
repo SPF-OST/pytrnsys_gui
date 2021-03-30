@@ -1,10 +1,21 @@
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QTabWidget, \
-    QVBoxLayout, QWidget, QDoubleSpinBox, QMessageBox
+from PyQt5.QtWidgets import (
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QCheckBox,
+    QHBoxLayout,
+    QGridLayout,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+    QDoubleSpinBox,
+    QMessageBox,
+)
 from PyQt5.QtGui import QIcon
 
 
 class PumpDlg(QDialog):
-
     def __init__(self, block, parent=None):
         super(PumpDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
@@ -54,16 +65,14 @@ class PumpDlg(QDialog):
         self.tabs.addTab(self.tab2, "Adjust Pump Power")
         self.tab1.setLayout(tab1Layout)
         self.tab2.setLayout(positionLayout)
-        #self.tab2 = layout
-        #self.tabs.resize(300, 200)
+        # self.tab2 = layout
+        # self.tabs.resize(300, 200)
 
-
-        #self.tabs.addTab(self.tab2, "Tab 2")
+        # self.tabs.addTab(self.tab2, "Tab 2")
         self.layout2 = QGridLayout(self)
-        self.layout2.addWidget(self.tabs,0,0)
+        self.layout2.addWidget(self.tabs, 0, 0)
         self.layout2.addLayout(buttonLayout, 2, 0, 3, 0)
         self.setLayout(self.layout2)
-
 
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)

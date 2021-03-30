@@ -18,4 +18,3 @@ class CreateConnectionCommand(QUndoCommand):
     def undo(self):
         if self.conn in self.conn.parent.connectionList:
             self.conn.deleteConn()
-

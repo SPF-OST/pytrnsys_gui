@@ -9,6 +9,7 @@ class Test_Export(object):
     Parameters should be passed into the individual functions to avoid unnecessary instantiotion
     of class.
     """
+
     testPassed = True
 
     def retrieveFiles(self, exportedFilepath, originalFilePath, exportedFileList, originalFileList):
@@ -32,7 +33,7 @@ class Test_Export(object):
 
         """
         for efiles in os.listdir(exportedFilepath):
-            if efiles != '.keepMe':
+            if efiles != ".keepMe":
                 # exportedFile = exportedFilepath + efiles
                 exportedFile = os.path.join(exportedFilepath, efiles)
                 if exportedFile not in exportedFileList:
@@ -64,9 +65,9 @@ class Test_Export(object):
 
         """
         i = 0
-        exportedFile = exportedFile.split('\\')
+        exportedFile = exportedFile.split("\\")
         while i < len(originalFileList):
-            referenceFile = originalFileList[i].split('\\')
+            referenceFile = originalFileList[i].split("\\")
             if exportedFile[-1] == referenceFile[-1]:
                 return True
             i += 1
@@ -97,8 +98,8 @@ class Test_Export(object):
         while i < len(exportedFileList):
             j = 0
             while j < len(originalFileList):
-                exportedFile = exportedFileList[i].split('\\')[-1]
-                referencefile = originalFileList[j].split('\\')[-1]
+                exportedFile = exportedFileList[i].split("\\")[-1]
+                referencefile = originalFileList[j].split("\\")[-1]
                 # print('this is exported :' + exportedFile + '\n')
                 # print('this is reference :' + referencefile + '\n')
                 if exportedFile != referencefile:
@@ -117,7 +118,7 @@ class Test_Export(object):
 
                     while fileOneLine:
                         if fileOneLine != fileTwoLine:
-                            if fileOneLine.split(' = ')[0][:5] != 'MfrPu':
+                            if fileOneLine.split(" = ")[0][:5] != "MfrPu":
                                 self.testPassed = False
                                 fileErrorList.append(i)
                                 break
@@ -145,9 +146,8 @@ class Test_Export(object):
         for dfiles in os.listdir(fileDirectory):
             # deleteFiles = fileDirectory + dfiles
             deleteFiles = os.path.join(fileDirectory, dfiles)
-            if dfiles != '.keepMe':
+            if dfiles != ".keepMe":
                 os.remove(deleteFiles)
-
 
     def showDifference(self, file1, file2):
         """
@@ -180,9 +180,9 @@ class Test_Export(object):
             if fileOneLine != fileTwoLine:
                 print("Error found at line %d\n" % line)
                 print("Exported file: %s \nReference file: %s \n" % (fileOneLine, fileTwoLine))
-                if fileOneLine.split(' = ')[0][:5] != 'MfrPu':
-                    file1Str = str(line) + ':' + fileOneLine
-                    file2Str = str(line) + ':' + fileTwoLine
+                if fileOneLine.split(" = ")[0][:5] != "MfrPu":
+                    file1Str = str(line) + ":" + fileOneLine
+                    file2Str = str(line) + ":" + fileTwoLine
                     file1List.append(file1Str)
                     file2List.append(file2Str)
             fileOneLine = fileOne.readline()

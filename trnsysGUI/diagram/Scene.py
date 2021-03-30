@@ -84,8 +84,8 @@ class Scene(QGraphicsScene):
 
         if self.parent().selectionMode and not self.released and self.pressed:
             self.selectionRect.setVisible(True)
-            self.sRw = (mouseEvent.scenePos().x() - self.sRstart.x())
-            self.sRh = (mouseEvent.scenePos().y() - self.sRstart.y())
+            self.sRw = mouseEvent.scenePos().x() - self.sRstart.x()
+            self.sRh = mouseEvent.scenePos().y() - self.sRstart.y()
 
             if self.sRw < 0 and self.sRh > 0:  # from top right to bottom left
                 rectangleR1 = QRectF(self.sRstart.x(), self.sRstart.y(), -abs(self.sRw), self.sRh).normalized()
@@ -203,10 +203,10 @@ class Scene(QGraphicsScene):
 
             if self.selectedItem is not None:
                 for items in self.selectedItem:
-                    if isinstance(items, GraphicalItem) and hasattr(items, 'resizer'):
+                    if isinstance(items, GraphicalItem) and hasattr(items, "resizer"):
                         self.removeItem(items.resizer)
                         items.deleteResizer()
-                    if isinstance(items, BlockItem) and hasattr(items, 'resizer'):
+                    if isinstance(items, BlockItem) and hasattr(items, "resizer"):
                         self.removeItem(items.resizer)
                         items.deleteResizer()
                     if isinstance(items, ResizerItem):
@@ -222,9 +222,12 @@ class Scene(QGraphicsScene):
             # self.selectionRect.setParentItem(self)
             if not self.released:
                 self.sRstart = event.scenePos()
-                self.selectionRect.setRect(self.sRstart.x(), self.sRstart.y(),
-                                           abs(event.scenePos().x() - self.sRstart.x()),
-                                           abs(event.scenePos().y() - self.sRstart.y()))
+                self.selectionRect.setRect(
+                    self.sRstart.x(),
+                    self.sRstart.y(),
+                    abs(event.scenePos().x() - self.sRstart.x()),
+                    abs(event.scenePos().y() - self.sRstart.y()),
+                )
                 self.selectionRect.setVisible(True)
 
         # if len(self.items(event.scenePos())) == 0:
@@ -292,27 +295,42 @@ class Scene(QGraphicsScene):
     def isInRect(self, point):
         # Check if a point is in the selection rectangle
         # from top left to bottom right
-        if point.x() > self.sRstart.x() and point.x() < (
-                self.sRstart.x() + self.sRw) and point.y() > self.sRstart.y() and point.y() < (
-                self.sRstart.y() + self.sRh):
+        if (
+            point.x() > self.sRstart.x()
+            and point.x() < (self.sRstart.x() + self.sRw)
+            and point.y() > self.sRstart.y()
+            and point.y() < (self.sRstart.y() + self.sRh)
+        ):
             self.logger.debug("In rect")
             return True
 
         # from top right to bottom left
-        elif point.x() < self.sRstart.x() and point.x() > (self.sRstart.x() + self.sRw) \
-                and point.y() > self.sRstart.y() and point.y() < (self.sRstart.y() + self.sRh):
+        elif (
+            point.x() < self.sRstart.x()
+            and point.x() > (self.sRstart.x() + self.sRw)
+            and point.y() > self.sRstart.y()
+            and point.y() < (self.sRstart.y() + self.sRh)
+        ):
             self.logger.debug("In rect")
             return True
 
         # from bottom right to top left
-        elif point.x() < self.sRstart.x() and point.x() > (self.sRstart.x() + self.sRw) \
-                and point.y() < self.sRstart.y() and point.y() > (self.sRstart.y() + self.sRh):
+        elif (
+            point.x() < self.sRstart.x()
+            and point.x() > (self.sRstart.x() + self.sRw)
+            and point.y() < self.sRstart.y()
+            and point.y() > (self.sRstart.y() + self.sRh)
+        ):
             self.logger.debug("In rect")
             return True
 
         # from bottom left to top right
-        elif point.x() > self.sRstart.x() and point.x() < (self.sRstart.x() + self.sRw) \
-                and point.y() < self.sRstart.y() and point.y() > (self.sRstart.y() + self.sRh):
+        elif (
+            point.x() > self.sRstart.x()
+            and point.x() < (self.sRstart.x() + self.sRw)
+            and point.y() < self.sRstart.y()
+            and point.y() > (self.sRstart.y() + self.sRh)
+        ):
             self.logger.debug("In rect")
             return True
 

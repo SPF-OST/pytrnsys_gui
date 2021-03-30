@@ -42,4 +42,3 @@ class groupDlg(QDialog):
         self.parent.selectionMode = False
 
         self.close()
-

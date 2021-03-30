@@ -1,5 +1,14 @@
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QRadioButton, \
-    QVBoxLayout, QListWidget
+from PyQt5.QtWidgets import (
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QHBoxLayout,
+    QGridLayout,
+    QDialog,
+    QRadioButton,
+    QVBoxLayout,
+    QListWidget,
+)
 
 
 class GenericPortPairDlg(QDialog):
@@ -60,7 +69,7 @@ class GenericPortPairDlg(QDialog):
 
     def loadList(self):
         print("Loading ports")
-        stringDct = {"0":"Left", "1":"Top", "2":"Right", "3":"Bottom"}
+        stringDct = {"0": "Left", "1": "Top", "2": "Right", "3": "Bottom"}
         for i in self.block.inputs:
             self.listW.addItem("Port pair at " + stringDct[str(i.side)])
 

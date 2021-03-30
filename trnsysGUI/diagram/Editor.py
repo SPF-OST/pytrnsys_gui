@@ -10,8 +10,23 @@ from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
 from PyQt5.QtGui import QIcon, QColor, QPainter
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QListView, QVBoxLayout, QListWidget, QLabel, QLineEdit, QScrollArea, \
-    QSplitter, QGraphicsItemGroup, QGraphicsLineItem, QMessageBox, QFileDialog, QTreeView, QPushButton
+from PyQt5.QtWidgets import (
+    QWidget,
+    QHBoxLayout,
+    QListView,
+    QVBoxLayout,
+    QListWidget,
+    QLabel,
+    QLineEdit,
+    QScrollArea,
+    QSplitter,
+    QGraphicsItemGroup,
+    QGraphicsLineItem,
+    QMessageBox,
+    QFileDialog,
+    QTreeView,
+    QPushButton,
+)
 
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
@@ -158,7 +173,7 @@ class Editor(QWidget):
 
         self.projectFolder = projectFolder
 
-        self.diagramName = os.path.split(self.projectFolder)[-1] + '.json'
+        self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
         self.saveAsPath = pl.Path()
         self.idGen = IdGenerator()
 
@@ -169,7 +184,7 @@ class Editor(QWidget):
         self.existReference = True
 
         self.controlExists = 0
-        self.controlDirectory = ''
+        self.controlDirectory = ""
 
         self.selectionMode = False
         self.groupMode = False
@@ -189,7 +204,7 @@ class Editor(QWidget):
         self.snapGrid = False
         self.snapSize = 20
 
-        self.trnsysPath = 'C:\Trnsys17\Exe\TRNExe.exe'
+        self.trnsysPath = "C:\Trnsys17\Exe\TRNExe.exe"
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -203,10 +218,30 @@ class Editor(QWidget):
 
         # Resource folder for library icons
         r_folder = "images/"
-        componentsList = ['Connector', 'TeePiece', 'TVentil', 'WTap_main', 'WTap', 'Pump', 'Collector',
-                          'GroundSourceHx', 'PV',
-                          'HP', 'HPTwoHx', 'HPDoubleDual', 'AirSourceHP', 'StorageTank', 'IceStorage', 'PitStorage',
-                          'IceStorageTwoHx', 'ExternalHx', 'Radiator', 'Boiler', 'GenericBlock', 'GenericItem']
+        componentsList = [
+            "Connector",
+            "TeePiece",
+            "TVentil",
+            "WTap_main",
+            "WTap",
+            "Pump",
+            "Collector",
+            "GroundSourceHx",
+            "PV",
+            "HP",
+            "HPTwoHx",
+            "HPDoubleDual",
+            "AirSourceHP",
+            "StorageTank",
+            "IceStorage",
+            "PitStorage",
+            "IceStorageTwoHx",
+            "ExternalHx",
+            "Radiator",
+            "Boiler",
+            "GenericBlock",
+            "GenericItem",
+        ]
         for component in componentsList:
             self.libItems.append(QtGui.QStandardItem(QIcon(r_folder + component), component))
         # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'MasterControl')), 'MasterControl'))
@@ -231,10 +266,10 @@ class Editor(QWidget):
         self.vertL.setStretchFactor(self.listV, 1)
 
         # for file browser
-        self.projectPath = ''  # XXX
+        self.projectPath = ""  # XXX
         self.fileList = []  # XXX
 
-        if loadValue == 'new' or loadValue == 'json':
+        if loadValue == "new" or loadValue == "json":
             self.createProjectFolder()
 
         self.fileBrowserLayout = QVBoxLayout()
@@ -254,7 +289,9 @@ class Editor(QWidget):
         # self.pathLayout.addWidget(self.openProjectButton)
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
-        self.splitter = QSplitter(Qt.Vertical, )
+        self.splitter = QSplitter(
+            Qt.Vertical,
+        )
         self.splitter.setChildrenCollapsible(False)
         self.scroll.setWidget(self.splitter)
         self.scroll.setFixedWidth(350)
@@ -262,7 +299,7 @@ class Editor(QWidget):
         self.fileBrowserLayout.addWidget(self.scroll)
         self.createDdckTree(self.projectFolder)
 
-        if loadValue == 'new' or loadValue == 'json':
+        if loadValue == "new" or loadValue == "json":
             self.createConfigBrowser(self.projectFolder)
             self.copyGenericFolder(self.projectFolder)
             self.createHydraulicDir(self.projectFolder)
@@ -334,9 +371,9 @@ class Editor(QWidget):
         self.alignXLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignXLineItem)
 
-        if loadValue == 'load' or loadValue == 'copy':
+        if loadValue == "load" or loadValue == "copy":
             self.decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
-        elif loadValue == 'json':
+        elif loadValue == "json":
             self.decodeDiagram(jsonPath, loadValue=loadValue)
 
         # #Search related lists
@@ -404,8 +441,11 @@ class Editor(QWidget):
             # if len(endPort.connectionList) == 0:
             # Connection(startPort, endPort, False, self)
 
-            if isinstance(startPort.parent, StorageTank) and isinstance(endPort.parent, StorageTank) \
-                    and startPort.parent != endPort.parent:
+            if (
+                isinstance(startPort.parent, StorageTank)
+                and isinstance(endPort.parent, StorageTank)
+                and startPort.parent != endPort.parent
+            ):
                 msgSTank = QMessageBox(self)
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
@@ -479,13 +519,23 @@ class Editor(QWidget):
 
                 for hx in t.heatExchangers:
                     if hx.sSide == 0:
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2],
-                                     t.hxInsideConnsLeft, "L", hx)
+                        t.connectHxs(
+                            self.findStorageCorrespPortsHx([hx.port1, hx.port2]),
+                            [hx.port1, hx.port2],
+                            t.hxInsideConnsLeft,
+                            "L",
+                            hx,
+                        )
                     elif hx.sSide == 2:
                         self.logger.debug("storage of hx R is " + str(t.displayName))
                         self.logger.debug("hx ports are" + str(hx.port1) + str(hx.port2))
-                        t.connectHxs(self.findStorageCorrespPortsHx([hx.port1, hx.port2]), [hx.port1, hx.port2],
-                                     t.hxInsideConnsRight, "R", hx)
+                        t.connectHxs(
+                            self.findStorageCorrespPortsHx([hx.port1, hx.port2]),
+                            [hx.port1, hx.port2],
+                            t.hxInsideConnsRight,
+                            "R",
+                            hx,
+                        )
                     else:
                         self.logger.debug("heatExchanger has not valid sSide")
 
@@ -591,7 +641,8 @@ class Editor(QWidget):
                             tp.deleteBlock()
                         else:
                             self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
+                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
+                            )
                     else:
                         self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.insideConnLeft = []
@@ -604,7 +655,8 @@ class Editor(QWidget):
                             tp.deleteBlock()
                         else:
                             self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
+                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
+                            )
                     else:
                         self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.insideConnRight = []
@@ -617,7 +669,8 @@ class Editor(QWidget):
                             tp.deleteBlock()
                         else:
                             self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
+                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
+                            )
                     else:
                         self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.hxInsideConnsLeft = []
@@ -630,7 +683,8 @@ class Editor(QWidget):
                             tp.deleteBlock()
                         else:
                             self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName)
+                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
+                            )
                     else:
                         self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
                 t.hxInsideConnsRight = []
@@ -676,46 +730,40 @@ class Editor(QWidget):
                 try:
                     in1.append(obj.inputs[0].connectionList[0].displayName)
                 except:
-                    in1.append('')
+                    in1.append("")
                 try:
                     in2.append(obj.inputs[1].connectionList[0].displayName)
                 except:
-                    in2.append('')
+                    in2.append("")
                 try:
                     out1.append(obj.outputs[0].connectionList[0].displayName)
                 except:
-                    out1.append('')
+                    out1.append("")
                 try:
                     out2.append(obj.outputs[1].connectionList[0].displayName)
                 except:
-                    out2.append('')
-        table = {
-            'Name': name,
-            'in 1': in1,
-            'in 2': in2,
-            'out 1': out1,
-            'out 2': out2
-        }
-        df = pd.DataFrame(table, columns=['Name', 'in 1', 'in 2', 'out 1', 'out 2'])
+                    out2.append("")
+        table = {"Name": name, "in 1": in1, "in 2": in2, "out 1": out1, "out 2": out2}
+        df = pd.DataFrame(table, columns=["Name", "in 1", "in 2", "out 1", "out 2"])
 
-    def exportData(self, exportTo='ddck'):
+    def exportData(self, exportTo="ddck"):
         self.logger.info("------------------------> START OF EXPORT <------------------------")
 
         self.setUpStorageInnerConns()
 
         self.sortTrnsysObj()
 
-        fullExportText = ''
+        fullExportText = ""
 
-        ddckFolder = os.path.join(self.projectFolder, 'ddck')
+        ddckFolder = os.path.join(self.projectFolder, "ddck")
 
-        if exportTo == 'mfs':
-            mfsFileName = self.diagramName.split('.')[0] + '_mfs.dck'
+        if exportTo == "mfs":
+            mfsFileName = self.diagramName.split(".")[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
             if self._doesFileExistAndDontOverwrite(exportPath):
                 return None
 
-        elif exportTo == 'ddck':
+        elif exportTo == "ddck":
             hydraulicsPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
 
             if self._doesFileExistAndDontOverwrite(hydraulicsPath):
@@ -738,7 +786,9 @@ class Editor(QWidget):
             fullExportText += "*************************************\n\n"
             fullExportText += "*************************************\n"
             fullExportText += "** Outputs to energy balance in kWh\n"
-            fullExportText += "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
+            fullExportText += (
+                "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
+            )
             fullExportText += "*************************************\n"
             fullExportText += "EQUATIONS 1\n"
             fullExportText += "qSysOut_PipeLoss = PipeLossTot\n"
@@ -753,13 +803,14 @@ class Editor(QWidget):
         if blackBoxProblem:
             return
         fullExportText += blackBoxText
-        if exportTo == 'mfs':
+        if exportTo == "mfs":
             fullExportText += exporter.exportMassFlows()
             fullExportText += exporter.exportPumpOutlets()
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
-        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType,
-                                                              descConnLength)  # , parameters, lineNrParameters)
+        fullExportText += exporter.exportParametersFlowSolver(
+            simulationUnit, simulationType, descConnLength
+        )  # , parameters, lineNrParameters)
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
@@ -775,24 +826,24 @@ class Editor(QWidget):
         # tes = open(os.path.join(ddckFolder, "Tes\\Tes.ddck"), "r")
         # fullExportText += tes.read()
         # tes.close()
-        if exportTo == 'mfs':
+        if exportTo == "mfs":
             fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
             fullExportText += "ENDS"
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
 
-        if exportTo == 'mfs':
-            f = open(str(exportPath), 'w')
+        if exportTo == "mfs":
+            f = open(str(exportPath), "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
-        elif exportTo == 'ddck':
+        elif exportTo == "ddck":
             if fullExportText[:1] == "\n":
                 fullExportText = fullExportText[1:]
             hydraulicFolder = os.path.split(hydraulicsPath)[0]
             if not (os.path.isdir(hydraulicFolder)):
                 os.makedirs(hydraulicFolder)
-            f = open(str(hydraulicsPath), 'w')
+            f = open(str(hydraulicsPath), "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
@@ -800,9 +851,9 @@ class Editor(QWidget):
         self.cleanUpExportedElements()
         self.tearDownStorageInnerConns()
 
-        if exportTo == 'mfs':
+        if exportTo == "mfs":
             return exportPath
-        elif exportTo == 'ddck':
+        elif exportTo == "ddck":
             return hydraulicsPath
 
     def _doesFileExistAndDontOverwrite(self, folderPath):
@@ -831,15 +882,17 @@ class Editor(QWidget):
 
         self.sortTrnsysObj()
 
-        fullExportText = ''
+        fullExportText = ""
 
-        ddckFolder = os.path.join(self.projectFolder, 'ddck')
+        ddckFolder = os.path.join(self.projectFolder, "ddck")
 
         hydCtrlPath = os.path.join(ddckFolder, "control\\hydraulic_control.ddck")
         if pl.Path(hydCtrlPath).exists():
             qmb = QMessageBox(self)
-            qmb.setText("Warning: " +
-                        "The file hydraulic_control.ddck already exists in the control folder. Do you want to overwrite it or cancel?")
+            qmb.setText(
+                "Warning: "
+                + "The file hydraulic_control.ddck already exists in the control folder. Do you want to overwrite it or cancel?"
+            )
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
@@ -872,7 +925,7 @@ class Editor(QWidget):
         controlFolder = os.path.split(hydCtrlPath)[0]
         if not (os.path.isdir(controlFolder)):
             os.makedirs(controlFolder)
-        f = open(str(hydCtrlPath), 'w')
+        f = open(str(hydCtrlPath), "w")
         f.truncate(0)
         f.write(fullExportText)
         f.close()
@@ -968,7 +1021,7 @@ class Editor(QWidget):
         -------
 
         """
-        with open(filename, 'w') as jsonfile:
+        with open(filename, "w") as jsonfile:
             json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
     def encodeDiagram(self, filename):
@@ -985,10 +1038,10 @@ class Editor(QWidget):
         """
         self.logger.info("filename is at encoder " + str(filename))
         # if filename != "":
-        with open(filename, 'w') as jsonfile:
+        with open(filename, "w") as jsonfile:
             json.dump(self, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
-    def decodeDiagram(self, filename, loadValue='load'):
+    def decodeDiagram(self, filename, loadValue="load"):
         """
         Decodes a diagram saved as a json-file. It also checks which folders exist in the ddck-directory of the pro-
         ject. It deletes all folders in the ddck-directory, which neither have a corresponding blockItem in the json-
@@ -1005,7 +1058,7 @@ class Editor(QWidget):
         """
 
         self.logger.info("Decoding " + filename)
-        with open(filename, 'r') as jsonfile:
+        with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
 
         if len(self.groupList) == 0:
@@ -1073,21 +1126,21 @@ class Editor(QWidget):
 
                     if "__nameDct__" in k:
                         self.logger.debug("Found the name dict while loading")
-                        if loadValue == 'load':
+                        if loadValue == "load":
                             self.diagramName = k["DiagramName"]
                             # self.projectFolder = k["ProjectFolder"]
 
-        blockFolderNames.append('generic')
-        blockFolderNames.append('hydraulic')
-        blockFolderNames.append('weather')
-        blockFolderNames.append('control')
+        blockFolderNames.append("generic")
+        blockFolderNames.append("hydraulic")
+        blockFolderNames.append("weather")
+        blockFolderNames.append("control")
 
-        ddckFolder = os.path.join(self.projectFolder, 'ddck')
+        ddckFolder = os.path.join(self.projectFolder, "ddck")
         ddckFolders = os.listdir(ddckFolder)
         additionalFolders = []
 
         for folder in ddckFolders:
-            if folder not in blockFolderNames and 'StorageTank' not in folder:
+            if folder not in blockFolderNames and "StorageTank" not in folder:
                 additionalFolders.append(folder)
 
         if len(additionalFolders) > 0:
@@ -1149,17 +1202,17 @@ class Editor(QWidget):
         self.saveToClipBoard(clipboardGroup)
 
     def saveToClipBoard(self, copyList):
-        filename = 'clipboard.json'
+        filename = "clipboard.json"
 
-        with open(filename, 'w') as jsonfile:
+        with open(filename, "w") as jsonfile:
             json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
         self.logger.debug("Copy complete!")
 
     def pasteFromClipBoard(self):
-        filename = 'clipboard.json'
+        filename = "clipboard.json"
 
-        with open(filename, 'r') as jsonfile:
+        with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=DecoderPaste, editor=self)
 
         for j in blocklist["Blocks"]:
@@ -1273,13 +1326,12 @@ class Editor(QWidget):
         # with open(filepaths, 'r') as file:
         #     data = file.readlines()
 
-        self.diagramName = os.path.split(self.projectFolder)[-1] + '.json'
+        self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
         diagramPath = os.path.join(self.projectFolder, self.diagramName)
 
         if os.path.isfile(diagramPath) and showWarning:
             qmb = QMessageBox(self)
-            qmb.setText("Warning: " +
-                        "This diagram name exists already. Do you want to overwrite or cancel?")
+            qmb.setText("Warning: " + "This diagram name exists already. Do you want to overwrite or cancel?")
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
@@ -1312,14 +1364,14 @@ class Editor(QWidget):
         #         msgb.exec()
 
     def saveAs(self):
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
-        with open(filepaths, 'r') as file:
+        filepaths = os.path.join(ROOT_DIR, "filepaths.txt")
+        with open(filepaths, "r") as file:
             data = file.readlines()
-        defaultDir = (data[1][:-1])
+        defaultDir = data[1][:-1]
         pickedPath = pl.Path(QFileDialog.getSaveFileName(self, "Save diagram", defaultDir, filter="*.json")[0])
         if str(pickedPath) == ".":
             msgb = QMessageBox(self)
@@ -1350,13 +1402,16 @@ class Editor(QWidget):
 
         """
 
-        if self.saveAsPath.name != '':
+        if self.saveAsPath.name != "":
             # print("Path name is " + self.saveAsPath.name)
             if newName + ".json" in self.saveAsPath.glob("*"):
-                QMessageBox(self, "Warning", "This diagram name exists already in the directory."
-                                             " Please rename this diagram")
+                QMessageBox(
+                    self, "Warning", "This diagram name exists already in the directory." " Please rename this diagram"
+                )
             else:
-                self.saveAsPath = pl.Path(self.saveAsPath.stem[0:self.saveAsPath.name.index(self.diagramName)] + newName)
+                self.saveAsPath = pl.Path(
+                    self.saveAsPath.stem[0 : self.saveAsPath.name.index(self.diagramName)] + newName
+                )
 
         self.diagramName = newName
         self.parent().currentFile = newName
@@ -1375,7 +1430,7 @@ class Editor(QWidget):
         # closeDialog = closeDlg()
         # if closeDialog.closeBool:
         filepath = pl.Path(pl.Path(__file__).resolve().parent.joinpath("recent"))
-        self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
+        self.encodeDiagram(str(filepath.joinpath(self.diagramName + ".json")))
 
     # Mode related
     def setAlignMode(self, b):
@@ -1552,8 +1607,7 @@ class Editor(QWidget):
             # conns = node.parent.getConnections()
             for i in node.parent.getConnections():
 
-                self.logger.debug("Parent has connections " + str(node.
-                                                                  parent.getConnections()))
+                self.logger.debug("Parent has connections " + str(node.parent.getConnections()))
 
                 # Looking at nodes of current block
                 if i.toPort.parent is node.parent and i.toPort is not node:
@@ -1647,7 +1701,7 @@ class Editor(QWidget):
             self.logger.debug("Returning at port " + str(port) + ", " + str(port.parent))
             return
 
-        port.color = 'gray'
+        port.color = "gray"
 
         # Recursion
         # Algorithm:
@@ -1673,25 +1727,25 @@ class Editor(QWidget):
         for c in connsP:
 
             if c.fromPort is port:
-                if c.toPort.color == 'white':
+                if c.toPort.color == "white":
                     c.traversed = True
                     self.dfs1(c.toPort, maxdepth, d + 1)
-                if c.toPort.color == 'gray':
+                if c.toPort.color == "gray":
                     self.logger.debug("Found a loop, says port " + str(port))
 
             if c.toPort is port:
-                if c.fromPort.color == 'white':
+                if c.fromPort.color == "white":
                     c.traversed = True
                     self.dfs1(c.fromPort, maxdepth, d + 1)
-                if c.fromPort.color == 'gray':
+                if c.fromPort.color == "gray":
                     self.logger.debug("Found a loop, says port " + str(port))
 
-        port.color = 'black'
+        port.color = "black"
 
-        for op in (port.parent.inputs + port.parent.outputs):
-            if op.color == 'white' and len(op.connectionList) > 0:
+        for op in port.parent.inputs + port.parent.outputs:
+            if op.color == "white" and len(op.connectionList) > 0:
                 self.dfs1(op, maxdepth, d)
-            if op.color == 'gray':
+            if op.color == "gray":
                 self.logger.debug("Found a loop in other")
 
     def dfs2(self, port, maxdepth, d):
@@ -1702,7 +1756,7 @@ class Editor(QWidget):
             self.logger.debug("Returning at port " + str(port) + ", " + str(port.parent))
             return
 
-        port.color = 'gray'
+        port.color = "gray"
 
         conns = port.parent.getConnections()
         connsP = []
@@ -1724,7 +1778,7 @@ class Editor(QWidget):
         for c in connsP:
 
             if c.fromPort is port:
-                if c.toPort.color == 'white':
+                if c.toPort.color == "white":
                     c.traversed = True
                     rlist = self.dfs2(c.toPort, maxdepth, d + 1)
                     if rlist is not None:
@@ -1732,13 +1786,13 @@ class Editor(QWidget):
                     else:
                         rlist = []
                         return rlist.append(port)
-                if c.toPort.color == 'gray':
+                if c.toPort.color == "gray":
                     self.logger.debug("Found a loop, says port " + str(port))
                     rlist = []
                     return rlist.append(port)
 
             if c.toPort is port:
-                if c.fromPort.color == 'white':
+                if c.fromPort.color == "white":
                     c.traversed = True
                     rlist = self.dfs2(c.fromPort, maxdepth, d + 1)
                     if rlist is not None:
@@ -1746,14 +1800,14 @@ class Editor(QWidget):
                     else:
                         rlist = []
                         return rlist.append(port)
-                if c.fromPort.color == 'gray':
+                if c.fromPort.color == "gray":
                     self.logger.debug("Found a loop, says port " + str(port))
                     rlist = []
                     return rlist.append(port)
-        port.color = 'black'
+        port.color = "black"
 
-        for op in (port.parent.inputs + port.parent.outputs):
-            if op.color == 'white' and len(op.connectionList) > 0:
+        for op in port.parent.inputs + port.parent.outputs:
+            if op.color == "white" and len(op.connectionList) > 0:
                 rlist = self.dfs2(op, maxdepth, d)
                 if rlist is not None:
                     return rlist.append(port)
@@ -1761,7 +1815,7 @@ class Editor(QWidget):
                     rlist = []
                     return rlist.append(port)
                 return rlist.append(self)
-            if op.color == 'gray':
+            if op.color == "gray":
                 self.logger.debug("Found a loop in other")
                 rlist = []
                 return rlist.append(self)
@@ -1790,19 +1844,19 @@ class Editor(QWidget):
         self.tester = Test_Export()
         self.testPassed = True
         msg = QMessageBox(self)
-        msg.setWindowTitle('Test Result')
+        msg.setWindowTitle("Test Result")
         # fileDir = 'U:/Desktop/TrnsysGUI/trnsysGUI/'
         # examplesFilePath = fileDir + 'examplesNewEncoding/'
         # exportedFilePath = fileDir + 'export_test/'
         # originalFilePath = fileDir + 'Reference/'
 
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)  # This is your Project Root
-        examplesFilePath = os.path.join(ROOT_DIR, 'examples')
-        exportedFilePath = os.path.join(ROOT_DIR, 'export_test')
-        originalFilePath = os.path.join(ROOT_DIR, 'Reference')
+        examplesFilePath = os.path.join(ROOT_DIR, "examples")
+        exportedFilePath = os.path.join(ROOT_DIR, "export_test")
+        originalFilePath = os.path.join(ROOT_DIR, "Reference")
 
         exportedFileList = []
         originalFileList = []
@@ -1834,8 +1888,7 @@ class Editor(QWidget):
         self.testEnabled = False
 
         # get all files from exportedFile folder and Original folder
-        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList,
-                                  originalFileList)
+        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList, originalFileList)
 
         # check if exported files exist inside reference folder
         j = 0
@@ -1852,8 +1905,7 @@ class Editor(QWidget):
             j += 1
 
         # Retrieve newly added files if any
-        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList,
-                                  originalFileList)
+        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList, originalFileList)
 
         # check if the files are identical
         fileNoList, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
@@ -1880,14 +1932,15 @@ class Editor(QWidget):
 
     def printPDF(self):
         """
-            ---------------------------------------------
-            Export diagram as pdf onto specified folder
-            fn = user input directory
-            ---------------------------------------------
+        ---------------------------------------------
+        Export diagram as pdf onto specified folder
+        fn = user input directory
+        ---------------------------------------------
         """
-        fn, _ = QFileDialog.getSaveFileName(self, 'Export PDF', None, 'PDF files (.pdf);;All Files()')
-        if fn != '':
-            if QFileInfo(fn).suffix() == "": fn += '.pdf'
+        fn, _ = QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
+        if fn != "":
+            if QFileInfo(fn).suffix() == "":
+                fn += ".pdf"
             printer = QPrinter(QPrinter.HighResolution)
             printer.setOrientation(QPrinter.Landscape)
             printer.setOutputFormat(QPrinter.PdfFormat)
@@ -1905,12 +1958,12 @@ class Editor(QWidget):
         If the path defined by the user doesn't exist. Creates that path.
         """
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
-        if self.projectPath != '':
+        if self.projectPath != "":
             self.PPL.setText(self.projectPath)
             # self.addButton.setEnabled(True)
             # self.delButton.setEnabled(True)
 
-            loadPath = os.path.join(self.projectPath, 'ddck')
+            loadPath = os.path.join(self.projectPath, "ddck")
             if not os.path.exists(loadPath):
                 os.makedirs(loadPath)
 
@@ -1921,9 +1974,9 @@ class Editor(QWidget):
             self.createDdckTree(loadPath)
 
             for o in self.trnsysObj:
-                if hasattr(o, 'updateTreePath'):
+                if hasattr(o, "updateTreePath"):
                     o.updateTreePath(self.projectPath)
-                elif hasattr(o, 'createControlDir'):
+                elif hasattr(o, "createControlDir"):
                     o.createControlDir()
 
     # def openFile(self):
@@ -1953,12 +2006,12 @@ class Editor(QWidget):
 
     def openProject(self):
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
-        if self.projectPath != '':
+        if self.projectPath != "":
             test = self.parent()
 
             self.parent().newDia()
             self.PPL.setText(self.projectPath)
-            loadPath = os.path.join(self.projectPath, 'ddck')
+            loadPath = os.path.join(self.projectPath, "ddck")
 
             self.createConfigBrowser(self.projectPath)
             self.copyGenericFolder(self.projectPath)
@@ -1969,7 +2022,7 @@ class Editor(QWidget):
             # todo : add files into list
 
     def createDdckTree(self, loadPath):
-        treeToRemove = self.findChild(QTreeView, 'ddck')
+        treeToRemove = self.findChild(QTreeView, "ddck")
         try:
             # treeToRemove.hide()
             treeToRemove.deleteLater()
@@ -1977,13 +2030,13 @@ class Editor(QWidget):
             self.logger.debug("Widget doesnt exist!")
         else:
             self.logger.debug("Deleted widget")
-        if self.projectPath == '':
-            loadPath = os.path.join(loadPath, 'ddck')
+        if self.projectPath == "":
+            loadPath = os.path.join(loadPath, "ddck")
         if not os.path.exists(loadPath):
             os.makedirs(loadPath)
         self.model = MyQFileSystemModel()
         self.model.setRootPath(loadPath)
-        self.model.setName('ddck')
+        self.model.setName("ddck")
         self.tree = MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(loadPath))
@@ -1993,7 +2046,7 @@ class Editor(QWidget):
         self.splitter.insertWidget(0, self.tree)
 
     def createConfigBrowser(self, loadPath):
-        self.layoutToRemove = self.findChild(QHBoxLayout, 'Config_Layout')
+        self.layoutToRemove = self.findChild(QHBoxLayout, "Config_Layout")
         try:
             # treeToRemove.hide()
             self.layoutToRemove.deleteLater()
@@ -2002,18 +2055,18 @@ class Editor(QWidget):
         else:
             self.logger.debug("Deleted widget")
         configPath = os.path.dirname(__file__)
-        configPath = os.path.join(configPath, 'project')
-        configPath = os.path.join(configPath, 'keepMe')
-        self.emptyConfig = os.path.join(configPath, 'run.config')
+        configPath = os.path.join(configPath, "project")
+        configPath = os.path.join(configPath, "keepMe")
+        self.emptyConfig = os.path.join(configPath, "run.config")
         # projectPath = os.path.join(configPath, self.date_time)
         shutil.copy(self.emptyConfig, loadPath)
         self.HBox = QHBoxLayout()
         self.refreshButton = QPushButton(self)
-        self.refreshButton.setIcon(QIcon('images/rotate-to-right.png'))
+        self.refreshButton.setIcon(QIcon("images/rotate-to-right.png"))
         self.refreshButton.clicked.connect(self.refreshConfig)
         self.model = MyQFileSystemModel()
         self.model.setRootPath(loadPath)
-        self.model.setName('Config File')
+        self.model.setName("Config File")
         self.model.setFilter(QDir.Files)
         self.tree = MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
@@ -2045,24 +2098,24 @@ class Editor(QWidget):
         # configPath = os.path.join(configPath, 'project')
         # configPath = os.path.join(configPath, self.date_time)
         # emptyConfig = os.path.join(configPath, 'run.config')
-        if self.projectPath == '':
+        if self.projectPath == "":
             localPath = self.projectFolder
         else:
             localPath = self.projectPath
 
-        self.configToEdit = os.path.join(localPath, 'run.config')
+        self.configToEdit = os.path.join(localPath, "run.config")
         os.remove(self.configToEdit)
         shutil.copy(self.emptyConfig, localPath)
-        self.configToEdit = os.path.join(localPath, 'run.config')
+        self.configToEdit = os.path.join(localPath, "run.config")
 
         localDdckPath = os.path.join(localPath, "ddck")
-        with open(self.configToEdit, 'r') as file:
+        with open(self.configToEdit, "r") as file:
             lines = file.readlines()
         localPathStr = "string LOCAL$ %s" % str(localDdckPath)
         # localPathStr.replace('/', '\\')
-        lines[21] = localPathStr + '\n'
+        lines[21] = localPathStr + "\n"
 
-        with open(self.configToEdit, 'w') as file:
+        with open(self.configToEdit, "w") as file:
             file.writelines(lines)
 
         # print(localPathStr)
@@ -2075,14 +2128,14 @@ class Editor(QWidget):
     def copyGenericFolder(self, loadPath):
 
         genericPath = os.path.dirname(__file__)
-        genericPath = os.path.join(genericPath, 'project')
-        genericPath = os.path.join(genericPath, 'keepMe')
-        genericPath = os.path.join(genericPath, 'generic')
-        self.headerFile = os.path.join(genericPath, 'head.ddck')
-        self.endFile = os.path.join(genericPath, 'end.ddck')
+        genericPath = os.path.join(genericPath, "project")
+        genericPath = os.path.join(genericPath, "keepMe")
+        genericPath = os.path.join(genericPath, "generic")
+        self.headerFile = os.path.join(genericPath, "head.ddck")
+        self.endFile = os.path.join(genericPath, "end.ddck")
 
-        self.genericFolder = os.path.join(loadPath, 'ddck')
-        self.genericFolder = os.path.join(self.genericFolder, 'generic')
+        self.genericFolder = os.path.join(loadPath, "ddck")
+        self.genericFolder = os.path.join(self.genericFolder, "generic")
 
         if not os.path.exists(self.genericFolder):
             self.logger.info("Creating " + self.genericFolder)
@@ -2095,8 +2148,8 @@ class Editor(QWidget):
 
     def createHydraulicDir(self, projectPath):
 
-        self.hydraulicFolder = os.path.join(projectPath, 'ddck')
-        self.hydraulicFolder = os.path.join(self.hydraulicFolder, 'hydraulic')
+        self.hydraulicFolder = os.path.join(projectPath, "ddck")
+        self.hydraulicFolder = os.path.join(self.hydraulicFolder, "hydraulic")
 
         if not os.path.exists(self.hydraulicFolder):
             self.logger.info("Creating " + self.hydraulicFolder)
@@ -2104,9 +2157,9 @@ class Editor(QWidget):
 
     def createWeatherAndControlDirs(self, projectPath):
 
-        ddckFolder = os.path.join(projectPath, 'ddck')
-        weatherFolder = os.path.join(ddckFolder, 'weather')
-        controlFolder = os.path.join(ddckFolder, 'control')
+        ddckFolder = os.path.join(projectPath, "ddck")
+        weatherFolder = os.path.join(ddckFolder, "weather")
+        controlFolder = os.path.join(ddckFolder, "control")
 
         if not os.path.exists(weatherFolder):
             self.logger.info("Creating " + weatherFolder)

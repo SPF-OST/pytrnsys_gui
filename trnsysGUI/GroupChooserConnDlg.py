@@ -50,4 +50,3 @@ class GroupChooserConnDlg(QDialog):
     def cancel(self):
         # print("Canceling")
         self.close()
-

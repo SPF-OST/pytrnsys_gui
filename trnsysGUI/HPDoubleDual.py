@@ -16,13 +16,13 @@ class HPDoubleDual(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HPDoubleDual, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.inputs.append(PortItem('i', 2, self))
-        self.inputs.append(PortItem('i', 2, self))
+        self.inputs.append(PortItem("i", 0, self))
+        self.inputs.append(PortItem("i", 2, self))
+        self.inputs.append(PortItem("i", 2, self))
 
-        self.outputs.append(PortItem('o', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
-        self.outputs.append(PortItem('o', 2, self))
+        self.outputs.append(PortItem("o", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
+        self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
 
         self.pixmap = QPixmap(self.image)
@@ -57,8 +57,8 @@ class HPDoubleDual(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0,h-2*delta], [w,delta],[w,h-2*delta]]
-        self.origOutputsPos = [[0,h-delta],[w,2*delta],[w,h-delta]]
+        self.origInputsPos = [[0, h - 2 * delta], [w, delta], [w, h - 2 * delta]]
+        self.origOutputsPos = [[0, h - delta], [w, 2 * delta], [w, h - delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1])
@@ -91,19 +91,19 @@ class HPDoubleDual(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            dct['.__BlockDict__'] = True
-            dct['BlockName'] = self.name
-            dct['BlockDisplayName'] = self.displayName
-            dct['PortsIDIn'] = portListInputs
-            dct['PortsIDOut'] = portListOutputs
-            dct['HeatPumpPosition'] = (float(self.pos().x()), float(self.pos().y()))
-            dct['ID'] = self.id
-            dct['trnsysID'] = self.trnsysId
-            dct['childIds'] = self.childIds
-            dct['FlippedH'] = self.flippedH
-            dct['FlippedV'] = self.flippedH
-            dct['RotationN'] = self.rotationN
-            dct['GroupName'] = self.groupName
+            dct[".__BlockDict__"] = True
+            dct["BlockName"] = self.name
+            dct["BlockDisplayName"] = self.displayName
+            dct["PortsIDIn"] = portListInputs
+            dct["PortsIDOut"] = portListOutputs
+            dct["HeatPumpPosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["ID"] = self.id
+            dct["trnsysID"] = self.trnsysId
+            dct["childIds"] = self.childIds
+            dct["FlippedH"] = self.flippedH
+            dct["FlippedV"] = self.flippedH
+            dct["RotationN"] = self.rotationN
+            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
@@ -158,18 +158,18 @@ class HPDoubleDual(BlockItem):
     def exportBlackBox(self):
         equation = []
         files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not(files):
-            status = 'noDdckFile'
-            for i in range(1,3):
+        if not (files):
+            status = "noDdckFile"
+            for i in range(1, 3):
                 equation.append("T" + self.displayName + "X" + str(i) + "=1")
         else:
-            status = 'noDdckEntry'
+            status = "noDdckEntry"
         lines = []
         for file in files:
-            infile = open(file, 'r')
+            infile = open(file, "r")
             lines += infile.readlines()
         for i in range(len(lines)):
-            if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
+            if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
                 counter = 1
                 for j in range(i, len(lines) - i):
                     if lines[j][0] == "T":
@@ -177,7 +177,7 @@ class HPDoubleDual(BlockItem):
                         equation.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
                         counter += 1
                     if counter == 4:
-                        status = 'success'
+                        status = "success"
                         break
                 break
 
@@ -196,26 +196,29 @@ class HPDoubleDual(BlockItem):
                     continue
                 else:
                     if len(self.outputs[i].connectionList) > 0:
-                        #HeatPumpTwoHx exportConnsString has 3 lines
+                        # HeatPumpTwoHx exportConnsString has 3 lines
                         if i == 0:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
+                            temp = (
+                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                            )  # + str(t.childIds[0])
                             temp += " " * (descConnLength - len(temp))
 
                             self.exportConnsString += temp + "\n"
                             f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
 
                         elif i == 1:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[1])
+                            temp = (
+                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                            )  # + str(t.childIds[1])
                             temp += " " * (descConnLength - len(temp))
 
                             self.exportConnsString += temp + "\n"
                             f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
 
                         elif i == 2:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[1])
+                            temp = (
+                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                            )  # + str(t.childIds[1])
                             temp += " " * (descConnLength - len(temp))
 
                             self.exportConnsString += temp + "\n"
@@ -237,7 +240,15 @@ class HPDoubleDual(BlockItem):
 
     def exportInputsFlowSolver2(self):
         f = ""
-        f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
+        f += (
+            " "
+            + str(self.exportInitialInput)
+            + " "
+            + str(self.exportInitialInput)
+            + " "
+            + str(self.exportInitialInput)
+            + " "
+        )
         return f, 3
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
@@ -245,8 +256,19 @@ class HPDoubleDual(BlockItem):
         for j in range(3):
             for i in range(0, 3):
                 if i < 2:
-                    temp = prefix + self.displayName + "-Side" + str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                           str(equationNumber) + "]\n"
+                    temp = (
+                        prefix
+                        + self.displayName
+                        + "-Side"
+                        + str(j)
+                        + "_"
+                        + abc[i]
+                        + "=["
+                        + str(simulationUnit)
+                        + ","
+                        + str(equationNumber)
+                        + "]\n"
+                    )
                     tot += temp
                     self.exportEquations.append(temp)
                     # nEqUsed += 1  # DC
@@ -256,7 +278,12 @@ class HPDoubleDual(BlockItem):
 
     def getSubBlockOffset(self, c):
         for i in range(3):
-            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+            if (
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
+            ):
                 return i
 
     def addTree(self):
@@ -266,7 +293,7 @@ class HPDoubleDual(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -275,7 +302,7 @@ class HPDoubleDual(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -287,7 +314,7 @@ class HPDoubleDual(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
+        for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
@@ -318,7 +345,7 @@ class HPDoubleDual(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -327,7 +354,7 @@ class HPDoubleDual(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -348,7 +375,7 @@ class HPDoubleDual(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

@@ -90,4 +90,3 @@ class DeepInspector(QDialog):
 
     def write(self, text):
         self.messages.append(text)
-

@@ -55,4 +55,3 @@ class segmentDlg(QDialog):
             if str(t.displayName).lower() == n.lower():
                 return True
         return False
-

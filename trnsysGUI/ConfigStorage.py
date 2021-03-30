@@ -1,7 +1,20 @@
 from PyQt5.QtCore import QPointF
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QHBoxLayout, QListWidget, QPushButton, QSpacerItem, \
-    QVBoxLayout, QRadioButton, QDialog, QTabWidget, QWidget, QMessageBox
+from PyQt5.QtWidgets import (
+    QLabel,
+    QLineEdit,
+    QGridLayout,
+    QHBoxLayout,
+    QListWidget,
+    QPushButton,
+    QSpacerItem,
+    QVBoxLayout,
+    QRadioButton,
+    QDialog,
+    QTabWidget,
+    QWidget,
+    QMessageBox,
+)
 
 from trnsysGUI.HeatExchanger import HeatExchanger
 
@@ -89,8 +102,6 @@ class ConfigStorage(QDialog):
         gl.addWidget(offsetLeOLabel, 6, 0, 1, 1)
         gl.addWidget(self.offsetLeO, 7, 0, 1, 3)
 
-
-
         # hxsideHbL = QHBoxLayout()
         # hxsideHbL.addWidget(self.lButton)
         # hxsideHbL.addWidget(self.rButton)
@@ -151,8 +162,9 @@ class ConfigStorage(QDialog):
         self.modifyPortButton = QPushButton("Modify")
         self.modifyPortButton.clicked.connect(self.modifyPort)
 
-        warning = QLabel("                Remove and modify function for Direct Ports are not fully functional, use with caution!")
-
+        warning = QLabel(
+            "                Remove and modify function for Direct Ports are not fully functional, use with caution!"
+        )
 
         addRemoveButtons = QHBoxLayout()
         addRemoveButtons.addWidget(self.manAddButton)
@@ -228,12 +240,24 @@ class ConfigStorage(QDialog):
         for h in self.storage.heatExchangers:
             if h.sSide == 0:
                 self.listWL.addItem(
-                    h.displayName + ", y_offset = " + "%d" %(100 - 100 * h.offset.y() / self.storage.h) + "%" \
-                    + " to " + "%d" % h.output + "%")
+                    h.displayName
+                    + ", y_offset = "
+                    + "%d" % (100 - 100 * h.offset.y() / self.storage.h)
+                    + "%"
+                    + " to "
+                    + "%d" % h.output
+                    + "%"
+                )
             if h.sSide == 2:
                 self.listWR.addItem(
-                    h.displayName + ", y_offset = " + "%d" %(100 - 100 * h.offset.y() / self.storage.h) + "%" \
-                    + " to " + "%d" % h.output + "%")
+                    h.displayName
+                    + ", y_offset = "
+                    + "%d" % (100 - 100 * h.offset.y() / self.storage.h)
+                    + "%"
+                    + " to "
+                    + "%d" % h.output
+                    + "%"
+                )
 
     def loadDirPorts(self):
         for c in self.storage.directPortConnsForList:
@@ -241,8 +265,14 @@ class ConfigStorage(QDialog):
                 listW = self.listWL2
             else:
                 listW = self.listWR2
-            listW.addItem(c.displayName + ',' + "Port pair from " + "%d%%" % (100 - 100 * c.fromPort.pos().y() / self.storage.h) +
-                          " to " + "%d%%" % (100 - 100 * c.toPort.pos().y() / self.storage.h))
+            listW.addItem(
+                c.displayName
+                + ","
+                + "Port pair from "
+                + "%d%%" % (100 - 100 * c.fromPort.pos().y() / self.storage.h)
+                + " to "
+                + "%d%%" % (100 - 100 * c.toPort.pos().y() / self.storage.h)
+            )
 
     # Unused
     def addPortPairToList(self, p):
@@ -257,8 +287,12 @@ class ConfigStorage(QDialog):
             else:
                 otherPort = p.connectionList[0].fromPort
 
-            listW.addItem("Port pair from " + "%0.2f" % (100 - 100 * p.pos().y() / self.storage.h) +
-                          " to " + "%0.2f" % (100 - 100 * otherPort.pos().y() / self.storage.h))
+            listW.addItem(
+                "Port pair from "
+                + "%0.2f" % (100 - 100 * p.pos().y() / self.storage.h)
+                + " to "
+                + "%0.2f" % (100 - 100 * otherPort.pos().y() / self.storage.h)
+            )
 
     def listWLClicked(self):
         self.listWR.clearSelection()
@@ -271,7 +305,6 @@ class ConfigStorage(QDialog):
 
     def listWR2Clicked(self):
         self.listWL2.clearSelection()
-
 
     def addHx(self):
         """
@@ -288,7 +321,11 @@ class ConfigStorage(QDialog):
         # if float(self.offsetLeO.text()) < 0:
         #     self.offsetLeO.setText('0')
 
-        if self.minOffsetDistance() and float(self.offsetLeI.text()) > float(self.offsetLeO.text()) and self.offsetsInRange():
+        if (
+            self.minOffsetDistance()
+            and float(self.offsetLeI.text()) > float(self.offsetLeO.text())
+            and self.offsetsInRange()
+        ):
             print("Adding hx")
             if self.rButton.isChecked():
                 print("addhxr")
@@ -298,7 +335,9 @@ class ConfigStorage(QDialog):
                 self.addHxL()
         else:
             msgb = QMessageBox()
-            msgb.setText("At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]")
+            msgb.setText(
+                "At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]"
+            )
             msgb.exec_()
 
     def minOffsetDistance(self):
@@ -317,65 +356,90 @@ class ConfigStorage(QDialog):
         -------
 
         """
-        if self.hxNameLe.text() == '':
+        if self.hxNameLe.text() == "":
             msgb = QMessageBox()
             msgb.setText("Please specify the name of the heat exchanger that you want to add.")
             msgb.exec_()
             return
 
-        hx_temp = HeatExchanger(0, self.w_hx, abs(
-            1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
-                                QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
-                                self.storage, self.hxNameLe.text(), tempHx=True)
+        hx_temp = HeatExchanger(
+            0,
+            self.w_hx,
+            abs(1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
+            QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
+            self.storage,
+            self.hxNameLe.text(),
+            tempHx=True,
+        )
 
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
         input = float(self.offsetLeI.text())
         hx_temp.output = output
         hx_temp.input = input
-        self.listWL.addItem(hx_temp.displayName + ", y_offsets = " + "%d" %(float(self.offsetLeI.text())) + "%" \
-                    + " to " + "%d" % output + "%")
+        self.listWL.addItem(
+            hx_temp.displayName
+            + ", y_offsets = "
+            + "%d" % (float(self.offsetLeI.text()))
+            + "%"
+            + " to "
+            + "%d" % output
+            + "%"
+        )
 
     def addHxR(self):
         """
-       Creates a HeatExchanger on the right side and adds it to the listWR
-       The comma in the display string of listWR is crucial, since the removeHx function takes the string until the
-       comma as name of the Heatexchanger to delete.
+        Creates a HeatExchanger on the right side and adds it to the listWR
+        The comma in the display string of listWR is crucial, since the removeHx function takes the string until the
+        comma as name of the Heatexchanger to delete.
 
-       Returns
-       -------
+        Returns
+        -------
 
         """
-        if self.hxNameLe.text() == '':
+        if self.hxNameLe.text() == "":
             msgb = QMessageBox()
             msgb.setText("Please specify the name of the heat exchanger that you want to add.")
             msgb.exec_()
             return
 
-        hx_temp = HeatExchanger(2, self.w_hx, abs(
-            1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
-                                QPointF(self.storage.w,
-                                        self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
-                                self.storage, self.hxNameLe.text(), tempHx=True)
+        hx_temp = HeatExchanger(
+            2,
+            self.w_hx,
+            abs(1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
+            QPointF(self.storage.w, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
+            self.storage,
+            self.hxNameLe.text(),
+            tempHx=True,
+        )
         # Add HeatExchanger string to list
         output = float(self.offsetLeO.text())
         input = float(self.offsetLeI.text())
         hx_temp.output = output
         hx_temp.input = input
-        self.listWR.addItem(hx_temp.displayName + ", y_offset = " + "%d" %(float(self.offsetLeI.text())) + "%" \
-                    + " to " + "%d" % output + "%")
+        self.listWR.addItem(
+            hx_temp.displayName
+            + ", y_offset = "
+            + "%d" % (float(self.offsetLeI.text()))
+            + "%"
+            + " to "
+            + "%d" % output
+            + "%"
+        )
 
     def manAddPortPair(self):
         if float(self.manPortLeI.text()) > 100:
-            self.manPortLeI.setText('100')
+            self.manPortLeI.setText("100")
 
         if float(self.manPortLeO.text()) < 0:
-            self.manPortLeO.setText('0')
+            self.manPortLeO.setText("0")
 
         if float(self.manPortLeI.text()) > float(self.offsetLeO.text()):
-            self.storage.setSideManualPair(self.manlButton.isChecked(),
-                                           (1 - 1 / 100 * float(self.manPortLeI.text())) * self.storage.h,
-                                           (1 - 1 / 100 * float(self.manPortLeO.text())) * self.storage.h)
+            self.storage.setSideManualPair(
+                self.manlButton.isChecked(),
+                (1 - 1 / 100 * float(self.manPortLeI.text())) * self.storage.h,
+                (1 - 1 / 100 * float(self.manPortLeO.text())) * self.storage.h,
+            )
 
         self.listWL2.clear()
         self.listWR2.clear()
@@ -390,9 +454,9 @@ class ConfigStorage(QDialog):
         for i in self.storage.directPortConnsForList:
             print(self.storage.directPortConnsForList)
             for j in self.listWL2.selectedItems():
-                if i.displayName == j.text()[:j.text().find(",")]:
-                    print('i :' + i.displayName)
-                    print('j : ' + j.text()[:j.text().find(",")])
+                if i.displayName == j.text()[: j.text().find(",")]:
+                    print("i :" + i.displayName)
+                    print("j : " + j.text()[: j.text().find(",")])
                     self.storage.directPortConnsForList.remove(i)
                     self.listWL2.takeItem(self.listWL2.row(self.listWL2.selectedItems()[0]))
 
@@ -415,15 +479,13 @@ class ConfigStorage(QDialog):
                     self.storage.parent.scene().removeItem(i.fromPort)
                     self.storage.parent.scene().removeItem(i.toPort)
 
-
-
         # print("After delete, left side has:")
         # print(self.storage.leftSide)
 
     def manRemovePortPairRight(self):
         for i in self.storage.directPortConnsForList:
             for j in self.listWR2.selectedItems():
-                if i.displayName == j.text()[:j.text().find(",")]:
+                if i.displayName == j.text()[: j.text().find(",")]:
                     # print('i :' + i.displayName)
                     # print('j : ' + j.text()[:j.text().find(",")])
                     self.storage.directPortConnsForList.remove(i)
@@ -448,15 +510,13 @@ class ConfigStorage(QDialog):
                     self.storage.parent.scene().removeItem(i.fromPort)
                     self.storage.parent.scene().removeItem(i.toPort)
 
-
-
     def removeHxL(self):
         for i in self.storage.heatExchangers:
             # Name is identified through index of comma
             for j in self.listWL.selectedItems():
                 # print('printing display name: ' + i.displayName + '\n')
                 # print('printing j.text: ' + j.text())
-                if i.displayName == j.text()[:j.text().find(",")]:
+                if i.displayName == j.text()[: j.text().find(",")]:
                     self.storage.heatExchangers.remove(i)
                     self.listWL.takeItem(self.listWL.row(self.listWL.selectedItems()[0]))
 
@@ -482,7 +542,7 @@ class ConfigStorage(QDialog):
         for i in self.storage.heatExchangers:
             # Name is identified through index of comma
             for j in self.listWR.selectedItems():
-                if i.displayName == j.text()[:j.text().find(",")]:
+                if i.displayName == j.text()[: j.text().find(",")]:
                     self.storage.heatExchangers.remove(i)
                     self.listWR.takeItem(self.listWR.row(self.listWR.selectedItems()[0]))
 
@@ -505,17 +565,17 @@ class ConfigStorage(QDialog):
         """
         Modify Hx.
         """
-        side = ''
+        side = ""
         noSelection = True
         try:
             hxName, residualInfo = self.listWL.selectedItems()[0].text().split(",")
-            side = 'Left'
+            side = "Left"
             noSelection = False
         except:
             pass
         try:
             hxName, residualInfo = self.listWR.selectedItems()[0].text().split(",")
-            side = 'Right'
+            side = "Right"
             noSelection = False
         except:
             pass
@@ -527,7 +587,7 @@ class ConfigStorage(QDialog):
         inputHeight = residualInfo[3]
         outputHeight = residualInfo[5]
 
-        dialogResult = modifyDialog(inputHeight,outputHeight)
+        dialogResult = modifyDialog(inputHeight, outputHeight)
 
         if dialogResult.cancelled:
             return
@@ -538,38 +598,51 @@ class ConfigStorage(QDialog):
 
         textPorts = dialogResult.newPortHeights
 
-        if str(textPorts[0]) == '':
+        if str(textPorts[0]) == "":
             textPorts[0] = inputHeight
         else:
             textPorts[0] = str(round(textPorts[0])) + "%"
-        if str(textPorts[1]) == '':
+        if str(textPorts[1]) == "":
             textPorts[1] = outputHeight
         else:
             textPorts[1] = str(round(textPorts[1])) + "%"
 
-        listText = hxName + "," + residualInfo[0] + " " + residualInfo[1] + " " + residualInfo[2] + " " + \
-                   textPorts[0] + " " + residualInfo[4] + " " + textPorts[1]
+        listText = (
+            hxName
+            + ","
+            + residualInfo[0]
+            + " "
+            + residualInfo[1]
+            + " "
+            + residualInfo[2]
+            + " "
+            + textPorts[0]
+            + " "
+            + residualInfo[4]
+            + " "
+            + textPorts[1]
+        )
 
-        if side == 'Left':
+        if side == "Left":
             self.listWL.selectedItems()[0].setText(listText)
-        elif side == 'Right':
+        elif side == "Right":
             self.listWR.selectedItems()[0].setText(listText)
 
     def modifyPort(self):
         """
         Modify existing ports.
         """
-        side = ''
+        side = ""
         noSelection = True
         try:
             connectionName, residualInfo = self.listWL2.selectedItems()[0].text().split(",")
-            side = 'Left'
+            side = "Left"
             noSelection = False
         except:
             pass
         try:
             connectionName, residualInfo = self.listWR2.selectedItems()[0].text().split(",")
-            side = 'Right'
+            side = "Right"
             noSelection = False
         except:
             pass
@@ -581,32 +654,44 @@ class ConfigStorage(QDialog):
         inputHeight = residualInfo[3]
         outputHeight = residualInfo[5]
 
-        dialogResult = modifyDialog(inputHeight,outputHeight)
+        dialogResult = modifyDialog(inputHeight, outputHeight)
 
         if dialogResult.cancelled:
             return
 
-        self.storage.modifyPortPosition(connectionName,dialogResult.newPortHeights)
+        self.storage.modifyPortPosition(connectionName, dialogResult.newPortHeights)
 
         textPorts = dialogResult.newPortHeights
 
-        if str(textPorts[0]) == '':
+        if str(textPorts[0]) == "":
             textPorts[0] = inputHeight
         else:
             textPorts[0] = str(round(textPorts[0])) + "%"
-        if str(textPorts[1]) == '':
+        if str(textPorts[1]) == "":
             textPorts[1] = outputHeight
         else:
             textPorts[1] = str(round(textPorts[1])) + "%"
 
-        listText = connectionName + "," + residualInfo[0] + " " + residualInfo[1] + " " + residualInfo[2] + " " + \
-                   textPorts[0] + " " + residualInfo[4] + " " + textPorts[1]
+        listText = (
+            connectionName
+            + ","
+            + residualInfo[0]
+            + " "
+            + residualInfo[1]
+            + " "
+            + residualInfo[2]
+            + " "
+            + textPorts[0]
+            + " "
+            + residualInfo[4]
+            + " "
+            + textPorts[1]
+        )
 
-        if side == 'Left':
+        if side == "Left":
             self.listWL2.selectedItems()[0].setText(listText)
-        elif side == 'Right':
+        elif side == "Right":
             self.listWR2.selectedItems()[0].setText(listText)
-
 
     def incrSize(self):
         self.storage.updatePortPositionsHW(self.h_hx, self.w_inc)
@@ -626,9 +711,9 @@ class ConfigStorage(QDialog):
     def acceptedEdit(self):
         # print("Changing displayName")
         test = self.le.text()
-        if self.le.text() == '':
+        if self.le.text() == "":
             qmb = QMessageBox()
-            qmb.setText('Please set a name for this storage tank.')
+            qmb.setText("Please set a name for this storage tank.")
             qmb.setStandardButtons(QMessageBox.Ok)
             qmb.setDefaultButton(QMessageBox.Ok)
             qmb.exec()
@@ -638,6 +723,7 @@ class ConfigStorage(QDialog):
 
     def cancel(self):
         self.close()
+
 
 class modifyDialog(QDialog):
     """
@@ -651,7 +737,7 @@ class modifyDialog(QDialog):
         self.executed = False
         self.cancelled = True
 
-        self.enteredPortHeights = ['','']
+        self.enteredPortHeights = ["", ""]
         self.newPortHeights = []
 
         newInputHeight = QLabel("Input currently at\t" + inputHeight + "\tnew (%):")
@@ -684,18 +770,17 @@ class modifyDialog(QDialog):
         self.setWindowTitle("Modify direct port couple")
         self.exec()
 
-
     def doneEdit(self):
 
         self.projectPathFlag = False
         self.folderNameFlag = False
         self.overwriteFolder = True
 
-        self.enteredPortHeights = [self.line1.text(),self.line2.text()]
-        portNames = ['Input','Output']
+        self.enteredPortHeights = [self.line1.text(), self.line2.text()]
+        portNames = ["Input", "Output"]
 
-        for i in range(0,2):
-            if self.enteredPortHeights[i] != '':
+        for i in range(0, 2):
+            if self.enteredPortHeights[i] != "":
                 try:
                     portHeight = int(self.enteredPortHeights[i])
                     if portHeight < 1 or portHeight > 100:
