@@ -12,6 +12,13 @@ trnsysGUI/filepaths.txt
 /test-results/
 /.coverage
 
+
+# setuptools' setup.py and twine/PyPI related stuff
+/.eggs/
+/build/
+/dist/
+/pytrnsys_gui.egg-info/
+
 *.xml
 *.pyc
 *.log
