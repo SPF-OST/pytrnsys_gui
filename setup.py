@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pytrnsys_gui_test",
+    name="pytrnsys-gui",
     author="Stefano Marti",
     version_config=True,
     author_email="stefano-marti@spf.ch",
