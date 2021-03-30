@@ -26,7 +26,7 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        git pull --tags
+        git fetch --unshallow
         git status
         git log --oneline -n 10
         python setup.py sdist bdist_wheel
