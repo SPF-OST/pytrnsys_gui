@@ -6,6 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="pytrnsys_gui",
     author="Stefano Marti",
+    version_config=True,
     author_email="stefano-marti@spf.ch",
     description="A GUI for Trnsys",
     long_description=long_description,
