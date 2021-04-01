@@ -25,6 +25,7 @@ from trnsysGUI.StorageTank import StorageTank
 import trnsysGUI.tracing as trc
 from trnsysGUI.configFile import configFile
 from trnsysGUI.settingsDlg import settingsDlg
+import trnsysGUI.images as _img
 
 __version__ = "1.0.0"
 __author__ = "Stefano Marti"
@@ -140,80 +141,48 @@ class MainWindow(QMainWindow):
         self.currentFile = "Untitled"
 
         # Toolbar actions
-        saveDiaAction = QAction(QIcon("images/inbox.png"), "Save", self)
+        saveDiaAction = QAction(_img.INBOX_PNG.icon(), "Save", self)
         saveDiaAction.triggered.connect(self.saveDia)
 
-        loadDiaAction = QAction(QIcon("images/outbox.png"), "Open", self)
+        loadDiaAction = QAction(_img.OUTBOX_PNG.icon(), "Open", self)
         loadDiaAction.triggered.connect(self.loadDia)
 
-        # exportTrnsysAction = QAction(QIcon('images/font-file.png'), "Export trnsys file", self)
-        # exportTrnsysAction.triggered.connect(self.exportTrnsys)
-
-        updateConfigAction = QAction(QIcon("images/updateConfig.png"), "Update run.config", self)
+        updateConfigAction = QAction(_img.UPDATE_CONFIG_PNG.icon(), "Update run.config", self)
         updateConfigAction.triggered.connect(self.updateRun)
 
-        runSimulationAction = QAction(QIcon("images/runSimulation.png"), "Run simulation", self)
+        runSimulationAction = QAction(_img.RUN_SIMULATION_PNG.icon(), "Run simulation", self)
         runSimulationAction.triggered.connect(self.runSimulation)
 
-        processSimulationAction = QAction(QIcon("images/processSimulation.png"), "Process data", self)
+        processSimulationAction = QAction(_img.PROCESS_SIMULATION_PNG.icon(), "Process data", self)
         processSimulationAction.triggered.connect(self.processSimulation)
 
-        # renameDiaAction = QAction(QIcon('images/text-label.png'), "Rename system diagram", self)
-        # renameDiaAction.triggered.connect(self.renameDia)
-
-        deleteDiaAction = QAction(QIcon("images/trash.png"), "Delete diagram", self)
+        deleteDiaAction = QAction(_img.TRASH_PNG.icon(), "Delete diagram", self)
         deleteDiaAction.triggered.connect(self.deleteDia)
 
-        # groupNewAction = QAction(QIcon('images/add-square.png'), "Create Group", self)
-        # groupNewAction.triggered.connect(self.createGroup)
-
-        # autoArrangeAction = QAction(QIcon('images/site-map.png'), "Tidy up connections", self)
-        # autoArrangeAction.triggered.connect(self.tidyUp)
-
-        zoomInAction = QAction(QIcon("images/zoom-in.png"), "Zoom in", self)
+        zoomInAction = QAction(_img.ZOOM_IN_PNG.icon(), "Zoom in", self)
         zoomInAction.triggered.connect(self.setZoomIn)
 
-        zoomOutAction = QAction(QIcon("images/zoom-Out.png"), "Zoom out", self)
+        zoomOutAction = QAction(_img.ZOOM_OUT_PNG.icon(), "Zoom out", self)
         zoomOutAction.triggered.connect(self.setZoomOut)
 
-        # zoom0Action = QAction(QIcon('images/zoom-0.png'), "Reset zoom", self)
-        # zoom0Action.triggered.connect(self.setZoom0)
-
-        # copyAction = QAction(QIcon('images/clipboard.png'), "Copy to clipboard", self)
-        # copyAction.triggered.connect(self.copySelection)
-        # copyAction.setShortcut("Ctrl+c")
-
-        # pasteAction = QAction(QIcon('images/puzzle-piece.png'), "Paste from clipboard", self)
-        # pasteAction.triggered.connect(self.pasteSelection)
-        # pasteAction.setShortcut("Ctrl+v")
-
-        toggleConnLabels = QAction(QIcon("images/labelToggle.png"), "Toggle labels", self)
+        toggleConnLabels = QAction(_img.LABEL_TOGGLE_PNG.icon(), "Toggle labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
 
-        exportHydraulicsAction = QAction(QIcon("images/exportHydraulics.png"), "Export hydraulic.ddck", self)
+        exportHydraulicsAction = QAction(_img.EXPORT_HYDRAULICS_PNG.icon(), "Export hydraulic.ddck", self)
         exportHydraulicsAction.triggered.connect(self.exportHydraulicsDdck)
 
-        exportHydCtrlAction = QAction(QIcon("images/exportHydraulicControl.png"), "Export hydraulic_control.ddck", self)
+        exportHydCtrlAction = QAction(_img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(), "Export hydraulic_control.ddck", self)
         exportHydCtrlAction.triggered.connect(self.exportHydraulicControl)
 
-        exportDckAction = QAction(QIcon("images/exportDck.png"), "Export dck", self)
+        exportDckAction = QAction(_img.EXPORT_DCK_PNG.icon(), "Export dck", self)
         exportDckAction.triggered.connect(self.exportDck)
 
-        editGroupsAction = QAction(QIcon("images/modal-list.png"), "Edit groups/loops", self)
+        editGroupsAction = QAction("Edit groups/loops", self)
         editGroupsAction.triggered.connect(self.editGroups)
 
-        selectMultipleAction = QAction(QIcon("images/elastic.png"), "Select multiple items", self)
+        selectMultipleAction = QAction("Select multiple items", self)
         selectMultipleAction.triggered.connect(self.createSelection)
         selectMultipleAction.setShortcut("s")
-
-        # deleteShortcut = QtGui.QKeySequence("Delete, Backspace, Ctrl+d")
-        # multipleDeleteAction = QAction("Delete selection", self)
-        # multipleDeleteAction.triggered.connect(self.deleteMultiple)
-        # multipleDeleteAction.setShortcuts(deleteShortcut)
-
-        # toggleEditorModeAction = QAction("Toggle editor mode", self)
-        # toggleEditorModeAction.triggered.connect(self.toggleEditorMode)
-        # toggleEditorModeAction.setShortcut("m")
 
         toggleSnapAction = QAction("Toggle snap grid", self)
         toggleSnapAction.triggered.connect(self.toggleSnap)
@@ -223,26 +192,19 @@ class MainWindow(QMainWindow):
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
 
-        runMassflowSolverAction = QAction(QIcon("images/runMfs.png"), "Run the massflow solver", self)
+        runMassflowSolverAction = QAction(_img.RUN_MFS_PNG.icon(), "Run the massflow solver", self)
         runMassflowSolverAction.triggered.connect(self.runAndVisMf)
 
-        openVisualizerAction = QAction(QIcon("images/visMfs.png"), "Start visualization of mass flows", self)
+        openVisualizerAction = QAction(_img.VIS_MFS_PNG.icon(), "Start visualization of mass flows", self)
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
-        # runMassflowSolverAction = QAction(QIcon('images/gear.png'), "Run the massflow solver", self)
-        # runMassflowSolverAction.triggered.connect(self.runMassflowSolver)
-
-        trnsysList = QAction(QIcon("images/bug-1.png"), "Print trnsysObj", self)
+        trnsysList = QAction("Print trnsysObj", self)
         trnsysList.triggered.connect(self.mb_debug)
 
-        loadVisual = QAction(QIcon("images/hard-drive.png"), "Load MRF", self)
+        loadVisual = QAction("Load MRF", self)
         loadVisual.triggered.connect(self.loadVisualization)
 
-        # testAppAction = QAction("Test", self)
-        # testAppAction.triggered.connect(self.testApp)
-        # testAppAction.setShortcut("Ctrl+t")
-
-        runAction = QAction(QIcon("images/rotate-to-right.png"), "Run", self)
+        runAction = QAction(_img.ROTATE_TO_RIGHT_PNG.icon(), "Run", self)
         runAction.triggered.connect(self.runApp)
 
         # Tool bar
@@ -261,19 +223,6 @@ class MainWindow(QMainWindow):
         tb.addAction(exportDckAction)
         tb.addAction(runSimulationAction)
         tb.addAction(processSimulationAction)
-        # tb.addAction(exportTrnsysAction)
-        # tb.addAction(renameDiaAction)
-        # tb.addAction(groupNewAction)
-        # tb.addAction(autoArrangeAction)
-        # tb.addAction(zoom0Action)
-        # tb.addAction(copyAction)
-        # tb.addAction(pasteAction)
-        # tb.addAction(editGroupsAction)
-        # tb.addAction(selectMultipleAction)
-        # tb.addAction(runMassflowSolverAction)
-        # tb.addAction(loadVisual)
-        # tb.addAction(trnsysList)
-        # tb.addAction(runAction)
         tb.addAction(deleteDiaAction)
 
         # Menu bar actions
@@ -298,45 +247,18 @@ class MainWindow(QMainWindow):
         fileMenuCopyToNewAction.triggered.connect(self.copyToNew)
         self.fileMenu.addAction(fileMenuCopyToNewAction)
 
-        # fileMenuSaveAsAction = QAction("Save as", self)
-        # fileMenuSaveAsAction.triggered.connect(self.saveDiaAs)
-        # self.fileMenu.addAction(fileMenuSaveAsAction)
-
-        # changeSettingsAction = QAction("Change settings", self)
-        # changeSettingsAction.triggered.connect(self.changeSettings)
-        # self.fileMenu.addAction(changeSettingsAction)
-
         exportAsPDF = QAction("Export as PDF", self)
         exportAsPDF.triggered.connect(self.exportPDF)
         exportAsPDF.setShortcut("Ctrl+e")
         self.fileMenu.addAction(exportAsPDF)
-
-        # exportAsEMF = QAction("Export as EMF", self)
-        # exportAsEMF.triggered.connect(self.exportEMF)
-        # exportAsEMF.setShortcut("Ctrl+F")
-        # self.fileMenu.addAction(exportAsEMF)
-
-        # movePortAction = QAction("Move direct ports", self)
-        # movePortAction.triggered.connect(self.movePorts)
-        # movePortAction.setShortcut("ctrl+m")
-
-        # setPathAction = QAction("Set Paths", self)
-        # setPathAction.triggered.connect(self.setPaths)
-        # self.fileMenu.addAction(setPathAction)
 
         debugConnections = QAction("Debug Conn", self)
         debugConnections.triggered.connect(self.debugConns)
         self.fileMenu.addAction(debugConnections)
 
         self.editMenu = QMenu("Edit")
-        # self.editMenu.addAction(toggleEditorModeAction)
-        # self.editMenu.addAction(multipleDeleteAction)
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
-        # self.editMenu.addAction(movePortAction)
-        # self.editMenu.addAction(copyAction)
-        # self.editMenu.addAction(pasteAction)
-        # self.editMenu.addAction(testAppAction)
 
         AboutAction = QAction("About", self)
         AboutAction.triggered.connect(self.showAbout)
@@ -373,9 +295,6 @@ class MainWindow(QMainWindow):
 
         self.editMenu.addAction(undoAction)
         self.editMenu.addAction(redoAction)
-
-        # self.undowidget = QUndoView(self.undoStack, self)
-        # self.undowidget.setMinimumSize(300, 100)
 
     def changeSettings(self):
         settingsDialog = settingsDlg(self)
