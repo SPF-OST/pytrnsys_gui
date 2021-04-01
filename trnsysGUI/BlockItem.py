@@ -1,16 +1,17 @@
 import glob
+import math
 import os
-from math import sqrt
+import typing as _tp
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSize, QPointF, QEvent, QTimer
-from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
+from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
+import trnsysGUI.images as _img
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.ResizerItem import ResizerItem
-import trnsysGUI.images as _img
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -18,7 +19,7 @@ FilePath = "res/Config.txt"
 
 def calcDist(p1, p2):
     vec = p1 - p2
-    norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
+    norm = math.sqrt(vec.x() ** 2 + vec.y() ** 2)
     return norm
 
 
@@ -27,7 +28,7 @@ def calcDist(p1, p2):
 class BlockItem(QGraphicsPixmapItem):
     def __init__(self, trnsysType, parent, **kwargs):
 
-        super(BlockItem, self).__init__(None)
+        super().__init__(None)
 
         self.logger = parent.logger
 
@@ -72,16 +73,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedHInt = -1
         self.flippedVInt = -1
 
-        # self.imageSource = "images/" + self.name + ".png"
-        # self.image = QImage("images/" + self.name)
-        # self.pixmap = QPixmap(self.image)
-        # self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
-        # To use svg instead of png for blocks:
-        self.imageSource = "images/" + self.name + ".svg"
-        if not os.path.exists(self.imageSource):
-            self.imageSource = "images/" + self.name + ".png"
-        self.image = QImage(self.imageSource)
+        self.image = self._getImageLoader().image()
         self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
         self.pixmap = QPixmap(self.image)
 
@@ -112,6 +104,9 @@ class BlockItem(QGraphicsPixmapItem):
 
         # Undo framework related
         self.oldPos = None
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        raise AssertionError("BlockItems should not be instantiated directly: use its child classes.")
 
     # Setter functions
     def setParent(self, p):
@@ -461,19 +456,13 @@ class BlockItem(QGraphicsPixmapItem):
 
     def updateImage(self):
         self.logger.debug("Inside block item update image")
-        if self.imageSource[-3:] == "svg":
-            # self.image = QImage(self.imageSource)
-            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-            # self.setPixmap(QPixmap(self.image))
+        imageLoader = self._getImageLoader()
+        if imageLoader.fileExtension == "svg":
+            image = imageLoader.image()
+            self.setPixmap(image.scaled(QSize(self.w, self.h)))
             self.pixmap = QPixmap(self.image)
             self.updateFlipStateH(self.flippedH)
             self.updateFlipStateV(self.flippedV)
-
-        # elif self.imageSource[-3:] == "png":
-        #     self.image = QImage(self.imageSource)
-        #     self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-        #     self.updateFlipStateH(self.flippedH)
-        #     self.updateFlipStateV(self.flippedV)
 
     def deleteResizer(self):
         try:

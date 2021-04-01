@@ -1,5 +1,6 @@
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
@@ -7,6 +8,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class Radiator(BlockItem):
@@ -19,6 +21,9 @@ class Radiator(BlockItem):
 
         self.changeSize()
         self.addTree()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.RADIATOR_SVG
 
     def changeSize(self):
         w = self.w

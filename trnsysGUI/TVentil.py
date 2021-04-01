@@ -1,9 +1,12 @@
+import typing as _tp
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtWidgets import QGraphicsTextItem
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class TVentil(BlockItem):
@@ -32,6 +35,9 @@ class TVentil(BlockItem):
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         self.changeSize()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.T_VENTIL_SVG
 
     def changeSize(self):
         w = self.w

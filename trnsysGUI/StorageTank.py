@@ -1,11 +1,13 @@
 import os
 import random
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QIcon, QColor
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
 from trnsysGUI.Connection import Connection
@@ -50,6 +52,9 @@ class StorageTank(BlockItem):
 
         self.changeSize()
         self.addTree()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.STORAGE_TANK_SVG
 
     # Setter functions
     def setParent(self, p):

@@ -1,15 +1,16 @@
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QIcon, QImage
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.ResizerItem import ResizerItem
+import trnsysGUI.images as _img
 
 
 class Boiler(BlockItem):
@@ -29,6 +30,9 @@ class Boiler(BlockItem):
 
         self.changeSize()
         self.addTree()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.BOILER_SVG
 
     def changeSize(self):
         self.logger.debug("passing through c change size")

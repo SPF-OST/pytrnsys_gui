@@ -1,8 +1,11 @@
+import typing as _tp
+
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class Connector(BlockItem):
@@ -20,6 +23,9 @@ class Connector(BlockItem):
         if "storagePorts" in kwargs:
             self.storagePorts = kwargs["storagePorts"]
         self.changeSize()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.COLLECTOR_SVG
 
     def changeSize(self):
         w = self.w

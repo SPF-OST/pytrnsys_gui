@@ -1,5 +1,6 @@
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
@@ -9,6 +10,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class GroundSourceHx(BlockItem):
@@ -26,6 +28,9 @@ class GroundSourceHx(BlockItem):
 
         self.changeSize()
         self.addTree()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.GROUND_SOURCE_HX_SVG
 
     def changeSize(self):
         self.logger.debug("passing through c change size")
