@@ -6,6 +6,9 @@ class ImageLoader:
     def __init__(self, fileName: str) -> None:
         self.fileName = fileName
 
+        parts = fileName.split(".")
+        self.fileExtension = parts[-1].lower() if parts else None
+
     def bitmap(self) -> _qtg.QBitmap:
         imageBytes = self._loadBytes()
 
@@ -18,6 +21,11 @@ class ImageLoader:
         bitmap = self.bitmap()
 
         return _qtg.QIcon(bitmap)
+
+    def image(self) -> _qtg.QImage:
+        bitmap = self.bitmap()
+
+        return bitmap.toImage()
 
     def _loadBytes(self) -> bytes:
         imageBytes = _pu.get_data("trnsysGUI", self.fileName)
