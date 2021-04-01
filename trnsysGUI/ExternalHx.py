@@ -1,10 +1,12 @@
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItemFourPorts import BlockItemFourPorts
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -24,6 +26,9 @@ class ExternalHx(BlockItemFourPorts):
 
         self.changeSize()
         self.addTree()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.EXTERNAL_HX_SVG
 
     def changeSize(self):
         w = self.w

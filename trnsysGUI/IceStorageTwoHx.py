@@ -1,14 +1,17 @@
-from trnsysGUI.BlockItemFourPorts import BlockItemFourPorts
 
 import os
 import shutil
+import typing as _tp
+
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+from trnsysGUI.BlockItemFourPorts import BlockItemFourPorts
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
+import trnsysGUI.images as _img
 
 
 class IceStorageTwoHx(BlockItemFourPorts):
@@ -22,6 +25,9 @@ class IceStorageTwoHx(BlockItemFourPorts):
 
         self.addTree()
         self.changeSize()
+
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.ICE_STORAGE_TWO_HX_SVG
 
     def changeSize(self):
         w = self.w
