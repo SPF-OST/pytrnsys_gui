@@ -1,24 +1,22 @@
 import os
-import glob
 import random
 import shutil
-import sys
-from pathlib import Path
 
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QIcon, QColor
-from PyQt5.QtWidgets import QMenu, QMessageBox, QFileDialog, QTreeView
+from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
+from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
-from trnsysGUI.Connection import Connection
 from trnsysGUI.Types.createType1924 import Type1924_TesPlugFlow
+import trnsysGUI.images as _img
 
 
 class StorageTank(BlockItem):
@@ -809,47 +807,28 @@ class StorageTank(BlockItem):
     def contextMenuEvent(self, event):
         menu = QMenu()
 
-        lNtp = QIcon("images/Notebook.png")
-        a1 = menu.addAction(lNtp, "Launch NotePad++")
+        a1 = menu.addAction("Launch NotePad++")
         a1.triggered.connect(self.launchNotepadFile)
 
-        rr = QIcon("images/rotate-to-right.png")
+        rr = _img.ROTATE_TO_RIGHT_PNG.icon()
         a2 = menu.addAction(rr, "Rotate Block clockwise")
         a2.triggered.connect(self.rotateBlockCW)
 
-        ll = QIcon("images/rotate-left.png")
+        ll = _img.ROTATE_LEFT_PNG.icon()
         a3 = menu.addAction(ll, "Rotate Block counter-clockwise")
         a3.triggered.connect(self.rotateBlockCCW)
 
-        rRot = QIcon("images/move-left.png")
-        a4 = menu.addAction(rRot, "Reset Rotation")
+        a4 = menu.addAction("Reset Rotation")
         a4.triggered.connect(self.resetRotation)
 
         b1 = menu.addAction("Print Rotation")
         b1.triggered.connect(self.printRotation)
 
-        dB = QIcon("images/close.png")
-        c1 = menu.addAction(dB, "Delete this Block")
+        c1 = menu.addAction("Delete this Block")
         c1.triggered.connect(self.deleteBlockCom)
-
-        # sG = QIcon('')
-        # c2 = menu.addAction("Set group")
-        # c2.triggered.connect(self.configGroup)
-        #
-        # d1 = menu.addAction('Dump information')
-        # d1.triggered.connect(self.dumpBlockInfo)
-        #
-        # e1 = menu.addAction('Inspect')
-        # e1.triggered.connect(self.inspectBlock)
-        #
-        # e2 = menu.addAction('Print port nb')
-        # e2.triggered.connect(self.printPortNb)
 
         e3 = menu.addAction("Export ddck")
         e3.triggered.connect(self.exportDck)
-
-        # e4 = menu.addAction('Debug Connection')
-        # e4.triggered.connect(self.debugConn)
 
         menu.exec_(event.screenPos())
 
