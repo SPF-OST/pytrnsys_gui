@@ -237,7 +237,7 @@ class Editor(QWidget):
             ("Radiator", _img.RADIATOR_SVG.icon()),
             ("Boiler", _img.BOILER_SVG.icon()),
             ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
-            ("GenericItem", _img.GENERIC_ITEM_PNG.icon())
+            ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon())
         ]
 
         libItems = [QtGui.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
