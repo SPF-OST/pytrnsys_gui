@@ -15,21 +15,21 @@ class ImageLoader:
 
         self._logger = logger
 
-    def bitmap(self) -> _qtg.QBitmap:
+    def pixmap(self) -> _qtg.QPixmap:
         imageBytes = self._loadBytes()
 
-        bitmap = _qtg.QBitmap()
-        bitmap.loadFromData(imageBytes)
+        pixmap = _qtg.QPixmap()
+        pixmap.loadFromData(imageBytes)
 
-        return bitmap
+        return pixmap
 
     def icon(self) -> _qtg.QIcon:
-        bitmap = self.bitmap()
+        bitmap = self.pixmap()
 
         return _qtg.QIcon(bitmap)
 
     def image(self) -> _qtg.QImage:
-        bitmap = self.bitmap()
+        bitmap = self.pixmap()
 
         return bitmap.toImage()
 
