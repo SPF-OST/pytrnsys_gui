@@ -79,7 +79,7 @@ class _FileDataLoader(_DataLoaderBase):
         self._absoluteFilePath = filePath.absolute()
 
     def getResourcePath(self) -> str:
-        return str(self._absoluteFilePath)
+        return f"{self.PATH_PREFIX}{self._absoluteFilePath}"
 
     def getExtension(self) -> _tp.Optional[str]:
         extension = self._absoluteFilePath.suffix
