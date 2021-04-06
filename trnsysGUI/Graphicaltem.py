@@ -1,10 +1,10 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap, QImage, QCursor, QIcon
-from PyQt5.QtSvg import QSvgRenderer
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QMenu, QFileDialog
 
 from trnsysGUI.ResizerItem import ResizerItem
+import trnsysGUI.images as _img
 
 
 class GraphicalItem(QGraphicsPixmapItem):
@@ -26,7 +26,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.rotationN = 0
         # Initial icon
         self.imageSource = "images/gear.svg"
-        self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
+        self.image = _img.ImageLoader(self.imageSource).bitmap().scaled(self.w, self.h).toImage()
         self.setPixmap(self.image)
 
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
@@ -69,11 +69,11 @@ class GraphicalItem(QGraphicsPixmapItem):
 
     def updateImage(self):
         if self.imageSource[-3:] == "svg":
-            self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
+            self.image = _img.ImageLoader(self.imageSource).bitmap().scaled(self.w, self.h).toImage()
             self.setPixmap(self.image)
 
         elif self.imageSource[-3:] == "png":
-            self.image = QImage(self.imageSource)
+            self.image = _img.ImageLoader(self.imageSource).image()
             self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
 
     def encode(self):
