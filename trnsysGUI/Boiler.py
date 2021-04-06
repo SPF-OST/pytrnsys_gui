@@ -22,9 +22,6 @@ class Boiler(BlockItem):
         self.inputs.append(PortItem("i", 2, self))
         self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
-        # self.imageSource = "images/" + "Boiler" + ".svg"
-        #
-        # self.pixmap = QPixmap(QImage(self.imageSource))
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
