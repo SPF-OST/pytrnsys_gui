@@ -1,6 +1,6 @@
 import os
 import shutil
-from pathlib import Path
+import pathlib as _pl
 import typing as _tp
 
 from PyQt5.QtCore import QSize
@@ -22,15 +22,12 @@ class GenericBlock(BlockItem):
         self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.childIds = []
         self.childIds.append(self.trnsysId)
 
         self.subBlockCounter = 0
 
-        self.imagesource = "images/" + self.name
+        self._imageAccessor = _img.GENERIC_BLOCK_PNG
 
         # Disallow adding port pairs later, because the trnsysIDs of the generated port pairs have to be
         # consecutive to be correctly printed out in the export
@@ -39,8 +36,8 @@ class GenericBlock(BlockItem):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
-        return _img.GENERIC_ITEM_PNG
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.GENERIC_BLOCK_PNG
 
     def changeSize(self):
         w = self.w
@@ -81,25 +78,22 @@ class GenericBlock(BlockItem):
         self.logger.debug(io)
         self.logger.debug(relH)
 
-    def setImage(self, name):
-        self.logger.debug("Setting image with name" + name)
-        self.image = _img.ImageLoader(name).image()
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+    def setImage(self):
+        self.setPixmap(self._imageAccessor.pixmap(width=self.w, height=self.h))
 
     def changeImage(self):
         name = str(self.pickImage().resolve())
         if name[-3:] == "png" or name[-3:] == "svg":
-            self.setImage(name)
-            self.setImagesource(name)
+            self.setImageSource(name)
+            self.setImage()
         else:
             self.logger.debug("No image picked, name is " + name)
 
-    def setImagesource(self, name):
-        self.imagesource = name
+    def setImageSource(self, name):
+        self._imageAccessor = _img.ImageAccessor.createForFile(_pl.Path(name))
 
     def pickImage(self):
-        return Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png *.svg")[0])
+        return _pl.Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png *.svg")[0])
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -158,7 +152,7 @@ class GenericBlock(BlockItem):
             dct["FlippedV"] = self.flippedV
             dct["RotationN"] = self.rotationN
             dct["GroupName"] = self.groupName
-            dct["Imagesource"] = self.imagesource
+            dct["Imagesource"] = self._imageAccessor.getResourcePath()
             dct["PortPairsNb"] = [self.getPairNb(i) for i in range(4)]
 
             dictName = "Block-"
@@ -174,7 +168,8 @@ class GenericBlock(BlockItem):
                 self.addPortPair(j)
 
         super(GenericBlock, self).decode(i, resConnList, resBlockList)
-        self.setImage(i["Imagesource"])
+        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
+        self.setImage()
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         correcter = 0
@@ -185,7 +180,8 @@ class GenericBlock(BlockItem):
                 self.addPortPair(j)
 
         super(GenericBlock, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
-        self.setImage(i["Imagesource"])
+        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
+        self.setImage()
 
     def addPortPair(self, side):
         h = self.h
