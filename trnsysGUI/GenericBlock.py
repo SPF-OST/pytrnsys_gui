@@ -36,7 +36,7 @@ class GenericBlock(BlockItem):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.GENERIC_BLOCK_PNG
 
     def changeSize(self):

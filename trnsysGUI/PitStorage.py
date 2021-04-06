@@ -25,7 +25,7 @@ class PitStorage(BlockItemFourPorts):
         self.addTree()
         self.changeSize()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PIT_STORAGE_SVG
 
     def changeSize(self):

@@ -22,7 +22,7 @@ class Radiator(BlockItem):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.RADIATOR_SVG
 
     def changeSize(self):

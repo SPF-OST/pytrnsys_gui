@@ -28,7 +28,7 @@ class Pump(BlockItem):
 
         self.changeSize()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PUMP_SVG
 
     def changeSize(self):

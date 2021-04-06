@@ -73,7 +73,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedHInt = -1
         self.flippedVInt = -1
 
-        self.image = self._getImageLoader().image()
+        self.image = self._getImageAccessor().image()
         self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
         self.pixmap = QPixmap(self.image)
 
@@ -105,9 +105,9 @@ class BlockItem(QGraphicsPixmapItem):
         # Undo framework related
         self.oldPos = None
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         currentClassName = BlockItem.__name__
-        currentMethodName = f"{currentClassName}.{BlockItem._getImageLoader.__name__}"
+        currentMethodName = f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
 
         message = (
             f"{currentMethodName} has been called. However, this method should not be called directly but must\n"
@@ -505,7 +505,7 @@ class BlockItem(QGraphicsPixmapItem):
 
     def updateImage(self):
         self.logger.debug("Inside block item update image")
-        imageLoader = self._getImageLoader()
+        imageLoader = self._getImageAccessor()
         if imageLoader.getFileExtension() == "svg":
             self.setPixmap(imageLoader.pixmap(width=self.w, height=self.h))
             self.pixmap = QPixmap(self.image)
