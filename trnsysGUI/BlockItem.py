@@ -32,8 +32,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         self.logger = parent.logger
 
-        self.w = 120.0
-        self.h = 120.0
+        self.w = 120
+        self.h = 120
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
         self.propertyFile = []
@@ -105,7 +105,7 @@ class BlockItem(QGraphicsPixmapItem):
         # Undo framework related
         self.oldPos = None
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         currentClassName = BlockItem.__name__
         currentMethodName = f"{currentClassName}.{BlockItem._getImageLoader.__name__}"
 
@@ -506,9 +506,8 @@ class BlockItem(QGraphicsPixmapItem):
     def updateImage(self):
         self.logger.debug("Inside block item update image")
         imageLoader = self._getImageLoader()
-        if imageLoader.fileExtension == "svg":
-            image = imageLoader.image()
-            self.setPixmap(image.scaled(QSize(self.w, self.h)))
+        if imageLoader.getFileExtension() == "svg":
+            self.setPixmap(imageLoader.pixmap(width=self.w, height=self.h))
             self.pixmap = QPixmap(self.image)
             self.updateFlipStateH(self.flippedH)
             self.updateFlipStateV(self.flippedV)
