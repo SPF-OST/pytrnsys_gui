@@ -1,10 +1,12 @@
+import pathlib as _pl
+
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QImage, QCursor, QIcon
+from PyQt5.QtGui import QCursor, QPixmap
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QMenu, QFileDialog
 
-from trnsysGUI.ResizerItem import ResizerItem
+import trnsysGUI.imageAccessor as _ia
 import trnsysGUI.images as _img
+from trnsysGUI.ResizerItem import ResizerItem
 
 
 class GraphicalItem(QGraphicsPixmapItem):
@@ -21,7 +23,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.flippedV = False
         self.rotationN = 0
         # Initial icon
-        self.imageSource = _img.GEAR_SVG.relativeFilePath
+        self._imageAccessor = _img.GEAR_SVG
         pixmap = _img.GEAR_SVG.pixmap(width=self.w, height=self.h)
         self.setPixmap(pixmap)
 
@@ -53,11 +55,11 @@ class GraphicalItem(QGraphicsPixmapItem):
         else:
             print("No image picked, name is " + fileName)
 
-    def setImageSource(self, s):
-        self.imageSource = s
+    def setImageSource(self, s: str):
+        self._imageAccessor = _ia.ImageAccessor.createForFile(_pl.Path(s))
 
     def updateImage(self):
-        pixmap = _img.ImageLoader(self.imageSource).pixmap(width=self.w, height=self.h)
+        pixmap = self._imageAccessor.pixmap(width=self.w, height=self.h)
         self.setPixmap(pixmap)
 
     def encode(self):
@@ -68,7 +70,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
         dct["ID"] = self.id
         dct["Size"] = self.w, self.h
-        dct["ImageSource"] = self.imageSource
+        dct["ImageSource"] = self._imageAccessor.getResourcePath()
         dct["FlippedH"] = self.flippedH
         dct["FlippedV"] = self.flippedV
         dct["RotationN"] = self.rotationN
@@ -77,17 +79,12 @@ class GraphicalItem(QGraphicsPixmapItem):
         return dictName, dct
 
     def decode(self, i, resConnList, resBlockList):
-        self.imageSource = i["ImageSource"]
+        self._imageAccessor = _ia.ImageAccessor.createFromResourcePath(i["ImageSource"])
+
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
         self.id = i["ID"]
         self.w, self.h = i["Size"]
         self.updateImage()
-
-        # self.updateFlipStateH(i["FlippedH"])
-        # self.updateFlipStateV(i["FlippedV"])
-        # self.rotateBlockToN(i["RotationN"])
-        # self.displayName = i["BlockDisplayName"]
-        # self.label.setPlainText(self.displayName)
 
         resBlockList.append(self)
 
