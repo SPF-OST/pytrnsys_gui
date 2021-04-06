@@ -24,7 +24,7 @@ class Connector(BlockItem):
             self.storagePorts = kwargs["storagePorts"]
         self.changeSize()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.COLLECTOR_SVG
 
     def changeSize(self):

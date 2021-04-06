@@ -1,125 +1,77 @@
-import pkgutil as _pu
-import logging as _log
-import typing as _tp
-
-import PyQt5.QtGui as _qtg
-
-_logger = _log.getLogger("root")
+import trnsysGUI.imageAccessor as _ia
 
 
-class ImageLoader:
-    def __init__(self, relativeFilePath: str, logger: _log.Logger = _logger) -> None:
-        self.relativeFilePath = relativeFilePath
-
-        parts = relativeFilePath.split(".")
-        self.fileExtension = parts[-1].lower() if parts else None
-
-        self._logger = logger
-
-    def pixmap(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QPixmap:
-        image = self.image(width=width, height=height)
-
-        return _qtg.QPixmap(image)
-
-    def icon(self) -> _qtg.QIcon:
-        pixmap = self.pixmap()
-
-        return _qtg.QIcon(pixmap)
-
-    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
-        imageBytes = self._loadBytes()
-
-        image = _qtg.QImage(imageBytes)
-
-        width = width if width else image.width()
-        height = height if height else image.height()
-
-        return image.scaled(width, height)
-
-    def _loadBytes(self) -> bytes:
-        try:
-            imageBytes = _pu.get_data("trnsysGUI", self.relativeFilePath)
-            if not imageBytes:
-                raise AssertionError("Image data is empty.")
-        except Exception as e:
-            self._logger.exception(
-                "An exception occurred loading image data for '%s'.",
-                self.relativeFilePath,
-                exc_info=True,
-                stack_info=True,
-            )
-            raise e
-        return imageBytes
+ImageAccessor = _ia.ImageAccessor
 
 
-AIR_SOURCE_HP_PNG = ImageLoader("images/AirSourceHP.png")
-AIR_SOURCE_HP_SVG = ImageLoader("images/AirSourceHP.svg")
-BOILER_PNG = ImageLoader("images/Boiler.png")
-BOILER_SVG = ImageLoader("images/Boiler.svg")
-BVI_PNG = ImageLoader("images/Bvi.png")
-COLLECTOR_PNG = ImageLoader("images/Collector.png")
-COLLECTOR_SVG = ImageLoader("images/Collector.svg")
-CONNECTOR_PNG = ImageLoader("images/Connector.png")
-CONNECTOR_SVG = ImageLoader("images/Connector.svg")
-ELECTRIC_ROD_SVG = ImageLoader("images/ElectricRod.svg")
-EXPORT_DCK_PNG = ImageLoader("images/exportDck.png")
-EXPORT_DCK_SVG = ImageLoader("images/exportDck.svg")
-EXPORT_HYDRAULIC_CONTROL_PNG = ImageLoader("images/exportHydraulicControl.png")
-EXPORT_HYDRAULIC_CONTROL_SVG = ImageLoader("images/exportHydraulicControl.svg")
-EXPORT_HYDRAULICS_PNG = ImageLoader("images/exportHydraulics.png")
-EXPORT_HYDRAULICS_SVG = ImageLoader("images/exportHydraulics.svg")
-EXTERNAL_HX_PNG = ImageLoader("images/ExternalHx.png")
-EXTERNAL_HX_SVG = ImageLoader("images/ExternalHx.svg")
-GEAR_PNG = ImageLoader("images/gear.png")
-GEAR_SVG = ImageLoader("images/gear.svg")
-GENERIC_BLOCK_PNG = ImageLoader("images/GenericBlock.png")
-GENERIC_ITEM_PNG = ImageLoader("images/GenericItem.png")
-GROUND_SOURCE_HX_PNG = ImageLoader("images/GroundSourceHx.png")
-GROUND_SOURCE_HX_SVG = ImageLoader("images/GroundSourceHx.svg")
-HP_PNG = ImageLoader("images/HP.png")
-HP_SVG = ImageLoader("images/HP.svg")
-HP_DOUBLE_DUAL_PNG = ImageLoader("images/HPDoubleDual.png")
-HP_DOUBLE_DUAL_SVG = ImageLoader("images/HPDoubleDual.svg")
-HP_TWO_HX_PNG = ImageLoader("images/HPTwoHx.png")
-HP_TWO_HX_SVG = ImageLoader("images/HPTwoHx.svg")
-ICE_STORAGE_PNG = ImageLoader("images/IceStorage.png")
-ICE_STORAGE_SVG = ImageLoader("images/IceStorage.svg")
-ICE_STORAGE_TWO_HX_PNG = ImageLoader("images/IceStorageTwoHx.png")
-ICE_STORAGE_TWO_HX_SVG = ImageLoader("images/IceStorageTwoHx.svg")
-INBOX_PNG = ImageLoader("images/inbox.png")
-LABEL_TOGGLE_PNG = ImageLoader("images/labelToggle.png")
-OUTBOX_PNG = ImageLoader("images/outbox.png")
-PIT_STORAGE_PNG = ImageLoader("images/PitStorage.png")
-PIT_STORAGE_SVG = ImageLoader("images/PitStorage.svg")
-PROCESS_SIMULATION_PNG = ImageLoader("images/processSimulation.png")
-PROCESS_SIMULATION_SVG = ImageLoader("images/processSimulation.svg")
-PUMP_PNG = ImageLoader("images/Pump.png")
-PUMP_SVG = ImageLoader("images/Pump.svg")
-PV_PNG = ImageLoader("images/PV.png")
-PV_SVG = ImageLoader("images/PV.svg")
-RADIATOR_PNG = ImageLoader("images/Radiator.png")
-RADIATOR_SVG = ImageLoader("images/Radiator.svg")
-ROTATE_LEFT_PNG = ImageLoader("images/rotate-left.png")
-ROTATE_TO_RIGHT_PNG = ImageLoader("images/rotate-to-right.png")
-RUN_MFS_PNG = ImageLoader("images/runMfs.png")
-RUN_MFS_SVG = ImageLoader("images/runMfs.svg")
-RUN_SIMULATION_PNG = ImageLoader("images/runSimulation.png")
-RUN_SIMULATION_SVG = ImageLoader("images/runSimulation.svg")
-STORAGE_TANK_PNG = ImageLoader("images/StorageTank.PNG")
-STORAGE_TANK_SVG = ImageLoader("images/StorageTank.svg")
-TEE_PIECE_PNG = ImageLoader("images/TeePiece.png")
-TEE_PIECE_SVG = ImageLoader("images/TeePiece.svg")
-TRASH_PNG = ImageLoader("images/trash.png")
-T_VENTIL_PNG = ImageLoader("images/TVentil.png")
-T_VENTIL_SVG = ImageLoader("images/TVentil.svg")
-UPDATE_CONFIG_PNG = ImageLoader("images/updateConfig.png")
-UPDATE_CONFIG_SVG = ImageLoader("images/updateConfig.svg")
-VIS_MFS_PNG = ImageLoader("images/visMfs.png")
-VIS_MFS_SVG = ImageLoader("images/visMfs.svg")
-W_TAP_PNG = ImageLoader("images/WTap.png")
-W_TAP_SVG = ImageLoader("images/WTap.svg")
-W_TAP_MAIN_PNG = ImageLoader("images/WTap_main.png")
-W_TAP_MAIN_SVG = ImageLoader("images/WTap_main.svg")
-ZOOM_0_PNG = ImageLoader("images/zoom-0.png")
-ZOOM_IN_PNG = ImageLoader("images/zoom-in.png")
-ZOOM_OUT_PNG = ImageLoader("images/zoom-out.png")
+AIR_SOURCE_HP_PNG = _ia.ImageAccessor.createForPackageResource("images/AirSourceHP.png")
+AIR_SOURCE_HP_SVG = _ia.ImageAccessor.createForPackageResource("images/AirSourceHP.svg")
+BOILER_PNG = _ia.ImageAccessor.createForPackageResource("images/Boiler.png")
+BOILER_SVG = _ia.ImageAccessor.createForPackageResource("images/Boiler.svg")
+BVI_PNG = _ia.ImageAccessor.createForPackageResource("images/Bvi.png")
+COLLECTOR_PNG = _ia.ImageAccessor.createForPackageResource("images/Collector.png")
+COLLECTOR_SVG = _ia.ImageAccessor.createForPackageResource("images/Collector.svg")
+CONNECTOR_PNG = _ia.ImageAccessor.createForPackageResource("images/Connector.png")
+CONNECTOR_SVG = _ia.ImageAccessor.createForPackageResource("images/Connector.svg")
+ELECTRIC_ROD_SVG = _ia.ImageAccessor.createForPackageResource("images/ElectricRod.svg")
+EXPORT_DCK_PNG = _ia.ImageAccessor.createForPackageResource("images/exportDck.png")
+EXPORT_DCK_SVG = _ia.ImageAccessor.createForPackageResource("images/exportDck.svg")
+EXPORT_HYDRAULIC_CONTROL_PNG = _ia.ImageAccessor.createForPackageResource("images/exportHydraulicControl.png")
+EXPORT_HYDRAULIC_CONTROL_SVG = _ia.ImageAccessor.createForPackageResource("images/exportHydraulicControl.svg")
+EXPORT_HYDRAULICS_PNG = _ia.ImageAccessor.createForPackageResource("images/exportHydraulics.png")
+EXPORT_HYDRAULICS_SVG = _ia.ImageAccessor.createForPackageResource("images/exportHydraulics.svg")
+EXTERNAL_HX_PNG = _ia.ImageAccessor.createForPackageResource("images/ExternalHx.png")
+EXTERNAL_HX_SVG = _ia.ImageAccessor.createForPackageResource("images/ExternalHx.svg")
+GEAR_PNG = _ia.ImageAccessor.createForPackageResource("images/gear.png")
+GEAR_SVG = _ia.ImageAccessor.createForPackageResource("images/gear.svg")
+GENERIC_BLOCK_PNG = _ia.ImageAccessor.createForPackageResource("images/GenericBlock.png")
+GENERIC_ITEM_PNG = _ia.ImageAccessor.createForPackageResource("images/GenericItem.png")
+GROUND_SOURCE_HX_PNG = _ia.ImageAccessor.createForPackageResource("images/GroundSourceHx.png")
+GROUND_SOURCE_HX_SVG = _ia.ImageAccessor.createForPackageResource("images/GroundSourceHx.svg")
+HP_PNG = _ia.ImageAccessor.createForPackageResource("images/HP.png")
+HP_SVG = _ia.ImageAccessor.createForPackageResource("images/HP.svg")
+HP_DOUBLE_DUAL_PNG = _ia.ImageAccessor.createForPackageResource("images/HPDoubleDual.png")
+HP_DOUBLE_DUAL_SVG = _ia.ImageAccessor.createForPackageResource("images/HPDoubleDual.svg")
+HP_TWO_HX_PNG = _ia.ImageAccessor.createForPackageResource("images/HPTwoHx.png")
+HP_TWO_HX_SVG = _ia.ImageAccessor.createForPackageResource("images/HPTwoHx.svg")
+ICE_STORAGE_PNG = _ia.ImageAccessor.createForPackageResource("images/IceStorage.png")
+ICE_STORAGE_SVG = _ia.ImageAccessor.createForPackageResource("images/IceStorage.svg")
+ICE_STORAGE_TWO_HX_PNG = _ia.ImageAccessor.createForPackageResource("images/IceStorageTwoHx.png")
+ICE_STORAGE_TWO_HX_SVG = _ia.ImageAccessor.createForPackageResource("images/IceStorageTwoHx.svg")
+INBOX_PNG = _ia.ImageAccessor.createForPackageResource("images/inbox.png")
+LABEL_TOGGLE_PNG = _ia.ImageAccessor.createForPackageResource("images/labelToggle.png")
+OUTBOX_PNG = _ia.ImageAccessor.createForPackageResource("images/outbox.png")
+PIT_STORAGE_PNG = _ia.ImageAccessor.createForPackageResource("images/PitStorage.png")
+PIT_STORAGE_SVG = _ia.ImageAccessor.createForPackageResource("images/PitStorage.svg")
+PROCESS_SIMULATION_PNG = _ia.ImageAccessor.createForPackageResource("images/processSimulation.png")
+PROCESS_SIMULATION_SVG = _ia.ImageAccessor.createForPackageResource("images/processSimulation.svg")
+PUMP_PNG = _ia.ImageAccessor.createForPackageResource("images/Pump.png")
+PUMP_SVG = _ia.ImageAccessor.createForPackageResource("images/Pump.svg")
+PV_PNG = _ia.ImageAccessor.createForPackageResource("images/PV.png")
+PV_SVG = _ia.ImageAccessor.createForPackageResource("images/PV.svg")
+RADIATOR_PNG = _ia.ImageAccessor.createForPackageResource("images/Radiator.png")
+RADIATOR_SVG = _ia.ImageAccessor.createForPackageResource("images/Radiator.svg")
+ROTATE_LEFT_PNG = _ia.ImageAccessor.createForPackageResource("images/rotate-left.png")
+ROTATE_TO_RIGHT_PNG = _ia.ImageAccessor.createForPackageResource("images/rotate-to-right.png")
+RUN_MFS_PNG = _ia.ImageAccessor.createForPackageResource("images/runMfs.png")
+RUN_MFS_SVG = _ia.ImageAccessor.createForPackageResource("images/runMfs.svg")
+RUN_SIMULATION_PNG = _ia.ImageAccessor.createForPackageResource("images/runSimulation.png")
+RUN_SIMULATION_SVG = _ia.ImageAccessor.createForPackageResource("images/runSimulation.svg")
+STORAGE_TANK_PNG = _ia.ImageAccessor.createForPackageResource("images/StorageTank.PNG")
+STORAGE_TANK_SVG = _ia.ImageAccessor.createForPackageResource("images/StorageTank.svg")
+TEE_PIECE_PNG = _ia.ImageAccessor.createForPackageResource("images/TeePiece.png")
+TEE_PIECE_SVG = _ia.ImageAccessor.createForPackageResource("images/TeePiece.svg")
+TRASH_PNG = _ia.ImageAccessor.createForPackageResource("images/trash.png")
+T_VENTIL_PNG = _ia.ImageAccessor.createForPackageResource("images/TVentil.png")
+T_VENTIL_SVG = _ia.ImageAccessor.createForPackageResource("images/TVentil.svg")
+UPDATE_CONFIG_PNG = _ia.ImageAccessor.createForPackageResource("images/updateConfig.png")
+UPDATE_CONFIG_SVG = _ia.ImageAccessor.createForPackageResource("images/updateConfig.svg")
+VIS_MFS_PNG = _ia.ImageAccessor.createForPackageResource("images/visMfs.png")
+VIS_MFS_SVG = _ia.ImageAccessor.createForPackageResource("images/visMfs.svg")
+W_TAP_PNG = _ia.ImageAccessor.createForPackageResource("images/WTap.png")
+W_TAP_SVG = _ia.ImageAccessor.createForPackageResource("images/WTap.svg")
+W_TAP_MAIN_PNG = _ia.ImageAccessor.createForPackageResource("images/WTap_main.png")
+W_TAP_MAIN_SVG = _ia.ImageAccessor.createForPackageResource("images/WTap_main.svg")
+ZOOM_0_PNG = _ia.ImageAccessor.createForPackageResource("images/zoom-0.png")
+ZOOM_IN_PNG = _ia.ImageAccessor.createForPackageResource("images/zoom-in.png")
+ZOOM_OUT_PNG = _ia.ImageAccessor.createForPackageResource("images/zoom-out.png")

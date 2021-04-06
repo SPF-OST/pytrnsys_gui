@@ -25,7 +25,7 @@ class WTap_main(BlockItem):
 
         self.changeSize()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.W_TAP_MAIN_SVG
 
     def changeSize(self):

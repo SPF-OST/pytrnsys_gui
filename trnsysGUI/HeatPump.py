@@ -32,7 +32,7 @@ class HeatPump(BlockItem):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.HP_SVG
 
     def changeSize(self):

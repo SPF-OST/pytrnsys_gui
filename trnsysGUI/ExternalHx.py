@@ -27,7 +27,7 @@ class ExternalHx(BlockItemFourPorts):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.EXTERNAL_HX_SVG
 
     def changeSize(self):

@@ -29,7 +29,7 @@ class WTap(BlockItem):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.W_TAP_SVG
 
     def changeSize(self):

@@ -28,7 +28,7 @@ class Boiler(BlockItem):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.BOILER_SVG
 
     def changeSize(self):

@@ -53,7 +53,7 @@ class StorageTank(BlockItem):
         self.changeSize()
         self.addTree()
 
-    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.STORAGE_TANK_SVG
 
     # Setter functions
