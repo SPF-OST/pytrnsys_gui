@@ -1,18 +1,17 @@
 import os
 import shutil
 from pathlib import Path
+import typing as _tp
 
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QImage, QIcon
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeView
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-
-# from trnsysGUI.newPortDlg import newPortDlg
 
 
 class GenericBlock(BlockItem):
@@ -40,12 +39,13 @@ class GenericBlock(BlockItem):
         self.changeSize()
         self.addTree()
 
+    def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
+        return _img.GENERIC_ITEM_PNG
+
     def changeSize(self):
-        # self.logger.debug("passing through c change size")
         w = self.w
         h = self.h
         delta = 4
-        deltaH = self.h / 10
 
         """ Resize block function """
 
@@ -62,63 +62,8 @@ class GenericBlock(BlockItem):
 
         self.outputs[0].setPos(2 * delta + w, h - 2 * delta)
         self.inputs[0].setPos(2 * delta + w, 2 * delta)
-        # self.inputs[0].side = 2 - 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
 
-        self.updatePortPos()
         return w, h
-
-    def updatePortPos(self):
-        delta = 4
-        deltaH = self.h / 10
-        w = self.w
-        h = self.h
-
-        # Update port positions:
-        # self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-        #                        h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        # self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-        #                       h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
-        # self.inputs[0].side = 2 - 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
-
-        # Number of pairs on each side, starting left, clockwise
-        pairNbs = [0, 0, 0, 0]
-        for s in range(4):
-            pairNbs[s] = self.getPairNb(s)
-
-        portNb = [0, 0, 0, 0]
-        for i in self.inputs:
-            # This could be necessary if one were able to add ports when block not flipped/rotated
-            # if i.initSide == 0:
-            # Below, i.side == initside
-
-            # if i.side == 0:
-            #     distBetweenPorts = (self.h - 4*delta) / (2 * self.getPairNb(0) - 1)
-            #     self.logger.debug("distance betw ports " + str(distBetweenPorts))
-            #     i.setPos(- 2*delta + 4 * self.flippedH * delta + self.flippedH * w,
-            #               2*delta + distBetweenPorts * portNb[0])
-            #     i.side = 0 + 2 * self.flippedH
-            #     portNb[0] += 1
-            #
-            #     self.outputs[self.inputs.index(i)].setPos(- 2*delta + 4 * self.flippedH * delta + self.flippedH * w,
-            #                2*delta + distBetweenPorts * portNb[0])
-            #     self.outputs[self.inputs.index(i)].side = 0 + 2 * self.flippedH
-            #     portNb[0] += 1
-            #
-            # if i.side == 1:
-            #     distBetweenPorts = (self.w - 4 * delta) / (2 * self.getPairNb(1) - 1)
-            #     self.logger.debug("distance betw ports " + str(distBetweenPorts))
-            #     i.setPos(2 * delta + distBetweenPorts * portNb[1],
-            #              - 2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
-            #     i.side = 1 + 2 * self.flippedV
-            #     portNb[1] += 1
-            #
-            #     self.outputs[self.inputs.index(i)].setPos(2 * delta + distBetweenPorts * portNb[1],
-            #              - 2 * delta + 4 * self.flippedV * delta + self.flippedV * h)
-            #     self.outputs[self.inputs.index(i)].side = 1 + 2 * self.flippedV
-            #     portNb[1] += 1
-            pass
 
     def getPairNb(self, side):
         res = 0
@@ -130,8 +75,6 @@ class GenericBlock(BlockItem):
         return res
 
     def addPortDlg(self):
-        # newPortDlg(self, self.parent.parent())
-        # dlg = GenericPortPairDlg(self, self.parent.parent())
         self.parent.parent().showGenericPortPairDlg(self)
 
     def addPort(self, io, relH):
@@ -140,7 +83,7 @@ class GenericBlock(BlockItem):
 
     def setImage(self, name):
         self.logger.debug("Setting image with name" + name)
-        self.image = QImage(name)
+        self.image = _img.ImageLoader(name).image()
         self.pixmap = QPixmap(self.image)
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
@@ -161,32 +104,25 @@ class GenericBlock(BlockItem):
     def contextMenuEvent(self, event):
         menu = QMenu()
 
-        lNtp = QIcon("images/Notebook.png")
-        a1 = menu.addAction(lNtp, "Launch NotePad++")
+        a1 = menu.addAction("Launch NotePad++")
         a1.triggered.connect(self.launchNotepadFile)
 
-        rr = QIcon("images/rotate-to-right.png")
+        rr = _img.ROTATE_TO_RIGHT_PNG.icon()
         a2 = menu.addAction(rr, "Rotate Block clockwise")
         a2.triggered.connect(self.rotateBlockCW)
 
-        ll = QIcon("images/rotate-left.png")
+        ll = _img.ROTATE_LEFT_PNG.icon()
         a3 = menu.addAction(ll, "Rotate Block counter-clockwise")
         a3.triggered.connect(self.rotateBlockCCW)
 
-        rRot = QIcon("images/move-left.png")
-        a4 = menu.addAction(rRot, "Reset Rotation")
+        a4 = menu.addAction("Reset Rotation")
         a4.triggered.connect(self.resetRotation)
 
         b1 = menu.addAction("Print Rotation")
         b1.triggered.connect(self.printRotation)
 
-        dB = QIcon("images/close.png")
-        c1 = menu.addAction(dB, "Delete this Block")
+        c1 = menu.addAction("Delete this Block")
         c1.triggered.connect(self.deleteBlock)
-
-        # sG = QIcon('')
-        # c2 = menu.addAction("Set group")
-        # c2.triggered.connect(self.configGroup)
 
         c3 = menu.addAction("Set image")
         c3.triggered.connect(self.changeImage)
@@ -194,12 +130,6 @@ class GenericBlock(BlockItem):
         if not self.isSet:
             c4 = menu.addAction("Add port")
             c4.triggered.connect(self.addPortDlg)
-
-        # d1 = menu.addAction('Dump information')
-        # d1.triggered.connect(self.dumpBlockInfo)
-        #
-        # e1 = menu.addAction('Inspect')
-        # e1.triggered.connect(self.inspectBlock)
 
         menu.exec_(event.screenPos())
 
@@ -320,27 +250,16 @@ class GenericBlock(BlockItem):
         self.pixmap = QPixmap(self.image.mirrored(bool(state), self.flippedV))
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedH = bool(state)
-        self.updatePortPos()
 
     def updateFlipStateV(self, state):
         self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
         self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
-        self.updatePortPos()
-
-    # def exportBlackBox(self):
-    #     resStr = ""
-    #     for i in range(len(self.inputs)):
-    #         resStr += "T" + self.displayName + "X" + str(i) + "=1 \n"
-    #     eqNb = len(self.inputs)
-    #     return resStr, eqNb
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         equationNr = 0
         f = ""
         for i in range(len(self.inputs)):
-            temp = ""
             c = self.inputs[i].connectionList[0]
             if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
                 continue
@@ -349,7 +268,7 @@ class GenericBlock(BlockItem):
             else:
                 temp = (
                     str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                )  # + str(t.childIds[0])
+                )
                 temp += " " * (descConnLength - len(temp))
 
                 # Generic block will have a 2n-liner exportConnString
@@ -412,14 +331,10 @@ class GenericBlock(BlockItem):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
+
         self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
@@ -437,16 +352,6 @@ class GenericBlock(BlockItem):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
 
     def updateTreePath(self, path):
         """
@@ -467,10 +372,8 @@ class GenericBlock(BlockItem):
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
@@ -492,7 +395,6 @@ class GenericBlock(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\Generic_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
