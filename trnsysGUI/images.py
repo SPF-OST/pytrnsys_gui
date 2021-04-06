@@ -1,13 +1,19 @@
 import pkgutil as _pu
+import logging as _log
+
 import PyQt5.QtGui as _qtg
+
+_logger = _log.getLogger("root")
 
 
 class ImageLoader:
-    def __init__(self, relativeFilePath: str) -> None:
+    def __init__(self, relativeFilePath: str, logger: _log.Logger = _logger) -> None:
         self.relativeFilePath = relativeFilePath
 
         parts = relativeFilePath.split(".")
         self.fileExtension = parts[-1].lower() if parts else None
+
+        self._logger = logger
 
     def bitmap(self) -> _qtg.QBitmap:
         imageBytes = self._loadBytes()
@@ -28,7 +34,18 @@ class ImageLoader:
         return bitmap.toImage()
 
     def _loadBytes(self) -> bytes:
-        imageBytes = _pu.get_data("trnsysGUI", self.relativeFilePath)
+        try:
+            imageBytes = _pu.get_data("trnsysGUI", self.relativeFilePath)
+            if not imageBytes:
+                raise AssertionError("Image data is empty.")
+        except Exception as e:
+            self._logger.exception(
+                "An exception occurred loading image data for '%s'.",
+                self.relativeFilePath,
+                exc_info=True,
+                stack_info=True,
+            )
+            raise e
         return imageBytes
 
 
