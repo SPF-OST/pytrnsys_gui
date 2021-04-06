@@ -106,7 +106,23 @@ class BlockItem(QGraphicsPixmapItem):
         self.oldPos = None
 
     def _getImageLoader(self) -> _tp.Optional[_img.ImageLoader]:
-        raise AssertionError("BlockItems should not be instantiated directly: use its child classes.")
+        currentClassName = BlockItem.__name__
+        currentMethodName = f"{currentClassName}.{BlockItem._getImageLoader.__name__}"
+
+        message = (
+            f"{currentMethodName} has been called. However, this method should not be called directly but must\n"
+            f"implemented in a child class. This means that a) someone instantiated `{currentClassName}` directly\n"
+            f"or b) a child class of it doesn't implement `{currentMethodName}`. Either way that's an\n"
+            f"unrecoverable error and therefore the program will be terminated now. Please do get in touch with\n"
+            f"the developers if you've encountered this error. Thanks."
+        )
+
+        exception = AssertionError(message)
+
+        # I've seen exception messages mysteriously swallowed that's why we're logging the message here, too.
+        self.logger.error(message, exc_info=exception, stack_info=True)
+
+        raise exception
 
     # Setter functions
     def setParent(self, p):
@@ -138,7 +154,12 @@ class BlockItem(QGraphicsPixmapItem):
         """
         # self.logger.debug("In setBlockToGroup")
         if newGroupName == self.groupName:
-            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
+            self.logger.debug(
+                "Block "
+                + str(self)
+                + str(self.displayName)
+                + "is already in this group"
+            )
             return
         else:
             # self.logger.debug("groups is " + str(self.parent.parent().groupList))
@@ -238,8 +259,12 @@ class BlockItem(QGraphicsPixmapItem):
         self.label.setPos(lx, h)
 
         if self.name == "Bvi":
-            self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3)
-            self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
+            self.inputs[0].setPos(
+                -2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3
+            )
+            self.outputs[0].setPos(
+                -2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3
+            )
             self.inputs[0].side = 0 + 2 * self.flippedH
             self.outputs[0].side = 0 + 2 * self.flippedH
 
@@ -257,18 +282,28 @@ class BlockItem(QGraphicsPixmapItem):
         if self.flippedH:
             for i in range(0, len(self.inputs)):
                 distanceToMirrorAxis = self.w / 2.0 - self.origInputsPos[i][0]
-                self.inputs[i].setPos(self.origInputsPos[i][0] + 2.0 * distanceToMirrorAxis, self.inputs[i].pos().y())
+                self.inputs[i].setPos(
+                    self.origInputsPos[i][0] + 2.0 * distanceToMirrorAxis,
+                    self.inputs[i].pos().y(),
+                )
 
             for i in range(0, len(self.outputs)):
                 distanceToMirrorAxis = self.w / 2.0 - self.origOutputsPos[i][0]
-                self.outputs[i].setPos(self.origOutputsPos[i][0] + 2.0 * distanceToMirrorAxis, self.outputs[i].pos().y())
+                self.outputs[i].setPos(
+                    self.origOutputsPos[i][0] + 2.0 * distanceToMirrorAxis,
+                    self.outputs[i].pos().y(),
+                )
 
         else:
             for i in range(0, len(self.inputs)):
-                self.inputs[i].setPos(self.origInputsPos[i][0], self.inputs[i].pos().y())
+                self.inputs[i].setPos(
+                    self.origInputsPos[i][0], self.inputs[i].pos().y()
+                )
 
             for i in range(0, len(self.outputs)):
-                self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
+                self.outputs[i].setPos(
+                    self.origOutputsPos[i][0], self.outputs[i].pos().y()
+                )
 
     def updateFlipStateV(self, state):
         self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
@@ -282,18 +317,28 @@ class BlockItem(QGraphicsPixmapItem):
         if self.flippedV:
             for i in range(0, len(self.inputs)):
                 distanceToMirrorAxis = self.h / 2.0 - self.origInputsPos[i][1]
-                self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1] + 2.0 * distanceToMirrorAxis)
+                self.inputs[i].setPos(
+                    self.inputs[i].pos().x(),
+                    self.origInputsPos[i][1] + 2.0 * distanceToMirrorAxis,
+                )
 
             for i in range(0, len(self.outputs)):
                 distanceToMirrorAxis = self.h / 2.0 - self.origOutputsPos[i][1]
-                self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1] + 2.0 * distanceToMirrorAxis)
+                self.outputs[i].setPos(
+                    self.outputs[i].pos().x(),
+                    self.origOutputsPos[i][1] + 2.0 * distanceToMirrorAxis,
+                )
 
         else:
             for i in range(0, len(self.inputs)):
-                self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1])
+                self.inputs[i].setPos(
+                    self.inputs[i].pos().x(), self.origInputsPos[i][1]
+                )
 
             for i in range(0, len(self.outputs)):
-                self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1])
+                self.outputs[i].setPos(
+                    self.outputs[i].pos().x(), self.origOutputsPos[i][1]
+                )
 
     def updateSide(self, port, n):
         port.side = (port.side + n) % 4
@@ -373,14 +418,18 @@ class BlockItem(QGraphicsPixmapItem):
                 p.connectionList[0].deleteConn()
 
     def deleteBlock(self):
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.logger.debug(
+            "Block " + str(self) + " is deleting itself (" + self.displayName + ")"
+        )
         self.deleteConns()
         # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
+        widgetToRemove = self.parent.parent().findChild(
+            QTreeView, self.displayName + "Tree"
+        )
         try:
             widgetToRemove.hide()
         except AttributeError:
@@ -522,7 +571,9 @@ class BlockItem(QGraphicsPixmapItem):
                 snapSize = self.parent.parent().snapSize
                 self.logger.debug("itemchange")
                 self.logger.debug(type(value))
-                value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
+                value = QPointF(
+                    value.x() - value.x() % snapSize, value.y() - value.y() % snapSize
+                )
                 return value
             else:
                 # if self.hasElementsInYBand() and not self.elementInY() and not self.aligned:
@@ -544,7 +595,10 @@ class BlockItem(QGraphicsPixmapItem):
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
                     self.parent.parent().alignYLineItem.setLine(
-                        self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
+                        self.pos().x() + self.w / 2,
+                        t.pos().y(),
+                        t.pos().x() + t.w / 2,
+                        t.pos().y(),
                     )
 
                     self.parent.parent().alignYLineItem.setVisible(True)
@@ -569,7 +623,10 @@ class BlockItem(QGraphicsPixmapItem):
                 if self.elementInXBand(t):
                     value = QPointF(t.pos().x(), self.pos().y())
                     self.parent.parent().alignXLineItem.setLine(
-                        t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
+                        t.pos().x(),
+                        t.pos().y() + self.w / 2,
+                        t.pos().x(),
+                        self.pos().y() + t.w / 2,
                     )
 
                     self.parent.parent().alignXLineItem.setVisible(True)
@@ -615,11 +672,15 @@ class BlockItem(QGraphicsPixmapItem):
 
     def elementInYBand(self, t):
         eps = 50
-        return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+        return (
+            self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+        )
 
     def elementInXBand(self, t):
         eps = 50
-        return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
+        return (
+            self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
+        )
 
     def elementInY(self):
         for t in self.parent.parent().trnsysObj:
@@ -674,7 +735,9 @@ class BlockItem(QGraphicsPixmapItem):
 
         self.logger.debug(len(self.inputs))
 
-        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
+        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(
+            i["PortsIDOut"]
+        ):
             temp = i["PortsIDIn"]
             i["PortsIDIn"] = i["PortsIDOut"]
             i["PortsIDOut"] = temp
@@ -688,7 +751,10 @@ class BlockItem(QGraphicsPixmapItem):
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.setPos(float(i["BlockPosition"][0] + offset_x), float(i["BlockPosition"][1] + offset_y))
+        self.setPos(
+            float(i["BlockPosition"][0] + offset_x),
+            float(i["BlockPosition"][1] + offset_y),
+        )
 
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
@@ -708,9 +774,15 @@ class BlockItem(QGraphicsPixmapItem):
         for i in self.inputs:
             # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                if (
+                    hasattr(c.fromPort.parent, "heatExchangers")
+                    and i.connectionList.index(c) == 0
+                ):
                     continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                elif (
+                    hasattr(c.toPort.parent, "heatExchangers")
+                    and i.connectionList.index(c) == 0
+                ):
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
@@ -719,9 +791,15 @@ class BlockItem(QGraphicsPixmapItem):
         for o in self.outputs:
             # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if type(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                if (
+                    type(c.fromPort.parent, "heatExchangers")
+                    and o.connectionList.index(c) == 0
+                ):
                     continue
-                elif type(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                elif (
+                    type(c.toPort.parent, "heatExchangers")
+                    and o.connectionList.index(c) == 0
+                ):
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
@@ -756,7 +834,11 @@ class BlockItem(QGraphicsPixmapItem):
                 infile = open(file, "r")
                 lines += infile.readlines()
             for i in range(len(lines)):
-                if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
+                if (
+                    "output" in lines[i].lower()
+                    and "to" in lines[i].lower()
+                    and "hydraulic" in lines[i].lower()
+                ):
                     for j in range(i, len(lines) - i):
                         if lines[j][0] == "T":
                             outputT = lines[j].split("=")[0].replace(" ", "")
@@ -790,9 +872,15 @@ class BlockItem(QGraphicsPixmapItem):
         for i in self.inputs:
             # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                if (
+                    hasattr(c.fromPort.parent, "heatExchangers")
+                    and i.connectionList.index(c) == 0
+                ):
                     continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
+                elif (
+                    hasattr(c.toPort.parent, "heatExchangers")
+                    and i.connectionList.index(c) == 0
+                ):
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
@@ -801,9 +889,15 @@ class BlockItem(QGraphicsPixmapItem):
         for o in self.outputs:
             # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                if (
+                    hasattr(c.fromPort.parent, "heatExchangers")
+                    and o.connectionList.index(c) == 0
+                ):
                     continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
+                elif (
+                    hasattr(c.toPort.parent, "heatExchangers")
+                    and o.connectionList.index(c) == 0
+                ):
                     continue
                 else:
                     temp = temp + str(c.trnsysId) + " "
