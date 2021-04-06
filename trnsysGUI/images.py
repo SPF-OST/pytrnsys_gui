@@ -3,10 +3,10 @@ import PyQt5.QtGui as _qtg
 
 
 class ImageLoader:
-    def __init__(self, fileName: str) -> None:
-        self.fileName = fileName
+    def __init__(self, relativeFilePath: str) -> None:
+        self.relativeFilePath = relativeFilePath
 
-        parts = fileName.split(".")
+        parts = relativeFilePath.split(".")
         self.fileExtension = parts[-1].lower() if parts else None
 
     def bitmap(self) -> _qtg.QBitmap:
@@ -28,7 +28,7 @@ class ImageLoader:
         return bitmap.toImage()
 
     def _loadBytes(self) -> bytes:
-        imageBytes = _pu.get_data("trnsysGUI", self.fileName)
+        imageBytes = _pu.get_data("trnsysGUI", self.relativeFilePath)
         return imageBytes
 
 
