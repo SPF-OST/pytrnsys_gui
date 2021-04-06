@@ -1,5 +1,6 @@
 import pkgutil as _pu
 import logging as _log
+import typing as _tp
 
 import PyQt5.QtGui as _qtg
 
@@ -15,23 +16,25 @@ class ImageLoader:
 
         self._logger = logger
 
-    def pixmap(self) -> _qtg.QPixmap:
-        imageBytes = self._loadBytes()
+    def pixmap(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QPixmap:
+        image = self.image(width=width, height=height)
 
-        pixmap = _qtg.QPixmap()
-        pixmap.loadFromData(imageBytes)
-
-        return pixmap
+        return _qtg.QPixmap(image)
 
     def icon(self) -> _qtg.QIcon:
-        bitmap = self.pixmap()
+        pixmap = self.pixmap()
 
-        return _qtg.QIcon(bitmap)
+        return _qtg.QIcon(pixmap)
 
-    def image(self) -> _qtg.QImage:
-        bitmap = self.pixmap()
+    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
+        imageBytes = self._loadBytes()
 
-        return bitmap.toImage()
+        image = _qtg.QImage(imageBytes)
+
+        width = width if width else image.width()
+        height = height if height else image.height()
+
+        return image.scaled(width, height)
 
     def _loadBytes(self) -> bytes:
         try:
