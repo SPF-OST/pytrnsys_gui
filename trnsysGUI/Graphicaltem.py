@@ -8,38 +8,27 @@ import trnsysGUI.images as _img
 
 
 class GraphicalItem(QGraphicsPixmapItem):
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, **_):
 
         super(GraphicalItem, self).__init__(None)
-        self.w = 100.0
-        self.h = 100.0
+        self.w = 100
+        self.h = 100
         self.parent = parent
         self.resizeMode = False
         self.id = self.parent.parent().idGen.getID()
-
-        # self.trnsysId = self.parent.parent().idGen.getTrnsysID()
-        # if "loadedBlock" not in kwargs:
-        #     self.parent.parent().trnsysObj.append(self)
 
         self.flippedH = False
         self.flippedV = False
         self.rotationN = 0
         # Initial icon
-        self.imageSource = "images/gear.svg"
-        self.image = _img.ImageLoader(self.imageSource).bitmap().scaled(self.w, self.h).toImage()
-        self.setPixmap(self.image)
+        self.imageSource = _img.GEAR_SVG.relativeFilePath
+        pixmap = _img.GEAR_SVG.pixmap(width=self.w, height=self.h)
+        self.setPixmap(pixmap)
 
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
         self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
-        # self.resizer = ResizerItem(self)
-
-        # if kwargs == {}:
-        #     self.parent.parent().graphicalObj.append(self)
-        # else:
-        #     if "loadedGI" in kwargs:
-        #         pass
         self.parent.parent().graphicalObj.append(self)
 
     def setItemSize(self, w, h):
@@ -68,13 +57,8 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.imageSource = s
 
     def updateImage(self):
-        if self.imageSource[-3:] == "svg":
-            self.image = _img.ImageLoader(self.imageSource).bitmap().scaled(self.w, self.h).toImage()
-            self.setPixmap(self.image)
-
-        elif self.imageSource[-3:] == "png":
-            self.image = _img.ImageLoader(self.imageSource).image()
-            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+        pixmap = _img.ImageLoader(self.imageSource).pixmap(width=self.w, height=self.h)
+        self.setPixmap(pixmap)
 
     def encode(self):
         dct = {}
