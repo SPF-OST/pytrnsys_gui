@@ -148,9 +148,11 @@ class ImageAccessor:
 
         imageBytes = self._loadBytes()
         image = _qtg.QImage.fromData(imageBytes)
-        size = self._getSize(image.size(), width=width, height=height)
 
-        return image.scaled(size)
+        size = self._getSize(image.size(), width=width, height=height)
+        scaledImage = image.scaled(size)
+
+        return scaledImage
 
     def _svgImage(self, *, width: int, height: int) -> _qtg.QImage:
         imageBytes = self._loadBytes()
