@@ -1,12 +1,10 @@
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtWidgets import QGraphicsTextItem
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
 
 
 class TVentil(BlockItem):
