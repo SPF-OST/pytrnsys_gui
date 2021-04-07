@@ -79,7 +79,7 @@ class GenericBlock(BlockItem):
         self.logger.debug(relH)
 
     def setImage(self):
-        pixmap = self._imageAccessor.pixmap(width=self.w, height=self.h)
+        pixmap = self._getPixmap()
         self.setPixmap(pixmap)
 
     def changeImage(self):

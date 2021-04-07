@@ -503,8 +503,7 @@ class StorageTank(BlockItem):
         return w, h
 
     def updateImage(self):
-        self.pixmap = self.pixmap.scaled(self.w, self.h)
-        self.setPixmap(self.pixmap)
+        super().updateImage()
         self.label.setPos(self.label.pos().x(), self.h)
 
     def updatePortPositions(self, h):
