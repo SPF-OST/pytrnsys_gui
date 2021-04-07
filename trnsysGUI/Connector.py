@@ -18,8 +18,6 @@ class Connector(BlockItem):
         self.inputs.append(PortItem("i", 0, self))
         self.outputs.append(PortItem("o", 2, self))
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         if "storagePorts" in kwargs:
             self.storagePorts = kwargs["storagePorts"]
         self.changeSize()

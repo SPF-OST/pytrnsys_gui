@@ -21,9 +21,6 @@ class WTap(BlockItem):
         self.inputs.append(PortItem("i", 0, self))
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.typeNumber = 5
 
         self.changeSize()

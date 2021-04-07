@@ -21,9 +21,6 @@ class TeePiece(BlockItem):
         self.inputs.append(PortItem("i", 2, self))
         self.outputs.append(PortItem("o", 1, self))
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
 
         # self.addTree()

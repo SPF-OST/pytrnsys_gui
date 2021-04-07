@@ -27,9 +27,6 @@ class HPDoubleDual(BlockItem):
         self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         # For restoring correct order of trnsysObj list
         self.childIds = []
         self.childIds.append(self.trnsysId)

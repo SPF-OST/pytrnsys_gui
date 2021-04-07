@@ -20,9 +20,6 @@ class IceStorageTwoHx(BlockItemFourPorts):
 
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.addTree()
         self.changeSize()
 

@@ -23,9 +23,6 @@ class GroundSourceHx(BlockItem):
         self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
         self.addTree()
 

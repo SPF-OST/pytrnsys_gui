@@ -21,9 +21,6 @@ class BlockItemFourPorts(BlockItem):
         self.outputs.append(PortItem("o", 0, self))
         self.outputs.append(PortItem("o", 2, self))
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())

@@ -27,13 +27,6 @@ class TVentil(BlockItem):
         self.inputs.append(PortItem("o", 1, self))
         self.outputs.append(PortItem("i", 2, self))
 
-        my_transform = QTransform()
-        my_transform.scale(1, -1)
-        self.image = self.image.transformed(my_transform)
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:

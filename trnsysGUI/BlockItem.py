@@ -73,9 +73,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedHInt = -1
         self.flippedVInt = -1
 
-        self.image = self._getImageAccessor().image()
-        self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-        self.pixmap = QPixmap(self.image)
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
 
         # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
@@ -271,13 +270,12 @@ class BlockItem(QGraphicsPixmapItem):
         return w, h
 
     def updateFlipStateH(self, state):
-        self.pixmap = QPixmap(self.image.mirrored(bool(state), self.flippedV))
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedH = bool(state)
-        if state == False:
-            self.flippedHInt = -1
-        else:
-            self.flippedHInt = 1
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
+        self.flippedHInt = 1 if self.flippedH else -1
 
         if self.flippedH:
             for i in range(0, len(self.inputs)):
@@ -306,13 +304,12 @@ class BlockItem(QGraphicsPixmapItem):
                 )
 
     def updateFlipStateV(self, state):
-        self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
-        if state == False:
-            self.flippedVInt = -1
-        else:
-            self.flippedVInt = 1
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
+        self.flippedVInt = 1 if self.flippedV else -1
 
         if self.flippedV:
             for i in range(0, len(self.inputs)):
@@ -505,12 +502,25 @@ class BlockItem(QGraphicsPixmapItem):
 
     def updateImage(self):
         self.logger.debug("Inside block item update image")
-        imageLoader = self._getImageAccessor()
-        if imageLoader.getFileExtension() == "svg":
-            self.setPixmap(imageLoader.pixmap(width=self.w, height=self.h))
-            self.pixmap = QPixmap(self.image)
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
+        if self.flippedH:
             self.updateFlipStateH(self.flippedH)
+
+        if self.flippedV:
             self.updateFlipStateV(self.flippedV)
+
+    def _getPixmap(self) -> QPixmap:
+        imageAccessor = self._getImageAccessor()
+
+        image = imageAccessor.image(width=self.w, height=self.h).mirrored(
+            horizontal=self.flippedH, vertical=self.flippedV
+        )
+        pixmap = QPixmap(image)
+
+        return pixmap
 
     def deleteResizer(self):
         try:

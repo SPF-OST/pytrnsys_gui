@@ -21,9 +21,6 @@ class ExternalHx(BlockItemFourPorts):
         self.w = 80
         self.h = 120
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
         self.addTree()
 

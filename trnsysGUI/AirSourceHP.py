@@ -22,9 +22,6 @@ class AirSourceHP(BlockItem):
         self.path = ""
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h), Qt.IgnoreAspectRatio))
-
         self.changeSize()
         self.addTree()
 

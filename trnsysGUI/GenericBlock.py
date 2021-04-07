@@ -79,7 +79,8 @@ class GenericBlock(BlockItem):
         self.logger.debug(relH)
 
     def setImage(self):
-        self.setPixmap(self._imageAccessor.pixmap(width=self.w, height=self.h))
+        pixmap = self._imageAccessor.pixmap(width=self.w, height=self.h)
+        self.setPixmap(pixmap)
 
     def changeImage(self):
         name = str(self.pickImage().resolve())
@@ -243,14 +244,16 @@ class GenericBlock(BlockItem):
         self.outputs.remove(self.outputs[n])
 
     def updateFlipStateH(self, state):
-        self.pixmap = QPixmap(self.image.mirrored(bool(state), self.flippedV))
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedH = bool(state)
 
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
     def updateFlipStateV(self, state):
-        self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
 
     def exportParametersFlowSolver(self, descConnLength):
         equationNr = 0
