@@ -18,6 +18,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    package_data={"trnsysGUI": ["images/*.png", "images/*.svg"]},
     install_requires=["pytrnsys", "PyQT5", "matplotlib", "numpy", "pandas", "bokeh"],
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",
