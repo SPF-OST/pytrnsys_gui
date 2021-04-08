@@ -124,7 +124,8 @@ class ImageAccessor:
             path = resourcePath[len(_FileDataLoader.PATH_PREFIX):]
             return _FileDataLoader(_pl.Path(path), logger)
 
-        raise AssertionError(f"Could not determine resource type for path '{resourcePath}'")
+        logger.warning("Found legacy resource path %s: assuming it's a package resource.", resourcePath)
+        return _PackageResourceDataLoader(resourcePath, logger)
 
     def getResourcePath(self) -> str:
         return self._dataLoader.getResourcePath()
