@@ -6,6 +6,8 @@
 #
 -e file:.#egg=pytrnsys-gui
     # via -r requirements\ci\test\requirements.in
+appdirs==1.4.4
+    # via pytrnsys-gui
 astroid==2.5.2
     # via pylint
 atomicwrites==1.4.0

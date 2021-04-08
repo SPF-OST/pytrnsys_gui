@@ -18,7 +18,15 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["pytrnsys", "PyQT5", "matplotlib", "numpy", "pandas", "bokeh"],
+    install_requires=[
+        "pytrnsys",
+        "PyQT5",
+        "matplotlib",
+        "numpy",
+        "pandas",
+        "bokeh",
+        "appdirs",
+    ],
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",
 )
