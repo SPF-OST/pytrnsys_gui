@@ -27,6 +27,7 @@ setuptools.setup(
         "numpy",
         "pandas",
         "bokeh",
+        "dataclasses_jsonschema",
         "appdirs",
     ],
     setup_requires=["setuptools-git-versioning"],
