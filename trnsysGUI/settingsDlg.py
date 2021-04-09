@@ -24,7 +24,7 @@ class SettingsDlg(_widgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        settings = _settings.Settings.tryLoadOrNone()
+        settings = self._getSettings()
         oldTrnsysPath = settings.trnsysBinaryDirPath if settings else ""
 
         label = _widgets.QLabel("Trnsys Path:")
@@ -37,13 +37,16 @@ class SettingsDlg(_widgets.QDialog):
 
         layout = _widgets.QHBoxLayout()
         layout.addWidget(label)
+        layout.addWidget(self.lineEdit)
         layout.addWidget(setButton)
 
-        okButton = _widgets.QPushButton("Done")
-        okButton.setFixedWidth(50)
-        okButton.clicked.connect(self._onOkButtonClicked)
+        self._okButton = _widgets.QPushButton("Done")
+        self._okButton.setFixedWidth(50)
+        self._okButton.clicked.connect(self._onOkButtonClicked)
+        canOk = bool(settings)
+        self._okButton.setEnabled(canOk)
         buttonLayout = _widgets.QHBoxLayout()
-        buttonLayout.addWidget(okButton, alignment=_qtc.Qt.AlignCenter)
+        buttonLayout.addWidget(self._okButton, alignment=_qtc.Qt.AlignCenter)
 
         overallLayout = _widgets.QVBoxLayout()
         overallLayout.addLayout(layout)
@@ -61,25 +64,25 @@ class SettingsDlg(_widgets.QDialog):
         dialog.exec()
         return dialog._settings
 
+    @staticmethod
+    def _getSettings() -> _tp.Optional[_settings.Settings]:
+        return _settings.Settings.tryLoadOrNone()
+
     def _onSetButtonClicked(self) -> None:
         newTrnsysPath = str(_widgets.QFileDialog.getExistingDirectory(self, "Select Trnsys Path"))
         self.lineEdit.setText(newTrnsysPath)
 
+        canOk = True if self._getSettings() or newTrnsysPath else False
+        self._okButton.setEnabled(canOk)
+
     def _onOkButtonClicked(self) -> None:
-        settings = _settings.Settings.tryLoadOrNone()
+        newTrnsysPath = self.lineEdit.text()
 
-        newTrnsysPath = _pl.Path(self.lineEdit.text())
-
-        if not settings and not newTrnsysPath:
-            msgBox = _widgets.QMessageBox()
-            msgBox.setText("Please set Trnsys path!")
-            msgBox.exec()
-            return
-
+        settings = self._getSettings()
         if settings:
             settings.trnsysBinaryDirPath = newTrnsysPath
         else:
-            settings = _settings.Settings.create(newTrnsysPath)
+            settings = _settings.Settings.create(_pl.Path(newTrnsysPath))
 
         self._settings = settings
 
