@@ -15,8 +15,6 @@ class MasterControl(BlockItem):
         self.w = 100
         self.h = 100
         self.loadedFiles = []
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         self.parent.parent().controlExists += 1
         self.createControlDir()

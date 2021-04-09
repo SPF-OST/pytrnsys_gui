@@ -67,6 +67,7 @@ from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
+import trnsysGUI.images as _img
 
 
 class Editor(QWidget):
@@ -214,40 +215,34 @@ class Editor(QWidget):
         self.libraryBrowserView.setResizeMode(QListView.Adjust)
         self.libraryModel.setColumnCount(0)
 
-        self.libItems = []
-
-        # Resource folder for library icons
-        r_folder = "images/"
-        componentsList = [
-            "Connector",
-            "TeePiece",
-            "TVentil",
-            "WTap_main",
-            "WTap",
-            "Pump",
-            "Collector",
-            "GroundSourceHx",
-            "PV",
-            "HP",
-            "HPTwoHx",
-            "HPDoubleDual",
-            "AirSourceHP",
-            "StorageTank",
-            "IceStorage",
-            "PitStorage",
-            "IceStorageTwoHx",
-            "ExternalHx",
-            "Radiator",
-            "Boiler",
-            "GenericBlock",
-            "GenericItem",
+        componentNamesWithIcon = [
+            ("Connector", _img.CONNECTOR_SVG.icon()),
+            ("TeePiece", _img.TEE_PIECE_SVG.icon()),
+            ("TVentil", _img.T_VENTIL_SVG.icon()),
+            ("WTap_main", _img.W_TAP_MAIN_SVG.icon()),
+            ("WTap", _img.W_TAP_SVG.icon()),
+            ("Pump", _img.PUMP_SVG.icon()),
+            ("Collector", _img.COLLECTOR_SVG.icon()),
+            ("GroundSourceHx", _img.GROUND_SOURCE_HX_SVG.icon()),
+            ("PV", _img.PV_SVG.icon()),
+            ("HP", _img.HP_SVG.icon()),
+            ("HPTwoHx", _img.HP_TWO_HX_SVG.icon()),
+            ("HPDoubleDual", _img.HP_DOUBLE_DUAL_SVG.icon()),
+            ("AirSourceHP", _img.AIR_SOURCE_HP_SVG.icon()),
+            ("StorageTank", _img.STORAGE_TANK_SVG.icon()),
+            ("IceStorage", _img.ICE_STORAGE_SVG.icon()),
+            ("PitStorage", _img.PIT_STORAGE_SVG.icon()),
+            ("IceStorageTwoHx", _img.ICE_STORAGE_TWO_HX_SVG.icon()),
+            ("ExternalHx", _img.EXTERNAL_HX_SVG.icon()),
+            ("Radiator", _img.RADIATOR_SVG.icon()),
+            ("Boiler", _img.BOILER_SVG.icon()),
+            ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
+            ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon())
         ]
-        for component in componentsList:
-            self.libItems.append(QtGui.QStandardItem(QIcon(r_folder + component), component))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'MasterControl')), 'MasterControl'))
-        # self.libItems.append(QtGui.QStandardItem(QIcon(QPixmap(r_folder + 'control')), 'Control'))
 
-        for i in self.libItems:
+        libItems = [QtGui.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
+
+        for i in libItems:
             self.libraryModel.appendRow(i)
 
         self.libraryBrowserView.setModel(self.libraryModel)
@@ -2013,7 +2008,7 @@ class Editor(QWidget):
         shutil.copy(self.emptyConfig, loadPath)
         self.HBox = QHBoxLayout()
         self.refreshButton = QPushButton(self)
-        self.refreshButton.setIcon(QIcon("images/rotate-to-right.png"))
+        self.refreshButton.setIcon(_img.ROTATE_TO_RIGHT_PNG)
         self.refreshButton.clicked.connect(self.refreshConfig)
         self.model = MyQFileSystemModel()
         self.model.setRootPath(loadPath)

@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
     QLabel,
@@ -7,21 +8,20 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QGridLayout,
     QTabWidget,
-    QVBoxLayout,
     QWidget,
-    QDoubleSpinBox,
     QMessageBox,
 )
-from PyQt5.QtGui import QIcon
+
+import trnsysGUI.Pump as _pmp
 
 
 class PumpDlg(QDialog):
-    def __init__(self, block, parent=None):
+    def __init__(self, pump: _pmp.Pump, parent=None):
         super(PumpDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
-        self.block = block
+        self.block = pump
         self.le = QLineEdit(self.block.label.toPlainText())
-        self.setWindowIcon(QIcon(block.pixmap))
+        self.setWindowIcon(QIcon(pump.pixmap()))
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
