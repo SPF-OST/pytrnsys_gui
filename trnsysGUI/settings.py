@@ -1,10 +1,9 @@
 import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
-import shutil as _sh
 
-import dataclasses_jsonschema as _dcj
 import appdirs as _ad
+import dataclasses_jsonschema as _dcj
 
 
 @_dc.dataclass
