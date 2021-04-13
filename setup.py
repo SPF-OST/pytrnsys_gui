@@ -20,7 +20,16 @@ setuptools.setup(
     ],
     package_data={"trnsysGUI": ["images/*.png", "images/*.svg"]},
     scripts=["trnsysGUI/GUI.py"],
-    install_requires=["pytrnsys", "PyQT5", "matplotlib", "numpy", "pandas", "bokeh"],
+    install_requires=[
+        "pytrnsys",
+        "PyQT5",
+        "matplotlib",
+        "numpy",
+        "pandas",
+        "bokeh",
+        "dataclasses_jsonschema",
+        "appdirs",
+    ],
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",
 )

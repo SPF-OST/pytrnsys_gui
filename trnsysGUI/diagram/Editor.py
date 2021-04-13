@@ -1309,18 +1309,6 @@ class Editor(QWidget):
         -------
 
         """
-        # print("saveaspath is " + str(self.saveAsPath))
-        # if self.saveAsPath.name == '':
-
-        # if getattr(sys, 'frozen', False):
-        #     ROOT_DIR = os.path.dirname(sys.executable)
-        # elif __file__:
-        #     ROOT_DIR = os.path.dirname(__file__)
-        # filepaths = os.path.join(ROOT_DIR, 'filepaths.txt')
-        # print(ROOT_DIR, filepaths)
-        # with open(filepaths, 'r') as file:
-        #     data = file.readlines()
-
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
         diagramPath = os.path.join(self.projectFolder, self.diagramName)
 
@@ -1344,43 +1332,6 @@ class Editor(QWidget):
             msgb = QMessageBox(self)
             msgb.setText("Saved diagram at " + diagramPath)
             msgb.exec()
-
-            # self.encodeDiagram(str(filepath.joinpath(self.diagramName + '.json')))
-            # msgb = QMessageBox(self)
-            # msgb.setText("Saved diagram at /trnsysGUI/diagrams/")
-            # msgb.exec()
-        # else:
-        #     if self.saveAsPath.exists():
-        #         pass
-        #     else:
-        #         self.encodeDiagram(str(self.saveAsPath))
-        #         msgb = QMessageBox(self)
-        #         msgb.setText("Saved diagram at" + str(self.saveAsPath))
-        #         msgb.exec()
-
-    def saveAs(self):
-        if getattr(sys, "frozen", False):
-            ROOT_DIR = os.path.dirname(sys.executable)
-        elif __file__:
-            ROOT_DIR = os.path.dirname(__file__)
-        filepaths = os.path.join(ROOT_DIR, "filepaths.txt")
-        with open(filepaths, "r") as file:
-            data = file.readlines()
-        defaultDir = data[1][:-1]
-        pickedPath = pl.Path(QFileDialog.getSaveFileName(self, "Save diagram", defaultDir, filter="*.json")[0])
-        if str(pickedPath) == ".":
-            msgb = QMessageBox(self)
-            msgb.setText("No valid path selected, aborting save as")
-            msgb.exec()
-            return
-        # print("picked path is" + str(pickedPath))
-
-        self.saveAsPath = pickedPath
-        self.diagramName = self.saveAsPath.stem
-        # print(self.saveAsPath)
-        # print(self.diagramName)
-
-        self.encodeDiagram(str(self.saveAsPath))
 
     def saveToProject(self):
         projectPath = self.projectPath

@@ -1,39 +1,93 @@
-from PyQt5.QtWidgets import QDialog, QLineEdit, QHBoxLayout, QPushButton, QGridLayout, QLabel
-from PyQt5 import QtCore
+__all__ = ["SettingsDlg", "MaybeCancelled", "CANCELLED"]
+
+import pathlib as _pl
+import typing as _tp
+
+import PyQt5.QtCore as _qtc
+import PyQt5.QtWidgets as _widgets
+
+import trnsysGUI.settings as _settings
 
 
-class settingsDlg(QDialog):
-    def __init__(self, parent):
-        super(settingsDlg, self).__init__(parent)
-        self.setModal(True)
-        self.parent = parent
-        nameLabel = QLabel("Trnsys Exe:")
-        self.le = QLineEdit(parent.centralWidget.latexPath)
+class _Cancelled:
+    pass
 
-        self.okButton = QPushButton("OK")
-        self.cancelButton = QPushButton("Cancel")
 
-        buttonLayout = QHBoxLayout()
-        buttonLayout.addStretch()
-        buttonLayout.addWidget(self.okButton)
-        buttonLayout.addWidget(self.cancelButton)
-        layout = QGridLayout()
-        layout.setColumnMinimumWidth(1, 300)
-        layout.addWidget(nameLabel, 0, 0)
-        layout.addWidget(self.le, 0, 1)
-        layout.addLayout(buttonLayout, 1, 0, 2, 0)
-        self.setLayout(layout)
+CANCELLED = _Cancelled()
 
-        self.okButton.clicked.connect(self.accept)
-        self.cancelButton.clicked.connect(self.reject)
-        self.setWindowTitle("Set new group")
-        self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.show()
+_TCo = _tp.TypeVar("_TCo", covariant=True)
 
-    def acceptedEdit(self):
-        if self.le.text() is not "":
-            self.parent.centralWidget.latexPath = self.le.text()
-            self.close()
+MaybeCancelled = _tp.Union[_TCo, _Cancelled]
 
-    def cancel(self):
+
+class SettingsDlg(_widgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        settings = self._getSettings()
+        oldTrnsysPath = settings.trnsysBinaryDirPath if settings else ""
+
+        label = _widgets.QLabel("Trnsys Path:")
+        self.lineEdit = _widgets.QLineEdit(oldTrnsysPath)
+        self.lineEdit.setDisabled(True)
+
+        setButton = _widgets.QPushButton("Set Trnsys Path")
+        setButton.setFixedWidth(100)
+        setButton.clicked.connect(self._onSetButtonClicked)
+
+        layout = _widgets.QHBoxLayout()
+        layout.addWidget(label)
+        layout.addWidget(self.lineEdit)
+        layout.addWidget(setButton)
+
+        self._okButton = _widgets.QPushButton("Done")
+        self._okButton.setFixedWidth(50)
+        self._okButton.clicked.connect(self._onOkButtonClicked)
+        canOk = bool(settings)
+        self._okButton.setEnabled(canOk)
+        buttonLayout = _widgets.QHBoxLayout()
+        buttonLayout.addWidget(self._okButton, alignment=_qtc.Qt.AlignCenter)
+
+        overallLayout = _widgets.QVBoxLayout()
+        overallLayout.addLayout(layout)
+        overallLayout.addLayout(buttonLayout)
+        self.setLayout(overallLayout)
+        self.setFixedWidth(800)
+
+        self.setWindowTitle("Set Paths")
+
+        self._settings: MaybeCancelled[_settings.Settings] = CANCELLED
+
+    @staticmethod
+    def showDialogAndGetSettings(parent=None) -> MaybeCancelled[_settings.Settings]:
+        dialog = SettingsDlg(parent)
+        dialog.exec()
+        return dialog._settings
+
+    @staticmethod
+    def _getSettings() -> _tp.Optional[_settings.Settings]:
+        return _settings.Settings.tryLoadOrNone()
+
+    def _onSetButtonClicked(self) -> None:
+        newTrnsysPath = str(_widgets.QFileDialog.getExistingDirectory(self, "Select Trnsys Path"))
+        self.lineEdit.setText(newTrnsysPath)
+
+        canOk = True if self._getSettings() or newTrnsysPath else False
+        self._okButton.setEnabled(canOk)
+
+    def _onOkButtonClicked(self) -> None:
+        newTrnsysPath = self.lineEdit.text()
+
+        settings = self._getSettings()
+        if settings:
+            settings.trnsysBinaryDirPath = newTrnsysPath
+        else:
+            settings = _settings.Settings.create(_pl.Path(newTrnsysPath))
+
+        self._settings = settings
+
+        self.close()
+
+    def cancel(self) -> None:
+        self._settings = CANCELLED
         self.close()

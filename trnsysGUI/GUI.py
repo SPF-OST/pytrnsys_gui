@@ -1,30 +1,30 @@
 #!/usr/bin/python
 import glob
 import os
+import pathlib as _pl
 import shutil
 import sys
 from math import sqrt
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
 from pytrnsys.utils import log
 
-import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.arguments as args
 import trnsysGUI.buildDck as dckBuilder
+import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.settings as _settings
+import trnsysGUI.settingsDlg as _sdlg
+import trnsysGUI.tracing as trc
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Connection import Connection
 from trnsysGUI.FolderSetUp import FolderSetUp
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
-from trnsysGUI.PathSetUp import PathSetUp
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.StorageTank import StorageTank
-import trnsysGUI.tracing as trc
 from trnsysGUI.configFile import configFile
-from trnsysGUI.settingsDlg import settingsDlg
 import trnsysGUI.images as _img
 
 __version__ = "1.0.0"
@@ -296,14 +296,6 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(undoAction)
         self.editMenu.addAction(redoAction)
 
-    def changeSettings(self):
-        settingsDialog = settingsDlg(self)
-
-        if ret == 1:
-            self.projectFolder, projectFile = os.path.split(
-                QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0].replace("/", "\\")
-            )
-
     def loadDialogue(self):
         self.projectFolder, projectFile = os.path.split(
             QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0].replace("/", "\\")
@@ -376,10 +368,6 @@ class MainWindow(QMainWindow):
         self.centralWidget = self._createDiagramEditor()
         self.setCentralWidget(self.centralWidget)
         self.centralWidget.save(showWarning=False)
-
-    def saveDiaAs(self):
-        self.logger.info("Saving diagram as...")
-        self.centralWidget.saveAs()
 
     def loadDia(self):
         self.logger.info("Loading diagram")
@@ -825,37 +813,6 @@ class MainWindow(QMainWindow):
             self.calledByVisualizeMf = False
             return mfrFile, tempFile
 
-    # def loadVisualization(self):
-    #
-    #     currentFilePath = self.currentFile
-    #     if '\\' in currentFilePath:
-    #         diaName = currentFilePath.split('\\')[-1][:-5]
-    #     elif '/' in currentFilePath:
-    #         diaName = currentFilePath.split('/')[-1][:-5]
-    #     else:
-    #         diaName = currentFilePath
-    #     if getattr(sys, 'frozen', False):
-    #         ROOT_DIR = os.path.dirname(sys.executable)
-    #     elif __file__:
-    #         ROOT_DIR = os.path.dirname(__file__)
-    #
-    #     filepaths = os.path.join(ROOT_DIR, 'filepaths')
-    #     with open(filepaths, 'r') as file:
-    #         data = file.readlines()
-    #
-    #     filePath = data[0][:-1]
-    #     MfrFilePath = os.path.join(filePath, diaName + '_Mfr.prt')
-    #     TempFilePath = os.path.join(filePath, diaName + '_T.prt')
-    #     print(MfrFilePath, TempFilePath)
-    #
-    #     if os.path.exists(MfrFilePath) and os.path.exists(TempFilePath):
-    #         MassFlowVisualizer(self, MfrFilePath, TempFilePath)
-    #         self.massFlowEnabled = True
-    #     else:
-    #         msgb = QMessageBox(self)
-    #         msgb.setText("MFR or Temperature file does not exist!")
-    #         msgb.exec()
-
     def loadVisualization(self):
         MfrFile = QFileDialog.getOpenFileName(self, "Select Mfr File", "exports", filter="*_Mfr.prt")[0]
         if MfrFile == "":
@@ -949,49 +906,18 @@ class MainWindow(QMainWindow):
             self.centralWidget.save()
             e.accept
 
-    def setPaths(self):
-        """
-        Sets the export, diagram, ddck and trnsys path.
-        """
-        pathDialog = PathSetUp(self)
+    def ensureSettingsExist(self):
+        settings = _settings.Settings.tryLoadOrNone()
+        if not settings:
+            newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)
+            while newSettings == _sdlg.CANCELLED:
+                newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)
 
-    def setFolder(self):
-        """
-        Sets the export, diagram, ddck and trnsys path.
-        """
-        pathDialog = FolderSetUp(self)
+            newSettings.save()
 
-    def checkFilePaths(self):
-        """
-        Checks if all file paths have been set. If not, call setPaths
-        """
-        if getattr(sys, "frozen", False):
-            ROOT_DIR = os.path.dirname(sys.executable)
-        elif __file__:
-            ROOT_DIR = os.path.dirname(__file__)
-        filepath = os.path.join(ROOT_DIR, "filepaths.txt")
-        if not os.path.isfile(filepath):
-            open(filepath, "w+")
-            open(filepath, "w+")
-        with open(filepath, "r") as file:
-            data = file.readlines()
-        if len(data) < 2:
-            pathSetUpDialog = PathSetUp(self)
-
-    def setTrnsysPath(self):
-        """
-        Sets the trnsys path during start up, after user has defined it.
-        """
-        noOfRequiredPaths = 4
-        if getattr(sys, "frozen", False):
-            ROOT_DIR = os.path.dirname(sys.executable)
-        elif __file__:
-            ROOT_DIR = os.path.dirname(__file__)
-        filepaths = os.path.join(ROOT_DIR, "filepaths.txt")
-        with open(filepaths, "r") as file:
-            data = file.readlines()
-        if len(data) == noOfRequiredPaths:
-            self.centralWidget.trnsysPath = os.path.join(data[3][:-1], "TRNExe.exe")
+    def loadTrnsysPath(self):
+        settings = _settings.Settings.load()
+        self.centralWidget.trnsysPath = _pl.Path(settings.trnsysBinaryDirPath) / "TRNExe.exe"
 
     def debugConns(self):
         """
@@ -1050,8 +976,8 @@ def main():
     form = MainWindow(logger)
     form.showMaximized()
     form.show()
-    form.checkFilePaths()
-    form.setTrnsysPath()
+    form.ensureSettingsExist()
+    form.loadTrnsysPath()
 
     tracer = trc.createTracer(arguments.shallTrace)
     tracer.run(lambda: app.exec())
