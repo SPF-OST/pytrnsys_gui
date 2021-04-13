@@ -1,14 +1,11 @@
-import os
-import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class TeePiece(BlockItem):
@@ -24,12 +21,12 @@ class TeePiece(BlockItem):
         self.inputs.append(PortItem("i", 2, self))
         self.outputs.append(PortItem("o", 1, self))
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
 
         # self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.TEE_PIECE_SVG
 
     def changeSize(self):
         w = self.w

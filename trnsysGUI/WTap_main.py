@@ -1,11 +1,11 @@
-import glob
-import os
+import typing as _tp
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class WTap_main(BlockItem):
@@ -18,12 +18,12 @@ class WTap_main(BlockItem):
 
         self.exportInitialInput = 0.0
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.typeNumber = 4
 
         self.changeSize()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.W_TAP_MAIN_SVG
 
     def changeSize(self):
         w = self.w

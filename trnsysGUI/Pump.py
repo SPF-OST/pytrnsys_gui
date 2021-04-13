@@ -1,12 +1,12 @@
-import sys
+import typing as _tp
 
+import numpy as np
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
-
-import numpy as np
+import trnsysGUI.images as _img
 
 
 class Pump(BlockItem):
@@ -23,10 +23,10 @@ class Pump(BlockItem):
         self.inputs.append(PortItem("i", 0, self))
         self.outputs.append(PortItem("o", 2, self))
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.PUMP_SVG
 
     def changeSize(self):
         w = self.w
