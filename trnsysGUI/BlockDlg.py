@@ -13,15 +13,17 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QIcon
 
+import trnsysGUI.BlockItem as _bi
+
 
 class BlockDlg(QDialog):
-    def __init__(self, block, parent=None):
+    def __init__(self, block: _bi.BlockItem, parent=None):
         super(BlockDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
         self.logger = parent.logger
         self.block = block
         self.le = QLineEdit(self.block.label.toPlainText())
-        self.setWindowIcon(QIcon(block.pixmap))
+        self.setWindowIcon(QIcon(block.pixmap()))
         self.loadButton = QPushButton("Load")
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")

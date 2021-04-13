@@ -1,3 +1,4 @@
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
     QLabel,
@@ -7,25 +8,25 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QGridLayout,
     QTabWidget,
-    QVBoxLayout,
     QWidget,
     QDoubleSpinBox,
     QMessageBox,
 )
-from PyQt5.QtGui import QIcon
+
+import trnsysGUI.TVentil as _vnt
 
 
 class TVentilDlg(QDialog):
-    def __init__(self, block, parent=None):
+    def __init__(self, ventil: _vnt.TVentil, parent=None):
         super(TVentilDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
 
         self.logger = parent.logger
 
-        self.block = block
+        self.block = ventil
         self.valvePosition = self.block.positionForMassFlowSolver
         self.le = QLineEdit(self.block.label.toPlainText())
-        self.setWindowIcon(QIcon(block.pixmap))
+        self.setWindowIcon(QIcon(ventil.pixmap()))
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 

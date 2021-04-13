@@ -107,7 +107,7 @@ class View(QGraphicsView):
                 bl = ExternalHx(name, self)
             elif name == "IceStorageTwoHx":
                 bl = IceStorageTwoHx(name, self)
-            elif name == "GenericItem":
+            elif name == "GraphicalItem":
                 bl = GraphicalItem(self)
             elif name == "MasterControl":
                 bl = MasterControl(name, self)

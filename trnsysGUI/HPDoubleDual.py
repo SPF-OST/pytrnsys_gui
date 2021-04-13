@@ -1,15 +1,17 @@
-import os
 import glob
+import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class HPDoubleDual(BlockItem):
@@ -25,9 +27,6 @@ class HPDoubleDual(BlockItem):
         self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         # For restoring correct order of trnsysObj list
         self.childIds = []
         self.childIds.append(self.trnsysId)
@@ -38,6 +37,9 @@ class HPDoubleDual(BlockItem):
 
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.HP_DOUBLE_DUAL_SVG
 
     def changeSize(self):
         w = self.w

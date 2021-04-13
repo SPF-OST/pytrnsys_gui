@@ -1,14 +1,16 @@
 import os
 import shutil
-from datetime import datetime
+import typing as _tp
+
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QTreeView, QMessageBox, QFileDialog
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class AirSourceHP(BlockItem):
@@ -20,11 +22,11 @@ class AirSourceHP(BlockItem):
         self.path = ""
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h), Qt.IgnoreAspectRatio))
-
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.AIR_SOURCE_HP_SVG
 
     def changeSize(self):
         # self.logger.debug("passing through c change size")
