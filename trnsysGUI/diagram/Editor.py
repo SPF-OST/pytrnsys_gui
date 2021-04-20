@@ -1,13 +1,14 @@
 import json
 import os
-import pathlib as pl
+import pathlib as _pl
+import pkgutil as _pu
 import shutil
 import sys
 
 import pandas as pd
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
-from PyQt5.QtGui import QIcon, QColor, QPainter
+from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (
@@ -28,6 +29,7 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigStorage import ConfigStorage
@@ -37,11 +39,6 @@ from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
-from trnsysGUI.diagram.DecoderPaste import DecoderPaste
-from trnsysGUI.diagram.Decoder import Decoder
-from trnsysGUI.diagram.Encoder import Encoder
-from trnsysGUI.diagram.View import View
-from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
@@ -61,13 +58,18 @@ from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
 from trnsysGUI.copyGroup import copyGroup
+from trnsysGUI.diagram.Decoder import Decoder
+from trnsysGUI.diagram.DecoderPaste import DecoderPaste
+from trnsysGUI.diagram.Encoder import Encoder
+from trnsysGUI.diagram.Scene import Scene
+from trnsysGUI.diagram.View import View
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
-import trnsysGUI.images as _img
+import trnsysGUI as _tgui
 
 
 class Editor(QWidget):
@@ -175,7 +177,7 @@ class Editor(QWidget):
         self.projectFolder = projectFolder
 
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
-        self.saveAsPath = pl.Path()
+        self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
 
         # Generator for massflow display testing
@@ -852,7 +854,7 @@ class Editor(QWidget):
             return hydraulicsPath
 
     def _doesFileExistAndDontOverwrite(self, folderPath):
-        if not pl.Path(folderPath).exists():
+        if not _pl.Path(folderPath).exists():
             return False
 
         qmb = QMessageBox(self)
@@ -882,7 +884,7 @@ class Editor(QWidget):
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
         hydCtrlPath = os.path.join(ddckFolder, "control\\hydraulic_control.ddck")
-        if pl.Path(hydCtrlPath).exists():
+        if _pl.Path(hydCtrlPath).exists():
             qmb = QMessageBox(self)
             qmb.setText(
                 "Warning: "
@@ -1355,7 +1357,7 @@ class Editor(QWidget):
                     self, "Warning", "This diagram name exists already in the directory." " Please rename this diagram"
                 )
             else:
-                self.saveAsPath = pl.Path(
+                self.saveAsPath = _pl.Path(
                     self.saveAsPath.stem[0 : self.saveAsPath.name.index(self.diagramName)] + newName
                 )
 
@@ -1375,7 +1377,7 @@ class Editor(QWidget):
 
         # closeDialog = closeDlg()
         # if closeDialog.closeBool:
-        filepath = pl.Path(pl.Path(__file__).resolve().parent.joinpath("recent"))
+        filepath = _pl.Path(_pl.Path(__file__).resolve().parent.joinpath("recent"))
         self.encodeDiagram(str(filepath.joinpath(self.diagramName + ".json")))
 
     # Mode related
@@ -2000,15 +2002,14 @@ class Editor(QWidget):
             self.logger.debug("Widget doesnt exist!")
         else:
             self.logger.debug("Deleted widget")
-        configPath = os.path.dirname(__file__)
-        configPath = os.path.join(configPath, "project")
-        configPath = os.path.join(configPath, "keepMe")
-        self.emptyConfig = os.path.join(configPath, "run.config")
-        # projectPath = os.path.join(configPath, self.date_time)
-        shutil.copy(self.emptyConfig, loadPath)
+
+        runConfigData = self._getPackageResourceData("templates/run.config")
+        runConfigPath = _pl.Path(loadPath) / "run.config"
+        runConfigPath.write_bytes(runConfigData)
+
         self.HBox = QHBoxLayout()
         self.refreshButton = QPushButton(self)
-        self.refreshButton.setIcon(_img.ROTATE_TO_RIGHT_PNG)
+        self.refreshButton.setIcon(_img.ROTATE_TO_RIGHT_PNG.icon())
         self.refreshButton.clicked.connect(self.refreshConfig)
         self.model = MyQFileSystemModel()
         self.model.setRootPath(loadPath)
@@ -2024,16 +2025,6 @@ class Editor(QWidget):
         self.HBox.addWidget(self.tree)
         self.HBox.setObjectName("Config_Layout")
         self.fileBrowserLayout.addLayout(self.HBox)
-        self.logger.debug(self.emptyConfig)
-
-    # def createProjectFolder(self):
-    #     self.date_time = datetime.now().strftime("%Y%m%d%H%M%S")
-    #     projectPath = os.path.dirname(__file__).replace('/','\\')
-    #     projectPath = os.path.join(projectPath, 'project')
-    #     projectPath = os.path.join(projectPath, self.date_time)
-    #     if not os.path.exists(projectPath):
-    #         os.makedirs(projectPath)
-    #     return projectPath
 
     def createProjectFolder(self):
         if not os.path.exists(self.projectFolder):
@@ -2072,25 +2063,25 @@ class Editor(QWidget):
         dia = FileOrderingDialog(self.fileList, self)
 
     def copyGenericFolder(self, loadPath):
+        genericFolderPath = _pl.Path(loadPath) / "ddck" / "generic"
 
-        genericPath = os.path.dirname(__file__)
-        genericPath = os.path.join(genericPath, "project")
-        genericPath = os.path.join(genericPath, "keepMe")
-        genericPath = os.path.join(genericPath, "generic")
-        self.headerFile = os.path.join(genericPath, "head.ddck")
-        self.endFile = os.path.join(genericPath, "end.ddck")
+        if not genericFolderPath.exists():
+            self.logger.info("Creating %s", genericFolderPath)
+            genericFolderPath.mkdir()
 
-        self.genericFolder = os.path.join(loadPath, "ddck")
-        self.genericFolder = os.path.join(self.genericFolder, "generic")
-
-        if not os.path.exists(self.genericFolder):
-            self.logger.info("Creating " + self.genericFolder)
-            os.makedirs(self.genericFolder)
-
+        headData = self._getPackageResourceData("templates/generic/head.ddck")
         self.logger.info("Copying head.ddck")
-        shutil.copy(self.headerFile, self.genericFolder)
+        (genericFolderPath / "head.ddck").write_bytes(headData)
+
+        endData = self._getPackageResourceData("templates/generic/end.ddck")
         self.logger.info("Copying end.ddck")
-        shutil.copy(self.endFile, self.genericFolder)
+        (genericFolderPath / "end.ddck").write_bytes(endData)
+
+    @staticmethod
+    def _getPackageResourceData(resourcePath):
+        data = _pu.get_data(_tgui.__name__, resourcePath)
+        assert data, f"{resourcePath} package resource not found"
+        return data
 
     def createHydraulicDir(self, projectPath):
 

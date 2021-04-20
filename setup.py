@@ -18,7 +18,14 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_data={"trnsysGUI": ["images/*.png", "images/*.svg"]},
+    package_data={
+        "trnsysGUI": [
+            "images/*.png",
+            "images/*.svg",
+            "templates/run.config",
+            "templates/generic/*.ddck",
+        ]
+    },
     scripts=["trnsysGUI/GUI.py"],
     install_requires=[
         "pytrnsys",
