@@ -28,8 +28,8 @@ class SettingsDlg(_widgets.QDialog):
         oldTrnsysPath = settings.trnsysBinaryDirPath if settings else ""
 
         label = _widgets.QLabel("Trnsys Path:")
-        self.lineEdit = _widgets.QLineEdit(oldTrnsysPath)
-        self.lineEdit.setDisabled(True)
+        self._lineEdit = _widgets.QLineEdit(oldTrnsysPath)
+        self._lineEdit.setDisabled(True)
 
         setButton = _widgets.QPushButton("Set Trnsys Path")
         setButton.setFixedWidth(100)
@@ -37,7 +37,7 @@ class SettingsDlg(_widgets.QDialog):
 
         layout = _widgets.QHBoxLayout()
         layout.addWidget(label)
-        layout.addWidget(self.lineEdit)
+        layout.addWidget(self._lineEdit)
         layout.addWidget(setButton)
 
         self._okButton = _widgets.QPushButton("Done")
@@ -69,20 +69,26 @@ class SettingsDlg(_widgets.QDialog):
         return _settings.Settings.tryLoadOrNone()
 
     def _onSetButtonClicked(self) -> None:
-        newTrnsysPath = str(_widgets.QFileDialog.getExistingDirectory(self, "Select Trnsys Path"))
-        self.lineEdit.setText(newTrnsysPath)
+        oldDirPath = self._lineEdit.text()
 
-        canOk = True if self._getSettings() or newTrnsysPath else False
+        newBinaryPath, _ = _widgets.QFileDialog.getOpenFileName(
+            self, "Select TRNSYS exe", directory=oldDirPath, filter="*.exe"
+        )
+
+        newDirPath = str(_pl.Path(newBinaryPath).parent)
+        self._lineEdit.setText(newDirPath)
+
+        canOk = True if self._getSettings() or newDirPath else False
         self._okButton.setEnabled(canOk)
 
     def _onOkButtonClicked(self) -> None:
-        newTrnsysPath = self.lineEdit.text()
+        newDirPath = self._lineEdit.text()
 
         settings = self._getSettings()
         if settings:
-            settings.trnsysBinaryDirPath = newTrnsysPath
+            settings.trnsysBinaryDirPath = newDirPath
         else:
-            settings = _settings.Settings.create(_pl.Path(newTrnsysPath))
+            settings = _settings.Settings.create(_pl.Path(newDirPath))
 
         self._settings = settings
 

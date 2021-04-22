@@ -205,7 +205,7 @@ class Editor(QWidget):
         self.snapGrid = False
         self.snapSize = 20
 
-        self.trnsysPath = "C:\Trnsys17\Exe\TRNExe.exe"
+        self.trnsysPath = pl.Path(r"C:\Trnsys17\Exe\TRNExe.exe")
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
