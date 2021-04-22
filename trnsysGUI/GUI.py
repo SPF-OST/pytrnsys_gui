@@ -256,6 +256,10 @@ class MainWindow(QMainWindow):
         debugConnections.triggered.connect(self.debugConns)
         self.fileMenu.addAction(debugConnections)
 
+        setTransysPath = QAction("Set TRNSYS path", self)
+        setTransysPath.triggered.connect(self.askUserForSettingsValuesAndSave)
+        self.fileMenu.addAction(setTransysPath)
+
         self.editMenu = QMenu("Edit")
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
@@ -793,12 +797,12 @@ class MainWindow(QMainWindow):
         self.logger.info(exportPath)
         if exportPath != "None":
             msgb = QMessageBox(self)
-            if not os.path.isfile(self.centralWidget.trnsysPath):
-                msgb.setText("TRNExe.exe not found!")
+            if not self.centralWidget.trnsysPath.is_file():
+                msgb.setText("TRNExe.exe not found! Consider correcting the path in the settings.")
                 msgb.exec()
                 return 0, 0
-            self.logger.info("trnsyspath: " + self.centralWidget.trnsysPath)
-            cmd = self.centralWidget.trnsysPath + " " + str(exportPath) + r" /H"
+            self.logger.info("trnsyspath: %s", self.centralWidget.trnsysPath)
+            cmd = f"{self.centralWidget.trnsysPath} {exportPath} /H"
             os.system(cmd)
             mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt")
             tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt")
@@ -909,11 +913,13 @@ class MainWindow(QMainWindow):
     def ensureSettingsExist(self):
         settings = _settings.Settings.tryLoadOrNone()
         if not settings:
-            newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)
-            while newSettings == _sdlg.CANCELLED:
-                newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)
+            self.askUserForSettingsValuesAndSave()
 
-            newSettings.save()
+    def askUserForSettingsValuesAndSave(self):
+        newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)
+        while newSettings == _sdlg.CANCELLED:
+            newSettings = _sdlg.SettingsDlg.showDialogAndGetSettings(parent=self)
+        newSettings.save()
 
     def loadTrnsysPath(self):
         settings = _settings.Settings.load()
