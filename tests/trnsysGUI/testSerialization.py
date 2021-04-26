@@ -13,10 +13,15 @@ class PersonVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     age: int
     heightInM: float
 
+    @classmethod
+    def _getVersion(cls):
+        return "ff2ba3c8-4fef-4a64-a026-11212ab35d6b"
+
 
 @_dc.dataclass
 class PersonVersion1(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion0):
     firstName: str
+
     lastName: str
     age: int
     heightInCm: int
@@ -28,6 +33,10 @@ class PersonVersion1(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion0):
         return PersonVersion1(
             superseded.firstName, lastName, superseded.age, heightInCm
         )
+
+    @classmethod
+    def _getVersion(cls):
+        return "70d5694f-032c-4ca8-b13c-c020b05f2179"
 
 
 @_dc.dataclass
@@ -43,18 +52,27 @@ class Person(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion1):
         ageInYears = superseded.age
         return Person(title, superseded.lastName, ageInYears, superseded.heightInCm)
 
+    @classmethod
+    def _getVersion(cls):
+        return "1774d088-3917-4c29-a76a-0a4514ef6cf5"
+
 
 class TestSerialization:
-    SERIALIZED_P0 = {"firstName": "Damian", "age": 32, "heightInM": 1.73, "_VERSION": 0}
+    SERIALIZED_P0 = {
+        "_VERSION": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b",
+        "age": 32,
+        "firstName": "Damian",
+        "heightInM": 1.73,
+    }
     SERIALIZED_P1 = {
-        "_VERSION": 1,
+        "_VERSION": "70d5694f-032c-4ca8-b13c-c020b05f2179",
         "age": 32,
         "firstName": "Damian",
         "heightInCm": 173,
         "lastName": "Birchler",
     }
     SERIALIZED_P = {
-        "_VERSION": 2,
+        "_VERSION": "1774d088-3917-4c29-a76a-0a4514ef6cf5",
         "ageInYears": 32,
         "heightInCm": 173,
         "lastName": "Birchler",
@@ -78,7 +96,7 @@ class TestSerialization:
 
         p = Person.fromUpgradableJson(json)
 
-        assert p._VERSION is 2
+        assert p._VERSION is Person._getVersion()
         assert p.title is ""
         assert p.lastName is ""
         assert p.ageInYears == self.SERIALIZED_P0["age"]

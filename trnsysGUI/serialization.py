@@ -15,10 +15,29 @@ _T = _tp.TypeVar("_T", bound="UpgradableJsonSchemaMixin")
 class UpgradableJsonSchemaMixinVersion0(JsonSchemaMixin):
     def __init_subclass__(cls, **kwargs):
         if not hasattr(cls, "_VERSION"):
-            cls._VERSION = 0
-            cls.__annotations__["_VERSION"] = int
+            cls._VERSION = cls._getVersion()
+            cls.__annotations__["_VERSION"] = str
 
         super().__init_subclass__(**kwargs)
+
+    @classmethod
+    @_abc.abstractmethod
+    def _getVersion(cls):
+        """To be overwritten in subclass. Use
+            .. code-block:: python
+
+                import uuid
+                print(str(uuid.uuid4()))
+
+            to generate a version and return that version
+            as a *constant* like so:
+
+                .. code-block:: python
+
+                def _getVersion(cls):
+                    return "41280f1d-67f5-4827-a306-4b2d71cba4c2"
+        """
+        pass
 
     @classmethod
     def fromUpgradableJson(cls: _tp.Type[_S0], data: str) -> _S0:
@@ -40,8 +59,8 @@ class UpgradableJsonSchemaMixin(_abc.ABC, UpgradableJsonSchemaMixinVersion0):
 
         supersededClass = kwargs.pop("supersedes")
         cls._SUPERSEDED_CLASS = supersededClass
-        cls._VERSION = supersededClass._VERSION + 1 if supersededClass else 0
-        cls.__annotations__["_VERSION"] = int
+        cls._VERSION = cls._getVersion()
+        cls.__annotations__["_VERSION"] = str
 
         super().__init_subclass__(**kwargs)
 
