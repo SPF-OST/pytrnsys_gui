@@ -6,7 +6,6 @@ import uuid as _uuid
 import appdirs as _ad
 
 import trnsysGUI.serialization as _ser
-from trnsysGUI.serialization import _S0, _T
 
 
 @_dc.dataclass
