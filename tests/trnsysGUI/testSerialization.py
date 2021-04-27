@@ -2,6 +2,7 @@ import copy as _cp
 import dataclasses as _dc
 import json as _json
 import uuid as _uuid
+import typing as _tp
 
 import pytest as _pt
 
@@ -20,12 +21,16 @@ class PersonVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
 
 @_dc.dataclass
-class PersonVersion1(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion0):
+class PersonVersion1(_ser.UpgradableJsonSchemaMixin):
     firstName: str
 
     lastName: str
     age: int
     heightInCm: int
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[PersonVersion0]:
+        return PersonVersion0
 
     @classmethod
     def fromSuperseded(cls, superseded: PersonVersion0) -> "PersonVersion1":
@@ -41,11 +46,15 @@ class PersonVersion1(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion0):
 
 
 @_dc.dataclass
-class Person(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion1):
+class Person(_ser.UpgradableJsonSchemaMixin):
     title: str
     lastName: str
     ageInYears: int
     heightInCm: int
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[PersonVersion1]:
+        return PersonVersion1
 
     @classmethod
     def fromSuperseded(cls, superseded: PersonVersion1) -> "Person":
@@ -157,8 +166,3 @@ class TestSerialization:
         with _pt.raises(_ser.SerializationError):
             Person.fromUpgradableJson(json)
 
-    def testNoSupersedesRaises(self):
-        with _pt.raises(ValueError):
-            @_dc.dataclass
-            class C(_ser.UpgradableJsonSchemaMixin):
-                f: int

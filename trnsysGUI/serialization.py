@@ -10,7 +10,6 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
-from dataclasses_jsonschema import JsonSchemaMixin
 
 _S0 = _tp.TypeVar("_S0", bound="UpgradableJsonSchemaMixinVersion0")
 _SOther = _tp.TypeVar("_SOther", bound="UpgradableJsonSchemaMixinVersion0")
@@ -23,7 +22,7 @@ class SerializationError(ValueError):
 
 
 @_dc.dataclass
-class UpgradableJsonSchemaMixinVersion0(JsonSchemaMixin):
+class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
     @classmethod
     def from_dict(
         cls: _tp.Type[_S0],
@@ -83,18 +82,7 @@ class UpgradableJsonSchemaMixinVersion0(JsonSchemaMixin):
 
 
 @_dc.dataclass
-class UpgradableJsonSchemaMixin(_abc.ABC, UpgradableJsonSchemaMixinVersion0):
-    def __init_subclass__(cls, **kwargs):
-        if "supersedes" not in kwargs:
-            raise ValueError(
-                "You must specify the superseded class using the `supersedes` keyword."
-            )
-
-        supersededClass = kwargs.pop("supersedes")
-        cls.SUPERSEDED_CLASS = supersededClass
-
-        super().__init_subclass__(**kwargs)
-
+class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
     @classmethod
     def from_dict(
         cls: _tp.Type[_T],
@@ -134,6 +122,11 @@ class UpgradableJsonSchemaMixin(_abc.ABC, UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     @_abc.abstractmethod
+    def getSupersededClass(cls) -> _SOther:
+        raise NotImplementedError()
+
+    @classmethod
+    @_abc.abstractmethod
     def fromSuperseded(cls: _tp.Type[_T], superseded: _S0) -> _T:
         raise NotImplementedError()
 
@@ -141,11 +134,11 @@ class UpgradableJsonSchemaMixin(_abc.ABC, UpgradableJsonSchemaMixinVersion0):
     def _getAllVersionsInDecreasingOrder(cls) -> _tp.Sequence[_tp.Type[_S0]]:
         currentVersion = cls
         allVersions = [currentVersion]
-        isSuperseding = hasattr(currentVersion, "SUPERSEDED_CLASS")
+        isSuperseding = issubclass(currentVersion, UpgradableJsonSchemaMixin)
         while isSuperseding:
-            currentVersion = currentVersion.SUPERSEDED_CLASS
+            currentVersion = currentVersion.getSupersededClass()
             allVersions.append(currentVersion)
-            isSuperseding = hasattr(currentVersion, "SUPERSEDED_CLASS")
+            isSuperseding = issubclass(currentVersion, UpgradableJsonSchemaMixin)
 
         return allVersions
 
