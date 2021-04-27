@@ -25,7 +25,7 @@ class SettingsDlg(_widgets.QDialog):
         super().__init__(parent)
 
         settings = self._getSettings()
-        oldTrnsysPath = settings.trnsysBinaryDirPath if settings else ""
+        oldTrnsysPath = settings.trnsysBinaryPath if settings else ""
 
         label = _widgets.QLabel("Trnsys Path:")
         self._lineEdit = _widgets.QLineEdit(oldTrnsysPath)
@@ -75,20 +75,19 @@ class SettingsDlg(_widgets.QDialog):
             self, "Select TRNSYS exe", directory=oldDirPath, filter="*.exe"
         )
 
-        newDirPath = str(_pl.Path(newBinaryPath).parent)
-        self._lineEdit.setText(newDirPath)
+        self._lineEdit.setText(newBinaryPath)
 
-        canOk = True if self._getSettings() or newDirPath else False
+        canOk = True if self._getSettings() or newBinaryPath else False
         self._okButton.setEnabled(canOk)
 
     def _onOkButtonClicked(self) -> None:
-        newDirPath = self._lineEdit.text()
+        newBinaryPath = self._lineEdit.text()
 
         settings = self._getSettings()
         if settings:
-            settings.trnsysBinaryDirPath = newDirPath
+            settings.trnsysBinaryPath = newBinaryPath
         else:
-            settings = _settings.Settings.create(_pl.Path(newDirPath))
+            settings = _settings.Settings.create(_pl.Path(newBinaryPath))
 
         self._settings = settings
 

@@ -923,7 +923,7 @@ class MainWindow(QMainWindow):
 
     def loadTrnsysPath(self):
         settings = _settings.Settings.load()
-        self.centralWidget.trnsysPath = _pl.Path(settings.trnsysBinaryDirPath) / "TRNExe.exe"
+        self.centralWidget.trnsysPath = _pl.Path(settings.trnsysBinaryPath)
 
     def debugConns(self):
         """

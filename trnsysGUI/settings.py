@@ -1,20 +1,32 @@
 import dataclasses as _dc
 import pathlib as _pl
 import typing as _tp
+import uuid as _uuid
 
 import appdirs as _ad
-import dataclasses_jsonschema as _dcj
+
+import trnsysGUI.serialization as _ser
+from trnsysGUI.serialization import _S0, _T
 
 
 @_dc.dataclass
-class Settings(_dcj.JsonSchemaMixin):
+class SettingsVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('f7a2c37c-ce82-4a4a-9869-80f00083275b')
+
+    trnsysBinaryDirPath: str
+
+
+@_dc.dataclass
+class Settings(_ser.UpgradableJsonSchemaMixin, supersedes=SettingsVersion0):
     @staticmethod
     def create(trnsysBinaryDirPath: _pl.Path) -> "Settings":
         return Settings(str(trnsysBinaryDirPath))
 
     _SETTINGS_FILE_NAME = "settings.json"
 
-    trnsysBinaryDirPath: str
+    trnsysBinaryPath: str
 
     @classmethod
     def tryLoadOrNone(cls) -> _tp.Optional["Settings"]:
@@ -25,7 +37,7 @@ class Settings(_dcj.JsonSchemaMixin):
 
         data = settingsFilePath.read_text()
 
-        return Settings.from_json(data)
+        return Settings.fromUpgradableJson(data)
 
     @classmethod
     def load(cls) -> "Settings":
@@ -51,3 +63,12 @@ class Settings(_dcj.JsonSchemaMixin):
         userConfigDirPath = _pl.Path(_ad.user_config_dir("pytrnsys-gui", "SPF OST"))
         settingsFilePath = userConfigDirPath / cls._SETTINGS_FILE_NAME
         return settingsFilePath
+
+    @classmethod
+    def fromSuperseded(cls: _tp.Type[_T], superseded: SettingsVersion0) -> "Settings":
+        trnsysBinaryPath = _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
+        return Settings.create(trnsysBinaryPath)
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('e5ea1fbd-1be9-4415-b3e9-7f3a2a11d216')
