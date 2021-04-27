@@ -1,7 +1,13 @@
-import typing as _tp
+__all__ = [
+    "UpgradableJsonSchemaMixinVersion0",
+    "UpgradableJsonSchemaMixin",
+    "SerializationError",
+]
+
 import abc as _abc
 import dataclasses as _dc
-import json as _json
+import typing as _tp
+import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 from dataclasses_jsonschema import JsonSchemaMixin
@@ -11,138 +17,163 @@ _SOther = _tp.TypeVar("_SOther", bound="UpgradableJsonSchemaMixinVersion0")
 _T = _tp.TypeVar("_T", bound="UpgradableJsonSchemaMixin")
 
 
+class SerializationError(ValueError):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+
 @_dc.dataclass
 class UpgradableJsonSchemaMixinVersion0(JsonSchemaMixin):
-    def __init_subclass__(cls, **kwargs):
-        if not hasattr(cls, "_VERSION"):
-            cls._VERSION = cls._getVersion()
-            cls.__annotations__["_VERSION"] = str
+    @classmethod
+    def from_dict(
+        cls: _tp.Type[_S0],
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> _S0:
+        if "__version__" in data:
+            data = data.copy()
+            actualVersion = data.pop("__version__")
+            expectedVersion = str(cls.getVersion())
 
-        super().__init_subclass__(**kwargs)
+            if actualVersion != expectedVersion:
+                raise SerializationError(
+                    f"Version mismatch: expected {expectedVersion}, got {actualVersion}."
+                )
+
+        try:
+            deserializedObject = super().from_dict(data, validate, validate_enums)
+        except _dcj.ValidationError as e:
+            raise SerializationError("Validation failed.") from e
+
+        return _tp.cast(_S0, deserializedObject)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        if "__version__" in data:
+            raise AssertionError(
+                "Serialized object dictionary from dataclasses-json already contained '__version__' key!"
+            )
+        data["__version__"] = str(self.getVersion())
+        return data
 
     @classmethod
     @_abc.abstractmethod
-    def _getVersion(cls):
+    def getVersion(cls) -> _uuid.UUID:
         """To be overwritten in subclass. Use
+        .. code-block:: python
+
+            import uuid
+            print(str(uuid.uuid4()))
+
+        to generate a version and return that version
+        as a *constant* like so:
+
             .. code-block:: python
 
-                import uuid
-                print(str(uuid.uuid4()))
-
-            to generate a version and return that version
-            as a *constant* like so:
-
-                .. code-block:: python
-
-                def _getVersion(cls):
-                    return "41280f1d-67f5-4827-a306-4b2d71cba4c2"
+            def getVersion(cls):
+                return uuid.UUID("41280f1d-67f5-4827-a306-4b2d71cba4c2")
         """
-        pass
-
-    @classmethod
-    def fromUpgradableJson(cls: _tp.Type[_S0], data: str) -> _S0:
-        kvs = _json.loads(data)
-
-        if "_VERSION" in kvs:
-            version = kvs["_VERSION"]
-            if version != cls._VERSION:
-                raise ValueError(f"Version mismatch: expected {cls._VERSION}, got {version}.")
-
-        return cls.from_dict(kvs)
+        raise NotImplementedError()
 
 
 @_dc.dataclass
 class UpgradableJsonSchemaMixin(_abc.ABC, UpgradableJsonSchemaMixinVersion0):
     def __init_subclass__(cls, **kwargs):
         if "supersedes" not in kwargs:
-            raise ValueError("You must specify the superseded class using the `supersedes` keyword.")
+            raise ValueError(
+                "You must specify the superseded class using the `supersedes` keyword."
+            )
 
         supersededClass = kwargs.pop("supersedes")
-        cls._SUPERSEDED_CLASS = supersededClass
-        cls._VERSION = cls._getVersion()
-        cls.__annotations__["_VERSION"] = str
+        cls.SUPERSEDED_CLASS = supersededClass
 
         super().__init_subclass__(**kwargs)
 
     @classmethod
-    def fromUpgradableJson(cls: _tp.Type[_T], data: str) -> _T:
+    def from_dict(
+        cls: _tp.Type[_T],
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> _T:
+        if "__version__" not in data:
+            raise SerializationError("No '__version__' field found.")
+
+        return super().from_dict(data, validate, validate_enums)
+
+    @classmethod
+    def fromUpgradableJson(
+        cls: _tp.Type[_T],
+        json: str,
+    ) -> _T:
         allVersions = cls._getAllVersionsInDecreasingOrder()
 
-        kvs = _json.loads(data)
-
-        result = cls._tryGetSupersededObjectAndNewerVersions(
-            kvs,
-            allVersions
-        )
+        result = cls._tryGetSupersededObjectAndNewerVersions(json, allVersions)
 
         if not result:
-            if "_VERSION" not in kvs:
-                raise ValueError("Could not determine data format version.")
-
-            # We need to do the following to get dataclasses-json's nice, detailed error message
+            # We need to do the following to get dataclasses-jsonschema's nice, detailed error message
             try:
-                cls.from_dict(kvs)
-            except _dcj.ValidationError as e:
-                raise ValueError from e
+                cls.from_json(json)
+            except SerializationError:
+                raise
             else:
                 raise AssertionError("Shouldn't get here.")
 
         supersededObject, newerVersions = result
 
         for newerVersion in newerVersions:
-            supersededObject = newerVersion._fromSuperseded(supersededObject)
+            supersededObject = newerVersion.fromSuperseded(supersededObject)
 
         return supersededObject
 
     @classmethod
-    def _getAllVersionsInDecreasingOrder(cls):
+    @_abc.abstractmethod
+    def fromSuperseded(cls: _tp.Type[_T], superseded: _S0) -> _T:
+        raise NotImplementedError()
+
+    @classmethod
+    def _getAllVersionsInDecreasingOrder(cls) -> _tp.Sequence[_tp.Type[_S0]]:
         currentVersion = cls
         allVersions = [currentVersion]
-        isSuperseding = hasattr(currentVersion, "_SUPERSEDED_CLASS")
+        isSuperseding = hasattr(currentVersion, "SUPERSEDED_CLASS")
         while isSuperseding:
-            currentVersion = currentVersion._SUPERSEDED_CLASS
+            currentVersion = currentVersion.SUPERSEDED_CLASS
             allVersions.append(currentVersion)
-            isSuperseding = hasattr(currentVersion, "_SUPERSEDED_CLASS")
+            isSuperseding = hasattr(currentVersion, "SUPERSEDED_CLASS")
 
         return allVersions
 
     @classmethod
-    def _tryGetSupersededObjectAndNewerVersions(cls, kvs, allVersions):
+    def _tryGetSupersededObjectAndNewerVersions(
+        cls, json: str, allVersions: _tp.Sequence[_tp.Type[_S0]]
+    ) -> _tp.Optional[_tp.Tuple[_S0, _tp.Sequence[_tp.Type[_SOther]]]]:
         newerVersions = []
         for version in allVersions:
-            supersededObject = cls._getDeserializedDataOrNone(kvs, version)
+            supersededObject = cls._getDeserializedDataOrNone(json, version)
 
             if supersededObject:
-                return supersededObject, reversed(newerVersions)
+                return supersededObject, list(reversed(newerVersions))
 
             newerVersions.append(version)
 
         return None
 
     @classmethod
-    def _getDeserializedDataOrNone(cls, kvs, supersededClass):
+    def _getDeserializedDataOrNone(
+        cls,
+        json: str,
+        supersededClass: _S0,
+    ) -> _tp.Optional[_S0]:
         try:
-            if not cls._doesVersionMatch(kvs, supersededClass):
-                return None
-
-            deserializedObject = supersededClass.from_dict(kvs)
+            deserializedObject = supersededClass.from_json(json)
 
             return deserializedObject
 
-        except _dcj.ValidationError:
+        except SerializationError:
             return None
-
-    @classmethod
-    def _doesVersionMatch(cls, kvs, supersededClass):
-        if "_VERSION" not in kvs:
-            isInitialVersion = not hasattr(supersededClass, "_SUPERSEDED_CLASS")
-            return isInitialVersion
-
-        version = kvs["_VERSION"]
-
-        return version == supersededClass._VERSION
-
-    @classmethod
-    @_abc.abstractmethod
-    def _fromSuperseded(cls: _tp.Type[_T], superseded: "UpgradableJsonSchemaMixin") -> _T:
-        pass

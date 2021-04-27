@@ -1,6 +1,7 @@
 import copy as _cp
 import dataclasses as _dc
 import json as _json
+import uuid as _uuid
 
 import pytest as _pt
 
@@ -14,8 +15,8 @@ class PersonVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     heightInM: float
 
     @classmethod
-    def _getVersion(cls):
-        return "ff2ba3c8-4fef-4a64-a026-11212ab35d6b"
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("ff2ba3c8-4fef-4a64-a026-11212ab35d6b")
 
 
 @_dc.dataclass
@@ -27,7 +28,7 @@ class PersonVersion1(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion0):
     heightInCm: int
 
     @classmethod
-    def _fromSuperseded(cls, superseded: PersonVersion0) -> "PersonVersion1":
+    def fromSuperseded(cls, superseded: PersonVersion0) -> "PersonVersion1":
         lastName = ""
         heightInCm = round(superseded.heightInM * 100)
         return PersonVersion1(
@@ -35,8 +36,8 @@ class PersonVersion1(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion0):
         )
 
     @classmethod
-    def _getVersion(cls):
-        return "70d5694f-032c-4ca8-b13c-c020b05f2179"
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("70d5694f-032c-4ca8-b13c-c020b05f2179")
 
 
 @_dc.dataclass
@@ -47,32 +48,32 @@ class Person(_ser.UpgradableJsonSchemaMixin, supersedes=PersonVersion1):
     heightInCm: int
 
     @classmethod
-    def _fromSuperseded(cls, superseded: PersonVersion1) -> "Person":
+    def fromSuperseded(cls, superseded: PersonVersion1) -> "Person":
         title = ""
         ageInYears = superseded.age
         return Person(title, superseded.lastName, ageInYears, superseded.heightInCm)
 
     @classmethod
-    def _getVersion(cls):
-        return "1774d088-3917-4c29-a76a-0a4514ef6cf5"
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("1774d088-3917-4c29-a76a-0a4514ef6cf5")
 
 
 class TestSerialization:
     SERIALIZED_P0 = {
-        "_VERSION": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b",
+        "__version__": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b",
         "age": 32,
         "firstName": "Damian",
         "heightInM": 1.73,
     }
     SERIALIZED_P1 = {
-        "_VERSION": "70d5694f-032c-4ca8-b13c-c020b05f2179",
+        "__version__": "70d5694f-032c-4ca8-b13c-c020b05f2179",
         "age": 32,
         "firstName": "Damian",
         "heightInCm": 173,
         "lastName": "Birchler",
     }
     SERIALIZED_P = {
-        "_VERSION": "1774d088-3917-4c29-a76a-0a4514ef6cf5",
+        "__version__": "1774d088-3917-4c29-a76a-0a4514ef6cf5",
         "ageInYears": 32,
         "heightInCm": 173,
         "lastName": "Birchler",
@@ -96,7 +97,6 @@ class TestSerialization:
 
         p = Person.fromUpgradableJson(json)
 
-        assert p._VERSION is Person._getVersion()
         assert p.title is ""
         assert p.lastName is ""
         assert p.ageInYears == self.SERIALIZED_P0["age"]
@@ -104,15 +104,23 @@ class TestSerialization:
 
     def testWrongVersionRaises(self):
         serializedP1 = _cp.deepcopy(self.SERIALIZED_P1)
-        serializedP1["_VERSION"] = 4
+        serializedP1["___version____"] = 4
         json = _json.dumps(serializedP1)
 
-        with _pt.raises(ValueError):
-            Person.fromUpgradableJson(json)
+        with _pt.raises(_ser.SerializationError):
+            Person.from_json(json)
+
+    def testWrongVersion0Raises(self):
+        serializedP1 = _cp.deepcopy(self.SERIALIZED_P0)
+        serializedP1["___version____"] = "2cba32bd-4c8a-49fc-9f0b-a6b312adcf24"
+        json = _json.dumps(serializedP1)
+
+        with _pt.raises(_ser.SerializationError):
+            Person.from_json(json)
 
     def testMissingVersion0DoesNotRaise(self):
         serializedP0 = _cp.deepcopy(self.SERIALIZED_P0)
-        del serializedP0["_VERSION"]
+        del serializedP0["__version__"]
 
         json = _json.dumps(serializedP0)
 
@@ -120,9 +128,37 @@ class TestSerialization:
 
     def testMissingVersionRaises(self):
         serializedP = _cp.deepcopy(self.SERIALIZED_P)
-        del serializedP["_VERSION"]
+        del serializedP["__version__"]
 
         json = _json.dumps(serializedP)
 
-        with _pt.raises(ValueError):
+        with _pt.raises(_ser.SerializationError):
             Person.fromUpgradableJson(json)
+
+    def testLoadVersion1(self):
+        json = _json.dumps(self.SERIALIZED_P1)
+
+        p1 = PersonVersion1.from_json(json)
+        p = Person.fromUpgradableJson(json)
+
+        assert p.title is ""
+        assert p.lastName == p1.lastName
+        assert p.ageInYears == p1.age
+        assert p.heightInCm == p1.heightInCm
+
+    def testWrongFormatRaises(self):
+        phonyP1 = self.SERIALIZED_P0.copy()
+        firstName = phonyP1["firstName"]
+        del phonyP1["firstName"]
+        phonyP1["first-mohican"] = firstName
+
+        json = _json.dumps(phonyP1)
+
+        with _pt.raises(_ser.SerializationError):
+            Person.fromUpgradableJson(json)
+
+    def testNoSupersedesRaises(self):
+        with _pt.raises(ValueError):
+            @_dc.dataclass
+            class C(_ser.UpgradableJsonSchemaMixin):
+                f: int
