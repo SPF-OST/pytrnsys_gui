@@ -26,7 +26,9 @@ setuptools.setup(
             "templates/generic/*.ddck",
         ]
     },
-    scripts=["trnsysGUI/GUI.py"],
+    entry_points={
+        'console_scripts': ['pytrnsys-gui=trnsysGUI.GUI:main']
+    },
     install_requires=[
         "pytrnsys",
         "PyQT5",
