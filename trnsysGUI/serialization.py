@@ -8,12 +8,16 @@ import abc as _abc
 import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
+import logging as _log
 
 import dataclasses_jsonschema as _dcj
 
 _S0 = _tp.TypeVar("_S0", bound="UpgradableJsonSchemaMixinVersion0")
 _SOther = _tp.TypeVar("_SOther", bound="UpgradableJsonSchemaMixinVersion0")
 _T = _tp.TypeVar("_T", bound="UpgradableJsonSchemaMixin")
+
+
+_logger = _log.getLogger("root")
 
 
 class SerializationError(ValueError):
@@ -113,11 +117,23 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
             else:
                 raise AssertionError("Shouldn't get here.")
 
+        supersededObject: _S0
         supersededObject, newerVersions = result
 
         for newerVersion in newerVersions:
+            _logger.debug(
+                "Attempting to convert %s to %s (%s)...",
+                supersededObject.getVersion(),
+                newerVersion.__name__,
+                newerVersion.getVersion(),
+            )
             supersededObject = newerVersion.fromSuperseded(supersededObject)
-
+            _logger.debug(
+                "Succeeded to convert %s to %s (%s)...",
+                supersededObject.getVersion(),
+                newerVersion.__name__,
+                newerVersion.getVersion(),
+            )
         return supersededObject
 
     @classmethod
@@ -151,6 +167,9 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
             supersededObject = cls._getDeserializedDataOrNone(json, version)
 
             if supersededObject:
+                _logger.debug(
+                    "Loaded %s at version %s", version.__name__, version.getVersion()
+                )
                 return supersededObject, list(reversed(newerVersions))
 
             newerVersions.append(version)
