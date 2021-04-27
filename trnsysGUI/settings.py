@@ -19,7 +19,7 @@ class SettingsVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
 
 @_dc.dataclass
-class Settings(_ser.UpgradableJsonSchemaMixin, supersedes=SettingsVersion0):
+class Settings(_ser.UpgradableJsonSchemaMixin):
     @staticmethod
     def create(trnsysBinaryDirPath: _pl.Path) -> "Settings":
         return Settings(str(trnsysBinaryDirPath))
@@ -65,7 +65,11 @@ class Settings(_ser.UpgradableJsonSchemaMixin, supersedes=SettingsVersion0):
         return settingsFilePath
 
     @classmethod
-    def fromSuperseded(cls: _tp.Type[_T], superseded: SettingsVersion0) -> "Settings":
+    def getSupersededClass(cls) -> _tp.Type[SettingsVersion0]:
+        return SettingsVersion0
+
+    @classmethod
+    def fromSuperseded(cls, superseded: SettingsVersion0) -> "Settings":
         trnsysBinaryPath = _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
         return Settings.create(trnsysBinaryPath)
 
