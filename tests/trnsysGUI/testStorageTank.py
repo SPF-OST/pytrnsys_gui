@@ -8,7 +8,7 @@ from PyQt5 import QtWidgets as _widgets
 import trnsysGUI.StorageTank as _st
 
 
-# Sometimes PyQT crashes with only returning a quite cryptic error code. Sometimes, again, we can get
+# Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
 _cgitb.enable(format="text")
 
@@ -92,8 +92,6 @@ class TestStorageTank:
             *objectsNeededToBeKeptAliveForDurationOfTest,
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
 
-        diagramViewMock.adjustSize()
-
         storageTank = _st.StorageTank(trnsysType="StorageTank", parent=diagramViewMock)
         diagramViewMock.scene().addItem(storageTank)
 
@@ -108,7 +106,9 @@ class TestStorageTank:
             connection.initLoad()
 
         reserializedStorageTank = storageTank.encode()[1]
-        reserializedStorageTankJson = _json.dumps(reserializedStorageTank, indent=4, sort_keys=True)
+        reserializedStorageTankJson = _json.dumps(
+            reserializedStorageTank, indent=4, sort_keys=True
+        )
 
         assert reserializedStorageTankJson == storageTankJson
 
@@ -153,6 +153,6 @@ class TestStorageTank:
         diagramViewMock.logger = logger
 
         mainWindow.setCentralWidget(editorMock)
-        mainWindow.showMaximized()
+        mainWindow.showMinimized()
 
         return diagramViewMock, [application, mainWindow, editorMock, graphicsScene]
