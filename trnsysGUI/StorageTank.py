@@ -18,7 +18,6 @@ from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.Types.createType1924 import Type1924_TesPlugFlow
-import trnsysGUI.images as _img
 
 
 class StorageTank(BlockItem):
