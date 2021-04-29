@@ -66,6 +66,10 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         return data
 
     @classmethod
+    def fromUpgradableJson(cls: _tp.Type[_S0], json: str) -> _S0:
+        return cls.from_json(json)
+
+    @classmethod
     @_abc.abstractmethod
     def getVersion(cls) -> _uuid.UUID:
         """To be overwritten in subclass. Use
@@ -104,23 +108,18 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         cls: _tp.Type[_T],
         json: str,
     ) -> _T:
-        allVersions = cls._getAllVersionsInDecreasingOrder()
+        supersededObject = cls._tryDeserializeOrNone(json)
 
-        result = cls._tryGetSupersededObjectAndNewerVersions(json, allVersions)
+        if not supersededObject:
+            cls._raiseSerializationError(json)
 
-        if not result:
-            # We need to do the following to get dataclasses-jsonschema's nice, detailed error message
-            try:
-                cls.from_json(json)
-            except SerializationError:
-                raise
-            else:
-                raise AssertionError("Shouldn't get here.")
+        return cls.fromUpgradableObject(supersededObject)
 
-        supersededObject: _S0
-        supersededObject, newerVersions = result
-
-        for newerVersion in newerVersions:
+    @classmethod
+    def fromUpgradableObject(cls: _tp.Type[_T], supersededObject: _S0) -> _T:
+        descendingNewerVersions = cls._getVersionsDownToAndExcludingGivenVersion(type(supersededObject))
+        ascendingNewerVersions = list(reversed(descendingNewerVersions))
+        for newerVersion in ascendingNewerVersions:
             _logger.debug(
                 "Attempting to convert %s to %s (%s)...",
                 supersededObject.getVersion(),
@@ -137,32 +136,9 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         return supersededObject
 
     @classmethod
-    @_abc.abstractmethod
-    def getSupersededClass(cls) -> _SOther:
-        raise NotImplementedError()
+    def _tryDeserializeOrNone(cls: _tp.Type[_T], json: str) -> _tp.Optional[_S0]:
+        allVersions = cls._getVersionsDownToAndExcludingGivenVersion(lowerBound=None)
 
-    @classmethod
-    @_abc.abstractmethod
-    def fromSuperseded(cls: _tp.Type[_T], superseded: _S0) -> _T:
-        raise NotImplementedError()
-
-    @classmethod
-    def _getAllVersionsInDecreasingOrder(cls) -> _tp.Sequence[_tp.Type[_S0]]:
-        currentVersion = cls
-        allVersions = [currentVersion]
-        isSuperseding = issubclass(currentVersion, UpgradableJsonSchemaMixin)
-        while isSuperseding:
-            currentVersion = currentVersion.getSupersededClass()
-            allVersions.append(currentVersion)
-            isSuperseding = issubclass(currentVersion, UpgradableJsonSchemaMixin)
-
-        return allVersions
-
-    @classmethod
-    def _tryGetSupersededObjectAndNewerVersions(
-        cls, json: str, allVersions: _tp.Sequence[_tp.Type[_S0]]
-    ) -> _tp.Optional[_tp.Tuple[_S0, _tp.Sequence[_tp.Type[_SOther]]]]:
-        newerVersions = []
         for version in allVersions:
             supersededObject = cls._getDeserializedDataOrNone(json, version)
 
@@ -170,11 +146,32 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
                 _logger.debug(
                     "Loaded %s at version %s", version.__name__, version.getVersion()
                 )
-                return supersededObject, list(reversed(newerVersions))
-
-            newerVersions.append(version)
+                return supersededObject
 
         return None
+
+    @classmethod
+    def _getVersionsDownToAndExcludingGivenVersion(
+        cls, lowerBound: _tp.Optional[_tp.Type[_S0]]
+    ) -> _tp.Sequence[_tp.Type[_S0]]:
+        currentVersion = cls
+        result = []
+        while True:
+            isInitialVersion = not issubclass(currentVersion, UpgradableJsonSchemaMixin)
+            if lowerBound:
+                if lowerBound == currentVersion:
+                    return result
+
+                if isInitialVersion:
+                    raise ValueError(f"{cls} neither directly or indirectly supersedes {lowerBound}")
+
+            else:
+                if isInitialVersion:
+                    result.append(currentVersion)
+                    return result
+
+            result.append(currentVersion)
+            currentVersion = currentVersion.getSupersededClass()
 
     @classmethod
     def _getDeserializedDataOrNone(
@@ -189,3 +186,23 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
 
         except SerializationError:
             return None
+
+    @classmethod
+    def _raiseSerializationError(cls, json):
+        # We need to do the following to get dataclasses-jsonschema's nice, detailed error message
+        try:
+            cls.from_json(json)
+        except SerializationError:
+            raise
+        else:
+            raise AssertionError("Shouldn't get here.")
+
+    @classmethod
+    @_abc.abstractmethod
+    def getSupersededClass(cls) -> _SOther:
+        raise NotImplementedError()
+
+    @classmethod
+    @_abc.abstractmethod
+    def fromSuperseded(cls: _tp.Type[_T], superseded: _S0) -> _T:
+        raise NotImplementedError()

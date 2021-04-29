@@ -67,6 +67,39 @@ class Person(_ser.UpgradableJsonSchemaMixin):
         return _uuid.UUID("1774d088-3917-4c29-a76a-0a4514ef6cf5")
 
 
+@_dc.dataclass
+class TeamVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
+    members: _tp.Sequence[PersonVersion1]
+
+    def __post_init__(self):
+        if not self.members:
+            raise ValueError("Team must have at least one member.")
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("9e322099-c043-4f23-b6df-4087bb5950d7")
+
+
+@_dc.dataclass
+class Team(_ser.UpgradableJsonSchemaMixin):
+    lead: Person
+    members: _tp.Sequence[Person]
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[TeamVersion0]:
+        return TeamVersion0
+
+    @classmethod
+    def fromSuperseded(cls, superseded: TeamVersion0) -> "Team":
+        members = [Person.fromUpgradableObject(m) for m in superseded.members]
+        lead = members[0]
+        return Team(lead, members)
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("b39b4d1a-c47b-4981-96d3-3fbb60b19e93")
+
+
 class TestSerialization:
     SERIALIZED_P0 = {
         "__version__": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b",
@@ -88,6 +121,32 @@ class TestSerialization:
         "lastName": "Birchler",
         "title": "Mr.",
     }
+    SERIALIZED_T0 = {
+        "__version__": "9e322099-c043-4f23-b6df-4087bb5950d7",
+        "members": [
+            {
+                "__version__": "70d5694f-032c-4ca8-b13c-c020b05f2179",
+                "age": 32,
+                "firstName": "Damian",
+                "heightInCm": 173,
+                "lastName": "Birchler",
+            },
+            {
+                "__version__": "70d5694f-032c-4ca8-b13c-c020b05f2179",
+                "age": 32,
+                "firstName": "Damian",
+                "heightInCm": 173,
+                "lastName": "Birchler",
+            },
+            {
+                "__version__": "70d5694f-032c-4ca8-b13c-c020b05f2179",
+                "age": 32,
+                "firstName": "Damian",
+                "heightInCm": 173,
+                "lastName": "Birchler",
+            },
+        ],
+    }
 
     def testSerialization(self):
         p0 = PersonVersion0(firstName="Damian", age=32, heightInM=1.73)
@@ -100,6 +159,9 @@ class TestSerialization:
 
         p = Person(title="Mr.", lastName="Birchler", ageInYears=32, heightInCm=173)
         assert p.to_dict() == self.SERIALIZED_P
+
+        t = TeamVersion0([p1, p1, p1])
+        assert t.to_dict() == self.SERIALIZED_T0
 
     def testStandardUseCase(self):
         json = _json.dumps(self.SERIALIZED_P0)
@@ -166,3 +228,12 @@ class TestSerialization:
         with _pt.raises(_ser.SerializationError):
             Person.fromUpgradableJson(json)
 
+    def testNested(self):
+        json = _json.dumps(self.SERIALIZED_T0)
+
+        team = Team.fromUpgradableJson(json)
+
+        expected = Person(title="", lastName="Birchler", ageInYears=32, heightInCm=173)
+        assert team.lead == expected
+        for member in team.members:
+            assert member == expected
