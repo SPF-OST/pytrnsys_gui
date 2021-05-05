@@ -31,7 +31,7 @@ Linux.
 1. Install pytrnsys-gui and the requirements:
     ```commandline
     pip install wheel
-    pip install -r https://github.com/SPF-OST/pytrnsys_gui/blob/master/requirements/releases/[version]/requirements.txt
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/[version]/requirements.txt
     ```
 where [version] should refer to the version you want to install. Typically, you'd choose the latest stable version,
 i.e. the latest version not ending in `aXX`.
