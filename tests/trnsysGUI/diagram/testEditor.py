@@ -57,7 +57,7 @@ class _Helper:
             sh.rmtree(self._actualFolderPath)
 
         pytrnsysGuiDir = pl.Path(__file__).parents[3]
-        exampleFolderPath = pytrnsysGuiDir / "trnsysGUI" / "examples" / "TRIHP_dualSource"
+        exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / "TRIHP_dualSource"
 
         sh.copytree(exampleFolderPath, self.projectFolderPath)
 

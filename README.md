@@ -18,31 +18,40 @@ Linux.
 
 1. [Python 3.9](https://www.python.org/downloads/)
 
-##### Getting started
+#### Getting started
 
+1. Open a command prompt (E.g. by hitting the Windows-key, the typing "cmd" 
+   into the search box and hitting enter). The following commands should be entered
+   into the command prompt just opened.
+
+1. Navigate to the directory which should contain the `pytrnsys-gui` directory:
+    ```commandline
+    cd [your-directory]
+    ```
+   Replace `[your-directory]` (including the brackets []) with your directory of choice: if your
+directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys-gui`.
+   
 1. Create a virtual environment:
     ```commandline
-    py -3.9 -m venv venv
+    py -3.9 -m venv pytrnsys-gui
     ```
 1. Activate it:
     ```commandline
-    venv\Scripts\activate
+    pytrnsys-gui\Scripts\activate
     ```
 1. Install pytrnsys-gui and the requirements:
     ```commandline
     pip install wheel
     pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/[version]/requirements.txt
     ```
-where [version] should refer to the version you want to install. Typically, you'd choose the latest stable version,
-i.e. the latest version not ending in `aXX`.
+where `[version]` should refer to the version you want to install. Typically, you'd choose the latest stable version,
+i.e. the latest version *not* ending in `aXX`.
 
-1. Run `pytrnsys-gui`!
-    ```commandline
-   pytrnsys-gui
-    ```
-    
-Beware that the GUI can only be started from within the virtual environment you created in step 1, i.e., whenever you open a new console window from which you want to start the GUI you first need to active the environment (step 2. above).
+You can now close the command prompt opened in the first step.
 
+The `pytrnsys-gui` can now be started by double-clicking on the 
+`pytrnsys-gui\Scripts\pytrnsys-gui.exe` file. Example projects can be found in the
+`pytrnsys-gui\examples` directory.
 
 
 ### Installation from source / Developer installation
@@ -66,7 +75,7 @@ Beware that the GUI can only be started from within the virtual environment you 
 ##### Recommended
 * [PyCharm Community IDE](https://www.jetbrains.com/pycharm/downloa)
 
-##### Getting started
+#### Getting started
 
 All the following commands should be run from the `pytrnsys_gui` directory. The commands
 specified are for a Windows environment. They are very similar for Linux.
