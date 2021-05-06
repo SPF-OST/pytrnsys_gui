@@ -20,7 +20,7 @@ Linux.
 
 #### Getting started
 
-1. Open a command prompt (E.g. by hitting the Windows-key, the typing "cmd" 
+1. Open a command prompt (e.g. by hitting the Windows-key, then typing "cmd" 
    into the search box and hitting enter). The following commands should be entered
    into the command prompt just opened.
 
@@ -39,14 +39,17 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
     ```commandline
     pytrnsys-gui\Scripts\activate
     ```
-1. Install pytrnsys-gui and the requirements:
+1. Install the `wheel` package:
     ```commandline
     pip install wheel
+    ```
+         
+1. Install `pytrnsys-gui` and its requirements: replace `[version]` in the following command 
+with the version you want to install (typically, you'd choose the latest stable version, i.e. the latest
+version *not* ending in `aXX`) and hit enter.
+    ```commandline
     pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/[version]/requirements.txt
     ```
-where `[version]` should refer to the version you want to install. Typically, you'd choose the latest stable version,
-i.e. the latest version *not* ending in `aXX`.
-
 You can now close the command prompt opened in the first step.
 
 The `pytrnsys-gui` can now be started by double-clicking on the 
