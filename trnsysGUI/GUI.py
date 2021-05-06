@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import glob
 import os
+import subprocess
 import pathlib as _pl
 import shutil
 import sys
@@ -627,12 +628,18 @@ class MainWindow(QMainWindow):
 
     def runAndVisMf(self):
         self.calledByVisualizeMf = True
-        mfrFile, tempFile = self.runMassflowSolver()
-        if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
-            MassFlowVisualizer(self, mfrFile, tempFile)
-            self.massFlowEnabled = True
-        else:
-            self.logger.info("No mfrFile or tempFile found!")
+        filePaths = self.runMassflowSolver()
+        if not filePaths:
+            self.logger.error("Could not execute runMassflowSolver")
+            return
+
+        mfrFile, tempFile = filePaths
+        if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
+            self.logger.error("No mfrFile or tempFile found!")
+            return
+
+        MassFlowVisualizer(self, mfrFile, tempFile)
+        self.massFlowEnabled = True
 
     def visualizeMf(self):
         qmb = QMessageBox()
@@ -802,20 +809,32 @@ class MainWindow(QMainWindow):
                 msgb.exec()
                 return 0, 0
             self.logger.info("trnsyspath: %s", self.centralWidget.trnsysPath)
-            cmd = f"{self.centralWidget.trnsysPath} {exportPath} /H"
-            os.system(cmd)
-            mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt")
-            tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt")
-            if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
-                msgb.setText("Execution of Trnsys NOT succesful")
-                msgb.exec()
-                del self.exportedTo
-            else:
-                if not self.calledByVisualizeMf:
-                    msgb.setText("Execution of Trnsys succesful")
-                    msgb.exec()
-            self.calledByVisualizeMf = False
-            return mfrFile, tempFile
+            # cmd = f"{self.centralWidget.trnsysPath} {exportPath} /H"
+            errorStatement = ""
+            try:
+                subprocess.run([str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True)
+                mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt")
+                tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt")
+                self.calledByVisualizeMf = False
+                return mfrFile, tempFile
+            except ValueError as e:
+                logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
+                for words in e.args:
+                    errorStatement += str(words)
+            except OSError as e:
+                logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
+                errorStatement = str(e)
+            except:
+                logger.error("UNDEFINED EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
+
+            messageText = "Exception while trying to execute runMassflowSolver:\n\n" + errorStatement
+            qmb = QMessageBox()
+            qmb.setText(messageText)
+            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.setDefaultButton(QMessageBox.Ok)
+            qmb.exec()
+
+            return None
 
     def loadVisualization(self):
         MfrFile = QFileDialog.getOpenFileName(self, "Select Mfr File", "exports", filter="*_Mfr.prt")[0]
