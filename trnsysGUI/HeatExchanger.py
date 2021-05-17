@@ -167,7 +167,6 @@ class HeatExchanger(QGraphicsItemGroup):
             self.lines.append(lineTop)
 
             times = self.h / HeatExchanger.partH
-            param = times / 2
             self.logger.debug("Times is " + str(times))
 
             for i in range(int(times)):
