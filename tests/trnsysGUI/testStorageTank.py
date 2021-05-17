@@ -15,7 +15,7 @@ _cgitb.enable(format="text")
 
 class TestStorageTank:
     def testSerialization(self, tmp_path):
-        storageTankJson = """{
+        storageTankLegacyJson = """{
     ".__BlockDict__": true,
     "BlockDisplayName": "Dhw",
     "BlockName": "StorageTank",
@@ -82,22 +82,122 @@ class TestStorageTank:
     "size_h": 220.0,
     "trnsysID": 638
 }"""
-
-        serializedStorageTank = _json.loads(storageTankJson)
-
+        expectedStorageTankJson = """{
+    ".__BlockDict__": true,
+    "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+    "blockDisplayName": "Dhw",
+    "blockName": "StorageTank",
+    "directPortPairs": [
+        {
+            "connectionId": 440,
+            "id": 1984,
+            "portPair": {
+                "inputPort": {
+                    "id": 1982,
+                    "relativeHeight": 0.95
+                },
+                "name": "TesDHWPortHpDhw",
+                "outputPort": {
+                    "id": 1983,
+                    "relativeHeight": 0.35454545454545455
+                },
+                "side": "left"
+            },
+            "trnsysId": 641
+        },
+        {
+            "connectionId": 881,
+            "id": 3926,
+            "portPair": {
+                "inputPort": {
+                    "id": 3924,
+                    "relativeHeight": 0.7
+                },
+                "name": "TesDHWPortDhwRecir",
+                "outputPort": {
+                    "id": 3925,
+                    "relativeHeight": 0.9
+                },
+                "side": "right"
+            },
+            "trnsysId": 1271
+        },
+        {
+            "connectionId": 886,
+            "id": 3943,
+            "portPair": {
+                "inputPort": {
+                    "id": 3941,
+                    "relativeHeight": 0.05
+                },
+                "name": "TesDHWPortDHW",
+                "outputPort": {
+                    "id": 3942,
+                    "relativeHeight": 0.95
+                },
+                "side": "right"
+            },
+            "trnsysId": 1277
+        }
+    ],
+    "groupName": "defaultGroup",
+    "heatExchangers": [
+        {
+            "connectionTrnsysId": 639,
+            "id": 1976,
+            "parentId": 1975,
+            "portPair": {
+                "inputPort": {
+                    "id": 1977,
+                    "relativeHeight": 0.3
+                },
+                "name": "SolarHx",
+                "outputPort": {
+                    "id": 1978,
+                    "relativeHeight": 0.11818181818181818
+                },
+                "side": "left"
+            },
+            "width": 40
+        }
+    ],
+    "height": 220.0,
+    "id": 1975,
+    "isHorizontallyFlipped": false,
+    "isVerticallyFlipped": false,
+    "position": [
+        -681.9155092592591,
+        -581.1302806712963
+    ],
+    "trnsysId": 638
+}"""
         logger = _log.getLogger("root")
-
         (
             diagramViewMock,
-            *objectsNeededToBeKeptAliveForDurationOfTest,
+            objectsNeededToBeKeptAliveWhileTanksAlive,
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
+
+        storageTank = self._deserializeStorageTank(storageTankLegacyJson, diagramViewMock)
+
+        serializedStorageTank = storageTank.encode()[1]
+        actualStorageTankJson = _json.dumps(
+            serializedStorageTank, indent=4, sort_keys=True
+        )
+
+        assert actualStorageTankJson == expectedStorageTankJson
+
+        self._deserializeStorageTank(actualStorageTankJson, diagramViewMock)
+
+    @staticmethod
+    def _deserializeStorageTank(storageTankLegacyJson, diagramViewMock):
+        legacySerializedStorageTank = _json.loads(storageTankLegacyJson)
 
         storageTank = _st.StorageTank(trnsysType="StorageTank", parent=diagramViewMock)
         diagramViewMock.scene().addItem(storageTank)
 
         connections = []
         blocks = []
-        storageTank.decode(serializedStorageTank, connections, blocks)
+        storageTank.decode(legacySerializedStorageTank, connections, blocks)
 
         for heatExchanger in storageTank.heatExchangers:
             heatExchanger.initLoad()
@@ -105,12 +205,7 @@ class TestStorageTank:
         for connection in connections:
             connection.initLoad()
 
-        reserializedStorageTank = storageTank.encode()[1]
-        reserializedStorageTankJson = _json.dumps(
-            reserializedStorageTank, indent=4, sort_keys=True
-        )
-
-        assert reserializedStorageTankJson == storageTankJson
+        return storageTank
 
     @staticmethod
     def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path):

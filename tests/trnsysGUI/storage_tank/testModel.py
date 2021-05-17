@@ -1,11 +1,9 @@
-import json as _json
-
 import trnsysGUI.storage_tank.model as _stm
 
 
 class TestModel:
     def testRoundTrip(self):
-        serializedModel = """{
+        storageTankLegacyJson = """{
     ".__BlockDict__": true,
     "BlockDisplayName": "Dhw",
     "BlockName": "StorageTank",
@@ -72,28 +70,98 @@ class TestModel:
     "size_h": 220.0,
     "trnsysID": 638
 }"""
-        model = _stm.StorageTankVersion0.fromUpgradableJson(serializedModel)
-        data = model.to_dict()
-        _removeVersionsRecursively(data)
+        expectedStorageTankJson = """{
+    ".__BlockDict__": true,
+    "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+    "blockDisplayName": "Dhw",
+    "blockName": "StorageTank",
+    "directPortPairs": [
+        {
+            "connectionId": 440,
+            "id": 1984,
+            "portPair": {
+                "inputPort": {
+                    "id": 1982,
+                    "relativeHeight": 0.95
+                },
+                "name": "TesDHWPortHpDhw",
+                "outputPort": {
+                    "id": 1983,
+                    "relativeHeight": 0.35454545454545455
+                },
+                "side": "left"
+            },
+            "trnsysId": 641
+        },
+        {
+            "connectionId": 881,
+            "id": 3926,
+            "portPair": {
+                "inputPort": {
+                    "id": 3924,
+                    "relativeHeight": 0.7
+                },
+                "name": "TesDHWPortDhwRecir",
+                "outputPort": {
+                    "id": 3925,
+                    "relativeHeight": 0.9
+                },
+                "side": "right"
+            },
+            "trnsysId": 1271
+        },
+        {
+            "connectionId": 886,
+            "id": 3943,
+            "portPair": {
+                "inputPort": {
+                    "id": 3941,
+                    "relativeHeight": 0.05
+                },
+                "name": "TesDHWPortDHW",
+                "outputPort": {
+                    "id": 3942,
+                    "relativeHeight": 0.95
+                },
+                "side": "right"
+            },
+            "trnsysId": 1277
+        }
+    ],
+    "groupName": "defaultGroup",
+    "heatExchangers": [
+        {
+            "connectionTrnsysId": 639,
+            "id": 1976,
+            "parentId": 1975,
+            "portPair": {
+                "inputPort": {
+                    "id": 1977,
+                    "relativeHeight": 0.3
+                },
+                "name": "SolarHx",
+                "outputPort": {
+                    "id": 1978,
+                    "relativeHeight": 0.11818181818181818
+                },
+                "side": "left"
+            },
+            "width": 40
+        }
+    ],
+    "height": 220.0,
+    "id": 1975,
+    "isHorizontallyFlipped": false,
+    "isVerticallyFlipped": false,
+    "position": [
+        -681.9155092592591,
+        -581.1302806712963
+    ],
+    "trnsysId": 638
+}"""
+        storageTank\
+            = _stm.StorageTank.from_json(storageTankLegacyJson)
+        actualStorageTankJson = storageTank.to_json(indent=4, sort_keys=True)
 
-        json = _json.dumps(data, indent=4, sort_keys=True)
-        assert json == serializedModel
+        assert actualStorageTankJson == expectedStorageTankJson
 
-
-def _removeVersionsRecursively(data):
-    if isinstance(data, dict) and "__version__" in data:
-        del data["__version__"]
-
-        _removeVersionsRecursively(data.values())
-
-    if isinstance(data, str):
-        return
-
-    try:
-        for value in data:
-            _removeVersionsRecursively(value)
-    except TypeError:
-        pass
-
-    # scalar: no need to do anything
-    return
