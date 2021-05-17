@@ -274,26 +274,6 @@ class ConfigStorage(QDialog):
                 + "%d%%" % (100 - 100 * c.toPort.pos().y() / self.storage.h)
             )
 
-    # Unused
-    def addPortPairToList(self, p):
-        if not p.isFromHx:
-            if p.side == 2:
-                listW = self.listWR2
-            else:
-                listW = self.listWL2
-
-            if p.connectionList[0].fromPort is p:
-                otherPort = p.connectionList[0].toPort
-            else:
-                otherPort = p.connectionList[0].fromPort
-
-            listW.addItem(
-                "Port pair from "
-                + "%0.2f" % (100 - 100 * p.pos().y() / self.storage.h)
-                + " to "
-                + "%0.2f" % (100 - 100 * otherPort.pos().y() / self.storage.h)
-            )
-
     def listWLClicked(self):
         self.listWR.clearSelection()
 
@@ -363,12 +343,12 @@ class ConfigStorage(QDialog):
             return
 
         hx_temp = HeatExchanger(
-            0,
-            self.w_hx,
-            abs(1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
-            QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
-            self.storage,
-            self.hxNameLe.text(),
+            side=0,
+            sizeW=self.w_hx,
+            sizeH=abs(1 / 100 * self.storage.h * (float(self.offsetLeO.text()) - float(self.offsetLeI.text()))),
+            offset=QPointF(0, self.storage.h - 1 / 100 * float(self.offsetLeI.text()) * self.storage.h),
+            parent=self.storage,
+            name=self.hxNameLe.text(),
             tempHx=True,
         )
 
