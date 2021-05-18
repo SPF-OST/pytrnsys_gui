@@ -756,21 +756,15 @@ class StorageTank(BlockItem):
 
         sideNr = portPair.side.toSideNr()
 
-        outputPortHeight = portPair.outputPort.relativeHeight * self.h
-        inputPortHeight = portPair.inputPort.relativeHeight * self.h
-        height = inputPortHeight - outputPortHeight
-
-        yOffsetFromStorageTop = self.h - inputPortHeight
-        xOffsetFromStorageSide = 0 if portPair.side == _model.Side.LEFT else self.w
-        offset = QPointF(xOffsetFromStorageSide, yOffsetFromStorageTop)
-
         name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
 
         heatExchanger = HeatExchanger(
             sideNr,
             heatExchangerModel.width,
-            height,
-            offset,
+            portPair.inputPort.relativeHeight,
+            portPair.outputPort.relativeHeight,
+            self.w,
+            self.h,
             self,
             name,
             loadedHx=True,
@@ -997,8 +991,8 @@ class StorageTank(BlockItem):
             Tname = "T" + self.heatExchangers[i].port1.connectionList[1].displayName
             Mfrname = "Mfr" + self.heatExchangers[i].port1.connectionList[1].displayName
             Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
-            inputPos = self.heatExchangers[i].input / 100
-            outputPos = self.heatExchangers[i].output / 100
+            inputPos = self.heatExchangers[i].relativeInputHeight / 100
+            outputPos = self.heatExchangers[i].relativeOutputHeight / 100
             connectorsHx[i] = {
                 "Name": HxName,
                 "T": Tname,
