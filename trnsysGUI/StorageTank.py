@@ -697,35 +697,44 @@ class StorageTank(BlockItem):
         ]
 
     def decode(self, i, resConnList, resBlockList):
+        offset_x = 0
+        offset_y = 0
+        self._decodeInternal(i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs=True)
+
+    def _decodeInternal(self, i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs: bool):
         self.logger.debug("Loading a Storage in Decoder")
 
         model = _model.StorageTank.from_dict(i)
 
         self.flippedH = model.isHorizontallyFlipped
-        # self.flippedV = i["FlippedV"] # No support for vertical flip
-        self.displayName = model.blockDisplayName
+
+        if shallSetNamesAndIDs:
+            self.displayName = model.blockDisplayName
 
         self.changeSize()
         self.h = model.height
         self.updateImage()
 
-        self.setPos(model.position[0], model.position[1])
-        self.trnsysId = model.trnsysId
-        self.id = model.id
+        self.setPos(model.position[0] + offset_x, model.position[1] + offset_y)
 
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(model.groupName)
+        if shallSetNamesAndIDs:
+            self.trnsysId = model.trnsysId
+            self.id = model.id
+            self.groupName = "defaultGroup"
+            self.setBlockToGroup(model.groupName)
 
         for heatExchangerModel in model.heatExchangers:
-            self._decodeHeatExchanger(heatExchangerModel)
+            self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)
 
         for portPairModel in model.directPortPairs:
-            self._decodeDirectPortPair(portPairModel, resConnList)
+            self._decodeDirectPortPair(portPairModel, resConnList, shallSetNamesAndIDs)
 
         resBlockList.append(self)
 
-    def _decodeDirectPortPair(self, portPairModel: _model.DirectPortPair, resConnList):
+    def _decodeDirectPortPair(self, portPairModel: _model.DirectPortPair, resConnList, shallSetNamesAndIDs: bool):
         portPair = portPairModel.portPair
+
+        name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
 
         connection = self.setSideManualPair(
             left=portPair.side == _model.Side.LEFT,
@@ -735,14 +744,14 @@ class StorageTank(BlockItem):
             toPortId=portPair.outputPort.id,
             connId=portPairModel.id,
             connCid=portPairModel.connectionId,
-            connDispName=portPair.name,
+            connDispName=name,
             trnsysConnId=portPairModel.trnsysId,
             loadedConn=True,
         )
 
         resConnList.append(connection)
 
-    def _decodeHeatExchanger(self, heatExchangerModel: _model.HeatExchanger):
+    def _decodeHeatExchanger(self, heatExchangerModel: _model.HeatExchanger, shallSetNamesAndIDs: bool):
         portPair = heatExchangerModel.portPair
 
         sideNr = portPair.side.toSideNr()
@@ -755,87 +764,27 @@ class StorageTank(BlockItem):
         xOffsetFromStorageSide = 0 if portPair.side == _model.Side.LEFT else self.w
         offset = QPointF(xOffsetFromStorageSide, yOffsetFromStorageTop)
 
+        name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
+
         heatExchanger = HeatExchanger(
             sideNr,
             heatExchangerModel.width,
             height,
             offset,
             self,
-            portPair.name,
+            name,
             loadedHx=True,
             connTrnsysID=heatExchangerModel.connectionTrnsysId
         )
-        heatExchanger.setId(heatExchangerModel.id)
+
+        if shallSetNamesAndIDs:
+            heatExchanger.setId(heatExchangerModel.id)
+
         heatExchanger.port1.id = portPair.inputPort.id
         heatExchanger.port2.id = portPair.outputPort.id
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.flippedH = i["FlippedH"]
-        self.changeSize()
-        self.h = i["size_h"]
-        self.updateImage()
-
-        self.setPos(
-            float(i["StoragePosition"][0]) + offset_x,
-            float(i["StoragePosition"][1]) + offset_y,
-        )
-
-        # Add heat exchanger
-        for h in i["HxList"]:
-            # self.logger.debug(kwargs)
-            # sys.exit()
-            # connsysConnId=kwargs["editor"].idGen.getTrnsysID()
-            hEx = HeatExchanger(
-                h["SideNr"],
-                h["Width"],
-                h["Height"],
-                QPointF(h["Offset"][0], h["Offset"][1]),
-                self,
-                h["DisplayName"] + "New",
-                port1ID=h["Port1ID"],
-                port2ID=h["Port2ID"],
-                connTrnsysID=h["connTrnsysID"],
-                loadedHx=True,
-            )
-
-            # hEx = HeatExchanger(h["SideNr"], h["Width"], h["Height"],
-            #                     QPointF(h["Offset"][0], h["Offset"][1]),
-            #                     self, h["DisplayName"] + "New",
-            #                     port1ID=h['Port1ID'], port2ID=h['Port2ID'],
-            #                     connTrnsysID=kwargs["editor"].idGen.getTrnsysID(), loadedHx=True)
-
-            # hEx.setId(["ID"])
-            hEx.port1.id = h["Port1ID"]
-            hEx.port2.id = h["Port2ID"]
-
-        # Add manual inputs
-        for x in i["PortPairList"]:
-            self.logger.debug("Printing port pair")
-            self.logger.debug(x)
-
-            # trnsysConnId=kwargs["editor"].idGen.getTrnsysID()
-            conn = self.setSideManualPair(
-                x["Side"],
-                x["Port1offset"],
-                x["Port2offset"],
-                fromPortId=x["Port1ID"],
-                toPortId=x["Port2ID"],
-                connId=x["ConnID"],
-                connCid=x["ConnCID"],
-                connDispName=x["ConnDisName"] + "New",
-                trnsysConnId=x["trnsysID"],
-                loadedConn=True,
-            )
-
-            # conn = self.setSideManualPair(x["Side"], x["Port1offset"], x["Port2offset"],
-            #                               fromPortId=x["Port1ID"], toPortId=x["Port2ID"],
-            #                               connId=kwargs["editor"].idGen.getID(),
-            #                               connCid=kwargs["editor"].idGen.getConnID(),
-            #                               connDispName=x["ConnDisName"] + "New",
-            #                               trnsysConnId=kwargs["editor"].idGen.getTrnsysID(), loadedConn=True)
-
-            resConnList.append(conn)
-        resBlockList.append(self)
+        self._decodeInternal(i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs=False)
 
     # Debug
     def dumpBlockInfo(self):
