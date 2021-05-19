@@ -84,9 +84,9 @@ class TestStorageTank:
 }"""
         expectedStorageTankJson = """{
     ".__BlockDict__": true,
+    "BlockDisplayName": "Dhw",
+    "BlockName": "StorageTank",
     "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
-    "blockDisplayName": "Dhw",
-    "blockName": "StorageTank",
     "directPortPairs": [
         {
             "connectionId": 440,

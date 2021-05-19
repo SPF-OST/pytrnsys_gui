@@ -59,8 +59,8 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     isHorizontallyFlipped: bool
     isVerticallyFlipped: bool
 
-    blockName: str
-    blockDisplayName: str
+    BlockName: str
+    BlockDisplayName: str
 
     groupName: str
     id: int
