@@ -40,8 +40,6 @@ class HeatExchanger(QGraphicsItemGroup):
         self.sSide = sideNr
         self.id = self.parent.parent.parent().idGen.getID()
 
-        # self.rectangle = QGraphicsRectItem(0,0 ,self.w -5, self.h, self)
-
         self.conn = None
 
         self.parent.heatExchangers.append(self)

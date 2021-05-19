@@ -538,8 +538,8 @@ class Editor(QWidget):
 
                 # print("t.leftside has len " + str(len(t.leftSide)))
                 # print("t.leftside is " + str(t.rightSide))
-                t.connectInside(self.findStorageCorrespPorts(t.leftSide), t.leftSide, t.insideConnLeft, "L")
-                t.connectInside(self.findStorageCorrespPorts(t.rightSide), t.rightSide, t.insideConnRight, "R")
+                t.connectInside(self.findStorageCorrespPorts(t.leftDirectPortPairsPortItems), t.leftDirectPortPairsPortItems, t.insideConnLeft, "L")
+                t.connectInside(self.findStorageCorrespPorts(t.rightDirectPortPairsPortItems), t.rightDirectPortPairsPortItems, t.insideConnRight, "R")
 
                 # print("------Checking insideConns")
                 # print(t.hxInsideConnsLeft)
