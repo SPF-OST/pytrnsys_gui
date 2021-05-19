@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import re
 import sys
 from datetime import timedelta, datetime, MINYEAR

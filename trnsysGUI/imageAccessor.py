@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["ImageAccessor"]
 
 import pkgutil as _pu

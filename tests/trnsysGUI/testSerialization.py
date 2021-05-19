@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import copy as _cp
 import dataclasses as _dc
 import json as _json

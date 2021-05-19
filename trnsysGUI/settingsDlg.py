@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["SettingsDlg", "MaybeCancelled", "CANCELLED"]
 
 import pathlib as _pl

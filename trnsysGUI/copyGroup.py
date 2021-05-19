@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 class copyGroup:
     def __init__(self, editor):
         self.diagramName = "COPYGROUP"

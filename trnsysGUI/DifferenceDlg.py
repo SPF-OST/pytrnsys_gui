@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 from datetime import datetime
 import sys

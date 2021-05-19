@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtCore import QMimeData, Qt
 from PyQt5.QtGui import QStandardItemModel
 

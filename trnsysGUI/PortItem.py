@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import sys
 
 from PyQt5 import QtCore

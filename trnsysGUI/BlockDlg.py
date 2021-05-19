@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 
 from PyQt5.QtWidgets import (

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import sys
 import re
 

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtWidgets import QDialog, QLineEdit, QLabel, QPushButton, QHBoxLayout, QGridLayout
 
 

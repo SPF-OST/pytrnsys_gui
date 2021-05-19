@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import argparse as _ap
 import dataclasses as _dc
 

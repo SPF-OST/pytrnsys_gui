@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import json
 import os
 import pathlib as _pl
