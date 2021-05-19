@@ -87,7 +87,7 @@ class TestModel:
                 "name": "TesDHWPortHpDhw",
                 "outputPort": {
                     "id": 1983,
-                    "relativeHeight": 0.35454545454545455
+                    "relativeHeight": 0.35
                 },
                 "side": "left"
             },
@@ -142,7 +142,7 @@ class TestModel:
                 "name": "SolarHx",
                 "outputPort": {
                     "id": 1978,
-                    "relativeHeight": 0.11818181818181818
+                    "relativeHeight": 0.12
                 },
                 "side": "left"
             },

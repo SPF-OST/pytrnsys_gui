@@ -214,8 +214,8 @@ class HeatExchanger(_dcj.JsonSchemaMixin):
         absoluteInputHeight = storageTankHeight - superseded.Offset[1]
         absoluteOutputHeight = absoluteInputHeight - superseded.Height
 
-        relativeInputHeight = absoluteInputHeight / storageTankHeight
-        relativeOutputHeight = absoluteOutputHeight / storageTankHeight
+        relativeInputHeight = round(absoluteInputHeight / storageTankHeight, 2)
+        relativeOutputHeight = round(absoluteOutputHeight / storageTankHeight, 2)
 
         inputPort = Port(superseded.Port1ID, relativeInputHeight)
         outputPort = Port(superseded.Port2ID, relativeOutputHeight)
@@ -246,11 +246,11 @@ class DirectPortPair(_dcj.JsonSchemaMixin):
         cls, superseded: DirectPortPairVersion0, storageTankHeight: float
     ) -> "DirectPortPair":
         absoluteInputHeight = storageTankHeight - superseded.Port1offset
-        relativeInputHeight = absoluteInputHeight / storageTankHeight
+        relativeInputHeight = round(absoluteInputHeight / storageTankHeight, 2)
         inputPort = Port(superseded.Port1ID, relativeInputHeight)
 
         absoluteOutputHeight = storageTankHeight - superseded.Port2offset
-        relativeOutputHeight = absoluteOutputHeight / storageTankHeight
+        relativeOutputHeight = round(absoluteOutputHeight / storageTankHeight, 2)
         outputPort = Port(superseded.Port2ID, relativeOutputHeight)
 
         side = Side.LEFT if superseded.Side else Side.RIGHT
