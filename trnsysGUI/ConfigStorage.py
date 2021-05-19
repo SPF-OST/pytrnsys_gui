@@ -169,10 +169,6 @@ class ConfigStorage(QDialog):
         self.modifyPortButton = QPushButton("Modify")
         self.modifyPortButton.clicked.connect(self.modifyPort)
 
-        warning = QLabel(
-            "                Remove and modify function for Direct Ports are not fully functional, use with caution!"
-        )
-
         addRemoveButtons = QHBoxLayout()
         addRemoveButtons.addWidget(self.manAddButton)
         addRemoveButtons.addWidget(self.manRemovebutton)
@@ -186,7 +182,6 @@ class ConfigStorage(QDialog):
         manPortLay.addWidget(self.manPortLeO)
         manPortLay.addLayout(qhbl3)
         manPortLay.addLayout(addRemoveButtons)
-        manPortLay.addWidget(warning)
 
         increaseSizeButton = QPushButton("Increase size")
         decreaseSizeButton = QPushButton("Decrease size")
