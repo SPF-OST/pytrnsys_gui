@@ -166,13 +166,13 @@ class HeatPump(BlockItem):
             lines += infile.readlines()
         for i in range(len(lines)):
             if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
-                counter = 0
+                counter = 1
                 for j in range(i, len(lines) - i):
                     if lines[j][0] == "T":
                         outputT = lines[j].split("=")[0].replace(" ", "")
                         equation.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
                         counter += 1
-                    if counter == 2:
+                    if counter == 3:
                         status = "success"
                         break
                 break
