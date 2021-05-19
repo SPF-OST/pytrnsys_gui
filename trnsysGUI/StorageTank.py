@@ -640,16 +640,12 @@ class StorageTank(BlockItem):
 
             side = _model.Side.createFromSideNr(connection.fromPort.side)
 
-            inputOffsetFromStorageTop = connection.fromPort.pos().y()
-            absoluteInputHeight = self.h - inputOffsetFromStorageTop
             inputPortModel = _model.Port(
-                connection.fromPort.id, relativeHeight=absoluteInputHeight / self.h
+                connection.fromPort.id, directPort.relativeInputHeight
             )
 
-            outputOffsetFromStorageTop = connection.toPort.pos().y()
-            absoluteOutputHeight = self.h - outputOffsetFromStorageTop
             outputPortModel = _model.Port(
-                connection.toPort.id, relativeHeight=absoluteOutputHeight / self.h
+                connection.toPort.id, directPort.relativeOutputHeight
             )
 
             portPairModel = _model.PortPair(
@@ -669,16 +665,14 @@ class StorageTank(BlockItem):
         for heatExchanger in self.heatExchangers:
             side = _model.Side.createFromSideNr(heatExchanger.sSide)
 
-            absoluteInputHeight = self.h - heatExchanger.offset.y()
             inputPort = _model.Port(
                 heatExchanger.port1.id,
-                relativeHeight=absoluteInputHeight / self.h,
+                heatExchanger.relativeInputHeight,
             )
 
-            absoluteOutputHeight = absoluteInputHeight - heatExchanger.h
             outputPort = _model.Port(
                 heatExchanger.port2.id,
-                relativeHeight=absoluteOutputHeight / self.h,
+                heatExchanger.relativeOutputHeight,
             )
 
             portPair = _model.PortPair(
