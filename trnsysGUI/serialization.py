@@ -8,10 +8,10 @@ __all__ = [
 ]
 
 import abc as _abc
-import dataclasses as _dc
+import logging as _log
 import typing as _tp
 import uuid as _uuid
-import logging as _log
+import json as _json
 
 import dataclasses_jsonschema as _dcj
 
@@ -28,7 +28,6 @@ class SerializationError(ValueError):
         super().__init__(*args)
 
 
-@_dc.dataclass
 class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
     @classmethod
     def from_dict(
@@ -37,6 +36,9 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         validate=True,
         validate_enums: bool = True,
     ) -> _S0:
+        if cls._doesRequireVersion() and "__version__" not in data:
+            raise SerializationError("No '__version__' field found.")
+
         if "__version__" in data:
             data = data.copy()
             actualVersion = data.pop("__version__")
@@ -61,12 +63,42 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         validate_enums: bool = True,
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
-        if "__version__" in data:
-            raise AssertionError(
-                "Serialized object dictionary from dataclasses-json already contained '__version__' key!"
-            )
+
+        assert (
+            "__version__" not in data
+        ), "Serialized object dictionary from dataclasses-json already contained '__version__' key!"
+
         data["__version__"] = str(self.getVersion())
         return data
+
+    @classmethod
+    def json_schema(
+        cls,
+        embeddable: bool = False,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,
+        validate_enums: bool = True,
+        **kwargs,
+    ) -> _dcj.JsonDict:
+        schema = super().json_schema(embeddable, schema_type, validate_enums, **kwargs)
+
+        schemaWithVersion = cls._getSchemaWithVersion(schema, embeddable)
+
+        return schemaWithVersion
+
+    @classmethod
+    def _getSchemaWithVersion(cls, fullSchema, embeddable):
+        schema = fullSchema[cls.__name__] if embeddable else fullSchema
+
+        properties = schema.get("properties", {})
+        properties = {**properties, "__version__": {"const": str(cls.getVersion())}}
+
+        required = schema.get("required", [])
+        if cls._doesRequireVersion():
+            required = [*required, "__version__"]
+
+        schema = {**schema, "properties": properties, "required": required}
+
+        return {**fullSchema, cls.__name__: schema} if embeddable else schema
 
     @classmethod
     @_abc.abstractmethod
@@ -87,8 +119,11 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
         """
         raise NotImplementedError()
 
+    @classmethod
+    def _doesRequireVersion(cls) -> bool:
+        return False
 
-@_dc.dataclass
+
 class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
     @classmethod
     def from_dict(
@@ -97,47 +132,150 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         validate=True,
         validate_enums: bool = True,
     ) -> _T:
-        if "__version__" not in data:
-            raise SerializationError("No '__version__' field found.")
+        if validate:
+            try:
+                cls._validate(data, validate_enums)
+            except _dcj.ValidationError as e:
+                raise SerializationError from e
 
-        return super().from_dict(data, validate, validate_enums)
+        try:
+            return super().from_dict(
+                data, validate=False, validate_enums=validate_enums
+            )
+        except SerializationError:
+            supersededClass = cls.getSupersededClass()
+
+            supersededInstance = supersededClass.from_dict(
+                data, validate=False, validate_enums=validate_enums
+            )
+
+            return cls.upgrade(supersededInstance)
 
     @classmethod
-    def fromUpgradableJson(
-        cls: _tp.Type[_T],
-        json: str,
-    ) -> _T:
-        allVersions = cls._getAllVersionsInDecreasingOrder()
+    def json_schema(
+        cls,
+        embeddable: bool = False,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,
+        validate_enums: bool = True,
+        **kwargs,
+    ) -> _dcj.JsonDict:
+        if embeddable:
+            return cls._getEmbeddableSchema(kwargs, schema_type, validate_enums)
 
-        result = cls._tryGetSupersededObjectAndNewerVersions(json, allVersions)
+        return cls._getSchema(kwargs, schema_type, validate_enums)
 
-        if not result:
-            # We need to do the following to get dataclasses-jsonschema's nice, detailed error message
-            try:
-                cls.from_json(json)
-            except SerializationError:
-                raise
-            else:
-                raise AssertionError("Shouldn't get here.")
+    @classmethod
+    def _getEmbeddableSchema(cls, kwargs, schema_type, validate_enums):
+        fullSchema = super().json_schema(
+            embeddable=True,
+            schema_type=schema_type,
+            validate_enums=validate_enums,
+            **kwargs,
+        )
 
-        supersededObject: _S0
-        supersededObject, newerVersions = result
+        supersededClass = cls.getSupersededClass()
+        fullSupersededSchema = supersededClass.json_schema(
+            embeddable=True,
+            schema_type=schema_type,
+            validate_enums=validate_enums,
+            **kwargs,
+        )
 
-        for newerVersion in newerVersions:
-            _logger.debug(
-                "Attempting to convert %s to %s (%s)...",
-                supersededObject.getVersion(),
-                newerVersion.__name__,
-                newerVersion.getVersion(),
+        combinedFullSchema = cls._addSupersededSchemaToEmbeddable(
+            fullSchema, fullSupersededSchema, schema_type, supersededClass
+        )
+        return combinedFullSchema
+
+    @classmethod
+    def _addSupersededSchemaToEmbeddable(
+        cls, fullSchema, fullSupersededSchema, schema_type, supersededClass
+    ):
+        schema = fullSchema[cls.__name__]
+        schemaReference = _dcj.schema_reference(schema_type, supersededClass.__name__)
+        combinedSchema = {"anyOf": [schema, schemaReference]}
+        combinedFullSchema = {
+            **fullSchema,
+            cls.__name__: combinedSchema,
+            **fullSupersededSchema,
+        }
+        return combinedFullSchema
+
+    @classmethod
+    def _getSchema(cls, kwargs, schema_type, validate_enums):
+        fullSchema = super().json_schema(
+            embeddable=False,
+            schema_type=schema_type,
+            validate_enums=validate_enums,
+            **kwargs,
+        )
+
+        supersededClass = cls.getSupersededClass()
+        fullSupersededSchema = supersededClass.json_schema(
+            embeddable=True,
+            schema_type=schema_type,
+            validate_enums=validate_enums,
+            **kwargs,
+        )
+
+        combinedFullSchema = cls._addSupersededSchemaToTopLevel(
+            fullSupersededSchema, fullSchema, supersededClass, schema_type
+        )
+        return combinedFullSchema
+
+    @classmethod
+    def _addSupersededSchemaToTopLevel(
+        cls, fullSupersededSchema, fullSchema, supersededClass, schema_type
+    ):
+        definitions = fullSchema.get("definitions", {})
+
+        cls._assertNoCollidingDefinitions(definitions, fullSupersededSchema)
+
+        allDefinitions = definitions | fullSupersededSchema
+
+        keys = {"type", "properties", "required", "description"}
+        schema = {k: v for k, v in fullSchema.items() if k in keys}
+        remainingSchema = {k: v for k, v in fullSchema.items() if k not in keys}
+
+        schemaReference = _dcj.schema_reference(schema_type, supersededClass.__name__)
+        combinedSchema = {"anyOf": [schema, schemaReference]}
+
+        combinedFullSchema = {**remainingSchema, **combinedSchema, "definitions": allDefinitions}
+        return combinedFullSchema
+
+    @classmethod
+    def _assertNoCollidingDefinitions(cls, definitions, fullSupersededSchema):
+        collidingDefinitions = [
+            (k, v)
+            for k, v in fullSupersededSchema.items()
+            if k in definitions and definitions[k] != v
+        ]
+        if collidingDefinitions:
+            key, newDefinition = collidingDefinitions[0]
+            currentDefinition = definitions[key]
+            raise AssertionError(
+                f"Colliding definition for {key}: old = {_json.dumps(currentDefinition)}, "
+                f"new = {_json.dumps(newDefinition)}"
             )
-            supersededObject = newerVersion.fromSuperseded(supersededObject)
-            _logger.debug(
-                "Succeeded to convert %s to %s (%s)...",
-                supersededObject.getVersion(),
-                newerVersion.__name__,
-                newerVersion.getVersion(),
+
+    @classmethod
+    def fromInstance(cls: _tp.Type[_T], instance: _S0) -> _T:
+        supersededClass = cls.getSupersededClass()
+        if type(instance) == supersededClass:
+            return cls.upgrade(instance)
+
+        weAreVersion1 = not issubclass(supersededClass, UpgradableJsonSchemaMixin)
+        if weAreVersion1:
+            raise ValueError(
+                "`instance' isn't an instance of current or any previous version."
             )
-        return supersededObject
+
+        partiallyUpgradedInstance = supersededClass.fromInstance(supersededClass)
+
+        return cls.upgrade(partiallyUpgradedInstance)
+
+    @classmethod
+    def _doesRequireVersion(cls) -> bool:
+        return True
 
     @classmethod
     @_abc.abstractmethod
@@ -146,49 +284,5 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
 
     @classmethod
     @_abc.abstractmethod
-    def fromSuperseded(cls: _tp.Type[_T], superseded: _S0) -> _T:
+    def upgrade(cls: _tp.Type[_T], superseded: _S0) -> _T:
         raise NotImplementedError()
-
-    @classmethod
-    def _getAllVersionsInDecreasingOrder(cls) -> _tp.Sequence[_tp.Type[_S0]]:
-        currentVersion = cls
-        allVersions = [currentVersion]
-        isSuperseding = issubclass(currentVersion, UpgradableJsonSchemaMixin)
-        while isSuperseding:
-            currentVersion = currentVersion.getSupersededClass()
-            allVersions.append(currentVersion)
-            isSuperseding = issubclass(currentVersion, UpgradableJsonSchemaMixin)
-
-        return allVersions
-
-    @classmethod
-    def _tryGetSupersededObjectAndNewerVersions(
-        cls, json: str, allVersions: _tp.Sequence[_tp.Type[_S0]]
-    ) -> _tp.Optional[_tp.Tuple[_S0, _tp.Sequence[_tp.Type[_SOther]]]]:
-        newerVersions = []
-        for version in allVersions:
-            supersededObject = cls._getDeserializedDataOrNone(json, version)
-
-            if supersededObject:
-                _logger.debug(
-                    "Loaded %s at version %s", version.__name__, version.getVersion()
-                )
-                return supersededObject, list(reversed(newerVersions))
-
-            newerVersions.append(version)
-
-        return None
-
-    @classmethod
-    def _getDeserializedDataOrNone(
-        cls,
-        json: str,
-        supersededClass: _S0,
-    ) -> _tp.Optional[_S0]:
-        try:
-            deserializedObject = supersededClass.from_json(json)
-
-            return deserializedObject
-
-        except SerializationError:
-            return None

@@ -39,7 +39,7 @@ class Settings(_ser.UpgradableJsonSchemaMixin):
 
         data = settingsFilePath.read_text()
 
-        return Settings.fromUpgradableJson(data)
+        return Settings.from_json(data)
 
     @classmethod
     def load(cls) -> "Settings":
@@ -71,7 +71,7 @@ class Settings(_ser.UpgradableJsonSchemaMixin):
         return SettingsVersion0
 
     @classmethod
-    def fromSuperseded(cls, superseded: SettingsVersion0) -> "Settings":
+    def upgrade(cls, superseded: SettingsVersion0) -> "Settings":
         trnsysBinaryPath = _pl.Path(superseded.trnsysBinaryDirPath) / "TRNExe.exe"
         return Settings.create(trnsysBinaryPath)
 

@@ -279,55 +279,6 @@ class PortItem(QGraphicsEllipseItem):
     def _debugClear(self):
         self.parent.parent.parent().listV.clear()
 
-    def mouseDoubleClickEvent(self, event):
-        pass
-        # self.logger.debug("double clicked")
-        # if hasattr(self.parent, 'heatExchangers') and not self.isFromHx:
-        #     self.deleteDirectPortPair()
-
-    def deleteDirectPortPair(self):
-
-        # if self.connectionList[0].fromPort is self:
-        #     self.deletePort(self.connectionList[0].toPort)
-        # elif self.connectionList[0].toPort is self:
-        #     self.deletePort(self.connectionList[0].fromPort)
-        # else:
-        #     self.logger.debug("Something wrong")
-        # self.deletePort(self)
-
-        if len(self.connectionList) > 0:
-            if self.connectionList[0].fromPort is self:
-                self.deletePort(self.connectionList[0].toPort)
-            elif self.connectionList[0].toPort is self:
-                self.deletePort(self.connectionList[0].fromPort)
-            else:
-                self.logger.debug("Something wrong")
-        self.deletePort(self)
-        #
-        # self.logger.debug("After delete: ")
-        # self.logger.debug(self.connectionList)
-
-    def deletePort(self, obj):
-        while len(obj.connectionList) > 0:
-            obj.connectionList[0].deleteConn()
-
-        if obj in obj.parent.inputs:
-            obj.parent.inputs.remove(obj)
-
-        if obj in obj.parent.outputs:
-            obj.parent.outputs.remove(obj)
-
-        obj.parent.parent.scene().removeItem(obj)
-
-        obj.parent.directPortConnsForList = [
-            c for c in obj.parent.directPortConnsForList if c.fromPort != self and c.toPort != self
-        ]
-
-        if obj in obj.parent.leftSide and self.side == 0:
-            obj.parent.leftSide.remove(obj)
-        if obj in obj.parent.rightSide and self.side == 2:
-            obj.parent.rightSide.remove(obj)
-
     def hideCorners(self, connection):
         cor = connection.getCorners()[0]
         cor2 = connection.getCorners()[-1]
