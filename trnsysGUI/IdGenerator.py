@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import uuid
 from itertools import count
 

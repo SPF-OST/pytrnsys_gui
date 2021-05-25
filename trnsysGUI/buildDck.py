@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import pytrnsys.trnsys_util.buildTrnsysDeck as build
 import numpy as num
 import os

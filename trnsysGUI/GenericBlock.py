@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import shutil
 import pathlib as _pl
@@ -272,7 +275,7 @@ class GenericBlock(BlockItem):
 
                 # Generic block will have a 2n-liner exportConnString
                 self.exportConnsString += temp + "\n"
-                f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i) + "\n"
+                f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i+1) + "\n"
 
         return f, equationNr
 

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import enum as _enum
 
 from PyQt5.QtCore import Qt

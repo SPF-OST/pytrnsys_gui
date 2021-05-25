@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import sys
 from math import atan, sqrt, acos
 import numpy as np

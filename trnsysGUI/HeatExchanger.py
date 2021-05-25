@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import random
 
 from PyQt5.QtCore import QPointF, Qt

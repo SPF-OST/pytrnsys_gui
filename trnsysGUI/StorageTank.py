@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import random
 import shutil
@@ -18,7 +21,7 @@ from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
-from trnsysGUI.Types.createType1924 import Type1924_TesPlugFlow
+from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow
 
 
 class StorageTank(BlockItem):

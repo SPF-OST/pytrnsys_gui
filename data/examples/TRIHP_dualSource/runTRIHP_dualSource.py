@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 # -*- coding: utf-8 -*-
 """
 Created on Fri Sep 30 10:06:47 2016

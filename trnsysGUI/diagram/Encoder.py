@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import json
 
 from trnsysGUI.diagram import Editor as _de

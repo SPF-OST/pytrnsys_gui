@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import json
 
 from trnsysGUI.AirSourceHP import AirSourceHP

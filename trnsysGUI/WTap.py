@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import shutil
 import typing as _tp

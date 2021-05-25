@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import logging as log
 import pathlib as pl
 import shutil as sh
@@ -57,7 +60,7 @@ class _Helper:
             sh.rmtree(self._actualFolderPath)
 
         pytrnsysGuiDir = pl.Path(__file__).parents[3]
-        exampleFolderPath = pytrnsysGuiDir / "trnsysGUI" / "examples" / "TRIHP_dualSource"
+        exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / "TRIHP_dualSource"
 
         sh.copytree(exampleFolderPath, self.projectFolderPath)
 
