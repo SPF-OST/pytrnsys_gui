@@ -9,7 +9,9 @@ from trnsysGUI.PortItem import PortItem
 
 
 class HeatExchanger(QGraphicsItemGroup):
-    partH = 10
+    COIL_HEIGHT_IN_PIXELS = 10
+    COIL_WITH_RELATIVE_TO_TANK_WIDTH = 0.6
+    PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS = 8
 
     def __init__(
         self,
@@ -27,9 +29,9 @@ class HeatExchanger(QGraphicsItemGroup):
         self.parent = parent
         self.logger = parent.logger
         xOffset = 0 if sideNr == 0 else storageTankWidth
-        yOffset = storageTankHeight - relativeInputHeight*storageTankHeight
+        yOffset = storageTankHeight - relativeInputHeight * storageTankHeight
         self.offset = QPointF(xOffset, yOffset)
-        self.lines = []
+        self._lines = []
         self.w = width
 
         self.relativeOutputHeight = relativeOutputHeight
@@ -54,13 +56,24 @@ class HeatExchanger(QGraphicsItemGroup):
         self.parent.inputs.append(self.port1)
         self.parent.outputs.append(self.port2)
 
-        delta = 4
         if self.sSide == 0:
-            self.port1.setPos(self.offset + QPointF(-2 * delta, 0))
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * delta, 0))
+            self.port1.setPos(
+                self.offset + QPointF(-self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
+            )
+            self.port2.setPos(
+                self.offset
+                + QPointF(0, self.h)
+                + QPointF(-self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
+            )
         if self.sSide == 2:
-            self.port1.setPos(self.offset + QPointF(2 * delta, 0))
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
+            self.port1.setPos(
+                self.offset + QPointF(self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
+            )
+            self.port2.setPos(
+                self.offset
+                + QPointF(0, self.h)
+                + QPointF(self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
+            )
 
         if kwargs == {} or "tempHx" in kwargs:
             self.logger.debug("Creating new HeatExchanger")
@@ -77,7 +90,6 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.loadedConnTrId = kwargs["connTrnsysID"]
 
     def initNew(self):
-
         self.conn = Connection(
             self.port1, self.port2, True, self.parent.parent.parent()
         )
@@ -92,8 +104,7 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port1.visibleColor = QColor(randomValue, randomValue, randomValue)
         self.port2.visibleColor = QColor(randomValue, randomValue, randomValue)
 
-        # StartPos is a QPoint
-        self.drawHx(6, 0.4)
+        self.draw()
 
     def initLoad(self):
         self.logger.debug("Finishing up HeatExchanger loading")
@@ -116,7 +127,7 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port2.visibleColor = QColor(randomValue, randomValue, randomValue)
 
         # StartPos is a QPoint
-        self.drawHx(6, 0.4)
+        self.draw()
 
     def setId(self, newId):
         self.id = newId
@@ -132,173 +143,57 @@ class HeatExchanger(QGraphicsItemGroup):
                 "A non-Storage-Tank block is trying to set parent of heatExchanger"
             )
 
-    def drawHx(self, param, factor):
-        if self.sSide == 0:
-            self.drawHxL(param, factor)
+    def draw(self):
+        sign = 1 if self.sSide == 0 else -1
 
-        if self.sSide == 2:
-            self.drawHxR(param, factor)
-
-    def drawHxL(self, param, factor):
-        # self.offset is the height of the first port
-        s = self.offset
-        delta = 4
-        # set bb = True for equal amount of lines
-        bb = False
-        if bb:
-            lineTop = QGraphicsLineItem(
-                s.x() - 2 * delta, s.y() + 0, s.x() + self.w, s.y() + 0, self
+        o = self.offset
+        self.floorHeight()
+        lineTop = QGraphicsLineItem(
+            o.x() - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS,
+            o.y() + 0,
+            o.x() + sign * self.w,
+            o.y() + 0,
+            self,
+        )
+        lineTop.setPen(QPen(Qt.black, 2))
+        self._lines.append(lineTop)
+        times = self.h / self.COIL_HEIGHT_IN_PIXELS
+        self.logger.debug("Times is " + str(times))
+        for i in range(int(times)):
+            line1 = QGraphicsLineItem(
+                o.x() + sign * self.w,
+                o.y() + i * self.COIL_HEIGHT_IN_PIXELS,
+                o.x() + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
+                o.y() + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
+                self,
             )
-            lineTop.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineTop)
 
-            sw = 0
-            for i in range(param):
-                line = QGraphicsLineItem(
-                    s.x() + self.w - factor * (sw % 2) * self.w,
-                    s.y() + i * self.h / param,
-                    s.x() + self.w - factor * ((sw + 1) % 2) * self.w,
-                    s.y() + (i + 1) * self.h / param,
-                    self,
-                )
-                line.setPen(QPen(Qt.black, 2))
-                self.lines.append(line)
-                sw = sw + 1
-
-            lineBottom = QGraphicsLineItem(
-                s.x() - 2 * delta, s.y() + self.h, s.x() + self.w, s.y() + self.h, self
+            line2 = QGraphicsLineItem(
+                o.x() + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
+                o.y() + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
+                o.x() + sign * self.w,
+                o.y() + (i + 1) * self.COIL_HEIGHT_IN_PIXELS,
+                self,
             )
-            lineBottom.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineBottom)
-        else:
-            self.floorHeight()
-            lineTop = QGraphicsLineItem(
-                s.x() - 2 * delta, s.y() + 0, s.x() + self.w, s.y() + 0, self
-            )
-            lineTop.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineTop)
 
-            times = self.h / HeatExchanger.partH
-            self.logger.debug("Times is " + str(times))
+            line1.setPen(QPen(Qt.black, 2))
+            line2.setPen(QPen(Qt.black, 2))
 
-            for i in range(int(times)):
-                # line = QGraphicsLineItem(s.x() + self.w - factor * (sw % 2) * self.w, s.y() + i * self.h / param,
-                #                          s.x() + self.w - factor * ((sw + 1) % 2) * self.w,
-                #                          s.y() + (i + 1) * self.h / param, self)
-
-                line1 = QGraphicsLineItem(
-                    s.x() + self.w,
-                    s.y() + i * HeatExchanger.partH,
-                    s.x() + self.w - factor * self.w,
-                    s.y() + (i + 1 / 2) * HeatExchanger.partH,
-                    self,
-                )
-                line2 = QGraphicsLineItem(
-                    s.x() + self.w - factor * self.w,
-                    s.y() + (i + 1 / 2) * HeatExchanger.partH,
-                    s.x() + self.w,
-                    s.y() + (i + 1) * HeatExchanger.partH,
-                    self,
-                )
-
-                line1.setPen(QPen(Qt.black, 2))
-                line2.setPen(QPen(Qt.black, 2))
-                self.lines.append(line1)
-                self.lines.append(line2)
-
-            lineBottom = QGraphicsLineItem(
-                s.x() - 2 * delta, s.y() + self.h, s.x() + self.w, s.y() + self.h, self
-            )
-            lineBottom.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineBottom)
-
-            # self.rectangle.setPos(lineTop.line().p1().x(), lineTop.line().p1().y())
-
-    def drawHxR(self, param, factor):
-        s = self.offset
-        delta = 4
-        # set bb = True for equal amount of line segments between the ports
-
-        bb = False
-        if bb:
-            lineTop = QGraphicsLineItem(
-                s.x() + 2 * delta, s.y() + 0, s.x() - self.w, s.y() + 0, self
-            )
-            lineTop.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineTop)
-
-            sw = 0
-            for i in range(param):
-                line = QGraphicsLineItem(
-                    s.x() - self.w + (1 - factor) * (sw % 2) * self.w,
-                    s.y() + i * self.h / param,
-                    s.x() - self.w + (1 - factor) * ((sw + 1) % 2) * self.w,
-                    s.y() + (i + 1) * self.h / param,
-                    self,
-                )
-                line.setPen(QPen(Qt.black, 2))
-                self.lines.append(line)
-                sw = sw + 1
-
-            lineBottom = QGraphicsLineItem(
-                s.x() + 2 * delta, s.y() + self.h, s.x() - self.w, s.y() + self.h, self
-            )
-            lineBottom.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineBottom)
-
-        else:
-            self.floorHeight()
-            lineTop = QGraphicsLineItem(
-                s.x() + 2 * delta, s.y() + 0, s.x() - self.w, s.y() + 0, self
-            )
-            lineTop.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineTop)
-
-            times = self.h / HeatExchanger.partH
-            param = times / 2
-            self.logger.debug("Times is " + str(times))
-
-            for i in range(int(times)):
-                # line = QGraphicsLineItem(s.x() + self.w - factor * (sw % 2) * self.w, s.y() + i * self.h / param,
-                #                          s.x() + self.w - factor * ((sw + 1) % 2) * self.w,
-                #                          s.y() + (i + 1) * self.h / param, self)
-
-                line1 = QGraphicsLineItem(
-                    s.x() - self.w,
-                    s.y() + i * HeatExchanger.partH,
-                    s.x() - self.w + (1 - factor) * self.w,
-                    s.y() + (i + 1 / 2) * HeatExchanger.partH,
-                    self,
-                )
-                line2 = QGraphicsLineItem(
-                    s.x() - self.w + (1 - factor) * self.w,
-                    s.y() + (i + 1 / 2) * HeatExchanger.partH,
-                    s.x() - self.w,
-                    s.y() + (i + 1) * HeatExchanger.partH,
-                    self,
-                )
-
-                line1.setPen(QPen(Qt.black, 2))
-                line2.setPen(QPen(Qt.black, 2))
-                self.lines.append(line1)
-                self.lines.append(line2)
-
-            lineBottom = QGraphicsLineItem(
-                s.x() + 2 * delta, s.y() + self.h, s.x() - self.w, s.y() + self.h, self
-            )
-            lineBottom.setPen(QPen(Qt.black, 2))
-            self.lines.append(lineBottom)
-
-            # self.rectangle.setPos(lineTop.line().p2().x(), lineTop.line().p2().y())
+            self._lines.append(line1)
+            self._lines.append(line2)
+        lineBottom = QGraphicsLineItem(
+            o.x() - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS,
+            o.y() + self.h,
+            o.x() + sign * self.w,
+            o.y() + self.h,
+            self,
+        )
+        lineBottom.setPen(QPen(Qt.black, 2))
+        self._lines.append(lineBottom)
 
     def floorHeight(self):
-        delta = 4
-        # Could be used if static partH would be used for the heatexchanger
-        self.h = self.h - self.h % HeatExchanger.partH
-        if self.sSide == 0:
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * delta, 0))
-        if self.sSide == 2:
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
+        self.h = self.h - self.h % self.COIL_HEIGHT_IN_PIXELS
+        self.port2.pos().setY(self.h)
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -331,8 +226,8 @@ class HeatExchanger(QGraphicsItemGroup):
             if isinstance(ch, QGraphicsLineItem):
                 ch.setPen(QPen(Qt.black, 2))
 
-    def updateLines(self, h):
-        self.removeLines()
+    def redraw(self):
+        self._clearDrawing()
         self.h = self.port2.pos().y() - self.port1.pos().y()
 
         if self.sSide == 0:
@@ -340,46 +235,43 @@ class HeatExchanger(QGraphicsItemGroup):
         else:
             self.offset = QPointF(self.parent.w, self.port1.pos().y())
 
-        self.drawHx(6, 0.4)
+        self.draw()
 
-    def removeLines(self):
-        while len(self.lines) != 0:
-            self.parent.parent.parent().diagramScene.removeItem(self.lines[0])
-            self.lines.remove(self.lines[0])
+    def _clearDrawing(self):
+        for line in self._lines:
+            self.parent.parent.parent().diagramScene.removeItem(line)
+
+        self._lines = []
 
     def mousePressEvent(self, event):
         self.highlightHx()
         self.logger.debug("pressed")
-        # super(HeatExchanger, self).keyPressEvent(event)
 
     def modifyPosition(self, newHeights):
-        if newHeights[0] == "":
-            newHeights[0] = self.relativeInputHeight
-        if newHeights[1] == "":
-            newHeights[1] = self.relativeOutputHeight
+        relativeInputHeight = (
+            newHeights[0] / 100 if newHeights[0] != "" else self.relativeInputHeight
+        )
+        relativeOutputHeight = (
+            newHeights[1] / 100 if newHeights[1] != "" else self.relativeOutputHeight
+        )
 
-        self.h = abs(1 / 100 * self.parent.h * (newHeights[1] - newHeights[0]))
+        self.relativeInputHeight = relativeInputHeight
+        self.relativeOutputHeight = relativeOutputHeight
 
-        delta = 4
-        if self.sSide == 0:
-            self.offset = QPointF(
-                0.0, self.parent.h - 1 / 100 * newHeights[0] * self.parent.h
-            )
-            self.port1.setPos(self.offset + QPointF(-2 * delta, 0))
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(-2 * delta, 0))
-        if self.sSide == 2:
-            self.offset = QPointF(
-                self.parent.w, self.parent.h - 1 / 100 * newHeights[0] * self.parent.h
-            )
-            self.port1.setPos(self.offset + QPointF(2 * delta, 0))
-            self.port2.setPos(self.offset + QPointF(0, self.h) + QPointF(2 * delta, 0))
+        self.h = self.parent.h * (relativeInputHeight - relativeOutputHeight)
 
-        self.relativeOutputHeight = (
-            self.parent.h - self.port2.pos().y()
-        ) / self.parent.h
-        self.relativeInputHeight = (
-            self.parent.h - self.port1.pos().y()
-        ) / self.parent.h
+        xOffset = 0 if self.sSide == 0 else self.parent.w
+        adjustedXOffset = (
+            xOffset - self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
+            if self.sSide == 0
+            else xOffset + self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
+        )
+        yOffset = self.parent.h - relativeInputHeight * self.parent.h
 
-        self.removeLines()
-        self.drawHx(6, 0.4)
+        self.offset = QPointF(xOffset, yOffset)
+
+        self.port1.setPos(adjustedXOffset, yOffset)
+        self.port2.setPos(adjustedXOffset, yOffset + self.h)
+
+        self._clearDrawing()
+        self.draw()
