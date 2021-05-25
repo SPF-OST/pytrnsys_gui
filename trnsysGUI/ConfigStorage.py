@@ -27,6 +27,10 @@ class Side(_enum.Enum):
 
 
 class ConfigStorage(QDialog):
+    HEAT_EXCHANGER_WIDTH = 40
+    WIDTH_INCREMENT = 10
+    HEIGHT_INCREMENT = 100
+
     def __init__(self, storage, parent):
         super(ConfigStorage, self).__init__(parent)
         self.parent = parent
@@ -34,50 +38,27 @@ class ConfigStorage(QDialog):
         self.n = 0
         self.m = 0
 
-        # Parameters:
-        self.w_hx = 40
-        self.w_inc = 10
-        self.h_hx = 100
-
         spacerHeight = 15
 
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
         self.tab2 = QWidget()
 
-        # Add tabs
         self.tabs.addTab(self.tab1, "Heat exchangers")
         self.tabs.addTab(self.tab2, "Direct ports")
 
-        # VBoxLayout
         h0 = QHBoxLayout()
         description = QLabel("Please configure the storage tank:")
         exportButton = QPushButton("Export ddck")
         exportButton.clicked.connect(self.storage.exportDck)
-        # loadButton = QPushButton("Load ddck")
-        # loadButton.clicked.connect(self.storage.loadDck)
+
         h0.addWidget(description)
-        # h0.addWidget(loadButton)
         h0.addWidget(exportButton)
-        # loadButton.setEnabled(False)
 
         tankNameLabel = QLabel()
         tankNameLabel.setText("<b>Tank name: </b>")
         self.le = QLineEdit(self.storage.label.toPlainText())
 
-        # connectionsLabelL = QLabel()
-        # connectionsLabelL.setText("<b>Left (distributed) Ports: </b>")
-        # self.leCNL = QLineEdit(str(len(self.storage.inputs)))
-
-        # connectionsLabelR = QLabel()
-        # connectionsLabelR.setText("<b>Right (distributed) Ports: </b>")
-        # self.leCNR = QLineEdit(str(len(self.storage.outputs)))
-
-        # addSideAutoButton = QPushButton("Add (distributed) ports")
-        # addSideAutoButton.clicked.connect(self.addSideAuto)
-        # spaceVBox = QSpacerItem(self.width(), spacerHeight)
-
-        # Grid layout
         gl = QGridLayout()
         hxsLabel = QLabel("<b>Heat Exchangers </b>")
         gl.addWidget(hxsLabel, 0, 0, 1, 2)
@@ -85,14 +66,9 @@ class ConfigStorage(QDialog):
         qhbL = QHBoxLayout()
 
         self.leftHeatExchangersItemListWidget = QListWidget()
-        # self.listWL.setMinimumWidth(self.width()/2)
-        # self.listWL.resize(QSize(self.listWL.minimumHeight(), self.width()/2))
-        # gl.addWidget(self.listWL, 1, 0, 2, 2)
         qhbL.addWidget(self.leftHeatExchangersItemListWidget)
 
         self.rightHeatExchangersItemListWidget = QListWidget()
-        # self.setBaseSize(QSize(100, 50))
-        # gl.addWidget(self.listWR, 1, 1, 1, 2)
         qhbL.addWidget(self.rightHeatExchangersItemListWidget)
 
         offsetLabel = QLabel("Height offsets in percent")
@@ -109,11 +85,6 @@ class ConfigStorage(QDialog):
         gl.addWidget(offsetLeOLabel, 6, 0, 1, 1)
         gl.addWidget(self.offsetLeO, 7, 0, 1, 3)
 
-        # hxsideHbL = QHBoxLayout()
-        # hxsideHbL.addWidget(self.lButton)
-        # hxsideHbL.addWidget(self.rButton)
-
-        # gl.addLayout(hxsideHbL, 6, 0)
         self.hxNameLe = QLineEdit()
         self.hxNameLe.setPlaceholderText("Enter a name...")
         gl.addWidget(self.hxNameLe, 8, 0, 1, 3)
@@ -159,7 +130,6 @@ class ConfigStorage(QDialog):
         qhbl3.addWidget(self.manrButton)
 
         self.manAddButton = QPushButton("Add (manual) ports")
-        spaceManPort = QSpacerItem(self.width(), spacerHeight)
         self.manAddButton.clicked.connect(self.manAddPortPair)
 
         self.manRemovebutton = QPushButton("Remove ports")
@@ -197,13 +167,6 @@ class ConfigStorage(QDialog):
         L.addLayout(h0)
         L.addWidget(tankNameLabel)
         L.addWidget(self.le)
-
-        # L.addWidget(connectionsLabelL)
-        # L.addWidget(self.leCNL)
-        # L.addWidget(connectionsLabelR)
-        # L.addWidget(self.leCNR)
-        # L.addWidget(addSideAutoButton)
-        # L.addItem(spaceVBox)
 
         t1Layout = QVBoxLayout()
         t1Layout.addLayout(qhbL)
@@ -271,12 +234,12 @@ class ConfigStorage(QDialog):
     @staticmethod
     def _createDirectPortPairListItem(directPortPair: _dpp.DirectPortPair):
         return (
-                directPortPair.connection.displayName
-                + ","
-                + "Port pair from "
-                + "%d%%" % int(directPortPair.relativeInputHeight * 100)
-                + " to "
-                + "%d%%" % int(directPortPair.relativeOutputHeight * 100)
+            directPortPair.connection.displayName
+            + ","
+            + "Port pair from "
+            + "%d%%" % int(directPortPair.relativeInputHeight * 100)
+            + " to "
+            + "%d%%" % int(directPortPair.relativeOutputHeight * 100)
         )
 
     def listWLClicked(self):
@@ -347,7 +310,7 @@ class ConfigStorage(QDialog):
 
         heatExchanger = HeatExchanger(
             sideNr=0 if side == Side.LEFT else 2,
-            width=0 if side == Side.LEFT else self.w_hx,
+            width=self.HEAT_EXCHANGER_WIDTH,
             relativeInputHeight=relativeInputHeight,
             relativeOutputHeight=relativeOutputHeight,
             storageTankWidth=self.storage.w,
@@ -452,78 +415,46 @@ class ConfigStorage(QDialog):
         """
         Modify Hx.
         """
-        side = ""
-        noSelection = True
-        try:
-            hxName, residualInfo = (
-                self.leftHeatExchangersItemListWidget.selectedItems()[0]
-                .text()
-                .split(",")
-            )
-            side = "Left"
-            noSelection = False
-        except:
-            pass
-        try:
-            hxName, residualInfo = (
-                self.rightHeatExchangersItemListWidget.selectedItems()[0]
-                .text()
-                .split(",")
-            )
-            side = "Right"
-            noSelection = False
-        except:
-            pass
+        result = self._getFirstSelectedItemAndHeatExchanger()
 
-        if noSelection:
+        if not result:
             return
 
-        residualInfo = residualInfo.split(" ")
-        inputHeight = residualInfo[3]
-        outputHeight = residualInfo[5]
+        selectedItem, heatExchanger = result
+
+        inputHeight = f"{heatExchanger.relativeInputHeight}%"
+        outputHeight = f"{heatExchanger.relativeOutputHeight}%"
 
         dialogResult = modifyDialog(inputHeight, outputHeight)
 
         if dialogResult.cancelled:
             return
 
-        for i in range(len(self.storage.heatExchangers)):
-            if self.storage.heatExchangers[i].displayName == hxName:
-                self.storage.heatExchangers[i].modifyPosition(
-                    dialogResult.newPortHeights
-                )
+        heatExchanger.modifyPosition(dialogResult.newPortHeights)
 
-        textPorts = dialogResult.newPortHeights
+        listText = self._createHeatExchangerListItem(heatExchanger)
 
-        if str(textPorts[0]) == "":
-            textPorts[0] = inputHeight
+        selectedItem.setText(listText)
+
+    def _getFirstSelectedItemAndHeatExchanger(self):
+        leftSelectedItems = self.leftHeatExchangersItemListWidget.selectedItems()
+        rightSelectedItems = self.rightHeatExchangersItemListWidget.selectedItems()
+
+        if leftSelectedItems:
+            side = 0
+            selectedItem = leftSelectedItems[0]
+        elif rightSelectedItems:
+            side = 2
+            selectedItem = rightSelectedItems[0]
         else:
-            textPorts[0] = str(round(textPorts[0])) + "%"
-        if str(textPorts[1]) == "":
-            textPorts[1] = outputHeight
-        else:
-            textPorts[1] = str(round(textPorts[1])) + "%"
+            return None
 
-        listText = (
-            hxName
-            + ","
-            + residualInfo[0]
-            + " "
-            + residualInfo[1]
-            + " "
-            + residualInfo[2]
-            + " "
-            + textPorts[0]
-            + " "
-            + residualInfo[4]
-            + " "
-            + textPorts[1]
-        )
+        name = selectedItem.text().split(",")[0]
+        for heatExchanger in self.storage.heatExchangers:
+            if heatExchanger.displayName == name and heatExchanger.sSide == side:
+                return selectedItem, heatExchanger
 
-        if side == "Left":
-            self.leftHeatExchangersItemListWidget.selectedItems()[0].setText(listText)
-        elif side == "Right":
-            self.rightHeatExchangersItemListWidget.selectedItems()[0].setText(listText)
+        raise AssertionError(f"No heat exchanger with name {name} found.")
 
     def modifyPort(self):
         """
@@ -601,18 +532,16 @@ class ConfigStorage(QDialog):
             )
 
     def incrSize(self):
-        self.storage.updatePortPositionsHW(self.h_hx, self.w_inc)
-        self.storage.updateHxLines(self.h_hx)
-        self.storage.h += self.h_hx
-        self.storage.w += self.w_inc
-        self.storage.updateImage()
+        self._changeSize(self.HEIGHT_INCREMENT, self.WIDTH_INCREMENT)
 
-    # Unused
     def decrSize(self):
-        self.storage.updatePortPositionsDecHW(self.h_hx, self.w_inc)
-        self.storage.updateHxLines(-self.h_hx)
-        self.storage.h -= self.h_hx
-        self.storage.w -= self.w_inc
+        self._changeSize(-self.HEIGHT_INCREMENT, -self.WIDTH_INCREMENT)
+
+    def _changeSize(self, deltaH, deltaW):
+        self.storage.updatePortItemPositions(deltaH, deltaW)
+        self.storage.redrawHeatExchangers()
+        self.storage.h += deltaH
+        self.storage.w += deltaW
         self.storage.updateImage()
 
     def acceptedEdit(self):
