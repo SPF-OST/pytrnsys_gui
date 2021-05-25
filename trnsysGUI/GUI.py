@@ -672,8 +672,6 @@ class MainWindow(QMainWindow):
             loadingAborted = self.loadDialogue()
             if loadingAborted:
                 return
-            self.centralWidget.idGen.reset()
-            self.centralWidget.delBlocks()
 
             if self.loadValue == "json":
                 pathDialog = FolderSetUp(self)
@@ -693,53 +691,6 @@ class MainWindow(QMainWindow):
                 del self.exportedTo
         else:
             return
-
-    def openFileAtStartUp(self):
-        """
-        Opens the most recently modified file from the recent folder
-
-        Things to note : file directory must be changed to corresponding directory on individual PCs
-        -------
-        """
-
-        self.logger.info("Opening diagram")
-        self.centralWidget.delBlocks()
-
-        # list_of_files = glob.glob('U:/Desktop/TrnsysGUI/trnsysGUI/recent/*')
-
-        if getattr(sys, "frozen", False):
-            ROOT_DIR = os.path.dirname(sys.executable)
-        elif __file__:
-            ROOT_DIR = os.path.dirname(__file__)
-        filePath = os.path.join(ROOT_DIR, "recent")
-        filePath = os.path.join(filePath, "*")
-        list_of_files = glob.glob(filePath)
-
-        if len(list_of_files) != 0:
-            latest_file = max(list_of_files, key=os.path.getmtime)
-        else:
-            latest_file = ""
-
-        while len(list_of_files) > 10:
-            list_of_files = glob.glob(filePath)
-            try:
-                fileToDelete = min(list_of_files, key=os.path.getmtime)
-            except FileNotFoundError:
-                self.logger.info("File not found")
-            else:
-                os.remove(fileToDelete)
-
-        try:
-            latest_file
-        except FileNotFoundError:
-            self.logger.info("File not found")
-        else:
-            if latest_file != "":
-                self.currentFile = latest_file
-                self.centralWidget.delBlocks()
-                self.centralWidget.decodeDiagram(latest_file)
-            else:
-                self.logger.info("No filename available")
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
