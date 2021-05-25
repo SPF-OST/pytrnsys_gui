@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import sys
 
 sys.path.append("C:\\Users\\parad\\OneDrive\\Desktop\\pytrnsys\\pytrnsys")

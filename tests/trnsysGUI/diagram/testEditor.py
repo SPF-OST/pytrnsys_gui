@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import logging as log
 import pathlib as pl
 import shutil as sh

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtCore import QPointF
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (

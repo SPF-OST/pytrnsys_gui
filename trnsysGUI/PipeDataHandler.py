@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import random
 
 from trnsysGUI.Connection import Connection

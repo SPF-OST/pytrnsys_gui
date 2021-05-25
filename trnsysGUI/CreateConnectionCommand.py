@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtWidgets import QUndoCommand
 
 from trnsysGUI.Connection import Connection

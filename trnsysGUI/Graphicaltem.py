@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import pathlib as _pl
 
 from PyQt5 import QtCore

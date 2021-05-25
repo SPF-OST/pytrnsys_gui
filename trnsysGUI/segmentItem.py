@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from math import sqrt
 import typing as tp
 

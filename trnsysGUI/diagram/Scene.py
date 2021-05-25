@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsRectItem

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import setuptools
 import pathlib as _pl
 import itertools as _it

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import glob
 import math
 import os
