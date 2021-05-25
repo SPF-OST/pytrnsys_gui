@@ -267,11 +267,9 @@ class HeatExchanger(QGraphicsItemGroup):
     def _setPortPositions(self):
         x, y = self._getPos()
         sign = 1 if self.sSide == 0 else -1
-        xWithProtrusion = sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
-        self.port1.pos().setX(x - xWithProtrusion)
-        self.port1.pos().setY(y)
-        self.port2.pos().setX(x - xWithProtrusion)
-        self.port2.pos().setY(y + self.h)
+        xWithProtrusion = x - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
+        self.port1.setPos(xWithProtrusion, y)
+        self.port2.setPos(xWithProtrusion, y + self.h)
 
     def _getPos(self):
         x = 0 if self.sSide == 0 else self._storageTankWidth
