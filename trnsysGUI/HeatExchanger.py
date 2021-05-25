@@ -28,17 +28,10 @@ class HeatExchanger(QGraphicsItemGroup):
         super(HeatExchanger, self).__init__(parent)
         self.parent = parent
         self.logger = parent.logger
-        xOffset = 0 if sideNr == 0 else storageTankWidth
-        yOffset = storageTankHeight - relativeInputHeight * storageTankHeight
-        self.offset = QPointF(xOffset, yOffset)
+
         self._lines = []
         self.w = width
 
-        self.relativeOutputHeight = relativeOutputHeight
-        self.relativeInputHeight = relativeInputHeight
-
-        relativeHeight = relativeInputHeight - relativeOutputHeight
-        self.h = relativeHeight * storageTankHeight
         self.sSide = sideNr
         self.id = self.parent.parent.parent().idGen.getID()
 
@@ -56,24 +49,12 @@ class HeatExchanger(QGraphicsItemGroup):
         self.parent.inputs.append(self.port1)
         self.parent.outputs.append(self.port2)
 
-        if self.sSide == 0:
-            self.port1.setPos(
-                self.offset + QPointF(-self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
-            )
-            self.port2.setPos(
-                self.offset
-                + QPointF(0, self.h)
-                + QPointF(-self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
-            )
-        if self.sSide == 2:
-            self.port1.setPos(
-                self.offset + QPointF(self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
-            )
-            self.port2.setPos(
-                self.offset
-                + QPointF(0, self.h)
-                + QPointF(self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS, 0)
-            )
+        self._setRelativeHeightsAndTankSize(
+            storageTankWidth,
+            storageTankHeight,
+            relativeInputHeight,
+            relativeOutputHeight,
+        )
 
         if kwargs == {} or "tempHx" in kwargs:
             self.logger.debug("Creating new HeatExchanger")
@@ -99,12 +80,13 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port2.setZValue(100)
 
         randomValue = int(random.uniform(20, 200))
-        self.port1.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
-        self.port2.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
-        self.port1.visibleColor = QColor(randomValue, randomValue, randomValue)
-        self.port2.visibleColor = QColor(randomValue, randomValue, randomValue)
+        randomColor = QColor(randomValue, randomValue, randomValue)
+        self.port1.innerCircle.setBrush(randomColor)
+        self.port2.innerCircle.setBrush(randomColor)
+        self.port1.visibleColor = randomColor
+        self.port2.visibleColor = randomColor
 
-        self.draw()
+        self._draw()
 
     def initLoad(self):
         self.logger.debug("Finishing up HeatExchanger loading")
@@ -121,13 +103,13 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port2.setZValue(100)
 
         randomValue = int(random.uniform(20, 200))
-        self.port1.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
-        self.port2.innerCircle.setBrush(QColor(randomValue, randomValue, randomValue))
-        self.port1.visibleColor = QColor(randomValue, randomValue, randomValue)
-        self.port2.visibleColor = QColor(randomValue, randomValue, randomValue)
+        randomColor = QColor(randomValue, randomValue, randomValue)
+        self.port1.innerCircle.setBrush(randomColor)
+        self.port2.innerCircle.setBrush(randomColor)
+        self.port1.visibleColor = randomColor
+        self.port2.visibleColor = randomColor
 
-        # StartPos is a QPoint
-        self.draw()
+        self._draw()
 
     def setId(self, newId):
         self.id = newId
@@ -143,58 +125,6 @@ class HeatExchanger(QGraphicsItemGroup):
                 "A non-Storage-Tank block is trying to set parent of heatExchanger"
             )
 
-    def draw(self):
-        sign = 1 if self.sSide == 0 else -1
-
-        o = self.offset
-        self.floorHeight()
-        lineTop = QGraphicsLineItem(
-            o.x() - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS,
-            o.y() + 0,
-            o.x() + sign * self.w,
-            o.y() + 0,
-            self,
-        )
-        lineTop.setPen(QPen(Qt.black, 2))
-        self._lines.append(lineTop)
-        times = self.h / self.COIL_HEIGHT_IN_PIXELS
-        self.logger.debug("Times is " + str(times))
-        for i in range(int(times)):
-            line1 = QGraphicsLineItem(
-                o.x() + sign * self.w,
-                o.y() + i * self.COIL_HEIGHT_IN_PIXELS,
-                o.x() + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
-                o.y() + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
-                self,
-            )
-
-            line2 = QGraphicsLineItem(
-                o.x() + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
-                o.y() + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
-                o.x() + sign * self.w,
-                o.y() + (i + 1) * self.COIL_HEIGHT_IN_PIXELS,
-                self,
-            )
-
-            line1.setPen(QPen(Qt.black, 2))
-            line2.setPen(QPen(Qt.black, 2))
-
-            self._lines.append(line1)
-            self._lines.append(line2)
-        lineBottom = QGraphicsLineItem(
-            o.x() - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS,
-            o.y() + self.h,
-            o.x() + sign * self.w,
-            o.y() + self.h,
-            self,
-        )
-        lineBottom.setPen(QPen(Qt.black, 2))
-        self._lines.append(lineBottom)
-
-    def floorHeight(self):
-        self.h = self.h - self.h % self.COIL_HEIGHT_IN_PIXELS
-        self.port2.pos().setY(self.h)
-
     def contextMenuEvent(self, event):
         menu = QMenu()
 
@@ -206,6 +136,10 @@ class HeatExchanger(QGraphicsItemGroup):
         a3 = menu.addAction("PLACEHOLDER TO FILL THIS EMPTY SPACE (Change position)")
 
         menu.exec_(event.screenPos())
+
+    def mousePressEvent(self, event):
+        self.highlightHx()
+        self.logger.debug("pressed")
 
     def renameHx(self):
         # dia = hxDlg(self, self.scene().parent())
@@ -226,28 +160,21 @@ class HeatExchanger(QGraphicsItemGroup):
             if isinstance(ch, QGraphicsLineItem):
                 ch.setPen(QPen(Qt.black, 2))
 
-    def redraw(self):
+    def setTankSize(self, storageTankWidth, storageTankHeight):
         self._clearDrawing()
-        self.h = self.port2.pos().y() - self.port1.pos().y()
 
-        if self.sSide == 0:
-            self.offset = QPointF(0, self.port1.pos().y())
-        else:
-            self.offset = QPointF(self.parent.w, self.port1.pos().y())
+        self._setRelativeHeightsAndTankSize(
+            storageTankWidth,
+            storageTankHeight,
+            self.relativeInputHeight,
+            self.relativeOutputHeight,
+        )
 
-        self.draw()
-
-    def _clearDrawing(self):
-        for line in self._lines:
-            self.parent.parent.parent().diagramScene.removeItem(line)
-
-        self._lines = []
-
-    def mousePressEvent(self, event):
-        self.highlightHx()
-        self.logger.debug("pressed")
+        self._draw()
 
     def modifyPosition(self, newHeights):
+        self._clearDrawing()
+
         relativeInputHeight = (
             newHeights[0] / 100 if newHeights[0] != "" else self.relativeInputHeight
         )
@@ -255,23 +182,100 @@ class HeatExchanger(QGraphicsItemGroup):
             newHeights[1] / 100 if newHeights[1] != "" else self.relativeOutputHeight
         )
 
-        self.relativeInputHeight = relativeInputHeight
-        self.relativeOutputHeight = relativeOutputHeight
-
-        self.h = self.parent.h * (relativeInputHeight - relativeOutputHeight)
-
-        xOffset = 0 if self.sSide == 0 else self.parent.w
-        adjustedXOffset = (
-            xOffset - self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
-            if self.sSide == 0
-            else xOffset + self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
+        self._setRelativeHeightsAndTankSize(
+            self._storageTankWidth,
+            self._storageTankHeight,
+            relativeInputHeight,
+            relativeOutputHeight,
         )
-        yOffset = self.parent.h - relativeInputHeight * self.parent.h
 
-        self.offset = QPointF(xOffset, yOffset)
+        self._draw()
 
-        self.port1.setPos(adjustedXOffset, yOffset)
-        self.port2.setPos(adjustedXOffset, yOffset + self.h)
+    def _draw(self):
+        sign = 1 if self.sSide == 0 else -1
 
-        self._clearDrawing()
-        self.draw()
+        x, y = self._getPos()
+        lineTop = QGraphicsLineItem(
+            x - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS,
+            y + 0,
+            x + sign * self.w,
+            y + 0,
+            self,
+        )
+        lineTop.setPen(QPen(Qt.black, 2))
+        self._lines.append(lineTop)
+        times = self.h / self.COIL_HEIGHT_IN_PIXELS
+        self.logger.debug("Times is " + str(times))
+        for i in range(int(times)):
+            line1 = QGraphicsLineItem(
+                x + sign * self.w,
+                y + i * self.COIL_HEIGHT_IN_PIXELS,
+                x + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
+                y + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
+                self,
+            )
+
+            line2 = QGraphicsLineItem(
+                x + sign * (1 - self.COIL_WITH_RELATIVE_TO_TANK_WIDTH) * self.w,
+                y + (i + 1 / 2) * self.COIL_HEIGHT_IN_PIXELS,
+                x + sign * self.w,
+                y + (i + 1) * self.COIL_HEIGHT_IN_PIXELS,
+                self,
+            )
+
+            line1.setPen(QPen(Qt.black, 2))
+            line2.setPen(QPen(Qt.black, 2))
+
+            self._lines.append(line1)
+            self._lines.append(line2)
+        lineBottom = QGraphicsLineItem(
+            x - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS,
+            y + self.h,
+            x + sign * self.w,
+            y + self.h,
+            self,
+        )
+        lineBottom.setPen(QPen(Qt.black, 2))
+        self._lines.append(lineBottom)
+
+    def _clearDrawing(self):
+        for line in self._lines:
+            self.parent.parent.parent().diagramScene.removeItem(line)
+
+        self._lines = []
+
+    def _setRelativeHeightsAndTankSize(
+        self,
+        storageTankWidth,
+        storageTankHeight,
+        relativeInputHeight,
+        relativeOutputHeight,
+    ):
+        self._storageTankWidth = storageTankWidth
+        self._storageTankHeight = storageTankHeight
+
+        self.relativeOutputHeight = relativeOutputHeight
+        self.relativeInputHeight = relativeInputHeight
+
+        relativeHeight = relativeInputHeight - relativeOutputHeight
+        absoluteHeight = relativeHeight * storageTankHeight
+
+        self.h = absoluteHeight - absoluteHeight % self.COIL_HEIGHT_IN_PIXELS
+
+        self._setPortPositions()
+
+    def _setPortPositions(self):
+        x, y = self._getPos()
+        sign = 1 if self.sSide == 0 else -1
+        xWithProtrusion = sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
+        self.port1.pos().setX(x - xWithProtrusion)
+        self.port1.pos().setY(y)
+        self.port2.pos().setX(x - xWithProtrusion)
+        self.port2.pos().setY(y + self.h)
+
+    def _getPos(self):
+        x = 0 if self.sSide == 0 else self._storageTankWidth
+        y = self._storageTankHeight - self.relativeInputHeight * self._storageTankHeight
+        return x, y
+
+

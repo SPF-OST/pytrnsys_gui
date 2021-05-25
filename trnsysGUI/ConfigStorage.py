@@ -422,8 +422,8 @@ class ConfigStorage(QDialog):
 
         selectedItem, heatExchanger = result
 
-        inputHeight = f"{heatExchanger.relativeInputHeight}%"
-        outputHeight = f"{heatExchanger.relativeOutputHeight}%"
+        inputHeight = f"{heatExchanger.relativeInputHeight * 100}%"
+        outputHeight = f"{heatExchanger.relativeOutputHeight * 100}%"
 
         dialogResult = modifyDialog(inputHeight, outputHeight)
 
@@ -539,9 +539,9 @@ class ConfigStorage(QDialog):
 
     def _changeSize(self, deltaH, deltaW):
         self.storage.updatePortItemPositions(deltaH, deltaW)
-        self.storage.redrawHeatExchangers()
         self.storage.h += deltaH
         self.storage.w += deltaW
+        self.storage.updateHeatExchangersAfterTankSizeChange()
         self.storage.updateImage()
 
     def acceptedEdit(self):

@@ -577,9 +577,9 @@ class StorageTank(BlockItem):
             else:
                 p.setPos(p.pos().x() + deltaW, rel_h_old * (self.h + deltaH))
 
-    def redrawHeatExchangers(self):
+    def updateHeatExchangersAfterTankSizeChange(self):
         for hx in self.heatExchangers:
-            hx.redraw()
+            hx.setTankSize(self.w, self.h)
 
     def encode(self):
         if not self.isVisible():
