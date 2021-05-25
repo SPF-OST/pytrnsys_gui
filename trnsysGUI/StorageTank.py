@@ -81,11 +81,6 @@ class StorageTank(BlockItem):
         for hx in self.heatExchangers:
             hx.parent = self
 
-    def setName(self, newName):
-        self.label.setPlainText(newName)
-        self.displayName = newName
-
-    # Ports related
     def createAndAddDirectPortPair(
         self,
         isOnLeftSide,
@@ -574,39 +569,17 @@ class StorageTank(BlockItem):
         super().updateImage()
         self.label.setPos(self.label.pos().x(), self.h)
 
-    def updatePortPositions(self, h):
-        for p in self.inputs + self.outputs:
-            rel_h_old = p.pos().y() / self.h
-            p.setPos(p.pos().x(), rel_h_old * (self.h + h))
-
-    def updatePortPositionsHW(self, h, w):
+    def updatePortItemPositions(self, deltaH, deltaW):
         for p in self.inputs + self.outputs:
             rel_h_old = p.pos().y() / self.h
             if p.side == 0:
-                p.setPos(p.pos().x(), rel_h_old * (self.h + h))
+                p.setPos(p.pos().x(), rel_h_old * (self.h + deltaH))
             else:
-                p.setPos(p.pos().x() + w, rel_h_old * (self.h + h))
+                p.setPos(p.pos().x() + deltaW, rel_h_old * (self.h + deltaH))
 
-    def updatePortPositionsDec(self, h):
-        for p in self.inputs + self.outputs:
-            rel_h_old = p.pos().y() / self.h
-            p.setPos(p.pos().x(), rel_h_old * (self.h - h))
-
-    def updatePortPositionsDecHW(self, h, w):
-        for p in self.inputs + self.outputs:
-            rel_h_old = p.pos().y() / self.h
-            if p.side == 0:
-                p.setPos(p.pos().x(), rel_h_old * (self.h - h))
-            else:
-                p.setPos(p.pos().x() - w, rel_h_old * (self.h - h))
-
-    def updateHxLines(self, h):
+    def redrawHeatExchangers(self):
         for hx in self.heatExchangers:
-            hx.updateLines(h)
-
-    def updateHxLinesDec(self, h):
-        for hx in self.heatExchangers:
-            hx.updateLines(-h)
+            hx.redraw()
 
     def encode(self):
         if not self.isVisible():
@@ -1161,7 +1134,6 @@ class StorageTank(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        test = os.path.split(self.path)
         if os.path.split(self.path)[-1] == "" or os.path.split(self.path)[-1] == "ddck":
             os.makedirs(destPath)
         else:
