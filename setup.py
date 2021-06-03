@@ -24,7 +24,7 @@ def _getDataFilePairs():
     ]
 
     destDirSourcePathPairs = [
-        _DestDirSourceFilePath(str(p.parent), str("data" / p)) for p in dataFilePaths
+        _DestDirSourceFilePath(str("pytrnsys_gui_data" / p.parent), str("data" / p)) for p in dataFilePaths
     ]
 
     sortedPairs = sorted(destDirSourcePathPairs, key=lambda dp: dp.destDir)
