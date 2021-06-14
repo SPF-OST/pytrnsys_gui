@@ -45,8 +45,7 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
     ```
          
 1. Install `pytrnsys-gui` and its requirements: replace `[version]` in the following command 
-with the version you want to install (typically, you'd choose the latest stable version, i.e. the latest
-version *not* ending in `aXX`) and hit enter.
+with `v` plus the version you want to install (e.g., `v0.9a17` for version 0.9a17) and hit enter.
     ```commandline
     pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/[version]/requirements.txt
     ```
