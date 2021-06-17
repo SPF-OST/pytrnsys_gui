@@ -20,6 +20,8 @@ Linux.
 
 #### Getting started
 
+A video guiding through the following steps can be found on [YouTube](https://www.youtube.com/watch?v=c8VPmOCeQN8).
+
 1. Open a command prompt (e.g. by hitting the Windows-key, then typing "cmd" 
    into the search box and hitting enter). The following commands should be entered
    into the command prompt just opened.
@@ -44,11 +46,13 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
     pip install wheel
     ```
          
-1. Install `pytrnsys-gui` and its requirements: replace `[version]` in the following command 
-with `v` plus the version you want to install (e.g., `v0.9a18` for version 0.9a18) and hit enter.
+1. Install `pytrnsys-gui` and its requirements:
     ```commandline
-    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/[version]/requirements.txt
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/v0.9a17/requirements.txt
     ```
+   (Note: In the [YouTube video](https://www.youtube.com/watch?v=c8VPmOCeQN8) the version is replaced manually, this is
+   not necessary anymore, when copying the command line above.)
+   
 You can now close the command prompt opened in the first step.
 
 The `pytrnsys-gui` can now be started by double-clicking on the 
