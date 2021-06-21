@@ -157,7 +157,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "dUaTHx%d_Tes%d=0.458 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
         lines = lines + line
-        line = "UaHx%d_Tes%d=1105*ratioTes ! kJ/hK only if modHx%d=0\n" % (idHx, nTes, idHx)
+        line = "UaHx%d_Tes%d=1105*ratioTes%d ! kJ/hK only if modHx%d=0\n" % (idHx, nTes, nTes, idHx)
         lines = lines + line
 
         line = "startUpHx%d_Tes%d=0. ! only if modHx%d=0\n" % (idHx, nTes, idHx)
