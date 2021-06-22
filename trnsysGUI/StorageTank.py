@@ -501,13 +501,13 @@ class StorageTank(BlockItem):
 
         # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
 
-    def connectHxs(self, side, side2, connList, lr, heatX):
+    def connectHxs(self, externalPorts, side2, connList, lr, heatX):
         """
         Adds a Connector block and connections to the external blocks (both virtual)
 
         Parameters
         ----------
-        side : :obj:`List` of :obj:`PortItem`
+        externalPorts : :obj:`List` of :obj:`PortItem`
         List of corresponding (external, to connect) PortItems
 
         side2 : :obj:`List` of :obj:`PortItem`
@@ -524,29 +524,34 @@ class StorageTank(BlockItem):
 
         """
 
-        self.logger.debug("ports have " + str(side[0].parent) + str(side[1].parent))
+        self.logger.debug(
+            "ports have " + str(externalPorts[0].parent) + str(externalPorts[1].parent)
+        )
 
         connector = Connector("Connector", self.parent, storagePorts=side2)
         connector.displayName = heatX.displayName
-        # connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
-
-        if side[0].connectionList[0].fromPort is side[0]:
-            c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
-        else:
-            c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
-            pass
-
-        if side[1].connectionList[0].fromPort is side[1]:
-            c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
-        else:
-            c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
-            pass
-
         connList.append(connector)
-        c1.displayName = side[0].connectionList[0].displayName
-        c1.isStorageIO = True
-        c2.displayName = side[1].connectionList[0].displayName
-        c2.isStorageIO = True
+
+        self._addConnectionBetweenExternalPortAndConnector(externalPorts[0], connector)
+        self._addConnectionBetweenExternalPortAndConnector(externalPorts[1], connector)
+
+    def _addConnectionBetweenExternalPortAndConnector(self, externalPort, connector):
+        isIncomingExternalConnection = (
+            externalPort.connectionList[0].fromPort is externalPort
+        )
+
+        fromPort, toPort = (
+            (externalPort, connector.inputs[0])
+            if isIncomingExternalConnection
+            else (connector.inputs[0], externalPort)
+        )
+
+        connection = Connection(
+            fromPort, toPort, isVirtual=True, parent=self.parent.parent()
+        )
+
+        connection.displayName = externalPort.connectionList[0].displayName
+        connection.isStorageIO = True
 
     # Transform related
     def changeSize(self):
@@ -603,7 +608,7 @@ class StorageTank(BlockItem):
             self.h,
             position,
             heatExchangerModels,
-            portPairModels
+            portPairModels,
         )
 
         dictName = "Block-"

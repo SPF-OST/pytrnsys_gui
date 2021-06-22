@@ -26,7 +26,7 @@ class Connector(BlockItem):
         self.changeSize()
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        return _img.COLLECTOR_SVG
+        return _img.CONNECTOR_SVG
 
     def changeSize(self):
         w = self.w
@@ -45,8 +45,6 @@ class Connector(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        deltaH = self.h / 8
-
         self.origInputsPos = [[0, delta]]
         self.origOutputsPos = [[w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
@@ -55,8 +53,6 @@ class Connector(BlockItem):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        # self.inputs[0].side = 0 + 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 

@@ -75,7 +75,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def initNew(self):
         self.conn = Connection(
-            self.port1, self.port2, True, self.parent.parent.parent()
+            self.port1, self.port2, isVirtual=True, parent=self.parent.parent.parent()
         )
         self.conn.displayName = self.displayName
 
