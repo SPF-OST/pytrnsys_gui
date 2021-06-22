@@ -33,7 +33,7 @@ class StorageTank(BlockItem):
 
         self.directPortPairs: _tp.List[DirectPortPair] = []
 
-        self.heatExchangers = []
+        self.heatExchangers: _tp.List[HeatExchanger] = []
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
@@ -925,49 +925,20 @@ class StorageTank(BlockItem):
             "nHx": nHx,
             "nHeatSources": 1,
         }
-        dictInput = {
-            "T": "Null",
-            "Mfr": "Null",
-            "Trev": "Null",
-            "zIn": 0.0,
-            "zOut": 0.0,
-        }
-        dictInputHx = {
-            "T": "Null",
-            "Mfr": "Null",
-            "Trev": "Null",
-            "zIn": 0.0,
-            "zOut": 0.0,
-            "cp": 0.0,
-            "rho": 0.0,
-        }
-        dictInputAux = {"zAux": 0.0, "qAux": 0.0}
 
-        connectorsPort = []
-        connectorsHx = []
-        connectorsAux = []
+        directPairsPorts = []
+        for directPortPair in self.directPortPairs:
+            connection = directPortPair.connection
 
-        # *dck TRNSYS file that you can execute
-        # *ddck text file wchich reporesents a peice of dck
-
-        for i in range(inputs["nPorts"]):
-            connectorsPort.append(dictInput)
-
-        for i in range(inputs["nHx"]):
-            connectorsHx.append(dictInputHx)
-
-        for i in range(inputs["nHeatSources"]):
-            connectorsAux.append(dictInputAux)
-
-        for i in range(inputs["nPorts"]):
-            connection = self.directPortPairs[i].connection
             Tname = "T" + connection.fromPort.connectionList[1].displayName
             side = connection.side
             Mfrname = "Mfr" + connection.fromPort.connectionList[1].displayName
             Trev = "T" + connection.toPort.connectionList[1].displayName
-            inputPos = (100 - 100 * connection.fromPort.pos().y() / self.h) / 100
-            outputPos = (100 - 100 * connection.toPort.pos().y() / self.h) / 100
-            connectorsPort[i] = {
+
+            inputPos = directPortPair.relativeInputHeight
+            outputPos = directPortPair.relativeOutputHeight
+
+            directPairsPort = {
                 "T": Tname,
                 "side": side,
                 "Mfr": Mfrname,
@@ -975,15 +946,19 @@ class StorageTank(BlockItem):
                 "zIn": inputPos,
                 "zOut": outputPos,
             }
+            directPairsPorts.append(directPairsPort)
 
-        for i in range(inputs["nHx"]):
-            HxName = self.heatExchangers[i].displayName
-            Tname = "T" + self.heatExchangers[i].port1.connectionList[1].displayName
-            Mfrname = "Mfr" + self.heatExchangers[i].port1.connectionList[1].displayName
-            Trev = "T" + self.heatExchangers[i].port2.connectionList[1].displayName
-            inputPos = self.heatExchangers[i].relativeInputHeight / 100
-            outputPos = self.heatExchangers[i].relativeOutputHeight / 100
-            connectorsHx[i] = {
+        heatExchangerPorts = []
+        for heatExchanger in self.heatExchangers:
+            HxName = heatExchanger.displayName
+            Tname = "T" + heatExchanger.port1.connectionList[1].displayName
+            Mfrname = "Mfr" + heatExchanger.port1.connectionList[1].displayName
+            Trev = "T" + heatExchanger.port2.connectionList[1].displayName
+
+            inputPos = heatExchanger.relativeInputHeight
+            outputPos = heatExchanger.relativeOutputHeight
+
+            heatExchangerPort = {
                 "Name": HxName,
                 "T": Tname,
                 "Mfr": Mfrname,
@@ -994,10 +969,17 @@ class StorageTank(BlockItem):
                 "rho": "rhowat",
             }
 
+            heatExchangerPorts.append(heatExchangerPort)
+
+        auxiliaryPorts = []
+        for i in range(inputs["nHeatSources"]):
+            dictInputAux = {"zAux": 0.0, "qAux": 0.0}
+            auxiliaryPorts.append(dictInputAux)
+
         exportPath = os.path.join(self.path, self.displayName + ".ddck")
         self.logger.debug(exportPath)
 
-        tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
+        tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
 
         tool.createDDck(self.path, self.displayName, self.displayName, typeFile="ddck")
         self.loadedTo = self.path
