@@ -62,8 +62,7 @@ class Connection(object):
 
     """
 
-    def __init__(self, fromPort, toPort, isVirtual, parent, **kwargs):
-        # self.logger.debug("Connection being created, fromPort" + fromPort.parent.displayName + ", toPort" + toPort.parent.displayName)
+    def __init__(self, fromPort: PortItem, toPort: PortItem, isVirtual, parent, **kwargs):
         self.logger = parent.logger
 
         self.fromPort = fromPort

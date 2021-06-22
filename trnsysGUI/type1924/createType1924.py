@@ -783,8 +783,6 @@ class Type1924_TesPlugFlow:
         nHx = inputs["nHx"]
         nHeatSources = inputs["nHeatSources"]
 
-        Ua = [1, 1, 1, 1]
-
         lines = self.sLine + "********** TYPE DEFINITION **********\n" + self.sLine
 
         lines = lines + "UNIT %d TYPE %d     ! plug flow tank\n" % (nUnit, nType)

@@ -1323,20 +1323,18 @@ class Editor(QWidget):
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
-            if ret == QMessageBox.Save:
-                self.logger.info("Overwriting")
-                self.encodeDiagram(diagramPath)
-                msgb = QMessageBox(self)
-                msgb.setText("Saved diagram at " + diagramPath)
-                msgb.exec()
 
-            else:
+            if ret != QMessageBox.Save:
                 self.logger.info("Canceling")
-        else:
+                return
+
+            self.logger.info("Overwriting")
             self.encodeDiagram(diagramPath)
-            msgb = QMessageBox(self)
-            msgb.setText("Saved diagram at " + diagramPath)
-            msgb.exec()
+
+        self.encodeDiagram(diagramPath)
+        msgb = QMessageBox(self)
+        msgb.setText("Saved diagram at " + diagramPath)
+        msgb.exec()
 
     def saveToProject(self):
         projectPath = self.projectPath
