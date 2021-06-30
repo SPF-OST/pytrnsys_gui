@@ -296,7 +296,7 @@ class TestSerialization:
                     ]
                 },
             },
-            "description": "Team(members: Sequence[testSerialization.Person])",
+            "description": "Team(members: Sequence[tests.trnsysGUI.testSerialization.Person])",
             "properties": {
                 "__version__": {"const": "9e322099-c043-4f23-b6df-4087bb5950d7"},
                 "members": {"items": {"$ref": "#/definitions/Person"}, "type": "array"},

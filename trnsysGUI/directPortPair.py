@@ -1,6 +1,6 @@
 import dataclasses as _dc
 
-from trnsysGUI.Connection import Connection
+from trnsysGUI.Connection import Connection  # type: ignore[attr-defined]
 
 
 @_dc.dataclass
@@ -22,6 +22,3 @@ class DirectPortPair:
 
         outputPosY = storageTankHeight - storageTankHeight*self.relativeOutputHeight
         self.connection.toPort.setY(outputPosY)
-
-
-

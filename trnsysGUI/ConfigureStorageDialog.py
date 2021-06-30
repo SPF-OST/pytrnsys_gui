@@ -21,9 +21,9 @@ from PyQt5.QtWidgets import (
     QListWidgetItem,
 )
 
-import trnsysGUI.DirectPortPair as _dpp
+import trnsysGUI.directPortPair as _dpp
 import trnsysGUI.HeatExchanger as _hx
-from trnsysGUI.ModifyRelativeHeightsDialog import ModifyRelativeHeightsDialog
+from trnsysGUI.modifyRelativeHeightsDialog import ModifyRelativeHeightsDialog
 
 
 class Side(_enum.Enum):

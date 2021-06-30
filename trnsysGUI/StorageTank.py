@@ -10,12 +10,12 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
 import trnsysGUI.images as _img
-import trnsysGUI.storage_tank.model as _model
+import trnsysGUI.storageTank.model as _model
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
-from trnsysGUI.DirectPortPair import DirectPortPair
+from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView

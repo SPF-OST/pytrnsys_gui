@@ -18,21 +18,18 @@ class ModifyRelativeHeightsDialog(_qwt.QDialog):
     A dialog box lets the user choose the path and the name of folder for a new project
     """
 
-    def __init__(self, inputHeight, outputHeight, parent=None):
+    def __init__(self, relativeInputHeight: float, relativeOutputHeight: float, parent=None):
         super().__init__(parent)
-
-        self.executed = False
-        self.cancelled = True
 
         self.newRelativeHeights: _tp.Optional[NewRelativeHeights] = None
 
-        inputLabel = _qwt.QLabel(f"New input height (was {inputHeight * 100:.0f}%): ")
+        inputLabel = _qwt.QLabel(f"New input height (was {relativeInputHeight * 100:.0f}%): ")
         self._inputLineEdit = _qwt.QLineEdit()
         inputLayout = _qwt.QHBoxLayout()
         inputLayout.addWidget(inputLabel)
         inputLayout.addWidget(self._inputLineEdit)
 
-        outputLabel = _qwt.QLabel(f"New output height (was {outputHeight * 100:.0f}%): ")
+        outputLabel = _qwt.QLabel(f"New output height (was {relativeOutputHeight * 100:.0f}%): ")
         self._outputLineEdit = _qwt.QLineEdit()
         outputLayout = _qwt.QHBoxLayout()
         outputLayout.addWidget(outputLabel)
@@ -80,7 +77,7 @@ class ModifyRelativeHeightsDialog(_qwt.QDialog):
             cls._showFormattingError(portName)
             return None
 
-        if not (1 <= relativeHeightInPercent <= 99):
+        if not 1 <= relativeHeightInPercent <= 99:
             cls._showFormattingError(portName)
             return None
 

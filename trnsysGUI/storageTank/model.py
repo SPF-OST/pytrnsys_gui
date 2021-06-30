@@ -88,14 +88,17 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
         return data
 
     @classmethod
-    def upgrade(cls, superseded: StorageTankVersion0) -> "StorageTank":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "StorageTank":
+        if not isinstance(superseded, StorageTankVersion0):
+            raise ValueError(f"Can only upgrade a {StorageTankVersion0.__name__} instance.")
+
         heatExchangers = cls._upgradeHeatExchangers(
             superseded.HxList,
             superseded.size_h
