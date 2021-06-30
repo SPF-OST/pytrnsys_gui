@@ -175,15 +175,8 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self._draw()
 
-    def modifyPosition(self, newHeights):
+    def setRelativeHeights(self, relativeInputHeight: float, relativeOutputHeight: float) -> None:
         self._clearDrawing()
-
-        relativeInputHeight = (
-            newHeights[0] / 100 if newHeights[0] != "" else self.relativeInputHeight
-        )
-        relativeOutputHeight = (
-            newHeights[1] / 100 if newHeights[1] != "" else self.relativeOutputHeight
-        )
 
         self._setRelativeHeightsAndTankSize(
             self._storageTankWidth,

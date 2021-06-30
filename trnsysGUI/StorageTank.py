@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 import trnsysGUI.images as _img
 import trnsysGUI.storage_tank.model as _model
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.ConfigStorage import ConfigStorage
+from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.DirectPortPair import DirectPortPair
@@ -185,38 +185,6 @@ class StorageTank(BlockItem):
         )
 
         return directPortPair
-
-    def modifyPortPosition(self, connectionName, newHeights):
-        matchingDirectPortPairs = [
-            dpp
-            for dpp in self.directPortPairs
-            if dpp.connection.displayName == connectionName
-        ]
-        if len(matchingDirectPortPairs) != 1:
-            raise RuntimeError(
-                f"Found no or multiple direct ports with name {connectionName}."
-            )
-        directPortPair = matchingDirectPortPairs[0]
-
-        x = 0 if directPortPair.isOnLeftSide else self.w
-
-        relativeInputHeight = (
-            newHeights[0] / 100
-            if newHeights[0] != ""
-            else directPortPair.relativeInputHeight
-        )
-        directPortPair.relativeInputHeight = relativeInputHeight
-        absoluteInputHeight = relativeInputHeight * self.h
-        directPortPair.connection.fromPort.setPos(x, absoluteInputHeight)
-
-        relativeOutputHeight = (
-            newHeights[1] / 100
-            if newHeights[1] != ""
-            else directPortPair.relativeOutputHeight
-        )
-        directPortPair.relativeOutputHeight = relativeOutputHeight
-        absoluteOutputHeight = relativeOutputHeight * self.h
-        directPortPair.connection.toPort.setPos(x, absoluteOutputHeight)
 
     def checkConnectInside(self, port1, port2, maxhops, d):
         """
@@ -846,7 +814,7 @@ class StorageTank(BlockItem):
         menu.exec_(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
-        self.dia = ConfigStorage(self, self.scene().parent())
+        self.dia = ConfigureStorageDialog(self, self.scene().parent())
 
     def hasManPortById(self, idFind):
 
