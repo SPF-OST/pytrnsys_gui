@@ -47,7 +47,7 @@ class TestStorageTank:
     def _deserializeStorageTank(storageTankLegacyJson, diagramViewMock):
         legacySerializedStorageTank = _json.loads(storageTankLegacyJson)
 
-        storageTank = _st.StorageTank(trnsysType="StorageTank", parent=diagramViewMock)
+        storageTank = _st.StorageTank(trnsysType="StorageTank", parent=diagramViewMock)  # pylint: disable=no-member
         diagramViewMock.scene().addItem(storageTank)
 
         connections = []
