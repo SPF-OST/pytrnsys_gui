@@ -22,7 +22,7 @@ Linux.
 
 A video guiding through the following steps can be found on [YouTube](https://www.youtube.com/watch?v=c8VPmOCeQN8).
 
-1. Open a command prompt (e.g. by hitting the Windows-key, then typing "cmd" 
+1. Open a command prompt (e.g., by hitting the Windows-key, then typing "cmd" 
    into the search box and hitting enter). The following commands should be entered
    into the command prompt just opened.
 
@@ -57,7 +57,23 @@ You can now close the command prompt opened in the first step.
 
 The `pytrnsys-gui` can now be started by double-clicking on the 
 `pytrnsys-gui\Scripts\pytrnsys-gui.exe` file. Example projects can be found in the
-`pytrnsys-gui\examples` directory.
+`pytrnsys-gui\pytrnsys_gui_data\examples` directory.
+
+
+#### Upgrading from one patch version to the next within the same minor version
+There is a shortcut for upgrading from one patch version to the next within the same minor version, e.g., from
+1.2.11 to 1.2.12:
+
+1. Activate your virtual environment:
+    ```commandline
+    pytrnsys-gui\Scripts\activate
+
+1. Issue the following command:
+    ```commandline
+    pip install --upgrade pytrnsys-gui
+   
+This method might not be 100% reliable. If you're experiencing problems, we recommend installing your preferred
+version from scratch as described above.
 
 
 ### Installation from source / Developer installation
@@ -105,5 +121,7 @@ specified are for a Windows environment. They are very similar for Linux.
     python GUI.py
     ```
     
-Beware that the GUI can only be started from within the virtual environment you created in step 1, i.e., whenever you open a new console window from which you want to start the GUI you first need to active the environment (step 2. above).
+Beware that the GUI can only be started from within the virtual environment you created in step 1. 
+I.e., whenever you open a new console window from which you want to start the GUI you first need 
+to activate the environment (step 2. above).
 
