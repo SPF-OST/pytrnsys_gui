@@ -28,11 +28,9 @@ jobs:
     - name: Static type checking with mypy
       run: |
         mypy trnsysGUI tests dev-tools
-      continue-on-error: true
     - name: Lint with pylint
       run: |
         pylint trnsysGUI tests dev-tools
-      continue-on-error: true
     - name: Test with pytest
       run: >
         pytest
