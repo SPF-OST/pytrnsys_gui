@@ -26,20 +26,11 @@ jobs:
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
     - name: Static type checking with mypy
-      run: |
-        mypy trnsysGUI tests dev-tools
-      continue-on-error: true
+      run: python dev-tools\run-static-checks-and-unit-tests.py --type
     - name: Lint with pylint
-      run: |
-        pylint trnsysGUI tests dev-tools
-      continue-on-error: true
+      run: python dev-tools\run-static-checks-and-unit-tests.py --lint
     - name: Test with pytest
-      run: >
-        pytest
-        --cov=trnsysGUI --cov-report html:test-results/coverage --cov-report term
-        --html=test-results/report/report.html
-        -m "not manual"
-        tests
+      run: python dev-tools\run-static-checks-and-unit-tests.py --unit
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:

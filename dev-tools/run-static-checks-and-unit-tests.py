@@ -26,10 +26,10 @@ def main():
         sh.rmtree(testResultsDirPath)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallTypeCheck:
-        sp.run("mypy trnsysGUI tests dev-tools")
+        sp.run(["mypy", "--show-error-codes", "trnsysGUI", "tests", "dev-tools"])
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallLint:
-        sp.run("pylint trnsysGUI tests dev-tools")
+        sp.run(["pylint", "trnsysGUI", "tests", "dev-tools"])
 
     if (
         arguments.shallRunAll

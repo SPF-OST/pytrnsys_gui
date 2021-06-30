@@ -35,7 +35,7 @@ from PyQt5.QtWidgets import (
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.ConfigStorage import ConfigStorage
+from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
@@ -1474,7 +1474,7 @@ class Editor(QWidget):
         c = TVentilDlg(bl, self)
 
     def showConfigStorageDlg(self, bl):
-        c = ConfigStorage(bl, self)
+        c = ConfigureStorageDialog(bl, self)
 
     def showGroupsEditor(self):
         c = groupsEditor(self)

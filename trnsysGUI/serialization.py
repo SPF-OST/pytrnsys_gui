@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 __all__ = [
     "UpgradableJsonSchemaMixinVersion0",
     "UpgradableJsonSchemaMixin",
@@ -16,7 +13,6 @@ import json as _json
 import dataclasses_jsonschema as _dcj
 
 _S0 = _tp.TypeVar("_S0", bound="UpgradableJsonSchemaMixinVersion0")
-_SOther = _tp.TypeVar("_SOther", bound="UpgradableJsonSchemaMixinVersion0")
 _T = _tp.TypeVar("_T", bound="UpgradableJsonSchemaMixin")
 
 
@@ -24,8 +20,7 @@ _logger = _log.getLogger("root")
 
 
 class SerializationError(ValueError):
-    def __init__(self, *args):
-        super().__init__(*args)
+    pass
 
 
 class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
@@ -51,8 +46,8 @@ class UpgradableJsonSchemaMixinVersion0(_dcj.JsonSchemaMixin):
 
         try:
             deserializedObject = super().from_dict(data, validate, validate_enums)
-        except _dcj.ValidationError as e:
-            raise SerializationError("Validation failed.") from e
+        except _dcj.ValidationError as error:
+            raise SerializationError("Validation failed.") from error
 
         return _tp.cast(_S0, deserializedObject)
 
@@ -135,8 +130,8 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         if validate:
             try:
                 cls._validate(data, validate_enums)
-            except _dcj.ValidationError as e:
-                raise SerializationError from e
+            except _dcj.ValidationError as error:
+                raise SerializationError from error
 
         try:
             return super().from_dict(
@@ -165,33 +160,33 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         return cls._getSchema(kwargs, schema_type, validate_enums)
 
     @classmethod
-    def _getEmbeddableSchema(cls, kwargs, schema_type, validate_enums):
+    def _getEmbeddableSchema(cls, kwargs, schemaType, validateEnums):
         fullSchema = super().json_schema(
             embeddable=True,
-            schema_type=schema_type,
-            validate_enums=validate_enums,
+            schema_type=schemaType,
+            validate_enums=validateEnums,
             **kwargs,
         )
 
         supersededClass = cls.getSupersededClass()
         fullSupersededSchema = supersededClass.json_schema(
             embeddable=True,
-            schema_type=schema_type,
-            validate_enums=validate_enums,
+            schema_type=schemaType,
+            validate_enums=validateEnums,
             **kwargs,
         )
 
         combinedFullSchema = cls._addSupersededSchemaToEmbeddable(
-            fullSchema, fullSupersededSchema, schema_type, supersededClass
+            fullSchema, fullSupersededSchema, schemaType, supersededClass
         )
         return combinedFullSchema
 
     @classmethod
     def _addSupersededSchemaToEmbeddable(
-        cls, fullSchema, fullSupersededSchema, schema_type, supersededClass
+        cls, fullSchema, fullSupersededSchema, schemaType, supersededClass
     ):
         schema = fullSchema[cls.__name__]
-        schemaReference = _dcj.schema_reference(schema_type, supersededClass.__name__)
+        schemaReference = _dcj.schema_reference(schemaType, supersededClass.__name__)
         combinedSchema = {"anyOf": [schema, schemaReference]}
         combinedFullSchema = {
             **fullSchema,
@@ -201,30 +196,30 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         return combinedFullSchema
 
     @classmethod
-    def _getSchema(cls, kwargs, schema_type, validate_enums):
+    def _getSchema(cls, kwargs, schemaType, validateEnums):
         fullSchema = super().json_schema(
             embeddable=False,
-            schema_type=schema_type,
-            validate_enums=validate_enums,
+            schema_type=schemaType,
+            validate_enums=validateEnums,
             **kwargs,
         )
 
         supersededClass = cls.getSupersededClass()
         fullSupersededSchema = supersededClass.json_schema(
             embeddable=True,
-            schema_type=schema_type,
-            validate_enums=validate_enums,
+            schema_type=schemaType,
+            validate_enums=validateEnums,
             **kwargs,
         )
 
         combinedFullSchema = cls._addSupersededSchemaToTopLevel(
-            fullSupersededSchema, fullSchema, supersededClass, schema_type
+            fullSupersededSchema, fullSchema, supersededClass, schemaType
         )
         return combinedFullSchema
 
     @classmethod
     def _addSupersededSchemaToTopLevel(
-        cls, fullSupersededSchema, fullSchema, supersededClass, schema_type
+        cls, fullSupersededSchema, fullSchema, supersededClass, schemaType
     ):
         definitions = fullSchema.get("definitions", {})
 
@@ -236,7 +231,7 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
         schema = {k: v for k, v in fullSchema.items() if k in keys}
         remainingSchema = {k: v for k, v in fullSchema.items() if k not in keys}
 
-        schemaReference = _dcj.schema_reference(schema_type, supersededClass.__name__)
+        schemaReference = _dcj.schema_reference(schemaType, supersededClass.__name__)
         combinedSchema = {"anyOf": [schema, schemaReference]}
 
         combinedFullSchema = {**remainingSchema, **combinedSchema, "definitions": allDefinitions}
@@ -258,20 +253,19 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
             )
 
     @classmethod
-    def fromInstance(cls: _tp.Type[_T], instance: _S0) -> _T:
+    def fromInstance(cls: _tp.Type[_T], instance: UpgradableJsonSchemaMixinVersion0) -> _T:
         supersededClass = cls.getSupersededClass()
-        if type(instance) == supersededClass:
+        if type(instance) == supersededClass:  # pylint: disable=unidiomatic-typecheck
             return cls.upgrade(instance)
 
-        weAreVersion1 = not issubclass(supersededClass, UpgradableJsonSchemaMixin)
-        if weAreVersion1:
-            raise ValueError(
-                "`instance' isn't an instance of current or any previous version."
-            )
+        if issubclass(supersededClass, UpgradableJsonSchemaMixin):
+            partiallyUpgradedInstance = supersededClass.fromInstance(instance)
 
-        partiallyUpgradedInstance = supersededClass.fromInstance(supersededClass)
+            return cls.upgrade(partiallyUpgradedInstance)
 
-        return cls.upgrade(partiallyUpgradedInstance)
+        raise ValueError(
+            "`instance' isn't an instance of current or any previous version."
+        )
 
     @classmethod
     def _doesRequireVersion(cls) -> bool:
@@ -279,10 +273,10 @@ class UpgradableJsonSchemaMixin(UpgradableJsonSchemaMixinVersion0, _abc.ABC):
 
     @classmethod
     @_abc.abstractmethod
-    def getSupersededClass(cls) -> _SOther:
+    def getSupersededClass(cls) -> _tp.Type[UpgradableJsonSchemaMixinVersion0]:
         raise NotImplementedError()
 
     @classmethod
     @_abc.abstractmethod
-    def upgrade(cls: _tp.Type[_T], superseded: _S0) -> _T:
+    def upgrade(cls: _tp.Type[_T], superseded: UpgradableJsonSchemaMixinVersion0) -> _T:
         raise NotImplementedError()
