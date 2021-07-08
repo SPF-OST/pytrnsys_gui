@@ -376,11 +376,6 @@ class Editor(QWidget):
         elif loadValue == "json":
             self.decodeDiagram(jsonPath, loadValue=loadValue)
 
-        # #Search related lists
-        # self.bfs_visitedNodes = []
-        # self.bfs_neighborNodes = []
-        # self.blockList = []
-
     # Debug function
     def dumpInformation(self):
         self.logger.debug("Diagram information:")
@@ -1927,31 +1922,6 @@ class Editor(QWidget):
                     o.updateTreePath(self.projectPath)
                 elif hasattr(o, "createControlDir"):
                     o.createControlDir()
-
-    # def openFile(self):
-    #     print("Opening diagram")
-    #     # self.centralWidget.delBlocks()
-    #     fileName = QFileDialog.getOpenFileName(self, "Open diagram", "examples", filter="*.json")[0]
-    #     print(fileName)
-    #     try:
-    #         self.statusBar().removeWidget(self.fileNameDisplay)
-    #     except:
-    #         pass
-    #     self.fileNameDisplay = QLabel("Opened from " + fileName)
-    #     self.statusBar().addWidget(self.fileNameDisplay)
-    #     if fileName != '':
-    #         self.centralWidget.idGen.reset()
-    #         self.currentFile = fileName
-    #         self.centralWidget.delBlocks()
-    #         self.centralWidget.decodeDiagram(fileName)
-    #     else:
-    #         print("No filename chosen")
-    #     try:
-    #         self.exportedTo
-    #     except AttributeError:
-    #         pass
-    #     else:
-    #         del self.exportedTo
 
     def openProject(self):
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))

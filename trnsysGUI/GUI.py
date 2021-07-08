@@ -1,35 +1,33 @@
 # pylint: skip-file
 # type: ignore
 
-#!/usr/bin/python
-import glob
 import os
-import subprocess
 import pathlib as _pl
 import shutil
+import subprocess
 import sys
-from math import sqrt
 
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from pytrnsys.utils import log
 
 import trnsysGUI.arguments as args
 import trnsysGUI.buildDck as dckBuilder
 import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.images as _img
 import trnsysGUI.settings as _settings
 import trnsysGUI.settingsDlg as _sdlg
 import trnsysGUI.tracing as trc
+from trnsysGUI import common as _com
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Connection import Connection
-from trnsysGUI.FolderSetUp import FolderSetUp
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.configFile import configFile
-import trnsysGUI.images as _img
+import trnsysGUI.project as _prj
+
 
 __version__ = "1.0.0"
 __author__ = "Stefano Marti"
@@ -37,108 +35,16 @@ __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
 
-def calcDist(p1, p2):
-    """
+class _MainWindow(QMainWindow):
+    def __init__(self, logger, project: _prj.Project, parent=None):
+        super().__init__(parent)
 
-    Parameters
-    ----------
-    p1 : :obj: `QPointF`
-
-    p2 : :obj: `QPointF`
-
-    Returns
-    -------
-
-    """
-    vec = p1 - p2
-    norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
-    return norm
-
-
-class NewOrLoadWindow(QMessageBox):
-    """
-    This class represents a dialogue box that is shown when starting the GUI. It asks the user whether a new
-    project should be opened or if an existing one should be loaded. Its parent class is QMessageBox.
-    """
-
-    def __init__(self, parent=None):
-        QMessageBox.__init__(self, parent)
-        self.setWindowTitle("Initializing options")
-
-        self.addButton(QPushButton("New"), QMessageBox.YesRole)
-        self.addButton(QPushButton("Open"), QMessageBox.NoRole)
-        self.addButton(QPushButton("Cancel"), QMessageBox.RejectRole)
-
-
-class MainWindow(QMainWindow):
-    """
-    This is the class containing the entire GUI window
-
-    It has a menubar, a central widget and a message bar at the bottom. The central widget is
-    the QWidget subclass containing the items library, the diagram editor and the element inspector
-    listview.
-
-    QActions comprise an icon (optionally), a description (tool tip) and the parent widget
-    They are connected to a method via the Signals-and-Slots framework, allowing the execution of functions by an event.
-    Shortcuts can be assigned to QActions.
-    They get included into the application either by being added to a menu or a tool bar.
-
-    Attributes
-    ----------
-    loadValue : str
-        Indicates whether a new project was created, an old one loaded or the process was cancelled
-    centralWidget : DiagramEditor
-
-    labelVisState : bool
-
-    massFlowEnabled : bool
-
-    calledByVisualizeMf : bool
-
-    currentFile : str
-        Probably obsolete (NEM 07.10.2020)
-    fileMenu : QMenu
-
-    editMenu : QMenu
-
-    helpMenu : QMenu
-
-    """
-
-    def __init__(self, logger, parent=None):
-        super(MainWindow, self).__init__(parent)
-
-        self.loadValue = ""
         self.jsonPath = None
         self.logger = logger
 
-        qmb = NewOrLoadWindow(self)
-        qmb.setText("Do you want to start a new project or open an existing one?")
-        ret = qmb.exec()
-
-        if ret == 1:
-            self.logger.info("Opening load dialogue")
-            self.loadDialogue()
-            if self.loadValue == "json":
-                ret = 0
-            elif self.loadValue == "cancel":
-                ret = 2
-
-        if ret == 0:
-            if self.loadValue != "json":
-                self.loadValue = "new"
-            self.logger.info("Setting up new project")
-            pathDialog = FolderSetUp(self)
-            self.projectFolder = pathDialog.projectFolder
-
-        if ret == 2:
-            self.logger.info("Cancelled opening or loading a project")
-            self.loadValue = "cancel"
-
-        self.centralWidget = self._createDiagramEditor()
+        self.centralWidget = self._createDiagramEditor(project)
         self.setCentralWidget(self.centralWidget)
-        if self.loadValue == "json":
-            self.centralWidget.save()
+
         self.labelVisState = False
         self.massFlowEnabled = False
         self.calledByVisualizeMf = False
@@ -151,13 +57,19 @@ class MainWindow(QMainWindow):
         loadDiaAction = QAction(_img.OUTBOX_PNG.icon(), "Open", self)
         loadDiaAction.triggered.connect(self.loadDia)
 
-        updateConfigAction = QAction(_img.UPDATE_CONFIG_PNG.icon(), "Update run.config", self)
+        updateConfigAction = QAction(
+            _img.UPDATE_CONFIG_PNG.icon(), "Update run.config", self
+        )
         updateConfigAction.triggered.connect(self.updateRun)
 
-        runSimulationAction = QAction(_img.RUN_SIMULATION_PNG.icon(), "Run simulation", self)
+        runSimulationAction = QAction(
+            _img.RUN_SIMULATION_PNG.icon(), "Run simulation", self
+        )
         runSimulationAction.triggered.connect(self.runSimulation)
 
-        processSimulationAction = QAction(_img.PROCESS_SIMULATION_PNG.icon(), "Process data", self)
+        processSimulationAction = QAction(
+            _img.PROCESS_SIMULATION_PNG.icon(), "Process data", self
+        )
         processSimulationAction.triggered.connect(self.processSimulation)
 
         deleteDiaAction = QAction(_img.TRASH_PNG.icon(), "Delete diagram", self)
@@ -172,10 +84,16 @@ class MainWindow(QMainWindow):
         toggleConnLabels = QAction(_img.LABEL_TOGGLE_PNG.icon(), "Toggle labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
 
-        exportHydraulicsAction = QAction(_img.EXPORT_HYDRAULICS_PNG.icon(), "Export hydraulic.ddck", self)
+        exportHydraulicsAction = QAction(
+            _img.EXPORT_HYDRAULICS_PNG.icon(), "Export hydraulic.ddck", self
+        )
         exportHydraulicsAction.triggered.connect(self.exportHydraulicsDdck)
 
-        exportHydCtrlAction = QAction(_img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(), "Export hydraulic_control.ddck", self)
+        exportHydCtrlAction = QAction(
+            _img.EXPORT_HYDRAULIC_CONTROL_PNG.icon(),
+            "Export hydraulic_control.ddck",
+            self,
+        )
         exportHydCtrlAction.triggered.connect(self.exportHydraulicControl)
 
         exportDckAction = QAction(_img.EXPORT_DCK_PNG.icon(), "Export dck", self)
@@ -196,10 +114,14 @@ class MainWindow(QMainWindow):
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
 
-        runMassflowSolverAction = QAction(_img.RUN_MFS_PNG.icon(), "Run the massflow solver", self)
+        runMassflowSolverAction = QAction(
+            _img.RUN_MFS_PNG.icon(), "Run the massflow solver", self
+        )
         runMassflowSolverAction.triggered.connect(self.runAndVisMf)
 
-        openVisualizerAction = QAction(_img.VIS_MFS_PNG.icon(), "Start visualization of mass flows", self)
+        openVisualizerAction = QAction(
+            _img.VIS_MFS_PNG.icon(), "Start visualization of mass flows", self
+        )
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
         trnsysList = QAction("Print trnsysObj", self)
@@ -304,78 +226,72 @@ class MainWindow(QMainWindow):
         self.editMenu.addAction(undoAction)
         self.editMenu.addAction(redoAction)
 
-    def loadDialogue(self):
-        self.projectFolder, projectFile = os.path.split(
-            QFileDialog.getOpenFileName(self, "Open diagram", filter="*.json")[0].replace("/", "\\")
-        )
-
-        if projectFile != "":
-            properProjectCheck1 = os.path.split(self.projectFolder)[-1] == projectFile.replace(".json", "")
-            properProjectCheck2 = "ddck" in os.listdir(self.projectFolder)
-            if properProjectCheck1 and properProjectCheck2:
-                self.loadValue = "load"
-            else:
-                projectMB = QMessageBox(self)
-                projectMB.setText(
-                    "The json you are opening does not have a proper project folder environment. "
-                    "Do you want to continue and create one?"
-                )
-                projectMB.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-                projectMB.setDefaultButton(QMessageBox.Cancel)
-                projectRet = projectMB.exec()
-
-                if projectRet == QMessageBox.Cancel:
-                    self.loadValue = "cancel"
-                else:
-                    self.loadValue = "json"
-                    self.jsonPath = os.path.join(self.projectFolder, projectFile)
-            return False
-        else:
-            self.logger.info("Aborted opening another project")
-            return True
-
     def newDia(self):
-        qmb = QMessageBox()
-        qmb.setText("Are you sure you want to start a new project? Unsaved progress on the current one will be lost.")
-        qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        qmb.setDefaultButton(QMessageBox.Cancel)
-        ret = qmb.exec()
-        if ret == QMessageBox.Yes:
-            self.logger.info("Initializing new project")
+        messageBox = QMessageBox()
+        messageBox.setText(
+            "Are you sure you want to start a new project? Unsaved progress on the current one will be lost."
+        )
+        messageBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        messageBox.setDefaultButton(QMessageBox.Cancel)
 
-            self.loadValue = "new"
-            pathDialog = FolderSetUp(self)
-            self.projectFolder = pathDialog.projectFolder
-
-            self.centralWidget = self._createDiagramEditor()
-            self.setCentralWidget(self.centralWidget)
-        else:
-            self.logger.info("Canceling")
+        result = messageBox.exec()
+        if result == QMessageBox.Cancel:
             return
+
+        startingDirectoryPath = _pl.Path(self.projectFolder).parent
+
+        createProjectMaybeCancelled = _prj.getCreateProject(startingDirectoryPath)
+        if _com.isCancelled(createProjectMaybeCancelled):
+            return
+        createProject = _com.value(createProjectMaybeCancelled)
+
+        self.centralWidget = self._createDiagramEditor(createProject)
+        self.setCentralWidget(self.centralWidget)
 
     def saveDia(self):
         self.logger.info("Saving diagram")
         self.centralWidget.save()
 
     def copyToNew(self):
-        self.logger.info("Copying project to new folder")
+        currentProjectFolderPath = _pl.Path(self.projectFolder)
 
-        self.loadValue = "copy"
-        pathDialog = FolderSetUp(self)
-        self.projectFolder = pathDialog.projectFolder
+        startingDirectoryPath = currentProjectFolderPath.parent
 
-        shutil.copytree(self.centralWidget.projectFolder, self.projectFolder)
+        maybeCancel = _prj.getExistingEmptyDirectory(startingDirectoryPath)
+        if _com.isCancelled(maybeCancel):
+            return
+        newProjectFolderPath = _com.value(maybeCancel)
 
-        jsonOld = os.path.split(self.centralWidget.projectFolder)[-1] + ".json"
-        self.centralWidget.projectFolder = self.projectFolder
-        jsonNew = os.path.split(self.projectFolder)[-1] + ".json"
-        os.rename(os.path.join(self.projectFolder, jsonOld), os.path.join(self.projectFolder, jsonNew))
+        oldProjectFolderPath = _pl.Path(self.projectFolder)
 
-        jsonPath = os.path.join(self.projectFolder, jsonNew)
+        self._copyContents(oldProjectFolderPath, newProjectFolderPath)
+        newJsonFilePath = self._adjustNewJsonFileName(newProjectFolderPath, oldProjectFolderPath)
 
-        self.centralWidget = self._createDiagramEditor()
+        loadProject = _prj.LoadProject(newJsonFilePath)
+
+        self.centralWidget = self._createDiagramEditor(loadProject)
         self.setCentralWidget(self.centralWidget)
         self.centralWidget.save(showWarning=False)
+
+    @staticmethod
+    def _copyContents(oldProjectFolderPath, newProjectFolderPath):
+        for child in oldProjectFolderPath.iterdir():
+            destinationPath = newProjectFolderPath / child.name
+            if child.is_dir():
+                shutil.copytree(child, destinationPath)
+            else:
+                shutil.copy(child, destinationPath)
+
+    @staticmethod
+    def _adjustNewJsonFileName(newProjectFolderPath, oldProjectFolderPath):
+        oldJsonFileName = f"{oldProjectFolderPath.name}.json"
+        newJsonFileName = f"{newProjectFolderPath.name}.json"
+        shutil.move(
+            newProjectFolderPath / oldJsonFileName,
+            newProjectFolderPath / newJsonFileName,
+        )
+        newJsonFilePath = newProjectFolderPath / newJsonFileName
+        return newJsonFilePath
 
     def loadDia(self):
         self.logger.info("Loading diagram")
@@ -426,7 +342,9 @@ class MainWindow(QMainWindow):
         storageWithoutFile = []
         for object in self.centralWidget.trnsysObj:
             if isinstance(object, StorageTank):
-                storageTankFile = os.path.join(object.displayName, object.displayName + ".ddck")
+                storageTankFile = os.path.join(
+                    object.displayName, object.displayName + ".ddck"
+                )
                 storageTankPath = os.path.join(ddckPath, storageTankFile)
                 if not (os.path.isfile(storageTankPath)):
                     storageWithoutFile.append(object.displayName + "\n")
@@ -435,9 +353,7 @@ class MainWindow(QMainWindow):
             messageText = "The following storage tank(s) do(es) not have a corresponding ddck:\n\n"
             for storage in storageWithoutFile:
                 messageText += storage
-            messageText += (
-                "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
-            )
+            messageText += "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
             qmb = QMessageBox()
             qmb.setText(messageText)
             qmb.setStandardButtons(QMessageBox.Ok)
@@ -450,10 +366,15 @@ class MainWindow(QMainWindow):
 
         #   Start simulation
         runApp = RunMain()
-        executionFailed, errorStatement = runApp.runAction(self.logger, self.centralWidget.projectFolder)
+        executionFailed, errorStatement = runApp.runAction(
+            self.logger, self.centralWidget.projectFolder
+        )
 
         if executionFailed:
-            messageText = "Exception while trying to execute RunParallelTrnsys:\n\n" + errorStatement
+            messageText = (
+                "Exception while trying to execute RunParallelTrnsys:\n\n"
+                + errorStatement
+            )
             qmb = QMessageBox()
             qmb.setText(messageText)
             qmb.setStandardButtons(QMessageBox.Ok)
@@ -473,10 +394,15 @@ class MainWindow(QMainWindow):
             qmb.exec()
             return
         processApp = ProcessMain()
-        executionFailed, errorStatement = processApp.processAction(self.logger, self.centralWidget.projectFolder)
+        executionFailed, errorStatement = processApp.processAction(
+            self.logger, self.centralWidget.projectFolder
+        )
 
         if executionFailed:
-            messageText = "Exception while trying to execute RunParallelTrnsys:\n\n" + errorStatement
+            messageText = (
+                "Exception while trying to execute RunParallelTrnsys:\n\n"
+                + errorStatement
+            )
             qmb = QMessageBox()
             qmb.setText(messageText)
             qmb.setStandardButtons(QMessageBox.Ok)
@@ -537,7 +463,9 @@ class MainWindow(QMainWindow):
 
     def deleteDia(self):
         qmb = QMessageBox()
-        qmb.setText('Are you sure you want to delete the diagram? (There is no possibility to "undo".)')
+        qmb.setText(
+            'Are you sure you want to delete the diagram? (There is no possibility to "undo".)'
+        )
         qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         qmb.setDefaultButton(QMessageBox.Cancel)
         ret = qmb.exec()
@@ -646,12 +574,16 @@ class MainWindow(QMainWindow):
 
     def visualizeMf(self):
         qmb = QMessageBox()
-        qmb.setText("Please select the mass flow rate prt-file that you want to visualize.")
+        qmb.setText(
+            "Please select the mass flow rate prt-file that you want to visualize."
+        )
         qmb.setStandardButtons(QMessageBox.Ok)
         qmb.setDefaultButton(QMessageBox.Ok)
         qmb.exec()
 
-        mfrFile = QFileDialog.getOpenFileName(self, "Open diagram", filter="*Mfr.prt")[0].replace("/", "\\")
+        mfrFile = QFileDialog.getOpenFileName(self, "Open diagram", filter="*Mfr.prt")[
+            0
+        ].replace("/", "\\")
         tempFile = mfrFile.replace("Mfr", "T")
         self.calledByVisualizeMf = True
         if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
@@ -663,34 +595,23 @@ class MainWindow(QMainWindow):
     def openFile(self):
         self.logger.info("Opening diagram")
         qmb = QMessageBox()
-        qmb.setText("Are you sure you want to open another project? Unsaved progress on the current one will be lost.")
+        qmb.setText(
+            "Are you sure you want to open another project? Unsaved progress on the current one will be lost."
+        )
         qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         qmb.setDefaultButton(QMessageBox.Cancel)
         ret = qmb.exec()
 
-        if ret == QMessageBox.Yes:
-            loadingAborted = self.loadDialogue()
-            if loadingAborted:
-                return
-
-            if self.loadValue == "json":
-                pathDialog = FolderSetUp(self)
-                self.projectFolder = pathDialog.projectFolder
-
-            self.centralWidget = self._createDiagramEditor()
-            self.setCentralWidget(self.centralWidget)
-
-            if self.loadValue == "json":
-                self.centralWidget.save()
-
-            try:
-                self.exportedTo
-            except AttributeError:
-                pass
-            else:
-                del self.exportedTo
-        else:
+        if ret == QMessageBox.Cancel:
             return
+
+        maybeCancelled = _prj.getLoadOrMigrateProject()
+        if _com.isCancelled(maybeCancelled):
+            return
+        project = _com.value(maybeCancelled)
+
+        self.centralWidget = self._createDiagramEditor(project)
+        self.setCentralWidget(self.centralWidget)
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
@@ -759,29 +680,42 @@ class MainWindow(QMainWindow):
         if exportPath != "None":
             msgb = QMessageBox(self)
             if not self.centralWidget.trnsysPath.is_file():
-                msgb.setText("TRNExe.exe not found! Consider correcting the path in the settings.")
+                msgb.setText(
+                    "TRNExe.exe not found! Consider correcting the path in the settings."
+                )
                 msgb.exec()
                 return 0, 0
             self.logger.info("trnsyspath: %s", self.centralWidget.trnsysPath)
             # cmd = f"{self.centralWidget.trnsysPath} {exportPath} /H"
             errorStatement = ""
             try:
-                subprocess.run([str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True)
-                mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt")
-                tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt")
+                subprocess.run(
+                    [str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True
+                )
+                mfrFile = os.path.join(
+                    self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt"
+                )
+                tempFile = os.path.join(
+                    self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt"
+                )
                 self.calledByVisualizeMf = False
                 return mfrFile, tempFile
             except ValueError as e:
-                logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
+                self.logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
                 for words in e.args:
                     errorStatement += str(words)
             except OSError as e:
-                logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
+                self.logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
                 errorStatement = str(e)
             except:
-                logger.error("UNDEFINED EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
+                self.logger.error(
+                    "UNDEFINED EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys"
+                )
 
-            messageText = "Exception while trying to execute runMassflowSolver:\n\n" + errorStatement
+            messageText = (
+                "Exception while trying to execute runMassflowSolver:\n\n"
+                + errorStatement
+            )
             qmb = QMessageBox()
             qmb.setText(messageText)
             qmb.setStandardButtons(QMessageBox.Ok)
@@ -791,13 +725,17 @@ class MainWindow(QMainWindow):
             return None
 
     def loadVisualization(self):
-        MfrFile = QFileDialog.getOpenFileName(self, "Select Mfr File", "exports", filter="*_Mfr.prt")[0]
+        MfrFile = QFileDialog.getOpenFileName(
+            self, "Select Mfr File", "exports", filter="*_Mfr.prt"
+        )[0]
         if MfrFile == "":
             msgb = QMessageBox(self)
             msgb.setText("No Mfr file chosen!")
             msgb.exec()
             return
-        TempFile = QFileDialog.getOpenFileName(self, "Select Temperature File", "exports", filter="*_T.prt")[0]
+        TempFile = QFileDialog.getOpenFileName(
+            self, "Select Temperature File", "exports", filter="*_T.prt"
+        )[0]
         if TempFile == "":
             msgb = QMessageBox(self)
             msgb.setText("No Temperature file chosen!")
@@ -821,7 +759,9 @@ class MainWindow(QMainWindow):
         else:
             self.logger.info(selectedMfrFileName, selectedTempFileName, diaName)
             msgb = QMessageBox(self)
-            msgb.setText("MFR or Temperature file does not correspond to current diagram!")
+            msgb.setText(
+                "MFR or Temperature file does not correspond to current diagram!"
+            )
             msgb.exec()
 
     def movePorts(self):
@@ -843,7 +783,9 @@ class MainWindow(QMainWindow):
 
     def showVersion(self):
         msgb = QMessageBox(self)
-        msgb.setText("Currrent version is " + __version__ + " with status " + __status__)
+        msgb.setText(
+            "Currrent version is " + __version__ + " with status " + __status__
+        )
         msgb.exec()
 
     def showCredits(self):
@@ -855,24 +797,17 @@ class MainWindow(QMainWindow):
         # "Icons made by Jeremias Schmidli and with icons by Vaadin from  www.flaticon.com</p>"
         msgb.exec()
 
-    def testApp(self):
-        self.newDia()
-        self.centralWidget.testFunction()
-        self.newDia()
-
-        msgb = QMessageBox(self)
-        msgb.setText("Test Complete, please restart the application. ")
-        msgb.exec()
-
-        self.close()
-
     def exportPDF(self):
         self.centralWidget.printPDF()
 
     def closeEvent(self, e):
         qmb = QMessageBox()
-        qmb.setText("Do you want to save the current state of the project before closing the program?")
-        qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Close | QMessageBox.Cancel)
+        qmb.setText(
+            "Do you want to save the current state of the project before closing the program?"
+        )
+        qmb.setStandardButtons(
+            QMessageBox.Save | QMessageBox.Close | QMessageBox.Cancel
+        )
         qmb.setDefaultButton(QMessageBox.Cancel)
         ret = qmb.exec()
         if ret == QMessageBox.Cancel:
@@ -921,13 +856,22 @@ class MainWindow(QMainWindow):
 
                 if objInput == connToInputToPort and objOutput == connToOutputToPort:
                     msgBox = QMessageBox()
-                    msgBox.setText("both %s and %s are input ports into %s" % (connName1, connName2, objName))
+                    msgBox.setText(
+                        "both %s and %s are input ports into %s"
+                        % (connName1, connName2, objName)
+                    )
                     msgBox.exec_()
                     self.noErrorConns = False
 
-                elif objInput == connToInputFromPort and objOutput == connToOutputFromPort:
+                elif (
+                    objInput == connToInputFromPort
+                    and objOutput == connToOutputFromPort
+                ):
                     msgBox = QMessageBox()
-                    msgBox.setText("both %s and %s are output ports from %s" % (connName1, connName2, objName))
+                    msgBox.setText(
+                        "both %s and %s are output ports from %s"
+                        % (connName1, connName2, objName)
+                    )
                     msgBox.exec_()
                     self.noErrorConns = False
         return self.noErrorConns
@@ -941,18 +885,55 @@ class MainWindow(QMainWindow):
             self.logger.info("Project path:", self.centralWidget.projectPath)
             runApp.runAction(self.centralWidget.projectPath)
 
-    def _createDiagramEditor(self):
-        return _de.Editor(self, self.projectFolder, self.jsonPath, self.loadValue, self.logger)
+    def _createDiagramEditor(self, project: _prj.Project) -> _de.Editor:
+        if isinstance(project, _prj.LoadProject):
+            self.projectFolder = str(project.jsonFilePath.parent)
+            return _de.Editor(
+                self,
+                self.projectFolder,
+                jsonPath=None,
+                loadValue="load",
+                logger=self.logger,
+            )
+
+        if isinstance(project, _prj.MigrateProject):
+            self.projectFolder = str(project.newProjectFolderPath)
+            editor = _de.Editor(
+                self,
+                project.newProjectFolderPath,
+                project.oldJsonFilePath,
+                loadValue="json",
+                logger=self.logger,
+            )
+            editor.save()
+            return editor
+
+        if isinstance(project, _prj.CreateProject):
+            self.projectFolder = str(project.jsonFilePath.parent)
+            return _de.Editor(
+                self,
+                self.projectFolder,
+                jsonPath=project.jsonFilePath,
+                loadValue="new",
+                logger=self.logger,
+            )
+
+        raise AssertionError(f"Unknown `project' type: {type(project)}")
 
 
 def main():
-    global logger
     arguments = args.getArgsOrExit()
 
     logger = log.setup_custom_logger("root", arguments.logLevel)
     app = QApplication(sys.argv)
     app.setApplicationName("Diagram Creator")
-    form = MainWindow(logger)
+
+    maybeCancelled = _prj.getProject()
+    if _com.isCancelled(maybeCancelled):
+        return
+    project = _com.value(maybeCancelled)
+
+    form = _MainWindow(logger, project)
     form.showMaximized()
     form.show()
     form.ensureSettingsExist()
@@ -964,16 +945,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Found bug: when dragging bridging connection over another segment, crash
-# Found glitch: when having a disr segment, gradient is not correct anymore
-# Found bug: IceStorage, when creating new connection and moving block, the connection does not update position
-# Found bug: When in mode 1, sometimes dragging leads to segments collaps to a small point
-
-# Improve autoarrange of connections
-# TODO:   old/Prevent loops when adding connections to StorageBlock
-# TODO 7: Solve mix up between i/o and left/right side
-
-# There is a mess introduced with kwargs because the dencoder returns objects, which cannot have any
-# connection to the "outside" of the decoder. This could maybe be improved by returning just the dict
-# to the DiagramEditor class, which then can easily create the objects correctly.
