@@ -265,7 +265,7 @@ class _MainWindow(QMainWindow):
         oldProjectFolderPath = _pl.Path(self.projectFolder)
 
         self._copyContents(oldProjectFolderPath, newProjectFolderPath)
-        newJsonFilePath = self._adjustNewJsonFileName(newProjectFolderPath, oldProjectFolderPath)
+        newJsonFilePath = self._changeAndGetNewJsonFileName(newProjectFolderPath, oldProjectFolderPath)
 
         loadProject = _prj.LoadProject(newJsonFilePath)
 
@@ -283,7 +283,7 @@ class _MainWindow(QMainWindow):
                 shutil.copy(child, destinationPath)
 
     @staticmethod
-    def _adjustNewJsonFileName(newProjectFolderPath, oldProjectFolderPath):
+    def _changeAndGetNewJsonFileName(newProjectFolderPath, oldProjectFolderPath):
         oldJsonFileName = f"{oldProjectFolderPath.name}.json"
         newJsonFileName = f"{newProjectFolderPath.name}.json"
         shutil.move(
