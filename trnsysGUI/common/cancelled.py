@@ -1,5 +1,3 @@
-__all__ = ["Cancelled", "CANCELLED", "isCancelled", "value"]
-
 import typing as _tp
 
 
@@ -8,11 +6,8 @@ class Cancelled:
 
 
 CANCELLED = Cancelled()
-
 _T = _tp.TypeVar("_T")
-
-
-MaybeCancelled = _tp.Union[Cancelled, _T]
+MaybeCancelled = _tp.Union[_T, Cancelled]
 
 
 def isCancelled(maybeCancelled: MaybeCancelled[_T]) -> bool:

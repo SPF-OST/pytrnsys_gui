@@ -15,7 +15,7 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
-from trnsysGUI import common as _com
+import trnsysGUI.common.cancelled as _ccl
 
 
 @_dc.dataclass
@@ -37,35 +37,20 @@ class MigrateProject:
 Project = _tp.Union[CreateProject, LoadProject, MigrateProject]
 
 
-def getProject() -> _com.MaybeCancelled[Project]:
+def getProject() -> _ccl.MaybeCancelled[Project]:
     createOpenMaybeCancelled = _askUserWhetherToCreateNewProjectOrOpenExisting()
-    if _com.isCancelled(createOpenMaybeCancelled):
-        return _com.CANCELLED
-    createOrOpenExisting = _com.value(createOpenMaybeCancelled)
 
-    if createOrOpenExisting == _CreateNewOrOpenExisting.OPEN_EXISTING:
-        result = getLoadOrMigrateProject()
+    while not _ccl.isCancelled(createOpenMaybeCancelled):
+        createOpen = _ccl.value(createOpenMaybeCancelled)
 
-        if _com.isCancelled(result):
-            return _com.CANCELLED
+        projectMaybeCancelled = _getProjectInternal(createOpen)
+        if not _ccl.isCancelled(projectMaybeCancelled):
+            project = _ccl.value(projectMaybeCancelled)
+            return _tp.cast(Project, project)  # Don't know why mypy requires this cast
 
-        return result
+        createOpenMaybeCancelled = _askUserWhetherToCreateNewProjectOrOpenExisting()
 
-    if createOrOpenExisting == _CreateNewOrOpenExisting.CREATE_NEW:
-        return getCreateProject()
-
-    raise AssertionError(f"Unknown value for enum {_CreateNewOrOpenExisting}: {createOrOpenExisting}")
-
-
-def getCreateProject(startingDirectoryPath: _tp.Optional[_pl.Path] = None) -> _com.MaybeCancelled[CreateProject]:
-    projectFolderPathMaybeCancelled = getExistingEmptyDirectory(startingDirectoryPath)
-    if _com.isCancelled(projectFolderPathMaybeCancelled):
-        return _com.CANCELLED
-    projectFolderPath = _com.value(projectFolderPathMaybeCancelled)
-
-    jsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
-
-    return CreateProject(jsonFilePath)
+    return _ccl.CANCELLED
 
 
 class _CreateNewOrOpenExisting(_enum.Enum):
@@ -73,7 +58,7 @@ class _CreateNewOrOpenExisting(_enum.Enum):
     OPEN_EXISTING = _enum.auto()
 
 
-def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _com.MaybeCancelled[
+def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _ccl.MaybeCancelled[
     _CreateNewOrOpenExisting
 ]:
     messageBox = _qtw.QMessageBox()
@@ -92,7 +77,7 @@ def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _com.MaybeCancelled[
 
     cancelButton = messageBox.button(_qtw.QMessageBox.Cancel)
     if clickedButton is cancelButton:
-        return _com.CANCELLED
+        return _ccl.CANCELLED
 
     if clickedButton is createButton:
         return _CreateNewOrOpenExisting.CREATE_NEW
@@ -103,24 +88,47 @@ def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _com.MaybeCancelled[
     raise AssertionError("Unknown button was clicked.")
 
 
+def _getProjectInternal(createOrOpenExisting: "_CreateNewOrOpenExisting") -> _ccl.MaybeCancelled[Project]:
+    if createOrOpenExisting == _CreateNewOrOpenExisting.OPEN_EXISTING:
+        return getLoadOrMigrateProject()
+
+    if createOrOpenExisting == _CreateNewOrOpenExisting.CREATE_NEW:
+        return getCreateProject()
+
+    raise AssertionError(f"Unknown value for enum {_CreateNewOrOpenExisting}: {createOrOpenExisting}")
+
+
+def getCreateProject(startingDirectoryPath: _tp.Optional[_pl.Path] = None) -> _ccl.MaybeCancelled[CreateProject]:
+    projectFolderPathMaybeCancelled = getExistingEmptyDirectory(startingDirectoryPath)
+    if _ccl.isCancelled(projectFolderPathMaybeCancelled):
+        return _ccl.CANCELLED
+    projectFolderPath = _ccl.value(projectFolderPathMaybeCancelled)
+
+    jsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
+
+    return CreateProject(jsonFilePath)
+
+
 def getExistingEmptyDirectory(
     startingDirectoryPath: _tp.Optional[_pl.Path] = None,
-) -> _com.MaybeCancelled[_pl.Path]:
-    selectedDirectoryPathString = _qtw.QFileDialog.getExistingDirectory(
-        caption="Select new project directory", directory=str(startingDirectoryPath)
-    )
-    if not selectedDirectoryPathString:
-        return _com.CANCELLED
+) -> _ccl.MaybeCancelled[_pl.Path]:
+    while True:
+        selectedDirectoryPathString = _qtw.QFileDialog.getExistingDirectory(
+            caption="Select new project directory", directory=str(startingDirectoryPath)
+        )
+        if not selectedDirectoryPathString:
+            return _ccl.CANCELLED
 
-    selectedDirectoryPath = _pl.Path(selectedDirectoryPathString)
+        selectedDirectoryPath = _pl.Path(selectedDirectoryPathString)
 
-    if not _isEmptyDirectory(selectedDirectoryPath):
+        if _isEmptyDirectory(selectedDirectoryPath):
+            return selectedDirectoryPath
+
+        errorMessage = "The new project directory must be empty."
+
         messageBox = _qtw.QMessageBox()
-        messageBox.setText("The new project directory must be empty.")
+        messageBox.setText(errorMessage)
         messageBox.exec()
-        return _com.CANCELLED
-
-    return _com.value(selectedDirectoryPath)
 
 
 def _isEmptyDirectory(path: _pl.Path) -> bool:
@@ -134,12 +142,12 @@ def _isEmptyDirectory(path: _pl.Path) -> bool:
     return isDirectoryEmpty
 
 
-def getLoadOrMigrateProject() -> _com.MaybeCancelled[_tp.Union[LoadProject, MigrateProject]]:
+def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[_tp.Union[LoadProject, MigrateProject]]:
     projectFolderPathString, _ = _qtw.QFileDialog.getOpenFileName(
         caption="Open diagram", filter="*.json"
     )
     if not projectFolderPathString:
-        return _com.CANCELLED
+        return _ccl.CANCELLED
     jsonFilePath = _pl.Path(projectFolderPathString)
 
     projectFolderPath = jsonFilePath.parent
@@ -159,14 +167,14 @@ def getLoadOrMigrateProject() -> _com.MaybeCancelled[_tp.Union[LoadProject, Migr
         messageBox.setDefaultButton(_qtw.QMessageBox.Cancel)
         result = messageBox.exec()
         if result == _qtw.QMessageBox.Cancel:
-            return _com.CANCELLED
+            return _ccl.CANCELLED
 
         maybeCancelled = getExistingEmptyDirectory(
             startingDirectoryPath=projectFolderPath.parent
         )
-        if _com.isCancelled(maybeCancelled):
-            return _com.CANCELLED
-        newProjectFolderPath = _com.value(maybeCancelled)
+        if _ccl.isCancelled(maybeCancelled):
+            return _ccl.CANCELLED
+        newProjectFolderPath = _ccl.value(maybeCancelled)
 
         return MigrateProject(oldJsonFilePath, newProjectFolderPath)
 

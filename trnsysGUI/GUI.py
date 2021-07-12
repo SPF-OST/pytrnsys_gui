@@ -12,12 +12,14 @@ from pytrnsys.utils import log
 
 import trnsysGUI.arguments as args
 import trnsysGUI.buildDck as dckBuilder
+import trnsysGUI.common.cancelled as _ccl
+import trnsysGUI.common.error as _err
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.images as _img
+import trnsysGUI.project as _prj
 import trnsysGUI.settings as _settings
 import trnsysGUI.settingsDlg as _sdlg
 import trnsysGUI.tracing as trc
-from trnsysGUI import common as _com
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Graphicaltem import GraphicalItem
@@ -26,8 +28,6 @@ from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.configFile import configFile
-import trnsysGUI.project as _prj
-
 
 __version__ = "1.0.0"
 __author__ = "Stefano Marti"
@@ -241,9 +241,9 @@ class _MainWindow(QMainWindow):
         startingDirectoryPath = _pl.Path(self.projectFolder).parent
 
         createProjectMaybeCancelled = _prj.getCreateProject(startingDirectoryPath)
-        if _com.isCancelled(createProjectMaybeCancelled):
+        if _ccl.isCancelled(createProjectMaybeCancelled):
             return
-        createProject = _com.value(createProjectMaybeCancelled)
+        createProject = _ccl.value(createProjectMaybeCancelled)
 
         self.centralWidget = self._createDiagramEditor(createProject)
         self.setCentralWidget(self.centralWidget)
@@ -257,10 +257,10 @@ class _MainWindow(QMainWindow):
 
         startingDirectoryPath = currentProjectFolderPath.parent
 
-        maybeCancel = _prj.getExistingEmptyDirectory(startingDirectoryPath)
-        if _com.isCancelled(maybeCancel):
+        maybeCancelled = _prj.getExistingEmptyDirectory(startingDirectoryPath)
+        if _ccl.isCancelled(maybeCancelled):
             return
-        newProjectFolderPath = _com.value(maybeCancel)
+        newProjectFolderPath = _ccl.value(maybeCancelled)
 
         oldProjectFolderPath = _pl.Path(self.projectFolder)
 
@@ -606,9 +606,9 @@ class _MainWindow(QMainWindow):
             return
 
         maybeCancelled = _prj.getLoadOrMigrateProject()
-        if _com.isCancelled(maybeCancelled):
+        if _ccl.isCancelled(maybeCancelled):
             return
-        project = _com.value(maybeCancelled)
+        project = _ccl.value(maybeCancelled)
 
         self.centralWidget = self._createDiagramEditor(project)
         self.setCentralWidget(self.centralWidget)
@@ -890,7 +890,7 @@ class _MainWindow(QMainWindow):
             self.projectFolder = str(project.jsonFilePath.parent)
             return _de.Editor(
                 self,
-                self.projectFolder,
+                str(project.jsonFilePath.parent),
                 jsonPath=None,
                 loadValue="load",
                 logger=self.logger,
@@ -900,8 +900,8 @@ class _MainWindow(QMainWindow):
             self.projectFolder = str(project.newProjectFolderPath)
             editor = _de.Editor(
                 self,
-                project.newProjectFolderPath,
-                project.oldJsonFilePath,
+                str(project.newProjectFolderPath),
+                str(project.oldJsonFilePath),
                 loadValue="json",
                 logger=self.logger,
             )
@@ -913,7 +913,7 @@ class _MainWindow(QMainWindow):
             return _de.Editor(
                 self,
                 self.projectFolder,
-                jsonPath=project.jsonFilePath,
+                jsonPath=str(project.jsonFilePath),
                 loadValue="new",
                 logger=self.logger,
             )
@@ -929,9 +929,9 @@ def main():
     app.setApplicationName("Diagram Creator")
 
     maybeCancelled = _prj.getProject()
-    if _com.isCancelled(maybeCancelled):
+    if _ccl.isCancelled(maybeCancelled):
         return
-    project = _com.value(maybeCancelled)
+    project = _ccl.value(maybeCancelled)
 
     form = _MainWindow(logger, project)
     form.showMaximized()
