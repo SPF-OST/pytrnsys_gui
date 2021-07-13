@@ -15,7 +15,7 @@ class TestEditor:
         "exampleProjectName",
         ["TRIHP_dualSource", "HeatingNetwork", "ExternalHeatExchanger"]
     )
-    def testExport(self, exampleProjectName: str):
+    def testExportHydraulics(self, exampleProjectName: str):
         helper = _Helper(exampleProjectName)
         helper.setup()
 
