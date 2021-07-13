@@ -1,0 +1,308 @@
+{
+    "Blocks": {
+        "..__GroupDct-defaultGroup": {
+            ".__GroupDict__": true,
+            "GroupName": "defaultGroup",
+            "Position": [
+                0,
+                0
+            ],
+            "Size": [
+                100,
+                100
+            ]
+        },
+        ".__BlockDct__": true,
+        "Block-1": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Tes",
+            "BlockName": "StorageTank",
+            "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+            "directPortPairs": [
+                {
+                    "connectionId": 2,
+                    "id": 10,
+                    "portPair": {
+                        "inputPort": {
+                            "id": 8,
+                            "relativeHeight": 0.5
+                        },
+                        "name": "Conn2",
+                        "outputPort": {
+                            "id": 9,
+                            "relativeHeight": 0.1
+                        },
+                        "side": "left"
+                    },
+                    "trnsysId": 4
+                }
+            ],
+            "groupName": "defaultGroup",
+            "heatExchangers": [],
+            "height": 120,
+            "id": 1,
+            "isHorizontallyFlipped": false,
+            "isVerticallyFlipped": false,
+            "position": [
+                -464.0,
+                -414.0
+            ],
+            "trnsysId": 1
+        },
+        "Block-13": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "ExHx",
+            "BlockName": "ExternalHx",
+            "ExternalHxPosition": [
+                -623.0,
+                -398.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 13,
+            "PortsIDIn": [
+                14,
+                15
+            ],
+            "PortsIDOut": [
+                16,
+                17
+            ],
+            "RotationN": 0,
+            "childIds": [
+                5,
+                6
+            ],
+            "trnsysID": 5
+        },
+        "Block-24": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Col",
+            "BlockName": "Collector",
+            "BlockPosition": [
+                -833.0,
+                -402.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 24,
+            "PortsIDIn": [
+                25
+            ],
+            "PortsIDOut": [
+                26
+            ],
+            "RotationN": 0,
+            "trnsysID": 9
+        },
+        "Connection-18": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 3,
+            "ConnDisplayName": "Col-Tes",
+            "ConnID": 18,
+            "CornerPositions": [
+                [
+                    -503.5,
+                    -378.0
+                ],
+                [
+                    -503.5,
+                    -354.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 15,
+            "PortToID": 8,
+            "SegmentPositions": [
+                [
+                    -543.0,
+                    -378.0,
+                    -502.9,
+                    -378.0
+                ],
+                [
+                    -503.5,
+                    -378.0,
+                    -503.5,
+                    -354.0
+                ],
+                [
+                    -464.0,
+                    -354.0,
+                    -502.9,
+                    -353.4
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 7
+        },
+        "Connection-21": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 4,
+            "ConnDisplayName": "Tes-Col",
+            "ConnID": 21,
+            "CornerPositions": [
+                [
+                    -503.5,
+                    -306.0
+                ],
+                [
+                    -503.5,
+                    -298.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                -60.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 9,
+            "PortToID": 17,
+            "SegmentPositions": [
+                [
+                    -464.0,
+                    -306.0,
+                    -502.9,
+                    -306.0
+                ],
+                [
+                    -503.5,
+                    -306.0,
+                    -503.5,
+                    -298.0
+                ],
+                [
+                    -543.0,
+                    -298.0,
+                    -502.9,
+                    -297.4
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 8
+        },
+        "Connection-27": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 5,
+            "ConnDisplayName": "Col-Hx",
+            "ConnID": 27,
+            "CornerPositions": [
+                [
+                    -668.0,
+                    -382.0
+                ],
+                [
+                    -668.0,
+                    -378.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 26,
+            "PortToID": 14,
+            "SegmentPositions": [
+                [
+                    -713.0,
+                    -382.0,
+                    -667.4,
+                    -382.0
+                ],
+                [
+                    -668.0,
+                    -382.0,
+                    -668.0,
+                    -378.0
+                ],
+                [
+                    -623.0,
+                    -378.0,
+                    -667.4,
+                    -377.4
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 10
+        },
+        "Connection-30": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 6,
+            "ConnDisplayName": "Hx-Col",
+            "ConnID": 30,
+            "CornerPositions": [
+                [
+                    -668.0,
+                    -298.0
+                ],
+                [
+                    -668.0,
+                    -302.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                -60.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 16,
+            "PortToID": 25,
+            "SegmentPositions": [
+                [
+                    -623.0,
+                    -298.0,
+                    -667.4,
+                    -298.0
+                ],
+                [
+                    -668.0,
+                    -298.0,
+                    -668.0,
+                    -302.0
+                ],
+                [
+                    -713.0,
+                    -302.0,
+                    -667.4,
+                    -301.4
+                ]
+            ],
+            "isVirtualConn": false,
+            "trnsysID": 11
+        },
+        "IDs": {
+            "GlobalId": 45,
+            "__idDct__": true,
+            "globalConnID": 19,
+            "trnsysID": 24
+        },
+        "Strings": {
+            "DiagramName": "ExternalHeatExchanger.json",
+            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\pytrnsys_gui\\data\\examples\\ExternalHeatExchanger",
+            "__nameDct__": true
+        }
+    }
+}

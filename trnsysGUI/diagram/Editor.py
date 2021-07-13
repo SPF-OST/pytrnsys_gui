@@ -741,7 +741,7 @@ class Editor(QWidget):
         table = {"Name": name, "in 1": in1, "in 2": in2, "out 1": out1, "out 2": out2}
         df = pd.DataFrame(table, columns=["Name", "in 1", "in 2", "out 1", "out 2"])
 
-    def exportData(self, exportTo="ddck"):
+    def exportHydraulics(self, exportTo="ddck"):
         self.logger.info("------------------------> START OF EXPORT <------------------------")
 
         self.setUpStorageInnerConns()
@@ -1827,7 +1827,7 @@ class Editor(QWidget):
             exampleFileList.append(fileName)
             self.decodeDiagram(fileName)
             # Export example files
-            self.exportData()
+            self.exportHydraulics()
             self.delBlocks()
         self.testEnabled = False
 
@@ -1843,7 +1843,7 @@ class Editor(QWidget):
                 if testDlg.exportBool:
                     self.delBlocks()
                     self.decodeDiagram(exampleFileList[j])
-                    self.exportData()
+                    self.exportHydraulics()
                     self.delBlocks()
                 self.existReference = True
             j += 1

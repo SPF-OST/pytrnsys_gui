@@ -13,22 +13,28 @@ import trnsysGUI.diagram.Editor as _de
 class TestEditor:
     @_pt.mark.parametrize(
         "exampleProjectName",
-        ["TRIHP_dualSource", "HeatingNetwork"]
+        ["TRIHP_dualSource", "HeatingNetwork", "ExternalHeatExchanger"]
     )
-    def testExportForMassFlowSolver(self, exampleProjectName: str):
+    def testExport(self, exampleProjectName: str):
         helper = _Helper(exampleProjectName)
         helper.setup()
 
         # The following line is required otherwise QT will crash
         _ = _qtw.QApplication([])
 
+        projectFolderPath = helper.projectFolderPath
+        self._exportHydraulic(projectFolderPath, _format="mfs")
+        self._exportHydraulic(projectFolderPath, _format="ddck")
+
+        helper.ensureActualProducedFilesAreAsExpected()
+
+    @staticmethod
+    def _exportHydraulic(projectFolderPath, *, _format):
         logger = _log.Logger("root")
         editor = _de.Editor(
-            parent=None, projectFolder=str(helper.projectFolderPath), jsonPath=None, loadValue="load", logger=logger
+            parent=None, projectFolder=str(projectFolderPath), jsonPath=None, loadValue="load", logger=logger
         )
-        editor.exportData(exportTo="mfs")
-
-        helper.ensureDckFilesAreEqualIgnoringRandomizedFlowRateValues()
+        editor.exportHydraulics(exportTo=_format)
 
 
 class _Helper:
@@ -42,22 +48,35 @@ class _Helper:
         self.projectFolderPath = self._actualFolderPath / self._exampleProjectName
         expectedProjectFolderPath = dataFolderPath / "expected" / self._exampleProjectName
 
-        deckFileName = f"{self._exampleProjectName}_mfs.dck"
-        self._actualDckFile = self.projectFolderPath / deckFileName
-        self._expectedDckFile = expectedProjectFolderPath / deckFileName
+        mfsDeckFileName = f"{self._exampleProjectName}_mfs.dck"
+        self._actualMfsDckFile = self.projectFolderPath / mfsDeckFileName
+        self._expectedMfsDckFile = expectedProjectFolderPath / mfsDeckFileName
+
+        relativeHydraulicDdckPath = _pl.Path("ddck") / "hydraulic" / "hydraulic.ddck"
+        self._actualHydraulicDckFile = self.projectFolderPath / relativeHydraulicDdckPath
+        self._expectedHydraulicDckFile = expectedProjectFolderPath / relativeHydraulicDdckPath
 
     def setup(self):
         self._copyExampleToTestInputFolder()
 
-    def ensureDckFilesAreEqualIgnoringRandomizedFlowRateValues(self):
-        actualContent = self._actualDckFile.read_text()
-        expectedContent = self._expectedDckFile.read_text()
-
-        actualContentWithoutRandomizedValues = self._replaceRandomizedMassflowRatesWithPlaceHolder(
-            actualContent, placeholder="XXX"
+    def ensureActualProducedFilesAreAsExpected(self):
+        self._ensureFilesAreEqual(
+            self._actualMfsDckFile, self._expectedMfsDckFile, shallReplaceRandomizedFlowRates=True
+        )
+        self._ensureFilesAreEqual(
+            self._actualHydraulicDckFile, self._expectedHydraulicDckFile, shallReplaceRandomizedFlowRates=False
         )
 
-        assert actualContentWithoutRandomizedValues == expectedContent
+    def _ensureFilesAreEqual(self, actualDeckFile, expectedDckFile, shallReplaceRandomizedFlowRates):
+        actualContent = actualDeckFile.read_text()
+        expectedContent = expectedDckFile.read_text()
+
+        if shallReplaceRandomizedFlowRates:
+            actualContent = self._replaceRandomizedFlowRatesWithPlaceHolder(
+                actualContent, placeholder="XXX"
+            )
+
+        assert actualContent == expectedContent
 
     def _copyExampleToTestInputFolder(self):
         if self._actualFolderPath.exists():
@@ -69,7 +88,7 @@ class _Helper:
         _sh.copytree(exampleFolderPath, self.projectFolderPath)
 
     @classmethod
-    def _replaceRandomizedMassflowRatesWithPlaceHolder(cls, actualContent, placeholder):
+    def _replaceRandomizedFlowRatesWithPlaceHolder(cls, actualContent, placeholder):
         pattern = rf"^(?P<variableName>Mfr[^ \t=]+)[ \t]+=[ \t]+[0-9\.]+"
 
         def replaceValueWithPlaceHolder(match: _tp.Match):
