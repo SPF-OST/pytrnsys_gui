@@ -8,14 +8,15 @@ import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
 import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.StorageTank as _st
 
 
 class TestEditor:
     @_pt.mark.parametrize(
         "exampleProjectName",
-        ["TRIHP_dualSource", "HeatingNetwork", "ExternalHeatExchanger"]
+        ["TRIHP_dualSource", "HeatingNetwork", "ExternalHeatExchanger"],
     )
-    def testExportHydraulics(self, exampleProjectName: str):
+    def testStorageAndHydraulicExports(self, exampleProjectName: str):
         helper = _Helper(exampleProjectName)
         helper.setup()
 
@@ -26,19 +27,40 @@ class TestEditor:
         self._exportHydraulic(projectFolderPath, _format="mfs")
         self._exportHydraulic(projectFolderPath, _format="ddck")
 
-        helper.ensureActualProducedFilesAreAsExpected()
+        # editor = self._createEditor(projectFolderPath)
+        # storageTanks = [o for o in editor.trnsysObj if isinstance(o, _st.StorageTank)]
+        # for storageTank in storageTanks:
+        #     storageTank.exportDck()
+
+        mfsDckFileRelativePath = f"{exampleProjectName}_mfs.dck"
+        helper.ensureFilesAreEqual(mfsDckFileRelativePath, shallReplaceRandomizedFlowRates=True)
+
+        hydraulicDdckRelativePath = f"ddck/hydraulic/hydraulic.ddck"
+        helper.ensureFilesAreEqual(hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False)
+
+    @classmethod
+    def _exportHydraulic(cls, projectFolderPath, *, _format):
+        editor = cls._createEditor(projectFolderPath)
+        editor.exportHydraulics(exportTo=_format)
 
     @staticmethod
-    def _exportHydraulic(projectFolderPath, *, _format):
+    def _createEditor(projectFolderPath):
         logger = _log.Logger("root")
         editor = _de.Editor(
-            parent=None, projectFolder=str(projectFolderPath), jsonPath=None, loadValue="load", logger=logger
+            parent=None,
+            projectFolder=str(projectFolderPath),
+            jsonPath=None,
+            loadValue="load",
+            logger=logger,
         )
-        editor.exportHydraulics(exportTo=_format)
+        return editor
 
 
 class _Helper:
-    def __init__(self, exampleProjectName: str):
+    def __init__(
+        self,
+        exampleProjectName: str,
+    ):
         self._exampleProjectName = exampleProjectName
 
         dataFolderPath = _pl.Path(__file__).parent / "data"
@@ -46,30 +68,23 @@ class _Helper:
         self._actualFolderPath = dataFolderPath / "actual"
 
         self.projectFolderPath = self._actualFolderPath / self._exampleProjectName
-        expectedProjectFolderPath = dataFolderPath / "expected" / self._exampleProjectName
-
-        mfsDeckFileName = f"{self._exampleProjectName}_mfs.dck"
-        self._actualMfsDckFile = self.projectFolderPath / mfsDeckFileName
-        self._expectedMfsDckFile = expectedProjectFolderPath / mfsDeckFileName
-
-        relativeHydraulicDdckPath = _pl.Path("ddck") / "hydraulic" / "hydraulic.ddck"
-        self._actualHydraulicDckFile = self.projectFolderPath / relativeHydraulicDdckPath
-        self._expectedHydraulicDckFile = expectedProjectFolderPath / relativeHydraulicDdckPath
+        self._expectedProjectFolderPath = (
+            dataFolderPath / "expected" / self._exampleProjectName
+        )
 
     def setup(self):
         self._copyExampleToTestInputFolder()
 
-    def ensureActualProducedFilesAreAsExpected(self):
-        self._ensureFilesAreEqual(
-            self._actualMfsDckFile, self._expectedMfsDckFile, shallReplaceRandomizedFlowRates=True
-        )
-        self._ensureFilesAreEqual(
-            self._actualHydraulicDckFile, self._expectedHydraulicDckFile, shallReplaceRandomizedFlowRates=False
-        )
+    def ensureFilesAreEqual(
+        self, fileToCompareRelativePath: str, shallReplaceRandomizedFlowRates: bool
+    ):
+        fileToCompareRelativePath = _pl.Path(fileToCompareRelativePath)
 
-    def _ensureFilesAreEqual(self, actualDeckFile, expectedDckFile, shallReplaceRandomizedFlowRates):
-        actualContent = actualDeckFile.read_text()
-        expectedContent = expectedDckFile.read_text()
+        actualFilePath = self.projectFolderPath / fileToCompareRelativePath
+        expectedFilePath = self._expectedProjectFolderPath / fileToCompareRelativePath
+
+        actualContent = actualFilePath.read_text()
+        expectedContent = expectedFilePath.read_text()
 
         if shallReplaceRandomizedFlowRates:
             actualContent = self._replaceRandomizedFlowRatesWithPlaceHolder(
@@ -83,7 +98,9 @@ class _Helper:
             _sh.rmtree(self._actualFolderPath)
 
         pytrnsysGuiDir = _pl.Path(__file__).parents[3]
-        exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / self._exampleProjectName
+        exampleFolderPath = (
+            pytrnsysGuiDir / "data" / "examples" / self._exampleProjectName
+        )
 
         _sh.copytree(exampleFolderPath, self.projectFolderPath)
 
@@ -94,7 +111,9 @@ class _Helper:
         def replaceValueWithPlaceHolder(match: _tp.Match):
             return cls._processMatch(match, placeholder)
 
-        actualContent = _re.sub(pattern, replaceValueWithPlaceHolder, actualContent, flags=_re.MULTILINE)
+        actualContent = _re.sub(
+            pattern, replaceValueWithPlaceHolder, actualContent, flags=_re.MULTILINE
+        )
 
         return actualContent
 
