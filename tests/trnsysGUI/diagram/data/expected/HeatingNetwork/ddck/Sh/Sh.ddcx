@@ -1,0 +1,7 @@
+*************************************
+**BEGIN Sh.ddcx
+*************************************
+** This file is used to store the black box component outputs of Sh
+
+TShPortLeft90=Tdp1In_Tes1
+TShPortLeft2=Tdp1Out_Tes1

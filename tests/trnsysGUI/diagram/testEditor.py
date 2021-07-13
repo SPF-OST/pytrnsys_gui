@@ -27,16 +27,35 @@ class TestEditor:
         self._exportHydraulic(projectFolderPath, _format="mfs")
         self._exportHydraulic(projectFolderPath, _format="ddck")
 
-        # editor = self._createEditor(projectFolderPath)
-        # storageTanks = [o for o in editor.trnsysObj if isinstance(o, _st.StorageTank)]
-        # for storageTank in storageTanks:
-        #     storageTank.exportDck()
+        editor = self._createEditor(projectFolderPath)
+        storageTanks = [o for o in editor.trnsysObj if isinstance(o, _st.StorageTank)]
+        for storageTank in storageTanks:
+            storageTank.exportDck()
 
         mfsDckFileRelativePath = f"{exampleProjectName}_mfs.dck"
-        helper.ensureFilesAreEqual(mfsDckFileRelativePath, shallReplaceRandomizedFlowRates=True)
+        helper.ensureFilesAreEqual(
+            mfsDckFileRelativePath, shallReplaceRandomizedFlowRates=True
+        )
 
         hydraulicDdckRelativePath = f"ddck/hydraulic/hydraulic.ddck"
-        helper.ensureFilesAreEqual(hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False)
+        helper.ensureFilesAreEqual(
+            hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False
+        )
+
+        for storageTank in storageTanks:
+            ddckFileRelativePath = (
+                f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddck"
+            )
+            helper.ensureFilesAreEqual(
+                ddckFileRelativePath, shallReplaceRandomizedFlowRates=False
+            )
+
+            ddcxFileRelativePath = (
+                f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddcx"
+            )
+            helper.ensureFilesAreEqual(
+                ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False
+            )
 
     @classmethod
     def _exportHydraulic(cls, projectFolderPath, *, _format):
