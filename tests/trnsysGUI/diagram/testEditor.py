@@ -1,26 +1,29 @@
-# pylint: skip-file
-# type: ignore
+import logging as _log
+import pathlib as _pl
+import shutil as _sh
+import re as _re
+import typing as _tp
 
-import logging as log
-import pathlib as pl
-import shutil as sh
-import re
+import PyQt5.QtWidgets as _qtw
+import pytest as _pt
 
-import PyQt5.QtWidgets as widgets
-
-import trnsysGUI.diagram.Editor as de
+import trnsysGUI.diagram.Editor as _de
 
 
 class TestEditor:
-    def testExportForMassFlowSolver(self):
-        helper = _Helper()
+    @_pt.mark.parametrize(
+        "exampleProjectName",
+        ["TRIHP_dualSource", "HeatingNetwork"]
+    )
+    def testExportForMassFlowSolver(self, exampleProjectName: str):
+        helper = _Helper(exampleProjectName)
         helper.setup()
 
         # The following line is required otherwise QT will crash
-        _ = widgets.QApplication([])
+        _ = _qtw.QApplication([])
 
-        logger = log.Logger("root")
-        editor = de.Editor(
+        logger = _log.Logger("root")
+        editor = _de.Editor(
             parent=None, projectFolder=str(helper.projectFolderPath), jsonPath=None, loadValue="load", logger=logger
         )
         editor.exportData(exportTo="mfs")
@@ -29,18 +32,19 @@ class TestEditor:
 
 
 class _Helper:
-    RANDOMIZED_FLOW_RATES = "MfrPuSH MfrPuHpEvap MfrPuHpShCond MfrPuHpDhwCond MfrPuDhw MfrPuCirc".split()
+    def __init__(self, exampleProjectName: str):
+        self._exampleProjectName = exampleProjectName
 
-    def __init__(self):
-        dataFolderPath = pl.Path(__file__).parent / "data"
+        dataFolderPath = _pl.Path(__file__).parent / "data"
 
         self._actualFolderPath = dataFolderPath / "actual"
 
-        self.projectFolderPath = self._actualFolderPath / "TRIHP_dualSource"
-        expectedProjectFolderPath = dataFolderPath / "expected" / "TRIHP_dualSource"
+        self.projectFolderPath = self._actualFolderPath / self._exampleProjectName
+        expectedProjectFolderPath = dataFolderPath / "expected" / self._exampleProjectName
 
-        self._actualDckFile = self.projectFolderPath / "TRIHP_dualSource_mfs.dck"
-        self._expectedDckFile = expectedProjectFolderPath / "TRIHP_dualSource_mfs.dck"
+        deckFileName = f"{self._exampleProjectName}_mfs.dck"
+        self._actualDckFile = self.projectFolderPath / deckFileName
+        self._expectedDckFile = expectedProjectFolderPath / deckFileName
 
     def setup(self):
         self._copyExampleToTestInputFolder()
@@ -49,7 +53,7 @@ class _Helper:
         actualContent = self._actualDckFile.read_text()
         expectedContent = self._expectedDckFile.read_text()
 
-        actualContentWithoutRandomizedValues = self._replaceRandomizeValuesWithPlaceholder(
+        actualContentWithoutRandomizedValues = self._replaceRandomizedMassflowRatesWithPlaceHolder(
             actualContent, placeholder="XXX"
         )
 
@@ -57,16 +61,30 @@ class _Helper:
 
     def _copyExampleToTestInputFolder(self):
         if self._actualFolderPath.exists():
-            sh.rmtree(self._actualFolderPath)
+            _sh.rmtree(self._actualFolderPath)
 
-        pytrnsysGuiDir = pl.Path(__file__).parents[3]
-        exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / "TRIHP_dualSource"
+        pytrnsysGuiDir = _pl.Path(__file__).parents[3]
+        exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / self._exampleProjectName
 
-        sh.copytree(exampleFolderPath, self.projectFolderPath)
+        _sh.copytree(exampleFolderPath, self.projectFolderPath)
 
-    def _replaceRandomizeValuesWithPlaceholder(self, actualContent, placeholder):
-        for massFlow in self.RANDOMIZED_FLOW_RATES:
-            pattern = rf"^{massFlow} = [0-9\.]+"
-            actualContent = re.sub(pattern, f"{massFlow} = {placeholder}", actualContent, flags=re.MULTILINE)
+    @classmethod
+    def _replaceRandomizedMassflowRatesWithPlaceHolder(cls, actualContent, placeholder):
+        pattern = rf"^(?P<variableName>Mfr[^ \t=]+)[ \t]+=[ \t]+[0-9\.]+"
+
+        def replaceValueWithPlaceHolder(match: _tp.Match):
+            return cls._processMatch(match, placeholder)
+
+        actualContent = _re.sub(pattern, replaceValueWithPlaceHolder, actualContent, flags=_re.MULTILINE)
 
         return actualContent
+
+    @staticmethod
+    def _processMatch(match: _tp.Match, placeholder: str) -> str:
+        matchedText = match[0]
+        if matchedText == "MfrsupplyWater = 1000":
+            return "MfrsupplyWater = 1000"
+
+        variableName = match["variableName"]
+
+        return f"{variableName} = {placeholder}"
