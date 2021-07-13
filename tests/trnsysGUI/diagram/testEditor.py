@@ -28,7 +28,11 @@ class TestEditor:
         self._exportHydraulic(projectFolderPath, _format="ddck")
 
         editor = self._createEditor(projectFolderPath)
-        storageTanks = [o for o in editor.trnsysObj if isinstance(o, _st.StorageTank)]
+        storageTanks = [
+            o
+            for o in editor.trnsysObj
+            if isinstance(o, _st.StorageTank)  # type: ignore[attr-defined] # pylint: disable=no-member
+        ]
         for storageTank in storageTanks:
             storageTank.exportDck()
 
@@ -37,7 +41,7 @@ class TestEditor:
             mfsDckFileRelativePath, shallReplaceRandomizedFlowRates=True
         )
 
-        hydraulicDdckRelativePath = f"ddck/hydraulic/hydraulic.ddck"
+        hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
         helper.ensureFilesAreEqual(
             hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False
         )
@@ -95,9 +99,11 @@ class _Helper:
         self._copyExampleToTestInputFolder()
 
     def ensureFilesAreEqual(
-        self, fileToCompareRelativePath: str, shallReplaceRandomizedFlowRates: bool
+        self,
+        fileToCompareRelativePathAsString: str,
+        shallReplaceRandomizedFlowRates: bool,
     ):
-        fileToCompareRelativePath = _pl.Path(fileToCompareRelativePath)
+        fileToCompareRelativePath = _pl.Path(fileToCompareRelativePathAsString)
 
         actualFilePath = self.projectFolderPath / fileToCompareRelativePath
         expectedFilePath = self._expectedProjectFolderPath / fileToCompareRelativePath

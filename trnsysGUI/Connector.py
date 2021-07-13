@@ -3,17 +3,14 @@
 
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
-
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
 
 
 class Connector(BlockItem):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super(Connector, self).__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, parent):
+        super().__init__(trnsysType, parent)
         self.sizeFactor = 0.5
         self.w = 40
         self.h = 40
@@ -21,12 +18,10 @@ class Connector(BlockItem):
         self.inputs.append(PortItem("i", 0, self))
         self.outputs.append(PortItem("o", 2, self))
 
-        if "storagePorts" in kwargs:
-            self.storagePorts = kwargs["storagePorts"]
         self.changeSize()
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        return _img.COLLECTOR_SVG
+        return _img.CONNECTOR_PNG
 
     def changeSize(self):
         w = self.w

@@ -509,41 +509,30 @@ class Editor(QWidget):
         -------
 
         """
-        for t in self.trnsysObj:
-            if type(t) is StorageTank:
+        storageTanks = [o for o in self.trnsysObj if isinstance(o, StorageTank)]
+        for storageTank in storageTanks:
+            for heatExchanger in storageTank.heatExchangers:
+                portsAtOtherEndOfConnection = [self._getPortAtOtherEndOfConnection(p) for p in
+                                               [heatExchanger.port1, heatExchanger.port2]]
 
-                for hx in t.heatExchangers:
-                    if hx.sSide == 0:
-                        t.connectHxs(
-                            self.findStorageCorrespPortsHx([hx.port1, hx.port2]),
-                            [hx.port1, hx.port2],
-                            t.hxInsideConnsLeft,
-                            "L",
-                            hx,
-                        )
-                    elif hx.sSide == 2:
-                        self.logger.debug("storage of hx R is " + str(t.displayName))
-                        self.logger.debug("hx ports are" + str(hx.port1) + str(hx.port2))
-                        t.connectHxs(
-                            self.findStorageCorrespPortsHx([hx.port1, hx.port2]),
-                            [hx.port1, hx.port2],
-                            t.hxInsideConnsRight,
-                            "R",
-                            hx,
-                        )
-                    else:
-                        self.logger.debug("heatExchanger has not valid sSide")
+                connectors = storageTank.hxInsideConnsLeft if heatExchanger.sSide == 0 else storageTank.hxInsideConnsRight
+                storageTank.connectHxs(
+                    portsAtOtherEndOfConnection,
+                    connectors,
+                    heatExchanger,
+                )
 
-                # print("t.leftside has len " + str(len(t.leftSide)))
-                # print("t.leftside is " + str(t.rightSide))
-                t.connectInside(self.findStorageCorrespPorts(t.leftDirectPortPairsPortItems), t.leftDirectPortPairsPortItems, t.insideConnLeft, "L")
-                t.connectInside(self.findStorageCorrespPorts(t.rightDirectPortPairsPortItems), t.rightDirectPortPairsPortItems, t.insideConnRight, "R")
+            storageTank.connectInside(
+                self.findStorageCorrespPorts(storageTank.leftDirectPortPairsPortItems),
+                storageTank.leftDirectPortPairsPortItems,
+                storageTank.insideConnLeft,
+                "L")
 
-                # print("------Checking insideConns")
-                # print(t.hxInsideConnsLeft)
-                # print(t.hxInsideConnsRight)
-                # print(t.insideConnLeft)
-                # print(t.insideConnRight)
+            storageTank.connectInside(
+                self.findStorageCorrespPorts(storageTank.rightDirectPortPairsPortItems),
+                storageTank.rightDirectPortPairsPortItems,
+                storageTank.insideConnRight,
+                "R")
 
     def findStorageCorrespPorts(self, portList):
         """
@@ -577,37 +566,12 @@ class Editor(QWidget):
 
         return res
 
-    def findStorageCorrespPortsHx(self, portList):
-        """
-        Parameters
-        ----------
-        portList
-
-        Returns
-        -------
-        res : :obj:`List` of :obj:`PortItem`
-        """
-        res = []
-        for p in portList:
-            # print("Port has")
-            # [print(c.displayName) for c in p.connectionList]
-
-            if len(p.connectionList) > 1:
-                if p.connectionList[1].fromPort is p:
-                    res.append(p.connectionList[1].toPort)
-                elif p.connectionList[1].toPort is p:
-                    res.append(p.connectionList[1].fromPort)
-                else:
-                    self.logger.debug("Port is not fromPort nor toPort")
-            if len(p.connectionList) == 1:
-                if p.connectionList[0].fromPort is p:
-                    res.append(p.connectionList[0].toPort)
-                elif p.connectionList[0].toPort is p:
-                    res.append(p.connectionList[0].fromPort)
-                else:
-                    self.logger.debug("Port is not fromPort nor toPort")
-        # print("res is " + str(res))
-        return res
+    @staticmethod
+    def _getPortAtOtherEndOfConnection(port):
+        connection = port.connectionList[1] if len(port.connectionList) > 1 else port.connectionList[0]
+        assert connection.fromPort is port or connection.toPort is port
+        otherPort = connection.fromPort if connection.toPort is port else connection.toPort
+        return otherPort
 
     def tearDownStorageInnerConns(self):
         """

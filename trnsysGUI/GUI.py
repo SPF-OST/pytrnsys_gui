@@ -349,7 +349,7 @@ class _MainWindow(QMainWindow):
                 if not (os.path.isfile(storageTankPath)):
                     storageWithoutFile.append(object.displayName + "\n")
 
-        if not (not (storageWithoutFile)):
+        if storageWithoutFile:
             messageText = "The following storage tank(s) do(es) not have a corresponding ddck:\n\n"
             for storage in storageWithoutFile:
                 messageText += storage
@@ -411,54 +411,8 @@ class _MainWindow(QMainWindow):
 
         return
 
-    def exportTrnsys(self):
-        self.logger.info("Exporting Trnsys file...")
-        noErrorExists = self.debugConns()
-        qmb = QMessageBox()
-
-        ddckFolder = os.path.join(self.projectFolder, "ddck")
-        ddckFolders = os.listdir(ddckFolder)
-        numberOfControlFolders = 0
-
-        for folder in ddckFolders:
-            if "Control" in folder:
-                controlFolder = os.path.join(ddckFolder, folder)
-                numberOfControlFolders += 1
-
-        controlMissing = True
-
-        if numberOfControlFolders > 1:
-            qmb.setText("A system can only have one control!")
-            qmb.exec_()
-            return
-        elif numberOfControlFolders == 1:
-            for file in os.listdir(controlFolder):
-                if file.endswith(".ddck"):
-                    controlMissing = False
-
-        if controlMissing:
-            qmb.setText("Please add a control-ddck before exporting!")
-            qmb.exec_()
-            return
-
-        # if self.centralWidget.controlExists < 1:
-
-        if not noErrorExists:
-            qmb.setText("Ignore connection errors and continue with export?")
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
-            ret = qmb.exec()
-            if ret == QMessageBox.Save:
-                self.logger.info("Overwriting")
-                # continue
-            else:
-                self.logger.info("Canceling")
-                return
-        self.centralWidget.exportData()
-
     def renameDia(self):
         self.logger.info("Renaming diagram...")
-        # self.centralWidget.propertiesDlg()
         self.centralWidget.showDiagramDlg()
 
     def deleteDia(self):
@@ -621,7 +575,7 @@ class _MainWindow(QMainWindow):
         statusQuo = self.labelVisState
         if not statusQuo:
             self.toggleConnLabels()
-        self.centralWidget.exportData(exportTo="ddck")
+        self.centralWidget.exportHydraulics(exportTo="ddck")
         if not statusQuo:
             self.toggleConnLabels()
 
@@ -674,7 +628,7 @@ class _MainWindow(QMainWindow):
     def runMassflowSolver(self):
         self.logger.info("Running massflow solver...")
 
-        exportPath = self.centralWidget.exportData(exportTo="mfs")
+        exportPath = self.centralWidget.exportHydraulics(exportTo="mfs")
         self.exportedTo = exportPath
         self.logger.info(exportPath)
         if exportPath != "None":

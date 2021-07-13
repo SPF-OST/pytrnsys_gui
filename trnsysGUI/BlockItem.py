@@ -781,58 +781,6 @@ class BlockItem(QGraphicsPixmapItem):
         resBlockList.append(self)
 
     # Export related
-    def exportParameterSolver(self, descConnLength):
-        temp = ""
-        for i in self.inputs:
-            # ConnectionList lenght should be max offset
-            for c in i.connectionList:
-                if (
-                    hasattr(c.fromPort.parent, "heatExchangers")
-                    and i.connectionList.index(c) == 0
-                ):
-                    continue
-                elif (
-                    hasattr(c.toPort.parent, "heatExchangers")
-                    and i.connectionList.index(c) == 0
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
-
-        for o in self.outputs:
-            # ConnectionList lenght should be max offset
-            for c in o.connectionList:
-                if (
-                    type(c.fromPort.parent, "heatExchangers")
-                    and o.connectionList.index(c) == 0
-                ):
-                    continue
-                elif (
-                    type(c.toPort.parent, "heatExchangers")
-                    and o.connectionList.index(c) == 0
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
-
-        temp += str(self.typeNumber)
-        temp += " " * (descConnLength - len(temp))
-        self.exportConnsString = temp
-
-        return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
-    # def exportBlackBox(self):
-    #     # if len(t.inputs + t.outputs) == 2 and not isinstance(self, Connector):
-    #     if len(self.inputs + self.outputs) == 2 and self.isVisible():
-    #         resStr = "T" + self.displayName + "=1 \n"
-    #         equationNr = 1
-    #
-    #         return resStr, equationNr
-    #     else:
-    #         return "", 0
-
     def exportBlackBox(self):
         equation = []
         if len(self.inputs + self.outputs) == 2 and self.isVisible():

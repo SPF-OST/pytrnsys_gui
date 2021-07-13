@@ -141,11 +141,8 @@ class BlockItemFourPorts(BlockItem):
         return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         f = ""
         for i in range(len(self.inputs)):
-            # ConnectionList lenght should be max offset
-            temp = ""
             for c in self.inputs[i].connectionList:
                 if hasattr(c.fromPort.parent, self.name) and self.inputs[i].connectionList.index(c) == 0:
                     continue
