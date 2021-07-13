@@ -100,7 +100,7 @@
         "Connection-18": {
             ".__ConnectionDict__": true,
             "ConnCID": 3,
-            "ConnDisplayName": "Col-Tes",
+            "ConnDisplayName": "Hx-Tes",
             "ConnID": 18,
             "CornerPositions": [
                 [
@@ -149,7 +149,7 @@
         "Connection-21": {
             ".__ConnectionDict__": true,
             "ConnCID": 4,
-            "ConnDisplayName": "Tes-Col",
+            "ConnDisplayName": "Tes-Hx",
             "ConnID": 21,
             "CornerPositions": [
                 [

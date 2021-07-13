@@ -27,8 +27,8 @@ PARAMETERS 33
 4 1 0 0        !5 : Col-Hx
 1 4 0 0        !6 : Hx-Col
 8 9 0 0        !7 : ConnTesL45
-2 7 0 0        !8 : Col-Tes
-7 2 0 0        !9 : Tes-Col
+2 7 0 0        !8 : Hx-Tes
+7 2 0 0        !9 : Tes-Hx
 INPUTS 8! for Type 935
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 
@@ -48,10 +48,10 @@ MfrHx-Col_A=[450,13]
 MfrHx-Col_B=[450,14]
 MfrConnTesL45_A=[450,16]
 MfrConnTesL45_B=[450,17]
-MfrCol-Tes_A=[450,19]
-MfrCol-Tes_B=[450,20]
-MfrTes-Col_A=[450,22]
-MfrTes-Col_B=[450,23]
+MfrHx-Tes_A=[450,19]
+MfrHx-Tes_B=[450,20]
+MfrTes-Hx_A=[450,22]
+MfrTes-Hx_B=[450,23]
 
 
 UNIT 451 TYPE 931
@@ -99,48 +99,48 @@ PHx-Col_kW= [452,3]/3600 !kW
 MfrHx-Col= MfrHx-Col_A
 
 UNIT 453 TYPE 931
-!Col-Tes
+!Hx-Tes
 PARAMETERS 6
-diCol-Tes
-LCol-Tes
-UCol-Tes
+diHx-Tes
+LHx-Tes
+UHx-Tes
 RhoWat
 CPWat
 20
 INPUTS 4
 TExHxX2
-MfrCol-Tes_A
+MfrHx-Tes_A
 TRoomStore
 TTesPortLeft50
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TCol-Tes= [453,1]
-PCol-Tes_kW= [453,3]/3600 !kW
-MfrCol-Tes= MfrCol-Tes_A
+THx-Tes= [453,1]
+PHx-Tes_kW= [453,3]/3600 !kW
+MfrHx-Tes= MfrHx-Tes_A
 
 UNIT 454 TYPE 931
-!Tes-Col
+!Tes-Hx
 PARAMETERS 6
-diTes-Col
-LTes-Col
-UTes-Col
+diTes-Hx
+LTes-Hx
+UTes-Hx
 RhoWat
 CPWat
 20
 INPUTS 4
 TTesPortLeft10
-MfrTes-Col_A
+MfrTes-Hx_A
 TRoomStore
 TExHxX2
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TTes-Col= [454,1]
-PTes-Col_kW= [454,3]/3600 !kW
-MfrTes-Col= MfrTes-Col_A
+TTes-Hx= [454,1]
+PTes-Hx_kW= [454,3]/3600 !kW
+MfrTes-Hx= MfrTes-Hx_A
 
 CONSTANTS 3
 ** Fluid Loop : defaultGroup
@@ -154,14 +154,14 @@ EQUATIONS 12
 **di_loop_0=0.05
 **L_loop_0=2
 **U_loop_0=10
-*** Col-Tes
-diCol-Tes=di_loop_0
-LCol-Tes=L_loop_0
-UCol-Tes=U_loop_0
-*** Tes-Col
-diTes-Col=di_loop_0
-LTes-Col=L_loop_0
-UTes-Col=U_loop_0
+*** Hx-Tes
+diHx-Tes=di_loop_0
+LHx-Tes=L_loop_0
+UHx-Tes=U_loop_0
+*** Tes-Hx
+diTes-Hx=di_loop_0
+LTes-Hx=L_loop_0
+UTes-Hx=U_loop_0
 *** Col-Hx
 diCol-Hx=di_loop_0
 LCol-Hx=L_loop_0
@@ -174,7 +174,7 @@ UHx-Col=U_loop_0
 
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PCol-Tes_kW+PTes-Col_kW+PCol-Hx_kW+PHx-Col_kW
+PipeLossTot=PHx-Tes_kW+PTes-Hx_kW+PCol-Hx_kW+PHx-Col_kW
 
 ASSIGN ExternalHeatExchanger_Mfr.prt 455
 
@@ -192,9 +192,9 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 4
-MfrCol-Tes MfrTes-Col MfrCol-Hx MfrHx-Col 
+MfrHx-Tes MfrTes-Hx MfrCol-Hx MfrHx-Col 
 ***
-MfrCol-Tes MfrTes-Col MfrCol-Hx MfrHx-Col 
+MfrHx-Tes MfrTes-Hx MfrCol-Hx MfrHx-Col 
 
 ASSIGN ExternalHeatExchanger_T.prt 456
 
@@ -212,7 +212,7 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 4
-TCol-Tes TTes-Col TCol-Hx THx-Col 
+THx-Tes TTes-Hx TCol-Hx THx-Col 
 ***
-TCol-Tes TTes-Col TCol-Hx THx-Col 
+THx-Tes TTes-Hx TCol-Hx THx-Col 
 

@@ -25,9 +25,9 @@ elSysIn_Q_TesTesAux = qHeatSource_Tes1
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
-Tdp1In_Tes1 = TCol-Tes ! @connectDdck
-Mfrdp1_Tes1 = MfrCol-Tes ! @connectDdck
-Tdp1InRev_Tes1 = TTes-Col ! @connectDdck
+Tdp1In_Tes1 = THx-Tes ! @connectDdck
+Mfrdp1_Tes1 = MfrHx-Tes ! @connectDdck
+Tdp1InRev_Tes1 = TTes-Hx ! @connectDdck
 CONSTANTS 2
 zAux1_Tes1=0.00 !connectDDck
 qAux1_Tes1=0.00 !connectDDck
