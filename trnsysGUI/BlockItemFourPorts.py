@@ -144,41 +144,32 @@ class BlockItemFourPorts(BlockItem):
         f = ""
         for i in range(len(self.inputs)):
             for c in self.inputs[i].connectionList:
-                if hasattr(c.fromPort.parent, self.name) and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, self.name) and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                else:
-                    if len(self.outputs[i].connectionList) > 0:
+                if len(self.outputs[i].connectionList) > 0:
+                    if i == 0:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[0])
+                        temp += " " * (descConnLength - len(temp))
 
-                        if i == 0:
-                            temp = (
-                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                            )  # + str(t.childIds[0])
-                            temp += " " * (descConnLength - len(temp))
+                        # ExternalHx will have a two-liner exportConnString
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
 
-                            # ExternalHx will have a two-liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
+                    elif i == 1:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[1])
+                        temp += " " * (descConnLength - len(temp))
 
-                        elif i == 1:
-                            temp = (
-                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                            )  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
-
-                            # ExternalHx will have a two liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
-                        else:
-                            f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                        # Presumably used only for storing the order of connections
-                        self.trnsysConn.append(c)
-                        self.trnsysConn.append(self.outputs[i].connectionList[0])
-
+                        # ExternalHx will have a two liner exportConnString
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
                     else:
-                        f += "Output of %s for input[{0}] is not connected " % self.name.format(i) + "\n"
+                        f += "Error: There are more inputs than trnsysIds" + "\n"
+
+                    # Presumably used only for storing the order of connections
+                    self.trnsysConn.append(c)
+                    self.trnsysConn.append(self.outputs[i].connectionList[0])
 
         return f, 2
 

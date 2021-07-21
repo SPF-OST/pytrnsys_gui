@@ -160,7 +160,7 @@ class Export(object):
         for t in self.trnsysObj:
 
             noHydraulicConnection = isinstance(t, StorageTank) or (
-                not (isinstance(t, Connection)) and not t.outputs and not t.inputs
+                not isinstance(t, Connection) and not t.outputs and not t.inputs
             )
 
             if noHydraulicConnection:

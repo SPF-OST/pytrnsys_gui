@@ -14,7 +14,7 @@ import trnsysGUI.StorageTank as _st
 class TestEditor:
     @_pt.mark.parametrize(
         "exampleProjectName",
-        ["TRIHP_dualSource", "HeatingNetwork", "ExternalHeatExchanger"],
+        ["ExternalHeatExchanger", "TRIHP_dualSource", "HeatingNetwork"],
     )
     def testStorageAndHydraulicExports(self, exampleProjectName: str):
         helper = _Helper(exampleProjectName)
@@ -24,28 +24,20 @@ class TestEditor:
         _ = _qtw.QApplication([])
 
         projectFolderPath = helper.projectFolderPath
+
         self._exportHydraulic(projectFolderPath, _format="mfs")
-        self._exportHydraulic(projectFolderPath, _format="ddck")
-
-        editor = self._createEditor(projectFolderPath)
-        storageTanks = [
-            o
-            for o in editor.trnsysObj
-            if isinstance(o, _st.StorageTank)  # type: ignore[attr-defined] # pylint: disable=no-member
-        ]
-        for storageTank in storageTanks:
-            storageTank.exportDck()
-
         mfsDckFileRelativePath = f"{exampleProjectName}_mfs.dck"
         helper.ensureFilesAreEqual(
             mfsDckFileRelativePath, shallReplaceRandomizedFlowRates=True
         )
 
+        self._exportHydraulic(projectFolderPath, _format="ddck")
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
         helper.ensureFilesAreEqual(
             hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False
         )
 
+        storageTanks = self._exportStorageTank(projectFolderPath)
         for storageTank in storageTanks:
             ddckFileRelativePath = (
                 f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddck"
@@ -60,6 +52,17 @@ class TestEditor:
             helper.ensureFilesAreEqual(
                 ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False
             )
+
+    def _exportStorageTank(self, projectFolderPath):
+        editor = self._createEditor(projectFolderPath)
+        storageTanks = [
+            o
+            for o in editor.trnsysObj
+            if isinstance(o, _st.StorageTank)  # type: ignore[attr-defined] # pylint: disable=no-member
+        ]
+        for storageTank in storageTanks:
+            storageTank.exportDck()
+        return storageTanks
 
     @classmethod
     def _exportHydraulic(cls, projectFolderPath, *, _format):

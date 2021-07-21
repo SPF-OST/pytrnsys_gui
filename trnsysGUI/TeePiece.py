@@ -69,38 +69,14 @@ class TeePiece(BlockItem):
     def exportParametersFlowSolver(self, descConnLength):
         temp = ""
         for i in self.inputs:
-            # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if (
-                    hasattr(c.fromPort.parent, "heatExchangers")
-                    and i.connectionList.index(c) == 0
-                    and not self.inFirstRow
-                ):
-                    continue
-                elif (
-                    hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if (
-                    hasattr(c.fromPort.parent, "heatExchangers")
-                    and o.connectionList.index(c) == 0
-                    and not self.inFirstRow
-                ):
-                    continue
-                elif (
-                    hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         temp += str(self.typeNumber)
         temp += " " * (descConnLength - len(temp))

@@ -263,19 +263,14 @@ class GenericBlock(BlockItem):
         f = ""
         for i in range(len(self.inputs)):
             c = self.inputs[i].connectionList[0]
-            if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                continue
-            elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                continue
-            else:
-                temp = (
-                    str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                )
-                temp += " " * (descConnLength - len(temp))
+            temp = (
+                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+            )
+            temp += " " * (descConnLength - len(temp))
 
-                # Generic block will have a 2n-liner exportConnString
-                self.exportConnsString += temp + "\n"
-                f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i+1) + "\n"
+            # Generic block will have a 2n-liner exportConnString
+            self.exportConnsString += temp + "\n"
+            f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i+1) + "\n"
 
         return f, equationNr
 

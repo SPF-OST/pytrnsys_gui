@@ -1379,13 +1379,8 @@ class Connection(object):
         return "", nUnit
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         f = ""
-        # If neither port is at a StorageTank
-        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
-            return "", 0
 
-        temp = ""
         if hasattr(self.fromPort.parent, "subBlockCounter"):
             temp = str(self.fromPort.parent.trnsysId + self.fromPort.parent.getSubBlockOffset(self)) + " "
         else:
@@ -1414,48 +1409,37 @@ class Connection(object):
 
         return f, 1
 
-    def exportInputsFlowSolver1(self):
-        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
-            return "", 0
-        else:
-            return "0,0 ", 1
+    @staticmethod
+    def exportInputsFlowSolver1():
+        return "0,0 ", 1
 
     def exportInputsFlowSolver2(self):
-        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
-            return "", 0
-        else:
-            return str(self.exportInitialInput) + " ", 1
+        return str(self.exportInitialInput) + " ", 1
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        if hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"):
-            return "", equationNumber, 0
-        else:
-            tot = ""
-            for i in range(0, 3):
-                if i < 2:
-                    temp = (
-                        prefix
-                        + self.displayName
-                        + "_"
-                        + abc[i]
-                        + "=["
-                        + str(simulationUnit)
-                        + ","
-                        + str(equationNumber)
-                        + "]\n"
-                    )
-                    tot += temp
-                    self.exportEquations.append(temp)
-                    # nEqUsed += 1  # DC
-                equationNumber += 1  # DC-ERROR it should count anyway
+        tot = ""
+        for i in range(0, 3):
+            if i < 2:
+                temp = (
+                    prefix
+                    + self.displayName
+                    + "_"
+                    + abc[i]
+                    + "=["
+                    + str(simulationUnit)
+                    + ","
+                    + str(equationNumber)
+                    + "]\n"
+                )
+                tot += temp
+                self.exportEquations.append(temp)
+                # nEqUsed += 1  # DC
+            equationNumber += 1  # DC-ERROR it should count anyway
 
             return tot, equationNumber, 2
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        if (
-            not (hasattr(self.fromPort.parent, "heatExchangers") or hasattr(self.toPort.parent, "heatExchangers"))
-            and not self.hiddenGenerated
-        ):
+        if not self.hiddenGenerated:
             f = ""
             unitNumber = startingUnit
             typeNr2 = 931  # Temperature calculation from a pipe

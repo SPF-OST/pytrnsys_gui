@@ -189,18 +189,10 @@ class TVentil(BlockItem):
             return "", nUnit
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         temp = ""
 
-        # This is to assert that the input in front of the output is always printed before the third one
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                else:
                     temp = temp + str(c.trnsysId) + " "
                     self.trnsysConn.append(c)
 
@@ -209,16 +201,11 @@ class TVentil(BlockItem):
             tempArr = []
 
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
+                # On same hight as output
+                if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
+                    tempArr.insert(0, c)
                 else:
-                    # On same hight as output
-                    if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
-                        tempArr.insert(0, c)
-                    else:
-                        tempArr.append(c)
+                    tempArr.append(c)
 
             for conn in tempArr:
                 temp = temp + str(conn.trnsysId) + " "
