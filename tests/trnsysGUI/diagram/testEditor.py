@@ -89,7 +89,7 @@ class _Helper:
 
     @classmethod
     def _replaceRandomizedFlowRatesWithPlaceHolder(cls, actualContent, placeholder):
-        pattern = rf"^(?P<variableName>Mfr[^ \t=]+)[ \t]+=[ \t]+[0-9\.]+"
+        pattern = r"^(?P<variableName>Mfr[^ \t=]+)[ \t]+=[ \t]+[0-9\.]+"
 
         def replaceValueWithPlaceHolder(match: _tp.Match):
             return cls._processMatch(match, placeholder)
