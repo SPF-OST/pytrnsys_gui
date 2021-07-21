@@ -69,7 +69,7 @@ def main():
         or arguments.shallPerformStaticChecks
         or arguments.shallTypeCheck
     ):
-        cmd = "mypy trnsysGUI tests dev-tools"
+        cmd = "mypy --show-error-codes trnsysGUI tests dev-tools"
         sp.run(cmd.split(), check=True)
 
     if (
