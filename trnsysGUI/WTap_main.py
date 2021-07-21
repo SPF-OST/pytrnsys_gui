@@ -84,7 +84,7 @@ class WTap_main(BlockItem):
 
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def exportInputsFlowSolver1(self):
         temp1 = "Mfr" + self.displayName

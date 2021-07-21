@@ -843,7 +843,7 @@ class BlockItem(QGraphicsPixmapItem):
 
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 ", 1

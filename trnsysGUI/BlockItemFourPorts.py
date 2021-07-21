@@ -142,36 +142,31 @@ class BlockItemFourPorts(BlockItem):
 
     def exportParametersFlowSolver(self, descConnLength):
         f = ""
-        for i in range(len(self.inputs)):
-            for c in self.inputs[i].connectionList:
-                if len(self.outputs[i].connectionList) > 0:
-                    if i == 0:
-                        temp = (
-                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                        )  # + str(t.childIds[0])
-                        temp += " " * (descConnLength - len(temp))
+        if self.outputs[0].connectionList:
+            incomingConnection = self.inputs[0].connectionList[0]
+            outgoingConnection = self.outputs[0].connectionList[0]
+            temp = (
+                    str(incomingConnection.trnsysId) + " " + str(outgoingConnection.trnsysId) + " 0 0 "
+            )
+            temp += " " * (descConnLength - len(temp))
+            self.exportConnsString += temp + "\n"
+            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
+            self.trnsysConn.append(incomingConnection)
+            self.trnsysConn.append(outgoingConnection)
 
-                        # ExternalHx will have a two-liner exportConnString
-                        self.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
+        if self.outputs[1].connectionList:
+            incomingConnection = self.inputs[1].connectionList[0]
+            outgoingConnection = self.outputs[1].connectionList[0]
+            temp = (
+                    str(incomingConnection.trnsysId) + " " + str(outgoingConnection.trnsysId) + " 0 0 "
+            )
+            temp += " " * (descConnLength - len(temp))
+            self.exportConnsString += temp + "\n"
+            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
+            self.trnsysConn.append(incomingConnection)
+            self.trnsysConn.append(outgoingConnection)
 
-                    elif i == 1:
-                        temp = (
-                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                        )  # + str(t.childIds[1])
-                        temp += " " * (descConnLength - len(temp))
-
-                        # ExternalHx will have a two liner exportConnString
-                        self.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
-                    else:
-                        f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                    # Presumably used only for storing the order of connections
-                    self.trnsysConn.append(c)
-                    self.trnsysConn.append(self.outputs[i].connectionList[0])
-
-        return f, 2
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 0,0 ", 2

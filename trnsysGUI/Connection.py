@@ -1407,7 +1407,7 @@ class Connection(object):
 
         f += temp + " " * (descConnLength - len(temp)) + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     @staticmethod
     def exportInputsFlowSolver1():

@@ -208,7 +208,7 @@ class HeatPumpTwoHx(BlockItem):
                 else:
                     f += "Output of ExternalHx for input[{0}] is not connected ".format(i) + "\n"
 
-        return f, 2
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 0,0 0,0", 3

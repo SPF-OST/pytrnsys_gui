@@ -259,7 +259,6 @@ class GenericBlock(BlockItem):
         self.setPixmap(pixmap)
 
     def exportParametersFlowSolver(self, descConnLength):
-        equationNr = 0
         f = ""
         for i in range(len(self.inputs)):
             c = self.inputs[i].connectionList[0]
@@ -272,7 +271,7 @@ class GenericBlock(BlockItem):
             self.exportConnsString += temp + "\n"
             f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i+1) + "\n"
 
-        return f, equationNr
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 " * len(self.inputs), len(self.inputs)
