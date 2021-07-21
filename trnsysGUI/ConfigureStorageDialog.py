@@ -239,7 +239,7 @@ class ConfigureStorageDialog(QDialog):
     @staticmethod
     def _getDirectPortPairListItemText(directPortPair: _dpp.DirectPortPair):
         return (
-            directPortPair.connection.displayName
+            directPortPair.name
             + ","
             + "Port pair from "
             + "%d%%" % int(directPortPair.relativeInputHeight * 100)
@@ -358,10 +358,9 @@ class ConfigureStorageDialog(QDialog):
     def _removeSelectedPortPairs(self, directPortPairsListWidget):
         for listItem in directPortPairsListWidget.selectedItems():
             for directPortPair in list(self.storage.directPortPairs):
-                connection = directPortPair.connection
 
                 if (
-                    connection.displayName
+                    directPortPair.name
                     == listItem.text()[: listItem.text().find(",")]
                 ):
                     self.storage.directPortPairs.remove(directPortPair)
@@ -371,17 +370,17 @@ class ConfigureStorageDialog(QDialog):
                         )
                     )
 
-                    while len(connection.fromPort.connectionList) > 0:
-                        connection.fromPort.connectionList[0].deleteConn()
+                    while len(directPortPair.fromPort.connectionList) > 0:
+                        directPortPair.fromPort.connectionList[0].deleteConn()
 
-                    while len(connection.toPort.connectionList) > 0:
-                        connection.toPort.connectionList[0].deleteConn()
+                    while len(directPortPair.toPort.connectionList) > 0:
+                        directPortPair.toPort.connectionList[0].deleteConn()
 
-                    self.storage.inputs.remove(connection.fromPort)
-                    self.storage.outputs.remove(connection.toPort)
+                    self.storage.inputs.remove(directPortPair.fromPort)
+                    self.storage.outputs.remove(directPortPair.toPort)
 
-                    self.storage.parent.scene().removeItem(connection.fromPort)
-                    self.storage.parent.scene().removeItem(connection.toPort)
+                    self.storage.parent.scene().removeItem(directPortPair.fromPort)
+                    self.storage.parent.scene().removeItem(directPortPair.toPort)
 
     def removeHxL(self):
         self._removeSelectedHeatExchangers(self.leftHeatExchangersItemListWidget)
@@ -509,7 +508,7 @@ class ConfigureStorageDialog(QDialog):
             return None
         selectedItem, isOnLeftSide = result
 
-        displayName = selectedItem.text().split(",")[0]
+        name = selectedItem.text().split(",")[0]
 
         directPortPairs: _tp.Sequence[
             _dpp.DirectPortPair
@@ -517,7 +516,7 @@ class ConfigureStorageDialog(QDialog):
         matchingDirectPortPairs = [
             dpp
             for dpp in directPortPairs
-            if dpp.connection.displayName == displayName
+            if dpp.name == name
             and dpp.isOnLeftSide == isOnLeftSide
         ]
 

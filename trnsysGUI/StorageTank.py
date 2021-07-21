@@ -66,7 +66,7 @@ class StorageTank(BlockItem):
             p
             for dpp in self.directPortPairs
             if dpp.isOnLeftSide == isOnLeftSide
-            for p in [dpp.connection.fromPort, dpp.connection.toPort]
+            for p in [dpp.fromPort, dpp.toPort]
         ]
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
@@ -131,8 +131,8 @@ class StorageTank(BlockItem):
         )
 
         self.directPortPairs.append(directPortPair)
-        self.inputs.append(directPortPair.connection.fromPort)
-        self.outputs.append(directPortPair.connection.toPort)
+        self.inputs.append(directPortPair.fromPort)
+        self.outputs.append(directPortPair.toPort)
 
         return directPortPair
 
@@ -493,7 +493,7 @@ class StorageTank(BlockItem):
             raise RuntimeError("Cannot encode an invisible storage tank.")
 
         heatExchangerModels = self._getHeatExchangerModelsForSerialization()
-        portPairModels = self._getDirectPortPairModelsForSerialization()
+        portPairModels = self._getDirectPortPairModelsForEncode()
         position = float(self.pos().x()), float(self.pos().y())
 
         storageTankModel = _model.StorageTank(
@@ -513,23 +513,23 @@ class StorageTank(BlockItem):
         dictName = "Block-"
         return dictName, storageTankModel.to_dict()
 
-    def _getDirectPortPairModelsForSerialization(self):
+    def _getDirectPortPairModelsForEncode(self):
         portPairModels = []
         for directPort in self.directPortPairs:
             connection = directPort.connection
 
-            side = _model.Side.createFromSideNr(connection.fromPort.side)
+            side = _model.Side.createFromSideNr(directPort.fromPort.side)
 
             inputPortModel = _model.Port(
-                connection.fromPort.id, directPort.relativeInputHeight
+                directPort.fromPort.id, directPort.relativeInputHeight
             )
 
             outputPortModel = _model.Port(
-                connection.toPort.id, directPort.relativeOutputHeight
+                directPort.toPort.id, directPort.relativeOutputHeight
             )
 
             portPairModel = _model.PortPair(
-                side, connection.displayName, inputPortModel, outputPortModel
+                side, directPort.name, inputPortModel, outputPortModel
             )
 
             directPortPairModel = _model.DirectPortPair(
@@ -832,12 +832,10 @@ class StorageTank(BlockItem):
 
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
-            connection = directPortPair.connection
-
-            Tname = "T" + connection.fromPort.connectionList[1].displayName
-            side = connection.side
-            Mfrname = "Mfr" + connection.fromPort.connectionList[1].displayName
-            Trev = "T" + connection.toPort.connectionList[1].displayName
+            Tname = "T" + directPortPair.fromPort.connectionList[1].displayName
+            side = directPortPair.side
+            Mfrname = "Mfr" + directPortPair.fromPort.connectionList[1].displayName
+            Trev = "T" + directPortPair.toPort.connectionList[1].displayName
 
             inputPos = directPortPair.relativeInputHeight
             outputPos = directPortPair.relativeOutputHeight
@@ -892,14 +890,12 @@ class StorageTank(BlockItem):
         self.logger.debug("Debugging conn")
         errorConnList = ""
         for i in range(len(self.directPortPairs)):
-            connection = self.directPortPairs[i].connection
-
-            stFromPort = connection.fromPort
-            stToPort = connection.toPort
-            toPort1 = connection.fromPort.connectionList[1].toPort
-            fromPort2 = connection.toPort.connectionList[1].fromPort
-            connName1 = connection.fromPort.connectionList[1].displayName
-            connName2 = connection.toPort.connectionList[1].displayName
+            stFromPort = self.directPortPairs[i].fromPort
+            stToPort = self.directPortPairs[i].toPort
+            toPort1 = stFromPort.connectionList[1].toPort
+            fromPort2 = stToPort.connectionList[1].fromPort
+            connName1 = stFromPort.connectionList[1].displayName
+            connName2 = stToPort.connectionList[1].displayName
 
             if stFromPort != toPort1:
                 errorConnList = errorConnList + connName1 + "\n"

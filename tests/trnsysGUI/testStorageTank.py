@@ -433,18 +433,18 @@ Tes%d
             externalFromPortConnection = _StrictMock(
                 displayName=f"dpp{i}ExtFromPortConn",
                 fromPort=_StrictMock(),
-                toPort=directPortPair.connection.fromPort,
+                toPort=directPortPair.fromPort,
             )
-            directPortPair.connection.fromPort.connectionList.append(
+            directPortPair.fromPort.connectionList.append(
                 externalFromPortConnection
             )
 
             externalToPortConnection = _StrictMock(
                 displayName=f"dpp{i}ExtToPortConn",
-                fromPort=directPortPair.connection.toPort,
+                fromPort=directPortPair.toPort,
                 toPort=_StrictMock(),
             )
-            directPortPair.connection.toPort.connectionList.append(
+            directPortPair.toPort.connectionList.append(
                 externalToPortConnection
             )
 
