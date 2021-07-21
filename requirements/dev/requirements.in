@@ -7,7 +7,5 @@ black
 
 sphinx
 
-PyQT5-stubs
-
 -r ../ci/test/requirements.in
 -e file:../pytrnsys#egg=pytrnsys
