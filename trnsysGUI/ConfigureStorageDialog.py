@@ -338,7 +338,7 @@ class ConfigureStorageDialog(QDialog):
         if float(self.manPortLeO.text()) < 0:
             self.manPortLeO.setText("0")
 
-        self.storage.createAndAddDirectPortPair(
+        self.storage.addDirectPortPair(
             self.manlButton.isChecked(),
             float(self.manPortLeI.text()) / 100,
             float(self.manPortLeO.text()) / 100,

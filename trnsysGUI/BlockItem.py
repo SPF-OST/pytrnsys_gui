@@ -731,15 +731,13 @@ class BlockItem(QGraphicsPixmapItem):
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
         self.rotateBlockToN(i["RotationN"])
-        # self.displayName = i["BlockDisplayName"]
-        # self.label.setPlainText(self.displayName)
         self.setName(i["BlockDisplayName"])
 
         self.groupName = "defaultGroup"

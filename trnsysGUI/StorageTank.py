@@ -84,7 +84,7 @@ class StorageTank(BlockItem):
         for hx in self.heatExchangers:
             hx.parent = self
 
-    def createAndAddDirectPortPair(
+    def addDirectPortPair(
         self,
         isOnLeftSide,
         relativeInputHeight,
@@ -134,10 +134,8 @@ class StorageTank(BlockItem):
         self.inputs.append(directPortPair.fromPort)
         self.outputs.append(directPortPair.toPort)
 
-        return directPortPair
-
+    @staticmethod
     def _createDirectPortPair(
-        self,
         isOnLeftSide,
         port1,
         port2,
@@ -148,40 +146,26 @@ class StorageTank(BlockItem):
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
         if not kwargs:
             directPortPair = DirectPortPair(
-                Connection(port1, port2, True, self.parent.parent()),
+                "<TODO: is this needed>",  # TODO@dbi remove virtual connections
+                port1,
+                port2,
                 relativeInputHeight,
                 relativeOutputHeight,
-                isOnLeftSide,
+                isOnLeftSide
             )
             return directPortPair
 
         port1.id = kwargs["fromPortId"]
         port2.id = kwargs["toPortId"]
 
-        connection = Connection(
+        name = kwargs["connDispName"]
+        directPortPair = DirectPortPair(
+            name,
             port1,
             port2,
-            True,
-            self.parent.parent(),
-            fromPortId=kwargs["fromPortId"],
-            toPortId=kwargs["toPortId"],
-            segmentsLoad=[],
-            cornersLoad=[],
-            loadedConn=True,
-        )
-
-        connection.displayName = kwargs["connDispName"]
-        connection.id = kwargs["connId"]
-        connection.connId = kwargs["connCid"]
-        connection.trnsysId = kwargs["trnsysConnId"]
-
-        if port1.side == 0:
-            connection.side = "Left"
-        elif port1.side == 2:
-            connection.side = "Right"
-
-        directPortPair = DirectPortPair(
-            connection, relativeInputHeight, relativeOutputHeight, isOnLeftSide
+            relativeInputHeight,
+            relativeOutputHeight,
+            isOnLeftSide
         )
 
         return directPortPair
@@ -516,8 +500,6 @@ class StorageTank(BlockItem):
     def _getDirectPortPairModelsForEncode(self):
         portPairModels = []
         for directPort in self.directPortPairs:
-            connection = directPort.connection
-
             side = _model.Side.createFromSideNr(directPort.fromPort.side)
 
             inputPortModel = _model.Port(
@@ -532,9 +514,7 @@ class StorageTank(BlockItem):
                 side, directPort.name, inputPortModel, outputPortModel
             )
 
-            directPortPairModel = _model.DirectPortPair(
-                portPairModel, connection.id, connection.connId, connection.trnsysId
-            )
+            directPortPairModel = _model.DirectPortPair(portPairModel)
 
             portPairModels.append(directPortPairModel)
 
@@ -580,11 +560,11 @@ class StorageTank(BlockItem):
             if c.fromPort is fromPort and c.toPort in ports
         ]
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         offset_x = 0
         offset_y = 0
         self._decodeInternal(
-            i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs=True
+            i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=True
         )
 
     def _decodeInternal(
@@ -593,7 +573,6 @@ class StorageTank(BlockItem):
         offset_x,
         offset_y,
         resBlockList,
-        resConnList,
         shallSetNamesAndIDs: bool,
     ):
         self.logger.debug("Loading a Storage in Decoder")
@@ -621,35 +600,29 @@ class StorageTank(BlockItem):
             self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)
 
         for portPairModel in model.directPortPairs:
-            self._decodeDirectPortPair(portPairModel, resConnList, shallSetNamesAndIDs)
+            self._decodeDirectPortPair(portPairModel, shallSetNamesAndIDs)
 
         resBlockList.append(self)
 
     def _decodeDirectPortPair(
         self,
         portPairModel: _model.DirectPortPair,
-        resConnList,
         shallSetNamesAndIDs: bool,
-    ):
+    ) -> DirectPortPair:
         portPair = portPairModel.portPair
 
         name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
 
-        directPortPair = self.createAndAddDirectPortPair(
+        self.addDirectPortPair(
             isOnLeftSide=portPair.side == _model.Side.LEFT,
             relativeInputHeight=portPair.inputPort.relativeHeight,
             relativeOutputHeight=portPair.outputPort.relativeHeight,
             storageTankHeight=self.h,
             fromPortId=portPair.inputPort.id,
             toPortId=portPair.outputPort.id,
-            connId=portPairModel.id,
-            connCid=portPairModel.connectionId,
             connDispName=name,
-            trnsysConnId=portPairModel.trnsysId,
             loadedConn=True,
         )
-
-        resConnList.append(directPortPair.connection)
 
     def _decodeHeatExchanger(
         self, heatExchangerModel: _model.HeatExchanger, shallSetNamesAndIDs: bool
@@ -832,10 +805,10 @@ class StorageTank(BlockItem):
 
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
-            Tname = "T" + directPortPair.fromPort.connectionList[1].displayName
+            Tname = "T" + directPortPair.fromPort.connectionList[0].displayName
             side = directPortPair.side
-            Mfrname = "Mfr" + directPortPair.fromPort.connectionList[1].displayName
-            Trev = "T" + directPortPair.toPort.connectionList[1].displayName
+            Mfrname = "Mfr" + directPortPair.fromPort.connectionList[0].displayName
+            Trev = "T" + directPortPair.toPort.connectionList[0].displayName
 
             inputPos = directPortPair.relativeInputHeight
             outputPos = directPortPair.relativeOutputHeight
@@ -889,13 +862,13 @@ class StorageTank(BlockItem):
     def debugConn(self):
         self.logger.debug("Debugging conn")
         errorConnList = ""
-        for i in range(len(self.directPortPairs)):
-            stFromPort = self.directPortPairs[i].fromPort
-            stToPort = self.directPortPairs[i].toPort
-            toPort1 = stFromPort.connectionList[1].toPort
-            fromPort2 = stToPort.connectionList[1].fromPort
-            connName1 = stFromPort.connectionList[1].displayName
-            connName2 = stToPort.connectionList[1].displayName
+        for directPort in self.directPortPairs:
+            stFromPort = directPort.fromPort
+            stToPort = directPort.toPort
+            toPort1 = stFromPort.connectionList[0].toPort
+            fromPort2 = stToPort.connectionList[0].fromPort
+            connName1 = stFromPort.connectionList[0].displayName
+            connName2 = stToPort.connectionList[0].displayName
 
             if stFromPort != toPort1:
                 errorConnList = errorConnList + connName1 + "\n"
@@ -916,17 +889,17 @@ class StorageTank(BlockItem):
 
     def checkConnExists(self):
         for hx in self.heatExchangers:
-            if len(hx.port1.connectionList) < 2:
+            if not hx.port1.connectionList:
                 return False
-            if len(hx.port2.connectionList) < 2:
+            if not hx.port2.connectionList:
                 return False
 
         for ports in self.leftDirectPortPairsPortItems:
-            if len(ports.connectionList) < 2:
+            if not ports.connectionList:
                 return False
 
         for ports in self.rightDirectPortPairsPortItems:
-            if len(ports.connectionList) < 2:
+            if not ports.connectionList:
                 return False
 
         return True

@@ -81,7 +81,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         dictName = "GraphicalItem-"
         return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self._imageAccessor = _ia.ImageAccessor.createFromResourcePath(i["ImageSource"])
 
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))

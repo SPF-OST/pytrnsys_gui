@@ -5,8 +5,7 @@
     "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
     "directPortPairs": [
         {
-            "connectionId": 440,
-            "id": 1984,
+            "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
             "portPair": {
                 "inputPort": {
                     "id": 1982,
@@ -18,12 +17,10 @@
                     "relativeHeight": 0.35
                 },
                 "side": "left"
-            },
-            "trnsysId": 641
+            }
         },
         {
-            "connectionId": 881,
-            "id": 3926,
+            "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
             "portPair": {
                 "inputPort": {
                     "id": 3924,
@@ -35,12 +32,10 @@
                     "relativeHeight": 0.9
                 },
                 "side": "right"
-            },
-            "trnsysId": 1271
+            }
         },
         {
-            "connectionId": 886,
-            "id": 3943,
+            "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
             "portPair": {
                 "inputPort": {
                     "id": 3941,
@@ -52,8 +47,7 @@
                     "relativeHeight": 0.95
                 },
                 "side": "right"
-            },
-            "trnsysId": 1277
+            }
         }
     ],
     "groupName": "defaultGroup",

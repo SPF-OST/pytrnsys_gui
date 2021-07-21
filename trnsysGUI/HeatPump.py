@@ -106,7 +106,7 @@ class HeatPump(BlockItem):
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.logger.debug("Loading a HeatPump block")
 
         self.flippedH = i["FlippedH"]

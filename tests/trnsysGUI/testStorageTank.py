@@ -50,15 +50,11 @@ class TestStorageTank:
         storageTank = _st.StorageTank(trnsysType="StorageTank", parent=diagramViewMock)  # pylint: disable=no-member
         diagramViewMock.scene().addItem(storageTank)
 
-        connections = []
         blocks = []
-        storageTank.decode(legacySerializedStorageTank, connections, blocks)
+        storageTank.decode(legacySerializedStorageTank, blocks)
 
         for heatExchanger in storageTank.heatExchangers:
             heatExchanger.initLoad()
-
-        for connection in connections:
-            connection.initLoad()
 
         return storageTank
 

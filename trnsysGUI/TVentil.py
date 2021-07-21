@@ -81,8 +81,8 @@ class TVentil(BlockItem):
         dct["PositionForMassFlowSolver"] = self.positionForMassFlowSolver
         return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
-        super(TVentil, self).decode(i, resConnList, resBlockList)
+    def decode(self, i, resBlockList):
+        super().decode(i, resBlockList)
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
             self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0

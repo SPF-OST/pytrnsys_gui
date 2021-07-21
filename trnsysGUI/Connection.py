@@ -1352,7 +1352,7 @@ class Connection(object):
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i):
         self.logger.debug("Loading a connection in Decoder")
 
         self.id = i["ConnID"]
@@ -1361,8 +1361,6 @@ class Connection(object):
         self.setName(i["ConnDisplayName"])
         self.groupName = "defaultGroup"
         self.setConnToGroup(i["GroupName"])
-
-        resConnList.append(self)
 
     # Export related
     def exportBlackBox(self):

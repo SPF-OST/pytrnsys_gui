@@ -28,7 +28,7 @@ class HeatExchanger(QGraphicsItemGroup):
         name="Untitled",
         **kwargs
     ):
-        super(HeatExchanger, self).__init__(parent)
+        super().__init__(parent)
         self.parent = parent
         self.logger = parent.logger
 

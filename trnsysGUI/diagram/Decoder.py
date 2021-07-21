@@ -201,7 +201,7 @@ class Decoder(json.JSONDecoder):
                     else:
                         bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
 
-                    bl.decode(i, resConnList, resBlockList)
+                    bl.decode(i, resBlockList)
 
                 elif ".__ConnectionDict__" in i:
                     fromPort = None
@@ -225,7 +225,8 @@ class Decoder(json.JSONDecoder):
 
                     c = Connection(fromPort, toPort, i["isVirtualConn"], self.editor, **connectionKwargs)
 
-                    c.decode(i, resConnList, resBlockList)
+                    c.decode(i)
+                    resConnList.append(c)
 
                 elif "__idDct__" in i:
                     resBlockList.append(i)
@@ -234,7 +235,6 @@ class Decoder(json.JSONDecoder):
                 else:
                     self.logger.debug("Error: Not recognized object in decoder, " + str(i))
 
-            # return resBlockList, resConnList, resStorageConnList
             return resBlockList, resConnList
 
         return arr

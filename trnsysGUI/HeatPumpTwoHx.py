@@ -113,7 +113,7 @@ class HeatPumpTwoHx(BlockItem):
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
         self.childIds = i["childIds"]
