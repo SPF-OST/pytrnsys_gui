@@ -20,11 +20,10 @@ def main():
         action="store_true",
         dest="shallKeepResults",
     )
-
     parser.add_argument(
         "-s",
         "--static-checks",
-        help="Also perform static checks",
+        help="Perform linting and type checking",
         action="store_true",
         dest="shallPerformStaticChecks",
     )
