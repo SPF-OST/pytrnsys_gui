@@ -30,7 +30,7 @@ jobs:
     - name: Lint with pylint
       run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
     - name: Generate class and package diagrams
-      run: python dev-tools/runStaticChecksAndUnitTests.py --diagram --keep-results
+      run: python dev-tools/runStaticChecksAndUnitTests.py --diagram=dot --keep-results
     - name: Test with pytest
       run: python dev-tools/runStaticChecksAndUnitTests.py --unit --keep-results
     - name: Upload test results and coverage reports

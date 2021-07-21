@@ -48,8 +48,11 @@ def main():
         "-d",
         "--diagram",
         help="Create package and class diagrams",
-        action="store_true",
-        dest="shallCreateDiagrams",
+        nargs="?",
+        default=None,
+        const="pdf",
+        choices=["pdf", "dot"],
+        dest="diagramsFormat",
     )
     parser.add_argument(
         "-a",
@@ -80,8 +83,9 @@ def main():
         cmd = "pylint trnsysGUI tests dev-tools"
         sp.run(cmd.split(), check=True)
 
-    if arguments.shallRunAll or arguments.shallCreateDiagrams:
-        cmd = "pyreverse -k -o pdf -p pytrnsys_gui -d test-results trnsysGUI"
+    if arguments.shallRunAll or arguments.diagramsFormat:
+        diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
         sp.run(cmd.split(), check=True)
 
     if (
@@ -91,7 +95,7 @@ def main():
             arguments.shallPerformStaticChecks
             or arguments.shallTypeCheck
             or arguments.shallLint
-            or arguments.shallCreateDiagrams
+            or arguments.diagramsFormat
         )
     ):
         args = [
