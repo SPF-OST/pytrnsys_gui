@@ -53,9 +53,6 @@ class TestStorageTank:
         blocks = []
         storageTank.decode(legacySerializedStorageTank, blocks)
 
-        for heatExchanger in storageTank.heatExchangers:
-            heatExchanger.initLoad()
-
         return storageTank
 
     def testExportDdck(self, tmp_path):  # pylint: disable=invalid-name

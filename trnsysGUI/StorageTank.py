@@ -544,7 +544,6 @@ class StorageTank(BlockItem):
                 heatExchanger.w,
                 heatExchanger.parent.id,
                 heatExchanger.id,
-                heatExchanger.conn.trnsysId,
             )
 
             heatExchangerModels.append(heatExchangerModel)
@@ -643,7 +642,6 @@ class StorageTank(BlockItem):
             self,
             name,
             loadedHx=True,
-            connTrnsysID=heatExchangerModel.connectionTrnsysId,
         )
 
         if shallSetNamesAndIDs:
@@ -826,9 +824,12 @@ class StorageTank(BlockItem):
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
             HxName = heatExchanger.displayName
-            Tname = "T" + heatExchanger.port1.connectionList[1].displayName
-            Mfrname = "Mfr" + heatExchanger.port1.connectionList[1].displayName
-            Trev = "T" + heatExchanger.port2.connectionList[1].displayName
+            incomingConnection = heatExchanger.port1.connectionList[0]
+            Tname = "T" + incomingConnection.displayName
+            Mfrname = "Mfr" + incomingConnection.displayName
+
+            outgoingConnection = heatExchanger.port2.connectionList[0]
+            Trev = "T" + outgoingConnection.displayName
 
             inputPos = heatExchanger.relativeInputHeight
             outputPos = heatExchanger.relativeOutputHeight

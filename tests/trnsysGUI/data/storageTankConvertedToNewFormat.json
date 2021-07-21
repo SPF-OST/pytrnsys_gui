@@ -53,7 +53,7 @@
     "groupName": "defaultGroup",
     "heatExchangers": [
         {
-            "connectionTrnsysId": 639,
+            "__version__": "68c5cebb-0c47-4dec-8c85-8872b7f6c238",
             "id": 1976,
             "parentId": 1975,
             "portPair": {

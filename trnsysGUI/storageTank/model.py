@@ -96,13 +96,16 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
         return data
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "StorageTank":
+    def upgrade(
+        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
+    ) -> "StorageTank":
         if not isinstance(superseded, StorageTankVersion0):
-            raise ValueError(f"Can only upgrade a {StorageTankVersion0.__name__} instance.")
+            raise ValueError(
+                f"Can only upgrade a {StorageTankVersion0.__name__} instance."
+            )
 
         heatExchangers = cls._upgradeHeatExchangers(
-            superseded.HxList,
-            superseded.size_h
+            superseded.HxList, superseded.size_h
         )
         directPortPairs = cls._upgradeDirectPortPairs(
             superseded.PortPairList, superseded.size_h
@@ -130,9 +133,12 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     ) -> _tp.Sequence["HeatExchanger"]:
         heatExchangers = []
         for supersededHeatExchanger in supersededHeatExchangers:
-            heatExchanger = HeatExchanger.createFromSupersededHeatExchanger(
+            heatExchangerLegacyVersion = HeatExchangerVersion0.createFromLegacyHeatExchanger(
                 supersededHeatExchanger, storageTankHeight
             )
+
+            heatExchanger = HeatExchanger.fromInstance(heatExchangerLegacyVersion)
+
             heatExchangers.append(heatExchanger)
 
         return heatExchangers
@@ -145,11 +151,11 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     ) -> _tp.Sequence["DirectPortPair"]:
         directPortPairs = []
         for supersededPair in supersededPairs:
-            directPortPairVersion1 = DirectPortPairVersion0.createFromSupersededPortPair(
-                supersededPair, storageTankHeight
+            directPortPairLegacyVersion = DirectPortPairVersion0.createFromLegacyPortPair(
+                    supersededPair, storageTankHeight
             )
 
-            directPortPair = DirectPortPair.fromInstance(directPortPairVersion1)
+            directPortPair = DirectPortPair.fromInstance(directPortPairLegacyVersion)
 
             directPortPairs.append(directPortPair)
 
@@ -203,21 +209,22 @@ class PortPair(_dcj.JsonSchemaMixin):
 
 
 @_dc.dataclass
-class HeatExchanger(_dcj.JsonSchemaMixin):
+class HeatExchangerVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     portPair: PortPair
 
     width: float
 
     parentId: int
+
     id: int
     connectionTrnsysId: int
 
     @classmethod
-    def createFromSupersededHeatExchanger(
+    def createFromLegacyHeatExchanger(
         cls,
         superseded: HeatExchangerLegacyVersion,
         storageTankHeight: float,
-    ) -> "HeatExchanger":
+    ) -> "HeatExchangerVersion0":
         absoluteInputHeight = storageTankHeight - superseded.Offset[1]
         absoluteOutputHeight = absoluteInputHeight - superseded.Height
 
@@ -231,13 +238,46 @@ class HeatExchanger(_dcj.JsonSchemaMixin):
 
         portPair = PortPair(side, superseded.DisplayName, inputPort, outputPort)
 
-        return HeatExchanger(
+        heatExchanger = HeatExchangerVersion0(
             portPair,
             superseded.Width,
             superseded.ParentID,
             superseded.ID,
             superseded.connTrnsysID,
         )
+
+        return heatExchanger
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("23938d79-dc02-4752-ba1b-25d7a610de27")
+
+
+@_dc.dataclass
+class HeatExchanger(_ser.UpgradableJsonSchemaMixin):
+    portPair: PortPair
+    width: float
+    parentId: int
+    id: int
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[UpgradableJsonSchemaMixinVersion0]:
+        return HeatExchangerVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: UpgradableJsonSchemaMixinVersion0) -> "HeatExchanger":
+        if not isinstance(superseded, HeatExchangerVersion0):
+            raise ValueError(
+                f"`superseded` is not of type {HeatExchangerVersion0.__name__}"
+            )
+
+        return HeatExchanger(
+            superseded.portPair, superseded.width, superseded.parentId, superseded.id
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("68c5cebb-0c47-4dec-8c85-8872b7f6c238")
 
 
 @_dc.dataclass
@@ -250,7 +290,7 @@ class DirectPortPairVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     trnsysId: int
 
     @classmethod
-    def createFromSupersededPortPair(
+    def createFromLegacyPortPair(
         cls, superseded: DirectPortPairLegacyVersion, storageTankHeight: float
     ) -> "DirectPortPairVersion0":
         absoluteInputHeight = storageTankHeight - superseded.Port1offset
@@ -287,10 +327,12 @@ class DirectPortPair(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def upgrade(cls, superseded: UpgradableJsonSchemaMixinVersion0) -> "DirectPortPair":
         if not isinstance(superseded, DirectPortPairVersion0):
-            raise ValueError(f"Superseded instance is not of type {DirectPortPairVersion0.__name__}")
+            raise ValueError(
+                f"Superseded instance is not of type {DirectPortPairVersion0.__name__}"
+            )
 
         return DirectPortPair(superseded.portPair)
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('67aaee05-7d09-40e1-a6e2-d367c7196832')
+        return _uuid.UUID("67aaee05-7d09-40e1-a6e2-d367c7196832")

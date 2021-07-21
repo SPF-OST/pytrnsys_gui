@@ -1043,11 +1043,6 @@ class Editor(QWidget):
                     self.logger.debug("Loading a Storage")
                     k.setParent(self.diagramView)
                     k.updateImage()
-                    # k.setBlockToGroup("defaultGroup")
-                    for hx in k.heatExchangers:
-                        hx.initLoad()
-
-                    # print("Printing storage tank" + str(k))
 
                 if isinstance(k, Connection):
                     if k.toPort == None or k.fromPort == None:
@@ -1188,18 +1183,9 @@ class Editor(QWidget):
                     for out in k.outputs:
                         out.id = self.idGen.getID()
 
-                    # copyGroupList.trnsysObj.append(k)
-                    # self.diagramScene.addItem(k)
-
                 if isinstance(k, StorageTank):
                     self.logger.debug("Loading a Storage")
-                    # k.setParent(self.diagramView)
                     k.updateImage()
-
-                    for hx in k.heatExchangers:
-                        hx.initLoad()
-
-                    # print("Printing storage tank" + str(k))
 
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)

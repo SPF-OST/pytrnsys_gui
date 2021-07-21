@@ -38,8 +38,6 @@ class HeatExchanger(QGraphicsItemGroup):
         self.sSide = sideNr
         self.id = self.parent.parent.parent().idGen.getID()
 
-        self.conn = None
-
         self.parent.heatExchangers.append(self)
         self.setZValue(100)
 
@@ -65,43 +63,13 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.displayName = name + str(self.id)
             elif "tempHx" in kwargs:
                 self.displayName = name
-            self.initNew()
-            self.loadedConnTrId = None  # Should not be used
+            self._setPortsColor()
         else:
             if "loadedHx" in kwargs:
                 self.logger.debug("Loading existing HeatExchanger")
                 self.displayName = name
-                self.loadedConnTrId = kwargs["connTrnsysID"]
 
-    def initNew(self):
-        self.conn = Connection(
-            self.port1, self.port2, True, self.parent.parent.parent()
-        )
-        self.conn.displayName = self.displayName
-
-        self.port1.setZValue(100)
-        self.port2.setZValue(100)
-
-        randomValue = int(random.uniform(20, 200))
-        randomColor = QColor(randomValue, randomValue, randomValue)
-        self.port1.innerCircle.setBrush(randomColor)
-        self.port2.innerCircle.setBrush(randomColor)
-        self.port1.visibleColor = randomColor
-        self.port2.visibleColor = randomColor
-
-        self._draw()
-
-    def initLoad(self):
-        self.logger.debug("Finishing up HeatExchanger loading")
-        self.logger.debug("self port1 is " + str(self.port1))
-        self.logger.debug("self port2  is " + str(self.port2))
-
-        self.conn = Connection(
-            self.port1, self.port2, True, self.parent.parent.parent()
-        )
-        self.conn.displayName = self.displayName
-        self.conn.trnsysId = self.loadedConnTrId
-
+    def _setPortsColor(self):
         self.port1.setZValue(100)
         self.port2.setZValue(100)
 
@@ -149,7 +117,6 @@ class HeatExchanger(QGraphicsItemGroup):
         self.scene().parent().showHxDlg(self)
 
     def rename(self, newName):
-        self.conn.displayName = newName
         self.displayName = newName
 
     def highlightHx(self):
