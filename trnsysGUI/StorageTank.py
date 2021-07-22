@@ -26,7 +26,7 @@ from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow
 
 class StorageTank(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.parent = parent
         self.dckFilePath = ""
@@ -769,15 +769,6 @@ class StorageTank(BlockItem):
     def _createFlowSolverParametersLine(self, incomingConnection: Connection, outgoingConnection: Connection) -> str:
         line = f"{incomingConnection.trnsysId} {outgoingConnection.trnsysId} 0 0\t!{self.trnsysId}: {self.name}\n"
         return line
-
-    def exportInputsFlowSolver1(self):
-        return "", 0
-
-    def exportInputsFlowSolver2(self):
-        return self.exportInputsFlowSolver1()
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        return "", equationNumber, 0
 
     def exportDck(self):
 
