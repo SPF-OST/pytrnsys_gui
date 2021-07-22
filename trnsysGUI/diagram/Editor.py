@@ -496,219 +496,8 @@ class Editor(QWidget):
         # if self.connectionList.__len__() > 0:
         #     self.connectionList[0].clearConn()
 
-    def cleanUpLineCrosses(self):
-        pass
-
-    # Export related methods
-    def setUpStorageInnerConns(self):
-        """
-        This function is called before the export file is generated. It connects all direct ports using TPieces and
-        Connections and it connects the HeatExchanger ports using a Connector block (this is because HeatExchangers
-        should work like BlockItems. This could maybe be improved by having a HeatExchanger as BlockItem sublclass.)
-        Returns
-        -------
-
-        """
-        storageTanks = [o for o in self.trnsysObj if isinstance(o, StorageTank)]
-        for storageTank in storageTanks:
-            for heatExchanger in storageTank.heatExchangers:
-                portsAtOtherEndOfConnection = [self._getPortAtOtherEndOfConnection(p) for p in
-                                               [heatExchanger.port1, heatExchanger.port2]]
-
-                connectors = storageTank.hxInsideConnsLeft if heatExchanger.sSide == 0 else storageTank.hxInsideConnsRight
-                storageTank.connectHxs(
-                    portsAtOtherEndOfConnection,
-                    connectors,
-                    heatExchanger,
-                )
-
-            storageTank.connectInside(
-                self.findStorageCorrespPorts(storageTank.leftDirectPortPairsPortItems),
-                storageTank.leftDirectPortPairsPortItems,
-                storageTank.insideConnLeft,
-                "L")
-
-            storageTank.connectInside(
-                self.findStorageCorrespPorts(storageTank.rightDirectPortPairsPortItems),
-                storageTank.rightDirectPortPairsPortItems,
-                storageTank.insideConnRight,
-                "R")
-
-    def findStorageCorrespPorts(self, portList):
-        """
-        This function gets the ports on the other side of pipes connected to a port of the StorageTank
-
-        Parameters
-        ----------
-        portList :obj:`List` of :obj:`PortItem`
-
-        Returns
-        -------
-        res : :obj:`List` of :obj:`PortItem`
-        """
-
-        res = []
-        for p in portList:
-            firstOutConn = None
-            for c in p.connectionList:
-                firstOutConn = c
-                if c.toPort.parent != c.fromPort.parent:
-                    break
-
-            if firstOutConn is not None:
-                if firstOutConn.toPort == p:
-                    res.append(firstOutConn.fromPort)
-                else:
-                    res.append(firstOutConn.toPort)
-            else:
-                self.logger.error("No corresponding storage port found")
-                res.append(p)
-
-        return res
-
-    @staticmethod
-    def _getPortAtOtherEndOfConnection(port):
-        connection = port.connectionList[1] if len(port.connectionList) > 1 else port.connectionList[0]
-        assert connection.fromPort is port or connection.toPort is port
-        otherPort = connection.fromPort if connection.toPort is port else connection.toPort
-        return otherPort
-
-    def tearDownStorageInnerConns(self):
-        """
-        Deletes all generated inner connections after exporting to Trnsys
-        Returns
-        -------
-
-        """
-        for t in self.trnsysObj:
-            if type(t) is StorageTank:
-
-                # print("in conn left list is ")
-                # [print(e.displayName) for e in t.insideConnLeft]
-                # print("in conn right list is ")
-                # [print(e.displayName) for e in t.insideConnRight]
-
-                # Remove old insideConnection:
-                # if len(t.insideConnLeft) > 0:
-                # print("t.insideConnection has " + str(len(t.insideConnLeft)) + "TPieces/connection")
-
-                while len(t.insideConnLeft) > 0:
-                    tp = t.insideConnLeft[0]
-                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        if tp in self.trnsysObj:
-                            t.insideConnLeft.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
-                            )
-                    else:
-                        self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
-                t.insideConnLeft = []
-
-                while len(t.insideConnRight) > 0:
-                    tp = t.insideConnRight[0]
-                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        if tp in self.trnsysObj:
-                            t.insideConnRight.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
-                            )
-                    else:
-                        self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
-                t.insideConnRight = []
-
-                while len(t.hxInsideConnsLeft) > 0:
-                    tp = t.hxInsideConnsLeft[0]
-                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        if tp in self.trnsysObj:
-                            t.hxInsideConnsLeft.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
-                            )
-                    else:
-                        self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
-                t.hxInsideConnsLeft = []
-
-                while len(t.hxInsideConnsRight) > 0:
-                    tp = t.hxInsideConnsRight[0]
-                    if isinstance(tp, TeePiece) or isinstance(tp, Connector):
-                        if tp in self.trnsysObj:
-                            t.hxInsideConnsRight.remove(tp)
-                            tp.deleteBlock()
-                        else:
-                            self.logger.debug(
-                                "The virtual element not in trnsysobj is " + str(tp) + " " + tp.displayName
-                            )
-                    else:
-                        self.logger.debug("Element other than TPiece/connector found in insideConnection " + str(tp))
-                t.hxInsideConnsRight = []
-
-        # self.setTrnsysIdBack()
-
-    def connectionPrinter(self):
-        # name = []
-        # fromPort1 = []
-        # fromPort2 = []
-        # toPort1 = []
-        # toPort2 = []
-        # for obj in self.trnsysObj:
-        #     if isinstance(obj,Connection):
-        #         name.append(obj.displayName)
-        #         fromPort1.append(obj.fromPort.connectionList[0].displayName)
-        #         toPort1.append(obj.toPort.connectionList[0].displayName)
-        #         if len(obj.fromPort.connectionList) == 2:
-        #             fromPort2.append(obj.fromPort.connectionList[1].displayName)
-        #         else:
-        #             fromPort2.append('')
-        #         if len(obj.toPort.connectionList) == 2:
-        #             toPort2.append(obj.toPort.connectionList[1].displayName)
-        #         else:
-        #             toPort2.append('')
-        # table = {
-        #         'Name': name,
-        #         'from 1': fromPort1,
-        #         'from 2': fromPort2,
-        #         'to 1': toPort1,
-        #         'to 2': toPort2
-        #         }
-        # df = pd.DataFrame(table, columns=['Name','from 1','from 2','to 1','to 2'])
-
-        name = []
-        in1 = []
-        in2 = []
-        out1 = []
-        out2 = []
-        for obj in self.trnsysObj:
-            if not isinstance(obj, Connection):
-                name.append(obj.displayName)
-                try:
-                    in1.append(obj.inputs[0].connectionList[0].displayName)
-                except:
-                    in1.append("")
-                try:
-                    in2.append(obj.inputs[1].connectionList[0].displayName)
-                except:
-                    in2.append("")
-                try:
-                    out1.append(obj.outputs[0].connectionList[0].displayName)
-                except:
-                    out1.append("")
-                try:
-                    out2.append(obj.outputs[1].connectionList[0].displayName)
-                except:
-                    out2.append("")
-        table = {"Name": name, "in 1": in1, "in 2": in2, "out 1": out1, "out 2": out2}
-        df = pd.DataFrame(table, columns=["Name", "in 1", "in 2", "out 1", "out 2"])
-
     def exportHydraulics(self, exportTo="ddck"):
         self.logger.info("------------------------> START OF EXPORT <------------------------")
-
-        self.setUpStorageInnerConns()
 
         self.sortTrnsysObj()
 
@@ -808,7 +597,6 @@ class Editor(QWidget):
             f.close()
 
         self.cleanUpExportedElements()
-        self.tearDownStorageInnerConns()
 
         if exportTo == "mfs":
             return exportPath
@@ -836,8 +624,6 @@ class Editor(QWidget):
 
     def exportHydraulicControl(self):
         self.logger.info("------------------------> START OF EXPORT <------------------------")
-
-        self.setUpStorageInnerConns()
 
         self.sortTrnsysObj()
 
@@ -890,7 +676,6 @@ class Editor(QWidget):
         f.close()
 
         self.cleanUpExportedElements()
-        self.tearDownStorageInnerConns()
 
         return hydCtrlPath
 

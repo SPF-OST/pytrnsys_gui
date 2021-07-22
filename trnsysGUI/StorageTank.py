@@ -40,13 +40,6 @@ class StorageTank(BlockItem):
         self.childIds = []
         self.childIds.append(self.trnsysId)
 
-        # List containing all the conns and blocks inside, used to input into connInside()
-        self.insideConnLeft = []
-        self.insideConnRight = []
-
-        self.hxInsideConnsLeft = []
-        self.hxInsideConnsRight = []
-
         self.blackBoxEquations = []
 
         self.nTes = self.parent.parent().idGen.getStoragenTes()
@@ -172,272 +165,6 @@ class StorageTank(BlockItem):
 
         return directPortPair
 
-    def checkConnectInside(self, port1, port2, maxhops, d):
-        """
-        Was used to check if connectInside works
-        Basically a depth first algorithm
-        Parameters
-        ----------
-        port1
-        port2
-        maxhops
-        d
-
-        Returns
-        -------
-
-        """
-        port1.visited = True
-
-        self.logger.debug(" " * 3 * d + "In port1 " + str(port1) + "at depth " + str(d))
-        self.logger.debug(
-            " " * 3 * d + "Connection list is " + str(port1.connectionList)
-        )
-        self.logger.debug(" " * 3 * d + "Parent is " + str(port1.parent))
-
-        if port1 is port2:
-            self.logger.debug(
-                " " * 3 * d + "Found a connection between port 1 and port 2"
-            )
-
-        if d == maxhops:
-            self.logger.debug(" " * 3 * d + "Port + " + str(port1) + " is returning.")
-            return
-
-        if port1.parent.name == "TeePiece.png":
-            # self.logger.debug("We are at T piece " + str(port1.parent))
-            conns = port1.parent.getConnections()
-            # self.logger.debug("Connections of T piece are " + str(conns))
-            for c in conns:
-                self.logger.debug(" " * 3 * d + "Conns")
-                if c.fromPort.parent is port1.parent:
-                    if (not c.fromPort.visited) and (not c.toPort.visited):
-                        c.fromPort.visited = True
-                        self.checkConnectInside(c.toPort, port2, maxhops, d + 1)
-
-                if c.toPort.parent is port1.parent:
-                    if (not c.toPort.visited) and (not c.fromPort.visited):
-                        c.toPort.visited = True
-                        self.checkConnectInside(c.fromPort, port2, maxhops, d + 1)
-
-        if port1.parent.name == "StorageTank":
-            # self.logger.debug("We are at " + str(port1.parent))
-
-            if d > 1:
-                self.logger.debug(
-                    " " * 3 * d
-                    + "port1 "
-                    + str(port1)
-                    + " at StorageTank is returning."
-                )
-                return
-
-            for j in port1.connectionList:
-                if j.toPort is port1:
-                    self.logger.debug(" " * 3 * d + "toPort is port1 is " + str(port1))
-                    self.logger.debug(
-                        " " * 3 * d + "fromPort is " + str(j.fromPort) + "\n"
-                    )
-                    if not j.fromPort.visited:
-                        self.checkConnectInside(j.fromPort, port2, maxhops, d + 1)
-                    else:
-                        self.logger.debug(
-                            " " * 3 * d
-                            + "Port was already visited, at depth "
-                            + str(d)
-                            + " at Storage Tank"
-                        )
-                if j.fromPort is port1:
-                    self.logger.debug(" " * 3 * d + "fromPort is port1" + str(port1))
-                    self.logger.debug(" " * 3 * d + "toPort is " + str(j.toPort) + "\n")
-                    if not j.toPort.visited:
-                        self.checkConnectInside(j.toPort, port2, maxhops, d + 1)
-                    else:
-                        self.logger.debug(
-                            " " * 3 * d
-                            + "Port was already visited, at depth "
-                            + str(d)
-                            + " at Storage Tank"
-                        )
-
-    def connectInside(self, connectedExternalPorts, storageTankPorts, teePieces, side):
-        tempArrConn = []
-
-        connectedExternalPortsCopy = connectedExternalPorts
-
-        # Assert that the storage has at least 2 ports at side
-        if len(connectedExternalPorts) < 2:
-            self.logger.error("storage needs at least 2 ports on a side")
-            return
-
-        if len(connectedExternalPorts) == 2:
-
-            connector = Connector("Connector", self.parent)
-            connector.displayName = (
-                "Conn" + self.displayName + side + str(connector.id)
-            )
-
-            # Used for recognizing it to print the temperature of the storage ports
-            connector.inFirstRow = True
-            connector.setVisible(False)
-
-            self.parent.scene().addItem(connector)
-            teePieces.append(connector)
-
-            firstConnectedExternalPort = connectedExternalPorts[0]
-            c1 = self._createConnectionBetweenExternalPortAndConnector(connector, firstConnectedExternalPort)
-
-            secondConnectedExternalPort = connectedExternalPorts[1]
-            c2 = self._createConnectionBetweenExternalPortAndConnector(connector, secondConnectedExternalPort)
-
-            c1.displayName = firstConnectedExternalPort.connectionList[0].displayName
-            c1.isStorageIO = True
-            c2.displayName = secondConnectedExternalPort.connectionList[0].displayName
-            c2.isStorageIO = True
-            return
-
-        h = 20
-        # self.logger.debug("Self.parent.parent()" + str(self.parent.parent()))
-        layer = 1
-        while len(connectedExternalPorts) > 2:
-            mem = []
-            if len(connectedExternalPorts) % 2 == 0:
-                x = len(connectedExternalPorts)
-                self.logger.debug("Even number of ports in side")
-            else:
-                x = len(connectedExternalPorts) - 1
-                mem.append(connectedExternalPorts[x])
-                # self.logger.debug("Uneven " + side(x))
-
-            for i in range(0, x, 2):
-                tpiece = TeePiece("TeePiece", self.parent)
-                tpiece.displayName = (
-                    "TeeTes" + self.displayName + side + str(tpiece.id)
-                )
-                tpiece.setVisible(False)
-                self.parent.scene().addItem(tpiece)
-                teePieces.append(tpiece)
-
-                c1 = Connection(connectedExternalPorts[i], tpiece.inputs[0], True, self.parent.parent())
-                c2 = Connection(
-                    tpiece.inputs[1], connectedExternalPorts[i + 1], True, self.parent.parent()
-                )
-                self.logger.debug(
-                    "c1 is from "
-                    + connectedExternalPorts[i].parent.displayName
-                    + " to "
-                    + tpiece.inputs[0].parent.displayName
-                )
-                self.logger.debug(
-                    "c2 is from "
-                    + tpiece.inputs[1].parent.displayName
-                    + " to "
-                    + connectedExternalPorts[i + 1].parent.displayName
-                )
-                if layer > 1:
-                    c1.firstS.setVisible(False)
-                    c2.firstS.setVisible(False)
-                    c1.hiddenGenerated = True
-                    c2.hiddenGenerated = True
-
-                resId = ""
-                for j in c1.displayName:
-                    if j.isdigit():
-                        resId += str(j)
-
-                # self.logger.debug("c1 name before is " + c1.displayName)
-                c1.displayName = "PiTes" + side + self.displayName + "_" + resId
-                # self.logger.debug("c1 name is " + c1.displayName)
-
-                resId = ""
-
-                for j in c2.displayName:
-                    if j.isdigit():
-                        resId += str(j)
-
-                c2.displayName = "PiTes" + side + self.displayName + "_" + resId
-
-                tempArrConn.append(c1)
-                tempArrConn.append(c2)
-
-                # self.parent.addItem(QGraphicsEllipseItem(h, i * 10, 3, 3))
-
-                if i == 0:
-                    mem.insert(0, tpiece.outputs[0])
-                else:
-                    mem.insert(-1, tpiece.outputs[0])
-
-            connectedExternalPorts = mem
-            layer += 1
-            h += 20
-            # self.logger.debug(str(len(side)))
-
-        lastC = Connection(connectedExternalPorts[0], connectedExternalPorts[1], True, self.parent.parent())
-        lastC.firstS.setVisible(False)
-        self.logger.debug(
-            "lastc is from "
-            + connectedExternalPorts[0].parent.displayName
-            + " to "
-            + connectedExternalPorts[1].parent.displayName
-        )
-        resId = ""
-        for j in lastC.displayName:
-            if j.isdigit():
-                resId += str(j)
-        lastC.displayName = "PiTes" + side + self.displayName + "_" + resId
-
-        if len(storageTankPorts) > 2:
-            lastC.hiddenGenerated = True
-
-        # Here the virtual pipes clone the name of their corresponding real pipe
-        # Could be used to set a new attribute generatedPrinted
-        for s in connectedExternalPortsCopy:
-            for t in tempArrConn:
-                if t.fromPort is s or t.toPort is s:
-                    self.logger.debug("This is a real connection " + str(t.displayName))
-                    if len(s.connectionList) > 0:
-                        t.displayName = s.connectionList[0].displayName  # + "GEN"
-                        t.setClone(True)
-                    else:
-                        self.logger.debug(
-                            "Found a port outside that has no connection to inside"
-                        )
-
-        # If tpieces were generated, the first len(connectedExternalPortsCopy) ones have to be marked as firstRow
-        for x in teePieces[: len(connectedExternalPortsCopy)]:
-            x.inFirstRow = True
-
-    def _createConnectionBetweenExternalPortAndConnector(self, connector, connectedExternalPort):
-        if self._isSourcePort(connectedExternalPort):
-            return Connection(
-                connectedExternalPort, connector.inputs[0], True, self.parent.parent()
-            )
-        else:
-            return Connection(
-                connector.inputs[0], connectedExternalPort, True, self.parent.parent()
-            )
-
-    @staticmethod
-    def _isSourcePort(port):
-        return port.connectionList[0].fromPort is port
-
-    def connectHxs(self, outsidePorts, connectors, heatX):
-        firstConnectedExternalPort = outsidePorts[0]
-        secondConnectedExternalPort = outsidePorts[1]
-        self.logger.debug("ports have " + str(firstConnectedExternalPort.parent) + str(secondConnectedExternalPort.parent))
-
-        connector = Connector("Connector", self.parent)
-        connector.displayName = heatX.displayName
-
-        c1 = self._createConnectionBetweenExternalPortAndConnector(connector, firstConnectedExternalPort)
-        c2 = self._createConnectionBetweenExternalPortAndConnector(connector, secondConnectedExternalPort)
-
-        connectors.append(connector)
-        c1.displayName = firstConnectedExternalPort.connectionList[0].displayName
-        c1.isStorageIO = True
-        c2.displayName = secondConnectedExternalPort.connectionList[0].displayName
-        c2.isStorageIO = True
-
     # Transform related
     def changeSize(self):
         """ Resize block function """
@@ -478,7 +205,7 @@ class StorageTank(BlockItem):
         if not self.isVisible():
             raise RuntimeError("Cannot encode an invisible storage tank.")
 
-        heatExchangerModels = self._getHeatExchangerModelsForSerialization()
+        heatExchangerModels = self._getHeatExchangerModelsForEncode()
         portPairModels = self._getDirectPortPairModelsForEncode()
         position = float(self.pos().x()), float(self.pos().y())
 
@@ -522,7 +249,7 @@ class StorageTank(BlockItem):
 
         return portPairModels
 
-    def _getHeatExchangerModelsForSerialization(self):
+    def _getHeatExchangerModelsForEncode(self):
         heatExchangerModels = []
         for heatExchanger in self.heatExchangers:
             side = _model.Side.createFromSideNr(heatExchanger.sSide)
@@ -551,15 +278,6 @@ class StorageTank(BlockItem):
             heatExchangerModels.append(heatExchangerModel)
 
         return heatExchangerModels
-
-    @staticmethod
-    def _getConnectionsAmong(ports: _tp.Sequence[PortItem]) -> _tp.Sequence[Connection]:
-        return [
-            c
-            for fromPort in ports
-            for c in fromPort.connectionList
-            if c.fromPort is fromPort and c.toPort in ports
-        ]
 
     def decode(self, i, resBlockList):
         offset_x = 0
@@ -708,27 +426,6 @@ class StorageTank(BlockItem):
         )
         self.parent.parent().dumpInformation()
 
-    def deleteBlockDebug(self):
-        self.logger.debug("Listing all connections")
-        conns = []
-        for p in self.inputs + self.outputs:
-            for c in p.connectionList:
-                conns.append(c)
-
-        [
-            self.logger.debug(
-                c.displayName
-                + ", fromPort: "
-                + c.fromPort.parent.displayName
-                + ", toPort: "
-                + c.toPort.parent.displayName
-            )
-            for c in conns
-        ]
-
-    def printPortNb(self):
-        self.logger.debug("ST has " + str(self.inputs) + " and " + str(self.outputs))
-
     # Misc
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -759,20 +456,7 @@ class StorageTank(BlockItem):
         menu.exec_(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
-        self.dia = ConfigureStorageDialog(self, self.scene().parent())
-
-    def hasManPortById(self, idFind):
-
-        res = -1
-
-        for p in self.leftDirectPortPairsPortItems:
-            if p.id == idFind:
-                res = True
-
-        for p in self.rightDirectPortPairsPortItems:
-            if p.id == idFind:
-                res = False
-        return res
+        ConfigureStorageDialog(self, self.scene().parent())
 
     # Export related
     def exportBlackBox(self):
