@@ -749,7 +749,26 @@ class StorageTank(BlockItem):
             return "noDdckFile", equations
 
     def exportParametersFlowSolver(self, descConnLength):
-        return "", 0
+        lines = []
+        for directPortPair in self.directPortPairs:
+            incomingConnection: Connection = directPortPair.fromPort.connectionList[0]
+            outgoingConnection: Connection = directPortPair.toPort.connectionList[0]
+            line = self._createFlowSolverParametersLine(incomingConnection, outgoingConnection)
+            lines.append(line)
+
+        for heatExchanger in self.heatExchangers:
+            incomingConnection: Connection = heatExchanger.port1.connectionList[0]
+            outgoingConnection: Connection = heatExchanger.port2.connectionList[0]
+            line = self._createFlowSolverParametersLine(incomingConnection, outgoingConnection)
+            lines.append(line)
+
+        result = "".join(lines)
+
+        return result
+
+    def _createFlowSolverParametersLine(self, incomingConnection: Connection, outgoingConnection: Connection) -> str:
+        line = f"{incomingConnection.trnsysId} {outgoingConnection.trnsysId} 0 0\t!{self.trnsysId}: {self.name}\n"
+        return line
 
     def exportInputsFlowSolver1(self):
         return "", 0
