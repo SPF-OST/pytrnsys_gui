@@ -188,40 +188,7 @@ class MassFlowVisualizer(QDialog):
             return
 
         if self.loadedFile:
-
             i = 0
-            # for t in self.parent.centralWidget.trnsysObj:
-            #     if isinstance(t, Connection):
-            #         if 'Mfr'+t.displayName in self.massFlowData.columns:
-            #             print("Found connection in ts " + str(self.timeStep) + " " + str(i))
-            #             if self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep] < 0:
-            #                 t.setColor(mfr="NegMfr")
-            #             elif self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep] == 0:
-            #                 t.setColor(mfr="ZeroMfr")
-            #             else:
-            #                 t.setColor(mfr="PosMfr")
-            #             i += 1
-
-            # for t in self.parent.centralWidget.trnsysObj:
-            #     if isinstance(t, Connection):
-            #         if 'Mfr'+t.displayName in self.massFlowData.columns:
-            #             print("Found connection in ts " + str(self.timeStep) + " " + str(i))
-            #             if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
-            #                 t.setColor(mfr="ZeroMfr")
-            #             elif self.minValue <= abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.lowerQuarter:
-            #                 t.setColor(mfr="minToLower")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             elif self.lowerQuarter <= abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.medianValue:
-            #                 t.setColor(mfr="lowerToMedian")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             elif self.medianValue <= abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.upperQuarter:
-            #                 t.setColor(mfr="medianToUpper")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             else:
-            #                 t.setColor(mfr="upperToMax")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             i += 1
-
             for t in self.parent.centralWidget.trnsysObj:
                 if isinstance(t, Connection):
                     if (
