@@ -30,7 +30,6 @@ def calcDist(p1, p2):
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
     def __init__(self, trnsysType, parent, **kwargs):
-
         super().__init__(None)
 
         self.logger = parent.logger
@@ -64,10 +63,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
-
-        # This case is because loaded blocks have parent=None
-        # if self.parent is not None:
-        #     self.parent.parent().trnsysObj.append(self)
 
         # Transform related
         self.flippedV = False
@@ -106,6 +101,9 @@ class BlockItem(QGraphicsPixmapItem):
 
         # Undo framework related
         self.oldPos = None
+
+        self.origOutputsPos = None
+        self.origInputsPos = None
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         currentClassName = BlockItem.__name__
@@ -875,6 +873,9 @@ class BlockItem(QGraphicsPixmapItem):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         return "", startingUnit
+
+    def getPortNameForHydraulicsDdck(self, portItem: PortItem) -> str:
+        return self.displayName
 
     def cleanUpAfterTrnsysExport(self):
         self.exportConnsString = ""

@@ -1,9 +1,9 @@
 # pylint: skip-file
 # type: ignore
 
-import os
-import random
-import shutil
+import os as _os
+import random as _rnd
+import shutil as _sh
 import typing as _tp
 
 from PyQt5.QtGui import QColor
@@ -15,13 +15,15 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
-from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TeePiece import TeePiece
+from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow
+
+InOut = _tp.Literal["In", "Out"]
 
 
 class StorageTank(BlockItem):
@@ -113,7 +115,7 @@ class StorageTank(BlockItem):
         port1.side = side
         port2.side = side
 
-        randomInt = int(random.uniform(20, 200))
+        randomInt = int(_rnd.uniform(20, 200))
         randomColor = QColor(randomInt, randomInt, randomInt)
 
         port1.innerCircle.setBrush(randomColor)
@@ -655,6 +657,47 @@ class StorageTank(BlockItem):
             i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs=False
         )
 
+    def getPortNameForStorageTankDdck(self, portItem: PortItem) -> str:
+        directPortPair = self._getDirectPortPairAndInOutForPortItemOrNone(portItem)
+
+        number = self.directPortPairs.index(directPortPair) + 1
+        inOut = self._getInOut(portItem, directPortPair)
+
+        return f"dp{number}{inOut}_Tes{self.nTes}"
+
+    def getPortNameForHydraulicsDdck(self, portItem: PortItem) -> str:
+        directPortPair = self._getDirectPortPairAndInOutForPortItemOrNone(portItem)
+        if directPortPair:
+            return self._getDirectPortPairPortNameForHydraulicsDdck(directPortPair, portItem)
+
+    def _getDirectPortPairAndInOutForPortItemOrNone(self, portItem: PortItem) -> _tp.Optional[DirectPortPair]:
+        directPortPairs = [dpp for dpp in self.directPortPairs if dpp.fromPort == portItem or dpp.toPort == portItem]
+        if not directPortPairs:
+            return None
+        assert len(directPortPairs) == 1
+
+        directPortPair = directPortPairs[0]
+
+        return directPortPair
+
+    def _getDirectPortPairPortNameForHydraulicsDdck(self, directPortPair, portItem):
+        isInputPort = directPortPair.fromPort == portItem
+
+        relativePortHeight = directPortPair.relativeInputHeight if isInputPort else directPortPair.relativeOutputHeight
+        relativePortHeightInPercent = int(round(relativePortHeight * 100, 2))
+
+        return f"{self.displayName}Port{directPortPair.side}{relativePortHeightInPercent}"
+
+    @staticmethod
+    def _getInOut(portItem: PortItem, directPortPair: DirectPortPair) -> InOut:
+        if directPortPair.fromPort == portItem:
+            return "In"
+
+        if directPortPair.fromPort == portItem:
+            return "Out"
+
+        raise ValueError("Port item does not belong to direct port pair.")
+
     # Debug
     def dumpBlockInfo(self):
         self.logger.debug("storage input list " + str(self.inputs))
@@ -734,10 +777,10 @@ class StorageTank(BlockItem):
     # Export related
     def exportBlackBox(self):
         equations = []
-        ddcxPath = os.path.join(self.path, self.displayName)
+        ddcxPath = _os.path.join(self.path, self.displayName)
         ddcxPath = ddcxPath + ".ddcx"
         self.exportDck()
-        if os.path.isfile(ddcxPath):
+        if _os.path.isfile(ddcxPath):
             infile = open(ddcxPath, "r")
             lines = infile.readlines()
             for line in lines:
@@ -862,12 +905,12 @@ class StorageTank(BlockItem):
             dictInputAux = {"zAux": 0.0, "qAux": 0.0}
             auxiliaryPorts.append(dictInputAux)
 
-        exportPath = os.path.join(self.path, self.displayName + ".ddck")
+        exportPath = _os.path.join(self.path, self.displayName + ".ddck")
         self.logger.debug(exportPath)
 
         tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
 
-        tool.createDDck(self.path, self.displayName, self.displayName, typeFile="ddck")
+        tool.createDDck(self.path, self.displayName, typeFile="ddck")
         self.loadedTo = self.path
 
     def debugConn(self):
@@ -931,10 +974,10 @@ class StorageTank(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = _os.path.join(self.path, "ddck")
+        self.path = _os.path.join(self.path, pathName)
+        if not _os.path.exists(self.path):
+            _os.makedirs(self.path)
 
         self.model = MyQFileSystemModel()
         self.model.setRootPath(self.path)
@@ -955,10 +998,10 @@ class StorageTank(BlockItem):
         to update the root path.
         """
         pathName = self.displayName
-        self.path = os.path.join(path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = _os.path.join(path, "ddck")
+        self.path = _os.path.join(self.path, pathName)
+        if not _os.path.exists(self.path):
+            _os.makedirs(self.path)
         self.model.setRootPath(self.path)
         self.tree.setRootIndex(self.model.index(self.path))
 
@@ -978,7 +1021,7 @@ class StorageTank(BlockItem):
         widgetToRemove = self.parent.parent().findChild(
             QTreeView, self.displayName + "Tree"
         )
-        shutil.rmtree(self.path)
+        _sh.rmtree(self.path)
         try:
             widgetToRemove.hide()
         except AttributeError:
@@ -995,12 +1038,12 @@ class StorageTank(BlockItem):
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.split(self.path)[-1] == "" or os.path.split(self.path)[-1] == "ddck":
-            os.makedirs(destPath)
+        self.logger.debug(_os.path.dirname(self.path))
+        destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
+        if _os.path.split(self.path)[-1] == "" or _os.path.split(self.path)[-1] == "ddck":
+            _os.makedirs(destPath)
         else:
-            if os.path.exists(self.path):
-                os.rename(self.path, destPath)
+            if _os.path.exists(self.path):
+                _os.rename(self.path, destPath)
         self.path = destPath
         self.logger.debug(self.path)
