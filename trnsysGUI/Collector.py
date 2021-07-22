@@ -18,7 +18,7 @@ import trnsysGUI.images as _img
 
 class Collector(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(Collector, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.inputs.append(PortItem("i", 2, self))
         self.outputs.append(PortItem("o", 2, self))
@@ -31,36 +31,30 @@ class Collector(BlockItem):
         return _img.COLLECTOR_SVG
 
     def changeSize(self):
-        # self.logger.debug("passing through c change size")
         w = self.w
         h = self.h
 
-        """ Resize block function """
         delta = 20
-        deltaH = self.h / 10
 
-        # Limit the block size:
         if h < 20:
             h = 20
         if w < 40:
             w = 40
-        # center label:
+
         rect = self.label.boundingRect()
         lw, lh = rect.width(), rect.height()
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origOutputsPos = [[w, delta]]
         self.origInputsPos = [[w, h - delta]]
-        # Update port positions:
+        self.origOutputsPos = [[w, delta]]
+
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        # self.inputs[0].side = 2 - 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 

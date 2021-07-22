@@ -17,7 +17,7 @@ from trnsysGUI.MyQTreeView import MyQTreeView
 
 class ExternalHx(BlockItemFourPorts):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(ExternalHx, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.loadedFiles = []
 
