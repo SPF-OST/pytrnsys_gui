@@ -20,8 +20,7 @@
             "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
             "directPortPairs": [
                 {
-                    "connectionId": 2,
-                    "id": 10,
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
                     "portPair": {
                         "inputPort": {
                             "id": 8,
@@ -33,8 +32,7 @@
                             "relativeHeight": 0.1
                         },
                         "side": "left"
-                    },
-                    "trnsysId": 4
+                    }
                 }
             ],
             "groupName": "defaultGroup",
@@ -127,7 +125,7 @@
                 [
                     -288.0,
                     -311.0,
-                    -502.9,
+                    -503.5,
                     -311.0
                 ],
                 [
@@ -186,102 +184,82 @@
                     -359.0
                 ],
                 [
-                    -288.0,
+                    -528.0,
                     -359.0,
-                    -527.4,
-                    -358.4
+                    -288.0,
+                    -359.0
                 ]
             ],
             "isVirtualConn": false,
             "trnsysID": 25
         },
-        "Connection-56": {
+        "Connection-79": {
             ".__ConnectionDict__": true,
-            "ConnCID": 26,
+            "ConnCID": 41,
             "ConnDisplayName": "Col-Hx",
-            "ConnID": 56,
+            "ConnID": 79,
             "CornerPositions": [
                 [
                     -668.0,
-                    -302.0
+                    -382.0
                 ],
                 [
                     -668.0,
-                    -349.0
-                ],
-                [
-                    -628.0,
-                    -349.0
-                ],
-                [
-                    -628.0,
                     -378.0
                 ]
             ],
             "FirstSegmentLabelPos": [
-                9.0,
-                11.0
+                20.0,
+                0.0
             ],
             "FirstSegmentMassFlowLabelPos": [
                 0.0,
                 0.0
             ],
             "GroupName": "defaultGroup",
-            "PortFromID": 25,
+            "PortFromID": 26,
             "PortToID": 14,
             "SegmentPositions": [
                 [
                     -713.0,
-                    -302.0,
+                    -382.0,
                     -668.0,
-                    -302.0
+                    -382.0
                 ],
                 [
                     -668.0,
-                    -302.0,
+                    -382.0,
                     -668.0,
-                    -349.0
-                ],
-                [
-                    -668.0,
-                    -349.0,
-                    -628.0,
-                    -349.0
-                ],
-                [
-                    -628.0,
-                    -349.0,
-                    -628.0,
                     -378.0
                 ],
                 [
-                    -628.0,
+                    -668.0,
                     -378.0,
                     -623.0,
                     -378.0
                 ]
             ],
             "isVirtualConn": false,
-            "trnsysID": 31
+            "trnsysID": 46
         },
-        "Connection-59": {
+        "Connection-82": {
             ".__ConnectionDict__": true,
-            "ConnCID": 27,
+            "ConnCID": 42,
             "ConnDisplayName": "Hx-Col",
-            "ConnID": 59,
+            "ConnID": 82,
             "CornerPositions": [
                 [
-                    -651.0,
+                    -668.0,
                     -298.0
                 ],
                 [
-                    -651.0,
-                    -382.0
+                    -668.0,
+                    -302.0
                 ]
             ],
             "FirstSegmentLabelPos": [
-                -90.0,
-                -121.0
+                -60.0,
+                0.0
             ],
             "FirstSegmentMassFlowLabelPos": [
                 0.0,
@@ -289,39 +267,39 @@
             ],
             "GroupName": "defaultGroup",
             "PortFromID": 16,
-            "PortToID": 26,
+            "PortToID": 25,
             "SegmentPositions": [
                 [
                     -623.0,
                     -298.0,
-                    -651.0,
+                    -668.0,
                     -298.0
                 ],
                 [
-                    -651.0,
+                    -668.0,
                     -298.0,
-                    -651.0,
-                    -382.0
+                    -668.0,
+                    -302.0
                 ],
                 [
-                    -651.0,
-                    -382.0,
+                    -668.0,
+                    -302.0,
                     -713.0,
-                    -382.0
+                    -302.0
                 ]
             ],
             "isVirtualConn": false,
-            "trnsysID": 32
+            "trnsysID": 47
         },
         "IDs": {
-            "GlobalId": 71,
+            "GlobalId": 86,
             "__idDct__": true,
-            "globalConnID": 37,
-            "trnsysID": 42
+            "globalConnID": 44,
+            "trnsysID": 49
         },
         "Strings": {
             "DiagramName": "ExternalHeatExchanger.json",
-            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\pytrnsys_gui2\\data\\examples\\ExternalHeatExchanger",
+            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\pytrnsys_gui\\data\\examples\\ExternalHeatExchanger",
             "__nameDct__": true
         }
     }
