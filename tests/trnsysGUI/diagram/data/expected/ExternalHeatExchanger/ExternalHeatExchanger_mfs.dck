@@ -118,12 +118,12 @@ UNIT 450 TYPE 935
 PARAMETERS 33
 8
 5 6 0 0        !1 : ExHxSide1
-7 8 0 0        !2 : ExHxSide2
-8 8 0 0        !2 : ExHxSide2
-6 5 0 0        !4 : Col
+24 25 0 0      !2 : ExHxSide2
+9 25 0 0       !2 : ExHxSide2
+5 6 0 0        !4 : Col
 4 1 0 0        !5 : Col-Hx
 1 4 0 0        !6 : Hx-Col
-8 9 0 0        !7 : ConnTesL45
+8 9 0 0        !7 : ConnTesL71
 2 7 0 0        !8 : Hx-Tes
 7 2 0 0        !9 : Tes-Hx
 INPUTS 8! for Type 935
@@ -143,8 +143,8 @@ MfrCol-Hx_A=[450,10]
 MfrCol-Hx_B=[450,11]
 MfrHx-Col_A=[450,13]
 MfrHx-Col_B=[450,14]
-MfrConnTesL45_A=[450,16]
-MfrConnTesL45_B=[450,17]
+MfrConnTesL71_A=[450,16]
+MfrConnTesL71_B=[450,17]
 MfrHx-Tes_A=[450,19]
 MfrHx-Tes_B=[450,20]
 MfrTes-Hx_A=[450,22]
@@ -251,14 +251,14 @@ EQUATIONS 12
 **di_loop_0=0.05
 **L_loop_0=2
 **U_loop_0=10
-*** Hx-Tes
-diHx-Tes=di_loop_0
-LHx-Tes=L_loop_0
-UHx-Tes=U_loop_0
 *** Tes-Hx
 diTes-Hx=di_loop_0
 LTes-Hx=L_loop_0
 UTes-Hx=U_loop_0
+*** Hx-Tes
+diHx-Tes=di_loop_0
+LHx-Tes=L_loop_0
+UHx-Tes=U_loop_0
 *** Col-Hx
 diCol-Hx=di_loop_0
 LCol-Hx=L_loop_0
@@ -271,7 +271,7 @@ UHx-Col=U_loop_0
 
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PHx-Tes_kW+PTes-Hx_kW+PCol-Hx_kW+PHx-Col_kW
+PipeLossTot=PTes-Hx_kW+PHx-Tes_kW+PCol-Hx_kW+PHx-Col_kW
 
 ASSIGN ExternalHeatExchanger_Mfr.prt 455
 
@@ -289,9 +289,9 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 4
-MfrHx-Tes MfrTes-Hx MfrCol-Hx MfrHx-Col 
+MfrTes-Hx MfrHx-Tes MfrCol-Hx MfrHx-Col 
 ***
-MfrHx-Tes MfrTes-Hx MfrCol-Hx MfrHx-Col 
+MfrTes-Hx MfrHx-Tes MfrCol-Hx MfrHx-Col 
 
 ASSIGN ExternalHeatExchanger_T.prt 456
 
@@ -309,9 +309,9 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 4
-THx-Tes TTes-Hx TCol-Hx THx-Col 
+TTes-Hx THx-Tes TCol-Hx THx-Col 
 ***
-THx-Tes TTes-Hx TCol-Hx THx-Col 
+TTes-Hx THx-Tes TCol-Hx THx-Col 
 
 CONSTANTS 1
 TRoomStore=1
