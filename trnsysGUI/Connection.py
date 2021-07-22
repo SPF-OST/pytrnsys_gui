@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 import trnsysGUI.BlockItem as _bi
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
+from trnsysGUI.DeleteConnectionCommand import DeleteConnectionCommand
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.Pump import Pump
@@ -26,52 +27,12 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
-    """
-    A connection (pipe) stores and displays the connection between two blocks.
-    Note: Nodes can have as parent 1)Connection 2)CornerItem
-    Attributes
-    ----------
-
-    fromPort : :obj:`PortItem`
-        Port where the Connection starts
-    toPort : :obj:`PortItem`
-        Port where the Connection ends
-    isVirtualConn : bool
-        Same as return of isVisible() from Qt. Virtual connections are invisible and either generated
-        when adding HeatExchanger or direct ports to a StorageTank
-    isStorageIO : bool
-        Unused. Was used to detect wether a connection was at the input/output of a StorageTank or not.
-    displayName : str
-        Name that is displayed by tooltip, and the name label
-    hiddenGenerated : bool
-        To detect between connections generated during export to connect all direct ports inside a StorageTank
-    isClone : bool
-        True for Connections that are generated during export and carry same displayName as the corresponding Connections
-        to a StorageTank
-    parent : :obj:DiagramEditor
-    groupName : str
-        Name of the group the Connection belongs to
-    typeNumber : int
-        Number that is displayed in the massflow export
-    exportConnsString : str
-    exportInputName : str
-        Unused. Could be used in exportInputsFlowSolver1()
-    exportInitialInput : int
-    exportEquations : :obj:`List` of str
-    trnsysConn : :obj:`List` of :obj:`BlockItem`
-
-    """
-
-    def __init__(self, fromPort: PortItem, toPort: PortItem, isVirtual, parent, **kwargs):
+    def __init__(self, fromPort: PortItem, toPort: PortItem, parent, **kwargs):
         self.logger = parent.logger
 
         self.fromPort = fromPort
         self.toPort = toPort
-        self.isVirtualConn = isVirtual
-        self.isStorageIO = False
         self.displayName = None
-        self.hiddenGenerated = False
-        self.isClone = False
 
         self.parent = parent
         self.groupName = ""
@@ -84,14 +45,6 @@ class Connection(object):
         self.exportInitialInput = -1
         self.exportEquations = []
         self._portItemsWithParent: _tp.List[_tp.Tuple[PortItem, _bi.BlockItem]] = []
-
-        # For functions in storage tank
-        if isVirtual and fromPort.side == 0:
-            self.side = "Left"
-        elif isVirtual and fromPort.side == 2:
-            self.side = "Right"
-        else:
-            self.side = ""
 
         # Global
         self.id = self.parent.idGen.getID()
@@ -140,19 +93,10 @@ class Connection(object):
         return res
 
     # Setter
-    def setClone(self, b):
-        self.isClone = b
-
     def setName(self, newName):
         self.displayName = newName
         for s in self.segments:
             s.label.setPlainText(newName)
-
-    # comment out
-    def setMass(self, mass):
-        self.mass = mass
-        for s in self.segments:
-            s.labelMass.setPlainText(self.mass)
 
     def setMassAndTemperature(self, mass, temp):
         """
@@ -332,7 +276,6 @@ class Connection(object):
     def initLoad(self):
         # Called by DiagramEditor when loading connection
 
-        self.logger.debug("self is " + str(self.isVirtualConn))
         self.logger.debug("Port 1 is " + str(self.fromPort) + "has Id" + str(self.fromPort.id))
         self.logger.debug("Port 2 is " + str(self.toPort))
 
@@ -368,9 +311,6 @@ class Connection(object):
 
         self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
 
-        if self.isVirtualConn:
-            self.firstS.setVisible(False)
-
         self.parent.diagramScene.addItem(self.firstS)
 
         self.positionLabel()
@@ -387,11 +327,6 @@ class Connection(object):
         self.firstS = segmentItem(self.startNode, self.endNode, self)
 
         self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
-
-        if self.isVirtualConn:
-            # if self.displayName == "UntitledConn189":
-            #     self.logger.debug("PiTesRCombiTes_189XXXXXXXX is now set invisible")
-            self.firstS.setVisible(False)
 
         self.parent.diagramScene.addItem(self.firstS)
 
@@ -463,9 +398,6 @@ class Connection(object):
             self.logger.debug("pos2 is " + str(pos2))
 
             s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
-
-            if self.isVirtualConn:
-                s.setVisible(False)
 
             self.parent.diagramScene.addItem(s)
 
@@ -541,9 +473,6 @@ class Connection(object):
         -------
 
         """
-        if self.isVirtualConn:
-            return
-
         # Here different cases can be implemented using self.PORT.side as sketched on paper
         rad = 2  # 4
 
@@ -1309,48 +1238,46 @@ class Connection(object):
 
     # Saving / Loading
     def encode(self):
-        if not self.isVirtualConn:
-            self.logger.debug("Encoding a connection")
+        self.logger.debug("Encoding a connection")
 
-            dct = {}
-            dct[".__ConnectionDict__"] = True
-            dct["PortFromID"] = self.fromPort.id
-            dct["PortToID"] = self.toPort.id
-            dct["isVirtualConn"] = self.isVirtualConn
-            dct["ConnDisplayName"] = self.displayName
-            dct["ConnID"] = self.id
-            dct["ConnCID"] = self.connId
-            dct["trnsysID"] = self.trnsysId
-            dct["GroupName"] = self.groupName
+        dct = {}
+        dct[".__ConnectionDict__"] = True
+        dct["PortFromID"] = self.fromPort.id
+        dct["PortToID"] = self.toPort.id
+        dct["ConnDisplayName"] = self.displayName
+        dct["ConnID"] = self.id
+        dct["ConnCID"] = self.connId
+        dct["trnsysID"] = self.trnsysId
+        dct["GroupName"] = self.groupName
 
-            segments = []  # Not used, but instead corners[]
+        segments = []  # Not used, but instead corners[]
 
-            for s in self.segments:
-                segmentTupel = (s.line().p1().x(), s.line().p1().y(), s.line().p2().x(), s.line().p2().y())
-                segments.append(segmentTupel)
-            # self.logger.debug("Segments in encoder is " + str(segments))
-            dct["SegmentPositions"] = segments
-            if len(self.segments) > 0:
-                dct["FirstSegmentLabelPos"] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-                dct["FirstSegmentMassFlowLabelPos"] = (
-                    self.segments[0].labelMass.pos().x(),
-                    self.segments[0].labelMass.pos().y(),
-                )
-            else:
-                self.logger.debug("This connection has no segment")
-                defaultPosition = self.fromPort.pos().x(), self.fromPort.pos().y()
-                dct["FirstSegmentLabelPos"] = defaultPosition
-                dct["FirstSegmentMassFlowLabelPos"] = defaultPosition
+        for s in self.segments:
+            segmentTupel = (s.line().p1().x(), s.line().p1().y(), s.line().p2().x(), s.line().p2().y())
+            segments.append(segmentTupel)
+        # self.logger.debug("Segments in encoder is " + str(segments))
+        dct["SegmentPositions"] = segments
+        if len(self.segments) > 0:
+            dct["FirstSegmentLabelPos"] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+            dct["FirstSegmentMassFlowLabelPos"] = (
+                self.segments[0].labelMass.pos().x(),
+                self.segments[0].labelMass.pos().y(),
+            )
+        else:
+            self.logger.debug("This connection has no segment")
+            defaultPosition = self.fromPort.pos().x(), self.fromPort.pos().y()
+            dct["FirstSegmentLabelPos"] = defaultPosition
+            dct["FirstSegmentMassFlowLabelPos"] = defaultPosition
 
-            corners = []
+        corners = []
 
-            for s in self.getCorners():
-                cornerTupel = (s.pos().x(), s.pos().y())
-                corners.append(cornerTupel)
-            dct["CornerPositions"] = corners
-            dictName = "Connection-"
+        for s in self.getCorners():
+            cornerTupel = (s.pos().x(), s.pos().y())
+            corners.append(cornerTupel)
+        dct["CornerPositions"] = corners
+        dictName = "Connection-"
 
-            return dictName, dct
+        return dictName, dct
 
     def decode(self, i):
         self.logger.debug("Loading a connection in Decoder")
@@ -1436,110 +1363,107 @@ class Connection(object):
         return f"{prefix}{self.displayName}_{abc[equationNumber]}=[{simulationUnit},{equationNumberOffset + equationNumber}]\n"
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        if not self.hiddenGenerated:
-            f = ""
-            unitNumber = startingUnit
-            typeNr2 = 931  # Temperature calculation from a pipe
+        f = ""
+        unitNumber = startingUnit
+        typeNr2 = 931  # Temperature calculation from a pipe
 
-            unitText = ""
-            ambientT = 20
+        unitText = ""
+        ambientT = 20
 
-            densityVar = "RhoWat"
-            specHeatVar = "CPWat"
+        densityVar = "RhoWat"
+        specHeatVar = "CPWat"
 
-            equationConstant1 = 1
-            equationConstant2 = 3
+        equationConstant1 = 1
+        equationConstant2 = 3
 
-            parameterNumber = 6
-            inputNumbers = 4
+        parameterNumber = 6
+        inputNumbers = 4
 
-            # Fixed strings
-            diameterPrefix = "di"
-            lengthPrefix = "L"
-            lossPrefix = "U"
-            tempRoomVar = "TRoomStore"
-            initialValueS = "20 0.0 20 20"
-            powerPrefix = "P"
+        # Fixed strings
+        diameterPrefix = "di"
+        lengthPrefix = "L"
+        lossPrefix = "U"
+        tempRoomVar = "TRoomStore"
+        initialValueS = "20 0.0 20 20"
+        powerPrefix = "P"
 
-            # Momentarily hardcoded
-            equationNr = 3
+        # Momentarily hardcoded
+        equationNr = 3
 
-            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-            unitText += "!" + self.displayName + "\n"
-            unitText += "PARAMETERS " + str(parameterNumber) + "\n"
+        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
+        unitText += "!" + self.displayName + "\n"
+        unitText += "PARAMETERS " + str(parameterNumber) + "\n"
 
-            unitText += diameterPrefix + self.displayName + "\n"
-            unitText += lengthPrefix + self.displayName + "\n"
-            unitText += lossPrefix + self.displayName + "\n"
-            unitText += densityVar + "\n"
-            unitText += specHeatVar + "\n"
-            unitText += str(ambientT) + "\n"
+        unitText += diameterPrefix + self.displayName + "\n"
+        unitText += lengthPrefix + self.displayName + "\n"
+        unitText += lossPrefix + self.displayName + "\n"
+        unitText += densityVar + "\n"
+        unitText += specHeatVar + "\n"
+        unitText += str(ambientT) + "\n"
 
-            unitText += "INPUTS " + str(inputNumbers) + "\n"
+        unitText += "INPUTS " + str(inputNumbers) + "\n"
 
-            if len(self._portItemsWithParent) == 2:
-                portItem = self._portItemsWithParent[0][0]
-                parent = self._portItemsWithParent[0][1]
-                if hasattr(parent, "getSubBlockOffset"):
-                    unitText += (
-                        "T"
-                        + parent.displayName
-                        + "X"
-                        + str(parent.getSubBlockOffset(self) + 1)
-                        + "\n"
-                    )
-                else:
-                    unitText += "T" + parent.getPortNameForHydraulicsDdck(portItem) + "\n"
-
-                unitText += self.exportEquations[0][0 : self.exportEquations[0].find("=")] + "\n"
-                unitText += tempRoomVar + "\n"
-
-                portItem = self._portItemsWithParent[1][0]
-                parent = self._portItemsWithParent[1][1]
-                if hasattr(parent, "getSubBlockOffset"):
-                    unitText += (
-                        "T"
-                        + parent.displayName
-                        + "X"
-                        + str(parent.getSubBlockOffset(self) + 1)
-                        + "\n"
-                    )
-                else:
-                    unitText += "T" + parent.getPortNameForHydraulicsDdck(portItem) + "\n"
-
-            else:
-                f += (
-                    "Error: NO VALUE\n" * 3
-                    + "at connection with parents "
-                    + str(self.fromPort.parent)
-                    + str(self.toPort.parent)
+        if len(self._portItemsWithParent) == 2:
+            portItem = self._portItemsWithParent[0][0]
+            parent = self._portItemsWithParent[0][1]
+            if hasattr(parent, "getSubBlockOffset"):
+                unitText += (
+                    "T"
+                    + parent.displayName
+                    + "X"
+                    + str(parent.getSubBlockOffset(self) + 1)
                     + "\n"
                 )
+            else:
+                unitText += "T" + parent.getPortNameForHydraulicsDdck(portItem) + "\n"
 
-            unitText += "***Initial values\n"
-            unitText += initialValueS + "\n\n"
+            unitText += self.exportEquations[0][0 : self.exportEquations[0].find("=")] + "\n"
+            unitText += tempRoomVar + "\n"
 
-            unitText += "EQUATIONS " + str(equationNr) + "\n"
-            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-            unitText += (
-                powerPrefix
-                + self.displayName
-                + "_kW"
-                + "= ["
-                + str(unitNumber)
-                + ","
-                + str(equationConstant2)
-                + "]/3600 !kW\n"
-            )
-            unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
+            portItem = self._portItemsWithParent[1][0]
+            parent = self._portItemsWithParent[1][1]
+            if hasattr(parent, "getSubBlockOffset"):
+                unitText += (
+                    "T"
+                    + parent.displayName
+                    + "X"
+                    + str(parent.getSubBlockOffset(self) + 1)
+                    + "\n"
+                )
+            else:
+                unitText += "T" + parent.getPortNameForHydraulicsDdck(portItem) + "\n"
 
-            unitNumber += 1
-            unitText += "\n"
-            f += unitText
-
-            return unitText, unitNumber
         else:
-            return "", startingUnit, 0
+            f += (
+                "Error: NO VALUE\n" * 3
+                + "at connection with parents "
+                + str(self.fromPort.parent)
+                + str(self.toPort.parent)
+                + "\n"
+            )
+
+        unitText += "***Initial values\n"
+        unitText += initialValueS + "\n\n"
+
+        unitText += "EQUATIONS " + str(equationNr) + "\n"
+        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
+        unitText += (
+            powerPrefix
+            + self.displayName
+            + "_kW"
+            + "= ["
+            + str(unitNumber)
+            + ","
+            + str(equationConstant2)
+            + "]/3600 !kW\n"
+        )
+        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
+
+        unitNumber += 1
+        unitText += "\n"
+        f += unitText
+
+        return unitText, unitNumber
 
     def findStoragePort(self, virtualBlock):
         portToPrint = None
@@ -1565,20 +1489,3 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self._portItemsWithParent = []
-
-
-class DeleteConnectionCommand(QUndoCommand):
-    def __init__(self, conn, descr):
-        super(DeleteConnectionCommand, self).__init__(descr)
-        self.conn = conn
-        self.connFromPort = self.conn.fromPort
-        self.connToPort = self.conn.toPort
-        self.connIsBlock = self.conn.isVirtualConn
-        self.connParent = self.conn.parent
-
-    def redo(self):
-        self.conn.deleteConn()
-        self.conn = None
-
-    def undo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort, self.connIsBlock, self.connParent)

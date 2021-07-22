@@ -42,8 +42,6 @@ class Encoder(json.JSONEncoder):
                 if isinstance(t, BlockItem) and not t.isVisible():
                     logger.debug("Invisible block [probably an insideBlock?]" + str(t) + str(t.displayName))
                     continue
-                if isinstance(t, Connection) and t.isVirtualConn:
-                    continue
 
                 dictName, dct = t.encode()
                 blockDct[dictName + str(t.id)] = dct

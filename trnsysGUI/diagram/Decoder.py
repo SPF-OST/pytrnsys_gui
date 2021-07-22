@@ -223,7 +223,7 @@ class Decoder(json.JSONDecoder):
 
                     connectionKwargs = self.create_connection_kwargs(i)
 
-                    c = Connection(fromPort, toPort, i["isVirtualConn"], self.editor, **connectionKwargs)
+                    c = Connection(fromPort, toPort, self.editor, **connectionKwargs)
 
                     c.decode(i)
                     resConnList.append(c)

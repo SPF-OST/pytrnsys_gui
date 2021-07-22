@@ -445,7 +445,7 @@ class Editor(QWidget):
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
 
-            command = CreateConnectionCommand(startPort, endPort, False, self, "CreateConn Command")
+            command = CreateConnectionCommand(startPort, endPort, self, "CreateConn Command")
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
@@ -1146,7 +1146,7 @@ class Editor(QWidget):
 
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
-            if isinstance(c, Connection) and not c.isVirtualConn:
+            if isinstance(c, Connection):
                 c.setLabelVisible(isVisible)
             if isinstance(c, BlockItem):
                 c.label.setVisible(isVisible)

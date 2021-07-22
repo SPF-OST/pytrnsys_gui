@@ -219,7 +219,6 @@ class DecoderPaste(json.JSONDecoder):
                             c = Connection(
                                 fport,
                                 tPort,
-                                i["isVirtualConn"],
                                 self.editor,
                                 fromPortId=i["PortFromID"],
                                 toPortId=i["PortToID"],

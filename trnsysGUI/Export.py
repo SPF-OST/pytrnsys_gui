@@ -332,7 +332,7 @@ class Export(object):
             loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
 
             for c in g.itemList:
-                if isinstance(c, Connection) and not c.isVirtualConn:
+                if isinstance(c, Connection):
                     loopText += "*** " + c.displayName + "\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
@@ -351,7 +351,7 @@ class Export(object):
         rightCounter = 0
 
         for i in self.editor.groupList[0].itemList:
-            if isinstance(i, Connection) and not i.isVirtualConn:
+            if isinstance(i, Connection):
                 if rightCounter == 0:
                     lossText += "P" + i.displayName + "_kW"
                 else:
@@ -403,7 +403,7 @@ class Export(object):
         s = ""
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isVirtualConn:
+            if isinstance(t, Connection):
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
@@ -457,7 +457,7 @@ class Export(object):
         s = ""
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isVirtualConn:
+            if isinstance(t, Connection):
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
