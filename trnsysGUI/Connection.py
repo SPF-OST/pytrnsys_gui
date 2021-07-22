@@ -1417,26 +1417,21 @@ class Connection(object):
         return str(self.exportInitialInput) + " ", 1
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        tot = ""
-        for i in range(0, 3):
-            if i < 2:
-                temp = (
-                    prefix
-                    + self.displayName
-                    + "_"
-                    + abc[i]
-                    + "=["
-                    + str(simulationUnit)
-                    + ","
-                    + str(equationNumber)
-                    + "]\n"
-                )
-                tot += temp
-                self.exportEquations.append(temp)
-                # nEqUsed += 1  # DC
-            equationNumber += 1  # DC-ERROR it should count anyway
+        equation1 = self._createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
 
-            return tot, equationNumber, 2
+        equation2 = self._createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
+
+        self.exportEquations.append(equation1)
+        self.exportEquations.append(equation2)
+
+        equations = equation1 + equation2
+        nEquationsUsed = 2
+        nextEquationNumber = equationNumber + 3
+
+        return equations, nextEquationNumber, nEquationsUsed
+
+    def _createFlowSolverOutputEquation(self, equationNumber, abc, prefix, equationNumberOffset, simulationUnit):
+        return f"{prefix}{self.displayName}_{abc[equationNumber]}=[{simulationUnit},{equationNumberOffset + equationNumber}]\n"
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if not self.hiddenGenerated:
