@@ -849,7 +849,6 @@ class BlockItem(QGraphicsPixmapItem):
         return "0,0 ", 1
 
     def exportInputsFlowSolver2(self):
-        # return str(self.exportInitialInput) + " [" + self.displayName + "]", 1
         return str(self.exportInitialInput) + " ", 1
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):

@@ -235,7 +235,7 @@ class Export(object):
     def exportOutputsFlowSolver(self, simulationUnit):
         f = ""
 
-        abc = list(string.ascii_uppercase)[0:3]
+        abc = "ABC"
 
         prefix = "Mfr"
         equationNumber = 1
