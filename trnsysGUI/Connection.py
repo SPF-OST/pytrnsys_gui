@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 import trnsysGUI.BlockItem as _bi
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
-from trnsysGUI.DeleteConnectionCommand import DeleteConnectionCommand
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.Pump import Pump
@@ -1489,3 +1488,19 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self._portItemsWithParent = []
+
+
+class DeleteConnectionCommand(QUndoCommand):
+    def __init__(self, conn, descr):
+        super().__init__(descr)
+        self.conn = conn
+        self.connFromPort = self.conn.fromPort
+        self.connToPort = self.conn.toPort
+        self.connParent = self.conn.parent
+
+    def redo(self):
+        self.conn.deleteConn()
+        self.conn = None
+
+    def undo(self):
+        self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)
