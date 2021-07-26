@@ -1,0 +1,217 @@
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+*************************************
+EQUATIONS 1
+qSysOut_PipeLoss = PipeLossTot
+
+EQUATIONS 5
+*** Black box component temperatures
+TTesPortLeft50=Tdp1In_Tes1
+TTesPortLeft10=Tdp1Out_Tes1
+TInHx=Thx1Out_Tes1
+TCol=1
+THP=1
+
+UNIT 450 TYPE 935
+PARAMETERS 33
+8
+8 7 0 0        !1 : Col
+4 5 0 0        !2 : HP
+4 5 0 0        !3 : InHx
+2 3 0 0        !4 : Hp-Tes
+3 2 0 0        !5 : Tes-Hp
+7 8 0 0        !6 : ConnTesL115
+1 6 0 0        !7 : Col-Tes
+6 1 0 0        !8 : Tes-Col
+INPUTS 8! for Type 935
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+
+*** Initial Inputs *
+-1 -1 -1 -1 -1 -1 -1 -1 
+
+EQUATIONS 16	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MfrCol_A=[450,1]
+MfrCol_B=[450,2]
+MfrHP_A=[450,4]
+MfrHP_B=[450,5]
+MfrInHx_A=[450,7]
+MfrInHx_B=[450,8]
+MfrHp-Tes_A=[450,10]
+MfrHp-Tes_B=[450,11]
+MfrTes-Hp_A=[450,13]
+MfrTes-Hp_B=[450,14]
+MfrConnTesL115_A=[450,16]
+MfrConnTesL115_B=[450,17]
+MfrCol-Tes_A=[450,19]
+MfrCol-Tes_B=[450,20]
+MfrTes-Col_A=[450,22]
+MfrTes-Col_B=[450,23]
+
+
+UNIT 451 TYPE 931
+!Hp-Tes
+PARAMETERS 6
+diHp-Tes
+LHp-Tes
+UHp-Tes
+RhoWat
+CPWat
+20
+INPUTS 4
+THP
+MfrHp-Tes_A
+TRoomStore
+TInHx
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+THp-Tes= [451,1]
+PHp-Tes_kW= [451,3]/3600 !kW
+MfrHp-Tes= MfrHp-Tes_A
+
+UNIT 452 TYPE 931
+!Tes-Hp
+PARAMETERS 6
+diTes-Hp
+LTes-Hp
+UTes-Hp
+RhoWat
+CPWat
+20
+INPUTS 4
+TInHx
+MfrTes-Hp_A
+TRoomStore
+THP
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTes-Hp= [452,1]
+PTes-Hp_kW= [452,3]/3600 !kW
+MfrTes-Hp= MfrTes-Hp_A
+
+UNIT 453 TYPE 931
+!Col-Tes
+PARAMETERS 6
+diCol-Tes
+LCol-Tes
+UCol-Tes
+RhoWat
+CPWat
+20
+INPUTS 4
+TCol
+MfrCol-Tes_A
+TRoomStore
+TTesPortLeft50
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TCol-Tes= [453,1]
+PCol-Tes_kW= [453,3]/3600 !kW
+MfrCol-Tes= MfrCol-Tes_A
+
+UNIT 454 TYPE 931
+!Tes-Col
+PARAMETERS 6
+diTes-Col
+LTes-Col
+UTes-Col
+RhoWat
+CPWat
+20
+INPUTS 4
+TTesPortLeft10
+MfrTes-Col_A
+TRoomStore
+TCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTes-Col= [454,1]
+PTes-Col_kW= [454,3]/3600 !kW
+MfrTes-Col= MfrTes-Col_A
+
+CONSTANTS 3
+** Fluid Loop : defaultGroup
+di_loop_0=0.05
+L_loop_0=2
+U_loop_0=10
+
+
+EQUATIONS 12
+** Fluid Loop : defaultGroup
+**di_loop_0=0.05
+**L_loop_0=2
+**U_loop_0=10
+*** Tes-Col
+diTes-Col=di_loop_0
+LTes-Col=L_loop_0
+UTes-Col=U_loop_0
+*** Tes-Hp
+diTes-Hp=di_loop_0
+LTes-Hp=L_loop_0
+UTes-Hp=U_loop_0
+*** Hp-Tes
+diHp-Tes=di_loop_0
+LHp-Tes=L_loop_0
+UHp-Tes=U_loop_0
+*** Col-Tes
+diCol-Tes=di_loop_0
+LCol-Tes=L_loop_0
+UCol-Tes=U_loop_0
+
+
+*** Pipe losses
+EQUATIONS 1
+PipeLossTot=PTes-Col_kW+PTes-Hp_kW+PHp-Tes_kW+PCol-Tes_kW
+
+ASSIGN storage-tank_Mfr.prt 455
+
+UNIT 455 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+455! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 4
+MfrTes-Hp MfrHp-Tes MfrCol-Tes MfrTes-Col 
+***
+MfrTes-Hp MfrHp-Tes MfrCol-Tes MfrTes-Col 
+
+ASSIGN storage-tank_T.prt 456
+
+UNIT 456 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+456! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 4
+TTes-Hp THp-Tes TCol-Tes TTes-Col 
+***
+TTes-Hp THp-Tes TCol-Tes TTes-Col 
+
