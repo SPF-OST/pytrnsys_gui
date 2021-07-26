@@ -1307,12 +1307,12 @@ class Connection(object):
     def exportParametersFlowSolver(self, descConnLength):
         f = ""
 
-        if hasattr(self.fromPort.parent, "subBlockCounter"):
+        if hasattr(self.fromPort.parent, "getSubBlockOffset"):
             temp = str(self.fromPort.parent.trnsysId + self.fromPort.parent.getSubBlockOffset(self)) + " "
         else:
             temp = str(self.fromPort.parent.trnsysId) + " "
 
-        if hasattr(self.toPort.parent, "subBlockCounter"):
+        if hasattr(self.toPort.parent, "getSubBlockOffset"):
             temp += str(self.toPort.parent.trnsysId + self.toPort.parent.getSubBlockOffset(self))
         else:
             temp += str(self.toPort.parent.trnsysId)
@@ -1346,7 +1346,6 @@ class Connection(object):
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
         equation1 = self._createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
-
         equation2 = self._createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
 
         self.exportEquations.append(equation1)

@@ -35,8 +35,6 @@ class HeatPumpTwoHx(BlockItem):
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
-        self.subBlockCounter = 0
-
         self.changeSize()
         self.addTree()
 

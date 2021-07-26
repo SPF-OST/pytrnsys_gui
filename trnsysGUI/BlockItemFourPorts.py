@@ -28,8 +28,6 @@ class BlockItemFourPorts(BlockItem):
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
-        self.subBlockCounter = 0
-
         self.changeSize()
 
     def encode(self):

@@ -28,8 +28,6 @@ class GenericBlock(BlockItem):
         self.childIds = []
         self.childIds.append(self.trnsysId)
 
-        self.subBlockCounter = 0
-
         self._imageAccessor = _img.GENERIC_BLOCK_PNG
 
         # Disallow adding port pairs later, because the trnsysIDs of the generated port pairs have to be
