@@ -11,34 +11,35 @@ from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
 import trnsysGUI.images as _img
 import trnsysGUI.storageTank.model as _model
+import trnsysGUI.IdGenerator as _id
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
-from trnsysGUI.Connector import Connector
 from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.TeePiece import TeePiece
+import trnsysGUI.side as _sd
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow
 
 InOut = _tp.Literal["In", "Out"]
+_T = _tp.TypeVar("_T", covariant=True)
 
 
 class StorageTank(BlockItem):
+    HEAT_EXCHANGER_WIDTH = 40
+
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
         self.parent = parent
+        self._idGenerator: _id.IdGenerator = self.parent.parent().idGen
         self.dckFilePath = ""
 
         self.directPortPairs: _tp.List[DirectPortPair] = []
 
         self.heatExchangers: _tp.List[HeatExchanger] = []
-
-        self.childIds = []
-        self.childIds.append(self.trnsysId)
 
         self.blackBoxEquations = []
 
@@ -95,8 +96,6 @@ class StorageTank(BlockItem):
         port2 = PortItem("o", sideNr, self)
         port2.setZValue(100)
 
-        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
-
         x = 0 if isOnLeftSide else self.w
         inputY = storageTankHeight - relativeInputHeight * storageTankHeight
         outputY = storageTankHeight - relativeOutputHeight * storageTankHeight
@@ -117,6 +116,7 @@ class StorageTank(BlockItem):
         port2.visibleColor = randomColor
 
         directPortPair = self._createDirectPortPair(
+            self._idGenerator.getTrnsysID(),
             isOnLeftSide,
             port1,
             port2,
@@ -131,6 +131,7 @@ class StorageTank(BlockItem):
 
     @staticmethod
     def _createDirectPortPair(
+        trnsysId,
         isOnLeftSide,
         port1,
         port2,
@@ -141,7 +142,7 @@ class StorageTank(BlockItem):
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
         if not kwargs:
             directPortPair = DirectPortPair(
-                "<TODO: is this needed>",  # TODO@dbi remove virtual connections
+                trnsysId,
                 port1,
                 port2,
                 relativeInputHeight,
@@ -153,9 +154,8 @@ class StorageTank(BlockItem):
         port1.id = kwargs["fromPortId"]
         port2.id = kwargs["toPortId"]
 
-        name = kwargs["connDispName"]
         directPortPair = DirectPortPair(
-            name,
+            trnsysId,
             port1,
             port2,
             relativeInputHeight,
@@ -164,6 +164,20 @@ class StorageTank(BlockItem):
         )
 
         return directPortPair
+
+    def addHeatExchanger(self, name, side, relativeInputHeight, relativeOutputHeight):
+        heatExchanger = HeatExchanger(
+            sideNr=0 if side == _sd.Side.LEFT else 2,
+            width=self.HEAT_EXCHANGER_WIDTH,
+            relativeInputHeight=relativeInputHeight,
+            relativeOutputHeight=relativeOutputHeight,
+            storageTankWidth=self.w,
+            storageTankHeight=self.h,
+            parent=self,
+            name=name,
+            tempHx=True,
+        )
+        return heatExchanger
 
     # Transform related
     def changeSize(self):
@@ -240,7 +254,7 @@ class StorageTank(BlockItem):
             )
 
             portPairModel = _model.PortPair(
-                side, directPort.name, inputPortModel, outputPortModel
+                side, directPort.trnsysId, inputPortModel, outputPortModel
             )
 
             directPortPairModel = _model.DirectPortPair(portPairModel)
@@ -265,14 +279,15 @@ class StorageTank(BlockItem):
             )
 
             portPair = _model.PortPair(
-                side, heatExchanger.displayName, inputPort, outputPort
+                side, heatExchanger.trnsysId, inputPort, outputPort
             )
 
             heatExchangerModel = _model.HeatExchanger(
                 portPair,
+                heatExchanger.displayName,
                 heatExchanger.w,
-                heatExchanger.parent.id,
-                heatExchanger.id,
+                self.id,
+                heatExchanger.id
             )
 
             heatExchangerModels.append(heatExchangerModel)
@@ -319,18 +334,15 @@ class StorageTank(BlockItem):
             self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)
 
         for portPairModel in model.directPortPairs:
-            self._decodeDirectPortPair(portPairModel, shallSetNamesAndIDs)
+            self._decodeDirectPortPair(portPairModel)
 
         resBlockList.append(self)
 
     def _decodeDirectPortPair(
         self,
         portPairModel: _model.DirectPortPair,
-        shallSetNamesAndIDs: bool,
-    ) -> DirectPortPair:
+    ) -> None:
         portPair = portPairModel.portPair
-
-        name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
 
         self.addDirectPortPair(
             isOnLeftSide=portPair.side == _model.Side.LEFT,
@@ -339,7 +351,6 @@ class StorageTank(BlockItem):
             storageTankHeight=self.h,
             fromPortId=portPair.inputPort.id,
             toPortId=portPair.outputPort.id,
-            connDispName=name,
             loadedConn=True,
         )
 
@@ -350,7 +361,8 @@ class StorageTank(BlockItem):
 
         sideNr = portPair.side.toSideNr()
 
-        name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
+        nameSuffix = "" if shallSetNamesAndIDs else "New"
+        name = heatExchangerModel.name + nameSuffix
 
         heatExchanger = HeatExchanger(
             sideNr,
@@ -375,46 +387,75 @@ class StorageTank(BlockItem):
             i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs=False
         )
 
-    def getPortNameForStorageTankDdck(self, portItem: PortItem) -> str:
-        directPortPair = self._getDirectPortPairAndInOutForPortItemOrNone(portItem)
-
-        number = self.directPortPairs.index(directPortPair) + 1
-        inOut = self._getInOut(portItem, directPortPair)
-
-        return f"dp{number}{inOut}_Tes{self.nTes}"
-
-    def getPortNameForHydraulicsDdck(self, portItem: PortItem) -> str:
-        directPortPair = self._getDirectPortPairAndInOutForPortItemOrNone(portItem)
+    def getTemperatureVariableName(self, portItem: PortItem) -> str:
+        directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
         if directPortPair:
-            return self._getDirectPortPairPortNameForHydraulicsDdck(directPortPair, portItem)
+            return self._getTemperatureVariableNameForDirectPortPairPortItem(directPortPair, portItem)
 
-    def _getDirectPortPairAndInOutForPortItemOrNone(self, portItem: PortItem) -> _tp.Optional[DirectPortPair]:
-        directPortPairs = [dpp for dpp in self.directPortPairs if dpp.fromPort == portItem or dpp.toPort == portItem]
-        if not directPortPairs:
-            return None
-        assert len(directPortPairs) == 1
+        heatExchanger = self._getHeatExchangerForPortItem(portItem)
+        if heatExchanger:
+            return self._getTemperatureVariableNameForHeatExchangerPortItem(heatExchanger)
 
-        directPortPair = directPortPairs[0]
+        raise ValueError("Port item doesn't belong to this storage tank.")
+
+    def getFlowSolverParametersId(self, portItem: PortItem) -> int:
+        directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
+        if directPortPair:
+            return directPortPair.trnsysId
+
+        heatExchanger = self._getHeatExchangerForPortItem(portItem)
+        if heatExchanger:
+            return heatExchanger.trnsysId
+
+        raise ValueError("Port item doesn't belong to this storage tank.")
+
+    def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+        for heatExchanger in self.heatExchangers:
+            if heatExchanger.trnsysId == generator.UNINITIALIZED_ID:
+                heatExchanger.trnsysId = generator.getTrnsysID()
+
+        for directPortPair in self.directPortPairs:
+            if directPortPair.trnsysId == generator.UNINITIALIZED_ID:
+                directPortPair.trnsysId = generator.getTrnsysID()
+
+    def _getHeatExchangerForPortItem(self, portItem: PortItem) -> _tp.Optional[HeatExchanger]:
+        heatExchanger = self._getSingleOrNone(
+            hx for hx in self.heatExchangers if hx.port1 == portItem or hx.port2 == portItem
+        )
+
+        return heatExchanger
+
+    def _getDirectPortPairForPortItemOrNone(self, portItem: PortItem) -> _tp.Optional[DirectPortPair]:
+        directPortPair = self._getSingleOrNone(
+            dpp for dpp in self.directPortPairs if dpp.fromPort == portItem or dpp.toPort == portItem
+        )
 
         return directPortPair
 
-    def _getDirectPortPairPortNameForHydraulicsDdck(self, directPortPair, portItem):
+    @staticmethod
+    def _getSingleOrNone(iterable: _tp.Iterable[_T]) -> _T:
+        sequence = list(iterable)
+
+        if not sequence:
+            return None
+
+        if len(sequence) > 1:
+            raise ValueError("Mor than one value in iterable.")
+
+        return sequence[0]
+
+    def _getTemperatureVariableNameForDirectPortPairPortItem(self, directPortPair, portItem):
         isInputPort = directPortPair.fromPort == portItem
-
-        relativePortHeight = directPortPair.relativeInputHeight if isInputPort else directPortPair.relativeOutputHeight
-        relativePortHeightInPercent = int(round(relativePortHeight * 100, 2))
-
-        return f"{self.displayName}Port{directPortPair.side}{relativePortHeightInPercent}"
+        relativeHeightInPercent = (
+            directPortPair.relativeInputHeightPercent
+            if isInputPort
+            else directPortPair.relativeOutputHeightPercent
+        )
+        return f"T{self.displayName}Port{directPortPair.side}{relativeHeightInPercent}"
 
     @staticmethod
-    def _getInOut(portItem: PortItem, directPortPair: DirectPortPair) -> InOut:
-        if directPortPair.fromPort == portItem:
-            return "In"
-
-        if directPortPair.fromPort == portItem:
-            return "Out"
-
-        raise ValueError("Port item does not belong to direct port pair.")
+    def _getTemperatureVariableNameForHeatExchangerPortItem(heatExchanger):
+        return f"T{heatExchanger.displayName}"
 
     # Debug
     def dumpBlockInfo(self):
@@ -476,26 +517,137 @@ class StorageTank(BlockItem):
             return "noDdckFile", equations
 
     def exportParametersFlowSolver(self, descConnLength):
-        lines = []
-        for directPortPair in self.directPortPairs:
-            incomingConnection: Connection = directPortPair.fromPort.connectionList[0]
-            outgoingConnection: Connection = directPortPair.toPort.connectionList[0]
-            line = self._createFlowSolverParametersLine(incomingConnection, outgoingConnection)
-            lines.append(line)
+        # The order is important here (has to be the same as in `exportOutputsFlowSolver`):
+        # first the direct port pairs, then the heat exchangers
+        directPortPairsLines = self._getFlowSolverParametersLinesForDirectPortPairs(self.directPortPairs, descConnLength)
 
-        for heatExchanger in self.heatExchangers:
-            incomingConnection: Connection = heatExchanger.port1.connectionList[0]
-            outgoingConnection: Connection = heatExchanger.port2.connectionList[0]
-            line = self._createFlowSolverParametersLine(incomingConnection, outgoingConnection)
-            lines.append(line)
+        heatExchangers = self.heatExchangers
+        heatExchangersLines = self._getFlowSolverParametersLinesForHeatExchangers(heatExchangers, descConnLength)
 
-        result = "".join(lines)
+        allLines = directPortPairsLines + heatExchangersLines
+
+        result = "\n".join(allLines) + "\n"
 
         return result
 
-    def _createFlowSolverParametersLine(self, incomingConnection: Connection, outgoingConnection: Connection) -> str:
-        line = f"{incomingConnection.trnsysId} {outgoingConnection.trnsysId} 0 0\t!{self.trnsysId}: {self.name}\n"
+    def _getFlowSolverParametersLinesForHeatExchangers(self, heatExchangers, descConnLength):
+        lines = []
+        for heatExchanger in heatExchangers:
+            incomingConnection: Connection = heatExchanger.port1.connectionList[0]
+            outgoingConnection: Connection = heatExchanger.port2.connectionList[0]
+
+            name = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
+
+            line = self._createFlowSolverParametersLine(
+                name,
+                heatExchanger.trnsysId,
+                incomingConnection,
+                outgoingConnection,
+                descConnLength
+            )
+
+            lines.append(line)
+        return lines
+
+    def _getFlowSolverParametersLinesForDirectPortPairs(self, directPortPairs, descConnLength):
+        lines = []
+        for directPortPair in directPortPairs:
+            incomingConnection: Connection = directPortPair.fromPort.connectionList[0]
+            outgoingConnection: Connection = directPortPair.toPort.connectionList[0]
+
+            name = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
+
+            line = self._createFlowSolverParametersLine(
+                name, directPortPair.trnsysId, incomingConnection, outgoingConnection, descConnLength
+            )
+            lines.append(line)
+        return lines
+
+    def _getMassFlowVariableSuffixForDirectPortPair(self, directPortPair: DirectPortPair):
+        return (f"{self.displayName}Dp{'L' if directPortPair.isOnLeftSide else 'R'}"
+                f"{directPortPair.relativeInputHeightPercent}-{directPortPair.relativeOutputHeightPercent}")
+
+    @staticmethod
+    def _getMassFlowVariableSuffixForHeatExchanger(heatExchanger):
+        return heatExchanger.displayName
+
+    @staticmethod
+    def _createFlowSolverParametersLine(
+            name: str,
+            trnsysId: int,
+            incomingConnection: Connection,
+            outgoingConnection: Connection,
+            parametersPartLength) -> str:
+        parametersPart = f"{incomingConnection.trnsysId} {outgoingConnection.trnsysId} 0 0"
+
+        currentParametersPart = len(parametersPart)
+        if currentParametersPart < parametersPartLength:
+            padding = " " * (parametersPartLength - currentParametersPart)
+            parametersPart += padding
+
+        line = f"{parametersPart}!{trnsysId} : {name}"
+
         return line
+
+    def exportInputsFlowSolver1(self):
+        return self._getInputs("0,0")
+
+    def exportInputsFlowSolver2(self):
+        return self._getInputs("-1")
+
+    def _getInputs(self, inputsValue):
+        heatExchangerInputs = [inputsValue for _ in self.heatExchangers]
+        directPortPairInputs = [inputsValue for _ in self.directPortPairs]
+        allInputs = heatExchangerInputs + directPortPairInputs
+        allInputsJoined = " ".join(allInputs) + " "
+        return allInputsJoined, len(allInputs)
+
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+        nextEquationNumber = equationNumber
+
+        # The order is important here (has to be the same as in `exportParametersFlowSolver`):
+        # first the direct port pairs, then the heat exchangers
+        directPortPairsEquations, nextEquationNumber = self._getFlowSolverOutputEquationsForDirectPortPairs(
+            abc, self.directPortPairs, nextEquationNumber, prefix, simulationUnit
+        )
+        heatExchangersEquations, nextEquationNumber = self._getFlowSolverOutputEquationsForHeatExchangers(
+            abc, self.heatExchangers, nextEquationNumber, prefix, simulationUnit
+        )
+
+        allEquations = directPortPairsEquations + heatExchangersEquations
+        self.exportEquations.extend(allEquations)
+
+        equationsJoined = "\n".join(allEquations) + "\n"
+        nEquationsUsed = len(allEquations)
+
+        return equationsJoined, nextEquationNumber, nEquationsUsed
+
+    def _getFlowSolverOutputEquationsForHeatExchangers(self, abc, heatExchangers, nextEquationNumber, prefix, simulationUnit):
+        heatExchangerLines = []
+        for heatExchanger in heatExchangers:
+            suffix = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
+
+            equation1 = self._createFlowSolverOutputEquation(suffix, abc[0], prefix, nextEquationNumber, simulationUnit)
+            equation2 = self._createFlowSolverOutputEquation(suffix, abc[1], prefix, nextEquationNumber + 1, simulationUnit)
+            heatExchangerLines.append(equation1)
+            heatExchangerLines.append(equation2)
+            nextEquationNumber += 3
+        return heatExchangerLines, nextEquationNumber
+
+    def _getFlowSolverOutputEquationsForDirectPortPairs(self, abc, directPortPairs, nextEquationNumber, prefix, simulationUnit):
+        equations = []
+        for directPortPair in directPortPairs:
+            suffix = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
+
+            equation1 = self._createFlowSolverOutputEquation(suffix, abc[0], prefix, nextEquationNumber, simulationUnit)
+            equation2 = self._createFlowSolverOutputEquation(suffix, abc[1], prefix, nextEquationNumber + 1, simulationUnit)
+            equations.append(equation1)
+            equations.append(equation2)
+            nextEquationNumber += 3
+        return equations, nextEquationNumber
+
+    def _createFlowSolverOutputEquation(self, name, x, prefix, equationNumber, simulationUnit):
+        return f"{prefix}{name}_{x}=[{simulationUnit},{equationNumber}]\n"
 
     def exportDck(self):
 
@@ -540,10 +692,13 @@ class StorageTank(BlockItem):
 
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
-            Tname = "T" + directPortPair.fromPort.connectionList[0].displayName
+            incomingConnection = directPortPair.fromPort.connectionList[0]
+            Tname = "T" + incomingConnection.displayName
             side = directPortPair.side
-            Mfrname = "Mfr" + directPortPair.fromPort.connectionList[0].displayName
-            Trev = "T" + directPortPair.toPort.connectionList[0].displayName
+            Mfrname = "Mfr" + incomingConnection.displayName
+
+            outgoingConnection = directPortPair.toPort.connectionList[0]
+            Trev = "T" + outgoingConnection.displayName
 
             inputPos = directPortPair.relativeInputHeight
             outputPos = directPortPair.relativeOutputHeight

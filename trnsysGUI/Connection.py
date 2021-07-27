@@ -10,6 +10,7 @@ from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import trnsysGUI.BlockItem as _bi
+import trnsysGUI.IdGenerator as _id
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
@@ -1310,12 +1311,14 @@ class Connection(object):
         if hasattr(self.fromPort.parent, "getSubBlockOffset"):
             temp = str(self.fromPort.parent.trnsysId + self.fromPort.parent.getSubBlockOffset(self)) + " "
         else:
-            temp = str(self.fromPort.parent.trnsysId) + " "
+            portId = self.fromPort.parent.getFlowSolverParametersId(self.fromPort)
+            temp = f"{portId} "
 
         if hasattr(self.toPort.parent, "getSubBlockOffset"):
             temp += str(self.toPort.parent.trnsysId + self.toPort.parent.getSubBlockOffset(self))
         else:
-            temp += str(self.toPort.parent.trnsysId)
+            portId = self.toPort.parent.getFlowSolverParametersId(self.toPort)
+            temp += f"{portId} "
 
         temp += " 0" * 2 + " "
         self.exportConnsString = temp
@@ -1413,7 +1416,7 @@ class Connection(object):
                     + "\n"
                 )
             else:
-                unitText += "T" + parent.getPortNameForHydraulicsDdck(portItem) + "\n"
+                unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
             unitText += self.exportEquations[0][0 : self.exportEquations[0].find("=")] + "\n"
             unitText += tempRoomVar + "\n"
@@ -1429,7 +1432,7 @@ class Connection(object):
                     + "\n"
                 )
             else:
-                unitText += "T" + parent.getPortNameForHydraulicsDdck(portItem) + "\n"
+                unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
         else:
             f += (
@@ -1487,6 +1490,9 @@ class Connection(object):
         # self.exportInitialInput = -1
         self.exportEquations = []
         self._portItemsWithParent = []
+
+    def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+        pass
 
 
 class DeleteConnectionCommand(QUndoCommand):
