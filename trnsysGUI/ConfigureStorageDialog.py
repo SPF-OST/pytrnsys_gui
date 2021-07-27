@@ -344,7 +344,9 @@ class ConfigureStorageDialog(QDialog):
             selectedDirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
 
             self.storage.directPortPairs.remove(selectedDirectPortPair)
-            directPortPairsListWidget.takeItem(selectedItem)
+
+            row = directPortPairsListWidget.row(selectedItem)
+            directPortPairsListWidget.takeItem(row)
 
             while len(selectedDirectPortPair.fromPort.connectionList) > 0:
                 selectedDirectPortPair.fromPort.connectionList[0].deleteConn()
@@ -365,31 +367,26 @@ class ConfigureStorageDialog(QDialog):
         self._removeSelectedHeatExchangers(self.rightHeatExchangersItemListWidget)
 
     def _removeSelectedHeatExchangers(self, heatExchangersItemListWidget):
-        for listItem in heatExchangersItemListWidget.selectedItems():
-            for heatExchanger in list(self.storage.heatExchangers):
-                if (
-                    heatExchanger.displayName
-                    == listItem.text()[: listItem.text().find(",")]
-                ):
-                    self.storage.heatExchangers.remove(heatExchanger)
-                    heatExchangersItemListWidget.takeItem(
-                        heatExchangersItemListWidget.row(
-                            heatExchangersItemListWidget.selectedItems()[0]
-                        )
-                    )
+        for selectedItem in heatExchangersItemListWidget.selectedItems():
+            heatExchanger = selectedItem.data(_qtc.Qt.UserRole)
 
-                    while len(heatExchanger.port1.connectionList) > 0:
-                        heatExchanger.port1.connectionList[0].deleteConn()
+            self.storage.heatExchangers.remove(heatExchanger)
 
-                    while len(heatExchanger.port2.connectionList) > 0:
-                        heatExchanger.port2.connectionList[0].deleteConn()
+            row = heatExchangersItemListWidget.row(selectedItem)
+            heatExchangersItemListWidget.takeItem(row)
 
-                    self.storage.inputs.remove(heatExchanger.port1)
-                    self.storage.outputs.remove(heatExchanger.port2)
+            while len(heatExchanger.port1.connectionList) > 0:
+                heatExchanger.port1.connectionList[0].deleteConn()
 
-                    self.storage.parent.scene().removeItem(heatExchanger.port1)
-                    self.storage.parent.scene().removeItem(heatExchanger.port2)
-                    self.storage.parent.scene().removeItem(heatExchanger)
+            while len(heatExchanger.port2.connectionList) > 0:
+                heatExchanger.port2.connectionList[0].deleteConn()
+
+            self.storage.inputs.remove(heatExchanger.port1)
+            self.storage.outputs.remove(heatExchanger.port2)
+
+            self.storage.parent.scene().removeItem(heatExchanger.port1)
+            self.storage.parent.scene().removeItem(heatExchanger.port2)
+            self.storage.parent.scene().removeItem(heatExchanger)
 
     def modifyHx(self):
         """
