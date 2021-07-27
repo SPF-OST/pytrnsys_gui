@@ -19,10 +19,10 @@ class _StrictMock:
 
 
 class TestStorageTank:
-    LEGACY_JSON_PATH = _pl.Path(__file__).parent / "data" / "storageTankLegacyFormat.json"
+    LEGACY_JSON_PATH = _pl.Path(__file__).parent / "data" / "storageTankOldestFormat.json"
 
     def testDeserializeJsonFromLegacyFormatAndSerialize(self, tmp_path):  # pylint: disable=invalid-name
-        expectedPath = _pl.Path(__file__).parent / "data" / "storageTankConvertedToNewFormat.json"
+        expectedPath = _pl.Path(__file__).parent / "data" / "storageTankNewestFormat.json"
         expectedStorageTankJson = expectedPath.read_text()
 
         logger = _log.getLogger("root")

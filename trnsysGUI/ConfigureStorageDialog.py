@@ -1,7 +1,6 @@
 # pylint: skip-file
 # type: ignore
 
-import enum as _enum
 import typing as _tp
 
 from PyQt5.QtWidgets import (
@@ -20,19 +19,14 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QListWidgetItem,
 )
+import PyQt5.QtCore as _qtc
 
 import trnsysGUI.directPortPair as _dpp
-import trnsysGUI.HeatExchanger as _hx
+import trnsysGUI.side as _side
 from trnsysGUI.modifyRelativeHeightsDialog import ModifyRelativeHeightsDialog
 
 
-class Side(_enum.Enum):
-    LEFT = _enum.auto()
-    RIGHT = _enum.auto()
-
-
 class ConfigureStorageDialog(QDialog):
-    HEAT_EXCHANGER_WIDTH = 40
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
 
@@ -229,19 +223,19 @@ class ConfigureStorageDialog(QDialog):
     def _loadDirectPortPairs(self):
         directPortPair: _dpp.DirectPortPair
         for directPortPair in self.storage.directPortPairs:
-            listItem = self._getDirectPortPairListItemText(directPortPair)
+            itemText = self._getDirectPortPairListItemText(directPortPair)
+            item = QListWidgetItem(itemText)
+            item.setData(_qtc.Qt.UserRole, directPortPair)
 
             if directPortPair.isOnLeftSide:
-                self._leftDirectPortPairsItemListWidget.addItem(listItem)
+                self._leftDirectPortPairsItemListWidget.addItem(item)
             else:
-                self._rightDirectPortPairsItemListWidget.addItem(listItem)
+                self._rightDirectPortPairsItemListWidget.addItem(item)
 
     @staticmethod
     def _getDirectPortPairListItemText(directPortPair: _dpp.DirectPortPair):
         return (
-            directPortPair.name
-            + ","
-            + "Port pair from "
+            "Port pair from "
             + "%d%%" % int(directPortPair.relativeInputHeight * 100)
             + " to "
             + "%d%%" % int(directPortPair.relativeOutputHeight * 100)
@@ -295,12 +289,12 @@ class ConfigureStorageDialog(QDialog):
         )
 
     def addHxL(self):
-        self._addHeatExchanger(Side.LEFT)
+        self._addHeatExchanger(_side.Side.LEFT)
 
     def addHxR(self):
-        self._addHeatExchanger(Side.RIGHT)
+        self._addHeatExchanger(_side.Side.RIGHT)
 
-    def _addHeatExchanger(self, side: Side):
+    def _addHeatExchanger(self, side: _side.Side):
         name = self.hxNameLe.text()
         if not name:
             messageBox = QMessageBox()
@@ -313,23 +307,13 @@ class ConfigureStorageDialog(QDialog):
         relativeInputHeight = float(self.offsetLeI.text()) / 100
         relativeOutputHeight = float(self.offsetLeO.text()) / 100
 
-        heatExchanger = _hx.HeatExchanger(
-            sideNr=0 if side == Side.LEFT else 2,
-            width=self.HEAT_EXCHANGER_WIDTH,
-            relativeInputHeight=relativeInputHeight,
-            relativeOutputHeight=relativeOutputHeight,
-            storageTankWidth=self.storage.w,
-            storageTankHeight=self.storage.h,
-            parent=self.storage,
-            name=name,
-            tempHx=True,
-        )
+        heatExchanger = self.storage.addHeatExchanger(name, side, relativeInputHeight, relativeOutputHeight)
 
-        listItem = self._getHeatExchangerListItemText(heatExchanger)
-        if side == Side.LEFT:
-            self.leftHeatExchangersItemListWidget.addItem(listItem)
+        itemText = self._getHeatExchangerListItemText(heatExchanger)
+        if side == _side.Side.LEFT:
+            self.leftHeatExchangersItemListWidget.addItem(itemText)
         else:
-            self.rightHeatExchangersItemListWidget.addItem(listItem)
+            self.rightHeatExchangersItemListWidget.addItem(itemText)
 
     def manAddPortPair(self):
         if float(self.manPortLeI.text()) > 100:
@@ -356,31 +340,23 @@ class ConfigureStorageDialog(QDialog):
         self._removeSelectedPortPairs(self._rightDirectPortPairsItemListWidget)
 
     def _removeSelectedPortPairs(self, directPortPairsListWidget):
-        for listItem in directPortPairsListWidget.selectedItems():
-            for directPortPair in list(self.storage.directPortPairs):
+        for selectedItem in directPortPairsListWidget.selectedItems():
+            selectedDirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
 
-                if (
-                    directPortPair.name
-                    == listItem.text()[: listItem.text().find(",")]
-                ):
-                    self.storage.directPortPairs.remove(directPortPair)
-                    directPortPairsListWidget.takeItem(
-                        directPortPairsListWidget.row(
-                            directPortPairsListWidget.selectedItems()[0]
-                        )
-                    )
+            self.storage.directPortPairs.remove(selectedDirectPortPair)
+            directPortPairsListWidget.takeItem(selectedItem)
 
-                    while len(directPortPair.fromPort.connectionList) > 0:
-                        directPortPair.fromPort.connectionList[0].deleteConn()
+            while len(selectedDirectPortPair.fromPort.connectionList) > 0:
+                selectedDirectPortPair.fromPort.connectionList[0].deleteConn()
 
-                    while len(directPortPair.toPort.connectionList) > 0:
-                        directPortPair.toPort.connectionList[0].deleteConn()
+            while len(selectedDirectPortPair.toPort.connectionList) > 0:
+                selectedDirectPortPair.toPort.connectionList[0].deleteConn()
 
-                    self.storage.inputs.remove(directPortPair.fromPort)
-                    self.storage.outputs.remove(directPortPair.toPort)
+            self.storage.inputs.remove(selectedDirectPortPair.fromPort)
+            self.storage.outputs.remove(selectedDirectPortPair.toPort)
 
-                    self.storage.parent.scene().removeItem(directPortPair.fromPort)
-                    self.storage.parent.scene().removeItem(directPortPair.toPort)
+            self.storage.parent.scene().removeItem(selectedDirectPortPair.fromPort)
+            self.storage.parent.scene().removeItem(selectedDirectPortPair.toPort)
 
     def removeHxL(self):
         self._removeSelectedHeatExchangers(self.leftHeatExchangersItemListWidget)
@@ -470,10 +446,11 @@ class ConfigureStorageDialog(QDialog):
         """
         Modify existing ports.
         """
-        result = self._getFirstSelectedItemAndDirectPortPair()
-        if not result:
+        selectedItem = self._getFirstSelectedDirectPortPairListWidgetItem()
+        if not selectedItem:
             return
-        selectedItem, directPortPair = result
+
+        directPortPair: _dpp.DirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
 
         dialogResult = ModifyRelativeHeightsDialog(
             directPortPair.relativeInputHeight, directPortPair.relativeOutputHeight
@@ -500,41 +477,16 @@ class ConfigureStorageDialog(QDialog):
         newText = self._getDirectPortPairListItemText(directPortPair)
         selectedItem.setText(newText)
 
-    def _getFirstSelectedItemAndDirectPortPair(
+    def _getFirstSelectedDirectPortPairListWidgetItem(
         self,
-    ) -> _tp.Optional[_tp.Tuple[QListWidgetItem, _dpp.DirectPortPair]]:
-        result = self._getFirstSelectedDirectPortPairListItemAndIsOnLeftSide()
-        if not result:
-            return None
-        selectedItem, isOnLeftSide = result
-
-        name = selectedItem.text().split(",")[0]
-
-        directPortPairs: _tp.Sequence[
-            _dpp.DirectPortPair
-        ] = self.storage.directPortPairs
-        matchingDirectPortPairs = [
-            dpp
-            for dpp in directPortPairs
-            if dpp.name == name
-            and dpp.isOnLeftSide == isOnLeftSide
-        ]
-
-        if not matchingDirectPortPairs:
-            return None
-
-        return selectedItem, matchingDirectPortPairs[0]
-
-    def _getFirstSelectedDirectPortPairListItemAndIsOnLeftSide(
-        self,
-    ) -> _tp.Optional[_tp.Tuple[QListWidgetItem, bool]]:
+    ) -> _tp.Optional[QListWidgetItem]:
         leftSelectedItems = self._leftDirectPortPairsItemListWidget.selectedItems()
         if leftSelectedItems:
-            return leftSelectedItems[0], True
+            return leftSelectedItems[0]
 
         rightSelectedItems = self._rightDirectPortPairsItemListWidget.selectedItems()
         if rightSelectedItems:
-            return rightSelectedItems[0], False
+            return rightSelectedItems[0]
 
         return None
 

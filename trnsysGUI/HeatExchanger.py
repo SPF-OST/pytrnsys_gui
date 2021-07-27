@@ -3,11 +3,10 @@
 
 import random
 
-from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu
 
-from trnsysGUI.Connection import Connection
 from trnsysGUI.PortItem import PortItem
 
 
@@ -37,15 +36,13 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self.sSide = sideNr
         self.id = self.parent.parent.parent().idGen.getID()
+        self.trnsysId = self.parent.parent.parent().idGen.getTrnsysID()
 
         self.parent.heatExchangers.append(self)
         self.setZValue(100)
 
         self.port1 = PortItem("i", self.sSide, self.parent)
         self.port2 = PortItem("o", self.sSide, self.parent)
-
-        self.port1.isFromHx = True
-        self.port2.isFromHx = True
 
         self.parent.inputs.append(self.port1)
         self.parent.outputs.append(self.port2)
