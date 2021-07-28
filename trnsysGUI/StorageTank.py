@@ -440,7 +440,7 @@ class StorageTank(BlockItem):
             return None
 
         if len(sequence) > 1:
-            raise ValueError("Mor than one value in iterable.")
+            raise ValueError("More than one value in iterable.")
 
         return sequence[0]
 
