@@ -7,11 +7,12 @@ import os
 import typing as _tp
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize, QPointF, QEvent, QTimer
+from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
 import trnsysGUI.images as _img
+import trnsysGUI.IdGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.ResizerItem import ResizerItem
@@ -30,7 +31,6 @@ def calcDist(p1, p2):
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
     def __init__(self, trnsysType, parent, **kwargs):
-
         super().__init__(None)
 
         self.logger = parent.logger
@@ -64,10 +64,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.exportInitialInput = -1
         self.exportEquations = []
         self.trnsysConn = []
-
-        # This case is because loaded blocks have parent=None
-        # if self.parent is not None:
-        #     self.parent.parent().trnsysObj.append(self)
 
         # Transform related
         self.flippedV = False
@@ -106,6 +102,9 @@ class BlockItem(QGraphicsPixmapItem):
 
         # Undo framework related
         self.oldPos = None
+
+        self.origOutputsPos = None
+        self.origInputsPos = None
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         currentClassName = BlockItem.__name__
@@ -731,15 +730,13 @@ class BlockItem(QGraphicsPixmapItem):
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
         self.rotateBlockToN(i["RotationN"])
-        # self.displayName = i["BlockDisplayName"]
-        # self.label.setPlainText(self.displayName)
         self.setName(i["BlockDisplayName"])
 
         self.groupName = "defaultGroup"
@@ -781,58 +778,6 @@ class BlockItem(QGraphicsPixmapItem):
         resBlockList.append(self)
 
     # Export related
-    def exportParameterSolver(self, descConnLength):
-        temp = ""
-        for i in self.inputs:
-            # ConnectionList lenght should be max offset
-            for c in i.connectionList:
-                if (
-                    hasattr(c.fromPort.parent, "heatExchangers")
-                    and i.connectionList.index(c) == 0
-                ):
-                    continue
-                elif (
-                    hasattr(c.toPort.parent, "heatExchangers")
-                    and i.connectionList.index(c) == 0
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
-
-        for o in self.outputs:
-            # ConnectionList lenght should be max offset
-            for c in o.connectionList:
-                if (
-                    type(c.fromPort.parent, "heatExchangers")
-                    and o.connectionList.index(c) == 0
-                ):
-                    continue
-                elif (
-                    type(c.toPort.parent, "heatExchangers")
-                    and o.connectionList.index(c) == 0
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
-
-        temp += str(self.typeNumber)
-        temp += " " * (descConnLength - len(temp))
-        self.exportConnsString = temp
-
-        return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
-    # def exportBlackBox(self):
-    #     # if len(t.inputs + t.outputs) == 2 and not isinstance(self, Connector):
-    #     if len(self.inputs + self.outputs) == 2 and self.isVisible():
-    #         resStr = "T" + self.displayName + "=1 \n"
-    #         equationNr = 1
-    #
-    #         return resStr, equationNr
-    #     else:
-    #         return "", 0
-
     def exportBlackBox(self):
         equation = []
         if len(self.inputs + self.outputs) == 2 and self.isVisible():
@@ -879,41 +824,16 @@ class BlockItem(QGraphicsPixmapItem):
         return "", nUnit
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         temp = ""
         for i in self.inputs:
-            # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if (
-                    hasattr(c.fromPort.parent, "heatExchangers")
-                    and i.connectionList.index(c) == 0
-                ):
-                    continue
-                elif (
-                    hasattr(c.toPort.parent, "heatExchangers")
-                    and i.connectionList.index(c) == 0
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if (
-                    hasattr(c.fromPort.parent, "heatExchangers")
-                    and o.connectionList.index(c) == 0
-                ):
-                    continue
-                elif (
-                    hasattr(c.toPort.parent, "heatExchangers")
-                    and o.connectionList.index(c) == 0
-                ):
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         temp += "0 "
         temp += str(self.typeNumber)
@@ -922,39 +842,41 @@ class BlockItem(QGraphicsPixmapItem):
 
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 ", 1
 
     def exportInputsFlowSolver2(self):
-        # return str(self.exportInitialInput) + " [" + self.displayName + "]", 1
         return str(self.exportInitialInput) + " ", 1
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        tot = ""
-        for i in range(0, 3):
-            if i < 2:
-                temp = (
-                    prefix
-                    + self.displayName
-                    + "_"
-                    + abc[i]
-                    + "=["
-                    + str(simulationUnit)
-                    + ","
-                    + str(equationNumber)
-                    + "]\n"
-                )
-                tot += temp
-                self.exportEquations.append(temp)
-                # nEqUsed += 1  # DC
-            equationNumber += 1  # DC-ERROR it should count anyway
+        equation1 = self._createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
+        equation2 = self._createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
 
-        return tot, equationNumber, 2
+        self.exportEquations.append(equation1)
+        self.exportEquations.append(equation2)
+
+        equations = equation1 + equation2
+        nEquationsUsed = 2
+        nextEquationNumber = equationNumber + 3
+
+        return equations, nextEquationNumber, nEquationsUsed
+
+    def _createFlowSolverOutputEquation(self, equationNumber, abc, prefix, equationNumberOffset, simulationUnit):
+        return f"{prefix}{self.displayName}_{abc[equationNumber]}=[{simulationUnit},{equationNumberOffset + equationNumber}]\n"
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         return "", startingUnit
+
+    def getTemperatureVariableName(self, portItem: PortItem) -> str:
+        return f"T{self.displayName}"
+
+    def getFlowSolverParametersId(self, portItem: PortItem) -> int:
+        return self.trnsysId
+
+    def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+        pass
 
     def cleanUpAfterTrnsysExport(self):
         self.exportConnsString = ""

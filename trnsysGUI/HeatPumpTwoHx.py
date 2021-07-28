@@ -35,8 +35,6 @@ class HeatPumpTwoHx(BlockItem):
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
-        self.subBlockCounter = 0
-
         self.changeSize()
         self.addTree()
 
@@ -113,7 +111,7 @@ class HeatPumpTwoHx(BlockItem):
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
         self.childIds = i["childIds"]
@@ -167,56 +165,48 @@ class HeatPumpTwoHx(BlockItem):
         return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         f = ""
         for i in range(len(self.inputs)):
-            # ConnectionList lenght should be max offset
-            temp = ""
             for c in self.inputs[i].connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                else:
-                    if len(self.outputs[i].connectionList) > 0:
-                        # HeatPumpTwoHx exportConnsString has 3 lines
-                        if i == 0:
-                            temp = (
-                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                            )  # + str(t.childIds[0])
-                            temp += " " * (descConnLength - len(temp))
+                if len(self.outputs[i].connectionList) > 0:
+                    # HeatPumpTwoHx exportConnsString has 3 lines
+                    if i == 0:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[0])
+                        temp += " " * (descConnLength - len(temp))
 
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
 
-                        elif i == 1:
-                            temp = (
-                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                            )  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
+                    elif i == 1:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[1])
+                        temp += " " * (descConnLength - len(temp))
 
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
 
-                        elif i == 2:
-                            temp = (
-                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                            )  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
+                    elif i == 2:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[1])
+                        temp += " " * (descConnLength - len(temp))
 
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[2]) + " : " + self.displayName + "Side3" + "\n"
-                        else:
-                            f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                        # Presumably used only for storing the order of connections
-                        self.trnsysConn.append(c)
-                        self.trnsysConn.append(self.outputs[i].connectionList[0])
-
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[2]) + " : " + self.displayName + "Side3" + "\n"
                     else:
-                        f += "Output of ExternalHx for input[{0}] is not connected ".format(i) + "\n"
+                        f += "Error: There are more inputs than trnsysIds" + "\n"
 
-        return f, 2
+                    # Presumably used only for storing the order of connections
+                    self.trnsysConn.append(c)
+                    self.trnsysConn.append(self.outputs[i].connectionList[0])
+
+                else:
+                    f += "Output of ExternalHx for input[{0}] is not connected ".format(i) + "\n"
+
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 0,0 0,0", 3

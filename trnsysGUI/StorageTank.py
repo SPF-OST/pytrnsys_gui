@@ -1,9 +1,9 @@
 # pylint: skip-file
 # type: ignore
 
-import os
-import random
-import shutil
+import os as _os
+import random as _rnd
+import shutil as _sh
 import typing as _tp
 
 from PyQt5.QtGui import QColor
@@ -11,39 +11,35 @@ from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
 import trnsysGUI.images as _img
 import trnsysGUI.storageTank.model as _model
+import trnsysGUI.IdGenerator as _id
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
-from trnsysGUI.Connector import Connector
-from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.TeePiece import TeePiece
+import trnsysGUI.side as _sd
+from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow
+
+InOut = _tp.Literal["In", "Out"]
+_T = _tp.TypeVar("_T", covariant=True)
 
 
 class StorageTank(BlockItem):
+    HEAT_EXCHANGER_WIDTH = 40
+
     def __init__(self, trnsysType, parent, **kwargs):
-        super(StorageTank, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.parent = parent
+        self._idGenerator: _id.IdGenerator = self.parent.parent().idGen
         self.dckFilePath = ""
 
         self.directPortPairs: _tp.List[DirectPortPair] = []
 
         self.heatExchangers: _tp.List[HeatExchanger] = []
-
-        self.childIds = []
-        self.childIds.append(self.trnsysId)
-
-        # List containing all the conns and blocks inside, used to input into connInside()
-        self.insideConnLeft = []
-        self.insideConnRight = []
-
-        self.hxInsideConnsLeft = []
-        self.hxInsideConnsRight = []
 
         self.blackBoxEquations = []
 
@@ -66,7 +62,7 @@ class StorageTank(BlockItem):
             p
             for dpp in self.directPortPairs
             if dpp.isOnLeftSide == isOnLeftSide
-            for p in [dpp.connection.fromPort, dpp.connection.toPort]
+            for p in [dpp.fromPort, dpp.toPort]
         ]
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
@@ -84,7 +80,7 @@ class StorageTank(BlockItem):
         for hx in self.heatExchangers:
             hx.parent = self
 
-    def createAndAddDirectPortPair(
+    def addDirectPortPair(
         self,
         isOnLeftSide,
         relativeInputHeight,
@@ -100,8 +96,6 @@ class StorageTank(BlockItem):
         port2 = PortItem("o", sideNr, self)
         port2.setZValue(100)
 
-        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
-
         x = 0 if isOnLeftSide else self.w
         inputY = storageTankHeight - relativeInputHeight * storageTankHeight
         outputY = storageTankHeight - relativeOutputHeight * storageTankHeight
@@ -113,7 +107,7 @@ class StorageTank(BlockItem):
         port1.side = side
         port2.side = side
 
-        randomInt = int(random.uniform(20, 200))
+        randomInt = int(_rnd.uniform(20, 200))
         randomColor = QColor(randomInt, randomInt, randomInt)
 
         port1.innerCircle.setBrush(randomColor)
@@ -122,6 +116,7 @@ class StorageTank(BlockItem):
         port2.visibleColor = randomColor
 
         directPortPair = self._createDirectPortPair(
+            self._idGenerator.getTrnsysID(),
             isOnLeftSide,
             port1,
             port2,
@@ -131,13 +126,12 @@ class StorageTank(BlockItem):
         )
 
         self.directPortPairs.append(directPortPair)
-        self.inputs.append(directPortPair.connection.fromPort)
-        self.outputs.append(directPortPair.connection.toPort)
+        self.inputs.append(directPortPair.fromPort)
+        self.outputs.append(directPortPair.toPort)
 
-        return directPortPair
-
+    @staticmethod
     def _createDirectPortPair(
-        self,
+        trnsysId,
         isOnLeftSide,
         port1,
         port2,
@@ -148,373 +142,42 @@ class StorageTank(BlockItem):
         # Misuse of kwargs for detecting if the manual port pair is being loaded and not newly created
         if not kwargs:
             directPortPair = DirectPortPair(
-                Connection(port1, port2, True, self.parent.parent()),
+                trnsysId,
+                port1,
+                port2,
                 relativeInputHeight,
                 relativeOutputHeight,
-                isOnLeftSide,
+                isOnLeftSide
             )
             return directPortPair
 
         port1.id = kwargs["fromPortId"]
         port2.id = kwargs["toPortId"]
 
-        connection = Connection(
+        directPortPair = DirectPortPair(
+            trnsysId,
             port1,
             port2,
-            True,
-            self.parent.parent(),
-            fromPortId=kwargs["fromPortId"],
-            toPortId=kwargs["toPortId"],
-            segmentsLoad=[],
-            cornersLoad=[],
-            loadedConn=True,
-        )
-
-        connection.displayName = kwargs["connDispName"]
-        connection.id = kwargs["connId"]
-        connection.connId = kwargs["connCid"]
-        connection.trnsysId = kwargs["trnsysConnId"]
-
-        if port1.side == 0:
-            connection.side = "Left"
-        elif port1.side == 2:
-            connection.side = "Right"
-
-        directPortPair = DirectPortPair(
-            connection, relativeInputHeight, relativeOutputHeight, isOnLeftSide
+            relativeInputHeight,
+            relativeOutputHeight,
+            isOnLeftSide
         )
 
         return directPortPair
 
-    def checkConnectInside(self, port1, port2, maxhops, d):
-        """
-        Was used to check if connectInside works
-        Basically a depth first algorithm
-        Parameters
-        ----------
-        port1
-        port2
-        maxhops
-        d
-
-        Returns
-        -------
-
-        """
-        port1.visited = True
-
-        self.logger.debug(" " * 3 * d + "In port1 " + str(port1) + "at depth " + str(d))
-        self.logger.debug(
-            " " * 3 * d + "Connection list is " + str(port1.connectionList)
+    def addHeatExchanger(self, name, side, relativeInputHeight, relativeOutputHeight):
+        heatExchanger = HeatExchanger(
+            sideNr=0 if side == _sd.Side.LEFT else 2,
+            width=self.HEAT_EXCHANGER_WIDTH,
+            relativeInputHeight=relativeInputHeight,
+            relativeOutputHeight=relativeOutputHeight,
+            storageTankWidth=self.w,
+            storageTankHeight=self.h,
+            parent=self,
+            name=name,
+            tempHx=True,
         )
-        self.logger.debug(" " * 3 * d + "Parent is " + str(port1.parent))
-
-        if port1 is port2:
-            self.logger.debug(
-                " " * 3 * d + "Found a connection between port 1 and port 2"
-            )
-
-        if d == maxhops:
-            self.logger.debug(" " * 3 * d + "Port + " + str(port1) + " is returning.")
-            return
-
-        if port1.parent.name == "TeePiece.png":
-            # self.logger.debug("We are at T piece " + str(port1.parent))
-            conns = port1.parent.getConnections()
-            # self.logger.debug("Connections of T piece are " + str(conns))
-            for c in conns:
-                self.logger.debug(" " * 3 * d + "Conns")
-                if c.fromPort.parent is port1.parent:
-                    if (not c.fromPort.visited) and (not c.toPort.visited):
-                        c.fromPort.visited = True
-                        self.checkConnectInside(c.toPort, port2, maxhops, d + 1)
-
-                if c.toPort.parent is port1.parent:
-                    if (not c.toPort.visited) and (not c.fromPort.visited):
-                        c.toPort.visited = True
-                        self.checkConnectInside(c.fromPort, port2, maxhops, d + 1)
-
-        if port1.parent.name == "StorageTank":
-            # self.logger.debug("We are at " + str(port1.parent))
-
-            if d > 1:
-                self.logger.debug(
-                    " " * 3 * d
-                    + "port1 "
-                    + str(port1)
-                    + " at StorageTank is returning."
-                )
-                return
-
-            for j in port1.connectionList:
-                if j.toPort is port1:
-                    self.logger.debug(" " * 3 * d + "toPort is port1 is " + str(port1))
-                    self.logger.debug(
-                        " " * 3 * d + "fromPort is " + str(j.fromPort) + "\n"
-                    )
-                    if not j.fromPort.visited:
-                        self.checkConnectInside(j.fromPort, port2, maxhops, d + 1)
-                    else:
-                        self.logger.debug(
-                            " " * 3 * d
-                            + "Port was already visited, at depth "
-                            + str(d)
-                            + " at Storage Tank"
-                        )
-                if j.fromPort is port1:
-                    self.logger.debug(" " * 3 * d + "fromPort is port1" + str(port1))
-                    self.logger.debug(" " * 3 * d + "toPort is " + str(j.toPort) + "\n")
-                    if not j.toPort.visited:
-                        self.checkConnectInside(j.toPort, port2, maxhops, d + 1)
-                    else:
-                        self.logger.debug(
-                            " " * 3 * d
-                            + "Port was already visited, at depth "
-                            + str(d)
-                            + " at Storage Tank"
-                        )
-
-    def connectInside(self, side, side2, tpList, sideVar):
-        """
-        Function generating the internal connections of the StorageTank direct ports
-        Parameters
-        ----------
-        side : :obj:`List` of :obj:`PortItem`
-        External Ports to which the generated elements are connected to
-
-        side2 : :obj:`List` of :obj:`PortItems`
-        StorageTank direct ports
-
-        tpList :obj:`List` of :obj:`TeePiece` or :obj:`Connector`
-        List of elements that should be deleted after the Trnsys export
-
-        sideVar : str
-        String added to the name of the generated elements
-
-        Returns
-        -------
-
-        """
-        # Side should be list of all ports to the same side
-        # Side is used in this function to store the nodes of one layer
-        for si in side:
-            self.logger.debug("side element" + si.parent.displayName)
-        tempArrConn = []
-
-        # Copy of the corresponding ports
-        side_test = side
-
-        # Assert that the storage has at least 2 ports at side
-        if len(side) < 2:
-            self.logger.debug("Error: storage needs at least 2 ports on a side")
-            return
-
-        if len(side) == 2:
-            self.logger.debug("Only 2 ports in side list")
-            self.logger.debug("ports have " + str(side[0].parent) + str(side[1].parent))
-
-            connector = Connector("Connector", self.parent, storagePorts=side2)
-            connector.displayName = (
-                "Conn" + self.displayName + sideVar + str(connector.id)
-            )
-
-            # Used for recognizing it to print the temperature of the storage ports
-            connector.inFirstRow = True
-            connector.setVisible(False)
-
-            self.parent.scene().addItem(connector)
-            tpList.append(connector)
-
-            # This makes the virtual connections in the same direction as the ones they replace
-            # Check if external connections to the storagetank have storage ports as fromPorts or toPorts
-            # if side[0] has toPort at storage: connector on second place
-            if side[0].connectionList[0].fromPort is side[0]:
-                c1 = Connection(
-                    side[0], connector.inputs[0], True, self.parent.parent()
-                )
-            else:
-                c1 = Connection(
-                    connector.inputs[0], side[0], True, self.parent.parent()
-                )
-                pass
-
-            if side[1].connectionList[0].fromPort is side[1]:
-                c2 = Connection(
-                    side[1], connector.inputs[0], True, self.parent.parent()
-                )
-            else:
-                c2 = Connection(
-                    connector.inputs[0], side[1], True, self.parent.parent()
-                )
-                pass
-
-            # Check where the fact is used that connector is at fromPort!
-
-            c1.displayName = side[0].connectionList[0].displayName
-            c1.isStorageIO = True
-            c2.displayName = side[1].connectionList[0].displayName
-            c2.isStorageIO = True
-            return
-
-        h = 20
-        # self.logger.debug("Self.parent.parent()" + str(self.parent.parent()))
-        layer = 1
-        while len(side) > 2:
-            mem = []
-            if len(side) % 2 == 0:
-                x = len(side)
-                self.logger.debug("Even number of ports in side")
-            else:
-                x = len(side) - 1
-                mem.append(side[x])
-                # self.logger.debug("Uneven " + side(x))
-
-            for i in range(0, x, 2):
-                tpiece = TeePiece("TeePiece", self.parent)
-                tpiece.displayName = (
-                    "TeeTes" + self.displayName + sideVar + str(tpiece.id)
-                )
-                tpiece.setVisible(False)
-                self.parent.scene().addItem(tpiece)
-                tpList.append(tpiece)
-
-                c1 = Connection(side[i], tpiece.inputs[0], True, self.parent.parent())
-                c2 = Connection(
-                    tpiece.inputs[1], side[i + 1], True, self.parent.parent()
-                )
-                self.logger.debug(
-                    "c1 is from "
-                    + side[i].parent.displayName
-                    + " to "
-                    + tpiece.inputs[0].parent.displayName
-                )
-                self.logger.debug(
-                    "c2 is from "
-                    + tpiece.inputs[1].parent.displayName
-                    + " to "
-                    + side[i + 1].parent.displayName
-                )
-                if layer > 1:
-                    c1.firstS.setVisible(False)
-                    c2.firstS.setVisible(False)
-                    c1.hiddenGenerated = True
-                    c2.hiddenGenerated = True
-
-                resId = ""
-                for j in c1.displayName:
-                    if j.isdigit():
-                        resId += str(j)
-
-                # self.logger.debug("c1 name before is " + c1.displayName)
-                c1.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
-                # self.logger.debug("c1 name is " + c1.displayName)
-
-                resId = ""
-
-                for j in c2.displayName:
-                    if j.isdigit():
-                        resId += str(j)
-
-                c2.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
-
-                tempArrConn.append(c1)
-                tempArrConn.append(c2)
-
-                # self.parent.addItem(QGraphicsEllipseItem(h, i * 10, 3, 3))
-
-                if i == 0:
-                    mem.insert(0, tpiece.outputs[0])
-                else:
-                    mem.insert(-1, tpiece.outputs[0])
-
-            side = mem
-            layer += 1
-            h += 20
-            # self.logger.debug(str(len(side)))
-
-        lastC = Connection(side[0], side[1], True, self.parent.parent())
-        lastC.firstS.setVisible(False)
-        self.logger.debug(
-            "lastc is from "
-            + side[0].parent.displayName
-            + " to "
-            + side[1].parent.displayName
-        )
-        resId = ""
-        for j in lastC.displayName:
-            if j.isdigit():
-                resId += str(j)
-        lastC.displayName = "PiTes" + sideVar + self.displayName + "_" + resId
-
-        if len(side2) > 2:
-            lastC.hiddenGenerated = True
-
-        # Here the virtual pipes clone the name of their corresponding real pipe
-        # Could be used to set a new attribute generatedPrinted
-        for s in side_test:
-            for t in tempArrConn:
-                if t.fromPort is s or t.toPort is s:
-                    self.logger.debug("This is a real connection " + str(t.displayName))
-                    if len(s.connectionList) > 0:
-                        t.displayName = s.connectionList[0].displayName  # + "GEN"
-                        t.setClone(True)
-                    else:
-                        self.logger.debug(
-                            "Found a port outside that has no connection to inside"
-                        )
-
-        # If tpieces were generated, the first len(side_test) ones have to be marked as firstRow
-        for x in tpList[: len(side_test)]:
-            x.inFirstRow = True
-
-        # self.checkConnectInside(self.inputs[0], self.inputs[3], 6, 1)
-
-    def connectHxs(self, side, side2, connList, lr, heatX):
-        """
-        Adds a Connector block and connections to the external blocks (both virtual)
-
-        Parameters
-        ----------
-        side : :obj:`List` of :obj:`PortItem`
-        List of corresponding (external, to connect) PortItems
-
-        side2 : :obj:`List` of :obj:`PortItem`
-        Pair of Hx ports
-
-        connList
-        lr : str
-        String that gets added to the generated element's name
-        heatX
-        HeatExchanger the ports are part of
-
-        Returns
-        -------
-
-        """
-
-        self.logger.debug("ports have " + str(side[0].parent) + str(side[1].parent))
-
-        connector = Connector("Connector", self.parent, storagePorts=side2)
-        connector.displayName = heatX.displayName
-        # connector.displayName = "Hx" + self.displayName + lr + str(int(100 - min([p.y() for p in side2])))
-
-        if side[0].connectionList[0].fromPort is side[0]:
-            c1 = Connection(side[0], connector.inputs[0], True, self.parent.parent())
-        else:
-            c1 = Connection(connector.inputs[0], side[0], True, self.parent.parent())
-            pass
-
-        if side[1].connectionList[0].fromPort is side[1]:
-            c2 = Connection(side[1], connector.inputs[0], True, self.parent.parent())
-        else:
-            c2 = Connection(connector.inputs[0], side[1], True, self.parent.parent())
-            pass
-
-        connList.append(connector)
-        c1.displayName = side[0].connectionList[0].displayName
-        c1.isStorageIO = True
-        c2.displayName = side[1].connectionList[0].displayName
-        c2.isStorageIO = True
+        return heatExchanger
 
     # Transform related
     def changeSize(self):
@@ -556,8 +219,8 @@ class StorageTank(BlockItem):
         if not self.isVisible():
             raise RuntimeError("Cannot encode an invisible storage tank.")
 
-        heatExchangerModels = self._getHeatExchangerModelsForSerialization()
-        portPairModels = self._getDirectPortPairModelsForSerialization()
+        heatExchangerModels = self._getHeatExchangerModelsForEncode()
+        portPairModels = self._getDirectPortPairModelsForEncode()
         position = float(self.pos().x()), float(self.pos().y())
 
         storageTankModel = _model.StorageTank(
@@ -577,34 +240,30 @@ class StorageTank(BlockItem):
         dictName = "Block-"
         return dictName, storageTankModel.to_dict()
 
-    def _getDirectPortPairModelsForSerialization(self):
+    def _getDirectPortPairModelsForEncode(self):
         portPairModels = []
         for directPort in self.directPortPairs:
-            connection = directPort.connection
-
-            side = _model.Side.createFromSideNr(connection.fromPort.side)
+            side = _model.Side.createFromSideNr(directPort.fromPort.side)
 
             inputPortModel = _model.Port(
-                connection.fromPort.id, directPort.relativeInputHeight
+                directPort.fromPort.id, directPort.relativeInputHeight
             )
 
             outputPortModel = _model.Port(
-                connection.toPort.id, directPort.relativeOutputHeight
+                directPort.toPort.id, directPort.relativeOutputHeight
             )
 
             portPairModel = _model.PortPair(
-                side, connection.displayName, inputPortModel, outputPortModel
+                side, directPort.trnsysId, inputPortModel, outputPortModel
             )
 
-            directPortPairModel = _model.DirectPortPair(
-                portPairModel, connection.id, connection.connId, connection.trnsysId
-            )
+            directPortPairModel = _model.DirectPortPair(portPairModel)
 
             portPairModels.append(directPortPairModel)
 
         return portPairModels
 
-    def _getHeatExchangerModelsForSerialization(self):
+    def _getHeatExchangerModelsForEncode(self):
         heatExchangerModels = []
         for heatExchanger in self.heatExchangers:
             side = _model.Side.createFromSideNr(heatExchanger.sSide)
@@ -620,35 +279,26 @@ class StorageTank(BlockItem):
             )
 
             portPair = _model.PortPair(
-                side, heatExchanger.displayName, inputPort, outputPort
+                side, heatExchanger.trnsysId, inputPort, outputPort
             )
 
             heatExchangerModel = _model.HeatExchanger(
                 portPair,
+                heatExchanger.displayName,
                 heatExchanger.w,
-                heatExchanger.parent.id,
-                heatExchanger.id,
-                heatExchanger.conn.trnsysId,
+                self.id,
+                heatExchanger.id
             )
 
             heatExchangerModels.append(heatExchangerModel)
 
         return heatExchangerModels
 
-    @staticmethod
-    def _getConnectionsAmong(ports: _tp.Sequence[PortItem]) -> _tp.Sequence[Connection]:
-        return [
-            c
-            for fromPort in ports
-            for c in fromPort.connectionList
-            if c.fromPort is fromPort and c.toPort in ports
-        ]
-
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         offset_x = 0
         offset_y = 0
         self._decodeInternal(
-            i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs=True
+            i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=True
         )
 
     def _decodeInternal(
@@ -657,7 +307,6 @@ class StorageTank(BlockItem):
         offset_x,
         offset_y,
         resBlockList,
-        resConnList,
         shallSetNamesAndIDs: bool,
     ):
         self.logger.debug("Loading a Storage in Decoder")
@@ -685,35 +334,25 @@ class StorageTank(BlockItem):
             self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)
 
         for portPairModel in model.directPortPairs:
-            self._decodeDirectPortPair(portPairModel, resConnList, shallSetNamesAndIDs)
+            self._decodeDirectPortPair(portPairModel)
 
         resBlockList.append(self)
 
     def _decodeDirectPortPair(
         self,
         portPairModel: _model.DirectPortPair,
-        resConnList,
-        shallSetNamesAndIDs: bool,
-    ):
+    ) -> None:
         portPair = portPairModel.portPair
 
-        name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
-
-        directPortPair = self.createAndAddDirectPortPair(
+        self.addDirectPortPair(
             isOnLeftSide=portPair.side == _model.Side.LEFT,
             relativeInputHeight=portPair.inputPort.relativeHeight,
             relativeOutputHeight=portPair.outputPort.relativeHeight,
             storageTankHeight=self.h,
             fromPortId=portPair.inputPort.id,
             toPortId=portPair.outputPort.id,
-            connId=portPairModel.id,
-            connCid=portPairModel.connectionId,
-            connDispName=name,
-            trnsysConnId=portPairModel.trnsysId,
             loadedConn=True,
         )
-
-        resConnList.append(directPortPair.connection)
 
     def _decodeHeatExchanger(
         self, heatExchangerModel: _model.HeatExchanger, shallSetNamesAndIDs: bool
@@ -722,7 +361,8 @@ class StorageTank(BlockItem):
 
         sideNr = portPair.side.toSideNr()
 
-        name = portPair.name if shallSetNamesAndIDs else portPair.name + "New"
+        nameSuffix = "" if shallSetNamesAndIDs else "New"
+        name = heatExchangerModel.name + nameSuffix
 
         heatExchanger = HeatExchanger(
             sideNr,
@@ -734,7 +374,6 @@ class StorageTank(BlockItem):
             self,
             name,
             loadedHx=True,
-            connTrnsysID=heatExchangerModel.connectionTrnsysId,
         )
 
         if shallSetNamesAndIDs:
@@ -748,6 +387,76 @@ class StorageTank(BlockItem):
             i, offset_x, offset_y, resBlockList, resConnList, shallSetNamesAndIDs=False
         )
 
+    def getTemperatureVariableName(self, portItem: PortItem) -> str:
+        directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
+        if directPortPair:
+            return self._getTemperatureVariableNameForDirectPortPairPortItem(directPortPair, portItem)
+
+        heatExchanger = self._getHeatExchangerForPortItem(portItem)
+        if heatExchanger:
+            return self._getTemperatureVariableNameForHeatExchangerPortItem(heatExchanger)
+
+        raise ValueError("Port item doesn't belong to this storage tank.")
+
+    def getFlowSolverParametersId(self, portItem: PortItem) -> int:
+        directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
+        if directPortPair:
+            return directPortPair.trnsysId
+
+        heatExchanger = self._getHeatExchangerForPortItem(portItem)
+        if heatExchanger:
+            return heatExchanger.trnsysId
+
+        raise ValueError("Port item doesn't belong to this storage tank.")
+
+    def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+        for heatExchanger in self.heatExchangers:
+            if heatExchanger.trnsysId == generator.UNINITIALIZED_ID:
+                heatExchanger.trnsysId = generator.getTrnsysID()
+
+        for directPortPair in self.directPortPairs:
+            if directPortPair.trnsysId == generator.UNINITIALIZED_ID:
+                directPortPair.trnsysId = generator.getTrnsysID()
+
+    def _getHeatExchangerForPortItem(self, portItem: PortItem) -> _tp.Optional[HeatExchanger]:
+        heatExchanger = self._getSingleOrNone(
+            hx for hx in self.heatExchangers if hx.port1 == portItem or hx.port2 == portItem
+        )
+
+        return heatExchanger
+
+    def _getDirectPortPairForPortItemOrNone(self, portItem: PortItem) -> _tp.Optional[DirectPortPair]:
+        directPortPair = self._getSingleOrNone(
+            dpp for dpp in self.directPortPairs if dpp.fromPort == portItem or dpp.toPort == portItem
+        )
+
+        return directPortPair
+
+    @staticmethod
+    def _getSingleOrNone(iterable: _tp.Iterable[_T]) -> _T:
+        sequence = list(iterable)
+
+        if not sequence:
+            return None
+
+        if len(sequence) > 1:
+            raise ValueError("More than one value in iterable.")
+
+        return sequence[0]
+
+    def _getTemperatureVariableNameForDirectPortPairPortItem(self, directPortPair, portItem):
+        isInputPort = directPortPair.fromPort == portItem
+        relativeHeightInPercent = (
+            directPortPair.relativeInputHeightPercent
+            if isInputPort
+            else directPortPair.relativeOutputHeightPercent
+        )
+        return f"T{self.displayName}Port{directPortPair.side}{relativeHeightInPercent}"
+
+    @staticmethod
+    def _getTemperatureVariableNameForHeatExchangerPortItem(heatExchanger):
+        return f"T{heatExchanger.displayName}"
+
     # Debug
     def dumpBlockInfo(self):
         self.logger.debug("storage input list " + str(self.inputs))
@@ -757,27 +466,6 @@ class StorageTank(BlockItem):
             "storage rightside " + str(self.rightDirectPortPairsPortItems)
         )
         self.parent.parent().dumpInformation()
-
-    def deleteBlockDebug(self):
-        self.logger.debug("Listing all connections")
-        conns = []
-        for p in self.inputs + self.outputs:
-            for c in p.connectionList:
-                conns.append(c)
-
-        [
-            self.logger.debug(
-                c.displayName
-                + ", fromPort: "
-                + c.fromPort.parent.displayName
-                + ", toPort: "
-                + c.toPort.parent.displayName
-            )
-            for c in conns
-        ]
-
-    def printPortNb(self):
-        self.logger.debug("ST has " + str(self.inputs) + " and " + str(self.outputs))
 
     # Misc
     def contextMenuEvent(self, event):
@@ -809,28 +497,15 @@ class StorageTank(BlockItem):
         menu.exec_(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
-        self.dia = ConfigureStorageDialog(self, self.scene().parent())
-
-    def hasManPortById(self, idFind):
-
-        res = -1
-
-        for p in self.leftDirectPortPairsPortItems:
-            if p.id == idFind:
-                res = True
-
-        for p in self.rightDirectPortPairsPortItems:
-            if p.id == idFind:
-                res = False
-        return res
+        ConfigureStorageDialog(self, self.scene().parent())
 
     # Export related
     def exportBlackBox(self):
         equations = []
-        ddcxPath = os.path.join(self.path, self.displayName)
+        ddcxPath = _os.path.join(self.path, self.displayName)
         ddcxPath = ddcxPath + ".ddcx"
         self.exportDck()
-        if os.path.isfile(ddcxPath):
+        if _os.path.isfile(ddcxPath):
             infile = open(ddcxPath, "r")
             lines = infile.readlines()
             for line in lines:
@@ -842,16 +517,137 @@ class StorageTank(BlockItem):
             return "noDdckFile", equations
 
     def exportParametersFlowSolver(self, descConnLength):
-        return "", 0
+        # The order is important here (has to be the same as in `exportOutputsFlowSolver`):
+        # first the direct port pairs, then the heat exchangers
+        directPortPairsLines = self._getFlowSolverParametersLinesForDirectPortPairs(self.directPortPairs, descConnLength)
+
+        heatExchangers = self.heatExchangers
+        heatExchangersLines = self._getFlowSolverParametersLinesForHeatExchangers(heatExchangers, descConnLength)
+
+        allLines = directPortPairsLines + heatExchangersLines
+
+        result = "\n".join(allLines) + "\n"
+
+        return result
+
+    def _getFlowSolverParametersLinesForHeatExchangers(self, heatExchangers, descConnLength):
+        lines = []
+        for heatExchanger in heatExchangers:
+            incomingConnection: Connection = heatExchanger.port1.connectionList[0]
+            outgoingConnection: Connection = heatExchanger.port2.connectionList[0]
+
+            name = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
+
+            line = self._createFlowSolverParametersLine(
+                name,
+                heatExchanger.trnsysId,
+                incomingConnection,
+                outgoingConnection,
+                descConnLength
+            )
+
+            lines.append(line)
+        return lines
+
+    def _getFlowSolverParametersLinesForDirectPortPairs(self, directPortPairs, descConnLength):
+        lines = []
+        for directPortPair in directPortPairs:
+            incomingConnection: Connection = directPortPair.fromPort.connectionList[0]
+            outgoingConnection: Connection = directPortPair.toPort.connectionList[0]
+
+            name = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
+
+            line = self._createFlowSolverParametersLine(
+                name, directPortPair.trnsysId, incomingConnection, outgoingConnection, descConnLength
+            )
+            lines.append(line)
+        return lines
+
+    def _getMassFlowVariableSuffixForDirectPortPair(self, directPortPair: DirectPortPair):
+        return (f"{self.displayName}Dp{'L' if directPortPair.isOnLeftSide else 'R'}"
+                f"{directPortPair.relativeInputHeightPercent}-{directPortPair.relativeOutputHeightPercent}")
+
+    @staticmethod
+    def _getMassFlowVariableSuffixForHeatExchanger(heatExchanger):
+        return heatExchanger.displayName
+
+    @staticmethod
+    def _createFlowSolverParametersLine(
+            name: str,
+            trnsysId: int,
+            incomingConnection: Connection,
+            outgoingConnection: Connection,
+            parametersPartLength) -> str:
+        parametersPart = f"{incomingConnection.trnsysId} {outgoingConnection.trnsysId} 0 0"
+
+        currentParametersPart = len(parametersPart)
+        if currentParametersPart < parametersPartLength:
+            padding = " " * (parametersPartLength - currentParametersPart)
+            parametersPart += padding
+
+        line = f"{parametersPart}!{trnsysId} : {name}"
+
+        return line
 
     def exportInputsFlowSolver1(self):
-        return "", 0
+        return self._getInputs("0,0")
 
     def exportInputsFlowSolver2(self):
-        return self.exportInputsFlowSolver1()
+        return self._getInputs("-1")
+
+    def _getInputs(self, inputsValue):
+        heatExchangerInputs = [inputsValue for _ in self.heatExchangers]
+        directPortPairInputs = [inputsValue for _ in self.directPortPairs]
+        allInputs = heatExchangerInputs + directPortPairInputs
+        allInputsJoined = " ".join(allInputs) + " "
+        return allInputsJoined, len(allInputs)
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        return "", equationNumber, 0
+        nextEquationNumber = equationNumber
+
+        # The order is important here (has to be the same as in `exportParametersFlowSolver`):
+        # first the direct port pairs, then the heat exchangers
+        directPortPairsEquations, nextEquationNumber = self._getFlowSolverOutputEquationsForDirectPortPairs(
+            abc, self.directPortPairs, nextEquationNumber, prefix, simulationUnit
+        )
+        heatExchangersEquations, nextEquationNumber = self._getFlowSolverOutputEquationsForHeatExchangers(
+            abc, self.heatExchangers, nextEquationNumber, prefix, simulationUnit
+        )
+
+        allEquations = directPortPairsEquations + heatExchangersEquations
+        self.exportEquations.extend(allEquations)
+
+        equationsJoined = "\n".join(allEquations) + "\n"
+        nEquationsUsed = len(allEquations)
+
+        return equationsJoined, nextEquationNumber, nEquationsUsed
+
+    def _getFlowSolverOutputEquationsForHeatExchangers(self, abc, heatExchangers, nextEquationNumber, prefix, simulationUnit):
+        heatExchangerLines = []
+        for heatExchanger in heatExchangers:
+            suffix = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
+
+            equation1 = self._createFlowSolverOutputEquation(suffix, abc[0], prefix, nextEquationNumber, simulationUnit)
+            equation2 = self._createFlowSolverOutputEquation(suffix, abc[1], prefix, nextEquationNumber + 1, simulationUnit)
+            heatExchangerLines.append(equation1)
+            heatExchangerLines.append(equation2)
+            nextEquationNumber += 3
+        return heatExchangerLines, nextEquationNumber
+
+    def _getFlowSolverOutputEquationsForDirectPortPairs(self, abc, directPortPairs, nextEquationNumber, prefix, simulationUnit):
+        equations = []
+        for directPortPair in directPortPairs:
+            suffix = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
+
+            equation1 = self._createFlowSolverOutputEquation(suffix, abc[0], prefix, nextEquationNumber, simulationUnit)
+            equation2 = self._createFlowSolverOutputEquation(suffix, abc[1], prefix, nextEquationNumber + 1, simulationUnit)
+            equations.append(equation1)
+            equations.append(equation2)
+            nextEquationNumber += 3
+        return equations, nextEquationNumber
+
+    def _createFlowSolverOutputEquation(self, name, x, prefix, equationNumber, simulationUnit):
+        return f"{prefix}{name}_{x}=[{simulationUnit},{equationNumber}]\n"
 
     def exportDck(self):
 
@@ -896,12 +692,13 @@ class StorageTank(BlockItem):
 
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
-            connection = directPortPair.connection
+            incomingConnection = directPortPair.fromPort.connectionList[0]
+            Tname = "T" + incomingConnection.displayName
+            side = directPortPair.side
+            Mfrname = "Mfr" + incomingConnection.displayName
 
-            Tname = "T" + connection.fromPort.connectionList[1].displayName
-            side = connection.side
-            Mfrname = "Mfr" + connection.fromPort.connectionList[1].displayName
-            Trev = "T" + connection.toPort.connectionList[1].displayName
+            outgoingConnection = directPortPair.toPort.connectionList[0]
+            Trev = "T" + outgoingConnection.displayName
 
             inputPos = directPortPair.relativeInputHeight
             outputPos = directPortPair.relativeOutputHeight
@@ -919,9 +716,12 @@ class StorageTank(BlockItem):
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
             HxName = heatExchanger.displayName
-            Tname = "T" + heatExchanger.port1.connectionList[1].displayName
-            Mfrname = "Mfr" + heatExchanger.port1.connectionList[1].displayName
-            Trev = "T" + heatExchanger.port2.connectionList[1].displayName
+            incomingConnection = heatExchanger.port1.connectionList[0]
+            Tname = "T" + incomingConnection.displayName
+            Mfrname = "Mfr" + incomingConnection.displayName
+
+            outgoingConnection = heatExchanger.port2.connectionList[0]
+            Trev = "T" + outgoingConnection.displayName
 
             inputPos = heatExchanger.relativeInputHeight
             outputPos = heatExchanger.relativeOutputHeight
@@ -944,32 +744,24 @@ class StorageTank(BlockItem):
             dictInputAux = {"zAux": 0.0, "qAux": 0.0}
             auxiliaryPorts.append(dictInputAux)
 
-        exportPath = os.path.join(self.path, self.displayName + ".ddck")
+        exportPath = _os.path.join(self.path, self.displayName + ".ddck")
         self.logger.debug(exportPath)
 
         tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
 
-        tool.createDDck(self.path, self.displayName, self.displayName, typeFile="ddck")
+        tool.createDDck(self.path, self.displayName, typeFile="ddck")
         self.loadedTo = self.path
-
-    def loadDck(self):
-        self.logger.debug("Opening diagram")
-        self.exportDck()
-        filePath = self.model.rootPath()
-        shutil.copy(self.loadedTo, filePath)
 
     def debugConn(self):
         self.logger.debug("Debugging conn")
         errorConnList = ""
-        for i in range(len(self.directPortPairs)):
-            connection = self.directPortPairs[i].connection
-
-            stFromPort = connection.fromPort
-            stToPort = connection.toPort
-            toPort1 = connection.fromPort.connectionList[1].toPort
-            fromPort2 = connection.toPort.connectionList[1].fromPort
-            connName1 = connection.fromPort.connectionList[1].displayName
-            connName2 = connection.toPort.connectionList[1].displayName
+        for directPort in self.directPortPairs:
+            stFromPort = directPort.fromPort
+            stToPort = directPort.toPort
+            toPort1 = stFromPort.connectionList[0].toPort
+            fromPort2 = stToPort.connectionList[0].fromPort
+            connName1 = stFromPort.connectionList[0].displayName
+            connName2 = stToPort.connectionList[0].displayName
 
             if stFromPort != toPort1:
                 errorConnList = errorConnList + connName1 + "\n"
@@ -990,17 +782,17 @@ class StorageTank(BlockItem):
 
     def checkConnExists(self):
         for hx in self.heatExchangers:
-            if len(hx.port1.connectionList) < 2:
+            if not hx.port1.connectionList:
                 return False
-            if len(hx.port2.connectionList) < 2:
+            if not hx.port2.connectionList:
                 return False
 
         for ports in self.leftDirectPortPairsPortItems:
-            if len(ports.connectionList) < 2:
+            if not ports.connectionList:
                 return False
 
         for ports in self.rightDirectPortPairsPortItems:
-            if len(ports.connectionList) < 2:
+            if not ports.connectionList:
                 return False
 
         return True
@@ -1021,10 +813,10 @@ class StorageTank(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = _os.path.join(self.path, "ddck")
+        self.path = _os.path.join(self.path, pathName)
+        if not _os.path.exists(self.path):
+            _os.makedirs(self.path)
 
         self.model = MyQFileSystemModel()
         self.model.setRootPath(self.path)
@@ -1045,10 +837,10 @@ class StorageTank(BlockItem):
         to update the root path.
         """
         pathName = self.displayName
-        self.path = os.path.join(path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = _os.path.join(path, "ddck")
+        self.path = _os.path.join(self.path, pathName)
+        if not _os.path.exists(self.path):
+            _os.makedirs(self.path)
         self.model.setRootPath(self.path)
         self.tree.setRootIndex(self.model.index(self.path))
 
@@ -1068,7 +860,7 @@ class StorageTank(BlockItem):
         widgetToRemove = self.parent.parent().findChild(
             QTreeView, self.displayName + "Tree"
         )
-        shutil.rmtree(self.path)
+        _sh.rmtree(self.path)
         try:
             widgetToRemove.hide()
         except AttributeError:
@@ -1085,12 +877,12 @@ class StorageTank(BlockItem):
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.split(self.path)[-1] == "" or os.path.split(self.path)[-1] == "ddck":
-            os.makedirs(destPath)
+        self.logger.debug(_os.path.dirname(self.path))
+        destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
+        if _os.path.split(self.path)[-1] == "" or _os.path.split(self.path)[-1] == "ddck":
+            _os.makedirs(destPath)
         else:
-            if os.path.exists(self.path):
-                os.rename(self.path, destPath)
+            if _os.path.exists(self.path):
+                _os.rename(self.path, destPath)
         self.path = destPath
         self.logger.debug(self.path)

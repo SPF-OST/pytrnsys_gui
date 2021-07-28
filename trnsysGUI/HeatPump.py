@@ -17,7 +17,7 @@ import trnsysGUI.images as _img
 
 class HeatPump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(HeatPump, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.inputs.append(PortItem("i", 0, self))
         self.inputs.append(PortItem("i", 2, self))
@@ -29,8 +29,6 @@ class HeatPump(BlockItem):
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
-
-        self.subBlockCounter = 0
 
         self.changeSize()
         self.addTree()
@@ -106,7 +104,7 @@ class HeatPump(BlockItem):
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.logger.debug("Loading a HeatPump block")
 
         self.flippedH = i["FlippedH"]
@@ -180,49 +178,40 @@ class HeatPump(BlockItem):
         return status, equation
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         f = ""
         for i in range(len(self.inputs)):
-            # ConnectionList lenght should be max offset
-            temp = ""
             for c in self.inputs[i].connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                else:
-                    if len(self.outputs[i].connectionList) > 0:
+                if len(self.outputs[i].connectionList) > 0:
+                    if i == 0:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[0])
+                        temp += " " * (descConnLength - len(temp))
 
-                        if i == 0:
-                            temp = (
-                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                            )  # + str(t.childIds[0])
-                            temp += " " * (descConnLength - len(temp))
+                        # HeatPump will have a two-liner exportConnString
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "HeatPump" + "\n"
 
-                            # HeatPump will have a two-liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "HeatPump" + "\n"
+                    elif i == 1:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[1])
+                        temp += " " * (descConnLength - len(temp))
 
-                        elif i == 1:
-                            temp = (
-                                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                            )  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
-
-                            # HeatPump will have a two liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Evap" + "\n"
-                        else:
-                            f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                        # Presumably used only for storing the order of connections
-                        self.trnsysConn.append(c)
-                        self.trnsysConn.append(self.outputs[i].connectionList[0])
-
+                        # HeatPump will have a two liner exportConnString
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Evap" + "\n"
                     else:
-                        f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
+                        f += "Error: There are more inputs than trnsysIds" + "\n"
 
-        return f, 2
+                    # Presumably used only for storing the order of connections
+                    self.trnsysConn.append(c)
+                    self.trnsysConn.append(self.outputs[i].connectionList[0])
+
+                else:
+                    f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
+
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 0,0 ", 2

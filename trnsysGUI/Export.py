@@ -28,52 +28,18 @@ class Export(object):
 
         self.lineNumOfPar = 0
         for component in self.trnsysObj:
-            numOfRelPorts = 0
-            if isinstance(component, StorageTank) or (
-                isinstance(component, Connection)
-                and (type(component.fromPort.parent) is StorageTank or type(component.toPort.parent) is StorageTank)
-            ):
-                pass
-            elif isinstance(component, Connection):
+            if isinstance(component, Connection):
                 numOfRelPorts = 1
             else:
-                try:
-                    numOutputs = len(component.outputs)
-                except:
-                    pass
-                try:
-                    numInputs = len(component.inputs)
-                except:
-                    pass
-                if numOutputs + numInputs <= 1:
-                    numOfRelPorts = numOutputs + numInputs
+                numOutputs = len(component.outputs)
+                numInputs = len(component.inputs)
+
+                if (numInputs == 0 and numOutputs == 1) or (numInputs == 1 and numOutputs == 0):
+                    numOfRelPorts = 1
                 else:
                     numOfRelPorts = min(numOutputs, numInputs)
             self.lineNumOfPar += numOfRelPorts
         self.numOfPar = 4 * self.lineNumOfPar + 1
-
-    def connectionExplorer(self):
-        connectionDict = {}
-        connectionDictNum = {}
-
-        numOfStorageTanks = 0
-        for t in self.trnsysObj:
-            if not isinstance(t, StorageTank):
-                toElement = ""
-                try:
-                    toElement = t.toPort.parent.trnsysId
-                except:
-                    pass
-
-                fromElement = ""
-                try:
-                    fromElement = t.fromPort.parent.trnsysId
-                except:
-                    pass
-
-                connectionDict[t.displayName] = [t.trnsysId, toElement, fromElement]
-                connectionDictNum[str(t.trnsysId)] = t.displayName
-        return connectionDict, connectionDictNum
 
     def exportBlackBox(self, exportTo="ddck"):
         f = "*** Black box component temperatures" + "\n"
@@ -155,18 +121,15 @@ class Export(object):
         f += str(self.lineNumOfPar) + "\n"
 
         # exportConnsString: i/o i/o 0 0
-        tempObjList = []
         nameString = ""
         for t in self.trnsysObj:
 
-            noHydraulicConnection = isinstance(t, StorageTank) or (
-                not (isinstance(t, Connection)) and not t.outputs and not t.inputs
-            )
+            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
             else:
-                ObjToCheck = t.exportParametersFlowSolver(descConnLength)[0]
+                ObjToCheck = t.exportParametersFlowSolver(descConnLength)
                 f += ObjToCheck
                 ObjToCheck = str(ObjToCheck).split(": ")[-1].rstrip()
 
@@ -272,7 +235,7 @@ class Export(object):
     def exportOutputsFlowSolver(self, simulationUnit):
         f = ""
 
-        abc = list(string.ascii_uppercase)[0:3]
+        abc = "ABC"
 
         prefix = "Mfr"
         equationNumber = 1
@@ -281,9 +244,7 @@ class Export(object):
         tot = ""
 
         for t in self.trnsysObj:
-            noHydraulicConnection = isinstance(t, StorageTank) or (
-                not (isinstance(t, Connection)) and not t.outputs and not t.inputs
-            )
+            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -371,7 +332,7 @@ class Export(object):
             loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
 
             for c in g.itemList:
-                if isinstance(c, Connection) and not c.isVirtualConn:
+                if isinstance(c, Connection):
                     loopText += "*** " + c.displayName + "\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
@@ -390,7 +351,7 @@ class Export(object):
         rightCounter = 0
 
         for i in self.editor.groupList[0].itemList:
-            if isinstance(i, Connection) and not i.isVirtualConn:
+            if isinstance(i, Connection):
                 if rightCounter == 0:
                     lossText += "P" + i.displayName + "_kW"
                 else:
@@ -442,7 +403,7 @@ class Export(object):
         s = ""
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isVirtualConn:
+            if isinstance(t, Connection):
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
@@ -496,7 +457,7 @@ class Export(object):
         s = ""
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection) and not t.isVirtualConn:
+            if isinstance(t, Connection):
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"

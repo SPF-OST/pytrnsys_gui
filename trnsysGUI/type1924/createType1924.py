@@ -47,7 +47,8 @@ class Type1924_TesPlugFlow:
 
         return lines
 
-    def getOnePortInputs(self, nTes, idPort, connectorPort):
+    @staticmethod
+    def _getOnePortInputs(nTes, idPort, connectorPort):
 
         lines = ""
 
@@ -813,13 +814,12 @@ class Type1924_TesPlugFlow:
 
         return lines
 
-    def createDDck(self, path, name, tankName, typeFile="ddck"):
-
+    def createDDck(self, path, tankName, typeFile="ddck"):
         lines = ""
         if typeFile == "ddck":
             self.extension = "ddck"
             lines = lines + self.sLine
-            lines = lines + ("**BEGIN %s.ddck\n" % name)
+            lines = lines + ("**BEGIN %s.ddck\n" % tankName)
             lines = lines + self.sLine + "\n"
             lines = lines + self.sLine
             lines = lines + "** Plug-Flow Model exported from TRNSYS GUI\n"
@@ -858,18 +858,18 @@ class Type1924_TesPlugFlow:
 
         for idPort in range(self.nMaxPorts):
             if idPort <= nPorts - 1:
-                line = self.getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
+                line = self._getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
                 lines = lines + line
                 inputTemperature = line.split("\n")[1].split("=")[0].replace(" ", "")
                 ddcxLine = (
-                    "T"
-                    + name
-                    + "Port"
-                    + self.connectorsPort[idPort]["side"]
-                    + str(int(round(self.connectorsPort[idPort]["zIn"] * 100, 0)))
-                    + "="
-                    + inputTemperature
-                    + "\n"
+                        "T"
+                        + tankName
+                        + "Port"
+                        + self.connectorsPort[idPort]["side"]
+                        + str(int(round(self.connectorsPort[idPort]["zIn"] * 100, 0)))
+                        + "="
+                        + inputTemperature
+                        + "\n"
                 )
 
                 ddcxLines = ddcxLines + ddcxLine
@@ -897,14 +897,14 @@ class Type1924_TesPlugFlow:
             line = outputTemperature + "=[%d,%d] ! \n" % (nUnit, counter)
             lines = lines + line
             ddcxLine = (
-                "T"
-                + name
-                + "Port"
-                + self.connectorsPort[idPort]["side"]
-                + str(int(self.connectorsPort[idPort]["zOut"] * 100))
-                + "="
-                + outputTemperature
-                + "\n"
+                    "T"
+                    + tankName
+                    + "Port"
+                    + self.connectorsPort[idPort]["side"]
+                    + str(int(self.connectorsPort[idPort]["zOut"] * 100))
+                    + "="
+                    + outputTemperature
+                    + "\n"
             )
             ddcxLines = ddcxLines + ddcxLine
             counter = counter + 2
@@ -927,10 +927,10 @@ class Type1924_TesPlugFlow:
             counter = counter + 10
 
         if ddcxLines != "":
-            header = self.sLine + "**BEGIN " + name + ".ddcx\n" + self.sLine
-            header = header + "** This file is used to store the black box component outputs of " + name + "\n\n"
+            header = self.sLine + "**BEGIN " + tankName + ".ddcx\n" + self.sLine
+            header = header + "** This file is used to store the black box component outputs of " + tankName + "\n\n"
             ddcxLines = header + ddcxLines
-            outfileDdcxPath = os.path.join(path, name)
+            outfileDdcxPath = os.path.join(path, tankName)
             outfileDdcx = open(outfileDdcxPath + ".ddcx", "w")
             outfileDdcx.writelines(ddcxLines)
             outfileDdcx.close()
@@ -984,46 +984,7 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getInsulationPlateParValues(nTes)
         lines = lines + self.getParameters(self.inputs)
 
-        nameWithPath = "%s\%s.%s" % (path, name, self.extension)
+        nameWithPath = "%s\%s.%s" % (path, (tankName), self.extension)
         outfile = open(nameWithPath, "w")
         outfile.writelines(lines)
         outfile.close()
-
-
-if __name__ == "__main__":
-
-    path = "C:\Daten\OngoingProject\SolTherm2050\Simulations\ddck\Tes"
-    name = "Type1924_automatic"
-
-    tool = Type1924_TesPlugFlow()
-
-    inputs = {"nUnit": 50, "nType": 1924, "nTes": 1, "nPorts": 2, "nHx": 2, "nHeatSources": 1}
-
-    dictInput = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0}
-    dictInputHx = {"T": "Null", "Mfr": "Null", "Trev": "Null", "zIn": 0.0, "zOut": 0.0, "cp": 0.0, "rho": 0.0}
-    dictInputAux = {"zAux": 0.0, "qAux": 0.0}
-
-    connectorsPort = []
-    connectorsHx = []
-    connectorsAux = []
-
-    for i in range(inputs["nPorts"]):
-        connectorsPort.append(dictInput)
-
-    for i in range(inputs["nHx"]):
-        connectorsHx.append(dictInputHx)
-
-    for i in range(inputs["nHeatSources"]):
-        connectorsAux.append(dictInputAux)
-
-    connectorsPort[0] = {"T": "60.", "Mfr": "2000", "Trev": "0", "zIn": 0.99, "zOut": 0.01}
-    connectorsPort[1] = {"T": "10.", "Mfr": "1000", "Trev": "0", "zIn": 0.05, "zOut": 0.95}
-
-    connectorsHx[0] = {"T": "50.", "Mfr": "800", "Trev": "0", "zIn": 0.9, "zOut": 0.5, "cp": "cpWat", "rho": "rhoWat"}
-    connectorsHx[1] = {"T": "30.", "Mfr": "500", "Trev": "0", "zIn": 0.4, "zOut": 0.2, "cp": "cpWat", "rho": "rhoWat"}
-
-    connectorsAux[0] = {"zAux": 0.7, "qAux": 3}  # kW
-
-    tool.setInputs(inputs, connectorsPort, connectorsHx, connectorsAux)
-
-    tool.createDDck(path, name, typeFile="ddck")

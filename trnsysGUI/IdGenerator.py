@@ -1,29 +1,26 @@
 # pylint: skip-file
 # type: ignore
 
-import uuid
 from itertools import count
 
 
 class IdGenerator(object):
+    # This value is used for the IDs when migrating from old JSON formats.
+    # After deserialization the IDs are set such that there are no duplicate
+    # IDs across all objects.
+    UNINITIALIZED_ID = -1
+
     def __init__(self):
         self.ids = []
         self.trnsysIds = []
         self.connIds = []
-        self.blockIds = []
         self.storageTes = []
         self.storageType = []
         self.idCounter = count(1)
         self.trnsysIdCounter = count(1)
         self.connIdCounter = count(1)
-        self.blockIdCounter = count(1)
         self.storagenTesCounter = count(1)
         self.storageTypeCounter = count(1924)
-
-    def getUUID(self):
-        x = uuid.uuid1().int
-        self.uuids.append(x)
-        return x
 
     def getID(self):
         id = next(self.idCounter)
@@ -40,11 +37,6 @@ class IdGenerator(object):
         self.connIds.append(id)
         return id
 
-    def getBlockID(self):
-        id = next(self.blockIdCounter)
-        self.blockIds.append(id)
-        return id
-
     def getStoragenTes(self):
         id = next(self.storagenTesCounter)
         self.storageTes.append(id)
@@ -54,9 +46,6 @@ class IdGenerator(object):
         id = next(self.storageTypeCounter)
         self.storageType.append(id)
         return id
-
-    def setBlockID(self, id):
-        self.blockIdCounter = count(id)
 
     def setID(self, id):
         self.idCounter = count(id)
@@ -71,12 +60,10 @@ class IdGenerator(object):
         self.ids = []
         self.trnsysIds = []
         self.connIds = []
-        self.blockIds = []
         self.storageTes = []
         self.storageType = []
         self.idCounter = count(1)
         self.trnsysIdCounter = count(1)
         self.connIdCounter = count(1)
-        self.blockIdCounter = count(1)
         self.storagenTesCounter = count(1)
         self.storageTypeCounter = count(1924)

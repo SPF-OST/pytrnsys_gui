@@ -1,0 +1,88 @@
+{
+    ".__BlockDict__": true,
+    "BlockDisplayName": "Dhw",
+    "BlockName": "StorageTank",
+    "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+    "directPortPairs": [
+        {
+            "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+            "portPair": {
+                "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                "inputPort": {
+                    "id": 1982,
+                    "relativeHeight": 0.95
+                },
+                "outputPort": {
+                    "id": 1983,
+                    "relativeHeight": 0.35
+                },
+                "side": "left",
+                "trnsysId": -1
+            }
+        },
+        {
+            "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+            "portPair": {
+                "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                "inputPort": {
+                    "id": 3924,
+                    "relativeHeight": 0.7
+                },
+                "outputPort": {
+                    "id": 3925,
+                    "relativeHeight": 0.9
+                },
+                "side": "right",
+                "trnsysId": -1
+            }
+        },
+        {
+            "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+            "portPair": {
+                "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                "inputPort": {
+                    "id": 3941,
+                    "relativeHeight": 0.05
+                },
+                "outputPort": {
+                    "id": 3942,
+                    "relativeHeight": 0.95
+                },
+                "side": "right",
+                "trnsysId": -1
+            }
+        }
+    ],
+    "groupName": "defaultGroup",
+    "heatExchangers": [
+        {
+            "__version__": "be068f84-2627-4f53-87a9-9a1f4fd1c529",
+            "id": 1976,
+            "name": "SolarHx",
+            "parentId": 1975,
+            "portPair": {
+                "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                "inputPort": {
+                    "id": 1977,
+                    "relativeHeight": 0.3
+                },
+                "outputPort": {
+                    "id": 1978,
+                    "relativeHeight": 0.12
+                },
+                "side": "left",
+                "trnsysId": -1
+            },
+            "width": 40
+        }
+    ],
+    "height": 220.0,
+    "id": 1975,
+    "isHorizontallyFlipped": false,
+    "isVerticallyFlipped": false,
+    "position": [
+        -681.9155092592591,
+        -581.1302806712963
+    ],
+    "trnsysId": 638
+}

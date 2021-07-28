@@ -22,15 +22,6 @@ class PortItem(QGraphicsEllipseItem):
         self.connectionList = []
         self.id = self.parent.parent.parent().idGen.getID()
 
-        # This boolean is used when the storage inside is connected, thus preventing Hx to connect to that.
-        self.isFromHx = False
-
-        # For debugging connections at StorageTank
-        self.visited = False
-
-        # For saving the connection of a port pair in a Tank
-        self.portPairVisited = False
-
         self.color = "white"
         self.ashColorR = QColor(239, 57, 75)
         self.ashColorB = QColor(20, 83, 245)

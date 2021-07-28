@@ -28,8 +28,6 @@ class GenericBlock(BlockItem):
         self.childIds = []
         self.childIds.append(self.trnsysId)
 
-        self.subBlockCounter = 0
-
         self._imageAccessor = _img.GENERIC_BLOCK_PNG
 
         # Disallow adding port pairs later, because the trnsysIDs of the generated port pairs have to be
@@ -259,25 +257,19 @@ class GenericBlock(BlockItem):
         self.setPixmap(pixmap)
 
     def exportParametersFlowSolver(self, descConnLength):
-        equationNr = 0
         f = ""
         for i in range(len(self.inputs)):
             c = self.inputs[i].connectionList[0]
-            if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                continue
-            elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                continue
-            else:
-                temp = (
-                    str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                )
-                temp += " " * (descConnLength - len(temp))
+            temp = (
+                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+            )
+            temp += " " * (descConnLength - len(temp))
 
-                # Generic block will have a 2n-liner exportConnString
-                self.exportConnsString += temp + "\n"
-                f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i+1) + "\n"
+            # Generic block will have a 2n-liner exportConnString
+            self.exportConnsString += temp + "\n"
+            f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i+1) + "\n"
 
-        return f, equationNr
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 " * len(self.inputs), len(self.inputs)

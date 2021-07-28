@@ -3,11 +3,10 @@
 
 import random
 
-from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu
 
-from trnsysGUI.Connection import Connection
 from trnsysGUI.PortItem import PortItem
 
 
@@ -28,7 +27,7 @@ class HeatExchanger(QGraphicsItemGroup):
         name="Untitled",
         **kwargs
     ):
-        super(HeatExchanger, self).__init__(parent)
+        super().__init__(parent)
         self.parent = parent
         self.logger = parent.logger
 
@@ -37,17 +36,13 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self.sSide = sideNr
         self.id = self.parent.parent.parent().idGen.getID()
-
-        self.conn = None
+        self.trnsysId = self.parent.parent.parent().idGen.getTrnsysID()
 
         self.parent.heatExchangers.append(self)
         self.setZValue(100)
 
         self.port1 = PortItem("i", self.sSide, self.parent)
         self.port2 = PortItem("o", self.sSide, self.parent)
-
-        self.port1.isFromHx = True
-        self.port2.isFromHx = True
 
         self.parent.inputs.append(self.port1)
         self.parent.outputs.append(self.port2)
@@ -65,43 +60,13 @@ class HeatExchanger(QGraphicsItemGroup):
                 self.displayName = name + str(self.id)
             elif "tempHx" in kwargs:
                 self.displayName = name
-            self.initNew()
-            self.loadedConnTrId = None  # Should not be used
+            self._setPortsColor()
         else:
             if "loadedHx" in kwargs:
                 self.logger.debug("Loading existing HeatExchanger")
                 self.displayName = name
-                self.loadedConnTrId = kwargs["connTrnsysID"]
 
-    def initNew(self):
-        self.conn = Connection(
-            self.port1, self.port2, True, self.parent.parent.parent()
-        )
-        self.conn.displayName = self.displayName
-
-        self.port1.setZValue(100)
-        self.port2.setZValue(100)
-
-        randomValue = int(random.uniform(20, 200))
-        randomColor = QColor(randomValue, randomValue, randomValue)
-        self.port1.innerCircle.setBrush(randomColor)
-        self.port2.innerCircle.setBrush(randomColor)
-        self.port1.visibleColor = randomColor
-        self.port2.visibleColor = randomColor
-
-        self._draw()
-
-    def initLoad(self):
-        self.logger.debug("Finishing up HeatExchanger loading")
-        self.logger.debug("self port1 is " + str(self.port1))
-        self.logger.debug("self port2  is " + str(self.port2))
-
-        self.conn = Connection(
-            self.port1, self.port2, True, self.parent.parent.parent()
-        )
-        self.conn.displayName = self.displayName
-        self.conn.trnsysId = self.loadedConnTrId
-
+    def _setPortsColor(self):
         self.port1.setZValue(100)
         self.port2.setZValue(100)
 
@@ -149,7 +114,6 @@ class HeatExchanger(QGraphicsItemGroup):
         self.scene().parent().showHxDlg(self)
 
     def rename(self, newName):
-        self.conn.displayName = newName
         self.displayName = newName
 
     def highlightHx(self):

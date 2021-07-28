@@ -19,10 +19,10 @@ class _StrictMock:
 
 
 class TestStorageTank:
-    LEGACY_JSON_PATH = _pl.Path(__file__).parent / "data" / "storageTankLegacyFormat.json"
+    LEGACY_JSON_PATH = _pl.Path(__file__).parent / "data" / "storageTankOldestFormat.json"
 
     def testDeserializeJsonFromLegacyFormatAndSerialize(self, tmp_path):  # pylint: disable=invalid-name
-        expectedPath = _pl.Path(__file__).parent / "data" / "storageTankConvertedToNewFormat.json"
+        expectedPath = _pl.Path(__file__).parent / "data" / "storageTankNewestFormat.json"
         expectedStorageTankJson = expectedPath.read_text()
 
         logger = _log.getLogger("root")
@@ -50,15 +50,8 @@ class TestStorageTank:
         storageTank = _st.StorageTank(trnsysType="StorageTank", parent=diagramViewMock)  # pylint: disable=no-member
         diagramViewMock.scene().addItem(storageTank)
 
-        connections = []
         blocks = []
-        storageTank.decode(legacySerializedStorageTank, connections, blocks)
-
-        for heatExchanger in storageTank.heatExchangers:
-            heatExchanger.initLoad()
-
-        for connection in connections:
-            connection.initLoad()
+        storageTank.decode(legacySerializedStorageTank, blocks)
 
         return storageTank
 
@@ -433,18 +426,18 @@ Tes%d
             externalFromPortConnection = _StrictMock(
                 displayName=f"dpp{i}ExtFromPortConn",
                 fromPort=_StrictMock(),
-                toPort=directPortPair.connection.fromPort,
+                toPort=directPortPair.fromPort,
             )
-            directPortPair.connection.fromPort.connectionList.append(
+            directPortPair.fromPort.connectionList.append(
                 externalFromPortConnection
             )
 
             externalToPortConnection = _StrictMock(
                 displayName=f"dpp{i}ExtToPortConn",
-                fromPort=directPortPair.connection.toPort,
+                fromPort=directPortPair.toPort,
                 toPort=_StrictMock(),
             )
-            directPortPair.connection.toPort.connectionList.append(
+            directPortPair.toPort.connectionList.append(
                 externalToPortConnection
             )
 
