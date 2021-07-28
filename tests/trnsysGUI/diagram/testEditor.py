@@ -41,7 +41,7 @@ def getProjects() -> _tp.Iterable[_Project]:
 
 def getTestProjects() -> _tp.Iterable[_Project]:
     testProjectTestCasesDir = _DATA_DIR / "tests"
-    testProjectTestCaseDirPaths = [tc for tc in testProjectTestCasesDir.iterdir() if not tc.name == "README"]
+    testProjectTestCaseDirPaths = [tc for tc in testProjectTestCasesDir.iterdir() if not tc.name == "README.txt"]
     for testProjectTestCaseDirPath in testProjectTestCaseDirPaths:
         projectName = testProjectTestCaseDirPath.name
         yield _Project.createForTestProject(projectName)
@@ -130,11 +130,7 @@ class _Helper:
         if self._project.shallCopyFolderFromExamples:
             self._copyExampleToTestInputFolder()
 
-    def ensureFilesAreEqual(
-        self,
-        fileRelativePathAsString: str,
-        shallReplaceRandomizedFlowRates: bool
-    ):
+    def ensureFilesAreEqual(self, fileRelativePathAsString: str, shallReplaceRandomizedFlowRates: bool):
         fileRelativePath = _pl.Path(fileRelativePathAsString)
         actualFilePath = self.actualProjectFolderPath / fileRelativePath
         expectedFilePath = self._expectedProjectFolderPath / fileRelativePath
