@@ -210,7 +210,6 @@ class DecoderPaste(json.JSONDecoder):
                         if tPort is None:
                             self.logger.debug("Did not found a tPort")
 
-                        # if not i["isVirtualConn"]:  # Now internal connections don't get encoded in the first place
                         if True:
                             for cornerL in i["CornerPositions"]:
                                 cornerL[0] += offset_x
