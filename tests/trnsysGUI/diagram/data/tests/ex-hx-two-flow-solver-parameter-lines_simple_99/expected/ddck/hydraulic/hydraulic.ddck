@@ -177,7 +177,7 @@ UHx-Col=U_loop_0
 EQUATIONS 1
 PipeLossTot=PTes-Hx_kW+PHx-Tes_kW+PCol-Hx_kW+PHx-Col_kW
 
-ASSIGN ExternalHeatExchanger_Mfr.prt 455
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 455
 
 UNIT 455 TYPE 25! User defined Printer
 PARAMETERS 10
@@ -197,7 +197,7 @@ MfrTes-Hx MfrHx-Tes MfrCol-Hx MfrHx-Col
 ***
 MfrTes-Hx MfrHx-Tes MfrCol-Hx MfrHx-Col 
 
-ASSIGN ExternalHeatExchanger_T.prt 456
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_T.prt 456
 
 UNIT 456 TYPE 25! User defined Printer
 PARAMETERS 10

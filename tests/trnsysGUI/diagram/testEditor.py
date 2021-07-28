@@ -1,57 +1,86 @@
+import dataclasses as _dc
 import logging as _log
 import pathlib as _pl
-import shutil as _sh
 import re as _re
+import shutil as _sh
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
-import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.StorageTank as _st
+import trnsysGUI.diagram.Editor as _de
+
+_DATA_DIR = _pl.Path(__file__).parent / "data"
+
+
+@_dc.dataclass
+class _Project:
+    projectName: str
+    testCasesDirName: str
+    shallCopyFolderFromExamples: bool
+
+    @staticmethod
+    def createForTestProject(projectName: str) -> "_Project":
+        return _Project(projectName, "tests", False)
+
+    @staticmethod
+    def createForExampleProject(projectName: str) -> "_Project":
+        return _Project(projectName, "examples", True)
+
+    @property
+    def testId(self) -> str:
+        return f"{self.projectName} [in {self.testCasesDirName}]"
+
+
+def getProjects() -> _tp.Iterable[_Project]:
+    yield _Project.createForExampleProject("TRIHP_dualSource")
+
+    yield from getTestProjects()
+
+
+def getTestProjects() -> _tp.Iterable[_Project]:
+    testProjectTestCasesDir = _DATA_DIR / "tests"
+    testProjectTestCaseDirPaths = [tc for tc in testProjectTestCasesDir.iterdir() if not tc.name == "README"]
+    for testProjectTestCaseDirPath in testProjectTestCaseDirPaths:
+        projectName = testProjectTestCaseDirPath.name
+        yield _Project.createForTestProject(projectName)
+
+
+TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 
 class TestEditor:
-    @_pt.mark.parametrize(
-        "exampleProjectName",
-        ["ExternalHeatExchanger", "TRIHP_dualSource", "HeatingNetwork"],
-    )
-    def testStorageAndHydraulicExports(self, exampleProjectName: str):
-        helper = _Helper(exampleProjectName)
+    @_pt.mark.parametrize("project", TEST_CASES)
+    def testStorageAndHydraulicExports(self, project: _Project, request: _pt.FixtureRequest):
+        helper = _Helper(project)
         helper.setup()
 
         # The following line is required otherwise QT will crash
-        _ = _qtw.QApplication([])
+        application = _qtw.QApplication([])
 
-        projectFolderPath = helper.projectFolderPath
+        def quitApplication():
+            application.quit()
+
+        request.addfinalizer(quitApplication)
+
+        projectFolderPath = helper.actualProjectFolderPath
 
         self._exportHydraulic(projectFolderPath, _format="mfs")
-        mfsDckFileRelativePath = f"{exampleProjectName}_mfs.dck"
-        helper.ensureFilesAreEqual(
-            mfsDckFileRelativePath, shallReplaceRandomizedFlowRates=True
-        )
+        mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
+        helper.ensureFilesAreEqual(mfsDdckRelativePath, shallReplaceRandomizedFlowRates=True)
 
         self._exportHydraulic(projectFolderPath, _format="ddck")
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
-        helper.ensureFilesAreEqual(
-            hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False
-        )
+        helper.ensureFilesAreEqual(hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False)
 
         storageTanks = self._exportStorageTank(projectFolderPath)
         for storageTank in storageTanks:
-            ddckFileRelativePath = (
-                f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddck"
-            )
-            helper.ensureFilesAreEqual(
-                ddckFileRelativePath, shallReplaceRandomizedFlowRates=False
-            )
+            ddckFileRelativePath = f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddck"
+            helper.ensureFilesAreEqual(ddckFileRelativePath, shallReplaceRandomizedFlowRates=False)
 
-            ddcxFileRelativePath = (
-                f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddcx"
-            )
-            helper.ensureFilesAreEqual(
-                ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False
-            )
+            ddcxFileRelativePath = f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddcx"
+            helper.ensureFilesAreEqual(ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False)
 
     def _exportStorageTank(self, projectFolderPath):
         editor = self._createEditor(projectFolderPath)
@@ -85,52 +114,47 @@ class TestEditor:
 class _Helper:
     def __init__(
         self,
-        exampleProjectName: str,
+        project: _Project,
     ):
-        self._exampleProjectName = exampleProjectName
+        self._project = project
 
-        dataFolderPath = _pl.Path(__file__).parent / "data"
+        testCasesFolderPath = _DATA_DIR / self._project.testCasesDirName
 
-        self._actualFolderPath = dataFolderPath / "actual"
+        # project name is used twice because the project file must always be contained in a folder
+        # of the same name
+        self.actualProjectFolderPath = testCasesFolderPath / self._project.projectName / self._project.projectName
 
-        self.projectFolderPath = self._actualFolderPath / self._exampleProjectName
-        self._expectedProjectFolderPath = (
-            dataFolderPath / "expected" / self._exampleProjectName
-        )
+        self._expectedProjectFolderPath = testCasesFolderPath / self._project.projectName / "expected"
 
     def setup(self):
-        self._copyExampleToTestInputFolder()
+        if self._project.shallCopyFolderFromExamples:
+            self._copyExampleToTestInputFolder()
 
     def ensureFilesAreEqual(
         self,
-        fileToCompareRelativePathAsString: str,
-        shallReplaceRandomizedFlowRates: bool,
+        fileRelativePathAsString: str,
+        shallReplaceRandomizedFlowRates: bool
     ):
-        fileToCompareRelativePath = _pl.Path(fileToCompareRelativePathAsString)
-
-        actualFilePath = self.projectFolderPath / fileToCompareRelativePath
-        expectedFilePath = self._expectedProjectFolderPath / fileToCompareRelativePath
+        fileRelativePath = _pl.Path(fileRelativePathAsString)
+        actualFilePath = self.actualProjectFolderPath / fileRelativePath
+        expectedFilePath = self._expectedProjectFolderPath / fileRelativePath
 
         actualContent = actualFilePath.read_text()
         expectedContent = expectedFilePath.read_text()
 
         if shallReplaceRandomizedFlowRates:
-            actualContent = self._replaceRandomizedFlowRatesWithPlaceHolder(
-                actualContent, placeholder="XXX"
-            )
+            actualContent = self._replaceRandomizedFlowRatesWithPlaceHolder(actualContent, placeholder="XXX")
 
         assert actualContent == expectedContent
 
     def _copyExampleToTestInputFolder(self):
-        if self._actualFolderPath.exists():
-            _sh.rmtree(self._actualFolderPath)
+        if self.actualProjectFolderPath.exists():
+            _sh.rmtree(self.actualProjectFolderPath)
 
         pytrnsysGuiDir = _pl.Path(__file__).parents[3]
-        exampleFolderPath = (
-            pytrnsysGuiDir / "data" / "examples" / self._exampleProjectName
-        )
+        exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / self._project.projectName
 
-        _sh.copytree(exampleFolderPath, self.projectFolderPath)
+        _sh.copytree(exampleFolderPath, self.actualProjectFolderPath)
 
     @classmethod
     def _replaceRandomizedFlowRatesWithPlaceHolder(cls, actualContent, placeholder):
@@ -139,9 +163,7 @@ class _Helper:
         def replaceValueWithPlaceHolder(match: _tp.Match):
             return cls._processMatch(match, placeholder)
 
-        actualContent = _re.sub(
-            pattern, replaceValueWithPlaceHolder, actualContent, flags=_re.MULTILINE
-        )
+        actualContent = _re.sub(pattern, replaceValueWithPlaceHolder, actualContent, flags=_re.MULTILINE)
 
         return actualContent
 
@@ -149,7 +171,7 @@ class _Helper:
     def _processMatch(match: _tp.Match, placeholder: str) -> str:
         matchedText = match[0]
         if matchedText == "MfrsupplyWater = 1000":
-            return "MfrsupplyWater = 1000"
+            return matchedText
 
         variableName = match["variableName"]
 
