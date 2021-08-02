@@ -174,8 +174,7 @@ class StorageTank(BlockItem):
             storageTankWidth=self.w,
             storageTankHeight=self.h,
             parent=self,
-            name=name,
-            tempHx=True,
+            name=name
         )
         return heatExchanger
 
@@ -372,8 +371,7 @@ class StorageTank(BlockItem):
             self.w,
             self.h,
             self,
-            name,
-            loadedHx=True,
+            name
         )
 
         if shallSetNamesAndIDs:

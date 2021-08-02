@@ -24,8 +24,7 @@ class HeatExchanger(QGraphicsItemGroup):
         storageTankWidth,
         storageTankHeight,
         parent,
-        name="Untitled",
-        **kwargs
+        name
     ):
         super().__init__(parent)
         self.parent = parent
@@ -54,19 +53,11 @@ class HeatExchanger(QGraphicsItemGroup):
             relativeOutputHeight,
         )
 
-        if kwargs == {} or "tempHx" in kwargs:
-            self.logger.debug("Creating new HeatExchanger")
-            if kwargs == {}:
-                self.displayName = name + str(self.id)
-            elif "tempHx" in kwargs:
-                self.displayName = name
-            self._setPortsColor()
-        else:
-            if "loadedHx" in kwargs:
-                self.logger.debug("Loading existing HeatExchanger")
-                self.displayName = name
+        self.displayName = name
+        
+        self._draw()
 
-    def _setPortsColor(self):
+    def _draw(self):
         self.port1.setZValue(100)
         self.port2.setZValue(100)
 
@@ -77,7 +68,7 @@ class HeatExchanger(QGraphicsItemGroup):
         self.port1.visibleColor = randomColor
         self.port2.visibleColor = randomColor
 
-        self._draw()
+        self._drawCoils()
 
     def setId(self, newId):
         self.id = newId
@@ -98,10 +89,6 @@ class HeatExchanger(QGraphicsItemGroup):
 
         a1 = menu.addAction("Rename...")
         a1.triggered.connect(self.renameHx)
-
-        a2 = menu.addAction("PLACEHOLDER TO FILL THIS EMPTY SPACE (Delete...)")
-
-        a3 = menu.addAction("PLACEHOLDER TO FILL THIS EMPTY SPACE (Change position)")
 
         menu.exec_(event.screenPos())
 
@@ -137,7 +124,7 @@ class HeatExchanger(QGraphicsItemGroup):
             self.relativeOutputHeight,
         )
 
-        self._draw()
+        self._drawCoils()
 
     def setRelativeHeights(self, relativeInputHeight: float, relativeOutputHeight: float) -> None:
         self._clearDrawing()
@@ -149,9 +136,9 @@ class HeatExchanger(QGraphicsItemGroup):
             relativeOutputHeight,
         )
 
-        self._draw()
+        self._drawCoils()
 
-    def _draw(self):
+    def _drawCoils(self):
         sign = 1 if self.sSide == 0 else -1
 
         x, y = self._getPos()
