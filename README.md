@@ -48,7 +48,7 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
          
 1. Install `pytrnsys-gui` and its requirements:
     ```commandline
-    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/v0.9.4/requirements.txt
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/v0.9.5/requirements.txt
     ```
    (Note: In the [YouTube video](https://www.youtube.com/watch?v=c8VPmOCeQN8) the version is replaced manually, this is
    not necessary anymore, when copying the command line above.)
