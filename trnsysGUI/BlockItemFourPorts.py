@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import glob
 import os
 
@@ -11,24 +14,19 @@ from trnsysGUI.PortItem import PortItem
 class BlockItemFourPorts(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(BlockItemFourPorts, self).__init__(trnsysType, parent, **kwargs)
-        
+
         self.logger = parent.logger
 
         self.h = 120
         self.w = 120
-        self.inputs.append(PortItem('i', 0, self))
-        self.inputs.append(PortItem('i', 2, self))
-        self.outputs.append(PortItem('o', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        self.inputs.append(PortItem("i", 0, self))
+        self.inputs.append(PortItem("i", 2, self))
+        self.outputs.append(PortItem("o", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
-
-        self.subBlockCounter = 0
 
         self.changeSize()
 
@@ -47,25 +45,25 @@ class BlockItemFourPorts(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            dct['.__BlockDict__'] = True
-            dct['BlockName'] = self.name
-            dct['BlockDisplayName'] = self.displayName
-            dct['PortsIDIn'] = portListInputs
-            dct['PortsIDOut'] = portListOutputs
-            dct[self.name+'Position'] = (float(self.pos().x()), float(self.pos().y()))
-            dct['ID'] = self.id
-            dct['trnsysID'] = self.trnsysId
-            dct['childIds'] = self.childIds
-            dct['FlippedH'] = self.flippedH
-            dct['FlippedV'] = self.flippedH
-            dct['RotationN'] = self.rotationN
-            dct['GroupName'] = self.groupName
+            dct[".__BlockDict__"] = True
+            dct["BlockName"] = self.name
+            dct["BlockDisplayName"] = self.displayName
+            dct["PortsIDIn"] = portListInputs
+            dct["PortsIDOut"] = portListOutputs
+            dct[self.name + "Position"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["ID"] = self.id
+            dct["trnsysID"] = self.trnsysId
+            dct["childIds"] = self.childIds
+            dct["FlippedH"] = self.flippedH
+            dct["FlippedV"] = self.flippedH
+            dct["RotationN"] = self.rotationN
+            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.logger.debug("Loading a %s block" % self.name)
 
         self.flippedH = i["FlippedH"]
@@ -82,7 +80,7 @@ class BlockItemFourPorts(BlockItem):
             self.outputs[x].id = i["PortsIDOut"][x]
             self.logger.debug("Output at %s" % self.name)
 
-        self.setPos(float(i[self.name+"Position"][0]), float(i[self.name+"Position"][1]))
+        self.setPos(float(i[self.name + "Position"][0]), float(i[self.name + "Position"][1]))
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
 
@@ -113,16 +111,16 @@ class BlockItemFourPorts(BlockItem):
     def exportBlackBox(self):
         equations = []
         files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not(files):
-            status = 'noDdckFile'
+        if not (files):
+            status = "noDdckFile"
         else:
-            status = 'noDdckEntry'
+            status = "noDdckEntry"
         lines = []
         for file in files:
-            infile = open(file, 'r')
+            infile = open(file, "r")
             lines += infile.readlines()
         for i in range(len(lines)):
-            if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
+            if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
                 counter = 1
                 for j in range(i, len(lines) - i):
                     if lines[j][0] == "T":
@@ -130,58 +128,43 @@ class BlockItemFourPorts(BlockItem):
                         equations.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
                         counter += 1
                     if counter == 3:
-                        status = 'success'
+                        status = "success"
                         break
                 break
 
-        if status == 'noDdckFile' or status == 'noDdckEntry':
+        if status == "noDdckFile" or status == "noDdckEntry":
             equations.append("T" + self.displayName + "X1" + "=1")
             equations.append("T" + self.displayName + "X2" + "=1")
 
         return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         f = ""
-        for i in range(len(self.inputs)):
-            # ConnectionList lenght should be max offset
-            temp = ""
-            for c in self.inputs[i].connectionList:
-                if hasattr(c.fromPort.parent, self.name) and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, self.name) and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                else:
-                    if len(self.outputs[i].connectionList) > 0:
+        if self.outputs[0].connectionList:
+            incomingConnection = self.inputs[0].connectionList[0]
+            outgoingConnection = self.outputs[0].connectionList[0]
+            temp = (
+                    str(incomingConnection.trnsysId) + " " + str(outgoingConnection.trnsysId) + " 0 0 "
+            )
+            temp += " " * (descConnLength - len(temp))
+            self.exportConnsString += temp + "\n"
+            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
+            self.trnsysConn.append(incomingConnection)
+            self.trnsysConn.append(outgoingConnection)
 
-                        if i == 0:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
-                            temp += " " * (descConnLength - len(temp))
+        if self.outputs[1].connectionList:
+            incomingConnection = self.inputs[1].connectionList[0]
+            outgoingConnection = self.outputs[1].connectionList[0]
+            temp = (
+                    str(incomingConnection.trnsysId) + " " + str(outgoingConnection.trnsysId) + " 0 0 "
+            )
+            temp += " " * (descConnLength - len(temp))
+            self.exportConnsString += temp + "\n"
+            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
+            self.trnsysConn.append(incomingConnection)
+            self.trnsysConn.append(outgoingConnection)
 
-                            # ExternalHx will have a two-liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
-
-                        elif i == 1:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
-
-                            # ExternalHx will have a two liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
-                        else:
-                            f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                        # Presumably used only for storing the order of connections
-                        self.trnsysConn.append(c)
-                        self.trnsysConn.append(self.outputs[i].connectionList[0])
-
-                    else:
-                        f += "Output of %s for input[{0}] is not connected " % self.name.format(i)  + "\n"
-
-        return f, 2
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 0,0 ", 2
@@ -196,8 +179,19 @@ class BlockItemFourPorts(BlockItem):
         for j in range(2):
             for i in range(0, 3):
                 if i < 2:
-                    temp = prefix + self.displayName + "-Side" + str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                           str(equationNumber) + "]\n"
+                    temp = (
+                        prefix
+                        + self.displayName
+                        + "-Side"
+                        + str(j)
+                        + "_"
+                        + abc[i]
+                        + "=["
+                        + str(simulationUnit)
+                        + ","
+                        + str(equationNumber)
+                        + "]\n"
+                    )
                     tot += temp
                     self.exportEquations.append(temp)
                     # nEqUsed += 1  # DC
@@ -207,5 +201,10 @@ class BlockItemFourPorts(BlockItem):
 
     def getSubBlockOffset(self, c):
         for i in range(2):
-            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+            if (
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
+            ):
                 return i

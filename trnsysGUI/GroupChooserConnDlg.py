@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtWidgets import QPushButton, QListWidget, QHBoxLayout, QVBoxLayout, QLabel, QDialog
 
 
@@ -50,4 +53,3 @@ class GroupChooserConnDlg(QDialog):
     def cancel(self):
         # print("Canceling")
         self.close()
-

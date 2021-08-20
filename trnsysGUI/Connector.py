@@ -1,25 +1,27 @@
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+# pylint: skip-file
+# type: ignore
 
+import typing as _tp
+
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
 
 
 class Connector(BlockItem):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super(Connector, self).__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, parent):
+        super().__init__(trnsysType, parent)
         self.sizeFactor = 0.5
         self.w = 40
         self.h = 40
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
+        self.inputs.append(PortItem("i", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-        if "storagePorts" in kwargs:
-            self.storagePorts = kwargs["storagePorts"]
         self.changeSize()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.CONNECTOR_PNG
 
     def changeSize(self):
         w = self.w
@@ -40,7 +42,7 @@ class Connector(BlockItem):
 
         deltaH = self.h / 8
 
-        self.origInputsPos = [[0,delta]]
+        self.origInputsPos = [[0, delta]]
         self.origOutputsPos = [[w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -56,4 +58,4 @@ class Connector(BlockItem):
         return w, h
 
     def exportBlackBox(self):
-        return 'noBlackBoxOutput', []
+        return "noBlackBoxOutput", []

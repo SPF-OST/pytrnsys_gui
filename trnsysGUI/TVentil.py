@@ -1,7 +1,11 @@
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
+# pylint: skip-file
+# type: ignore
+
+import typing as _tp
+
 from PyQt5.QtWidgets import QGraphicsTextItem
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
 
@@ -20,18 +24,14 @@ class TVentil(BlockItem):
 
         self.exportInitialInput = 0.0
 
-        self.inputs.append(PortItem('o', 0, self))
-        self.inputs.append(PortItem('o', 1, self))
-        self.outputs.append(PortItem('i', 2, self))
-
-        my_transform = QTransform()
-        my_transform.scale(1, -1)
-        self.image = self.image.transformed(my_transform)
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        self.inputs.append(PortItem("o", 0, self))
+        self.inputs.append(PortItem("o", 1, self))
+        self.outputs.append(PortItem("i", 2, self))
 
         self.changeSize()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.T_VENTIL_SVG
 
     def changeSize(self):
         w = self.w
@@ -51,10 +51,10 @@ class TVentil(BlockItem):
 
         deltaH = self.h / 18
 
-        self.label.setPos(lx, h - self.flippedV*(h+h/2))
-        self.posLabel.setPos(lx+5, -15)
+        self.label.setPos(lx, h - self.flippedV * (h + h / 2))
+        self.posLabel.setPos(lx + 5, -15)
 
-        self.origInputsPos = [[0,delta], [delta, 0]]
+        self.origInputsPos = [[0, delta], [delta, 0]]
         self.origOutputsPos = [[w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
@@ -77,18 +77,18 @@ class TVentil(BlockItem):
 
     def encode(self):
         dictName, dct = super(TVentil, self).encode()
-        dct['IsTempering'] = self.isTempering
-        dct['PositionForMassFlowSolver'] = self.positionForMassFlowSolver
+        dct["IsTempering"] = self.isTempering
+        dct["PositionForMassFlowSolver"] = self.positionForMassFlowSolver
         return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
-        super(TVentil, self).decode(i, resConnList, resBlockList)
+    def decode(self, i, resBlockList):
+        super().decode(i, resBlockList)
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
             self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
-            self.positionForMassFlowSolver = i['PositionForMassFlowSolver']
+            self.positionForMassFlowSolver = i["PositionForMassFlowSolver"]
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         super(TVentil, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
@@ -97,7 +97,7 @@ class TVentil(BlockItem):
             self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
-            self.positionForMassFlowSolver = i['PositionForMassFlowSolver']
+            self.positionForMassFlowSolver = i["PositionForMassFlowSolver"]
 
     def exportParameterSolver(self, descConnLength):
         temp = ""
@@ -143,7 +143,7 @@ class TVentil(BlockItem):
 
     def exportMassFlows(self):
         if not self.isTempering:
-            resStr = "xFrac" + self.displayName + " = "+str(self.positionForMassFlowSolver) + "\n"
+            resStr = "xFrac" + self.displayName + " = " + str(self.positionForMassFlowSolver) + "\n"
             equationNr = 1
             return resStr, equationNr
         else:
@@ -166,7 +166,10 @@ class TVentil(BlockItem):
             f += "5 !Nb.of iterations before fixing the value \n"
             f += "INPUTS 4 \n"
 
-            if self.outputs[0].pos().y() == self.inputs[0].pos().y() or self.outputs[0].pos().x() == self.inputs[0].pos().x():
+            if (
+                self.outputs[0].pos().y() == self.inputs[0].pos().y()
+                or self.outputs[0].pos().x() == self.inputs[0].pos().x()
+            ):
                 first = self.inputs[0]
                 second = self.inputs[1]
 
@@ -186,18 +189,10 @@ class TVentil(BlockItem):
             return "", nUnit
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         temp = ""
 
-        # This is to assert that the input in front of the output is always printed before the third one
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                else:
                     temp = temp + str(c.trnsysId) + " "
                     self.trnsysConn.append(c)
 
@@ -206,16 +201,11 @@ class TVentil(BlockItem):
             tempArr = []
 
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
+                # On same hight as output
+                if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
+                    tempArr.insert(0, c)
                 else:
-                    # On same hight as output
-                    if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
-                        tempArr.insert(0, c)
-                    else:
-                        tempArr.append(c)
+                    tempArr.append(c)
 
             for conn in tempArr:
                 temp = temp + str(conn.trnsysId) + " "
@@ -226,7 +216,7 @@ class TVentil(BlockItem):
         self.exportConnsString = temp
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def exportInputsFlowSolver1(self):
         temp1 = "xFrac" + self.displayName
@@ -236,9 +226,18 @@ class TVentil(BlockItem):
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
         if self.isVisible():
             tot = ""
-            for i in range(0,3):
-                temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                       str(equationNumber) + "]\n"
+            for i in range(0, 3):
+                temp = (
+                    prefix
+                    + self.displayName
+                    + "_"
+                    + abc[i]
+                    + "=["
+                    + str(simulationUnit)
+                    + ","
+                    + str(equationNumber)
+                    + "]\n"
+                )
                 tot += temp
                 self.exportEquations.append(temp)
                 # nEqUsed += 1  # DC
@@ -249,7 +248,7 @@ class TVentil(BlockItem):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
-            f = ''
+            f = ""
             unitNumber = startingUnit
             tNr = 929  # Temperature calculation from a tee-piece
 
@@ -264,7 +263,7 @@ class TVentil(BlockItem):
             unitText += "INPUTS 6\n"
 
             for s in self.exportEquations:
-                unitText += s[0:s.find('=')] + "\n"
+                unitText += s[0 : s.find("=")] + "\n"
 
             for it in self.trnsysConn:
                 unitText += "T" + it.displayName + "\n"
@@ -281,4 +280,3 @@ class TVentil(BlockItem):
             return f, unitNumber
         else:
             return "", startingUnit
-

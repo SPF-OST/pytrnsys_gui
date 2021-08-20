@@ -1,8 +1,0 @@
-wheel
-
-pytest
-pytest-cov
-mypy
-pylint
-
--e file:.#egg=pytrnsys-gui

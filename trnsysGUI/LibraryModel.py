@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtCore import QMimeData, Qt
 from PyQt5.QtGui import QStandardItemModel
 
@@ -7,7 +10,7 @@ class LibraryModel(QStandardItemModel):
         QStandardItemModel.__init__(self, parent)
 
     def mimeTypes(self):
-        return ['component/name']
+        return ["component/name"]
 
     def mimeData(self, idxs):
         mimedata = QMimeData()
@@ -16,5 +19,5 @@ class LibraryModel(QStandardItemModel):
                 txt = self.data(idx, Qt.DisplayRole)
                 txt2 = bytearray()
                 txt2.extend(map(ord, txt))
-                mimedata.setData('component/name', txt2)
+                mimedata.setData("component/name", txt2)
         return mimedata

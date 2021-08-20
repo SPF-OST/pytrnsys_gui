@@ -1,14 +1,14 @@
-import os
-import shutil
+# pylint: skip-file
+# type: ignore
+
+import typing as _tp
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class TeePiece(BlockItem):
@@ -20,16 +20,16 @@ class TeePiece(BlockItem):
 
         self.typeNumber = 2
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.inputs.append(PortItem('i', 2, self))
-        self.outputs.append(PortItem('o', 1, self))
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        self.inputs.append(PortItem("i", 0, self))
+        self.inputs.append(PortItem("i", 2, self))
+        self.outputs.append(PortItem("o", 1, self))
 
         self.changeSize()
 
         # self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.TEE_PIECE_SVG
 
     def changeSize(self):
         w = self.w
@@ -49,11 +49,10 @@ class TeePiece(BlockItem):
 
         deltaH = self.h / 8
 
-        self.label.setPos(lx, h - self.flippedV*(h+h/2))
+        self.label.setPos(lx, h - self.flippedV * (h + h / 2))
 
-
-        self.origInputsPos = [[0,delta], [w,delta]]
-        self.origOutputsPos = [[delta,0]]
+        self.origInputsPos = [[0, delta], [w, delta]]
+        self.origOutputsPos = [[delta, 0]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -70,26 +69,14 @@ class TeePiece(BlockItem):
     def exportParametersFlowSolver(self, descConnLength):
         temp = ""
         for i in self.inputs:
-            # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0 and not self.inFirstRow:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0 and not self.inFirstRow:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         temp += str(self.typeNumber)
         temp += " " * (descConnLength - len(temp))
@@ -97,14 +84,23 @@ class TeePiece(BlockItem):
 
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
         if self.isVisible():
             tot = ""
             for i in range(0, 3):
-                temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                       str(equationNumber) + "]\n"
+                temp = (
+                    prefix
+                    + self.displayName
+                    + "_"
+                    + abc[i]
+                    + "=["
+                    + str(simulationUnit)
+                    + ","
+                    + str(equationNumber)
+                    + "]\n"
+                )
                 tot += temp
                 self.exportEquations.append(temp)
                 # nEqUsed += 1  # DC
@@ -115,7 +111,7 @@ class TeePiece(BlockItem):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
-            f = ''
+            f = ""
             unitNumber = startingUnit
             tNr = 929  # Temperature calculation from a tee-piece
 
@@ -130,7 +126,7 @@ class TeePiece(BlockItem):
             unitText += "INPUTS 6\n"
 
             for s in self.exportEquations:
-                unitText += s[0:s.find('=')] + "\n"
+                unitText += s[0 : s.find("=")] + "\n"
 
             for it in self.trnsysConn:
                 unitText += "T" + it.displayName + "\n"

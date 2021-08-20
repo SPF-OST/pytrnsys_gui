@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QMessageBox
 
 
@@ -55,4 +58,3 @@ class segmentDlg(QDialog):
             if str(t.displayName).lower() == n.lower():
                 return True
         return False
-

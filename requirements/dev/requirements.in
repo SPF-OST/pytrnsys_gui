@@ -1,11 +1,11 @@
 wheel
 
+twine
+
 pip-tools
 black
 
 sphinx
 
-PyQT5-stubs
-
--r ../test/requirements.in
+-r ../ci/test/requirements.in
 -e file:../pytrnsys#egg=pytrnsys

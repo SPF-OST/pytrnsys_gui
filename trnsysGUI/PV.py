@@ -1,5 +1,9 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
@@ -8,7 +12,7 @@ from PyQt5.QtWidgets import QTreeView
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class PV(BlockItem):
@@ -21,11 +25,11 @@ class PV(BlockItem):
         # self.outputs.append(PortItem('o', 2, self))
         self.loadedFiles = []
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.PV_SVG
 
     def changeSize(self):
         # self.logger.debug("passing through c change size")
@@ -65,7 +69,7 @@ class PV(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -74,7 +78,7 @@ class PV(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -86,7 +90,7 @@ class PV(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
+        for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
@@ -117,7 +121,7 @@ class PV(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -126,7 +130,7 @@ class PV(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -147,7 +151,7 @@ class PV(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\PV_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

@@ -1,28 +1,34 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItemFourPorts import BlockItemFourPorts
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 
+
 class ExternalHx(BlockItemFourPorts):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(ExternalHx, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.loadedFiles = []
 
         self.w = 80
         self.h = 120
 
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.EXTERNAL_HX_SVG
 
     def changeSize(self):
         w = self.w
@@ -42,8 +48,8 @@ class ExternalHx(BlockItemFourPorts):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0,delta], [w,delta]]
-        self.origOutputsPos = [[0,h-delta], [w,h-delta]]
+        self.origInputsPos = [[0, delta], [w, delta]]
+        self.origOutputsPos = [[0, h - delta], [w, h - delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -52,7 +58,7 @@ class ExternalHx(BlockItemFourPorts):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.inputs[0].side = (self.rotationN +2 * self.flippedH) % 4
+        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
@@ -67,7 +73,7 @@ class ExternalHx(BlockItemFourPorts):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -76,7 +82,7 @@ class ExternalHx(BlockItemFourPorts):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -88,7 +94,7 @@ class ExternalHx(BlockItemFourPorts):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
+        for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
@@ -119,7 +125,7 @@ class ExternalHx(BlockItemFourPorts):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -128,7 +134,7 @@ class ExternalHx(BlockItemFourPorts):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -149,7 +155,7 @@ class ExternalHx(BlockItemFourPorts):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\ExternalHx_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

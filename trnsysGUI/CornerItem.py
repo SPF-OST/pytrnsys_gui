@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5 import QtCore
 from PyQt5.QtGui import QBrush
 from PyQt5.QtWidgets import QGraphicsEllipseItem
@@ -56,12 +59,14 @@ class CornerItem(QGraphicsEllipseItem):
             # self.logger.debug("Position in arr is" + str(positionInArr))
 
             if type(nNode.parent) is CornerItem:
-                segAfter.setLine(self.scenePos().x(), self.scenePos().y(), segAfter.line().p2().x(),
-                                 segAfter.line().p2().y())
+                segAfter.setLine(
+                    self.scenePos().x(), self.scenePos().y(), segAfter.line().p2().x(), segAfter.line().p2().y()
+                )
 
             if type(pNode.parent) is CornerItem:
-                segBefore.setLine(segBefore.line().p1().x(), segBefore.line().p1().y(), self.scenePos().x(),
-                                  self.scenePos().y())
+                segBefore.setLine(
+                    segBefore.line().p1().x(), segBefore.line().p1().y(), self.scenePos().x(), self.scenePos().y()
+                )
 
             if hasattr(nNode.parent, "fromPort"):
                 # self.logger.debug("The moving node (cornerItem) is " + str(self.node))
@@ -131,8 +136,12 @@ class CornerItem(QGraphicsEllipseItem):
                     if self.node.lastNode() is nNode:
                         self.logger.debug("nNode is at toPort")
                         t = self.parent.segments[-1]
-                        t.setLine(self.scenePos().x(), self.scenePos().y(), nNode.parent.toPort.scenePos().x(),
-                                              nNode.parent.toPort.scenePos().y())
+                        t.setLine(
+                            self.scenePos().x(),
+                            self.scenePos().y(),
+                            nNode.parent.toPort.scenePos().x(),
+                            nNode.parent.toPort.scenePos().y(),
+                        )
 
             if hasattr(pNode.parent, "fromPort"):
                 # self.logger.debug("The moving node (cornerItem) is " + str(self.node))
@@ -197,8 +206,12 @@ class CornerItem(QGraphicsEllipseItem):
                     if self.node.firstNode() is pNode:
                         self.logger.debug("pNode is at fromPort")
                         f = self.parent.segments[0]
-                        f.setLine(pNode.parent.fromPort.scenePos().x(), pNode.parent.fromPort.scenePos().y(),
-                                  self.scenePos().x(), self.scenePos().y())
+                        f.setLine(
+                            pNode.parent.fromPort.scenePos().x(),
+                            pNode.parent.fromPort.scenePos().y(),
+                            self.scenePos().x(),
+                            self.scenePos().y(),
+                        )
 
             for s in self.parent.segments:
                 s.updateGrad()

@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtWidgets import QLabel, QListWidget, QVBoxLayout, QPushButton, QHBoxLayout, QDialog
 
 
@@ -56,9 +59,9 @@ class groupsEditor(QDialog):
         self.removeGroupProps()
         for g in self.diag.groupList:
             if g.displayName == name:
-               self.listVGProps.addItem(str(g.exportDi))
-               self.listVGProps.addItem(str(g.exportU))
-               self.listVGProps.addItem(str(g.exportL))
+                self.listVGProps.addItem(str(g.exportDi))
+                self.listVGProps.addItem(str(g.exportU))
+                self.listVGProps.addItem(str(g.exportL))
 
     def removeGroupProps(self):
         self.listVGProps.clear()
@@ -72,4 +75,3 @@ class groupsEditor(QDialog):
 
     def cancel(self):
         self.close()
-

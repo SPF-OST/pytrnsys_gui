@@ -8,6 +8,17 @@ trnsysGUI/clipboard.json
 trnsysGUI/recent/
 trnsysGUI/filepaths.txt
 
+# Test results and code coverage files
+/test-results/
+/.coverage
+
+
+# setuptools' setup.py and twine/PyPI related stuff
+/.eggs/
+/build/
+/dist/
+/pytrnsys_gui.egg-info/
+
 *.xml
 *.pyc
 *.log
@@ -19,3 +30,4 @@ trnsysGUI/filepaths.txt
 docs/_build/
 docs/trnsysGUI.uml
 
+/.tgitconfig

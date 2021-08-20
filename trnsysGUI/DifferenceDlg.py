@@ -1,10 +1,26 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 from datetime import datetime
 import sys
 
 from PyQt5.QtCore import QPointF
-from PyQt5.QtWidgets import QLabel, QLineEdit, QGridLayout, QHBoxLayout, QListWidget, QPushButton, QSpacerItem, \
-    QVBoxLayout, QRadioButton, QDialog, QTabWidget, QWidget, QMessageBox
+from PyQt5.QtWidgets import (
+    QLabel,
+    QLineEdit,
+    QGridLayout,
+    QHBoxLayout,
+    QListWidget,
+    QPushButton,
+    QSpacerItem,
+    QVBoxLayout,
+    QRadioButton,
+    QDialog,
+    QTabWidget,
+    QWidget,
+    QMessageBox,
+)
 
 
 class DifferenceDlg(QDialog):
@@ -17,6 +33,7 @@ class DifferenceDlg(QDialog):
 
     fileName refers to the name of the file where the differences are found.
     """
+
     def __init__(self, parent, exportList, referenceList, fileName):
         super(DifferenceDlg, self).__init__(parent)
         self.parent = parent
@@ -24,7 +41,6 @@ class DifferenceDlg(QDialog):
         self.updatedLines = []
 
         spacerHeight = 15
-
 
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
@@ -120,8 +136,8 @@ class DifferenceDlg(QDialog):
             for items in self.listWL.selectedItems():
                 # print(items.text()[:items.text().find(":")])
                 # print(items.text()[items.text().find(":")+1:])
-                lineNo = items.text()[:items.text().find(":")]
-                string = items.text()[items.text().find(":")+1:]
+                lineNo = items.text()[: items.text().find(":")]
+                string = items.text()[items.text().find(":") + 1 :]
                 self.updatedLines.append(items.text())
 
         self.updateReferenceFile(lineNo, string)
@@ -129,7 +145,6 @@ class DifferenceDlg(QDialog):
         msg2 = QMessageBox()
         msg2.setText("Changes updated in the reference file.")
         msg2.exec_()
-
 
     def acceptChangeAll(self):
 
@@ -142,8 +157,8 @@ class DifferenceDlg(QDialog):
             i += 1
 
         for item in items:
-            lineNo = item.text()[:item.text().find(":")]
-            string = item.text()[item.text().find(":") + 1:]
+            lineNo = item.text()[: item.text().find(":")]
+            string = item.text()[item.text().find(":") + 1 :]
             lineNoList.append(lineNo)
             stringList.append(string)
             self.updatedLines.append(item.text())
@@ -157,7 +172,6 @@ class DifferenceDlg(QDialog):
 
     def finishEdit(self):
         self.close()
-
 
     def updateReferenceFile(self, lineNo, string):
         """
@@ -177,27 +191,27 @@ class DifferenceDlg(QDialog):
 
         """
 
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        originalFilePath = os.path.join(ROOT_DIR, 'Reference')
+        originalFilePath = os.path.join(ROOT_DIR, "Reference")
         fileToUpdate = os.path.join(originalFilePath, self.fileName)
 
-        with open(fileToUpdate, 'r') as file:
+        with open(fileToUpdate, "r") as file:
             lines = file.readlines()
             # print(lines)
 
         stringToAdd = string
 
         try:
-            lines[int(lineNo)-1]
+            lines[int(lineNo) - 1]
         except IndexError:
             lines.append("")
 
-        lines[int(lineNo)-1] = stringToAdd
+        lines[int(lineNo) - 1] = stringToAdd
 
-        with open(fileToUpdate, 'w') as file:
+        with open(fileToUpdate, "w") as file:
             file.writelines(lines)
 
         print("finish running")
@@ -220,40 +234,39 @@ class DifferenceDlg(QDialog):
 
         """
 
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        originalFilePath = os.path.join(ROOT_DIR, 'Reference')
+        originalFilePath = os.path.join(ROOT_DIR, "Reference")
         fileToUpdate = os.path.join(originalFilePath, self.fileName)
 
-        with open(fileToUpdate, 'r') as file:
+        with open(fileToUpdate, "r") as file:
             lines = file.readlines()
 
         i = 0
         while i < len(lineNoList):
             try:
-                lines[int(lineNoList[i])-1]
+                lines[int(lineNoList[i]) - 1]
             except IndexError:
                 lines.append("")
 
-            lines[int(lineNoList[i])-1] = stringList[i]
+            lines[int(lineNoList[i]) - 1] = stringList[i]
             i += 1
 
-        with open(fileToUpdate, 'w') as file:
+        with open(fileToUpdate, "w") as file:
             file.writelines(lines)
 
         print("finish running")
 
-
     def updateChangelog(self):
         linesToAppend = []
 
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             ROOT_DIR = os.path.dirname(sys.executable)
         elif __file__:
             ROOT_DIR = os.path.dirname(__file__)
-        changelogfile = os.path.join(ROOT_DIR, 'changelogs.txt')
+        changelogfile = os.path.join(ROOT_DIR, "changelogs.txt")
 
         reason = self.reasonInput.text()
         dateAndTime = datetime.now()
@@ -266,21 +279,15 @@ class DifferenceDlg(QDialog):
         fileNameHeader = "Name of file:"
 
         linesToAppend.append(Divider)
-        linesToAppend.append(dt_string + '\n' + '\n')
-        linesToAppend.append(fileNameHeader + '\n')
-        linesToAppend.append(fileName + '\n' + '\n')
-        linesToAppend.append(differenceHeader + '\n')
+        linesToAppend.append(dt_string + "\n" + "\n")
+        linesToAppend.append(fileNameHeader + "\n")
+        linesToAppend.append(fileName + "\n" + "\n")
+        linesToAppend.append(differenceHeader + "\n")
         for lines in updatedLines:
             linesToAppend.append(lines)
-        linesToAppend.append('\n' + reasonHeader + '\n')
-        linesToAppend.append(reason + '\n')
+        linesToAppend.append("\n" + reasonHeader + "\n")
+        linesToAppend.append(reason + "\n")
         linesToAppend.append(Divider)
 
-
-        with open(changelogfile, 'a') as file:
+        with open(changelogfile, "a") as file:
             file.writelines(linesToAppend)
-
-
-
-
-

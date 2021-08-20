@@ -1,5 +1,9 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
@@ -9,6 +13,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class WTap(BlockItem):
@@ -16,16 +21,16 @@ class WTap(BlockItem):
         super(WTap, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
         self.h = 40
-        self.inputs.append(PortItem('i', 0, self))
+        self.inputs.append(PortItem("i", 0, self))
         self.loadedFiles = []
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         self.typeNumber = 5
 
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.W_TAP_SVG
 
     def changeSize(self):
         w = self.w
@@ -62,29 +67,16 @@ class WTap(BlockItem):
         return resStr, equationNr
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         temp = ""
         for i in self.inputs:
-            # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         temp += "0 0 "
         temp += str(self.typeNumber)
@@ -93,7 +85,7 @@ class WTap(BlockItem):
 
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def addTree(self):
         """
@@ -102,7 +94,7 @@ class WTap(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -111,7 +103,7 @@ class WTap(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -123,7 +115,7 @@ class WTap(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
+        for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
@@ -154,7 +146,7 @@ class WTap(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -163,7 +155,7 @@ class WTap(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -184,7 +176,7 @@ class WTap(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\WTap_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

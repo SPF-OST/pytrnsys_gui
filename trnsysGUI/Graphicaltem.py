@@ -1,46 +1,39 @@
+# pylint: skip-file
+# type: ignore
+
+import pathlib as _pl
+
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QImage, QCursor, QIcon
-from PyQt5.QtSvg import QSvgRenderer
+from PyQt5.QtGui import QCursor, QPixmap
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QMenu, QFileDialog
 
+import trnsysGUI.imageAccessor as _ia
+import trnsysGUI.images as _img
 from trnsysGUI.ResizerItem import ResizerItem
 
 
 class GraphicalItem(QGraphicsPixmapItem):
-
-    def __init__(self, parent, **kwargs):
+    def __init__(self, parent, **_):
 
         super(GraphicalItem, self).__init__(None)
-        self.w = 100.0
-        self.h = 100.0
+        self.w = 100
+        self.h = 100
         self.parent = parent
         self.resizeMode = False
         self.id = self.parent.parent().idGen.getID()
-
-        # self.trnsysId = self.parent.parent().idGen.getTrnsysID()
-        # if "loadedBlock" not in kwargs:
-        #     self.parent.parent().trnsysObj.append(self)
 
         self.flippedH = False
         self.flippedV = False
         self.rotationN = 0
         # Initial icon
-        self.imageSource = "images/gear.svg"
-        self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
-        self.setPixmap(self.image)
+        self._imageAccessor = _img.GEAR_SVG
+        pixmap = _img.GEAR_SVG.pixmap(width=self.w, height=self.h)
+        self.setPixmap(pixmap)
 
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
         self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
-        # self.resizer = ResizerItem(self)
-
-        # if kwargs == {}:
-        #     self.parent.parent().graphicalObj.append(self)
-        # else:
-        #     if "loadedGI" in kwargs:
-        #         pass
         self.parent.parent().graphicalObj.append(self)
 
     def setItemSize(self, w, h):
@@ -65,52 +58,41 @@ class GraphicalItem(QGraphicsPixmapItem):
         else:
             print("No image picked, name is " + fileName)
 
-    def setImageSource(self, s):
-        self.imageSource = s
+    def setImageSource(self, s: str):
+        self._imageAccessor = _ia.ImageAccessor.createForFile(_pl.Path(s))
 
     def updateImage(self):
-        if self.imageSource[-3:] == "svg":
-            self.image = QPixmap(QIcon(self.imageSource).pixmap(QSize(self.w, self.h)).toImage())
-            self.setPixmap(self.image)
-
-        elif self.imageSource[-3:] == "png":
-            self.image = QImage(self.imageSource)
-            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
+        pixmap = self._imageAccessor.pixmap(width=self.w, height=self.h)
+        self.setPixmap(pixmap)
 
     def encode(self):
         dct = {}
 
-        dct['.__BlockDict__'] = True
-        dct['BlockName'] = "GraphicalItem"
-        dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
-        dct['ID'] = self.id
-        dct['Size'] = self.w, self.h
-        dct['ImageSource'] = self.imageSource
-        dct['FlippedH'] = self.flippedH
-        dct['FlippedV'] = self.flippedV
-        dct['RotationN'] = self.rotationN
+        dct[".__BlockDict__"] = True
+        dct["BlockName"] = "GraphicalItem"
+        dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
+        dct["ID"] = self.id
+        dct["Size"] = self.w, self.h
+        dct["ImageSource"] = self._imageAccessor.getResourcePath()
+        dct["FlippedH"] = self.flippedH
+        dct["FlippedV"] = self.flippedV
+        dct["RotationN"] = self.rotationN
 
         dictName = "GraphicalItem-"
         return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
-        self.imageSource = i["ImageSource"]
+    def decode(self, i, resBlockList):
+        self._imageAccessor = _ia.ImageAccessor.createFromResourcePath(i["ImageSource"])
+
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
         self.id = i["ID"]
         self.w, self.h = i["Size"]
         self.updateImage()
 
-        # self.updateFlipStateH(i["FlippedH"])
-        # self.updateFlipStateV(i["FlippedV"])
-        # self.rotateBlockToN(i["RotationN"])
-        # self.displayName = i["BlockDisplayName"]
-        # self.label.setPlainText(self.displayName)
-
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.setPos(float(i["BlockPosition"][0] + offset_x),
-                    float(i["BlockPosition"][1] + offset_y))
+        self.setPos(float(i["BlockPosition"][0] + offset_x), float(i["BlockPosition"][1] + offset_y))
 
         # self.updateFlipStateH(i["FlippedH"])
         # self.updateFlipStateV(i["FlippedV"])

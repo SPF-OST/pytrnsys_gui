@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import re
 import sys
 from datetime import timedelta, datetime, MINYEAR
@@ -13,14 +16,14 @@ import pandas as pd
 import itertools
 import numpy as np
 
-class MassFlowVisualizer(QDialog):
 
-    def __init__(self, parent,mfrFile, tempFile):
+class MassFlowVisualizer(QDialog):
+    def __init__(self, parent, mfrFile, tempFile):
 
         super(MassFlowVisualizer, self).__init__(parent)
-        
+
         self.logger = parent.logger
-        
+
         self.dataFilePath = mfrFile
         self.tempDatafilePath = tempFile
         self.loadedFile = False
@@ -34,7 +37,7 @@ class MassFlowVisualizer(QDialog):
 
         self.parent = parent
         self.timeStep = 0
-        self.timeSteps = len(self.massFlowData.index) - 1    # 0 to 364
+        self.timeSteps = len(self.massFlowData.index) - 1  # 0 to 364
 
         # threshold values for positive list
         self.medianValue = 0
@@ -77,13 +80,13 @@ class MassFlowVisualizer(QDialog):
         self.cancelButton = QPushButton("Cancel")
 
         minColorLabel = QLabel("Min")
-        minColorLabel.setStyleSheet('color: blue')
+        minColorLabel.setStyleSheet("color: blue")
         maxColorLabel = QLabel("Max")
-        maxColorLabel.setStyleSheet('color: red')
+        maxColorLabel.setStyleSheet("color: red")
         minToFiftyPercentile = QLabel("Min to 50%")
-        minToFiftyPercentile.setStyleSheet('color: cyan')
+        minToFiftyPercentile.setStyleSheet("color: cyan")
         fiftyPercentileToMax = QLabel("50% to max")
-        fiftyPercentileToMax.setStyleSheet('color: pink')
+        fiftyPercentileToMax.setStyleSheet("color: pink")
         arrowLabel = QLabel("-->")
         arrowLabel2 = QLabel("-->")
         arrowLabel3 = QLabel("-->")
@@ -158,20 +161,16 @@ class MassFlowVisualizer(QDialog):
                 else:
                     t.firstS.labelMass.setVisible(False)
 
-        self.logger.debug("%s %s %s" %(str(self.minValue), str(self.medianValue), str(self.maxValue)))
-
-
+        self.logger.debug("%s %s %s" % (str(self.minValue), str(self.medianValue), str(self.maxValue)))
 
     def loadFile(self):
         if not self.loadedFile:
-            self.massFlowData = pd.read_csv(self.dataFilePath, sep='\t').rename(
-                columns=lambda x: x.strip())
+            self.massFlowData = pd.read_csv(self.dataFilePath, sep="\t").rename(columns=lambda x: x.strip())
         self.loadedFile = True
 
     def loadTempFile(self):
         if not self.tempLoadedFile:
-            self.tempMassFlowData = pd.read_csv(self.tempDatafilePath, sep='\t').rename(
-                columns=lambda x: x.strip())
+            self.tempMassFlowData = pd.read_csv(self.tempDatafilePath, sep="\t").rename(columns=lambda x: x.strip())
         self.tempLoadedFile = True
 
     def start(self):
@@ -189,75 +188,60 @@ class MassFlowVisualizer(QDialog):
             return
 
         if self.loadedFile:
-
             i = 0
-            # for t in self.parent.centralWidget.trnsysObj:
-            #     if isinstance(t, Connection):
-            #         if 'Mfr'+t.displayName in self.massFlowData.columns:
-            #             print("Found connection in ts " + str(self.timeStep) + " " + str(i))
-            #             if self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep] < 0:
-            #                 t.setColor(mfr="NegMfr")
-            #             elif self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep] == 0:
-            #                 t.setColor(mfr="ZeroMfr")
-            #             else:
-            #                 t.setColor(mfr="PosMfr")
-            #             i += 1
-
-            # for t in self.parent.centralWidget.trnsysObj:
-            #     if isinstance(t, Connection):
-            #         if 'Mfr'+t.displayName in self.massFlowData.columns:
-            #             print("Found connection in ts " + str(self.timeStep) + " " + str(i))
-            #             if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
-            #                 t.setColor(mfr="ZeroMfr")
-            #             elif self.minValue <= abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.lowerQuarter:
-            #                 t.setColor(mfr="minToLower")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             elif self.lowerQuarter <= abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.medianValue:
-            #                 t.setColor(mfr="lowerToMedian")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             elif self.medianValue <= abs(self.massFlowData['Mfr'+t.displayName].iloc[self.timeStep]) < self.upperQuarter:
-            #                 t.setColor(mfr="medianToUpper")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             else:
-            #                 t.setColor(mfr="upperToMax")
-            #                 t.setMass(str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep])))
-            #             i += 1
-
             for t in self.parent.centralWidget.trnsysObj:
                 if isinstance(t, Connection):
-                    if 'Mfr'+t.displayName in self.massFlowData.columns and 'T'+t.displayName in self.tempMassFlowData:
-                        mass = str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep]))
-                        mass1Dp = str(round(self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep], 1))
-                        temperature = str(round(self.tempMassFlowData['T' + t.displayName].iloc[self.timeStep]))
+                    if (
+                        "Mfr" + t.displayName in self.massFlowData.columns
+                        and "T" + t.displayName in self.tempMassFlowData
+                    ):
+                        mass = str(round(self.massFlowData["Mfr" + t.displayName].iloc[self.timeStep]))
+                        mass1Dp = str(round(self.massFlowData["Mfr" + t.displayName].iloc[self.timeStep], 1))
+                        temperature = str(round(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
                         self.logger.debug("Found connection in ts " + str(self.timeStep) + " " + str(i))
                         self.logger.debug("mass flow value of %s : " % t.displayName)
                         t.setMassAndTemperature(mass1Dp, temperature)
                         thickValue = self.getThickness(mass)
                         self.logger.debug("Thickvalue: " + str(thickValue))
-                        if self.massFlowData['Mfr' + t.displayName].iloc[self.timeStep] == 0:
+                        if self.massFlowData["Mfr" + t.displayName].iloc[self.timeStep] == 0:
                             t.setColor(thickValue, mfr="ZeroMfr")
-                        elif round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) == self.maxValue:
+                        elif round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep])) == self.maxValue:
                             t.setColor(thickValue, mfr="max")
-                        elif round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) == self.minValue:
+                        elif round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep])) == self.minValue:
                             t.setColor(thickValue, mfr="min")
-                        elif self.minValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.lowerQuarter:
+                        elif (
+                            self.minValue
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            <= self.lowerQuarter
+                        ):
                             t.setColor(thickValue, mfr="minTo25")
-                        elif self.lowerQuarter < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.medianValue:
+                        elif (
+                            self.lowerQuarter
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            <= self.medianValue
+                        ):
                             t.setColor(thickValue, mfr="25To50")
-                        elif self.medianValue < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) <= self.upperQuarter:
+                        elif (
+                            self.medianValue
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            <= self.upperQuarter
+                        ):
                             t.setColor(thickValue, mfr="50To75")
-                        elif self.upperQuarter < round(abs(self.tempMassFlowData['T'+t.displayName].iloc[self.timeStep])) < self.maxValue:
+                        elif (
+                            self.upperQuarter
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            < self.maxValue
+                        ):
                             t.setColor(thickValue, mfr="75ToMax")
                         else:
                             t.setColor(thickValue, mfr="test")
                         i += 1
                 else:
-                    if 'xFrac'+t.displayName in self.massFlowData.columns:
-                        valvePosition = str(self.massFlowData['xFrac' + t.displayName].iloc[self.timeStep])
+                    if "xFrac" + t.displayName in self.massFlowData.columns:
+                        valvePosition = str(self.massFlowData["xFrac" + t.displayName].iloc[self.timeStep])
                         t.setPositionForMassFlowSolver(valvePosition)
                         t.posLabel.setPlainText(valvePosition)
-                        self.logger.debug('valve position: ' +str(valvePosition))
-
+                        self.logger.debug("valve position: " + str(valvePosition))
 
         else:
             return
@@ -331,7 +315,6 @@ class MassFlowVisualizer(QDialog):
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)
 
-
     def checkTimeStep(self):
         """
         Check individual columns of the data frame, If a column has rows with different values, return False.
@@ -344,7 +327,7 @@ class MassFlowVisualizer(QDialog):
         massFlowDataDup = self.massFlowData
         massFlowDataDup = massFlowDataDup.drop(massFlowDataDup.index[0])
         for items in round(abs(massFlowDataDup)).nunique().iteritems():
-            if items[0] != 'TIME':
+            if items[0] != "TIME":
                 if items[1] > 1:
                     return False
         return True
@@ -353,7 +336,7 @@ class MassFlowVisualizer(QDialog):
         tempMassFlowDataDup = self.tempMassFlowData
         tempMassFlowDataDup = tempMassFlowDataDup.drop(tempMassFlowDataDup.index[0])
         for items in tempMassFlowDataDup.nunique().iteritems():
-            if items[0] != 'TIME':
+            if items[0] != "TIME":
                 if items[1] > 1:
                     return False
         return True
@@ -371,18 +354,18 @@ class MassFlowVisualizer(QDialog):
         -------
         """
 
-        data = self.massFlowData.values.tolist()    # data frame converted to nested list
+        data = self.massFlowData.values.tolist()  # data frame converted to nested list
         for sublist in data:  # delete the time column from the list
             del sublist[0]
         data = list(itertools.chain.from_iterable(data))  # nested list combined into one list
-        cleanedData = [x for x in data if str(x) != 'nan']  # remove nan from list
+        cleanedData = [x for x in data if str(x) != "nan"]  # remove nan from list
         cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
         nonZeroData = [x for x in cleanedData if x > 1]  # a work around to remove the 1 values from the data frame
         noDuplicateData = list(dict.fromkeys(nonZeroData))
 
         self.medianValueMfr = np.percentile(noDuplicateData, 50)  # median value / 50th percentile
         self.lowerQuarterMfr = np.percentile(noDuplicateData, 25)  # 25th percentile
-        self.upperQuarterMfr = np.percentile(noDuplicateData, 75)   # 75th percentile
+        self.upperQuarterMfr = np.percentile(noDuplicateData, 75)  # 75th percentile
         self.minValueMfr = np.min(noDuplicateData)  # minimum value excluding 0
         self.maxValueMfr = np.max(noDuplicateData)  # max value
 
@@ -399,7 +382,6 @@ class MassFlowVisualizer(QDialog):
         else:
             return 2
 
-
     def getTempThresholdValues(self):
         """
         Access the data frame, convert into a nested list.
@@ -413,17 +395,17 @@ class MassFlowVisualizer(QDialog):
         -------
         """
 
-        data = self.tempMassFlowData.values.tolist()    # data frame converted to nested list
+        data = self.tempMassFlowData.values.tolist()  # data frame converted to nested list
         for sublist in data:  # delete the time column from the list
             del sublist[0]
         data = list(itertools.chain.from_iterable(data))  # nested list combined into one list
-        cleanedData = [x for x in data if str(x) != 'nan']  # remove nan from list
+        cleanedData = [x for x in data if str(x) != "nan"]  # remove nan from list
         cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
         noDuplicateData = list(dict.fromkeys(cleanedData))
 
         self.medianValue = np.percentile(noDuplicateData, 50)  # median value / 50th percentile
         self.lowerQuarter = np.percentile(noDuplicateData, 25)  # 25th percentile
-        self.upperQuarter = np.percentile(noDuplicateData, 75)   # 75th percentile
+        self.upperQuarter = np.percentile(noDuplicateData, 75)  # 75th percentile
         self.minValue = np.min(noDuplicateData)  # minimum value excluding 0
         self.maxValue = np.max(noDuplicateData)  # max value
 
@@ -449,7 +431,6 @@ class MassFlowVisualizer(QDialog):
         result = base + timedelta(seconds=(base.replace(year=base.year + 1) - base).total_seconds() * decHour)
         return str(result)
 
-
     def pressedSlider(self):
         self.pauseVis()
 
@@ -471,4 +452,3 @@ class MassFlowVisualizer(QDialog):
         elif e.key() == Qt.Key_Down:
             self.logger.debug("Down is pressed")
             self.decreaseValue()
-

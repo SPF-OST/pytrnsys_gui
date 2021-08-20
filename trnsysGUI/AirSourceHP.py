@@ -1,29 +1,35 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import shutil
-from datetime import datetime
+import typing as _tp
+
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtWidgets import QTreeView, QMessageBox, QFileDialog
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
+
 
 class AirSourceHP(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(AirSourceHP, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem('i', 2, self))
-        self.outputs.append(PortItem('o', 2, self))
-        self.path = ''
+        self.inputs.append(PortItem("i", 2, self))
+        self.outputs.append(PortItem("o", 2, self))
+        self.path = ""
         self.loadedFiles = []
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h), Qt.IgnoreAspectRatio))
 
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.AIR_SOURCE_HP_SVG
 
     def changeSize(self):
         # self.logger.debug("passing through c change size")
@@ -45,8 +51,8 @@ class AirSourceHP(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[w,delta]]
-        self.origOutputsPos = [[w,h-delta]]
+        self.origInputsPos = [[w, delta]]
+        self.origOutputsPos = [[w, h - delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
@@ -65,7 +71,7 @@ class AirSourceHP(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -74,7 +80,7 @@ class AirSourceHP(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -107,7 +113,7 @@ class AirSourceHP(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -116,7 +122,7 @@ class AirSourceHP(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -137,7 +143,7 @@ class AirSourceHP(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\AirSourceHP_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

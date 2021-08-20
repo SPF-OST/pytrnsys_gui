@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtCore import Qt, QModelIndex
 from PyQt5.QtWidgets import QFileSystemModel
 
@@ -17,7 +20,7 @@ class MyQFileSystemModel(QFileSystemModel):
         if section == 0 and role == Qt.DisplayRole:
             return self.name
         if section == 4 and role == Qt.DisplayRole:
-            return 'Priority'
+            return "Priority"
         else:
             return super(QFileSystemModel, self).headerData(section, orientation, role)
 

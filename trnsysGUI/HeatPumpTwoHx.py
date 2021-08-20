@@ -1,31 +1,33 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 import shutil
+import typing as _tp
 
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class HeatPumpTwoHx(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HeatPumpTwoHx, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.inputs.append(PortItem('i', 2, self))
-        self.inputs.append(PortItem('i', 2, self))
+        self.inputs.append(PortItem("i", 0, self))
+        self.inputs.append(PortItem("i", 2, self))
+        self.inputs.append(PortItem("i", 2, self))
 
-        self.outputs.append(PortItem('o', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
-        self.outputs.append(PortItem('o', 2, self))
+        self.outputs.append(PortItem("o", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
+        self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         # For restoring correct order of trnsysObj list
         self.childIds = []
@@ -33,10 +35,11 @@ class HeatPumpTwoHx(BlockItem):
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
-        self.subBlockCounter = 0
-
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.HP_TWO_HX_SVG
 
     def changeSize(self):
         w = self.w
@@ -56,8 +59,8 @@ class HeatPumpTwoHx(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0,delta], [w,delta],[w,h-2*delta]]
-        self.origOutputsPos = [[0,h-delta],[w,2*delta],[w,h-delta]]
+        self.origInputsPos = [[0, delta], [w, delta], [w, h - 2 * delta]]
+        self.origOutputsPos = [[0, h - delta], [w, 2 * delta], [w, h - delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1])
@@ -90,25 +93,25 @@ class HeatPumpTwoHx(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            dct['.__BlockDict__'] = True
-            dct['BlockName'] = self.name
-            dct['BlockDisplayName'] = self.displayName
-            dct['PortsIDIn'] = portListInputs
-            dct['PortsIDOut'] = portListOutputs
-            dct['HeatPumpPosition'] = (float(self.pos().x()), float(self.pos().y()))
-            dct['ID'] = self.id
-            dct['trnsysID'] = self.trnsysId
-            dct['childIds'] = self.childIds
-            dct['FlippedH'] = self.flippedH
-            dct['FlippedV'] = self.flippedH
-            dct['RotationN'] = self.rotationN
-            dct['GroupName'] = self.groupName
+            dct[".__BlockDict__"] = True
+            dct["BlockName"] = self.name
+            dct["BlockDisplayName"] = self.displayName
+            dct["PortsIDIn"] = portListInputs
+            dct["PortsIDOut"] = portListOutputs
+            dct["HeatPumpPosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["ID"] = self.id
+            dct["trnsysID"] = self.trnsysId
+            dct["childIds"] = self.childIds
+            dct["FlippedH"] = self.flippedH
+            dct["FlippedV"] = self.flippedH
+            dct["RotationN"] = self.rotationN
+            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
         self.childIds = i["childIds"]
@@ -158,64 +161,67 @@ class HeatPumpTwoHx(BlockItem):
         equations = ["T" + self.displayName + "X1" + "=1"]
         equations.append("T" + self.displayName + "X2" + "=1")
         equations.append("T" + self.displayName + "X3" + "=1")
-        status = 'success'
+        status = "success"
         return status, equations
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         f = ""
         for i in range(len(self.inputs)):
-            # ConnectionList lenght should be max offset
-            temp = ""
             for c in self.inputs[i].connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                else:
-                    if len(self.outputs[i].connectionList) > 0:
-                        #HeatPumpTwoHx exportConnsString has 3 lines
-                        if i == 0:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
-                            temp += " " * (descConnLength - len(temp))
+                if len(self.outputs[i].connectionList) > 0:
+                    # HeatPumpTwoHx exportConnsString has 3 lines
+                    if i == 0:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[0])
+                        temp += " " * (descConnLength - len(temp))
 
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
 
-                        elif i == 1:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
+                    elif i == 1:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[1])
+                        temp += " " * (descConnLength - len(temp))
 
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
 
-                        elif i == 2:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
+                    elif i == 2:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[1])
+                        temp += " " * (descConnLength - len(temp))
 
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[2]) + " : " + self.displayName + "Side3" + "\n"
-                        else:
-                            f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                        # Presumably used only for storing the order of connections
-                        self.trnsysConn.append(c)
-                        self.trnsysConn.append(self.outputs[i].connectionList[0])
-
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[2]) + " : " + self.displayName + "Side3" + "\n"
                     else:
-                        f += "Output of ExternalHx for input[{0}] is not connected ".format(i) + "\n"
+                        f += "Error: There are more inputs than trnsysIds" + "\n"
 
-        return f, 2
+                    # Presumably used only for storing the order of connections
+                    self.trnsysConn.append(c)
+                    self.trnsysConn.append(self.outputs[i].connectionList[0])
+
+                else:
+                    f += "Output of ExternalHx for input[{0}] is not connected ".format(i) + "\n"
+
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 0,0 0,0", 3
 
     def exportInputsFlowSolver2(self):
         f = ""
-        f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
+        f += (
+            " "
+            + str(self.exportInitialInput)
+            + " "
+            + str(self.exportInitialInput)
+            + " "
+            + str(self.exportInitialInput)
+            + " "
+        )
         return f, 3
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
@@ -223,8 +229,19 @@ class HeatPumpTwoHx(BlockItem):
         for j in range(3):
             for i in range(0, 3):
                 if i < 2:
-                    temp = prefix + self.displayName + "-Side" + str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                           str(equationNumber) + "]\n"
+                    temp = (
+                        prefix
+                        + self.displayName
+                        + "-Side"
+                        + str(j)
+                        + "_"
+                        + abc[i]
+                        + "=["
+                        + str(simulationUnit)
+                        + ","
+                        + str(equationNumber)
+                        + "]\n"
+                    )
                     tot += temp
                     self.exportEquations.append(temp)
                     # nEqUsed += 1  # DC
@@ -234,7 +251,12 @@ class HeatPumpTwoHx(BlockItem):
 
     def getSubBlockOffset(self, c):
         for i in range(3):
-            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+            if (
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
+            ):
                 return i
 
     def addTree(self):
@@ -244,7 +266,7 @@ class HeatPumpTwoHx(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -253,7 +275,7 @@ class HeatPumpTwoHx(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -265,7 +287,7 @@ class HeatPumpTwoHx(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
+        for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
@@ -296,7 +318,7 @@ class HeatPumpTwoHx(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -305,7 +327,7 @@ class HeatPumpTwoHx(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -326,7 +348,7 @@ class HeatPumpTwoHx(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

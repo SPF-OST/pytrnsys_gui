@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtWidgets import QUndoCommand
 
 import trnsysGUI.Collector
@@ -47,39 +50,39 @@ class DeleteBlockCommand(QUndoCommand):
 
     def undo(self):
         name = self.blName
-        if name == 'StorageTank':
+        if name == "StorageTank":
             bl = trnsysGUI.StorageTank.StorageTank(name, self.blParent)
-        elif name == 'TeePiece':
+        elif name == "TeePiece":
             bl = trnsysGUI.TeePiece.TeePiece(name, self.blParent)
-        elif name == 'TVentil':
+        elif name == "TVentil":
             bl = trnsysGUI.TVentil.TVentil(name, self.blParent)
-        elif name == 'Pump':
+        elif name == "Pump":
             bl = trnsysGUI.Pump.Pump(name, self.blParent)
-        elif name == 'Collector':
+        elif name == "Collector":
             bl = trnsysGUI.Collector.Collector(name, self.blParent)
-        elif name == 'HP':
+        elif name == "HP":
             bl = trnsysGUI.HeatPump.HeatPump(name, self.blParent)
-        elif name == 'IceStorage':
+        elif name == "IceStorage":
             bl = trnsysGUI.IceStorage.IceStorage(name, self.blParent)
-        elif name == 'Radiator':
+        elif name == "Radiator":
             bl = trnsysGUI.Radiator.Radiator(name, self.blParent)
-        elif name == 'WTap':
+        elif name == "WTap":
             bl = trnsysGUI.WTap.WTap(name, self.blParent)
-        elif name == 'WTap_main':
+        elif name == "WTap_main":
             bl = trnsysGUI.WTap_mainW.Tap_main(name, self.blParent)
-        elif name == 'Connector':
+        elif name == "Connector":
             bl = trnsysGUI.Connector.Connector(name, self.blParent)
-        elif name == 'GenericBlock':
+        elif name == "GenericBlock":
             bl = trnsysGUI.GenericBlock.GenericBlock(name, self.blParent)
-        elif name == 'HPTwoHx':
+        elif name == "HPTwoHx":
             bl = trnsysGUI.HeatPumpTwoHx.HeatPumpTwoHx(name, self.blParent)
-        elif name == 'Boiler':
+        elif name == "Boiler":
             bl = trnsysGUI.Boiler.Boiler(name, self.blParent)
-        elif name == 'AirSourceHP':
+        elif name == "AirSourceHP":
             bl = trnsysGUI.AirSourceHP.AirSourceHP(name, self.blParent)
-        elif name == 'PV':
+        elif name == "PV":
             bl = trnsysGUI.PV.PV
-        elif name == 'GroundSourceHx':
+        elif name == "GroundSourceHx":
             bl = trnsysGUI.GroundSourceHx.GroundSourceHx(name, self.blParent)
         else:
             bl = trnsysGUI.BlockItem.BlockItem(name, self.blParent)
@@ -105,6 +108,7 @@ class DeleteBlockCommand(QUndoCommand):
             self.portsIdIn.append(p.id)
         for p in self.bl.outputs:
             self.portsIdOut.append(p.id)
+
 
 # From stackoverflow, this should have helped:
 

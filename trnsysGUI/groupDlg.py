@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 from PyQt5.QtWidgets import QDialog, QLineEdit, QHBoxLayout, QPushButton, QGridLayout, QLabel
 
 
@@ -42,4 +45,3 @@ class groupDlg(QDialog):
         self.parent.selectionMode = False
 
         self.close()
-

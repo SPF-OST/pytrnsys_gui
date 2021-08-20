@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import sys
 import re
 
@@ -90,4 +93,3 @@ class DeepInspector(QDialog):
 
     def write(self, text):
         self.messages.append(text)
-

@@ -1,11 +1,14 @@
-import glob
-import os
+# pylint: skip-file
+# type: ignore
+
+import typing as _tp
 
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class WTap_main(BlockItem):
@@ -14,16 +17,16 @@ class WTap_main(BlockItem):
         self.w = 40
         self.h = 40
         # self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem('o', 0, self))
+        self.outputs.append(PortItem("o", 0, self))
 
         self.exportInitialInput = 0.0
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
 
         self.typeNumber = 4
 
         self.changeSize()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.W_TAP_MAIN_SVG
 
     def changeSize(self):
         w = self.w
@@ -43,7 +46,7 @@ class WTap_main(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origOutputsPos = [[0,delta]]
+        self.origOutputsPos = [[0, delta]]
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
         self.updateFlipStateH(self.flippedH)
@@ -55,7 +58,7 @@ class WTap_main(BlockItem):
 
     def exportBlackBox(self):
         equation = ["T" + self.displayName + "=Tcw"]
-        return 'success', equation
+        return "success", equation
 
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"
@@ -63,29 +66,16 @@ class WTap_main(BlockItem):
         return resStr, equationNr
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         temp = ""
         for i in self.inputs:
-            # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         temp += "0 0 "
         temp += str(self.typeNumber)
@@ -94,11 +84,9 @@ class WTap_main(BlockItem):
 
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def exportInputsFlowSolver1(self):
         temp1 = "Mfr" + self.displayName
         self.exportInputName = " " + temp1 + " "
         return self.exportInputName, 1
-
-

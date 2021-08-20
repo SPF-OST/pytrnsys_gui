@@ -1,17 +1,32 @@
+# pylint: skip-file
+# type: ignore
+
 import os
 
-from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QCheckBox, QHBoxLayout, QGridLayout, QMessageBox, \
-    QFileDialog
+from PyQt5.QtWidgets import (
+    QDialog,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QCheckBox,
+    QHBoxLayout,
+    QGridLayout,
+    QMessageBox,
+    QFileDialog,
+)
 from PyQt5.QtGui import QIcon
 
+import trnsysGUI.BlockItem as _bi
+
+
 class BlockDlg(QDialog):
-    def __init__(self, block, parent=None):
+    def __init__(self, block: _bi.BlockItem, parent=None):
         super(BlockDlg, self).__init__(parent)
         nameLabel = QLabel("Name:")
         self.logger = parent.logger
         self.block = block
         self.le = QLineEdit(self.block.label.toPlainText())
-        self.setWindowIcon(QIcon(block.pixmap))
+        self.setWindowIcon(QIcon(block.pixmap()))
         self.loadButton = QPushButton("Load")
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
@@ -96,7 +111,7 @@ class BlockDlg(QDialog):
         self.logger.debug("Opening diagram")
         # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.ddck")[0]
-        if fileName != '':
+        if fileName != "":
             if len(self.block.propertyFile) < 2:
                 self.block.propertyFile.append(fileName)
             else:
@@ -107,5 +122,5 @@ class BlockDlg(QDialog):
         pass
 
     def disableLoad(self):
-        if self.block.name == 'TeePiece' or self.block.name == 'WTap_main':
+        if self.block.name == "TeePiece" or self.block.name == "WTap_main":
             self.loadButton.setDisabled(True)

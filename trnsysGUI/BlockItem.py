@@ -1,55 +1,42 @@
-import os
+# pylint: skip-file
+# type: ignore
+
 import glob
-from math import sqrt
+import math
+import os
+import typing as _tp
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSize, QPointF, QPoint, QEvent, QTimer
-from PyQt5.QtGui import QPixmap, QIcon, QImage, QCursor, QMouseEvent
+from PyQt5.QtCore import QPointF, QEvent, QTimer
+from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
-# from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
-from trnsysGUI.PortItem import PortItem
-from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
+import trnsysGUI.images as _img
+import trnsysGUI.IdGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand
-
-from PyQt5.QtWidgets import QUndoCommand
-
-# from trnsysGUI.Collector import Collector
-# from trnsysGUI.Connector import Connector
-# from trnsysGUI.GenericBlock import GenericBlock
-# from trnsysGUI.HeatPump import HeatPump
-# from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
-# from trnsysGUI.IceStorage import IceStorage
-# from trnsysGUI.Pump import Pump
-# from trnsysGUI.Radiator import Radiator
-# from trnsysGUI.StorageTank import StorageTank
-# from trnsysGUI.TVentil import TVentil
-# from trnsysGUI.TeePiece import TeePiece
-# from trnsysGUI.WTap import WTap
-# from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.PortItem import PortItem
 from trnsysGUI.ResizerItem import ResizerItem
-from trnsysGUI.TVentilDlg import TVentilDlg
 
 global FilePath
 FilePath = "res/Config.txt"
 
+
 def calcDist(p1, p2):
     vec = p1 - p2
-    norm = sqrt(vec.x() ** 2 + vec.y() ** 2)
+    norm = math.sqrt(vec.x() ** 2 + vec.y() ** 2)
     return norm
+
 
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
-
     def __init__(self, trnsysType, parent, **kwargs):
+        super().__init__(None)
 
-        super(BlockItem, self).__init__(None)
-        
         self.logger = parent.logger
 
-        self.w = 120.0
-        self.h = 120.0
+        self.w = 120
+        self.h = 120
         self.parent = parent
         self.id = self.parent.parent().idGen.getID()
         self.propertyFile = []
@@ -57,13 +44,12 @@ class BlockItem(QGraphicsPixmapItem):
         if "displayName" in kwargs:
             self.displayName = kwargs["displayName"]
         else:
-            self.displayName = trnsysType + '_' + str(self.id)
-
+            self.displayName = trnsysType + "_" + str(self.id)
 
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
 
-        self.groupName = ''
+        self.groupName = ""
         self.setDefaultGroup()
 
         self.inputs = []
@@ -79,10 +65,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.exportEquations = []
         self.trnsysConn = []
 
-        # This case is because loaded blocks have parent=None
-        # if self.parent is not None:
-        #     self.parent.parent().trnsysObj.append(self)
-
         # Transform related
         self.flippedV = False
         self.flippedH = False
@@ -90,18 +72,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedHInt = -1
         self.flippedVInt = -1
 
-        # self.imageSource = "images/" + self.name + ".png"
-        # self.image = QImage("images/" + self.name)
-        # self.pixmap = QPixmap(self.image)
-        # self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
-
-        # To use svg instead of png for blocks:
-        self.imageSource = "images/" + self.name + ".svg"
-        if not os.path.exists(self.imageSource):
-            self.imageSource = "images/" + self.name + ".png"
-        self.image = QImage(self.imageSource)
-        self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-        self.pixmap = QPixmap(self.image)
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
 
         # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
@@ -111,18 +83,18 @@ class BlockItem(QGraphicsPixmapItem):
         self.label = QGraphicsTextItem(self.displayName, self)
         self.label.setVisible(False)
 
-        if self.name == 'Bvi':
-            self.inputs.append(PortItem('i', 0, self))
-            self.outputs.append(PortItem('o', 2, self))
+        if self.name == "Bvi":
+            self.inputs.append(PortItem("i", 0, self))
+            self.outputs.append(PortItem("o", 2, self))
 
-        if self.name == 'StorageTank':
+        if self.name == "StorageTank":
             # Inputs get appended in ConfigStorage
             pass
 
         self.logger.debug("Block name is " + str(self.name))
 
         # Update size for generic block:
-        if self.name == 'Bvi':
+        if self.name == "Bvi":
             self.changeSize()
 
         # Experimental, used for detecting genereated blocks attached to storage ports
@@ -130,6 +102,28 @@ class BlockItem(QGraphicsPixmapItem):
 
         # Undo framework related
         self.oldPos = None
+
+        self.origOutputsPos = None
+        self.origInputsPos = None
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        currentClassName = BlockItem.__name__
+        currentMethodName = f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
+
+        message = (
+            f"{currentMethodName} has been called. However, this method should not be called directly but must\n"
+            f"implemented in a child class. This means that a) someone instantiated `{currentClassName}` directly\n"
+            f"or b) a child class of it doesn't implement `{currentMethodName}`. Either way that's an\n"
+            f"unrecoverable error and therefore the program will be terminated now. Please do get in touch with\n"
+            f"the developers if you've encountered this error. Thanks."
+        )
+
+        exception = AssertionError(message)
+
+        # I've seen exception messages mysteriously swallowed that's why we're logging the message here, too.
+        self.logger.error(message, exc_info=exception, stack_info=True)
+
+        raise exception
 
     # Setter functions
     def setParent(self, p):
@@ -161,7 +155,12 @@ class BlockItem(QGraphicsPixmapItem):
         """
         # self.logger.debug("In setBlockToGroup")
         if newGroupName == self.groupName:
-            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
+            self.logger.debug(
+                "Block "
+                + str(self)
+                + str(self.displayName)
+                + "is already in this group"
+            )
             return
         else:
             # self.logger.debug("groups is " + str(self.parent.parent().groupList))
@@ -182,63 +181,49 @@ class BlockItem(QGraphicsPixmapItem):
         self.displayName = newName
         self.label.setPlainText(newName)
 
-
     # Interaction related
     def contextMenuEvent(self, event):
         menu = QMenu()
 
-        lNtp = QIcon('images/Notebook.png')
-        a1 = menu.addAction(lNtp, 'Launch NotePad++')
+        a1 = menu.addAction("Launch NotePad++")
         a1.triggered.connect(self.launchNotepadFile)
 
-        rr = QIcon('images/rotate-to-right.png')
-        a2 = menu.addAction(rr, 'Rotate Block clockwise')
+        rr = _img.ROTATE_TO_RIGHT_PNG.icon()
+        a2 = menu.addAction(rr, "Rotate Block clockwise")
         a2.triggered.connect(self.rotateBlockCW)
 
-        ll = QIcon('images/rotate-left.png')
-        a3 = menu.addAction(ll, 'Rotate Block counter-clockwise')
+        ll = _img.ROTATE_LEFT_PNG.icon()
+        a3 = menu.addAction(ll, "Rotate Block counter-clockwise")
         a3.triggered.connect(self.rotateBlockCCW)
 
-        rRot = QIcon('images/move-left.png')
-        a4 = menu.addAction(rRot, 'Reset Rotation')
+        a4 = menu.addAction("Reset Rotation")
         a4.triggered.connect(self.resetRotation)
 
-        b1 = menu.addAction('Print Rotation')
+        b1 = menu.addAction("Print Rotation")
         b1.triggered.connect(self.printRotation)
 
-        dB = QIcon('images/close.png')
-        c1 = menu.addAction(dB, 'Delete this Block')
+        c1 = menu.addAction("Delete this Block")
         c1.triggered.connect(self.deleteBlockCom)
-
-        # sG = QIcon('')
-        # c2 = menu.addAction("Set group")
-        # c2.triggered.connect(self.configGroup)
-        #
-        # d1 = menu.addAction('Dump information')
-        # d1.triggered.connect(self.dumpBlockInfo)
-        #
-        # e1 = menu.addAction('Inspect')
-        # e1.triggered.connect(self.inspectBlock)
 
         menu.exec_(event.screenPos())
 
     def launchNotepadFile(self):
         self.logger.debug("Launching notpad")
         global FilePath
-        os.system('start notepad++ ' + FilePath)
+        os.system("start notepad++ " + FilePath)
 
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
             dia = self.parent.parent().showTVentilDlg(self)
-        elif self.name == 'Pump':
+        elif self.name == "Pump":
             dia = self.parent.parent().showPumpDlg(self)
-        elif self.name == 'TeePiece' or self.name == 'WTap_main' :
+        elif self.name == "TeePiece" or self.name == "WTap_main":
             dia = self.parent.parent().showBlockDlg(self)
         else:
             dia = self.parent.parent().showBlockDlg(self)
             if len(self.propertyFile) > 0:
                 for files in self.propertyFile:
-                    os.startfile(files, 'open')
+                    os.startfile(files, "open")
 
     def mouseReleaseEvent(self, event):
         # self.logger.debug("Released mouse over block")
@@ -253,7 +238,6 @@ class BlockItem(QGraphicsPixmapItem):
                 self.oldPos = self.scenePos()
 
         super(BlockItem, self).mouseReleaseEvent(event)
-
 
     # Transform related
     def changeSize(self):
@@ -275,63 +259,85 @@ class BlockItem(QGraphicsPixmapItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        if self.name == 'Bvi':
-            self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3)
-            self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
+        if self.name == "Bvi":
+            self.inputs[0].setPos(
+                -2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3
+            )
+            self.outputs[0].setPos(
+                -2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3
+            )
             self.inputs[0].side = 0 + 2 * self.flippedH
             self.outputs[0].side = 0 + 2 * self.flippedH
 
         return w, h
 
     def updateFlipStateH(self, state):
-        self.pixmap = QPixmap(self.image.mirrored(bool(state), self.flippedV))
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedH = bool(state)
-        if state == False:
-            self.flippedHInt = -1
-        else:
-            self.flippedHInt = 1
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
+        self.flippedHInt = 1 if self.flippedH else -1
 
         if self.flippedH:
-            for i in range(0,len(self.inputs)):
-                distanceToMirrorAxis = self.w/2. - self.origInputsPos[i][0]
-                self.inputs[i].setPos(self.origInputsPos[i][0]+2.*distanceToMirrorAxis, self.inputs[i].pos().y())
+            for i in range(0, len(self.inputs)):
+                distanceToMirrorAxis = self.w / 2.0 - self.origInputsPos[i][0]
+                self.inputs[i].setPos(
+                    self.origInputsPos[i][0] + 2.0 * distanceToMirrorAxis,
+                    self.inputs[i].pos().y(),
+                )
 
             for i in range(0, len(self.outputs)):
-                distanceToMirrorAxis = self.w/2. - self.origOutputsPos[i][0]
-                self.outputs[i].setPos(self.origOutputsPos[i][0]+2.*distanceToMirrorAxis, self.outputs[i].pos().y())
+                distanceToMirrorAxis = self.w / 2.0 - self.origOutputsPos[i][0]
+                self.outputs[i].setPos(
+                    self.origOutputsPos[i][0] + 2.0 * distanceToMirrorAxis,
+                    self.outputs[i].pos().y(),
+                )
 
         else:
             for i in range(0, len(self.inputs)):
-                self.inputs[i].setPos(self.origInputsPos[i][0], self.inputs[i].pos().y())
+                self.inputs[i].setPos(
+                    self.origInputsPos[i][0], self.inputs[i].pos().y()
+                )
 
             for i in range(0, len(self.outputs)):
-                self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
+                self.outputs[i].setPos(
+                    self.origOutputsPos[i][0], self.outputs[i].pos().y()
+                )
 
     def updateFlipStateV(self, state):
-        self.pixmap = QPixmap(self.image.mirrored(self.flippedH, bool(state)))
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
         self.flippedV = bool(state)
-        if state == False:
-            self.flippedVInt = -1
-        else:
-            self.flippedVInt = 1
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
+        self.flippedVInt = 1 if self.flippedV else -1
 
         if self.flippedV:
-            for i in range(0,len(self.inputs)):
-                distanceToMirrorAxis = self.h/2. - self.origInputsPos[i][1]
-                self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1]+2.*distanceToMirrorAxis)
+            for i in range(0, len(self.inputs)):
+                distanceToMirrorAxis = self.h / 2.0 - self.origInputsPos[i][1]
+                self.inputs[i].setPos(
+                    self.inputs[i].pos().x(),
+                    self.origInputsPos[i][1] + 2.0 * distanceToMirrorAxis,
+                )
 
             for i in range(0, len(self.outputs)):
-                distanceToMirrorAxis = self.h/2. - self.origOutputsPos[i][1]
-                self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1]+2.*distanceToMirrorAxis)
+                distanceToMirrorAxis = self.h / 2.0 - self.origOutputsPos[i][1]
+                self.outputs[i].setPos(
+                    self.outputs[i].pos().x(),
+                    self.origOutputsPos[i][1] + 2.0 * distanceToMirrorAxis,
+                )
 
         else:
             for i in range(0, len(self.inputs)):
-                self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1])
+                self.inputs[i].setPos(
+                    self.inputs[i].pos().x(), self.origInputsPos[i][1]
+                )
 
             for i in range(0, len(self.outputs)):
-                self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1])
+                self.outputs[i].setPos(
+                    self.outputs[i].pos().x(), self.origOutputsPos[i][1]
+                )
 
     def updateSide(self, port, n):
         port.side = (port.side + n) % 4
@@ -399,7 +405,6 @@ class BlockItem(QGraphicsPixmapItem):
     def printRotation(self):
         self.logger.debug("Rotation is " + str(self.rotationN))
 
-
     # Deletion related
     def deleteConns(self):
 
@@ -412,14 +417,18 @@ class BlockItem(QGraphicsPixmapItem):
                 p.connectionList[0].deleteConn()
 
     def deleteBlock(self):
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
+        self.logger.debug(
+            "Block " + str(self) + " is deleting itself (" + self.displayName + ")"
+        )
         self.deleteConns()
         # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(
+            QTreeView, self.displayName + "Tree"
+        )
         try:
             widgetToRemove.hide()
         except AttributeError:
@@ -432,7 +441,6 @@ class BlockItem(QGraphicsPixmapItem):
         # command = trnsysGUI.DeleteBlockCommand.DeleteBlockCommand(self, "Delete block command")
         # self.parent.parent().parent().undoStack.push(command)
         self.parent.deleteBlockCom(self)
-
 
     def configGroup(self):
         """
@@ -459,7 +467,6 @@ class BlockItem(QGraphicsPixmapItem):
                 c.append(cl)
         return c
 
-
     # Scaling related
     def mousePressEvent(self, event):  # create resizer
         """
@@ -476,7 +483,7 @@ class BlockItem(QGraphicsPixmapItem):
 
         """
         self.logger.debug("Inside Block Item mouse click")
-        if self.name == 'GenericBlock' or self.name == 'StorageTank':
+        if self.name == "GenericBlock" or self.name == "StorageTank":
             return
         try:
             self.resizer
@@ -497,19 +504,25 @@ class BlockItem(QGraphicsPixmapItem):
 
     def updateImage(self):
         self.logger.debug("Inside block item update image")
-        if self.imageSource[-3:] == "svg":
-            # self.image = QImage(self.imageSource)
-            self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-            # self.setPixmap(QPixmap(self.image))
-            self.pixmap = QPixmap(self.image)
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
+        if self.flippedH:
             self.updateFlipStateH(self.flippedH)
+
+        if self.flippedV:
             self.updateFlipStateV(self.flippedV)
 
-        # elif self.imageSource[-3:] == "png":
-        #     self.image = QImage(self.imageSource)
-        #     self.setPixmap(QPixmap(self.image).scaled(QSize(self.w, self.h)))
-        #     self.updateFlipStateH(self.flippedH)
-        #     self.updateFlipStateV(self.flippedV)
+    def _getPixmap(self) -> QPixmap:
+        imageAccessor = self._getImageAccessor()
+
+        image = imageAccessor.image(width=self.w, height=self.h).mirrored(
+            horizontal=self.flippedH, vertical=self.flippedV
+        )
+        pixmap = QPixmap(image)
+
+        return pixmap
 
     def deleteResizer(self):
         try:
@@ -518,7 +531,6 @@ class BlockItem(QGraphicsPixmapItem):
             self.logger.debug("No resizer")
         else:
             del self.resizer
-
 
     # Debug
     def dumpBlockInfo(self):
@@ -560,7 +572,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.parent.parent().listV.addItem("Inputs: " + str(self.inputs))
         self.parent.parent().listV.addItem("Outputs: " + str(self.outputs))
 
-
     # AlignMode related
     def itemChange(self, change, value):
         # self.logger.debug(change, value)
@@ -571,7 +582,9 @@ class BlockItem(QGraphicsPixmapItem):
                 snapSize = self.parent.parent().snapSize
                 self.logger.debug("itemchange")
                 self.logger.debug(type(value))
-                value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
+                value = QPointF(
+                    value.x() - value.x() % snapSize, value.y() - value.y() % snapSize
+                )
                 return value
             else:
                 # if self.hasElementsInYBand() and not self.elementInY() and not self.aligned:
@@ -592,7 +605,12 @@ class BlockItem(QGraphicsPixmapItem):
             if isinstance(t, BlockItem) and t is not self:
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
-                    self.parent.parent().alignYLineItem.setLine(self.pos().x() + self.w/2, t.pos().y(), t.pos().x() + t.w/2, t.pos().y())
+                    self.parent.parent().alignYLineItem.setLine(
+                        self.pos().x() + self.w / 2,
+                        t.pos().y(),
+                        t.pos().x() + t.w / 2,
+                        t.pos().y(),
+                    )
 
                     self.parent.parent().alignYLineItem.setVisible(True)
 
@@ -601,7 +619,13 @@ class BlockItem(QGraphicsPixmapItem):
                     qtm.setSingleShot(True)
                     qtm.start(1000)
 
-                    e = QMouseEvent(QEvent.MouseButtonRelease, self.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton, QtCore.Qt.NoModifier)
+                    e = QMouseEvent(
+                        QEvent.MouseButtonRelease,
+                        self.pos(),
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoModifier,
+                    )
                     self.parent.mouseReleaseEvent(e)
                     self.parent.parent().alignMode = False
                     # self.setPos(self.pos().x(), t.pos().y())
@@ -609,8 +633,12 @@ class BlockItem(QGraphicsPixmapItem):
 
                 if self.elementInXBand(t):
                     value = QPointF(t.pos().x(), self.pos().y())
-                    self.parent.parent().alignXLineItem.setLine(t.pos().x(), t.pos().y() + self.w / 2,
-                                                                t.pos().x(), self.pos().y() + t.w / 2)
+                    self.parent.parent().alignXLineItem.setLine(
+                        t.pos().x(),
+                        t.pos().y() + self.w / 2,
+                        t.pos().x(),
+                        self.pos().y() + t.w / 2,
+                    )
 
                     self.parent.parent().alignXLineItem.setVisible(True)
 
@@ -619,8 +647,13 @@ class BlockItem(QGraphicsPixmapItem):
                     qtm.setSingleShot(True)
                     qtm.start(1000)
 
-                    e = QMouseEvent(QEvent.MouseButtonRelease, self.pos(), QtCore.Qt.NoButton, QtCore.Qt.NoButton,
-                                    QtCore.Qt.NoModifier)
+                    e = QMouseEvent(
+                        QEvent.MouseButtonRelease,
+                        self.pos(),
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoModifier,
+                    )
                     self.parent.mouseReleaseEvent(e)
                     self.parent.parent().alignMode = False
 
@@ -650,11 +683,15 @@ class BlockItem(QGraphicsPixmapItem):
 
     def elementInYBand(self, t):
         eps = 50
-        return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+        return (
+            self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+        )
 
     def elementInXBand(self, t):
         eps = 50
-        return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
+        return (
+            self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
+        )
 
     def elementInY(self):
         for t in self.parent.parent().trnsysObj:
@@ -662,7 +699,6 @@ class BlockItem(QGraphicsPixmapItem):
                 if self.scenePos().y == t.scenePos().y():
                     return True
         return False
-
 
     # Encoding
     def encode(self):
@@ -677,32 +713,30 @@ class BlockItem(QGraphicsPixmapItem):
                 portListOutputs.append(p.id)
             dct = {}
 
-            dct['.__BlockDict__'] = True
-            dct['BlockName'] = self.name
-            dct['BlockDisplayName'] = self.displayName
-            dct['BlockPosition'] = (float(self.pos().x()), float(self.pos().y()))
-            dct['ID'] = self.id
-            dct['trnsysID'] = self.trnsysId
-            dct['PortsIDIn'] = portListInputs
-            dct['PortsIDOut'] = portListOutputs
-            dct['FlippedH'] = self.flippedH
-            dct['FlippedV'] = self.flippedV
-            dct['RotationN'] = self.rotationN
-            dct['GroupName'] = self.groupName
+            dct[".__BlockDict__"] = True
+            dct["BlockName"] = self.name
+            dct["BlockDisplayName"] = self.displayName
+            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["ID"] = self.id
+            dct["trnsysID"] = self.trnsysId
+            dct["PortsIDIn"] = portListInputs
+            dct["PortsIDOut"] = portListOutputs
+            dct["FlippedH"] = self.flippedH
+            dct["FlippedV"] = self.flippedV
+            dct["RotationN"] = self.rotationN
+            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
         self.rotateBlockToN(i["RotationN"])
-        # self.displayName = i["BlockDisplayName"]
-        # self.label.setPlainText(self.displayName)
         self.setName(i["BlockDisplayName"])
 
         self.groupName = "defaultGroup"
@@ -710,7 +744,9 @@ class BlockItem(QGraphicsPixmapItem):
 
         self.logger.debug(len(self.inputs))
 
-        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
+        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(
+            i["PortsIDOut"]
+        ):
             temp = i["PortsIDIn"]
             i["PortsIDIn"] = i["PortsIDOut"]
             i["PortsIDOut"] = temp
@@ -724,8 +760,10 @@ class BlockItem(QGraphicsPixmapItem):
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.setPos(float(i["BlockPosition"][0] + offset_x),
-                  float(i["BlockPosition"][1] + offset_y))
+        self.setPos(
+            float(i["BlockPosition"][0] + offset_x),
+            float(i["BlockPosition"][1] + offset_y),
+        )
 
         self.updateFlipStateH(i["FlippedH"])
         self.updateFlipStateV(i["FlippedV"])
@@ -739,73 +777,36 @@ class BlockItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
-
     # Export related
-    def exportParameterSolver(self, descConnLength):
-        temp = ""
-        for i in self.inputs:
-            # ConnectionList lenght should be max offset
-            for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
-
-        for o in self.outputs:
-            # ConnectionList lenght should be max offset
-            for c in o.connectionList:
-                if type(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                elif type(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
-
-        temp += str(self.typeNumber)
-        temp += " " * (descConnLength - len(temp))
-        self.exportConnsString = temp
-
-        return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
-    # def exportBlackBox(self):
-    #     # if len(t.inputs + t.outputs) == 2 and not isinstance(self, Connector):
-    #     if len(self.inputs + self.outputs) == 2 and self.isVisible():
-    #         resStr = "T" + self.displayName + "=1 \n"
-    #         equationNr = 1
-    #
-    #         return resStr, equationNr
-    #     else:
-    #         return "", 0
-
     def exportBlackBox(self):
         equation = []
         if len(self.inputs + self.outputs) == 2 and self.isVisible():
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-            if not(files):
-                status = 'noDdckFile'
+            if not (files):
+                status = "noDdckFile"
             else:
-                status = 'noDdckEntry'
+                status = "noDdckEntry"
             lines = []
             for file in files:
-                infile = open(file, 'r')
+                infile = open(file, "r")
                 lines += infile.readlines()
             for i in range(len(lines)):
-                if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
+                if (
+                    "output" in lines[i].lower()
+                    and "to" in lines[i].lower()
+                    and "hydraulic" in lines[i].lower()
+                ):
                     for j in range(i, len(lines) - i):
                         if lines[j][0] == "T":
                             outputT = lines[j].split("=")[0].replace(" ", "")
-                            status = 'success'
+                            status = "success"
                             break
                     equation = ["T" + self.displayName + "=" + outputT]
                     break
         else:
-            status = 'noBlackBoxOutput'
+            status = "noBlackBoxOutput"
 
-        if status == 'noDdckFile' or status == 'noDdckEntry':
+        if status == "noDdckFile" or status == "noDdckEntry":
             equation.append("T" + self.displayName + "=1")
 
         return status, equation
@@ -823,29 +824,16 @@ class BlockItem(QGraphicsPixmapItem):
         return "", nUnit
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         temp = ""
         for i in self.inputs:
-            # ConnectionList lenght should be max offset
             for c in i.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and i.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         for o in self.outputs:
-            # ConnectionList lenght should be max offset
             for c in o.connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+                temp = temp + str(c.trnsysId) + " "
+                self.trnsysConn.append(c)
 
         temp += "0 "
         temp += str(self.typeNumber)
@@ -854,31 +842,42 @@ class BlockItem(QGraphicsPixmapItem):
 
         f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
 
-        return f, 1
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 ", 1
 
     def exportInputsFlowSolver2(self):
-        # return str(self.exportInitialInput) + " [" + self.displayName + "]", 1
         return str(self.exportInitialInput) + " ", 1
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        tot = ""
-        for i in range(0, 3):
-            if i < 2:
-                temp = prefix + self.displayName + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                       str(equationNumber) + "]\n"
-                tot += temp
-                self.exportEquations.append(temp)
-                # nEqUsed += 1  # DC
-            equationNumber += 1  # DC-ERROR it should count anyway
+        equation1 = self._createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
+        equation2 = self._createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
 
-        return tot, equationNumber, 2
+        self.exportEquations.append(equation1)
+        self.exportEquations.append(equation2)
+
+        equations = equation1 + equation2
+        nEquationsUsed = 2
+        nextEquationNumber = equationNumber + 3
+
+        return equations, nextEquationNumber, nEquationsUsed
+
+    def _createFlowSolverOutputEquation(self, equationNumber, abc, prefix, equationNumberOffset, simulationUnit):
+        return f"{prefix}{self.displayName}_{abc[equationNumber]}=[{simulationUnit},{equationNumberOffset + equationNumber}]\n"
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         return "", startingUnit
-    
+
+    def getTemperatureVariableName(self, portItem: PortItem) -> str:
+        return f"T{self.displayName}"
+
+    def getFlowSolverParametersId(self, portItem: PortItem) -> int:
+        return self.trnsysId
+
+    def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+        pass
+
     def cleanUpAfterTrnsysExport(self):
         self.exportConnsString = ""
         self.exportInputName = "0"

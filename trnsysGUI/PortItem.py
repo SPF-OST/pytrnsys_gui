@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import sys
 
 from PyQt5 import QtCore
@@ -9,9 +12,9 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QMenu
 class PortItem(QGraphicsEllipseItem):
     def __init__(self, name, side, parent):
         self.parent = parent
-        
+
         self.logger = parent.logger
-        
+
         self.name = name
         self.side = side
         self.createdAtSide = side
@@ -19,16 +22,7 @@ class PortItem(QGraphicsEllipseItem):
         self.connectionList = []
         self.id = self.parent.parent.parent().idGen.getID()
 
-        # This boolean is used when the storage inside is connected, thus preventing Hx to connect to that.
-        self.isFromHx = False
-
-        # For debugging connections at StorageTank
-        self.visited = False
-
-        # For saving the connection of a port pair in a Tank
-        self.portPairVisited = False
-
-        self.color = 'white'
+        self.color = "white"
         self.ashColorR = QColor(239, 57, 75)
         self.ashColorB = QColor(20, 83, 245)
 
@@ -40,12 +34,12 @@ class PortItem(QGraphicsEllipseItem):
         self.visibleColor = QColor(0, 0, 0)
 
         # This if is only for input/output having different colors
-        if name == 'i':
+        if name == "i":
             color = QColor(self.ashColorR)
             # self.innerCircle.setBrush(QColor(self.ashColorR))
             # self.innerCircle.setBrush(QColor(0, 0, 0))
             self.innerCircle.setBrush(self.visibleColor)
-        if name == 'o':
+        if name == "o":
             color = QColor(self.ashColorB)
             # self.innerCircle.setBrush(QColor(self.ashColorB))
             # self.innerCircle.setBrush(QColor(0, 0, 0))
@@ -74,7 +68,11 @@ class PortItem(QGraphicsEllipseItem):
 
     def itemChange(self, change, value):
         # TODO : here to merge segments when moving blockitems
-        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers')and change == self.ItemPositionChange:
+        if (
+            self.parent.parent.parent().moveDirectPorts
+            and hasattr(self.parent, "heatExchangers")
+            and change == self.ItemPositionChange
+        ):
             if not self.savePos is None:
                 self.logger.debug("val is " + str(value))
                 value.setY(max(value.y(), 0))
@@ -93,8 +91,7 @@ class PortItem(QGraphicsEllipseItem):
                     # self.logger.debug("Type of parent is " + str(type(nextNodeInConn.parent)))
 
                     e = conn.segments[0]
-                    e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(),
-                              e.line().p2().y())
+                    e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(), e.line().p2().y())
 
                 if conn.toPort is self:
                     # self.logger.debug("This port is the ending port of connection")
@@ -125,13 +122,18 @@ class PortItem(QGraphicsEllipseItem):
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
                             seg = conn.segments[0]  # first segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x() + 0.6, cor.scenePos().y())
-                            if len(conn.segments)>2:
+                            seg.setLine(
+                                self.scenePos().x(), self.scenePos().y(), cor.scenePos().x() + 0.6, cor.scenePos().y()
+                            )
+                            if len(conn.segments) > 2:
                                 verSeg = conn.segments[1]
                                 nextSeg = conn.segments[2]
                                 if nextSeg.isHorizontal() and seg.isHorizontal():
-                                    if int(seg.endNode.parent.pos().y()-0) <= int(nextSeg.line().p2().y()) <= int(
-                                            seg.endNode.parent.pos().y()+0):
+                                    if (
+                                        int(seg.endNode.parent.pos().y() - 0)
+                                        <= int(nextSeg.line().p2().y())
+                                        <= int(seg.endNode.parent.pos().y() + 0)
+                                    ):
                                         self.logger.debug("both segments are horizontal from fromport")
                                         # verSeg.deleteSegment()
                                         self.hideCorners(conn)
@@ -149,19 +151,29 @@ class PortItem(QGraphicsEllipseItem):
                             seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
 
                 elif conn.toPort is self:
-                    if (conn.fromPort.createdAtSide != 1 and conn.fromPort.createdAtSide != 3) or not conn.segments[0].isVertical():
+                    if (conn.fromPort.createdAtSide != 1 and conn.fromPort.createdAtSide != 3) or not conn.segments[
+                        0
+                    ].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
 
                             seg = conn.segments[-1]
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x()+ 0.6, cor.scenePos().y()+ 0.6)
-                            if len(conn.segments)>2:
+                            seg.setLine(
+                                self.scenePos().x(),
+                                self.scenePos().y(),
+                                cor.scenePos().x() + 0.6,
+                                cor.scenePos().y() + 0.6,
+                            )
+                            if len(conn.segments) > 2:
                                 verSeg = conn.segments[-2]
                                 nextSeg = conn.segments[-3]
                                 if nextSeg.isHorizontal() and seg.isHorizontal():
-                                    if int(nextSeg.endNode.parent.pos().y() - 0) <= int(seg.line().p2().y()) <= int(
-                                            nextSeg.endNode.parent.pos().y() + 0):
+                                    if (
+                                        int(nextSeg.endNode.parent.pos().y() - 0)
+                                        <= int(seg.line().p2().y())
+                                        <= int(nextSeg.endNode.parent.pos().y() + 0)
+                                    ):
                                         self.logger.debug("both segments are horizontal from toport")
                                         self.hideCorners(conn)
                                         verSeg.setVisible(False)
@@ -175,16 +187,14 @@ class PortItem(QGraphicsEllipseItem):
                             self.logger.debug("Inside 2nd")
 
                             seg = conn.segments[-1]  # last segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
-                                        cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
                         elif len(conn.getCorners()) == 2 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(self.scenePos().x(), cor.pos().y())
                             self.logger.debug("Inside 3rd")
 
                             seg = conn.segments[-1]  # last segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
-                                        cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
 
                 else:
                     self.logger.debug("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
@@ -196,7 +206,7 @@ class PortItem(QGraphicsEllipseItem):
         return super(PortItem, self).itemChange(change, value)
 
     def mousePressEvent(self, event):
-        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, 'heatExchangers'):
+        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, "heatExchangers"):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
         else:
@@ -210,12 +220,12 @@ class PortItem(QGraphicsEllipseItem):
 
         self.setRect(-4, -4, 10, 10)
         self.innerCircle.setRect(-4, -4, 10, 10)
-        if self.name == 'i':
+        if self.name == "i":
             # self.setBrush(Qt.red)
             # self.innerCircle.setBrush(Qt.red)
             # self.innerCircle.setBrush(QColor(0, 0, 0))
             self.innerCircle.setBrush(self.visibleColor)
-        if self.name == 'o':
+        if self.name == "o":
             # self.setBrush(QColor(Qt.blue))
             # self.innerCircle.setBrush(QColor(Qt.blue))
             # self.innerCircle.setBrush(QColor(0, 0, 0))
@@ -230,13 +240,13 @@ class PortItem(QGraphicsEllipseItem):
         self.setRect(-4, -4, 7, 7)
         self.innerCircle.setRect(-4, -4, 6.5, 6.5)
         if len(self.connectionList) == 0:
-            if self.name == 'i':
+            if self.name == "i":
                 # self.setBrush(Qt.red)
                 # self.setBrush(self.ashColorR)
                 # self.innerCircle.setBrush(self.ashColorR)
                 # self.innerCircle.setBrush(QColor(0, 0, 0))
                 self.innerCircle.setBrush(self.visibleColor)
-            if self.name == 'o':
+            if self.name == "o":
                 # self.setBrush(self.ashColorR)
                 # self.innerCircle.setBrush(self.ashColorB)
                 # self.innerCircle.setBrush(QColor(0, 0, 0))
@@ -249,7 +259,9 @@ class PortItem(QGraphicsEllipseItem):
         self.parent.parent.parent().listV.addItem("Connections:")
         for c in self.connectionList:
             self.parent.parent.parent().listV.addItem(c.displayName)
-        self.parent.parent.parent().listV.addItem("Flipped state (H,V):" + str(self.parent.flippedH) + ", " + str(self.parent.flippedV))
+        self.parent.parent.parent().listV.addItem(
+            "Flipped state (H,V):" + str(self.parent.flippedH) + ", " + str(self.parent.flippedV)
+        )
         self.parent.parent.parent().listV.addItem("Side: " + str(self.side))
         self.parent.parent.parent().listV.addItem("createdAtSide: " + str(self.createdAtSide))
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
@@ -257,53 +269,6 @@ class PortItem(QGraphicsEllipseItem):
 
     def _debugClear(self):
         self.parent.parent.parent().listV.clear()
-
-    def mouseDoubleClickEvent(self, event):
-        pass
-        # self.logger.debug("double clicked")
-        # if hasattr(self.parent, 'heatExchangers') and not self.isFromHx:
-        #     self.deleteDirectPortPair()
-
-    def deleteDirectPortPair(self):
-
-        # if self.connectionList[0].fromPort is self:
-        #     self.deletePort(self.connectionList[0].toPort)
-        # elif self.connectionList[0].toPort is self:
-        #     self.deletePort(self.connectionList[0].fromPort)
-        # else:
-        #     self.logger.debug("Something wrong")
-        # self.deletePort(self)
-
-        if len(self.connectionList) > 0:
-            if self.connectionList[0].fromPort is self:
-                self.deletePort(self.connectionList[0].toPort)
-            elif self.connectionList[0].toPort is self:
-                self.deletePort(self.connectionList[0].fromPort)
-            else:
-                self.logger.debug("Something wrong")
-        self.deletePort(self)
-        #
-        # self.logger.debug("After delete: ")
-        # self.logger.debug(self.connectionList)
-
-    def deletePort(self, obj):
-        while len(obj.connectionList) > 0:
-            obj.connectionList[0].deleteConn()
-
-        if obj in obj.parent.inputs:
-            obj.parent.inputs.remove(obj)
-
-        if obj in obj.parent.outputs:
-            obj.parent.outputs.remove(obj)
-
-        obj.parent.parent.scene().removeItem(obj)
-
-        obj.parent.directPortConnsForList = [c for c in obj.parent.directPortConnsForList if c.fromPort != self and c.toPort != self]
-
-        if obj in obj.parent.leftSide and self.side == 0:
-            obj.parent.leftSide.remove(obj)
-        if obj in obj.parent.rightSide and self.side == 2:
-            obj.parent.rightSide.remove(obj)
 
     def hideCorners(self, connection):
         cor = connection.getCorners()[0]
@@ -316,5 +281,3 @@ class PortItem(QGraphicsEllipseItem):
         cor2 = connection.getCorners()[-1]
         cor.setVisible(True)
         cor2.setVisible(True)
-
-

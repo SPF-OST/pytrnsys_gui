@@ -1,25 +1,28 @@
+# pylint: skip-file
+# type: ignore
+
+import glob
 import os
 import shutil
-import glob
+import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
+import trnsysGUI.images as _img
 
 
 class HeatPump(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(HeatPump, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.inputs.append(PortItem('i', 2, self))
-        self.outputs.append(PortItem('o', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
+        self.inputs.append(PortItem("i", 0, self))
+        self.inputs.append(PortItem("i", 2, self))
+        self.outputs.append(PortItem("o", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
         self.loadedFiles = []
 
         # For restoring correct order of trnsysObj list
@@ -27,10 +30,11 @@ class HeatPump(BlockItem):
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
-        self.subBlockCounter = 0
-
         self.changeSize()
         self.addTree()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.HP_SVG
 
     def changeSize(self):
         w = self.w
@@ -50,8 +54,8 @@ class HeatPump(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0,delta], [w,delta]]
-        self.origOutputsPos = [[0,h-delta], [w,h-delta]]
+        self.origInputsPos = [[0, delta], [w, delta]]
+        self.origOutputsPos = [[0, h - delta], [w, h - delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -82,25 +86,25 @@ class HeatPump(BlockItem):
                 portListOutputs.append(p.id)
 
             dct = {}
-            dct['.__BlockDict__'] = True
-            dct['BlockName'] = self.name
-            dct['BlockDisplayName'] = self.displayName
-            dct['PortsIDIn'] = portListInputs
-            dct['PortsIDOut'] = portListOutputs
-            dct['HeatPumpPosition'] = (float(self.pos().x()), float(self.pos().y()))
-            dct['ID'] = self.id
-            dct['trnsysID'] = self.trnsysId
-            dct['childIds'] = self.childIds
-            dct['FlippedH'] = self.flippedH
-            dct['FlippedV'] = self.flippedH
-            dct['RotationN'] = self.rotationN
-            dct['GroupName'] = self.groupName
+            dct[".__BlockDict__"] = True
+            dct["BlockName"] = self.name
+            dct["BlockDisplayName"] = self.displayName
+            dct["PortsIDIn"] = portListInputs
+            dct["PortsIDOut"] = portListOutputs
+            dct["HeatPumpPosition"] = (float(self.pos().x()), float(self.pos().y()))
+            dct["ID"] = self.id
+            dct["trnsysID"] = self.trnsysId
+            dct["childIds"] = self.childIds
+            dct["FlippedH"] = self.flippedH
+            dct["FlippedV"] = self.flippedH
+            dct["RotationN"] = self.rotationN
+            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
+    def decode(self, i, resBlockList):
         self.logger.debug("Loading a HeatPump block")
 
         self.flippedH = i["FlippedH"]
@@ -148,73 +152,66 @@ class HeatPump(BlockItem):
     def exportBlackBox(self):
         equation = []
         files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not(files):
-            status = 'noDdckFile'
-            for i in range(1,3):
+        if not (files):
+            status = "noDdckFile"
+            for i in range(1, 3):
                 equation.append("T" + self.displayName + "X" + str(i) + "=1")
         else:
-            status = 'noDdckEntry'
+            status = "noDdckEntry"
         lines = []
         for file in files:
-            infile = open(file, 'r')
+            infile = open(file, "r")
             lines += infile.readlines()
         for i in range(len(lines)):
-            if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
-                counter = 0
+            if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
+                counter = 1
                 for j in range(i, len(lines) - i):
                     if lines[j][0] == "T":
                         outputT = lines[j].split("=")[0].replace(" ", "")
                         equation.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
                         counter += 1
-                    if counter == 2:
-                        status = 'success'
+                    if counter == 3:
+                        status = "success"
                         break
                 break
 
         return status, equation
 
     def exportParametersFlowSolver(self, descConnLength):
-        # descConnLength = 20
         f = ""
         for i in range(len(self.inputs)):
-            # ConnectionList lenght should be max offset
-            temp = ""
             for c in self.inputs[i].connectionList:
-                if hasattr(c.fromPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                elif hasattr(c.toPort.parent, "heatExchangers") and self.inputs[i].connectionList.index(c) == 0:
-                    continue
-                else:
-                    if len(self.outputs[i].connectionList) > 0:
+                if len(self.outputs[i].connectionList) > 0:
+                    if i == 0:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[0])
+                        temp += " " * (descConnLength - len(temp))
 
-                        if i == 0:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[0])
-                            temp += " " * (descConnLength - len(temp))
+                        # HeatPump will have a two-liner exportConnString
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "HeatPump" + "\n"
 
-                            # HeatPump will have a two-liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "HeatPump" + "\n"
+                    elif i == 1:
+                        temp = (
+                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
+                        )  # + str(t.childIds[1])
+                        temp += " " * (descConnLength - len(temp))
 
-                        elif i == 1:
-                            temp = str(c.trnsysId) + " " + str(
-                                self.outputs[i].connectionList[0].trnsysId) + " 0 0 "  # + str(t.childIds[1])
-                            temp += " " * (descConnLength - len(temp))
-
-                            # HeatPump will have a two liner exportConnString
-                            self.exportConnsString += temp + "\n"
-                            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Evap" + "\n"
-                        else:
-                            f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                        # Presumably used only for storing the order of connections
-                        self.trnsysConn.append(c)
-                        self.trnsysConn.append(self.outputs[i].connectionList[0])
-
+                        # HeatPump will have a two liner exportConnString
+                        self.exportConnsString += temp + "\n"
+                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Evap" + "\n"
                     else:
-                        f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
+                        f += "Error: There are more inputs than trnsysIds" + "\n"
 
-        return f, 2
+                    # Presumably used only for storing the order of connections
+                    self.trnsysConn.append(c)
+                    self.trnsysConn.append(self.outputs[i].connectionList[0])
+
+                else:
+                    f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
+
+        return f
 
     def exportInputsFlowSolver1(self):
         return "0,0 0,0 ", 2
@@ -230,8 +227,19 @@ class HeatPump(BlockItem):
             for i in range(0, 3):
 
                 if i < 2:
-                    temp = prefix + self.displayName + "-Hp-Side"+str(j) + "_" + abc[i] + "=[" + str(simulationUnit) + "," + \
-                           str(equationNumber) + "]\n"
+                    temp = (
+                        prefix
+                        + self.displayName
+                        + "-Hp-Side"
+                        + str(j)
+                        + "_"
+                        + abc[i]
+                        + "=["
+                        + str(simulationUnit)
+                        + ","
+                        + str(equationNumber)
+                        + "]\n"
+                    )
                     tot += temp
                     self.exportEquations.append(temp)
                     # nEqUsed += 1  # DC
@@ -241,7 +249,12 @@ class HeatPump(BlockItem):
 
     def getSubBlockOffset(self, c):
         for i in range(2):
-            if self.inputs[i] == c.toPort or self.inputs[i] == c.fromPort or self.outputs[i] == c.toPort or self.outputs[i] == c.fromPort:
+            if (
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
+            ):
                 return i
 
     def addTree(self):
@@ -251,7 +264,7 @@ class HeatPump(BlockItem):
         """
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
-        if self.parent.parent().projectPath =='':
+        if self.parent.parent().projectPath == "":
             # self.path = os.path.dirname(__file__)
             # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
@@ -260,7 +273,7 @@ class HeatPump(BlockItem):
             # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
-        self.path = os.path.join(self.path, 'ddck')
+        self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
@@ -272,7 +285,7 @@ class HeatPump(BlockItem):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount()-1):
+        for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
@@ -303,7 +316,7 @@ class HeatPump(BlockItem):
 
     def deleteBlock(self):
         """
-                Overridden method to also delete folder
+        Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
@@ -312,7 +325,7 @@ class HeatPump(BlockItem):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName+'Tree')
+        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:
@@ -333,7 +346,7 @@ class HeatPump(BlockItem):
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
         # destPath = str(os.path.dirname(self.path))+'\\HP_'+self.displayName
-        destPath = os.path.join(os.path.split(self.path)[0],self.displayName)
+        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath

@@ -1,12 +1,15 @@
-import sys
+# pylint: skip-file
+# type: ignore
 
+import typing as _tp
+
+import numpy as np
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
-
-import numpy as np
+import trnsysGUI.images as _img
 
 
 class Pump(BlockItem):
@@ -20,13 +23,13 @@ class Pump(BlockItem):
 
         self.exportInitialInput = 0.0
 
-        self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem('o', 2, self))
-
-        self.pixmap = QPixmap(self.image)
-        self.setPixmap(self.pixmap.scaled(QSize(self.w, self.h)))
+        self.inputs.append(PortItem("i", 0, self))
+        self.outputs.append(PortItem("o", 2, self))
 
         self.changeSize()
+
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        return _img.PUMP_SVG
 
     def changeSize(self):
         w = self.w
@@ -46,7 +49,7 @@ class Pump(BlockItem):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0,delta]]
+        self.origInputsPos = [[0, delta]]
         self.origOutputsPos = [[w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -69,7 +72,7 @@ class Pump(BlockItem):
         return w, h
 
     def exportBlackBox(self):
-        return 'noBlackBoxOutput', []
+        return "noBlackBoxOutput", []
 
     def exportPumpOutlets(self):
         f = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
@@ -84,5 +87,3 @@ class Pump(BlockItem):
         temp1 = "Mfr" + self.displayName
         self.exportInputName = " " + temp1 + " "
         return self.exportInputName, 1
-
-

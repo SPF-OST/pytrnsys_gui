@@ -1,0 +1,11 @@
+wheel
+
+pytest
+pytest-cov
+pytest-html
+mypy
+pylint
+
+PyQT5-stubs
+
+-e file:.#egg=pytrnsys-gui
