@@ -9,7 +9,7 @@ from trnsysGUI.Connection import Connection
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
 from trnsysGUI.ResizerItem import ResizerItem
-from trnsysGUI.StorageTank import StorageTank
+from trnsysGUI.storageTank.widget import StorageTank
 
 
 class Scene(QGraphicsScene):
