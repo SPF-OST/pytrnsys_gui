@@ -531,11 +531,11 @@ class _MainWindow(QMainWindow):
     def exportDck(self):
         try:
             buildDck.buildDck(self.projectFolder)
-        except ValueError as error:
+        except Exception as error:
             messageBox = QMessageBox()
             messageBox.setStandardButtons(QMessageBox.Ok)
             messageBox.setText(
-                f"There has been an error in the deck file generated: {error}"
+                f"The deck file could not be generated: {error}"
             )
             messageBox.exec()
 
