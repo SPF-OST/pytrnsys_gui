@@ -22,4 +22,17 @@ class Side(_enum.Enum):
         if self == self.RIGHT:
             return 2
 
-        raise ValueError("Cannot convert {self} to side nr.")
+        raise ValueError(f"Cannot convert {self} to side nr.")
+
+    def formatDdck(self):
+        if self == self.LEFT:
+            return "Left"
+
+        if self == self.RIGHT:
+            return "Right"
+
+        raise ValueError(f"Cannot convert {self} to side nr.")
+
+    @property
+    def isLeft(self) -> bool:
+        return self == self.LEFT

@@ -31,10 +31,10 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
+import trnsysGUI as _tgui
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
@@ -45,21 +45,17 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
-from trnsysGUI.IdGenerator import IdGenerator
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.PumpDlg import PumpDlg
-from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
-from trnsysGUI.copyGroup import copyGroup
 from trnsysGUI.diagram.Decoder import Decoder
-from trnsysGUI.diagram.DecoderPaste import DecoderPaste
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
@@ -67,9 +63,11 @@ from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.hxDlg import hxDlg
+from trnsysGUI.idGenerator import IdGenerator
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
-import trnsysGUI as _tgui
+from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
+from trnsysGUI.storageTank.widget import StorageTank
 
 
 class Editor(QWidget):
@@ -106,7 +104,7 @@ class Editor(QWidget):
     and pasting will load the clipboard using a slighly different decoder than for loading an entire diagram.
     When the elements are pasted, they compose a group which can be dragged around and is desintegrated when the mouse
     is released.
-    It is controlled by the attributes selectionMode, groupMode, copyMode and multipleSelectedMode
+    It is controlled by the attributes selectionMode and groupMode
 
     Attributes
     ----------
@@ -122,10 +120,6 @@ class Editor(QWidget):
         Enables/disables selection rectangle in Scene
     groupMode : bool
         Enables creation of a new group in Scene
-    copyMode : bool
-        Enables copying elements in the selection rectangle
-    multipleSelectedMode : bool
-        Unused
     alignMode : bool
         Enables mode in which a dragged block is aligned to y or x value of another one
         Toggled in the MainWindow class in toggleAlignMode()
@@ -191,8 +185,6 @@ class Editor(QWidget):
 
         self.selectionMode = False
         self.groupMode = False
-        self.copyMode = False
-        self.multipleSelectedMode = False
 
         self.alignMode = False
 
@@ -922,89 +914,6 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def copyElements(self):
-        """
-        Copies elements
-        Returns
-        -------
-
-        """
-        clipboardGroup = copyGroup(self)
-        self.logger.debug(self.diagramScene.elementsInRect())
-
-        for t in self.diagramScene.elementsInRect():
-            self.logger.debug("element in rect is" + str(t))
-            clipboardGroup.trnsysObj.append(t)
-
-        self.saveToClipBoard(clipboardGroup)
-
-    def saveToClipBoard(self, copyList):
-        filename = "clipboard.json"
-
-        with open(filename, "w") as jsonfile:
-            json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
-
-        self.logger.debug("Copy complete!")
-
-    def pasteFromClipBoard(self):
-        filename = "clipboard.json"
-
-        with open(filename, "r") as jsonfile:
-            blocklist = json.load(jsonfile, cls=DecoderPaste, editor=self)
-
-        for j in blocklist["Blocks"]:
-            # print("J is " + str(j))
-
-            for k in j:
-                if isinstance(k, BlockItem):
-                    # k.setParent(self.diagramView)
-                    k.changeSize()
-                    self.copyGroupList.addToGroup(k)
-
-                    for inp in k.inputs:
-                        inp.id = self.idGen.getID()
-                    for out in k.outputs:
-                        out.id = self.idGen.getID()
-
-                if isinstance(k, StorageTank):
-                    self.logger.debug("Loading a Storage")
-                    k.updateImage()
-
-                if isinstance(k, GraphicalItem):
-                    k.setParent(self.diagramView)
-                    self.diagramScene.addItem(k)
-                    # k.resizer.setPos(k.w, k.h)
-                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
-
-                if isinstance(k, Connection):
-                    self.logger.debug("Almost done with loading a connection")
-                    k.initLoad()
-                    for corners in k.getCorners():
-                        # copyGroupList.trnsysObj.append(k)
-                        self.copyGroupList.addToGroup(corners)
-
-                if isinstance(k, dict):
-                    pass
-
-                    # print("Global id is " + str(globalID))
-                    # print("trnsys id is " + str(trnsysID))
-
-        # global copyMode
-        # global selectionMode
-        # global selectionMode
-        # global pasting
-
-        self.copyMode = False
-        self.selectionMode = False
-
-        self.diagramScene.addItem(self.copyGroupList)
-        self.copyGroupList.setFlags(self.copyGroupList.ItemIsMovable)
-
-        self.pasting = True
-
-        # for t in self.trnsysObj:
-        #     print("Tr obj is" + str(t) + " " + str(t.trnsysId))
-
     def clearCopyGroup(self):
 
         for it in self.copyGroupList.childItems():
@@ -1019,7 +928,6 @@ class Editor(QWidget):
             if isinstance(t, GraphicalItem):
                 self.selectionGroupList.addToGroup(t)
 
-        self.multipleSelectedMode = False
         self.selectionMode = False
 
         self.diagramScene.addItem(self.selectionGroupList)
@@ -1190,10 +1098,6 @@ class Editor(QWidget):
 
     def showNewDiagramDlg(self):
         c = newDiagramDlg(self)
-
-    # Not used
-    # def showNewPortDlg(self):
-    #     c = newPortDlg
 
     def showSegmentDlg(self, seg):
         c = segmentDlg(seg, self)

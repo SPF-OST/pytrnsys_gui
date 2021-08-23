@@ -11,7 +11,7 @@ import trnsysGUI.HeatPumpTwoHx
 import trnsysGUI.IceStorage
 import trnsysGUI.Pump
 import trnsysGUI.Radiator
-import trnsysGUI.StorageTank
+import trnsysGUI.storageTank.widget as _stw
 import trnsysGUI.TVentil
 import trnsysGUI.TeePiece
 import trnsysGUI.WTap
@@ -51,7 +51,7 @@ class DeleteBlockCommand(QUndoCommand):
     def undo(self):
         name = self.blName
         if name == "StorageTank":
-            bl = trnsysGUI.StorageTank.StorageTank(name, self.blParent)
+            bl = _stw.StorageTank(name, self.blParent)
         elif name == "TeePiece":
             bl = trnsysGUI.TeePiece.TeePiece(name, self.blParent)
         elif name == "TVentil":
@@ -108,22 +108,3 @@ class DeleteBlockCommand(QUndoCommand):
             self.portsIdIn.append(p.id)
         for p in self.bl.outputs:
             self.portsIdOut.append(p.id)
-
-
-# From stackoverflow, this should have helped:
-
-# from trnsysGUI.Collector import Collector
-# from trnsysGUI.Connector import Connector
-# from trnsysGUI.GenericBlock import GenericBlock
-# from trnsysGUI.HeatPump import HeatPump
-# from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
-# from trnsysGUI.IceStorage import IceStorage
-# from trnsysGUI.Pump import Pump
-# from trnsysGUI.Radiator import Radiator
-# from trnsysGUI.StorageTank import StorageTank
-# from trnsysGUI.TVentil import TVentil
-# from trnsysGUI.TeePiece import TeePiece
-# from trnsysGUI.WTap import WTap
-# from trnsysGUI.WTap_main import WTap_main
-#
-# from trnsysGUI.BlockItem import BlockItem

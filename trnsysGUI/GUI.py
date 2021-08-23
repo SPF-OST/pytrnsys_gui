@@ -26,7 +26,7 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
-from trnsysGUI.StorageTank import StorageTank
+from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.configFile import configFile
 
 __version__ = "1.0.0"
@@ -416,11 +416,8 @@ class _MainWindow(QMainWindow):
             return
 
     def createGroup(self):
-        # print("Tb createGroup pressed")
-        # global selectionMode
         self.centralWidget.selectionMode = True
         self.centralWidget.groupMode = True
-        self.centralWidget.copyMode = False
         self.centralWidget.multipleSelectMode = False
 
     def tidyUp(self):
@@ -438,24 +435,6 @@ class _MainWindow(QMainWindow):
     def setZoom0(self):
         self.logger.info("Setting zoom 0")
         self.centralWidget.diagramView.resetTransform()
-
-    def copySelection(self):
-        self.logger.info("Copying selection")
-        # global selectionMode
-        # global copyMode
-
-        self.centralWidget.selectionMode = True
-        self.centralWidget.copyMode = True
-        self.centralWidget.groupMode = False
-        self.centralWidget.multipleSelectMode = False
-
-        self.centralWidget.copyElements()
-
-    def pasteSelection(self):
-        self.logger.info("Pasting selection")
-        self.centralWidget.pasteFromClipBoard()
-        # global copyMode
-        self.centralWidget.copyMode = False
 
     def runAndVisMf(self):
         self.calledByVisualizeMf = True

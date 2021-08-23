@@ -12,7 +12,7 @@ from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
 import trnsysGUI.images as _img
-import trnsysGUI.IdGenerator as _id
+from trnsysGUI import idGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.ResizerItem import ResizerItem
@@ -532,46 +532,6 @@ class BlockItem(QGraphicsPixmapItem):
         else:
             del self.resizer
 
-    # Debug
-    def dumpBlockInfo(self):
-        # for a in inspect.getMembers(self):
-        #     self.logger.debug(str(a))
-
-        self.logger.debug("This is a dump of " + str(self))
-        self.logger.debug("Name = " + str(self.displayName))
-        self.logger.debug("TrnsysType = " + str(self.name))
-        self.logger.debug("TrnsysTypeNumber = " + str(self.typeNumber))
-        self.logger.debug("Size = " + str(self.w) + " * " + str(self.h))
-
-        self.printIds()
-        self.printConnections()
-
-    def printIds(self):
-        self.logger.debug("ID:" + str(self.id))
-        self.logger.debug("TrnsysID: " + str(self.trnsysId))
-
-        for inp in self.inputs:
-            self.logger.debug("Has input with ID " + str(inp.id))
-
-        for out in self.outputs:
-            self.logger.debug("Has output with ID " + str(out.id))
-
-    def printConnections(self):
-        self.logger.debug("Connections are:")
-        for c in self.getConnections():
-            self.logger.debug(c.displayName + " with ID " + str(c.id))
-
-    def inspectBlock(self):
-        self.parent.parent().listV.clear()
-        self.parent.parent().listV.addItem("Name: " + self.name)
-        self.parent.parent().listV.addItem("Display name: " + self.displayName)
-        self.parent.parent().listV.addItem("Group name: " + self.groupName)
-        self.parent.parent().listV.addItem("Parent: " + str(self.parent))
-        self.parent.parent().listV.addItem("Position: " + str(self.pos()))
-        self.parent.parent().listV.addItem("Sceneposition: " + str(self.scenePos()))
-        self.parent.parent().listV.addItem("Inputs: " + str(self.inputs))
-        self.parent.parent().listV.addItem("Outputs: " + str(self.outputs))
-
     # AlignMode related
     def itemChange(self, change, value):
         # self.logger.debug(change, value)
@@ -851,8 +811,8 @@ class BlockItem(QGraphicsPixmapItem):
         return str(self.exportInitialInput) + " ", 1
 
     def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        equation1 = self._createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
-        equation2 = self._createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
+        equation1 = self.__createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
+        equation2 = self.__createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
 
         self.exportEquations.append(equation1)
         self.exportEquations.append(equation2)
@@ -863,7 +823,7 @@ class BlockItem(QGraphicsPixmapItem):
 
         return equations, nextEquationNumber, nEquationsUsed
 
-    def _createFlowSolverOutputEquation(self, equationNumber, abc, prefix, equationNumberOffset, simulationUnit):
+    def __createFlowSolverOutputEquation(self, equationNumber, abc, prefix, equationNumberOffset, simulationUnit):
         return f"{prefix}{self.displayName}_{abc[equationNumber]}=[{simulationUnit},{equationNumberOffset + equationNumber}]\n"
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):

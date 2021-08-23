@@ -5,7 +5,7 @@ import typing as _tp
 import dataclasses_jsonschema as _dcj
 
 import trnsysGUI.serialization as _ser
-import trnsysGUI.IdGenerator as _id
+from trnsysGUI import idGenerator as _id
 from trnsysGUI.storageTank.side import Side
 
 
