@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import trnsysGUI.imageAccessor as _ia
 
 
