@@ -9,11 +9,11 @@ import sys
 
 from PyQt5.QtWidgets import *
 from pytrnsys.utils import log
+import pytrnsys.trnsys_util.deckUtils as _du
 
 import trnsysGUI.arguments as args
-import trnsysGUI.buildDck as dckBuilder
+import trnsysGUI.buildDck as buildDck
 import trnsysGUI.common.cancelled as _ccl
-import trnsysGUI.common.error as _err
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.images as _img
 import trnsysGUI.project as _prj
@@ -99,13 +99,6 @@ class _MainWindow(QMainWindow):
         exportDckAction = QAction(_img.EXPORT_DCK_PNG.icon(), "Export dck", self)
         exportDckAction.triggered.connect(self.exportDck)
 
-        editGroupsAction = QAction("Edit groups/loops", self)
-        editGroupsAction.triggered.connect(self.editGroups)
-
-        selectMultipleAction = QAction("Select multiple items", self)
-        selectMultipleAction.triggered.connect(self.createSelection)
-        selectMultipleAction.setShortcut("s")
-
         toggleSnapAction = QAction("Toggle snap grid", self)
         toggleSnapAction.triggered.connect(self.toggleSnap)
         toggleSnapAction.setShortcut("a")
@@ -124,14 +117,6 @@ class _MainWindow(QMainWindow):
         )
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
-        trnsysList = QAction("Print trnsysObj", self)
-        trnsysList.triggered.connect(self.mb_debug)
-
-        loadVisual = QAction("Load MRF", self)
-        loadVisual.triggered.connect(self.loadVisualization)
-
-        runAction = QAction(_img.ROTATE_TO_RIGHT_PNG.icon(), "Run", self)
-        runAction.triggered.connect(self.runApp)
 
         # Tool bar
         tb = self.addToolBar("Main Toolbar...")
@@ -472,45 +457,6 @@ class _MainWindow(QMainWindow):
         # global copyMode
         self.centralWidget.copyMode = False
 
-    def editGroups(self):
-        self.centralWidget.editGroups()
-
-    def mb_debug(self):
-        pass
-        # print(self.centralWidget.trnsysObj)
-        # a = [int(s.id) for s in self.centralWidget.trnsysObj]
-        # a.sort()
-        # print(a)
-        #
-        # for s in self.centralWidget.trnsysObj:
-        #     if s.id == 11:
-        #         print("Duplicate id obj is " + str(s.displayName) + " " + str(s.id))
-        #
-        # for t in self.centralWidget.trnsysObj:
-        #     t.alignMode = True
-        #     print(t.alignMode)
-
-        # temp = []
-        # for t in self.centralWidget.trnsysObj:
-        #     if isinstance(t, BlockItem):
-        #         for p in t.inputs + t.outputs:
-        #             if p not in temp:
-        #                 temp.append(p)
-        #
-        # for p in temp:
-        #     if p.isFromHx:
-        #         print("Port with parent " + str(p.parent.displayName) + "is from Hx")
-        #
-        # res = True
-        #
-        # for b in self.centralWidget.trnsysObj:
-        #     if isinstance(b, Connection) and b not in self.centralWidget.connectionList:
-        #         res = False
-        #
-        # print("editor connectionList is consistent with trnsysObj: " + str(res))
-
-        # dIns = DeepInspector(self.centralWidget)
-
     def runAndVisMf(self):
         self.calledByVisualizeMf = True
         filePaths = self.runMassflowSolver()
@@ -583,7 +529,15 @@ class _MainWindow(QMainWindow):
         self.centralWidget.exportHydraulicControl()
 
     def exportDck(self):
-        dckBuilder.buildDck(self.projectFolder)
+        try:
+            buildDck.buildDck(self.projectFolder)
+        except Exception as error:
+            messageBox = QMessageBox()
+            messageBox.setStandardButtons(QMessageBox.Ok)
+            messageBox.setText(
+                f"The deck file could not be generated: {error}"
+            )
+            messageBox.exec()
 
     def toggleEditorMode(self):
         self.logger.info("Toggling editor mode")
@@ -597,13 +551,6 @@ class _MainWindow(QMainWindow):
     def toggleSnap(self):
         self.centralWidget.snapGrid = not self.centralWidget.snapGrid
         self.centralWidget.diagramScene.update()
-
-    def createSelection(self):
-        self.centralWidget.clearSelectionGroup()
-        self.centralWidget.selectionMode = True
-        self.centralWidget.copyMode = False
-        self.centralWidget.groupMode = False
-        self.centralWidget.multipleSelectMode = True
 
     def deleteMultiple(self):
         # print("pressed del")
@@ -677,46 +624,6 @@ class _MainWindow(QMainWindow):
             qmb.exec()
 
             return None
-
-    def loadVisualization(self):
-        MfrFile = QFileDialog.getOpenFileName(
-            self, "Select Mfr File", "exports", filter="*_Mfr.prt"
-        )[0]
-        if MfrFile == "":
-            msgb = QMessageBox(self)
-            msgb.setText("No Mfr file chosen!")
-            msgb.exec()
-            return
-        TempFile = QFileDialog.getOpenFileName(
-            self, "Select Temperature File", "exports", filter="*_T.prt"
-        )[0]
-        if TempFile == "":
-            msgb = QMessageBox(self)
-            msgb.setText("No Temperature file chosen!")
-            msgb.exec()
-            return
-
-        selectedMfrFileName = str(MfrFile).split("/")[-1][:-8]
-        selectedTempFileName = str(TempFile).split("/")[-1][:-6]
-
-        currentFilePath = self.currentFile
-        if "\\" in currentFilePath:
-            diaName = currentFilePath.split("\\")[-1][:-5]
-        elif "/" in currentFilePath:
-            diaName = currentFilePath.split("/")[-1][:-5]
-        else:
-            diaName = currentFilePath
-
-        if selectedMfrFileName == selectedTempFileName == diaName:
-            MassFlowVisualizer(self, MfrFile, TempFile)
-            self.massFlowEnabled = True
-        else:
-            self.logger.info(selectedMfrFileName, selectedTempFileName, diaName)
-            msgb = QMessageBox(self)
-            msgb.setText(
-                "MFR or Temperature file does not correspond to current diagram!"
-            )
-            msgb.exec()
 
     def movePorts(self):
         self.centralWidget.moveDirectPorts = True
@@ -829,15 +736,6 @@ class _MainWindow(QMainWindow):
                     msgBox.exec_()
                     self.noErrorConns = False
         return self.noErrorConns
-
-    def runApp(self):
-        runApp = RunMain()
-        if self.centralWidget.projectPath == "":
-            self.logger.info("Temp path:", self.centralWidget.projectFolder)
-            runApp.runAction(self.centralWidget.projectFolder)
-        else:
-            self.logger.info("Project path:", self.centralWidget.projectPath)
-            runApp.runAction(self.centralWidget.projectPath)
 
     def _createDiagramEditor(self, project: _prj.Project) -> _de.Editor:
         if isinstance(project, _prj.LoadProject):
