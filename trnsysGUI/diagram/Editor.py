@@ -8,6 +8,7 @@ import pkgutil as _pu
 import shutil
 import sys
 
+import pandas as pd
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
 from PyQt5.QtGui import QColor, QPainter
@@ -36,6 +37,7 @@ from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
+from trnsysGUI.Connector import Connector
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.Export import Export
@@ -45,19 +47,22 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
-from trnsysGUI.idGenerator import IdGenerator
+from trnsysGUI.IdGenerator import IdGenerator
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.PumpDlg import PumpDlg
-from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
+from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
+from trnsysGUI.copyGroup import copyGroup
 from trnsysGUI.diagram.Decoder import Decoder
+from trnsysGUI.diagram.DecoderPaste import DecoderPaste
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
@@ -186,6 +191,11 @@ class Editor(QWidget):
 
         self.controlExists = 0
         self.controlDirectory = ""
+
+        self.selectionMode = False
+        self.groupMode = False
+        self.copyMode = False
+        self.multipleSelectedMode = False
 
         self.alignMode = False
 
@@ -914,6 +924,111 @@ class Editor(QWidget):
         painter.setRenderHint(QPainter.Antialiasing)
         self.diagramScene.render(painter)
         painter.end()
+
+    def copyElements(self):
+        """
+        Copies elements
+        Returns
+        -------
+
+        """
+        clipboardGroup = copyGroup(self)
+        self.logger.debug(self.diagramScene.elementsInRect())
+
+        for t in self.diagramScene.elementsInRect():
+            self.logger.debug("element in rect is" + str(t))
+            clipboardGroup.trnsysObj.append(t)
+
+        self.saveToClipBoard(clipboardGroup)
+
+    def saveToClipBoard(self, copyList):
+        filename = "clipboard.json"
+
+        with open(filename, "w") as jsonfile:
+            json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
+
+        self.logger.debug("Copy complete!")
+
+    def pasteFromClipBoard(self):
+        filename = "clipboard.json"
+
+        with open(filename, "r") as jsonfile:
+            blocklist = json.load(jsonfile, cls=DecoderPaste, editor=self)
+
+        for j in blocklist["Blocks"]:
+            # print("J is " + str(j))
+
+            for k in j:
+                if isinstance(k, BlockItem):
+                    # k.setParent(self.diagramView)
+                    k.changeSize()
+                    self.copyGroupList.addToGroup(k)
+
+                    for inp in k.inputs:
+                        inp.id = self.idGen.getID()
+                    for out in k.outputs:
+                        out.id = self.idGen.getID()
+
+                if isinstance(k, StorageTank):
+                    self.logger.debug("Loading a Storage")
+                    k.updateImage()
+
+                if isinstance(k, GraphicalItem):
+                    k.setParent(self.diagramView)
+                    self.diagramScene.addItem(k)
+                    # k.resizer.setPos(k.w, k.h)
+                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+
+                if isinstance(k, Connection):
+                    self.logger.debug("Almost done with loading a connection")
+                    k.initLoad()
+                    for corners in k.getCorners():
+                        # copyGroupList.trnsysObj.append(k)
+                        self.copyGroupList.addToGroup(corners)
+
+                if isinstance(k, dict):
+                    pass
+
+                    # print("Global id is " + str(globalID))
+                    # print("trnsys id is " + str(trnsysID))
+
+        # global copyMode
+        # global selectionMode
+        # global selectionMode
+        # global pasting
+
+        self.copyMode = False
+        self.selectionMode = False
+
+        self.diagramScene.addItem(self.copyGroupList)
+        self.copyGroupList.setFlags(self.copyGroupList.ItemIsMovable)
+
+        self.pasting = True
+
+        # for t in self.trnsysObj:
+        #     print("Tr obj is" + str(t) + " " + str(t.trnsysId))
+
+    def clearCopyGroup(self):
+
+        for it in self.copyGroupList.childItems():
+            self.copyGroupList.removeFromGroup(it)
+
+        self.pasting = False
+
+    def createSelectionGroup(self, selectionList):
+        for t in selectionList:
+            if isinstance(t, BlockItem):
+                self.selectionGroupList.addToGroup(t)
+            if isinstance(t, GraphicalItem):
+                self.selectionGroupList.addToGroup(t)
+
+        self.multipleSelectedMode = False
+        self.selectionMode = False
+
+        self.diagramScene.addItem(self.selectionGroupList)
+        self.selectionGroupList.setFlags(self.selectionGroupList.ItemIsMovable)
+
+        self.itemsSelected = True
 
     def clearSelectionGroup(self):
         for it in self.selectionGroupList.childItems():

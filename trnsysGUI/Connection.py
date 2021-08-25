@@ -10,7 +10,7 @@ from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import trnsysGUI.BlockItem as _bi
-from trnsysGUI import idGenerator as _id
+import trnsysGUI.IdGenerator as _id
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node

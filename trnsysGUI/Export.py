@@ -2,11 +2,20 @@
 # type: ignore
 
 import re
+import string
+import os
+import sys
 
 from PyQt5.QtWidgets import QMessageBox
 
 from trnsysGUI.Connection import Connection
+from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
+from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.StorageTank import StorageTank
+from trnsysGUI.Connector import Connector
+from trnsysGUI.TeePiece import TeePiece
+from trnsysGUI.Collector import Collector
 
 
 class Export(object):

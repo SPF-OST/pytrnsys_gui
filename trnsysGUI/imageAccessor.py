@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 __all__ = ["ImageAccessor"]
 
 import pkgutil as _pu
@@ -24,14 +27,14 @@ class _DataLoaderBase(_abc.ABC):
             data = self._loadDataImpl()
             if not data:
                 raise AssertionError("Image data is empty.")
-        except Exception as error:
+        except Exception as e:
             self._logger.exception(
                 "An exception occurred loading image data for '%s'.",
                 self.getResourcePath(),
                 exc_info=True,
                 stack_info=True,
             )
-            raise error
+            raise e
         return data
 
     @_abc.abstractmethod
@@ -43,7 +46,7 @@ class _DataLoaderBase(_abc.ABC):
         pass
 
     @_abc.abstractmethod
-    def _loadDataImpl(self) -> _tp.Optional[bytes]:
+    def _loadDataImpl(self) -> bytes:
         pass
 
 
@@ -65,7 +68,7 @@ class _PackageResourceDataLoader(_DataLoaderBase):
 
         return extension
 
-    def _loadDataImpl(self) -> _tp.Optional[bytes]:
+    def _loadDataImpl(self) -> bytes:
         data = _pu.get_data(trnsysGUI.__name__, self._resourcePath)
         return data
 
@@ -155,7 +158,7 @@ class ImageAccessor:
 
         return scaledImage
 
-    def _svgImage(self, *, width: _tp.Optional[int], height: _tp.Optional[int]) -> _qtg.QImage:
+    def _svgImage(self, *, width: int, height: int) -> _qtg.QImage:
         imageBytes = self._loadBytes()
         svgRenderer = _qsvg.QSvgRenderer(imageBytes)
 
@@ -170,7 +173,7 @@ class ImageAccessor:
         return image
 
     @staticmethod
-    def _getSize(defaultSize: _qtc.QSize, *, width: _tp.Optional[int], height: _tp.Optional[int]) -> _qtc.QSize:
+    def _getSize(defaultSize: _qtc.QSize, *, width: int, height: int) -> _qtc.QSize:
         width = width if width else defaultSize.width()
         height = height if height else defaultSize.height()
 

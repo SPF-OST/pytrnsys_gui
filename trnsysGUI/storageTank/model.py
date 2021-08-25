@@ -6,7 +6,7 @@ import enum as _enum
 import dataclasses_jsonschema as _dcj
 
 import trnsysGUI.serialization as _ser
-from trnsysGUI import idGenerator as _id
+import trnsysGUI.IdGenerator as _id
 
 
 @_dc.dataclass

@@ -6,7 +6,7 @@ import pathlib as _pl
 
 from PyQt5 import QtWidgets as _widgets
 
-import trnsysGUI.storageTank.widget as _st
+import trnsysGUI.StorageTank as _st
 
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
