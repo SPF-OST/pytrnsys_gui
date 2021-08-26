@@ -31,17 +31,8 @@ class RunMain:
         fullPath = os.path.join(path, configFile)
         logger.info("Starting RunParallelTrnsys with " + fullPath)
         try:
-            runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile, transferredLogger=logger)
+            runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)
             return False, ""
-        except ValueError as e:
-            logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
-            errorStatement = ""
-            for words in e.args:
-                errorStatement += str(words)
-            return True, errorStatement
-        except OSError as e:
-            logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
+        except Exception as e:
+            logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys: %s", str(e))
             return True, str(e)
-        except:
-            logger.error("UNDEFINED EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
-            return True, ""
