@@ -1,12 +1,12 @@
 import dataclasses as _dc
 import uuid as _uuid
 import typing as _tp
-import enum as _enum
 
 import dataclasses_jsonschema as _dcj
 
 import trnsysGUI.serialization as _ser
 import trnsysGUI.IdGenerator as _id
+from trnsysGUI.storageTank.side import Side
 
 
 @_dc.dataclass
@@ -168,30 +168,6 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def getSupersededClass(cls):
         return StorageTankVersion0
-
-
-class Side(_enum.Enum):
-    LEFT = "left"
-    RIGHT = "right"
-
-    @staticmethod
-    def createFromSideNr(sideNr: int) -> "Side":
-        if sideNr == 2:
-            return Side.RIGHT
-
-        if sideNr == 0:
-            return Side.LEFT
-
-        raise ValueError(f"Unknown side number: {sideNr}")
-
-    def toSideNr(self):
-        if self == self.LEFT:
-            return 0
-
-        if self == self.RIGHT:
-            return 2
-
-        raise ValueError("Cannot convert {self} to side nr.")
 
 
 @_dc.dataclass

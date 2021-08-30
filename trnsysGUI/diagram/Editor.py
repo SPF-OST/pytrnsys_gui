@@ -8,7 +8,6 @@ import pkgutil as _pu
 import shutil
 import sys
 
-import pandas as pd
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
 from PyQt5.QtGui import QColor, QPainter
@@ -35,9 +34,8 @@ from PyQt5.QtWidgets import (
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
+from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
-from trnsysGUI.Connector import Connector
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.Export import Export
@@ -57,7 +55,6 @@ from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
-from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
 from trnsysGUI.copyGroup import copyGroup

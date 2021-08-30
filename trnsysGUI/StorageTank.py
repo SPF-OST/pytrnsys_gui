@@ -9,17 +9,17 @@ import typing as _tp
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
+import trnsysGUI.IdGenerator as _id
 import trnsysGUI.images as _img
 import trnsysGUI.storageTank.model as _model
-import trnsysGUI.IdGenerator as _id
+import trnsysGUI.storageTank.side as _sd
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
+from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
 from trnsysGUI.HeatExchanger import HeatExchanger
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.side as _sd
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow
 
@@ -154,7 +154,7 @@ class StorageTank(BlockItem):
     def addHeatExchanger(self, name, trnsysId, side, relativeInputHeight, relativeOutputHeight):
         heatExchanger = HeatExchanger(
             trnsysId=trnsysId,
-            sideNr=0 if side == _sd.Side.LEFT else 2,
+            sideNr=side.toSideNr(),
             width=self.HEAT_EXCHANGER_WIDTH,
             relativeInputHeight=relativeInputHeight,
             relativeOutputHeight=relativeOutputHeight,
@@ -229,7 +229,7 @@ class StorageTank(BlockItem):
     def _getDirectPortPairModelsForEncode(self):
         portPairModels = []
         for directPort in self.directPortPairs:
-            side = _model.Side.createFromSideNr(directPort.fromPort.side)
+            side = _sd.Side.createFromSideNr(directPort.fromPort.side)
 
             inputPortModel = _model.Port(directPort.fromPort.id, directPort.relativeInputHeight)
 
@@ -246,7 +246,7 @@ class StorageTank(BlockItem):
     def _getHeatExchangerModelsForEncode(self):
         heatExchangerModels = []
         for heatExchanger in self.heatExchangers:
-            side = _model.Side.createFromSideNr(heatExchanger.sSide)
+            side = _sd.Side.createFromSideNr(heatExchanger.sSide)
 
             inputPort = _model.Port(
                 heatExchanger.port1.id,
@@ -318,7 +318,7 @@ class StorageTank(BlockItem):
 
         self.addDirectPortPair(
             trnsysId=portPair.trnsysId,
-            isOnLeftSide=portPair.side == _model.Side.LEFT,
+            isOnLeftSide=portPair.side == _sd.Side.LEFT,
             relativeInputHeight=portPair.inputPort.relativeHeight,
             relativeOutputHeight=portPair.outputPort.relativeHeight,
             storageTankHeight=self.h,

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import typing as _tp
 
+import PyQt5.QtCore as _qtc
 from PyQt5.QtWidgets import (
     QLabel,
     QLineEdit,
@@ -21,11 +22,10 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QListWidgetItem,
 )
-import PyQt5.QtCore as _qtc
 
 import trnsysGUI.directPortPair as _dpp
-import trnsysGUI.side as _side
 import trnsysGUI.modifyRelativeHeightsDialog as _mhd
+import trnsysGUI.storageTank.side as _sd
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.StorageTank as _st
@@ -293,12 +293,12 @@ class ConfigureStorageDialog(QDialog):
         return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
 
     def _addHxL(self):
-        self._addHeatExchanger(_side.Side.LEFT)
+        self._addHeatExchanger(_sd.Side.LEFT)
 
     def _addHxR(self):
-        self._addHeatExchanger(_side.Side.RIGHT)
+        self._addHeatExchanger(_sd.Side.RIGHT)
 
-    def _addHeatExchanger(self, side: _side.Side):
+    def _addHeatExchanger(self, side: _sd.Side):
         name = self.hxNameLe.text()
         if not name:
             messageBox = QMessageBox()
@@ -313,7 +313,7 @@ class ConfigureStorageDialog(QDialog):
         heatExchanger = self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
 
         itemText = self._getHeatExchangerListItemText(heatExchanger)
-        if side == _side.Side.LEFT:
+        if side == _sd.Side.LEFT:
             self.leftHeatExchangersItemListWidget.addItem(itemText)
         else:
             self.rightHeatExchangersItemListWidget.addItem(itemText)
