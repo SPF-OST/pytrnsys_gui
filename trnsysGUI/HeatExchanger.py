@@ -17,6 +17,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def __init__(
         self,
+        trnsysId,
         sideNr,
         width,
         relativeInputHeight,
@@ -35,7 +36,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self.sSide = sideNr
         self.id = self.parent.parent.parent().idGen.getID()
-        self.trnsysId = self.parent.parent.parent().idGen.getTrnsysID()
+        self.trnsysId = trnsysId
 
         self.parent.heatExchangers.append(self)
         self.setZValue(100)
@@ -54,7 +55,7 @@ class HeatExchanger(QGraphicsItemGroup):
         )
 
         self.displayName = name
-        
+
         self._draw()
 
     def _draw(self):
@@ -222,5 +223,3 @@ class HeatExchanger(QGraphicsItemGroup):
         x = 0 if self.sSide == 0 else self._storageTankWidth
         y = self._storageTankHeight - self.relativeInputHeight * self._storageTankHeight
         return x, y
-
-
