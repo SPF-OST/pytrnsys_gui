@@ -17,7 +17,7 @@
                     "relativeHeight": 0.35
                 },
                 "side": "left",
-                "trnsysId": 7702
+                "trnsysId": -1
             }
         },
         {
@@ -33,7 +33,7 @@
                     "relativeHeight": 0.9
                 },
                 "side": "right",
-                "trnsysId": 7702
+                "trnsysId": -1
             }
         },
         {
@@ -49,7 +49,7 @@
                     "relativeHeight": 0.95
                 },
                 "side": "right",
-                "trnsysId": 7702
+                "trnsysId": -1
             }
         }
     ],
@@ -71,7 +71,7 @@
                     "relativeHeight": 0.12
                 },
                 "side": "left",
-                "trnsysId": 7702
+                "trnsysId": -1
             },
             "width": 40
         }
