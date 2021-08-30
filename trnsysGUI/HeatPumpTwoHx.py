@@ -209,7 +209,7 @@ class HeatPumpTwoHx(BlockItem):
         return f
 
     def exportInputsFlowSolver1(self):
-        return "0,0 0,0 0,0", 3
+        return "0,0 0,0 0,0 ", 3
 
     def exportInputsFlowSolver2(self):
         f = ""
