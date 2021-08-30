@@ -1,8 +1,6 @@
 # pylint: skip-file
 # type: ignore
 
-from __future__ import annotations
-
 import typing as _tp
 
 from PyQt5.QtWidgets import (
@@ -25,19 +23,15 @@ import PyQt5.QtCore as _qtc
 
 import trnsysGUI.directPortPair as _dpp
 import trnsysGUI.side as _side
-import trnsysGUI.modifyRelativeHeightsDialog as _mhd
-
-if _tp.TYPE_CHECKING:
-    import trnsysGUI.StorageTank as _st
-    import trnsysGUI.diagram.Editor as _ed
+from trnsysGUI.modifyRelativeHeightsDialog import ModifyRelativeHeightsDialog
 
 
 class ConfigureStorageDialog(QDialog):
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
 
-    def __init__(self, storage: _st.StorageTank, parent: _ed.Editor):
-        super().__init__(parent)
+    def __init__(self, storage, parent):
+        super(ConfigureStorageDialog, self).__init__(parent)
         self.parent = parent
         self.storage = storage
         self.n = 0
@@ -135,11 +129,11 @@ class ConfigureStorageDialog(QDialog):
         qhbl3.addWidget(self.manrButton)
 
         self.manAddButton = QPushButton("Add (manual) ports")
-        self.manAddButton.clicked.connect(self.addPortPair)
+        self.manAddButton.clicked.connect(self.manAddPortPair)
 
         self.manRemovebutton = QPushButton("Remove ports")
-        self.manRemovebutton.clicked.connect(self.removePortPairLeft)
-        self.manRemovebutton.clicked.connect(self.removePortPairRight)
+        self.manRemovebutton.clicked.connect(self.manRemovePortPairLeft)
+        self.manRemovebutton.clicked.connect(self.manRemovePortPairRight)
 
         self.modifyPortButton = QPushButton("Modify")
         self.modifyPortButton.clicked.connect(self.modifyPort)
@@ -275,10 +269,10 @@ class ConfigureStorageDialog(QDialog):
             print("Adding hx")
             if self.rButton.isChecked():
                 print("addhxr")
-                self._addHxR()
+                self.addHxR()
             if self.lButton.isChecked():
                 print("addhxl")
-                self._addHxL()
+                self.addHxL()
         else:
             msgb = QMessageBox()
             msgb.setText(
@@ -290,27 +284,30 @@ class ConfigureStorageDialog(QDialog):
         return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 5
 
     def offsetsInRange(self):
-        return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
+        return (0 <= float(self.offsetLeI.text()) <= 100) and (
+            0 <= float(self.offsetLeO.text()) <= 100
+        )
 
-    def _addHxL(self):
+    def addHxL(self):
         self._addHeatExchanger(_side.Side.LEFT)
 
-    def _addHxR(self):
+    def addHxR(self):
         self._addHeatExchanger(_side.Side.RIGHT)
 
     def _addHeatExchanger(self, side: _side.Side):
         name = self.hxNameLe.text()
         if not name:
             messageBox = QMessageBox()
-            messageBox.setText("Please specify the name of the heat exchanger that you want to add.")
+            messageBox.setText(
+                "Please specify the name of the heat exchanger that you want to add."
+            )
             messageBox.exec_()
             return
 
         relativeInputHeight = float(self.offsetLeI.text()) / 100
         relativeOutputHeight = float(self.offsetLeO.text()) / 100
 
-        trnsysId = self.parent.idGen.getTrnsysID()
-        heatExchanger = self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
+        heatExchanger = self.storage.addHeatExchanger(name, side, relativeInputHeight, relativeOutputHeight)
 
         itemText = self._getHeatExchangerListItemText(heatExchanger)
         if side == _side.Side.LEFT:
@@ -318,16 +315,14 @@ class ConfigureStorageDialog(QDialog):
         else:
             self.rightHeatExchangersItemListWidget.addItem(itemText)
 
-    def addPortPair(self):
+    def manAddPortPair(self):
         if float(self.manPortLeI.text()) > 100:
             self.manPortLeI.setText("100")
 
         if float(self.manPortLeO.text()) < 0:
             self.manPortLeO.setText("0")
 
-        trnsysId = self.parent.idGen.getTrnsysID()
         self.storage.addDirectPortPair(
-            trnsysId,
             self.manlButton.isChecked(),
             float(self.manPortLeI.text()) / 100,
             float(self.manPortLeO.text()) / 100,
@@ -338,10 +333,10 @@ class ConfigureStorageDialog(QDialog):
         self._rightDirectPortPairsItemListWidget.clear()
         self._loadDirectPortPairs()
 
-    def removePortPairLeft(self):
+    def manRemovePortPairLeft(self):
         self._removeSelectedPortPairs(self._leftDirectPortPairsItemListWidget)
 
-    def removePortPairRight(self):
+    def manRemovePortPairRight(self):
         self._removeSelectedPortPairs(self._rightDirectPortPairsItemListWidget)
 
     def _removeSelectedPortPairs(self, directPortPairsListWidget):
@@ -402,15 +397,23 @@ class ConfigureStorageDialog(QDialog):
             return
         selectedItem, heatExchanger = result
 
-        modifyDialog = _mhd.ModifyRelativeHeightsDialog(
+        modifyDialog = ModifyRelativeHeightsDialog(
             heatExchanger.relativeInputHeight, heatExchanger.relativeOutputHeight
         )
         newHeights = modifyDialog.newRelativeHeights
         if not newHeights:
             return
 
-        newInputHeight = newHeights.input if newHeights.input != "empty" else heatExchanger.relativeInputHeight
-        newOutputHeight = newHeights.output if newHeights.output != "empty" else heatExchanger.relativeOutputHeight
+        newInputHeight = (
+            newHeights.input
+            if newHeights.input != "empty"
+            else heatExchanger.relativeInputHeight
+        )
+        newOutputHeight = (
+            newHeights.output
+            if newHeights.output != "empty"
+            else heatExchanger.relativeOutputHeight
+        )
         heatExchanger.setRelativeHeights(newInputHeight, newOutputHeight)
 
         listText = self._getHeatExchangerListItemText(heatExchanger)
@@ -446,19 +449,27 @@ class ConfigureStorageDialog(QDialog):
 
         directPortPair: _dpp.DirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
 
-        dialogResult = _mhd.ModifyRelativeHeightsDialog(
+        dialogResult = ModifyRelativeHeightsDialog(
             directPortPair.relativeInputHeight, directPortPair.relativeOutputHeight
         )
         newHeights = dialogResult.newRelativeHeights
         if not newHeights:
             return
 
-        newRelativeInputHeight = newHeights.input if newHeights.input != "empty" else directPortPair.relativeInputHeight
+        newRelativeInputHeight = (
+            newHeights.input
+            if newHeights.input != "empty"
+            else directPortPair.relativeInputHeight
+        )
         newRelativeOutputHeight = (
-            newHeights.output if newHeights.output != "empty" else directPortPair.relativeOutputHeight
+            newHeights.output
+            if newHeights.output != "empty"
+            else directPortPair.relativeOutputHeight
         )
 
-        directPortPair.setRelativeHeights(newRelativeInputHeight, newRelativeOutputHeight, self.storage.h)
+        directPortPair.setRelativeHeights(
+            newRelativeInputHeight, newRelativeOutputHeight, self.storage.h
+        )
 
         newText = self._getDirectPortPairListItemText(directPortPair)
         selectedItem.setText(newText)
