@@ -21,8 +21,6 @@ trnsysGUI/filepaths.txt
 
 *.xml
 *.pyc
-*.log
-*.lst
 
 /.idea/
 /venv/
