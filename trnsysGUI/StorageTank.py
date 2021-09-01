@@ -567,7 +567,7 @@ class StorageTank(BlockItem):
         allEquations = directPortPairsEquations + heatExchangersEquations
         self.exportEquations.extend(allEquations)
 
-        equationsJoined = "\n".join(allEquations) + "\n"
+        equationsJoined = "".join(allEquations)
         nEquationsUsed = len(allEquations)
 
         return equationsJoined, nextEquationNumber, nEquationsUsed
