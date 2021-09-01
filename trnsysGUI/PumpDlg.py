@@ -54,10 +54,12 @@ class PumpDlg(QDialog):
         tab1Layout.addLayout(flipLayout, 1, 0, 3, 0)
 
         positionLayout = QHBoxLayout()
-        self.PumpPowerLabel = QLabel("Pump Power")
+        self.PumpPowerLabel = QLabel("Mass Flow Rate")
         self.LineEdit = QLineEdit(str(self.block.rndPwr))
+        self.PumpPowerLabel2 = QLabel("kg/h")
         positionLayout.addWidget(self.PumpPowerLabel)
         positionLayout.addWidget(self.LineEdit)
+        positionLayout.addWidget(self.PumpPowerLabel2)
 
         # Initialize tab screen
         self.tabs = QTabWidget()
@@ -65,7 +67,7 @@ class PumpDlg(QDialog):
         self.tab2 = QWidget()
         # Add tabs
         self.tabs.addTab(self.tab1, "Diagram")
-        self.tabs.addTab(self.tab2, "Adjust Pump Power")
+        self.tabs.addTab(self.tab2, "Adjust Mass Flow Rate")
         self.tab1.setLayout(tab1Layout)
         self.tab2.setLayout(positionLayout)
         # self.tab2 = layout
