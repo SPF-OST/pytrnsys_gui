@@ -233,7 +233,7 @@ class ConfigureStorageDialog(QDialog):
             item = QListWidgetItem(itemText)
             item.setData(_qtc.Qt.UserRole, directPortPair)
 
-            if directPortPair.isOnLeftSide:
+            if directPortPair.side.isLeft:
                 self._leftDirectPortPairsItemListWidget.addItem(item)
             else:
                 self._rightDirectPortPairsItemListWidget.addItem(item)

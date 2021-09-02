@@ -33,13 +33,15 @@ class groupDlg(QDialog):
         self.show()
 
     def acceptedEdit(self):
-        if self.le.text() is not "":
-            self.group.setName(self.le.text())
-            self.group.setItemsGroup(self.itemList)
+        if not self.le.text():
+            return
 
-            self.parent.selectionMode = False
-            self.parent.groupMode = False
-            self.close()
+        self.group.setName(self.le.text())
+        self.group.setItemsGroup(self.itemList)
+
+        self.parent.selectionMode = False
+        self.parent.groupMode = False
+        self.close()
 
     def cancel(self):
         self.parent.selectionMode = False

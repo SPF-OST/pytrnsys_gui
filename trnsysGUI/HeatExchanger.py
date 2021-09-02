@@ -77,7 +77,7 @@ class HeatExchanger(QGraphicsItemGroup):
     def setParent(self, p):
         self.parent = p
 
-        if p.name is "StorageTank":
+        if p.name == "StorageTank":
             self.logger.debug("p is a StorageTank")
             self.setParentItem(p)
         else:
