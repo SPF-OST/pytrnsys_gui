@@ -18,6 +18,7 @@ from trnsysGUI.PortItem import PortItem
 from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.segmentItem import segmentItem
+import trnsysGUI.hydraulicLoops as _hl
 
 
 def calcDist(p1, p2):
@@ -1493,6 +1494,9 @@ class Connection(object):
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
+
+    def editHydraulicLoop(self) -> None:
+        _hl.showHydraulicLoopDialog(self.fromPort, self.toPort)
 
 
 class DeleteConnectionCommand(QUndoCommand):

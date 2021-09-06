@@ -117,7 +117,6 @@ class segmentItem(QGraphicsLineItem):
         except ZeroDivisionError:
             return QColor(100, 100, 100)
         else:
-            # return QColor(f1 * c2_r + f2 * c1_r, 0, f1 * c2_b + f2 * c1_b)
             return QColor(f1 * c2_r + f2 * c1_r, f1 * c2_g + f2 * c1_g, f1 * c2_b + f2 * c1_b)
 
     def initGrad(self):
@@ -725,7 +724,6 @@ class segmentItem(QGraphicsLineItem):
             self.secondLine.setVisible(True)
 
     def renameConn(self):
-        # dia = segmentDlg(self, self.scene().parent())
         self.scene().parent().showSegmentDlg(self)
 
     def printItemsAt(self):
@@ -751,26 +749,16 @@ class segmentItem(QGraphicsLineItem):
         a3 = menu.addAction("Invert this connection")
         a3.triggered.connect(self.parent.invertConnection)
 
+        editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
+        editHydraulicLoopAction.triggered.connect(self.parent.editHydraulicLoop)
+
         a4 = menu.addAction("Toggle name")
         a4.triggered.connect(self.parent.toggleLabelVisible)
 
         a5 = menu.addAction("Toggle mass flow")
         a5.triggered.connect(self.parent.toggleMassFlowLabelVisible)
 
-        # b1 = menu.addAction('Set group ')
-        # b1.triggered.connect(self.configGroup)
-        # a4 = menu.addAction('Print end and start items')
-        # a4.triggered.connect(self.printItemsAt)
-        #
-        # a5 = menu.addAction('Print corners')
-        # a5.triggered.connect(self.parent.getCorners)
-        #
-        # a6 = menu.addAction('Print group')
-        # a6.triggered.connect(self.printGroup)
-        #
-        # a7 = menu.addAction('Inspect')
-        # a7.triggered.connect(self.inspect)
-        menu.exec_(event.screenPos())
+        menu.exec(event.screenPos())
 
     def configGroup(self):
         GroupChooserConnDlg(self.parent, self.parent.parent)
