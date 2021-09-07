@@ -9,7 +9,6 @@ import sys
 
 from PyQt5.QtWidgets import *
 from pytrnsys.utils import log
-import pytrnsys.trnsys_util.deckUtils as _du
 
 import trnsysGUI.arguments as args
 import trnsysGUI.buildDck as buildDck
@@ -26,6 +25,7 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
+from trnsysGUI.errors import showErrorMessageBox
 from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.configFile import configFile
 
@@ -335,15 +335,11 @@ class _MainWindow(QMainWindow):
                     storageWithoutFile.append(object.displayName + "\n")
 
         if storageWithoutFile:
-            messageText = "The following storage tank(s) do(es) not have a corresponding ddck:\n\n"
+            errorMessage = "The following storage tank(s) do(es) not have a corresponding ddck:\n\n"
             for storage in storageWithoutFile:
-                messageText += storage
-            messageText += "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
-            qmb = QMessageBox()
-            qmb.setText(messageText)
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
+                errorMessage += storage
+            errorMessage += "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
+            showErrorMessageBox(errorMessage)
             return
 
         #   Update run.config
@@ -356,27 +352,18 @@ class _MainWindow(QMainWindow):
         )
 
         if executionFailed:
-            messageText = (
-                "Exception while trying to execute RunParallelTrnsys:\n\n"
-                + errorStatement
+            errorMessage = (
+                f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
             )
-            qmb = QMessageBox()
-            qmb.setText(messageText)
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
+            showErrorMessageBox(errorMessage)
 
         return
 
     def processSimulation(self):
         processPath = os.path.join(self.projectFolder, "process.config")
         if not os.path.isfile(processPath):
-            messageText = "No such file:\n" + processPath
-            qmb = QMessageBox()
-            qmb.setText(messageText)
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
+            errorMessage = f"No such file: {processPath}"
+            showErrorMessageBox(errorMessage)
             return
         processApp = ProcessMain()
         executionFailed, errorStatement = processApp.processAction(
@@ -384,15 +371,10 @@ class _MainWindow(QMainWindow):
         )
 
         if executionFailed:
-            messageText = (
-                "Exception while trying to execute RunParallelTrnsys:\n\n"
-                + errorStatement
+            errorMessage = (
+                f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
             )
-            qmb = QMessageBox()
-            qmb.setText(messageText)
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
+            showErrorMessageBox(errorMessage)
 
         return
 
@@ -511,12 +493,8 @@ class _MainWindow(QMainWindow):
         try:
             buildDck.buildDck(self.projectFolder)
         except Exception as error:
-            messageBox = QMessageBox()
-            messageBox.setStandardButtons(QMessageBox.Ok)
-            messageBox.setText(
-                f"The deck file could not be generated: {error}"
-            )
-            messageBox.exec()
+            errorMessage = f"The deck file could not be generated: {error}"
+            showErrorMessageBox(errorMessage)
 
     def toggleEditorMode(self):
         self.logger.info("Toggling editor mode")
@@ -555,52 +533,33 @@ class _MainWindow(QMainWindow):
         self.logger.info("Running massflow solver...")
 
         exportPath = self.centralWidget.exportHydraulics(exportTo="mfs")
+        if not exportPath:
+            return None
+
         self.exportedTo = exportPath
         self.logger.info(exportPath)
-        if exportPath != "None":
-            msgb = QMessageBox(self)
-            if not self.centralWidget.trnsysPath.is_file():
-                msgb.setText(
-                    "TRNExe.exe not found! Consider correcting the path in the settings."
-                )
-                msgb.exec()
-                return 0, 0
-            self.logger.info("trnsyspath: %s", self.centralWidget.trnsysPath)
-            # cmd = f"{self.centralWidget.trnsysPath} {exportPath} /H"
-            errorStatement = ""
-            try:
-                subprocess.run(
-                    [str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True
-                )
-                mfrFile = os.path.join(
-                    self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt"
-                )
-                tempFile = os.path.join(
-                    self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt"
-                )
-                self.calledByVisualizeMf = False
-                return mfrFile, tempFile
-            except ValueError as e:
-                self.logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
-                for words in e.args:
-                    errorStatement += str(words)
-            except OSError as e:
-                self.logger.error("EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys")
-                errorStatement = str(e)
-            except:
-                self.logger.error(
-                    "UNDEFINED EXCEPTION WHILE TRYING TO EXECUTE RunParallelTrnsys"
-                )
 
-            messageText = (
-                "Exception while trying to execute runMassflowSolver:\n\n"
-                + errorStatement
+        if not self.centralWidget.trnsysPath.is_file():
+            errorMessage = "TRNExe.exe not found! Consider correcting the path in the settings."
+            showErrorMessageBox(errorMessage)
+            return None
+
+        try:
+            subprocess.run(
+                [str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True
             )
-            qmb = QMessageBox()
-            qmb.setText(messageText)
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
+            mfrFile = os.path.join(
+                self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt"
+            )
+            tempFile = os.path.join(
+                self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt"
+            )
+            self.calledByVisualizeMf = False
+            return mfrFile, tempFile
+        except Exception as exception:
+            errorMessage = f"An exception occurred while trying to execute the mass flow solver: {exception}"
+            showErrorMessageBox(errorMessage)
+            self.logger.error(errorMessage)
 
             return None
 
