@@ -193,92 +193,119 @@
             ".__BlockDict__": true,
             "BlockDisplayName": "Dhw",
             "BlockName": "StorageTank",
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "HxList": [],
-            "ID": 1975,
-            "PortPairList": [
+            "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+            "directPortPairs": [
                 {
-                    "ConnCID": 440,
-                    "ConnDisName": "UntitledConn440",
-                    "ConnID": 1984,
-                    "Port1ID": 1982,
-                    "Port1offset": 11.0,
-                    "Port2ID": 1983,
-                    "Port2offset": 142.0,
-                    "Side": true,
-                    "trnsysID": 641
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 1982,
+                            "relativeHeight": 0.95
+                        },
+                        "outputPort": {
+                            "id": 1983,
+                            "relativeHeight": 0.35
+                        },
+                        "side": "left",
+                        "trnsysId": 2457
+                    }
                 },
                 {
-                    "ConnCID": 1421,
-                    "ConnDisName": "Conn1421",
-                    "ConnID": 6192,
-                    "Port1ID": 6190,
-                    "Port1offset": 209.0,
-                    "Port2ID": 6191,
-                    "Port2offset": 11.0,
-                    "Side": false,
-                    "trnsysID": 2016
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 6190,
+                            "relativeHeight": 0.05
+                        },
+                        "outputPort": {
+                            "id": 6191,
+                            "relativeHeight": 0.95
+                        },
+                        "side": "right",
+                        "trnsysId": 2458
+                    }
                 },
                 {
-                    "ConnCID": 1424,
-                    "ConnDisName": "Conn1424",
-                    "ConnID": 6203,
-                    "Port1ID": 6201,
-                    "Port1offset": 66.0,
-                    "Port2ID": 6202,
-                    "Port2offset": 22.0,
-                    "Side": false,
-                    "trnsysID": 2020
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 6201,
+                            "relativeHeight": 0.7
+                        },
+                        "outputPort": {
+                            "id": 6202,
+                            "relativeHeight": 0.9
+                        },
+                        "side": "right",
+                        "trnsysId": 2459
+                    }
                 }
             ],
-            "StoragePosition": [
+            "groupName": "defaultGroup",
+            "heatExchangers": [],
+            "height": 220.0,
+            "id": 1975,
+            "isHorizontallyFlipped": false,
+            "isVerticallyFlipped": false,
+            "position": [
                 -700.0,
                 -540.0
             ],
-            "size_h": 220.0,
-            "trnsysID": 638
+            "trnsysId": 638
         },
         "Block-2026": {
             ".__BlockDict__": true,
             "BlockDisplayName": "SH",
             "BlockName": "StorageTank",
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "HxList": [],
-            "ID": 2026,
-            "PortPairList": [
+            "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+            "directPortPairs": [
                 {
-                    "ConnCID": 452,
-                    "ConnDisName": "UntitledConn452",
-                    "ConnID": 2029,
-                    "Port1ID": 2027,
-                    "Port1offset": 11.0,
-                    "Port2ID": 2028,
-                    "Port2offset": 209.0,
-                    "Side": true,
-                    "trnsysID": 658
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 2027,
+                            "relativeHeight": 0.95
+                        },
+                        "outputPort": {
+                            "id": 2028,
+                            "relativeHeight": 0.05
+                        },
+                        "side": "left",
+                        "trnsysId": 2460
+                    }
                 },
                 {
-                    "ConnCID": 1427,
-                    "ConnDisName": "Conn1427",
-                    "ConnID": 6214,
-                    "Port1ID": 6212,
-                    "Port1offset": 209.0,
-                    "Port2ID": 6213,
-                    "Port2offset": 11.0,
-                    "Side": false,
-                    "trnsysID": 2024
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 6212,
+                            "relativeHeight": 0.05
+                        },
+                        "outputPort": {
+                            "id": 6213,
+                            "relativeHeight": 0.95
+                        },
+                        "side": "right",
+                        "trnsysId": 2461
+                    }
                 }
             ],
-            "StoragePosition": [
+            "groupName": "defaultGroup",
+            "heatExchangers": [],
+            "height": 220.0,
+            "id": 2026,
+            "isHorizontallyFlipped": false,
+            "isVerticallyFlipped": false,
+            "position": [
                 -700.0,
                 -280.0
             ],
-            "size_h": 220.0,
-            "trnsysID": 656
+            "trnsysId": 656
         },
         "Block-3065": {
             ".__BlockDict__": true,
@@ -866,7 +893,6 @@
                     -269.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1240
         },
         "Connection-5976": {
@@ -905,7 +931,6 @@
                     -411.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1938
         },
         "Connection-6001": {
@@ -954,7 +979,6 @@
                     -480.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1946
         },
         "Connection-6007": {
@@ -993,7 +1017,6 @@
                     -420.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1948
         },
         "Connection-6010": {
@@ -1032,7 +1055,6 @@
                     -351.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1949
         },
         "Connection-6013": {
@@ -1081,7 +1103,6 @@
                     -480.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1950
         },
         "Connection-6020": {
@@ -1120,7 +1141,6 @@
                     -20.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1953
         },
         "Connection-6039": {
@@ -1159,7 +1179,6 @@
                     -91.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1959
         },
         "Connection-6049": {
@@ -1208,7 +1227,6 @@
                     -151.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1963
         },
         "Connection-6081": {
@@ -1247,7 +1265,6 @@
                     -289.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1974
         },
         "Connection-6085": {
@@ -1296,7 +1313,6 @@
                     -529.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1976
         },
         "Connection-6098": {
@@ -1335,7 +1351,6 @@
                     -289.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1980
         },
         "Connection-6103": {
@@ -1384,7 +1399,6 @@
                     60.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1983
         },
         "Connection-6110": {
@@ -1433,7 +1447,6 @@
                     -20.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1985
         },
         "Connection-6113": {
@@ -1472,7 +1485,6 @@
                     40.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1986
         },
         "Connection-6119": {
@@ -1521,7 +1533,6 @@
                     60.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1988
         },
         "Connection-6134": {
@@ -1560,7 +1571,6 @@
                     60.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 1993
         },
         "Connection-6174": {
@@ -1609,7 +1619,6 @@
                     -269.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2009
         },
         "Connection-6180": {
@@ -1658,7 +1667,6 @@
                     -529.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2011
         },
         "Connection-6195": {
@@ -1707,7 +1715,6 @@
                     -331.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2017
         },
         "Connection-6206": {
@@ -1746,7 +1753,6 @@
                     -474.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2021
         },
         "Connection-6209": {
@@ -1795,7 +1801,6 @@
                     -509.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2022
         },
         "Connection-6230": {
@@ -1844,7 +1849,6 @@
                     -529.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2030
         },
         "Connection-6234": {
@@ -1893,7 +1897,6 @@
                     -269.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2032
         },
         "Connection-6237": {
@@ -1942,7 +1945,6 @@
                     -269.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2033
         },
         "Connection-6245": {
@@ -1991,7 +1993,6 @@
                     -71.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2037
         },
         "Connection-6248": {
@@ -2040,7 +2041,6 @@
                     -71.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2038
         },
         "Connection-6251": {
@@ -2089,7 +2089,6 @@
                     -131.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2039
         },
         "Connection-6255": {
@@ -2138,7 +2137,6 @@
                     -331.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2041
         },
         "Connection-6258": {
@@ -2187,7 +2185,6 @@
                     -331.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2042
         },
         "Connection-6261": {
@@ -2236,7 +2233,6 @@
                     -331.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2043
         },
         "Connection-6264": {
@@ -2285,7 +2281,6 @@
                     -331.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2044
         },
         "Connection-6271": {
@@ -2334,7 +2329,6 @@
                     -529.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2047
         },
         "Connection-6275": {
@@ -2383,7 +2377,6 @@
                     -269.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2049
         },
         "Connection-6278": {
@@ -2432,7 +2425,6 @@
                     -269.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2050
         },
         "Connection-6281": {
@@ -2481,7 +2473,6 @@
                     -269.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2051
         },
         "Connection-6284": {
@@ -2530,7 +2521,6 @@
                     -249.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2052
         },
         "Connection-6293": {
@@ -2579,7 +2569,6 @@
                     -71.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2055
         },
         "Connection-6297": {
@@ -2628,7 +2617,6 @@
                     -71.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2057
         },
         "Connection-6300": {
@@ -2677,7 +2665,6 @@
                     -71.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2058
         },
         "Connection-6705": {
@@ -2716,7 +2703,6 @@
                     -378.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2189
         },
         "Connection-6708": {
@@ -2748,7 +2734,7 @@
             "SegmentPositions": [
                 [
                     -700.0,
-                    -398.0,
+                    -397.0,
                     -720.0,
                     -398.0
                 ],
@@ -2765,7 +2751,6 @@
                     -398.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2190
         },
         "Connection-6711": {
@@ -2814,7 +2799,6 @@
                     -398.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2191
         },
         "Connection-7414": {
@@ -2863,7 +2847,6 @@
                     60.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2416
         },
         "Connection-7417": {
@@ -2912,7 +2895,6 @@
                     -20.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2417
         },
         "Connection-7420": {
@@ -2961,7 +2943,6 @@
                     -20.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2418
         },
         "Connection-7423": {
@@ -3000,7 +2981,6 @@
                     0.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2419
         },
         "Connection-7426": {
@@ -3049,18 +3029,17 @@
                     -91.0
                 ]
             ],
-            "isVirtualConn": false,
             "trnsysID": 2420
         },
         "IDs": {
-            "GlobalId": 7533,
+            "GlobalId": 7534,
             "__idDct__": true,
-            "globalConnID": 1740,
-            "trnsysID": 2457
+            "globalConnID": 1741,
+            "trnsysID": 2463
         },
         "Strings": {
             "DiagramName": "TRIHP_dualSource.json",
-            "ProjectFolder": "C:\\Daten\\GIT\\pytrnsys_gui\\trnsysGUI\\examples\\TRIHP_dualSource",
+            "ProjectFolder": "C:\\Daten\\GIT\\pytrnsys_gui\\data\\examples\\TRIHP_dualSource",
             "__nameDct__": true
         }
     }
