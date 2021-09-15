@@ -207,12 +207,15 @@ class ConfigureStorageDialog(QDialog):
         self.show()
 
     def _loadHeatExchangers(self):
-        for h in self.storage.heatExchangers:
-            listItem = self._getHeatExchangerListItemText(h)
-            if h.sSide == 0:
-                self.leftHeatExchangersItemListWidget.addItem(listItem)
-            if h.sSide == 2:
-                self.rightHeatExchangersItemListWidget.addItem(listItem)
+        for heatExchanger in self.storage.heatExchangers:
+            itemText = self._getHeatExchangerListItemText(heatExchanger)
+            item = QListWidgetItem(itemText)
+            item.setData(_qtc.Qt.UserRole, heatExchanger)
+
+            if heatExchanger.sSide == 0:
+                self.leftHeatExchangersItemListWidget.addItem(item)
+            else:
+                self.rightHeatExchangersItemListWidget.addItem(item)
 
     @staticmethod
     def _getHeatExchangerListItemText(h):
