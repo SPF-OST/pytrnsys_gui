@@ -270,9 +270,22 @@ class ConfigureStorageDialog(QDialog):
         Returns
         -------
         """
+        try:
+            _inputPercentageHeight = float(self.offsetLeI.text())
+        except:
+            self.parent.logger.warning('HX input height is not a number.')
+            return
+
+        try:
+            _outputPercentageHeight = float(self.offsetLeO.text())
+        except:
+            self.parent.logger.warning('HX output height is not a number.')
+            return
+
+
         if (
             self.minOffsetDistance()
-            and float(self.offsetLeI.text()) > float(self.offsetLeO.text())
+            and _inputPercentageHeight > _outputPercentageHeight
             and self.offsetsInRange()
         ):
             if self.rButton.isChecked():
@@ -324,7 +337,20 @@ class ConfigureStorageDialog(QDialog):
             self.rightHeatExchangersItemListWidget.addItem(itemText)
 
     def addPortPair(self):
-        if float(self.manPortLeI.text()) >= 100 or float(self.manPortLeO.text()) <= 0:
+        try:
+            _inputPortPercentageHeight = float(self.manPortLeI.text())
+        except:
+            self.parent.logger.warning('Input port height is not a number.')
+            return
+
+        try:
+            _outputPortPercentageHeight = float(self.manPortLeO.text())
+        except:
+            self.parent.logger.warning('Output port height is not a number.')
+            return
+
+        if max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100 or min(_inputPortPercentageHeight,
+                                                                                          _outputPortPercentageHeight) <= 0:
             messageBox = QMessageBox()
             messageBox.setText(
                 'Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %).')
@@ -344,8 +370,8 @@ class ConfigureStorageDialog(QDialog):
         self.storage.addDirectPortPair(
             trnsysId,
             _pairSide,
-            float(self.manPortLeI.text()) / 100,
-            float(self.manPortLeO.text()) / 100,
+            _inputPortPercentageHeight / 100,
+            _outputPortPercentageHeight / 100,
             self.storage.h,
         )
 
