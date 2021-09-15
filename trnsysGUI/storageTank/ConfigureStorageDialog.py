@@ -324,11 +324,12 @@ class ConfigureStorageDialog(QDialog):
             self.rightHeatExchangersItemListWidget.addItem(itemText)
 
     def addPortPair(self):
-        if float(self.manPortLeI.text()) > 100:
-            self.manPortLeI.setText("100")
-
-        if float(self.manPortLeO.text()) < 0:
-            self.manPortLeO.setText("0")
+        if float(self.manPortLeI.text()) >= 100 or float(self.manPortLeO.text()) <= 0:
+            messageBox = QMessageBox()
+            messageBox.setText(
+                'Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %).')
+            messageBox.exec_()
+            return
 
         trnsysId = self.parent.idGen.getTrnsysID()
 
