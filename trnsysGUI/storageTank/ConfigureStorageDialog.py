@@ -326,9 +326,18 @@ class ConfigureStorageDialog(QDialog):
             self.manPortLeO.setText("0")
 
         trnsysId = self.parent.idGen.getTrnsysID()
+
+        if self.manlButton.isChecked():
+            _pairSide = _sd.Side.LEFT
+        elif self.manrButton.isChecked():
+            _pairSide = _sd.Side.RIGHT
+        else:
+            self.parent.logger.warning('No side selected for port pair.')
+            return
+
         self.storage.addDirectPortPair(
             trnsysId,
-            self.manlButton.isChecked(),
+            _pairSide,
             float(self.manPortLeI.text()) / 100,
             float(self.manPortLeO.text()) / 100,
             self.storage.h,
