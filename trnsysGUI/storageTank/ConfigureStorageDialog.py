@@ -261,7 +261,7 @@ class ConfigureStorageDialog(QDialog):
 
     def addHx(self):
         """
-        Checks whether the inputs are in the correct range [0,100] and in order, and calls the function for creating a
+        Checks whether the inputs are in the correct range (0,100) and in order, and calls the function for creating a
         HeatExchanger on the respective side.
 
         Returns
@@ -272,17 +272,19 @@ class ConfigureStorageDialog(QDialog):
             and float(self.offsetLeI.text()) > float(self.offsetLeO.text())
             and self.offsetsInRange()
         ):
-            print("Adding hx")
             if self.rButton.isChecked():
-                print("addhxr")
+                self.parent.logger.debug('Adding HX on righthand side.')
                 self._addHxR()
-            if self.lButton.isChecked():
-                print("addhxl")
+            elif self.lButton.isChecked():
+                self.parent.logger.debug('Adding HX on lefthand side.')
                 self._addHxL()
+            else:
+                self.parent.logger.warning('No side selected for heat exchanger.')
+                return
         else:
             msgb = QMessageBox()
             msgb.setText(
-                "At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]"
+                "At least 20% of difference and larger top port than bottom port needed and valid range (0, 100)"
             )
             msgb.exec_()
 
