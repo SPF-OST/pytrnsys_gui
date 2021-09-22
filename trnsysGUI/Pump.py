@@ -19,7 +19,6 @@ class Pump(BlockItem):
         self.h = 40
         self.typeNumber = 1
         self.rndPwr = np.random.randint(0, 1000)
-        self.resStr = "Mfr" + self.displayName + " = " + str(self.rndPwr) + "\n"
 
         self.exportInitialInput = 0.0
 
@@ -57,16 +56,6 @@ class Pump(BlockItem):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        # Update port positions:
-        # if self.flippedH:
-        #     self.inputs[0].setPos(w, delta)
-        #     self.outputs[0].setPos(0, delta)
-        # else:
-        #     self.inputs[0].setPos(0, delta)
-        #     self.outputs[0].setPos(w, delta)
-        # self.outputs[0].setPos(w - self.flippedH * w - 2 * delta * self.flippedH + 2 * delta, h / 2)
-        # self.inputs[0].side = 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h
@@ -81,7 +70,8 @@ class Pump(BlockItem):
 
     def exportMassFlows(self):
         equationNr = 1
-        return self.resStr, equationNr
+        massFlowLine = f"Mfr{self.displayName} = {self.rndPwr}\n"
+        return massFlowLine, equationNr
 
     def exportInputsFlowSolver1(self):
         temp1 = "Mfr" + self.displayName

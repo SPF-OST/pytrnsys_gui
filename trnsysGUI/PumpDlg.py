@@ -114,7 +114,6 @@ class PumpDlg(QDialog):
 
     def setPumpPower(self):
         self.block.rndPwr = int(self.LineEdit.text())
-        self.block.resStr = "Mfr" + self.block.displayName + " = " + self.LineEdit.text() + "\n"
 
     def cancel(self):
         self.close()
