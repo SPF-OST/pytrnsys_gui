@@ -14,24 +14,28 @@ def getOrCreateHydraulicLoop(
     fromPort: _pi.PortItem, toPort: _pi.PortItem  # type: ignore[name-defined]
 ) -> "_model.HydraulicLoop":
     connections = [
-        _model.Connection("conn1", 10.0, None),
-        _model.Connection("conn2", 10.0, None),
-        _model.Connection("conn3", 3.0, None),
-        _model.Connection("conn4", 10.0, None),
-        _model.Connection("conn5", 10.0, None),
-        _model.Connection("conn6", 10.0, None),
+        _model.Connection("conn1", 10.0, 45.0, None),
+        _model.Connection("conn2", 10.0, 45.0, None),
+        _model.Connection("conn3", 3.0, 45.0, None),
+        _model.Connection("conn4", 10.0, 45.0, None),
+        _model.Connection("conn5", 10.0, 45.0, None),
+        _model.Connection("conn6", 10.0, 45.0, None),
     ]
 
-    fluid = _model.Fluid("water", 4184.0)
+    water = _model.PredefinedFluids.WATER
 
-    return _model.HydraulicLoop("loop", fluid, connections)
+    return _model.HydraulicLoop("loop", water, connections)
 
 
 def showHydraulicLoopDialog(
     fromPort: _pi.PortItem, toPort: _pi.PortItem  # type: ignore[name-defined]
 ) -> None:
     hydraulicLoop = getOrCreateHydraulicLoop(fromPort, toPort)
-    _gui.HydraulicLoopDialog.showDialog(hydraulicLoop)
+
+    okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(hydraulicLoop)
+    if okedOrCancelled == "cancelled":
+        return
+
     _applyModel(hydraulicLoop)
 
 

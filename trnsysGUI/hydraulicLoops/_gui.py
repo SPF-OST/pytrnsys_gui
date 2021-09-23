@@ -12,21 +12,16 @@ from . import _UI_hydraulicLoopDialog_generated as _uigen
 from . import _model
 
 
-def _setConnectionDiameter(connection: _model.Connection, diameterInCm: _tp.Any) -> bool:
-    try:
-        connection.diameterInCm = float(diameterInCm)
-    except ValueError:
-        return False
-
-    return True
-
-
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
     def __init__(self, hydraulicLoop: _model.HydraulicLoop):
         super().__init__()
         self.setupUi(self)
 
+        self.hydraulicLoop = hydraulicLoop
+
         self.loopName.setText(hydraulicLoop.name)
+
+        self._configureFluidComboBox()
 
         connectionsModel = _ConnectionsUiModel(hydraulicLoop.connections)
         self.connectionsTableView.setModel(connectionsModel)
@@ -34,10 +29,31 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self.connectionsTableView.resizeRowsToContents()
         self.connectionsTableView.resizeColumnsToContents()
 
+    def _configureFluidComboBox(self):
+        def getFluidName(fluid_: _model.Fluid) -> str:
+            return fluid_.name
+
+        sortedFluids: _tp.Sequence[_model.Fluid] = sorted(_model.PredefinedFluids.getAllFluids(), key=getFluidName)
+        for fluid in sortedFluids:
+            self.fluidComboBox.addItem(fluid.name, userData=fluid)
+
+        def onCurrentIndexChanged(_) -> None:
+            self.hydraulicLoop.fluid = self.fluidComboBox.currentData()
+
+        self.fluidComboBox.currentIndexChanged.connect(onCurrentIndexChanged)
+
     @staticmethod
-    def showDialog(hydraulicLoop: _model.HydraulicLoop) -> None:
+    def showDialog(hydraulicLoop: _model.HydraulicLoop) -> _tp.Literal["oked", "cancelled"]:
         dialog = HydraulicLoopDialog(hydraulicLoop)
-        dialog.exec()
+
+        dialogCode = dialog.exec()
+
+        if dialogCode == _qtw.QDialog.Accepted:
+            return "oked"
+        elif dialogCode == _qtw.QDialog.Rejected:
+            return "cancelled"
+        else:
+            raise AssertionError(f"Unknown dialog code {dialogCode}.")
 
 
 _PropertyValue = _tp.Union[str, float]
@@ -47,14 +63,23 @@ _PropertyValue = _tp.Union[str, float]
 class _Property:
     header: str
     getter: _tp.Callable[[_model.Connection], _PropertyValue]
-    setter: _tp.Optional[_tp.Callable[[_model.Connection, _PropertyValue], bool]] = None
+    setter: _tp.Optional[_tp.Callable[[_model.Connection, _PropertyValue], None]] = None
     shallHighlightOutliers: bool = True
+
+
+def _setConnectionDiameter(connection: _model.Connection, diameterInCm: _tp.Any) -> None:
+    connection.diameterInCm = float(diameterInCm)
+
+
+def _setConnectionUValue(connection: _model.Connection, uValueInWPerM2K: _tp.Any) -> None:
+    connection.uValueInWPerM2K = float(uValueInWPerM2K)
 
 
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     _PROPERTIES = [
         _Property("Name", lambda c: c.name, shallHighlightOutliers=False),
-        _Property("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter)
+        _Property("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
+        _Property("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue)
     ]
 
     def __init__(self, connections: _tp.Sequence[_model.Connection]):
@@ -120,7 +145,10 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     def _getMostUsedValue(self, prop):
         sortedValues = sorted(prop.getter(c) for c in self.connections)
         groupedValues = _it.groupby(sortedValues)
-        valuesWithCount = [dict(value=v, count=len([*vs])) for v, vs in groupedValues]
+        valuesWithCount = [
+            {"value": v, "count": len(list(vs))}
+            for v, vs in groupedValues
+        ]
         mostUsedValueWithCount = max(valuesWithCount, key=lambda vwc: vwc["count"])
         return mostUsedValueWithCount["value"]
 
@@ -130,8 +158,9 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         connection, prop = self._getConnectionAndProperty(index)
 
-        wasSuccessful = prop.setter(connection, value)  # type: ignore[misc]
-        if not wasSuccessful:
+        try:
+            prop.setter(connection, value)  # type: ignore[misc]
+        except ValueError:
             return False
 
         self.dataChanged.emit(index, index, [role])
