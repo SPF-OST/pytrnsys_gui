@@ -30,8 +30,8 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self.connectionsTableView.resizeColumnsToContents()
 
     def _configureFluidComboBox(self):
-        def getFluidName(fluid_: _model.Fluid) -> str:
-            return fluid_.name
+        def getFluidName(_fluid: _model.Fluid) -> str:
+            return _fluid.name
 
         sortedFluids: _tp.Sequence[_model.Fluid] = sorted(_model.PredefinedFluids.getAllFluids(), key=getFluidName)
         for fluid in sortedFluids:
@@ -50,10 +50,11 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         if dialogCode == _qtw.QDialog.Accepted:
             return "oked"
-        elif dialogCode == _qtw.QDialog.Rejected:
+
+        if dialogCode == _qtw.QDialog.Rejected:
             return "cancelled"
-        else:
-            raise AssertionError(f"Unknown dialog code {dialogCode}.")
+
+        raise AssertionError(f"Unknown dialog code {dialogCode}.")
 
 
 _PropertyValue = _tp.Union[str, float]

@@ -669,19 +669,6 @@ class Editor(QWidget):
 
     def cleanUpExportedElements(self):
         for t in self.trnsysObj:
-            # if isinstance(t, BlockItem):
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            #
-            # if type(t) is Connection:
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
             t.cleanUpAfterTrnsysExport()
 
     def sortTrnsysObj(self):

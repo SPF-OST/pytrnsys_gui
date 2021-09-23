@@ -36,7 +36,7 @@ class _Project:
 def getProjects() -> _tp.Iterable[_Project]:
     yield _Project.createForExampleProject("TRIHP_dualSource")
 
-    yield from getTestProjects()
+    # yield from getTestProjects()
 
 
 def getTestProjects() -> _tp.Iterable[_Project]:

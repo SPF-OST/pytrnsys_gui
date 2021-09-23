@@ -5,15 +5,15 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
 
 
 class HeatPumpTwoHx(BlockItem):
@@ -164,90 +164,20 @@ class HeatPumpTwoHx(BlockItem):
         status = "success"
         return status, equations
 
-    def exportParametersFlowSolver(self, descConnLength):
-        f = ""
-        for i in range(len(self.inputs)):
-            for c in self.inputs[i].connectionList:
-                if len(self.outputs[i].connectionList) > 0:
-                    # HeatPumpTwoHx exportConnsString has 3 lines
-                    if i == 0:
-                        temp = (
-                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                        )  # + str(t.childIds[0])
-                        temp += " " * (descConnLength - len(temp))
+    def getInternalPiping(self) -> InternalPiping:
+        pipes = []
+        portItems = {}
+        for i in range(3):
+            inputPort = _mfn.PortItem()
+            outputPort = _mfn.PortItem()
 
-                        self.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
+            pipe = _mfn.Pipe(f"{self.displayName}Side{i+1}", self.childIds[i], inputPort, outputPort)
+            pipes.append(pipe)
 
-                    elif i == 1:
-                        temp = (
-                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                        )  # + str(t.childIds[1])
-                        temp += " " * (descConnLength - len(temp))
+            portItems[inputPort] = self.inputs[i]
+            portItems[outputPort] = self.outputs[i]
 
-                        self.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
-
-                    elif i == 2:
-                        temp = (
-                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                        )  # + str(t.childIds[1])
-                        temp += " " * (descConnLength - len(temp))
-
-                        self.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(self.childIds[2]) + " : " + self.displayName + "Side3" + "\n"
-                    else:
-                        f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                    # Presumably used only for storing the order of connections
-                    self.trnsysConn.append(c)
-                    self.trnsysConn.append(self.outputs[i].connectionList[0])
-
-                else:
-                    f += "Output of ExternalHx for input[{0}] is not connected ".format(i) + "\n"
-
-        return f
-
-    def exportInputsFlowSolver1(self):
-        return "0,0 0,0 0,0 ", 3
-
-    def exportInputsFlowSolver2(self):
-        f = ""
-        f += (
-            " "
-            + str(self.exportInitialInput)
-            + " "
-            + str(self.exportInitialInput)
-            + " "
-            + str(self.exportInitialInput)
-            + " "
-        )
-        return f, 3
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        tot = ""
-        for j in range(3):
-            for i in range(0, 3):
-                if i < 2:
-                    temp = (
-                        prefix
-                        + self.displayName
-                        + "-Side"
-                        + str(j)
-                        + "_"
-                        + abc[i]
-                        + "=["
-                        + str(simulationUnit)
-                        + ","
-                        + str(equationNumber)
-                        + "]\n"
-                    )
-                    tot += temp
-                    self.exportEquations.append(temp)
-                    # nEqUsed += 1  # DC
-                equationNumber += 1  # DC-ERROR it should count anyway
-
-        return tot, equationNumber, 6
+        return InternalPiping(pipes, portItems)
 
     def getSubBlockOffset(self, c):
         for i in range(3):

@@ -5,15 +5,13 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
 
 
 class Collector(BlockItem):

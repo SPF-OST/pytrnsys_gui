@@ -105,7 +105,6 @@ class Export(object):
 
     def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength):
         # If not all ports of an object are connected, less than 4 numbers will show up
-        # TrnsysConn is a list containing the fromPort and twoPort in order as they appear in the export of connections
         f = ""
         f += "UNIT " + str(simulationUnit) + " TYPE " + str(simulationType) + "\n"
         f += "PARAMETERS " + str(self.numOfPar) + "\n"
@@ -196,28 +195,27 @@ class Export(object):
         f = ""
         f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 935\n"
 
-        counter = 0
+        numberOfInputs = 0
 
+        counter = 0
         for t in self.trnsysObj:
-            res = t.exportInputsFlowSolver1()
+            res = t.exportInputsFlowSolver()
             f += res[0]
             counter += res[1]
+            numberOfInputs += res[1]
 
             if counter > 8 or t == self.trnsysObj[-1]:
                 f += "\n"
                 counter = 0
 
-        f += "\n*** Initial Inputs *" + "\n"
-
-        counter2 = 0
-        for t in self.trnsysObj:
-            res = t.exportInputsFlowSolver2()
-            f += res[0]
-            counter2 += res[1]
-
-            if counter2 > 8:
+        f += "*** Initial Inputs (TRNSYS requires them to be there but the storage tank doesn't use them.)*\n"
+        counter = 0
+        for _ in range(numberOfInputs):
+            f += "-1 "
+            if counter > 8:
                 f += "\n"
-                counter2 = 0
+                counter = 0
+            counter += 1
 
         f += "\n\n"
 

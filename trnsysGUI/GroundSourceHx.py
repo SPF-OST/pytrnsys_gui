@@ -5,15 +5,15 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import massFlowSolver as _mfs
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
 
 
 class GroundSourceHx(BlockItem):
@@ -161,3 +161,11 @@ class GroundSourceHx(BlockItem):
             os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)
+
+    def getInternalPiping(self) -> _mfs.InternalPiping:
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        return _mfs.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})

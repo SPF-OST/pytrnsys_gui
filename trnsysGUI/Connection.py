@@ -1,24 +1,29 @@
 # pylint: skip-file
 # type: ignore
 
-import typing as _tp
+from __future__ import annotations
+
 import math as _math
+import typing as _tp
 
 import numpy as np
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
-import trnsysGUI.BlockItem as _bi
-from trnsysGUI import idGenerator as _id
-from trnsysGUI.Collector import Collector
+import massFlowSolver as _mfs
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.hydraulicLoops as _hl
+from massFlowSolver import InternalPiping
+from trnsysGUI import idGenerator as _id, PortItem as _pi
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItem import PortItem
-from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.segmentItem import segmentItem
-import trnsysGUI.hydraulicLoops as _hl
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.BlockItem as _bi
 
 
 def calcDist(p1, p2):
@@ -27,7 +32,7 @@ def calcDist(p1, p2):
     return norm
 
 
-class Connection(object):
+class Connection(_mfs.MassFlowNetworkContributorMixin):
     def __init__(self, fromPort: PortItem, toPort: PortItem, parent, **kwargs):
         self.logger = parent.logger
 
@@ -43,9 +48,6 @@ class Connection(object):
         self.typeNumber = 0
         self.exportConnsString = ""
         self.exportInputName = "0"
-        self.exportInitialInput = -1
-        self.exportEquations = []
-        self._portItemsWithParent: _tp.List[_tp.Tuple[PortItem, _bi.BlockItem]] = []
 
         # Global
         self.id = self.parent.idGen.getID()
@@ -84,6 +86,9 @@ class Connection(object):
 
                 if "labelMassPos" in kwargs:
                     self.labelMassPosLoad = kwargs["labelMassPos"]
+
+    def getTrnsysId(self) -> int:
+        return self.trnsysId
 
     def isVisible(self):
         res = True
@@ -160,20 +165,7 @@ class Connection(object):
                 col = QColor(255, 153, 153)  # light red
             elif kwargs["mfr"] == "75ToMax":
                 col = QColor(255, 51, 51)  # red
-            # elif kwargs["mfr"] == "negMinToLower":
-            #     col = QColor(0, 0, 0)  # Black
-            # elif kwargs["mfr"] == "negLowerToMedian":
-            #     col = QColor(47, 47, 73)  # Lighter black
-            # elif kwargs["mfr"] == "negMedianToUpper":
-            #     col = QColor(78, 78, 97)  # even lighter black
-            # elif kwargs["mfr"] == "negUpperToMax":
-            #     col = QColor(100, 100, 114)  # even even lighter black
-            # elif kwargs["mfr"] == "negMaxToZero":
-            #     col = QColor(115, 115, 124)  # darker than gray
-            # elif kwargs["mfr"] == "zeroToMin":
-            #     col = QColor(156, 156, 164)  # lighter than gray
             else:
-                # PosMfr
                 col = QColor(255, 0, 0)
 
             for s in self.segments:
@@ -202,14 +194,11 @@ class Connection(object):
         self.logger.debug("corner not found is " + str(searchCorner))
 
         return 0
-        # Alternative
-        # return corners.index(searchCorner)
 
     def getFirstSeg(self):
         return self.segments[0]
 
     def getCorners(self):
-        # Returns a list containing all the corners of this connection
         res = []
 
         tempNode = self.startNode.nextN()
@@ -218,29 +207,7 @@ class Connection(object):
             res.append(tempNode.parent)
             tempNode = tempNode.nextN()
 
-        # self.logger.debug("getcorners gives " + str(res))
         return res
-
-    # To correct the direction of a connection, unused
-    def correctPorts(self):
-        if isinstance(self.fromPort.parent, Pump):
-            if self.fromPort.name == "i":
-                self.switchPorts()
-
-        if isinstance(self.toPort.parent, Pump):
-            if self.toPort.name == "o":
-                self.switchPorts()
-
-        if isinstance(self.fromPort, Collector):
-            if self.fromPort.name == "i":
-                self.switchPorts()
-
-        if isinstance(self.toPort, Collector):
-            if self.toPort.name == "o":
-                self.switchPorts()
-
-        if isinstance(self.fromPort.parent, TVentil):
-            self.switchPorts()
 
     def switchPorts(self):
         temp = self.fromPort
@@ -251,14 +218,11 @@ class Connection(object):
     def initNew(self, parent):
 
         self.parent = parent
-        # self.logger.debug("Parent is " + str(self.parent))
 
-        # Global
         self.parent.trnsysObj.append(self)
 
         self.displayName = "Conn" + str(self.connId)
 
-        # global editorMode
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")
             self.initSegmentM0()
@@ -271,8 +235,6 @@ class Connection(object):
         self.parent.connectionList.append(self)
         self.fromPort.connectionList.append(self)
         self.toPort.connectionList.append(self)
-
-        # self.correctPorts()
 
     def initLoad(self):
         # Called by DiagramEditor when loading connection
@@ -297,9 +259,6 @@ class Connection(object):
 
         if self.labelMassPosLoad:
             self.setMassLabelPos(self.labelMassPosLoad)
-
-        # Still not tested
-        # self.correctPorts()
 
     def initSegmentM0(self):
         self.startNode.setParent(self)
@@ -1306,63 +1265,31 @@ class Connection(object):
     def exportDivSetting2(self, nUnit):
         return "", nUnit
 
-    def exportParametersFlowSolver(self, descConnLength):
-        f = ""
+    def getInternalPiping(self) -> InternalPiping:
+        fromPort = _mfn.PortItem()
+        toPort = _mfn.PortItem()
 
-        if hasattr(self.fromPort.parent, "getSubBlockOffset"):
-            temp = str(self.fromPort.parent.trnsysId + self.fromPort.parent.getSubBlockOffset(self)) + " "
-        else:
-            portId = self.fromPort.parent.getFlowSolverParametersId(self.fromPort)
-            temp = f"{portId} "
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
 
-        if hasattr(self.toPort.parent, "getSubBlockOffset"):
-            temp += str(self.toPort.parent.trnsysId + self.toPort.parent.getSubBlockOffset(self))
-        else:
-            portId = self.toPort.parent.getFlowSolverParametersId(self.toPort)
-            temp += f"{portId} "
+        return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-        temp += " 0" * 2 + " "
-        self.exportConnsString = temp
+    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItem) -> _tp.Optional[int]:
+        assert graphicalPortItem in [self.fromPort, self.toPort],\
+            "This connection is not connected to `graphicalPortItem'"
 
-        # This is to ensure that the "output" of a Div always appears first
-        fromPortWithParent = (self.fromPort, self.fromPort.parent)
-        if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
-            self._portItemsWithParent.insert(0, fromPortWithParent)
-        else:
-            self._portItemsWithParent.append(fromPortWithParent)
+        blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
 
-        toPortWithParent = (self.toPort, self.toPort.parent)
-        if type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs:
-            self._portItemsWithParent.insert(0, toPortWithParent)
-        else:
-            self._portItemsWithParent.append(toPortWithParent)
+        internalPiping = blockItem.getInternalPiping()
 
-        f += temp + " " * (descConnLength - len(temp)) + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+        for startingNode in internalPiping.openLoopsStartingNodes:
+            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
+            for realNode in realNodesAndPortItems.realNodes:
+                for portItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
+                    candidateGraphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+                    if candidateGraphicalPortItem == graphicalPortItem:
+                        return realNode.trnsysId
 
-        return f
-
-    @staticmethod
-    def exportInputsFlowSolver1():
-        return "0,0 ", 1
-
-    def exportInputsFlowSolver2(self):
-        return str(self.exportInitialInput) + " ", 1
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        equation1 = self._createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
-        equation2 = self._createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
-
-        self.exportEquations.append(equation1)
-        self.exportEquations.append(equation2)
-
-        equations = equation1 + equation2
-        nEquationsUsed = 2
-        nextEquationNumber = equationNumber + 3
-
-        return equations, nextEquationNumber, nEquationsUsed
-
-    def _createFlowSolverOutputEquation(self, equationNumber, abc, prefix, equationNumberOffset, simulationUnit):
-        return f"{prefix}{self.displayName}_{abc[equationNumber]}=[{simulationUnit},{equationNumberOffset + equationNumber}]\n"
+        return None
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         f = ""
@@ -1405,9 +1332,21 @@ class Connection(object):
 
         unitText += "INPUTS " + str(inputNumbers) + "\n"
 
-        if len(self._portItemsWithParent) == 2:
-            portItem = self._portItemsWithParent[0][0]
-            parent = self._portItemsWithParent[0][1]
+        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+        assert len(openLoops) == 1
+        openLoop = openLoops[0]
+
+        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+        assert len(realNodes) == 1
+        realNode = realNodes[0]
+
+        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+
+        portItemsWithParent = self._getPortItemsWithParent()
+
+        if len(portItemsWithParent) == 2 or True:
+            portItem = portItemsWithParent[0][0]
+            parent = portItemsWithParent[0][1]
             if hasattr(parent, "getSubBlockOffset"):
                 unitText += (
                     "T"
@@ -1419,11 +1358,11 @@ class Connection(object):
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
-            unitText += self.exportEquations[0][0 : self.exportEquations[0].find("=")] + "\n"
+            unitText += f"{outputVariables[0].name}\n"
             unitText += tempRoomVar + "\n"
 
-            portItem = self._portItemsWithParent[1][0]
-            parent = self._portItemsWithParent[1][1]
+            portItem = portItemsWithParent[1][0]
+            parent = portItemsWithParent[1][1]
             if hasattr(parent, "getSubBlockOffset"):
                 unitText += (
                     "T"
@@ -1467,6 +1406,15 @@ class Connection(object):
 
         return unitText, unitNumber
 
+    def _getPortItemsWithParent(self):
+        if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
+            return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
+
+        if type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs:
+            return [(self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)]
+
+        return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
+
     def findStoragePort(self, virtualBlock):
         portToPrint = None
         for p in virtualBlock.inputs + virtualBlock.outputs:
@@ -1488,9 +1436,6 @@ class Connection(object):
     def cleanUpAfterTrnsysExport(self):
         self.exportConnsString = ""
         self.exportInputName = "0"
-        # self.exportInitialInput = -1
-        self.exportEquations = []
-        self._portItemsWithParent = []
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass

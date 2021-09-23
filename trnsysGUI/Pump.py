@@ -8,8 +8,10 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
 from trnsysGUI.PortItem import PortItem
 import trnsysGUI.images as _img
+import massFlowSolver.networkModel as _mfn
 
 
 class Pump(BlockItem):
@@ -20,8 +22,6 @@ class Pump(BlockItem):
         self.typeNumber = 1
         self.rndPwr = np.random.randint(0, 1000)
         self.resStr = "Mfr" + self.displayName + " = " + str(self.rndPwr) + "\n"
-
-        self.exportInitialInput = 0.0
 
         self.inputs.append(PortItem("i", 0, self))
         self.outputs.append(PortItem("o", 2, self))
@@ -57,18 +57,9 @@ class Pump(BlockItem):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        # Update port positions:
-        # if self.flippedH:
-        #     self.inputs[0].setPos(w, delta)
-        #     self.outputs[0].setPos(0, delta)
-        # else:
-        #     self.inputs[0].setPos(0, delta)
-        #     self.outputs[0].setPos(w, delta)
-        # self.outputs[0].setPos(w - self.flippedH * w - 2 * delta * self.flippedH + 2 * delta, h / 2)
-        # self.inputs[0].side = 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+
         return w, h
 
     def exportBlackBox(self):
@@ -83,7 +74,11 @@ class Pump(BlockItem):
         equationNr = 1
         return self.resStr, equationNr
 
-    def exportInputsFlowSolver1(self):
-        temp1 = "Mfr" + self.displayName
-        self.exportInputName = " " + temp1 + " "
-        return self.exportInputName, 1
+    def getInternalPiping(self) -> InternalPiping:
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+
+        pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        return InternalPiping([pump], modelPortItemsToGraphicalPortItem)

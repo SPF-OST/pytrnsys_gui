@@ -5,12 +5,14 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QGraphicsTextItem
 
+import massFlowSolver as _mfs
+import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.PortItem import PortItem
 
 
-class TVentil(BlockItem):
+class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(TVentil, self).__init__(trnsysType, parent, **kwargs)
 
@@ -22,13 +24,14 @@ class TVentil(BlockItem):
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
-        self.exportInitialInput = 0.0
-
         self.inputs.append(PortItem("o", 0, self))
         self.inputs.append(PortItem("o", 1, self))
         self.outputs.append(PortItem("i", 2, self))
 
         self.changeSize()
+
+    def getTrnsysId(self) -> int:
+        return self.trnsysId
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.T_VENTIL_SVG
@@ -99,48 +102,6 @@ class TVentil(BlockItem):
             self.isTempering = i["IsTempering"]
             self.positionForMassFlowSolver = i["PositionForMassFlowSolver"]
 
-    def exportParameterSolver(self, descConnLength):
-        temp = ""
-
-        for o in self.outputs:
-            # ConnectionList lenght should be max offset
-            for c in o.connectionList:
-                if type(c.fromPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                elif type(c.toPort.parent, "heatExchangers") and o.connectionList.index(c) == 0:
-                    continue
-                else:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
-
-        for i in self.inputs:
-            # Either left or right
-            tempArr = []
-
-            for c in i.connectionList:
-                if type(c.fromPort.parent) and i.connectionList.index(c) == 0:
-                    continue
-                elif type(c.toPort.parent) and i.connectionList.index(c) == 0:
-                    continue
-                else:
-                    # On same hight as output
-                    if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
-                        tempArr.insert(0, c)
-                    else:
-                        tempArr.append(c)
-
-            for conn in tempArr:
-                temp = temp + str(conn.trnsysId) + " "
-                self.trnsysConn.append(conn)
-
-            temp += "0 "
-
-            temp += str(self.typeNumber)
-            temp += " " * (descConnLength - len(temp))
-            self.exportConnsString = temp
-
-            return temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
     def exportMassFlows(self):
         if not self.isTempering:
             resStr = "xFrac" + self.displayName + " = " + str(self.positionForMassFlowSolver) + "\n"
@@ -188,63 +149,18 @@ class TVentil(BlockItem):
         else:
             return "", nUnit
 
-    def exportParametersFlowSolver(self, descConnLength):
-        temp = ""
+    def getInternalPiping(self) -> _mfs.InternalPiping:
+        teePiece, modelPortItemsToGraphicalPortItem = self._getModelAndMapping()
 
-        for o in self.outputs:
-            for c in o.connectionList:
-                    temp = temp + str(c.trnsysId) + " "
-                    self.trnsysConn.append(c)
+        return _mfs.InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
 
-        for i in self.inputs:
-            # Either left or right
-            tempArr = []
-
-            for c in i.connectionList:
-                # On same hight as output
-                if i.pos().x() == self.outputs[0].pos().x() or i.pos().y() == self.outputs[0].y():
-                    tempArr.insert(0, c)
-                else:
-                    tempArr.append(c)
-
-            for conn in tempArr:
-                temp = temp + str(conn.trnsysId) + " "
-                self.trnsysConn.append(conn)
-
-        temp += str(self.typeNumber)
-        temp += " " * (descConnLength - len(temp))
-        self.exportConnsString = temp
-        f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
-        return f
-
-    def exportInputsFlowSolver1(self):
-        temp1 = "xFrac" + self.displayName
-        self.exportInputName = " " + temp1 + " "
-        return self.exportInputName, 1
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        if self.isVisible():
-            tot = ""
-            for i in range(0, 3):
-                temp = (
-                    prefix
-                    + self.displayName
-                    + "_"
-                    + abc[i]
-                    + "=["
-                    + str(simulationUnit)
-                    + ","
-                    + str(equationNumber)
-                    + "]\n"
-                )
-                tot += temp
-                self.exportEquations.append(temp)
-                # nEqUsed += 1  # DC
-                equationNumber += 1  # DC-ERR
-            return tot, equationNumber, 3
-        else:
-            return "", equationNumber + 1, 0
+    def _getModelAndMapping(self):
+        input1 = _mfn.PortItem()
+        input2 = _mfn.PortItem()
+        output = _mfn.PortItem()
+        teePiece = _mfn.Diverter(self.displayName, self.trnsysId, output, input1, input2)
+        modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
+        return teePiece, modelPortItemsToGraphicalPortItem
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
@@ -262,11 +178,24 @@ class TVentil(BlockItem):
             unitText += "PARAMETERS 0\n"
             unitText += "INPUTS 6\n"
 
-            for s in self.exportEquations:
-                unitText += s[0 : s.find("=")] + "\n"
+            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+            assert len(openLoops) == 1
+            openLoop = openLoops[0]
 
-            for it in self.trnsysConn:
-                unitText += "T" + it.displayName + "\n"
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+            assert len(realNodes) == 1
+            realNode = realNodes[0]
+
+            outputVariables = realNode.serialize(nodesToIndices).outputVariables
+            for outputVariable in outputVariables:
+                if not outputVariable:
+                    continue
+
+                unitText += outputVariable.name + "\n"
+
+            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
 
             unitText += "***Initial values\n"
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"

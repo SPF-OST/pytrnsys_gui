@@ -4,10 +4,9 @@
 import glob
 import os
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap, QTransform
-
+import massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
 from trnsysGUI.PortItem import PortItem
 
 
@@ -138,66 +137,23 @@ class BlockItemFourPorts(BlockItem):
 
         return status, equations
 
-    def exportParametersFlowSolver(self, descConnLength):
-        f = ""
-        if self.outputs[0].connectionList:
-            incomingConnection = self.inputs[0].connectionList[0]
-            outgoingConnection = self.outputs[0].connectionList[0]
-            temp = (
-                    str(incomingConnection.trnsysId) + " " + str(outgoingConnection.trnsysId) + " 0 0 "
-            )
-            temp += " " * (descConnLength - len(temp))
-            self.exportConnsString += temp + "\n"
-            f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "Side1" + "\n"
-            self.trnsysConn.append(incomingConnection)
-            self.trnsysConn.append(outgoingConnection)
+    def getInternalPiping(self) -> InternalPiping:
+        side1Input = _mfn.PortItem()
+        side1Output = _mfn.PortItem()
+        side1Pipe = _mfn.Pipe(f"{self.displayName}Side1", self.childIds[0], side1Input, side1Output)
 
-        if self.outputs[1].connectionList:
-            incomingConnection = self.inputs[1].connectionList[0]
-            outgoingConnection = self.outputs[1].connectionList[0]
-            temp = (
-                    str(incomingConnection.trnsysId) + " " + str(outgoingConnection.trnsysId) + " 0 0 "
-            )
-            temp += " " * (descConnLength - len(temp))
-            self.exportConnsString += temp + "\n"
-            f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Side2" + "\n"
-            self.trnsysConn.append(incomingConnection)
-            self.trnsysConn.append(outgoingConnection)
+        side2Input = _mfn.PortItem()
+        side2Output = _mfn.PortItem()
+        side2Pipe = _mfn.Pipe(f"{self.displayName}Side2", self.childIds[1], side2Input, side2Output)
 
-        return f
+        modelPortItemsToGraphicalPortItem = {
+            side1Input: self.inputs[0],
+            side1Output: self.outputs[0],
+            side2Input: self.inputs[1],
+            side2Output: self.outputs[1]
+        }
 
-    def exportInputsFlowSolver1(self):
-        return "0,0 0,0 ", 2
-
-    def exportInputsFlowSolver2(self):
-        f = ""
-        f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
-        return f, 2
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        tot = ""
-        for j in range(2):
-            for i in range(0, 3):
-                if i < 2:
-                    temp = (
-                        prefix
-                        + self.displayName
-                        + "-Side"
-                        + str(j)
-                        + "_"
-                        + abc[i]
-                        + "=["
-                        + str(simulationUnit)
-                        + ","
-                        + str(equationNumber)
-                        + "]\n"
-                    )
-                    tot += temp
-                    self.exportEquations.append(temp)
-                    # nEqUsed += 1  # DC
-                equationNumber += 1  # DC-ERROR it should count anyway
-
-        return tot, equationNumber, 4
+        return InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
 
     def getSubBlockOffset(self, c):
         for i in range(2):
