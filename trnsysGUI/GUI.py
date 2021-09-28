@@ -1,5 +1,4 @@
-# pylint: skip-file
-# type: ignore
+
 
 import os
 import pathlib as _pl
