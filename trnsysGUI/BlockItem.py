@@ -106,6 +106,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.origOutputsPos = None
         self.origInputsPos = None
 
+        self.selectedBlockItem = False
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         currentClassName = BlockItem.__name__
         currentMethodName = f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
@@ -483,6 +485,13 @@ class BlockItem(QGraphicsPixmapItem):
 
         """
         self.logger.debug("Inside Block Item mouse click")
+
+        # Set flag for selected Block
+        for c in self.parent.parent().trnsysObj:
+            if isinstance(c, BlockItem):
+                c.selectedBlockItem = False
+        self.selectedBlockItem = True
+
         if self.name == "GenericBlock" or self.name == "StorageTank":
             return
         try:

@@ -65,6 +65,8 @@ class Connection(object):
         self.mass = 0  # comment out
         self.temperature = 0
 
+        self.selectedConnection = False
+
         # A new connection is created if there are no kwargs
         if not kwargs:
             self.fromPortId = self.parent.idGen.getID()
@@ -1158,6 +1160,8 @@ class Connection(object):
         for s in self.segments:
             s.setHighlight(True)
 
+        self.selectedConnection = True
+
         self.setLabelsHighlight(True)
 
     def unhighlightOtherConns(self):
@@ -1167,6 +1171,8 @@ class Connection(object):
     def unhighlightConn(self):
         for s in self.segments:
             s.updateGrad()
+
+        self.selectedConnection = False
 
         self.setLabelsHighlight(False)
 
