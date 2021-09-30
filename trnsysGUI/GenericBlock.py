@@ -160,16 +160,19 @@ class GenericBlock(BlockItem):
             dictName = "Block-"
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
-        self.logger.debug("Portpair is " + str(i["PortPairsNb"]))
-        correcter = 0
-        for j in range(4):
-            if j == 2:
-                correcter = -1
-            for k in range(i["PortPairsNb"][j] + correcter):
-                self.addPortPair(j)
+    def decode(self, i, resBlockList):
+        assert len(self.inputs) == len(self.outputs)
+        numberOfPortPairs = len(self.inputs)
+        for portPairIndex in range(numberOfPortPairs):
+            self.removePortPair(portPairIndex)
 
-        super(GenericBlock, self).decode(i, resConnList, resBlockList)
+        numberOfPortPairsBySide = i["PortPairsNb"]
+        for side in range(3):
+            numberOfPortPairsToAdd = numberOfPortPairsBySide[side]
+            for _ in range(numberOfPortPairsToAdd):
+                self.addPortPair(side)
+
+        super(GenericBlock, self).decode(i, resBlockList)
         self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
         self.setImage()
 
