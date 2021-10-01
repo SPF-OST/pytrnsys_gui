@@ -239,7 +239,7 @@ class segmentItem(QGraphicsLineItem):
             self.keyPr = 1
             self.logger.debug("Setting key to 1")
 
-            self.parent.highlightConn()
+            self.parent.selectConnection()
 
             if self.isVertical():
                 try:
@@ -779,7 +779,7 @@ class segmentItem(QGraphicsLineItem):
         self.logger.debug(self.parent.groupName)
 
     def inspect(self):
-        self.parent.highlightConn()
+        self.parent.selectConnection()
         self.parent.inspectConn()
 
     def setLabelVisible(self, isVisible: bool) -> None:
@@ -796,16 +796,16 @@ class segmentItem(QGraphicsLineItem):
         wasVisible = self.labelMass.isVisible()
         self.setMassFlowLabelVisible(not wasVisible)
 
-    def setHighlight(self, isHighlight: bool) -> None:
-        if isHighlight:
-            highlightPen = self._createHighlightPen()
-            self.setPen(highlightPen)
+    def setSelect(self, isSelected: bool) -> None:
+        if isSelected:
+            selectPen = self._createSelectPen()
+            self.setPen(selectPen)
         else:
             self.updateGrad()
 
     @staticmethod
-    def _createHighlightPen() -> QPen:
+    def _createSelectPen() -> QPen:
         color = QColor(125, 242, 189)
         width = 4
-        highlightPen = QPen(color, width)
-        return highlightPen
+        selectPen = QPen(color, width)
+        return selectPen

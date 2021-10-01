@@ -65,7 +65,7 @@ class Connection(object):
         self.mass = 0  # comment out
         self.temperature = 0
 
-        self.selectedConnection = False
+        self.isSelected = False
 
         # A new connection is created if there are no kwargs
         if not kwargs:
@@ -1153,32 +1153,32 @@ class Connection(object):
             else:
                 self.logger.debug("While removeing conn from group, no group with conn.groupName")
 
-    # Highlight when clicked, unhighlight when clicked elsewhere
-    def highlightConn(self):
-        self.unhighlightOtherConns()
+    # Select when clicked, deselect when clicked elsewhere
+    def selectConnection(self):
+        self.deselectOtherConnections()
 
         for s in self.segments:
-            s.setHighlight(True)
+            s.setSelect(True)
 
-        self.selectedConnection = True
+        self.isSelected = True
 
-        self.setLabelsHighlight(True)
+        self.setLabelsSelected(True)
 
-    def unhighlightOtherConns(self):
+    def deselectOtherConnections(self):
         for c in self.parent.connectionList:
-            c.unhighlightConn()
+            c.deselectConnection()
 
-    def unhighlightConn(self):
+    def deselectConnection(self):
         for s in self.segments:
             s.updateGrad()
 
-        self.selectedConnection = False
+        self.isSelected = False
 
-        self.setLabelsHighlight(False)
+        self.setLabelsSelected(False)
 
-    def setLabelsHighlight(self, isHighlight: bool) -> None:
-        self._setBold(self.firstS.label, isHighlight)
-        self._setBold(self.firstS.labelMass, isHighlight)
+    def setLabelsSelected(self, isSelected: bool) -> None:
+        self._setBold(self.firstS.label, isSelected)
+        self._setBold(self.firstS.labelMass, isSelected)
 
     @staticmethod
     def _setBold(label: QGraphicsTextItem, isBold: bool) -> None:

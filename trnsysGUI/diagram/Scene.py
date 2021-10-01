@@ -164,11 +164,11 @@ class Scene(QGraphicsScene):
             for c in self.parent().trnsysObj:
                 # Delete connection
                 if isinstance(c, Connection):
-                    if c.selectedConnection:
+                    if c.isSelected:
                         c.deleteConnCom()
                 # Delete block
                 if isinstance(c, BlockItem):
-                    if c.selectedBlockItem:
+                    if c.isSelected:
                         c.deleteBlockCom()
 
     def mousePressEvent(self, event):
@@ -186,7 +186,7 @@ class Scene(QGraphicsScene):
             self.parent().multipleSelectMode = True
             for c in self.parent().connectionList:
                 if not self.parent().parent().massFlowEnabled:
-                    c.unhighlightConn()
+                    c.deselectConnection()
 
             self.parent().alignYLineItem.setVisible(False)
 

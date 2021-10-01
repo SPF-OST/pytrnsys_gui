@@ -106,7 +106,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.origOutputsPos = None
         self.origInputsPos = None
 
-        self.selectedBlockItem = False
+        self.isSelected = False
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         currentClassName = BlockItem.__name__
@@ -489,8 +489,8 @@ class BlockItem(QGraphicsPixmapItem):
         # Set flag for selected Block
         for c in self.parent.parent().trnsysObj:
             if isinstance(c, BlockItem):
-                c.selectedBlockItem = False
-        self.selectedBlockItem = True
+                c.isSelected = False
+        self.isSelected = True
 
         if self.name == "GenericBlock" or self.name == "StorageTank":
             return
