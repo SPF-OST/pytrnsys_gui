@@ -219,11 +219,6 @@ class DecoderPaste(json.JSONDecoder):
                                 fport,
                                 tPort,
                                 self.editor,
-                                fromPortId=i["PortFromID"],
-                                toPortId=i["PortToID"],
-                                segmentsLoad=i["SegmentPositions"],
-                                cornersLoad=i["CornerPositions"],
-                                loadedConn=True,
                             )
                             c.setName(i["ConnDisplayName"])
 
