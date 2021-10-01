@@ -160,7 +160,6 @@ class Scene(QGraphicsScene):
             self.logger.debug("Changing move bool to " + str(self.parent().moveDirectPorts))
 
         if event.key() == Qt.Key_Delete:
-            self.logger.debug("Delete detected")
             for c in self.parent().trnsysObj:
                 # Delete connection
                 if isinstance(c, Connection):
