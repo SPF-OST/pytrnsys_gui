@@ -591,9 +591,8 @@ class _MainWindow(QMainWindow):
         msgb = QMessageBox(self)
         msgb.setText(
             "<p><b>Contributors:</b></p>"
-            "<p>Stefano Marti, Dani Carbonell, Mattia Battaglia, Jeremias Schmidli, and Martin Neugebauer."
+            "<p>Dani Carbonell, Martin Neugebauer, Damian Birchler, Jeremias Schmidli"
         )
-        # "Icons made by Jeremias Schmidli and with icons by Vaadin from  www.flaticon.com</p>"
         msgb.exec()
 
     def exportPDF(self):
