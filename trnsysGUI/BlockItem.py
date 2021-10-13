@@ -55,8 +55,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.name = trnsysType
         self.trnsysId = self.parent.parent().idGen.getTrnsysID()
         self.typeNumber = 0
-        self.exportConnsString = ""
-        self.exportInputName = "0"
 
         # Transform related
         self.flippedV = False
@@ -764,10 +762,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
-
-    def cleanUpAfterTrnsysExport(self):
-        self.exportConnsString = ""
-        self.exportInputName = "0"
 
     def deleteLoadedFile(self):
         for items in self.loadedFiles:

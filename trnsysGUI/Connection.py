@@ -46,8 +46,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         # Export related
         self.typeNumber = 0
-        self.exportConnsString = ""
-        self.exportInputName = "0"
 
         # Global
         self.id = self.parent.idGen.getID()
@@ -1429,10 +1427,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
                     else:
                         portToPrint = self.fromPort.connectionList[0].fromPort
         return portToPrint
-
-    def cleanUpAfterTrnsysExport(self):
-        self.exportConnsString = ""
-        self.exportInputName = "0"
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass

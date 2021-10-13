@@ -110,7 +110,6 @@ class Export(object):
         f += "PARAMETERS " + str(self.numOfPar) + "\n"
         f += str(self.lineNumOfPar) + "\n"
 
-        # exportConnsString: i/o i/o 0 0
         nameString = ""
         for t in self.trnsysObj:
 
