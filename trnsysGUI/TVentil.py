@@ -49,8 +49,6 @@ class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
         lw, lh = rect.width(), rect.height()
         lx = (w - lw) / 2
 
-        deltaH = self.h / 18
-
         self.label.setPos(lx, h - self.flippedV * (h + h / 2))
         self.posLabel.setPos(lx + 5, -15)
 
@@ -68,6 +66,24 @@ class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h
+
+    def rotateBlockCW(self):
+        super().rotateBlockCW()
+        # Rotate valve position label back so it will always stay horizontal
+        self._updateRotation()
+
+    def rotateBlockCCW(self):
+        super().rotateBlockCCW()
+        # Rotate valve position label back so it will always stay horizontal
+        self._updateRotation()
+
+    def resetRotation(self):
+        super().resetRotation()
+        # Rotate valve position label back so it will always stay horizontal
+        self._updateRotation()
+
+    def _updateRotation(self):
+        self.posLabel.setRotation(-self.rotationN * 90)
 
     def setComplexDiv(self, b):
         self.isTempering = bool(b)

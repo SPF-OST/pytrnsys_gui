@@ -373,6 +373,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     def resetRotation(self):
         self.logger.debug("Resetting rotation...")
         self.setRotation(0)
+        self.label.setRotation(0)
 
         for p in self.inputs:
             p.itemChange(27, p.scenePos())
