@@ -21,7 +21,6 @@ class Pump(BlockItem):
         self.h = 40
         self.typeNumber = 1
         self.rndPwr = np.random.randint(0, 1000)
-        self.resStr = "Mfr" + self.displayName + " = " + str(self.rndPwr) + "\n"
 
         self.inputs.append(PortItem("i", 0, self))
         self.outputs.append(PortItem("o", 2, self))
@@ -72,7 +71,8 @@ class Pump(BlockItem):
 
     def exportMassFlows(self):
         equationNr = 1
-        return self.resStr, equationNr
+        massFlowLine = f"Mfr{self.displayName} = {self.rndPwr}\n"
+        return massFlowLine, equationNr
 
     def getInternalPiping(self) -> InternalPiping:
         inputPort = _mfn.PortItem()

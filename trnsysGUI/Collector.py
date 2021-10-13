@@ -93,16 +93,6 @@ class Collector(BlockItem):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
-
     def updateTreePath(self, path):
         """
         When the user chooses the project path for the file explorers, this method is called

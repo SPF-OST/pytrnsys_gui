@@ -7,6 +7,7 @@ import pathlib as _pl
 import pkgutil as _pu
 import shutil
 import sys
+import typing as _tp
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
@@ -31,7 +32,9 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
+import pytrnsys.trnsys_util.deckUtils as _du
 import trnsysGUI as _tgui
+import trnsysGUI.errors as _errs
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
@@ -481,10 +484,10 @@ class Editor(QWidget):
     def cleanUpConnections(self):
         for c in self.connectionList:
             c.niceConn()
-        # if self.connectionList.__len__() > 0:
-        #     self.connectionList[0].clearConn()
 
-    def exportHydraulics(self, exportTo="ddck"):
+    def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
+        assert exportTo in ["ddck", "mfs"]
+
         self.logger.info("------------------------> START OF EXPORT <------------------------")
 
         self.sortTrnsysObj()
@@ -496,14 +499,11 @@ class Editor(QWidget):
         if exportTo == "mfs":
             mfsFileName = self.diagramName.split(".")[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
-            if self._doesFileExistAndDontOverwrite(exportPath):
-                return None
-
         elif exportTo == "ddck":
-            hydraulicsPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
+            exportPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
 
-            if self._doesFileExistAndDontOverwrite(hydraulicsPath):
-                return None
+        if self._doesFileExistAndDontOverwrite(exportPath):
+            return None
 
         self.logger.info("Printing the TRNSYS file...")
 
@@ -537,7 +537,8 @@ class Editor(QWidget):
 
         blackBoxProblem, blackBoxText = exporter.exportBlackBox(exportTo=exportTo)
         if blackBoxProblem:
-            return
+            return None
+
         fullExportText += blackBoxText
         if exportTo == "mfs":
             fullExportText += exporter.exportMassFlows()
@@ -546,7 +547,8 @@ class Editor(QWidget):
 
         fullExportText += exporter.exportParametersFlowSolver(
             simulationUnit, simulationType, descConnLength
-        )  # , parameters, lineNrParameters)
+        )
+
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
@@ -554,14 +556,9 @@ class Editor(QWidget):
         fullExportText += exporter.exportPrintPipeLoops()
         fullExportText += exporter.exportPrintPipeLosses()
 
-        # unitnr should maybe be variable in exportData()
-
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)
 
-        # tes = open(os.path.join(ddckFolder, "Tes\\Tes.ddck"), "r")
-        # fullExportText += tes.read()
-        # tes.close()
         if exportTo == "mfs":
             fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
             fullExportText += "ENDS"
@@ -569,27 +566,32 @@ class Editor(QWidget):
         self.logger.info("------------------------> END OF EXPORT <------------------------")
 
         if exportTo == "mfs":
-            f = open(str(exportPath), "w")
+            f = open(exportPath, "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
         elif exportTo == "ddck":
             if fullExportText[:1] == "\n":
                 fullExportText = fullExportText[1:]
-            hydraulicFolder = os.path.split(hydraulicsPath)[0]
+            hydraulicFolder = os.path.split(exportPath)[0]
             if not (os.path.isdir(hydraulicFolder)):
                 os.makedirs(hydraulicFolder)
-            f = open(str(hydraulicsPath), "w")
+            f = open(exportPath, "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
 
         self.cleanUpExportedElements()
 
-        if exportTo == "mfs":
-            return exportPath
-        elif exportTo == "ddck":
-            return hydraulicsPath
+        try:
+            lines = _du.loadDeck(exportPath, eraseBeginComment=True, eliminateComments=True)
+            _du.checkEquationsAndConstants(lines, exportPath)
+        except Exception as error:
+            errorMessage = f"An error occurred while exporting the system hydraulics: {error}"
+            _errs.showErrorMessageBox(errorMessage)
+            return None
+
+        return exportPath
 
     def _doesFileExistAndDontOverwrite(self, folderPath):
         if not _pl.Path(folderPath).exists():

@@ -186,5 +186,5 @@ class View(QGraphicsView):
 
         """
         command = DeleteBlockCommand(bl, "Delete block command")
-        print("Deleted block")
+        self.logger.debug('Deleting block...')
         self.parent().parent().undoStack.push(command)

@@ -36,9 +36,7 @@ INPUTS 8! for Type 935
 
 EQUATIONS 16	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrTesDpL50-10_A=[450,1]
-
 MfrTesDpL50-10_B=[450,2]
-
 MfrExHx-Side0_A=[450,4]
 MfrExHx-Side0_B=[450,5]
 MfrExHx-Side1_A=[450,7]

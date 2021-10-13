@@ -207,12 +207,15 @@ class ConfigureStorageDialog(QDialog):
         self.show()
 
     def _loadHeatExchangers(self):
-        for h in self.storage.heatExchangers:
-            listItem = self._getHeatExchangerListItemText(h)
-            if h.sSide == 0:
-                self.leftHeatExchangersItemListWidget.addItem(listItem)
-            if h.sSide == 2:
-                self.rightHeatExchangersItemListWidget.addItem(listItem)
+        for heatExchanger in self.storage.heatExchangers:
+            itemText = self._getHeatExchangerListItemText(heatExchanger)
+            item = QListWidgetItem(itemText)
+            item.setData(_qtc.Qt.UserRole, heatExchanger)
+
+            if heatExchanger.sSide == 0:
+                self.leftHeatExchangersItemListWidget.addItem(item)
+            else:
+                self.rightHeatExchangersItemListWidget.addItem(item)
 
     @staticmethod
     def _getHeatExchangerListItemText(h):
@@ -261,28 +264,43 @@ class ConfigureStorageDialog(QDialog):
 
     def addHx(self):
         """
-        Checks whether the inputs are in the correct range [0,100] and in order, and calls the function for creating a
+        Checks whether the inputs are in the correct range (0,100) and in order, and calls the function for creating a
         HeatExchanger on the respective side.
 
         Returns
         -------
         """
+        try:
+            _inputPercentageHeight = float(self.offsetLeI.text())
+        except:
+            self.parent.logger.warning('HX input height is not a number.')
+            return
+
+        try:
+            _outputPercentageHeight = float(self.offsetLeO.text())
+        except:
+            self.parent.logger.warning('HX output height is not a number.')
+            return
+
+
         if (
             self.minOffsetDistance()
-            and float(self.offsetLeI.text()) > float(self.offsetLeO.text())
+            and _inputPercentageHeight > _outputPercentageHeight
             and self.offsetsInRange()
         ):
-            print("Adding hx")
             if self.rButton.isChecked():
-                print("addhxr")
+                self.parent.logger.debug('Adding HX on righthand side.')
                 self._addHxR()
-            if self.lButton.isChecked():
-                print("addhxl")
+            elif self.lButton.isChecked():
+                self.parent.logger.debug('Adding HX on lefthand side.')
                 self._addHxL()
+            else:
+                self.parent.logger.warning('No side selected for heat exchanger.')
+                return
         else:
             msgb = QMessageBox()
             msgb.setText(
-                "At least 20% of difference and larger top port than bottom port needed and valid range [0, 100]"
+                "At least 20% of difference and larger top port than bottom port needed and valid range (0, 100)"
             )
             msgb.exec_()
 
@@ -319,18 +337,41 @@ class ConfigureStorageDialog(QDialog):
             self.rightHeatExchangersItemListWidget.addItem(itemText)
 
     def addPortPair(self):
-        if float(self.manPortLeI.text()) > 100:
-            self.manPortLeI.setText("100")
+        try:
+            _inputPortPercentageHeight = float(self.manPortLeI.text())
+        except:
+            self.parent.logger.warning('Input port height is not a number.')
+            return
 
-        if float(self.manPortLeO.text()) < 0:
-            self.manPortLeO.setText("0")
+        try:
+            _outputPortPercentageHeight = float(self.manPortLeO.text())
+        except:
+            self.parent.logger.warning('Output port height is not a number.')
+            return
+
+        if max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100 or min(_inputPortPercentageHeight,
+                                                                                          _outputPortPercentageHeight) <= 0:
+            messageBox = QMessageBox()
+            messageBox.setText(
+                'Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %).')
+            messageBox.exec_()
+            return
 
         trnsysId = self.parent.idGen.getTrnsysID()
+
+        if self.manlButton.isChecked():
+            _pairSide = _sd.Side.LEFT
+        elif self.manrButton.isChecked():
+            _pairSide = _sd.Side.RIGHT
+        else:
+            self.parent.logger.warning('No side selected for port pair.')
+            return
+
         self.storage.addDirectPortPair(
             trnsysId,
-            self.manlButton.isChecked(),
-            float(self.manPortLeI.text()) / 100,
-            float(self.manPortLeO.text()) / 100,
+            _pairSide,
+            _inputPortPercentageHeight / 100,
+            _outputPortPercentageHeight / 100,
             self.storage.h,
         )
 
