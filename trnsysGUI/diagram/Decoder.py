@@ -221,9 +221,7 @@ class Decoder(json.JSONDecoder):
                     if toPort is None:
                         self.logger.debug("Error: Did not found a toPort")
 
-                    connectionKwargs = self.create_connection_kwargs(i)
-
-                    c = Connection(fromPort, toPort, self.editor, **connectionKwargs)
+                    c = Connection(fromPort, toPort, self.editor)
 
                     c.decode(i)
                     resConnList.append(c)
@@ -238,21 +236,3 @@ class Decoder(json.JSONDecoder):
             return resBlockList, resConnList
 
         return arr
-
-    @staticmethod
-    def create_connection_kwargs(item: tp.Mapping[str, tp.Any]) -> tp.Mapping[str, tp.Any]:
-        connectionKwargs = dict(
-            loadedConn=True,
-            fromPortId=item["PortFromID"],
-            toPortId=item["PortToID"],
-            segmentsLoad=item["SegmentPositions"],
-            cornersLoad=item["CornerPositions"],
-        )
-
-        if "FirstSegmentLabelPos" in item:
-            connectionKwargs["labelPos"] = tuple(item["FirstSegmentLabelPos"])
-
-        if "FirstSegmentMassFlowLabelPos" in item:
-            connectionKwargs["labelMassPos"] = tuple(item["FirstSegmentMassFlowLabelPos"])
-
-        return connectionKwargs

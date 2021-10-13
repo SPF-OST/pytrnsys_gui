@@ -1,10 +1,12 @@
 # pylint: skip-file
 # type: ignore
 
-import typing as _tp
+import dataclasses as _dc
 import math as _math
+import typing as _tp
+import uuid as _uuid
 
-import numpy as np
+import dataclasses_jsonschema as _dcj
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
@@ -18,6 +20,7 @@ from trnsysGUI.PortItem import PortItem
 from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.segmentItem import segmentItem
+import trnsysGUI.serialization as _ser
 
 
 def calcDist(p1, p2):
@@ -27,7 +30,7 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
-    def __init__(self, fromPort: PortItem, toPort: PortItem, parent, **kwargs):
+    def __init__(self, fromPort: PortItem, toPort: PortItem, parent):
         self.logger = parent.logger
 
         self.fromPort = fromPort
@@ -57,32 +60,10 @@ class Connection(object):
         self.endNode = Node()
         self.firstS: _tp.Optional[segmentItem] = None
 
-        self.segmentsLoad = None
-        self.cornersLoad = None
-        self.labelPosLoad = None
-        self.labelMassPosLoad = None
-
         self.mass = 0  # comment out
         self.temperature = 0
 
-        # A new connection is created if there are no kwargs
-        if not kwargs:
-            self.fromPortId = self.parent.idGen.getID()
-            self.toPortId = self.parent.idGen.getID()
-            self.initNew(parent)
-        else:
-            if "loadedConn" in kwargs:
-                self.logger.debug("Connection being loaded")
-                self.fromPortId = kwargs["fromPortId"]
-                self.toPortId = kwargs["toPortId"]
-                self.segmentsLoad = kwargs["segmentsLoad"]
-                self.cornersLoad = kwargs["cornersLoad"]
-
-                if "labelPos" in kwargs:
-                    self.labelPosLoad = kwargs["labelPos"]
-
-                if "labelMassPos" in kwargs:
-                    self.labelMassPosLoad = kwargs["labelMassPos"]
+        self.initNew(parent)
 
     def isVisible(self):
         res = True
@@ -263,42 +244,13 @@ class Connection(object):
             self.initSegmentM0()
         elif self.parent.editorMode == 1:
             self.logger.debug("Creating a new connection in mode 1")
-            self.initSegmentM1()
+            self._initializeSingleSegmentConnection()
         else:
             self.logger.debug("No valid mode during creating of connection")
 
         self.parent.connectionList.append(self)
         self.fromPort.connectionList.append(self)
         self.toPort.connectionList.append(self)
-
-        # self.correctPorts()
-
-    def initLoad(self):
-        # Called by DiagramEditor when loading connection
-
-        self.logger.debug("Port 1 is " + str(self.fromPort) + "has Id" + str(self.fromPort.id))
-        self.logger.debug("Port 2 is " + str(self.toPort))
-
-        # self.parent = loadParent
-        self.initSegmentM1()
-
-        self.parent.trnsysObj.append(self)
-
-        self.parent.connectionList.append(self)
-        self.fromPort.connectionList.append(self)
-        self.toPort.connectionList.append(self)
-
-        if len(self.cornersLoad) > 0:
-            self.loadSegments()
-
-        if self.labelPosLoad:
-            self.setLabelPos(self.labelPosLoad)
-
-        if self.labelMassPosLoad:
-            self.setMassLabelPos(self.labelMassPosLoad)
-
-        # Still not tested
-        # self.correctPorts()
 
     def initSegmentM0(self):
         self.startNode.setParent(self)
@@ -315,7 +267,7 @@ class Connection(object):
 
         self.positionLabel()
 
-    def initSegmentM1(self):
+    def _initializeSingleSegmentConnection(self):
         # Can be rewritten for efficiency etc. (e.g not doing initSegmentM0 and calling niceConn())
 
         self.startNode.setParent(self)
@@ -334,24 +286,17 @@ class Connection(object):
 
         self.positionLabel()
 
-    def loadSegments(self):
+    def loadSegments(self, segmentsCorners):
         self.clearConn()
-
-        self.logger.debug("cornerLoads is " + str(self.cornersLoad))
 
         tempNode = self.startNode
 
-        self.logger.debug("start node has nn " + str(tempNode.nextNode))
-        self.logger.debug(" ")
         rad = 2
 
-        for x in range(len(self.cornersLoad)):
+        for x in range(len(segmentsCorners)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
-            # self.logger.debug("items are now " + str(self.parent.diagramScene.items()))
-            self.logger.debug("Corner" + str(cor) + " has  " + str(cor.node))
 
-            cor.setPos(float(self.cornersLoad[x][0]), float(self.cornersLoad[x][1]))
-            # cor.setFlags(cor.ItemIsSelectable | cor.ItemIsMovable)
+            cor.setPos(float(segmentsCorners[x][0]), float(segmentsCorners[x][1]))
             cor.setFlag(cor.ItemSendsScenePositionChanges, True)
 
             cor.setZValue(100)
@@ -417,47 +362,12 @@ class Connection(object):
             s.label.setPlainText(self.displayName)
 
     def positionLabel(self):
+        self.firstS.label.setPos(self.getStartPoint())
+        self.rotateLabel()
 
-        if self.parent.editorMode == 0:
-            vec1 = self.firstS.line().p2() - self.firstS.line().p1()
-            vec2 = QPointF(1 / 10 * vec1.x(), 1 / 10 * vec1.y())
-
-            eps = 0.5
-            if vec1.x() == 0:
-                angleBetween = _math.atan(vec1.y() / eps)
-            else:
-                angleBetween = _math.atan(vec1.y() / vec1.x())
-
-            d1 = calcDist(QPointF(0, 0), vec1)
-
-            if d1 == 0:
-                d1 = eps
-
-            vec3 = QPointF(-5 * angleBetween * vec1.y() / d1, 5 * angleBetween * vec1.x() / d1)
-            self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
-
-        elif self.parent.editorMode == 1:
-            # self.logger.debug("changing label pos in editor mode 1")
-            if self.fromPort.side == 0:
-                self.firstS.label.setPos(QPointF(-60, 0))
-
-            # Here the behavior of positioning can be improved
-            elif self.fromPort.side in [1, 2, 3]:
-                self.firstS.label.setPos(QPointF(20, 0))
-        else:
-            pass
-        if self.segmentsLoad:
-            vec1 = np.array(self.segmentsLoad[0][:2])
-            vec2 = np.array(self.segmentsLoad[0][2:])
-            vec = vec2 - vec1
-            # uVec1 = vec1/np.linalg.norm(vec1)
-            # uVec2 = vec2/np.linalg.norm(vec2)
-            uVec = vec / np.linalg.norm(vec)
-            dotProduct = np.dot(np.array([1.0, 0]), uVec)
-            angle = np.rad2deg(np.arccos(dotProduct))
-            if np.isnan(angle):
-                angle = 0
-            self.firstS.label.setRotation(-angle)
+    def rotateLabel(self):
+        angle = 0 if self.firstS.isHorizontal() else 90
+        self.firstS.label.setRotation(angle)
 
     def setMassFlowLabelVisible(self, isVisible: bool) -> None:
         self.firstS.setMassFlowLabelVisible(isVisible)
@@ -693,7 +603,6 @@ class Connection(object):
                 corner2.setZValue(100)
                 self.fromPort.setZValue(100)
                 self.toPort.setZValue(100)
-                self.logger.debug("Here in niceconn")
 
                 corner1.setPos(help_point_1)
                 corner2.setPos(help_point_2)
@@ -886,8 +795,8 @@ class Connection(object):
                             s.startNode.setNext(node1)
                             s.endNode.setPrev(node2)
 
-                            s.firstChild = segmentItem(s.startNode, node1, s.parent)
-                            s.secondChild = segmentItem(node2, s.endNode, s.parent)
+                            s.firstChild = segmentItem(s.startNode, node1, s.connection)
+                            s.secondChild = segmentItem(node2, s.endNode, s.connection)
 
                             s.hasBridge = True
                             c.hasBridge = True
@@ -1240,54 +1149,53 @@ class Connection(object):
     def encode(self):
         self.logger.debug("Encoding a connection")
 
-        dct = {}
-        dct[".__ConnectionDict__"] = True
-        dct["PortFromID"] = self.fromPort.id
-        dct["PortToID"] = self.toPort.id
-        dct["ConnDisplayName"] = self.displayName
-        dct["ConnID"] = self.id
-        dct["ConnCID"] = self.connId
-        dct["trnsysID"] = self.trnsysId
-        dct["GroupName"] = self.groupName
-
-        segments = []  # Not used, but instead corners[]
-
-        for s in self.segments:
-            segmentTupel = (s.line().p1().x(), s.line().p1().y(), s.line().p2().x(), s.line().p2().y())
-            segments.append(segmentTupel)
-        # self.logger.debug("Segments in encoder is " + str(segments))
-        dct["SegmentPositions"] = segments
         if len(self.segments) > 0:
-            dct["FirstSegmentLabelPos"] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-            dct["FirstSegmentMassFlowLabelPos"] = (
-                self.segments[0].labelMass.pos().x(),
-                self.segments[0].labelMass.pos().y(),
-            )
+            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
         else:
             self.logger.debug("This connection has no segment")
-            defaultPosition = self.fromPort.pos().x(), self.fromPort.pos().y()
-            dct["FirstSegmentLabelPos"] = defaultPosition
-            dct["FirstSegmentMassFlowLabelPos"] = defaultPosition
+            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()
+            labelPos = defaultPos
+            labelMassPos = defaultPos
 
         corners = []
-
         for s in self.getCorners():
             cornerTupel = (s.pos().x(), s.pos().y())
             corners.append(cornerTupel)
-        dct["CornerPositions"] = corners
-        dictName = "Connection-"
 
-        return dictName, dct
+        connectionModel = ConnectionModel(
+            self.connId,
+            self.displayName,
+            self.id,
+            corners,
+            labelPos,
+            labelMassPos,
+            self.groupName,
+            self.fromPort.id,
+            self.toPort.id,
+            self.trnsysId,
+        )
+
+        dictName = "Connection-"
+        return dictName, connectionModel.to_dict()
 
     def decode(self, i):
         self.logger.debug("Loading a connection in Decoder")
 
-        self.id = i["ConnID"]
-        self.connId = i["ConnCID"]
-        self.trnsysId = i["trnsysID"]
-        self.setName(i["ConnDisplayName"])
+        model = ConnectionModel.from_dict(i)
+
+        self.id = model.id
+        self.connId = model.connectionId
+        self.trnsysId = model.trnsysId
+        self.setName(model.name)
         self.groupName = "defaultGroup"
-        self.setConnToGroup(i["GroupName"])
+        self.setConnToGroup(model.groupName)
+
+        if len(model.segmentsCorners) > 0:
+            self.loadSegments(model.segmentsCorners)
+
+        self.setLabelPos(model.labelPos)
+        self.setMassLabelPos(model.massFlowLabelPos)
 
     # Export related
     def exportBlackBox(self):
@@ -1509,3 +1417,86 @@ class DeleteConnectionCommand(QUndoCommand):
 
     def undo(self):
         self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)
+
+@_dc.dataclass
+class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
+    ConnCID: int
+    ConnDisplayName: str
+    ConnID: int
+    CornerPositions: _tp.List[_tp.Tuple[float, float]]
+    FirstSegmentLabelPos: _tp.Tuple[float, float]
+    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]
+    GroupName: str
+    PortFromID: int
+    PortToID: int
+    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
+    trnsysID: int
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
+
+@_dc.dataclass
+class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
+
+    connectionId: int
+    name: str
+    id: int
+    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
+    labelPos: _tp.Tuple[float, float]
+    massFlowLabelPos: _tp.Tuple[float, float]
+    groupName: str
+    fromPortId: int
+    toPortId: int
+    trnsysId: int
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "ConnectionModel":
+        data.pop(".__ConnectionDict__")
+        connectionModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(ConnectionModel, connectionModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__ConnectionDict__"] = True
+        return data
+
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return ConnectionModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
+        firstSegmentLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0], \
+                               superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1]
+        firstSegmentMassFlowLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0], \
+                                       superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1]
+
+        return ConnectionModel(
+            superseded.ConnCID,
+            superseded.ConnDisplayName,
+            superseded.ConnID,
+            superseded.CornerPositions,
+            firstSegmentLabelPos,
+            firstSegmentMassFlowLabelPos,
+            superseded.GroupName,
+            superseded.PortFromID,
+            superseded.PortToID,
+            superseded.trnsysID,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+
