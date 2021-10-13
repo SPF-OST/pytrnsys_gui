@@ -87,9 +87,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
                 if "labelMassPos" in kwargs:
                     self.labelMassPosLoad = kwargs["labelMassPos"]
 
-    def getTrnsysId(self) -> int:
-        return self.trnsysId
-
     def isVisible(self):
         res = True
         for s in self.segments:

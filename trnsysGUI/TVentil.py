@@ -30,9 +30,6 @@ class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
 
         self.changeSize()
 
-    def getTrnsysId(self) -> int:
-        return self.trnsysId
-
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.T_VENTIL_SVG
 

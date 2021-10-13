@@ -20,9 +20,6 @@ class MassFlowNetworkContributorMixin:
     def getInternalPiping(self) -> InternalPiping:
         raise NotImplementedError()
 
-    def getTrnsysId(self) -> int:
-        raise NotImplementedError()
-
     def exportParametersFlowSolver(self, descConnLength):
         openLoops, allNodesToIndices = self._getOpenLoopsAndNodeToIndices()
 
