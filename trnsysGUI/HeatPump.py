@@ -182,7 +182,7 @@ class HeatPump(BlockItem):
     def getInternalPiping(self) -> InternalPiping:
         heatPumpInput = _mfn.PortItem()
         heatPumpOutput = _mfn.PortItem()
-        heatPumpPipe = _mfn.Pipe(f"{self.displayName}HeatPump", self.childIds[0], heatPumpInput, heatPumpOutput)
+        heatPumpPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], heatPumpInput, heatPumpOutput)
 
         evaporatorInput = _mfn.PortItem()
         evaporatorOutput = _mfn.PortItem()

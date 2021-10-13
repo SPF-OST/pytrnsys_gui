@@ -48,7 +48,7 @@ PARAMETERS 393
 70 71 0 0      !12 : HxDHWSide1
 75 73 0 0      !13 : HxDHWSide2
 69 23 0 1      !14 : PuAuxEvap
-23 69 0 0      !15 : HPHeatPump
+23 69 0 0      !15 : HPCond
 21 17 0 0      !16 : HPEvap
 8 16 0 0       !17 : PiHpCondIn
 20 94 19 2     !18 : TeeCircOut
@@ -188,8 +188,8 @@ MfrHxDHWSide2_A=[450,37]
 MfrHxDHWSide2_B=[450,38]
 MfrPuAuxEvap_A=[450,40]
 MfrPuAuxEvap_B=[450,41]
-MfrHPHeatPump_A=[450,43]
-MfrHPHeatPump_B=[450,44]
+MfrHPCond_A=[450,43]
+MfrHPCond_B=[450,44]
 MfrHPEvap_A=[450,46]
 MfrHPEvap_B=[450,47]
 MfrPiHpCondIn_A=[450,49]
