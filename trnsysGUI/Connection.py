@@ -4,7 +4,8 @@
 from __future__ import annotations
 
 import dataclasses as _dc
-import math as _mathimport typing as _tp
+import math as _math
+import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj

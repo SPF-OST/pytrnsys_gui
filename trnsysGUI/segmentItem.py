@@ -266,8 +266,6 @@ class segmentItem(QGraphicsLineItem):
                     self.dragInMode0(newPos)
 
             elif self.connection.parent.editorMode == 1:
-                # if self.parent.segments[0].isVertical() == False and self.parent.segments[2].isVertical() == False:
-                # self.logger.debug(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                     if not self.startNode.parent.isVisible():
                         self.startNode.parent.setVisible(True)
@@ -303,10 +301,6 @@ class segmentItem(QGraphicsLineItem):
                         self._dragInMode1(True, newPos)
             else:
                 self.logger.debug("Unrecognized editorMode in segmentItem mouseMoveEvent")
-
-    def mouseDoubleClickEvent(self, event):
-        # self.parent.deleteConn()
-        return
 
     def deleteNextHorizSeg(self, b, nextS):
         if b:
@@ -401,7 +395,6 @@ class segmentItem(QGraphicsLineItem):
                     self.connection.parent.diagramScene.removeItem(self)
 
             elif self.connection.parent.editorMode == 1:
-                # if self.parent.segments[0].isVertical() == False and self.parent.segments[2].isVertical() == False:
                 if self.isVertical():
                     try:
                         self.oldX
@@ -420,9 +413,6 @@ class segmentItem(QGraphicsLineItem):
                         except IndexError:
                             self.logger.debug("no next or prev segments")
                         else:
-                            # if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
-                            #         self.endNode.parent.pos().y()): # TODO : Edit here to combine segment
-                            # self.logger.debug("Next h seg could be deleted")
                             if nextHorizSeg.isHorizontal() and int(self.endNode.parent.pos().y() - 10) <= int(
                                 nextHorizSeg.line().p2().y()
                             ) <= int(self.endNode.parent.pos().y() + 10):
@@ -433,7 +423,6 @@ class segmentItem(QGraphicsLineItem):
                             if prevHorizSeg.isHorizontal() and int(self.startNode.parent.pos().y() - 10) <= int(
                                 prevHorizSeg.line().p2().y()
                             ) <= int(self.startNode.parent.pos().y() + 10):
-                                # self.logger.debug("Prev h seg could be deleted")
                                 self.deletePrevHorizSeg(False, prevHorizSeg)
                                 self.logger.debug("previous horizontal")
                                 return
@@ -442,9 +431,6 @@ class segmentItem(QGraphicsLineItem):
                     self.logger.debug("Second corner is not none")
                     # if PortItem
                     if hasattr(self.endNode.parent, "fromPort"):
-                        # self.hide()
-                        # self.parent.segments.remove(self)
-                        # self.parent.parent.diagramScene.removeItem(self)
 
                         segbef = self.connection.segments[self.connection.getNodePos(self.secondCorner.node.prevN().parent)]
 
@@ -752,7 +738,7 @@ class segmentItem(QGraphicsLineItem):
         a3.triggered.connect(self.connection.invertConnection)
 
         editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
-        editHydraulicLoopAction.triggered.connect(self.parent.editHydraulicLoop)
+        editHydraulicLoopAction.triggered.connect(self.connection.editHydraulicLoop)
 
         a4 = menu.addAction("Toggle name")
         a4.triggered.connect(self.connection.toggleLabelVisible)
