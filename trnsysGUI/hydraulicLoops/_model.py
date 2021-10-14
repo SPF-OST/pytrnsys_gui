@@ -34,13 +34,13 @@ class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
 class PredefinedFluids:
     # If you add fluids here, don't forget to add them to `getAllFluids` below!
     WATER = Fluid("water", specificHeatCapacityInJPerKgK=418.45, densityInKgPerM3=997)
-    GLYCOL = Fluid("glycol", specificHeatCapacityInJPerKgK=2360, densityInKgPerM3=1113.2)
+    BRINE = Fluid("brine", specificHeatCapacityInJPerKgK=2360, densityInKgPerM3=1113.2)
 
     @classmethod
     def getAllFluids(cls) -> _tp.Sequence[Fluid]:
         return [
             cls.WATER,
-            cls.GLYCOL
+            cls.BRINE
         ]
 
 
