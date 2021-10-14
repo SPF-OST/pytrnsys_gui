@@ -581,8 +581,6 @@ class Editor(QWidget):
             f.write(fullExportText)
             f.close()
 
-        self.cleanUpExportedElements()
-
         try:
             lines = _du.loadDeck(exportPath, eraseBeginComment=True, eliminateComments=True)
             _du.checkEquationsAndConstants(lines, exportPath)
@@ -665,26 +663,7 @@ class Editor(QWidget):
         f.write(fullExportText)
         f.close()
 
-        self.cleanUpExportedElements()
-
         return hydCtrlPath
-
-    def cleanUpExportedElements(self):
-        for t in self.trnsysObj:
-            # if isinstance(t, BlockItem):
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            #
-            # if type(t) is Connection:
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            t.cleanUpAfterTrnsysExport()
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)
@@ -790,7 +769,6 @@ class Editor(QWidget):
         -------
 
         """
-
         self.logger.info("Decoding " + filename)
         with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
@@ -818,21 +796,6 @@ class Editor(QWidget):
                     self.logger.debug("Loading a Storage")
                     k.setParent(self.diagramView)
                     k.updateImage()
-
-                if isinstance(k, Connection):
-                    if k.toPort == None or k.fromPort == None:
-                        continue
-                    # name = k.displayName
-                    # testFrom = k.fromPort
-                    # testTo = k.toPort
-                    self.logger.debug("Almost done with loading a connection")
-                    # print("Connection displ name " + str(k.displayName))
-                    # print("Connection fromPort" + str(k.fromPort))
-                    # print("Connection toPort" + str(k.toPort))
-                    # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
-                    k.initLoad()
-                    a = 1
-                    # k.setConnToGroup("defaultGroup")
 
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)

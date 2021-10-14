@@ -25,6 +25,8 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install wheel
         pip install -r requirements/ci/test/requirements.txt
+    - name: Generate UI code from Qt Creator Studio .ui files
+      run: python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
     - name: Static type checking with mypy
       run: python dev-tools/runStaticChecksAndUnitTests.py --type
     - name: Lint with pylint

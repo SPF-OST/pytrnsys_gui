@@ -1,24 +1,25 @@
+import dataclasses as _dc
 import os as _os
 import random as _rnd
 import shutil as _sh
 import typing as _tp
-import dataclasses as _dc
 
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
-from trnsysGUI import idGenerator as _id
+import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 import trnsysGUI.storageTank.model as _model
 import trnsysGUI.storageTank.side as _sd
+from massFlowSolver import InternalPiping
+from trnsysGUI import idGenerator as _id
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog  # type: ignore[attr-defined]
-from trnsysGUI.Connection import Connection  # type: ignore[attr-defined]
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.PortItem import PortItem  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
+from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog  # type: ignore[attr-defined]
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
 
 InOut = _tp.Literal["In", "Out"]
@@ -442,48 +443,49 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         self.logger.warning("No file at " + ddcxPath)
         return "noDdckFile", equations
 
-    def exportParametersFlowSolver(self, descConnLength):
-        # The order is important here (has to be the same as in `exportOutputsFlowSolver`):
-        # first the direct port pairs, then the heat exchangers
-        directPortPairsLines = self._getFlowSolverParametersLinesForDirectPortPairs(self.directPortPairs, descConnLength)
+    def getInternalPiping(self) -> InternalPiping:
+        heatExchangerNodes, heatExchangerPortItems = self._createHeatExchangerNodes()
 
-        heatExchangers = self.heatExchangers
-        heatExchangersLines = self._getFlowSolverParametersLinesForHeatExchangers(heatExchangers, descConnLength)
+        portPairNodes, portPairsPortItems = self._createPortPairNodes()
 
-        allLines = directPortPairsLines + heatExchangersLines
+        nodes = [*heatExchangerNodes, *portPairNodes]
+        modelPortItemsToGraphicalPortItem = heatExchangerPortItems | portPairsPortItems
 
-        result = "\n".join(allLines) + "\n"
+        return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
-        return result
+    def _createHeatExchangerNodes(self):
+        heatExchangerPortItems = {}
+        heatExchangerNodes = []
+        for heatExchanger in self.heatExchangers:
+            heatExchangerPortItem1 = _mfn.PortItem()
+            heatExchangerPortItems[heatExchangerPortItem1] = heatExchanger.port1
 
-    def _getFlowSolverParametersLinesForHeatExchangers(self, heatExchangers, descConnLength):
-        lines = []
-        for heatExchanger in heatExchangers:
-            incomingConnection: Connection = heatExchanger.port1.connectionList[0]
-            outgoingConnection: Connection = heatExchanger.port2.connectionList[0]
+            heatExchangerPortItem2 = _mfn.PortItem()
+            heatExchangerPortItems[heatExchangerPortItem2] = heatExchanger.port2
 
             name = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
 
-            line = self._createFlowSolverParametersLine(
-                name, heatExchanger.trnsysId, incomingConnection, outgoingConnection, descConnLength
-            )
+            node = _mfn.Pipe(name, heatExchanger.trnsysId, heatExchangerPortItem1, heatExchangerPortItem2)
+            heatExchangerNodes.append(node)
 
-            lines.append(line)
-        return lines
+        return heatExchangerNodes, heatExchangerPortItems
 
-    def _getFlowSolverParametersLinesForDirectPortPairs(self, directPortPairs, descConnLength):
-        lines = []
-        for directPortPair in directPortPairs:
-            incomingConnection: Connection = directPortPair.fromPort.connectionList[0]
-            outgoingConnection: Connection = directPortPair.toPort.connectionList[0]
+    def _createPortPairNodes(self):
+        portPairsPortItems = {}
+        portPairNodes = []
+        for directPortPair in self.directPortPairs:
+            portPairPortItem1 = _mfn.PortItem()
+            portPairsPortItems[portPairPortItem1] = directPortPair.fromPort
 
-            name = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
+            portPairPortItem2 = _mfn.PortItem()
+            portPairsPortItems[portPairPortItem2] = directPortPair.toPort
 
-            line = self._createFlowSolverParametersLine(
-                name, directPortPair.trnsysId, incomingConnection, outgoingConnection, descConnLength
-            )
-            lines.append(line)
-        return lines
+            portPairName = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
+
+            node = _mfn.Pipe(portPairName, directPortPair.trnsysId, portPairPortItem1, portPairPortItem2)
+            portPairNodes.append(node)
+
+        return portPairNodes, portPairsPortItems
 
     def _getMassFlowVariableSuffixForDirectPortPair(self, directPortPair: DirectPortPair):
         return (
@@ -494,90 +496,6 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
     @staticmethod
     def _getMassFlowVariableSuffixForHeatExchanger(heatExchanger):
         return heatExchanger.displayName
-
-    @staticmethod
-    def _createFlowSolverParametersLine(
-        name: str, trnsysId: int, incomingConnection: Connection, outgoingConnection: Connection, parametersPartLength
-    ) -> str:
-        parametersPart = f"{incomingConnection.trnsysId} {outgoingConnection.trnsysId} 0 0"
-
-        currentParametersPart = len(parametersPart)
-        if currentParametersPart < parametersPartLength:
-            padding = " " * (parametersPartLength - currentParametersPart)
-            parametersPart += padding
-
-        line = f"{parametersPart}!{trnsysId} : {name}"
-
-        return line
-
-    def exportInputsFlowSolver1(self):
-        return self._getInputs("0,0")
-
-    def exportInputsFlowSolver2(self):
-        return self._getInputs("-1")
-
-    def _getInputs(self, inputsValue):
-        heatExchangerInputs = [inputsValue for _ in self.heatExchangers]
-        directPortPairInputs = [inputsValue for _ in self.directPortPairs]
-        allInputs = heatExchangerInputs + directPortPairInputs
-        allInputsJoined = " ".join(allInputs) + " "
-        return allInputsJoined, len(allInputs)
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        nextEquationNumber = equationNumber
-
-        # The order is important here (has to be the same as in `exportParametersFlowSolver`):
-        # first the direct port pairs, then the heat exchangers
-        directPortPairsEquations, nextEquationNumber = self._getFlowSolverOutputEquationsForDirectPortPairs(
-            abc, self.directPortPairs, nextEquationNumber, prefix, simulationUnit
-        )
-        heatExchangersEquations, nextEquationNumber = self._getFlowSolverOutputEquationsForHeatExchangers(
-            abc, self.heatExchangers, nextEquationNumber, prefix, simulationUnit
-        )
-
-        allEquations = directPortPairsEquations + heatExchangersEquations
-        self.exportEquations.extend(allEquations)
-
-        equationsJoined = "".join(allEquations)
-        nEquationsUsed = len(allEquations)
-
-        return equationsJoined, nextEquationNumber, nEquationsUsed
-
-    def _getFlowSolverOutputEquationsForHeatExchangers(
-        self, abc, heatExchangers, nextEquationNumber, prefix, simulationUnit
-    ):
-        heatExchangerLines = []
-        for heatExchanger in heatExchangers:
-            suffix = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
-
-            equation1 = self._createFlowSolverOutputEquation(suffix, abc[0], prefix, nextEquationNumber, simulationUnit)
-            equation2 = self._createFlowSolverOutputEquation(
-                suffix, abc[1], prefix, nextEquationNumber + 1, simulationUnit
-            )
-            heatExchangerLines.append(equation1)
-            heatExchangerLines.append(equation2)
-            nextEquationNumber += 3
-        return heatExchangerLines, nextEquationNumber
-
-    def _getFlowSolverOutputEquationsForDirectPortPairs(
-        self, abc, directPortPairs, nextEquationNumber, prefix, simulationUnit
-    ):
-        equations = []
-        for directPortPair in directPortPairs:
-            suffix = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
-
-            equation1 = self._createFlowSolverOutputEquation(suffix, abc[0], prefix, nextEquationNumber, simulationUnit)
-            equation2 = self._createFlowSolverOutputEquation(
-                suffix, abc[1], prefix, nextEquationNumber + 1, simulationUnit
-            )
-            equations.append(equation1)
-            equations.append(equation2)
-            nextEquationNumber += 3
-        return equations, nextEquationNumber
-
-    @staticmethod
-    def _createFlowSolverOutputEquation(name, alphabeticPortIndex, prefix, equationNumber, simulationUnit):
-        return f"{prefix}{name}_{alphabeticPortIndex}=[{simulationUnit},{equationNumber}]\n"
 
     def exportDck(self):  # pylint: disable=too-many-locals,too-many-statements
 
