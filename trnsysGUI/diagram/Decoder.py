@@ -212,9 +212,9 @@ class Decoder(json.JSONDecoder):
                     # Looking for the ports the connection is connected to
                     for connBl in resBlockList:
                         for p in connBl.inputs + connBl.outputs:
-                            if p.id == i["PortFromID"]:
+                            if p.id == i["fromPortId"]:
                                 fromPort = p
-                            if p.id == i["PortToID"]:
+                            if p.id == i["toPortId"]:
                                 toPort = p
 
                     if fromPort is None:
