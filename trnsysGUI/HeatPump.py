@@ -77,8 +77,6 @@ class HeatPump(BlockItem):
         if self.isVisible():
             self.logger.debug("Encoding a HeatPump")
 
-            # childIdList = []
-
             portListInputs = []
             portListOutputs = []
 
@@ -180,21 +178,21 @@ class HeatPump(BlockItem):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        heatPumpInput = _mfn.PortItem()
-        heatPumpOutput = _mfn.PortItem()
-        heatPumpPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], heatPumpInput, heatPumpOutput)
+        condenserInput = _mfn.PortItem()
+        condenserOutput = _mfn.PortItem()
+        condenserPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], condenserInput, condenserOutput)
 
         evaporatorInput = _mfn.PortItem()
         evaporatorOutput = _mfn.PortItem()
         evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[1], evaporatorInput, evaporatorOutput)
 
         modelPortItemsToGraphicalPortItem = {
-            heatPumpInput: self.inputs[0],
-            heatPumpOutput: self.outputs[0],
+            condenserInput: self.inputs[0],
+            condenserOutput: self.outputs[0],
             evaporatorInput: self.inputs[1],
             evaporatorOutput: self.outputs[1],
         }
-        nodes = [heatPumpPipe, evaporatorPipe]
+        nodes = [condenserPipe, evaporatorPipe]
 
         return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
@@ -216,12 +214,7 @@ class HeatPump(BlockItem):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, "ddck")
@@ -242,16 +235,6 @@ class HeatPump(BlockItem):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
-
     def updateTreePath(self, path):
         """
         When the user chooses the project path for the file explorers, this method is called
@@ -271,10 +254,8 @@ class HeatPump(BlockItem):
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
@@ -296,7 +277,6 @@ class HeatPump(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\HP_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
