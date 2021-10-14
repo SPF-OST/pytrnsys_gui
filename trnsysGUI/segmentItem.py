@@ -131,7 +131,17 @@ class segmentItem(QGraphicsLineItem):
         # color = QColor(3, 124, 193)
         color = QtCore.Qt.red
 
-        pen1 = QtGui.QPen(color, 4)
+        pen1 = QtGui.QPen(color, 10)
+
+        # Try to see if every single segment is called here
+        if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
+            self.logger.debug("this is the middle segment " + str(self.parent.displayName))
+        elif type(self.startNode.parent) is not CornerItem and type(self.endNode.parent) is CornerItem:
+            self.logger.debug("this is the start segment " + str(self.parent.displayName))
+        elif type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is not CornerItem:
+            self.logger.debug("this is the end segment " + str(self.parent.displayName))
+        else:
+            self.logger.debug("this is the strange segment " + str(self.parent.displayName))
 
         # TODO: Dont forget that disr segments can also have parent type not CornerItem
         if type(self.startNode.parent) is CornerItem:
@@ -144,16 +154,76 @@ class segmentItem(QGraphicsLineItem):
         else:
             x2 = self.endNode.parent
 
+
+
         # At init
-        self.linearGrad = QLinearGradient(
-            QPointF(x1.fromPort.scenePos().x(), x1.fromPort.scenePos().y()),
-            QPointF(x2.toPort.scenePos().x(), x2.toPort.scenePos().y()),
-        )
+        i = self.parent.segments.index(self)
+        if len(self.parent.cornersLoad) >= 2:
+            if i == 0:
+                if x1.fromPort.scenePos().x() != self.parent.cornersLoad[0][0]:
+                    self.linearGrad = QLinearGradient(
+                        QPointF(self.parent.cornersLoad[0][0], self.parent.cornersLoad[0][1] - 5),
+                        QPointF(self.parent.cornersLoad[0][0], self.parent.cornersLoad[0][1] + 5))
+                else:
+                    self.linearGrad = QLinearGradient(
+                        QPointF(self.parent.cornersLoad[0][0] - 5, self.parent.cornersLoad[0][1]),
+                        QPointF(self.parent.cornersLoad[0][0] + 5, self.parent.cornersLoad[0][1]))
+            if i == 1:
+                if self.parent.cornersLoad[0][0] != self.parent.cornersLoad[1][0]:
+                    self.linearGrad = QLinearGradient(
+                        QPointF(self.parent.cornersLoad[0][0], self.parent.cornersLoad[0][1] - 5),
+                        QPointF(self.parent.cornersLoad[0][0], self.parent.cornersLoad[0][1] + 5))
+                else:
+                    self.linearGrad = QLinearGradient(
+                        QPointF(self.parent.cornersLoad[0][0] - 5, self.parent.cornersLoad[0][1]),
+                        QPointF(self.parent.cornersLoad[0][0] + 5, self.parent.cornersLoad[0][1]))
+            if i >= 2:
+                if self.parent.cornersLoad[1][0] != x2.toPort.scenePos().x():
+                    self.linearGrad = QLinearGradient(
+                        QPointF(self.parent.cornersLoad[1][0], self.parent.cornersLoad[1][1] - 5),
+                        QPointF(self.parent.cornersLoad[1][0], self.parent.cornersLoad[1][1] + 5))
+                else:
+                    self.linearGrad = QLinearGradient(
+                        QPointF(self.parent.cornersLoad[1][0] - 5, self.parent.cornersLoad[1][1]),
+                        QPointF(self.parent.cornersLoad[1][0] + 5, self.parent.cornersLoad[1][1]))
+        elif len(self.parent.cornersLoad) == 1:
+            if x1.fromPort.scenePos().x() != x2.toPort.scenePos().x():
+                self.linearGrad = QLinearGradient(
+                    QPointF(self.parent.cornersLoad[0][0], self.parent.cornersLoad[0][1] - 5),
+                    QPointF(self.parent.cornersLoad[0][0], self.parent.cornersLoad[0][1] + 5))
+            else:
+                self.linearGrad = QLinearGradient(
+                    QPointF(self.parent.cornersLoad[0][0] - 5, self.parent.cornersLoad[0][1]),
+                    QPointF(self.parent.cornersLoad[0][0] + 5, self.parent.cornersLoad[0][1]))
+        else:
+            self.linearGrad = QLinearGradient(
+                QPointF(x1.fromPort.scenePos().x(), x1.fromPort.scenePos().y() - 5),
+                QPointF(x1.fromPort.scenePos().x(), x1.fromPort.scenePos().y() + 5))
+
+        self.logger.debug("get cornerslist " + str(self.parent.cornersLoad) + str(self.parent.cornersLoad[0][0]))
+        # self.logger.debug("linepoint start" + str(self.startNode.parent.pos))
+        self.logger.debug("x1 fromport point " + str(x1.fromPort.scenePos().x()))
+        self.logger.debug("x2 fromport point " + str(x2.fromPort.scenePos().x()))
+        self.logger.debug("x2 toport point " + str(x2.toPort.scenePos().x()))
+        self.logger.debug("second line " + str(self.secondCorner))
+        self.logger.debug("this is the segment index: %s", self.parent.segments.index(self))
+        self.logger.debug("fromport side: %s", self.parent.fromPort.side)
+        self.logger.debug("toport side: %s", self.parent.toPort.side)
+
+        self.logger.debug("name of connection " + str(self.parent.displayName))
+        # self.logger.debug("linepoint end" + str(self.line().p2().x()))
+
+        # self.logger.debug("line position" + str(self.line().p2().x()) + str(self.line().p1().x()))
+
         self.linearGrad.setColorAt(0, QtCore.Qt.blue)
         self.linearGrad.setColorAt(1, QtCore.Qt.red)
 
-        self.linearGrad.setColorAt(0, QtCore.Qt.gray)
-        self.linearGrad.setColorAt(1, QtCore.Qt.black)
+        self.linearGrad.setColorAt(0, QtCore.Qt.red)
+        self.linearGrad.setColorAt(0.4, QtCore.Qt.red)
+        self.linearGrad.setColorAt(0.4001, QtCore.Qt.white)
+        self.linearGrad.setColorAt(0.5999, QtCore.Qt.white)
+        self.linearGrad.setColorAt(0.6, QtCore.Qt.blue)
+        self.linearGrad.setColorAt(1, QtCore.Qt.blue)
 
         # self.setPen(QtGui.QPen(color, 2))
 
@@ -170,7 +240,7 @@ class segmentItem(QGraphicsLineItem):
         """
         # This color is overwritten by the gradient
         color = QtCore.Qt.red
-        pen1 = QtGui.QPen(color, 4)
+        pen1 = QtGui.QPen(color, 10)
 
         totLenConn = self.parent.totalLength()
         partLen1 = self.parent.partialLength(self.startNode)
@@ -186,27 +256,31 @@ class segmentItem(QGraphicsLineItem):
             # self.logger.debug("In updategrad, startnode parent is corner")
             # self.logger.debug("I have a corner parent, self is " + str(self))
 
-            startGradP = QPointF(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y())
+            startGradP = QPointF(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y()-5)
         elif self.startNode.prevN() is None:
             startGradP = QPointF(
                 self.startNode.parent.fromPort.scenePos().x(), self.startNode.parent.fromPort.scenePos().y()
-            )
+            -5)
         else:
             startGradP = QPointF(self.line().p1().x(), self.line().p1().y())
 
         if type(self.endNode.parent) is CornerItem:
             # self.logger.debug("In update grad, endnode parent is corner")
             # self.logger.debug("I have a corner parent, self is " + str(self))
-            endGradP = QPointF(self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
+            endGradP = QPointF(self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y()+5)
         elif self.endNode.nextN() is None:
-            endGradP = QPointF(self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
+            endGradP = QPointF(self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y()+5)
         else:
             endGradP = QPointF(self.line().p2().x(), self.line().p2().y())
 
         self.linearGrad = QLinearGradient(startGradP, endGradP)
 
-        self.linearGrad.setColorAt(0, self.interpolate(partLen1, totLenConn))
-        self.linearGrad.setColorAt(1, self.interpolate(partLen2, totLenConn))
+        self.linearGrad.setColorAt(0, QtCore.Qt.red)
+        self.linearGrad.setColorAt(0.4, QtCore.Qt.red)
+        self.linearGrad.setColorAt(0.41, QtCore.Qt.white)
+        self.linearGrad.setColorAt(0.59, QtCore.Qt.white)
+        self.linearGrad.setColorAt(0.6, QtCore.Qt.blue)
+        self.linearGrad.setColorAt(1, QtCore.Qt.blue)
 
         pen1.setBrush(QBrush(self.linearGrad))
 
@@ -227,11 +301,18 @@ class segmentItem(QGraphicsLineItem):
 
         # Todo: Add support for disr segments
 
-        # if the startNode parent is a connection:
-        if not hasattr(self.startNode.parent, "fromPort"):
-            self.parent.segments.insert(self.parent.segments.index(prevSeg) + 1, self)
+        if self not in self.parent.segments:
+            # if the startNode parent is a connection:
+            if not hasattr(self.startNode.parent, "fromPort"):
+                self.parent.segments.insert(self.parent.segments.index(prevSeg) + 1, self)
+                self.logger.debug("in hasattr")
+            else:
+                self.parent.segments.insert(0, self)
+                self.logger.debug("in else")
+
+            self.logger.debug("insert function " + str(self.parent.displayName) + " " + str(len(self.parent.segments)))
         else:
-            self.parent.segments.insert(0, self)
+            self.logger.debug("problem detected")
 
     def mousePressEvent(self, e):
 
@@ -629,6 +710,8 @@ class segmentItem(QGraphicsLineItem):
         return self.line().p1().x() == self.line().p2().x()
 
     def isHorizontal(self):
+        self.logger.debug("horizontal check" + str(self.line().p1().x()) + str(self.line().p2().x()))
+        self.logger.debug("segments load" + str(self.parent.segmentsLoad))
         return self.line().p1().y() == self.line().p2().y()
 
     def dragInMode0(self, newPos):
