@@ -108,6 +108,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         return connection.trnsysId
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        if type(self) == BlockItem:
+            raise AssertionError("`BlockItem' cannot be instantiated directly.")
+
         currentClassName = BlockItem.__name__
         currentMethodName = f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
 

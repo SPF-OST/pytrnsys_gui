@@ -193,13 +193,15 @@ class Decoder(json.JSONDecoder):
                         bl = Control(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
+
+                    
                     # --- new encoding]
 
                     elif i["BlockName"] == "GraphicalItem":
                         bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
 
                     else:
-                        bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
+                        raise AssertionError(f"Unknown kind of block item: {i['BlockName']}")
 
                     bl.decode(i, resBlockList)
 
