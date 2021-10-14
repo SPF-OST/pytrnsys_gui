@@ -215,6 +215,7 @@ class Editor(QWidget):
         componentNamesWithIcon = [
             ("Connector", _img.CONNECTOR_SVG.icon()),
             ("TeePiece", _img.TEE_PIECE_SVG.icon()),
+            ("DPTeePiece", _img.DP_TEE_PIECE_SVG.icon()),
             ("TVentil", _img.T_VENTIL_SVG.icon()),
             ("WTap_main", _img.W_TAP_MAIN_SVG.icon()),
             ("WTap", _img.W_TAP_SVG.icon()),
