@@ -8,11 +8,13 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
 
 
 class HeatPump(BlockItem):
@@ -177,75 +179,24 @@ class HeatPump(BlockItem):
 
         return status, equation
 
-    def exportParametersFlowSolver(self, descConnLength):
-        f = ""
-        for i in range(len(self.inputs)):
-            for c in self.inputs[i].connectionList:
-                if len(self.outputs[i].connectionList) > 0:
-                    if i == 0:
-                        temp = (
-                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                        )  # + str(t.childIds[0])
-                        temp += " " * (descConnLength - len(temp))
+    def getInternalPiping(self) -> InternalPiping:
+        heatPumpInput = _mfn.PortItem()
+        heatPumpOutput = _mfn.PortItem()
+        heatPumpPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], heatPumpInput, heatPumpOutput)
 
-                        # HeatPump will have a two-liner exportConnString
-                        self.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(self.childIds[0]) + " : " + self.displayName + "HeatPump" + "\n"
+        evaporatorInput = _mfn.PortItem()
+        evaporatorOutput = _mfn.PortItem()
+        evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[1], evaporatorInput, evaporatorOutput)
 
-                    elif i == 1:
-                        temp = (
-                            str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-                        )  # + str(t.childIds[1])
-                        temp += " " * (descConnLength - len(temp))
+        modelPortItemsToGraphicalPortItem = {
+            heatPumpInput: self.inputs[0],
+            heatPumpOutput: self.outputs[0],
+            evaporatorInput: self.inputs[1],
+            evaporatorOutput: self.outputs[1],
+        }
+        nodes = [heatPumpPipe, evaporatorPipe]
 
-                        # HeatPump will have a two liner exportConnString
-                        self.exportConnsString += temp + "\n"
-                        f += temp + "!" + str(self.childIds[1]) + " : " + self.displayName + "Evap" + "\n"
-                    else:
-                        f += "Error: There are more inputs than trnsysIds" + "\n"
-
-                    # Presumably used only for storing the order of connections
-                    self.trnsysConn.append(c)
-                    self.trnsysConn.append(self.outputs[i].connectionList[0])
-
-                else:
-                    f += "Output of HeatPump for input[{0}] is not connected ".format(i) + "\n"
-
-        return f
-
-    def exportInputsFlowSolver1(self):
-        return "0,0 0,0 ", 2
-
-    def exportInputsFlowSolver2(self):
-        f = ""
-        f += " " + str(self.exportInitialInput) + " " + str(self.exportInitialInput) + " "
-        return f, 2
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        tot = ""
-        for j in range(2):
-            for i in range(0, 3):
-
-                if i < 2:
-                    temp = (
-                        prefix
-                        + self.displayName
-                        + "-Hp-Side"
-                        + str(j)
-                        + "_"
-                        + abc[i]
-                        + "=["
-                        + str(simulationUnit)
-                        + ","
-                        + str(equationNumber)
-                        + "]\n"
-                    )
-                    tot += temp
-                    self.exportEquations.append(temp)
-                    # nEqUsed += 1  # DC
-                equationNumber += 1  # DC-ERROR it should count anyway
-
-        return tot, equationNumber, 4
+        return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
     def getSubBlockOffset(self, c):
         for i in range(2):

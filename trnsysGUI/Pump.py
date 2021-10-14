@@ -8,8 +8,10 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
 from trnsysGUI.PortItem import PortItem
 import trnsysGUI.images as _img
+import massFlowSolver.networkModel as _mfn
 
 
 class Pump(BlockItem):
@@ -19,8 +21,6 @@ class Pump(BlockItem):
         self.h = 40
         self.typeNumber = 1
         self.rndPwr = np.random.randint(0, 1000)
-
-        self.exportInitialInput = 0.0
 
         self.inputs.append(PortItem("i", 0, self))
         self.outputs.append(PortItem("o", 2, self))
@@ -58,6 +58,7 @@ class Pump(BlockItem):
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+
         return w, h
 
     def exportBlackBox(self):
@@ -73,7 +74,11 @@ class Pump(BlockItem):
         massFlowLine = f"Mfr{self.displayName} = {self.rndPwr}\n"
         return massFlowLine, equationNr
 
-    def exportInputsFlowSolver1(self):
-        temp1 = "Mfr" + self.displayName
-        self.exportInputName = " " + temp1 + " "
-        return self.exportInputName, 1
+    def getInternalPiping(self) -> InternalPiping:
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+
+        pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        return InternalPiping([pump], modelPortItemsToGraphicalPortItem)

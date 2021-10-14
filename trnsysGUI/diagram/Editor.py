@@ -581,8 +581,6 @@ class Editor(QWidget):
             f.write(fullExportText)
             f.close()
 
-        self.cleanUpExportedElements()
-
         try:
             lines = _du.loadDeck(exportPath, eraseBeginComment=True, eliminateComments=True)
             _du.checkEquationsAndConstants(lines, exportPath)
@@ -665,26 +663,7 @@ class Editor(QWidget):
         f.write(fullExportText)
         f.close()
 
-        self.cleanUpExportedElements()
-
         return hydCtrlPath
-
-    def cleanUpExportedElements(self):
-        for t in self.trnsysObj:
-            # if isinstance(t, BlockItem):
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            #
-            # if type(t) is Connection:
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            t.cleanUpAfterTrnsysExport()
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)

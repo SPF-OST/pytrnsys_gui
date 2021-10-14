@@ -119,7 +119,6 @@ class segmentItem(QGraphicsLineItem):
         except ZeroDivisionError:
             return QColor(100, 100, 100)
         else:
-            # return QColor(f1 * c2_r + f2 * c1_r, 0, f1 * c2_b + f2 * c1_b)
             return QColor(f1 * c2_r + f2 * c1_r, f1 * c2_g + f2 * c1_g, f1 * c2_b + f2 * c1_b)
 
     def initGrad(self):
@@ -267,8 +266,6 @@ class segmentItem(QGraphicsLineItem):
                     self.dragInMode0(newPos)
 
             elif self.connection.parent.editorMode == 1:
-                # if self.parent.segments[0].isVertical() == False and self.parent.segments[2].isVertical() == False:
-                # self.logger.debug(len(self.parent.segments))
                 if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                     if not self.startNode.parent.isVisible():
                         self.startNode.parent.setVisible(True)
@@ -304,10 +301,6 @@ class segmentItem(QGraphicsLineItem):
                         self._dragInMode1(True, newPos)
             else:
                 self.logger.debug("Unrecognized editorMode in segmentItem mouseMoveEvent")
-
-    def mouseDoubleClickEvent(self, event):
-        # self.parent.deleteConn()
-        return
 
     def deleteNextHorizSeg(self, b, nextS):
         if b:
@@ -402,7 +395,6 @@ class segmentItem(QGraphicsLineItem):
                     self.connection.parent.diagramScene.removeItem(self)
 
             elif self.connection.parent.editorMode == 1:
-                # if self.parent.segments[0].isVertical() == False and self.parent.segments[2].isVertical() == False:
                 if self.isVertical():
                     try:
                         self.oldX
@@ -421,9 +413,6 @@ class segmentItem(QGraphicsLineItem):
                         except IndexError:
                             self.logger.debug("no next or prev segments")
                         else:
-                            # if nextHorizSeg.isHorizontal() and int(nextHorizSeg.line().p2().y()) == int(
-                            #         self.endNode.parent.pos().y()): # TODO : Edit here to combine segment
-                            # self.logger.debug("Next h seg could be deleted")
                             if nextHorizSeg.isHorizontal() and int(self.endNode.parent.pos().y() - 10) <= int(
                                 nextHorizSeg.line().p2().y()
                             ) <= int(self.endNode.parent.pos().y() + 10):
@@ -434,7 +423,6 @@ class segmentItem(QGraphicsLineItem):
                             if prevHorizSeg.isHorizontal() and int(self.startNode.parent.pos().y() - 10) <= int(
                                 prevHorizSeg.line().p2().y()
                             ) <= int(self.startNode.parent.pos().y() + 10):
-                                # self.logger.debug("Prev h seg could be deleted")
                                 self.deletePrevHorizSeg(False, prevHorizSeg)
                                 self.logger.debug("previous horizontal")
                                 return
@@ -443,9 +431,6 @@ class segmentItem(QGraphicsLineItem):
                     self.logger.debug("Second corner is not none")
                     # if PortItem
                     if hasattr(self.endNode.parent, "fromPort"):
-                        # self.hide()
-                        # self.parent.segments.remove(self)
-                        # self.parent.parent.diagramScene.removeItem(self)
 
                         segbef = self.connection.segments[self.connection.getNodePos(self.secondCorner.node.prevN().parent)]
 
@@ -727,7 +712,6 @@ class segmentItem(QGraphicsLineItem):
             self.secondLine.setVisible(True)
 
     def renameConn(self):
-        # dia = segmentDlg(self, self.scene().parent())
         self.scene().parent().showSegmentDlg(self)
 
     def printItemsAt(self):
@@ -753,26 +737,16 @@ class segmentItem(QGraphicsLineItem):
         a3 = menu.addAction("Invert this connection")
         a3.triggered.connect(self.connection.invertConnection)
 
+        editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
+        editHydraulicLoopAction.triggered.connect(self.connection.editHydraulicLoop)
+
         a4 = menu.addAction("Toggle name")
         a4.triggered.connect(self.connection.toggleLabelVisible)
 
         a5 = menu.addAction("Toggle mass flow")
         a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
 
-        # b1 = menu.addAction('Set group ')
-        # b1.triggered.connect(self.configGroup)
-        # a4 = menu.addAction('Print end and start items')
-        # a4.triggered.connect(self.printItemsAt)
-        #
-        # a5 = menu.addAction('Print corners')
-        # a5.triggered.connect(self.parent.getCorners)
-        #
-        # a6 = menu.addAction('Print group')
-        # a6.triggered.connect(self.printGroup)
-        #
-        # a7 = menu.addAction('Inspect')
-        # a7.triggered.connect(self.inspect)
-        menu.exec_(event.screenPos())
+        menu.exec(event.screenPos())
 
     def configGroup(self):
         GroupChooserConnDlg(self.connection, self.connection.parent)

@@ -124,28 +124,27 @@ PARAMETERS 353
 6 7 0 0        !87 : PiHpEvapMix
 6 55 0 0       !88 : PiHPEvapIn
 INPUTS 88! for Type 935
-0,0  MfrPuSH  xFracDivSh 0,0  MfrsupplyWater  xFracDivHpEvap 0,0  xFracDivCondTOTesDhw 0,0 0,0 
- xFracDivSHCool 0,0 0,0 0,0  MfrPuHpEvap  MfrPuHpShCond 0,0 0,0 0,0 
-0,0 0,0  xFracDivDhw 0,0  xFracDivDhwOut  xFracDivCool 0,0  MfrPuHpDhwCond 0,0 
-0,0  xFracDivTesDhwOut  xFracDivHp  MfrPuDhw 0,0 0,0  MfrPuCirc 0,0 0,0 
+0,0 MfrPuSH xFracDivSh 0,0 MfrsupplyWater xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
+xFracDivSHCool 0,0 0,0 0,0 MfrPuHpEvap MfrPuHpShCond 0,0 0,0 0,0 
+0,0 0,0 xFracDivDhw 0,0 xFracDivDhwOut xFracDivCool 0,0 MfrPuHpDhwCond 0,0 
+0,0 xFracDivTesDhwOut xFracDivHp MfrPuDhw 0,0 0,0 MfrPuCirc 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 
-
-*** Initial Inputs *
--1 0.0 0.0 -1 0.0 0.0 -1 0.0  -1 -1 
-0.0 -1  -1 -1 0.0 0.0 -1 -1 -1 
--1 -1 0.0 -1 0.0 0.0 -1 0.0 -1 
--1 0.0 0.0 0.0 -1 -1 0.0 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1  -1 -1 -1 
+*** Initial Inputs (TRNSYS requires them to be there but the storage tank doesn't use them.)*
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 
 -1 -1 -1 -1 -1 -1 -1 -1 -1 
 -1 -1 -1 -1 -1 -1 -1 -1 -1 
 -1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 -1 -1 -1 
+-1 -1 -1 -1 -1 -1 
 
 EQUATIONS 194	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrRadiatorSH_A=[450,1]
@@ -168,20 +167,20 @@ MfrTeeHpEvap_C=[450,21]
 MfrDivCondTOTesDhw_A=[450,22]
 MfrDivCondTOTesDhw_B=[450,23]
 MfrDivCondTOTesDhw_C=[450,24]
-MfrHxCool-Side0_A=[450,25]
-MfrHxCool-Side0_B=[450,26]
-MfrHxCool-Side1_A=[450,28]
-MfrHxCool-Side1_B=[450,29]
+MfrHxCoolSide1_A=[450,25]
+MfrHxCoolSide1_B=[450,26]
+MfrHxCoolSide2_A=[450,28]
+MfrHxCoolSide2_B=[450,29]
 MfrDivSHCool_A=[450,31]
 MfrDivSHCool_B=[450,32]
 MfrDivSHCool_C=[450,33]
 MfrTeeCoolRadIn_A=[450,34]
 MfrTeeCoolRadIn_B=[450,35]
 MfrTeeCoolRadIn_C=[450,36]
-MfrHxDHW-Side0_A=[450,37]
-MfrHxDHW-Side0_B=[450,38]
-MfrHxDHW-Side1_A=[450,40]
-MfrHxDHW-Side1_B=[450,41]
+MfrHxDHWSide1_A=[450,37]
+MfrHxDHWSide1_B=[450,38]
+MfrHxDHWSide2_A=[450,40]
+MfrHxDHWSide2_B=[450,41]
 MfrPuHpEvap_A=[450,43]
 MfrPuHpEvap_B=[450,44]
 MfrPuHpShCond_A=[450,46]
@@ -274,12 +273,12 @@ MfrPiGhxIn_A=[450,157]
 MfrPiGhxIn_B=[450,158]
 MfrPiGhxOut_A=[450,160]
 MfrPiGhxOut_B=[450,161]
-MfrHP-Side0_A=[450,163]
-MfrHP-Side0_B=[450,164]
-MfrHP-Side1_A=[450,166]
-MfrHP-Side1_B=[450,167]
-MfrHP-Side2_A=[450,169]
-MfrHP-Side2_B=[450,170]
+MfrHPSide1_A=[450,163]
+MfrHPSide1_B=[450,164]
+MfrHPSide2_A=[450,166]
+MfrHPSide2_B=[450,167]
+MfrHPSide3_A=[450,169]
+MfrHPSide3_B=[450,170]
 MfrPiHpCondOut_A=[450,172]
 MfrPiHpCondOut_B=[450,173]
 MfrPiHpDesOut_A=[450,175]
