@@ -782,59 +782,77 @@ class Connection(object):
             # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
             #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
             #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
-
-            self.fromPort.createdAtSide = self.fromPort.side
-            self.toPort.createdAtSide = self.toPort.side
-            self.logger.debug("Ports are directed to each other")
-            self.clearConn()
-
-            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
-
-            corner1.node.setNext(corner2.node)
-
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, self.endNode, self)
-
-            self.startNode.setNext(corner1.node)
-            self.endNode.setPrev(corner2.node)
-
-            # self.logger.debug("niceConn...")
-            self.printConnNodes()
-            self.parent.diagramScene.addItem(seg1)
-            self.parent.diagramScene.addItem(seg2)
-            self.parent.diagramScene.addItem(seg3)
-
-            self.parent.diagramScene.addItem(corner1)
-            self.parent.diagramScene.addItem(corner2)
-
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
-            midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
+            if pos1.y() == pos2.y() or \
+                    pos1().x() == pos2.x():
+                self.logger.debug("we are here" + str(self.displayName))
+                seg1 = segmentItem(self.startNode, self.endNode, self)
 
-            help_point_1 = QPointF(midx, pos1.y())
-            help_point_2 = QPointF(midx, pos2.y())
+                # self.logger.debug("niceConn...")
+                self.printConnNodes()
+                self.parent.diagramScene.addItem(seg1)
 
-            seg1.setLine(QLineF(pos1, help_point_1))
-            seg2.setLine(QLineF(help_point_1, help_point_2))
-            seg3.setLine(QLineF(help_point_2, pos2))
+                seg1.setLine(QLineF(pos1, pos2))
 
-            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
+                self.fromPort.setZValue(100)
+                self.toPort.setZValue(100)
+                self.logger.debug("Here in niceconn")
 
-            corner1.setZValue(100)
-            corner2.setZValue(100)
-            self.fromPort.setZValue(100)
-            self.toPort.setZValue(100)
-            self.logger.debug("Here in niceconn")
+                self.firstS = self.getFirstSeg()
 
-            corner1.setPos(help_point_1)
-            corner2.setPos(help_point_2)
-            self.firstS = self.getFirstSeg()
+                self.logger.debug("Conn has now " + str(self.firstS))
+            else:
+                self.fromPort.createdAtSide = self.fromPort.side
+                self.toPort.createdAtSide = self.toPort.side
+                self.logger.debug("Ports are directed to each other")
+                self.clearConn()
 
-            self.logger.debug("Conn has now " + str(self.firstS))
+                corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+                corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+
+                corner1.node.setNext(corner2.node)
+
+                seg1 = segmentItem(self.startNode, corner1.node, self)
+                seg2 = segmentItem(corner1.node, corner2.node, self)
+                seg3 = segmentItem(corner2.node, self.endNode, self)
+
+                self.startNode.setNext(corner1.node)
+                self.endNode.setPrev(corner2.node)
+
+                # self.logger.debug("niceConn...")
+                self.printConnNodes()
+                self.parent.diagramScene.addItem(seg1)
+                self.parent.diagramScene.addItem(seg2)
+                self.parent.diagramScene.addItem(seg3)
+
+                self.parent.diagramScene.addItem(corner1)
+                self.parent.diagramScene.addItem(corner2)
+
+                midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
+
+                help_point_1 = QPointF(midx, pos1.y())
+                help_point_2 = QPointF(midx, pos2.y())
+
+                seg1.setLine(QLineF(pos1, help_point_1))
+                seg2.setLine(QLineF(help_point_1, help_point_2))
+                seg3.setLine(QLineF(help_point_2, pos2))
+
+                corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
+                corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
+
+                corner1.setZValue(100)
+                corner2.setZValue(100)
+                self.fromPort.setZValue(100)
+                self.toPort.setZValue(100)
+                self.logger.debug("Here in niceconn")
+
+                corner1.setPos(help_point_1)
+                corner2.setPos(help_point_2)
+                self.firstS = self.getFirstSeg()
+
+                self.logger.debug("Conn has now " + str(self.firstS))
 
     # Unused
     def buildBridges(self):
