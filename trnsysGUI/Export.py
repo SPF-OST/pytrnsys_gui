@@ -2,6 +2,7 @@
 # type: ignore
 
 import re
+import massFlowSolver as _mfs
 
 from PyQt5.QtWidgets import QMessageBox
 
@@ -17,19 +18,10 @@ class Export(object):
         self.editor = editor
         self.maxChar = 20
 
-        self.lineNumOfPar = 0
-        for component in self.trnsysObj:
-            if isinstance(component, Connection):
-                numOfRelPorts = 1
-            else:
-                numOutputs = len(component.outputs)
-                numInputs = len(component.inputs)
+        o: _mfs.MassFlowNetworkContributorMixin
+        nodes = [n for o in self.trnsysObj for n in o.getInternalPiping().openLoopsStartingNodes]
+        self.lineNumOfPar = len(nodes)
 
-                if (numInputs == 0 and numOutputs == 1) or (numInputs == 1 and numOutputs == 0):
-                    numOfRelPorts = 1
-                else:
-                    numOfRelPorts = min(numOutputs, numInputs)
-            self.lineNumOfPar += numOfRelPorts
         self.numOfPar = 4 * self.lineNumOfPar + 1
 
     def exportBlackBox(self, exportTo="ddck"):
