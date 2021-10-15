@@ -467,6 +467,13 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
         """
         self.logger.debug("Inside Block Item mouse click")
+
+        # Set flag for selected Block
+        for c in self.parent.parent().trnsysObj:
+            if isinstance(c, BlockItem):
+                c.isSelected = False
+        self.isSelected = True
+
         if self.name == "GenericBlock" or self.name == "StorageTank":
             return
         try:

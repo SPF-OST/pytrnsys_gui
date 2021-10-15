@@ -1020,28 +1020,32 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             else:
                 self.logger.debug("While removeing conn from group, no group with conn.groupName")
 
-    # Highlight when clicked, unhighlight when clicked elsewhere
-    def highlightConn(self):
-        self.unhighlightOtherConns()
+    # Select when clicked, deselect when clicked elsewhere
+    def selectConnection(self):
+        self.deselectOtherConnections()
 
         for s in self.segments:
-            s.setHighlight(True)
+            s.setSelect(True)
 
-        self.setLabelsHighlight(True)
+        self.isSelected = True
 
-    def unhighlightOtherConns(self):
+        self.setLabelsSelected(True)
+
+    def deselectOtherConnections(self):
         for c in self.parent.connectionList:
-            c.unhighlightConn()
+            c.deselectConnection()
 
-    def unhighlightConn(self):
+    def deselectConnection(self):
         for s in self.segments:
             s.updateGrad()
 
-        self.setLabelsHighlight(False)
+        self.isSelected = False
 
-    def setLabelsHighlight(self, isHighlight: bool) -> None:
-        self._setBold(self.firstS.label, isHighlight)
-        self._setBold(self.firstS.labelMass, isHighlight)
+        self.setLabelsSelected(False)
+
+    def setLabelsSelected(self, isSelected: bool) -> None:
+        self._setBold(self.firstS.label, isSelected)
+        self._setBold(self.firstS.labelMass, isSelected)
 
     @staticmethod
     def _setBold(label: QGraphicsTextItem, isBold: bool) -> None:

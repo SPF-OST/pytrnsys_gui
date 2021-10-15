@@ -159,6 +159,17 @@ class Scene(QGraphicsScene):
             self.parent().moveDirectPorts = not self.parent().moveDirectPorts
             self.logger.debug("Changing move bool to " + str(self.parent().moveDirectPorts))
 
+        if event.key() == Qt.Key_Delete:
+            for c in self.parent().trnsysObj:
+                # Delete connection
+                if isinstance(c, Connection):
+                    if c.isSelected:
+                        c.deleteConnCom()
+                # Delete block
+                if isinstance(c, BlockItem):
+                    if c.isSelected:
+                        c.deleteBlockCom()
+
     def mousePressEvent(self, event):
         # TODO : remove resizer when click on other block items
         super().mousePressEvent(event)
@@ -174,7 +185,7 @@ class Scene(QGraphicsScene):
             self.parent().multipleSelectMode = True
             for c in self.parent().connectionList:
                 if not self.parent().parent().massFlowEnabled:
-                    c.unhighlightConn()
+                    c.deselectConnection()
 
             self.parent().alignYLineItem.setVisible(False)
 
