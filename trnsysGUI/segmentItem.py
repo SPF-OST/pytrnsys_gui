@@ -154,7 +154,27 @@ class segmentItem(QGraphicsLineItem):
         else:
             x2 = self.endNode.parent
 
-
+        # for s in self.parent.segments:
+        #     i = s.parent.segments.index(s)
+        #     if i > 0:
+        #         i = i - 1
+        #     if i+1 >= len(self.parent.cornersLoad):
+        #         if self.parent.cornersLoad[i][0] != x2.toPort.scenePos().x():
+        #             self.linearGrad = QLinearGradient(
+        #                 QPointF(self.parent.cornersLoad[i][0], self.parent.cornersLoad[i][1] - 5),
+        #                 QPointF(self.parent.cornersLoad[i][0], self.parent.cornersLoad[i][1] + 5))
+        #         else:
+        #             self.linearGrad = QLinearGradient(
+        #                 QPointF(self.parent.cornersLoad[i][0] - 5, self.parent.cornersLoad[i][1]),
+        #                 QPointF(self.parent.cornersLoad[i][0] + 5, self.parent.cornersLoad[i][1]))
+        #     elif self.parent.cornersLoad[i][0] != self.parent.cornersLoad[i+1][0]:
+        #         self.linearGrad = QLinearGradient(
+        #             QPointF(self.parent.cornersLoad[i][0], self.parent.cornersLoad[i][1] - 5),
+        #             QPointF(self.parent.cornersLoad[i][0], self.parent.cornersLoad[i][1] + 5))
+        #     else:
+        #         self.linearGrad = QLinearGradient(
+        #             QPointF(self.parent.cornersLoad[i][0] - 5, self.parent.cornersLoad[i][1]),
+        #             QPointF(self.parent.cornersLoad[i][0] + 5, self.parent.cornersLoad[i][1]))
 
         # At init
         i = self.parent.segments.index(self)
@@ -209,6 +229,11 @@ class segmentItem(QGraphicsLineItem):
         self.logger.debug("this is the segment index: %s", self.parent.segments.index(self))
         self.logger.debug("fromport side: %s", self.parent.fromPort.side)
         self.logger.debug("toport side: %s", self.parent.toPort.side)
+
+        if len(self.parent.segments) > len(self.parent.cornersLoad) + 1:
+            self.logger.debug("we have a problem")
+        self.logger.debug("len of segments" + str(len(self.parent.segments)))
+        self.logger.debug("len of cornersload" + str(len(self.parent.cornersLoad)))
 
         self.logger.debug("name of connection " + str(self.parent.displayName))
         # self.logger.debug("linepoint end" + str(self.line().p2().x()))
