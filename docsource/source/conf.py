@@ -21,8 +21,8 @@
 # -- Project information -----------------------------------------------------
 
 project = "pytrnsys GUI"
-copyright = "2021, Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia, Martin Neugebauer"
-author = "Stefano Marti, Dani Carbonell, Jeremias Schmidli, Mattia Battaglia, Martin Neugebauer"
+copyright = "2021, Institute for Solar Technology (SPF), OST Rapperswil"
+author = "Dani Carbonell, Martin Neugebauer, Damian Birchler, Jeremias Schmidli"
 
 # The full version, including alpha/beta/rc tags
 release = "2021"

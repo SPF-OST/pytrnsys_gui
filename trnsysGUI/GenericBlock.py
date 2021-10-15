@@ -2,16 +2,16 @@
 # type: ignore
 
 import os
-import shutil
 import pathlib as _pl
+import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeView
 
+import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
@@ -160,16 +160,19 @@ class GenericBlock(BlockItem):
             dictName = "Block-"
             return dictName, dct
 
-    def decode(self, i, resConnList, resBlockList):
-        self.logger.debug("Portpair is " + str(i["PortPairsNb"]))
-        correcter = 0
-        for j in range(4):
-            if j == 2:
-                correcter = -1
-            for k in range(i["PortPairsNb"][j] + correcter):
-                self.addPortPair(j)
+    def decode(self, i, resBlockList):
+        assert len(self.inputs) == len(self.outputs)
+        numberOfPortPairs = len(self.inputs)
+        for portPairIndex in range(numberOfPortPairs):
+            self.removePortPair(portPairIndex)
 
-        super(GenericBlock, self).decode(i, resConnList, resBlockList)
+        numberOfPortPairsBySide = i["PortPairsNb"]
+        for side in range(3):
+            numberOfPortPairsToAdd = numberOfPortPairsBySide[side]
+            for _ in range(numberOfPortPairsToAdd):
+                self.addPortPair(side)
+
+        super(GenericBlock, self).decode(i, resBlockList)
         self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
         self.setImage()
 
@@ -256,56 +259,21 @@ class GenericBlock(BlockItem):
         pixmap = self._getPixmap()
         self.setPixmap(pixmap)
 
-    def exportParametersFlowSolver(self, descConnLength):
-        f = ""
-        for i in range(len(self.inputs)):
-            c = self.inputs[i].connectionList[0]
-            temp = (
-                str(c.trnsysId) + " " + str(self.outputs[i].connectionList[0].trnsysId) + " 0 0 "
-            )
-            temp += " " * (descConnLength - len(temp))
+    def getInternalPiping(self) -> InternalPiping:
+        assert len(self.inputs) == len(self.outputs)
 
-            # Generic block will have a 2n-liner exportConnString
-            self.exportConnsString += temp + "\n"
-            f += temp + "!" + str(self.childIds[i]) + " : " + self.displayName + "X" + str(i+1) + "\n"
+        pipes = []
+        portItems = {}
+        for i, (graphicalInputPort, graphicalOutputPort) in enumerate(zip(self.inputs, self.outputs)):
+            inputPort = _mfn.PortItem()
+            outputPort = _mfn.PortItem()
+            pipe = _mfn.Pipe(f"{self.displayName}X{i}", self.childIds[0], inputPort, outputPort)
 
-        return f
+            pipes.append(pipe)
+            portItems[inputPort] = graphicalInputPort
+            portItems[outputPort] = graphicalOutputPort
 
-    def exportInputsFlowSolver1(self):
-        return "0,0 " * len(self.inputs), len(self.inputs)
-
-    def exportInputsFlowSolver2(self):
-        f = ""
-        for i in range(len(self.inputs)):
-            f += " " + str(self.exportInitialInput) + " "
-
-        return f, len(self.inputs)
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        tot = ""
-        for j in range(len(self.inputs)):
-            for i in range(0, 3):
-
-                if i < 2:
-                    temp = (
-                        prefix
-                        + self.displayName
-                        + "-X"
-                        + str(j)
-                        + "_"
-                        + abc[i]
-                        + "=["
-                        + str(simulationUnit)
-                        + ","
-                        + str(equationNumber)
-                        + "]\n"
-                    )
-                    tot += temp
-                    self.exportEquations.append(temp)
-                    # nEqUsed += 1  # DC
-                equationNumber += 1  # DC-ERROR it should count anyway
-
-        return tot, equationNumber, 2 * len(self.inputs)
+        return InternalPiping(pipes, portItems)
 
     def getSubBlockOffset(self, c):
         for i in range(len(self.inputs)):
