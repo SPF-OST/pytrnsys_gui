@@ -11,12 +11,11 @@ import PyQt5.QtWidgets as _qtw
 try:
     from . import _UI_hydraulicLoopDialog_generated as _uigen
 except ImportError:
-    message = (
+    raise AssertionError(  # pylint: disable=raise-missing-from
         "Could not find the generated Python code for a .ui file. Please run the "
         "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
         "`pytrnsys_gui` directory."
     )
-    raise AssertionError(message)
 
 from . import _model
 
