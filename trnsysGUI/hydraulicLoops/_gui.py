@@ -8,7 +8,16 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-from . import _UI_hydraulicLoopDialog_generated as _uigen
+try:
+    from . import _UI_hydraulicLoopDialog_generated as _uigen
+except ImportError:
+    message = (
+        "Could not find the generated Python code for a .ui file. Please run the "
+        "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
+        "`pytrnsys_gui` directory."
+    )
+    raise AssertionError(message)
+
 from . import _model
 
 
@@ -80,7 +89,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     _PROPERTIES = [
         _Property("Name", lambda c: c.name, shallHighlightOutliers=False),
         _Property("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
-        _Property("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue)
+        _Property("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),
     ]
 
     def __init__(self, connections: _tp.Sequence[_model.Connection]):
@@ -146,10 +155,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     def _getMostUsedValue(self, prop):
         sortedValues = sorted(prop.getter(c) for c in self.connections)
         groupedValues = _it.groupby(sortedValues)
-        valuesWithCount = [
-            {"value": v, "count": len(list(vs))}
-            for v, vs in groupedValues
-        ]
+        valuesWithCount = [{"value": v, "count": len(list(vs))} for v, vs in groupedValues]
         mostUsedValueWithCount = max(valuesWithCount, key=lambda vwc: vwc["count"])
         return mostUsedValueWithCount["value"]
 
