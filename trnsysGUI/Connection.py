@@ -4,10 +4,11 @@
 import typing as _tp
 import math as _math
 
+from PyQt5 import QtGui, QtCore
 import numpy as np
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
+from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QUndoCommand
 
 import trnsysGUI.BlockItem as _bi
 from trnsysGUI import idGenerator as _id
@@ -326,7 +327,7 @@ class Connection(object):
 
         self.firstS = segmentItem(self.startNode, self.endNode, self)
 
-        self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
+        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
         self.parent.diagramScene.addItem(self.firstS)
 
@@ -343,7 +344,7 @@ class Connection(object):
 
         self.logger.debug("start node has nn " + str(tempNode.nextNode))
         self.logger.debug(" ")
-        rad = 2
+        rad = 4
 
         for x in range(len(self.cornersLoad)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -397,7 +398,8 @@ class Connection(object):
             self.logger.debug("pos1 is " + str(pos1))
             self.logger.debug("pos2 is " + str(pos2))
 
-            s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
+            # s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
+            s.setLine(pos1[0], pos1[1], pos2[0], pos2[1])
 
             self.parent.diagramScene.addItem(s)
 
@@ -474,7 +476,7 @@ class Connection(object):
 
         """
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 2  # 4
+        rad = 4  # 4
 
         self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
@@ -529,11 +531,11 @@ class Connection(object):
             p3 = QPointF(pos2.x() + portOffset, baseline_h)
             p4 = QPointF(p3.x(), pos2.y())
 
-            seg1.setLine(QLineF(pos1, p1))
-            seg2.setLine(QLineF(p1, p2))
-            seg3.setLine(QLineF(p2, p3))
-            seg4.setLine(QLineF(p3, p4))
-            seg5.setLine(QLineF(p4, pos2))
+            seg1.setLine(pos1, p1)
+            seg2.setLine(p1, p2)
+            seg3.setLine(p2, p3)
+            seg4.setLine(p3, p4)
+            seg5.setLine(p4, pos2)
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -597,11 +599,11 @@ class Connection(object):
             p3 = QPointF(pos2.x() - portOffset, baseline_h)
             p4 = QPointF(p3.x(), pos2.y())
 
-            seg1.setLine(QLineF(pos1, p1))
-            seg2.setLine(QLineF(p1, p2))
-            seg3.setLine(QLineF(p2, p3))
-            seg4.setLine(QLineF(p3, p4))
-            seg5.setLine(QLineF(p4, pos2))
+            seg1.setLine(pos1, p1)
+            seg2.setLine(p1, p2)
+            seg3.setLine(p2, p3)
+            seg4.setLine(p3, p4)
+            seg5.setLine(p4, pos2)
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -644,8 +646,8 @@ class Connection(object):
 
                 p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
-                seg1.setLine(QLineF(pos1, p1))
-                seg2.setLine(QLineF(p1, pos2))
+                seg1.setLine(pos1, p1)
+                seg2.setLine(p1, pos2)
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner1.setZValue(100)
@@ -669,7 +671,6 @@ class Connection(object):
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.printConnNodes()
                 self.parent.diagramScene.addItem(seg1)
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(seg3)
@@ -682,10 +683,11 @@ class Connection(object):
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
 
-                seg1.setLine(QLineF(pos1, help_point_1))
-                seg2.setLine(QLineF(help_point_1, help_point_2))
-                seg3.setLine(QLineF(help_point_2, pos2))
+                seg1.setLine(pos1, help_point_1)
+                seg2.setLine(help_point_1, help_point_2)
+                seg3.setLine(help_point_2, pos2)
 
+                self.printConnNodes()
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
 
@@ -724,8 +726,8 @@ class Connection(object):
 
                 p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
-                seg1.setLine(QLineF(pos1, p1))
-                seg2.setLine(QLineF(p1, pos2))
+                seg1.setLine(pos1, p1)
+                seg2.setLine(p1, pos2)
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner1.setZValue(100)
@@ -748,7 +750,6 @@ class Connection(object):
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.printConnNodes()
                 self.parent.diagramScene.addItem(seg1)
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(seg3)
@@ -761,9 +762,11 @@ class Connection(object):
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
 
-                seg1.setLine(QLineF(pos1, help_point_1))
-                seg2.setLine(QLineF(help_point_1, help_point_2))
-                seg3.setLine(QLineF(help_point_2, pos2))
+                seg1.setLine(pos1, help_point_1)
+                seg2.setLine(help_point_1, help_point_2)
+                seg3.setLine(help_point_2, pos2)
+
+                self.printConnNodes()
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -801,7 +804,6 @@ class Connection(object):
             self.endNode.setPrev(corner2.node)
 
             # self.logger.debug("niceConn...")
-            self.printConnNodes()
             self.parent.diagramScene.addItem(seg1)
             self.parent.diagramScene.addItem(seg2)
             self.parent.diagramScene.addItem(seg3)
@@ -817,9 +819,10 @@ class Connection(object):
             help_point_1 = QPointF(midx, pos1.y())
             help_point_2 = QPointF(midx, pos2.y())
 
-            seg1.setLine(QLineF(pos1, help_point_1))
-            seg2.setLine(QLineF(help_point_1, help_point_2))
-            seg3.setLine(QLineF(help_point_2, pos2))
+            seg1.setLine(pos1.x(), pos1.y(), midx, pos1.y())
+            seg2.setLine(midx, pos1.y(), midx, pos2.y())
+            seg3.setLine(midx, pos2.y(), pos2.x(), pos2.y())
+            self.printConnNodes()
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -940,8 +943,8 @@ class Connection(object):
                             newPos1 = collisionPos - normVecp2p1
                             newPos2 = collisionPos + normVecp2p1
 
-                            s.firstChild.setLine(QLineF(qp1.x(), qp1.y(), newPos1.x(), newPos1.y()))
-                            s.secondChild.setLine(QLineF(newPos2.x(), newPos2.y(), qp2.x(), qp2.y()))
+                            s.firstChild.setLine(qp1.x(), qp1.y(), newPos1.x(), newPos1.y())
+                            s.secondChild.setLine(newPos2.x(), newPos2.y(), qp2.x(), qp2.y())
 
                             s.firstChild.setVisible(True)
                             s.secondChild.setVisible(True)
