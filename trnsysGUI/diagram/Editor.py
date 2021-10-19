@@ -53,6 +53,7 @@ from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
+from trnsysGUI.DPPortItem import DPPortItem
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
@@ -427,7 +428,6 @@ class Editor(QWidget):
         if startPort is not endPort:
             # if len(endPort.connectionList) == 0:
             # Connection(startPort, endPort, False, self)
-
             if (
                 isinstance(startPort.parent, StorageTank)
                 and isinstance(endPort.parent, StorageTank)
@@ -436,9 +436,9 @@ class Editor(QWidget):
                 msgSTank = QMessageBox(self)
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
-
-            command = CreateConnectionCommand(startPort, endPort, self, "CreateConn Command")
-            self.parent().undoStack.push(command)
+            if type(startPort) is type(endPort):
+                command = CreateConnectionCommand(startPort, endPort, self, "CreateConn Command")
+                self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
         """
@@ -473,7 +473,7 @@ class Editor(QWidget):
             itemsAtReleasePos = self.diagramScene.items(releasePos)
             self.logger.debug("items are " + str(itemsAtReleasePos))
             for it in itemsAtReleasePos:
-                if type(it) is PortItem:
+                if type(it) is PortItem or type(it) is DPPortItem:
                     self.createConnection(self.tempStartPort, it)
                 else:
                     self.startedConnection = False

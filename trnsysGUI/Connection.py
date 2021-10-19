@@ -344,7 +344,7 @@ class Connection(object):
 
         self.logger.debug("start node has nn " + str(tempNode.nextNode))
         self.logger.debug(" ")
-        rad = 4
+        rad = 2 if type(self.fromPort) is PortItem else 4
 
         for x in range(len(self.cornersLoad)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -476,7 +476,7 @@ class Connection(object):
 
         """
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 4  # 4
+        rad = 2 if type(self.fromPort) is PortItem else 4
 
         self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
@@ -500,6 +500,8 @@ class Connection(object):
             corner1.node.setNext(corner2.node)
             corner2.node.setNext(corner3.node)
             corner3.node.setNext(corner4.node)
+
+            seg1 = createSegmentItem(...)
 
             seg1 = segmentItem(self.startNode, corner1.node, self)
             seg2 = segmentItem(corner1.node, corner2.node, self)
