@@ -145,7 +145,7 @@ class segmentItem(QGraphicsItemGroup):
         if type(self.startNode.firstNode().parent.fromPort) is DPPortItem:
             self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
             self.redLine.setPen(QtGui.QPen(QtCore.Qt.red, 3))
-            if y1 == y2 or x1 != x2:
+            if abs(y1 - y2) < 1:
                 self.blueLine.setLine(x1, y1 + 3, x2, y2 + 3)
                 self.redLine.setLine(x1, y1 - 3, x2, y2 - 3)
             else:
