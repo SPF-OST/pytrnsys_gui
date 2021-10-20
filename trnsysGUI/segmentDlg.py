@@ -10,7 +10,7 @@ class segmentDlg(QDialog):
         self.seg = seg
         nameLabel = QLabel("Name:")
         objectLabel = QLabel("Object:" + str(self.seg))
-        self.le = QLineEdit(self.seg.parent.displayName)
+        self.le = QLineEdit(self.seg.connection.displayName)
 
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
