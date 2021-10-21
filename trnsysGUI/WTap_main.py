@@ -7,7 +7,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
 
 
@@ -17,7 +17,7 @@ class WTap_main(BlockItem):
         self.w = 40
         self.h = 40
         # self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem("o", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 0, self))
 
         self.exportInitialInput = 0.0
 

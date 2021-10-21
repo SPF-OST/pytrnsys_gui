@@ -8,7 +8,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
 
 
@@ -22,8 +22,8 @@ class Pump(BlockItem):
 
         self.exportInitialInput = 0.0
 
-        self.inputs.append(PortItem("i", 0, self))
-        self.outputs.append(PortItem("o", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
 
         self.changeSize()
 

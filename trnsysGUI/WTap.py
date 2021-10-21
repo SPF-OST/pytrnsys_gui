@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QTreeView
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
 
 
@@ -21,7 +21,7 @@ class WTap(BlockItem):
         super(WTap, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
         self.h = 40
-        self.inputs.append(PortItem("i", 0, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
         self.loadedFiles = []
 
         self.typeNumber = 5

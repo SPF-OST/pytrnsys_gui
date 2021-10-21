@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QTreeView
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
 
 
@@ -21,13 +21,13 @@ class HPDoubleDual(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HPDoubleDual, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem("i", 0, self))
-        self.inputs.append(PortItem("i", 2, self))
-        self.inputs.append(PortItem("i", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(SinglePipePortItem("i", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 2, self))
 
-        self.outputs.append(PortItem("o", 0, self))
-        self.outputs.append(PortItem("o", 2, self))
-        self.outputs.append(PortItem("o", 2, self))
+        self.outputs.append(SinglePipePortItem("o", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         # For restoring correct order of trnsysObj list

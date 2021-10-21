@@ -31,6 +31,7 @@ from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.connection.segmentItemFactory import *
 
 
 class Decoder(json.JSONDecoder):
@@ -223,7 +224,10 @@ class Decoder(json.JSONDecoder):
 
                     connectionKwargs = self.create_connection_kwargs(i)
 
-                    c = Connection(fromPort, toPort, self.editor, **connectionKwargs)
+                    if isinstance(fromPort, SinglePipePortItem):
+                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), self.editor, **connectionKwargs)
+                    if isinstance(fromPort, DoublePipePortItem):
+                        c = Connection(fromPort, toPort, DoublePipeSegmentItemFactory(), self.editor, **connectionKwargs)
 
                     c.decode(i)
                     resConnList.append(c)

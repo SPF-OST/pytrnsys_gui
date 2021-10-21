@@ -8,17 +8,19 @@ from PyQt5 import QtGui, QtCore
 import numpy as np
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QUndoCommand
+from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import trnsysGUI.BlockItem as _bi
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.Collector import Collector
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.SinglePipeSegmentItem import SinglePipeSegmentItem
+from trnsysGUI.DoublePipeSegmentItem import DoublePipeSegmentItem
 from trnsysGUI.Pump import Pump
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.segmentItem import segmentItem
+from trnsysGUI.SegmentItemBase import SegmentItemBase
 
 
 def calcDist(p1, p2):
@@ -28,12 +30,14 @@ def calcDist(p1, p2):
 
 
 class Connection(object):
-    def __init__(self, fromPort: PortItem, toPort: PortItem, parent, **kwargs):
+    def __init__(self, fromPort, toPort, segmentItemFactory, parent, **kwargs):
         self.logger = parent.logger
 
         self.fromPort = fromPort
         self.toPort = toPort
         self.displayName = None
+
+        self.segmentItemFactory = segmentItemFactory
 
         self.parent = parent
         self.groupName = ""
@@ -45,18 +49,18 @@ class Connection(object):
         self.exportInputName = "0"
         self.exportInitialInput = -1
         self.exportEquations = []
-        self._portItemsWithParent: _tp.List[_tp.Tuple[PortItem, _bi.BlockItem]] = []
+        self._portItemsWithParent: _tp.List[_tp.Tuple[SinglePipePortItem, _bi.BlockItem]] = []
 
         # Global
         self.id = self.parent.idGen.getID()
         self.connId = self.parent.idGen.getConnID()
         self.trnsysId = self.parent.idGen.getTrnsysID()
 
-        self.segments: _tp.List[segmentItem] = []
+        self.segments: _tp.List[SegmentItemBase] = []
 
         self.startNode = Node()
         self.endNode = Node()
-        self.firstS: _tp.Optional[segmentItem] = None
+        self.firstS: _tp.Optional[SegmentItemBase] = None
 
         self.segmentsLoad = None
         self.cornersLoad = None
@@ -84,6 +88,9 @@ class Connection(object):
 
                 if "labelMassPos" in kwargs:
                     self.labelMassPosLoad = kwargs["labelMassPos"]
+
+    def segmentItemCreation(self, startNode, endNode):
+        return self.segmentItemFactory.createSegmentItem(startNode, endNode, self)
 
     def isVisible(self):
         res = True
@@ -308,7 +315,7 @@ class Connection(object):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = segmentItem(self.startNode, self.endNode, self)
+        self.firstS = self.segmentItemCreation(self.startNode, self.endNode)
 
         self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
 
@@ -325,7 +332,7 @@ class Connection(object):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = segmentItem(self.startNode, self.endNode, self)
+        self.firstS = self.segmentItemCreation(self.startNode, self.endNode)
 
         self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
@@ -344,7 +351,7 @@ class Connection(object):
 
         self.logger.debug("start node has nn " + str(tempNode.nextNode))
         self.logger.debug(" ")
-        rad = 2 if type(self.fromPort) is PortItem else 4
+        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
 
         for x in range(len(self.cornersLoad)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -362,13 +369,13 @@ class Connection(object):
 
             cor.node.nextNode.setPrev(cor.node)
             cor.node.prevNode.setNext(cor.node)
-            segmentItem(tempNode, cor.node, self)
+            self.segmentItemCreation(tempNode, cor.node)
 
             tempNode = cor.node
 
             self.printConn()
 
-        segmentItem(tempNode, tempNode.nextN(), self)
+        self.segmentItemCreation(tempNode, tempNode.nextN())
 
         # self.parent.diagramScene.addItem(lastSeg)
 
@@ -476,7 +483,7 @@ class Connection(object):
 
         """
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 2 if type(self.fromPort) is PortItem else 4
+        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
 
         self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
@@ -501,13 +508,11 @@ class Connection(object):
             corner2.node.setNext(corner3.node)
             corner3.node.setNext(corner4.node)
 
-            seg1 = createSegmentItem(...)
-
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, corner3.node, self)
-            seg4 = segmentItem(corner3.node, corner4.node, self)
-            seg5 = segmentItem(corner4.node, self.endNode, self)
+            seg1 = self.segmentItemCreation(self.startNode, corner1.node)
+            seg2 = self.segmentItemCreation(corner1.node, corner2.node)
+            seg3 = self.segmentItemCreation(corner2.node, corner3.node)
+            seg4 = self.segmentItemCreation(corner3.node, corner4.node)
+            seg5 = self.segmentItemCreation(corner4.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
@@ -570,11 +575,11 @@ class Connection(object):
             corner2.node.setNext(corner3.node)
             corner3.node.setNext(corner4.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, corner3.node, self)
-            seg4 = segmentItem(corner3.node, corner4.node, self)
-            seg5 = segmentItem(corner4.node, self.endNode, self)
+            seg1 = self.segmentItemCreation(self.startNode, corner1.node)
+            seg2 = self.segmentItemCreation(corner1.node, corner2.node)
+            seg3 = self.segmentItemCreation(corner2.node, corner3.node)
+            seg4 = self.segmentItemCreation(corner3.node, corner4.node)
+            seg5 = self.segmentItemCreation(corner4.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
@@ -636,8 +641,8 @@ class Connection(object):
             if pos2.y() <= pos1.y():
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, self.endNode, self)
+                seg1 = self.segmentItemCreation(self.startNode, corner1.node)
+                seg2 = self.segmentItemCreation(corner1.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
@@ -666,9 +671,9 @@ class Connection(object):
 
                 corner1.node.setNext(corner2.node)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, corner2.node, self)
-                seg3 = segmentItem(corner2.node, self.endNode, self)
+                seg1 = self.segmentItemCreation(self.startNode, corner1.node)
+                seg2 = self.segmentItemCreation(corner1.node, corner2.node)
+                seg3 = self.segmentItemCreation(corner2.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
@@ -716,8 +721,8 @@ class Connection(object):
             if pos2.y() >= pos1.y():
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, self.endNode, self)
+                seg1 = self.segmentItemCreation(self.startNode, corner1.node)
+                seg2 = self.segmentItemCreation(corner1.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
@@ -745,9 +750,9 @@ class Connection(object):
 
                 corner1.node.setNext(corner2.node)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, corner2.node, self)
-                seg3 = segmentItem(corner2.node, self.endNode, self)
+                seg1 = self.segmentItemCreation(self.startNode, corner1.node)
+                seg2 = self.segmentItemCreation(corner1.node, corner2.node)
+                seg3 = self.segmentItemCreation(corner2.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
@@ -798,9 +803,9 @@ class Connection(object):
 
             corner1.node.setNext(corner2.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, self.endNode, self)
+            seg1 = self.segmentItemCreation(self.startNode, corner1.node)
+            seg2 = self.segmentItemCreation(corner1.node, corner2.node)
+            seg3 = self.segmentItemCreation(corner2.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner2.node)
@@ -855,7 +860,7 @@ class Connection(object):
             # self.logger.debug("Col items are " + str(col))
 
             for c in col:
-                if type(c) is segmentItem:
+                if type(c) is SegmentItemBase:
                     # self.logger.debug("There is a segment colliding....")
                     # self.logger.debug("c.hasBridge is " + str(c.hasBridge))
                     # self.logger.debug("s.hasBridge is " + str(s.hasBridge))
@@ -891,8 +896,8 @@ class Connection(object):
                             s.startNode.setNext(node1)
                             s.endNode.setPrev(node2)
 
-                            s.firstChild = segmentItem(s.startNode, node1, s.parent)
-                            s.secondChild = segmentItem(node2, s.endNode, s.parent)
+                            s.firstChild = self.segmentItemCreation(s.startNode, node1)
+                            s.secondChild = self.segmentItemCreation(node2, s.endNode)
 
                             s.hasBridge = True
                             c.hasBridge = True
@@ -971,12 +976,12 @@ class Connection(object):
         items = self.parent.diagramScene.items()
 
         for it in items:
-            if type(it) is segmentItem:
+            if type(it) is SinglePipeSegmentItem or type(it) is DoublePipeSegmentItem:
                 if it.startNode.lastNode() is self.endNode or it.startNode.firstNode() is self.startNode:
                     # self.logger.debug("Del segment")
                     self.parent.diagramScene.removeItem(it)
             if type(it) is QGraphicsTextItem:
-                if type(it.parent) is PortItem:
+                if type(it.parent) is SinglePipePortItem:
                     self.logger.debug("it has " + str(it.parent()))
                     self.logger.debug("Deleting it")
                     self.parent.diagramScene.removeItem(it)
@@ -1513,4 +1518,4 @@ class DeleteConnectionCommand(QUndoCommand):
         self.conn = None
 
     def undo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)
+        self.conn = Connection(self.connFromPort, self.connToPort, self.segmentItemFactory, self.connParent)

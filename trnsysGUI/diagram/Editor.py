@@ -52,8 +52,9 @@ from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PipeDataHandler import PipeDataHandler
-from trnsysGUI.PortItem import PortItem
-from trnsysGUI.DPPortItem import DPPortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
+from trnsysGUI.connection.segmentItemFactory import *
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
@@ -410,7 +411,7 @@ class Editor(QWidget):
         self.tempStartPort = port
         self.startedConnection = True
 
-    def createConnection(self, startPort, endPort):
+    def createConnection(self, startPort, endPort, segmentItemFactory):
         """
         Creates a new connection if startPort and endPort are not the same. Is added as a command to the
         undoStack.
@@ -437,7 +438,7 @@ class Editor(QWidget):
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
             if type(startPort) is type(endPort):
-                command = CreateConnectionCommand(startPort, endPort, self, "CreateConn Command")
+                command = CreateConnectionCommand(startPort, endPort, segmentItemFactory, self, "CreateConn Command")
                 self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
@@ -473,8 +474,11 @@ class Editor(QWidget):
             itemsAtReleasePos = self.diagramScene.items(releasePos)
             self.logger.debug("items are " + str(itemsAtReleasePos))
             for it in itemsAtReleasePos:
-                if type(it) is PortItem or type(it) is DPPortItem:
-                    self.createConnection(self.tempStartPort, it)
+                test = SinglePipeSegmentItemFactory()
+                if isinstance(it, SinglePipePortItem):
+                    self.createConnection(self.tempStartPort, it, SinglePipeSegmentItemFactory())
+                if isinstance(it, DoublePipePortItem):
+                    self.createConnection(self.tempStartPort, it, DoublePipeSegmentItemFactory())
                 else:
                     self.startedConnection = False
                     self.connLineItem.setVisible(False)
