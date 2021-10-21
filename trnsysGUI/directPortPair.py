@@ -1,6 +1,7 @@
 import dataclasses as _dc
 
 import trnsysGUI.PortItem as _port
+import trnsysGUI.storageTank.side as _sd
 
 
 @_dc.dataclass
@@ -10,7 +11,7 @@ class DirectPortPair:
     toPort: _port.PortItem  # type: ignore[name-defined]
     relativeInputHeight: float
     relativeOutputHeight: float
-    isOnLeftSide: bool
+    side: _sd.Side
 
     @property
     def relativeInputHeightPercent(self):
@@ -19,10 +20,6 @@ class DirectPortPair:
     @property
     def relativeOutputHeightPercent(self):
         return self._toPercent(self.relativeOutputHeight)
-
-    @property
-    def side(self) -> str:
-        return "Left" if self.isOnLeftSide else "Right"
 
     def setRelativeHeights(self,
                            relativeInputHeight: float,

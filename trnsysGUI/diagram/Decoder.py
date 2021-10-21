@@ -5,7 +5,6 @@ import json
 import typing as tp
 
 from trnsysGUI.AirSourceHP import AirSourceHP
-from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
 from trnsysGUI.Connection import Connection
@@ -26,11 +25,11 @@ from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.Pump import Pump
 from trnsysGUI.Radiator import Radiator
-from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.storageTank.widget import StorageTank
 
 
 class Decoder(json.JSONDecoder):
@@ -193,26 +192,29 @@ class Decoder(json.JSONDecoder):
                         bl = Control(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
+
+                    
                     # --- new encoding]
 
                     elif i["BlockName"] == "GraphicalItem":
                         bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
 
                     else:
-                        bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
+                        raise AssertionError(f"Unknown kind of block item: {i['BlockName']}")
 
                     bl.decode(i, resBlockList)
 
                 elif ".__ConnectionDict__" in i:
-                    fromPort = None
-                    toPort = None
+                    fromPortId, toPortId = self._getPortIds(i)
 
                     # Looking for the ports the connection is connected to
+                    fromPort = None
+                    toPort = None
                     for connBl in resBlockList:
                         for p in connBl.inputs + connBl.outputs:
-                            if p.id == i["PortFromID"]:
+                            if p.id == fromPortId:
                                 fromPort = p
-                            if p.id == i["PortToID"]:
+                            if p.id == toPortId:
                                 toPort = p
 
                     if fromPort is None:
@@ -221,9 +223,7 @@ class Decoder(json.JSONDecoder):
                     if toPort is None:
                         self.logger.debug("Error: Did not found a toPort")
 
-                    connectionKwargs = self.create_connection_kwargs(i)
-
-                    c = Connection(fromPort, toPort, self.editor, **connectionKwargs)
+                    c = Connection(fromPort, toPort, self.editor)
 
                     c.decode(i)
                     resConnList.append(c)
@@ -240,19 +240,14 @@ class Decoder(json.JSONDecoder):
         return arr
 
     @staticmethod
-    def create_connection_kwargs(item: tp.Mapping[str, tp.Any]) -> tp.Mapping[str, tp.Any]:
-        connectionKwargs = dict(
-            loadedConn=True,
-            fromPortId=item["PortFromID"],
-            toPortId=item["PortToID"],
-            segmentsLoad=item["SegmentPositions"],
-            cornersLoad=item["CornerPositions"],
-        )
-
-        if "FirstSegmentLabelPos" in item:
-            connectionKwargs["labelPos"] = tuple(item["FirstSegmentLabelPos"])
-
-        if "FirstSegmentMassFlowLabelPos" in item:
-            connectionKwargs["labelMassPos"] = tuple(item["FirstSegmentMassFlowLabelPos"])
-
-        return connectionKwargs
+    def _getPortIds(i):
+        if "PortFromID" in i and "PortToID" in i:
+            # Legacy port ID naming
+            fromPortId = i["PortFromID"]
+            toPortId = i["PortToID"]
+        elif "fromPortId" in i and "toPortId" in i:
+            fromPortId = i["fromPortId"]
+            toPortId = i["toPortId"]
+        else:
+            raise AssertionError("Could not find port IDs for connection.")
+        return fromPortId, toPortId

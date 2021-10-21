@@ -5,18 +5,18 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import massFlowSolver as _mfs
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
-
 
 class GroundSourceHx(BlockItem):
+
     def __init__(self, trnsysType, parent, **kwargs):
         super(GroundSourceHx, self).__init__(trnsysType, parent, **kwargs)
 
@@ -60,8 +60,6 @@ class GroundSourceHx(BlockItem):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        # self.inputs[0].side = 1 + 2 * self.flippedV
-        # self.outputs[0].side = 1 + 2 * self.flippedV
         self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
         self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
 
@@ -75,12 +73,7 @@ class GroundSourceHx(BlockItem):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, "ddck")
@@ -101,16 +94,6 @@ class GroundSourceHx(BlockItem):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
-
     def updateTreePath(self, path):
         """
         When the user chooses the project path for the file explorers, this method is called
@@ -130,10 +113,8 @@ class GroundSourceHx(BlockItem):
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
@@ -155,9 +136,16 @@ class GroundSourceHx(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\Ground_Hx_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)
+
+    def getInternalPiping(self) -> _mfs.InternalPiping:
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        return _mfs.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})

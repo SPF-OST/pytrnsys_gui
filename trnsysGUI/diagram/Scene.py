@@ -9,7 +9,7 @@ from trnsysGUI.Connection import Connection
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
 from trnsysGUI.ResizerItem import ResizerItem
-from trnsysGUI.StorageTank import StorageTank
+from trnsysGUI.storageTank.widget import StorageTank
 
 
 class Scene(QGraphicsScene):
@@ -106,32 +106,25 @@ class Scene(QGraphicsScene):
     def mouseReleaseEvent(self, mouseEvent):
         self.logger.debug("Releasing mouse in Scene...")
         self.parent().sceneMouseReleaseEvent(mouseEvent)
-        super(Scene, self).mouseReleaseEvent(mouseEvent)
+        super().mouseReleaseEvent(mouseEvent)
         self.parent().moveDirectPorts = False
         if self.parent().pasting:
-            # Dismantle group
             self.parent().clearCopyGroup()
 
         if self.parent().itemsSelected:
-            # Dismantle selection
             self.parent().clearSelectionGroup()
 
         if self.parent().selectionMode:
-            # self.released = True
             self.logger.debug("There are elements inside the selection : " + str(self.hasElementsInRect()))
             if self.hasElementsInRect():
                 if self.parent().groupMode:
                     g = self.createGroup()
-                    # groupDlg(g, self.parent(), self.elementsInRect())
                     self.parent().showGroupDlg(g, self.elementsInRect())
                 elif self.parent().multipleSelectMode:
                     self.parent().createSelectionGroup(self.elementsInRect())
-                elif self.parent().copyMode:
-                    self.parent().copyElements()
                 else:
                     self.logger.info("No recognized mode for selection")
             else:
-                self.parent().copyMode = False
                 self.parent().selectionMode = False
 
             self.released = False
@@ -166,36 +159,33 @@ class Scene(QGraphicsScene):
             self.parent().moveDirectPorts = not self.parent().moveDirectPorts
             self.logger.debug("Changing move bool to " + str(self.parent().moveDirectPorts))
 
+        if event.key() == Qt.Key_Delete:
+            for c in self.parent().trnsysObj:
+                # Delete connection
+                if isinstance(c, Connection):
+                    if c.isSelected:
+                        c.deleteConnCom()
+                # Delete block
+                if isinstance(c, BlockItem):
+                    if c.isSelected:
+                        c.deleteBlockCom()
+
     def mousePressEvent(self, event):
-        # self.parent().mousePressEvent(event)
         # TODO : remove resizer when click on other block items
-        super(Scene, self).mousePressEvent(event)
+        super().mousePressEvent(event)
 
         if len(self.items(event.scenePos())) > 0:
             self.selectedItem = self.items(event.scenePos())
-            # for items in self.items():
-            #     if items != self.selectedItem[0]:
-            #         if isinstance(items, ResizerItem):
-            #             break
-            #         else:
-            #             if hasattr(items, 'resizer'):
-            #                 self.removeItem(items.resizer)
-            #                 items.deleteResizer()
-            #     else:
-            #         print(items)
-            #         print(self.selectedItem[0])
 
-        """For selection when clicking on empty space"""
         if len(self.items(event.scenePos())) == 0:
             self.logger.debug("No items here!")
             self.parent().clearSelectionGroup()
             self.parent().selectionMode = True
-            self.parent().copyMode = False
             self.parent().groupMode = False
             self.parent().multipleSelectMode = True
             for c in self.parent().connectionList:
                 if not self.parent().parent().massFlowEnabled:
-                    c.unhighlightConn()
+                    c.deselectConnection()
 
             self.parent().alignYLineItem.setVisible(False)
 
@@ -219,10 +209,8 @@ class Scene(QGraphicsScene):
             if self.selectedItem is not None:
                 self.selectedItem.clear()
 
-        # global selectionMode
         if self.parent().selectionMode:
             self.pressed = True
-            # self.selectionRect.setParentItem(self)
             if not self.released:
                 self.sRstart = event.scenePos()
                 self.selectionRect.setRect(
@@ -232,18 +220,6 @@ class Scene(QGraphicsScene):
                     abs(event.scenePos().y() - self.sRstart.y()),
                 )
                 self.selectionRect.setVisible(True)
-
-        # if len(self.items(event.scenePos())) == 0:
-        #     print("No items here!")
-        #     for c in self.parent().connectionList:
-        #         c.unhighlightConn()
-        #
-        #     self.parent().alignYLineItem.setVisible(False)
-        #
-        #     for st in self.parent().trnsysObj:
-        #         if isinstance(st, StorageTank):
-        #             for hx in st.heatExchangers:
-        #                 hx.unhighlightHx()
 
     def createGroup(self):
         newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)

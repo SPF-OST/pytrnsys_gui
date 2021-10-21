@@ -7,8 +7,8 @@ import pathlib as _pl
 import pkgutil as _pu
 import shutil
 import sys
+import typing as _tp
 
-import pandas as pd
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
 from PyQt5.QtGui import QColor, QPainter
@@ -32,12 +32,13 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
+import pytrnsys.trnsys_util.deckUtils as _du
+import trnsysGUI as _tgui
+import trnsysGUI.errors as _errs
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.Connection import Connection
-from trnsysGUI.Connector import Connector
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
 from trnsysGUI.Export import Export
@@ -47,22 +48,17 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
 from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
-from trnsysGUI.IdGenerator import IdGenerator
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.PumpDlg import PumpDlg
-from trnsysGUI.StorageTank import StorageTank
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
-from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
-from trnsysGUI.copyGroup import copyGroup
 from trnsysGUI.diagram.Decoder import Decoder
-from trnsysGUI.diagram.DecoderPaste import DecoderPaste
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
@@ -70,9 +66,11 @@ from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.hxDlg import hxDlg
+from trnsysGUI.idGenerator import IdGenerator
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
-import trnsysGUI as _tgui
+from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
+from trnsysGUI.storageTank.widget import StorageTank
 
 
 class Editor(QWidget):
@@ -109,7 +107,7 @@ class Editor(QWidget):
     and pasting will load the clipboard using a slighly different decoder than for loading an entire diagram.
     When the elements are pasted, they compose a group which can be dragged around and is desintegrated when the mouse
     is released.
-    It is controlled by the attributes selectionMode, groupMode, copyMode and multipleSelectedMode
+    It is controlled by the attributes selectionMode and groupMode
 
     Attributes
     ----------
@@ -125,10 +123,6 @@ class Editor(QWidget):
         Enables/disables selection rectangle in Scene
     groupMode : bool
         Enables creation of a new group in Scene
-    copyMode : bool
-        Enables copying elements in the selection rectangle
-    multipleSelectedMode : bool
-        Unused
     alignMode : bool
         Enables mode in which a dragged block is aligned to y or x value of another one
         Toggled in the MainWindow class in toggleAlignMode()
@@ -194,8 +188,6 @@ class Editor(QWidget):
 
         self.selectionMode = False
         self.groupMode = False
-        self.copyMode = False
-        self.multipleSelectedMode = False
 
         self.alignMode = False
 
@@ -492,10 +484,10 @@ class Editor(QWidget):
     def cleanUpConnections(self):
         for c in self.connectionList:
             c.niceConn()
-        # if self.connectionList.__len__() > 0:
-        #     self.connectionList[0].clearConn()
 
-    def exportHydraulics(self, exportTo="ddck"):
+    def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
+        assert exportTo in ["ddck", "mfs"]
+
         self.logger.info("------------------------> START OF EXPORT <------------------------")
 
         self.sortTrnsysObj()
@@ -507,14 +499,11 @@ class Editor(QWidget):
         if exportTo == "mfs":
             mfsFileName = self.diagramName.split(".")[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
-            if self._doesFileExistAndDontOverwrite(exportPath):
-                return None
-
         elif exportTo == "ddck":
-            hydraulicsPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
+            exportPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
 
-            if self._doesFileExistAndDontOverwrite(hydraulicsPath):
-                return None
+        if self._doesFileExistAndDontOverwrite(exportPath):
+            return None
 
         self.logger.info("Printing the TRNSYS file...")
 
@@ -548,7 +537,8 @@ class Editor(QWidget):
 
         blackBoxProblem, blackBoxText = exporter.exportBlackBox(exportTo=exportTo)
         if blackBoxProblem:
-            return
+            return None
+
         fullExportText += blackBoxText
         if exportTo == "mfs":
             fullExportText += exporter.exportMassFlows()
@@ -557,7 +547,8 @@ class Editor(QWidget):
 
         fullExportText += exporter.exportParametersFlowSolver(
             simulationUnit, simulationType, descConnLength
-        )  # , parameters, lineNrParameters)
+        )
+
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
@@ -565,14 +556,9 @@ class Editor(QWidget):
         fullExportText += exporter.exportPrintPipeLoops()
         fullExportText += exporter.exportPrintPipeLosses()
 
-        # unitnr should maybe be variable in exportData()
-
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)
 
-        # tes = open(os.path.join(ddckFolder, "Tes\\Tes.ddck"), "r")
-        # fullExportText += tes.read()
-        # tes.close()
         if exportTo == "mfs":
             fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
             fullExportText += "ENDS"
@@ -580,27 +566,30 @@ class Editor(QWidget):
         self.logger.info("------------------------> END OF EXPORT <------------------------")
 
         if exportTo == "mfs":
-            f = open(str(exportPath), "w")
+            f = open(exportPath, "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
         elif exportTo == "ddck":
             if fullExportText[:1] == "\n":
                 fullExportText = fullExportText[1:]
-            hydraulicFolder = os.path.split(hydraulicsPath)[0]
+            hydraulicFolder = os.path.split(exportPath)[0]
             if not (os.path.isdir(hydraulicFolder)):
                 os.makedirs(hydraulicFolder)
-            f = open(str(hydraulicsPath), "w")
+            f = open(exportPath, "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
 
-        self.cleanUpExportedElements()
+        try:
+            lines = _du.loadDeck(exportPath, eraseBeginComment=True, eliminateComments=True)
+            _du.checkEquationsAndConstants(lines, exportPath)
+        except Exception as error:
+            errorMessage = f"An error occurred while exporting the system hydraulics: {error}"
+            _errs.showErrorMessageBox(errorMessage)
+            return None
 
-        if exportTo == "mfs":
-            return exportPath
-        elif exportTo == "ddck":
-            return hydraulicsPath
+        return exportPath
 
     def _doesFileExistAndDontOverwrite(self, folderPath):
         if not _pl.Path(folderPath).exists():
@@ -674,26 +663,7 @@ class Editor(QWidget):
         f.write(fullExportText)
         f.close()
 
-        self.cleanUpExportedElements()
-
         return hydCtrlPath
-
-    def cleanUpExportedElements(self):
-        for t in self.trnsysObj:
-            # if isinstance(t, BlockItem):
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            #
-            # if type(t) is Connection:
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            t.cleanUpAfterTrnsysExport()
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)
@@ -799,7 +769,6 @@ class Editor(QWidget):
         -------
 
         """
-
         self.logger.info("Decoding " + filename)
         with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
@@ -827,21 +796,6 @@ class Editor(QWidget):
                     self.logger.debug("Loading a Storage")
                     k.setParent(self.diagramView)
                     k.updateImage()
-
-                if isinstance(k, Connection):
-                    if k.toPort == None or k.fromPort == None:
-                        continue
-                    # name = k.displayName
-                    # testFrom = k.fromPort
-                    # testTo = k.toPort
-                    self.logger.debug("Almost done with loading a connection")
-                    # print("Connection displ name " + str(k.displayName))
-                    # print("Connection fromPort" + str(k.fromPort))
-                    # print("Connection toPort" + str(k.toPort))
-                    # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
-                    k.initLoad()
-                    a = 1
-                    # k.setConnToGroup("defaultGroup")
 
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
@@ -925,89 +879,6 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def copyElements(self):
-        """
-        Copies elements
-        Returns
-        -------
-
-        """
-        clipboardGroup = copyGroup(self)
-        self.logger.debug(self.diagramScene.elementsInRect())
-
-        for t in self.diagramScene.elementsInRect():
-            self.logger.debug("element in rect is" + str(t))
-            clipboardGroup.trnsysObj.append(t)
-
-        self.saveToClipBoard(clipboardGroup)
-
-    def saveToClipBoard(self, copyList):
-        filename = "clipboard.json"
-
-        with open(filename, "w") as jsonfile:
-            json.dump(copyList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
-
-        self.logger.debug("Copy complete!")
-
-    def pasteFromClipBoard(self):
-        filename = "clipboard.json"
-
-        with open(filename, "r") as jsonfile:
-            blocklist = json.load(jsonfile, cls=DecoderPaste, editor=self)
-
-        for j in blocklist["Blocks"]:
-            # print("J is " + str(j))
-
-            for k in j:
-                if isinstance(k, BlockItem):
-                    # k.setParent(self.diagramView)
-                    k.changeSize()
-                    self.copyGroupList.addToGroup(k)
-
-                    for inp in k.inputs:
-                        inp.id = self.idGen.getID()
-                    for out in k.outputs:
-                        out.id = self.idGen.getID()
-
-                if isinstance(k, StorageTank):
-                    self.logger.debug("Loading a Storage")
-                    k.updateImage()
-
-                if isinstance(k, GraphicalItem):
-                    k.setParent(self.diagramView)
-                    self.diagramScene.addItem(k)
-                    # k.resizer.setPos(k.w, k.h)
-                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
-
-                if isinstance(k, Connection):
-                    self.logger.debug("Almost done with loading a connection")
-                    k.initLoad()
-                    for corners in k.getCorners():
-                        # copyGroupList.trnsysObj.append(k)
-                        self.copyGroupList.addToGroup(corners)
-
-                if isinstance(k, dict):
-                    pass
-
-                    # print("Global id is " + str(globalID))
-                    # print("trnsys id is " + str(trnsysID))
-
-        # global copyMode
-        # global selectionMode
-        # global selectionMode
-        # global pasting
-
-        self.copyMode = False
-        self.selectionMode = False
-
-        self.diagramScene.addItem(self.copyGroupList)
-        self.copyGroupList.setFlags(self.copyGroupList.ItemIsMovable)
-
-        self.pasting = True
-
-        # for t in self.trnsysObj:
-        #     print("Tr obj is" + str(t) + " " + str(t.trnsysId))
-
     def clearCopyGroup(self):
 
         for it in self.copyGroupList.childItems():
@@ -1022,7 +893,6 @@ class Editor(QWidget):
             if isinstance(t, GraphicalItem):
                 self.selectionGroupList.addToGroup(t)
 
-        self.multipleSelectedMode = False
         self.selectionMode = False
 
         self.diagramScene.addItem(self.selectionGroupList)
@@ -1194,10 +1064,6 @@ class Editor(QWidget):
     def showNewDiagramDlg(self):
         c = newDiagramDlg(self)
 
-    # Not used
-    # def showNewPortDlg(self):
-    #     c = newPortDlg
-
     def showSegmentDlg(self, seg):
         c = segmentDlg(seg, self)
 
@@ -1214,7 +1080,7 @@ class Editor(QWidget):
         self.logger.debug("Ok, here is my log")
         self.logger.debug(int(args[0]) + 1)
         if len(self.connectionList) > 0:
-            self.connectionList[0].highlightConn()
+            self.connectionList[0].selectConnection()
 
     def getConnection(self, n):
         return self.connectionList[int(n)]

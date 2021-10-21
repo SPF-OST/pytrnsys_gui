@@ -8,7 +8,7 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
-import trnsysGUI.StorageTank as _st
+import trnsysGUI.storageTank.widget as _stw
 import trnsysGUI.diagram.Editor as _de
 
 _DATA_DIR = _pl.Path(__file__).parent / "data"
@@ -87,7 +87,7 @@ class TestEditor:
         storageTanks = [
             o
             for o in editor.trnsysObj
-            if isinstance(o, _st.StorageTank)  # type: ignore[attr-defined] # pylint: disable=no-member
+            if isinstance(o, _stw.StorageTank)  # type: ignore[attr-defined] # pylint: disable=no-member
         ]
         for storageTank in storageTanks:
             storageTank.exportDck()
