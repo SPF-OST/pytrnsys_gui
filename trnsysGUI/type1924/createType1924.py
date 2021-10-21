@@ -626,18 +626,17 @@ class Type1924_TesPlugFlow:
         line = "EQUATIONS 5\n"
         lines = lines + line
 
-        line = "sumQv_Tes%d     = [%d,176] ! Heat input of all heat exchangers [kW]\n" % (nTes, nUnit)
-        lines = lines + line
-        line = "sumQLoss_Tes%d  = [%d,177] ! Heat Losses of the Tes [kW]\n" % (nTes, nUnit)
-        lines = lines + line
-        line = "sumQAcum_Tes%d  = [%d,178] ! Sensible accumulated heat [kW]\n" % (nTes, nUnit)
-        lines = lines + line
-        line = "sumQPorts_Tes%d = [%d,179] ! Heat Input by direct ports [kW]\n" % (nTes, nUnit)
-        lines = lines + line
-        line = "Imb_Tes%d       = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n" % (
-            nTes,
-            nUnit,
-        )
+        line = "Qv_Tes%d     = [%d,176] ! Heat input of all heat exchangers [kW] + Heat input of all auxiliary heat sources [kW]\n"%(nTes,nUnit)
+        lines=lines+line
+        line = "QLoss_Tes%d  = [%d,177] ! Heat Losses of the Tes [kW]\n"%(nTes,nUnit)
+        lines=lines+line
+        line = "QAcum_Tes%d  = [%d,178] ! Sensible accumulated heat [kW]\n"%(nTes,nUnit)
+        lines=lines+line
+        line = "QPorts_Tes%d = [%d,179] ! Heat Input by direct ports [kW]\n"%(nTes,nUnit)
+        lines=lines+line
+        line = "QImb_Tes%d   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n"%(nTes,nUnit)
+        lines=lines+line
+
         lines = lines + line
 
         return lines
@@ -671,7 +670,7 @@ class Type1924_TesPlugFlow:
 
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
-        line = "sumQv_Tes1 sumQLoss_Tes1 sumQAcum_Tes1 sumQPorts_Tes1 Imb_Tes1 "
+        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d "%(nTes,nTes,nTes,nTes,nTes); lines = lines + line
         lines = lines + line
         for i in range(inputs["nPorts"]):
             line = "Qdp%d_Tes%d " % (i + 1, nTes)
@@ -826,7 +825,7 @@ class Type1924_TesPlugFlow:
             lines = lines + self.sLine + "\n"
             lines = lines + self.sLine
             lines = lines + "** To be checked: \n"
-            lines = lines + "** check cp and rho values for the cirquits \n"
+            lines = lines + "** check cp and rho values for the circuits \n"
             lines = lines + "** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used \n"
             lines = lines + self.sLine + "\n"
             lines = lines + self.sLine
@@ -836,8 +835,9 @@ class Type1924_TesPlugFlow:
             )
             lines = lines + self.sLine
             lines = lines + "EQUATIONS 3\n"
-            lines = lines + ("qSysOut_Tes%sLoss = sumQLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
-            lines = lines + ("qSysOut_Tes%sAcum = sumQAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
+            lines = lines + ("qSysOut_Tes%sLoss = QLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
+            lines = lines + ("qSysOut_Tes%sAcum = QAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
+
             lines = lines + ("elSysIn_Q_Tes%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
 
         elif typeFile == "dck":
