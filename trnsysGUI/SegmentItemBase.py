@@ -54,10 +54,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         self.cornerChild = None
 
         self.linePoints = None
-        self.x1 = None
-        self.y1 = None
-        self.x2 = None
-        self.y2 = None
 
         self.startNode = startNode
         self.endNode = endNode
@@ -130,20 +126,24 @@ class SegmentItemBase(QGraphicsItemGroup):
     def line(self):
         return self.linePoints
 
-    @_abc.abstractmethod
     def setLine(self, *args):
         self.setZValue(-1)
         if len(args) == 2:
-            self.x1 = args[0].x()
-            self.y1 = args[0].y()
-            self.x2 = args[1].x()
-            self.y2 = args[1].y()
+            x1 = args[0].x()
+            y1 = args[0].y()
+            x2 = args[1].x()
+            y2 = args[1].y()
         else:
-            self.x1 = args[0]
-            self.y1 = args[1]
-            self.x2 = args[2]
-            self.y2 = args[3]
+            x1 = args[0]
+            y1 = args[1]
+            x2 = args[2]
+            y2 = args[3]
 
+        self._setLineImpl(x1, y1, x2, y2)
+
+    @_abc.abstractmethod
+    def _setLineImpl(self, x1, y1, x2, y2):
+        raise NotImplementedError()
 
     def initGrad(self):
         """
@@ -162,7 +162,7 @@ class SegmentItemBase(QGraphicsItemGroup):
         -------
 
         """
-        pass
+        raise NotImplementedError()
 
 
     def insertInParentSegments(self):
@@ -751,7 +751,7 @@ class SegmentItemBase(QGraphicsItemGroup):
 
     @_abc.abstractmethod
     def setHighlight(self, isHighlight: bool) -> None:
-        pass
+        raise NotImplementedError()
 
     @staticmethod
     def _createHighlightPen() -> QPen:

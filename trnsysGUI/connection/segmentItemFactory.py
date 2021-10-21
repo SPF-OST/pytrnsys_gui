@@ -16,19 +16,9 @@ class SegmentItemFactoryBase(_abc.ABC):
 
 class SinglePipeSegmentItemFactory(SegmentItemFactoryBase):
     def createSegmentItem(self, startNode, endNode, parent) -> SinglePipeSegmentItem:
-        # if not isinstance(startNode, SinglePipePortItem):
-        #     raise ValueError("`fromPort' isn't a single pipe port item.")
-        # if not isinstance(endNode, SinglePipePortItem):
-        #     raise ValueError("`toPort' isn't a single pipe port item.")
-
         return SinglePipeSegmentItem(startNode, endNode, parent)
 
 
 class DoublePipeSegmentItemFactory(SegmentItemFactoryBase):
     def createSegmentItem(self, startNode, endNode, parent) -> DoublePipeSegmentItem:
-        # if not isinstance(startNode, DoublePipePortItem):
-        #     raise ValueError("`fromPort' isn't a double pipe port item.")
-        # if not isinstance(endNode, DoublePipePortItem):
-        #     raise ValueError("`toPort' isn't a double pipe port item.")
-
         return DoublePipeSegmentItem(startNode, endNode, parent)

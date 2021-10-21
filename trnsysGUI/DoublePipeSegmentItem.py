@@ -22,19 +22,18 @@ class DoublePipeSegmentItem(SegmentItemBase):
         self.blueLine = QGraphicsLineItem(self)
         self.redLine = QGraphicsLineItem(self)
 
-    def setLine(self, *args):
-        super().setLine(*args)
+    def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
         self.redLine.setPen(QtGui.QPen(QtCore.Qt.red, 3))
         offset = 3
 
-        if abs(self.y1 - self.y2) < 1:
-            self.blueLine.setLine(self.x1, self.y1 + offset, self.x2, self.y2 + offset)
-            self.redLine.setLine(self.x1, self.y1 - offset, self.x2, self.y2 - offset)
+        if abs(y1 - y2) < 1:
+            self.blueLine.setLine(x1, y1 + offset, x2, y2 + offset)
+            self.redLine.setLine(x1, y1 - offset, x2, y2 - offset)
         else:
-            self.blueLine.setLine(self.x1 + offset, self.y1, self.x2 + offset, self.y2)
-            self.redLine.setLine(self.x1 - offset, self.y1, self.x2 - offset, self.y2)
-        self.linePoints = QLineF(self.x1, self.y1, self.x2, self.y2)
+            self.blueLine.setLine(x1 + offset, y1, x2 + offset, y2)
+            self.redLine.setLine(x1 - offset, y1, x2 - offset, y2)
+        self.linePoints = QLineF(x1, y1, x2, y2)
 
     def updateGrad(self):
         """

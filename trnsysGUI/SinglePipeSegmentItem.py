@@ -25,10 +25,9 @@ class SinglePipeSegmentItem(SegmentItemBase):
         self.linearGrad = None
         self.initGrad()
 
-    def setLine(self, *args):
-        super().setLine(*args)
+    def _setLineImpl(self, x1, y1, x2, y2):
         self.initGrad()
-        self.singleLine.setLine(self.x1, self.y1, self.x2, self.y2)
+        self.singleLine.setLine(x1, y1, x2, y2)
         self.linePoints = self.singleLine.line()
 
 
