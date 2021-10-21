@@ -38,11 +38,11 @@ class Type1924_TesPlugFlow:
 
         line = "EQUATIONS 3\n"
         lines = lines + line
-        line = "Thx%dIn_Tes%d = %s ! @connectDdck\n" % (idHx, nTes, connectorHx[idHx - 1]["T"])
+        line = "Thx%dIn_Tes%d = %s\n" % (idHx, nTes, connectorHx[idHx - 1]["T"])
         lines = lines + line
-        line = "Mfrhx%d_Tes%d = %s ! @connectDdck\n" % (idHx, nTes, connectorHx[idHx - 1]["Mfr"])
+        line = "Mfrhx%d_Tes%d = %s\n" % (idHx, nTes, connectorHx[idHx - 1]["Mfr"])
         lines = lines + line
-        line = "Thx%dInRev_Tes%d = %s ! @connectDdck\n" % (idHx, nTes, connectorHx[idHx - 1]["Trev"])
+        line = "Thx%dInRev_Tes%d = %s\n" % (idHx, nTes, connectorHx[idHx - 1]["Trev"])
         lines = lines + line
 
         return lines
@@ -54,11 +54,11 @@ class Type1924_TesPlugFlow:
 
         line = "EQUATIONS 3\n"
         lines = lines + line
-        line = "Tdp%dIn_Tes%d = %s ! @connectDdck\n" % (idPort, nTes, connectorPort[idPort - 1]["T"])
+        line = "Tdp%dIn_Tes%d = %s\n" % (idPort, nTes, connectorPort[idPort - 1]["T"])
         lines = lines + line
-        line = "Mfrdp%d_Tes%d = %s ! @connectDdck\n" % (idPort, nTes, connectorPort[idPort - 1]["Mfr"])
+        line = "Mfrdp%d_Tes%d = %s\n" % (idPort, nTes, connectorPort[idPort - 1]["Mfr"])
         lines = lines + line
-        line = "Tdp%dInRev_Tes%d = %s ! @connectDdck\n" % (idPort, nTes, connectorPort[idPort - 1]["Trev"])
+        line = "Tdp%dInRev_Tes%d = %s\n" % (idPort, nTes, connectorPort[idPort - 1]["Trev"])
         lines = lines + line
 
         return lines
@@ -70,9 +70,9 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 2\n"
         lines = lines + line
 
-        line = "zInDp%d_Tes%d=%.2f ! @connectDdck \n" % (idPort + 1, nTes, connectorPort[idPort]["zIn"])
+        line = "zInDp%d_Tes%d=%.2f\n" % (idPort + 1, nTes, connectorPort[idPort]["zIn"])
         lines = lines + line
-        line = "zOutDp%d_Tes%d=%.2f ! @connectDdck \n" % (idPort + 1, nTes, connectorPort[idPort]["zOut"])
+        line = "zOutDp%d_Tes%d=%.2f\n" % (idPort + 1, nTes, connectorPort[idPort]["zOut"])
         lines = lines + line
 
         return lines
@@ -110,13 +110,13 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 4\n"
         lines = lines + line
 
-        line = "zInhx%d_Tes%d=%.2f  ! @connectDdck\n" % (idHx, nTes, connectHx[idHx - 1]["zIn"])
+        line = "zInhx%d_Tes%d=%.2f\n" % (idHx, nTes, connectHx[idHx - 1]["zIn"])
         lines = lines + line
-        line = "zOuthx%d_Tes%d=%.2f ! @connectDdck\n" % (idHx, nTes, connectHx[idHx - 1]["zOut"])
+        line = "zOuthx%d_Tes%d=%.2f\n" % (idHx, nTes, connectHx[idHx - 1]["zOut"])
         lines = lines + line
-        line = "Cphx%d_Tes%d=%s     ! @connectDdck\n" % (idHx, nTes, connectHx[idHx - 1]["cp"])
+        line = "Cphx%d_Tes%d=%s\n" % (idHx, nTes, connectHx[idHx - 1]["cp"])
         lines = lines + line
-        line = "Rhohx%d_Tes%d=%s    ! @connectDdck\n" % (idHx, nTes, connectHx[idHx - 1]["rho"])
+        line = "Rhohx%d_Tes%d=%s\n" % (idHx, nTes, connectHx[idHx - 1]["rho"])
         lines = lines + line
 
         return lines
@@ -257,15 +257,15 @@ class Type1924_TesPlugFlow:
         line = "ALat_Tes%d = Heigh_Tes%d*PI*Diameter_Tes%d ! m2\n" % (nTes, nTes, nTes)
         lines = lines + line
 
-        line = "UaBot_Tes%d= Ubot_Tes%d*ATop_Tes%d ! @userDefined W/k \n" % (nTes, nTes, nTes)
+        line = "UaBot_Tes%d= Ubot_Tes%d*ATop_Tes%d !  W/k \n" % (nTes, nTes, nTes)
         lines = lines + line
-        line = "Uaz1_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 ! @userDefined W/k\n" % (nTes, nTes, nTes)
+        line = "Uaz1_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (nTes, nTes, nTes)
         lines = lines + line
-        line = "Uaz2_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 ! @userDefined W/k\n" % (nTes, nTes, nTes)
+        line = "Uaz2_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (nTes, nTes, nTes)
         lines = lines + line
-        line = "Uaz3_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 ! @userDefined W/k\n" % (nTes, nTes, nTes)
+        line = "Uaz3_Tes%d = Ufoam_Tes%d*ALat_Tes%d/3 !  W/k\n" % (nTes, nTes, nTes)
         lines = lines + line
-        line = "UaTop_Tes%d = Ufoam_Tes%d*ATop_Tes%d ! @userDefined W/k\n" % (nTes, nTes, nTes)
+        line = "UaTop_Tes%d = Ufoam_Tes%d*ATop_Tes%d !  W/k\n" % (nTes, nTes, nTes)
         lines = lines + line
 
         return lines
@@ -378,9 +378,9 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
             for i in range(nHeatSources):
-                line = "zAux%d_Tes%d=%.2f !connectDDck\n" % (i + 1, nTes, connectorAux[i]["zAux"])
+                line = "zAux%d_Tes%d=%.2f\n" % (i + 1, nTes, connectorAux[i]["zAux"])
                 lines = lines + line
-                line = "qAux%d_Tes%d=%.2f !connectDDck\n" % (i + 1, nTes, connectorAux[i]["qAux"])
+                line = "qAux%d_Tes%d=%.2f\n" % (i + 1, nTes, connectorAux[i]["qAux"])
                 lines = lines + line
 
             line = "\n"
@@ -626,7 +626,7 @@ class Type1924_TesPlugFlow:
         line = "EQUATIONS 5\n"
         lines = lines + line
 
-        line = "Qv_Tes%d     = [%d,176] ! Heat input of all heat exchangers [kW] + Heat input of all auxiliary heat sources [kW]\n"%(nTes,nUnit)
+        line = "Qv_Tes%d     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n"%(nTes,nUnit)
         lines=lines+line
         line = "QLoss_Tes%d  = [%d,177] ! Heat Losses of the Tes [kW]\n"%(nTes,nUnit)
         lines=lines+line
@@ -636,8 +636,6 @@ class Type1924_TesPlugFlow:
         lines=lines+line
         line = "QImb_Tes%d   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n"%(nTes,nUnit)
         lines=lines+line
-
-        lines = lines + line
 
         return lines
 
@@ -670,7 +668,7 @@ class Type1924_TesPlugFlow:
 
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
-        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d "%(nTes,nTes,nTes,nTes,nTes); lines = lines + line
+        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d "%(nTes,nTes,nTes,nTes,nTes)
         lines = lines + line
         for i in range(inputs["nPorts"]):
             line = "Qdp%d_Tes%d " % (i + 1, nTes)
@@ -942,7 +940,7 @@ class Type1924_TesPlugFlow:
 
         if nTes == 1:
             lines = lines + "CONSTANTS 3\n"
-            line = "TRoomStore=15 ! @userDefined\n"
+            line = "TRoomStore=15 ! \n"
             lines = lines + line
             line = "VStoreRef = 0.763\n"
             lines = lines + line
