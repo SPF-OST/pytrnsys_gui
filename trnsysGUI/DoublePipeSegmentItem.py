@@ -22,6 +22,9 @@ class DoublePipeSegmentItem(SegmentItemBase):
         self.blueLine = QGraphicsLineItem(self)
         self.redLine = QGraphicsLineItem(self)
 
+    def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
+        return DoublePipeSegmentItem(startNode, endNode, self.parent)
+
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
         self.redLine.setPen(QtGui.QPen(QtCore.Qt.red, 3))
@@ -30,19 +33,18 @@ class DoublePipeSegmentItem(SegmentItemBase):
         if abs(y1 - y2) < 1:
             self.blueLine.setLine(x1, y1 + offset, x2, y2 + offset)
             self.redLine.setLine(x1, y1 - offset, x2, y2 - offset)
-        else:
+        elif abs(x1 - x2) < 1:
             self.blueLine.setLine(x1 + offset, y1, x2 + offset, y2)
             self.redLine.setLine(x1 - offset, y1, x2 - offset, y2)
+        else:
+            # Initially, connections go directly between its two ports: only
+            # afterwards are they broken up into horizontal and vertical segments.
+            # This is probably an artifact of back when connections didn't have to
+            # be straight. Once, these artifacts have been removed, we should throw here.
+            pass
         self.linePoints = QLineF(x1, y1, x2, y2)
 
     def updateGrad(self):
-        """
-        Updates the gradient by calling the interpolation function
-        Returns
-        -------
-
-        """
-
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
         self.redLine.setPen(QtGui.QPen(QtCore.Qt.red, 3))
 

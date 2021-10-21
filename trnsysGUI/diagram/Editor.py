@@ -9,6 +9,7 @@ import shutil
 import sys
 import typing as _tp
 
+import pytrnsys.trnsys_util.deckUtils as _du
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
 from PyQt5.QtGui import QColor, QPainter
@@ -32,7 +33,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
-import pytrnsys.trnsys_util.deckUtils as _du
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
 import trnsysGUI.images as _img
@@ -41,6 +41,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Connection import Connection
 from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
@@ -52,14 +53,13 @@ from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PipeDataHandler import PipeDataHandler
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
-from trnsysGUI.connection.segmentItemFactory import *
 from trnsysGUI.PumpDlg import PumpDlg
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
+from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
@@ -73,6 +73,7 @@ from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.PortItemBase import PortItemBase
 
 
 class Editor(QWidget):
@@ -411,24 +412,8 @@ class Editor(QWidget):
         self.tempStartPort = port
         self.startedConnection = True
 
-    def createConnection(self, startPort, endPort, segmentItemFactory):
-        """
-        Creates a new connection if startPort and endPort are not the same. Is added as a command to the
-        undoStack.
-
-        Parameters
-        ----------
-        startPort : :obj:`PortItem`
-        endPort : :obj:`PortItem`
-
-        Returns
-        -------
-
-        """
-        # print("Creating connection...")
+    def _createConnection(self, startPort, endPort):
         if startPort is not endPort:
-            # if len(endPort.connectionList) == 0:
-            # Connection(startPort, endPort, False, self)
             if (
                 isinstance(startPort.parent, StorageTank)
                 and isinstance(endPort.parent, StorageTank)
@@ -437,9 +422,16 @@ class Editor(QWidget):
                 msgSTank = QMessageBox(self)
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
-            if type(startPort) is type(endPort):
-                command = CreateConnectionCommand(startPort, endPort, segmentItemFactory, self, "CreateConn Command")
-                self.parent().undoStack.push(command)
+
+            if isinstance(startPort, SinglePipePortItem) and isinstance(endPort, SinglePipePortItem):
+                factory = SinglePipeSegmentItemFactory()
+            elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
+                factory = DoublePipeSegmentItemFactory()
+            else:
+                raise AssertionError(f"Unknown port type: {portType.__name__}.")
+
+            command = CreateConnectionCommand(startPort, endPort, factory, self, "CreateConn Command")
+            self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
         """
@@ -474,11 +466,8 @@ class Editor(QWidget):
             itemsAtReleasePos = self.diagramScene.items(releasePos)
             self.logger.debug("items are " + str(itemsAtReleasePos))
             for it in itemsAtReleasePos:
-                test = SinglePipeSegmentItemFactory()
-                if isinstance(it, SinglePipePortItem):
-                    self.createConnection(self.tempStartPort, it, SinglePipeSegmentItemFactory())
-                if isinstance(it, DoublePipePortItem):
-                    self.createConnection(self.tempStartPort, it, DoublePipeSegmentItemFactory())
+                if isinstance(it, PortItemBase):
+                    self._createConnection(self.tempStartPort, it)
                 else:
                     self.startedConnection = False
                     self.connLineItem.setVisible(False)

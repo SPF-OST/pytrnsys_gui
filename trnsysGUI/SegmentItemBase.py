@@ -1,19 +1,13 @@
 # pylint: skip-file
 # type: ignore
 
-from math import sqrt
 import typing as tp
+from math import sqrt
 
-import abc as _abc
-
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import QPointF, QLineF
-from PyQt5.QtGui import QColor, QLinearGradient, QBrush, QPen
-from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QGraphicsTextItem, QMenu
+from PyQt5.QtGui import QColor, QPen
+from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QMenu
 
 from trnsysGUI.CornerItem import CornerItem
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 
@@ -39,8 +33,7 @@ class SegmentItemBase(QGraphicsItemGroup):
         parent: type(parent): Connection
         """
 
-        super(SegmentItemBase, self).__init__(None)
-        __metaclass__ = _abc.ABCMeta
+        super().__init__(None)
         self.logger = parent.logger
 
         self.setFlag(self.ItemIsSelectable, True)
@@ -129,19 +122,16 @@ class SegmentItemBase(QGraphicsItemGroup):
     def setLine(self, *args):
         self.setZValue(-1)
         if len(args) == 2:
-            x1 = args[0].x()
-            y1 = args[0].y()
-            x2 = args[1].x()
-            y2 = args[1].y()
+            p1, p2 = args
+            x1 = p1.x()
+            y1 = p1.y()
+            x2 = p2.x()
+            y2 = p2.y()
         else:
-            x1 = args[0]
-            y1 = args[1]
-            x2 = args[2]
-            y2 = args[3]
+            x1, y1, x2, y2 = args
 
         self._setLineImpl(x1, y1, x2, y2)
 
-    @_abc.abstractmethod
     def _setLineImpl(self, x1, y1, x2, y2):
         raise NotImplementedError()
 
@@ -152,9 +142,8 @@ class SegmentItemBase(QGraphicsItemGroup):
         -------
 
         """
-        pass
+        raise NotImplementedError()
 
-    @_abc.abstractmethod
     def updateGrad(self):
         """
         Updates the gradient by calling the interpolation function
@@ -491,8 +480,8 @@ class SegmentItemBase(QGraphicsItemGroup):
         rad = 2
 
         self.cornerChild = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.start, self.end, self.parent)
-        self.firstChild = self.parent.SegmentItemCreation(self.start, self.cornerChild.node, self.parent)
-        self.secondChild = self.parent.SegmentItemCreation(self.cornerChild.node, self.end, self.parent)
+        self.firstChild = self._createSegment(self.start, self.cornerChild.node)
+        self.secondChild = self._createSegment(self.cornerChild.node, self.end)
 
         self.start.setNext(self.cornerChild.node)
         self.end.setPrev(self.cornerChild.node)
@@ -528,8 +517,8 @@ class SegmentItemBase(QGraphicsItemGroup):
 
                 self.endNode = self.secondCorner.node
 
-                self.firstLine = self.parent.SegmentItemCreation(self.secondCorner.node, self.thirdCorner.node, self.parent)
-                self.secondLine = self.parent.SegmentItemCreation(self.thirdCorner.node, self.thirdCorner.node.nextN(), self.parent)
+                self.firstLine = self._createSegment(self.secondCorner.node, self.thirdCorner.node)
+                self.secondLine = self._createSegment(self.thirdCorner.node, self.thirdCorner.node.nextN())
 
                 self.secondCorner.setVisible(False)
                 self.thirdCorner.setVisible(False)
@@ -561,8 +550,8 @@ class SegmentItemBase(QGraphicsItemGroup):
 
                 self.startNode = self.thirdCorner.node
 
-                self.firstLine = self.parent.SegmentItemCreation(self.secondCorner.node.prevN(), self.secondCorner.node, self.parent)
-                self.secondLine = self.parent.SegmentItemCreation(self.secondCorner.node, self.thirdCorner.node, self.parent)
+                self.firstLine = self._createSegment(self.secondCorner.node.prevN(), self.secondCorner.node)
+                self.secondLine = self._createSegment(self.secondCorner.node, self.thirdCorner.node)
 
                 self.secondCorner.setVisible(False)
                 self.thirdCorner.setVisible(False)
@@ -577,6 +566,10 @@ class SegmentItemBase(QGraphicsItemGroup):
                 self.logger.debug("inited")
 
                 self._isDraggingInProgress = True
+
+    def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
+        raise NotImplementedError()
+
 
     def isVertical(self):
         return self.line().p1().x() == self.line().p2().x()
@@ -749,7 +742,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         wasVisible = self.labelMass.isVisible()
         self.setMassFlowLabelVisible(not wasVisible)
 
-    @_abc.abstractmethod
     def setHighlight(self, isHighlight: bool) -> None:
         raise NotImplementedError()
 

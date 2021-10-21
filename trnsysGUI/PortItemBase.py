@@ -203,7 +203,7 @@ class PortItemBase(QGraphicsEllipseItem):
             for cb in self.posCallbacks:
                 cb(value)
             return value
-        return super(PortItemBase, self).itemChange(change, value)
+        return super().itemChange(change, value)
 
     def mousePressEvent(self, event):
         if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, "heatExchangers"):

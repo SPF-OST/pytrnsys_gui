@@ -49,7 +49,7 @@ class buildDck:
         self.inputs["generateUnitTypesUsed"] = True
         self.inputs["runCases"] = True
         self.inputs["runType"] = "runFromConfig"
-        self.inputs["outputLevel"] = "DEBUG"
+        self.inputs["outputLevel"] = "INFO"
 
         self.overwriteForcedByUser = False
 

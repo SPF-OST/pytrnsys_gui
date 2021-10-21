@@ -1,11 +1,8 @@
 import abc as _abc
-from trnsysGUI.Node import Node
+
+from trnsysGUI.DoublePipeSegmentItem import DoublePipeSegmentItem
 from trnsysGUI.SegmentItemBase import SegmentItemBase
 from trnsysGUI.SinglePipeSegmentItem import SinglePipeSegmentItem
-from trnsysGUI.DoublePipeSegmentItem import DoublePipeSegmentItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
-
 
 
 class SegmentItemFactoryBase(_abc.ABC):

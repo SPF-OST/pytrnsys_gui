@@ -569,7 +569,7 @@ class BlockItem(QGraphicsPixmapItem):
                         self.pos().x() + self.w / 2,
                         t.pos().y(),
                         t.pos().x() + t.w / 2,
-                        t.pos().y(),
+                        t.pos().y()
                     )
 
                     self.parent.parent().alignYLineItem.setVisible(True)
@@ -597,7 +597,7 @@ class BlockItem(QGraphicsPixmapItem):
                         t.pos().x(),
                         t.pos().y() + self.w / 2,
                         t.pos().x(),
-                        self.pos().y() + t.w / 2,
+                        self.pos().y() + t.w / 2
                     )
 
                     self.parent.parent().alignXLineItem.setVisible(True)
