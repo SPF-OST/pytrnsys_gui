@@ -41,7 +41,7 @@ def getProjects() -> _tp.Iterable[_Project]:
 
 def getTestProjects() -> _tp.Iterable[_Project]:
     testProjectTestCasesDir = _DATA_DIR / "tests"
-    testProjectTestCaseDirPaths = [tc for tc in testProjectTestCasesDir.iterdir() if not tc.name == "README.txt"]
+    testProjectTestCaseDirPaths = [tc for tc in testProjectTestCasesDir.iterdir() if tc.name != "README.txt"]
     for testProjectTestCaseDirPath in testProjectTestCaseDirPaths:
         projectName = testProjectTestCaseDirPath.name
         yield _Project.createForTestProject(projectName)
@@ -74,24 +74,28 @@ class TestEditor:
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
         helper.ensureFilesAreEqual(hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False)
 
-        storageTanks = self._exportStorageTank(projectFolderPath)
-        for storageTank in storageTanks:
-            ddckFileRelativePath = f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddck"
+        storageTankNames = self._exportStorageTanksAndGetNames(projectFolderPath)
+        for storageTankName in storageTankNames:
+            ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath, shallReplaceRandomizedFlowRates=False)
 
-            ddcxFileRelativePath = f"ddck/{storageTank.displayName}/{storageTank.displayName}.ddcx"
+            ddcxFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddcx"
             helper.ensureFilesAreEqual(ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False)
 
-    def _exportStorageTank(self, projectFolderPath):
+    def _exportStorageTanksAndGetNames(self, projectFolderPath: _pl.Path) -> _tp.Sequence[str]:
         editor = self._createEditor(projectFolderPath)
         storageTanks = [
             o
             for o in editor.trnsysObj
             if isinstance(o, _stw.StorageTank)  # type: ignore[attr-defined] # pylint: disable=no-member
         ]
+
         for storageTank in storageTanks:
             storageTank.exportDck()
-        return storageTanks
+
+        storageTankNames = [t.displayName for t in storageTanks]
+
+        return storageTankNames
 
     @classmethod
     def _exportHydraulic(cls, projectFolderPath, *, _format):
