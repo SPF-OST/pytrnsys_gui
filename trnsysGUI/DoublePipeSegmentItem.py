@@ -23,7 +23,7 @@ class DoublePipeSegmentItem(SegmentItemBase):
         self.redLine = QGraphicsLineItem(self)
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
-        return DoublePipeSegmentItem(startNode, endNode, self.parent)
+        return DoublePipeSegmentItem(startNode, endNode, self.connection)
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
@@ -48,10 +48,13 @@ class DoublePipeSegmentItem(SegmentItemBase):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
         self.redLine.setPen(QtGui.QPen(QtCore.Qt.red, 3))
 
-    def setHighlight(self, isHighlight: bool) -> None:
-        if isHighlight:
-            highlightPen = self._createHighlightPen()
-            self.blueLine.setPen(highlightPen)
-            self.redLine.setPen(highlightPen)
+    def setSelect(self, isSelected: bool) -> None:
+        if isSelected:
+            selectPen = self._createSelectPen()
+            self.blueLine.setPen(selectPen)
+            self.redLine.setPen(selectPen)
         else:
             self.updateGrad()
+
+    def setColorAndWidthAccordingToMassflow(self, color, width):
+        pass

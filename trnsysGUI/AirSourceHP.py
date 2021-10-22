@@ -5,15 +5,15 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
+from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem
-import trnsysGUI.images as _img
 
 
 class AirSourceHP(BlockItem):
@@ -27,6 +27,13 @@ class AirSourceHP(BlockItem):
 
         self.changeSize()
         self.addTree()
+
+    def getInternalPiping(self) -> InternalPiping:
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.AIR_SOURCE_HP_SVG

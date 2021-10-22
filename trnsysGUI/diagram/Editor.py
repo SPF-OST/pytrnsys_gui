@@ -238,7 +238,7 @@ class Editor(QWidget):
             ("Radiator", _img.RADIATOR_SVG.icon()),
             ("Boiler", _img.BOILER_SVG.icon()),
             ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
-            ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon())
+            ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
         ]
 
         libItems = [QtGui.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
@@ -412,7 +412,7 @@ class Editor(QWidget):
         self.tempStartPort = port
         self.startedConnection = True
 
-    def _createConnection(self, startPort, endPort):
+    def _createConnection(self, startPort, endPort) -> None:
         if startPort is not endPort:
             if (
                 isinstance(startPort.parent, StorageTank)
@@ -428,7 +428,7 @@ class Editor(QWidget):
             elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
                 factory = DoublePipeSegmentItemFactory()
             else:
-                raise AssertionError(f"Unknown port type: {portType.__name__}.")
+                raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
             command = CreateConnectionCommand(startPort, endPort, factory, self, "CreateConn Command")
             self.parent().undoStack.push(command)
@@ -466,7 +466,7 @@ class Editor(QWidget):
             itemsAtReleasePos = self.diagramScene.items(releasePos)
             self.logger.debug("items are " + str(itemsAtReleasePos))
             for it in itemsAtReleasePos:
-                if isinstance(it, PortItemBase):
+                if type(it) == type(self.tempStartPort):
                     self._createConnection(self.tempStartPort, it)
                 else:
                     self.startedConnection = False
@@ -539,9 +539,7 @@ class Editor(QWidget):
             fullExportText += exporter.exportPumpOutlets()
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
-        fullExportText += exporter.exportParametersFlowSolver(
-            simulationUnit, simulationType, descConnLength
-        )
+        fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength)
 
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
@@ -574,8 +572,6 @@ class Editor(QWidget):
             f.truncate(0)
             f.write(fullExportText)
             f.close()
-
-        self.cleanUpExportedElements()
 
         try:
             lines = _du.loadDeck(exportPath, eraseBeginComment=True, eliminateComments=True)
@@ -659,26 +655,7 @@ class Editor(QWidget):
         f.write(fullExportText)
         f.close()
 
-        self.cleanUpExportedElements()
-
         return hydCtrlPath
-
-    def cleanUpExportedElements(self):
-        for t in self.trnsysObj:
-            # if isinstance(t, BlockItem):
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            #
-            # if type(t) is Connection:
-            #     t.exportConnsString = ""
-            #     t.exportInputName = "0"
-            #     t.exportInitialInput = -1
-            #     t.exportEquations = []
-            #     t.trnsysConn = []
-            t.cleanUpAfterTrnsysExport()
 
     def sortTrnsysObj(self):
         res = self.trnsysObj.sort(key=self.sortId)
@@ -784,7 +761,6 @@ class Editor(QWidget):
         -------
 
         """
-
         self.logger.info("Decoding " + filename)
         with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
@@ -812,21 +788,6 @@ class Editor(QWidget):
                     self.logger.debug("Loading a Storage")
                     k.setParent(self.diagramView)
                     k.updateImage()
-
-                if isinstance(k, Connection):
-                    if k.toPort == None or k.fromPort == None:
-                        continue
-                    # name = k.displayName
-                    # testFrom = k.fromPort
-                    # testTo = k.toPort
-                    self.logger.debug("Almost done with loading a connection")
-                    # print("Connection displ name " + str(k.displayName))
-                    # print("Connection fromPort" + str(k.fromPort))
-                    # print("Connection toPort" + str(k.toPort))
-                    # print("Connection from " + k.fromPort.parent.displayName + " to " + k.toPort.parent.displayName)
-                    k.initLoad()
-                    a = 1
-                    # k.setConnToGroup("defaultGroup")
 
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
@@ -1111,7 +1072,7 @@ class Editor(QWidget):
         self.logger.debug("Ok, here is my log")
         self.logger.debug(int(args[0]) + 1)
         if len(self.connectionList) > 0:
-            self.connectionList[0].highlightConn()
+            self.connectionList[0].selectConnection()
 
     def getConnection(self, n):
         return self.connectionList[int(n)]

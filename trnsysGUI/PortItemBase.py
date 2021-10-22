@@ -1,12 +1,10 @@
 # pylint: skip-file
 # type: ignore
 
-import sys
-
 from PyQt5 import QtCore
-from PyQt5.QtCore import QRectF, Qt, QPointF
+from PyQt5.QtCore import QRectF, QPointF
 from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QMenu
+from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 
 class PortItemBase(QGraphicsEllipseItem):

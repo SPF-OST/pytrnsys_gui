@@ -5,15 +5,15 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.images as _img
+import massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem
-import trnsysGUI.images as _img
 
 
 class WTap(BlockItem):
@@ -66,26 +66,11 @@ class WTap(BlockItem):
         equationNr = 1
         return resStr, equationNr
 
-    def exportParametersFlowSolver(self, descConnLength):
-        temp = ""
-        for i in self.inputs:
-            for c in i.connectionList:
-                temp = temp + str(c.trnsysId) + " "
-                self.trnsysConn.append(c)
+    def getInternalPiping(self) -> InternalPiping:
+        portItem = _mfn.PortItem()
+        sink = _mfn.Sink(self.displayName, self.trnsysId, portItem)
 
-        for o in self.outputs:
-            for c in o.connectionList:
-                temp = temp + str(c.trnsysId) + " "
-                self.trnsysConn.append(c)
-
-        temp += "0 0 "
-        temp += str(self.typeNumber)
-        temp += " " * (descConnLength - len(temp))
-        self.exportConnsString = temp
-
-        f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
-        return f
+        return InternalPiping([sink], {portItem: self.inputs[0]})
 
     def addTree(self):
         """

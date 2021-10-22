@@ -1,12 +1,11 @@
 # pylint: skip-file
 # type: ignore
 
-from math import sqrt
 import typing as tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QLinearGradient, QBrush
+from PyQt5.QtGui import QLinearGradient, QBrush, QPen
 from PyQt5.QtWidgets import QGraphicsLineItem
 
 from trnsysGUI.CornerItem import CornerItem
@@ -26,7 +25,7 @@ class SinglePipeSegmentItem(SegmentItemBase):
         self.initGrad()
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
-        return SinglePipeSegmentItem(startNode, endNode, self.parent)
+        return SinglePipeSegmentItem(startNode, endNode, self.connection)
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.initGrad()
@@ -83,9 +82,9 @@ class SinglePipeSegmentItem(SegmentItemBase):
         color = QtCore.Qt.white
         pen1 = QtGui.QPen(color, 4)
 
-        totLenConn = self.parent.totalLength()
-        partLen1 = self.parent.partialLength(self.startNode)
-        partLen2 = self.parent.partialLength(self.endNode)
+        totLenConn = self.connection.totalLength()
+        partLen1 = self.connection.partialLength(self.startNode)
+        partLen2 = self.connection.partialLength(self.endNode)
 
         # self.logger.debug("totlenconn is " + str(totLenConn))
         # self.logger.debug("partlen1 is " + str(partLen1) + "(node1)" + str(self.startNode))
@@ -125,9 +124,13 @@ class SinglePipeSegmentItem(SegmentItemBase):
 
         self.singleLine.setPen(pen1)
 
-    def setHighlight(self, isHighlight: bool) -> None:
-        if isHighlight:
-            highlightPen = self._createHighlightPen()
-            self.singleLine.setPen(highlightPen)
+    def setSelect(self, isSelected: bool) -> None:
+        if isSelected:
+            selectPen = self._createSelectPen()
+            self.singleLine.setPen(selectPen)
         else:
             self.updateGrad()
+
+    def setColorAndWidthAccordingToMassflow(self, color, width):
+        pen1 = QPen(color, width)
+        self.singleLine.setPen(pen1)

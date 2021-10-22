@@ -83,7 +83,7 @@ class TestStorageTank:
 
 *************************************
 ** To be checked: 
-** check cp and rho values for the cirquits 
+** check cp and rho values for the circuits 
 ** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
 *************************************
 
@@ -92,32 +92,32 @@ class TestStorageTank:
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
-qSysOut_TesDhwLoss = sumQLoss_Tes7703
-qSysOut_TesDhwAcum = sumQAcum_Tes7703
+qSysOut_TesDhwLoss = QLoss_Tes7703
+qSysOut_TesDhwAcum = QAcum_Tes7703
 elSysIn_Q_TesDhwAux = qHeatSource_Tes7703
 
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
-Tdp1In_Tes7703 = Tdpp0ExtFromPortConn ! @connectDdck
-Mfrdp1_Tes7703 = Mfrdpp0ExtFromPortConn ! @connectDdck
-Tdp1InRev_Tes7703 = Tdpp0ExtToPortConn ! @connectDdck
+Tdp1In_Tes7703 = Tdpp0ExtFromPortConn
+Mfrdp1_Tes7703 = Mfrdpp0ExtFromPortConn
+Tdp1InRev_Tes7703 = Tdpp0ExtToPortConn
 EQUATIONS 3
-Tdp2In_Tes7703 = Tdpp1ExtFromPortConn ! @connectDdck
-Mfrdp2_Tes7703 = Mfrdpp1ExtFromPortConn ! @connectDdck
-Tdp2InRev_Tes7703 = Tdpp1ExtToPortConn ! @connectDdck
+Tdp2In_Tes7703 = Tdpp1ExtFromPortConn
+Mfrdp2_Tes7703 = Mfrdpp1ExtFromPortConn
+Tdp2InRev_Tes7703 = Tdpp1ExtToPortConn
 EQUATIONS 3
-Tdp3In_Tes7703 = Tdpp2ExtFromPortConn ! @connectDdck
-Mfrdp3_Tes7703 = Mfrdpp2ExtFromPortConn ! @connectDdck
-Tdp3InRev_Tes7703 = Tdpp2ExtToPortConn ! @connectDdck
+Tdp3In_Tes7703 = Tdpp2ExtFromPortConn
+Mfrdp3_Tes7703 = Mfrdpp2ExtFromPortConn
+Tdp3InRev_Tes7703 = Tdpp2ExtToPortConn
 EQUATIONS 3
-Thx1In_Tes7703 = Thx0ExtFromPortConn ! @connectDdck
-Mfrhx1_Tes7703 = Mfrhx0ExtFromPortConn ! @connectDdck
-Thx1InRev_Tes7703 = Thx0ExtToPortConn ! @connectDdck
+Thx1In_Tes7703 = Thx0ExtFromPortConn
+Mfrhx1_Tes7703 = Mfrhx0ExtFromPortConn
+Thx1InRev_Tes7703 = Thx0ExtToPortConn
 CONSTANTS 2
-zAux1_Tes7703=0.00 !connectDDck
-qAux1_Tes7703=0.00 !connectDDck
+zAux1_Tes7703=0.00
+qAux1_Tes7703=0.00
 
 *************************************
 **** Outputs to hydraulic solver ****
@@ -138,22 +138,22 @@ CONSTANTS 1
 ratioTes7703 = Vol_Tes7703 / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
-zInDp1_Tes7703=0.95 ! @connectDdck 
-zOutDp1_Tes7703=0.35 ! @connectDdck 
+zInDp1_Tes7703=0.95
+zOutDp1_Tes7703=0.35
 *********Connecting values of DIRECT PORT=2***********
 CONSTANTS 2
-zInDp2_Tes7703=0.70 ! @connectDdck 
-zOutDp2_Tes7703=0.90 ! @connectDdck 
+zInDp2_Tes7703=0.70
+zOutDp2_Tes7703=0.90
 *********Connecting values of DIRECT PORT=3***********
 CONSTANTS 2
-zInDp3_Tes7703=0.05 ! @connectDdck 
-zOutDp3_Tes7703=0.95 ! @connectDdck 
+zInDp3_Tes7703=0.05
+zOutDp3_Tes7703=0.95
 *********Connecting values of HX=1***********
 CONSTANTS 4
-zInhx1_Tes7703=0.30  ! @connectDdck
-zOuthx1_Tes7703=0.12 ! @connectDdck
-Cphx1_Tes7703=cpwat     ! @connectDdck
-Rhohx1_Tes7703=rhowat    ! @connectDdck
+zInhx1_Tes7703=0.30
+zOuthx1_Tes7703=0.12
+Cphx1_Tes7703=cpwat
+Rhohx1_Tes7703=rhowat
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes7703=0 ! 0: no forced stratification ; 1: force to stratify
@@ -230,11 +230,11 @@ Ubot_Tes7703 = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
 Atop_Tes7703 = Vol_Tes7703/Heigh_Tes7703 ! m2
 Diameter_Tes7703 = (4*ATop_Tes7703/PI)^0.5 ! m 
 ALat_Tes7703 = Heigh_Tes7703*PI*Diameter_Tes7703 ! m2
-UaBot_Tes7703= Ubot_Tes7703*ATop_Tes7703 ! @userDefined W/k 
-Uaz1_Tes7703 = Ufoam_Tes7703*ALat_Tes7703/3 ! @userDefined W/k
-Uaz2_Tes7703 = Ufoam_Tes7703*ALat_Tes7703/3 ! @userDefined W/k
-Uaz3_Tes7703 = Ufoam_Tes7703*ALat_Tes7703/3 ! @userDefined W/k
-UaTop_Tes7703 = Ufoam_Tes7703*ATop_Tes7703 ! @userDefined W/k
+UaBot_Tes7703= Ubot_Tes7703*ATop_Tes7703 !  W/k 
+Uaz1_Tes7703 = Ufoam_Tes7703*ALat_Tes7703/3 !  W/k
+Uaz2_Tes7703 = Ufoam_Tes7703*ALat_Tes7703/3 !  W/k
+Uaz3_Tes7703 = Ufoam_Tes7703*ALat_Tes7703/3 !  W/k
+UaTop_Tes7703 = Ufoam_Tes7703*ATop_Tes7703 !  W/k
 ************* MOVING PLATE *******************
 CONSTANTS 4
 MoInsPlate_Tes7703=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
@@ -364,11 +364,11 @@ Qhx1Out_Tes7703=[50,104] !
 EQUATIONS 1
 qHeatSource_Tes7703 = [50,181] ! Heat input of all auxiliary heat sources [kW]
 EQUATIONS 5
-sumQv_Tes7703     = [50,176] ! Heat input of all heat exchangers [kW]
-sumQLoss_Tes7703  = [50,177] ! Heat Losses of the Tes [kW]
-sumQAcum_Tes7703  = [50,178] ! Sensible accumulated heat [kW]
-sumQPorts_Tes7703 = [50,179] ! Heat Input by direct ports [kW]
-Imb_Tes7703       = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
+Qv_Tes7703     = [50,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]
+QLoss_Tes7703  = [50,177] ! Heat Losses of the Tes [kW]
+QAcum_Tes7703  = [50,178] ! Sensible accumulated heat [kW]
+QPorts_Tes7703 = [50,179] ! Heat Input by direct ports [kW]
+QImb_Tes7703   = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
 CONSTANTS 1 
 unitPrinter_Tes7703 = 51 
 ASSIGN temp\TES7703_MO.Prt unitPrinter_Tes7703
@@ -380,7 +380,7 @@ unitPrinter_Tes7703 ! 1: Logical unit number, -
 -1  ! 4: Printing & integrating interval, h. -1 for monthly integration
 0  ! 5: Number of inputs to avoid integration
 INPUTS 10
-sumQv_Tes1 sumQLoss_Tes1 sumQAcum_Tes1 sumQPorts_Tes1 Imb_Tes1 Qdp1_Tes7703 Qdp2_Tes7703 Qdp3_Tes7703 Qhx1Out_Tes7703 qHeatSource_Tes7703 
+Qv_Tes7703 QLoss_Tes7703 QAcum_Tes7703 QPorts_Tes7703 QImb_Tes7703 Qdp1_Tes7703 Qdp2_Tes7703 Qdp3_Tes7703 Qhx1Out_Tes7703 qHeatSource_Tes7703 
 zero zero zero zero zero zero zero zero zero zero 
 *************************************
 ********** Online Plotter ***********
