@@ -1,23 +1,34 @@
 # pylint: skip-file
 # type: ignore
 
-import typing as _tp
-import math as _math
+from __future__ import annotations
 
-import numpy as np
-from PyQt5.QtCore import QLineF, QPointF
-from PyQt5.QtGui import QColor, QPen
+import dataclasses as _dc
+import math as _math
+import typing as _tp
+import uuid as _uuid
+
+import dataclasses_jsonschema as _dcj
+from PyQt5.QtCore import QPointF
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
-import trnsysGUI.BlockItem as _bi
-from trnsysGUI import idGenerator as _id
-from trnsysGUI.Collector import Collector
+import massFlowSolver as _mfs
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.hydraulicLoops as _hl
+import trnsysGUI.serialization as _ser
+from massFlowSolver import InternalPiping
+from trnsysGUI import idGenerator as _id, PortItemBase as _pi
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
-from trnsysGUI.PortItem import PortItem
-from trnsysGUI.Pump import Pump
+from trnsysGUI.PortItemBase import PortItemBase
+from trnsysGUI.SegmentItemBase import SegmentItemBase
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.segmentItem import segmentItem
+from trnsysGUI.connection.segmentItemFactory import SegmentItemFactoryBase
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.BlockItem as _bi
 
 
 def calcDist(p1, p2):
@@ -26,13 +37,15 @@ def calcDist(p1, p2):
     return norm
 
 
-class Connection(object):
-    def __init__(self, fromPort: PortItem, toPort: PortItem, parent, **kwargs):
+class Connection(_mfs.MassFlowNetworkContributorMixin):
+    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, segmentItemFactory: SegmentItemFactoryBase, parent):
         self.logger = parent.logger
 
         self.fromPort = fromPort
         self.toPort = toPort
         self.displayName = None
+
+        self._segmentItemFactory = segmentItemFactory
 
         self.parent = parent
         self.groupName = ""
@@ -44,45 +57,26 @@ class Connection(object):
         self.exportInputName = "0"
         self.exportInitialInput = -1
         self.exportEquations = []
-        self._portItemsWithParent: _tp.List[_tp.Tuple[PortItem, _bi.BlockItem]] = []
+        self._portItemsWithParent: _tp.List[_tp.Tuple[PortItemBase, _bi.BlockItem]] = []
 
         # Global
         self.id = self.parent.idGen.getID()
         self.connId = self.parent.idGen.getConnID()
         self.trnsysId = self.parent.idGen.getTrnsysID()
 
-        self.segments: _tp.List[segmentItem] = []
+        self.segments: _tp.List[SegmentItemBase] = []
 
         self.startNode = Node()
         self.endNode = Node()
-        self.firstS: _tp.Optional[segmentItem] = None
-
-        self.segmentsLoad = None
-        self.cornersLoad = None
-        self.labelPosLoad = None
-        self.labelMassPosLoad = None
+        self.firstS: _tp.Optional[SegmentItemBase] = None
 
         self.mass = 0  # comment out
         self.temperature = 0
 
-        # A new connection is created if there are no kwargs
-        if not kwargs:
-            self.fromPortId = self.parent.idGen.getID()
-            self.toPortId = self.parent.idGen.getID()
-            self.initNew(parent)
-        else:
-            if "loadedConn" in kwargs:
-                self.logger.debug("Connection being loaded")
-                self.fromPortId = kwargs["fromPortId"]
-                self.toPortId = kwargs["toPortId"]
-                self.segmentsLoad = kwargs["segmentsLoad"]
-                self.cornersLoad = kwargs["cornersLoad"]
+        self.initNew(parent)
 
-                if "labelPos" in kwargs:
-                    self.labelPosLoad = kwargs["labelPos"]
-
-                if "labelMassPos" in kwargs:
-                    self.labelMassPosLoad = kwargs["labelMassPos"]
+    def _createSegmentItem(self, startNode, endNode):
+        return self._segmentItemFactory.createSegmentItem(startNode, endNode, self)
 
     def isVisible(self):
         res = True
@@ -159,26 +153,12 @@ class Connection(object):
                 col = QColor(255, 153, 153)  # light red
             elif kwargs["mfr"] == "75ToMax":
                 col = QColor(255, 51, 51)  # red
-            # elif kwargs["mfr"] == "negMinToLower":
-            #     col = QColor(0, 0, 0)  # Black
-            # elif kwargs["mfr"] == "negLowerToMedian":
-            #     col = QColor(47, 47, 73)  # Lighter black
-            # elif kwargs["mfr"] == "negMedianToUpper":
-            #     col = QColor(78, 78, 97)  # even lighter black
-            # elif kwargs["mfr"] == "negUpperToMax":
-            #     col = QColor(100, 100, 114)  # even even lighter black
-            # elif kwargs["mfr"] == "negMaxToZero":
-            #     col = QColor(115, 115, 124)  # darker than gray
-            # elif kwargs["mfr"] == "zeroToMin":
-            #     col = QColor(156, 156, 164)  # lighter than gray
             else:
-                # PosMfr
                 col = QColor(255, 0, 0)
 
             for s in self.segments:
                 self.logger.debug("Value: " + str(value))
-                pen1 = QPen(col, value)
-                s.setPen(pen1)
+                s.setColorAndWidthAccordingToMassflow(col, value)
 
         else:
             self.logger.debug("No color to set in Connection.setColor()")
@@ -201,14 +181,11 @@ class Connection(object):
         self.logger.debug("corner not found is " + str(searchCorner))
 
         return 0
-        # Alternative
-        # return corners.index(searchCorner)
 
     def getFirstSeg(self):
         return self.segments[0]
 
     def getCorners(self):
-        # Returns a list containing all the corners of this connection
         res = []
 
         tempNode = self.startNode.nextN()
@@ -217,29 +194,7 @@ class Connection(object):
             res.append(tempNode.parent)
             tempNode = tempNode.nextN()
 
-        # self.logger.debug("getcorners gives " + str(res))
         return res
-
-    # To correct the direction of a connection, unused
-    def correctPorts(self):
-        if isinstance(self.fromPort.parent, Pump):
-            if self.fromPort.name == "i":
-                self.switchPorts()
-
-        if isinstance(self.toPort.parent, Pump):
-            if self.toPort.name == "o":
-                self.switchPorts()
-
-        if isinstance(self.fromPort, Collector):
-            if self.fromPort.name == "i":
-                self.switchPorts()
-
-        if isinstance(self.toPort, Collector):
-            if self.toPort.name == "o":
-                self.switchPorts()
-
-        if isinstance(self.fromPort.parent, TVentil):
-            self.switchPorts()
 
     def switchPorts(self):
         temp = self.fromPort
@@ -250,55 +205,23 @@ class Connection(object):
     def initNew(self, parent):
 
         self.parent = parent
-        # self.logger.debug("Parent is " + str(self.parent))
 
-        # Global
         self.parent.trnsysObj.append(self)
 
         self.displayName = "Conn" + str(self.connId)
 
-        # global editorMode
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")
             self.initSegmentM0()
         elif self.parent.editorMode == 1:
             self.logger.debug("Creating a new connection in mode 1")
-            self.initSegmentM1()
+            self._initializeSingleSegmentConnection()
         else:
             self.logger.debug("No valid mode during creating of connection")
 
         self.parent.connectionList.append(self)
         self.fromPort.connectionList.append(self)
         self.toPort.connectionList.append(self)
-
-        # self.correctPorts()
-
-    def initLoad(self):
-        # Called by DiagramEditor when loading connection
-
-        self.logger.debug("Port 1 is " + str(self.fromPort) + "has Id" + str(self.fromPort.id))
-        self.logger.debug("Port 2 is " + str(self.toPort))
-
-        # self.parent = loadParent
-        self.initSegmentM1()
-
-        self.parent.trnsysObj.append(self)
-
-        self.parent.connectionList.append(self)
-        self.fromPort.connectionList.append(self)
-        self.toPort.connectionList.append(self)
-
-        if len(self.cornersLoad) > 0:
-            self.loadSegments()
-
-        if self.labelPosLoad:
-            self.setLabelPos(self.labelPosLoad)
-
-        if self.labelMassPosLoad:
-            self.setMassLabelPos(self.labelMassPosLoad)
-
-        # Still not tested
-        # self.correctPorts()
 
     def initSegmentM0(self):
         self.startNode.setParent(self)
@@ -307,15 +230,15 @@ class Connection(object):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = segmentItem(self.startNode, self.endNode, self)
+        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
 
-        self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
+        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
         self.parent.diagramScene.addItem(self.firstS)
 
         self.positionLabel()
 
-    def initSegmentM1(self):
+    def _initializeSingleSegmentConnection(self):
         # Can be rewritten for efficiency etc. (e.g not doing initSegmentM0 and calling niceConn())
 
         self.startNode.setParent(self)
@@ -324,9 +247,9 @@ class Connection(object):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = segmentItem(self.startNode, self.endNode, self)
+        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
 
-        self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
+        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
         self.parent.diagramScene.addItem(self.firstS)
 
@@ -334,24 +257,17 @@ class Connection(object):
 
         self.positionLabel()
 
-    def loadSegments(self):
+    def loadSegments(self, segmentsCorners):
         self.clearConn()
-
-        self.logger.debug("cornerLoads is " + str(self.cornersLoad))
 
         tempNode = self.startNode
 
-        self.logger.debug("start node has nn " + str(tempNode.nextNode))
-        self.logger.debug(" ")
-        rad = 2
+        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
 
-        for x in range(len(self.cornersLoad)):
+        for x in range(len(segmentsCorners)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
-            # self.logger.debug("items are now " + str(self.parent.diagramScene.items()))
-            self.logger.debug("Corner" + str(cor) + " has  " + str(cor.node))
 
-            cor.setPos(float(self.cornersLoad[x][0]), float(self.cornersLoad[x][1]))
-            # cor.setFlags(cor.ItemIsSelectable | cor.ItemIsMovable)
+            cor.setPos(float(segmentsCorners[x][0]), float(segmentsCorners[x][1]))
             cor.setFlag(cor.ItemSendsScenePositionChanges, True)
 
             cor.setZValue(100)
@@ -361,13 +277,13 @@ class Connection(object):
 
             cor.node.nextNode.setPrev(cor.node)
             cor.node.prevNode.setNext(cor.node)
-            segmentItem(tempNode, cor.node, self)
+            self._createSegmentItem(tempNode, cor.node)
 
             tempNode = cor.node
 
             self.printConn()
 
-        segmentItem(tempNode, tempNode.nextN(), self)
+        self._createSegmentItem(tempNode, tempNode.nextN())
 
         # self.parent.diagramScene.addItem(lastSeg)
 
@@ -396,8 +312,7 @@ class Connection(object):
 
             self.logger.debug("pos1 is " + str(pos1))
             self.logger.debug("pos2 is " + str(pos2))
-
-            s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
+            s.setLine(pos1[0], pos1[1], pos2[0], pos2[1])
 
             self.parent.diagramScene.addItem(s)
 
@@ -417,47 +332,12 @@ class Connection(object):
             s.label.setPlainText(self.displayName)
 
     def positionLabel(self):
+        self.firstS.label.setPos(self.getStartPoint())
+        self.rotateLabel()
 
-        if self.parent.editorMode == 0:
-            vec1 = self.firstS.line().p2() - self.firstS.line().p1()
-            vec2 = QPointF(1 / 10 * vec1.x(), 1 / 10 * vec1.y())
-
-            eps = 0.5
-            if vec1.x() == 0:
-                angleBetween = _math.atan(vec1.y() / eps)
-            else:
-                angleBetween = _math.atan(vec1.y() / vec1.x())
-
-            d1 = calcDist(QPointF(0, 0), vec1)
-
-            if d1 == 0:
-                d1 = eps
-
-            vec3 = QPointF(-5 * angleBetween * vec1.y() / d1, 5 * angleBetween * vec1.x() / d1)
-            self.firstS.label.setPos(self.fromPort.pos() + vec2 + vec3)
-
-        elif self.parent.editorMode == 1:
-            # self.logger.debug("changing label pos in editor mode 1")
-            if self.fromPort.side == 0:
-                self.firstS.label.setPos(QPointF(-60, 0))
-
-            # Here the behavior of positioning can be improved
-            elif self.fromPort.side in [1, 2, 3]:
-                self.firstS.label.setPos(QPointF(20, 0))
-        else:
-            pass
-        if self.segmentsLoad:
-            vec1 = np.array(self.segmentsLoad[0][:2])
-            vec2 = np.array(self.segmentsLoad[0][2:])
-            vec = vec2 - vec1
-            # uVec1 = vec1/np.linalg.norm(vec1)
-            # uVec2 = vec2/np.linalg.norm(vec2)
-            uVec = vec / np.linalg.norm(vec)
-            dotProduct = np.dot(np.array([1.0, 0]), uVec)
-            angle = np.rad2deg(np.arccos(dotProduct))
-            if np.isnan(angle):
-                angle = 0
-            self.firstS.label.setRotation(-angle)
+    def rotateLabel(self):
+        angle = 0 if self.firstS.isHorizontal() else 90
+        self.firstS.label.setRotation(angle)
 
     def setMassFlowLabelVisible(self, isVisible: bool) -> None:
         self.firstS.setMassFlowLabelVisible(isVisible)
@@ -474,7 +354,7 @@ class Connection(object):
 
         """
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 2  # 4
+        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
 
         self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
@@ -499,11 +379,11 @@ class Connection(object):
             corner2.node.setNext(corner3.node)
             corner3.node.setNext(corner4.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, corner3.node, self)
-            seg4 = segmentItem(corner3.node, corner4.node, self)
-            seg5 = segmentItem(corner4.node, self.endNode, self)
+            seg1 = self._createSegmentItem(self.startNode, corner1.node)
+            seg2 = self._createSegmentItem(corner1.node, corner2.node)
+            seg3 = self._createSegmentItem(corner2.node, corner3.node)
+            seg4 = self._createSegmentItem(corner3.node, corner4.node)
+            seg5 = self._createSegmentItem(corner4.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
@@ -529,11 +409,11 @@ class Connection(object):
             p3 = QPointF(pos2.x() + portOffset, baseline_h)
             p4 = QPointF(p3.x(), pos2.y())
 
-            seg1.setLine(QLineF(pos1, p1))
-            seg2.setLine(QLineF(p1, p2))
-            seg3.setLine(QLineF(p2, p3))
-            seg4.setLine(QLineF(p3, p4))
-            seg5.setLine(QLineF(p4, pos2))
+            seg1.setLine(pos1, p1)
+            seg2.setLine(p1, p2)
+            seg3.setLine(p2, p3)
+            seg4.setLine(p3, p4)
+            seg5.setLine(p4, pos2)
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -566,11 +446,11 @@ class Connection(object):
             corner2.node.setNext(corner3.node)
             corner3.node.setNext(corner4.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, corner3.node, self)
-            seg4 = segmentItem(corner3.node, corner4.node, self)
-            seg5 = segmentItem(corner4.node, self.endNode, self)
+            seg1 = self._createSegmentItem(self.startNode, corner1.node)
+            seg2 = self._createSegmentItem(corner1.node, corner2.node)
+            seg3 = self._createSegmentItem(corner2.node, corner3.node)
+            seg4 = self._createSegmentItem(corner3.node, corner4.node)
+            seg5 = self._createSegmentItem(corner4.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
@@ -597,11 +477,11 @@ class Connection(object):
             p3 = QPointF(pos2.x() - portOffset, baseline_h)
             p4 = QPointF(p3.x(), pos2.y())
 
-            seg1.setLine(QLineF(pos1, p1))
-            seg2.setLine(QLineF(p1, p2))
-            seg3.setLine(QLineF(p2, p3))
-            seg4.setLine(QLineF(p3, p4))
-            seg5.setLine(QLineF(p4, pos2))
+            seg1.setLine(pos1, p1)
+            seg2.setLine(p1, p2)
+            seg3.setLine(p2, p3)
+            seg4.setLine(p3, p4)
+            seg5.setLine(p4, pos2)
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -632,8 +512,8 @@ class Connection(object):
             if pos2.y() <= pos1.y():
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
@@ -644,8 +524,8 @@ class Connection(object):
 
                 p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
-                seg1.setLine(QLineF(pos1, p1))
-                seg2.setLine(QLineF(p1, pos2))
+                seg1.setLine(pos1, p1)
+                seg2.setLine(p1, pos2)
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner1.setZValue(100)
@@ -662,14 +542,13 @@ class Connection(object):
 
                 corner1.node.setNext(corner2.node)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, corner2.node, self)
-                seg3 = segmentItem(corner2.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, corner2.node)
+                seg3 = self._createSegmentItem(corner2.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.printConnNodes()
                 self.parent.diagramScene.addItem(seg1)
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(seg3)
@@ -682,10 +561,11 @@ class Connection(object):
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
 
-                seg1.setLine(QLineF(pos1, help_point_1))
-                seg2.setLine(QLineF(help_point_1, help_point_2))
-                seg3.setLine(QLineF(help_point_2, pos2))
+                seg1.setLine(pos1, help_point_1)
+                seg2.setLine(help_point_1, help_point_2)
+                seg3.setLine(help_point_2, pos2)
 
+                self.printConnNodes()
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
 
@@ -693,7 +573,6 @@ class Connection(object):
                 corner2.setZValue(100)
                 self.fromPort.setZValue(100)
                 self.toPort.setZValue(100)
-                self.logger.debug("Here in niceconn")
 
                 corner1.setPos(help_point_1)
                 corner2.setPos(help_point_2)
@@ -712,8 +591,8 @@ class Connection(object):
             if pos2.y() >= pos1.y():
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
@@ -724,8 +603,8 @@ class Connection(object):
 
                 p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
-                seg1.setLine(QLineF(pos1, p1))
-                seg2.setLine(QLineF(p1, pos2))
+                seg1.setLine(pos1, p1)
+                seg2.setLine(p1, pos2)
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner1.setZValue(100)
@@ -741,14 +620,13 @@ class Connection(object):
 
                 corner1.node.setNext(corner2.node)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, corner2.node, self)
-                seg3 = segmentItem(corner2.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, corner2.node)
+                seg3 = self._createSegmentItem(corner2.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.printConnNodes()
                 self.parent.diagramScene.addItem(seg1)
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(seg3)
@@ -761,9 +639,11 @@ class Connection(object):
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
 
-                seg1.setLine(QLineF(pos1, help_point_1))
-                seg2.setLine(QLineF(help_point_1, help_point_2))
-                seg3.setLine(QLineF(help_point_2, pos2))
+                seg1.setLine(pos1, help_point_1)
+                seg2.setLine(help_point_1, help_point_2)
+                seg3.setLine(help_point_2, pos2)
+
+                self.printConnNodes()
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -782,6 +662,8 @@ class Connection(object):
             # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
             #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
             #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
+            pos1 = self.fromPort.scenePos()
+            pos2 = self.toPort.scenePos()
 
             self.fromPort.createdAtSide = self.fromPort.side
             self.toPort.createdAtSide = self.toPort.side
@@ -793,15 +675,14 @@ class Connection(object):
 
             corner1.node.setNext(corner2.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, self.endNode, self)
+            seg1 = self._createSegmentItem(self.startNode, corner1.node)
+            seg2 = self._createSegmentItem(corner1.node, corner2.node)
+            seg3 = self._createSegmentItem(corner2.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner2.node)
 
             # self.logger.debug("niceConn...")
-            self.printConnNodes()
             self.parent.diagramScene.addItem(seg1)
             self.parent.diagramScene.addItem(seg2)
             self.parent.diagramScene.addItem(seg3)
@@ -809,26 +690,25 @@ class Connection(object):
             self.parent.diagramScene.addItem(corner1)
             self.parent.diagramScene.addItem(corner2)
 
-            pos1 = self.fromPort.scenePos()
-            pos2 = self.toPort.scenePos()
-
             midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
 
-            help_point_1 = QPointF(midx, pos1.y())
-            help_point_2 = QPointF(midx, pos2.y())
-
-            seg1.setLine(QLineF(pos1, help_point_1))
-            seg2.setLine(QLineF(help_point_1, help_point_2))
-            seg3.setLine(QLineF(help_point_2, pos2))
+            seg1.setLine(pos1.x(), pos1.y(), midx, pos1.y())
+            seg2.setLine(midx, pos1.y(), midx, pos2.y())
+            seg3.setLine(midx, pos2.y(), pos2.x(), pos2.y())
+            self.printConnNodes()
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
 
             corner1.setZValue(100)
             corner2.setZValue(100)
-            self.fromPort.setZValue(100)
             self.toPort.setZValue(100)
+            self.fromPort.setZValue(100)
+
             self.logger.debug("Here in niceconn")
+
+            help_point_1 = QPointF(midx, pos1.y())
+            help_point_2 = QPointF(midx, pos2.y())
 
             corner1.setPos(help_point_1)
             corner2.setPos(help_point_2)
@@ -850,7 +730,7 @@ class Connection(object):
             # self.logger.debug("Col items are " + str(col))
 
             for c in col:
-                if type(c) is segmentItem:
+                if type(c) is SegmentItemBase:
                     # self.logger.debug("There is a segment colliding....")
                     # self.logger.debug("c.hasBridge is " + str(c.hasBridge))
                     # self.logger.debug("s.hasBridge is " + str(s.hasBridge))
@@ -886,8 +766,8 @@ class Connection(object):
                             s.startNode.setNext(node1)
                             s.endNode.setPrev(node2)
 
-                            s.firstChild = segmentItem(s.startNode, node1, s.parent)
-                            s.secondChild = segmentItem(node2, s.endNode, s.parent)
+                            s.firstChild = self._createSegmentItem(s.startNode, node1)
+                            s.secondChild = self._createSegmentItem(node2, s.endNode)
 
                             s.hasBridge = True
                             c.hasBridge = True
@@ -940,8 +820,8 @@ class Connection(object):
                             newPos1 = collisionPos - normVecp2p1
                             newPos2 = collisionPos + normVecp2p1
 
-                            s.firstChild.setLine(QLineF(qp1.x(), qp1.y(), newPos1.x(), newPos1.y()))
-                            s.secondChild.setLine(QLineF(newPos2.x(), newPos2.y(), qp2.x(), qp2.y()))
+                            s.firstChild.setLine(qp1.x(), qp1.y(), newPos1.x(), newPos1.y())
+                            s.secondChild.setLine(newPos2.x(), newPos2.y(), qp2.x(), qp2.y())
 
                             s.firstChild.setVisible(True)
                             s.secondChild.setVisible(True)
@@ -966,12 +846,12 @@ class Connection(object):
         items = self.parent.diagramScene.items()
 
         for it in items:
-            if type(it) is segmentItem:
+            if isinstance(it, SegmentItemBase):
                 if it.startNode.lastNode() is self.endNode or it.startNode.firstNode() is self.startNode:
                     # self.logger.debug("Del segment")
                     self.parent.diagramScene.removeItem(it)
             if type(it) is QGraphicsTextItem:
-                if type(it.parent) is PortItem:
+                if isinstance(it.parent, PortItemBase):
                     self.logger.debug("it has " + str(it.parent()))
                     self.logger.debug("Deleting it")
                     self.parent.diagramScene.removeItem(it)
@@ -1151,28 +1031,32 @@ class Connection(object):
             else:
                 self.logger.debug("While removeing conn from group, no group with conn.groupName")
 
-    # Highlight when clicked, unhighlight when clicked elsewhere
-    def highlightConn(self):
-        self.unhighlightOtherConns()
+    # Select when clicked, deselect when clicked elsewhere
+    def selectConnection(self):
+        self.deselectOtherConnections()
 
         for s in self.segments:
-            s.setHighlight(True)
+            s.setSelect(True)
 
-        self.setLabelsHighlight(True)
+        self.isSelected = True
 
-    def unhighlightOtherConns(self):
+        self.setLabelsSelected(True)
+
+    def deselectOtherConnections(self):
         for c in self.parent.connectionList:
-            c.unhighlightConn()
+            c.deselectConnection()
 
-    def unhighlightConn(self):
+    def deselectConnection(self):
         for s in self.segments:
             s.updateGrad()
 
-        self.setLabelsHighlight(False)
+        self.isSelected = False
 
-    def setLabelsHighlight(self, isHighlight: bool) -> None:
-        self._setBold(self.firstS.label, isHighlight)
-        self._setBold(self.firstS.labelMass, isHighlight)
+        self.setLabelsSelected(False)
+
+    def setLabelsSelected(self, isSelected: bool) -> None:
+        self._setBold(self.firstS.label, isSelected)
+        self._setBold(self.firstS.labelMass, isSelected)
 
     @staticmethod
     def _setBold(label: QGraphicsTextItem, isBold: bool) -> None:
@@ -1240,54 +1124,53 @@ class Connection(object):
     def encode(self):
         self.logger.debug("Encoding a connection")
 
-        dct = {}
-        dct[".__ConnectionDict__"] = True
-        dct["PortFromID"] = self.fromPort.id
-        dct["PortToID"] = self.toPort.id
-        dct["ConnDisplayName"] = self.displayName
-        dct["ConnID"] = self.id
-        dct["ConnCID"] = self.connId
-        dct["trnsysID"] = self.trnsysId
-        dct["GroupName"] = self.groupName
-
-        segments = []  # Not used, but instead corners[]
-
-        for s in self.segments:
-            segmentTupel = (s.line().p1().x(), s.line().p1().y(), s.line().p2().x(), s.line().p2().y())
-            segments.append(segmentTupel)
-        # self.logger.debug("Segments in encoder is " + str(segments))
-        dct["SegmentPositions"] = segments
         if len(self.segments) > 0:
-            dct["FirstSegmentLabelPos"] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-            dct["FirstSegmentMassFlowLabelPos"] = (
-                self.segments[0].labelMass.pos().x(),
-                self.segments[0].labelMass.pos().y(),
-            )
+            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
         else:
             self.logger.debug("This connection has no segment")
-            defaultPosition = self.fromPort.pos().x(), self.fromPort.pos().y()
-            dct["FirstSegmentLabelPos"] = defaultPosition
-            dct["FirstSegmentMassFlowLabelPos"] = defaultPosition
+            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()
+            labelPos = defaultPos
+            labelMassPos = defaultPos
 
         corners = []
-
         for s in self.getCorners():
             cornerTupel = (s.pos().x(), s.pos().y())
             corners.append(cornerTupel)
-        dct["CornerPositions"] = corners
-        dictName = "Connection-"
 
-        return dictName, dct
+        connectionModel = ConnectionModel(
+            self.connId,
+            self.displayName,
+            self.id,
+            corners,
+            labelPos,
+            labelMassPos,
+            self.groupName,
+            self.fromPort.id,
+            self.toPort.id,
+            self.trnsysId,
+        )
+
+        dictName = "Connection-"
+        return dictName, connectionModel.to_dict()
 
     def decode(self, i):
         self.logger.debug("Loading a connection in Decoder")
 
-        self.id = i["ConnID"]
-        self.connId = i["ConnCID"]
-        self.trnsysId = i["trnsysID"]
-        self.setName(i["ConnDisplayName"])
+        model = ConnectionModel.from_dict(i)
+
+        self.id = model.id
+        self.connId = model.connectionId
+        self.trnsysId = model.trnsysId
+        self.setName(model.name)
         self.groupName = "defaultGroup"
-        self.setConnToGroup(i["GroupName"])
+        self.setConnToGroup(model.groupName)
+
+        if len(model.segmentsCorners) > 0:
+            self.loadSegments(model.segmentsCorners)
+
+        self.setLabelPos(model.labelPos)
+        self.setMassLabelPos(model.massFlowLabelPos)
 
     # Export related
     def exportBlackBox(self):
@@ -1305,63 +1188,31 @@ class Connection(object):
     def exportDivSetting2(self, nUnit):
         return "", nUnit
 
-    def exportParametersFlowSolver(self, descConnLength):
-        f = ""
+    def getInternalPiping(self) -> InternalPiping:
+        fromPort = _mfn.PortItem()
+        toPort = _mfn.PortItem()
 
-        if hasattr(self.fromPort.parent, "getSubBlockOffset"):
-            temp = str(self.fromPort.parent.trnsysId + self.fromPort.parent.getSubBlockOffset(self)) + " "
-        else:
-            portId = self.fromPort.parent.getFlowSolverParametersId(self.fromPort)
-            temp = f"{portId} "
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
 
-        if hasattr(self.toPort.parent, "getSubBlockOffset"):
-            temp += str(self.toPort.parent.trnsysId + self.toPort.parent.getSubBlockOffset(self))
-        else:
-            portId = self.toPort.parent.getFlowSolverParametersId(self.toPort)
-            temp += f"{portId} "
+        return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-        temp += " 0" * 2 + " "
-        self.exportConnsString = temp
+    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
+        assert graphicalPortItem in [self.fromPort, self.toPort],\
+            "This connection is not connected to `graphicalPortItem'"
 
-        # This is to ensure that the "output" of a Div always appears first
-        fromPortWithParent = (self.fromPort, self.fromPort.parent)
-        if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
-            self._portItemsWithParent.insert(0, fromPortWithParent)
-        else:
-            self._portItemsWithParent.append(fromPortWithParent)
+        blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
 
-        toPortWithParent = (self.toPort, self.toPort.parent)
-        if type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs:
-            self._portItemsWithParent.insert(0, toPortWithParent)
-        else:
-            self._portItemsWithParent.append(toPortWithParent)
+        internalPiping = blockItem.getInternalPiping()
 
-        f += temp + " " * (descConnLength - len(temp)) + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
+        for startingNode in internalPiping.openLoopsStartingNodes:
+            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
+            for realNode in realNodesAndPortItems.realNodes:
+                for portItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
+                    candidateGraphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+                    if candidateGraphicalPortItem == graphicalPortItem:
+                        return realNode.trnsysId
 
-        return f
-
-    @staticmethod
-    def exportInputsFlowSolver1():
-        return "0,0 ", 1
-
-    def exportInputsFlowSolver2(self):
-        return str(self.exportInitialInput) + " ", 1
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        equation1 = self._createFlowSolverOutputEquation(0, abc, prefix, equationNumber, simulationUnit)
-        equation2 = self._createFlowSolverOutputEquation(1, abc, prefix, equationNumber, simulationUnit)
-
-        self.exportEquations.append(equation1)
-        self.exportEquations.append(equation2)
-
-        equations = equation1 + equation2
-        nEquationsUsed = 2
-        nextEquationNumber = equationNumber + 3
-
-        return equations, nextEquationNumber, nEquationsUsed
-
-    def _createFlowSolverOutputEquation(self, equationNumber, abc, prefix, equationNumberOffset, simulationUnit):
-        return f"{prefix}{self.displayName}_{abc[equationNumber]}=[{simulationUnit},{equationNumberOffset + equationNumber}]\n"
+        return None
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         f = ""
@@ -1404,9 +1255,21 @@ class Connection(object):
 
         unitText += "INPUTS " + str(inputNumbers) + "\n"
 
-        if len(self._portItemsWithParent) == 2:
-            portItem = self._portItemsWithParent[0][0]
-            parent = self._portItemsWithParent[0][1]
+        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+        assert len(openLoops) == 1
+        openLoop = openLoops[0]
+
+        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+        assert len(realNodes) == 1
+        realNode = realNodes[0]
+
+        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+
+        portItemsWithParent = self._getPortItemsWithParent()
+
+        if len(portItemsWithParent) == 2 or True:
+            portItem = portItemsWithParent[0][0]
+            parent = portItemsWithParent[0][1]
             if hasattr(parent, "getSubBlockOffset"):
                 unitText += (
                     "T"
@@ -1418,11 +1281,11 @@ class Connection(object):
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
-            unitText += self.exportEquations[0][0 : self.exportEquations[0].find("=")] + "\n"
+            unitText += f"{outputVariables[0].name}\n"
             unitText += tempRoomVar + "\n"
 
-            portItem = self._portItemsWithParent[1][0]
-            parent = self._portItemsWithParent[1][1]
+            portItem = portItemsWithParent[1][0]
+            parent = portItemsWithParent[1][1]
             if hasattr(parent, "getSubBlockOffset"):
                 unitText += (
                     "T"
@@ -1466,6 +1329,15 @@ class Connection(object):
 
         return unitText, unitNumber
 
+    def _getPortItemsWithParent(self):
+        if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
+            return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
+
+        if type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs:
+            return [(self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)]
+
+        return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
+
     def findStoragePort(self, virtualBlock):
         portToPrint = None
         for p in virtualBlock.inputs + virtualBlock.outputs:
@@ -1484,15 +1356,11 @@ class Connection(object):
                         portToPrint = self.fromPort.connectionList[0].fromPort
         return portToPrint
 
-    def cleanUpAfterTrnsysExport(self):
-        self.exportConnsString = ""
-        self.exportInputName = "0"
-        # self.exportInitialInput = -1
-        self.exportEquations = []
-        self._portItemsWithParent = []
-
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
+
+    def editHydraulicLoop(self) -> None:
+        _hl.showHydraulicLoopDialog(self.fromPort, self.toPort)
 
 
 class DeleteConnectionCommand(QUndoCommand):
@@ -1508,4 +1376,86 @@ class DeleteConnectionCommand(QUndoCommand):
         self.conn = None
 
     def undo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)
+        self.conn = Connection(self.connFromPort, self.connToPort, self.segmentItemFactory, self.connParent)
+
+@_dc.dataclass
+class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
+    ConnCID: int
+    ConnDisplayName: str
+    ConnID: int
+    CornerPositions: _tp.List[_tp.Tuple[float, float]]
+    FirstSegmentLabelPos: _tp.Tuple[float, float]
+    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]
+    GroupName: str
+    PortFromID: int
+    PortToID: int
+    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
+    trnsysID: int
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
+
+
+@_dc.dataclass
+class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
+    connectionId: int
+    name: str
+    id: int
+    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
+    labelPos: _tp.Tuple[float, float]
+    massFlowLabelPos: _tp.Tuple[float, float]
+    groupName: str
+    fromPortId: int
+    toPortId: int
+    trnsysId: int
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "ConnectionModel":
+        data.pop(".__ConnectionDict__")
+        connectionModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(ConnectionModel, connectionModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__ConnectionDict__"] = True
+        return data
+
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return ConnectionModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
+        firstSegmentLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0], \
+                               superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1]
+        firstSegmentMassFlowLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0], \
+                                       superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1]
+
+        return ConnectionModel(
+            superseded.ConnCID,
+            superseded.ConnDisplayName,
+            superseded.ConnID,
+            superseded.CornerPositions,
+            firstSegmentLabelPos,
+            firstSegmentMassFlowLabelPos,
+            superseded.GroupName,
+            superseded.PortFromID,
+            superseded.PortToID,
+            superseded.trnsysID,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')

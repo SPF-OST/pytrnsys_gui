@@ -7,23 +7,34 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
+from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
+
+import massFlowSolver.networkModel as _mfn
 
 
 class Radiator(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Radiator, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem("i", 0, self))
-        self.outputs.append(PortItem("o", 0, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 0, self))
         self.loadedFiles = []
 
         self.changeSize()
         self.addTree()
+
+    def getInternalPiping(self) -> InternalPiping:
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.RADIATOR_SVG

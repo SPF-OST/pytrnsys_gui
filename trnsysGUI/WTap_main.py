@@ -3,12 +3,11 @@
 
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
-
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.PortItem import PortItem
+import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
+from trnsysGUI.BlockItem import BlockItem
+from massFlowSolver import InternalPiping
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 
 class WTap_main(BlockItem):
@@ -16,10 +15,8 @@ class WTap_main(BlockItem):
         super(WTap_main, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
         self.h = 40
-        # self.inputs.append(PortItem('i', 0, self))
-        self.outputs.append(PortItem("o", 0, self))
 
-        self.exportInitialInput = 0.0
+        self.outputs.append(SinglePipePortItem("o", 0, self))
 
         self.typeNumber = 4
 
@@ -65,28 +62,7 @@ class WTap_main(BlockItem):
         equationNr = 1
         return resStr, equationNr
 
-    def exportParametersFlowSolver(self, descConnLength):
-        temp = ""
-        for i in self.inputs:
-            for c in i.connectionList:
-                temp = temp + str(c.trnsysId) + " "
-                self.trnsysConn.append(c)
-
-        for o in self.outputs:
-            for c in o.connectionList:
-                temp = temp + str(c.trnsysId) + " "
-                self.trnsysConn.append(c)
-
-        temp += "0 0 "
-        temp += str(self.typeNumber)
-        temp += " " * (descConnLength - len(temp))
-        self.exportConnsString = temp
-
-        f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
-        return f
-
-    def exportInputsFlowSolver1(self):
-        temp1 = "Mfr" + self.displayName
-        self.exportInputName = " " + temp1 + " "
-        return self.exportInputName, 1
+    def getInternalPiping(self) -> InternalPiping:
+        inputPort = _mfn.PortItem()
+        sink = _mfn.Source(self.displayName, self.trnsysId, inputPort)
+        return InternalPiping([sink], {inputPort: self.outputs[0]})

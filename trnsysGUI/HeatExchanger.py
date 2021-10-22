@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu
 
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 
 class HeatExchanger(QGraphicsItemGroup):
@@ -40,9 +40,8 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self.parent.heatExchangers.append(self)
         self.setZValue(100)
-
-        self.port1 = PortItem("i", self.sSide, self.parent)
-        self.port2 = PortItem("o", self.sSide, self.parent)
+        self.port1 = SinglePipePortItem("i", self.sSide, self.parent)
+        self.port2 = SinglePipePortItem("o", self.sSide, self.parent)
 
         self.parent.inputs.append(self.port1)
         self.parent.outputs.append(self.port2)

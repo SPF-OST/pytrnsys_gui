@@ -7,7 +7,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 import trnsysGUI.images as _img
 
 
@@ -20,9 +20,9 @@ class DPTeePiece(BlockItem):
 
         self.typeNumber = 2
 
-        self.inputs.append(PortItem("i", 0, self))
-        self.inputs.append(PortItem("i", 2, self))
-        self.outputs.append(PortItem("o", 1, self))
+        self.inputs.append(DoublePipePortItem("i", 0, self))
+        self.inputs.append(DoublePipePortItem("i", 2, self))
+        self.outputs.append(DoublePipePortItem("o", 1, self))
 
         self.changeSize()
 

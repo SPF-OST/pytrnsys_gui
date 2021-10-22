@@ -1,14 +1,14 @@
 import dataclasses as _dc
 
-import trnsysGUI.PortItem as _port
+import trnsysGUI.SinglePipePortItem as _port
 import trnsysGUI.storageTank.side as _sd
 
 
 @_dc.dataclass
 class DirectPortPair:
     trnsysId: int
-    fromPort: _port.PortItem  # type: ignore[name-defined]
-    toPort: _port.PortItem  # type: ignore[name-defined]
+    fromPort: _port.SinglePipePortItem  # type: ignore[name-defined]
+    toPort: _port.SinglePipePortItem  # type: ignore[name-defined]
     relativeInputHeight: float
     relativeOutputHeight: float
     side: _sd.Side

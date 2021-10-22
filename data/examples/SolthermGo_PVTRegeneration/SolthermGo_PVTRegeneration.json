@@ -1,0 +1,2421 @@
+{
+    "Blocks": {
+        "..__GroupDct-defaultGroup": {
+            ".__GroupDict__": true,
+            "GroupName": "defaultGroup",
+            "Position": [
+                0,
+                0
+            ],
+            "Size": [
+                100,
+                100
+            ]
+        },
+        ".__BlockDct__": true,
+        "Block-100": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PuAux",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -920.0,
+                -300.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 100,
+            "PortsIDIn": [
+                101
+            ],
+            "PortsIDOut": [
+                102
+            ],
+            "RotationN": 0,
+            "trnsysID": 100
+        },
+        "Block-1001": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "DivSol",
+            "BlockName": "TVentil",
+            "BlockPosition": [
+                -1260.0,
+                -539.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1001,
+            "IsTempering": false,
+            "PortsIDIn": [
+                1002,
+                1003
+            ],
+            "PortsIDOut": [
+                1004
+            ],
+            "PositionForMassFlowSolver": "1.0",
+            "RotationN": 2,
+            "trnsysID": 403
+        },
+        "Block-1017": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeePiece1017",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -1321.1302806712958,
+                -367.91196469907425
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1017,
+            "PortsIDIn": [
+                1018,
+                1019
+            ],
+            "PortsIDOut": [
+                1020
+            ],
+            "RotationN": -3,
+            "trnsysID": 408
+        },
+        "Block-1030": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "AuxHP",
+            "BlockName": "HP",
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "HeatPumpPosition": [
+                -1080.0,
+                -300.0
+            ],
+            "ID": 1030,
+            "PortsIDIn": [
+                1031,
+                1032
+            ],
+            "PortsIDOut": [
+                1033,
+                1034
+            ],
+            "RotationN": 0,
+            "childIds": [
+                412,
+                413
+            ],
+            "trnsysID": 412
+        },
+        "Block-1204": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeePieceCirc1",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -220.0,
+                -480.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1204,
+            "PortsIDIn": [
+                1205,
+                1206
+            ],
+            "PortsIDOut": [
+                1207
+            ],
+            "RotationN": 2,
+            "trnsysID": 470
+        },
+        "Block-1285": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Collector",
+            "BlockName": "Collector",
+            "BlockPosition": [
+                -1460.0,
+                -580.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1285,
+            "PortsIDIn": [
+                1286
+            ],
+            "PortsIDOut": [
+                1287
+            ],
+            "RotationN": 0,
+            "trnsysID": 498
+        },
+        "Block-1322": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PuCol",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -1359.0494791666667,
+                -399.6672453703704
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1322,
+            "PortsIDIn": [
+                1323
+            ],
+            "PortsIDOut": [
+                1324
+            ],
+            "RotationN": -1,
+            "trnsysID": 511
+        },
+        "Block-1332": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PuSh",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -349.83912037037044,
+                -101.84564552254801
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1332,
+            "PortsIDIn": [
+                1333
+            ],
+            "PortsIDOut": [
+                1334
+            ],
+            "RotationN": 2,
+            "trnsysID": 515
+        },
+        "Block-1359": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PuDHW",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -426.7798374003344,
+                -320.8537316341951
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 1359,
+            "PortsIDIn": [
+                1360
+            ],
+            "PortsIDOut": [
+                1361
+            ],
+            "RotationN": -2,
+            "trnsysID": 524
+        },
+        "Block-320": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "RadFloor",
+            "BlockName": "Radiator",
+            "BlockPosition": [
+                -259.0,
+                -222.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 320,
+            "PortsIDIn": [
+                321
+            ],
+            "PortsIDOut": [
+                322
+            ],
+            "RotationN": 0,
+            "trnsysID": 177
+        },
+        "Block-323": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "MixSh",
+            "BlockName": "TVentil",
+            "BlockPosition": [
+                -540.0,
+                -300.0
+            ],
+            "FlippedH": false,
+            "FlippedV": true,
+            "GroupName": "defaultGroup",
+            "ID": 323,
+            "IsTempering": 2,
+            "PortsIDIn": [
+                324,
+                325
+            ],
+            "PortsIDOut": [
+                326
+            ],
+            "PositionForMassFlowSolver": "0.0",
+            "RotationN": 0,
+            "trnsysID": 178
+        },
+        "Block-333": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeeSh",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -539.0,
+                -142.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 333,
+            "PortsIDIn": [
+                334,
+                335
+            ],
+            "PortsIDOut": [
+                336
+            ],
+            "RotationN": 0,
+            "trnsysID": 181
+        },
+        "Block-599": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Sh",
+            "BlockName": "StorageTank",
+            "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+            "directPortPairs": [
+                {
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 2200,
+                            "relativeHeight": 0.99
+                        },
+                        "outputPort": {
+                            "id": 2201,
+                            "relativeHeight": 0.01
+                        },
+                        "side": "right",
+                        "trnsysId": 15
+                    }
+                },
+                {
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 2469,
+                            "relativeHeight": 0.6
+                        },
+                        "outputPort": {
+                            "id": 2470,
+                            "relativeHeight": 0.01
+                        },
+                        "side": "left",
+                        "trnsysId": 16
+                    }
+                }
+            ],
+            "groupName": "defaultGroup",
+            "heatExchangers": [],
+            "height": 160.0,
+            "id": 599,
+            "isHorizontallyFlipped": false,
+            "isVerticallyFlipped": false,
+            "position": [
+                -698.0,
+                -281.0
+            ],
+            "trnsysId": 269
+        },
+        "Block-600": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Dhw",
+            "BlockName": "StorageTank",
+            "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+            "directPortPairs": [
+                {
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 607,
+                            "relativeHeight": 0.6
+                        },
+                        "outputPort": {
+                            "id": 608,
+                            "relativeHeight": 0.05
+                        },
+                        "side": "left",
+                        "trnsysId": 19
+                    }
+                },
+                {
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 2270,
+                            "relativeHeight": 1.0
+                        },
+                        "outputPort": {
+                            "id": 2271,
+                            "relativeHeight": 0.01
+                        },
+                        "side": "right",
+                        "trnsysId": 20
+                    }
+                },
+                {
+                    "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 2275,
+                            "relativeHeight": 0.95
+                        },
+                        "outputPort": {
+                            "id": 2276,
+                            "relativeHeight": 0.65
+                        },
+                        "side": "right",
+                        "trnsysId": 21
+                    }
+                }
+            ],
+            "groupName": "defaultGroup",
+            "heatExchangers": [
+                {
+                    "__version__": "be068f84-2627-4f53-87a9-9a1f4fd1c529",
+                    "id": 642,
+                    "name": "642",
+                    "parentId": 600,
+                    "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
+                        "inputPort": {
+                            "id": 643,
+                            "relativeHeight": 0.3
+                        },
+                        "outputPort": {
+                            "id": 644,
+                            "relativeHeight": 0.05
+                        },
+                        "side": "left",
+                        "trnsysId": 18
+                    },
+                    "width": 40
+                }
+            ],
+            "height": 160.0,
+            "id": 600,
+            "isHorizontallyFlipped": false,
+            "isVerticallyFlipped": false,
+            "position": [
+                -700.0,
+                -500.0
+            ],
+            "trnsysId": 270
+        },
+        "Block-612": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "MixAux",
+            "BlockName": "TVentil",
+            "BlockPosition": [
+                -840.0,
+                -300.0
+            ],
+            "FlippedH": true,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 612,
+            "IsTempering": false,
+            "PortsIDIn": [
+                613,
+                614
+            ],
+            "PortsIDOut": [
+                615
+            ],
+            "PositionForMassFlowSolver": "0.0",
+            "RotationN": 0,
+            "trnsysID": 274
+        },
+        "Block-664": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TeeAuxRt",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -780.0,
+                -142.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 664,
+            "PortsIDIn": [
+                665,
+                666
+            ],
+            "PortsIDOut": [
+                667
+            ],
+            "RotationN": 0,
+            "trnsysID": 291
+        },
+        "Block-769": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "tapWater",
+            "BlockName": "WTap",
+            "BlockPosition": [
+                -180.0,
+                -520.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 769,
+            "PortsIDIn": [
+                809
+            ],
+            "PortsIDOut": [],
+            "RotationN": 0,
+            "trnsysID": 327
+        },
+        "Block-771": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "supplyWater",
+            "BlockName": "WTap_main",
+            "BlockPosition": [
+                -179.0,
+                -363.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 771,
+            "PortsIDIn": [],
+            "PortsIDOut": [
+                810
+            ],
+            "RotationN": 0,
+            "trnsysID": 328
+        },
+        "Block-773": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "TPieceCirc2",
+            "BlockName": "TeePiece",
+            "BlockPosition": [
+                -260.0,
+                -363.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 773,
+            "PortsIDIn": [
+                811,
+                812
+            ],
+            "PortsIDOut": [
+                813
+            ],
+            "RotationN": 0,
+            "trnsysID": 329
+        },
+        "Block-781": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PuCirc",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -220.0,
+                -440.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 781,
+            "PortsIDIn": [
+                817
+            ],
+            "PortsIDOut": [
+                818
+            ],
+            "RotationN": 1,
+            "trnsysID": 331
+        },
+        "Block-784": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "HxDHW",
+            "BlockName": "ExternalHx",
+            "ExternalHxPosition": [
+                -380.0,
+                -520.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 784,
+            "PortsIDIn": [
+                819,
+                820
+            ],
+            "PortsIDOut": [
+                821,
+                822
+            ],
+            "RotationN": 0,
+            "childIds": [
+                332,
+                333
+            ],
+            "trnsysID": 332
+        },
+        "Block-792": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "DivDhwOut",
+            "BlockName": "TVentil",
+            "BlockPosition": [
+                -540.0,
+                -520.0
+            ],
+            "FlippedH": false,
+            "FlippedV": true,
+            "GroupName": "defaultGroup",
+            "ID": 792,
+            "IsTempering": false,
+            "PortsIDIn": [
+                825,
+                826
+            ],
+            "PortsIDOut": [
+                827
+            ],
+            "PositionForMassFlowSolver": "1.0",
+            "RotationN": 0,
+            "trnsysID": 335
+        },
+        "Block-796": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "DivDhw",
+            "BlockName": "TVentil",
+            "BlockPosition": [
+                -539.0,
+                -361.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 796,
+            "IsTempering": false,
+            "PortsIDIn": [
+                828,
+                829
+            ],
+            "PortsIDOut": [
+                830
+            ],
+            "PositionForMassFlowSolver": "1.0",
+            "RotationN": 0,
+            "trnsysID": 336
+        },
+        "Block-971": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Ghx",
+            "BlockName": "GroundSourceHx",
+            "BlockPosition": [
+                -1160.0,
+                -120.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 971,
+            "PortsIDIn": [
+                972
+            ],
+            "PortsIDOut": [
+                973
+            ],
+            "RotationN": 0,
+            "trnsysID": 392
+        },
+        "Block-981": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "PuGhx",
+            "BlockName": "Pump",
+            "BlockPosition": [
+                -1140.0,
+                -139.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 981,
+            "PortsIDIn": [
+                982
+            ],
+            "PortsIDOut": [
+                983
+            ],
+            "RotationN": -1,
+            "trnsysID": 396
+        },
+        "Block-987": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "HxSolGhx",
+            "BlockName": "ExternalHx",
+            "ExternalHxPosition": [
+                -1280.0,
+                -220.0
+            ],
+            "FlippedH": false,
+            "FlippedV": false,
+            "GroupName": "defaultGroup",
+            "ID": 987,
+            "PortsIDIn": [
+                988,
+                989
+            ],
+            "PortsIDOut": [
+                990,
+                991
+            ],
+            "RotationN": 0,
+            "childIds": [
+                398,
+                399
+            ],
+            "trnsysID": 398
+        },
+        "Connection-1038": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 318,
+            "ConnDisplayName": "PiHPCondIn",
+            "ConnID": 1038,
+            "CornerPositions": [
+                [
+                    -900.3970336693667,
+                    -122.0
+                ],
+                [
+                    -900.3970336693667,
+                    -200.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -159.0,
+                16.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 665,
+            "PortToID": 1034,
+            "SegmentPositions": [
+                [
+                    -780.0,
+                    -122.0,
+                    -900.3970336693667,
+                    -122.0
+                ],
+                [
+                    -900.3970336693667,
+                    -122.0,
+                    -900.3970336693667,
+                    -200.0
+                ],
+                [
+                    -900.3970336693667,
+                    -200.0,
+                    -960.0,
+                    -200.0
+                ]
+            ],
+            "trnsysID": 415
+        },
+        "Connection-1174": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 350,
+            "ConnDisplayName": "PiTesSolIn",
+            "ConnID": 1174,
+            "CornerPositions": [
+                [
+                    -1020.0783058449073,
+                    -559.0
+                ],
+                [
+                    -1020.0783058449073,
+                    -388.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -178.0,
+                4.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1002,
+            "PortToID": 643,
+            "SegmentPositions": [
+                [
+                    -1260.0,
+                    -559.0,
+                    -1020.0783058449073,
+                    -559.0
+                ],
+                [
+                    -1020.0783058449073,
+                    -559.0,
+                    -1020.0783058449073,
+                    -388.0
+                ],
+                [
+                    -1020.0783058449073,
+                    -388.0,
+                    -708.0,
+                    -388.0
+                ]
+            ],
+            "trnsysID": 459
+        },
+        "Connection-1193": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 357,
+            "ConnDisplayName": "PiHxDHWPrimIn",
+            "ConnID": 1193,
+            "CornerPositions": [
+                [
+                    -440.0,
+                    -500.0
+                ],
+                [
+                    -440.0,
+                    -500.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 827,
+            "PortToID": 819,
+            "SegmentPositions": [
+                [
+                    -500.0,
+                    -500.0,
+                    -440.0,
+                    -500.0
+                ],
+                [
+                    -440.0,
+                    -500.0,
+                    -440.0,
+                    -500.0
+                ],
+                [
+                    -440.0,
+                    -500.0,
+                    -380.0,
+                    -500.0
+                ]
+            ],
+            "trnsysID": 466
+        },
+        "Connection-1196": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 358,
+            "ConnDisplayName": "PiHxDhwSecIn",
+            "ConnID": 1196,
+            "CornerPositions": [
+                [
+                    -280.0,
+                    -343.0
+                ],
+                [
+                    -280.0,
+                    -420.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 811,
+            "PortToID": 822,
+            "SegmentPositions": [
+                [
+                    -260.0,
+                    -343.0,
+                    -280.0,
+                    -343.0
+                ],
+                [
+                    -280.0,
+                    -343.0,
+                    -280.0,
+                    -420.0
+                ],
+                [
+                    -280.0,
+                    -420.0,
+                    -300.0,
+                    -420.0
+                ]
+            ],
+            "trnsysID": 467
+        },
+        "Connection-1208": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 360,
+            "ConnDisplayName": "PiPuCircOut",
+            "ConnID": 1208,
+            "CornerPositions": [
+                [
+                    -240.0,
+                    -363.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 818,
+            "PortToID": 813,
+            "SegmentPositions": [
+                [
+                    -240.0,
+                    -400.0,
+                    -240.0,
+                    -363.0
+                ],
+                [
+                    -240.0,
+                    -363.0,
+                    -240.0,
+                    -363.0
+                ]
+            ],
+            "trnsysID": 471
+        },
+        "Connection-1211": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 361,
+            "ConnDisplayName": "PiDhwMains",
+            "ConnID": 1211,
+            "CornerPositions": [
+                [
+                    -200.0,
+                    -343.0
+                ],
+                [
+                    -200.0,
+                    -343.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 810,
+            "PortToID": 812,
+            "SegmentPositions": [
+                [
+                    -179.0,
+                    -343.0,
+                    -200.0,
+                    -343.0
+                ],
+                [
+                    -200.0,
+                    -343.0,
+                    -200.0,
+                    -343.0
+                ],
+                [
+                    -200.0,
+                    -343.0,
+                    -220.0,
+                    -343.0
+                ]
+            ],
+            "trnsysID": 472
+        },
+        "Connection-1214": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 362,
+            "ConnDisplayName": "PiDhwSecOut",
+            "ConnID": 1214,
+            "CornerPositions": [
+                [
+                    -280.0,
+                    -500.0
+                ],
+                [
+                    -280.0,
+                    -500.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 820,
+            "PortToID": 1206,
+            "SegmentPositions": [
+                [
+                    -300.0,
+                    -500.0,
+                    -280.0,
+                    -500.0
+                ],
+                [
+                    -280.0,
+                    -500.0,
+                    -280.0,
+                    -500.0
+                ],
+                [
+                    -280.0,
+                    -500.0,
+                    -260.0,
+                    -500.0
+                ]
+            ],
+            "trnsysID": 473
+        },
+        "Connection-1217": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 363,
+            "ConnDisplayName": "PiPuCircIn",
+            "ConnID": 1217,
+            "CornerPositions": [
+                [
+                    -240.0,
+                    -440.333
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1207,
+            "PortToID": 817,
+            "SegmentPositions": [
+                [
+                    -240.0,
+                    -480.0,
+                    -240.0,
+                    -440.333
+                ],
+                [
+                    -240.0,
+                    -440.333,
+                    -240.0,
+                    -440.0
+                ]
+            ],
+            "trnsysID": 474
+        },
+        "Connection-1220": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 364,
+            "ConnDisplayName": "PiDhwDemand",
+            "ConnID": 1220,
+            "CornerPositions": [
+                [
+                    -200.0,
+                    -500.0
+                ],
+                [
+                    -200.0,
+                    -500.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1205,
+            "PortToID": 809,
+            "SegmentPositions": [
+                [
+                    -220.0,
+                    -500.0,
+                    -200.0,
+                    -500.0
+                ],
+                [
+                    -200.0,
+                    -500.0,
+                    -200.0,
+                    -500.0
+                ],
+                [
+                    -200.0,
+                    -500.0,
+                    -180.0,
+                    -500.0
+                ]
+            ],
+            "trnsysID": 475
+        },
+        "Connection-1257": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 377,
+            "ConnDisplayName": "PiHPEvapIn",
+            "ConnID": 1257,
+            "CornerPositions": [
+                [
+                    -1120.0,
+                    -280.333
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                68.0,
+                -29.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 983,
+            "PortToID": 1031,
+            "SegmentPositions": [
+                [
+                    -1120.0,
+                    -179.0,
+                    -1120.0,
+                    -280.333
+                ],
+                [
+                    -1120.0,
+                    -280.333,
+                    -1080.0,
+                    -280.0
+                ]
+            ],
+            "trnsysID": 488
+        },
+        "Connection-1266": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 380,
+            "ConnDisplayName": "PiGHXOut",
+            "ConnID": 1266,
+            "CornerPositions": [
+                [
+                    -1120.0,
+                    -139.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                13.0,
+                23.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 972,
+            "PortToID": 982,
+            "SegmentPositions": [
+                [
+                    -1120.0,
+                    -120.0,
+                    -1120.0,
+                    -139.0
+                ],
+                [
+                    -1120.0,
+                    -139.0,
+                    -1120.0,
+                    -139.0
+                ]
+            ],
+            "trnsysID": 491
+        },
+        "Connection-1269": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 381,
+            "ConnDisplayName": "PiGHXIn",
+            "ConnID": 1269,
+            "CornerPositions": [
+                [
+                    -1170.0,
+                    -120.0
+                ],
+                [
+                    -1170.0,
+                    -120.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -73.0,
+                43.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 991,
+            "PortToID": 973,
+            "SegmentPositions": [
+                [
+                    -1200.0,
+                    -120.0,
+                    -1170.0,
+                    -120.0
+                ],
+                [
+                    -1170.0,
+                    -120.0,
+                    -1170.0,
+                    -120.0
+                ],
+                [
+                    -1170.0,
+                    -120.0,
+                    -1140.0,
+                    -120.0
+                ]
+            ],
+            "trnsysID": 492
+        },
+        "Connection-1272": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 382,
+            "ConnDisplayName": "PiHPEvapOut",
+            "ConnID": 1272,
+            "CornerPositions": [
+                [
+                    -1140.0,
+                    -200.0
+                ],
+                [
+                    -1140.0,
+                    -200.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -199.0,
+                -39.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1033,
+            "PortToID": 989,
+            "SegmentPositions": [
+                [
+                    -1080.0,
+                    -200.0,
+                    -1140.0,
+                    -200.0
+                ],
+                [
+                    -1140.0,
+                    -200.0,
+                    -1140.0,
+                    -200.0
+                ],
+                [
+                    -1140.0,
+                    -200.0,
+                    -1200.0,
+                    -200.0
+                ]
+            ],
+            "trnsysID": 493
+        },
+        "Connection-1275": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 383,
+            "ConnDisplayName": "PiHPcondOut",
+            "ConnID": 1275,
+            "CornerPositions": [
+                [
+                    -958.0,
+                    -280.0
+                ],
+                [
+                    -958.0,
+                    -281.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -43.0,
+                -50.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1032,
+            "PortToID": 101,
+            "SegmentPositions": [
+                [
+                    -960.0,
+                    -280.0,
+                    -958.0,
+                    -280.0
+                ],
+                [
+                    -958.0,
+                    -280.0,
+                    -958.0,
+                    -281.0
+                ],
+                [
+                    -958.0,
+                    -281.0,
+                    -920.0,
+                    -280.0
+                ]
+            ],
+            "trnsysID": 494
+        },
+        "Connection-1278": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 384,
+            "ConnDisplayName": "PiPuAuxOut",
+            "ConnID": 1278,
+            "CornerPositions": [
+                [
+                    -879.0,
+                    -280.0
+                ],
+                [
+                    -879.0,
+                    -281.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 102,
+            "PortToID": 615,
+            "SegmentPositions": [
+                [
+                    -880.0,
+                    -280.0,
+                    -879.0,
+                    -280.0
+                ],
+                [
+                    -879.0,
+                    -280.0,
+                    -879.0,
+                    -281.0
+                ],
+                [
+                    -879.0,
+                    -281.0,
+                    -840.0,
+                    -281.0
+                ]
+            ],
+            "trnsysID": 495
+        },
+        "Connection-1300": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 391,
+            "ConnDisplayName": "PITesSolOut",
+            "ConnID": 1300,
+            "CornerPositions": [
+                [
+                    -1014.5651403356479,
+                    -348.0
+                ],
+                [
+                    -1014.5651403356479,
+                    -347.91196469907425
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 644,
+            "PortToID": 1020,
+            "SegmentPositions": [
+                [
+                    -708.0,
+                    -348.0,
+                    -1014.5651403356479,
+                    -348.0
+                ],
+                [
+                    -1014.5651403356479,
+                    -348.0,
+                    -1014.5651403356479,
+                    -347.91196469907425
+                ],
+                [
+                    -1014.5651403356479,
+                    -347.91196469907425,
+                    -1321.1302806712958,
+                    -347.91196469907425
+                ]
+            ],
+            "trnsysID": 503
+        },
+        "Connection-1303": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 392,
+            "ConnDisplayName": "PiHxSolGhxIn",
+            "ConnID": 1303,
+            "CornerPositions": [
+                [
+                    -1280.0,
+                    -200.333
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -144.0,
+                -117.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1003,
+            "PortToID": 988,
+            "SegmentPositions": [
+                [
+                    -1280.0,
+                    -539.0,
+                    -1280.0,
+                    -200.333
+                ],
+                [
+                    -1280.0,
+                    -200.333,
+                    -1280.0,
+                    -200.0
+                ]
+            ],
+            "trnsysID": 504
+        },
+        "Connection-1312": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 395,
+            "ConnDisplayName": "PiColOut",
+            "ConnID": 1312,
+            "CornerPositions": [
+                [
+                    -1320.0,
+                    -560.0
+                ],
+                [
+                    -1320.0,
+                    -559.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                2.0,
+                -42.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1287,
+            "PortToID": 1004,
+            "SegmentPositions": [
+                [
+                    -1340.0,
+                    -560.0,
+                    -1320.0,
+                    -560.0
+                ],
+                [
+                    -1320.0,
+                    -560.0,
+                    -1320.0,
+                    -559.0
+                ],
+                [
+                    -1320.0,
+                    -559.0,
+                    -1300.0,
+                    -559.0
+                ]
+            ],
+            "trnsysID": 507
+        },
+        "Connection-1315": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 396,
+            "ConnDisplayName": "PiHxSolGhxOut",
+            "ConnID": 1315,
+            "CornerPositions": [
+                [
+                    -1335.0,
+                    -120.0
+                ],
+                [
+                    -1335.0,
+                    -122.0
+                ],
+                [
+                    -1340.5128761574074,
+                    -122.0
+                ],
+                [
+                    -1340.5128761574074,
+                    -327.91196469907425
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -131.0,
+                11.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 990,
+            "PortToID": 1019,
+            "SegmentPositions": [
+                [
+                    -1280.0,
+                    -120.0,
+                    -1335.0,
+                    -120.0
+                ],
+                [
+                    -1335.0,
+                    -120.0,
+                    -1335.0,
+                    -122.0
+                ],
+                [
+                    -1335.0,
+                    -122.0,
+                    -1340.5128761574074,
+                    -122.0
+                ],
+                [
+                    -1340.5128761574074,
+                    -122.0,
+                    -1340.5128761574074,
+                    -327.91196469907425
+                ],
+                [
+                    -1340.5128761574074,
+                    -327.91196469907425,
+                    -1341.1302806712958,
+                    -327.91196469907425
+                ]
+            ],
+            "trnsysID": 508
+        },
+        "Connection-1325": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 399,
+            "ConnDisplayName": "PiPuSolIn",
+            "ConnID": 1325,
+            "CornerPositions": [
+                [
+                    -1341.1302806712958,
+                    -400.0002453703704
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1018,
+            "PortToID": 1323,
+            "SegmentPositions": [
+                [
+                    -1341.1302806712958,
+                    -367.91196469907425,
+                    -1341.1302806712958,
+                    -400.0002453703704
+                ],
+                [
+                    -1341.1302806712958,
+                    -400.0002453703704,
+                    -1339.0494791666667,
+                    -399.6672453703704
+                ]
+            ],
+            "trnsysID": 512
+        },
+        "Connection-1328": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 400,
+            "ConnDisplayName": "PiColIn",
+            "ConnID": 1328,
+            "CornerPositions": [
+                [
+                    -1339.0494791666667,
+                    -480.333
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -124.0,
+                -68.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1324,
+            "PortToID": 1286,
+            "SegmentPositions": [
+                [
+                    -1339.0494791666667,
+                    -439.6672453703704,
+                    -1339.0494791666667,
+                    -480.333
+                ],
+                [
+                    -1339.0494791666667,
+                    -480.333,
+                    -1340.0,
+                    -480.0
+                ]
+            ],
+            "trnsysID": 513
+        },
+        "Connection-1371": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 413,
+            "ConnDisplayName": "PiHxDHWPrimOut",
+            "ConnID": 1371,
+            "CornerPositions": [
+                [
+                    -403.8899187001672,
+                    -420.0
+                ],
+                [
+                    -403.8899187001672,
+                    -340.8537316341951
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 821,
+            "PortToID": 1360,
+            "SegmentPositions": [
+                [
+                    -380.0,
+                    -420.0,
+                    -403.8899187001672,
+                    -420.0
+                ],
+                [
+                    -403.8899187001672,
+                    -420.0,
+                    -403.8899187001672,
+                    -340.8537316341951
+                ],
+                [
+                    -403.8899187001672,
+                    -340.8537316341951,
+                    -426.7798374003344,
+                    -340.8537316341951
+                ]
+            ],
+            "trnsysID": 528
+        },
+        "Connection-1374": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 414,
+            "ConnDisplayName": "PiPuDhwOut",
+            "ConnID": 1374,
+            "CornerPositions": [
+                [
+                    -483.8899187001672,
+                    -340.8537316341951
+                ],
+                [
+                    -483.8899187001672,
+                    -341.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1361,
+            "PortToID": 830,
+            "SegmentPositions": [
+                [
+                    -466.7798374003344,
+                    -340.8537316341951,
+                    -483.8899187001672,
+                    -340.8537316341951
+                ],
+                [
+                    -483.8899187001672,
+                    -340.8537316341951,
+                    -483.8899187001672,
+                    -341.0
+                ],
+                [
+                    -483.8899187001672,
+                    -341.0,
+                    -499.0,
+                    -341.0
+                ]
+            ],
+            "trnsysID": 529
+        },
+        "Connection-1398": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 422,
+            "ConnDisplayName": "PiRadOut",
+            "ConnID": 1398,
+            "CornerPositions": [
+                [
+                    -304.4195601851852,
+                    -122.0
+                ],
+                [
+                    -304.4195601851852,
+                    -121.84564552254801
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 322,
+            "PortToID": 1333,
+            "SegmentPositions": [
+                [
+                    -259.0,
+                    -122.0,
+                    -304.4195601851852,
+                    -122.0
+                ],
+                [
+                    -304.4195601851852,
+                    -122.0,
+                    -304.4195601851852,
+                    -121.84564552254801
+                ],
+                [
+                    -304.4195601851852,
+                    -121.84564552254801,
+                    -349.83912037037044,
+                    -121.84564552254801
+                ]
+            ],
+            "trnsysID": 537
+        },
+        "Connection-1401": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 423,
+            "ConnDisplayName": "PiPuSHOut",
+            "ConnID": 1401,
+            "CornerPositions": [
+                [
+                    -444.4195601851852,
+                    -121.84564552254801
+                ],
+                [
+                    -444.4195601851852,
+                    -122.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 1334,
+            "PortToID": 335,
+            "SegmentPositions": [
+                [
+                    -389.83912037037044,
+                    -121.84564552254801,
+                    -444.4195601851852,
+                    -121.84564552254801
+                ],
+                [
+                    -444.4195601851852,
+                    -121.84564552254801,
+                    -444.4195601851852,
+                    -122.0
+                ],
+                [
+                    -444.4195601851852,
+                    -122.0,
+                    -499.0,
+                    -122.0
+                ]
+            ],
+            "trnsysID": 538
+        },
+        "Connection-2205": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 615,
+            "ConnDisplayName": "PiTesSHOut",
+            "ConnID": 2205,
+            "CornerPositions": [
+                [
+                    -560.0,
+                    -279.4
+                ],
+                [
+                    -560.0,
+                    -280.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 2200,
+            "PortToID": 324,
+            "SegmentPositions": [
+                [
+                    -578.0,
+                    -279.4,
+                    -560.0,
+                    -279.4
+                ],
+                [
+                    -560.0,
+                    -279.4,
+                    -560.0,
+                    -280.0
+                ],
+                [
+                    -560.0,
+                    -280.0,
+                    -540.0,
+                    -280.0
+                ]
+            ],
+            "trnsysID": 807
+        },
+        "Connection-2208": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 616,
+            "ConnDisplayName": "PiTesSHIn",
+            "ConnID": 2208,
+            "CornerPositions": [
+                [
+                    -559.5,
+                    -122.0
+                ],
+                [
+                    -559.5,
+                    -122.6
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                -60.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 334,
+            "PortToID": 2201,
+            "SegmentPositions": [
+                [
+                    -539.0,
+                    -122.0,
+                    -559.5,
+                    -122.0
+                ],
+                [
+                    -559.5,
+                    -122.0,
+                    -559.5,
+                    -122.6
+                ],
+                [
+                    -559.5,
+                    -122.6,
+                    -578.0,
+                    -122.6
+                ]
+            ],
+            "trnsysID": 808
+        },
+        "Connection-2280": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 632,
+            "ConnDisplayName": "PiTesDhwOut",
+            "ConnID": 2280,
+            "CornerPositions": [
+                [
+                    -560.0,
+                    -500.0
+                ],
+                [
+                    -560.0,
+                    -500.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 2270,
+            "PortToID": 825,
+            "SegmentPositions": [
+                [
+                    -580.0,
+                    -500.0,
+                    -560.0,
+                    -500.0
+                ],
+                [
+                    -560.0,
+                    -500.0,
+                    -560.0,
+                    -500.0
+                ],
+                [
+                    -560.0,
+                    -500.0,
+                    -540.0,
+                    -500.0
+                ]
+            ],
+            "trnsysID": 832
+        },
+        "Connection-2283": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 633,
+            "ConnDisplayName": "PiTesCircOut",
+            "ConnID": 2283,
+            "CornerPositions": [
+                [
+                    -550.0,
+                    -492.0
+                ],
+                [
+                    -550.0,
+                    -480.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 2275,
+            "PortToID": 826,
+            "SegmentPositions": [
+                [
+                    -580.0,
+                    -492.0,
+                    -550.0,
+                    -492.0
+                ],
+                [
+                    -550.0,
+                    -492.0,
+                    -550.0,
+                    -480.0
+                ],
+                [
+                    -550.0,
+                    -480.0,
+                    -520.0,
+                    -480.0
+                ]
+            ],
+            "trnsysID": 833
+        },
+        "Connection-2286": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 634,
+            "ConnDisplayName": "PiTesCircIn",
+            "ConnID": 2286,
+            "CornerPositions": [
+                [
+                    -519.0,
+                    -444.333
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 829,
+            "PortToID": 2276,
+            "SegmentPositions": [
+                [
+                    -519.0,
+                    -361.0,
+                    -519.0,
+                    -444.333
+                ],
+                [
+                    -519.0,
+                    -444.333,
+                    -580.0,
+                    -444.0
+                ]
+            ],
+            "trnsysID": 834
+        },
+        "Connection-2289": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 635,
+            "ConnDisplayName": "PiTesDhwIn",
+            "ConnID": 2289,
+            "CornerPositions": [
+                [
+                    -559.5,
+                    -341.0
+                ],
+                [
+                    -559.5,
+                    -341.6
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                -60.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 828,
+            "PortToID": 2271,
+            "SegmentPositions": [
+                [
+                    -539.0,
+                    -341.0,
+                    -559.5,
+                    -341.0
+                ],
+                [
+                    -559.5,
+                    -341.0,
+                    -559.5,
+                    -341.6
+                ],
+                [
+                    -559.5,
+                    -341.6,
+                    -580.0,
+                    -341.6
+                ]
+            ],
+            "trnsysID": 835
+        },
+        "Connection-2474": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 676,
+            "ConnDisplayName": "PiTesSHAuxOut",
+            "ConnID": 2474,
+            "CornerPositions": [
+                [
+                    -720.0,
+                    -122.6
+                ],
+                [
+                    -720.0,
+                    -122.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                -60.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -10.0,
+                22.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 2470,
+            "PortToID": 666,
+            "SegmentPositions": [
+                [
+                    -698.0,
+                    -122.6,
+                    -720.0,
+                    -122.6
+                ],
+                [
+                    -720.0,
+                    -122.6,
+                    -720.0,
+                    -122.0
+                ],
+                [
+                    -720.0,
+                    -122.0,
+                    -740.0,
+                    -122.0
+                ]
+            ],
+            "trnsysID": 895
+        },
+        "Connection-2477": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 677,
+            "ConnDisplayName": "PiTesSHAuxIn",
+            "ConnID": 2477,
+            "CornerPositions": [
+                [
+                    -750.0,
+                    -280.0
+                ],
+                [
+                    -750.0,
+                    -217.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                47.0,
+                -33.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 613,
+            "PortToID": 2469,
+            "SegmentPositions": [
+                [
+                    -800.0,
+                    -280.0,
+                    -750.0,
+                    -280.0
+                ],
+                [
+                    -750.0,
+                    -280.0,
+                    -750.0,
+                    -217.0
+                ],
+                [
+                    -750.0,
+                    -217.0,
+                    -698.0,
+                    -217.0
+                ]
+            ],
+            "trnsysID": 896
+        },
+        "Connection-327": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 154,
+            "ConnDisplayName": "PiRadIn",
+            "ConnID": 327,
+            "CornerPositions": [
+                [
+                    -399.8367874710648,
+                    -280.0
+                ],
+                [
+                    -399.8367874710648,
+                    -202.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 326,
+            "PortToID": 321,
+            "SegmentPositions": [
+                [
+                    -500.0,
+                    -280.0,
+                    -399.8367874710648,
+                    -280.0
+                ],
+                [
+                    -399.8367874710648,
+                    -280.0,
+                    -399.8367874710648,
+                    -202.0
+                ],
+                [
+                    -399.8367874710648,
+                    -202.0,
+                    -259.0,
+                    -202.0
+                ]
+            ],
+            "trnsysID": 179
+        },
+        "Connection-340": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 157,
+            "ConnDisplayName": "PiShMix",
+            "ConnID": 340,
+            "CornerPositions": [
+                [
+                    -520.0,
+                    -142.0
+                ],
+                [
+                    -520.0,
+                    -260.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                0.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 336,
+            "PortToID": 325,
+            "SegmentPositions": [
+                [
+                    -519.0,
+                    -142.0,
+                    -520.0,
+                    -142.0
+                ],
+                [
+                    -520.0,
+                    -142.0,
+                    -520.0,
+                    -260.0
+                ],
+                [
+                    -520.0,
+                    -260.0,
+                    -520.0,
+                    -260.0
+                ]
+            ],
+            "trnsysID": 183
+        },
+        "Connection-622": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 225,
+            "ConnDisplayName": "PiTesDHWAuxIn",
+            "ConnID": 622,
+            "CornerPositions": [
+                [
+                    -823.0,
+                    -300.0
+                ],
+                [
+                    -823.0,
+                    -436.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                20.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                -57.0,
+                -169.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 614,
+            "PortToID": 607,
+            "SegmentPositions": [
+                [
+                    -820.0,
+                    -300.0,
+                    -823.0,
+                    -300.0
+                ],
+                [
+                    -823.0,
+                    -300.0,
+                    -823.0,
+                    -436.0
+                ],
+                [
+                    -823.0,
+                    -436.0,
+                    -700.0,
+                    -436.0
+                ]
+            ],
+            "trnsysID": 277
+        },
+        "Connection-766": {
+            ".__ConnectionDict__": true,
+            "ConnCID": 264,
+            "ConnDisplayName": "PiTesDHWAuxOut",
+            "ConnID": 766,
+            "CornerPositions": [
+                [
+                    -760.1329655640736,
+                    -348.0
+                ],
+                [
+                    -760.1329655640736,
+                    -142.0
+                ]
+            ],
+            "FirstSegmentLabelPos": [
+                -60.0,
+                0.0
+            ],
+            "FirstSegmentMassFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "GroupName": "defaultGroup",
+            "PortFromID": 608,
+            "PortToID": 667,
+            "SegmentPositions": [
+                [
+                    -700.0,
+                    -348.0,
+                    -760.1329655640736,
+                    -348.0
+                ],
+                [
+                    -760.1329655640736,
+                    -348.0,
+                    -760.1329655640736,
+                    -142.0
+                ],
+                [
+                    -760.1329655640736,
+                    -142.0,
+                    -760.0,
+                    -142.0
+                ]
+            ],
+            "trnsysID": 326
+        },
+        "IDs": {
+            "GlobalId": 2602,
+            "__idDct__": true,
+            "globalConnID": 708,
+            "trnsysID": 939
+        },
+        "Strings": {
+            "DiagramName": "SolthermGo_PVTRegeneration.json",
+            "ProjectFolder": "C:\\Daten\\GIT\\pytrnsys_gui\\data\\examples\\SolthermGo_PVTRegeneration",
+            "__nameDct__": true
+        }
+    }
+}
