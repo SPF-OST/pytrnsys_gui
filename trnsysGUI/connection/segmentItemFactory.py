@@ -1,3 +1,6 @@
+# pylint: skip-file
+# type: ignore
+
 import abc as _abc
 
 from trnsysGUI.DoublePipeSegmentItem import DoublePipeSegmentItem
