@@ -1,18 +1,14 @@
-# pylint: skip-file
-# type: ignore
-
-from math import sqrt
-import typing as tp
+import typing as _tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QLineF
 from PyQt5.QtWidgets import QGraphicsLineItem
 
-from trnsysGUI.SegmentItemBase import SegmentItemBase
+from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
-if tp.TYPE_CHECKING:
-    from trnsysGUI.Connection import Connection
+if _tp.TYPE_CHECKING:
+    from trnsysGUI.Connection import Connection  # type: ignore[attr-defined]  #  pylint: disable=unused-import
 
 
 class DoublePipeSegmentItem(SegmentItemBase):

@@ -1,11 +1,8 @@
-# pylint: skip-file
-# type: ignore
-
 import abc as _abc
 
-from trnsysGUI.DoublePipeSegmentItem import DoublePipeSegmentItem
-from trnsysGUI.SegmentItemBase import SegmentItemBase
-from trnsysGUI.SinglePipeSegmentItem import SinglePipeSegmentItem
+from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
+from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
+from trnsysGUI.singlePipeSegmentItem import SinglePipeSegmentItem
 
 
 class SegmentItemFactoryBase(_abc.ABC):

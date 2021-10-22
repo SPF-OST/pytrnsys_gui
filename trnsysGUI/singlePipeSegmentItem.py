@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import typing as tp
 
 from PyQt5 import QtGui, QtCore
@@ -8,12 +5,12 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QLinearGradient, QBrush, QPen
 from PyQt5.QtWidgets import QGraphicsLineItem
 
-from trnsysGUI.CornerItem import CornerItem
-from trnsysGUI.SegmentItemBase import SegmentItemBase
+from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
+from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
 if tp.TYPE_CHECKING:
-    from trnsysGUI.Connection import Connection
+    from trnsysGUI.Connection import Connection  # type: ignore[attr-defined]  # pylint: disable=unused-import
 
 
 class SinglePipeSegmentItem(SegmentItemBase):
@@ -33,33 +30,23 @@ class SinglePipeSegmentItem(SegmentItemBase):
         self.linePoints = self.singleLine.line()
 
     def initGrad(self):
-        """
-        Initialize gradient
-        Returns
-        -------
-
-        """
-        # color = QColor(177, 202, 211)
-        # color = QColor(3, 124, 193)
         color = QtCore.Qt.white
 
         pen1 = QtGui.QPen(color, 4)
 
-        # TODO: Dont forget that disr segments can also have parent type not CornerItem
-        if type(self.startNode.parent) is CornerItem:
-            x1 = self.startNode.firstNode().parent
+        if isinstance(self.startNode.parent, CornerItem):
+            startBlock = self.startNode.firstNode().parent
         else:
-            x1 = self.startNode.parent
+            startBlock = self.startNode.parent
 
-        if type(self.endNode.parent) is CornerItem:
-            x2 = self.endNode.lastNode().parent
+        if isinstance(self.endNode.parent, CornerItem):
+            endBlock = self.endNode.lastNode().parent
         else:
-            x2 = self.endNode.parent
+            endBlock = self.endNode.parent
 
-        # At init
         self.linearGrad = QLinearGradient(
-            QPointF(x1.fromPort.scenePos().x(), x1.fromPort.scenePos().y()),
-            QPointF(x2.toPort.scenePos().x(), x2.toPort.scenePos().y()),
+            QPointF(startBlock.fromPort.scenePos().x(), startBlock.fromPort.scenePos().y()),
+            QPointF(endBlock.toPort.scenePos().x(), endBlock.toPort.scenePos().y()),
         )
         self.linearGrad.setColorAt(0, QtCore.Qt.blue)
         self.linearGrad.setColorAt(1, QtCore.Qt.red)
@@ -72,13 +59,6 @@ class SinglePipeSegmentItem(SegmentItemBase):
         self.singleLine.setPen(pen1)
 
     def updateGrad(self):
-        """
-        Updates the gradient by calling the interpolation function
-        Returns
-        -------
-
-        """
-        # This color is overwritten by the gradient
         color = QtCore.Qt.white
         pen1 = QtGui.QPen(color, 4)
 
@@ -86,16 +66,7 @@ class SinglePipeSegmentItem(SegmentItemBase):
         partLen1 = self.connection.partialLength(self.startNode)
         partLen2 = self.connection.partialLength(self.endNode)
 
-        # self.logger.debug("totlenconn is " + str(totLenConn))
-        # self.logger.debug("partlen1 is " + str(partLen1) + "(node1)" + str(self.startNode))
-        # self.logger.debug("partlen2  is " + str(partLen2) + "(node2)" + str(self.endNode) +"\n")
-
-        # TODO: Dont forget that disr segments can also have parent type not CornerItem
-
-        if type(self.startNode.parent) is CornerItem:
-            # self.logger.debug("In updategrad, startnode parent is corner")
-            # self.logger.debug("I have a corner parent, self is " + str(self))
-
+        if isinstance(self.startNode.parent, CornerItem):
             startGradP = QPointF(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y())
         elif self.startNode.prevN() is None:
             startGradP = QPointF(
@@ -104,9 +75,7 @@ class SinglePipeSegmentItem(SegmentItemBase):
         else:
             startGradP = QPointF(self.line().p1().x(), self.line().p1().y())
 
-        if type(self.endNode.parent) is CornerItem:
-            # self.logger.debug("In update grad, endnode parent is corner")
-            # self.logger.debug("I have a corner parent, self is " + str(self))
+        if isinstance(self.endNode.parent, CornerItem):
             endGradP = QPointF(self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
         elif self.endNode.nextN() is None:
             endGradP = QPointF(self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
@@ -117,8 +86,6 @@ class SinglePipeSegmentItem(SegmentItemBase):
 
         self.linearGrad.setColorAt(0, self.interpolate(partLen1, totLenConn))
         self.linearGrad.setColorAt(1, self.interpolate(partLen2, totLenConn))
-
-        # self.singleLine.setPen(QtGui.QPen(color, 2))
 
         pen1.setBrush(QBrush(self.linearGrad))
 

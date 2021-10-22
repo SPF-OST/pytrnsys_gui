@@ -136,15 +136,6 @@ class SegmentItemBase(QGraphicsItemGroup):
     def _setLineImpl(self, x1, y1, x2, y2):
         raise NotImplementedError()
 
-    def initGrad(self):
-        """
-        Initialize gradient
-        Returns
-        -------
-
-        """
-        raise NotImplementedError()
-
     def updateGrad(self):
         raise NotImplementedError()
 
