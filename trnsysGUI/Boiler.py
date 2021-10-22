@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QTreeView
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
 
 
@@ -22,8 +22,8 @@ class Boiler(BlockItem):
         self.w = 80
         self.h = 120
         self.portOffset = 5
-        self.inputs.append(PortItem("i", 2, self))
-        self.outputs.append(PortItem("o", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 2, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.changeSize()

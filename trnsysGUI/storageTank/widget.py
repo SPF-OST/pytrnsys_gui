@@ -17,7 +17,7 @@ from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
-from trnsysGUI.PortItem import PortItem  # type: ignore[attr-defined]
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog  # type: ignore[attr-defined]
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
@@ -114,9 +114,9 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
 
     def _createPort(
         self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
-    ) -> PortItem:
+    ) -> SinglePipePortItem:
         sideNr = side.toSideNr()
-        portItem = PortItem(name, sideNr, self)
+        portItem = SinglePipePortItem(name, sideNr, self)
         portItem.setZValue(100)
         xPos = 0 if side == _sd.Side.LEFT else self.w
         yPos = storageTankHeight - relativeHeight * storageTankHeight
@@ -125,7 +125,7 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         return portItem
 
     @staticmethod
-    def _setPortColor(portItem: PortItem, color: QColor) -> None:
+    def _setPortColor(portItem: SinglePipePortItem, color: QColor) -> None:
         portItem.innerCircle.setBrush(color)
         portItem.visibleColor = color
 
@@ -326,7 +326,7 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
     ):
         self._decodeInternal(i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=False)
 
-    def getTemperatureVariableName(self, portItem: PortItem) -> str:
+    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
         directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
         if directPortPair:
             return self._getTemperatureVariableNameForDirectPortPairPortItem(directPortPair, portItem)
@@ -337,7 +337,7 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
 
         raise ValueError("Port item doesn't belong to this storage tank.")
 
-    def getFlowSolverParametersId(self, portItem: PortItem) -> int:
+    def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:
         directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
         if directPortPair:
             return directPortPair.trnsysId
@@ -359,12 +359,12 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
             if directPortPair.trnsysId == generator.UNINITIALIZED_ID:
                 directPortPair.trnsysId = generator.getTrnsysID()
 
-    def _getHeatExchangerForPortItem(self, portItem: PortItem) -> _tp.Optional[HeatExchanger]:
+    def _getHeatExchangerForPortItem(self, portItem: SinglePipePortItem) -> _tp.Optional[HeatExchanger]:
         heatExchanger = self._getSingleOrNone(hx for hx in self.heatExchangers if portItem in [hx.port1, hx.port2])
 
         return heatExchanger
 
-    def _getDirectPortPairForPortItemOrNone(self, portItem: PortItem) -> _tp.Optional[DirectPortPair]:
+    def _getDirectPortPairForPortItemOrNone(self, portItem: SinglePipePortItem) -> _tp.Optional[DirectPortPair]:
         directPortPair = self._getSingleOrNone(
             dpp for dpp in self.directPortPairs if portItem in [dpp.fromPort, dpp.toPort]
         )

@@ -14,9 +14,9 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTree
 import trnsysGUI.images as _img
 import massFlowSolver as _mfs
 
-from trnsysGUI import idGenerator as _id, PortItem as _pi
+from trnsysGUI import idGenerator as _id, PortItemBase as _pi
 from trnsysGUI.MoveCommand import MoveCommand
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.ResizerItem import ResizerItem
 
 global FilePath
@@ -75,8 +75,8 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.label.setVisible(False)
 
         if self.name == "Bvi":
-            self.inputs.append(PortItem("i", 0, self))
-            self.outputs.append(PortItem("o", 2, self))
+            self.inputs.append(SinglePipePortItem("i", 0, self))
+            self.outputs.append(SinglePipePortItem("o", 2, self))
 
         if self.name == "StorageTank":
             # Inputs get appended in ConfigStorage
@@ -97,7 +97,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.origOutputsPos = None
         self.origInputsPos = None
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItem) -> _tp.Optional[int]:
+    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
         assert graphicalPortItem.parent == self, "`graphicalPortItem' does not belong to this `BlockItem'."
 
         if not graphicalPortItem.connectionList:
@@ -558,7 +558,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                         self.pos().x() + self.w / 2,
                         t.pos().y(),
                         t.pos().x() + t.w / 2,
-                        t.pos().y(),
+                        t.pos().y()
                     )
 
                     self.parent.parent().alignYLineItem.setVisible(True)
@@ -586,7 +586,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                         t.pos().x(),
                         t.pos().y() + self.w / 2,
                         t.pos().x(),
-                        self.pos().y() + t.w / 2,
+                        self.pos().y() + t.w / 2
                     )
 
                     self.parent.parent().alignXLineItem.setVisible(True)
@@ -765,10 +765,10 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         return "", startingUnit
 
-    def getTemperatureVariableName(self, portItem: PortItem) -> str:
+    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
         return f"T{self.displayName}"
 
-    def getFlowSolverParametersId(self, portItem: PortItem) -> int:
+    def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:
         return self.trnsysId
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:

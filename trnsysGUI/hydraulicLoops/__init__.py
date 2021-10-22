@@ -6,7 +6,7 @@ __all__ = ["getOrCreateHydraulicLoop", "showHydraulicLoopDialog"]
 
 import typing as _tp
 
-import trnsysGUI.PortItem as _pi
+import trnsysGUI.PortItemBase as _pi
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
@@ -16,7 +16,7 @@ from . import _model
 
 
 def getOrCreateHydraulicLoop(
-    fromPort: _pi.PortItem, toPort: _pi.PortItem  # type: ignore[name-defined]
+    fromPort: _pi.PortItemBase, toPort: _pi.PortItemBase  # type: ignore[name-defined]
 ) -> "_model.HydraulicLoop":
     fromPortConnections = _getReachableConnections(fromPort)
     toPortConnections = _getReachableConnections(toPort)
@@ -32,7 +32,7 @@ def getOrCreateHydraulicLoop(
     return _model.HydraulicLoop("loop", water, modelConnections)
 
 
-def _getReachableConnections(port: _pi.PortItem) -> set[_conn.Connection]:  # type: ignore[name-defined]
+def _getReachableConnections(port: _pi.PortItemBase) -> set[_conn.Connection]:  # type: ignore[name-defined]
     assert len(port.connectionList) <= 1
 
     portItems = {port}
@@ -45,8 +45,8 @@ def _getReachableConnections(port: _pi.PortItem) -> set[_conn.Connection]:  # ty
 
 
 def _expandPortItemSetByOneLayer(
-    portItems: set[_pi.PortItem],  # type: ignore[name-defined]
-) -> _tp.Tuple[set[_pi.PortItem], set[_conn.Connection]]:  # type: ignore[name-defined]
+    portItems: set[_pi.PortItemBase],  # type: ignore[name-defined]
+) -> _tp.Tuple[set[_pi.PortItemBase], set[_conn.Connection]]:  # type: ignore[name-defined]
     connections = {_getSingleConnection(p) for p in portItems if p.connectionList}
     connectionPortItems = {p for c in connections for p in [c.fromPort, c.toPort]}
 
@@ -57,7 +57,7 @@ def _expandPortItemSetByOneLayer(
     return portItems, connections
 
 
-def _getInternallyConnectedPortItems(port: _pi.PortItem) -> _tp.Sequence[_pi.PortItem]:  # type: ignore[name-defined]
+def _getInternallyConnectedPortItems(port: _pi.PortItemBase) -> _tp.Sequence[_pi.PortItemBase]:  # type: ignore[name-defined]
     contributor: _mfs.MassFlowNetworkContributorMixin = port.parent  # type: ignore[name-defined]
     internalPiping = contributor.getInternalPiping()
 
@@ -76,12 +76,12 @@ def _getInternallyConnectedPortItems(port: _pi.PortItem) -> _tp.Sequence[_pi.Por
     return allIncidentInternallyConnectedPortItems[0]
 
 
-def _getSingleConnection(portItem: _pi.PortItem) -> _conn.Connection:  # type: ignore[name-defined]
+def _getSingleConnection(portItem: _pi.PortItemBase) -> _conn.Connection:  # type: ignore[name-defined]
     assert len(portItem.connectionList) == 1
     return portItem.connectionList[0]
 
 
-def showHydraulicLoopDialog(fromPort: _pi.PortItem, toPort: _pi.PortItem) -> None:  # type: ignore[name-defined]
+def showHydraulicLoopDialog(fromPort: _pi.PortItemBase, toPort: _pi.PortItemBase) -> None:  # type: ignore[name-defined]
     hydraulicLoop = getOrCreateHydraulicLoop(fromPort, toPort)
 
     okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(hydraulicLoop)

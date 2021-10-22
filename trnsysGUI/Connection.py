@@ -9,21 +9,23 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
-from PyQt5.QtCore import QLineF, QPointF
-from PyQt5.QtGui import QColor, QPen
+from PyQt5.QtCore import QPointF
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.hydraulicLoops as _hl
+import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
-from trnsysGUI import idGenerator as _id, PortItem as _pi
+from trnsysGUI import idGenerator as _id, PortItemBase as _pi
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.PortItemBase import PortItemBase
+from trnsysGUI.SegmentItemBase import SegmentItemBase
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.segmentItem import segmentItem
-import trnsysGUI.serialization as _ser
+from trnsysGUI.connection.segmentItemFactory import SegmentItemFactoryBase
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.BlockItem as _bi
@@ -36,12 +38,14 @@ def calcDist(p1, p2):
 
 
 class Connection(_mfs.MassFlowNetworkContributorMixin):
-    def __init__(self, fromPort: PortItem, toPort: PortItem, parent):
+    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, segmentItemFactory: SegmentItemFactoryBase, parent):
         self.logger = parent.logger
 
         self.fromPort = fromPort
         self.toPort = toPort
         self.displayName = None
+
+        self._segmentItemFactory = segmentItemFactory
 
         self.parent = parent
         self.groupName = ""
@@ -49,22 +53,30 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         # Export related
         self.typeNumber = 0
+        self.exportConnsString = ""
+        self.exportInputName = "0"
+        self.exportInitialInput = -1
+        self.exportEquations = []
+        self._portItemsWithParent: _tp.List[_tp.Tuple[PortItemBase, _bi.BlockItem]] = []
 
         # Global
         self.id = self.parent.idGen.getID()
         self.connId = self.parent.idGen.getConnID()
         self.trnsysId = self.parent.idGen.getTrnsysID()
 
-        self.segments: _tp.List[segmentItem] = []
+        self.segments: _tp.List[SegmentItemBase] = []
 
         self.startNode = Node()
         self.endNode = Node()
-        self.firstS: _tp.Optional[segmentItem] = None
+        self.firstS: _tp.Optional[SegmentItemBase] = None
 
         self.mass = 0  # comment out
         self.temperature = 0
 
         self.initNew(parent)
+
+    def _createSegmentItem(self, startNode, endNode):
+        return self._segmentItemFactory.createSegmentItem(startNode, endNode, self)
 
     def isVisible(self):
         res = True
@@ -146,8 +158,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
             for s in self.segments:
                 self.logger.debug("Value: " + str(value))
-                pen1 = QPen(col, value)
-                s.setPen(pen1)
+                s.setColorAndWidthAccordingToMassflow(col, value)
 
         else:
             self.logger.debug("No color to set in Connection.setColor()")
@@ -219,9 +230,9 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = segmentItem(self.startNode, self.endNode, self)
+        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
 
-        self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
+        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
         self.parent.diagramScene.addItem(self.firstS)
 
@@ -236,9 +247,9 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = segmentItem(self.startNode, self.endNode, self)
+        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
 
-        self.firstS.setLine(QLineF(self.getStartPoint(), self.getEndPoint()))
+        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
         self.parent.diagramScene.addItem(self.firstS)
 
@@ -251,7 +262,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         tempNode = self.startNode
 
-        rad = 2
+        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
 
         for x in range(len(segmentsCorners)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -266,13 +277,13 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
             cor.node.nextNode.setPrev(cor.node)
             cor.node.prevNode.setNext(cor.node)
-            segmentItem(tempNode, cor.node, self)
+            self._createSegmentItem(tempNode, cor.node)
 
             tempNode = cor.node
 
             self.printConn()
 
-        segmentItem(tempNode, tempNode.nextN(), self)
+        self._createSegmentItem(tempNode, tempNode.nextN())
 
         # self.parent.diagramScene.addItem(lastSeg)
 
@@ -301,8 +312,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
             self.logger.debug("pos1 is " + str(pos1))
             self.logger.debug("pos2 is " + str(pos2))
-
-            s.setLine(QLineF(pos1[0], pos1[1], pos2[0], pos2[1]))
+            s.setLine(pos1[0], pos1[1], pos2[0], pos2[1])
 
             self.parent.diagramScene.addItem(s)
 
@@ -344,7 +354,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         """
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 2  # 4
+        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
 
         self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
@@ -369,11 +379,11 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             corner2.node.setNext(corner3.node)
             corner3.node.setNext(corner4.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, corner3.node, self)
-            seg4 = segmentItem(corner3.node, corner4.node, self)
-            seg5 = segmentItem(corner4.node, self.endNode, self)
+            seg1 = self._createSegmentItem(self.startNode, corner1.node)
+            seg2 = self._createSegmentItem(corner1.node, corner2.node)
+            seg3 = self._createSegmentItem(corner2.node, corner3.node)
+            seg4 = self._createSegmentItem(corner3.node, corner4.node)
+            seg5 = self._createSegmentItem(corner4.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
@@ -399,11 +409,11 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             p3 = QPointF(pos2.x() + portOffset, baseline_h)
             p4 = QPointF(p3.x(), pos2.y())
 
-            seg1.setLine(QLineF(pos1, p1))
-            seg2.setLine(QLineF(p1, p2))
-            seg3.setLine(QLineF(p2, p3))
-            seg4.setLine(QLineF(p3, p4))
-            seg5.setLine(QLineF(p4, pos2))
+            seg1.setLine(pos1, p1)
+            seg2.setLine(p1, p2)
+            seg3.setLine(p2, p3)
+            seg4.setLine(p3, p4)
+            seg5.setLine(p4, pos2)
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -436,11 +446,11 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             corner2.node.setNext(corner3.node)
             corner3.node.setNext(corner4.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, corner3.node, self)
-            seg4 = segmentItem(corner3.node, corner4.node, self)
-            seg5 = segmentItem(corner4.node, self.endNode, self)
+            seg1 = self._createSegmentItem(self.startNode, corner1.node)
+            seg2 = self._createSegmentItem(corner1.node, corner2.node)
+            seg3 = self._createSegmentItem(corner2.node, corner3.node)
+            seg4 = self._createSegmentItem(corner3.node, corner4.node)
+            seg5 = self._createSegmentItem(corner4.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
@@ -467,11 +477,11 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             p3 = QPointF(pos2.x() - portOffset, baseline_h)
             p4 = QPointF(p3.x(), pos2.y())
 
-            seg1.setLine(QLineF(pos1, p1))
-            seg2.setLine(QLineF(p1, p2))
-            seg3.setLine(QLineF(p2, p3))
-            seg4.setLine(QLineF(p3, p4))
-            seg5.setLine(QLineF(p4, pos2))
+            seg1.setLine(pos1, p1)
+            seg2.setLine(p1, p2)
+            seg3.setLine(p2, p3)
+            seg4.setLine(p3, p4)
+            seg5.setLine(p4, pos2)
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -502,8 +512,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             if pos2.y() <= pos1.y():
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
@@ -514,8 +524,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
                 p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
-                seg1.setLine(QLineF(pos1, p1))
-                seg2.setLine(QLineF(p1, pos2))
+                seg1.setLine(pos1, p1)
+                seg2.setLine(p1, pos2)
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner1.setZValue(100)
@@ -532,14 +542,13 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
                 corner1.node.setNext(corner2.node)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, corner2.node, self)
-                seg3 = segmentItem(corner2.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, corner2.node)
+                seg3 = self._createSegmentItem(corner2.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.printConnNodes()
                 self.parent.diagramScene.addItem(seg1)
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(seg3)
@@ -552,10 +561,11 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
 
-                seg1.setLine(QLineF(pos1, help_point_1))
-                seg2.setLine(QLineF(help_point_1, help_point_2))
-                seg3.setLine(QLineF(help_point_2, pos2))
+                seg1.setLine(pos1, help_point_1)
+                seg2.setLine(help_point_1, help_point_2)
+                seg3.setLine(help_point_2, pos2)
 
+                self.printConnNodes()
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
 
@@ -581,8 +591,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             if pos2.y() >= pos1.y():
                 corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
@@ -593,8 +603,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
                 p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
 
-                seg1.setLine(QLineF(pos1, p1))
-                seg2.setLine(QLineF(p1, pos2))
+                seg1.setLine(pos1, p1)
+                seg2.setLine(p1, pos2)
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner1.setZValue(100)
@@ -610,14 +620,13 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
                 corner1.node.setNext(corner2.node)
 
-                seg1 = segmentItem(self.startNode, corner1.node, self)
-                seg2 = segmentItem(corner1.node, corner2.node, self)
-                seg3 = segmentItem(corner2.node, self.endNode, self)
+                seg1 = self._createSegmentItem(self.startNode, corner1.node)
+                seg2 = self._createSegmentItem(corner1.node, corner2.node)
+                seg3 = self._createSegmentItem(corner2.node, self.endNode)
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.printConnNodes()
                 self.parent.diagramScene.addItem(seg1)
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(seg3)
@@ -630,9 +639,11 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
                 help_point_1 = QPointF(pos1.x(), offsetPoint)
                 help_point_2 = QPointF(pos2.x(), offsetPoint)
 
-                seg1.setLine(QLineF(pos1, help_point_1))
-                seg2.setLine(QLineF(help_point_1, help_point_2))
-                seg3.setLine(QLineF(help_point_2, pos2))
+                seg1.setLine(pos1, help_point_1)
+                seg2.setLine(help_point_1, help_point_2)
+                seg3.setLine(help_point_2, pos2)
+
+                self.printConnNodes()
 
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -651,6 +662,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
             #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
             #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
+            pos1 = self.fromPort.scenePos()
+            pos2 = self.toPort.scenePos()
 
             self.fromPort.createdAtSide = self.fromPort.side
             self.toPort.createdAtSide = self.toPort.side
@@ -662,15 +675,14 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
             corner1.node.setNext(corner2.node)
 
-            seg1 = segmentItem(self.startNode, corner1.node, self)
-            seg2 = segmentItem(corner1.node, corner2.node, self)
-            seg3 = segmentItem(corner2.node, self.endNode, self)
+            seg1 = self._createSegmentItem(self.startNode, corner1.node)
+            seg2 = self._createSegmentItem(corner1.node, corner2.node)
+            seg3 = self._createSegmentItem(corner2.node, self.endNode)
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner2.node)
 
             # self.logger.debug("niceConn...")
-            self.printConnNodes()
             self.parent.diagramScene.addItem(seg1)
             self.parent.diagramScene.addItem(seg2)
             self.parent.diagramScene.addItem(seg3)
@@ -678,26 +690,25 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             self.parent.diagramScene.addItem(corner1)
             self.parent.diagramScene.addItem(corner2)
 
-            pos1 = self.fromPort.scenePos()
-            pos2 = self.toPort.scenePos()
-
             midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
 
-            help_point_1 = QPointF(midx, pos1.y())
-            help_point_2 = QPointF(midx, pos2.y())
-
-            seg1.setLine(QLineF(pos1, help_point_1))
-            seg2.setLine(QLineF(help_point_1, help_point_2))
-            seg3.setLine(QLineF(help_point_2, pos2))
+            seg1.setLine(pos1.x(), pos1.y(), midx, pos1.y())
+            seg2.setLine(midx, pos1.y(), midx, pos2.y())
+            seg3.setLine(midx, pos2.y(), pos2.x(), pos2.y())
+            self.printConnNodes()
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
 
             corner1.setZValue(100)
             corner2.setZValue(100)
-            self.fromPort.setZValue(100)
             self.toPort.setZValue(100)
+            self.fromPort.setZValue(100)
+
             self.logger.debug("Here in niceconn")
+
+            help_point_1 = QPointF(midx, pos1.y())
+            help_point_2 = QPointF(midx, pos2.y())
 
             corner1.setPos(help_point_1)
             corner2.setPos(help_point_2)
@@ -719,7 +730,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             # self.logger.debug("Col items are " + str(col))
 
             for c in col:
-                if type(c) is segmentItem:
+                if type(c) is SegmentItemBase:
                     # self.logger.debug("There is a segment colliding....")
                     # self.logger.debug("c.hasBridge is " + str(c.hasBridge))
                     # self.logger.debug("s.hasBridge is " + str(s.hasBridge))
@@ -755,8 +766,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
                             s.startNode.setNext(node1)
                             s.endNode.setPrev(node2)
 
-                            s.firstChild = segmentItem(s.startNode, node1, s.connection)
-                            s.secondChild = segmentItem(node2, s.endNode, s.connection)
+                            s.firstChild = self._createSegmentItem(s.startNode, node1)
+                            s.secondChild = self._createSegmentItem(node2, s.endNode)
 
                             s.hasBridge = True
                             c.hasBridge = True
@@ -809,8 +820,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
                             newPos1 = collisionPos - normVecp2p1
                             newPos2 = collisionPos + normVecp2p1
 
-                            s.firstChild.setLine(QLineF(qp1.x(), qp1.y(), newPos1.x(), newPos1.y()))
-                            s.secondChild.setLine(QLineF(newPos2.x(), newPos2.y(), qp2.x(), qp2.y()))
+                            s.firstChild.setLine(qp1.x(), qp1.y(), newPos1.x(), newPos1.y())
+                            s.secondChild.setLine(newPos2.x(), newPos2.y(), qp2.x(), qp2.y())
 
                             s.firstChild.setVisible(True)
                             s.secondChild.setVisible(True)
@@ -835,12 +846,12 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         items = self.parent.diagramScene.items()
 
         for it in items:
-            if type(it) is segmentItem:
+            if isinstance(it, SegmentItemBase):
                 if it.startNode.lastNode() is self.endNode or it.startNode.firstNode() is self.startNode:
                     # self.logger.debug("Del segment")
                     self.parent.diagramScene.removeItem(it)
             if type(it) is QGraphicsTextItem:
-                if type(it.parent) is PortItem:
+                if isinstance(it.parent, PortItemBase):
                     self.logger.debug("it has " + str(it.parent()))
                     self.logger.debug("Deleting it")
                     self.parent.diagramScene.removeItem(it)
@@ -1185,7 +1196,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItem) -> _tp.Optional[int]:
+    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
         assert graphicalPortItem in [self.fromPort, self.toPort],\
             "This connection is not connected to `graphicalPortItem'"
 
@@ -1365,7 +1376,7 @@ class DeleteConnectionCommand(QUndoCommand):
         self.conn = None
 
     def undo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)
+        self.conn = Connection(self.connFromPort, self.connToPort, self.segmentItemFactory, self.connParent)
 
 @_dc.dataclass
 class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
@@ -1448,4 +1459,3 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
-

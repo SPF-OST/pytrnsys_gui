@@ -4,10 +4,8 @@
 from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsTextItem
 
-from trnsysGUI.Connection import Connection
-from trnsysGUI.PortItem import PortItem
-from trnsysGUI.segmentItem import segmentItem
 from trnsysGUI.BlockItem import BlockItem
+from trnsysGUI.Connection import Connection
 
 
 class Group(QGraphicsRectItem):
