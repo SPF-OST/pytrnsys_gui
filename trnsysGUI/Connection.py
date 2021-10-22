@@ -1403,9 +1403,9 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
 
+
 @_dc.dataclass
 class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
-
     connectionId: int
     name: str
     id: int

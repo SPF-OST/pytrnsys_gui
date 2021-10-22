@@ -240,7 +240,7 @@ class segmentItem(QGraphicsLineItem):
             self.keyPr = 1
             self.logger.debug("Setting key to 1")
 
-            self.parent.selectConnection()
+            self.connection.selectConnection()
 
             if self.isVertical():
                 try:
@@ -251,8 +251,6 @@ class segmentItem(QGraphicsLineItem):
                     self.logger.debug("set oldx")
 
     def mouseMoveEvent(self, e):
-        # self.logger.debug("mouse moved")
-        # self.logger.debug(str(e.button()))
 
         self.logger.debug(self.connection.parent.editorMode)
         if self.keyPr == 1:
