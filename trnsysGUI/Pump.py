@@ -4,14 +4,12 @@
 import typing as _tp
 
 import numpy as np
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 
-from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping
-from trnsysGUI.PortItem import PortItem
-import trnsysGUI.images as _img
 import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
+from massFlowSolver import InternalPiping
+from trnsysGUI.BlockItem import BlockItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 
 class Pump(BlockItem):
@@ -22,8 +20,8 @@ class Pump(BlockItem):
         self.typeNumber = 1
         self.rndPwr = np.random.randint(0, 1000)
 
-        self.inputs.append(PortItem("i", 0, self))
-        self.outputs.append(PortItem("o", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
 
         self.changeSize()
 

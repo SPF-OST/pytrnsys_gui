@@ -28,6 +28,7 @@ from trnsysGUI.Radiator import Radiator
 from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
+from trnsysGUI.DPTeePiece import DPTeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 
@@ -70,6 +71,8 @@ class View(QGraphicsView):
                 self.parent().showConfigStorageDlg(bl)
             elif name == "TeePiece":
                 bl = TeePiece(name, self)
+            elif name == "DPTeePiece":
+                bl = DPTeePiece(name, self)
             elif name == "TVentil":
                 bl = TVentil(name, self)
             elif name == "Pump":

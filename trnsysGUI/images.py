@@ -61,6 +61,7 @@ STORAGE_TANK_PNG = _ia.ImageAccessor.createForPackageResource("images/StorageTan
 STORAGE_TANK_SVG = _ia.ImageAccessor.createForPackageResource("images/StorageTank.svg")
 TEE_PIECE_PNG = _ia.ImageAccessor.createForPackageResource("images/TeePiece.png")
 TEE_PIECE_SVG = _ia.ImageAccessor.createForPackageResource("images/TeePiece.svg")
+DP_TEE_PIECE_SVG = _ia.ImageAccessor.createForPackageResource("images/DPTeePiece.svg")
 TRASH_PNG = _ia.ImageAccessor.createForPackageResource("images/trash.png")
 T_VENTIL_PNG = _ia.ImageAccessor.createForPackageResource("images/TVentil.png")
 T_VENTIL_SVG = _ia.ImageAccessor.createForPackageResource("images/TVentil.svg")

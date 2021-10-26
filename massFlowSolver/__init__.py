@@ -1,14 +1,14 @@
 import dataclasses as _dc
 import typing as _tp
 
-import trnsysGUI.PortItem as _pi
+import trnsysGUI.PortItemBase as _pi
 from massFlowSolver import networkModel as _mfn
 
 
 @_dc.dataclass
 class InternalPiping:
     openLoopsStartingNodes: _tp.Sequence[_mfn.NodeBase]
-    modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItem]
+    modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]
 
 
 @_dc.dataclass
@@ -98,5 +98,5 @@ class MassFlowNetworkContributorMixin:
             allNodesToIndices |= nodesToIndices
         return openLoops, allNodesToIndices
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItem) -> _tp.Optional[int]:
+    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
         raise NotImplementedError()

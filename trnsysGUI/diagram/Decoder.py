@@ -10,6 +10,8 @@ from trnsysGUI.Collector import Collector
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
+from trnsysGUI.DPTeePiece import DPTeePiece
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.Graphicaltem import GraphicalItem
@@ -25,10 +27,12 @@ from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.Pump import Pump
 from trnsysGUI.Radiator import Radiator
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
 from trnsysGUI.storageTank.widget import StorageTank
 
 
@@ -192,12 +196,15 @@ class Decoder(json.JSONDecoder):
                         bl = Control(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-
-                    
                     # --- new encoding]
 
                     elif i["BlockName"] == "GraphicalItem":
                         bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
+
+                    elif i["BlockName"] == "DPTeePiece":
+                        bl = DPTeePiece(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
 
                     else:
                         raise AssertionError(f"Unknown kind of block item: {i['BlockName']}")
@@ -223,8 +230,12 @@ class Decoder(json.JSONDecoder):
                     if toPort is None:
                         self.logger.debug("Error: Did not found a toPort")
 
-                    c = Connection(fromPort, toPort, self.editor)
-
+                    if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
+                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), self.editor)
+                    elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
+                        c = Connection(fromPort, toPort, DoublePipeSegmentItemFactory(), self.editor)
+                    else:
+                        raise AssertionError("`fromPort' and `toPort' have different types.")
                     c.decode(i)
                     resConnList.append(c)
 

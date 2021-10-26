@@ -9,7 +9,7 @@ import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 
 class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
@@ -24,9 +24,10 @@ class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
-        self.inputs.append(PortItem("o", 0, self))
-        self.inputs.append(PortItem("o", 1, self))
-        self.outputs.append(PortItem("i", 2, self))
+
+        self.inputs.append(SinglePipePortItem("o", 0, self))
+        self.inputs.append(SinglePipePortItem("o", 1, self))
+        self.outputs.append(SinglePipePortItem("i", 2, self))
 
         self.changeSize()
 

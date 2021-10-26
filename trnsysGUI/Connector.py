@@ -5,7 +5,7 @@ import typing as _tp
 
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 
 class Connector(BlockItem):
@@ -15,8 +15,8 @@ class Connector(BlockItem):
         self.w = 40
         self.h = 40
 
-        self.inputs.append(PortItem("i", 0, self))
-        self.outputs.append(PortItem("o", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
 
         self.changeSize()
 

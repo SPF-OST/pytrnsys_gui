@@ -7,7 +7,7 @@ import os
 import massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
 from massFlowSolver import InternalPiping
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 
 class BlockItemFourPorts(BlockItem):
@@ -18,10 +18,10 @@ class BlockItemFourPorts(BlockItem):
 
         self.h = 120
         self.w = 120
-        self.inputs.append(PortItem("i", 0, self))
-        self.inputs.append(PortItem("i", 2, self))
-        self.outputs.append(PortItem("o", 0, self))
-        self.outputs.append(PortItem("o", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(SinglePipePortItem("i", 2, self))
+        self.outputs.append(SinglePipePortItem("o", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
