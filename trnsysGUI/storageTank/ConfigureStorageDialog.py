@@ -207,6 +207,9 @@ class ConfigureStorageDialog(QDialog):
         self.show()
 
     def _loadHeatExchangers(self):
+        self.leftHeatExchangersItemListWidget.clear()
+        self.rightHeatExchangersItemListWidget.clear()
+
         for heatExchanger in self.storage.heatExchangers:
             itemText = self._getHeatExchangerListItemText(heatExchanger)
             item = QListWidgetItem(itemText)
@@ -230,6 +233,9 @@ class ConfigureStorageDialog(QDialog):
         )
 
     def _loadDirectPortPairs(self):
+        self._leftDirectPortPairsItemListWidget.clear()
+        self._rightDirectPortPairsItemListWidget.clear()
+
         directPortPair: _dpp.DirectPortPair
         for directPortPair in self.storage.directPortPairs:
             itemText = self._getDirectPortPairListItemText(directPortPair)
@@ -328,13 +334,9 @@ class ConfigureStorageDialog(QDialog):
         relativeOutputHeight = float(self.offsetLeO.text()) / 100
 
         trnsysId = self.parent.idGen.getTrnsysID()
-        heatExchanger = self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
+        self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
 
-        itemText = self._getHeatExchangerListItemText(heatExchanger)
-        if side == _sd.Side.LEFT:
-            self.leftHeatExchangersItemListWidget.addItem(itemText)
-        else:
-            self.rightHeatExchangersItemListWidget.addItem(itemText)
+        self._loadHeatExchangers()
 
     def addPortPair(self):
         try:
@@ -375,8 +377,6 @@ class ConfigureStorageDialog(QDialog):
             self.storage.h,
         )
 
-        self._leftDirectPortPairsItemListWidget.clear()
-        self._rightDirectPortPairsItemListWidget.clear()
         self._loadDirectPortPairs()
 
     def removePortPairLeft(self):
