@@ -33,6 +33,8 @@ from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
+from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.doubleSinglePipeConnector import DoubleSinglePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
 
 
@@ -203,6 +205,14 @@ class Decoder(json.JSONDecoder):
 
                     elif i["BlockName"] == "DPTeePiece":
                         bl = DPTeePiece(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "DoubleSinglePipeConnector":
+                        bl = DoubleSinglePipeConnector(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "DoubleDoublePipeConnector":
+                        bl = DoubleDoublePipeConnector(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
 

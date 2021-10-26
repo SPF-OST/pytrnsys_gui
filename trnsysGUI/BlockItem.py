@@ -213,13 +213,15 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
-            dia = self.parent.parent().showTVentilDlg(self)
+            self.parent.parent().showTVentilDlg(self)
         elif self.name == "Pump":
-            dia = self.parent.parent().showPumpDlg(self)
+            self.parent.parent().showPumpDlg(self)
         elif self.name == "TeePiece" or self.name == "WTap_main":
-            dia = self.parent.parent().showBlockDlg(self)
+            self.parent.parent().showBlockDlg(self)
+        elif self.name in ["DoubleSinglePipeConnector", "DoubleDoublePipeConnector", "DPTeePiece"]:
+            self.parent.parent().showDoublePipeBlockDlg(self)
         else:
-            dia = self.parent.parent().showBlockDlg(self)
+            self.parent.parent().showBlockDlg(self)
             if len(self.propertyFile) > 0:
                 for files in self.propertyFile:
                     os.startfile(files, "open")
@@ -296,6 +298,14 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             for i in range(0, len(self.outputs)):
                 self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
 
+        if self.rotationN % 4 == 2:
+            for p in self.inputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+            for p in self.outputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+
     def updateFlipStateV(self, state):
         self.flippedV = bool(state)
 
@@ -348,6 +358,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             p.itemChange(27, p.scenePos())
             self.updateSide(p, 1)
 
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
     def rotateBlockToN(self, n):
         if n > 0:
             while self.rotationN != n:
@@ -373,6 +386,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             p.itemChange(27, p.scenePos())
             self.updateSide(p, -1)
 
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
     def resetRotation(self):
         self.logger.debug("Resetting rotation...")
         self.setRotation(0)
@@ -389,6 +405,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
 
         self.rotationN = 0
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
 
     def printRotation(self):
         self.logger.debug("Rotation is " + str(self.rotationN))

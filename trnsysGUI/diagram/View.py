@@ -4,12 +4,14 @@
 from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QGraphicsView
+
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
+from trnsysGUI.DPTeePiece import DPTeePiece
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
@@ -25,12 +27,13 @@ from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.Pump import Pump
 from trnsysGUI.Radiator import Radiator
-from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
-from trnsysGUI.DPTeePiece import DPTeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.doubleSinglePipeConnector import DoubleSinglePipeConnector
+from trnsysGUI.storageTank.widget import StorageTank
 
 
 class View(QGraphicsView):
@@ -73,6 +76,10 @@ class View(QGraphicsView):
                 bl = TeePiece(name, self)
             elif name == "DPTeePiece":
                 bl = DPTeePiece(name, self)
+            elif name == "DoubleSinglePipeConnector":
+                bl = DoubleSinglePipeConnector(name, self)
+            elif name == "DoubleDoublePipeConnector":
+                bl = DoubleDoublePipeConnector(name, self)
             elif name == "TVentil":
                 bl = TVentil(name, self)
             elif name == "Pump":

@@ -3,38 +3,54 @@
 
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
-
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem
-import trnsysGUI.images as _img
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 
-class DPTeePiece(BlockItem):
+class DoubleSinglePipeConnector(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(DPTeePiece, self).__init__(trnsysType, parent, **kwargs)
+        super(DoubleSinglePipeConnector, self).__init__(trnsysType, parent, **kwargs)
 
-        self.w = 60
-        self.h = 40
+        self.w = 20
+        self.h = 20
 
         self.typeNumber = 2
 
-        self.inputs.append(DoublePipePortItem("i", 0, self))
-        self.inputs.append(DoublePipePortItem("i", 2, self))
-        self.outputs.append(DoublePipePortItem("o", 1, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.outputs.append(DoublePipePortItem("o", 2, self))
 
         self.changeSize()
 
+        # self.addTree()
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        if self.rotationN % 4 == 0:
-            return _img.DP_TEE_PIECE_SVG
-        elif self.rotationN % 4 == 1:
-            return _img.DP_TEE_PIECE_ROTATED_90
-        elif self.rotationN % 4 == 2:
-            return _img.DP_TEE_PIECE_ROTATED_180
-        elif self.rotationN % 4 == 3:
-            return _img.DP_TEE_PIECE_ROTATED_270
+        return _img.DOUBLE_SINGLE_PIPE_CONNECTOR_SVG
+
+    def rotateBlockCW(self):
+        super().rotateBlockCW()
+        self._flipPipes()
+
+    def rotateBlockCCW(self):
+        super().rotateBlockCCW()
+        self._flipPipes()
+
+    def _flipPipes(self):
+        angle = (self.rotationN % 4) * 90
+        if angle == 0:
+            self.updateFlipStateV(False)
+        elif angle == 90:
+            self.updateFlipStateV(True)
+        elif angle == 180:
+            self.updateFlipStateV(True)
+        elif angle == 270:
+            self.updateFlipStateV(False)
+
+    def resetRotation(self):
+        super().resetRotation()
+        self.updateFlipStateV(0)
 
     def changeSize(self):
         w = self.w
@@ -43,8 +59,8 @@ class DPTeePiece(BlockItem):
         # Limit the block size:
         if h < 20:
             h = 20
-        if w < 40:
-            w = 40
+        if w < 20:
+            w = 20
 
         # center label:
         rect = self.label.boundingRect()
@@ -53,8 +69,8 @@ class DPTeePiece(BlockItem):
 
         self.label.setPos(lx, h - self.flippedV * (h + h / 2))
 
-        self.origInputsPos = [[0, 30], [w, 30]]
-        self.origOutputsPos = [[30, 0]]
+        self.origInputsPos = [[0, 0], [0, 20]]
+        self.origOutputsPos = [[20, 10]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
@@ -63,8 +79,8 @@ class DPTeePiece(BlockItem):
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 1 - 1 * self.flippedH) % 4
+        self.inputs[1].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return w, h
 
