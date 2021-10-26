@@ -13,7 +13,7 @@ def main():
         generatedFileName = f"_UI_{uiFilePath.with_suffix('').name}_generated.py"
         generatedFilePath = uiFilePath.with_name(generatedFileName)
         print(f"Generating {generatedFilePath} from {uiFilePath}...", end="")
-        cmd = ["pyuic5", str(uiFilePath), "-o", generatedFilePath]
+        cmd = ["pyuic5", str(uiFilePath), "-o", str(generatedFilePath)]
         _sp.run(cmd, shell=True, check=True)
         print("done.")
 
