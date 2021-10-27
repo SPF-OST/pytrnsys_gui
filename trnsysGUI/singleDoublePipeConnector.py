@@ -1,16 +1,15 @@
 import typing as _tp
 
 import trnsysGUI.images as _img
-from trnsysGUI.dPConnector import DPConnector
+from massFlowSolver import InternalPiping
+from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
 
 
-class DoubleSinglePipeConnector(DPConnector):
+class SingleDoublePipeConnector(DoublePipeConnectorBase):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
-
-        self.typeNumber = 2
 
         self.inputs.append(SinglePipePortItem("i", 0, self))
         self.inputs.append(SinglePipePortItem("i", 0, self))
@@ -23,15 +22,25 @@ class DoubleSinglePipeConnector(DPConnector):
 
     def changeSize(self):
         super().changeSize()
+
         self.origInputsPos = [[0, 0], [0, 20]]
         self.origOutputsPos = [[20, 10]]
+
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
+        # pylint: disable=duplicate-code  # 2
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.inputs[1].side = (self.rotationN + 2 * self.flippedH) % 4
+        # pylint: disable=duplicate-code  # 2
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+
+    def getInternalPiping(self) -> InternalPiping:
+        raise NotImplementedError()
+
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):
+        raise NotImplementedError()

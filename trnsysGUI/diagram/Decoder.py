@@ -10,7 +10,7 @@ from trnsysGUI.Collector import Collector
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
-from trnsysGUI.DPTeePiece import DPTeePiece
+from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
@@ -34,7 +34,7 @@ from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
 from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.doubleSinglePipeConnector import DoubleSinglePipeConnector
+from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
 
 
@@ -204,11 +204,11 @@ class Decoder(json.JSONDecoder):
                         bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
 
                     elif i["BlockName"] == "DPTeePiece":
-                        bl = DPTeePiece(
+                        bl = DoublePipeTeePiece(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "DoubleSinglePipeConnector":
-                        bl = DoubleSinglePipeConnector(
+                        bl = SingleDoublePipeConnector(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "DoubleDoublePipeConnector":

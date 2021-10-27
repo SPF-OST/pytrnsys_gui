@@ -242,31 +242,33 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     # Transform related
     def changeSize(self):
-        w = self.w
-        h = self.h
+        self._positionLabel()
 
-        """ Resize block function """
-        delta = 4
-
-        # Limit the block size:
-        if h < 20:
-            h = 20
-        if w < 40:
-            w = 40
-
-        # center label:
-        rect = self.label.boundingRect()
-        lw, lh = rect.width(), rect.height()
-        lx = (w - lw) / 2
-        self.label.setPos(lx, h)
+        w, h = self._getCappedWithAndHeight()
 
         if self.name == "Bvi":
+            delta = 4
+
             self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3)
             self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
             self.inputs[0].side = 0 + 2 * self.flippedH
             self.outputs[0].side = 0 + 2 * self.flippedH
 
-        return w, h
+    def _positionLabel(self):
+        width, height = self._getCappedWithAndHeight()
+        rect = self.label.boundingRect()
+        labelWidth, lableHeight = rect.width(), rect.height()
+        labelPosX = (height - labelWidth) / 2
+        self.label.setPos(labelPosX, width)
+
+    def _getCappedWithAndHeight(self):
+        width = self.w
+        height = self.h
+        if height < 20:
+            height = 20
+        if width < 40:
+            width = 40
+        return width, height
 
     def updateFlipStateH(self, state):
         self.flippedH = bool(state)
