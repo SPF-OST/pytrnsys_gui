@@ -213,13 +213,15 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
-            dia = self.parent.parent().showTVentilDlg(self)
+            self.parent.parent().showTVentilDlg(self)
         elif self.name == "Pump":
-            dia = self.parent.parent().showPumpDlg(self)
+            self.parent.parent().showPumpDlg(self)
         elif self.name == "TeePiece" or self.name == "WTap_main":
-            dia = self.parent.parent().showBlockDlg(self)
+            self.parent.parent().showBlockDlg(self)
+        elif self.name in ["DoubleSinglePipeConnector", "DoubleDoublePipeConnector", "DPTeePiece"]:
+            self.parent.parent().showDoublePipeBlockDlg(self)
         else:
-            dia = self.parent.parent().showBlockDlg(self)
+            self.parent.parent().showBlockDlg(self)
             if len(self.propertyFile) > 0:
                 for files in self.propertyFile:
                     os.startfile(files, "open")
@@ -240,31 +242,33 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     # Transform related
     def changeSize(self):
-        w = self.w
-        h = self.h
+        self._positionLabel()
 
-        """ Resize block function """
-        delta = 4
-
-        # Limit the block size:
-        if h < 20:
-            h = 20
-        if w < 40:
-            w = 40
-
-        # center label:
-        rect = self.label.boundingRect()
-        lw, lh = rect.width(), rect.height()
-        lx = (w - lw) / 2
-        self.label.setPos(lx, h)
+        w, h = self._getCappedWithAndHeight()
 
         if self.name == "Bvi":
+            delta = 4
+
             self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3)
             self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
             self.inputs[0].side = 0 + 2 * self.flippedH
             self.outputs[0].side = 0 + 2 * self.flippedH
 
-        return w, h
+    def _positionLabel(self):
+        width, height = self._getCappedWithAndHeight()
+        rect = self.label.boundingRect()
+        labelWidth, lableHeight = rect.width(), rect.height()
+        labelPosX = (height - labelWidth) / 2
+        self.label.setPos(labelPosX, width)
+
+    def _getCappedWithAndHeight(self):
+        width = self.w
+        height = self.h
+        if height < 20:
+            height = 20
+        if width < 40:
+            width = 40
+        return width, height
 
     def updateFlipStateH(self, state):
         self.flippedH = bool(state)
@@ -295,6 +299,14 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
             for i in range(0, len(self.outputs)):
                 self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
+
+        if self.rotationN % 4 == 2:
+            for p in self.inputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+            for p in self.outputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
 
     def updateFlipStateV(self, state):
         self.flippedV = bool(state)
@@ -348,6 +360,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             p.itemChange(27, p.scenePos())
             self.updateSide(p, 1)
 
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
     def rotateBlockToN(self, n):
         if n > 0:
             while self.rotationN != n:
@@ -373,6 +388,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             p.itemChange(27, p.scenePos())
             self.updateSide(p, -1)
 
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
     def resetRotation(self):
         self.logger.debug("Resetting rotation...")
         self.setRotation(0)
@@ -389,6 +407,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
 
         self.rotationN = 0
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
 
     def printRotation(self):
         self.logger.debug("Rotation is " + str(self.rotationN))

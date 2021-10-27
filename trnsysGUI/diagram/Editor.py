@@ -65,6 +65,7 @@ from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
 from trnsysGUI.diagramDlg import diagramDlg
+from trnsysGUI.doublePipeBlockDlg import DoublePipeBlockDlg
 from trnsysGUI.groupDlg import groupDlg
 from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.hxDlg import hxDlg
@@ -73,7 +74,6 @@ from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
-from trnsysGUI.PortItemBase import PortItemBase
 
 
 class Editor(QWidget):
@@ -219,6 +219,8 @@ class Editor(QWidget):
             ("Connector", _img.CONNECTOR_SVG.icon()),
             ("TeePiece", _img.TEE_PIECE_SVG.icon()),
             ("DPTeePiece", _img.DP_TEE_PIECE_SVG.icon()),
+            ("DoubleSinglePipeConnector", _img.DOUBLE_SINGLE_PIPE_CONNECTOR_SVG.icon()),
+            ("DoubleDoublePipeConnector", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("TVentil", _img.T_VENTIL_SVG.icon()),
             ("WTap_main", _img.W_TAP_MAIN_SVG.icon()),
             ("WTap", _img.W_TAP_SVG.icon()),
@@ -1031,6 +1033,9 @@ class Editor(QWidget):
     # Dialog calls
     def showBlockDlg(self, bl):
         c = BlockDlg(bl, self)
+
+    def showDoublePipeBlockDlg(self, bl):
+        c = DoublePipeBlockDlg(bl, self)
 
     def showPumpDlg(self, bl):
         c = PumpDlg(bl, self)

@@ -66,6 +66,8 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         self.segments: _tp.List[SegmentItemBase] = []
 
+        self.isSelected = False
+
         self.startNode = Node()
         self.endNode = Node()
         self.firstS: _tp.Optional[SegmentItemBase] = None

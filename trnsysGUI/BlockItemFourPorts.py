@@ -54,7 +54,7 @@ class BlockItemFourPorts(BlockItem):
             dct["trnsysID"] = self.trnsysId
             dct["childIds"] = self.childIds
             dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedH
+            dct["FlippedV"] = self.flippedV
             dct["RotationN"] = self.rotationN
             dct["GroupName"] = self.groupName
 
