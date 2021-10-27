@@ -143,26 +143,6 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         )
         return heatExchanger
 
-    # Transform related
-    def changeSize(self):
-        """Resize block function"""
-        width = self.w
-        height = self.h
-
-        # Limit the block size:
-        if height < 20:
-            height = 20
-        if width < 40:
-            width = 40
-
-        # center label:
-        rect = self.label.boundingRect()
-        labelWidth = rect.width()
-        labelXPos = (width - labelWidth) / 2
-        self.label.setPos(labelXPos, height)
-
-        return width, height
-
     def updateImage(self):
         super().updateImage()
         self.label.setPos(self.label.pos().x(), self.h)

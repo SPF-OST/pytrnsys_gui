@@ -11,7 +11,7 @@ from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
-from trnsysGUI.DPTeePiece import DPTeePiece
+from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
@@ -32,7 +32,7 @@ from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.doubleSinglePipeConnector import DoubleSinglePipeConnector
+from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
 
 
@@ -75,9 +75,9 @@ class View(QGraphicsView):
             elif name == "TeePiece":
                 bl = TeePiece(name, self)
             elif name == "DPTeePiece":
-                bl = DPTeePiece(name, self)
+                bl = DoublePipeTeePiece(name, self)
             elif name == "DoubleSinglePipeConnector":
-                bl = DoubleSinglePipeConnector(name, self)
+                bl = SingleDoublePipeConnector(name, self)
             elif name == "DoubleDoublePipeConnector":
                 bl = DoubleDoublePipeConnector(name, self)
             elif name == "TVentil":

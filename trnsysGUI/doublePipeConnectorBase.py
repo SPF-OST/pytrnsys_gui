@@ -6,7 +6,7 @@ from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 
 
-class DPConnector(BlockItem):
+class DoublePipeConnectorBase(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -40,10 +40,7 @@ class DPConnector(BlockItem):
         self.updateFlipStateV(0)
 
     def getInternalPiping(self) -> InternalPiping:
-        pass
-
-    def _getModelAndMapping(self):
-        pass
+        raise NotImplementedError()
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        pass
+        raise NotImplementedError()
