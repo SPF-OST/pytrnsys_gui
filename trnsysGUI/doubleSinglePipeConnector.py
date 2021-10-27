@@ -1,17 +1,14 @@
-# pylint: skip-file
-# type: ignore
-
 import typing as _tp
 
 import trnsysGUI.images as _img
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.BlockItem import BlockItem # type: ignore[attr-defined]
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem # type: ignore[attr-defined]
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem # type: ignore[attr-defined]
 
 
 class DoubleSinglePipeConnector(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(DoubleSinglePipeConnector, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.w = 20
         self.h = 20
