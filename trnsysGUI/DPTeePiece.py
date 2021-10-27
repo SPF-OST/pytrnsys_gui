@@ -3,12 +3,10 @@
 
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
-
+import trnsysGUI.images as _img
+from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem
-import trnsysGUI.images as _img
 
 
 class DPTeePiece(BlockItem):
@@ -68,48 +66,20 @@ class DPTeePiece(BlockItem):
 
         return w, h
 
-    def exportParametersFlowSolver(self, descConnLength):
-        temp = ""
-        for i in self.inputs:
-            for c in i.connectionList:
-                temp = temp + str(c.trnsysId) + " "
-                self.trnsysConn.append(c)
+    def getInternalPiping(self) -> InternalPiping:
+        teePiece, modelPortItemsToGraphicalPortItem = self._getModelAndMapping()
 
-        for o in self.outputs:
-            for c in o.connectionList:
-                temp = temp + str(c.trnsysId) + " "
-                self.trnsysConn.append(c)
+        internalPiping = InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
 
-        temp += str(self.typeNumber)
-        temp += " " * (descConnLength - len(temp))
-        self.exportConnsString = temp
+        return internalPiping
 
-        f = temp + "!" + str(self.trnsysId) + " : " + str(self.displayName) + "\n"
-
-        return f
-
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
-        if self.isVisible():
-            tot = ""
-            for i in range(0, 3):
-                temp = (
-                    prefix
-                    + self.displayName
-                    + "_"
-                    + abc[i]
-                    + "=["
-                    + str(simulationUnit)
-                    + ","
-                    + str(equationNumber)
-                    + "]\n"
-                )
-                tot += temp
-                self.exportEquations.append(temp)
-                # nEqUsed += 1  # DC
-                equationNumber += 1  # DC-ERR
-            return tot, equationNumber, 3
-        else:
-            return "", equationNumber + 3, 0
+    def _getModelAndMapping(self):
+        input1 = _mfn.PortItem()
+        input2 = _mfn.PortItem()
+        output = _mfn.PortItem()
+        teePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input1, input2, output)
+        modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
+        return teePiece, modelPortItemsToGraphicalPortItem
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
@@ -127,11 +97,24 @@ class DPTeePiece(BlockItem):
             unitText += "PARAMETERS 0\n"
             unitText += "INPUTS 6\n"
 
-            for s in self.exportEquations:
-                unitText += s[0 : s.find("=")] + "\n"
+            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+            assert len(openLoops) == 1
+            openLoop = openLoops[0]
 
-            for it in self.trnsysConn:
-                unitText += "T" + it.displayName + "\n"
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+            assert len(realNodes) == 1
+            realNode = realNodes[0]
+
+            outputVariables = realNode.serialize(nodesToIndices).outputVariables
+            for outputVariable in outputVariables:
+                if not outputVariable:
+                    continue
+
+                unitText += outputVariable.name + "\n"
+
+            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
+            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
 
             unitText += "***Initial values\n"
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"

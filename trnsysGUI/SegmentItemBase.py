@@ -718,7 +718,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         wasVisible = self.labelMass.isVisible()
         self.setMassFlowLabelVisible(not wasVisible)
 
-
     def setSelect(self, isSelected: bool) -> None:
         raise NotImplementedError()
 
