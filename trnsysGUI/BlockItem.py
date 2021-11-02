@@ -4,20 +4,19 @@
 import glob
 import os
 import typing as _tp
-import abc as _abc
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
-import trnsysGUI.images as _img
 import massFlowSolver as _mfs
-
-from trnsysGUI import idGenerator as _id, PortItemBase as _pi
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
+from trnsysGUI import idGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -97,15 +96,23 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.origOutputsPos = None
         self.origInputsPos = None
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
-        assert graphicalPortItem.parent == self, "`graphicalPortItem' does not belong to this `BlockItem'."
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
+
+        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
 
         if not graphicalPortItem.connectionList:
             return None
 
-        connection = graphicalPortItem.connectionList[0]
+        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
 
-        return connection.trnsysId
+        connectionInternalPiping = connection.getInternalPiping()
+
+        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
+
+        assert len(connectionStartingNodes) == 1
+
+        return connectionStartingNodes[0]
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if type(self) == BlockItem:

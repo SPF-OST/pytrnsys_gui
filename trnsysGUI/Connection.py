@@ -1198,21 +1198,25 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' doesn't belong to `internalPiping'"
+
+        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+
         assert graphicalPortItem in [self.fromPort, self.toPort],\
             "This connection is not connected to `graphicalPortItem'"
 
         blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
 
-        internalPiping = blockItem.getInternalPiping()
+        blockItemInternalPiping = blockItem.getInternalPiping()
 
-        for startingNode in internalPiping.openLoopsStartingNodes:
+        for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
             realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
             for realNode in realNodesAndPortItems.realNodes:
                 for portItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
-                    candidateGraphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[portItem]
                     if candidateGraphicalPortItem == graphicalPortItem:
-                        return realNode.trnsysId
+                        return realNode
 
         return None
 
