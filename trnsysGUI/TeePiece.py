@@ -66,7 +66,17 @@ class TeePiece(BlockItem):
     def getInternalPiping(self) -> InternalPiping:
         teePiece, modelPortItemsToGraphicalPortItem = self._getModelAndMapping()
 
-        internalPiping = InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
+        input1 = ColdPortItem()
+        input2 = ColdPortItem()
+        output = ColdPortItem()
+        coldTeePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input1, input2, output)
+
+        input1 = HotPortItem()
+        input2 = HotPortItem()
+        output = HotPortItem()
+        hotTeePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input1, input2, output)
+
+        internalPiping = InternalPiping([coldTeePiece, hotTeePiece], modelPortItemsToGraphicalPortItem)
 
         return internalPiping
 

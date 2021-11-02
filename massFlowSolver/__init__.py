@@ -7,7 +7,7 @@ from massFlowSolver import networkModel as _mfn
 
 @_dc.dataclass
 class InternalPiping:
-    openLoopsStartingNodes: _tp.Sequence[_mfn.NodeBase]
+    openLoopsStartingNodes: _tp.Sequence[_mfn.RealNodeBase]
     modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]
 
 
@@ -87,16 +87,15 @@ class MassFlowNetworkContributorMixin:
 
             portItemsToIndices = {}
             for portItem in portItems:
-                graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-                portItemIndex = self._getPortItemIndex(graphicalPortItem)
-                if not portItemIndex:
+                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)
+                if not connectedRealNode:
                     raise AssertionError("Hydraulics not connected.")
-                portItemsToIndices[portItem] = portItemIndex
+                portItemsToIndices[portItem] = connectedRealNode.trnsysId
             realNodesToIndices = {n: n.trnsysId for n in realNodes}
             nodesToIndices = portItemsToIndices | realNodesToIndices
 
             allNodesToIndices |= nodesToIndices
         return openLoops, allNodesToIndices
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         raise NotImplementedError()
