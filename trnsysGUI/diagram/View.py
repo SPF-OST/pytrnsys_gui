@@ -76,7 +76,7 @@ class View(QGraphicsView):
                 bl = TeePiece(name, self)
             elif name == "DPTeePiece":
                 bl = DoublePipeTeePiece(name, self)
-            elif name == "DoubleSinglePipeConnector":
+            elif name == "SingleDoublePipeConnector":
                 bl = SingleDoublePipeConnector(name, self)
             elif name == "DoubleDoublePipeConnector":
                 bl = DoubleDoublePipeConnector(name, self)

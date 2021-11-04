@@ -18,8 +18,9 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.hydraulicLoops as _hl
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
-from trnsysGUI import idGenerator as _id, PortItemBase as _pi
+from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
@@ -1191,34 +1192,72 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         return "", nUnit
 
     def getInternalPiping(self) -> InternalPiping:
-        fromPort = _mfn.PortItem()
-        toPort = _mfn.PortItem()
+        if isinstance(self.fromPort, SinglePipePortItem):
+            fromPort = _mfn.PortItem()
+            toPort = _mfn.PortItem()
 
-        pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
+            pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
 
-        return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
+            return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
+        elif isinstance(self.fromPort, DoublePipePortItem):
+            coldFromPort = _mfn.ColdPortItem()
+            coldToPort = _mfn.ColdPortItem()
+            coldPipe = _mfn.Pipe("Cold"+self.displayName, self.trnsysId, coldFromPort, coldToPort)
+            ColdModelPortItemsToGraphicalPortItem = {coldFromPort: self.fromPort, coldToPort: self.toPort}
+
+            hotFromPort = _mfn.HotPortItem()
+            hotToPort = _mfn.HotPortItem()
+            hotPipe = _mfn.Pipe("Hot"+self.displayName, self.parent.idGen.getTrnsysID(), hotFromPort, hotToPort)
+            HotModelPortItemsToGraphicalPortItem = {hotFromPort: self.fromPort, hotToPort: self.toPort}
+
+            ModelPortItemsToGraphicalPortItem = ColdModelPortItemsToGraphicalPortItem | HotModelPortItemsToGraphicalPortItem
+            return InternalPiping([coldPipe, hotPipe], ModelPortItemsToGraphicalPortItem)
+        else:
+            raise AssertionError("fromPort has an unknown type.")
 
     def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' doesn't belong to `internalPiping'"
+        if isinstance(self.fromPort, SinglePipePortItem):
+            assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' doesn't belong to `internalPiping'"
 
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+            graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
 
-        assert graphicalPortItem in [self.fromPort, self.toPort],\
-            "This connection is not connected to `graphicalPortItem'"
+            assert graphicalPortItem in [self.fromPort, self.toPort],\
+                "This connection is not connected to `graphicalPortItem'"
 
-        blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
+            blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
 
-        blockItemInternalPiping = blockItem.getInternalPiping()
+            blockItemInternalPiping = blockItem.getInternalPiping()
 
-        for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
-            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
-            for realNode in realNodesAndPortItems.realNodes:
-                for portItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
-                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[portItem]
-                    if candidateGraphicalPortItem == graphicalPortItem:
-                        return realNode
+            for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
+                realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
+                for realNode in realNodesAndPortItems.realNodes:
+                    for portItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
+                        candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[portItem]
+                        if candidateGraphicalPortItem == graphicalPortItem:
+                            return realNode
+            return None
+        elif isinstance(self.fromPort, DoublePipePortItem):
+            assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' doesn't belong to `internalPiping'"
 
-        return None
+            graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+
+            assert graphicalPortItem in [self.fromPort, self.toPort], \
+                "This connection is not connected to `graphicalPortItem'"
+
+            blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
+
+            blockItemInternalPiping = blockItem.getInternalPiping()
+
+            for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
+                realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
+                for realNode in realNodesAndPortItems.realNodes:
+                    for candidatePortItem in [n for n in realNode.getNeighbours() if type(n) is type(portItem)]:
+                        candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[candidatePortItem]
+                        if candidateGraphicalPortItem == graphicalPortItem:
+                            return realNode
+            return None
+        else:
+            raise AssertionError("fromPort has an unknown type.")
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         f = ""

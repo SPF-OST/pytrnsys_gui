@@ -87,11 +87,11 @@ class MassFlowNetworkContributorMixin:
 
             portItemsToIndices = {}
             for portItem in portItems:
-                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)
+                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)  # find connected element
                 if not connectedRealNode:
                     raise AssertionError("Hydraulics not connected.")
-                portItemsToIndices[portItem] = connectedRealNode.trnsysId
-            realNodesToIndices = {n: n.trnsysId for n in realNodes}
+                portItemsToIndices[portItem] = connectedRealNode.trnsysId  # BlockID
+            realNodesToIndices = {n: n.trnsysId for n in realNodes}  # ConnectionID's
             nodesToIndices = portItemsToIndices | realNodesToIndices
 
             allNodesToIndices |= nodesToIndices

@@ -1,5 +1,7 @@
 import typing as _tp
 
+import massFlowSolver as _mfs
+import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
@@ -58,8 +60,47 @@ class DoublePipeTeePiece(BlockItem):
         # pylint: disable=duplicate-code  # 1
         self.outputs[0].side = (self.rotationN + 1 - 1 * self.flippedH) % 4
 
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
+
+        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+
+        if not graphicalPortItem.connectionList:
+            return None
+
+        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
+
+        connectionInternalPiping = connection.getInternalPiping()
+
+        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
+
+        assert len(connectionStartingNodes) == 2
+
+        if isinstance(portItem, _mfn.ColdPortItem):
+            return connectionStartingNodes[0]
+        if isinstance(portItem, _mfn.HotPortItem):
+            return connectionStartingNodes[1]
+
+        return None
+
     def getInternalPiping(self) -> InternalPiping:
-        raise NotImplementedError()
+        coldInput1 = _mfn.ColdPortItem()
+        coldInput2 = _mfn.ColdPortItem()
+        coldOutput = _mfn.ColdPortItem()
+        coldTeePiece = _mfn.TeePiece("Cold"+self.displayName, self.trnsysId, coldInput1, coldInput2, coldOutput)
+        ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[0], coldInput2: self.inputs[1], coldOutput: self.outputs[0]}
+
+        hotInput1 = _mfn.HotPortItem()
+        hotInput2 = _mfn.HotPortItem()
+        hotOutput = _mfn.HotPortItem()
+        hotTeePiece = _mfn.TeePiece("Hot"+self.displayName, self.trnsysId, hotInput1, hotInput2, hotOutput)
+        HotModelPortItemsToGraphicalPortItem = {hotInput1: self.inputs[0], hotInput2: self.inputs[1], hotOutput: self.outputs[0]}
+
+        ModelPortItemsToGraphicalPortItem = ColdModelPortItemsToGraphicalPortItem | HotModelPortItemsToGraphicalPortItem
+
+        internalPiping = InternalPiping([coldTeePiece, hotTeePiece], ModelPortItemsToGraphicalPortItem)
+
+        return internalPiping
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError()

@@ -94,6 +94,16 @@ class PortItem(NodeBase, _abc.ABC):
 
 
 @_dc.dataclass(eq=False)
+class ColdPortItem(PortItem):
+    pass
+
+
+@_dc.dataclass(eq=False)
+class HotPortItem(PortItem):
+    pass
+
+
+@_dc.dataclass(eq=False)
 class RealNodeBase(NodeBase, _abc.ABC):
     name: str
     trnsysId: int

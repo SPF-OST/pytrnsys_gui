@@ -219,7 +219,7 @@ class Editor(QWidget):
             ("Connector", _img.CONNECTOR_SVG.icon()),
             ("TeePiece", _img.TEE_PIECE_SVG.icon()),
             ("DPTeePiece", _img.DP_TEE_PIECE_SVG.icon()),
-            ("DoubleSinglePipeConnector", _img.DOUBLE_SINGLE_PIPE_CONNECTOR_SVG.icon()),
+            ("SingleDoublePipeConnector", _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("DoubleDoublePipeConnector", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("TVentil", _img.T_VENTIL_SVG.icon()),
             ("WTap_main", _img.W_TAP_MAIN_SVG.icon()),
