@@ -33,6 +33,7 @@ from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
+from trnsysGUI.connection.pipeModel import SinglePipeModel, DoublePipeModel
 from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
@@ -241,9 +242,9 @@ class Decoder(json.JSONDecoder):
                         self.logger.debug("Error: Did not found a toPort")
 
                     if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
-                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), self.editor)
+                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), DoublePipeModel(), self.editor)
                     elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
-                        c = Connection(fromPort, toPort, DoublePipeSegmentItemFactory(), self.editor)
+                        c = Connection(fromPort, toPort, DoublePipeSegmentItemFactory(), DoublePipeModel(), self.editor)
                     else:
                         raise AssertionError("`fromPort' and `toPort' have different types.")
                     c.decode(i)
