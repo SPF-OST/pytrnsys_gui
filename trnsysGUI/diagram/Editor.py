@@ -59,7 +59,6 @@ from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
-from trnsysGUI.connection.pipeModel import SinglePipeModel, DoublePipeModel
 from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
@@ -428,14 +427,12 @@ class Editor(QWidget):
 
             if isinstance(startPort, SinglePipePortItem) and isinstance(endPort, SinglePipePortItem):
                 factory = SinglePipeSegmentItemFactory()
-                pipeModel = SinglePipeModel()
             elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
                 factory = DoublePipeSegmentItemFactory()
-                pipeModel = DoublePipeModel()
             else:
                 raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
-            command = CreateConnectionCommand(startPort, endPort, factory, pipeModel, self, "CreateConn Command")
+            command = CreateConnectionCommand(startPort, endPort, factory, self, "CreateConn Command")
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):

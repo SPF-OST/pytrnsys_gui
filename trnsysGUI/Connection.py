@@ -3,12 +3,9 @@
 
 from __future__ import annotations
 
-import dataclasses as _dc
 import math as _math
 import typing as _tp
-import uuid as _uuid
 
-import dataclasses_jsonschema as _dcj
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
@@ -16,7 +13,6 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.hydraulicLoops as _hl
-import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
@@ -26,7 +22,6 @@ from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.connection.pipeModel import PipeModel
 from trnsysGUI.connection.segmentItemFactory import SegmentItemFactoryBase
 
 if _tp.TYPE_CHECKING:
@@ -40,7 +35,7 @@ def calcDist(p1, p2):
 
 
 class Connection(_mfs.MassFlowNetworkContributorMixin):
-    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, segmentItemFactory: SegmentItemFactoryBase, pipeModel: PipeModel, parent):
+    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, segmentItemFactory: SegmentItemFactoryBase, parent):
         self.logger = parent.logger
 
         self.fromPort = fromPort
@@ -48,7 +43,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.displayName = None
 
         self._segmentItemFactory = segmentItemFactory
-        self._pipeModel = pipeModel
 
         self.parent = parent
         self.groupName = ""
@@ -1134,55 +1128,10 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
     # Saving / Loading
     def encode(self):
-        self.logger.debug("Encoding a connection")
-
-        if len(self.segments) > 0:
-            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
-        else:
-            self.logger.debug("This connection has no segment")
-            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()
-            labelPos = defaultPos
-            labelMassPos = defaultPos
-
-        corners = []
-        for s in self.getCorners():
-            cornerTupel = (s.pos().x(), s.pos().y())
-            corners.append(cornerTupel)
-
-        connectionModel = ConnectionModel(
-            self.connId,
-            self.displayName,
-            self.id,
-            corners,
-            labelPos,
-            labelMassPos,
-            self.groupName,
-            self.fromPort.id,
-            self.toPort.id,
-            self.trnsysId,
-        )
-
-        dictName = "Connection-"
-        return dictName, connectionModel.to_dict()
+        raise NotImplementedError
 
     def decode(self, i):
-        self.logger.debug("Loading a connection in Decoder")
-
-        model = ConnectionModel.from_dict(i)
-
-        self.id = model.id
-        self.connId = model.connectionId
-        self.trnsysId = model.trnsysId
-        self.setName(model.name)
-        self.groupName = "defaultGroup"
-        self.setConnToGroup(model.groupName)
-
-        if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
-
-        self.setLabelPos(model.labelPos)
-        self.setMassLabelPos(model.massFlowLabelPos)
+        raise NotImplementedError
 
     # Export related
     def exportBlackBox(self):
@@ -1201,10 +1150,10 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         return "", nUnit
 
     def getInternalPiping(self) -> InternalPiping:
-        return self._pipeModel.getInternalPiping(self)
+        raise NotImplementedError
 
     def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        return self._pipeModel.getConnectedRealNode(portItem, internalPiping, self)
+        raise NotImplementedError
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         f = ""
@@ -1363,7 +1312,6 @@ class DeleteConnectionCommand(QUndoCommand):
         self.connToPort = self.conn.toPort
         self.connParent = self.conn.parent
         self.connSegmentItemFactory = self.conn._segmentItemFactory
-        self.connPipeModel = self.conn._pipeModel
 
     def redo(self):
         self.conn.deleteConn()
@@ -1371,86 +1319,4 @@ class DeleteConnectionCommand(QUndoCommand):
 
     def undo(self):
         self.conn = Connection(self.connFromPort, self.connToPort,
-                               self.connSegmentItemFactory, self.connPipeModel. self.connParent)
-
-@_dc.dataclass
-class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    ConnCID: int
-    ConnDisplayName: str
-    ConnID: int
-    CornerPositions: _tp.List[_tp.Tuple[float, float]]
-    FirstSegmentLabelPos: _tp.Tuple[float, float]
-    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]
-    GroupName: str
-    PortFromID: int
-    PortToID: int
-    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
-    trnsysID: int
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
-
-
-@_dc.dataclass
-class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
-    connectionId: int
-    name: str
-    id: int
-    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
-    labelPos: _tp.Tuple[float, float]
-    massFlowLabelPos: _tp.Tuple[float, float]
-    groupName: str
-    fromPortId: int
-    toPortId: int
-    trnsysId: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "ConnectionModel":
-        data.pop(".__ConnectionDict__")
-        connectionModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(ConnectionModel, connectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__ConnectionDict__"] = True
-        return data
-
-
-    @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return ConnectionModelVersion0
-
-    @classmethod
-    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
-        firstSegmentLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0], \
-                               superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1]
-        firstSegmentMassFlowLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0], \
-                                       superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1]
-
-        return ConnectionModel(
-            superseded.ConnCID,
-            superseded.ConnDisplayName,
-            superseded.ConnID,
-            superseded.CornerPositions,
-            firstSegmentLabelPos,
-            firstSegmentMassFlowLabelPos,
-            superseded.GroupName,
-            superseded.PortFromID,
-            superseded.PortToID,
-            superseded.trnsysID,
-        )
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+                               self.connSegmentItemFactory, self.connParent)

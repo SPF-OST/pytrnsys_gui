@@ -7,10 +7,8 @@ import typing as tp
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
-from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
-from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
@@ -32,9 +30,11 @@ from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
-from trnsysGUI.connection.pipeModel import SinglePipeModel, DoublePipeModel
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
 
@@ -242,10 +242,9 @@ class Decoder(json.JSONDecoder):
                         self.logger.debug("Error: Did not found a toPort")
 
                     if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
-                        # singlePipeModel = SinglePipeModel.from_dict(i)
-                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), SinglePipeModel(), self.editor)
+                        c = SinglePipeConnection(fromPort, toPort, SinglePipeSegmentItemFactory(), self.editor)
                     elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
-                        c = Connection(fromPort, toPort, DoublePipeSegmentItemFactory(), DoublePipeModel(), self.editor)
+                        c = DoublePipeConnection(fromPort, toPort, DoublePipeSegmentItemFactory(), self.editor)
                     else:
                         raise AssertionError("`fromPort' and `toPort' have different types.")
                     c.decode(i)

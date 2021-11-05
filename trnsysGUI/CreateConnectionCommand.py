@@ -3,22 +3,28 @@
 
 from PyQt5.QtWidgets import QUndoCommand
 
-from trnsysGUI.Connection import Connection
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 
 
 class CreateConnectionCommand(QUndoCommand):
-    def __init__(self, fromPort, toPort, segmentItemFactory, modelPipe, connParent, descr):
+    def __init__(self, fromPort, toPort, segmentItemFactory, connParent, descr):
         super().__init__(descr)
         self.conn = None
         self.connFromPort = fromPort
         self.connToPort = toPort
         self.segmentItemFactory = segmentItemFactory
-        self.modelPipe = modelPipe
         self.connParent = connParent
 
     def redo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort,
-                               self.segmentItemFactory, self.modelPipe, self.connParent)
+        if isinstance(self.connFromPort, SinglePipePortItem):
+            self.conn = SinglePipeConnection(self.connFromPort, self.connToPort,
+                                   self.segmentItemFactory, self.connParent)
+        if isinstance(self.connFromPort, DoublePipePortItem):
+            self.conn = DoublePipeConnection(self.connFromPort, self.connToPort,
+                                   self.segmentItemFactory, self.connParent)
 
     def undo(self):
         if self.conn in self.conn.parent.connectionList:

@@ -46,41 +46,6 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         # pylint: disable=duplicate-code  # 2
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
-    def encode(self):
-        # Double check that no virtual block gets encoded
-        if self.isVisible():
-            portListInputs = []
-            portListOutputs = []
-
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
-            dct = {}
-
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["childIds"] = self.childIds
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
-
-            dictName = "Block-"
-
-            return dictName, dct
-
-
-    def decode(self, i, resBlockList):
-        self.childIds = i["childIds"]
-        super().decode(i, resBlockList)
-
     def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
 
