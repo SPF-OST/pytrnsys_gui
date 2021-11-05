@@ -242,7 +242,8 @@ class Decoder(json.JSONDecoder):
                         self.logger.debug("Error: Did not found a toPort")
 
                     if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
-                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), DoublePipeModel(), self.editor)
+                        # singlePipeModel = SinglePipeModel.from_dict(i)
+                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), SinglePipeModel(), self.editor)
                     elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
                         c = Connection(fromPort, toPort, DoublePipeSegmentItemFactory(), DoublePipeModel(), self.editor)
                     else:

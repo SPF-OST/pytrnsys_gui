@@ -24,6 +24,10 @@ class DoublePipeTeePiece(BlockItem):
 
         self.changeSize()
 
+        self.childIds = []
+        self.childIds.append(self.trnsysId)
+        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         rotationAngle = (self.rotationN % 4) * 90
 

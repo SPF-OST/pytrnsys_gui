@@ -12,8 +12,13 @@ class PipeModel(_abc.ABC):
     @_abc.abstractmethod
     def getInternalPiping(self) -> InternalPiping:
         raise NotImplementedError()
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+
+    def getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         raise NotImplementedError()
+
+    def getDecoder(self):
+        raise NotImplementedError()
+
 
 class SinglePipeModel(PipeModel):
 
