@@ -118,7 +118,7 @@ specified are for a Windows environment. They are very similar for Linux.
    
 1. Build the python-files corresponding to the ui-file included:
     ```commandline
-   dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
+   py dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
    ```
    Note: You have to execute this file each time you pull from the source results in changes to existing ui-files or new 
    ones.  
@@ -126,7 +126,7 @@ specified are for a Windows environment. They are very similar for Linux.
 1. Now you can run `pytrnsys-gui`!
     ```commandline
     cd trnsysGUI
-    python GUI.py
+    py GUI.py
     ```
     
 Beware that the GUI can only be started from within the virtual environment you created in step 1. 

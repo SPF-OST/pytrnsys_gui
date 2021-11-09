@@ -923,13 +923,11 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
     # Gradient related
     def totalLength(self):
-        s = self.startNode
-        e = self.endNode
-        res = 0
+        summedLength = 0
 
-        for seg in self.segments:
-            res += calcDist(seg.line().p1(), seg.line().p2())
-        return res
+        for segment in self.segments:
+            summedLength += calcDist(segment.line().p1(), segment.line().p2())
+        return summedLength
 
     def partialLength(self, node):
         # Returns the cummulative length of line up to given node
