@@ -102,7 +102,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.mass = "{:,}".format(self.mass)
         self.temperature = temp
         for s in self.segments:
-            s.labelMass.setPlainText("M: %s kg/Hr   T: %s\u2103" % (self.mass.replace(",", "'"), self.temperature))
+            s.labelMass.setPlainText("M: %s kg/h   T: %s\u2103" % (self.mass.replace(",", "'"), self.temperature))
 
     def setDisplayName(self, newName):
         self.displayName = newName

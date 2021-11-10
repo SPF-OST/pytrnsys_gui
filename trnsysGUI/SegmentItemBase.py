@@ -82,7 +82,7 @@ class SegmentItemBase(QGraphicsItemGroup):
         self.connection.parent.diagramScene.addItem(self.label)
         self.label.setVisible(False)
         self.label.setFlag(self.ItemIsMovable, True)
-        self.labelMass = QGraphicsTextItem(self.connection.displayName)
+        self.labelMass = QGraphicsTextItem()
         self.connection.parent.diagramScene.addItem(self.labelMass)
         self.labelMass.setVisible(False)
         self.labelMass.setFlag(self.ItemIsMovable, True)
