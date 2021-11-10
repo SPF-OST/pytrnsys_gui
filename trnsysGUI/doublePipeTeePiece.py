@@ -7,6 +7,7 @@ from massFlowSolver import InternalPiping
 from massFlowSolver.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 
 
 class DoublePipeTeePiece(BlockItem):
@@ -112,7 +113,7 @@ class DoublePipeTeePiece(BlockItem):
         connectionInternalPiping = connection.getInternalPiping()
         connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
 
-        assert len(connectionStartingNodes) == 2, "Connection is not a doublePipe"
+        assert isinstance(connection, DoublePipeConnection), "Connection is not a doublePipe"
         connectionColdPort = connectionStartingNodes[0]
         connectionHotPort = connectionStartingNodes[1]
 
@@ -127,13 +128,13 @@ class DoublePipeTeePiece(BlockItem):
         coldInput1 = ColdPortItem()
         coldInput2 = ColdPortItem()
         coldOutput = ColdPortItem()
-        coldTeePiece = _mfn.TeePiece("Cold"+self.displayName, self.childIds[0], coldInput1, coldInput2, coldOutput)
+        coldTeePiece = _mfn.TeePiece(self.displayName + "Cold", self.childIds[0], coldInput1, coldInput2, coldOutput)
         ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[0], coldInput2: self.inputs[1], coldOutput: self.outputs[0]}
 
         hotInput1 = HotPortItem()
         hotInput2 = HotPortItem()
         hotOutput = HotPortItem()
-        hotTeePiece = _mfn.TeePiece("Hot"+self.displayName, self.childIds[1], hotInput1, hotInput2, hotOutput)
+        hotTeePiece = _mfn.TeePiece(self.displayName + "Hot", self.childIds[1], hotInput1, hotInput2, hotOutput)
         HotModelPortItemsToGraphicalPortItem = {hotInput1: self.inputs[0], hotInput2: self.inputs[1], hotOutput: self.outputs[0]}
 
         ModelPortItemsToGraphicalPortItem = ColdModelPortItemsToGraphicalPortItem | HotModelPortItemsToGraphicalPortItem
@@ -143,4 +144,49 @@ class DoublePipeTeePiece(BlockItem):
         return internalPiping
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        raise NotImplementedError()
+        if self.isVisible():
+            f = ""
+            unitNumber = startingUnit
+            tNr = 929  # Temperature calculation from a tee-piece
+
+            unitText = ""
+            ambientT = 20
+
+            equationConstant = 1
+
+            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+            unitText += "!" + self.displayName + "\n"
+            unitText += "PARAMETERS 0\n"
+            unitText += "INPUTS 6\n"
+
+            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+            assert len(openLoops) == 2
+            openLoop = openLoops[0]
+
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+            assert len(realNodes) == 1
+            realNode = realNodes[0]
+
+            outputVariables = realNode.serialize(nodesToIndices).outputVariables
+            for outputVariable in outputVariables:
+                if not outputVariable:
+                    continue
+
+                unitText += outputVariable.name + "\n"
+
+            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
+            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+
+            unitText += "***Initial values\n"
+            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+
+            unitText += "EQUATIONS 1\n"
+            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+
+            unitNumber += 1
+            f += unitText + "\n"
+
+            return f, unitNumber
+        else:
+            return "", startingUnit

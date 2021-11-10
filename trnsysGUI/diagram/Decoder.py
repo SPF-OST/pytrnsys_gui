@@ -208,11 +208,11 @@ class Decoder(json.JSONDecoder):
                         bl = DoublePipeTeePiece(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] == "SingleDoublePipeConnector":
+                    elif i["BlockName"] == "SPCnctr":
                         bl = SingleDoublePipeConnector(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] == "DoubleDoublePipeConnector":
+                    elif i["BlockName"] == "DPCnctr":
                         bl = DoubleDoublePipeConnector(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )

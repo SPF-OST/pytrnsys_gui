@@ -8,6 +8,8 @@ from massFlowSolver.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 
 
 class SingleDoublePipeConnector(DoublePipeConnectorBase):
@@ -60,11 +62,11 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
 
         connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
 
-        if len(connectionStartingNodes) == 1:
+        if isinstance(connection, SinglePipeConnection):
             connectionSinglePort = connectionStartingNodes[0]
             return connectionSinglePort
 
-        elif len(connectionStartingNodes) == 2:
+        elif isinstance(connection, DoublePipeConnection):
             connectionColdPort = connectionStartingNodes[0]
             connectionHotPort = connectionStartingNodes[1]
 
@@ -73,20 +75,20 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
             elif isinstance(portItem, HotPortItem):
                 return connectionHotPort
             else:
-                raise AssertionError("portItem has not a doublePipePortItem")
+                raise AssertionError("PortItem has not a doublePipePortItem.")
 
         else:
-            return None
+            raise AssertionError("Connection is an unknown class.")
 
     def getInternalPiping(self) -> InternalPiping:
         coldInput1 = ColdPortItem()
         coldOutput = ColdPortItem()
-        coldConnector = _mfn.Pipe("Cold"+self.displayName, self.childIds[0], coldInput1, coldOutput)
+        coldConnector = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput1, coldOutput)
         ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[0], coldOutput: self.outputs[0]}
 
         hotInput1 = HotPortItem()
         hotOutput = HotPortItem()
-        hotConnector = _mfn.Pipe("Hot"+self.displayName, self.childIds[1], hotInput1, hotOutput)
+        hotConnector = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput1, hotOutput)
         HotModelPortItemsToGraphicalPortItem = {hotInput1: self.inputs[1], hotOutput: self.outputs[0]}
 
         ModelPortItemsToGraphicalPortItem = ColdModelPortItemsToGraphicalPortItem | HotModelPortItemsToGraphicalPortItem
@@ -96,4 +98,49 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         return internalPiping
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        raise NotImplementedError()
+        if self.isVisible():
+            f = ""
+            unitNumber = startingUnit
+            tNr = 929  # Temperature calculation from a tee-piece
+
+            unitText = ""
+            ambientT = 20
+
+            equationConstant = 1
+
+            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+            unitText += "!" + self.displayName + "\n"
+            unitText += "PARAMETERS 0\n"
+            unitText += "INPUTS 6\n"
+
+            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+            assert len(openLoops) == 2
+            openLoop = openLoops[0]
+
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+            assert len(realNodes) == 1
+            realNode = realNodes[0]
+
+            outputVariables = realNode.serialize(nodesToIndices).outputVariables
+            for outputVariable in outputVariables:
+                if not outputVariable:
+                    continue
+
+                unitText += outputVariable.name + "\n"
+
+            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
+            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+
+            unitText += "***Initial values\n"
+            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+
+            unitText += "EQUATIONS 1\n"
+            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+
+            unitNumber += 1
+            f += unitText + "\n"
+
+            return f, unitNumber
+        else:
+            return "", startingUnit

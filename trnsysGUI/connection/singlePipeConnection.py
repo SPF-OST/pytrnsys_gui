@@ -111,6 +111,121 @@ class SinglePipeConnection(Connection):
                         return realNode
         return None
 
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):
+        f = ""
+        unitNumber = startingUnit
+        typeNr2 = 931  # Temperature calculation from a pipe
+
+        unitText = ""
+        ambientT = 20
+
+        densityVar = "RhoWat"
+        specHeatVar = "CPWat"
+
+        equationConstant1 = 1
+        equationConstant2 = 3
+
+        parameterNumber = 6
+        inputNumbers = 4
+
+        # Fixed strings
+        diameterPrefix = "di"
+        lengthPrefix = "L"
+        lossPrefix = "U"
+        tempRoomVar = "TRoomStore"
+        initialValueS = "20 0.0 20 20"
+        powerPrefix = "P"
+
+        # Momentarily hardcoded
+        equationNr = 3
+
+        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
+        unitText += "!" + self.displayName + "\n"
+        unitText += "PARAMETERS " + str(parameterNumber) + "\n"
+
+        unitText += diameterPrefix + self.displayName + "\n"
+        unitText += lengthPrefix + self.displayName + "\n"
+        unitText += lossPrefix + self.displayName + "\n"
+        unitText += densityVar + "\n"
+        unitText += specHeatVar + "\n"
+        unitText += str(ambientT) + "\n"
+
+        unitText += "INPUTS " + str(inputNumbers) + "\n"
+
+        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+        assert len(openLoops) == 1
+        openLoop = openLoops[0]
+
+        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+        assert len(realNodes) == 1
+        realNode = realNodes[0]
+
+        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+
+        portItemsWithParent = self._getPortItemsWithParent()
+
+        if len(portItemsWithParent) == 2 or True:
+            portItem = portItemsWithParent[0][0]
+            parent = portItemsWithParent[0][1]
+            if hasattr(parent, "getSubBlockOffset"):
+                unitText += (
+                    "T"
+                    + parent.displayName
+                    + "X"
+                    + str(parent.getSubBlockOffset(self) + 1)
+                    + "\n"
+                )
+            else:
+                unitText += parent.getTemperatureVariableName(portItem) + "\n"
+
+            unitText += f"{outputVariables[0].name}\n"
+            unitText += tempRoomVar + "\n"
+
+            portItem = portItemsWithParent[1][0]
+            parent = portItemsWithParent[1][1]
+            if hasattr(parent, "getSubBlockOffset"):
+                unitText += (
+                    "T"
+                    + parent.displayName
+                    + "X"
+                    + str(parent.getSubBlockOffset(self) + 1)
+                    + "\n"
+                )
+            else:
+                unitText += parent.getTemperatureVariableName(portItem) + "\n"
+
+        else:
+            f += (
+                "Error: NO VALUE\n" * 3
+                + "at connection with parents "
+                + str(self.fromPort.parent)
+                + str(self.toPort.parent)
+                + "\n"
+            )
+
+        unitText += "***Initial values\n"
+        unitText += initialValueS + "\n\n"
+
+        unitText += "EQUATIONS " + str(equationNr) + "\n"
+        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
+        unitText += (
+            powerPrefix
+            + self.displayName
+            + "_kW"
+            + "= ["
+            + str(unitNumber)
+            + ","
+            + str(equationConstant2)
+            + "]/3600 !kW\n"
+        )
+        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
+
+        unitNumber += 1
+        unitText += "\n"
+        f += unitText
+
+        return unitText, unitNumber
+
 
 @_dc.dataclass
 class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):

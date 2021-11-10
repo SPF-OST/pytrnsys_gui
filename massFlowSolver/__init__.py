@@ -25,8 +25,7 @@ class MassFlowNetworkContributorMixin:
 
         allParameters = []
         for openLoop in openLoops:
-            nodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            realNodes = nodes
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
             parameters = [rn.serialize(allNodesToIndices).parameters for rn in realNodes]
             allParameters.extend(parameters)
 

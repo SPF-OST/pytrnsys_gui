@@ -39,7 +39,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         if "displayName" in kwargs:
             self.displayName = kwargs["displayName"]
         else:
-            self.displayName = trnsysType + "_" + str(self.id)
+            self.displayName = trnsysType + str(self.id)
 
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
@@ -225,7 +225,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             self.parent.parent().showPumpDlg(self)
         elif self.name == "TeePiece" or self.name == "WTap_main":
             self.parent.parent().showBlockDlg(self)
-        elif self.name in ["SingleDoublePipeConnector", "DoubleDoublePipeConnector", "DPTeePiece"]:
+        elif self.name in ["SPCnctr", "DPCnctr", "DPTeePiece"]:
             self.parent.parent().showDoublePipeBlockDlg(self)
         else:
             self.parent.parent().showBlockDlg(self)
