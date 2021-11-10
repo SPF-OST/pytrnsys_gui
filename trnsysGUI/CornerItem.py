@@ -66,7 +66,7 @@ class CornerItem(QGraphicsEllipseItem):
                 else:
                     self.logger.debug("segmentBefore.line() is None")
 
-            if hasattr(nextNode.parent, "fromPort"):
+            if hasattr(nextNode.parent, "toPort"):
                 if nextNode.nextN() is None and self.node.lastNode() is nextNode:
                     self.logger.debug("nextNode is at 'toPort'")
                     lastSegment = self.parent.segments[-1]
