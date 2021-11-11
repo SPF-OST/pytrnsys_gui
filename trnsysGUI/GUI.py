@@ -209,19 +209,15 @@ class _MainWindow(QMainWindow):
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
 
-        AboutAction = QAction("About", self)
-        AboutAction.triggered.connect(self.showAbout)
+        pytrnsysOnlineDocAction = QAction("pytrnsys online documentation", self)
+        pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
 
-        VersionAction = QAction("Version", self)
-        VersionAction.triggered.connect(self.showVersion)
-
-        CreditsAction = QAction("Credits", self)
-        CreditsAction.triggered.connect(self.showCredits)
+        pytrnsysGuiOnlineDocAction = QAction("GUI online documentation", self)
+        pytrnsysGuiOnlineDocAction.triggered.connect(self.openPytrnsysGuiOnlineDoc)
 
         self.helpMenu = QMenu("Help")
-        self.helpMenu.addAction(AboutAction)
-        self.helpMenu.addAction(VersionAction)
-        self.helpMenu.addAction(CreditsAction)
+        self.helpMenu.addAction(pytrnsysOnlineDocAction)
+        self.helpMenu.addAction(pytrnsysGuiOnlineDocAction)
 
         # Menu bar
         self.mb = self.menuBar()
@@ -603,32 +599,18 @@ class _MainWindow(QMainWindow):
 
     def mouseMoveEvent(self, e):
         pass
-        # x = e.x()
-        # y = e.y()
-        #
-        # text = "x: {0},  y: {1}".format(x, y)
-        # self.sb.showMessage(text)
-        # #print("event")
 
-    def showAbout(self):
-        msgb = QMessageBox(self)
-        msgb.setText("PyQt based diagram editor coupled to Trnsys functions")
-        msgb.exec()
+    def openPytrnsysOnlineDoc(self):
+        try:
+            os.system("start \"\" https://pytrnsys.readthedocs.io")
+        except:
+            self.logger.warning("Could not open pytrnsys online documentation. (Works on Windows only.)")
 
-    def showVersion(self):
-        msgb = QMessageBox(self)
-        msgb.setText(
-            "Currrent version is " + __version__ + " with status " + __status__
-        )
-        msgb.exec()
-
-    def showCredits(self):
-        msgb = QMessageBox(self)
-        msgb.setText(
-            "<p><b>Contributors:</b></p>"
-            "<p>Dani Carbonell, Martin Neugebauer, Damian Birchler, Jeremias Schmidli"
-        )
-        msgb.exec()
+    def openPytrnsysGuiOnlineDoc(self):
+        try:
+            os.system("start \"\" https://spf-ost.github.io/pytrnsys_gui")
+        except:
+            self.logger.warning("Could not open pytrnsys-gui online documentation. (Works on Windows only.)")
 
     def exportPDF(self):
         self.centralWidget.printPDF()
