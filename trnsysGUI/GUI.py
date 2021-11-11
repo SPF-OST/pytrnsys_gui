@@ -175,6 +175,40 @@ class _MainWindow(QMainWindow):
         self.editMenu.addAction(toggleSnapAction)
         self.editMenu.addAction(toggleAlignModeAction)
 
+        runMassflowSolverActionMenu = QAction("Run mass flow solver", self)
+        runMassflowSolverActionMenu.triggered.connect(self.runAndVisMf)
+
+        openVisualizerActionMenu = QAction("Start mass flow visualizer", self)
+        openVisualizerActionMenu.triggered.connect(self.visualizeMf)
+
+        exportHydraulicsActionMenu = QAction("Export hydraulic.ddck", self)
+        exportHydraulicsActionMenu.triggered.connect(self.exportHydraulicsDdck)
+
+        exportHydCtrlActionMenu = QAction("Export hydraulic_control.ddck", self)
+        exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
+
+        updateConfigActionMenu = QAction("Update run.config", self)
+        updateConfigActionMenu.triggered.connect(self.updateRun)
+
+        exportDckActionMenu = QAction("Export dck", self)
+        exportDckActionMenu.triggered.connect(self.exportDck)
+
+        runSimulationActionMenu = QAction("Run simulation...", self)
+        runSimulationActionMenu.triggered.connect(self.runSimulation)
+
+        processSimulationActionMenu = QAction("Process simulation...", self)
+        processSimulationActionMenu.triggered.connect(self.processSimulation)
+
+        self.projectMenu = QMenu("Project")
+        self.projectMenu.addAction(runMassflowSolverActionMenu)
+        self.projectMenu.addAction(openVisualizerActionMenu)
+        self.projectMenu.addAction(exportHydraulicsActionMenu)
+        self.projectMenu.addAction(exportHydCtrlActionMenu)
+        self.projectMenu.addAction(updateConfigActionMenu)
+        self.projectMenu.addAction(exportDckActionMenu)
+        self.projectMenu.addAction(runSimulationActionMenu)
+        self.projectMenu.addAction(processSimulationActionMenu)
+
         AboutAction = QAction("About", self)
         AboutAction.triggered.connect(self.showAbout)
 
@@ -192,6 +226,7 @@ class _MainWindow(QMainWindow):
         # Menu bar
         self.mb = self.menuBar()
         self.mb.addMenu(self.fileMenu)
+        self.mb.addMenu(self.projectMenu)
         self.mb.addMenu(self.editMenu)
         self.mb.addMenu(self.helpMenu)
         self.mb.addSeparator()
