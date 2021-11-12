@@ -42,182 +42,53 @@ class CornerItem(QGraphicsEllipseItem):
         self.posCallbacks = []
 
     def itemChange(self, change, value):
-        # self.logger.debug("Change is " + str(change))
         if change == self.ItemScenePositionHasChanged:
-            # self.logger.debug("pos change")
-            # self.logger.debug("self has partial lenght " + str(self.parent.partialLength(self)))
-            # self.logger.debug("Self is at " + str(self.parent.partialLength(self.node) / (self.parent.totalLength())) + "% of the whole connection")
 
-            nNode = self.node.nextN()
-            pNode = self.node.prevN()
+            nextNode = self.node.nextN()
+            previousNode = self.node.prevN()
 
-            positionInArr = self.parent.getNodePos(self)
+            nodePosInConnection = self.parent.getNodePos(self)
 
-            segBefore = self.parent.segments[positionInArr]
-            segAfter = self.parent.segments[positionInArr + 1]
+            segmentBefore = self.parent.segments[nodePosInConnection]
+            segmentAfter = self.parent.segments[nodePosInConnection + 1]
 
-            # self.logger.debug("Position in arr is" + str(positionInArr))
-
-            if type(nNode.parent) is CornerItem:
-                segAfter.setLine(
-                    self.scenePos().x(), self.scenePos().y(), segAfter.line().p2().x(), segAfter.line().p2().y()
-                )
-
-            if type(pNode.parent) is CornerItem:
-                segBefore.setLine(
-                    segBefore.line().p1().x(), segBefore.line().p1().y(), self.scenePos().x(), self.scenePos().y()
-                )
-
-            if hasattr(nNode.parent, "fromPort"):
-                # self.logger.debug("The moving node (cornerItem) is " + str(self.node))
-                # self.logger.debug("type of nNode is conn")
-
-                # We have two options: either nNode is at a port or at a disrupted segment
-                if nNode.nextN() is not None:
-                    # We are at a disrupted segment
-                    pass
-                    # segments = nNode.parent.segments
-                    #
-                    # s = None
-                    # s2 = None
-                    #
-                    # for x in segments:
-                    #     if x.endNode is nNode:
-                    #         s = x
-                    #     if x.startNode is nNode.nextN():
-                    #         s2 = x
-                    #
-                    # if s is None or s2 is None:
-                    #     self.logger.debug("Error, there shouldn't be a empty s or s2")
-                    #
-                    # s.startNode.setNext(s2.endNode)
-                    # s2.endNode.setPrev(s.startNode)
-                    #
-                    # newS = segmentItem(s.startNode, s2.endNode, s.parent)
-                    # newS.setVisible(False)
-                    # s.parent.parent.diagramScene.addItem(newS)
-                    #
-                    # if type(s2.endNode.parent) is Connection:
-                    #     self.logger.debug("Line of s is " + str(s.line()))
-                    #     self.logger.debug("Line of s2 is " + str(s2.line()))
-                    #     newS.setLine(self.scenePos().x(),
-                    #                  self.scenePos().y(),
-                    #                  s2.line().p2().x(),
-                    #                  s2.line().p2().y())
-                    #     self.logger.debug("Set pos node to Connection")
-                    #
-                    # elif type(s2.endNode.parent) is CornerItem:
-                    #     newS.setLine(self.scenePos().x(),
-                    #                  self.scenePos().y(),
-                    #                  s2.line().p2().x(),
-                    #                  s2.line().p2().y())
-                    #     self.logger.debug("Set pos node to node")
-                    #
-                    # else:
-                    #     pass
-                    #
-                    # newS.setVisible(True)
-                    # s.hide()
-                    # s2.hide()
-                    # s.parent.segments.remove(s2)
-                    # s.parent.segments.remove(s)
-                    # # self.logger.debug("Length of segments is " + str(len(segments)))
-                    #
-                    # del s2.endNode
-                    # del s.endNode
-                    #
-                    # newS.parent.parent.diagramScene.removeItem(s)
-                    # newS.parent.parent.diagramScene.removeItem(s2)
-                    #
-                    # newS.parent.buildBridges()
-
+            if type(nextNode.parent) is CornerItem:
+                if segmentAfter.line() is not None:
+                    segmentAfter.setLine(self.scenePos().x(), self.scenePos().y(), segmentAfter.line().p2().x(),
+                                     segmentAfter.line().p2().y())
                 else:
+                    self.logger.debug("segmentAfter.line() is None")
 
-                    if self.node.lastNode() is nNode:
-                        self.logger.debug("nNode is at toPort")
-                        t = self.parent.segments[-1]
-                        t.setLine(
-                            self.scenePos().x(),
-                            self.scenePos().y(),
-                            nNode.parent.toPort.scenePos().x(),
-                            nNode.parent.toPort.scenePos().y(),
-                        )
-
-            if hasattr(pNode.parent, "fromPort"):
-                # self.logger.debug("The moving node (cornerItem) is " + str(self.node))
-                # self.logger.debug("type of pNode is conn")
-
-                if pNode.prevN() is not None:
-                    # We are at a disrupted segment
-                    pass
-                    # segments = nNode.parent.segments
-                    #
-                    # s = None
-                    # s2 = None
-                    #
-                    # for x in segments:
-                    #     if x.startNode is pNode:
-                    #         s2 = x
-                    #     if x.endNode is pNode.prevN():
-                    #         s = x
-                    #
-                    # if s is None or s2 is None:
-                    #     self.logger.debug("Error, there shouldn't be a empty s or s2")
-                    #
-                    # s.startNode.setNext(s2.endNode)
-                    # s2.endNode.setPrev(s.startNode)
-                    #
-                    # newS = segmentItem(s.startNode, s2.endNode, s.parent)
-                    # newS.setVisible(False)
-                    # s.parent.parent.diagramScene.addItem(newS)
-                    #
-                    # if type(s2.endNode.parent) is Connection:
-                    #     self.logger.debug("Line of s is " + str(s.line()))
-                    #     self.logger.debug("Line of s2 is " + str(s2.line()))
-                    #     newS.setLine(s.line().p2().x(),
-                    #                  s.line().p2().y(), self.scenePos().x(), self.scenePos().y())
-                    #
-                    #     self.logger.debug("Set pos node to Connection")
-                    #
-                    # elif type(s2.endNode.parent) is CornerItem:
-                    #     newS.setLine(s.line().p1().x(),
-                    #                  s.line().p1().y(), self.scenePos().x(), self.scenePos().y())
-                    #     self.logger.debug("Set pos node to node")
-                    #
-                    # else:
-                    #     pass
-                    #
-                    # newS.setVisible(True)
-                    # s.hide()
-                    # s2.hide()
-                    # s.parent.segments.remove(s2)
-                    # s.parent.segments.remove(s)
-                    # # self.logger.debug("Length of segments is " + str(len(segments)))
-                    #
-                    # del s2.endNode
-                    # del s.endNode
-                    #
-                    # newS.parent.parent.diagramScene.removeItem(s)
-                    # newS.parent.parent.diagramScene.removeItem(s2)
-                    #
-                    # newS.parent.buildBridges()
-
+            if type(previousNode.parent) is CornerItem:
+                if segmentBefore.line() is not None:
+                    segmentBefore.setLine(segmentBefore.line().p1().x(), segmentBefore.line().p1().y(),
+                                          self.scenePos().x(), self.scenePos().y())
                 else:
-                    if self.node.firstNode() is pNode:
-                        self.logger.debug("pNode is at fromPort")
-                        f = self.parent.segments[0]
-                        f.setLine(
-                            pNode.parent.fromPort.scenePos().x(),
-                            pNode.parent.fromPort.scenePos().y(),
-                            self.scenePos().x(),
-                            self.scenePos().y(),
-                        )
+                    self.logger.debug("segmentBefore.line() is None")
 
-            for s in self.parent.segments:
-                s.updateGrad()
+            if hasattr(nextNode.parent, "toPort"):
+                if nextNode.nextN() is None and self.node.lastNode() is nextNode:
+                    self.logger.debug("nextNode is at 'toPort'")
+                    lastSegment = self.parent.segments[-1]
+                    lastSegment.setLine(self.scenePos().x(), self.scenePos().y(), nextNode.parent.toPort.scenePos().x(),
+                                        nextNode.parent.toPort.scenePos().y())
 
-        if change == self.ItemScenePositionHasChanged:
-            for cb in self.posCallbacks:
-                cb(value)
+            if hasattr(previousNode.parent, "fromPort"):
+                if previousNode.prevN() is None and self.node.firstNode() is previousNode:
+                    self.logger.debug("previousNode is at 'fromPort'")
+                    firstSegment = self.parent.segments[0]
+                    firstSegment.setLine(previousNode.parent.fromPort.scenePos().x(),
+                                         previousNode.parent.fromPort.scenePos().y(), self.scenePos().x(),
+                                         self.scenePos().y())
+
+            for segment in self.parent.segments:
+                try:
+                    segment.updateGrad()
+                except:
+                    self.logger.warning('Could not update color gradient of pipe.')
+
+            for callback in self.posCallbacks:
+                callback(value)
             return value
+
         return super(CornerItem, self).itemChange(change, value)
