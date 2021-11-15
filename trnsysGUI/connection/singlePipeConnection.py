@@ -218,11 +218,9 @@ class SinglePipeConnection(Connection):
             + str(equationConstant2)
             + "]/3600 !kW\n"
         )
-        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
+        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A\n\n"
 
         unitNumber += 1
-        unitText += "\n"
-        f += unitText
 
         return unitText, unitNumber
 

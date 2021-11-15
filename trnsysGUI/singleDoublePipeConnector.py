@@ -85,7 +85,7 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         coldInput = ColdPortItem()
         coldOutput = ColdPortItem()
         coldConnector = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.outputs[0], coldOutput: self.inputs[1]}
+        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.inputs[1], coldOutput: self.outputs[0]}
 
         hotInput = HotPortItem()
         hotOutput = HotPortItem()
@@ -124,3 +124,16 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
             return unitText, unitNumber
         else:
             return "", startingUnit
+
+    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
+        internalPiping = self.getInternalPiping()
+        startingNodes = internalPiping.openLoopsStartingNodes
+        graphicalPortItems = internalPiping.modelPortItemsToGraphicalPortItem
+
+        keyPortItems = [key for key, value in graphicalPortItems.items() if value == portItem]
+        assert len(keyPortItems) == 1, "portItem is not unique"
+        keyPortItem = keyPortItems[0]
+        for index in range(len(startingNodes)):
+            if startingNodes[index].fromNode == keyPortItem or startingNodes[index].toNode == keyPortItem:
+                return "T" + startingNodes[index].name
+        raise AssertionError("Found no internal SingleDoublePipeConnector-Connection.")

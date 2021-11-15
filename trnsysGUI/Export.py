@@ -5,8 +5,9 @@ import re
 import massFlowSolver as _mfs
 
 from PyQt5.QtWidgets import QMessageBox
-
 from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.TVentil import TVentil
 
 
@@ -331,11 +332,19 @@ class Export(object):
         rightCounter = 0
 
         for i in self.editor.groupList[0].itemList:
-            if isinstance(i, Connection):
+            if isinstance(i, SinglePipeConnection):
                 if rightCounter == 0:
                     lossText += "P" + i.displayName + "_kW"
                 else:
                     lossText += "+" + "P" + i.displayName + "_kW"
+                rightCounter += 1
+            if isinstance(i, DoublePipeConnection):
+                if rightCounter == 0:
+                    lossText += "P" + i.displayName + "Cold_kW"
+                    lossText += "P" + i.displayName + "Hot_kW"
+                else:
+                    lossText += "+" + "P" + i.displayName + "Cold_kW"
+                    lossText += "+" + "P" + i.displayName + "Hot_kW"
                 rightCounter += 1
 
         if rightCounter == 0:
@@ -383,11 +392,18 @@ class Export(object):
         s = ""
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, SinglePipeConnection):
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
                 s += "Mfr" + t.displayName + " "
+            if isinstance(t, DoublePipeConnection):
+                temps = ["Cold", "Hot"]
+                for temp in temps:
+                    breakline += 1
+                    if breakline % 8 == 0:
+                        s += "\n"
+                    s += "Mfr" + t.displayName + temp + " "
             if isinstance(t, TVentil) and t.isVisible():
                 breakline += 1
                 if breakline % 8 == 0:
@@ -437,11 +453,18 @@ class Export(object):
         s = ""
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, SinglePipeConnection):
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
                 s += "T" + t.displayName + " "
+            if isinstance(t, DoublePipeConnection):
+                temps = ["Cold", "Hot"]
+                for temp in temps:
+                    breakline += 1
+                    if breakline % 8 == 0:
+                        s += "\n"
+                    s += "T" + t.displayName + temp + " "
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f

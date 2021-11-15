@@ -116,7 +116,7 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
         coldInput = ColdPortItem()
         coldOutput = ColdPortItem()
         coldTeePiece = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.outputs[0], coldOutput: self.inputs[0]}
+        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.inputs[0], coldOutput: self.outputs[0]}
 
         hotInput = HotPortItem()
         hotOutput = HotPortItem()
@@ -145,10 +145,10 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
 
                 unitText += "EQUATIONS 1\n"
 
-                tIn = f"GT(Mfr{self.displayName}{temp}_A, 0)*T{self.inputs[0].connectionList[0].displayName} + " \
-                      f"LT(Mfr{self.displayName}{temp}_A, 0)*T{self.outputs[0].connectionList[0].displayName}"
+                tIn = f"GT(Mfr{self.displayName}{temp}_A, 0)*T{self.inputs[0].connectionList[0].displayName}{temp} + " \
+                      f"LT(Mfr{self.displayName}{temp}_A, 0)*T{self.outputs[0].connectionList[0].displayName}{temp}"
                 tOut = f"T{self.displayName}{temp}"
-                unitText += f"{tOut} = {tIn}{temp}\n\n"
+                unitText += f"{tOut} = {tIn}\n\n"
 
                 unitNumber += 1
 

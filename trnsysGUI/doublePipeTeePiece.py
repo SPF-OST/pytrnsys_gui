@@ -129,7 +129,7 @@ class DoublePipeTeePiece(BlockItem):
         coldInput2 = ColdPortItem()
         coldOutput = ColdPortItem()
         coldTeePiece = _mfn.TeePiece(self.displayName + "Cold", self.childIds[0], coldInput1, coldInput2, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[1], coldInput2: self.inputs[0], coldOutput: self.outputs[0]}
+        ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[0], coldInput2: self.inputs[1], coldOutput: self.outputs[0]}
 
         hotInput1 = HotPortItem()
         hotInput2 = HotPortItem()

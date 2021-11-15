@@ -87,7 +87,7 @@ class DoublePipeConnection(Connection):
         coldFromPort = ColdPortItem()
         coldToPort = ColdPortItem()
         coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
-        ColdModelPortItemsToGraphicalPortItem = {coldFromPort: self.toPort, coldToPort: self.fromPort}
+        ColdModelPortItemsToGraphicalPortItem = {coldFromPort: self.fromPort, coldToPort: self.toPort}
 
         hotFromPort = HotPortItem()
         hotToPort = HotPortItem()
@@ -128,7 +128,7 @@ class DoublePipeConnection(Connection):
         densityVar = "RhoWat"
         specHeatVar = "CPWat"
 
-        parameterNumber = 35
+        parameterNumber = 6
         inputNumbers = 6
 
         # Fixed strings
@@ -172,7 +172,7 @@ class DoublePipeConnection(Connection):
             portItem = portItemsWithParent[0][0]
             parent = portItemsWithParent[0][1]
 
-            firstColumn = f"{parent.getTemperatureVariableName(portItem)}{temp}"
+            firstColumn = f"T{self.displayName}{temp}"
             unitText += self.addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temp}, deg C")
 
             firstColumn = f"{outputVariables[0].name}"
@@ -180,7 +180,7 @@ class DoublePipeConnection(Connection):
 
             portItem = portItemsWithParent[1][0]
             parent = portItemsWithParent[1][1]
-            firstColumn = f"{parent.getTemperatureVariableName(portItem)}{temp}"
+            firstColumn = f"T{self.displayName}{temp}"
             unitText += self.addComment(firstColumn, "! Other side of pipe, deg C")
 
         unitText += "***Initial values\n"
@@ -210,7 +210,7 @@ class DoublePipeConnection(Connection):
         equationConstants = [equationConstant1, equationConstant2]
 
         for openLoop, temp, equationConstant in zip(openLoops, temps, equationConstants):
-            firstColumn = f"E{self.displayName}{temp}kW = [{unitNumber},{equationConstant}]/3600"
+            firstColumn = f"P{self.displayName}{temp}_kW = [{unitNumber},{equationConstant}]/3600"
             unitText += self.addComment(firstColumn, f"! {equationConstant}: Delivered energy pipe {temp}, kJ/h")
 
         unitNumber += 1
