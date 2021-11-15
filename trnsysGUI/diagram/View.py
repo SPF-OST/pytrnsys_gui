@@ -74,7 +74,7 @@ class View(QGraphicsView):
                 self.parent().showConfigStorageDlg(bl)
             elif name == "TeePiece":
                 bl = TeePiece(name, self)
-            elif name == "DPTeePiece":
+            elif name == "DPTee":
                 bl = DoublePipeTeePiece(name, self)
             elif name == "SPCnctr":
                 bl = SingleDoublePipeConnector(name, self)

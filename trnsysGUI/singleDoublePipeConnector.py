@@ -48,6 +48,7 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         # pylint: disable=duplicate-code  # 2
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
+
     def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
 
@@ -81,15 +82,15 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
             raise AssertionError("Connection is an unknown class.")
 
     def getInternalPiping(self) -> InternalPiping:
-        coldInput1 = ColdPortItem()
+        coldInput = ColdPortItem()
         coldOutput = ColdPortItem()
-        coldConnector = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput1, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[0], coldOutput: self.outputs[0]}
+        coldConnector = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
+        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.outputs[0], coldOutput: self.inputs[1]}
 
-        hotInput1 = HotPortItem()
+        hotInput = HotPortItem()
         hotOutput = HotPortItem()
-        hotConnector = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput1, hotOutput)
-        HotModelPortItemsToGraphicalPortItem = {hotInput1: self.inputs[1], hotOutput: self.outputs[0]}
+        hotConnector = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput)
+        HotModelPortItemsToGraphicalPortItem = {hotInput: self.inputs[0], hotOutput: self.outputs[0]}
 
         ModelPortItemsToGraphicalPortItem = ColdModelPortItemsToGraphicalPortItem | HotModelPortItemsToGraphicalPortItem
 
@@ -99,48 +100,27 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
-            f = ""
             unitNumber = startingUnit
-            tNr = 929  # Temperature calculation from a tee-piece
 
             unitText = ""
-            ambientT = 20
-
-            equationConstant = 1
-
-            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-            unitText += "!" + self.displayName + "\n"
-            unitText += "PARAMETERS 0\n"
-            unitText += "INPUTS 6\n"
 
             openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
             assert len(openLoops) == 2
-            openLoop = openLoops[0]
+            temps = ["Cold", "Hot"]
 
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            assert len(realNodes) == 1
-            realNode = realNodes[0]
+            for index, (openLoop, temp) in enumerate(zip(openLoops, temps)):
+                # unitText += "UNIT " + str(unitNumber) + "\n"
+                unitText += "!" + self.displayName + temp + "\n\n"
 
-            outputVariables = realNode.serialize(nodesToIndices).outputVariables
-            for outputVariable in outputVariables:
-                if not outputVariable:
-                    continue
+                unitText += "EQUATIONS 1\n"
 
-                unitText += outputVariable.name + "\n"
+                tIn = f"GT(Mfr{self.displayName}{temp}_A, 0)*T{self.inputs[index].connectionList[0].displayName} + " \
+                      f"LT(Mfr{self.displayName}{temp}_A, 0)*T{self.outputs[0].connectionList[0].displayName}{temp}"
+                tOut = f"T{self.displayName}{temp}"
+                unitText += f"{tOut} = {tIn}\n\n"
 
-            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
-            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+                unitNumber += 1
 
-            unitText += "***Initial values\n"
-            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
-
-            unitText += "EQUATIONS 1\n"
-            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
-
-            unitNumber += 1
-            f += unitText + "\n"
-
-            return f, unitNumber
+            return unitText, unitNumber
         else:
             return "", startingUnit

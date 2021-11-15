@@ -96,5 +96,24 @@ class MassFlowNetworkContributorMixin:
             allNodesToIndices |= nodesToIndices
         return openLoops, allNodesToIndices
 
+    def _getConnectedRealNodes(self):
+        internalPiping = self.getInternalPiping()
+        connectedRealNodes = []
+        openLoops = []
+        for startingNode in internalPiping.openLoopsStartingNodes:
+            connectedNodes = _mfn.getConnectedNodes(startingNode)
+            openLoops.append(_OpenLoop(connectedNodes))
+
+            portItems = [n for n in connectedNodes if isinstance(n, _mfn.PortItem)]
+
+            for portItem in portItems:
+                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)
+                connectedRealNodes.append(connectedRealNode)
+        return connectedRealNodes
+
     def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         raise NotImplementedError()
+
+    def addComment(self, firstColumn, comment):
+        spacing = 40
+        return f"{firstColumn.ljust(spacing)}{comment}\n"

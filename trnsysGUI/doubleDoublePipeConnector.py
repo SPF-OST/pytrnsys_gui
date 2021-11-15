@@ -116,7 +116,7 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
         coldInput = ColdPortItem()
         coldOutput = ColdPortItem()
         coldTeePiece = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.inputs[0], coldOutput: self.outputs[0]}
+        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.outputs[0], coldOutput: self.inputs[0]}
 
         hotInput = HotPortItem()
         hotOutput = HotPortItem()
@@ -131,47 +131,27 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
-            f = ""
             unitNumber = startingUnit
-            tNr = 929  # Temperature calculation from a tee-piece
 
             unitText = ""
-            ambientT = 20
-
-            equationConstant = 1
-
-            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-            unitText += "!" + self.displayName + "\n"
-            unitText += "PARAMETERS 0\n"
-            unitText += "INPUTS 6\n"
 
             openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
             assert len(openLoops) == 2
-            openLoop = openLoops[0]
+            temps = ["Cold", "Hot"]
 
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            assert len(realNodes) == 1
-            realNode = realNodes[0]
+            for openLoop, temp in zip(openLoops, temps):
+                # unitText += "UNIT " + str(unitNumber) + "\n"
+                unitText += "!" + self.displayName + temp + "\n\n"
 
-            outputVariables = realNode.serialize(nodesToIndices).outputVariables
-            for outputVariable in outputVariables:
-                if not outputVariable:
-                    continue
+                unitText += "EQUATIONS 1\n"
 
-                unitText += outputVariable.name + "\n"
+                tIn = f"GT(Mfr{self.displayName}{temp}_A, 0)*T{self.inputs[0].connectionList[0].displayName} + " \
+                      f"LT(Mfr{self.displayName}{temp}_A, 0)*T{self.outputs[0].connectionList[0].displayName}"
+                tOut = f"T{self.displayName}{temp}"
+                unitText += f"{tOut} = {tIn}{temp}\n\n"
 
-            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+                unitNumber += 1
 
-            unitText += "***Initial values\n"
-            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
-
-            unitText += "EQUATIONS 1\n"
-            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
-
-            unitNumber += 1
-            f += unitText + "\n"
-
-            return f, unitNumber
+            return unitText, unitNumber
         else:
             return "", startingUnit

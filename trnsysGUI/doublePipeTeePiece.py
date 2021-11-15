@@ -129,7 +129,7 @@ class DoublePipeTeePiece(BlockItem):
         coldInput2 = ColdPortItem()
         coldOutput = ColdPortItem()
         coldTeePiece = _mfn.TeePiece(self.displayName + "Cold", self.childIds[0], coldInput1, coldInput2, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[0], coldInput2: self.inputs[1], coldOutput: self.outputs[0]}
+        ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[1], coldInput2: self.inputs[0], coldOutput: self.outputs[0]}
 
         hotInput1 = HotPortItem()
         hotInput2 = HotPortItem()
@@ -145,7 +145,6 @@ class DoublePipeTeePiece(BlockItem):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
-            f = ""
             unitNumber = startingUnit
             tNr = 929  # Temperature calculation from a tee-piece
 
@@ -154,39 +153,38 @@ class DoublePipeTeePiece(BlockItem):
 
             equationConstant = 1
 
-            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-            unitText += "!" + self.displayName + "\n"
-            unitText += "PARAMETERS 0\n"
-            unitText += "INPUTS 6\n"
-
             openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
             assert len(openLoops) == 2
-            openLoop = openLoops[0]
+            temps = ["Cold", "Hot"]
+            for openLoop, temp in zip(openLoops, temps):
+                unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+                unitText += "!" + self.displayName + temp + "\n"
+                unitText += "PARAMETERS 0\n"
+                unitText += "INPUTS 6\n"
 
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            assert len(realNodes) == 1
-            realNode = realNodes[0]
+                realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+                assert len(realNodes) == 1
+                realNode = realNodes[0]
 
-            outputVariables = realNode.serialize(nodesToIndices).outputVariables
-            for outputVariable in outputVariables:
-                if not outputVariable:
-                    continue
+                outputVariables = realNode.serialize(nodesToIndices).outputVariables
+                for outputVariable in outputVariables:
+                    if not outputVariable:
+                        continue
 
-                unitText += outputVariable.name + "\n"
+                    unitText += outputVariable.name + "\n"
 
-            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
-            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+                unitText += f"T{self.inputs[0].connectionList[0].displayName}{temp}\n"
+                unitText += f"T{self.inputs[1].connectionList[0].displayName}{temp}\n"
+                unitText += f"T{self.outputs[0].connectionList[0].displayName}{temp}\n"
 
-            unitText += "***Initial values\n"
-            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+                unitText += "***Initial values\n"
+                unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
-            unitText += "EQUATIONS 1\n"
-            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+                unitText += "EQUATIONS 1\n"
+                unitText += "T" + self.displayName + temp + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n\n"
 
-            unitNumber += 1
-            f += unitText + "\n"
+                unitNumber += 1
 
-            return f, unitNumber
+            return unitText, unitNumber
         else:
             return "", startingUnit

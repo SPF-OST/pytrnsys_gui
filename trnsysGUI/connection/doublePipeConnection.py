@@ -87,7 +87,7 @@ class DoublePipeConnection(Connection):
         coldFromPort = ColdPortItem()
         coldToPort = ColdPortItem()
         coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
-        ColdModelPortItemsToGraphicalPortItem = {coldFromPort: self.fromPort, coldToPort: self.toPort}
+        ColdModelPortItemsToGraphicalPortItem = {coldFromPort: self.toPort, coldToPort: self.fromPort}
 
         hotFromPort = HotPortItem()
         hotToPort = HotPortItem()
@@ -119,7 +119,6 @@ class DoublePipeConnection(Connection):
         return None
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        f = ""
         unitNumber = startingUnit
         typeNr2 = 9511  # Temperature calculation from a pipe
 
@@ -129,11 +128,6 @@ class DoublePipeConnection(Connection):
         densityVar = "RhoWat"
         specHeatVar = "CPWat"
 
-        equationConstant1 = 1
-        equationConstant2 = 3
-        equationConstant3 = 11
-        equationConstant4 = 12
-
         parameterNumber = 35
         inputNumbers = 6
 
@@ -142,11 +136,11 @@ class DoublePipeConnection(Connection):
         lengthPrefix = "L"
         lossPrefix = "U"
         tempRoomVar = "TRoomStore"
-        initialValueS = "20 0.0 20 20"
+        initialValueS = "15.0 0.0 15.0 15.0 0.0 15.0"
         powerPrefix = "P"
 
         # Momentarily hardcoded
-        equationNr = 2
+        equationNr = 6
 
         unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
         unitText += "!" + self.displayName + "\n"
@@ -163,8 +157,8 @@ class DoublePipeConnection(Connection):
 
         openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
         assert len(openLoops) == 2
-        temp = ["Cold", "Hot"]
-        for openLoop, temp in zip(openLoops, temp):
+        temps = ["Cold", "Hot"]
+        for openLoop, temp in zip(openLoops, temps):
             realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
             assert len(realNodes) == 1
             realNode = realNodes[0]
@@ -178,32 +172,48 @@ class DoublePipeConnection(Connection):
             portItem = portItemsWithParent[0][0]
             parent = portItemsWithParent[0][1]
 
-            unitText += f"{parent.getTemperatureVariableName(portItem)}{temp}In"
-            unitText += f"{outputVariables[0].name}In\n"
+            firstColumn = f"{parent.getTemperatureVariableName(portItem)}{temp}"
+            unitText += self.addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temp}, deg C")
+
+            firstColumn = f"{outputVariables[0].name}"
+            unitText += self.addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temp}, kJ/h")
 
             portItem = portItemsWithParent[1][0]
             parent = portItemsWithParent[1][1]
-            unitText += f"{parent.getTemperatureVariableName(portItem)}{temp}Rev\n"
+            firstColumn = f"{parent.getTemperatureVariableName(portItem)}{temp}"
+            unitText += self.addComment(firstColumn, "! Other side of pipe, deg C")
 
         unitText += "***Initial values\n"
         unitText += initialValueS + "\n\n"
 
-        unitText += "EQUATIONS " + str(equationNr1) + "\n"
-        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-        unitText += (
-            powerPrefix
-            + self.displayName
-            + "_kW"
-            + "= ["
-            + str(unitNumber)
-            + ","
-            + str(equationConstant2)
-            + "]/3600 !kW\n"
-        )
-        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
+        unitText += "EQUATIONS " + str(equationNr) + "\n"
+
+        equationConstant1 = 1
+        equationConstant2 = 3
+        equationConstants = [equationConstant1, equationConstant2]
+
+        for openLoop, temp, equationConstant in zip(openLoops, temps, equationConstants):
+            firstColumn = "T" + self.displayName + temp + " = [" + str(unitNumber) + "," + str(equationConstant) + "]"
+            unitText += self.addComment(firstColumn, f"! {equationConstant}: Outlet fluid temperature pipe {temp}, deg C")
+
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+            assert len(realNodes) == 1
+            realNode = realNodes[0]
+
+            outputVariables = realNode.serialize(nodesToIndices).outputVariables
+
+            firstColumn = f"Mfr{self.displayName}{temp} = {outputVariables[0].name}"
+            unitText += self.addComment(firstColumn, f"! Outlet mass flow rate pipe {temp}, kg/h")
+
+        equationConstant1 = 7
+        equationConstant2 = 8
+        equationConstants = [equationConstant1, equationConstant2]
+
+        for openLoop, temp, equationConstant in zip(openLoops, temps, equationConstants):
+            firstColumn = f"E{self.displayName}{temp}kW = [{unitNumber},{equationConstant}]/3600"
+            unitText += self.addComment(firstColumn, f"! {equationConstant}: Delivered energy pipe {temp}, kJ/h")
 
         unitNumber += 1
-        unitText += "\n"
-        f += unitText
+        unitText += "\n\n"
 
         return unitText, unitNumber

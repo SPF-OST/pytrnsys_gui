@@ -204,7 +204,7 @@ class Decoder(json.JSONDecoder):
                     elif i["BlockName"] == "GraphicalItem":
                         bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
 
-                    elif i["BlockName"] == "DPTeePiece":
+                    elif i["BlockName"] == "DPTee":
                         bl = DoublePipeTeePiece(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )

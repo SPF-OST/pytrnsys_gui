@@ -225,7 +225,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             self.parent.parent().showPumpDlg(self)
         elif self.name == "TeePiece" or self.name == "WTap_main":
             self.parent.parent().showBlockDlg(self)
-        elif self.name in ["SPCnctr", "DPCnctr", "DPTeePiece"]:
+        elif self.name in ["SPCnctr", "DPCnctr", "DPTee"]:
             self.parent.parent().showDoublePipeBlockDlg(self)
         else:
             self.parent.parent().showBlockDlg(self)
