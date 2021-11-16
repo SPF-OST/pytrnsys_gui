@@ -1,0 +1,43 @@
+<RCC>
+    <qresource prefix="/tango-icons/status">
+        <file>tango-icon-theme-0.8.90/scalable/status/audio-volume-high.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/audio-volume-low.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/audio-volume-medium.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/audio-volume-muted.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/battery-caution.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/dialog-error.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/dialog-information.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/dialog-warning.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/folder-drag-accept.icon</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/folder-drag-accept.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/folder-open.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/folder-visiting.icon</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/folder-visiting.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/image-loading.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/image-missing.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/mail-attachment.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/Makefile.am</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/Makefile.in</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/network-error.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/network-idle.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/network-offline.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/network-receive.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/network-transmit.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/network-transmit-receive.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/network-wireless-encrypted.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/printer-error.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/software-update-available.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/software-update-urgent.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/user-trash-full.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-clear.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-clear-night.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-few-clouds.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-few-clouds-night.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-overcast.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-severe-alert.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-showers.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-showers-scattered.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-snow.svg</file>
+        <file>tango-icon-theme-0.8.90/scalable/status/weather-storm.svg</file>
+    </qresource>
+</RCC>
