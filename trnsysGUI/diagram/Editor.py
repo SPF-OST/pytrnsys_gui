@@ -59,7 +59,6 @@ from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
-from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
@@ -425,14 +424,7 @@ class Editor(QWidget):
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
 
-            if isinstance(startPort, SinglePipePortItem) and isinstance(endPort, SinglePipePortItem):
-                factory = SinglePipeSegmentItemFactory()
-            elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
-                factory = DoublePipeSegmentItemFactory()
-            else:
-                raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
-
-            command = CreateConnectionCommand(startPort, endPort, factory, self, "CreateConn Command")
+            command = CreateConnectionCommand(startPort, endPort, self, "CreateConn Command")
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):

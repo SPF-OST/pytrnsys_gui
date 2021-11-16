@@ -5,7 +5,10 @@ import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
+from massFlowSolver.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 
 
 class DoublePipeConnectorBase(BlockItem):
@@ -75,12 +78,41 @@ class DoublePipeConnectorBase(BlockItem):
         self.childIds = i["childIds"]
         super().decode(i, resBlockList)
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[
-        _mfn.RealNodeBase]:
-        raise NotImplementedError
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
+
+        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+
+        if not graphicalPortItem.connectionList:
+            return None
+
+        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
+
+        connectionInternalPiping = connection.getInternalPiping()
+
+        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
+
+        if isinstance(connection, SinglePipeConnection):
+            connectionSinglePort = connectionStartingNodes[0]
+            return connectionSinglePort
+
+        elif isinstance(connection, DoublePipeConnection):
+            connectionColdPort = connectionStartingNodes[0]
+            connectionHotPort = connectionStartingNodes[1]
+
+            if isinstance(portItem, ColdPortItem):
+                return connectionColdPort
+            elif isinstance(portItem, HotPortItem):
+                return connectionHotPort
+            else:
+                raise AssertionError("PortItem has not a doublePipePortItem.")
+
+        else:
+            raise AssertionError("Connection is an unknown class.")
 
     def getInternalPiping(self) -> InternalPiping:
         raise NotImplementedError
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError
+

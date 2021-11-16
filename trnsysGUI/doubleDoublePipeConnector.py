@@ -1,7 +1,6 @@
 import os
 import typing as _tp
 
-import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
@@ -9,7 +8,6 @@ from massFlowSolver.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
 
 
@@ -87,30 +85,6 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
             os.makedirs(self.path)
         self.model.setRootPath(self.path)
         self.tree.setRootIndex(self.model.index(self.path))
-
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
-
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-
-        if not graphicalPortItem.connectionList:
-            return None
-
-        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
-        assert isinstance(connection, DoublePipeConnection), "Connection is not a doublePipe"
-
-        connectionInternalPiping = connection.getInternalPiping()
-        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
-
-        connectionColdPort = connectionStartingNodes[0]
-        connectionHotPort = connectionStartingNodes[1]
-
-        if isinstance(portItem, ColdPortItem):
-            return connectionColdPort
-        if isinstance(portItem, HotPortItem):
-            return connectionHotPort
-
-        return None
 
     def getInternalPiping(self) -> InternalPiping:
         coldInput = ColdPortItem()

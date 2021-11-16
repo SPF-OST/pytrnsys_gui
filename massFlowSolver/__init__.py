@@ -86,11 +86,11 @@ class MassFlowNetworkContributorMixin:
 
             portItemsToIndices = {}
             for portItem in portItems:
-                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)  # find connected element
+                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)
                 if not connectedRealNode:
                     raise AssertionError("Hydraulics not connected.")
-                portItemsToIndices[portItem] = connectedRealNode.trnsysId  # BlockID
-            realNodesToIndices = {n: n.trnsysId for n in realNodes}  # ConnectionID's
+                portItemsToIndices[portItem] = connectedRealNode.trnsysId
+            realNodesToIndices = {n: n.trnsysId for n in realNodes}
             nodesToIndices = portItemsToIndices | realNodesToIndices
 
             allNodesToIndices |= nodesToIndices
@@ -101,4 +101,4 @@ class MassFlowNetworkContributorMixin:
 
     def addComment(self, firstColumn, comment):
         spacing = 40
-        return f"{firstColumn.ljust(spacing)}{comment}\n"
+        return f"{str(firstColumn).ljust(spacing)}{comment}\n"

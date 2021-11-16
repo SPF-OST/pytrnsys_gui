@@ -16,23 +16,19 @@ import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
 from trnsysGUI.Connection import Connection
 from trnsysGUI.PortItemBase import PortItemBase
-from trnsysGUI.connection.segmentItemFactory import SegmentItemFactoryBase
+from trnsysGUI.singlePipeSegmentItem import SinglePipeSegmentItem
 
 if _tp.TYPE_CHECKING:
     pass
 
 
-def calcDist(p1, p2):
-    vec = p1 - p2
-    norm = _math.sqrt(vec.x() ** 2 + vec.y() ** 2)
-    return norm
-
-
 class SinglePipeConnection(Connection):
-    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, segmentItemFactory: SegmentItemFactoryBase, parent):
-        super().__init__(fromPort, toPort, segmentItemFactory, parent)
+    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
+        super().__init__(fromPort, toPort, parent)
 
-    # Saving / Loading
+    def _createSegmentItem(self, startNode, endNode):
+        return SinglePipeSegmentItem(startNode, endNode, self)
+
     def encode(self):
         self.logger.debug("Encoding a connection")
 

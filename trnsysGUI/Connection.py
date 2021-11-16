@@ -22,7 +22,6 @@ from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.connection.segmentItemFactory import SegmentItemFactoryBase
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.BlockItem as _bi
@@ -35,14 +34,12 @@ def calcDist(p1, p2):
 
 
 class Connection(_mfs.MassFlowNetworkContributorMixin):
-    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, segmentItemFactory: SegmentItemFactoryBase, parent):
+    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
         self.logger = parent.logger
 
         self.fromPort = fromPort
         self.toPort = toPort
         self.displayName = None
-
-        self._segmentItemFactory = segmentItemFactory
 
         self.parent = parent
         self.groupName = ""
@@ -76,7 +73,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.initNew(parent)
 
     def _createSegmentItem(self, startNode, endNode):
-        return self._segmentItemFactory.createSegmentItem(startNode, endNode, self)
+        raise NotImplementedError()
 
     def isVisible(self):
         res = True
@@ -214,7 +211,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         self.parent.trnsysObj.append(self)
 
-        self.displayName = "Conn" + str(self.connId)
+        self.displayName = "Conn_" + str(self.connId)
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")
@@ -339,6 +336,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
     def positionLabel(self):
         self.firstS.label.setPos(self.getStartPoint())
+        self.firstS.labelMass.setPos(self.getStartPoint())
         self.rotateLabel()
 
     def rotateLabel(self):
@@ -1197,12 +1195,10 @@ class DeleteConnectionCommand(QUndoCommand):
         self.connFromPort = self.conn.fromPort
         self.connToPort = self.conn.toPort
         self.connParent = self.conn.parent
-        self.connSegmentItemFactory = self.conn._segmentItemFactory
 
     def redo(self):
         self.conn.deleteConn()
         self.conn = None
 
     def undo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort,
-                               self.connSegmentItemFactory, self.connParent)
+        self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)

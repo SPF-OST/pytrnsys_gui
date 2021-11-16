@@ -2,13 +2,14 @@
 # type: ignore
 
 import re
-import massFlowSolver as _mfs
 
 from PyQt5.QtWidgets import QMessageBox
+
+import massFlowSolver as _mfs
 from trnsysGUI.Connection import Connection
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.TVentil import TVentil
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 
 
 class Export(object):
@@ -331,20 +332,17 @@ class Export(object):
         lossText = ""
         rightCounter = 0
 
-        for i in self.editor.groupList[0].itemList:
-            if isinstance(i, SinglePipeConnection):
-                if rightCounter == 0:
-                    lossText += "P" + i.displayName + "_kW"
-                else:
-                    lossText += "+" + "P" + i.displayName + "_kW"
+        for object in self.editor.groupList[0].itemList:
+            if isinstance(object, SinglePipeConnection):
+                if rightCounter != 0:
+                    lossText += "+"
+                lossText += "P" + object.displayName + "_kW"
                 rightCounter += 1
-            if isinstance(i, DoublePipeConnection):
-                if rightCounter == 0:
-                    lossText += "P" + i.displayName + "Cold_kW"
-                    lossText += "P" + i.displayName + "Hot_kW"
-                else:
-                    lossText += "+" + "P" + i.displayName + "Cold_kW"
-                    lossText += "+" + "P" + i.displayName + "Hot_kW"
+            if isinstance(object, DoublePipeConnection):
+                if rightCounter != 0:
+                    lossText += "+"
+                lossText += "P" + object.displayName + "Cold_kW" + "+"
+                lossText += "P" + object.displayName + "Hot_kW"
                 rightCounter += 1
 
         if rightCounter == 0:

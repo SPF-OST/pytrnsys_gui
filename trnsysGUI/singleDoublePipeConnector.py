@@ -1,6 +1,5 @@
 import typing as _tp
 
-import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
@@ -8,8 +7,6 @@ from massFlowSolver.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 
 
 class SingleDoublePipeConnector(DoublePipeConnectorBase):
@@ -47,39 +44,6 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         self.inputs[1].side = (self.rotationN + 2 * self.flippedH) % 4
         # pylint: disable=duplicate-code  # 2
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-
-
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
-
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-
-        if not graphicalPortItem.connectionList:
-            return None
-
-        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
-
-        connectionInternalPiping = connection.getInternalPiping()
-
-        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
-
-        if isinstance(connection, SinglePipeConnection):
-            connectionSinglePort = connectionStartingNodes[0]
-            return connectionSinglePort
-
-        elif isinstance(connection, DoublePipeConnection):
-            connectionColdPort = connectionStartingNodes[0]
-            connectionHotPort = connectionStartingNodes[1]
-
-            if isinstance(portItem, ColdPortItem):
-                return connectionColdPort
-            elif isinstance(portItem, HotPortItem):
-                return connectionHotPort
-            else:
-                raise AssertionError("PortItem has not a doublePipePortItem.")
-
-        else:
-            raise AssertionError("Connection is an unknown class.")
 
     def getInternalPiping(self) -> InternalPiping:
         coldInput = ColdPortItem()
@@ -125,7 +89,7 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         else:
             return "", startingUnit
 
-    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
+    def getTemperatureVariableName(self, portItem) -> str:
         internalPiping = self.getInternalPiping()
         startingNodes = internalPiping.openLoopsStartingNodes
         graphicalPortItems = internalPiping.modelPortItemsToGraphicalPortItem
@@ -137,3 +101,4 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
             if startingNodes[index].fromNode == keyPortItem or startingNodes[index].toNode == keyPortItem:
                 return "T" + startingNodes[index].name
         raise AssertionError("Found no internal SingleDoublePipeConnector-Connection.")
+
