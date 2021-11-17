@@ -25,7 +25,7 @@ def getOrCreateHydraulicLoop(
     connections = list(fromPortConnections | toPortConnections)
 
     modelConnections = [
-        _model.Connection(c.displayName, 10, 500, c)
+        _model.Connection(c.displayName, diameterInCm=10, uValueInWPerM2K=500, lengthInM=30, connection=c)
         for c in connections
     ]
 

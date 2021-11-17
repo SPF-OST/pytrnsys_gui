@@ -13,7 +13,7 @@ try:
     import trnsysGUI.resources.QRC_resources_generated as _
 except ImportError as importError:
     raise AssertionError(
-        "Could not find the generated Python code for a .ui file. Please run the "
+        "Could not find the generated Python code for a .ui or .qrc file. Please run the "
         "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
         "`pytrnsys_gui` directory."
     ) from importError
@@ -30,13 +30,110 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         self.loopName.setText(hydraulicLoop.name)
 
+        self._configureBulkOperations()
+
         self._configureFluidComboBox()
 
-        connectionsModel = _ConnectionsUiModel(hydraulicLoop.connections)
+        self._reloadConnections()
+
+    def _configureBulkOperations(self):
+        def setTotalLoopLengthInfoToolTipVisible(_) -> None:
+            isVisible = self._isBulkTotalPipeLengthTypeSelected()
+            self.bulkLengthInfoIconWidget.setVisible(isVisible)
+
+        self.bulkLengthTypeComboBox.currentTextChanged.connect(setTotalLoopLengthInfoToolTipVisible)
+
+        def onBulkApplyButtonPressed() -> None:
+            individualPipeLengthInM = self._bulkIndividualPipeLengthInM
+
+            diameterText = self.bulkDiameterLineEdit.text()
+            diameterInCm = float(diameterText) if diameterText else None
+
+            uValueText = self.bulkUValueLineEdit.text()
+            uValueInWPerM2K = float(uValueText) if uValueText else None
+
+            for connection in self.hydraulicLoop.connections:
+                if individualPipeLengthInM is not None:
+                    connection.lengthInM = individualPipeLengthInM
+
+                if diameterInCm is not None:
+                    connection.diameterInCm = diameterInCm
+
+                if uValueInWPerM2K is not None:
+                    connection.uValueInWPerM2K = uValueInWPerM2K
+
+            self._reloadConnections()
+
+        self.bulkApplyButton.pressed.connect(onBulkApplyButtonPressed)
+
+        def clearLineEdits() -> None:
+            self.bulkLengthLineEdit.clear()
+            self.bulkDiameterLineEdit.clear()
+            self.bulkUValueLineEdit.clear()
+
+        self.bulkCancelButton.pressed.connect(clearLineEdits)
+
+        self._configureForPositiveFloat(self.bulkLengthLineEdit)
+        self._configureForPositiveFloat(self.bulkDiameterLineEdit)
+        self._configureForPositiveFloat(self.bulkUValueLineEdit)
+
+    def _isBulkTotalPipeLengthTypeSelected(self):
+        text = self.bulkLengthTypeComboBox.currentText()
+
+        if text == "Individual pipe length":
+            return False
+
+        if text == "Total loop length":
+            return True
+
+        raise AssertionError(f"Unknown bulk length type text: {text}")
+
+    @staticmethod
+    def _configureForPositiveFloat(lineEdit: _qtw.QLineEdit):
+        def checkIfTextIsPositiveFloatOrReset() -> None:
+            text = lineEdit.text()
+            try:
+                _parsePositiveFloat(text)
+            except ValueError:
+                lineEdit.setText("")
+
+        lineEdit.editingFinished.connect(checkIfTextIsPositiveFloatOrReset)
+
+    def _reloadConnections(self):
+        connectionsModel = _ConnectionsUiModel(self.hydraulicLoop.connections)
+
+        connectionsModel.dataChanged.connect(lambda *_: self._updatePipesStatisticsLabel())
+
         self.connectionsTableView.setModel(connectionsModel)
 
         self.connectionsTableView.resizeRowsToContents()
         self.connectionsTableView.resizeColumnsToContents()
+
+        self._updatePipesStatisticsLabel()
+
+    def _updatePipesStatisticsLabel(self):
+        totalLoopLengthInM = sum(c.lengthInM for c in self.hydraulicLoop.connections)
+        statisticsLabelText = (
+            f"Number of pipes: {len(self.hydraulicLoop.connections)}, total loop length: {totalLoopLengthInM:g} m"
+        )
+        self.pipesStatisticsLabel.setText(statisticsLabelText)
+
+    @property
+    def _bulkIndividualPipeLengthInM(self) -> _tp.Optional[float]:
+        lengthText = self.bulkLengthLineEdit.text()
+        if not lengthText:
+            return None
+
+        haveTotalPipeLength = self._isBulkTotalPipeLengthTypeSelected()
+
+        if not haveTotalPipeLength:
+            individualPipeLengthInM = float(lengthText)
+            return individualPipeLengthInM
+
+        loopLengthInM = float(lengthText)
+        nPipes = len(self.hydraulicLoop.connections)
+        individualPipeLengthM = loopLengthInM / nPipes
+        return individualPipeLengthM
 
     def _configureFluidComboBox(self):
         def getFluidName(_fluid: _model.Fluid) -> str:
@@ -77,12 +174,25 @@ class _Property:
     shallHighlightOutliers: bool = True
 
 
-def _setConnectionDiameter(connection: _model.Connection, diameterInCm: _tp.Any) -> None:
-    connection.diameterInCm = float(diameterInCm)
+def _parsePositiveFloat(text: str) -> float:
+    value = float(text)
+
+    if value < 0:
+        raise ValueError("Value must be positive.")
+
+    return value
 
 
-def _setConnectionUValue(connection: _model.Connection, uValueInWPerM2K: _tp.Any) -> None:
-    connection.uValueInWPerM2K = float(uValueInWPerM2K)
+def _setConnectionDiameter(connection: _model.Connection, diameterInCmText: _tp.Any) -> None:
+    connection.diameterInCm = _parsePositiveFloat(diameterInCmText)
+
+
+def _setConnectionUValue(connection: _model.Connection, uValueInWPerM2KText: _tp.Any) -> None:
+    connection.uValueInWPerM2K = _parsePositiveFloat(uValueInWPerM2KText)
+
+
+def _setConnectionLength(connection: _model.Connection, lengthInMText: _tp.Any) -> None:
+    connection.lengthInM = _parsePositiveFloat(lengthInMText)
 
 
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
@@ -90,6 +200,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         _Property("Name", lambda c: c.name, shallHighlightOutliers=False),
         _Property("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
         _Property("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),
+        _Property("Length [m]", lambda c: c.lengthInM, _setConnectionLength),
     ]
 
     def __init__(self, connections: _tp.Sequence[_model.Connection]):

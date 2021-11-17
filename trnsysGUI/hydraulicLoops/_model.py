@@ -17,6 +17,7 @@ class Connection:
     name: str
     diameterInCm: float
     uValueInWPerM2K: float
+    lengthInM: float
     connection: _conn.Connection  # type: ignore[name-defined]
 
 

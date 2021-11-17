@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>423</width>
-    <height>544</height>
+    <width>487</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -227,7 +227,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>cm</string>
+               <string>m</string>
               </property>
              </widget>
             </item>
@@ -447,6 +447,16 @@
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
         </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="pipesStatisticsLabel">
+        <property name="text">
+         <string>Number of pipes: 5, total loop length: x</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
        </widget>
       </item>
      </layout>
