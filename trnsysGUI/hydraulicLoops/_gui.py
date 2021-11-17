@@ -196,6 +196,7 @@ def _setConnectionLength(connection: _model.Connection, lengthInMText: _tp.Any) 
 
 
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
+    c: _model.Connection
     _PROPERTIES = [
         _Property("Name", lambda c: c.name, shallHighlightOutliers=False),
         _Property("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
@@ -263,7 +264,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         raise ValueError(f"Role must be {_qtc.Qt.FontRole} or {_qtc.Qt.ForegroundRole}.", role)
 
-    def _getMostUsedValue(self, prop):
+    def _getMostUsedValue(self, prop: _Property):
         sortedValues = sorted(prop.getter(c) for c in self.connections)
         groupedValues = _it.groupby(sortedValues)
         valuesWithCount = [{"value": v, "count": len(list(vs))} for v, vs in groupedValues]

@@ -3,12 +3,9 @@
 
 from __future__ import annotations
 
-import dataclasses as _dc
 import math as _math
 import typing as _tp
-import uuid as _uuid
 
-import dataclasses_jsonschema as _dcj
 from PyQt5.QtCore import QLineF, QPointF
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
@@ -22,11 +19,11 @@ from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItem import PortItem
 from trnsysGUI.TVentil import TVentil
+from trnsysGUI.connectionModel import ConnectionModel
 from trnsysGUI.segmentItem import segmentItem
-import trnsysGUI.serialization as _ser
 
 if _tp.TYPE_CHECKING:
-    import trnsysGUI.BlockItem as _bi
+    pass
 
 
 def calcDist(p1, p2):
@@ -64,6 +61,10 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.mass = 0  # comment out
         self.temperature = 0
 
+        self._diameterInCm = ConnectionModel.DEFAULT_DIAMETER_IN_CM
+        self._uValueInWPerM2K = ConnectionModel.DEFAULT_U_VALUE_IN_W_PER_M2_K
+        self._lengthInM = ConnectionModel.DEFAULT_LENGTH_IN_M
+
         self.initNew(parent)
 
     def isVisible(self):
@@ -89,10 +90,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.temperature = temp
         for s in self.segments:
             s.labelMass.setPlainText("M: %s kg/Hr   T: %s\u2103" % (self.mass.replace(",", "'"), self.temperature))
-
-    def setDisplayName(self, newName):
-        self.displayName = newName
-        self.updateSegLabels()
 
     def setLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
@@ -151,6 +148,30 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         else:
             self.logger.debug("No color to set in Connection.setColor()")
+
+    @property
+    def diameterInCm(self) -> float:
+        return self._diameterInCm
+
+    @diameterInCm.setter
+    def diameterInCm(self, diameterInCm: float) -> None:
+        self._diameterInCm = diameterInCm
+
+    @property
+    def uValueInWPerM2K(self) -> float:
+        return self._uValueInWPerM2K
+
+    @uValueInWPerM2K.setter
+    def uValueInWPerM2K(self, uValueInWPerM2K: float) -> None:
+        self._uValueInWPerM2K = uValueInWPerM2K
+
+    @property
+    def lengthInM(self) -> float:
+        return self._lengthInM
+
+    @lengthInM.setter
+    def lengthInM(self, lengthInM: float) -> None:
+        self._lengthInM = lengthInM
 
     # Getters
     def getStartPoint(self):
@@ -1134,6 +1155,9 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             self.fromPort.id,
             self.toPort.id,
             self.trnsysId,
+            self.diameterInCm,
+            self.uValueInWPerM2K,
+            self.lengthInM
         )
 
         dictName = "Connection-"
@@ -1150,6 +1174,9 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.setName(model.name)
         self.groupName = "defaultGroup"
         self.setConnToGroup(model.groupName)
+        self.diameterInCm = model.diameterInCm
+        self.uValueInWPerM2K = model.uValueInWPerM2K
+        self.lengthInM = model.lengthInM
 
         if len(model.segmentsCorners) > 0:
             self.loadSegments(model.segmentsCorners)
@@ -1182,8 +1209,10 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
     def _getPortItemIndex(self, graphicalPortItem: _pi.PortItem) -> _tp.Optional[int]:
-        assert graphicalPortItem in [self.fromPort, self.toPort],\
-            "This connection is not connected to `graphicalPortItem'"
+        assert graphicalPortItem in [
+            self.fromPort,
+            self.toPort,
+        ], "This connection is not connected to `graphicalPortItem'"
 
         blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
 
@@ -1256,13 +1285,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             portItem = portItemsWithParent[0][0]
             parent = portItemsWithParent[0][1]
             if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
+                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
@@ -1272,13 +1295,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             portItem = portItemsWithParent[1][0]
             parent = portItemsWithParent[1][1]
             if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
+                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
@@ -1363,85 +1380,4 @@ class DeleteConnectionCommand(QUndoCommand):
     def undo(self):
         self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)
 
-@_dc.dataclass
-class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    ConnCID: int
-    ConnDisplayName: str
-    ConnID: int
-    CornerPositions: _tp.List[_tp.Tuple[float, float]]
-    FirstSegmentLabelPos: _tp.Tuple[float, float]
-    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]
-    GroupName: str
-    PortFromID: int
-    PortToID: int
-    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
-    trnsysID: int
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
-
-@_dc.dataclass
-class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
-
-    connectionId: int
-    name: str
-    id: int
-    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
-    labelPos: _tp.Tuple[float, float]
-    massFlowLabelPos: _tp.Tuple[float, float]
-    groupName: str
-    fromPortId: int
-    toPortId: int
-    trnsysId: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "ConnectionModel":
-        data.pop(".__ConnectionDict__")
-        connectionModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(ConnectionModel, connectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__ConnectionDict__"] = True
-        return data
-
-
-    @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return ConnectionModelVersion0
-
-    @classmethod
-    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
-        firstSegmentLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0], \
-                               superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1]
-        firstSegmentMassFlowLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0], \
-                                       superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1]
-
-        return ConnectionModel(
-            superseded.ConnCID,
-            superseded.ConnDisplayName,
-            superseded.ConnID,
-            superseded.CornerPositions,
-            firstSegmentLabelPos,
-            firstSegmentMassFlowLabelPos,
-            superseded.GroupName,
-            superseded.PortFromID,
-            superseded.PortToID,
-            superseded.trnsysID,
-        )
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
 

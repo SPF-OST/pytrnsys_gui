@@ -25,7 +25,7 @@ def getOrCreateHydraulicLoop(
     connections = list(fromPortConnections | toPortConnections)
 
     modelConnections = [
-        _model.Connection(c.displayName, diameterInCm=10, uValueInWPerM2K=500, lengthInM=30, connection=c)
+        _model.Connection(c.displayName, c.diameterInCm, c.uValueInWPerM2K, c.lengthInM, connection=c)
         for c in connections
     ]
 
@@ -92,4 +92,10 @@ def showHydraulicLoopDialog(fromPort: _pi.PortItem, toPort: _pi.PortItem) -> Non
 
 
 def _applyModel(hydraulicLoop: _model.HydraulicLoop) -> None:
-    pass
+    for model in hydraulicLoop.connections:
+        connection = model.connection
+
+        connection.setName(model.name)
+        connection.diameterInCm = model.diameterInCm
+        connection.uValueInWPerM2K = model.uValueInWPerM2K
+        connection.lengthInM = model.lengthInM
