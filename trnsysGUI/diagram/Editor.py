@@ -45,9 +45,6 @@ from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.Graphicaltem import GraphicalItem
-from trnsysGUI.Group import Group
-from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
-from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -63,8 +60,6 @@ from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
 from trnsysGUI.diagramDlg import diagramDlg
-from trnsysGUI.groupDlg import groupDlg
-from trnsysGUI.groupsEditor import groupsEditor
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.idGenerator import IdGenerator
 from trnsysGUI.newDiagramDlg import newDiagramDlg
@@ -107,7 +102,7 @@ class Editor(QWidget):
     and pasting will load the clipboard using a slighly different decoder than for loading an entire diagram.
     When the elements are pasted, they compose a group which can be dragged around and is desintegrated when the mouse
     is released.
-    It is controlled by the attributes selectionMode and groupMode
+    It is controlled by the attribute selectionMode.
 
     Attributes
     ----------
@@ -121,8 +116,6 @@ class Editor(QWidget):
         Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
     selectionMode : bool
         Enables/disables selection rectangle in Scene
-    groupMode : bool
-        Enables creation of a new group in Scene
     alignMode : bool
         Enables mode in which a dragged block is aligned to y or x value of another one
         Toggled in the MainWindow class in toggleAlignMode()
@@ -157,7 +150,6 @@ class Editor(QWidget):
     tempStartPort : :obj:`PortItem`
     connectionList : :obj:`List` of :obj:`Connection`
     trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-    groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
     graphicalObj : :obj:`List` of :obj:`GraphicalItem`
     connLine : :obj:`QLineF`
     connLineItem = :obj:`QGraphicsLineItem`
@@ -187,7 +179,6 @@ class Editor(QWidget):
         self.controlDirectory = ""
 
         self.selectionMode = False
-        self.groupMode = False
 
         self.alignMode = False
 
@@ -307,11 +298,7 @@ class Editor(QWidget):
         self.tempStartPort = None
         self.connectionList = []
         self.trnsysObj = []
-        self.groupList = []
         self.graphicalObj = []
-
-        self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
-        self.defaultGroup.setName("defaultGroup")
 
         self.copyGroupList = QGraphicsItemGroup()
         self.selectionGroupList = QGraphicsItemGroup()
@@ -552,8 +539,6 @@ class Editor(QWidget):
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
-        fullExportText += exporter.exportPrintLoops()
-        fullExportText += exporter.exportPrintPipeLoops()
         fullExportText += exporter.exportPrintPipeLosses()
 
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
@@ -698,13 +683,8 @@ class Editor(QWidget):
             self.logger.info("In deleting...")
             self.trnsysObj[0].deleteBlock()
 
-        while len(self.groupList) > 1:
-            self.groupList[-1].deleteGroup()
-
         while len(self.graphicalObj) > 0:
             self.graphicalObj[0].deleteBlock()
-
-        self.logger.debug("Groups are " + str(self.groupList))
 
     def newDiagram(self):
         self.centralWidget.delBlocks()
@@ -773,11 +753,6 @@ class Editor(QWidget):
         with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
 
-        if len(self.groupList) == 0:
-            self.logger.debug("self.group is empty, adding default group")
-            self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
-            self.defaultGroup.setName("defaultGroup")
-
         blockFolderNames = []
 
         for j in blocklist["Blocks"]:
@@ -789,8 +764,6 @@ class Editor(QWidget):
                     k.changeSize()
                     self.diagramScene.addItem(k)
                     blockFolderNames.append(k.displayName)
-                    # blockFolderNames.append(k.name + '_' + k.displayName)
-                    # k.setBlockToGroup("defaultGroup")
 
                 if isinstance(k, StorageTank):
                     self.logger.debug("Loading a Storage")
@@ -800,27 +773,21 @@ class Editor(QWidget):
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
                     self.diagramScene.addItem(k)
-                    # k.resizer.setPos(k.w, k.h)
-                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
+
 
                 if isinstance(k, dict):
                     if "__idDct__" in k:
                         # here we don't set the ids because the copyGroup would need access to idGen
                         self.logger.debug("Found the id dict while loading, not setting the ids")
-                        # global globalID
-                        # global trnsysID
-                        # global globalConnID
 
                         self.idGen.setID(k["GlobalId"])
                         self.idGen.setTrnsysID(k["trnsysID"])
                         self.idGen.setConnID(k["globalConnID"])
-                        # self.idGen.setBlockID()
 
                     if "__nameDct__" in k:
                         self.logger.debug("Found the name dict while loading")
                         if loadValue == "load":
                             self.diagramName = k["DiagramName"]
-                            # self.projectFolder = k["ProjectFolder"]
 
         blockFolderNames.append("generic")
         blockFolderNames.append("hydraulic")
@@ -1011,10 +978,6 @@ class Editor(QWidget):
     def setitemsSelected(self, b):
         self.itemsSelected = b
 
-    # Misc
-    def editGroups(self):
-        self.showGroupsEditor()
-
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
             if isinstance(c, Connection):
@@ -1029,13 +992,6 @@ class Editor(QWidget):
             if isinstance(t, Connection):
                 t.updateSegGrads()
 
-    def findGroupByName(self, name):
-        for g in self.groupList:
-            if g.displayName == name:
-                return g
-
-        return None
-
     # Dialog calls
     def showBlockDlg(self, bl):
         c = BlockDlg(bl, self)
@@ -1048,15 +1004,6 @@ class Editor(QWidget):
 
     def showGenericPortPairDlg(self, bl):
         c = GenericPortPairDlg(bl, self)
-
-    def showGroupChooserBlockDlg(self, bl):
-        c = GroupChooserBlockDlg(bl, self)
-
-    def showGroupChooserConnDlg(self, conn):
-        c = GroupChooserConnDlg(conn, self)
-
-    def showGroupDlg(self, group, itemList):
-        c = groupDlg(group, self, itemList)
 
     def showHxDlg(self, hx):
         c = hxDlg(hx, self)
@@ -1072,9 +1019,6 @@ class Editor(QWidget):
 
     def showConfigStorageDlg(self, bl):
         c = ConfigureStorageDialog(bl, self)
-
-    def showGroupsEditor(self):
-        c = groupsEditor(self)
 
     def testFunctionInspection(self, *args):
         self.logger.debug("Ok, here is my log")
@@ -1132,16 +1076,6 @@ class Editor(QWidget):
 
         # [print(p.parent.displayName) for p in res]
         return res
-
-    def delGroup(self):
-        """
-        This is used for deleting the first connected componts group found by BFS, unused
-        Returns
-        -------
-
-        """
-        for bl in self.blockList:
-            bl.deleteBlock()
 
     def testFunction(self):
         """

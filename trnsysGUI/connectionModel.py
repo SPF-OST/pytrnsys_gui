@@ -76,31 +76,10 @@ class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):
 
 
 @_dc.dataclass
-class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
+class ConnectionModelVersion2(_ser.UpgradableJsonSchemaMixin):
     DEFAULT_DIAMETER_IN_CM = 2
     DEFAULT_LENGTH_IN_M = 2.0
     DEFAULT_U_VALUE_IN_W_PER_M2_K = 320
-
-    @classmethod
-    def from_dict(  # pylint: disable=duplicate-code  # 1
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "ConnectionModel":
-        data.pop(".__ConnectionDict__")
-        connectionModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(ConnectionModel, connectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code  # 1
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__ConnectionDict__"] = True
-        return data
 
     connectionId: int
     name: str
@@ -121,10 +100,10 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
         return ConnectionModelVersion1
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModel":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModelVersion2":
         assert isinstance(superseded, ConnectionModelVersion1)
 
-        return ConnectionModel(
+        return ConnectionModelVersion2(
             superseded.connectionId,
             superseded.name,
             superseded.id,
@@ -143,3 +122,71 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("1a1c2140-d710-4fae-983e-90dcecc609ec")
+
+
+@_dc.dataclass
+class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
+    DEFAULT_DIAMETER_IN_CM = 2
+    DEFAULT_LENGTH_IN_M = 2.0
+    DEFAULT_U_VALUE_IN_W_PER_M2_K = 320
+
+    @classmethod
+    def from_dict(  # pylint: disable=duplicate-code  # 2
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "ConnectionModel":
+        data.pop(".__ConnectionDict__")
+        connectionModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(ConnectionModel, connectionModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code  # 3
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__ConnectionDict__"] = True
+        return data
+
+    connectionId: int
+    name: str
+    id: int
+    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
+    labelPos: _tp.Tuple[float, float]
+    massFlowLabelPos: _tp.Tuple[float, float]
+    fromPortId: int
+    toPortId: int
+    trnsysId: int
+    diameterInCm: float
+    uValueInWPerM2K: float
+    lengthInM: float
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return ConnectionModelVersion2
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModel":
+        assert isinstance(superseded, ConnectionModelVersion2)
+
+        return ConnectionModel(
+            superseded.connectionId,
+            superseded.name,
+            superseded.id,
+            superseded.segmentsCorners,
+            superseded.labelPos,
+            superseded.massFlowLabelPos,
+            superseded.fromPortId,
+            superseded.toPortId,
+            superseded.trnsysId,
+            cls.DEFAULT_DIAMETER_IN_CM,
+            cls.DEFAULT_U_VALUE_IN_W_PER_M2_K,
+            cls.DEFAULT_LENGTH_IN_M,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('0282bd53-3157-4266-9641-19df2f54d167')

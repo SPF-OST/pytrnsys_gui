@@ -106,7 +106,6 @@ class HPDoubleDual(BlockItem):
             dct["FlippedH"] = self.flippedH
             dct["FlippedV"] = self.flippedH
             dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
@@ -131,9 +130,6 @@ class HPDoubleDual(BlockItem):
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
 
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
-
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
@@ -154,8 +150,6 @@ class HPDoubleDual(BlockItem):
         # self.trnsysId = i["trnsysID"]
         # self.id = i["ID"]
 
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
         resBlockList.append(self)
 
     def exportBlackBox(self):

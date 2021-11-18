@@ -265,7 +265,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         raise ValueError(f"Role must be {_qtc.Qt.FontRole} or {_qtc.Qt.ForegroundRole}.", role)
 
     def _getMostUsedValue(self, prop: _Property):
-        sortedValues = sorted(prop.getter(c) for c in self.connections)
+        sortedValues = sorted(prop.getter(c) for c in self.connections)  # type: ignore[misc, call-arg]
         groupedValues = _it.groupby(sortedValues)
         valuesWithCount = [{"value": v, "count": len(list(vs))} for v, vs in groupedValues]
         mostUsedValueWithCount = max(valuesWithCount, key=lambda vwc: vwc["count"])

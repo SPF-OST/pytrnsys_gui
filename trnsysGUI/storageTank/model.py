@@ -56,7 +56,7 @@ class DirectPortPairLegacyVersion(_dcj.JsonSchemaMixin):
 
 
 @_dc.dataclass
-class StorageTank(_ser.UpgradableJsonSchemaMixin):
+class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):
     isHorizontallyFlipped: bool
     isVerticallyFlipped: bool
 
@@ -75,43 +75,14 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     directPortPairs: _tp.Sequence["DirectPortPair"]
 
     @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "StorageTank":
-        data.pop(".__BlockDict__")
-        storageTank = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(StorageTank, storageTank)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__BlockDict__"] = True
-        return data
-
-    @classmethod
-    def upgrade(
-        cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0
-    ) -> "StorageTank":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "StorageTankVersion1":
         if not isinstance(superseded, StorageTankVersion0):
-            raise ValueError(
-                f"Can only upgrade a {StorageTankVersion0.__name__} instance."
-            )
+            raise ValueError(f"Can only upgrade a {StorageTankVersion0.__name__} instance.")
 
-        heatExchangers = cls._upgradeHeatExchangers(
-            superseded.HxList, superseded.size_h
-        )
-        directPortPairs = cls._upgradeDirectPortPairs(
-            superseded.PortPairList, superseded.size_h
-        )
+        heatExchangers = cls._upgradeHeatExchangers(superseded.HxList, superseded.size_h)
+        directPortPairs = cls._upgradeDirectPortPairs(superseded.PortPairList, superseded.size_h)
 
-        return StorageTank(
+        return StorageTankVersion1(
             superseded.FlippedH,
             superseded.FlippedV,
             superseded.BlockName,
@@ -152,7 +123,7 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
         directPortPairs = []
         for supersededPair in supersededPairs:
             directPortPairLegacyVersion = DirectPortPairVersion0.createFromLegacyPortPair(
-                    supersededPair, storageTankHeight
+                supersededPair, storageTankHeight
             )
 
             directPortPair = DirectPortPair.fromInstance(directPortPairLegacyVersion)
@@ -168,6 +139,72 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def getSupersededClass(cls):
         return StorageTankVersion0
+
+
+@_dc.dataclass
+class StorageTank(_ser.UpgradableJsonSchemaMixin):
+    isHorizontallyFlipped: bool
+    isVerticallyFlipped: bool
+
+    BlockName: str
+    BlockDisplayName: str
+
+    id: int
+    trnsysId: int
+
+    height: int
+    position: _tp.Tuple[float, float]
+
+    heatExchangers: _tp.Sequence["HeatExchanger"]
+
+    directPortPairs: _tp.Sequence["DirectPortPair"]
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "StorageTank":
+        data.pop(".__BlockDict__")
+        storageTank = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(StorageTank, storageTank)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "StorageTank":
+        if not isinstance(superseded, StorageTankVersion1):
+            raise ValueError(f"Can only upgrade a {StorageTankVersion1.__name__} instance.")
+
+        return StorageTank(
+            superseded.isHorizontallyFlipped,
+            superseded.isVerticallyFlipped,
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.id,
+            superseded.trnsysId,
+            superseded.height,
+            superseded.position,
+            superseded.heatExchangers,
+            superseded.directPortPairs,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("05f422d3-41fd-48d1-b8d0-4655d9f65247")
+
+    @classmethod
+    def getSupersededClass(cls):
+        return StorageTankVersion1
 
 
 @_dc.dataclass
@@ -187,7 +224,7 @@ class PortPairVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('e1b81a7b-51ca-44f0-9d3a-6b6c42eb8e91')
+        return _uuid.UUID("e1b81a7b-51ca-44f0-9d3a-6b6c42eb8e91")
 
 
 @_dc.dataclass
@@ -205,20 +242,18 @@ class PortPair(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "PortPair":
         if not isinstance(superseded, PortPairVersion0):
-            raise ValueError(
-                f"Superseded instance is not of type {PortPairVersion0.__name__}"
-            )
+            raise ValueError(f"Superseded instance is not of type {PortPairVersion0.__name__}")
 
         return PortPair(
             superseded.side,
             _id.IdGenerator.UNINITIALIZED_ID,  # type: ignore[attr-defined]
             superseded.inputPort,
-            superseded.outputPort
+            superseded.outputPort,
         )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('ed17e7a7-4798-4a80-beb7-81730523cf35')
+        return _uuid.UUID("ed17e7a7-4798-4a80-beb7-81730523cf35")
 
 
 @_dc.dataclass
@@ -280,13 +315,9 @@ class HeatExchangerVersion1(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HeatExchangerVersion1":
         if not isinstance(superseded, HeatExchangerVersion0):
-            raise ValueError(
-                f"`superseded` is not of type {HeatExchangerVersion0.__name__}"
-            )
+            raise ValueError(f"`superseded` is not of type {HeatExchangerVersion0.__name__}")
 
-        return HeatExchangerVersion1(
-            superseded.portPair, superseded.width, superseded.parentId, superseded.id
-        )
+        return HeatExchangerVersion1(superseded.portPair, superseded.width, superseded.parentId, superseded.id)
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
@@ -308,19 +339,15 @@ class HeatExchanger(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HeatExchanger":
         if not isinstance(superseded, HeatExchangerVersion1):
-            raise ValueError(
-                f"`superseded` is not of type {HeatExchangerVersion1.__name__}"
-            )
+            raise ValueError(f"`superseded` is not of type {HeatExchangerVersion1.__name__}")
 
         portPair = PortPair.fromInstance(superseded.portPair)
 
-        return HeatExchanger(
-            portPair, superseded.portPair.name, superseded.width, superseded.parentId, superseded.id
-        )
+        return HeatExchanger(portPair, superseded.portPair.name, superseded.width, superseded.parentId, superseded.id)
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('be068f84-2627-4f53-87a9-9a1f4fd1c529')
+        return _uuid.UUID("be068f84-2627-4f53-87a9-9a1f4fd1c529")
 
 
 @_dc.dataclass
@@ -370,9 +397,7 @@ class DirectPortPair(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DirectPortPair":
         if not isinstance(superseded, DirectPortPairVersion0):
-            raise ValueError(
-                f"Superseded instance is not of type {DirectPortPairVersion0.__name__}"
-            )
+            raise ValueError(f"Superseded instance is not of type {DirectPortPairVersion0.__name__}")
 
         portPair = PortPair.fromInstance(superseded.portPair)
 

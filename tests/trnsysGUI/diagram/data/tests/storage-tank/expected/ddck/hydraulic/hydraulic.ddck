@@ -140,39 +140,9 @@ TTes-Col= [454,1]
 PTes-Col_kW= [454,3]/3600 !kW
 MfrTes-Col= MfrTes-Col_A
 
-CONSTANTS 3
-** Fluid Loop : defaultGroup
-di_loop_0=0.05
-L_loop_0=2
-U_loop_0=10
-
-
-EQUATIONS 12
-** Fluid Loop : defaultGroup
-**di_loop_0=0.05
-**L_loop_0=2
-**U_loop_0=10
-*** Tes-Col
-diTes-Col=di_loop_0
-LTes-Col=L_loop_0
-UTes-Col=U_loop_0
-*** Tes-Hp
-diTes-Hp=di_loop_0
-LTes-Hp=L_loop_0
-UTes-Hp=U_loop_0
-*** Hp-Tes
-diHp-Tes=di_loop_0
-LHp-Tes=L_loop_0
-UHp-Tes=U_loop_0
-*** Col-Tes
-diCol-Tes=di_loop_0
-LCol-Tes=L_loop_0
-UCol-Tes=U_loop_0
-
-
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PTes-Col_kW+PTes-Hp_kW+PHp-Tes_kW+PCol-Tes_kW
+PipeLossTot=PTes-Hp_kW+PHp-Tes_kW+PCol-Tes_kW+PTes-Col_kW
 
 ASSIGN storage-tank_Mfr.prt 455
 

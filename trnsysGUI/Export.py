@@ -271,85 +271,16 @@ class Export(object):
 
         return f
 
-    def exportPrintLoops(self):
-        f = ""
-        loopText = ""
-        constsNr = 0
-        constString = "CONSTANTS "
-        suffix1 = "_save"
-        string1 = "dtSim/rhoWat/"
-        Pi = "3.14"
-        for g in self.editor.groupList:
-
-            loopText += "** Fluid Loop : " + g.displayName + "\n"
-
-            loopNr = self.editor.groupList.index(g)
-
-            diLp = "di_loop_" + str(loopNr)
-            LLp = "L_loop_" + str(loopNr)
-            ULp = "U_loop_" + str(loopNr)
-
-            loopText += diLp + "=" + str(g.exportDi) + "\n"
-            loopText += LLp + "=" + str(g.exportL) + "\n"
-            loopText += ULp + "=" + str(g.exportU) + "\n"
-            constsNr += 3
-            loopText += "\n"
-
-        f += constString + str(constsNr) + "\n"
-        f += loopText + "\n"
-
-        return f
-
-    def exportPrintPipeLoops(self):
-        f = ""
-        loopText = ""
-        equationString = "EQUATIONS "
-        equationNr = 0
-
-        for g in self.editor.groupList:
-            loopText += "** Fluid Loop : " + g.displayName + "\n"
-
-            loopNr = self.editor.groupList.index(g)
-
-            diLp = "di_loop_" + str(loopNr)
-            LLp = "L_loop_" + str(loopNr)
-            ULp = "U_loop_" + str(loopNr)
-
-            loopText += "**" + diLp + "=" + str(g.exportDi) + "\n"
-            loopText += "**" + LLp + "=" + str(g.exportL) + "\n"
-            loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
-
-            for c in g.itemList:
-                if isinstance(c, Connection):
-                    loopText += "*** " + c.displayName + "\n"
-                    loopText += "di" + c.displayName + "=" + diLp + "\n"
-                    loopText += "L" + c.displayName + "=" + LLp + "\n"
-                    loopText += "U" + c.displayName + "=" + ULp + "\n"
-                    equationNr += 3
-
-            loopText += "\n"
-
-        f += equationString + str(equationNr) + "\n"
-        f += loopText + "\n"
-        return f
-
     def exportPrintPipeLosses(self):
-        f = ""
-        lossText = ""
-        rightCounter = 0
+        connections = [o for o in self.editor.trnsysObj if isinstance(o, Connection)]
 
-        for i in self.editor.groupList[0].itemList:
-            if isinstance(i, Connection):
-                if rightCounter == 0:
-                    lossText += "P" + i.displayName + "_kW"
-                else:
-                    lossText += "+" + "P" + i.displayName + "_kW"
-                rightCounter += 1
+        if not connections:
+            lossText = "0"
+        else:
+            lossText = "+".join(f"P{c.displayName}_kW" for c in connections)
 
-        if rightCounter == 0:
-            lossText += "0"
+        f = "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText + "\n\n"
 
-        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText + "\n\n"
         return f
 
     def exportMassFlowPrinter(self, unitnr, descLen):

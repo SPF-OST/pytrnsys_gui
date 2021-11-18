@@ -140,36 +140,6 @@ THx-Col= [454,1]
 PHx-Col_kW= [454,3]/3600 !kW
 MfrHx-Col= MfrHx-Col_A
 
-CONSTANTS 3
-** Fluid Loop : defaultGroup
-di_loop_0=0.05
-L_loop_0=2
-U_loop_0=10
-
-
-EQUATIONS 12
-** Fluid Loop : defaultGroup
-**di_loop_0=0.05
-**L_loop_0=2
-**U_loop_0=10
-*** Tes-Hx
-diTes-Hx=di_loop_0
-LTes-Hx=L_loop_0
-UTes-Hx=U_loop_0
-*** Hx-Tes
-diHx-Tes=di_loop_0
-LHx-Tes=L_loop_0
-UHx-Tes=U_loop_0
-*** Col-Hx
-diCol-Hx=di_loop_0
-LCol-Hx=L_loop_0
-UCol-Hx=U_loop_0
-*** Hx-Col
-diHx-Col=di_loop_0
-LHx-Col=L_loop_0
-UHx-Col=U_loop_0
-
-
 *** Pipe losses
 EQUATIONS 1
 PipeLossTot=PTes-Hx_kW+PHx-Tes_kW+PCol-Hx_kW+PHx-Col_kW

@@ -192,7 +192,6 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
             self.flippedV,
             self.name,
             self.displayName,
-            self.groupName,
             self.id,
             self.trnsysId,
             self.h,
@@ -277,8 +276,6 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         if shallSetNamesAndIDs:
             self.trnsysId = model.trnsysId
             self.id = model.id
-            self.groupName = "defaultGroup"
-            self.setBlockToGroup(model.groupName)
 
         for heatExchangerModel in model.heatExchangers:
             self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)

@@ -22,9 +22,6 @@ from trnsysGUI.TVentil import TVentil
 from trnsysGUI.connectionModel import ConnectionModel
 from trnsysGUI.segmentItem import segmentItem
 
-if _tp.TYPE_CHECKING:
-    pass
-
 
 def calcDist(p1, p2):
     vec = p1 - p2
@@ -41,8 +38,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.displayName = None
 
         self.parent = parent
-        self.groupName = ""
-        self.setDefaultGroup()
 
         # Export related
         self.typeNumber = 0
@@ -919,8 +914,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             self.logger.debug([i.id for i in self.parent.trnsysObj])
             return
 
-        self.removeConnFromGroup()
-
         self.logger.debug("Removing trnsysObj " + str(self))
         self.parent.connectionList.remove(self)
         del self
@@ -1009,38 +1002,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         element.setNext(pr)
         element.setPrev(ne)
 
-    # Group related
-    def setDefaultGroup(self):
-        self.setConnToGroup("defaultGroup")
-
-    def setConnToGroup(self, newGroupName):
-        self.logger.debug("In setConnToGroup")
-        if newGroupName == self.groupName:
-            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
-            return
-        else:
-            # self.logger.debug("groups is " + str(self.parent.groupList))
-            for g in self.parent.groupList:
-                self.logger.debug("At group " + str(g.displayName))
-                if g.displayName == self.groupName:
-                    self.logger.debug("Found the old group")
-                    g.itemList.remove(self)
-                if g.displayName == newGroupName:
-                    self.logger.debug("Found the new group")
-                    g.itemList.append(self)
-
-            self.groupName = newGroupName
-
-    def removeConnFromGroup(self):
-        for g in self.parent.groupList:
-            if g.displayName == self.groupName:
-                if self in g.itemList:
-                    g.itemList.remove(self)
-                else:
-                    self.logger.debug("While removing conn from group, groupName is invalid")
-            else:
-                self.logger.debug("While removeing conn from group, no group with conn.groupName")
-
     # Highlight when clicked, unhighlight when clicked elsewhere
     def highlightConn(self):
         self.unhighlightOtherConns()
@@ -1074,10 +1035,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
     def inspectConn(self):
         self.parent.listV.clear()
         self.parent.listV.addItem("Display name: " + self.displayName)
-        self.parent.listV.addItem("Group name: " + self.groupName)
         self.parent.listV.addItem("Parent: " + str(self.parent))
-        # self.parent.listV.addItem("Position: " + str(self.pos()))
-        # self.parent.listV.addItem("Sceneposition: " + str(self.scenePos()))
         self.parent.listV.addItem("fromPort: " + str(self.fromPort) + str(self.fromPort.id))
         self.parent.listV.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
 
@@ -1151,7 +1109,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             corners,
             labelPos,
             labelMassPos,
-            self.groupName,
             self.fromPort.id,
             self.toPort.id,
             self.trnsysId,
@@ -1172,8 +1129,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.connId = model.connectionId
         self.trnsysId = model.trnsysId
         self.setName(model.name)
-        self.groupName = "defaultGroup"
-        self.setConnToGroup(model.groupName)
         self.diameterInCm = model.diameterInCm
         self.uValueInWPerM2K = model.uValueInWPerM2K
         self.lengthInM = model.lengthInM

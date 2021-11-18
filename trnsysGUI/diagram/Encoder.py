@@ -3,10 +3,8 @@
 
 import json
 
-from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
-from trnsysGUI.copyGroup import copyGroup
+from trnsysGUI.diagram import Editor as _de
 
 
 class Encoder(json.JSONEncoder):
@@ -32,7 +30,7 @@ class Encoder(json.JSONEncoder):
         """
         logger = obj.logger
 
-        if isinstance(obj, _de.Editor) or isinstance(obj, copyGroup):
+        if isinstance(obj, _de.Editor):
             logger.debug("Is diagram or copygroup")
 
             res = {}
@@ -56,15 +54,6 @@ class Encoder(json.JSONEncoder):
 
             nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName, "ProjectFolder": obj.projectFolder}
             blockDct["Strings"] = nameDict
-
-            for g in obj.groupList:
-                dct = {}
-                dct[".__GroupDict__"] = True
-                dct["GroupName"] = g.displayName
-                dct["Position"] = g.x, g.y
-                dct["Size"] = g.w, g.h
-
-                blockDct["..__GroupDct-" + g.displayName] = dct
 
             for gi in obj.graphicalObj:
                 dictName, dct = gi.encode()

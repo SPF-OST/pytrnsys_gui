@@ -15,7 +15,6 @@ from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.GroundSourceHx import GroundSourceHx
-from trnsysGUI.Group import Group
 from trnsysGUI.HPDoubleDual import HPDoubleDual
 from trnsysGUI.HeatPump import HeatPump
 from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
@@ -77,18 +76,6 @@ class Decoder(json.JSONDecoder):
             for i in sorted_values:
                 if type(i) is not dict:
                     continue
-
-                if ".__GroupDict__" in i:
-                    self.logger.debug("Found the group dict")
-                    self.logger.debug("Decoding group " + str(i["GroupName"]))
-
-                    groupListNames = [g.displayName for g in self.editor.groupList]
-
-                    if i["GroupName"] not in groupListNames:
-                        g = Group(
-                            i["Position"][0], i["Position"][1], i["Size"][0], i["Size"][1], self.editor.diagramScene
-                        )
-                        g.setName(i["GroupName"])
 
                 # Adding the blocks to the scene could also be done inside Decoder now (before not possible because
                 # no way of accessing the diagramView)

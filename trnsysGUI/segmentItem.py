@@ -1,8 +1,8 @@
 # pylint: skip-file
 # type: ignore
 
-from math import sqrt
 import typing as tp
+from math import sqrt
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPointF, QLineF
@@ -10,7 +10,6 @@ from PyQt5.QtGui import QColor, QLinearGradient, QBrush, QPen
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QMenu
 
 from trnsysGUI.CornerItem import CornerItem
-from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 
 # This is needed to avoid a circular import but still be able to type check
@@ -747,12 +746,6 @@ class segmentItem(QGraphicsLineItem):
         a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
 
         menu.exec(event.screenPos())
-
-    def configGroup(self):
-        GroupChooserConnDlg(self.connection, self.connection.parent)
-
-    def printGroup(self):
-        self.logger.debug(self.connection.groupName)
 
     def inspect(self):
         self.connection.highlightConn()

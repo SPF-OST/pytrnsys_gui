@@ -451,7 +451,6 @@ Tes%d
         editorMock.connectionList = []
         editorMock.logger = logger
         editorMock.trnsysObj = []
-        editorMock.groupList = []
         editorMock.projectPath = str(projectPath)
         editorMock.splitter = _mock.Mock(name="splitter")
         editorMock.idGen = _mock.Mock(

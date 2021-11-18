@@ -4,10 +4,10 @@
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsRectItem
+
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Connection import Connection
 from trnsysGUI.Graphicaltem import GraphicalItem
-from trnsysGUI.Group import Group
 from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.storageTank.widget import StorageTank
 
@@ -117,10 +117,7 @@ class Scene(QGraphicsScene):
         if self.parent().selectionMode:
             self.logger.debug("There are elements inside the selection : " + str(self.hasElementsInRect()))
             if self.hasElementsInRect():
-                if self.parent().groupMode:
-                    g = self.createGroup()
-                    self.parent().showGroupDlg(g, self.elementsInRect())
-                elif self.parent().multipleSelectMode:
+                if self.parent().multipleSelectMode:
                     self.parent().createSelectionGroup(self.elementsInRect())
                 else:
                     self.logger.info("No recognized mode for selection")
@@ -170,7 +167,6 @@ class Scene(QGraphicsScene):
             self.logger.debug("No items here!")
             self.parent().clearSelectionGroup()
             self.parent().selectionMode = True
-            self.parent().groupMode = False
             self.parent().multipleSelectMode = True
             for c in self.parent().connectionList:
                 if not self.parent().parent().massFlowEnabled:
@@ -209,11 +205,6 @@ class Scene(QGraphicsScene):
                     abs(event.scenePos().y() - self.sRstart.y()),
                 )
                 self.selectionRect.setVisible(True)
-
-    def createGroup(self):
-        newGroup = Group(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRh, self)
-
-        return newGroup
 
     def elementsInRect(self):
         # Return elements in the selection rectangle
