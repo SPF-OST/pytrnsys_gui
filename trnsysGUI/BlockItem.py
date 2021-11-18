@@ -675,33 +675,31 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     # Encoding
     def encode(self):
-        # Double check that no virtual block gets encoded
-        if self.isVisible():
-            portListInputs = []
-            portListOutputs = []
+        portListInputs = []
+        portListOutputs = []
 
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
-            dct = {}
+        for p in self.inputs:
+            portListInputs.append(p.id)
+        for p in self.outputs:
+            portListOutputs.append(p.id)
+        dct = {}
 
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
+        dct[".__BlockDict__"] = True
+        dct["BlockName"] = self.name
+        dct["BlockDisplayName"] = self.displayName
+        dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
+        dct["ID"] = self.id
+        dct["trnsysID"] = self.trnsysId
+        dct["PortsIDIn"] = portListInputs
+        dct["PortsIDOut"] = portListOutputs
+        dct["FlippedH"] = self.flippedH
+        dct["FlippedV"] = self.flippedV
+        dct["RotationN"] = self.rotationN
+        dct["GroupName"] = self.groupName
 
-            dictName = "Block-"
+        dictName = "Block-"
 
-            return dictName, dct
+        return dictName, dct
 
     def decode(self, i, resBlockList):
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))

@@ -1,17 +1,12 @@
 # pylint: skip-file
 # type: ignore
 
-import re
-import sys
 from datetime import timedelta, datetime, MINYEAR
 
-import numpy
-from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtGui import QPainter, QBrush, QColor
-from PyQt5.QtWidgets import QSlider, QDialog, QLineEdit, QPushButton, QHBoxLayout, QLabel, QGridLayout, QWidget
+from PyQt5.QtWidgets import QSlider, QDialog, QLineEdit, QPushButton, QHBoxLayout, QLabel, QGridLayout
 
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase
 import pandas as pd
 import itertools
 import numpy as np
@@ -155,7 +150,7 @@ class MassFlowVisualizer(QDialog):
         self.showMass = not self.showMass
 
         for t in self.parent.centralWidget.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, ConnectionBase):
                 if self.showMass:
                     t.firstS.labelMass.setVisible(True)
                 else:
@@ -190,7 +185,7 @@ class MassFlowVisualizer(QDialog):
         if self.loadedFile:
             i = 0
             for t in self.parent.centralWidget.trnsysObj:
-                if isinstance(t, Connection):
+                if isinstance(t, ConnectionBase):
                     if (
                         "Mfr" + t.displayName in self.massFlowData.columns
                         and "T" + t.displayName in self.tempMassFlowData
@@ -436,7 +431,7 @@ class MassFlowVisualizer(QDialog):
 
     def closeEvent(self, a0):
         for t in self.parent.centralWidget.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, ConnectionBase):
                 t.firstS.labelMass.setVisible(False)
 
         self.pauseVis()

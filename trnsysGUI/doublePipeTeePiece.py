@@ -1,10 +1,12 @@
+# pylint: skip-file
+
 import typing as _tp
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
-from massFlowSolver.modelPortItems import ColdPortItem, HotPortItem
+from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
@@ -67,41 +69,42 @@ class DoublePipeTeePiece(BlockItem):
         self.outputs[0].side = (self.rotationN + 1 - 1 * self.flippedH) % 4
 
     def encode(self):
-        # Double check that no virtual block gets encoded
-        if self.isVisible():
-            portListInputs = []
-            portListOutputs = []
+        portListInputs = []
+        portListOutputs = []
 
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
-            dct = {}
+        for inp in self.inputs:
+            portListInputs.append(inp.id)
+        for output in self.outputs:
+            portListOutputs.append(output.id)
 
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["childIds"] = self.childIds
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
+        dct = {}
 
-            dictName = "Block-"
+        dct[".__BlockDict__"] = True
+        dct["BlockName"] = self.name
+        dct["BlockDisplayName"] = self.displayName
+        dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
+        dct["ID"] = self.id
+        dct["trnsysID"] = self.trnsysId
+        dct["childIds"] = self.childIds
+        dct["PortsIDIn"] = portListInputs
+        dct["PortsIDOut"] = portListOutputs
+        dct["FlippedH"] = self.flippedH
+        dct["FlippedV"] = self.flippedV
+        dct["RotationN"] = self.rotationN
+        dct["GroupName"] = self.groupName
 
-            return dictName, dct
+        dictName = "Block-"
+
+        return dictName, dct
 
     def decode(self, i, resBlockList):
         self.childIds = i["childIds"]
         super().decode(i, resBlockList)
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) \
+            -> _tp.Optional[_mfn.RealNodeBase]:
+        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, \
+            "`portItem' does not belong to this `BlockItem'."
 
         graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
 
@@ -125,66 +128,66 @@ class DoublePipeTeePiece(BlockItem):
         return None
 
     def getInternalPiping(self) -> InternalPiping:
-        coldInput1 = ColdPortItem()
-        coldInput2 = ColdPortItem()
-        coldOutput = ColdPortItem()
+        coldInput1: _mfn.PortItem = ColdPortItem()
+        coldInput2: _mfn.PortItem = ColdPortItem()
+        coldOutput: _mfn.PortItem = ColdPortItem()
         coldTeePiece = _mfn.TeePiece(self.displayName + "Cold", self.childIds[0], coldInput1, coldInput2, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput1: self.inputs[0], coldInput2: self.inputs[1], coldOutput: self.outputs[0]}
+        coldModelPortItemsToGraphicalPortItem = {
+            coldInput1: self.inputs[0], coldInput2: self.inputs[1], coldOutput: self.outputs[0]}
 
-        hotInput1 = HotPortItem()
-        hotInput2 = HotPortItem()
-        hotOutput = HotPortItem()
+        hotInput1: _mfn.PortItem = HotPortItem()
+        hotInput2: _mfn.PortItem = HotPortItem()
+        hotOutput: _mfn.PortItem = HotPortItem()
         hotTeePiece = _mfn.TeePiece(self.displayName + "Hot", self.childIds[1], hotInput1, hotInput2, hotOutput)
-        HotModelPortItemsToGraphicalPortItem = {hotInput1: self.inputs[0], hotInput2: self.inputs[1], hotOutput: self.outputs[0]}
+        hotModelPortItemsToGraphicalPortItem = {
+            hotInput1: self.inputs[0], hotInput2: self.inputs[1], hotOutput: self.outputs[0]}
 
-        ModelPortItemsToGraphicalPortItem = ColdModelPortItemsToGraphicalPortItem | HotModelPortItemsToGraphicalPortItem
+        modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
 
-        internalPiping = InternalPiping([coldTeePiece, hotTeePiece], ModelPortItemsToGraphicalPortItem)
+        internalPiping = InternalPiping([coldTeePiece, hotTeePiece], modelPortItemsToGraphicalPortItem)
 
         return internalPiping
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        if self.isVisible():
-            unitNumber = startingUnit
-            tNr = 929  # Temperature calculation from a tee-piece
+    def exportPipeAndTeeTypesForTemp(self, startingUnit): # pylint: disable=too-many-locals
+        unitNumber = startingUnit
+        tNr = 929  # Temperature calculation from a tee-piece
 
-            unitText = ""
-            ambientT = 20
+        unitText = ""
+        ambientT = 20
 
-            equationConstant = 1
+        equationConstant = 1
 
-            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
-            assert len(openLoops) == 2
-            temps = ["Cold", "Hot"]
-            for openLoop, temp in zip(openLoops, temps):
-                unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-                unitText += "!" + self.displayName + temp + "\n"
-                unitText += "PARAMETERS 0\n"
-                unitText += "INPUTS 6\n"
+        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+        assert len(openLoops) == 2
+        temps = ["Cold", "Hot"]
 
-                realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-                assert len(realNodes) == 1
-                realNode = realNodes[0]
+        for openLoop, temp in zip(openLoops, temps):
+            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+            unitText += "!" + self.displayName + temp + "\n"
+            unitText += "PARAMETERS 0\n"
+            unitText += "INPUTS 6\n"
 
-                outputVariables = realNode.serialize(nodesToIndices).outputVariables
-                for outputVariable in outputVariables:
-                    if not outputVariable:
-                        continue
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+            assert len(realNodes) == 1
+            realNode = realNodes[0]
 
-                    unitText += outputVariable.name + "\n"
+            outputVariables = realNode.serialize(nodesToIndices).outputVariables
+            for outputVariable in outputVariables:
+                if not outputVariable:
+                    continue
 
-                unitText += f"T{self.inputs[0].connectionList[0].displayName}{temp}\n"
-                unitText += f"T{self.inputs[1].connectionList[0].displayName}{temp}\n"
-                unitText += f"T{self.outputs[0].connectionList[0].displayName}{temp}\n"
+                unitText += outputVariable.name + "\n"
 
-                unitText += "***Initial values\n"
-                unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+            unitText += f"T{self.inputs[0].connectionList[0].displayName}{temp}\n"
+            unitText += f"T{self.inputs[1].connectionList[0].displayName}{temp}\n"
+            unitText += f"T{self.outputs[0].connectionList[0].displayName}{temp}\n"
 
-                unitText += "EQUATIONS 1\n"
-                unitText += "T" + self.displayName + temp + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n\n"
+            unitText += "***Initial values\n"
+            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
-                unitNumber += 1
+            unitText += "EQUATIONS 1\n"
+            unitText += "T" + self.displayName + temp + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n\n"
 
-            return unitText, unitNumber
-        else:
-            return "", startingUnit
+            unitNumber += 1
+
+        return unitText, unitNumber

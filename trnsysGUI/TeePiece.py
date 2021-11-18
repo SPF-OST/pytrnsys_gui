@@ -78,7 +78,6 @@ class TeePiece(BlockItem):
         modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
         return teePiece, modelPortItemsToGraphicalPortItem
 
-
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
             f = ""

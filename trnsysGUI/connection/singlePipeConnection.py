@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import dataclasses as _dc
-import math as _math
 import typing as _tp
 import uuid as _uuid
 
@@ -14,7 +13,7 @@ import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.singlePipeSegmentItem import SinglePipeSegmentItem
 
@@ -22,12 +21,20 @@ if _tp.TYPE_CHECKING:
     pass
 
 
-class SinglePipeConnection(Connection):
+class SinglePipeConnection(ConnectionBase):
     def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
         super().__init__(fromPort, toPort, parent)
 
     def _createSegmentItem(self, startNode, endNode):
         return SinglePipeSegmentItem(startNode, endNode, self)
+
+    def getRadius(self):
+        rad = 2
+        return rad
+
+    def deleteConnCom(self):
+        command = DeleteSinglePipeConnectionCommandBase(self, "Delete conn comand")
+        self.parent.parent().undoStack.push(command)
 
     def encode(self):
         self.logger.debug("Encoding a connection")
@@ -101,8 +108,8 @@ class SinglePipeConnection(Connection):
         for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
             realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
             for realNode in realNodesAndPortItems.realNodes:
-                for portItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
-                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[portItem]
+                for candidatePortItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
+                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[candidatePortItem]
                     if candidateGraphicalPortItem == graphicalPortItem:
                         return realNode
         return None
@@ -219,6 +226,13 @@ class SinglePipeConnection(Connection):
         unitNumber += 1
 
         return unitText, unitNumber
+
+class DeleteSinglePipeConnectionCommandBase(DeleteConnectionCommandBase):
+    def __init__(self, conn, descr):
+        super().__init__(conn, descr)
+
+    def undo(self):
+        self.conn = SinglePipeConnection(self.connFromPort, self.connToPort, self.connParent)
 
 
 @_dc.dataclass

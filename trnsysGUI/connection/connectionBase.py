@@ -33,7 +33,7 @@ def calcDist(p1, p2):
     return norm
 
 
-class Connection(_mfs.MassFlowNetworkContributorMixin):
+class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
         self.logger = parent.logger
 
@@ -57,7 +57,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.id = self.parent.idGen.getID()
         self.connId = self.parent.idGen.getConnID()
         self.trnsysId = self.parent.idGen.getTrnsysID()
-        self.createChildIds()
 
         self.segments: _tp.List[SegmentItemBase] = []
 
@@ -198,12 +197,6 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.fromPort = self.toPort
         self.toPort = temp
 
-    def createChildIds(self):
-        self.childIds = []
-        if isinstance(self.fromPort, DoublePipePortItem):
-            self.childIds.append(self.trnsysId)
-            self.childIds.append(self.parent.idGen.getTrnsysID())
-
     # Initialization
     def initNew(self, parent):
 
@@ -265,7 +258,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         tempNode = self.startNode
 
-        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
+        rad = self.getRadius()
 
         for x in range(len(segmentsCorners)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -296,10 +289,10 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             pos1 = None
             pos2 = None
 
-            if isinstance(s.startNode.parent, Connection) and s.startNode.prevNode is None:
+            if isinstance(s.startNode.parent, ConnectionBase) and s.startNode.prevNode is None:
                 # self.logger.debug("startnode is at connection")
                 pos1 = s.startNode.parent.fromPort.scenePos().x(), s.startNode.parent.fromPort.scenePos().y()
-            if isinstance(s.endNode.parent, Connection) and s.endNode.nextNode is None:
+            if isinstance(s.endNode.parent, ConnectionBase) and s.endNode.nextNode is None:
                 # self.logger.debug("endnode is at connection")
                 pos2 = s.endNode.parent.toPort.scenePos().x(), s.endNode.parent.toPort.scenePos().y()
 
@@ -349,6 +342,9 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
     def toggleMassFlowLabelVisible(self) -> None:
         self.firstS.toggleMassFlowLabelVisible()
 
+    def getRadius(self):
+        raise NotImplementedError
+
     # Makes 90deg angles of connection
     def niceConn(self):
         """
@@ -358,7 +354,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         """
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
+        rad = self.getRadius()
 
         self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
@@ -870,14 +866,14 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
             while walker.prevN() is not self.startNode:
                 # self.logger.debug("Del corner...")
-                if type(walker.parent) is not Connection:
+                if type(walker.parent) is not ConnectionBase:
                     self.parent.diagramScene.removeItem(walker.parent)
                 else:
                     self.logger.debug("Caution, this is a disrupt.")
                 walker = walker.prevN()
                 # del (walker.nextN())
 
-            if type(walker.parent) is not Connection:
+            if type(walker.parent) is not ConnectionBase:
                 self.parent.diagramScene.removeItem(walker.parent)
             else:
                 self.logger.debug("Caution.")
@@ -920,8 +916,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         del self
 
     def deleteConnCom(self):
-        command = DeleteConnectionCommand(self, "Delete conn comand")
-        self.parent.parent().undoStack.push(command)
+        raise NotImplementedError
 
     # Gradient related
     def totalLength(self):
@@ -1188,7 +1183,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         _hl.showHydraulicLoopDialog(self.fromPort, self.toPort)
 
 
-class DeleteConnectionCommand(QUndoCommand):
+class DeleteConnectionCommandBase(QUndoCommand):
     def __init__(self, conn, descr):
         super().__init__(descr)
         self.conn = conn
@@ -1201,4 +1196,4 @@ class DeleteConnectionCommand(QUndoCommand):
         self.conn = None
 
     def undo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort, self.connParent)
+        self.conn = ConnectionBase(self.connFromPort, self.connToPort, self.connParent)

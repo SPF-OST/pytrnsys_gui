@@ -9,7 +9,7 @@ from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 
 
-class CreateConnectionCommand(QUndoCommand):
+class CreateConnectionCommandBase(QUndoCommand):
     def __init__(self, fromPort, toPort, connParent, descr):
         super().__init__(descr)
         self.conn = None
@@ -18,10 +18,7 @@ class CreateConnectionCommand(QUndoCommand):
         self.connParent = connParent
 
     def redo(self):
-        if isinstance(self.connFromPort, SinglePipePortItem):
-            self.conn = SinglePipeConnection(self.connFromPort, self.connToPort, self.connParent)
-        if isinstance(self.connFromPort, DoublePipePortItem):
-            self.conn = DoublePipeConnection(self.connFromPort, self.connToPort, self.connParent)
+        raise NotImplementedError
 
     def undo(self):
         if self.conn in self.conn.parent.connectionList:

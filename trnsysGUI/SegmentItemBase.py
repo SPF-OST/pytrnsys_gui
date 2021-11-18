@@ -11,10 +11,11 @@ from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QMenu
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
+from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 
 # This is needed to avoid a circular import but still be able to type check
 if tp.TYPE_CHECKING:
-    from trnsysGUI.Connection import Connection
+    from trnsysGUI.connection.connectionBase import ConnectionBase
 
 
 def calcDist(p1, p2):
@@ -24,7 +25,7 @@ def calcDist(p1, p2):
 
 
 class SegmentItemBase(QGraphicsItemGroup):
-    def __init__(self, startNode, endNode, parent: "Connection"):
+    def __init__(self, startNode, endNode, parent: "ConnectionBase"):
         """
         A connection is displayed as a chain of segmentItems (stored in Connection.segments)
         Parameters.
@@ -452,7 +453,7 @@ class SegmentItemBase(QGraphicsItemGroup):
         else:
             self.end = self.endNode
 
-        rad = 2
+        rad = self.connection.getRadius()
 
         self.cornerChild = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.start, self.end, self.connection)
         self.firstChild = self._createSegment(self.start, self.cornerChild.node)
@@ -473,7 +474,7 @@ class SegmentItemBase(QGraphicsItemGroup):
 
     def _initInMode1(self, b):
 
-        rad = 2
+        rad = self.connection.getRadius()
 
         if b:
             if (hasattr(self.startNode.parent, "fromPort")) and (self.startNode.prevN() is None):

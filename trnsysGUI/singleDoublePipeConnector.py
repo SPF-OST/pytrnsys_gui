@@ -1,9 +1,9 @@
 import typing as _tp
 
-import massFlowSolver.networkModel as _mfn
+import massFlowSolver.networkModel as _mfn  # type: ignore[attr-defined]
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
-from massFlowSolver.modelPortItems import ColdPortItem, HotPortItem
+from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
@@ -18,10 +18,6 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         self.outputs.append(DoublePipePortItem("o", 2, self))
 
         self.changeSize()
-
-        self.childIds = []
-        self.childIds.append(self.trnsysId)
-        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG
@@ -46,59 +42,61 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
     def getInternalPiping(self) -> InternalPiping:
-        coldInput = ColdPortItem()
-        coldOutput = ColdPortItem()
+        coldInput: _mfn.PortItem = ColdPortItem()
+        coldOutput: _mfn.PortItem = ColdPortItem()
         coldConnector = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
-        ColdModelPortItemsToGraphicalPortItem = {coldInput: self.inputs[1], coldOutput: self.outputs[0]}
+        coldModelPortItemsToGraphicalPortItem = {coldInput: self.outputs[0], coldOutput: self.inputs[1]}
 
-        hotInput = HotPortItem()
-        hotOutput = HotPortItem()
+        hotInput: _mfn.PortItem = HotPortItem()
+        hotOutput: _mfn.PortItem = HotPortItem()
         hotConnector = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput)
-        HotModelPortItemsToGraphicalPortItem = {hotInput: self.inputs[0], hotOutput: self.outputs[0]}
+        hotModelPortItemsToGraphicalPortItem = {hotInput: self.inputs[0], hotOutput: self.outputs[0]}
 
-        ModelPortItemsToGraphicalPortItem = ColdModelPortItemsToGraphicalPortItem | HotModelPortItemsToGraphicalPortItem
+        modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
 
-        internalPiping = InternalPiping([coldConnector, hotConnector], ModelPortItemsToGraphicalPortItem)
+        internalPiping = InternalPiping([coldConnector, hotConnector], modelPortItemsToGraphicalPortItem)
 
         return internalPiping
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        if self.isVisible():
-            unitNumber = startingUnit
+        unitNumber = startingUnit
 
-            unitText = ""
+        unitText = ""
 
-            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
-            assert len(openLoops) == 2
-            temps = ["Cold", "Hot"]
+        openLoops = self._getOpenLoopsAndNodeToIndices()[0]  # pylint: disable=duplicate-code
+        assert len(openLoops) == 2
+        temps = ["Cold", "Hot"]
 
-            for index, (openLoop, temp) in enumerate(zip(openLoops, temps)):
-                # unitText += "UNIT " + str(unitNumber) + "\n"
-                unitText += "!" + self.displayName + temp + "\n\n"
+        for index, temp in enumerate(temps):
+            # unitText += "UNIT " + str(unitNumber) + "\n"
+            unitText += "!" + self.displayName + temp + "\n\n"
 
-                unitText += "EQUATIONS 1\n"
+            unitText += "EQUATIONS 1\n"
 
-                tIn = f"GT(Mfr{self.displayName}{temp}_A, 0)*T{self.inputs[index].connectionList[0].displayName} + " \
-                      f"LT(Mfr{self.displayName}{temp}_A, 0)*T{self.outputs[0].connectionList[0].displayName}{temp}"
-                tOut = f"T{self.displayName}{temp}"
-                unitText += f"{tOut} = {tIn}\n\n"
+            tIn = f"GT(Mfr{self.displayName}{temp}_A, 0)*T{self.inputs[index].connectionList[0].displayName} + " \
+                  f"LT(Mfr{self.displayName}{temp}_A, 0)*T{self.outputs[0].connectionList[0].displayName}{temp}"
+            tOut = f"T{self.displayName}{temp}"  # pylint: disable=duplicate-code
+            unitText += f"{tOut} = {tIn}\n\n"
 
-                unitNumber += 1
+            unitNumber += 1
 
-            return unitText, unitNumber
-        else:
-            return "", startingUnit
+        return unitText, unitNumber
 
     def getTemperatureVariableName(self, portItem) -> str:
         internalPiping = self.getInternalPiping()
+
         startingNodes = internalPiping.openLoopsStartingNodes
+        assert all(isinstance(n, _mfn.Pipe) for n in startingNodes)
+        internalPipes = [_tp.cast(_mfn.Pipe, n) for n in startingNodes]
+
         graphicalPortItems = internalPiping.modelPortItemsToGraphicalPortItem
 
         keyPortItems = [key for key, value in graphicalPortItems.items() if value == portItem]
         assert len(keyPortItems) == 1, "portItem is not unique"
         keyPortItem = keyPortItems[0]
-        for index in range(len(startingNodes)):
-            if startingNodes[index].fromNode == keyPortItem or startingNodes[index].toNode == keyPortItem:
-                return "T" + startingNodes[index].name
-        raise AssertionError("Found no internal SingleDoublePipeConnector-Connection.")
 
+        for internalPipe in internalPipes:
+            if keyPortItem in (internalPipe.fromNode, internalPipe.toNode):
+                return "T" + internalPipe.name
+
+        raise AssertionError("Found no internal SingleDoublePipeConnector-Connection.")

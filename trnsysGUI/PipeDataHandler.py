@@ -3,7 +3,7 @@
 
 import random
 
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase
 
 
 class PipeDataHandler(object):
@@ -22,7 +22,7 @@ class PipeDataHandler(object):
         f = open(self.massflowFilePath, "w")
         for ts in range(self.timeSteps):
             for t in self.diagramEditor.trnsysObj:
-                if isinstance(t, Connection):
+                if isinstance(t, ConnectionBase):
                     if ts != 100:
                         a = random.random()
                     else:

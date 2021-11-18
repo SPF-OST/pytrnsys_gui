@@ -1,15 +1,13 @@
 # pylint: skip-file
-# type: ignore
-
 import re
 
 from PyQt5.QtWidgets import QMessageBox
 
-import massFlowSolver as _mfs
-from trnsysGUI.Connection import Connection
-from trnsysGUI.TVentil import TVentil
+import massFlowSolver as _mfs  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
+from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
 
 
 class Export(object):
@@ -107,7 +105,7 @@ class Export(object):
         nameString = ""
         for t in self.trnsysObj:
 
-            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
+            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -226,7 +224,7 @@ class Export(object):
         tot = ""
 
         for t in self.trnsysObj:
-            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
+            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -314,7 +312,7 @@ class Export(object):
             loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
 
             for c in g.itemList:
-                if isinstance(c, Connection):
+                if isinstance(c, ConnectionBase):
                     loopText += "*** " + c.displayName + "\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
@@ -332,17 +330,17 @@ class Export(object):
         lossText = ""
         rightCounter = 0
 
-        for object in self.editor.groupList[0].itemList:
-            if isinstance(object, SinglePipeConnection):
+        for t in self.editor.groupList[0].itemList:
+            if isinstance(t, SinglePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
-                lossText += "P" + object.displayName + "_kW"
+                lossText += "P" + t.displayName + "_kW"
                 rightCounter += 1
-            if isinstance(object, DoublePipeConnection):
+            if isinstance(t, DoublePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
-                lossText += "P" + object.displayName + "Cold_kW" + "+"
-                lossText += "P" + object.displayName + "Hot_kW"
+                lossText += "P" + t.displayName + "Cold_kW" + "+"
+                lossText += "P" + t.displayName + "Hot_kW"
                 rightCounter += 1
 
         if rightCounter == 0:

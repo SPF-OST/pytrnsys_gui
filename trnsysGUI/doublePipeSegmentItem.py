@@ -8,11 +8,11 @@ from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defin
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
-    from trnsysGUI.Connection import Connection  # type: ignore[attr-defined]  #  pylint: disable=unused-import
+    from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]  #  pylint: disable=unused-import
 
 
 class DoublePipeSegmentItem(SegmentItemBase):
-    def __init__(self, startNode, endNode, parent: "Connection"):
+    def __init__(self, startNode, endNode, parent: "ConnectionBase"):
         super().__init__(startNode, endNode, parent)
 
         self.blueLine = QGraphicsLineItem(self)

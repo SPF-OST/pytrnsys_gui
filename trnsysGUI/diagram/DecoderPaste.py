@@ -7,7 +7,7 @@ from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
 from trnsysGUI.ExternalHx import ExternalHx
@@ -215,7 +215,7 @@ class DecoderPaste(json.JSONDecoder):
                                 cornerL[0] += offset_x
                                 cornerL[1] += offset_y
 
-                            c = Connection(
+                            c = ConnectionBase(
                                 fport,
                                 tPort,
                                 self.editor,

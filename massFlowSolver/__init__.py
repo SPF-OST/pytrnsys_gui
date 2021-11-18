@@ -99,6 +99,3 @@ class MassFlowNetworkContributorMixin:
     def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         raise NotImplementedError()
 
-    def addComment(self, firstColumn, comment):
-        spacing = 40
-        return f"{str(firstColumn).ljust(spacing)}{comment}\n"

@@ -32,7 +32,7 @@ def getOrCreateHydraulicLoop(
     return _model.HydraulicLoop("loop", water, modelConnections)
 
 
-def _getReachableConnections(port: _pi.PortItemBase) -> set[_conn.Connection]:  # type: ignore[name-defined]
+def _getReachableConnections(port: _pi.PortItemBase) -> set[_conn.ConnectionBase]:  # type: ignore[name-defined]
     assert len(port.connectionList) <= 1
 
     portItems = {port}
@@ -46,7 +46,7 @@ def _getReachableConnections(port: _pi.PortItemBase) -> set[_conn.Connection]:  
 
 def _expandPortItemSetByOneLayer(
     portItems: set[_pi.PortItemBase],  # type: ignore[name-defined]
-) -> _tp.Tuple[set[_pi.PortItemBase], set[_conn.Connection]]:  # type: ignore[name-defined]
+) -> _tp.Tuple[set[_pi.PortItemBase], set[_conn.ConnectionBase]]:  # type: ignore[name-defined]
     connections = {_getSingleConnection(p) for p in portItems if p.connectionList}
     connectionPortItems = {p for c in connections for p in [c.fromPort, c.toPort]}
 
@@ -76,7 +76,7 @@ def _getInternallyConnectedPortItems(port: _pi.PortItemBase) -> _tp.Sequence[_pi
     return allIncidentInternallyConnectedPortItems[0]
 
 
-def _getSingleConnection(portItem: _pi.PortItemBase) -> _conn.Connection:  # type: ignore[name-defined]
+def _getSingleConnection(portItem: _pi.PortItemBase) -> _conn.ConnectionBase:  # type: ignore[name-defined]
     assert len(portItem.connectionList) == 1
     return portItem.connectionList[0]
 

@@ -5,7 +5,7 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsTextItem
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase
 
 
 class Group(QGraphicsRectItem):
@@ -67,7 +67,7 @@ class Group(QGraphicsRectItem):
                 if i.scenePos().x() < min_x:
                     min_y = i.scenePos().y()
 
-            if type(i) is Connection:
+            if type(i) is ConnectionBase:
                 # ignore for center calculation
                 pass
 
@@ -94,7 +94,7 @@ class Group(QGraphicsRectItem):
         for o in itemList:
             if isinstance(o, BlockItem):
                 o.setBlockToGroup(self.displayName)
-            elif isinstance(o, Connection):
+            elif isinstance(o, ConnectionBase):
                 o.setConnToGroup(self.displayName)
             else:
                 print("Found an item which is wether Block nor Connection in setItemsGroup")
@@ -117,7 +117,7 @@ class Group(QGraphicsRectItem):
         inGroup = False
 
         for i in self.itemList:
-            if isinstance(i, Connection):
+            if isinstance(i, ConnectionBase):
                 if i.id == c.id:
                     print("Found the connection already to be in group")
                     inGroup = True
@@ -146,7 +146,7 @@ class Group(QGraphicsRectItem):
             "There are "
             + len([t for t in self.parent.parent().trnsysObj if type(t) is BlockItem])
             + " blocks and "
-            + len([t for t in self.parent.parent().trnsysObj if type(t) is Connection])
+            + len([t for t in self.parent.parent().trnsysObj if type(t) is ConnectionBase])
             + " connections"
         )
 

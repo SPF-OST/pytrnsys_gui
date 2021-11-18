@@ -20,7 +20,7 @@ import trnsysGUI.settings as _settings
 import trnsysGUI.settingsDlg as _sdlg
 import trnsysGUI.tracing as trc
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
@@ -553,7 +553,7 @@ class _MainWindow(QMainWindow):
         for t in temp:
             if isinstance(t, BlockItem):
                 t.deleteBlock()
-            elif isinstance(t, Connection):
+            elif isinstance(t, ConnectionBase):
                 t.deleteConn()
             elif isinstance(t, GraphicalItem):
                 t.deleteBlock()
