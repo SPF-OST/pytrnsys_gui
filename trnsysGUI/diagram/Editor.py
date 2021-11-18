@@ -66,6 +66,7 @@ from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
+import trnsysGUI.hydraulicLoops as _hl
 
 
 class Editor(QWidget):
@@ -77,12 +78,6 @@ class Editor(QWidget):
     Logically:
     A Connection is composed of a fromPort and a toPort, which gives the direction of the pipe.
     Ports are attached to Blocks.
-    Initially, there is a temporary fromPort set to None.
-    As soon any Port is clicked and dragged, tempStartPort is set to that Port and startedConnectino is set to True.
-    -> startConnection()
-    If the mouse is then released over a different Port, a Connection is created, otherwise startedConnection is set to False
-    and the process is interrupted.
-    -> createConnection()
     Visually:
     A diagram editor has a QGraphicsLineItem (connLineItem) which is set Visible only when a connection is being created
 
@@ -146,8 +141,7 @@ class Editor(QWidget):
         Contains the "logical" part of the diagram
     diagramView : :obj:`QGraphicsView`
         Contains the visualization of the diagramScene
-    startedConnection : Bool
-    tempStartPort : :obj:`PortItem`
+    _currentlyDraggedConnectionFromPort : :obj:`PortItem`
     connectionList : :obj:`List` of :obj:`Connection`
     trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
     graphicalObj : :obj:`List` of :obj:`GraphicalItem`
@@ -294,8 +288,7 @@ class Editor(QWidget):
         self.horizontalLayout.setStretchFactor(self.diagramView, 5)
         self.horizontalLayout.setStretchFactor(self.libraryBrowserView, 1)
 
-        self.startedConnection = False
-        self.tempStartPort = None
+        self._currentlyDraggedConnectionFromPort = None
         self.connectionList = []
         self.trnsysObj = []
         self.graphicalObj = []
@@ -380,72 +373,32 @@ class Editor(QWidget):
 
     # Connections related methods
     def startConnection(self, port):
-        """
-        When a PortItem is clicked, it is saved into the tempStartPort
+        self._currentlyDraggedConnectionFromPort = port
 
-        Parameters
-        ----------
-        port : :obj:`PortItem`
+    def _createConnectionUndoable(self, startPort, endPort):
+        if startPort == endPort:
+            raise ValueError(f"Start and end port are the same.")
 
-        Returns
-        -------
+        if (
+            isinstance(startPort.parent, StorageTank)
+            and isinstance(endPort.parent, StorageTank)
+            and startPort.parent != endPort.parent
+        ):
+            msgSTank = QMessageBox(self)
+            msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
+            msgSTank.exec_()
 
-        """
-        self.logger.debug("port is " + str(port))
-        self.tempStartPort = port
-        self.startedConnection = True
+        hydraulicLoop = _hl.getOrCreateHydraulicLoop(startPort, endPort)
 
-    def createConnection(self, startPort, endPort):
-        """
-        Creates a new connection if startPort and endPort are not the same. Is added as a command to the
-        undoStack.
-
-        Parameters
-        ----------
-        startPort : :obj:`PortItem`
-        endPort : :obj:`PortItem`
-
-        Returns
-        -------
-
-        """
-        # print("Creating connection...")
-        if startPort is not endPort:
-            # if len(endPort.connectionList) == 0:
-            # Connection(startPort, endPort, False, self)
-
-            if (
-                isinstance(startPort.parent, StorageTank)
-                and isinstance(endPort.parent, StorageTank)
-                and startPort.parent != endPort.parent
-            ):
-                msgSTank = QMessageBox(self)
-                msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
-                msgSTank.exec_()
-
-            command = CreateConnectionCommand(startPort, endPort, self, "CreateConn Command")
-            self.parent().undoStack.push(command)
+        command = CreateConnectionCommand(startPort, endPort, self, "CreateConn Command")
+        self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
-        """
-        Qt method that sets the line signalling the creation of a new connection.
-
-        Parameters
-        ----------
-        event
-
-        Returns
-        -------
-
-        """
-        if self.startedConnection:
-            # print("Started conn, should draw")
-            tempx = self.tempStartPort.scenePos().x()
-            tempy = self.tempStartPort.scenePos().y()
+        if self._currentlyDraggedConnectionFromPort:
+            tempx = self._currentlyDraggedConnectionFromPort.scenePos().x()
+            tempy = self._currentlyDraggedConnectionFromPort.scenePos().y()
             posx = event.scenePos().x()
             posy = event.scenePos().y()
-            # print(str(posx))
-            # print(str(tempx))
 
             self.connLineItem.setVisible(True)
             self.connLine.setLine(tempx, tempy, posx, posy)
@@ -453,20 +406,28 @@ class Editor(QWidget):
             self.connLineItem.setVisible(True)
 
     def sceneMouseReleaseEvent(self, event):
-        # print("Called sceneMouseReleaseEvent with startedConnection=" + str(self.startedConnection))
-        if self.startedConnection:
-            releasePos = event.scenePos()
-            itemsAtReleasePos = self.diagramScene.items(releasePos)
-            self.logger.debug("items are " + str(itemsAtReleasePos))
-            for it in itemsAtReleasePos:
-                if type(it) is PortItem:
-                    self.createConnection(self.tempStartPort, it)
-                else:
-                    self.startedConnection = False
-                    self.connLineItem.setVisible(False)
+        if not self._currentlyDraggedConnectionFromPort:
+            return
 
-                    # Not necessary
-                    # self.tempStartPort = None
+        mousePosition = event.scenePos()
+
+        hitItems = self.diagramScene.items(mousePosition)
+        hitPortItems = [i for i in hitItems if isinstance(i, PortItem)]
+        numberOfHitPortsItems = len(hitPortItems)
+
+        if numberOfHitPortsItems == 0:
+            return
+
+        if numberOfHitPortsItems > 1:
+            raise NotImplementedError("Can't deal with overlapping port items.")
+
+        hitPortItem = hitPortItems[0]
+
+        if hitPortItem != self._currentlyDraggedConnectionFromPort:
+            self._createConnectionUndoable(self._currentlyDraggedConnectionFromPort, hitPortItem)
+
+        self._currentlyDraggedConnectionFromPort = None
+        self.connLineItem.setVisible(False)
 
     def cleanUpConnections(self):
         for c in self.connectionList:

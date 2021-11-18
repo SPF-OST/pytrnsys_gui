@@ -8,8 +8,10 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
+import trnsysGUI.hydraulicLoops.dialog.serialization
+
 try:
-    from . import _UI_hydraulicLoopDialog_generated as _uigen
+    from trnsysGUI.hydraulicLoops import _UI_hydraulicLoopDialog_generated as _uigen
     import trnsysGUI.resources.QRC_resources_generated as _
 except ImportError as importError:
     raise AssertionError(
@@ -18,7 +20,7 @@ except ImportError as importError:
         "`pytrnsys_gui` directory."
     ) from importError
 
-from . import _model
+from trnsysGUI.hydraulicLoops import _model
 
 
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
@@ -136,10 +138,10 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         return individualPipeLengthM
 
     def _configureFluidComboBox(self):
-        def getFluidName(_fluid: _model.Fluid) -> str:
+        def getFluidName(_fluid: trnsysGUI.hydraulicLoops.dialog.serialization.Fluid) -> str:
             return _fluid.name
 
-        sortedFluids: _tp.Sequence[_model.Fluid] = sorted(_model.PredefinedFluids.getAllFluids(), key=getFluidName)
+        sortedFluids: _tp.Sequence[trnsysGUI.hydraulicLoops.dialog.serialization.Fluid] = sorted(_model.PredefinedFluids.getAllFluids(), key=getFluidName)
         for fluid in sortedFluids:
             self.fluidComboBox.addItem(fluid.name, userData=fluid)
 

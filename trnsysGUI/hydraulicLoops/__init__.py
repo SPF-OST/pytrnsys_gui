@@ -11,8 +11,7 @@ import trnsysGUI.PortItem as _pi
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 
-from . import _gui
-from . import _model
+from .dialog import _gui, _model
 
 
 def getOrCreateHydraulicLoop(

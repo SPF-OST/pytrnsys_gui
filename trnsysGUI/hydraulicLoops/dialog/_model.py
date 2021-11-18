@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-__all__ = ["Connection", "Fluid", "HydraulicLoop"]
+__all__ = ["Connection", "HydraulicLoop"]
 
 import dataclasses as _dc
 import typing as _tp
-import uuid as _uuid
 
-import trnsysGUI.serialization as _ser
+from trnsysGUI.hydraulicLoops.dialog.serialization import Fluid
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.Connection as _conn
@@ -19,17 +18,6 @@ class Connection:
     uValueInWPerM2K: float
     lengthInM: float
     connection: _conn.Connection  # type: ignore[name-defined]
-
-
-@_dc.dataclass
-class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
-    name: str
-    specificHeatCapacityInJPerKgK: float
-    densityInKgPerM3: float
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('5b1d8eb8-e9c0-4c6a-b14f-0a7216b60132')
 
 
 class PredefinedFluids:
