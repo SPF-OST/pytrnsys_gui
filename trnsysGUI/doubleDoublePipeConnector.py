@@ -55,24 +55,9 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         unitNumber = startingUnit
+        unitText = ""  # pylint: disable=duplicate-code
 
-        unitText = ""
-
-        openLoops = self._getOpenLoopsAndNodeToIndices()[0]
-        assert len(openLoops) == 2
-        temps = ["Cold", "Hot"]
-
-        for temp in temps:
-            # unitText += "UNIT " + str(unitNumber) + "\n"
-            unitText += "!" + self.displayName + temp + "\n\n"
-
-            unitText += "EQUATIONS 1\n"
-
-            tIn = f"GT(Mfr{self.displayName}{temp}_A, 0)*T{self.inputs[0].connectionList[0].displayName}{temp} + " \
-                  f"LT(Mfr{self.displayName}{temp}_A, 0)*T{self.outputs[0].connectionList[0].displayName}{temp}"
-            tOut = f"T{self.displayName}{temp}"
-            unitText += f"{tOut} = {tIn}\n\n"
-
-            unitNumber += 1
+        unitText += self._getEquations(self.inputs[0], "Cold")
+        unitText += self._getEquations(self.inputs[0], "Hot")
 
         return unitText, unitNumber

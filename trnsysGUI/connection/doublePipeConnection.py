@@ -133,6 +133,11 @@ class DoublePipeConnection(ConnectionBase):
         parameterNumber = 35
         inputNumbers = 6
 
+        eqConst1 = 1
+        eqConst3 = 3
+        eqConst7 = 7
+        eqConst8 = 8
+
         # default values
         lPipe = 24.384
         diPipe = 0.02618
@@ -225,73 +230,74 @@ class DoublePipeConnection(ConnectionBase):
         unitText += self._addComment(dRadn1, "! Radial distance of node -7")
         unitText += self._addComment(dRadn1, "! Radial distance of node -8")
 
-        unitText += "INPUTS " + str(inputNumbers) + "\n"
-
         openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
         assert len(openLoops) == 2
-        temps = ["Cold", "Hot"]
-        for openLoop, temp in zip(openLoops, temps):
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            assert len(realNodes) == 1
-            realNode = realNodes[0]
+        coldOpenLoop = openLoops[0]
+        hotOpenLoop = openLoops[1]
 
-            outputVariables = realNode.serialize(nodesToIndices).outputVariables
-
-            portItemsWithParent = self._getPortItemsWithParent()
-
-            assert len(portItemsWithParent) == 2
-
-            parent = portItemsWithParent[0][1]
-
-            firstColumn = f"T{parent.displayName}{temp}"
-            unitText += self._addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temp}, deg C")
-
-            firstColumn = f"{outputVariables[0].name}"
-            unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temp}, kJ/h")
-
-            parent = portItemsWithParent[1][1]
-            firstColumn = f"T{parent.displayName}{temp}"
-            unitText += self._addComment(firstColumn, "! Other side of pipe, deg C")
+        unitText += "INPUTS " + str(inputNumbers) + "\n"
+        unitText += self._getInputs(nodesToIndices, coldOpenLoop, "Cold")
+        unitText += self._getInputs(nodesToIndices, hotOpenLoop, "Hot")
 
         unitText += "***Initial values\n"
         unitText += initialValueS + "\n\n"
 
         unitText += "EQUATIONS " + str(equationNr) + "\n"
-
-        equationConstant1 = 1
-        equationConstant3 = 3
-        firstEquationConstants = [equationConstant1, equationConstant3]
-
-        equationConstant7 = 7
-        equationConstant8 = 8
-        secondEquationConstants = [equationConstant7, equationConstant8]
-
-        for openLoop, temp, firstEquationConstant, secondEquationConstant in zip(
-            openLoops, temps, firstEquationConstants, secondEquationConstants
-        ):
-            firstColumn = (
-                "T" + self.displayName + temp + " = [" + str(unitNumber) + "," + str(firstEquationConstant) + "]"
-            )
-            unitText += self._addComment(
-                firstColumn, f"! {firstEquationConstant}: Outlet fluid temperature pipe {temp}, deg C"
-            )
-
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            assert len(realNodes) == 1
-            realNode = realNodes[0]
-
-            outputVariables = realNode.serialize(nodesToIndices).outputVariables
-
-            firstColumn = f"Mfr{self.displayName}{temp} = {outputVariables[0].name}"
-            unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temp}, kg/h")
-
-            firstColumn = f"P{self.displayName}{temp}_kW = [{unitNumber},{secondEquationConstant}]/3600"
-            unitText += self._addComment(firstColumn, f"! {secondEquationConstant}: Delivered energy pipe {temp}, kJ/h")
+        unitText += self._getEquations(eqConst1, eqConst7, coldOpenLoop, nodesToIndices, unitNumber, "Cold")
+        unitText += self._getEquations(eqConst3, eqConst8, hotOpenLoop, nodesToIndices, unitNumber, "Hot")
 
         unitNumber += 1
         unitText += "\n"
 
         return unitText, unitNumber
+
+    def _getInputs(self, nodesToIndices, openLoop, temperature):
+        realNode = self._getRealNode(openLoop)
+
+        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+        outputVariable = outputVariables[0]
+
+        portItemsWithParent = self._getPortItemsWithParent()
+        assert len(portItemsWithParent) == 2
+
+        parent = portItemsWithParent[0][1]
+        firstColumn = f"T{parent.displayName}{temperature}"
+        unitText = self._addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temperature}, deg C")
+
+        firstColumn = f"{outputVariable.name}"
+        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperature}, kJ/h")
+
+        parent = portItemsWithParent[1][1]
+        firstColumn = f"T{parent.displayName}{temperature}"
+        unitText += self._addComment(firstColumn, "! Other side of pipe, deg C")
+
+        return unitText
+
+    @staticmethod
+    def _getRealNode(openLoop):
+        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+        assert len(realNodes) == 1
+        realNode = realNodes[0]
+        return realNode
+
+    def _getEquations(
+            self, equationConstant1, equationConstant2, openLoop, nodesToIndices, unitNumber, temperature: object
+    ):
+        realNode = self._getRealNode(openLoop)
+        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+        outputVariable = outputVariables[0]
+
+        firstColumn = (
+                "T" + self.displayName + temperature + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
+        )
+        unitText = self._addComment(
+            firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperature}, deg C"
+        )
+        firstColumn = f"Mfr{self.displayName}{temperature} = {outputVariable.name}"
+        unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperature}, kg/h")
+        firstColumn = f"P{self.displayName}{temperature}_kW = [{unitNumber},{equationConstant2}]/3600"
+        unitText += self._addComment(firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperature}, kJ/h")
+        return unitText
 
     @staticmethod
     def _addComment(firstColumn, comment):

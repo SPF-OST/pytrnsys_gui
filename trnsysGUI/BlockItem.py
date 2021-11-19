@@ -17,6 +17,7 @@ from trnsysGUI import idGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -749,7 +750,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     # Export related
     def exportBlackBox(self):
         equation = []
-        if len(self.inputs + self.outputs) == 2 and self.isVisible():
+        if len(self.inputs + self.outputs) == 2 and not isinstance(self.outputs[0], DoublePipePortItem):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not (files):
                 status = "noDdckFile"

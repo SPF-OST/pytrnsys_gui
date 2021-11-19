@@ -386,20 +386,14 @@ class Export(object):
         f += "\n"
 
         s = ""
+        equationType = "Mfr"
         breakline = 0
         for t in self.trnsysObj:
             if isinstance(t, SinglePipeConnection):
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "Mfr" + t.displayName + " "
+                breakline, s = self._getEquation(breakline, s, t, "", equationType)
             if isinstance(t, DoublePipeConnection):
-                temps = ["Cold", "Hot"]
-                for temp in temps:
-                    breakline += 1
-                    if breakline % 8 == 0:
-                        s += "\n"
-                    s += "Mfr" + t.displayName + temp + " "
+                breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
+                breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
             if isinstance(t, TVentil) and t.isVisible():
                 breakline += 1
                 if breakline % 8 == 0:
@@ -408,6 +402,13 @@ class Export(object):
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
+
+    def _getEquation(self, breakline, s, t, temperature, equationType):
+        breakline += 1
+        if breakline % 8 == 0:
+            s += "\n"
+        s += equationType + t.displayName + temperature + " "
+        return breakline, s
 
     def exportTempPrinter(self, unitnr, descLen):
 
@@ -447,20 +448,14 @@ class Export(object):
         f += "\n"
 
         s = ""
+        equationType = "T"
         breakline = 0
         for t in self.trnsysObj:
             if isinstance(t, SinglePipeConnection):
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "T" + t.displayName + " "
+                breakline, s = self._getEquation(breakline, s, t, "", equationType)
             if isinstance(t, DoublePipeConnection):
-                temps = ["Cold", "Hot"]
-                for temp in temps:
-                    breakline += 1
-                    if breakline % 8 == 0:
-                        s += "\n"
-                    s += "T" + t.displayName + temp + " "
+                breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
+                breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f

@@ -154,40 +154,45 @@ class DoublePipeTeePiece(BlockItem):
 
         unitText = ""
         ambientT = 20
-
         equationConstant = 1
 
         openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
         assert len(openLoops) == 2
-        temps = ["Cold", "Hot"]
+        coldOpenLoop = openLoops[0]
+        hotOpenLoop = openLoops[1]
 
-        for openLoop, temp in zip(openLoops, temps):
-            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-            unitText += "!" + self.displayName + temp + "\n"
-            unitText += "PARAMETERS 0\n"
-            unitText += "INPUTS 6\n"
-
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            assert len(realNodes) == 1
-            realNode = realNodes[0]
-
-            outputVariables = realNode.serialize(nodesToIndices).outputVariables
-            for outputVariable in outputVariables:
-                if not outputVariable:
-                    continue
-
-                unitText += outputVariable.name + "\n"
-
-            unitText += f"T{self.inputs[0].connectionList[0].displayName}{temp}\n"
-            unitText += f"T{self.inputs[1].connectionList[0].displayName}{temp}\n"
-            unitText += f"T{self.outputs[0].connectionList[0].displayName}{temp}\n"
-
-            unitText += "***Initial values\n"
-            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
-
-            unitText += "EQUATIONS 1\n"
-            unitText += "T" + self.displayName + temp + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n\n"
-
-            unitNumber += 1
-
+        unitNumber, unitText = self._getExport(ambientT, equationConstant, nodesToIndices, coldOpenLoop, tNr,
+                                                "Cold", unitNumber, unitText)
+        unitNumber, unitText = self._getExport(ambientT, equationConstant, nodesToIndices, hotOpenLoop, tNr, "Hot",
+                                                unitNumber, unitText)
         return unitText, unitNumber
+
+    def _getExport(self, ambientT, equationConstant, nodesToIndices, openLoop, tNr, temperature, unitNumber, unitText):
+        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+        unitText += "!" + self.displayName + temperature + "\n"
+        unitText += "PARAMETERS 0\n"
+        unitText += "INPUTS 6\n"
+
+        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+        assert len(realNodes) == 1
+        realNode = realNodes[0]
+
+        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+        for outputVariable in outputVariables:
+            if not outputVariable:
+                continue
+
+            unitText += outputVariable.name + "\n"
+
+        unitText += f"T{self.inputs[0].connectionList[0].displayName}{temperature}\n"
+        unitText += f"T{self.inputs[1].connectionList[0].displayName}{temperature}\n"
+        unitText += f"T{self.outputs[0].connectionList[0].displayName}{temperature}\n"
+
+        unitText += "***Initial values\n"
+        unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+
+        unitText += "EQUATIONS 1\n"
+        unitText += "T" + self.displayName + temperature + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n\n"
+        unitNumber += 1
+
+        return unitNumber, unitText
