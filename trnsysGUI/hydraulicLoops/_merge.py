@@ -23,7 +23,7 @@ def merge(
 ) -> _tp.Optional["UndoCommand"]:
     merger = _Merger(hydraulicLoops, defaultFluid)
 
-    return merger.createMergeOrExtendCommand(fromPort, toPort, createConnectionCommand)
+    return merger.createUndoCommand(fromPort, toPort, createConnectionCommand)
 
 
 class _Merger:
@@ -31,7 +31,7 @@ class _Merger:
         self._hydraulicLoops = hydraulicLoops
         self.defaultFluid = defaultFluid
 
-    def createMergeOrExtendCommand(
+    def createUndoCommand(
         self,
         fromPort: _pi.PortItem,  # type: ignore[name-defined]
         toPort: _pi.PortItem,  # type: ignore[name-defined]

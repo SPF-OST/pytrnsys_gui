@@ -737,7 +737,7 @@ class segmentItem(QGraphicsLineItem):
         a3.triggered.connect(self.connection.invertConnection)
 
         editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
-        editHydraulicLoopAction.triggered.connect(self.connection._editHydraulicLoop)
+        editHydraulicLoopAction.triggered.connect(self.connection.editHydraulicLoop)
 
         a4 = menu.addAction("Toggle name")
         a4.triggered.connect(self.connection.toggleLabelVisible)

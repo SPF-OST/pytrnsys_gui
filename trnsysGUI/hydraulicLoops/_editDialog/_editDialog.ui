@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>722</width>
-    <height>565</height>
+    <width>459</width>
+    <height>537</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Hydraulic loop properties</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,10,1">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="generalGroupBox">
      <property name="sizePolicy">
@@ -56,6 +56,22 @@
        </widget>
       </item>
       <item>
+       <widget class="QWidget" name="invalidNameWarningWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>22</width>
+          <height>22</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The name is already taken&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">image: url(:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-warning.svg);</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -65,7 +81,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>13</width>
+          <width>0</width>
           <height>19</height>
          </size>
         </property>
@@ -104,7 +120,7 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>161</width>
+          <width>130</width>
           <height>19</height>
          </size>
         </property>
@@ -252,7 +268,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The total length will be distributed evenly among the pipes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The total length will be distributed evenly among the pipes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="styleSheet">
                <string notr="true">image: url(:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-information.svg);</string>

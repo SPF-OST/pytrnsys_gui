@@ -6,7 +6,7 @@ import typing as _tp
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
-import PyQt5.QtWidgets as _qtw
+from PyQt5 import QtWidgets as _qtw
 
 try:
     from . import _UI_editDialog_generated as _uigen
@@ -23,20 +23,44 @@ from .. import model as _model
 
 
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
-    def __init__(self, hydraulicLoop: _gmodel.HydraulicLoop, fluids: _model.Fluids):
+    def __init__(self, hydraulicLoop: _gmodel.HydraulicLoop, invalidNames: _tp.Sequence[str], fluids: _model.Fluids):
         super().__init__()
         self.setupUi(self)
 
         self.hydraulicLoop = hydraulicLoop
+        self._invalidNames: _tp.Set[str] = {*invalidNames}
         self._fluids = fluids
 
+        self._configureLoopName()
         self.loopName.setText(hydraulicLoop.name)
 
         self._configureBulkOperations()
 
         self._configureFluidComboBox()
 
+        fluidIndex = self.fluidComboBox.findData(self.hydraulicLoop.fluid)
+        assert fluidIndex >= 0
+        self.fluidComboBox.setCurrentIndex(fluidIndex)
+
         self._reloadConnections()
+
+    def _configureLoopName(self):
+        def onNameChanged(newName) -> None:
+            self.hydraulicLoop.name = newName
+
+            isNameValid = self._isNameValid(newName)
+
+            isWarningVisible = not isNameValid
+            self.invalidNameWarningWidget.setVisible(isWarningVisible)
+
+            okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.Ok)
+            isOkButtonEnabled = isNameValid
+            okButton.setEnabled(isOkButtonEnabled)
+
+        self.loopName.textChanged.connect(onNameChanged)
+
+    def _isNameValid(self, newName: str) -> bool:
+        return newName not in self._invalidNames
 
     def _configureBulkOperations(self):
         def setTotalLoopLengthInfoToolTipVisible(_) -> None:
@@ -147,8 +171,10 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self.fluidComboBox.currentIndexChanged.connect(onCurrentIndexChanged)
 
     @classmethod
-    def showDialog(cls, hydraulicLoop: _gmodel.HydraulicLoop, fluids: _model.Fluids) -> _tp.Literal["oked", "cancelled"]:
-        dialog = HydraulicLoopDialog(hydraulicLoop, fluids)
+    def showDialog(
+        cls, hydraulicLoop: _gmodel.HydraulicLoop, invalidNames: _tp.Sequence[str], fluids: _model.Fluids
+    ) -> _tp.Literal["oked", "cancelled"]:
+        dialog = HydraulicLoopDialog(hydraulicLoop, invalidNames, fluids)
 
         dialogCode = dialog.exec()
 

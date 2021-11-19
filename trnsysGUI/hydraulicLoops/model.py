@@ -40,9 +40,7 @@ class AutomaticallyGeneratedName(Name):
 
 class HydraulicLoop:
     def __init__(
-        self, name: Name,
-            fluid: _ser.Fluid,
-            connections: _tp.Sequence[_conn.Connection]  # type: ignore[name-defined]
+        self, name: Name, fluid: _ser.Fluid, connections: _tp.Sequence[_conn.Connection]  # type: ignore[name-defined]
     ) -> None:
         self.name = name
         self.fluid = fluid
@@ -72,12 +70,30 @@ class HydraulicLoops:
 
         self.hydraulicLoops = [*hydraulicLoops]
 
+    @staticmethod
+    def createLoops(
+        connections: _tp.Sequence[_conn.Connection], fluid: Fluid  # type: ignore[name-defined]
+    ) -> "HydraulicLoops":
+        loops = HydraulicLoops([])
+
+        todo = connections
+        while todo:
+            nextConnection = todo[0]
+            reachableConnections = _search.getReachableConnections(nextConnection.fromPort)
+            todo = [c for c in todo if c not in reachableConnections]
+
+            name = loops.generateName()
+            loop = HydraulicLoop(name, fluid, list(reachableConnections))
+            loops.addLoop(loop)
+
+        return loops
+
     @classmethod
     def createFromJson(
-            cls,
-            sequence: _tp.Sequence[_tp.Dict],
-            connections: _tp.Sequence[_conn.Connection], # type: ignore[name-defined]
-            fluids: "Fluids"
+        cls,
+        sequence: _tp.Sequence[_tp.Dict],
+        connections: _tp.Sequence[_conn.Connection],  # type: ignore[name-defined]
+        fluids: "Fluids",
     ) -> "HydraulicLoops":
         serializedLoops = [_ser.HydraulicLoop.from_dict(o) for o in sequence]
 
@@ -121,7 +137,7 @@ class HydraulicLoops:
         return loop
 
     def getLoop(self, name: str) -> _tp.Optional[HydraulicLoop]:
-        loop = _getSingleOrNone(l for l in self.hydraulicLoops if l.name == name)
+        loop = _getSingleOrNone(l for l in self.hydraulicLoops if l.name.value == name)
         return loop
 
     def addLoop(self, loop: HydraulicLoop) -> None:

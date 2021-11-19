@@ -378,7 +378,8 @@ class Editor(QWidget):
 
         createConnectionsCommand = CreateConnectionCommand(startPort, endPort, self)
 
-        mergeLoopsCommand = _hl.merge(startPort, endPort, self._hydraulicLoops, createConnectionsCommand)
+        defaultFluid = self._fluids.WATER
+        _hl.merge(startPort, endPort, self._hydraulicLoops, defaultFluid, createConnectionsCommand)
 
         self.parent().undoStack.push(createConnectionsCommand)
 
@@ -754,6 +755,10 @@ class Editor(QWidget):
             self.logger.debug("Tr obj is" + str(t) + " " + str(t.trnsysId))
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " + str(t.isTempering))
+
+        # TODO@damian.birchler
+        self._fluids = _hlm.Fluids([])
+        self._hydraulicLoops = _hlm.HydraulicLoops.createLoops(self.connectionList, self._fluids.WATER)
 
     def exportSvg(self):
         """
@@ -1209,6 +1214,6 @@ class Editor(QWidget):
             self.logger.info("Creating " + controlFolder)
             os.makedirs(controlFolder)
 
-    def _editHydraulicLoop(self, connection: Connection):
+    def editHydraulicLoop(self, connection: Connection):
         hydraulicLoop = self._hydraulicLoops.getLoopForPortItem(connection.fromPort)
-        _hl.edit(hydraulicLoop)
+        _hl.edit(hydraulicLoop, self._hydraulicLoops, self._fluids)

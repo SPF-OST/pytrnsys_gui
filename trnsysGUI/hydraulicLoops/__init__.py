@@ -11,14 +11,19 @@ from . import _merge
 merge = _merge.merge
 
 
-def edit(hydraulicLoop: _model.HydraulicLoop, fluids: _model.Fluids) -> None:  # type: ignore[name-defined]
+def edit(
+        hydraulicLoop: _model.HydraulicLoop,
+        hydraulicLoops: _model.HydraulicLoops,
+        fluids: _model.Fluids) -> None:
     guiHydraulicLoop = _createGuiLoop(hydraulicLoop)
 
-    okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(guiHydraulicLoop, fluids)
+    occupiedNames = [l.name.value for l in hydraulicLoops.hydraulicLoops if l != hydraulicLoop]
+
+    okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(guiHydraulicLoop, occupiedNames, fluids)
     if okedOrCancelled == "cancelled":
         return
 
-    _applyModel(guiHydraulicLoop)
+    _applyModel(guiHydraulicLoop, hydraulicLoop)
 
 
 def _createGuiLoop(hydraulicLoop: _model.HydraulicLoop) -> _gmodel.HydraulicLoop:
@@ -30,8 +35,16 @@ def _createGuiLoop(hydraulicLoop: _model.HydraulicLoop) -> _gmodel.HydraulicLoop
     return guiLoop
 
 
-def _applyModel(hydraulicLoop: _gmodel.HydraulicLoop) -> None:
-    for model in hydraulicLoop.connections:
+def _applyModel(guiHydraulicLoop: _gmodel.HydraulicLoop, hydraulicLoop: _model.HydraulicLoop) -> None:
+    # TODO@damian.birchler Make sure loop name is valid
+    oldName = hydraulicLoop.name.value
+    newName = guiHydraulicLoop.name
+    if oldName != newName:
+        hydraulicLoop.name = _model.UserDefinedName(newName)
+
+    hydraulicLoop.fluid = guiHydraulicLoop.fluid
+
+    for model in guiHydraulicLoop.connections:
         connection = model.connection
 
         connection.setName(model.name)

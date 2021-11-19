@@ -1318,7 +1318,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         pass
 
     def editHydraulicLoop(self) -> None:
-        _hl.showHydraulicLoopDialog(self.fromPort, self.toPort)
+        self.parent.editHydraulicLoop(self)
 
 
 class DeleteConnectionCommand(QUndoCommand):

@@ -22,7 +22,7 @@ class MergeResult:
     fluid: _model.Fluid
 
 
-class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_Dialog):
+class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
     def __init__(self, loop1: _model.HydraulicLoop, loop2: _model.HydraulicLoop):
         super().__init__()
         self.setupUi(self)
@@ -34,4 +34,5 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_Dialog):
     def showDialogAndGetResult(
         loop1: _model.HydraulicLoop, loop2: _model.HydraulicLoop  # pylint: disable=unused-argument
     ) -> _tp.Union[_tp.Literal["cancelled"], MergeResult]:
+        # TODO@damian.birchler
         return "cancelled"
