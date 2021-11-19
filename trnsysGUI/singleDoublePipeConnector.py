@@ -62,12 +62,23 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         unitNumber = startingUnit
         unitText = ""
 
-        unitText += self._getEquations(self.inputs[0], "Cold")
-        unitText += self._getEquations(self.inputs[1], "Hot")
+        unitText += self._getEquation(self.inputs[0], "Cold")
+        unitText += self._getEquation(self.inputs[1], "Hot")
 
         unitNumber += 1
 
         return unitText, unitNumber
+
+    def _getEquation(self, inp, temperature):
+        unitText = "!" + self.displayName + temperature + "\n"
+        unitText += "EQUATIONS 1\n"
+
+        tIn = f"GT(Mfr{self.displayName}{temperature}_A, 0)*T{inp.connectionList[0].displayName} + " \
+              f"LT(Mfr{self.displayName}{temperature}_A, 0)*" \
+              f"T{self.outputs[0].connectionList[0].displayName}{temperature}"  # pylint: disable=duplicate-code
+        tOut = f"T{self.displayName}{temperature}"
+        unitText += f"{tOut} = {tIn}\n\n"
+        return unitText
 
     def getTemperatureVariableName(self, portItem) -> str:
         internalPiping = self.getInternalPiping()

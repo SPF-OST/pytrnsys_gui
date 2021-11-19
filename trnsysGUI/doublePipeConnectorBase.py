@@ -117,14 +117,3 @@ class DoublePipeConnectorBase(BlockItem):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError
-
-    def _getEquations(self, inp, temperature):
-        unitText = "!" + self.displayName + temperature + "\n"
-        unitText += "EQUATIONS 1\n"
-
-        tIn = f"GT(Mfr{self.displayName}{temperature}_A, 0)*T{inp.connectionList[0].displayName} + " \
-              f"LT(Mfr{self.displayName}{temperature}_A, 0)*" \
-              f"T{self.outputs[0].connectionList[0].displayName}{temperature}"
-        tOut = f"T{self.displayName}{temperature}"  # pylint: disable=duplicate-code
-        unitText += f"{tOut} = {tIn}\n\n"
-        return unitText

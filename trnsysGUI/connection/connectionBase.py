@@ -204,7 +204,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self.parent.trnsysObj.append(self)
 
-        self.displayName = "Conn_" + str(self.connId)
+        self.displayName = "Conn" + str(self.connId)
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")
