@@ -8,27 +8,27 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.hydraulicLoops.dialog.serialization
-
 try:
-    from trnsysGUI.hydraulicLoops import _UI_hydraulicLoopDialog_generated as _uigen
+    from . import _UI_editDialog_generated as _uigen
     import trnsysGUI.resources.QRC_resources_generated as _
 except ImportError as importError:
-    raise AssertionError(
+    raise AssertionError(  # pylint: disable=duplicate-code  # 1
         "Could not find the generated Python code for a .ui or .qrc file. Please run the "
         "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
         "`pytrnsys_gui` directory."
     ) from importError
 
-from trnsysGUI.hydraulicLoops import _model
+from . import model as _gmodel
+from .. import model as _model
 
 
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
-    def __init__(self, hydraulicLoop: _model.HydraulicLoop):
+    def __init__(self, hydraulicLoop: _gmodel.HydraulicLoop, fluids: _model.Fluids):
         super().__init__()
         self.setupUi(self)
 
         self.hydraulicLoop = hydraulicLoop
+        self._fluids = fluids
 
         self.loopName.setText(hydraulicLoop.name)
 
@@ -138,11 +138,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         return individualPipeLengthM
 
     def _configureFluidComboBox(self):
-        def getFluidName(_fluid: trnsysGUI.hydraulicLoops.dialog.serialization.Fluid) -> str:
-            return _fluid.name
-
-        sortedFluids: _tp.Sequence[trnsysGUI.hydraulicLoops.dialog.serialization.Fluid] = sorted(_model.PredefinedFluids.getAllFluids(), key=getFluidName)
-        for fluid in sortedFluids:
+        for fluid in self._fluids.fluids:
             self.fluidComboBox.addItem(fluid.name, userData=fluid)
 
         def onCurrentIndexChanged(_) -> None:
@@ -150,9 +146,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         self.fluidComboBox.currentIndexChanged.connect(onCurrentIndexChanged)
 
-    @staticmethod
-    def showDialog(hydraulicLoop: _model.HydraulicLoop) -> _tp.Literal["oked", "cancelled"]:
-        dialog = HydraulicLoopDialog(hydraulicLoop)
+    @classmethod
+    def showDialog(cls, hydraulicLoop: _gmodel.HydraulicLoop, fluids: _model.Fluids) -> _tp.Literal["oked", "cancelled"]:
+        dialog = HydraulicLoopDialog(hydraulicLoop, fluids)
 
         dialogCode = dialog.exec()
 
@@ -171,8 +167,8 @@ _PropertyValue = _tp.Union[str, float]
 @_dc.dataclass
 class _Property:
     header: str
-    getter: _tp.Callable[[_model.Connection], _PropertyValue]
-    setter: _tp.Optional[_tp.Callable[[_model.Connection, _PropertyValue], None]] = None
+    getter: _tp.Callable[[_gmodel.Connection], _PropertyValue]
+    setter: _tp.Optional[_tp.Callable[[_gmodel.Connection, _PropertyValue], None]] = None
     shallHighlightOutliers: bool = True
 
 
@@ -185,20 +181,20 @@ def _parsePositiveFloat(text: str) -> float:
     return value
 
 
-def _setConnectionDiameter(connection: _model.Connection, diameterInCmText: _tp.Any) -> None:
+def _setConnectionDiameter(connection: _gmodel.Connection, diameterInCmText: _tp.Any) -> None:
     connection.diameterInCm = _parsePositiveFloat(diameterInCmText)
 
 
-def _setConnectionUValue(connection: _model.Connection, uValueInWPerM2KText: _tp.Any) -> None:
+def _setConnectionUValue(connection: _gmodel.Connection, uValueInWPerM2KText: _tp.Any) -> None:
     connection.uValueInWPerM2K = _parsePositiveFloat(uValueInWPerM2KText)
 
 
-def _setConnectionLength(connection: _model.Connection, lengthInMText: _tp.Any) -> None:
+def _setConnectionLength(connection: _gmodel.Connection, lengthInMText: _tp.Any) -> None:
     connection.lengthInM = _parsePositiveFloat(lengthInMText)
 
 
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
-    c: _model.Connection
+    c: _gmodel.Connection
     _PROPERTIES = [
         _Property("Name", lambda c: c.name, shallHighlightOutliers=False),
         _Property("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
@@ -206,7 +202,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         _Property("Length [m]", lambda c: c.lengthInM, _setConnectionLength),
     ]
 
-    def __init__(self, connections: _tp.Sequence[_model.Connection]):
+    def __init__(self, connections: _tp.Sequence[_gmodel.Connection]):
         super().__init__()
 
         self.connections = connections
@@ -288,7 +284,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         return True
 
-    def _getConnectionAndProperty(self, modelIndex: _qtc.QModelIndex) -> _tp.Tuple[_model.Connection, _Property]:
+    def _getConnectionAndProperty(self, modelIndex: _qtc.QModelIndex) -> _tp.Tuple[_gmodel.Connection, _Property]:
         rowIndex = modelIndex.row()
         connection = self.connections[rowIndex]
 

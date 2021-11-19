@@ -19,6 +19,7 @@ class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
 @_dc.dataclass
 class HydraulicLoop(_ser.UpgradableJsonSchemaMixinVersion0):
     name: str
+    hasUserDefinedName: bool
     fluidName: str
     connectionsTrnsysId: _tp.Sequence[int]
 

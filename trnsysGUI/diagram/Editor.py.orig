@@ -993,13 +993,13 @@ class Editor(QWidget):
                 # connectionList[0] is the hidden connection created when the portPair is
                 i = 0
                 # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
-                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
+                while (p.connectionList[i]._fromPort.parent) == (p.connectionList[i]._toPort.parent):
                     i += 1
                 if len(p.connectionList) >= i + 1:
-                    if p.connectionList[i].fromPort is p:
-                        res.append(p.connectionList[i].toPort)
-                    elif p.connectionList[i].toPort is p:
-                        res.append(p.connectionList[i].fromPort)
+                    if p.connectionList[i]._fromPort is p:
+                        res.append(p.connectionList[i]._toPort)
+                    elif p.connectionList[i]._toPort is p:
+                        res.append(p.connectionList[i]._fromPort)
                     else:
                         self.logger.debug("Port is not fromPort nor toPort")
 

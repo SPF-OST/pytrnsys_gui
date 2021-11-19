@@ -1,34 +1,70 @@
-import typing as _tp
+from __future__ import annotations
+
+__all__ = ["Fluid", "HydraulicLoop", "HydraulicLoops", "Fluids"]
+
+import abc as _abc
 import itertools as _it
+import typing as _tp
 
-import trnsysGUI.Connection as _conn
+import trnsysGUI.PortItem as _pi  # type: ignore[name-defined]
+from . import _search
+from . import _serialization as _ser
 
-from . import serialization as _ser
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.Connection as _conn  # type: ignore[name-defined]
+
+Fluid = _ser.Fluid
+
+
+class Name(_abc.ABC):
+    def __init__(self, value: str):
+        self.value = value
+
+    @property
+    @_abc.abstractmethod
+    def isUserDefined(self) -> bool:
+        raise NotImplementedError()
+
+
+class UserDefinedName(Name):
+    @property
+    def isUserDefined(self) -> bool:
+        return True
+
+
+class AutomaticallyGeneratedName(Name):
+    @property
+    def isUserDefined(self) -> bool:
+        return False
 
 
 class HydraulicLoop:
-    def __init__(self, name: str, fluid: _ser.Fluid, connections: _tp.Sequence[_conn.Connection]) -> None:
+    def __init__(
+        self, name: Name,
+            fluid: _ser.Fluid,
+            connections: _tp.Sequence[_conn.Connection]  # type: ignore[name-defined]
+    ) -> None:
         self.name = name
         self.fluid = fluid
-        self.connections = [*connections]
+        self.connections: _tp.List[_conn.Connection] = [*connections]  # type: ignore[name-defined]
 
-    def addConnection(self, connection: _conn.Connection) -> None:
+    def addConnection(self, connection: _conn.Connection) -> None:  # type: ignore[name-defined]
         if self.containsConnection(connection):
             raise ValueError(f"Connection '{connection.displayName}' already part of hydraulic loop '{self.name}'.")
 
         self.connections.append(connection)
 
-    def removeConnection(self, connection: _conn.Connection) -> None:
+    def removeConnection(self, connection: _conn.Connection) -> None:  # type: ignore[name-defined]
         if not self.containsConnection(connection):
             raise ValueError(f"Connection '{connection.displayName}' does not belong to hydraulic loop {self.name}.")
 
-    def containsConnection(self, connection: _conn.Connection):
+    def containsConnection(self, connection: _conn.Connection):  # type: ignore[name-defined]
         return connection in self.connections
 
 
 class HydraulicLoops:
     def __init__(self, hydraulicLoops: _tp.Sequence[HydraulicLoop]) -> None:
-        duplicateNames = _getDuplicates(l.name for l in hydraulicLoops)
+        duplicateNames = _getDuplicates(l.name.value for l in hydraulicLoops)
         if duplicateNames:
             raise ValueError(
                 f"Hydraulic loop names must be unique (the following names were duplicated: {','.join(duplicateNames)})."
@@ -36,23 +72,80 @@ class HydraulicLoops:
 
         self.hydraulicLoops = [*hydraulicLoops]
 
+    @classmethod
+    def createFromJson(
+            cls,
+            sequence: _tp.Sequence[_tp.Dict],
+            connections: _tp.Sequence[_conn.Connection], # type: ignore[name-defined]
+            fluids: "Fluids"
+    ) -> "HydraulicLoops":
+        serializedLoops = [_ser.HydraulicLoop.from_dict(o) for o in sequence]
+
+        connectionsByTrnsysId = {c.trnsysId: c for c in connections}
+
+        loops = []
+        for serializedLoop in serializedLoops:
+            loop = cls._createLoop(serializedLoop, connectionsByTrnsysId, fluids)
+            loops.append(loop)
+
+        return HydraulicLoops(loops)
+
+    @classmethod
+    def _createLoop(
+        cls,
+        serializedLoop: _ser.HydraulicLoop,
+        connectionsByTrnsysId: _tp.Mapping[int, _conn.Connection],  # type: ignore[name-defined]
+        fluids: "Fluids",
+    ) -> HydraulicLoop:
+        name = cls._createName(serializedLoop)
+
+        fluid = fluids.getFluid(serializedLoop.fluidName)
+        assert fluid, f"Unknown fluid {serializedLoop.fluidName}"
+
+        connections = [connectionsByTrnsysId[i] for i in serializedLoop.connectionsTrnsysId]
+
+        loop = HydraulicLoop(name, fluid, connections)
+        return loop
+
     @staticmethod
-    def createFromJson(self, sequence: _tp.Sequence[_tp.Dict]) -> "HydraulicLoops":
-        hydraulicLoops = [_ser.HydraulicLoop.from_dict(o) for o in sequence]
-        return HydraulicLoops(hydraulicLoops)
+    def _createName(serializedLoop: _ser.HydraulicLoop) -> Name:
+        isUserDefinedName = serializedLoop.hasUserDefinedName
+        nameValue = serializedLoop.name
+        name = UserDefinedName(nameValue) if isUserDefinedName else AutomaticallyGeneratedName(nameValue)
+        return name
+
+    def getLoopForPortItem(self, portItem: _pi.PortItem) -> _tp.Optional[HydraulicLoop]:  # type: ignore[name-defined]
+        connections = _search.getReachableConnections(portItem)
+        loops = {self._getLoopForConnection(c) for c in connections}
+        loop = _getSingleOrNone(loops)
+        return loop
+
+    def getLoop(self, name: str) -> _tp.Optional[HydraulicLoop]:
+        loop = _getSingleOrNone(l for l in self.hydraulicLoops if l.name == name)
+        return loop
 
     def addLoop(self, loop: HydraulicLoop) -> None:
-        if self.getLoop(loop.name):
-            raise ValueError(f"There already exists a loop with name '{loop.name}'.")
+        if self.getLoop(loop.name.value):
+            raise ValueError(f"Loop with name '{loop.name.value}' already exists.")
 
         self.hydraulicLoops.append(loop)
 
     def removeLoop(self, loop: HydraulicLoop) -> None:
-        if not self.getLoop(loop.name):
-            raise ValueError(f"Unknown loop: '{loop.name}'.")
+        self.hydraulicLoops.remove(loop)
 
-    def getLoop(self, name: str) -> _tp.Optional[HydraulicLoop]:
-        return _getUnique(name, self.hydraulicLoops, lambda l: l.name)
+    def generateName(self) -> AutomaticallyGeneratedName:
+        for i in range(1, 100000):
+            candidateName = f"loop{i}"
+            if not self.getLoop(candidateName):
+                generatedName = candidateName
+                return AutomaticallyGeneratedName(generatedName)
+
+        raise AssertionError(f"Failed to generate new name after {i} tries.")
+
+    def _getLoopForConnection(self, connection: _conn.Connection) -> HydraulicLoop:  # type: ignore[name-defined]
+        loops = {l for l in self.hydraulicLoops if connection in l.connections}
+        loop = _getSingle(loops)
+        return loop
 
 
 class Fluids:
@@ -84,26 +177,40 @@ class Fluids:
         return Fluids(fluids)
 
     def getFluid(self, name: str) -> _tp.Optional[_ser.Fluid]:
-        return _getUnique(name, self.fluids, lambda f: f.name)
+        fluid = _getSingleOrNone(f for f in self.fluids if f.name == name)
+        return fluid
 
 
 _TValue = _tp.TypeVar("_TValue", covariant=True)
-_TKey = _tp.TypeVar("_TKey", covariant=True)
-_Projection = _tp.Callable[[_TValue], _TKey]
 
 
-def _getDuplicates(values: _tp.Iterable[_TValue]) -> _tp.Sequence[_TValue]:
+class _SupportsLessThan(_tp.Protocol):
+    def __lt__(self, __other: _tp.Any) -> bool:
+        ...
+
+
+_SupportsLessThanT = _tp.TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)
+
+
+def _getDuplicates(values: _tp.Iterable[_SupportsLessThanT]) -> _tp.Sequence[_SupportsLessThanT]:
     sortedValues = sorted(values)
     groupedValues = _it.groupby(sortedValues)
-    duplicateValues = [k for k, g in groupedValues if len(*g) > 1]
+    duplicateValues = [k for k, g in groupedValues if len(list(g)) > 1]
     return duplicateValues
 
 
-def _getUnique(key: _TKey, values: _tp.Sequence[_TValue], projection: _Projection) -> _tp.Optional[_TValue]:
-    matchingValues = [v for v in values if projection(v) == key]
-    if not matchingValues:
+def _getSingleOrNone(values: _tp.Iterable[_TValue]) -> _tp.Optional[_TValue]:
+    valuesList = [*values]
+    if not valuesList:
         return None
 
-    assert matchingValues == 1
+    numberOfValues = len(valuesList)
+    assert numberOfValues == 1, f"Expected 0 or 1 value, but got {numberOfValues}."
 
-    return matchingValues[0]
+    return valuesList[0]
+
+
+def _getSingle(values: _tp.Iterable[_TValue]) -> _TValue:
+    value = _getSingleOrNone(values)
+    assert value is not None, "Expected a single value but got none."
+    return value

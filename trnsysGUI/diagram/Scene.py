@@ -42,12 +42,7 @@ class Scene(QGraphicsScene):
     """
 
     def __init__(self, parent=None):
-        # Static size
-        # super(Scene, self).__init__(QRectF(0, 0, parent.height(), 1500), parent)
-        # self.setSceneRect(0, 0, parent.height(), parent.width())
-
-        # Dynamic size, but "zero" at beginning
-        super(Scene, self).__init__(parent)
+        super().__init__(parent)
 
         self.logger = parent.logger
 
@@ -74,9 +69,6 @@ class Scene(QGraphicsScene):
         self.addItem(self.viewRect2)
 
         self.selectedItem = None
-
-        # self.viewRect1.setPos(-1300, -100)
-        # self.viewRect2.setPos(-1300, -100)
 
         self.released = False
         self.pressed = False

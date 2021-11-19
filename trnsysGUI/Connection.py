@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.hydraulicLoops as _hl
+import trnsysGUI.diagram.Editor as _ed
 from massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id, PortItem as _pi
 from trnsysGUI.CornerItem import CornerItem
@@ -37,7 +38,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.toPort = toPort
         self.displayName = None
 
-        self.parent = parent
+        self.parent: _ed.Editor = parent
 
         # Export related
         self.typeNumber = 0

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>487</width>
-    <height>535</height>
+    <width>722</width>
+    <height>565</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Hydraulic loop properties</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="2,3,10,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3,10,1">
    <item>
     <widget class="QGroupBox" name="generalGroupBox">
      <property name="sizePolicy">
@@ -65,8 +65,8 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>12</height>
+          <width>13</width>
+          <height>19</height>
          </size>
         </property>
        </spacer>
@@ -104,8 +104,8 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>196</width>
-          <height>12</height>
+          <width>161</width>
+          <height>19</height>
          </size>
         </property>
        </spacer>
