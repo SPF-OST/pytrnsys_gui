@@ -23,12 +23,12 @@ from .. import model as _model
 
 
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
-    def __init__(self, hydraulicLoop: _gmodel.HydraulicLoop, invalidNames: _tp.Sequence[str], fluids: _model.Fluids):
+    def __init__(self, hydraulicLoop: _gmodel.HydraulicLoop, occupiedNames: _tp.Sequence[str], fluids: _model.Fluids):
         super().__init__()
         self.setupUi(self)
 
         self.hydraulicLoop = hydraulicLoop
-        self._invalidNames: _tp.Set[str] = {*invalidNames}
+        self._occupiedNames: _tp.Set[str] = {*occupiedNames}
         self._fluids = fluids
 
         self._configureLoopName()
@@ -48,19 +48,27 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         def onNameChanged(newName) -> None:
             self.hydraulicLoop.name = newName
 
-            isNameValid = self._isNameValid(newName)
+            isNameEmpty = not newName
+            isNameOccupied = self._isNameOccupied(newName)
 
-            isWarningVisible = not isNameValid
-            self.invalidNameWarningWidget.setVisible(isWarningVisible)
+            if isNameEmpty:
+                tooltipText = "The name must not be empty"
+            elif isNameOccupied:
+                tooltipText = "This name is already in use"
+            else:
+                tooltipText = ""
+            self.invalidNameWarningWidget.setToolTip(tooltipText)
+
+            haveError = isNameEmpty or isNameOccupied
+            self.invalidNameWarningWidget.setVisible(haveError)
 
             okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.Ok)
-            isOkButtonEnabled = isNameValid
-            okButton.setEnabled(isOkButtonEnabled)
+            okButton.setEnabled(not haveError)
 
         self.loopName.textChanged.connect(onNameChanged)
 
-    def _isNameValid(self, newName: str) -> bool:
-        return newName not in self._invalidNames
+    def _isNameOccupied(self, newName: str) -> bool:
+        return newName in self._occupiedNames
 
     def _configureBulkOperations(self):
         def setTotalLoopLengthInfoToolTipVisible(_) -> None:
@@ -172,9 +180,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
     @classmethod
     def showDialog(
-        cls, hydraulicLoop: _gmodel.HydraulicLoop, invalidNames: _tp.Sequence[str], fluids: _model.Fluids
+        cls, hydraulicLoop: _gmodel.HydraulicLoop, occupiedNames: _tp.Sequence[str], fluids: _model.Fluids
     ) -> _tp.Literal["oked", "cancelled"]:
-        dialog = HydraulicLoopDialog(hydraulicLoop, invalidNames, fluids)
+        dialog = HydraulicLoopDialog(hydraulicLoop, occupiedNames, fluids)
 
         dialogCode = dialog.exec()
 
