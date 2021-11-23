@@ -4,14 +4,12 @@
 import typing as tp
 from math import sqrt
 
-
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QMenu
 
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 # This is needed to avoid a circular import but still be able to type check
 if tp.TYPE_CHECKING:
@@ -111,8 +109,8 @@ class SegmentItemBase(QGraphicsItemGroup):
         c2_g = 0
 
         try:
-            f1 = partLen2 / totLenConn
-            f2 = (totLenConn - partLen2) / totLenConn
+            f1 = int(partLen2 / totLenConn)
+            f2 = int((totLenConn - partLen2) / totLenConn)
         except ZeroDivisionError:
             return QColor(100, 100, 100)
         else:

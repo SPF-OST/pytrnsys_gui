@@ -171,8 +171,8 @@ class ImageAccessor:
 
     @staticmethod
     def _getSize(defaultSize: _qtc.QSize, *, width: _tp.Optional[int], height: _tp.Optional[int]) -> _qtc.QSize:
-        width = width if width else defaultSize.width()
-        height = height if height else defaultSize.height()
+        width = int(width if width else defaultSize.width())
+        height = int(height if height else defaultSize.height())
 
         return _qtc.QSize(width, height)
 
