@@ -1,6 +1,6 @@
 import dataclasses as _dc
 
-import trnsysGUI.SinglePipePortItem as _port
+import trnsysGUI.singlePipePortItem as _port
 import trnsysGUI.storageTank.side as _sd
 
 

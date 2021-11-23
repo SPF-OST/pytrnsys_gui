@@ -5,7 +5,7 @@ import typing as _tp
 
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class Connector(BlockItem):

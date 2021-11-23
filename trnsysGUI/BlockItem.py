@@ -18,10 +18,10 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 import trnsysGUI.serialization as _ser
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.ResizerItem import ResizerItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 global FilePath
 FilePath = "res/Config.txt"

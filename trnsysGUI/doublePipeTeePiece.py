@@ -6,7 +6,7 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
+from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeBlockItemModel
 from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 

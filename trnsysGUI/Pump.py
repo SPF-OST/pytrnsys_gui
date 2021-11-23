@@ -9,7 +9,7 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class Pump(BlockItem):

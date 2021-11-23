@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QMenu
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 # This is needed to avoid a circular import but still be able to type check
 if tp.TYPE_CHECKING:

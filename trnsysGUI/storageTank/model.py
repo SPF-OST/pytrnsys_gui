@@ -78,19 +78,19 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     def from_dict(
         cls,
         data: _dcj.JsonDict,
-        validate=True,
+        validate=True,  # pylint: disable=duplicate-code #5
         validate_enums: bool = True,
     ) -> "StorageTank":
         data.pop(".__BlockDict__")
-        storageTank = super().from_dict(data, validate, validate_enums)
+        storageTank = super().from_dict(data, validate, validate_enums)  # pylint: disable=duplicate-code #6
         return _tp.cast(StorageTank, storageTank)
 
-    def to_dict(
+    def to_dict(  # pylint: disable=duplicate-code #7
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:
+        validate_enums: bool = True,
+    ) -> _dcj.JsonDict:  # pylint: disable=duplicate-code #8
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
         return data

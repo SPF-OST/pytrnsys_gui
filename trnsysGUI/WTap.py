@@ -13,7 +13,7 @@ from trnsysGUI.BlockItem import BlockItem
 from massFlowSolver import InternalPiping
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class WTap(BlockItem):

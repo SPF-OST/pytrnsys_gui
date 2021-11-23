@@ -11,8 +11,7 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectionBase import ConnectionBase, \
-    DeleteConnectionCommandBase  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
 from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 
@@ -50,8 +49,8 @@ class DoublePipeConnection(ConnectionBase):
             labelMassPos = defaultPos
 
         corners = []
-        for s in self.getCorners():
-            cornerTupel = (s.pos().x(), s.pos().y())
+        for corner in self.getCorners():
+            cornerTupel = (corner.pos().x(), corner.pos().y())
             corners.append(cornerTupel)
 
         doublePipeConnectionModel = DoublePipeConnectionModel(
@@ -65,7 +64,7 @@ class DoublePipeConnection(ConnectionBase):
             self.groupName,
             self.fromPort.id,
             self.toPort.id,
-            self.trnsysId
+            self.trnsysId,
         )
 
         dictName = "Connection-"
@@ -290,14 +289,14 @@ class DoublePipeConnection(ConnectionBase):
         return realNode
 
     def _getEquations(
-            self, equationConstant1, equationConstant2, openLoop, nodesToIndices, unitNumber, temperature: object
+        self, equationConstant1, equationConstant2, openLoop, nodesToIndices, unitNumber, temperature: object
     ):
         realNode = self._getRealNode(openLoop)
         outputVariables = realNode.serialize(nodesToIndices).outputVariables
         outputVariable = outputVariables[0]
 
         firstColumn = (
-                "T" + self.displayName + temperature + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
+            "T" + self.displayName + temperature + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
         )
         unitText = self._addComment(
             firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperature}, deg C"
@@ -356,4 +355,4 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+        return _uuid.UUID("332cd663-684d-414a-b1ec-33fd036f0f17")

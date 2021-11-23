@@ -2,13 +2,10 @@ import typing as _tp
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
-from trnsysGUI.PortItemBase import PortItemBase
+from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
 
 
 class SinglePipePortItem(PortItemBase):
-    def __init__(self, name, side, parent):
-        super().__init__(name, side, parent)
-
     def getConnectedRealNode(self, portItem: _mfn.PortItem) -> _tp.Optional[_mfn.RealNodeBase]:
         connection: _mfs.MassFlowNetworkContributorMixin = self.connectionList[0]
 
@@ -19,4 +16,3 @@ class SinglePipePortItem(PortItemBase):
 
         connectionSinglePort = connectionStartingNodes[0]
         return connectionSinglePort
-

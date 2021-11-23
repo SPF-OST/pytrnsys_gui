@@ -8,8 +8,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
-from trnsysGUI.BlockItem import BlockItemModel
+
 
 class DoublePipeConnectorBase(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
@@ -125,7 +124,7 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
     def from_dict(
         cls,
         data: _dcj.JsonDict,
-        validate=True,
+        validate=True,  # pylint: disable=duplicate-code #7
         validate_enums: bool = True,
     ) -> "DoublePipeBlockItemModel":
         data.pop(".__BlockDict__")
@@ -136,7 +135,7 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,  # pylint: disable=duplicate-code #6
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
@@ -145,4 +144,3 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
-

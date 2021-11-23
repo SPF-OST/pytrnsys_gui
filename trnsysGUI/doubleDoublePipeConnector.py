@@ -3,7 +3,7 @@ import typing as _tp
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
+from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
 from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 
