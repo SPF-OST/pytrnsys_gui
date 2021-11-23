@@ -699,25 +699,25 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         model = BlockItemModel.from_dict(i)
 
         self.setName(model.BlockDisplayName)
-        self.setPos(float(model.BlockPosition[0]), float(model.BlockPosition[1]))
-        self.id = model.ID
-        self.trnsysId = model.trnsysID
+        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.id = model.Id
+        self.trnsysId = model.trnsysId
 
-        if len(self.inputs) != len(model.PortsIDIn) or len(self.outputs) != len(model.PortsIDOut):
-            temp = model.PortsIDIn
-            model.PortsIDIn = model.PortsIDOut
-            model.PortsIDOut = temp
+        if len(self.inputs) != len(model.portsIdsIn) or len(self.outputs) != len(model.portsIdsOut):
+            temp = model.portsIdsIn
+            model.portsIdsIn = model.portsIdsOut
+            model.portsIdsOut = temp
 
         for index, inp in enumerate(self.inputs):
-            inp.id = model.PortsIDIn[index]
+            inp.id = model.portsIdsIn[index]
 
         for index, out in enumerate(self.outputs):
-            out.id = model.PortsIDOut[index]
+            out.id = model.portsIdsOut[index]
 
-        self.updateFlipStateH(model.FlippedH)
-        self.updateFlipStateV(model.FlippedV)
-        self.rotateBlockToN(model.RotationN)
-        self.setBlockToGroup(model.GroupName)
+        self.updateFlipStateH(model.flippedH)
+        self.updateFlipStateV(model.flippedV)
+        self.rotateBlockToN(model.rotationN)
+        self.setBlockToGroup(model.groupName)
 
         resBlockList.append(self)
 
@@ -803,7 +803,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                 self.logger.debug("filelist:", self.parent.parent().fileList)
 
 @_dc.dataclass
-class BlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
+class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     BlockName: str
     BlockDisplayName: str
     BlockPosition: _tp.Tuple[float, float]
@@ -815,6 +815,24 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
     FlippedV: bool
     RotationN: int
     GroupName: str
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
+
+@_dc.dataclass
+class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
+    BlockName: str
+    BlockDisplayName: str
+    blockPosition: _tp.Tuple[float, float]
+    Id: int
+    trnsysId: int
+    portsIdsIn: _tp.List[int]
+    portsIdsOut: _tp.List[int]
+    flippedH: bool
+    flippedV: bool
+    rotationN: int
+    groupName: str
 
     @classmethod
     def from_dict(
@@ -836,6 +854,27 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
         return data
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return BlockItemModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel":
+
+        return BlockItemModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.BlockPosition,
+            superseded.ID,
+            superseded.trnsysID,
+            superseded.PortsIDIn,
+            superseded.PortsIDOut,
+            superseded.FlippedH,
+            superseded.FlippedV,
+            superseded.RotationN,
+            superseded.GroupName
+        )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
