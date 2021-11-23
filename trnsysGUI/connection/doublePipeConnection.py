@@ -1,14 +1,20 @@
 from __future__ import annotations
 
+import dataclasses as _dc
 import typing as _tp
+import uuid as _uuid
+
+import dataclasses_jsonschema as _dcj
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
+import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping  # type: ignore[attr-defined]
-from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
-from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase, \
+    DeleteConnectionCommandBase  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
+from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 
 if _tp.TYPE_CHECKING:
     pass
@@ -34,50 +40,53 @@ class DoublePipeConnection(ConnectionBase):
         self.parent.parent().undoStack.push(command)
 
     def encode(self):
-        dct = {}
-        dct[".__ConnectionDict__"] = True
-        dct["fromPortId"] = self.fromPort.id
-        dct["toPortId"] = self.toPort.id
-        dct["name"] = self.displayName
-        dct["id"] = self.id
-        dct["connectionId"] = self.connId
-        dct["trnsysId"] = self.trnsysId
-        dct["childIds"] = self.childIds
-        dct["groupName"] = self.groupName
-
         if len(self.segments) > 0:
-            dct["labelPos"] = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-            dct["massFlowLabelPos"] = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
+            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
         else:
+            self.logger.debug("This connection has no segment")
             defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()
-            dct["labelPos"] = defaultPos
-            dct["massFlowLabelPos"] = defaultPos
+            labelPos = defaultPos
+            labelMassPos = defaultPos
 
         corners = []
-        for corner in self.getCorners():
-            cornerTupel = (corner.pos().x(), corner.pos().y())
+        for s in self.getCorners():
+            cornerTupel = (s.pos().x(), s.pos().y())
             corners.append(cornerTupel)
 
-        dct["segmentsCorners"] = corners
+        doublePipeConnectionModel = DoublePipeConnectionModel(
+            self.connId,
+            self.displayName,
+            self.id,
+            self.childIds,
+            corners,
+            labelPos,
+            labelMassPos,
+            self.groupName,
+            self.fromPort.id,
+            self.toPort.id,
+            self.trnsysId
+        )
 
         dictName = "Connection-"
-
-        return dictName, dct
+        return dictName, doublePipeConnectionModel.to_dict()
 
     def decode(self, i):
-        self.id = i["id"]
-        self.connId = i["connectionId"]
-        self.trnsysId = i["trnsysId"]
-        self.childIds = i["childIds"]
-        self.setName(i["name"])
+        model = DoublePipeConnectionModel.from_dict(i)
+
+        self.id = model.id
+        self.connId = model.connectionId
+        self.trnsysId = model.trnsysId
+        self.childIds = model.childIds
+        self.setName(model.name)
         self.groupName = "defaultGroup"
-        self.setConnToGroup(i["groupName"])
+        self.setConnToGroup(model.groupName)
 
-        if len(i["segmentsCorners"]) > 0:
-            self.loadSegments(i["segmentsCorners"])
+        if len(model.segmentsCorners) > 0:
+            self.loadSegments(model.segmentsCorners)
 
-        self.setLabelPos(i["labelPos"])
-        self.setMassLabelPos(i["massFlowLabelPos"])
+        self.setLabelPos(model.labelPos)
+        self.setMassLabelPos(model.massFlowLabelPos)
 
     def getInternalPiping(self) -> InternalPiping:
         coldFromPort: _mfn.PortItem = ColdPortItem()
@@ -308,3 +317,43 @@ class DoublePipeConnection(ConnectionBase):
 class DeleteDoublePipeConnectionCommandBase(DeleteConnectionCommandBase):
     def undo(self):
         self.conn = DoublePipeConnection(self.connFromPort, self.connToPort, self.connParent)
+
+
+@_dc.dataclass
+class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
+    connectionId: int
+    name: str
+    id: int
+    childIds: _tp.List[int]
+    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
+    labelPos: _tp.Tuple[float, float]
+    massFlowLabelPos: _tp.Tuple[float, float]
+    groupName: str
+    fromPortId: int
+    toPortId: int
+    trnsysId: int
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "DoublePipeConnectionModel":
+        data.pop(".__ConnectionDict__")
+        doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__ConnectionDict__"] = True
+        return data
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')

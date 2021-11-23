@@ -16,11 +16,9 @@ import trnsysGUI.hydraulicLoops as _hl
 from massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 
 if _tp.TYPE_CHECKING:
@@ -1197,3 +1195,4 @@ class DeleteConnectionCommandBase(QUndoCommand):
 
     def undo(self):
         self.conn = ConnectionBase(self.connFromPort, self.connToPort, self.connParent)
+

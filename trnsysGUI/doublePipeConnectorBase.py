@@ -1,15 +1,15 @@
-
+import dataclasses as _dc
 import typing as _tp
+import uuid as _uuid
 
-import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
+import dataclasses_jsonschema as _dcj
+
 import trnsysGUI.images as _img
+import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
-from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
-
+from trnsysGUI.BlockItem import BlockItemModel
 
 class DoublePipeConnectorBase(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
@@ -57,63 +57,92 @@ class DoublePipeConnectorBase(BlockItem):
         for output in self.outputs:
             portListOutputs.append(output.id)
 
-        dct = {}
-        dct[".__BlockDict__"] = True
-        dct["BlockName"] = self.name
-        dct["BlockDisplayName"] = self.displayName
-        dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-        dct["ID"] = self.id
-        dct["trnsysID"] = self.trnsysId
-        dct["childIds"] = self.childIds
-        dct["PortsIDIn"] = portListInputs
-        dct["PortsIDOut"] = portListOutputs
-        dct["FlippedH"] = self.flippedH
-        dct["FlippedV"] = self.flippedV
-        dct["RotationN"] = self.rotationN
-        dct["GroupName"] = self.groupName
+        blockPosition = (float(self.pos().x()), float(self.pos().y()))
+
+        connectorModel = DoublePipeBlockItemModel(
+            self.name,
+            self.displayName,
+            blockPosition,
+            self.id,
+            self.trnsysId,
+            self.childIds,
+            portListInputs,
+            portListOutputs,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+            self.groupName
+        )
 
         dictName = "Block-"
-
-        return dictName, dct
+        return dictName, connectorModel.to_dict()
 
     def decode(self, i, resBlockList):
-        super().decode(i, resBlockList)
-        self.childIds = i["childIds"]
+        model = DoublePipeBlockItemModel.from_dict(i)
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) \
-            -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, \
-            "`portItem' does not belong to this `BlockItem'."
+        self.setName(model.BlockDisplayName)
+        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.id = model.id
+        self.trnsysId = model.trnsysId
+        self.childIds = model.childIds
 
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+        for index, inp in enumerate(self.inputs):
+            inp.id = model.portsIdsIn[index]
 
-        if not graphicalPortItem.connectionList:
-            return None
+        for index, out in enumerate(self.outputs):
+            out.id = model.portsIdsOut[index]
 
-        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
+        self.updateFlipStateH(model.flippedH)
+        self.updateFlipStateV(model.flippedV)
+        self.rotateBlockToN(model.rotationN)
+        self.setBlockToGroup(model.groupName)
 
-        connectionInternalPiping = connection.getInternalPiping()
-        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
-
-        if isinstance(connection, SinglePipeConnection):
-            connectionSinglePort = connectionStartingNodes[0]
-            return connectionSinglePort
-
-        if isinstance(connection, DoublePipeConnection):
-            connectionColdPort = connectionStartingNodes[0]
-            connectionHotPort = connectionStartingNodes[1]
-
-            if isinstance(portItem, ColdPortItem):
-                return connectionColdPort
-            if isinstance(portItem, HotPortItem):
-                return connectionHotPort
-
-            raise AssertionError("PortItem has not a doublePipePortItem.")
-
-        raise AssertionError("Connection is an unknown class.")
+        resBlockList.append(self)
 
     def getInternalPiping(self) -> InternalPiping:
         raise NotImplementedError
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError
+
+
+@_dc.dataclass
+class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
+    BlockName: str
+    BlockDisplayName: str
+    blockPosition: _tp.Tuple[float, float]
+    id: int
+    trnsysId: int
+    childIds: _tp.List[int]
+    portsIdsIn: _tp.List[int]
+    portsIdsOut: _tp.List[int]
+    flippedH: bool
+    flippedV: bool
+    rotationN: int
+    groupName: str
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "DoublePipeBlockItemModel":
+        data.pop(".__BlockDict__")
+        doublePipeBlockItemModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(DoublePipeBlockItemModel, doublePipeBlockItemModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+

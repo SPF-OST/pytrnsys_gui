@@ -1,10 +1,13 @@
 # pylint: skip-file
 # type: ignore
 
+import dataclasses as _dc
 import glob
 import os
 import typing as _tp
+import uuid as _uuid
 
+import dataclasses_jsonschema as _dcj
 from PyQt5 import QtCore
 from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
@@ -13,11 +16,12 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTree
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
+import trnsysGUI.serialization as _ser
 from trnsysGUI import idGenerator as _id
+from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.SinglePipePortItem import SinglePipePortItem
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -102,18 +106,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
         graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
 
-        if not graphicalPortItem.connectionList:
-            return None
-
-        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
-
-        connectionInternalPiping = connection.getInternalPiping()
-
-        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
-
-        assert len(connectionStartingNodes) == 1
-
-        return connectionStartingNodes[0]
+        return graphicalPortItem.getConnectedRealNode(portItem)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if type(self) == BlockItem:
@@ -674,59 +667,57 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                     return True
         return False
 
-    # Encoding
     def encode(self):
-        if self.isVisible():
-            portListInputs = []
-            portListOutputs = []
+        portListInputs = []
+        portListOutputs = []
 
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
-            dct = {}
+        for inp in self.inputs:
+            portListInputs.append(inp.id)
+        for output in self.outputs:
+            portListOutputs.append(output.id)
 
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
+        blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-            dictName = "Block-"
+        blockItemModel = BlockItemModel(
+            self.name,
+            self.displayName,
+            blockPosition,
+            self.id,
+            self.trnsysId,
+            portListInputs,
+            portListOutputs,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+            self.groupName,
+        )
 
-            return dictName, dct
+        dictName = "Block-"
+        return dictName, blockItemModel.to_dict()
 
     def decode(self, i, resBlockList):
-        self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
-        self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-        self.setName(i["BlockDisplayName"])
+        model = BlockItemModel.from_dict(i)
 
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
+        self.setName(model.BlockDisplayName)
+        self.setPos(float(model.BlockPosition[0]), float(model.BlockPosition[1]))
+        self.id = model.ID
+        self.trnsysId = model.trnsysID
 
-        self.logger.debug(len(self.inputs))
+        if len(self.inputs) != len(model.PortsIDIn) or len(self.outputs) != len(model.PortsIDOut):
+            temp = model.PortsIDIn
+            model.PortsIDIn = model.PortsIDOut
+            model.PortsIDOut = temp
 
-        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
-            temp = i["PortsIDIn"]
-            i["PortsIDIn"] = i["PortsIDOut"]
-            i["PortsIDOut"] = temp
+        for index, inp in enumerate(self.inputs):
+            inp.id = model.PortsIDIn[index]
 
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
+        for index, out in enumerate(self.outputs):
+            out.id = model.PortsIDOut[index]
 
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
+        self.updateFlipStateH(model.FlippedH)
+        self.updateFlipStateV(model.FlippedV)
+        self.rotateBlockToN(model.RotationN)
+        self.setBlockToGroup(model.GroupName)
 
         resBlockList.append(self)
 
@@ -810,3 +801,42 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             except ValueError:
                 self.logger.debug("File already deleted from file list.")
                 self.logger.debug("filelist:", self.parent.parent().fileList)
+
+@_dc.dataclass
+class BlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
+    BlockName: str
+    BlockDisplayName: str
+    BlockPosition: _tp.Tuple[float, float]
+    ID: int
+    trnsysID: int
+    PortsIDIn: _tp.List[int]
+    PortsIDOut: _tp.List[int]
+    FlippedH: bool
+    FlippedV: bool
+    RotationN: int
+    GroupName: str
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "BlockItemModel":
+        data.pop(".__BlockDict__")
+        blockItemModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(BlockItemModel, blockItemModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')

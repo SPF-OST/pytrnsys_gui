@@ -2,14 +2,13 @@
 
 import typing as _tp
 
-import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
-from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.DoublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.doublePipeConnectorBase import DoublePipeBlockItemModel
+from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 
 
 class DoublePipeTeePiece(BlockItem):
@@ -77,55 +76,48 @@ class DoublePipeTeePiece(BlockItem):
         for output in self.outputs:
             portListOutputs.append(output.id)
 
-        dct = {}
+        blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-        dct[".__BlockDict__"] = True
-        dct["BlockName"] = self.name
-        dct["BlockDisplayName"] = self.displayName
-        dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-        dct["ID"] = self.id
-        dct["trnsysID"] = self.trnsysId
-        dct["childIds"] = self.childIds
-        dct["PortsIDIn"] = portListInputs
-        dct["PortsIDOut"] = portListOutputs
-        dct["FlippedH"] = self.flippedH
-        dct["FlippedV"] = self.flippedV
-        dct["RotationN"] = self.rotationN
-        dct["GroupName"] = self.groupName
+        teePieceModel = DoublePipeBlockItemModel(
+            self.name,
+            self.displayName,
+            blockPosition,
+            self.id,
+            self.trnsysId,
+            self.childIds,
+            portListInputs,
+            portListOutputs,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+            self.groupName,
+        )
 
         dictName = "Block-"
-
-        return dictName, dct
+        return dictName, teePieceModel.to_dict()
 
     def decode(self, i, resBlockList):
-        self.childIds = i["childIds"]
-        super().decode(i, resBlockList)
+        model = DoublePipeBlockItemModel.from_dict(i)
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) \
-            -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, \
-            "`portItem' does not belong to this `BlockItem'."
+        self.setName(model.BlockName)
+        self.displayName = model.BlockDisplayName
+        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.id = model.id
+        self.trnsysId = model.trnsysId
+        self.childIds = model.childIds
 
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+        for index, inp in enumerate(self.inputs):
+            inp.id = model.portsIdsIn[index]
 
-        if not graphicalPortItem.connectionList:
-            return None
+        for index, out in enumerate(self.outputs):
+            out.id = model.portsIdsOut[index]
 
-        connection: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.connectionList[0]
+        self.updateFlipStateH(model.flippedH)
+        self.updateFlipStateV(model.flippedV)
+        self.rotateBlockToN(model.rotationN)
+        self.setBlockToGroup(model.groupName)
 
-        connectionInternalPiping = connection.getInternalPiping()
-        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
-
-        assert isinstance(connection, DoublePipeConnection), "Connection is not a doublePipe"
-        connectionColdPort = connectionStartingNodes[0]
-        connectionHotPort = connectionStartingNodes[1]
-
-        if isinstance(portItem, ColdPortItem):
-            return connectionColdPort
-        if isinstance(portItem, HotPortItem):
-            return connectionHotPort
-
-        return None
+        resBlockList.append(self)
 
     def getInternalPiping(self) -> InternalPiping:
         coldInput1: _mfn.PortItem = ColdPortItem()

@@ -3,11 +3,6 @@
 
 from PyQt5.QtWidgets import QUndoCommand
 
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
-
 
 class CreateConnectionCommandBase(QUndoCommand):
     def __init__(self, fromPort, toPort, connParent, descr):

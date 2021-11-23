@@ -3,18 +3,18 @@
 
 from __future__ import annotations
 
-import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
+import dataclasses as _dc
 import dataclasses_jsonschema as _dcj
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
-from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase
 from trnsysGUI.PortItemBase import PortItemBase
+from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase
 from trnsysGUI.singlePipeSegmentItem import SinglePipeSegmentItem
 
 if _tp.TYPE_CHECKING:
@@ -37,8 +37,6 @@ class SinglePipeConnection(ConnectionBase):
         self.parent.parent().undoStack.push(command)
 
     def encode(self):
-        self.logger.debug("Encoding a connection")
-
         if len(self.segments) > 0:
             labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
             labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
@@ -70,8 +68,6 @@ class SinglePipeConnection(ConnectionBase):
         return dictName, connectionModel.to_dict()
 
     def decode(self, i):
-        self.logger.debug("Loading a connection in Decoder")
-
         model = ConnectionModel.from_dict(i)
 
         self.id = model.id
