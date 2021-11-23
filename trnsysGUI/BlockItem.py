@@ -818,7 +818,7 @@ class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
+        return _uuid.UUID('b87a3360-eaa7-48f3-9bed-d01224727cbe')
 
 @_dc.dataclass
 class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
@@ -878,4 +878,4 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+        return _uuid.UUID('bbc03f36-d1a1-4d97-a9c0-d212ea3a0203')

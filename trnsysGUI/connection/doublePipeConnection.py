@@ -35,7 +35,7 @@ class DoublePipeConnection(ConnectionBase):
         return rad
 
     def deleteConnCom(self):
-        command = DeleteDoublePipeConnectionCommandBase(self, "Delete conn comand")
+        command = DeleteDoublePipeConnectionCommand(self, "Delete conn comand")
         self.parent.parent().undoStack.push(command)
 
     def encode(self):
@@ -313,7 +313,7 @@ class DoublePipeConnection(ConnectionBase):
         return str(firstColumn).ljust(spacing) + comment + "\n"
 
 
-class DeleteDoublePipeConnectionCommandBase(DeleteConnectionCommandBase):
+class DeleteDoublePipeConnectionCommand(DeleteConnectionCommandBase):
     def undo(self):
         self.conn = DoublePipeConnection(self.connFromPort, self.connToPort, self.connParent)
 
@@ -355,4 +355,4 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("332cd663-684d-414a-b1ec-33fd036f0f17")
+        return _uuid.UUID('0810c9ea-85df-4431-bb40-3190c25c9161')

@@ -143,4 +143,4 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+        return _uuid.UUID('e5149c30-9f05-4a3a-8a3c-9ada74143802')

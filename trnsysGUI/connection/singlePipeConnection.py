@@ -33,7 +33,7 @@ class SinglePipeConnection(ConnectionBase):
         return rad
 
     def deleteConnCom(self):
-        command = DeleteSinglePipeConnectionCommandBase(self, "Delete conn comand")
+        command = DeleteSinglePipeConnectionCommand(self, "Delete conn comand")
         self.parent.parent().undoStack.push(command)
 
     def encode(self):
@@ -223,7 +223,7 @@ class SinglePipeConnection(ConnectionBase):
 
         return unitText, unitNumber
 
-class DeleteSinglePipeConnectionCommandBase(DeleteConnectionCommandBase):
+class DeleteSinglePipeConnectionCommand(DeleteConnectionCommandBase):
     def __init__(self, conn, descr):
         super().__init__(conn, descr)
 
