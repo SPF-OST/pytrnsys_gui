@@ -17,7 +17,7 @@ from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog  # type: ignore[attr-defined]
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]

@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QTreeView
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
 
 

@@ -38,10 +38,8 @@ import trnsysGUI.errors as _errs
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
-from trnsysGUI.CreateConnectionCommand import CreateConnectionCommand
 from trnsysGUI.DifferenceDlg import DifferenceDlg
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
@@ -52,14 +50,15 @@ from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PumpDlg import PumpDlg
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.TestDlg import TestDlg
 from trnsysGUI.Test_Export import Test_Export
-from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
+from trnsysGUI.connection.connectionBase import ConnectionBase
+from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
+from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
@@ -147,9 +146,6 @@ class Editor(QWidget):
     vertL : :obj:`QVBoxLayout`
     Cointains the library browser view and the listWidget
 
-    datagen : :obj:`PipeDataHandler`
-        Used for generating random massflows for every timestep to test the massflow
-        visualizer prototype
     moveDirectPorts: bool
         Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
     diagramScene : :obj:`QGraphicsScene`
@@ -179,9 +175,6 @@ class Editor(QWidget):
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
         self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
-
-        # Generator for massflow display testing
-        self.datagen = PipeDataHandler(self)
 
         self.testEnabled = False
         self.existReference = True
@@ -218,9 +211,9 @@ class Editor(QWidget):
         componentNamesWithIcon = [
             ("Connector", _img.CONNECTOR_SVG.icon()),
             ("TeePiece", _img.TEE_PIECE_SVG.icon()),
-            ("DPTeePiece", _img.DP_TEE_PIECE_SVG.icon()),
-            ("DoubleSinglePipeConnector", _img.DOUBLE_SINGLE_PIPE_CONNECTOR_SVG.icon()),
-            ("DoubleDoublePipeConnector", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
+            ("DPTee", _img.DP_TEE_PIECE_SVG.icon()),
+            ("SPCnr", _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
+            ("DPCnr", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("TVentil", _img.T_VENTIL_SVG.icon()),
             ("WTap_main", _img.W_TAP_MAIN_SVG.icon()),
             ("WTap", _img.W_TAP_SVG.icon()),
@@ -426,13 +419,12 @@ class Editor(QWidget):
                 msgSTank.exec_()
 
             if isinstance(startPort, SinglePipePortItem) and isinstance(endPort, SinglePipePortItem):
-                factory = SinglePipeSegmentItemFactory()
+                command = CreateSinglePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
             elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
-                factory = DoublePipeSegmentItemFactory()
+                command = CreateDoublePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
             else:
                 raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
-            command = CreateConnectionCommand(startPort, endPort, factory, self, "CreateConn Command")
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
@@ -1011,7 +1003,7 @@ class Editor(QWidget):
 
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
-            if isinstance(c, Connection):
+            if isinstance(c, ConnectionBase):
                 c.setLabelVisible(isVisible)
             if isinstance(c, BlockItem):
                 c.label.setVisible(isVisible)
@@ -1020,7 +1012,7 @@ class Editor(QWidget):
 
     def updateConnGrads(self):
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, ConnectionBase):
                 t.updateSegGrads()
 
     def findGroupByName(self, name):

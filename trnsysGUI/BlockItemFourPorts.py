@@ -7,7 +7,7 @@ import os
 import massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
 from massFlowSolver import InternalPiping
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class BlockItemFourPorts(BlockItem):

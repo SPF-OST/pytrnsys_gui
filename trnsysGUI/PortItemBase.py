@@ -1,10 +1,17 @@
 # pylint: skip-file
 # type: ignore
 
+from __future__ import annotations
+
+import typing as _tp
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QRectF, QPointF
 from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem
+
+if _tp.TYPE_CHECKING:
+    import massFlowSolver.networkModel as _mfn
 
 
 class PortItemBase(QGraphicsEllipseItem):
@@ -279,3 +286,6 @@ class PortItemBase(QGraphicsEllipseItem):
         cor2 = connection.getCorners()[-1]
         cor.setVisible(True)
         cor2.setVisible(True)
+
+    def getConnectedRealNode(self, portItem: _mfn.PortItem) -> _tp.Optional[_mfn.RealNodeBase]:
+        raise NotImplementedError()

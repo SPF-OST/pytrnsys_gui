@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu
 
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class HeatExchanger(QGraphicsItemGroup):

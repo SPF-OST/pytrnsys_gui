@@ -9,7 +9,7 @@ import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):

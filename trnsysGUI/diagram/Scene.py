@@ -5,7 +5,7 @@ from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsRectItem
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.Group import Group
 from trnsysGUI.ResizerItem import ResizerItem
@@ -162,7 +162,7 @@ class Scene(QGraphicsScene):
         if event.key() == Qt.Key_Delete:
             for c in self.parent().trnsysObj:
                 # Delete connection
-                if isinstance(c, Connection):
+                if isinstance(c, ConnectionBase):
                     if c.isSelected:
                         c.deleteConnCom()
                 # Delete block
@@ -237,7 +237,7 @@ class Scene(QGraphicsScene):
                 if self.isInRect(o.scenePos()):
                     res.append(o)
 
-            if type(o) is Connection:
+            if isinstance(o, ConnectionBase):
                 self.logger.debug("Checking connection to group")
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     res.append(o)
@@ -258,7 +258,7 @@ class Scene(QGraphicsScene):
                 if self.isInRect(o.scenePos()):
                     return True
 
-            if type(o) is Connection:
+            if isinstance(o, ConnectionBase):
                 self.logger.debug("Checking connection to group")
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     return True

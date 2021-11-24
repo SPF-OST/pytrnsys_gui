@@ -7,11 +7,9 @@ import typing as tp
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
-from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
-from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
-from trnsysGUI.DoublePipePortItem import DoublePipePortItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.Graphicaltem import GraphicalItem
@@ -27,13 +25,15 @@ from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.Pump import Pump
 from trnsysGUI.Radiator import Radiator
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
-from trnsysGUI.connection.segmentItemFactory import SinglePipeSegmentItemFactory, DoublePipeSegmentItemFactory
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
 
@@ -203,15 +203,15 @@ class Decoder(json.JSONDecoder):
                     elif i["BlockName"] == "GraphicalItem":
                         bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
 
-                    elif i["BlockName"] == "DPTeePiece":
+                    elif i["BlockName"] == "DPTee":
                         bl = DoublePipeTeePiece(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] == "DoubleSinglePipeConnector":
+                    elif i["BlockName"] == "SPCnr":
                         bl = SingleDoublePipeConnector(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] == "DoubleDoublePipeConnector":
+                    elif i["BlockName"] == "DPCnr":
                         bl = DoubleDoublePipeConnector(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
@@ -241,9 +241,9 @@ class Decoder(json.JSONDecoder):
                         self.logger.debug("Error: Did not found a toPort")
 
                     if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
-                        c = Connection(fromPort, toPort, SinglePipeSegmentItemFactory(), self.editor)
+                        c = SinglePipeConnection(fromPort, toPort, self.editor)
                     elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
-                        c = Connection(fromPort, toPort, DoublePipeSegmentItemFactory(), self.editor)
+                        c = DoublePipeConnection(fromPort, toPort, self.editor)
                     else:
                         raise AssertionError("`fromPort' and `toPort' have different types.")
                     c.decode(i)

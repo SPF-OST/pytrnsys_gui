@@ -5,7 +5,6 @@ import json
 
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
 from trnsysGUI.copyGroup import copyGroup
 
 

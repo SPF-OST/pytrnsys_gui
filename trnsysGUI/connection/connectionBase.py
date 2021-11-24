@@ -3,12 +3,9 @@
 
 from __future__ import annotations
 
-import dataclasses as _dc
 import math as _math
 import typing as _tp
-import uuid as _uuid
 
-import dataclasses_jsonschema as _dcj
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
@@ -16,16 +13,13 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.hydraulicLoops as _hl
-import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping
-from trnsysGUI import idGenerator as _id, PortItemBase as _pi
+from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.connection.segmentItemFactory import SegmentItemFactoryBase
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.BlockItem as _bi
@@ -37,15 +31,13 @@ def calcDist(p1, p2):
     return norm
 
 
-class Connection(_mfs.MassFlowNetworkContributorMixin):
-    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, segmentItemFactory: SegmentItemFactoryBase, parent):
+class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
+    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
         self.logger = parent.logger
 
         self.fromPort = fromPort
         self.toPort = toPort
         self.displayName = None
-
-        self._segmentItemFactory = segmentItemFactory
 
         self.parent = parent
         self.groupName = ""
@@ -78,7 +70,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         self.initNew(parent)
 
     def _createSegmentItem(self, startNode, endNode):
-        return self._segmentItemFactory.createSegmentItem(startNode, endNode, self)
+        raise NotImplementedError()
 
     def isVisible(self):
         res = True
@@ -264,7 +256,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         tempNode = self.startNode
 
-        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
+        rad = self.getRadius()
 
         for x in range(len(segmentsCorners)):
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
@@ -295,10 +287,10 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
             pos1 = None
             pos2 = None
 
-            if isinstance(s.startNode.parent, Connection) and s.startNode.prevNode is None:
+            if isinstance(s.startNode.parent, ConnectionBase) and s.startNode.prevNode is None:
                 # self.logger.debug("startnode is at connection")
                 pos1 = s.startNode.parent.fromPort.scenePos().x(), s.startNode.parent.fromPort.scenePos().y()
-            if isinstance(s.endNode.parent, Connection) and s.endNode.nextNode is None:
+            if isinstance(s.endNode.parent, ConnectionBase) and s.endNode.nextNode is None:
                 # self.logger.debug("endnode is at connection")
                 pos2 = s.endNode.parent.toPort.scenePos().x(), s.endNode.parent.toPort.scenePos().y()
 
@@ -335,6 +327,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
     def positionLabel(self):
         self.firstS.label.setPos(self.getStartPoint())
+        self.firstS.labelMass.setPos(self.getStartPoint())
         self.rotateLabel()
 
     def rotateLabel(self):
@@ -347,6 +340,9 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
     def toggleMassFlowLabelVisible(self) -> None:
         self.firstS.toggleMassFlowLabelVisible()
 
+    def getRadius(self):
+        raise NotImplementedError()
+
     # Makes 90deg angles of connection
     def niceConn(self):
         """
@@ -356,7 +352,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
         """
         # Here different cases can be implemented using self.PORT.side as sketched on paper
-        rad = 2 if type(self.fromPort) is SinglePipePortItem else 4
+        rad = self.getRadius()
 
         self.logger.debug(
             "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
@@ -868,14 +864,14 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
             while walker.prevN() is not self.startNode:
                 # self.logger.debug("Del corner...")
-                if type(walker.parent) is not Connection:
+                if not isinstance(walker.parent, ConnectionBase):
                     self.parent.diagramScene.removeItem(walker.parent)
                 else:
                     self.logger.debug("Caution, this is a disrupt.")
                 walker = walker.prevN()
                 # del (walker.nextN())
 
-            if type(walker.parent) is not Connection:
+            if not isinstance(walker.parent, ConnectionBase):
                 self.parent.diagramScene.removeItem(walker.parent)
             else:
                 self.logger.debug("Caution.")
@@ -918,8 +914,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         del self
 
     def deleteConnCom(self):
-        command = DeleteConnectionCommand(self, "Delete conn comand")
-        self.parent.parent().undoStack.push(command)
+        raise NotImplementedError()
 
     # Gradient related
     def totalLength(self):
@@ -1122,55 +1117,10 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
 
     # Saving / Loading
     def encode(self):
-        self.logger.debug("Encoding a connection")
-
-        if len(self.segments) > 0:
-            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
-        else:
-            self.logger.debug("This connection has no segment")
-            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()
-            labelPos = defaultPos
-            labelMassPos = defaultPos
-
-        corners = []
-        for s in self.getCorners():
-            cornerTupel = (s.pos().x(), s.pos().y())
-            corners.append(cornerTupel)
-
-        connectionModel = ConnectionModel(
-            self.connId,
-            self.displayName,
-            self.id,
-            corners,
-            labelPos,
-            labelMassPos,
-            self.groupName,
-            self.fromPort.id,
-            self.toPort.id,
-            self.trnsysId,
-        )
-
-        dictName = "Connection-"
-        return dictName, connectionModel.to_dict()
+        raise NotImplementedError()
 
     def decode(self, i):
-        self.logger.debug("Loading a connection in Decoder")
-
-        model = ConnectionModel.from_dict(i)
-
-        self.id = model.id
-        self.connId = model.connectionId
-        self.trnsysId = model.trnsysId
-        self.setName(model.name)
-        self.groupName = "defaultGroup"
-        self.setConnToGroup(model.groupName)
-
-        if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
-
-        self.setLabelPos(model.labelPos)
-        self.setMassLabelPos(model.massFlowLabelPos)
+        raise NotImplementedError()
 
     # Export related
     def exportBlackBox(self):
@@ -1189,145 +1139,13 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         return "", nUnit
 
     def getInternalPiping(self) -> InternalPiping:
-        fromPort = _mfn.PortItem()
-        toPort = _mfn.PortItem()
+        raise NotImplementedError()
 
-        pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
-
-        return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
-
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
-        assert graphicalPortItem in [self.fromPort, self.toPort],\
-            "This connection is not connected to `graphicalPortItem'"
-
-        blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
-
-        internalPiping = blockItem.getInternalPiping()
-
-        for startingNode in internalPiping.openLoopsStartingNodes:
-            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
-            for realNode in realNodesAndPortItems.realNodes:
-                for portItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
-                    candidateGraphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-                    if candidateGraphicalPortItem == graphicalPortItem:
-                        return realNode.trnsysId
-
-        return None
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+        raise NotImplementedError()
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        f = ""
-        unitNumber = startingUnit
-        typeNr2 = 931  # Temperature calculation from a pipe
-
-        unitText = ""
-        ambientT = 20
-
-        densityVar = "RhoWat"
-        specHeatVar = "CPWat"
-
-        equationConstant1 = 1
-        equationConstant2 = 3
-
-        parameterNumber = 6
-        inputNumbers = 4
-
-        # Fixed strings
-        diameterPrefix = "di"
-        lengthPrefix = "L"
-        lossPrefix = "U"
-        tempRoomVar = "TRoomStore"
-        initialValueS = "20 0.0 20 20"
-        powerPrefix = "P"
-
-        # Momentarily hardcoded
-        equationNr = 3
-
-        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-        unitText += "!" + self.displayName + "\n"
-        unitText += "PARAMETERS " + str(parameterNumber) + "\n"
-
-        unitText += diameterPrefix + self.displayName + "\n"
-        unitText += lengthPrefix + self.displayName + "\n"
-        unitText += lossPrefix + self.displayName + "\n"
-        unitText += densityVar + "\n"
-        unitText += specHeatVar + "\n"
-        unitText += str(ambientT) + "\n"
-
-        unitText += "INPUTS " + str(inputNumbers) + "\n"
-
-        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
-        assert len(openLoops) == 1
-        openLoop = openLoops[0]
-
-        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-        assert len(realNodes) == 1
-        realNode = realNodes[0]
-
-        outputVariables = realNode.serialize(nodesToIndices).outputVariables
-
-        portItemsWithParent = self._getPortItemsWithParent()
-
-        if len(portItemsWithParent) == 2 or True:
-            portItem = portItemsWithParent[0][0]
-            parent = portItemsWithParent[0][1]
-            if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
-            else:
-                unitText += parent.getTemperatureVariableName(portItem) + "\n"
-
-            unitText += f"{outputVariables[0].name}\n"
-            unitText += tempRoomVar + "\n"
-
-            portItem = portItemsWithParent[1][0]
-            parent = portItemsWithParent[1][1]
-            if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
-            else:
-                unitText += parent.getTemperatureVariableName(portItem) + "\n"
-
-        else:
-            f += (
-                "Error: NO VALUE\n" * 3
-                + "at connection with parents "
-                + str(self.fromPort.parent)
-                + str(self.toPort.parent)
-                + "\n"
-            )
-
-        unitText += "***Initial values\n"
-        unitText += initialValueS + "\n\n"
-
-        unitText += "EQUATIONS " + str(equationNr) + "\n"
-        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-        unitText += (
-            powerPrefix
-            + self.displayName
-            + "_kW"
-            + "= ["
-            + str(unitNumber)
-            + ","
-            + str(equationConstant2)
-            + "]/3600 !kW\n"
-        )
-        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A" "\n"
-
-        unitNumber += 1
-        unitText += "\n"
-        f += unitText
-
-        return unitText, unitNumber
+        raise NotImplementedError()
 
     def _getPortItemsWithParent(self):
         if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
@@ -1363,7 +1181,7 @@ class Connection(_mfs.MassFlowNetworkContributorMixin):
         _hl.showHydraulicLoopDialog(self.fromPort, self.toPort)
 
 
-class DeleteConnectionCommand(QUndoCommand):
+class DeleteConnectionCommandBase(QUndoCommand):
     def __init__(self, conn, descr):
         super().__init__(descr)
         self.conn = conn
@@ -1376,86 +1194,5 @@ class DeleteConnectionCommand(QUndoCommand):
         self.conn = None
 
     def undo(self):
-        self.conn = Connection(self.connFromPort, self.connToPort, self.segmentItemFactory, self.connParent)
+        self.conn = ConnectionBase(self.connFromPort, self.connToPort, self.connParent)
 
-@_dc.dataclass
-class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    ConnCID: int
-    ConnDisplayName: str
-    ConnID: int
-    CornerPositions: _tp.List[_tp.Tuple[float, float]]
-    FirstSegmentLabelPos: _tp.Tuple[float, float]
-    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]
-    GroupName: str
-    PortFromID: int
-    PortToID: int
-    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
-    trnsysID: int
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
-
-
-@_dc.dataclass
-class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
-    connectionId: int
-    name: str
-    id: int
-    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
-    labelPos: _tp.Tuple[float, float]
-    massFlowLabelPos: _tp.Tuple[float, float]
-    groupName: str
-    fromPortId: int
-    toPortId: int
-    trnsysId: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "ConnectionModel":
-        data.pop(".__ConnectionDict__")
-        connectionModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(ConnectionModel, connectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__ConnectionDict__"] = True
-        return data
-
-
-    @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return ConnectionModelVersion0
-
-    @classmethod
-    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
-        firstSegmentLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0], \
-                               superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1]
-        firstSegmentMassFlowLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0], \
-                                       superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1]
-
-        return ConnectionModel(
-            superseded.ConnCID,
-            superseded.ConnDisplayName,
-            superseded.ConnID,
-            superseded.CornerPositions,
-            firstSegmentLabelPos,
-            firstSegmentMassFlowLabelPos,
-            superseded.GroupName,
-            superseded.PortFromID,
-            superseded.PortToID,
-            superseded.trnsysID,
-        )
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')

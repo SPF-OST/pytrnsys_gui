@@ -1,13 +1,13 @@
 # pylint: skip-file
-# type: ignore
-
 import re
-import massFlowSolver as _mfs
 
 from PyQt5.QtWidgets import QMessageBox
 
-from trnsysGUI.Connection import Connection
-from trnsysGUI.TVentil import TVentil
+import massFlowSolver as _mfs  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
+from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
 
 
 class Export(object):
@@ -105,7 +105,7 @@ class Export(object):
         nameString = ""
         for t in self.trnsysObj:
 
-            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
+            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -224,7 +224,7 @@ class Export(object):
         tot = ""
 
         for t in self.trnsysObj:
-            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
+            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -312,7 +312,7 @@ class Export(object):
             loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
 
             for c in g.itemList:
-                if isinstance(c, Connection):
+                if isinstance(c, ConnectionBase):
                     loopText += "*** " + c.displayName + "\n"
                     loopText += "di" + c.displayName + "=" + diLp + "\n"
                     loopText += "L" + c.displayName + "=" + LLp + "\n"
@@ -330,12 +330,17 @@ class Export(object):
         lossText = ""
         rightCounter = 0
 
-        for i in self.editor.groupList[0].itemList:
-            if isinstance(i, Connection):
-                if rightCounter == 0:
-                    lossText += "P" + i.displayName + "_kW"
-                else:
-                    lossText += "+" + "P" + i.displayName + "_kW"
+        for t in self.editor.groupList[0].itemList:
+            if isinstance(t, SinglePipeConnection):
+                if rightCounter != 0:
+                    lossText += "+"
+                lossText += "P" + t.displayName + "_kW"
+                rightCounter += 1
+            if isinstance(t, DoublePipeConnection):
+                if rightCounter != 0:
+                    lossText += "+"
+                lossText += "P" + t.displayName + "Cold_kW" + "+"
+                lossText += "P" + t.displayName + "Hot_kW"
                 rightCounter += 1
 
         if rightCounter == 0:
@@ -381,13 +386,14 @@ class Export(object):
         f += "\n"
 
         s = ""
+        equationType = "Mfr"
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "Mfr" + t.displayName + " "
+            if isinstance(t, SinglePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "", equationType)
+            if isinstance(t, DoublePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
+                breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
             if isinstance(t, TVentil) and t.isVisible():
                 breakline += 1
                 if breakline % 8 == 0:
@@ -396,6 +402,13 @@ class Export(object):
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
+
+    def _getEquation(self, breakline, s, t, temperature, equationType):
+        breakline += 1
+        if breakline % 8 == 0:
+            s += "\n"
+        s += equationType + t.displayName + temperature + " "
+        return breakline, s
 
     def exportTempPrinter(self, unitnr, descLen):
 
@@ -435,13 +448,14 @@ class Export(object):
         f += "\n"
 
         s = ""
+        equationType = "T"
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "T" + t.displayName + " "
+            if isinstance(t, SinglePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "", equationType)
+            if isinstance(t, DoublePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
+                breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f

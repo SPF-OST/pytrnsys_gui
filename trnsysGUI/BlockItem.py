@@ -1,23 +1,27 @@
 # pylint: skip-file
 # type: ignore
 
+import dataclasses as _dc
 import glob
 import os
 import typing as _tp
-import abc as _abc
+import uuid as _uuid
 
+import dataclasses_jsonschema as _dcj
 from PyQt5 import QtCore
 from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
-import trnsysGUI.images as _img
 import massFlowSolver as _mfs
-
-from trnsysGUI import idGenerator as _id, PortItemBase as _pi
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
+import trnsysGUI.serialization as _ser
+from trnsysGUI import idGenerator as _id
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.MoveCommand import MoveCommand
-from trnsysGUI.SinglePipePortItem import SinglePipePortItem
 from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -97,15 +101,12 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.origOutputsPos = None
         self.origInputsPos = None
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Optional[int]:
-        assert graphicalPortItem.parent == self, "`graphicalPortItem' does not belong to this `BlockItem'."
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
 
-        if not graphicalPortItem.connectionList:
-            return None
+        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
 
-        connection = graphicalPortItem.connectionList[0]
-
-        return connection.trnsysId
+        return graphicalPortItem.getConnectedRealNode(portItem)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if type(self) == BlockItem:
@@ -218,7 +219,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             self.parent.parent().showPumpDlg(self)
         elif self.name == "TeePiece" or self.name == "WTap_main":
             self.parent.parent().showBlockDlg(self)
-        elif self.name in ["DoubleSinglePipeConnector", "DoubleDoublePipeConnector", "DPTeePiece"]:
+        elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
             self.parent.parent().showDoublePipeBlockDlg(self)
         else:
             self.parent.parent().showBlockDlg(self)
@@ -666,60 +667,57 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                     return True
         return False
 
-    # Encoding
     def encode(self):
-        # Double check that no virtual block gets encoded
-        if self.isVisible():
-            portListInputs = []
-            portListOutputs = []
+        portListInputs = []
+        portListOutputs = []
 
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
-            dct = {}
+        for inp in self.inputs:
+            portListInputs.append(inp.id)
+        for output in self.outputs:
+            portListOutputs.append(output.id)
 
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
+        blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-            dictName = "Block-"
+        blockItemModel = BlockItemModel(
+            self.name,
+            self.displayName,
+            blockPosition,
+            self.id,
+            self.trnsysId,
+            portListInputs,
+            portListOutputs,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+            self.groupName,
+        )
 
-            return dictName, dct
+        dictName = "Block-"
+        return dictName, blockItemModel.to_dict()
 
     def decode(self, i, resBlockList):
-        self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
-        self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-        self.setName(i["BlockDisplayName"])
+        model = BlockItemModel.from_dict(i)
 
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
+        self.setName(model.BlockDisplayName)
+        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.id = model.Id
+        self.trnsysId = model.trnsysId
 
-        self.logger.debug(len(self.inputs))
+        if len(self.inputs) != len(model.portsIdsIn) or len(self.outputs) != len(model.portsIdsOut):
+            temp = model.portsIdsIn
+            model.portsIdsIn = model.portsIdsOut
+            model.portsIdsOut = temp
 
-        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
-            temp = i["PortsIDIn"]
-            i["PortsIDIn"] = i["PortsIDOut"]
-            i["PortsIDOut"] = temp
+        for index, inp in enumerate(self.inputs):
+            inp.id = model.portsIdsIn[index]
 
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
+        for index, out in enumerate(self.outputs):
+            out.id = model.portsIdsOut[index]
 
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
+        self.updateFlipStateH(model.flippedH)
+        self.updateFlipStateV(model.flippedV)
+        self.rotateBlockToN(model.rotationN)
+        self.setBlockToGroup(model.groupName)
 
         resBlockList.append(self)
 
@@ -744,7 +742,8 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     # Export related
     def exportBlackBox(self):
         equation = []
-        if len(self.inputs + self.outputs) == 2 and self.isVisible():
+        if len(self.inputs + self.outputs) == 2 and self.isVisible() \
+                and not isinstance(self.outputs[0], DoublePipePortItem):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not (files):
                 status = "noDdckFile"
@@ -802,3 +801,81 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             except ValueError:
                 self.logger.debug("File already deleted from file list.")
                 self.logger.debug("filelist:", self.parent.parent().fileList)
+
+@_dc.dataclass
+class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
+    BlockName: str
+    BlockDisplayName: str
+    BlockPosition: _tp.Tuple[float, float]
+    ID: int
+    trnsysID: int
+    PortsIDIn: _tp.List[int]
+    PortsIDOut: _tp.List[int]
+    FlippedH: bool
+    FlippedV: bool
+    RotationN: int
+    GroupName: str
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('b87a3360-eaa7-48f3-9bed-d01224727cbe')
+
+@_dc.dataclass
+class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
+    BlockName: str
+    BlockDisplayName: str
+    blockPosition: _tp.Tuple[float, float]
+    Id: int
+    trnsysId: int
+    portsIdsIn: _tp.List[int]
+    portsIdsOut: _tp.List[int]
+    flippedH: bool
+    flippedV: bool
+    rotationN: int
+    groupName: str
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "BlockItemModel":
+        data.pop(".__BlockDict__")
+        blockItemModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(BlockItemModel, blockItemModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return BlockItemModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel":
+
+        return BlockItemModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.BlockPosition,
+            superseded.ID,
+            superseded.trnsysID,
+            superseded.PortsIDIn,
+            superseded.PortsIDOut,
+            superseded.FlippedH,
+            superseded.FlippedV,
+            superseded.RotationN,
+            superseded.GroupName
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('bbc03f36-d1a1-4d97-a9c0-d212ea3a0203')
