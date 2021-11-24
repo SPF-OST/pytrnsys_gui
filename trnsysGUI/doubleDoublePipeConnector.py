@@ -3,9 +3,9 @@ import typing as _tp
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
-from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
-from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
+from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
 
 
 class DoubleDoublePipeConnector(DoublePipeConnectorBase):
@@ -66,10 +66,12 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
         unitText = "!" + self.displayName + temperature + "\n"
         unitText += "EQUATIONS 1\n"
 
-        tIn = f"GT(Mfr{self.displayName}{temperature}_A, 0)*" \
-              f"T{self.inputs[0].connectionList[0].displayName}{temperature} + " \
-              f"LT(Mfr{self.displayName}{temperature}_A, 0)*" \
-              f"T{self.outputs[0].connectionList[0].displayName}{temperature}"
+        tIn = (
+            f"GT(Mfr{self.displayName}{temperature}_A, 0)*"
+            f"T{self.inputs[0].connectionList[0].displayName}{temperature} + "
+            f"LT(Mfr{self.displayName}{temperature}_A, 0)*"
+            f"T{self.outputs[0].connectionList[0].displayName}{temperature}"
+        )
         tOut = f"T{self.displayName}{temperature}"  # pylint: disable=duplicate-code
         unitText += f"{tOut} = {tIn}\n\n"
         return unitText

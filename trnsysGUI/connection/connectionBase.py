@@ -11,7 +11,6 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
 import trnsysGUI.hydraulicLoops as _hl
 from massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id
@@ -1141,9 +1140,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def getInternalPiping(self) -> InternalPiping:
         raise NotImplementedError()
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        raise NotImplementedError()
-
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError()
 
@@ -1195,4 +1191,3 @@ class DeleteConnectionCommandBase(QUndoCommand):
 
     def undo(self):
         self.conn = ConnectionBase(self.connFromPort, self.connToPort, self.connParent)
-

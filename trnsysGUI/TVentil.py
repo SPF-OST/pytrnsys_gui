@@ -196,9 +196,8 @@ class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
             assert len(openLoops) == 1
             openLoop = openLoops[0]
 
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            assert len(realNodes) == 1
-            realNode = realNodes[0]
+            assert len(openLoop.realNodes) == 1
+            realNode = openLoop.realNodes[0]
 
             outputVariables = realNode.serialize(nodesToIndices).outputVariables
             for outputVariable in outputVariables:

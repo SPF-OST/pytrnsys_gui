@@ -6,13 +6,15 @@ from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
 
 
 class SinglePipePortItem(PortItemBase):
-    def getConnectedRealNode(self, portItem: _mfn.PortItem) -> _tp.Optional[_mfn.RealNodeBase]:
-        connection: _mfs.MassFlowNetworkContributorMixin = self.connectionList[0]
+    def _selectConnectedRealNode(  # pylint: disable=duplicate-code  # 2
+        self,
+        portItem: _mfn.PortItem,
+        connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
+    ) -> _mfn.RealNodeBase:
+        assert (
+            len(connectedPortItemsAndAdjacentRealNode) == 1
+        ), "Only exactly one model port item can should connected with a single pipe graphical port item."
 
-        connectionInternalPiping = connection.getInternalPiping()
-        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
+        selectedRealNode = connectedPortItemsAndAdjacentRealNode[0].realNode
 
-        assert len(connectionStartingNodes) == 1
-
-        connectionSinglePort = connectionStartingNodes[0]
-        return connectionSinglePort
+        return selectedRealNode
