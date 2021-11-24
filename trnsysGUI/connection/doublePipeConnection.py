@@ -15,8 +15,6 @@ from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnection
 from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
 from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
 
-if _tp.TYPE_CHECKING:
-    pass
 
 
 class DoublePipeConnection(ConnectionBase):

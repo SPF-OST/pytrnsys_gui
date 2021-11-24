@@ -3,30 +3,26 @@
 
 from __future__ import annotations
 
+import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
-import dataclasses as _dc
 import dataclasses_jsonschema as _dcj
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
+import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.serialization as _ser
-from massFlowSolver import InternalPiping
-from trnsysGUI.PortItemBase import PortItemBase
-from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase
-from trnsysGUI.singlePipeSegmentItem import SinglePipeSegmentItem
-
-if _tp.TYPE_CHECKING:
-    pass
+import trnsysGUI.singlePipeSegmentItem as _spsi
 
 
-class SinglePipeConnection(ConnectionBase):
-    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
+class SinglePipeConnection(_cb.ConnectionBase):
+    def __init__(self, fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, parent):
         super().__init__(fromPort, toPort, parent)
 
     def _createSegmentItem(self, startNode, endNode):
-        return SinglePipeSegmentItem(startNode, endNode, self)
+        return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
 
     def getRadius(self):
         rad = 2
@@ -83,12 +79,12 @@ class SinglePipeConnection(ConnectionBase):
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
 
-    def getInternalPiping(self) -> InternalPiping:
+    def getInternalPiping(self) -> _mfs.InternalPiping:
         fromPort = _mfn.PortItem()
         toPort = _mfn.PortItem()
 
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
-        return InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
+        return _mfs.InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
     def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' doesn't belong to `internalPiping'"
@@ -223,7 +219,7 @@ class SinglePipeConnection(ConnectionBase):
 
         return unitText, unitNumber
 
-class DeleteSinglePipeConnectionCommand(DeleteConnectionCommandBase):
+class DeleteSinglePipeConnectionCommand(_cb.DeleteConnectionCommandBase):
     def __init__(self, conn, descr):
         super().__init__(conn, descr)
 

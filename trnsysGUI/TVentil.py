@@ -93,61 +93,13 @@ class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
         self.positionForMassFlowSolver = f
 
     def encode(self):
-        portListInputs = []
-        portListOutputs = []
-
-        for p in self.inputs:
-            portListInputs.append(p.id)
-        for p in self.outputs:
-            portListOutputs.append(p.id)
-        dct = {}
-
-        dct[".__BlockDict__"] = True
-        dct["BlockName"] = self.name
-        dct["BlockDisplayName"] = self.displayName
-        dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-        dct["ID"] = self.id
-        dct["trnsysID"] = self.trnsysId
-        dct["PortsIDIn"] = portListInputs
-        dct["PortsIDOut"] = portListOutputs
-        dct["FlippedH"] = self.flippedH
-        dct["FlippedV"] = self.flippedV
-        dct["RotationN"] = self.rotationN
-        dct["GroupName"] = self.groupName
-
+        dictName, dct = super(TVentil, self).encode()
         dct["IsTempering"] = self.isTempering
         dct["PositionForMassFlowSolver"] = self.positionForMassFlowSolver
-
-        dictName = "Block-"
         return dictName, dct
 
     def decode(self, i, resBlockList):
-        self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
-        self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-        self.setName(i["BlockDisplayName"])
-
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
-
-        self.logger.debug(len(self.inputs))
-
-        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
-            temp = i["PortsIDIn"]
-            i["PortsIDIn"] = i["PortsIDOut"]
-            i["PortsIDOut"] = temp
-
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
-
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
-
-        resBlockList.append(self)
-
+        super().decode(i, resBlockList)
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
             self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0

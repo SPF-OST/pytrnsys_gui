@@ -9,7 +9,7 @@ import uuid as _uuid
 import trnsysGUI.serialization as _ser
 
 if _tp.TYPE_CHECKING:
-    import trnsysGUI.connection.connectionBase as _conn
+    import trnsysGUI.connection.singlePipeConnection as _spc
 
 
 @_dc.dataclass
@@ -17,7 +17,7 @@ class Connection:
     name: str
     diameterInCm: float
     uValueInWPerM2K: float
-    connection: _conn.ConnectionBase  # type: ignore[name-defined]
+    connection: _spc.SinglePipeConnection  # type: ignore[name-defined]
 
 
 @_dc.dataclass

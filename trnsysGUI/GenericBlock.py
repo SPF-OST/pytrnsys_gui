@@ -172,32 +172,7 @@ class GenericBlock(BlockItem):
             for _ in range(numberOfPortPairsToAdd):
                 self.addPortPair(side)
 
-        self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
-        self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-        self.setName(i["BlockDisplayName"])
-
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
-
-        self.logger.debug(len(self.inputs))
-
-        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
-            temp = i["PortsIDIn"]
-            i["PortsIDIn"] = i["PortsIDOut"]
-            i["PortsIDOut"] = temp
-
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
-
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
-
-        resBlockList.append(self)
-
+        super(GenericBlock, self).decode(i, resBlockList)
         self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
         self.setImage()
 

@@ -237,7 +237,7 @@ class Scene(QGraphicsScene):
                 if self.isInRect(o.scenePos()):
                     res.append(o)
 
-            if type(o) is ConnectionBase:
+            if isinstance(o, ConnectionBase):
                 self.logger.debug("Checking connection to group")
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     res.append(o)
@@ -258,7 +258,7 @@ class Scene(QGraphicsScene):
                 if self.isInRect(o.scenePos()):
                     return True
 
-            if type(o) is ConnectionBase:
+            if isinstance(o, ConnectionBase):
                 self.logger.debug("Checking connection to group")
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     return True

@@ -341,7 +341,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.firstS.toggleMassFlowLabelVisible()
 
     def getRadius(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     # Makes 90deg angles of connection
     def niceConn(self):
@@ -864,14 +864,14 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
             while walker.prevN() is not self.startNode:
                 # self.logger.debug("Del corner...")
-                if type(walker.parent) is not ConnectionBase:
+                if not isinstance(walker.parent, ConnectionBase):
                     self.parent.diagramScene.removeItem(walker.parent)
                 else:
                     self.logger.debug("Caution, this is a disrupt.")
                 walker = walker.prevN()
                 # del (walker.nextN())
 
-            if type(walker.parent) is not ConnectionBase:
+            if not isinstance(walker.parent, ConnectionBase):
                 self.parent.diagramScene.removeItem(walker.parent)
             else:
                 self.logger.debug("Caution.")
@@ -914,7 +914,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         del self
 
     def deleteConnCom(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     # Gradient related
     def totalLength(self):
@@ -1117,10 +1117,10 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     # Saving / Loading
     def encode(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def decode(self, i):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     # Export related
     def exportBlackBox(self):

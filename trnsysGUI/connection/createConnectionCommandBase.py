@@ -13,7 +13,7 @@ class CreateConnectionCommandBase(QUndoCommand):
         self.connParent = connParent
 
     def redo(self):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def undo(self):
         if self.conn in self.conn.parent.connectionList:

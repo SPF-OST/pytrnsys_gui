@@ -50,7 +50,6 @@ from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PipeDataHandler import PipeDataHandler
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
@@ -147,9 +146,6 @@ class Editor(QWidget):
     vertL : :obj:`QVBoxLayout`
     Cointains the library browser view and the listWidget
 
-    datagen : :obj:`PipeDataHandler`
-        Used for generating random massflows for every timestep to test the massflow
-        visualizer prototype
     moveDirectPorts: bool
         Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
     diagramScene : :obj:`QGraphicsScene`
@@ -179,9 +175,6 @@ class Editor(QWidget):
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
         self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
-
-        # Generator for massflow display testing
-        self.datagen = PipeDataHandler(self)
 
         self.testEnabled = False
         self.existReference = True

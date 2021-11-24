@@ -6,7 +6,7 @@ from datetime import timedelta, datetime, MINYEAR
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtWidgets import QSlider, QDialog, QLineEdit, QPushButton, QHBoxLayout, QLabel, QGridLayout
 
-from trnsysGUI.connection.connectionBase import ConnectionBase
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 import pandas as pd
 import itertools
 import numpy as np
@@ -150,7 +150,7 @@ class MassFlowVisualizer(QDialog):
         self.showMass = not self.showMass
 
         for t in self.parent.centralWidget.trnsysObj:
-            if isinstance(t, ConnectionBase):
+            if isinstance(t, SinglePipeConnection):
                 if self.showMass:
                     t.firstS.labelMass.setVisible(True)
                 else:
@@ -185,7 +185,7 @@ class MassFlowVisualizer(QDialog):
         if self.loadedFile:
             i = 0
             for t in self.parent.centralWidget.trnsysObj:
-                if isinstance(t, ConnectionBase):
+                if isinstance(t, SinglePipeConnection):
                     if (
                         "Mfr" + t.displayName in self.massFlowData.columns
                         and "T" + t.displayName in self.tempMassFlowData
@@ -431,7 +431,7 @@ class MassFlowVisualizer(QDialog):
 
     def closeEvent(self, a0):
         for t in self.parent.centralWidget.trnsysObj:
-            if isinstance(t, ConnectionBase):
+            if isinstance(t, SinglePipeConnection):
                 t.firstS.labelMass.setVisible(False)
 
         self.pauseVis()
