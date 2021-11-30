@@ -15,11 +15,11 @@ class StorageTankVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     FlippedV: bool
     BlockName: str
     BlockDisplayName: str
+    GroupName: str
     size_h: int
     StoragePosition: _tp.Tuple[float, float]
     trnsysID: int
     ID: int
-    GroupName: str
     HxList: _tp.Sequence["HeatExchangerLegacyVersion"]
     PortPairList: _tp.Sequence["DirectPortPairLegacyVersion"]
 
@@ -162,7 +162,7 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def from_dict(
         cls,
-        data: _dcj.JsonDict,
+        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 2
         validate=True,
         validate_enums: bool = True,
     ) -> "StorageTank":
@@ -174,9 +174,9 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
+        data = super().to_dict(omit_none, validate, validate_enums)   # pylint: disable=duplicate-code  # 1
         data[".__BlockDict__"] = True
         return data
 

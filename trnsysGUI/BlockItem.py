@@ -1,23 +1,27 @@
 # pylint: skip-file
 # type: ignore
 
+import dataclasses as _dc
 import glob
 import os
 import typing as _tp
-import abc as _abc
+import uuid as _uuid
 
+import dataclasses_jsonschema as _dcj
 from PyQt5 import QtCore
 from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
-import trnsysGUI.images as _img
 import massFlowSolver as _mfs
-
-from trnsysGUI import idGenerator as _id, PortItem as _pi
+import massFlowSolver.networkModel as _mfn
+import trnsysGUI.images as _img
+import trnsysGUI.serialization as _ser
+from trnsysGUI import idGenerator as _id
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.MoveCommand import MoveCommand
-from trnsysGUI.PortItem import PortItem
 from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 global FilePath
 FilePath = "res/Config.txt"
@@ -72,8 +76,8 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.label.setVisible(False)
 
         if self.name == "Bvi":
-            self.inputs.append(PortItem("i", 0, self))
-            self.outputs.append(PortItem("o", 2, self))
+            self.inputs.append(SinglePipePortItem("i", 0, self))
+            self.outputs.append(SinglePipePortItem("o", 2, self))
 
         if self.name == "StorageTank":
             # Inputs get appended in ConfigStorage
@@ -94,17 +98,17 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.origOutputsPos = None
         self.origInputsPos = None
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItem) -> _tp.Optional[int]:
-        assert graphicalPortItem.parent == self, "`graphicalPortItem' does not belong to this `BlockItem'."
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
+        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
 
-        if not graphicalPortItem.connectionList:
-            return None
+        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
 
-        connection = graphicalPortItem.connectionList[0]
-
-        return connection.trnsysId
+        return graphicalPortItem.getConnectedRealNode(portItem)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        if type(self) == BlockItem:
+            raise AssertionError("`BlockItem' cannot be instantiated directly.")
+
         currentClassName = BlockItem.__name__
         currentMethodName = f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
 
@@ -171,13 +175,15 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     def mouseDoubleClickEvent(self, event):
         if hasattr(self, "isTempering"):
-            dia = self.parent.parent().showTVentilDlg(self)
+            self.parent.parent().showTVentilDlg(self)
         elif self.name == "Pump":
-            dia = self.parent.parent().showPumpDlg(self)
+            self.parent.parent().showPumpDlg(self)
         elif self.name == "TeePiece" or self.name == "WTap_main":
-            dia = self.parent.parent().showBlockDlg(self)
+            self.parent.parent().showBlockDlg(self)
+        elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
+            self.parent.parent().showDoublePipeBlockDlg(self)
         else:
-            dia = self.parent.parent().showBlockDlg(self)
+            self.parent.parent().showBlockDlg(self)
             if len(self.propertyFile) > 0:
                 for files in self.propertyFile:
                     os.startfile(files, "open")
@@ -198,31 +204,33 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
     # Transform related
     def changeSize(self):
-        w = self.w
-        h = self.h
+        self._positionLabel()
 
-        """ Resize block function """
-        delta = 4
-
-        # Limit the block size:
-        if h < 20:
-            h = 20
-        if w < 40:
-            w = 40
-
-        # center label:
-        rect = self.label.boundingRect()
-        lw, lh = rect.width(), rect.height()
-        lx = (w - lw) / 2
-        self.label.setPos(lx, h)
+        w, h = self._getCappedWithAndHeight()
 
         if self.name == "Bvi":
+            delta = 4
+
             self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3)
             self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
             self.inputs[0].side = 0 + 2 * self.flippedH
             self.outputs[0].side = 0 + 2 * self.flippedH
 
-        return w, h
+    def _positionLabel(self):
+        width, height = self._getCappedWithAndHeight()
+        rect = self.label.boundingRect()
+        labelWidth, lableHeight = rect.width(), rect.height()
+        labelPosX = (height - labelWidth) / 2
+        self.label.setPos(labelPosX, width)
+
+    def _getCappedWithAndHeight(self):
+        width = self.w
+        height = self.h
+        if height < 20:
+            height = 20
+        if width < 40:
+            width = 40
+        return width, height
 
     def updateFlipStateH(self, state):
         self.flippedH = bool(state)
@@ -253,6 +261,14 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
             for i in range(0, len(self.outputs)):
                 self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
+
+        if self.rotationN % 4 == 2:
+            for p in self.inputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+            for p in self.outputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
 
     def updateFlipStateV(self, state):
         self.flippedV = bool(state)
@@ -306,6 +322,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             p.itemChange(27, p.scenePos())
             self.updateSide(p, 1)
 
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
     def rotateBlockToN(self, n):
         if n > 0:
             while self.rotationN != n:
@@ -331,6 +350,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             p.itemChange(27, p.scenePos())
             self.updateSide(p, -1)
 
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
+
     def resetRotation(self):
         self.logger.debug("Resetting rotation...")
         self.setRotation(0)
@@ -347,6 +369,9 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
 
         self.rotationN = 0
+
+        pixmap = self._getPixmap()
+        self.setPixmap(pixmap)
 
     def printRotation(self):
         self.logger.debug("Rotation is " + str(self.rotationN))
@@ -416,6 +441,13 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
         """
         self.logger.debug("Inside Block Item mouse click")
+
+        # Set flag for selected Block
+        for c in self.parent.parent().trnsysObj:
+            if isinstance(c, BlockItem):
+                c.isSelected = False
+        self.isSelected = True
+
         if self.name == "GenericBlock" or self.name == "StorageTank":
             return
         try:
@@ -500,7 +532,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                         self.pos().x() + self.w / 2,
                         t.pos().y(),
                         t.pos().x() + t.w / 2,
-                        t.pos().y(),
+                        t.pos().y()
                     )
 
                     self.parent.parent().alignYLineItem.setVisible(True)
@@ -528,7 +560,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                         t.pos().x(),
                         t.pos().y() + self.w / 2,
                         t.pos().x(),
-                        self.pos().y() + t.w / 2,
+                        self.pos().y() + t.w / 2
                     )
 
                     self.parent.parent().alignXLineItem.setVisible(True)
@@ -587,56 +619,55 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                     return True
         return False
 
-    # Encoding
     def encode(self):
-        # Double check that no virtual block gets encoded
-        if self.isVisible():
-            portListInputs = []
-            portListOutputs = []
+        portListInputs = []
+        portListOutputs = []
 
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
-            dct = {}
+        for inp in self.inputs:
+            portListInputs.append(inp.id)
+        for output in self.outputs:
+            portListOutputs.append(output.id)
 
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
+        blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-            dictName = "Block-"
+        blockItemModel = BlockItemModel(
+            self.name,
+            self.displayName,
+            blockPosition,
+            self.id,
+            self.trnsysId,
+            portListInputs,
+            portListOutputs,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+        )
 
-            return dictName, dct
+        dictName = "Block-"
+        return dictName, blockItemModel.to_dict()
 
     def decode(self, i, resBlockList):
-        self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
-        self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-        self.setName(i["BlockDisplayName"])
+        model = BlockItemModel.from_dict(i)
 
-        self.logger.debug(len(self.inputs))
+        self.setName(model.BlockDisplayName)
+        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.id = model.Id
+        self.trnsysId = model.trnsysId
 
-        if len(self.inputs) != len(i["PortsIDIn"]) or len(self.outputs) != len(i["PortsIDOut"]):
-            temp = i["PortsIDIn"]
-            i["PortsIDIn"] = i["PortsIDOut"]
-            i["PortsIDOut"] = temp
+        if len(self.inputs) != len(model.portsIdsIn) or len(self.outputs) != len(model.portsIdsOut):
+            temp = model.portsIdsIn
+            model.portsIdsIn = model.portsIdsOut
+            model.portsIdsOut = temp
 
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
+        for index, inp in enumerate(self.inputs):
+            inp.id = model.portsIdsIn[index]
 
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
+        for index, out in enumerate(self.outputs):
+            out.id = model.portsIdsOut[index]
+
+        self.updateFlipStateH(model.flippedH)
+        self.updateFlipStateV(model.flippedV)
+        self.rotateBlockToN(model.rotationN)
 
         resBlockList.append(self)
 
@@ -661,7 +692,8 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     # Export related
     def exportBlackBox(self):
         equation = []
-        if len(self.inputs + self.outputs) == 2 and self.isVisible():
+        if len(self.inputs + self.outputs) == 2 and self.isVisible() \
+                and not isinstance(self.outputs[0], DoublePipePortItem):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not (files):
                 status = "noDdckFile"
@@ -703,10 +735,10 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         return "", startingUnit
 
-    def getTemperatureVariableName(self, portItem: PortItem) -> str:
+    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
         return f"T{self.displayName}"
 
-    def getFlowSolverParametersId(self, portItem: PortItem) -> int:
+    def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:
         return self.trnsysId
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
@@ -719,3 +751,81 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             except ValueError:
                 self.logger.debug("File already deleted from file list.")
                 self.logger.debug("filelist:", self.parent.parent().fileList)
+
+
+@_dc.dataclass
+class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
+    BlockName: str
+    BlockDisplayName: str
+    BlockPosition: _tp.Tuple[float, float]
+    ID: int
+    trnsysID: int
+    PortsIDIn: _tp.List[int]
+    PortsIDOut: _tp.List[int]
+    FlippedH: bool
+    FlippedV: bool
+    RotationN: int
+    GroupName: str
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('b87a3360-eaa7-48f3-9bed-d01224727cbe')
+
+
+@_dc.dataclass
+class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
+    BlockName: str
+    BlockDisplayName: str
+    blockPosition: _tp.Tuple[float, float]
+    Id: int
+    trnsysId: int
+    portsIdsIn: _tp.List[int]
+    portsIdsOut: _tp.List[int]
+    flippedH: bool
+    flippedV: bool
+    rotationN: int
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "BlockItemModel":
+        data.pop(".__BlockDict__")
+        blockItemModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(BlockItemModel, blockItemModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return BlockItemModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel":
+
+        return BlockItemModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.BlockPosition,
+            superseded.ID,
+            superseded.trnsysID,
+            superseded.PortsIDIn,
+            superseded.PortsIDOut,
+            superseded.FlippedH,
+            superseded.FlippedV,
+            superseded.RotationN,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('bbc03f36-d1a1-4d97-a9c0-d212ea3a0203')

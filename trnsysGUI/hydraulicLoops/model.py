@@ -6,12 +6,12 @@ import abc as _abc
 import itertools as _it
 import typing as _tp
 
-import trnsysGUI.PortItem as _pi  # type: ignore[name-defined]
+import trnsysGUI.singlePipePortItem as _spi  # type: ignore[name-defined]
 from . import _search
 from . import _serialization as _ser
 
 if _tp.TYPE_CHECKING:
-    import trnsysGUI.Connection as _conn  # type: ignore[name-defined]
+    import trnsysGUI.connection.singlePipeConnection as _spc  # type: ignore[name-defined]
 
 Fluid = _ser.Fluid
 
@@ -40,23 +40,26 @@ class AutomaticallyGeneratedName(Name):
 
 class HydraulicLoop:
     def __init__(
-        self, name: Name, fluid: _ser.Fluid, connections: _tp.Sequence[_conn.Connection]  # type: ignore[name-defined]
+        self,
+        name: Name,
+        fluid: _ser.Fluid,
+        connections: _tp.Sequence[_spc.SinglePipeConnection],  # type: ignore[name-defined]
     ) -> None:
         self.name = name
         self.fluid = fluid
-        self.connections: _tp.List[_conn.Connection] = [*connections]  # type: ignore[name-defined]
+        self.connections: _tp.List[_spc.SinglePipeConnection] = [*connections]  # type: ignore[name-defined]
 
-    def addConnection(self, connection: _conn.Connection) -> None:  # type: ignore[name-defined]
+    def addConnection(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         if self.containsConnection(connection):
             raise ValueError(f"Connection '{connection.displayName}' already part of hydraulic loop '{self.name}'.")
 
         self.connections.append(connection)
 
-    def removeConnection(self, connection: _conn.Connection) -> None:  # type: ignore[name-defined]
+    def removeConnection(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         if not self.containsConnection(connection):
             raise ValueError(f"Connection '{connection.displayName}' does not belong to hydraulic loop {self.name}.")
 
-    def containsConnection(self, connection: _conn.Connection):  # type: ignore[name-defined]
+    def containsConnection(self, connection: _spc.SinglePipeConnection):  # type: ignore[name-defined]
         return connection in self.connections
 
 
@@ -72,7 +75,7 @@ class HydraulicLoops:
 
     @staticmethod
     def createLoops(
-        connections: _tp.Sequence[_conn.Connection], fluid: Fluid  # type: ignore[name-defined]
+        connections: _tp.Sequence[_spc.SinglePipeConnection], fluid: Fluid  # type: ignore[name-defined]
     ) -> "HydraulicLoops":
         loops = HydraulicLoops([])
 
@@ -92,7 +95,7 @@ class HydraulicLoops:
     def createFromJson(
         cls,
         sequence: _tp.Sequence[_tp.Dict],
-        connections: _tp.Sequence[_conn.Connection],  # type: ignore[name-defined]
+        connections: _tp.Sequence[_spc.SinglePipeConnection],  # type: ignore[name-defined]
         fluids: "Fluids",
     ) -> "HydraulicLoops":
         serializedLoops = [_ser.HydraulicLoop.from_dict(o) for o in sequence]
@@ -110,7 +113,7 @@ class HydraulicLoops:
     def _createLoop(
         cls,
         serializedLoop: _ser.HydraulicLoop,
-        connectionsByTrnsysId: _tp.Mapping[int, _conn.Connection],  # type: ignore[name-defined]
+        connectionsByTrnsysId: _tp.Mapping[int, _spc.SinglePipeConnection],  # type: ignore[name-defined]
         fluids: "Fluids",
     ) -> HydraulicLoop:
         name = cls._createName(serializedLoop)
@@ -130,7 +133,9 @@ class HydraulicLoops:
         name = UserDefinedName(nameValue) if isUserDefinedName else AutomaticallyGeneratedName(nameValue)
         return name
 
-    def getLoopForPortItem(self, portItem: _pi.PortItem) -> _tp.Optional[HydraulicLoop]:  # type: ignore[name-defined]
+    def getLoopForPortItem(
+        self, portItem: _spi.SinglePipePortItem  # type: ignore[name-defined]
+    ) -> _tp.Optional[HydraulicLoop]:
         connections = _search.getReachableConnections(portItem)
         loops = {self._getLoopForConnection(c) for c in connections}
         loop = _getSingleOrNone(loops)
@@ -158,7 +163,9 @@ class HydraulicLoops:
 
         raise AssertionError(f"Failed to generate new name after {i} tries.")
 
-    def _getLoopForConnection(self, connection: _conn.Connection) -> HydraulicLoop:  # type: ignore[name-defined]
+    def _getLoopForConnection(
+        self, connection: _spc.SinglePipeConnection  # type: ignore[name-defined]
+    ) -> HydraulicLoop:
         loops = {l for l in self.hydraulicLoops if connection in l.connections}
         loop = _getSingle(loops)
         return loop

@@ -4,22 +4,21 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.Connection as _conn
-import trnsysGUI.PortItem as _pi
+import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.singlePipePortItem as _spi
 from . import _mergeLoopsDialog as _md
 from . import model as _model
 
-
 if _tp.TYPE_CHECKING:
-    import trnsysGUI.createConnectionCommand as _ccc
+    import trnsysGUI.connection.createSinglePipeConnectionCommand as _cspc
 
 
 def merge(
-    fromPort: _pi.PortItem,  # type: ignore[name-defined]
-    toPort: _pi.PortItem,  # type: ignore[name-defined]
+    fromPort: _spi.SinglePipePortItem,  # type: ignore[name-defined]
+    toPort: _spi.SinglePipePortItem,  # type: ignore[name-defined]
     hydraulicLoops: _model.HydraulicLoops,
     defaultFluid: _model.Fluid,
-    createConnectionCommand: _ccc.CreateConnectionCommand,
+    createConnectionCommand: _cspc.CreateSinglePipeConnectionCommand,  # type: ignore[name-defined]
 ) -> _tp.Optional["UndoCommand"]:
     merger = _Merger(hydraulicLoops, defaultFluid)
 
@@ -33,9 +32,9 @@ class _Merger:
 
     def createUndoCommand(
         self,
-        fromPort: _pi.PortItem,  # type: ignore[name-defined]
-        toPort: _pi.PortItem,  # type: ignore[name-defined]
-        createConnectionCommand: _ccc.CreateConnectionCommand,  # type: ignore[name-defined]
+        fromPort: _spi.SinglePipePortItem,  # type: ignore[name-defined]
+        toPort: _spi.SinglePipePortItem,  # type: ignore[name-defined]
+        createConnectionCommand: _cspc.CreateSinglePipeConnectionCommand,  # type: ignore[name-defined]
     ) -> _tp.Optional["UndoCommand"]:
         fromLoop = self._hydraulicLoops.getLoopForPortItem(fromPort)
         toLoop = self._hydraulicLoops.getLoopForPortItem(toPort)
@@ -92,12 +91,14 @@ class _Merger:
 
 
 class UndoCommand(_qtw.QUndoCommand):
-    def __init__(self, label: str, createConnectionCommand: _ccc.CreateConnectionCommand) -> None:
+    def __init__(
+        self, label: str, createConnectionCommand: _cspc.CreateSinglePipeConnectionCommand  # type: ignore[name-defined]
+    ) -> None:
         super().__init__(label, createConnectionCommand)
         self._createConnectionCommand = createConnectionCommand
 
-    def _getConnection(self) -> _tp.Optional[_conn.Connection]:  # type: ignore[name-defined]
-        connection = self._createConnectionCommand.connection
+    def _getConnection(self) -> _tp.Optional[_spc.SinglePipeConnection]:  # type: ignore[name-defined]
+        connection = self._createConnectionCommand.conn
         assert connection
         return connection
 
@@ -120,8 +121,6 @@ class _CreateUndoCommand(UndoCommand):
         self._shallDeleteOnRedo = shallDeleteOnRedo
 
     def redo(self) -> None:
-        super().redo()
-
         if self._shallDeleteOnRedo:
             self._deleteLoop()
         else:
@@ -147,7 +146,7 @@ class _ExtendUndoCommand(UndoCommand):
     def __init__(
         self,
         loop: _model.HydraulicLoop,
-        createConnectionCommand: _ccc.CreateConnectionCommand,
+        createConnectionCommand: _cspc.CreateSinglePipeConnectionCommand,  # type: ignore[name-defined]
         shallRemoveFromLoopOnRedo: bool = False,
     ) -> None:
         label = "Shrink hydraulic loop" if shallRemoveFromLoopOnRedo else "Extend hydraulic loop"
@@ -188,7 +187,7 @@ class _MergeUndoCommandCommand(UndoCommand):
         mergedName: _model.Name,
         mergedFluid: _model.Fluid,
         hydraulicLoops: _model.HydraulicLoops,
-        createConnectionCommand: _ccc.CreateConnectionCommand,
+        createConnectionCommand: _cspc.CreateSinglePipeConnectionCommand,  # type: ignore[name-defined]
         shallSplitOnRedo: bool = False,
     ) -> None:
         label = "Split hydraulic loop" if shallSplitOnRedo else "Merge hydraulic loops"

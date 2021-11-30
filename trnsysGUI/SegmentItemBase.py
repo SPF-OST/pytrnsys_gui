@@ -4,17 +4,15 @@
 import typing as tp
 from math import sqrt
 
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import QPointF, QLineF
-from PyQt5.QtGui import QColor, QLinearGradient, QBrush, QPen
-from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsTextItem, QMenu
+from PyQt5.QtGui import QColor, QPen
+from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QMenu
 
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 
 # This is needed to avoid a circular import but still be able to type check
 if tp.TYPE_CHECKING:
-    from trnsysGUI.Connection import Connection
+    from trnsysGUI.connection.connectionBase import ConnectionBase
 
 
 def calcDist(p1, p2):
@@ -23,8 +21,8 @@ def calcDist(p1, p2):
     return norm
 
 
-class segmentItem(QGraphicsLineItem):
-    def __init__(self, startNode, endNode, parent: "Connection"):
+class SegmentItemBase(QGraphicsItemGroup):
+    def __init__(self, startNode, endNode, parent: "ConnectionBase"):
         """
         A connection is displayed as a chain of segmentItems (stored in Connection.segments)
         Parameters.
@@ -34,8 +32,7 @@ class segmentItem(QGraphicsLineItem):
         parent: type(parent): Connection
         """
 
-        super(segmentItem, self).__init__(None)
-
+        super().__init__(None)
         self.logger = parent.logger
 
         self.setFlag(self.ItemIsSelectable, True)
@@ -47,6 +44,8 @@ class segmentItem(QGraphicsLineItem):
         self.firstChild = None
         self.secondChild = None
         self.cornerChild = None
+
+        self.linePoints = None
 
         self.startNode = startNode
         self.endNode = endNode
@@ -75,17 +74,13 @@ class segmentItem(QGraphicsLineItem):
         # Used to only create the child objects once
         self._isDraggingInProgress = False
 
-        self.linearGrad = None
-
         self.insertInParentSegments()
-        self.initGrad()
 
         self.label = QGraphicsTextItem(self.connection.displayName)
         self.connection.parent.diagramScene.addItem(self.label)
         self.label.setVisible(False)
         self.label.setFlag(self.ItemIsMovable, True)
-
-        self.labelMass = QGraphicsTextItem(self.connection.displayName)
+        self.labelMass = QGraphicsTextItem()
         self.connection.parent.diagramScene.addItem(self.labelMass)
         self.labelMass.setVisible(False)
         self.labelMass.setFlag(self.ItemIsMovable, True)
@@ -113,104 +108,34 @@ class segmentItem(QGraphicsLineItem):
         c2_g = 0
 
         try:
-            f1 = partLen2 / totLenConn
-            f2 = (totLenConn - partLen2) / totLenConn
+            f1 = int(partLen2 / totLenConn)
+            f2 = int((totLenConn - partLen2) / totLenConn)
         except ZeroDivisionError:
             return QColor(100, 100, 100)
         else:
             return QColor(f1 * c2_r + f2 * c1_r, f1 * c2_g + f2 * c1_g, f1 * c2_b + f2 * c1_b)
 
-    def initGrad(self):
-        """
-        Initialize gradient
-        Returns
-        -------
+    def line(self):
+        return self.linePoints
 
-        """
-        # color = QColor(177, 202, 211)
-        # color = QColor(3, 124, 193)
-        color = QtCore.Qt.red
-
-        pen1 = QtGui.QPen(color, 4)
-
-        # TODO: Dont forget that disr segments can also have parent type not CornerItem
-        if type(self.startNode.parent) is CornerItem:
-            x1 = self.startNode.firstNode().parent
+    def setLine(self, *args):
+        self.setZValue(-1)
+        if len(args) == 2:
+            p1, p2 = args
+            x1 = p1.x()
+            y1 = p1.y()
+            x2 = p2.x()
+            y2 = p2.y()
         else:
-            x1 = self.startNode.parent
+            x1, y1, x2, y2 = args
 
-        if type(self.endNode.parent) is CornerItem:
-            x2 = self.endNode.lastNode().parent
-        else:
-            x2 = self.endNode.parent
+        self._setLineImpl(x1, y1, x2, y2)
 
-        # At init
-        self.linearGrad = QLinearGradient(
-            QPointF(x1.fromPort.scenePos().x(), x1.fromPort.scenePos().y()),
-            QPointF(x2.toPort.scenePos().x(), x2.toPort.scenePos().y()),
-        )
-        self.linearGrad.setColorAt(0, QtCore.Qt.blue)
-        self.linearGrad.setColorAt(1, QtCore.Qt.red)
-
-        self.linearGrad.setColorAt(0, QtCore.Qt.gray)
-        self.linearGrad.setColorAt(1, QtCore.Qt.black)
-
-        # self.setPen(QtGui.QPen(color, 2))
-
-        pen1.setBrush(QBrush(self.linearGrad))
-
-        self.setPen(pen1)
+    def _setLineImpl(self, x1, y1, x2, y2):
+        raise NotImplementedError()
 
     def updateGrad(self):
-        """
-        Updates the gradient by calling the interpolation function
-        Returns
-        -------
-
-        """
-        # This color is overwritten by the gradient
-        color = QtCore.Qt.red
-        pen1 = QtGui.QPen(color, 4)
-
-        totLenConn = self.connection.totalLength()
-        partLen1 = self.connection.partialLength(self.startNode)
-        partLen2 = self.connection.partialLength(self.endNode)
-
-        # self.logger.debug("totlenconn is " + str(totLenConn))
-        # self.logger.debug("partlen1 is " + str(partLen1) + "(node1)" + str(self.startNode))
-        # self.logger.debug("partlen2  is " + str(partLen2) + "(node2)" + str(self.endNode) +"\n")
-
-        # TODO: Dont forget that disr segments can also have parent type not CornerItem
-
-        if type(self.startNode.parent) is CornerItem:
-            # self.logger.debug("In updategrad, startnode parent is corner")
-            # self.logger.debug("I have a corner parent, self is " + str(self))
-
-            startGradP = QPointF(self.startNode.parent.scenePos().x(), self.startNode.parent.scenePos().y())
-        elif self.startNode.prevN() is None:
-            startGradP = QPointF(
-                self.startNode.parent.fromPort.scenePos().x(), self.startNode.parent.fromPort.scenePos().y()
-            )
-        else:
-            startGradP = QPointF(self.line().p1().x(), self.line().p1().y())
-
-        if type(self.endNode.parent) is CornerItem:
-            # self.logger.debug("In update grad, endnode parent is corner")
-            # self.logger.debug("I have a corner parent, self is " + str(self))
-            endGradP = QPointF(self.endNode.parent.scenePos().x(), self.endNode.parent.scenePos().y())
-        elif self.endNode.nextN() is None:
-            endGradP = QPointF(self.endNode.parent.toPort.scenePos().x(), self.endNode.parent.toPort.scenePos().y())
-        else:
-            endGradP = QPointF(self.line().p2().x(), self.line().p2().y())
-
-        self.linearGrad = QLinearGradient(startGradP, endGradP)
-
-        self.linearGrad.setColorAt(0, self.interpolate(partLen1, totLenConn))
-        self.linearGrad.setColorAt(1, self.interpolate(partLen2, totLenConn))
-
-        pen1.setBrush(QBrush(self.linearGrad))
-
-        self.setPen(pen1)
+        raise NotImplementedError()
 
     def insertInParentSegments(self):
         """
@@ -219,8 +144,8 @@ class segmentItem(QGraphicsLineItem):
         -------
 
         """
-
         prevSeg = None
+
         for s in self.connection.segments:
             if s.endNode is self.startNode:
                 prevSeg = s
@@ -231,6 +156,7 @@ class segmentItem(QGraphicsLineItem):
         if not hasattr(self.startNode.parent, "fromPort"):
             self.connection.segments.insert(self.connection.segments.index(prevSeg) + 1, self)
         else:
+
             self.connection.segments.insert(0, self)
 
     def mousePressEvent(self, e):
@@ -239,7 +165,7 @@ class segmentItem(QGraphicsLineItem):
             self.keyPr = 1
             self.logger.debug("Setting key to 1")
 
-            self.connection.highlightConn()
+            self.connection.selectConnection()
 
             if self.isVertical():
                 try:
@@ -250,9 +176,6 @@ class segmentItem(QGraphicsLineItem):
                     self.logger.debug("set oldx")
 
     def mouseMoveEvent(self, e):
-        # self.logger.debug("mouse moved")
-        # self.logger.debug(str(e.button()))
-
         self.logger.debug(self.connection.parent.editorMode)
         if self.keyPr == 1:
             self.logger.debug("moved with button 1")
@@ -271,6 +194,7 @@ class segmentItem(QGraphicsLineItem):
                     if not self.endNode.parent.isVisible():
                         self.endNode.parent.setVisible(True)
                     if self.isVertical():
+
                         self.logger.debug("Segment is vertical: %s", self.connection.segments.index(self))
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
                         self.startNode.parent.setPos(newPos.x(), self.startNode.parent.scenePos().y())
@@ -313,6 +237,7 @@ class segmentItem(QGraphicsLineItem):
             self.endNode.setPrev(self.startNode)
 
             # x-position of the ending point of the next segment line
+
             posx1 = self.connection.segments[self.connection.segments.index(self) + 2].line().p2().x()
 
             self.connection.parent.diagramScene.removeItem(nextS)
@@ -401,12 +326,14 @@ class segmentItem(QGraphicsLineItem):
                         pass
                     else:
                         command = HorizSegmentMoveCommand(self, self.oldX, "Moving segment command")
+
                         self.connection.parent.parent().undoStack.push(command)
                         self.oldX = self.scenePos().x()
 
                 if self.isHorizontal():
                     if type(self.startNode.parent) is CornerItem and type(self.endNode.parent) is CornerItem:
                         try:
+
                             nextHorizSeg = self.connection.segments[self.connection.segments.index(self) + 2]
                             prevHorizSeg = self.connection.segments[self.connection.segments.index(self) - 2]
                         except IndexError:
@@ -430,7 +357,6 @@ class segmentItem(QGraphicsLineItem):
                     self.logger.debug("Second corner is not none")
                     # if PortItem
                     if hasattr(self.endNode.parent, "fromPort"):
-
                         segbef = self.connection.segments[self.connection.getNodePos(self.secondCorner.node.prevN().parent)]
 
                         segbef.setLine(
@@ -457,6 +383,7 @@ class segmentItem(QGraphicsLineItem):
 
                     # if PortItem
                     elif hasattr(self.startNode.parent, "fromPort"):
+
                         segafter = self.connection.segments[self.connection.getNodePos(self.thirdCorner.node.nextN().parent)]
 
                         segafter.setLine(
@@ -495,6 +422,7 @@ class segmentItem(QGraphicsLineItem):
             self.disrAfterNode = self.startNode
             self.start = self.startNode.prevN().prevN()
 
+
             segments = self.connection.segments
             for s in segments:
                 if s.startNode is self.start:
@@ -510,6 +438,7 @@ class segmentItem(QGraphicsLineItem):
             self.disrBeforeNode = self.endNode
             self.end = self.endNode.nextN().nextN()
 
+
             segments = self.connection.segments
             for s in segments:
                 if s.endNode is self.end:
@@ -521,11 +450,11 @@ class segmentItem(QGraphicsLineItem):
         else:
             self.end = self.endNode
 
-        rad = 2
+        rad = self.connection.getRadius()
 
         self.cornerChild = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.start, self.end, self.connection)
-        self.firstChild = segmentItem(self.start, self.cornerChild.node, self.connection)
-        self.secondChild = segmentItem(self.cornerChild.node, self.end, self.connection)
+        self.firstChild = self._createSegment(self.start, self.cornerChild.node)
+        self.secondChild = self._createSegment(self.cornerChild.node, self.end)
 
         self.start.setNext(self.cornerChild.node)
         self.end.setPrev(self.cornerChild.node)
@@ -542,7 +471,7 @@ class segmentItem(QGraphicsLineItem):
 
     def _initInMode1(self, b):
 
-        rad = 2
+        rad = self.connection.getRadius()
 
         if b:
             if (hasattr(self.startNode.parent, "fromPort")) and (self.startNode.prevN() is None):
@@ -552,6 +481,7 @@ class segmentItem(QGraphicsLineItem):
 
                 self.secondCorner = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
                 self.thirdCorner = CornerItem(
+
                     -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
                 )
 
@@ -561,8 +491,8 @@ class segmentItem(QGraphicsLineItem):
 
                 self.endNode = self.secondCorner.node
 
-                self.firstLine = segmentItem(self.secondCorner.node, self.thirdCorner.node, self.connection)
-                self.secondLine = segmentItem(self.thirdCorner.node, self.thirdCorner.node.nextN(), self.connection)
+                self.firstLine = self._createSegment(self.secondCorner.node, self.thirdCorner.node)
+                self.secondLine = self._createSegment(self.thirdCorner.node, self.thirdCorner.node.nextN())
 
                 self.secondCorner.setVisible(False)
                 self.thirdCorner.setVisible(False)
@@ -585,6 +515,7 @@ class segmentItem(QGraphicsLineItem):
 
                 self.secondCorner = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
                 self.thirdCorner = CornerItem(
+
                     -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
                 )
 
@@ -594,8 +525,8 @@ class segmentItem(QGraphicsLineItem):
 
                 self.startNode = self.thirdCorner.node
 
-                self.firstLine = segmentItem(self.secondCorner.node.prevN(), self.secondCorner.node, self.connection)
-                self.secondLine = segmentItem(self.secondCorner.node, self.thirdCorner.node, self.connection)
+                self.firstLine = self._createSegment(self.secondCorner.node.prevN(), self.secondCorner.node)
+                self.secondLine = self._createSegment(self.secondCorner.node, self.thirdCorner.node)
 
                 self.secondCorner.setVisible(False)
                 self.thirdCorner.setVisible(False)
@@ -611,6 +542,10 @@ class segmentItem(QGraphicsLineItem):
 
                 self._isDraggingInProgress = True
 
+    def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
+        raise NotImplementedError()
+
+
     def isVertical(self):
         return self.line().p1().x() == self.line().p2().x()
 
@@ -622,8 +557,9 @@ class segmentItem(QGraphicsLineItem):
         p2 = self.line().p2()
 
         if len(self.scene().items(newPos)) == 0:
-            self.firstChild.setLine(QLineF(p1.x(), p1.y(), newPos.x(), newPos.y()))
-            self.secondChild.setLine(QLineF(newPos.x(), newPos.y(), p2.x(), p2.y()))
+
+            self.firstChild.setLine(p1.x(), p1.y(), newPos.x(), newPos.y())
+            self.secondChild.setLine(newPos.x(), newPos.y(), p2.x(), p2.y())
 
             self.cornerChild.setPos(newPos)
 
@@ -644,6 +580,7 @@ class segmentItem(QGraphicsLineItem):
 
         if b:
             self.thirdCorner.setPos(newPos.x() - 10, newPos.y())
+
             self.secondCorner.setPos(newPos.x() - 10, self.connection.fromPort.scenePos().y())
             self.thirdCorner.node.nextN().parent.setY(newPos.y())
 
@@ -678,6 +615,7 @@ class segmentItem(QGraphicsLineItem):
 
         else:
             self.secondCorner.setPos(newPos.x() + 10, newPos.y())
+
             self.thirdCorner.setPos(newPos.x() + 10, self.connection.toPort.scenePos().y())
             self.secondCorner.node.prevN().parent.setY(newPos.y())
 
@@ -726,29 +664,27 @@ class segmentItem(QGraphicsLineItem):
             )
 
     def contextMenuEvent(self, event):
-        menu = QMenu()
-        a1 = menu.addAction("Rename...")
-        a1.triggered.connect(self.renameConn)
-
-        a2 = menu.addAction("Delete this connection")
-        a2.triggered.connect(self.connection.deleteConnCom)
-
-        a3 = menu.addAction("Invert this connection")
-        a3.triggered.connect(self.connection.invertConnection)
-
-        editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
-        editHydraulicLoopAction.triggered.connect(self.connection.editHydraulicLoop)
-
-        a4 = menu.addAction("Toggle name")
-        a4.triggered.connect(self.connection.toggleLabelVisible)
-
-        a5 = menu.addAction("Toggle mass flow")
-        a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
+        menu = self._getContextMenu()
 
         menu.exec(event.screenPos())
 
+    def _getContextMenu(self) -> QMenu:
+        menu = QMenu()
+        a1 = menu.addAction("Rename...")
+        a1.triggered.connect(self.renameConn)
+        a2 = menu.addAction("Delete this connection")
+        a2.triggered.connect(self.connection.deleteConnCom)
+        a3 = menu.addAction("Invert this connection")
+        a3.triggered.connect(self.connection.invertConnection)
+        a4 = menu.addAction("Toggle name")
+        a4.triggered.connect(self.connection.toggleLabelVisible)
+        a5 = menu.addAction("Toggle mass flow")
+        a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
+        return menu
+
     def inspect(self):
-        self.connection.highlightConn()
+
+        self.connection.selectConnection()
         self.connection.inspectConn()
 
     def setLabelVisible(self, isVisible: bool) -> None:
@@ -765,16 +701,17 @@ class segmentItem(QGraphicsLineItem):
         wasVisible = self.labelMass.isVisible()
         self.setMassFlowLabelVisible(not wasVisible)
 
-    def setHighlight(self, isHighlight: bool) -> None:
-        if isHighlight:
-            highlightPen = self._createHighlightPen()
-            self.setPen(highlightPen)
-        else:
-            self.updateGrad()
+    def setSelect(self, isSelected: bool) -> None:
+        raise NotImplementedError()
 
     @staticmethod
-    def _createHighlightPen() -> QPen:
+
+    def _createSelectPen() -> QPen:
         color = QColor(125, 242, 189)
         width = 4
-        highlightPen = QPen(color, width)
-        return highlightPen
+
+        selectPen = QPen(color, width)
+        return selectPen
+
+    def setColorAndWidthAccordingToMassflow(self, color, width):
+        raise NotImplementedError()

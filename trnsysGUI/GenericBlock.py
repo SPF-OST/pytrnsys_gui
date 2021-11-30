@@ -14,15 +14,15 @@ from trnsysGUI.BlockItem import BlockItem
 from massFlowSolver import InternalPiping
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class GenericBlock(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super(GenericBlock, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(PortItem("i", 2, self))
-        self.outputs.append(PortItem("o", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 2, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.childIds = []
@@ -192,8 +192,8 @@ class GenericBlock(BlockItem):
         w = self.w
         delta = 4
         self.logger.debug("side is " + str(side))
-        self.inputs.append(PortItem("i", side, self))
-        self.outputs.append(PortItem("o", side, self))
+        self.inputs.append(SinglePipePortItem("i", side, self))
+        self.outputs.append(SinglePipePortItem("o", side, self))
         # Allocate id
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 

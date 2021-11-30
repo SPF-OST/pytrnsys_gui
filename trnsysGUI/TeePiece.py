@@ -7,7 +7,7 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from massFlowSolver import InternalPiping
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class TeePiece(BlockItem):
@@ -19,9 +19,9 @@ class TeePiece(BlockItem):
 
         self.typeNumber = 2
 
-        self.inputs.append(PortItem("i", 0, self))
-        self.inputs.append(PortItem("i", 2, self))
-        self.outputs.append(PortItem("o", 1, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(SinglePipePortItem("i", 2, self))
+        self.outputs.append(SinglePipePortItem("o", 1, self))
 
         self.changeSize()
 

@@ -6,7 +6,7 @@ from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsRectItem
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
+from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.storageTank.widget import StorageTank
@@ -148,6 +148,17 @@ class Scene(QGraphicsScene):
             self.parent().moveDirectPorts = not self.parent().moveDirectPorts
             self.logger.debug("Changing move bool to " + str(self.parent().moveDirectPorts))
 
+        if event.key() == Qt.Key_Delete:
+            for c in self.parent().trnsysObj:
+                # Delete connection
+                if isinstance(c, ConnectionBase):
+                    if c.isSelected:
+                        c.deleteConnCom()
+                # Delete block
+                if isinstance(c, BlockItem):
+                    if c.isSelected:
+                        c.deleteBlockCom()
+
     def mousePressEvent(self, event):
         # TODO : remove resizer when click on other block items
         super().mousePressEvent(event)
@@ -162,7 +173,7 @@ class Scene(QGraphicsScene):
             self.parent().multipleSelectMode = True
             for c in self.parent().connectionList:
                 if not self.parent().parent().massFlowEnabled:
-                    c.unhighlightConn()
+                    c.deselectConnection()
 
             self.parent().alignYLineItem.setVisible(False)
 
@@ -209,7 +220,7 @@ class Scene(QGraphicsScene):
                 if self.isInRect(o.scenePos()):
                     res.append(o)
 
-            if type(o) is Connection:
+            if isinstance(o, ConnectionBase):
                 self.logger.debug("Checking connection to group")
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     res.append(o)
@@ -230,7 +241,7 @@ class Scene(QGraphicsScene):
                 if self.isInRect(o.scenePos()):
                     return True
 
-            if type(o) is Connection:
+            if isinstance(o, ConnectionBase):
                 self.logger.debug("Checking connection to group")
                 if self.isInRect(o.fromPort.scenePos()) and self.isInRect(o.toPort.scenePos()):
                     return True

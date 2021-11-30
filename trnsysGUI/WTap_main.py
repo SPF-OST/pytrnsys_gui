@@ -7,7 +7,7 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from massFlowSolver import InternalPiping
-from trnsysGUI.PortItem import PortItem
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class WTap_main(BlockItem):
@@ -16,7 +16,7 @@ class WTap_main(BlockItem):
         self.w = 40
         self.h = 40
 
-        self.outputs.append(PortItem("o", 0, self))
+        self.outputs.append(SinglePipePortItem("o", 0, self))
 
         self.typeNumber = 4
 

@@ -2,11 +2,10 @@ from __future__ import annotations
 
 __all__ = ["edit", "merge"]
 
+from . import _merge
 from . import model as _model
 from ._editDialog import gui as _gui
 from ._editDialog import model as _gmodel
-from . import _merge
-
 
 merge = _merge.merge
 
@@ -36,7 +35,6 @@ def _createGuiLoop(hydraulicLoop: _model.HydraulicLoop) -> _gmodel.HydraulicLoop
 
 
 def _applyModel(guiHydraulicLoop: _gmodel.HydraulicLoop, hydraulicLoop: _model.HydraulicLoop) -> None:
-    # TODO@damian.birchler Make sure loop name is valid
     oldName = hydraulicLoop.name.value
     newName = guiHydraulicLoop.name
     if oldName != newName:

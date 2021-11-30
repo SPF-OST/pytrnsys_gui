@@ -5,12 +5,11 @@ import json
 import typing as tp
 
 from trnsysGUI.AirSourceHP import AirSourceHP
-from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
-from trnsysGUI.Connection import Connection
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.Graphicaltem import GraphicalItem
@@ -25,11 +24,17 @@ from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.Pump import Pump
 from trnsysGUI.Radiator import Radiator
-from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
+from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
+from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.storageTank.widget import StorageTank
 
 
 class Decoder(json.JSONDecoder):
@@ -185,21 +190,35 @@ class Decoder(json.JSONDecoder):
                     elif i["BlockName"] == "GraphicalItem":
                         bl = GraphicalItem(self.editor.diagramView, loadedGI=True)
 
+                    elif i["BlockName"] == "DPTee":
+                        bl = DoublePipeTeePiece(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "SPCnr":
+                        bl = SingleDoublePipeConnector(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "DPCnr":
+                        bl = DoubleDoublePipeConnector(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+
                     else:
-                        bl = BlockItem(i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"])
+                        raise AssertionError(f"Unknown kind of block item: {i['BlockName']}")
 
                     bl.decode(i, resBlockList)
 
                 elif ".__ConnectionDict__" in i:
-                    fromPort = None
-                    toPort = None
+                    fromPortId, toPortId = self._getPortIds(i)
 
                     # Looking for the ports the connection is connected to
+                    fromPort = None
+                    toPort = None
                     for connBl in resBlockList:
                         for p in connBl.inputs + connBl.outputs:
-                            if p.id == i["PortFromID"]:
+                            if p.id == fromPortId:
                                 fromPort = p
-                            if p.id == i["PortToID"]:
+                            if p.id == toPortId:
                                 toPort = p
 
                     if fromPort is None:
@@ -208,8 +227,12 @@ class Decoder(json.JSONDecoder):
                     if toPort is None:
                         self.logger.debug("Error: Did not found a toPort")
 
-                    c = Connection(fromPort, toPort, self.editor)
-
+                    if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
+                        c = SinglePipeConnection(fromPort, toPort, self.editor)
+                    elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
+                        c = DoublePipeConnection(fromPort, toPort, self.editor)
+                    else:
+                        raise AssertionError("`fromPort' and `toPort' have different types.")
                     c.decode(i)
                     resConnList.append(c)
 
@@ -223,3 +246,16 @@ class Decoder(json.JSONDecoder):
             return resBlockList, resConnList
 
         return arr
+
+    @staticmethod
+    def _getPortIds(i):
+        if "PortFromID" in i and "PortToID" in i:
+            # Legacy port ID naming
+            fromPortId = i["PortFromID"]
+            toPortId = i["PortToID"]
+        elif "fromPortId" in i and "toPortId" in i:
+            fromPortId = i["fromPortId"]
+            toPortId = i["toPortId"]
+        else:
+            raise AssertionError("Could not find port IDs for connection.")
+        return fromPortId, toPortId

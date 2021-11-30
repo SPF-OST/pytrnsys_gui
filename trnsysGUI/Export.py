@@ -1,12 +1,13 @@
 # pylint: skip-file
-# type: ignore
-
 import re
 
 from PyQt5.QtWidgets import QMessageBox
 
-from trnsysGUI.Connection import Connection
-from trnsysGUI.TVentil import TVentil
+import massFlowSolver as _mfs  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
+from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
 
 
 class Export(object):
@@ -17,19 +18,10 @@ class Export(object):
         self.editor = editor
         self.maxChar = 20
 
-        self.lineNumOfPar = 0
-        for component in self.trnsysObj:
-            if isinstance(component, Connection):
-                numOfRelPorts = 1
-            else:
-                numOutputs = len(component.outputs)
-                numInputs = len(component.inputs)
+        o: _mfs.MassFlowNetworkContributorMixin
+        nodes = [n for o in self.trnsysObj for n in o.getInternalPiping().openLoopsStartingNodes]
+        self.lineNumOfPar = len(nodes)
 
-                if (numInputs == 0 and numOutputs == 1) or (numInputs == 1 and numOutputs == 0):
-                    numOfRelPorts = 1
-                else:
-                    numOfRelPorts = min(numOutputs, numInputs)
-            self.lineNumOfPar += numOfRelPorts
         self.numOfPar = 4 * self.lineNumOfPar + 1
 
     def exportBlackBox(self, exportTo="ddck"):
@@ -113,7 +105,7 @@ class Export(object):
         nameString = ""
         for t in self.trnsysObj:
 
-            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
+            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -232,7 +224,7 @@ class Export(object):
         tot = ""
 
         for t in self.trnsysObj:
-            noHydraulicConnection = not isinstance(t, Connection) and not t.outputs and not t.inputs
+            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -272,15 +264,27 @@ class Export(object):
         return f
 
     def exportPrintPipeLosses(self):
-        connections = [o for o in self.editor.trnsysObj if isinstance(o, Connection)]
+        f = ""
+        lossText = ""
+        rightCounter = 0
 
-        if not connections:
-            lossText = "0"
-        else:
-            lossText = "+".join(f"P{c.displayName}_kW" for c in connections)
+        for t in self.editor.trnsysObj:
+            if isinstance(t, SinglePipeConnection):
+                if rightCounter != 0:
+                    lossText += "+"
+                lossText += "P" + t.displayName + "_kW"
+                rightCounter += 1
+            if isinstance(t, DoublePipeConnection):
+                if rightCounter != 0:
+                    lossText += "+"
+                lossText += "P" + t.displayName + "Cold_kW" + "+"
+                lossText += "P" + t.displayName + "Hot_kW"
+                rightCounter += 1
 
-        f = "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText + "\n\n"
+        if rightCounter == 0:
+            lossText += "0"
 
+        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText + "\n\n"
         return f
 
     def exportMassFlowPrinter(self, unitnr, descLen):
@@ -320,13 +324,14 @@ class Export(object):
         f += "\n"
 
         s = ""
+        equationType = "Mfr"
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "Mfr" + t.displayName + " "
+            if isinstance(t, SinglePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "", equationType)
+            if isinstance(t, DoublePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
+                breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
             if isinstance(t, TVentil) and t.isVisible():
                 breakline += 1
                 if breakline % 8 == 0:
@@ -335,6 +340,13 @@ class Export(object):
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
+
+    def _getEquation(self, breakline, s, t, temperature, equationType):
+        breakline += 1
+        if breakline % 8 == 0:
+            s += "\n"
+        s += equationType + t.displayName + temperature + " "
+        return breakline, s
 
     def exportTempPrinter(self, unitnr, descLen):
 
@@ -374,13 +386,14 @@ class Export(object):
         f += "\n"
 
         s = ""
+        equationType = "T"
         breakline = 0
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
-                breakline += 1
-                if breakline % 8 == 0:
-                    s += "\n"
-                s += "T" + t.displayName + " "
+            if isinstance(t, SinglePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "", equationType)
+            if isinstance(t, DoublePipeConnection):
+                breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
+                breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f

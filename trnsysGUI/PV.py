@@ -5,8 +5,7 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
@@ -21,8 +20,6 @@ class PV(BlockItem):
         factor = 0.97
         self.w = 100
         self.h = 100
-        # self.inputs.append(PortItem('i', 2, self))
-        # self.outputs.append(PortItem('o', 2, self))
         self.loadedFiles = []
 
         self.changeSize()
@@ -32,13 +29,8 @@ class PV(BlockItem):
         return _img.PV_SVG
 
     def changeSize(self):
-        # self.logger.debug("passing through c change size")
         w = self.w
         h = self.h
-
-        """ Resize block function """
-        delta = -2
-        deltaH = self.h / 10
 
         # Limit the block size:
         if h < 20:
@@ -50,16 +42,6 @@ class PV(BlockItem):
         lw, lh = rect.width(), rect.height()
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
-
-        # Update port positions:
-        # self.outputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-        #                        h - h * self.flippedV - deltaH + 2 * deltaH * self.flippedV)
-        # self.inputs[0].setPos(2 * delta - 4 * self.flippedH * delta - self.flippedH * w + w,
-        #                       h * self.flippedV + deltaH - 2 * deltaH * self.flippedV)
-        # self.inputs[0].side = 2 - 2 * self.flippedH
-        # self.outputs[0].side = 2 - 2 * self.flippedH
-        # self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        # self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h
 
     def addTree(self):
@@ -70,12 +52,7 @@ class PV(BlockItem):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, "ddck")
@@ -95,16 +72,6 @@ class PV(BlockItem):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
 
     def updateTreePath(self, path):
         """
@@ -150,7 +117,6 @@ class PV(BlockItem):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\PV_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)

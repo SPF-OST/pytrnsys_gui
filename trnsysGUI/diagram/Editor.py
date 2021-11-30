@@ -8,6 +8,7 @@ import pkgutil as _pu
 import shutil
 import typing as _tp
 
+import pytrnsys.trnsys_util.deckUtils as _du
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir
 from PyQt5.QtGui import QColor, QPainter
@@ -31,14 +32,14 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
-import pytrnsys.trnsys_util.deckUtils as _du
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.Connection import Connection
-from trnsysGUI.createConnectionCommand import CreateConnectionCommand
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
+
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
@@ -46,16 +47,19 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.PipeDataHandler import PipeDataHandler
-from trnsysGUI.PortItem import PortItem
 from trnsysGUI.PumpDlg import PumpDlg
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
+from trnsysGUI.connection.connectionBase import ConnectionBase
+from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
+from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
 from trnsysGUI.diagramDlg import diagramDlg
+from trnsysGUI.doublePipeBlockDlg import DoublePipeBlockDlg
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.idGenerator import IdGenerator
 from trnsysGUI.newDiagramDlg import newDiagramDlg
@@ -129,9 +133,6 @@ class Editor(QWidget):
     vertL : :obj:`QVBoxLayout`
     Cointains the library browser view and the listWidget
 
-    datagen : :obj:`PipeDataHandler`
-        Used for generating random massflows for every timestep to test the massflow
-        visualizer prototype
     moveDirectPorts: bool
         Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
     diagramScene : :obj:`QGraphicsScene`
@@ -159,9 +160,6 @@ class Editor(QWidget):
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
         self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
-
-        # Generator for massflow display testing
-        self.datagen = PipeDataHandler(self)
 
         self.testEnabled = False
         self.existReference = True
@@ -197,6 +195,9 @@ class Editor(QWidget):
         componentNamesWithIcon = [
             ("Connector", _img.CONNECTOR_SVG.icon()),
             ("TeePiece", _img.TEE_PIECE_SVG.icon()),
+            ("DPTee", _img.DP_TEE_PIECE_SVG.icon()),
+            ("SPCnr", _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
+            ("DPCnr", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("TVentil", _img.T_VENTIL_SVG.icon()),
             ("WTap_main", _img.W_TAP_MAIN_SVG.icon()),
             ("WTap", _img.W_TAP_SVG.icon()),
@@ -363,25 +364,33 @@ class Editor(QWidget):
     def startConnection(self, port):
         self._currentlyDraggedConnectionFromPort = port
 
-    def _createConnectionUndoable(self, startPort, endPort):
-        if startPort == endPort:
-            raise ValueError(f"Start and end port are the same.")
+    def _createConnection(self, startPort, endPort) -> None:
+        if startPort is not endPort:
+            if (
+                isinstance(startPort.parent, StorageTank)
+                and isinstance(endPort.parent, StorageTank)
+                and startPort.parent != endPort.parent
+            ):
+                msgSTank = QMessageBox(self)
+                msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
+                msgSTank.exec_()
 
-        if (
-            isinstance(startPort.parent, StorageTank)
-            and isinstance(endPort.parent, StorageTank)
-            and startPort.parent != endPort.parent
-        ):
-            msgSTank = QMessageBox(self)
-            msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
-            msgSTank.exec_()
+            isValidSinglePipeConnection = (
+                isinstance(startPort, SinglePipePortItem)
+                and isinstance(endPort, SinglePipePortItem)
+            )
+            if isValidSinglePipeConnection:
+                command = CreateSinglePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
 
-        createConnectionsCommand = CreateConnectionCommand(startPort, endPort, self)
+                defaultFluid = self._fluids.WATER
+                _hl.merge(startPort, endPort, self._hydraulicLoops, defaultFluid, command)
 
-        defaultFluid = self._fluids.WATER
-        _hl.merge(startPort, endPort, self._hydraulicLoops, defaultFluid, createConnectionsCommand)
+            elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
+                command = CreateDoublePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
+            else:
+                raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
-        self.parent().undoStack.push(createConnectionsCommand)
+            self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
         if self._currentlyDraggedConnectionFromPort:
@@ -402,7 +411,7 @@ class Editor(QWidget):
         mousePosition = event.scenePos()
 
         hitItems = self.diagramScene.items(mousePosition)
-        hitPortItems = [i for i in hitItems if isinstance(i, PortItem)]
+        hitPortItems = [i for i in hitItems if type(i) == type(self._currentlyDraggedConnectionFromPort)]
         numberOfHitPortsItems = len(hitPortItems)
 
         if numberOfHitPortsItems == 0:
@@ -414,7 +423,7 @@ class Editor(QWidget):
         hitPortItem = hitPortItems[0]
 
         if hitPortItem != self._currentlyDraggedConnectionFromPort:
-            self._createConnectionUndoable(self._currentlyDraggedConnectionFromPort, hitPortItem)
+            self._createConnection(self._currentlyDraggedConnectionFromPort, hitPortItem)
 
         self._currentlyDraggedConnectionFromPort = None
         self.connLineItem.setVisible(False)
@@ -914,7 +923,7 @@ class Editor(QWidget):
 
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
-            if isinstance(c, Connection):
+            if isinstance(c, ConnectionBase):
                 c.setLabelVisible(isVisible)
             if isinstance(c, BlockItem):
                 c.label.setVisible(isVisible)
@@ -923,12 +932,15 @@ class Editor(QWidget):
 
     def updateConnGrads(self):
         for t in self.trnsysObj:
-            if isinstance(t, Connection):
+            if isinstance(t, ConnectionBase):
                 t.updateSegGrads()
 
     # Dialog calls
     def showBlockDlg(self, bl):
         c = BlockDlg(bl, self)
+
+    def showDoublePipeBlockDlg(self, bl):
+        c = DoublePipeBlockDlg(bl, self)
 
     def showPumpDlg(self, bl):
         c = PumpDlg(bl, self)
@@ -958,7 +970,7 @@ class Editor(QWidget):
         self.logger.debug("Ok, here is my log")
         self.logger.debug(int(args[0]) + 1)
         if len(self.connectionList) > 0:
-            self.connectionList[0].highlightConn()
+            self.connectionList[0].selectConnection()
 
     def getConnection(self, n):
         return self.connectionList[int(n)]
@@ -1214,6 +1226,8 @@ class Editor(QWidget):
             self.logger.info("Creating " + controlFolder)
             os.makedirs(controlFolder)
 
-    def editHydraulicLoop(self, connection: Connection):
-        hydraulicLoop = self._hydraulicLoops.getLoopForPortItem(connection.fromPort)
+    def editHydraulicLoop(self, singlePipeConnection: SinglePipeConnection):
+        assert isinstance(singlePipeConnection.fromPort, SinglePipePortItem)
+
+        hydraulicLoop = self._hydraulicLoops.getLoopForPortItem(singlePipeConnection.fromPort)
         _hl.edit(hydraulicLoop, self._hydraulicLoops, self._fluids)

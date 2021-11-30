@@ -5,6 +5,7 @@ import json
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.diagram import Editor as _de
+from trnsysGUI.BlockItem import BlockItem
 
 
 class Encoder(json.JSONEncoder):

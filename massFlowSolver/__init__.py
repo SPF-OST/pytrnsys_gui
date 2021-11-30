@@ -1,14 +1,14 @@
 import dataclasses as _dc
 import typing as _tp
 
-import trnsysGUI.PortItem as _pi
+import trnsysGUI.PortItemBase as _pi
 from massFlowSolver import networkModel as _mfn
 
 
 @_dc.dataclass
 class InternalPiping:
-    openLoopsStartingNodes: _tp.Sequence[_mfn.NodeBase]
-    modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItem]
+    openLoopsStartingNodes: _tp.Sequence[_mfn.RealNodeBase]
+    modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]
 
 
 @_dc.dataclass
@@ -25,8 +25,7 @@ class MassFlowNetworkContributorMixin:
 
         allParameters = []
         for openLoop in openLoops:
-            nodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            realNodes = nodes
+            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
             parameters = [rn.serialize(allNodesToIndices).parameters for rn in realNodes]
             allParameters.extend(parameters)
 
@@ -87,16 +86,16 @@ class MassFlowNetworkContributorMixin:
 
             portItemsToIndices = {}
             for portItem in portItems:
-                graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-                portItemIndex = self._getPortItemIndex(graphicalPortItem)
-                if not portItemIndex:
+                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)
+                if not connectedRealNode:
                     raise AssertionError("Hydraulics not connected.")
-                portItemsToIndices[portItem] = portItemIndex
+                portItemsToIndices[portItem] = connectedRealNode.trnsysId
             realNodesToIndices = {n: n.trnsysId for n in realNodes}
             nodesToIndices = portItemsToIndices | realNodesToIndices
 
             allNodesToIndices |= nodesToIndices
         return openLoops, allNodesToIndices
 
-    def _getPortItemIndex(self, graphicalPortItem: _pi.PortItem) -> _tp.Optional[int]:
+    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         raise NotImplementedError()
+

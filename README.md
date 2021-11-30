@@ -48,7 +48,7 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
          
 1. Install `pytrnsys-gui` and its requirements:
     ```commandline
-    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/v0.9.7/requirements.txt
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/v0.9.9/requirements.txt
     ```
    (Note: In the [YouTube video](https://www.youtube.com/watch?v=c8VPmOCeQN8) the version is replaced manually, this is
    not necessary anymore, when copying the command line above.)
@@ -115,10 +115,18 @@ specified are for a Windows environment. They are very similar for Linux.
     pip install wheel
     pip install -r requirements\dev\requirements.txt
     ```
-1. Run `pytrnsys-gui`!
+   
+1. Build the python-files corresponding to the ui-file included:
+    ```commandline
+   py dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
+   ```
+   Note: You have to execute this file each time you pull from the source results in changes to existing ui-files or new 
+   ones.  
+   
+1. Now you can run `pytrnsys-gui`!
     ```commandline
     cd trnsysGUI
-    python GUI.py
+    py GUI.py
     ```
     
 Beware that the GUI can only be started from within the virtual environment you created in step 1. 
