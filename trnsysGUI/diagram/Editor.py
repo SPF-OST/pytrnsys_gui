@@ -232,6 +232,9 @@ class Editor(QWidget):
             ("ExternalHx", _img.EXTERNAL_HX_SVG.icon()),
             ("Radiator", _img.RADIATOR_SVG.icon()),
             ("Boiler", _img.BOILER_SVG.icon()),
+            ("Sink", _img.SINK_SVG.icon()),
+            ("Source", _img.SOURCE_SVG.icon()),
+            ("SourceSink", _img.SOURCE_SINK_SVG.icon()),
             ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
             ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
         ]
