@@ -129,7 +129,7 @@ class Decoder(json.JSONDecoder):
                         )
                     elif i["BlockName"] == "Connector":
                         bl = Connector(
-                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                            i["BlockName"], self.editor.diagramView
                         )
                     elif i["BlockName"] == "Boiler":
                         bl = Boiler(

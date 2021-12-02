@@ -1125,20 +1125,3 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
-
-
-class DeleteConnectionCommandBase(QUndoCommand):
-    def __init__(self, conn, descr):
-        super().__init__(descr)
-        self.conn = conn
-        self.connFromPort = self.conn.fromPort
-        self.connToPort = self.conn.toPort
-        self.connParent = self.conn.parent
-
-    def redo(self):
-        self.conn.deleteConn()
-        self.conn = None
-
-    def undo(self):
-        self.conn = ConnectionBase(self.connFromPort, self.connToPort, self.connParent)
-

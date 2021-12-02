@@ -5,7 +5,7 @@ __all__ = ["Connection", "HydraulicLoop"]
 import dataclasses as _dc
 import typing as _tp
 
-from .. import _serialization as _ser
+from trnsysGUI.hydraulicLoops import _serialization as _ser
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc

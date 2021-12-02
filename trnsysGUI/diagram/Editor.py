@@ -34,12 +34,12 @@ from PyQt5.QtWidgets import (
 
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
+import trnsysGUI.hydraulicLoops.edit as _hledit
+import trnsysGUI.hydraulicLoops.migration as _hlmig
+import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
-
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
@@ -48,26 +48,26 @@ from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PumpDlg import PumpDlg
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.doublePipeBlockDlg import DoublePipeBlockDlg
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.idGenerator import IdGenerator
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
-import trnsysGUI.hydraulicLoops.model as _hlm
-import trnsysGUI.hydraulicLoops as _hl
 
 
 class Editor(QWidget):
@@ -290,8 +290,8 @@ class Editor(QWidget):
         self.connectionList = []
         self.trnsysObj = []
         self.graphicalObj = []
-        self._fluids: _tp.Optional[_hlm.Fluids] = None
-        self._hydraulicLoops: _tp.Optional[_hlm.HydraulicLoops] = None
+        self.fluids: _tp.Optional[_hlm.Fluids] = None
+        self.hydraulicLoops: _tp.Optional[_hlm.HydraulicLoops] = None
 
         self.copyGroupList = QGraphicsItemGroup()
         self.selectionGroupList = QGraphicsItemGroup()
@@ -380,13 +380,9 @@ class Editor(QWidget):
                 and isinstance(endPort, SinglePipePortItem)
             )
             if isValidSinglePipeConnection:
-                command = CreateSinglePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
-
-                defaultFluid = self._fluids.WATER
-                _hl.merge(startPort, endPort, self._hydraulicLoops, defaultFluid, command)
-
+                command = CreateSinglePipeConnectionCommand(startPort, endPort, self)
             elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
-                command = CreateDoublePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
+                command = CreateDoublePipeConnectionCommand(startPort, endPort, self)
             else:
                 raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
@@ -766,8 +762,9 @@ class Editor(QWidget):
                 self.logger.debug("tv has " + str(t.isTempering))
 
         # TODO@damian.birchler
-        self._fluids = _hlm.Fluids([])
-        self._hydraulicLoops = _hlm.HydraulicLoops.createLoops(self.connectionList, self._fluids.WATER)
+        self.fluids = _hlm.Fluids([])
+        singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
+        self.hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
 
     def exportSvg(self):
         """
@@ -1229,5 +1226,5 @@ class Editor(QWidget):
     def editHydraulicLoop(self, singlePipeConnection: SinglePipeConnection):
         assert isinstance(singlePipeConnection.fromPort, SinglePipePortItem)
 
-        hydraulicLoop = self._hydraulicLoops.getLoopForPortItem(singlePipeConnection.fromPort)
-        _hl.edit(hydraulicLoop, self._hydraulicLoops, self._fluids)
+        hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
+        _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)

@@ -9,7 +9,7 @@ import PyQt5.QtGui as _qtg
 from PyQt5 import QtWidgets as _qtw
 
 try:
-    from . import _UI_editDialog_generated as _uigen
+    from . import _UI_dialog_generated as _uigen
     import trnsysGUI.resources.QRC_resources_generated as _
 except ImportError as importError:
     raise AssertionError(  # pylint: disable=duplicate-code  # 1
@@ -18,8 +18,9 @@ except ImportError as importError:
         "`pytrnsys_gui` directory."
     ) from importError
 
+from trnsysGUI.hydraulicLoops import model as _model
+
 from . import model as _gmodel
-from .. import model as _model
 
 
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
@@ -27,26 +28,26 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         super().__init__()
         self.setupUi(self)
 
-        self.hydraulicLoop = hydraulicLoop
-        self._occupiedNames: _tp.Set[str] = {*occupiedNames}
+        self._hydraulicLoop = hydraulicLoop
+        self._occupiedNames = occupiedNames
         self._fluids = fluids
 
-        self._configureLoopName()
-        self.loopName.setText(hydraulicLoop.name)
-
-        self._configureBulkOperations()
+        self._configureLoopNameLineEdit()
+        self.loopName.setText(self._hydraulicLoop.name)
 
         self._configureFluidComboBox()
 
-        fluidIndex = self.fluidComboBox.findData(self.hydraulicLoop.fluid)
+        fluidIndex = self.fluidComboBox.findData(self._hydraulicLoop.fluid)
         assert fluidIndex >= 0
         self.fluidComboBox.setCurrentIndex(fluidIndex)
 
+        self._configureBulkOperations()
+
         self._reloadConnections()
 
-    def _configureLoopName(self):
+    def _configureLoopNameLineEdit(self) -> None:
         def onNameChanged(newName) -> None:
-            self.hydraulicLoop.name = newName
+            self._hydraulicLoop.name = newName
 
             isNameEmpty = not newName
             isNameOccupied = self._isNameOccupied(newName)
@@ -62,7 +63,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             haveError = isNameEmpty or isNameOccupied
             self.invalidNameWarningWidget.setVisible(haveError)
 
-            okButton = self.okCancelButtonBox.button(_qtw.QDialogButtonBox.Ok)
+            okButton = self.okCancelButtonBox.button(self.okCancelButtonBox.Ok)
             okButton.setEnabled(not haveError)
 
         self.loopName.textChanged.connect(onNameChanged)
@@ -70,7 +71,16 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
     def _isNameOccupied(self, newName: str) -> bool:
         return newName in self._occupiedNames
 
-    def _configureBulkOperations(self):
+    def _configureFluidComboBox(self) -> None:
+        for fluid in self._fluids.fluids:
+            self.fluidComboBox.addItem(fluid.name, userData=fluid)
+
+        def onCurrentIndexChanged(_) -> None:
+            self._hydraulicLoop.fluid = self.fluidComboBox.currentData()
+
+        self.fluidComboBox.currentIndexChanged.connect(onCurrentIndexChanged)
+
+    def _configureBulkOperations(self) -> None:
         def setTotalLoopLengthInfoToolTipVisible(_) -> None:
             isVisible = self._isBulkTotalPipeLengthTypeSelected()
             self.bulkLengthInfoIconWidget.setVisible(isVisible)
@@ -86,7 +96,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             uValueText = self.bulkUValueLineEdit.text()
             uValueInWPerM2K = float(uValueText) if uValueText else None
 
-            for connection in self.hydraulicLoop.connections:
+            for connection in self._hydraulicLoop.connections:
                 if individualPipeLengthInM is not None:
                     connection.lengthInM = individualPipeLengthInM
 
@@ -111,7 +121,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self._configureForPositiveFloat(self.bulkDiameterLineEdit)
         self._configureForPositiveFloat(self.bulkUValueLineEdit)
 
-    def _isBulkTotalPipeLengthTypeSelected(self):
+    def _isBulkTotalPipeLengthTypeSelected(self) -> bool:
         text = self.bulkLengthTypeComboBox.currentText()
 
         if text == "Individual pipe length":
@@ -123,7 +133,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         raise AssertionError(f"Unknown bulk length type text: {text}")
 
     @staticmethod
-    def _configureForPositiveFloat(lineEdit: _qtw.QLineEdit):
+    def _configureForPositiveFloat(lineEdit: _qtw.QLineEdit) -> None:
         def checkIfTextIsPositiveFloatOrReset() -> None:
             text = lineEdit.text()
             try:
@@ -133,8 +143,8 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         lineEdit.editingFinished.connect(checkIfTextIsPositiveFloatOrReset)
 
-    def _reloadConnections(self):
-        connectionsModel = _ConnectionsUiModel(self.hydraulicLoop.connections)
+    def _reloadConnections(self) -> None:
+        connectionsModel = _ConnectionsUiModel(self._hydraulicLoop.connections)
 
         connectionsModel.dataChanged.connect(lambda *_: self._updatePipesStatisticsLabel())
 
@@ -145,10 +155,10 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
         self._updatePipesStatisticsLabel()
 
-    def _updatePipesStatisticsLabel(self):
-        totalLoopLengthInM = sum(c.lengthInM for c in self.hydraulicLoop.connections)
+    def _updatePipesStatisticsLabel(self) -> None:
+        totalLoopLengthInM = sum(c.lengthInM for c in self._hydraulicLoop.connections)
         statisticsLabelText = (
-            f"Number of pipes: {len(self.hydraulicLoop.connections)}, total loop length: {totalLoopLengthInM:g} m"
+            f"Number of pipes: {len(self._hydraulicLoop.connections)}, total loop length: {totalLoopLengthInM:g} m"
         )
         self.pipesStatisticsLabel.setText(statisticsLabelText)
 
@@ -165,18 +175,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             return individualPipeLengthInM
 
         loopLengthInM = float(lengthText)
-        nPipes = len(self.hydraulicLoop.connections)
+        nPipes = len(self._hydraulicLoop.connections)
         individualPipeLengthM = loopLengthInM / nPipes
         return individualPipeLengthM
-
-    def _configureFluidComboBox(self):
-        for fluid in self._fluids.fluids:
-            self.fluidComboBox.addItem(fluid.name, userData=fluid)
-
-        def onCurrentIndexChanged(_) -> None:
-            self.hydraulicLoop.fluid = self.fluidComboBox.currentData()
-
-        self.fluidComboBox.currentIndexChanged.connect(onCurrentIndexChanged)
 
     @classmethod
     def showDialog(
@@ -275,7 +276,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         return None
 
-    def _getHighlightData(self, connection, prop, role):
+    def _getHighlightData(self, connection: _gmodel.Connection, prop: _Property, role: int) -> _tp.Any:
         mostUsedValue = self._getMostUsedValue(prop)
         value = prop.getter(connection)  # type: ignore[misc,call-arg]
         shallHighlight = value != mostUsedValue
@@ -296,7 +297,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         raise ValueError(f"Role must be {_qtc.Qt.FontRole} or {_qtc.Qt.ForegroundRole}.", role)
 
-    def _getMostUsedValue(self, prop: _Property):
+    def _getMostUsedValue(self, prop: _Property) -> float:
         sortedValues = sorted(prop.getter(c) for c in self.connections)  # type: ignore[misc, call-arg]
         groupedValues = _it.groupby(sortedValues)
         valuesWithCount = [{"value": v, "count": len(list(vs))} for v, vs in groupedValues]
@@ -355,5 +356,5 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         return _qtc.QModelIndex()
 
     @staticmethod
-    def _isTopLevel(parent):
+    def _isTopLevel(parent: _qtc.QModelIndex) -> bool:
         return not parent.isValid()

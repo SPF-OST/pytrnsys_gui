@@ -15,7 +15,7 @@ import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.serialization as _ser
 import trnsysGUI.singlePipeSegmentItem as _spsi
-import trnsysGUI.hydraulicLoops as _hl
+import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -65,11 +65,11 @@ class SinglePipeConnection(_cb.ConnectionBase):
         self._editor.editHydraulicLoop(self)
 
     def deleteConnCom(self):
-        command = DeleteSinglePipeConnectionCommand(self, "Delete conn comand")
+        deleteConnectionCommand = _dspc.DeleteSinglePipeConnectionCommand(
+            self, self._editor.hydraulicLoops, self._editor.fluids.fluids, self._editor.fluids.WATER
+        )
 
-        # TODO@damian split loops
-
-        self.parent.parent().undoStack.push(command)
+        self.parent.parent().undoStack.push(deleteConnectionCommand)
 
     def encode(self):
         if len(self.segments) > 0:
@@ -98,7 +98,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
             self.trnsysId,
             self.diameterInCm,
             self.uValueInWPerM2K,
-            self.lengthInM
+            self.lengthInM,
         )
 
         dictName = "Connection-"
@@ -125,13 +125,19 @@ class SinglePipeConnection(_cb.ConnectionBase):
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
         return _mfs.InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' doesn't belong to `internalPiping'"
+    def _getConnectedRealNode(
+        self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping
+    ) -> _tp.Optional[_mfn.RealNodeBase]:
+        assert (
+            portItem in internalPiping.modelPortItemsToGraphicalPortItem
+        ), "`portItem' doesn't belong to `internalPiping'"
 
         graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
 
-        assert graphicalPortItem in [self.fromPort, self.toPort],\
-            "This connection is not connected to `graphicalPortItem'"
+        assert graphicalPortItem in [
+            self.fromPort,
+            self.toPort,
+        ], "This connection is not connected to `graphicalPortItem'"
 
         blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
         blockItemInternalPiping = blockItem.getInternalPiping()
@@ -140,7 +146,9 @@ class SinglePipeConnection(_cb.ConnectionBase):
             realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
             for realNode in realNodesAndPortItems.realNodes:
                 for candidatePortItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
-                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[candidatePortItem]
+                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[
+                        candidatePortItem
+                    ]
                     if candidateGraphicalPortItem == graphicalPortItem:
                         return realNode
         return None
@@ -202,13 +210,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
             portItem = portItemsWithParent[0][0]
             parent = portItemsWithParent[0][1]
             if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
+                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
@@ -218,13 +220,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
             portItem = portItemsWithParent[1][0]
             parent = portItemsWithParent[1][1]
             if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
+                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
@@ -259,14 +255,6 @@ class SinglePipeConnection(_cb.ConnectionBase):
         return unitText, unitNumber
 
 
-class DeleteSinglePipeConnectionCommand(_cb.DeleteConnectionCommandBase):
-    def __init__(self, conn, descr):
-        super().__init__(conn, descr)
-
-    def undo(self):
-        self.conn = SinglePipeConnection(self.connFromPort, self.connToPort, self.connParent)
-
-
 @_dc.dataclass
 class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     ConnCID: int
@@ -283,7 +271,7 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
+        return _uuid.UUID("7a15d665-f634-4037-b5af-3662b487a214")
 
 
 @_dc.dataclass
@@ -332,10 +320,14 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
-        firstSegmentLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0], \
-                               superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1]
-        firstSegmentMassFlowLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0], \
-                                       superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1]
+        firstSegmentLabelPos = (
+            superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
+            superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
+        )
+        firstSegmentMassFlowLabelPos = (
+            superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
+            superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
+        )
 
         return ConnectionModel(
             superseded.ConnCID,
@@ -354,4 +346,4 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+        return _uuid.UUID("332cd663-684d-414a-b1ec-33fd036f0f17")

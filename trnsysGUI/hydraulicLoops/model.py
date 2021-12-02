@@ -6,8 +6,7 @@ import abc as _abc
 import itertools as _it
 import typing as _tp
 
-import trnsysGUI.singlePipePortItem as _spi  # type: ignore[name-defined]
-from . import _search
+from . import _helpers
 from . import _serialization as _ser
 
 if _tp.TYPE_CHECKING:
@@ -73,24 +72,6 @@ class HydraulicLoops:
 
         self.hydraulicLoops = [*hydraulicLoops]
 
-    @staticmethod
-    def createLoops(
-        connections: _tp.Sequence[_spc.SinglePipeConnection], fluid: Fluid  # type: ignore[name-defined]
-    ) -> "HydraulicLoops":
-        loops = HydraulicLoops([])
-
-        todo = connections
-        while todo:
-            nextConnection = todo[0]
-            reachableConnections = _search.getReachableConnections(nextConnection.fromPort)
-            todo = [c for c in todo if c not in reachableConnections]
-
-            name = loops.generateName()
-            loop = HydraulicLoop(name, fluid, list(reachableConnections))
-            loops.addLoop(loop)
-
-        return loops
-
     @classmethod
     def createFromJson(
         cls,
@@ -133,12 +114,11 @@ class HydraulicLoops:
         name = UserDefinedName(nameValue) if isUserDefinedName else AutomaticallyGeneratedName(nameValue)
         return name
 
-    def getLoopForPortItem(
-        self, portItem: _spi.SinglePipePortItem  # type: ignore[name-defined]
-    ) -> _tp.Optional[HydraulicLoop]:
-        connections = _search.getReachableConnections(portItem)
-        loops = {self._getLoopForConnection(c) for c in connections}
-        loop = _getSingleOrNone(loops)
+    def getLoopForExistingConnection(
+        self, connection: _spc.SinglePipeConnection  # type: ignore[name-defined]
+    ) -> HydraulicLoop:
+        loops = {l for l in self.hydraulicLoops if connection in l.connections}
+        loop = _helpers.getSingle(loops)
         return loop
 
     def getLoop(self, name: str) -> _tp.Optional[HydraulicLoop]:
@@ -162,13 +142,6 @@ class HydraulicLoops:
                 return AutomaticallyGeneratedName(generatedName)
 
         raise AssertionError(f"Failed to generate new name after {i} tries.")
-
-    def _getLoopForConnection(
-        self, connection: _spc.SinglePipeConnection  # type: ignore[name-defined]
-    ) -> HydraulicLoop:
-        loops = {l for l in self.hydraulicLoops if connection in l.connections}
-        loop = _getSingle(loops)
-        return loop
 
 
 class Fluids:
@@ -231,9 +204,3 @@ def _getSingleOrNone(values: _tp.Iterable[_TValue]) -> _tp.Optional[_TValue]:
     assert numberOfValues == 1, f"Expected 0 or 1 value, but got {numberOfValues}."
 
     return valuesList[0]
-
-
-def _getSingle(values: _tp.Iterable[_TValue]) -> _TValue:
-    value = _getSingleOrNone(values)
-    assert value is not None, "Expected a single value but got none."
-    return value

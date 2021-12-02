@@ -34,8 +34,11 @@ def main():
         "-t",
         "--type",
         help="Perform type checking",
-        action="store_true",
-        dest="shallTypeCheck",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="mypyArguments",
     )
     parser.add_argument(
         "-u",
@@ -67,9 +70,10 @@ def main():
 
     _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallTypeCheck:
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
         cmd = "mypy --show-error-codes trnsysGUI tests dev-tools"
-        sp.run(cmd.split(), check=True)
+        additionalArgs = arguments.mypyArguments or ""
+        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
         cmd = "pylint trnsysGUI tests dev-tools"
@@ -87,7 +91,7 @@ def main():
         or arguments.shallRunTests
         or not (
             arguments.shallPerformStaticChecks
-            or arguments.shallTypeCheck
+            or arguments.mypyArguments is not None
             or arguments.lintArguments is not None
             or arguments.diagramsFormat
         )

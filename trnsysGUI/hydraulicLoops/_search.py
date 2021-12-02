@@ -3,46 +3,62 @@ from __future__ import annotations
 import typing as _tp
 
 import massFlowSolver as _mfs
+import massFlowSolver.networkModel as _mfn
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.singlePipePortItem as _spi
-from massFlowSolver import networkModel as _mfn
+
+from . import _helpers
 
 
 def getReachableConnections(
     port: _spi.SinglePipePortItem,  # type: ignore[name-defined]
+    ignoreConnections: _tp.Optional[set[_spc.SinglePipeConnection]] = None,  # type: ignore[name-defined]
 ) -> set[_spc.SinglePipeConnection]:  # type: ignore[name-defined]
     assert len(port.connectionList) <= 1
 
     portItems = {port}
-    newPortItems, newConnections = _expandPortItemSetByOneLayer(portItems)
+    newPortItems, newConnections = _expandPortItemSetByOneLayer(portItems, ignoreConnections)
     while newPortItems != portItems:
         portItems = newPortItems
-        newPortItems, newConnections = _expandPortItemSetByOneLayer(portItems)
+        newPortItems, newConnections = _expandPortItemSetByOneLayer(portItems, ignoreConnections)
 
     return newConnections
 
 
+def isLeaf(port: _spi.SinglePipePortItem) -> bool:
+    internallyConnectedPortItems = _getInternallyConnectedPortItems(port)
+
+    if not port.connectionList and not internallyConnectedPortItems:
+        raise ValueError("Port item is not connected to any connection.")
+
+    if internallyConnectedPortItems and port.connectionList:
+        return False
+
+    return True
+
+
 def _expandPortItemSetByOneLayer(
     portItems: set[_spi.SinglePipePortItem],  # type: ignore[name-defined]
+    ignoreConnections: _tp.Optional[set[_spc.SinglePipeConnection]] = None,  # type: ignore[name-defined]
 ) -> _tp.Tuple[set[_spi.SinglePipePortItem], set[_spc.SinglePipeConnection]]:  # type: ignore[name-defined]
-    connections = set()
-    for portItem in portItems:
-        if not portItem.connectionList:
-            continue
+    if ignoreConnections is None:
+        ignoreConnections = set()
 
-        connection = _getSingle(portItem.connectionList)
-        if not isinstance(connection, _spc.SinglePipeConnection):  # type: ignore[attr-defined]
-            continue
+    connectedPortItems = [pi for pi in portItems if pi.connectionList]
+    connections = [_helpers.getSingle(pi.connectionList) for pi in connectedPortItems]
+    relevantConnections = {
+        c
+        for c in connections
+        if isinstance(c, _spc.SinglePipeConnection) and c not in ignoreConnections  # type: ignore[attr-defined]
+    }
 
-        connections.add(connection)
-
-    connectionPortItems = {p for c in connections for p in [c.fromPort, c.toPort]}
+    connectionPortItems = {p for c in relevantConnections for p in [c.fromPort, c.toPort]}
 
     internalPortItems = {mpi for p in portItems for mpi in _getInternallyConnectedPortItems(p)}
 
     portItems = connectionPortItems | internalPortItems
 
-    return portItems, connections
+    return portItems, relevantConnections
 
 
 def _getInternallyConnectedPortItems(

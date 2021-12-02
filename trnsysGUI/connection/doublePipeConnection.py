@@ -4,6 +4,8 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
+import PyQt5.QtWidgets as _qtw
+
 import dataclasses_jsonschema as _dcj
 
 import massFlowSolver as _mfs
@@ -11,10 +13,9 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
 from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
-
 
 
 class DoublePipeConnection(ConnectionBase):
@@ -33,7 +34,7 @@ class DoublePipeConnection(ConnectionBase):
         return rad
 
     def deleteConnCom(self):
-        command = DeleteDoublePipeConnectionCommand(self, "Delete conn comand")
+        command = DeleteDoublePipeConnectionCommand(self)
         self.parent.parent().undoStack.push(command)
 
     def encode(self):
@@ -308,9 +309,20 @@ class DoublePipeConnection(ConnectionBase):
         return str(firstColumn).ljust(spacing) + comment + "\n"
 
 
-class DeleteDoublePipeConnectionCommand(DeleteConnectionCommandBase):
+class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
+    def __init__(self, conn):
+        super().__init__("Delete double pipe connection")
+        self._connection = conn
+        self._fromPort = self._connection.fromPort
+        self._toPort = self._connection.toPort
+        self._editor = self._connection.parent
+
     def undo(self):
-        self.conn = DoublePipeConnection(self.connFromPort, self.connToPort, self.connParent)
+        self._connection = DoublePipeConnection(self._fromPort, self._toPort, self._editor)
+
+    def redo(self):
+        self._connection.deleteConn()
+        self._connection = None
 
 
 @_dc.dataclass

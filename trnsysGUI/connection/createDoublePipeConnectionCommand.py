@@ -1,15 +1,32 @@
-# pylint: skip-file
-# type: ignore
+from __future__ import annotations
 
-from trnsysGUI.connection.createConnectionCommandBase import CreateConnectionCommandBase
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+import typing as _tp
+
+import PyQt5.QtWidgets as _qtw
+
+import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.doublePipePortItem as _dpi
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.diagram.Editor as _ed
 
 
-class CreateDoublePipeConnectionCommand(CreateConnectionCommandBase):
-    def __init__(self, fromPort, toPort, connParent, descr):
-        super().__init__(fromPort, toPort, connParent, descr)
+class CreateDoublePipeConnectionCommand(_qtw.QUndoCommand):
+    def __init__(
+        self,
+        fromPort: _dpi.DoublePipePortItem,
+        toPort: _dpi.DoublePipePortItem,
+        editor: _ed.Editor,  # type: ignore[name-defined]
+    ) -> None:
+        super().__init__("Create double pipe connection")
+        self._fromPort = fromPort
+        self._toPort = toPort
+        self._editor = editor
+        self._connection = None
 
     def redo(self):
-        self.conn = DoublePipeConnection(self.connFromPort, self.connToPort, self.connParent)
+        self._connection = _dpc.DoublePipeConnection(self._fromPort, self._toPort, self._editor)
 
-        super().redo()
+    def undo(self):
+        self._connection.deleteConn()
+        self._connection = None

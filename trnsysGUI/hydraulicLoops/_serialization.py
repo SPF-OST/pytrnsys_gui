@@ -5,7 +5,7 @@ import uuid as _uuid
 from trnsysGUI import serialization as _ser
 
 
-@_dc.dataclass
+@_dc.dataclass(frozen=True, eq=False)
 class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
     name: str
     specificHeatCapacityInJPerKgK: float
