@@ -113,7 +113,7 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
         if isNameEmpty:
             self.invalidNameWarningWidget.setToolTip("You must specify a name")
         elif isNameTaken:
-            self.invalidNameWarningWidget.setToolTip("This name is already taken")
+            self.invalidNameWarningWidget.setToolTip("This name is already in use")
 
         isNameValid = not isNameEmpty and not isNameTaken
         self.invalidNameWarningWidget.setVisible(not isNameValid)

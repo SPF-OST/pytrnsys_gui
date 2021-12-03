@@ -4,9 +4,9 @@ import dataclasses as _dc
 import typing as _tp
 
 from trnsysGUI.hydraulicLoops import model as _model, _helpers
-from .dialogs.merge import _dialog as _md
+from ._dialogs.merge import dialog as _md
 from . import common as _common
-from ._search import getReachableConnections
+from . import _search
 from .. import singlePipePortItem as _spi
 
 if _tp.TYPE_CHECKING:
@@ -71,7 +71,7 @@ class _Merger:
 
         if fromLoop == toLoop:
             loop = fromLoop
-            loop.addConnection(connection)
+            self._addConnection(connection, loop)
             return None
 
         # This line is needed to help mypy along
@@ -160,7 +160,7 @@ def _getLoopIgnoringConnection(
     connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
     hydraulicLoops: _model.HydraulicLoops,
 ) -> _tp.Optional[_model.HydraulicLoop]:
-    connections = getReachableConnections(portItem, ignoreConnections={connection})
+    connections = _search.getReachableConnections(portItem, ignoreConnections={connection})
     if not connections:
         return None
 

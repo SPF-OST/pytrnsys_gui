@@ -53,7 +53,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             isNameOccupied = self._isNameOccupied(newName)
 
             if isNameEmpty:
-                tooltipText = "The name must not be empty"
+                tooltipText = "You must specify a name"
             elif isNameOccupied:
                 tooltipText = "This name is already in use"
             else:
@@ -297,7 +297,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         raise ValueError(f"Role must be {_qtc.Qt.FontRole} or {_qtc.Qt.ForegroundRole}.", role)
 
-    def _getMostUsedValue(self, prop: _Property) -> float:
+    def _getMostUsedValue(self, prop: _Property) -> _PropertyValue:
         sortedValues = sorted(prop.getter(c) for c in self.connections)  # type: ignore[misc, call-arg]
         groupedValues = _it.groupby(sortedValues)
         valuesWithCount = [{"value": v, "count": len(list(vs))} for v, vs in groupedValues]
@@ -340,7 +340,9 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         prop = self._PROPERTIES[columnIndex]
         return bool(prop.setter)
 
-    def index(self, row: int, column: int, parent: _qtc.QModelIndex = None) -> _qtc.QModelIndex:
+    def index(self, row: int, column: int, parent: _tp.Optional[_qtc.QModelIndex] = None) -> _qtc.QModelIndex:
+        assert parent
+
         if not self._isTopLevel(parent):
             return _qtc.QModelIndex()
 

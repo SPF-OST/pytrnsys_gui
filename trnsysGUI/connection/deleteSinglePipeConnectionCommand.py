@@ -35,9 +35,9 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
     def redo(self) -> None:
         assert self._connection
 
-        splitLoopsSummary = self._splitSummary.after if self._splitSummary else None
+        splitLoopsSummary = self._splitSummary.after if self._splitSummary else None  # pylint: disable=no-member
 
-        cancellable = _hlsplit.split(self._connection, self._hydraulicLoops, splitLoopsSummary)
+        cancellable = _hlsplit.split(self._connection, self._hydraulicLoops, self._fluids, splitLoopsSummary)
         if cancellable == "cancelled":
             self.setObsolete(True)
             return
@@ -51,7 +51,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
             self._fromPort, self._toPort, self._connectionParent
         )
 
-        mergedLoopSummary = self._splitSummary.before if self._splitSummary else None
+        mergedLoopSummary = self._splitSummary.before if self._splitSummary else None  # pylint: disable=no-member
 
         cancellable = _hlmerge.merge(
             self._connection, self._hydraulicLoops, self._fluids, self._defaultFluid, mergedLoopSummary

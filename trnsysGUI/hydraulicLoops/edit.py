@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from . import model as _model
-from .dialogs.edit import dialog as _gui, model as _gmodel
+from ._dialogs.edit import dialog as _gui, model as _gmodel
 
 
 def edit(

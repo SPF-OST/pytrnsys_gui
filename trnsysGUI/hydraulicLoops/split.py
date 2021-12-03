@@ -7,6 +7,7 @@ from . import _helpers
 from . import _search
 from . import common as _common
 from . import model as _model
+from ._dialogs.split import dialog as _dialog
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc
@@ -29,16 +30,18 @@ class SplitSummary:
 def split(
     connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
     hydraulicLoops: _model.HydraulicLoops,
+    fluids: _tp.Sequence[_model.Fluid],
     splitLoopsSummary: _tp.Optional[_common.SplitLoopsSummary],
 ) -> _common.Cancellable[_tp.Optional[SplitSummary]]:
-    splitter = _Splitter(hydraulicLoops)
+    splitter = _Splitter(hydraulicLoops, fluids)
 
     return splitter.split(connection, splitLoopsSummary)
 
 
 class _Splitter:
-    def __init__(self, hydraulicLoops: _model.HydraulicLoops) -> None:
+    def __init__(self, hydraulicLoops: _model.HydraulicLoops, fluids: _tp.Sequence[_model.Fluid]) -> None:
         self._hydraulicLoops = hydraulicLoops
+        self._fluids = fluids
 
     def split(
         self,
@@ -47,16 +50,19 @@ class _Splitter:
     ) -> _common.Cancellable[_tp.Optional[SplitSummary]]:
         fromPort, toPort = _helpers.getFromAndToPort(connection)
 
+        fromConnections = _search.getReachableConnections(fromPort, ignoreConnections={connection})
+        toConnections = _search.getReachableConnections(toPort, ignoreConnections={connection})
+
         loop = self._hydraulicLoops.getLoopForExistingConnection(connection)
 
-        isFromLeaf = _search.isLeaf(fromPort)
-        isToLeaf = _search.isLeaf(toPort)
-
-        if isFromLeaf and isToLeaf:
+        otherConnections = {*loop.connections} - {connection}
+        isOnlyConnection = not otherConnections
+        if isOnlyConnection:
             self._removeLoop(loop)
             return None
 
-        if isFromLeaf or isToLeaf:
+        isConnectionRedundant = otherConnections == (fromConnections | toConnections)
+        if isConnectionRedundant:
             self._removeConnection(connection, loop)
             return None
 
@@ -74,15 +80,13 @@ class _Splitter:
         loop: _model.HydraulicLoop,
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         splitLoopsSummary: _tp.Optional[_common.SplitLoopsSummary],
-    ) -> SplitSummary:
+    ) -> _common.Cancellable[SplitSummary]:
         if not splitLoopsSummary:
-            # TODO@damian.birchler ask user what to do here
-            fromLoopSummary = _common.LoopSummary(loop.name, loop.fluid)
-
-            toLoopName = self._hydraulicLoops.generateName()
-            toLoopSummary = _common.LoopSummary(toLoopName, loop.fluid)
-
-            splitLoopsSummary = _common.SplitLoopsSummary(fromLoopSummary, toLoopSummary)
+            occupiedNames = {l.name.value for l in self._hydraulicLoops.hydraulicLoops} - {loop.name.value}
+            cancellable = _dialog.SplitLoopDialog.showDialogAndGetResult(loop, occupiedNames, self._fluids)
+            if cancellable == "cancelled":
+                return "cancelled"
+            splitLoopsSummary = cancellable
 
         self._hydraulicLoops.removeLoop(loop)
 

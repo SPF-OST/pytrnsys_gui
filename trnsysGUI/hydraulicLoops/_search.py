@@ -12,8 +12,8 @@ from . import _helpers
 
 def getReachableConnections(
     port: _spi.SinglePipePortItem,  # type: ignore[name-defined]
-    ignoreConnections: _tp.Optional[set[_spc.SinglePipeConnection]] = None,  # type: ignore[name-defined]
-) -> set[_spc.SinglePipeConnection]:  # type: ignore[name-defined]
+    ignoreConnections: _tp.Set[_spc.SinglePipeConnection] = None,  # type: ignore[name-defined]
+) -> _tp.Set[_spc.SinglePipeConnection]:  # type: ignore[name-defined]
     assert len(port.connectionList) <= 1
 
     portItems = {port}
@@ -23,18 +23,6 @@ def getReachableConnections(
         newPortItems, newConnections = _expandPortItemSetByOneLayer(portItems, ignoreConnections)
 
     return newConnections
-
-
-def isLeaf(port: _spi.SinglePipePortItem) -> bool:
-    internallyConnectedPortItems = _getInternallyConnectedPortItems(port)
-
-    if not port.connectionList and not internallyConnectedPortItems:
-        raise ValueError("Port item is not connected to any connection.")
-
-    if internallyConnectedPortItems and port.connectionList:
-        return False
-
-    return True
 
 
 def _expandPortItemSetByOneLayer(

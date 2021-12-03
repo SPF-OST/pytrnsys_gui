@@ -51,7 +51,9 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
     def undo(self):
         splitLoopsSummary = self._mergeSummary.before if self._mergeSummary else None  # pylint: disable=no-member
 
-        cancellable = _hlsplit.split(self._connection, self._editor.hydraulicLoops, splitLoopsSummary)
+        cancellable = _hlsplit.split(
+            self._connection, self._editor.hydraulicLoops, self._editor.fluids.fluids, splitLoopsSummary
+        )
         assert cancellable != "cancelled"
 
         self._connection.deleteConn()
