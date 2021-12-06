@@ -125,34 +125,6 @@ class SinglePipeConnection(_cb.ConnectionBase):
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
         return _mfs.InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-    def _getConnectedRealNode(
-        self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping
-    ) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert (
-            portItem in internalPiping.modelPortItemsToGraphicalPortItem
-        ), "`portItem' doesn't belong to `internalPiping'"
-
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-
-        assert graphicalPortItem in [
-            self.fromPort,
-            self.toPort,
-        ], "This connection is not connected to `graphicalPortItem'"
-
-        blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
-        blockItemInternalPiping = blockItem.getInternalPiping()
-
-        for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
-            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
-            for realNode in realNodesAndPortItems.realNodes:
-                for candidatePortItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
-                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[
-                        candidatePortItem
-                    ]
-                    if candidateGraphicalPortItem == graphicalPortItem:
-                        return realNode
-        return None
-
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         f = ""
         unitNumber = startingUnit
@@ -198,9 +170,8 @@ class SinglePipeConnection(_cb.ConnectionBase):
         assert len(openLoops) == 1
         openLoop = openLoops[0]
 
-        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-        assert len(realNodes) == 1
-        realNode = realNodes[0]
+        assert len(openLoop.realNodes) == 1
+        realNode = openLoop.realNodes[0]
 
         outputVariables = realNode.serialize(nodesToIndices).outputVariables
 

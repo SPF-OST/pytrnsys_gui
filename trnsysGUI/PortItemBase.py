@@ -12,6 +12,8 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 if _tp.TYPE_CHECKING:
     import massFlowSolver.networkModel as _mfn
+    import massFlowSolver as _mfs
+    import trnsysGUI.connection.connectionBase as _cb
 
 
 class PortItemBase(QGraphicsEllipseItem):
@@ -287,5 +289,51 @@ class PortItemBase(QGraphicsEllipseItem):
         cor.setVisible(True)
         cor2.setVisible(True)
 
-    def getConnectedRealNode(self, portItem: _mfn.PortItem) -> _tp.Optional[_mfn.RealNodeBase]:
+    def getConnectedRealNode(
+        self,
+        portItem: _mfn.PortItem,
+        massFlowContributor: _mfs.MassFlowNetworkContributorMixin,
+    ) -> _tp.Optional[_mfn.RealNodeBase]:
+        connectedMassFlowContributor = self._getConnectedMassFlowContributor(massFlowContributor)
+        if not connectedMassFlowContributor:
+            return None
+
+        connectedInternalPiping = connectedMassFlowContributor.getInternalPiping()
+
+        connectedPortItemsAndAdjacentRealNode = (
+            connectedInternalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(self)
+        )
+
+        selectedConnectedRealNode = self._selectConnectedRealNode(portItem, connectedPortItemsAndAdjacentRealNode)
+
+        return selectedConnectedRealNode
+
+    def _getConnectedMassFlowContributor(
+        self, massFlowContributor: _mfs.MassFlowNetworkContributorMixin
+    ) -> _tp.Optional[_mfs.MassFlowNetworkContributorMixin]:
+        if massFlowContributor == self.parent:
+            return self._getConnectionOrNone()
+        else:
+            connection = self._getConnectionOrNone()
+
+            if not connection or connection != massFlowContributor:
+                raise ValueError("`massFlowContributor' is not adjacent to this port item.")
+
+            return self.parent
+
+    def _getConnectionOrNone(self) -> _tp.Optional[_cb.ConnectionBase]:
+        if not self.connectionList:
+            return None
+
+        assert len(self.connectionList) == 1
+
+        connection = self.connectionList[0]
+
+        return connection
+
+    def _selectConnectedRealNode(
+        self,
+        portItem: _mfn.PortItem,
+        connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
+    ) -> _mfn.RealNodeBase:
         raise NotImplementedError()

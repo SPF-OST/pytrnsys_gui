@@ -11,7 +11,6 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
 from massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
@@ -1088,9 +1087,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         return "", nUnit
 
     def getInternalPiping(self) -> InternalPiping:
-        raise NotImplementedError()
-
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
         raise NotImplementedError()
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):

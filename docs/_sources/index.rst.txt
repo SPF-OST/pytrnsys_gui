@@ -13,6 +13,10 @@ Switzerland University of Applied Sciences <https://www.ost.ch/>`_.
       :width: 600
       :alt: logos
 
+.. note::
+   This documentation is exclusively about the graphical user interface of pytrnsys. The documentation about pytrnsys
+   itself can be found `here <https://pytrnsys.readthedocs.io>`_.
+
 Table of contents
 =================
 .. toctree::
