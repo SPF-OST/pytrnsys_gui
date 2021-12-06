@@ -13,7 +13,7 @@ class SinglePipePortItem(PortItemBase):
     ) -> _mfn.RealNodeBase:
         assert (
             len(connectedPortItemsAndAdjacentRealNode) == 1
-        ), "Only exactly one model port item can should connected with a single pipe graphical port item."
+        ), "Only exactly one model port item should be connected with a single pipe graphical port item."
 
         selectedRealNode = connectedPortItemsAndAdjacentRealNode[0].realNode
 
