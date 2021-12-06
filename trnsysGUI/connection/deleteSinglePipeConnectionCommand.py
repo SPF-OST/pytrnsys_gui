@@ -7,9 +7,7 @@ from PyQt5 import QtWidgets as _qtw
 import trnsysGUI.hydraulicLoops.model as _hlmodel
 import trnsysGUI.hydraulicLoops.split as _hlsplit
 import trnsysGUI.hydraulicLoops.merge as _hlmerge
-
-if _tp.TYPE_CHECKING:
-    import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.connection.singlePipeConnection as _spc
 
 
 class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=too-many-instance-attributes

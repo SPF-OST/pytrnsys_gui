@@ -108,12 +108,13 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
             self._reloadConnections()
 
-        self.bulkApplyButton.pressed.connect(onBulkApplyButtonPressed)
-
         def clearLineEdits() -> None:
             self.bulkLengthLineEdit.clear()
             self.bulkDiameterLineEdit.clear()
             self.bulkUValueLineEdit.clear()
+
+        self.bulkApplyButton.pressed.connect(onBulkApplyButtonPressed)
+        self.bulkApplyButton.pressed.connect(clearLineEdits)
 
         self.bulkCancelButton.pressed.connect(clearLineEdits)
 

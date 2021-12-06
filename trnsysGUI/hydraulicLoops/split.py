@@ -61,8 +61,10 @@ class _Splitter:
             self._removeLoop(loop)
             return None
 
-        isConnectionRedundant = otherConnections == (fromConnections | toConnections)
+        isConnectionRedundant = fromConnections == otherConnections or toConnections == otherConnections
         if isConnectionRedundant:
+            assert fromConnections == otherConnections and toConnections == otherConnections
+
             self._removeConnection(connection, loop)
             return None
 

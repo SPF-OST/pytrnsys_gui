@@ -656,21 +656,6 @@ class Editor(QWidget):
         self.showNewDiagramDlg()
 
     # Encoding / decoding
-    def encode(self, filename, encodeList):
-        """
-        Encoding function. Not used. encodeDiagram is used instead
-        Parameters
-        ----------
-        filename : str
-        encodeList : :obj:`list` of :obj:`BlockItem` and :obj:`Connection`
-
-        Returns
-        -------
-
-        """
-        with open(filename, "w") as jsonfile:
-            json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
-
     def encodeDiagram(self, filename):
         """
         Encodes the diagram to a json file.
@@ -761,10 +746,23 @@ class Editor(QWidget):
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " + str(t.isTempering))
 
-        # TODO@damian.birchler
-        self.fluids = _hlm.Fluids([])
+        self._decodeFluidsAndHydraulicLoops(blocklist)
+
+    def _decodeFluidsAndHydraulicLoops(self, blocklist):
+        if "fluids" not in blocklist:
+            fluids = _hlm.Fluids([])
+        else:
+            serializedFluids = blocklist["fluids"]
+            fluids = _hlm.Fluids.createFromJson(serializedFluids)
+        self.fluids = fluids
+
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
-        self.hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
+        if "hydraulicLoops" not in blocklist:
+            hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
+        else:
+            serializedHydraulicLoops = blocklist["hydraulicLoops"]
+            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(serializedHydraulicLoops, singlePipeConnections, self.fluids)
+        self.hydraulicLoops = hydraulicLoops
 
     def exportSvg(self):
         """

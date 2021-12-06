@@ -52,9 +52,9 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         self.fluid1ComboBox.setCurrentIndex(0)
         self.fluid2ComboBox.setCurrentIndex(0)
 
-        self._onAnyChange(self.name1ComboBox.currentText(), self.name2ComboBox.currentText())
-
         self._configureButtons()
+
+        self._onAnyChange(self.name1ComboBox.currentText(), self.name2ComboBox.currentText())
 
     def _configureButtons(self) -> None:
         def onAbort() -> None:
@@ -75,6 +75,8 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
             self.splitSummary = _common.SplitLoopsSummary(
                 _common.LoopSummary(name1, fluid1), _common.LoopSummary(name2, fluid2)
             )
+
+            self.close()
 
         self.applyButton.clicked.connect(onApply)
 
@@ -111,7 +113,8 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
                 self.name2ComboBox.currentText(),
             )
 
-        self.name2ComboBox.currentTextChanged.connect(onName1TextChanged)
+        self.name1ComboBox.currentTextChanged.connect(onName1TextChanged)
+
         self.name2ComboBox.addItem("")
         self.name2ComboBox.addItem(self._loop.name.value)
 
@@ -128,6 +131,12 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         self.applyButton.setEnabled(areNamesOk)
 
     def _onEitherNameChanged(self, name1: str, name2: str) -> bool:
+        isName1Valid = self._onNameChanged(name1, self.name1WarningWidget)
+        isName2Valid = self._onNameChanged(name2, self.name2WarningWidget)
+
+        if not isName1Valid or not isName2Valid:
+            return False
+
         if name1 == name2:
             tooltip = "The names of the two loops must differ"
             self.name1WarningWidget.setToolTip(tooltip)
@@ -137,10 +146,7 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
 
             return False
 
-        isName1Valid = self._onNameChanged(name1, self.name1WarningWidget)
-        isName2Valid = self._onNameChanged(name2, self.name2WarningWidget)
-
-        return isName1Valid and isName2Valid
+        return True
 
     def _onNameChanged(self, newName: str, warningWidget: _qtw.QWidget) -> bool:
         isEmpty = not newName

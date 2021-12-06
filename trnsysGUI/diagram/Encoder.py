@@ -62,6 +62,9 @@ class Encoder(json.JSONEncoder):
 
             res["Blocks"] = blockDct
 
+            res["fluids"] = obj.fluids.toJson()
+            res["hydraulicLoops"] = obj.hydraulicLoops.toJson()
+
             return res
         else:
             logger.debug("This is a strange object in Encoder" + type(obj))

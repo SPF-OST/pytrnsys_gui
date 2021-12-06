@@ -58,6 +58,8 @@ class HydraulicLoop:
         if not self.containsConnection(connection):
             raise ValueError(f"Connection '{connection.displayName}' does not belong to hydraulic loop {self.name}.")
 
+        self.connections.remove(connection)
+
     def containsConnection(self, connection: _spc.SinglePipeConnection):  # type: ignore[name-defined]
         return connection in self.connections
 
@@ -106,6 +108,18 @@ class HydraulicLoops:
 
         loop = HydraulicLoop(name, fluid, connections)
         return loop
+
+    def toJson(self) -> _tp.Sequence[_tp.Dict]:
+        result = []
+        for loop in self.hydraulicLoops:
+            connectionTrnsysIds = [c.trnsysId for c in loop.connections]
+            serializedLoop = _ser.HydraulicLoop(
+                loop.name.value, loop.name.isUserDefined, loop.fluid.name, connectionTrnsysIds
+            )
+            json = serializedLoop.to_dict()
+            result.append(json)
+
+        return result
 
     @staticmethod
     def _createName(serializedLoop: _ser.HydraulicLoop) -> Name:
@@ -161,7 +175,7 @@ class Fluids:
         if not haveWater:
             fluidList.append(self.WATER)
 
-        haveBrine = any(f.name == self.BRINE for f in fluidList)
+        haveBrine = any(f.name == self.BRINE.name for f in fluidList)
         if not haveBrine:
             fluidList.append(self.BRINE)
 
@@ -171,6 +185,10 @@ class Fluids:
     def createFromJson(sequence: _tp.Sequence[_tp.Dict]) -> "Fluids":
         fluids = [_ser.Fluid.from_dict(o) for o in sequence]
         return Fluids(fluids)
+
+    def toJson(self) -> _tp.Sequence[_tp.Dict]:
+        result = [f.to_dict() for f in self.fluids]
+        return result
 
     def getFluid(self, name: str) -> _tp.Optional[_ser.Fluid]:
         fluid = _getSingleOrNone(f for f in self.fluids if f.name == name)
