@@ -14,13 +14,12 @@ from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
 import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 import trnsysGUI.serialization as _ser
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 global FilePath
@@ -100,13 +99,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
         self.origOutputsPos = None
         self.origInputsPos = None
-
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
-
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-
-        return graphicalPortItem.getConnectedRealNode(portItem)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if type(self) == BlockItem:
@@ -577,10 +569,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
                     self.parent.parent().alignYLineItem.setLine(
-                        self.pos().x() + self.w / 2,
-                        t.pos().y(),
-                        t.pos().x() + t.w / 2,
-                        t.pos().y()
+                        self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
                     )
 
                     self.parent.parent().alignYLineItem.setVisible(True)
@@ -605,10 +594,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                 if self.elementInXBand(t):
                     value = QPointF(t.pos().x(), self.pos().y())
                     self.parent.parent().alignXLineItem.setLine(
-                        t.pos().x(),
-                        t.pos().y() + self.w / 2,
-                        t.pos().x(),
-                        self.pos().y() + t.w / 2
+                        t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
                     )
 
                     self.parent.parent().alignXLineItem.setVisible(True)
@@ -742,8 +728,11 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     # Export related
     def exportBlackBox(self):
         equation = []
-        if len(self.inputs + self.outputs) == 2 and self.isVisible() \
-                and not isinstance(self.outputs[0], DoublePipePortItem):
+        if (
+            len(self.inputs + self.outputs) == 2
+            and self.isVisible()
+            and not isinstance(self.outputs[0], DoublePipePortItem)
+        ):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not (files):
                 status = "noDdckFile"
@@ -802,6 +791,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                 self.logger.debug("File already deleted from file list.")
                 self.logger.debug("filelist:", self.parent.parent().fileList)
 
+
 @_dc.dataclass
 class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     BlockName: str
@@ -818,7 +808,8 @@ class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('b87a3360-eaa7-48f3-9bed-d01224727cbe')
+        return _uuid.UUID("b87a3360-eaa7-48f3-9bed-d01224727cbe")
+
 
 @_dc.dataclass
 class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
@@ -873,9 +864,9 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
             superseded.FlippedH,
             superseded.FlippedV,
             superseded.RotationN,
-            superseded.GroupName
+            superseded.GroupName,
         )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('bbc03f36-d1a1-4d97-a9c0-d212ea3a0203')
+        return _uuid.UUID("bbc03f36-d1a1-4d97-a9c0-d212ea3a0203")

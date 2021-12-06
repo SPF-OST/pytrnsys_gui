@@ -86,26 +86,6 @@ class SinglePipeConnection(_cb.ConnectionBase):
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
         return _mfs.InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' doesn't belong to `internalPiping'"
-
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-
-        assert graphicalPortItem in [self.fromPort, self.toPort],\
-            "This connection is not connected to `graphicalPortItem'"
-
-        blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
-        blockItemInternalPiping = blockItem.getInternalPiping()
-
-        for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
-            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
-            for realNode in realNodesAndPortItems.realNodes:
-                for candidatePortItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
-                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[candidatePortItem]
-                    if candidateGraphicalPortItem == graphicalPortItem:
-                        return realNode
-        return None
-
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         f = ""
         unitNumber = startingUnit
@@ -151,9 +131,8 @@ class SinglePipeConnection(_cb.ConnectionBase):
         assert len(openLoops) == 1
         openLoop = openLoops[0]
 
-        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-        assert len(realNodes) == 1
-        realNode = realNodes[0]
+        assert len(openLoop.realNodes) == 1
+        realNode = openLoop.realNodes[0]
 
         outputVariables = realNode.serialize(nodesToIndices).outputVariables
 
@@ -163,13 +142,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
             portItem = portItemsWithParent[0][0]
             parent = portItemsWithParent[0][1]
             if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
+                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
@@ -179,13 +152,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
             portItem = portItemsWithParent[1][0]
             parent = portItemsWithParent[1][1]
             if hasattr(parent, "getSubBlockOffset"):
-                unitText += (
-                    "T"
-                    + parent.displayName
-                    + "X"
-                    + str(parent.getSubBlockOffset(self) + 1)
-                    + "\n"
-                )
+                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
             else:
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
@@ -219,6 +186,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
 
         return unitText, unitNumber
 
+
 class DeleteSinglePipeConnectionCommand(_cb.DeleteConnectionCommandBase):
     def __init__(self, conn, descr):
         super().__init__(conn, descr)
@@ -243,7 +211,7 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('7a15d665-f634-4037-b5af-3662b487a214')
+        return _uuid.UUID("7a15d665-f634-4037-b5af-3662b487a214")
 
 
 @_dc.dataclass
@@ -280,17 +248,20 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
         data[".__ConnectionDict__"] = True
         return data
 
-
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return ConnectionModelVersion0
 
     @classmethod
     def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
-        firstSegmentLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0], \
-                               superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1]
-        firstSegmentMassFlowLabelPos = superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0], \
-                                       superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1]
+        firstSegmentLabelPos = (
+            superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
+            superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
+        )
+        firstSegmentMassFlowLabelPos = (
+            superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
+            superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
+        )
 
         return ConnectionModel(
             superseded.ConnCID,
@@ -307,4 +278,4 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('332cd663-684d-414a-b1ec-33fd036f0f17')
+        return _uuid.UUID("332cd663-684d-414a-b1ec-33fd036f0f17")

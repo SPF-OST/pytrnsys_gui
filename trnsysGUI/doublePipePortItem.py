@@ -2,24 +2,30 @@ import typing as _tp
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
-from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
-from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
+import trnsysGUI.PortItemBase as _pi
+import trnsysGUI.doublePipeModelPortItems as _dpmpi
 
 
-class DoublePipePortItem(PortItemBase):
-    def getConnectedRealNode(self, portItem: _mfn.PortItem) -> _tp.Optional[_mfn.RealNodeBase]:
-        connection: _mfs.MassFlowNetworkContributorMixin = self.connectionList[0]
+class DoublePipePortItem(_pi.PortItemBase):  # type: ignore[name-defined]
+    def _selectConnectedRealNode(  # pylint: disable=duplicate-code  # 1
+        self,
+        portItem: _mfn.PortItem,
+        connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
+    ) -> _mfn.RealNodeBase:
+        assert isinstance(
+            portItem, (_dpmpi.ColdPortItem, _dpmpi.HotPortItem)
+        ), "Only hot or cold model port items should be mapped to double pipe graphical port items."
 
-        connectionInternalPiping = connection.getInternalPiping()
-        connectionStartingNodes = connectionInternalPiping.openLoopsStartingNodes
+        selectedRealNodes = [
+            pan.realNode
+            for pan in connectedPortItemsAndAdjacentRealNode
+            if type(pan.portItem) == type(portItem)  # pylint: disable=unidiomatic-typecheck
+        ]
 
-        assert len(connectionStartingNodes) == 2
-        connectionColdPort = connectionStartingNodes[0]
-        connectionHotPort = connectionStartingNodes[1]
+        assert (
+            len(selectedRealNodes) == 1
+        ), "Only exactly one hot (or cold) model port item should be connected to a double pipe graphical port item."
 
-        if isinstance(portItem, ColdPortItem):
-            return connectionColdPort
-        if isinstance(portItem, HotPortItem):
-            return connectionHotPort
+        selectedRealNode = selectedRealNodes[0]
 
-        raise AssertionError("portItem is not valid DoublePipePortItem")
+        return selectedRealNode
