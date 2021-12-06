@@ -61,7 +61,9 @@ class _Splitter:
             self._removeLoop(loop)
             return None
 
-        isConnectionRedundant = fromConnections == otherConnections or toConnections == otherConnections
+        isConnectionRedundant = (
+            fromConnections == otherConnections or toConnections == otherConnections  # pylint: disable=consider-using-in
+        )
         if isConnectionRedundant:
             assert fromConnections == otherConnections and toConnections == otherConnections
 
