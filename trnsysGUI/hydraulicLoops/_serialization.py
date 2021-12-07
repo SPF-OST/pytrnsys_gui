@@ -5,11 +5,20 @@ import uuid as _uuid
 from trnsysGUI import serialization as _ser
 
 
+@_dc.dataclass
+class Variable(_ser.UpgradableJsonSchemaMixinVersion0):
+    name: str
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('3196024b-6775-42bc-92d2-e11d60c64bac')
+
+
 @_dc.dataclass(frozen=True, eq=False)
 class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
     name: str
-    specificHeatCapacityInJPerKgK: float
-    densityInKgPerM3: float
+    specificHeatCapacityInJPerKgK: _tp.Union[float, Variable]
+    densityInKgPerM3: _tp.Union[float, Variable]
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:

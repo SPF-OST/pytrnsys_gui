@@ -750,23 +750,15 @@ class Editor(QWidget):
         self._decodeFluidsAndHydraulicLoops(blocklist)
 
     def _decodeFluidsAndHydraulicLoops(self, blocklist):
+        self.fluids = _hlm.Fluids([])
+
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
-        if "fluids" not in blocklist or "hydraulicLoops" not in blocklist:
-            assert (
-                "fluids" not in blocklist and "hydraulicLoops" not in blocklist
-            ), "Found eiter fluids or hydraulic loops in project file, but not both."
-
-            fluids = _hlm.Fluids([])
-            hydraulicLoops = _hlmig.createLoops(singlePipeConnections, fluids.WATER)
-
+        if "hydraulicLoops" not in blocklist:
+            hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
         else:
-            serializedFluids = blocklist["fluids"]
-            fluids = _hlm.Fluids.createFromJson(serializedFluids)
-
             serializedHydraulicLoops = blocklist["hydraulicLoops"]
-            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(serializedHydraulicLoops, singlePipeConnections, fluids)
+            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(serializedHydraulicLoops, singlePipeConnections, self.fluids)
 
-        self.fluids = fluids
         self.hydraulicLoops = hydraulicLoops
 
     def exportSvg(self):

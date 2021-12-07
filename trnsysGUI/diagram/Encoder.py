@@ -62,7 +62,6 @@ class Encoder(json.JSONEncoder):
 
             res["Blocks"] = blockDct
 
-            res["fluids"] = obj.fluids.toJson()
             res["hydraulicLoops"] = obj.hydraulicLoops.toJson()
 
             return res

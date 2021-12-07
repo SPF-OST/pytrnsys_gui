@@ -52,14 +52,32 @@ MfrHx-Col_A=[450,22]
 MfrHx-Col_B=[450,23]
 
 
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 4
+** loop1
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+** loop2
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+
 UNIT 451 TYPE 931
 !Tes-Hx
 PARAMETERS 6
-diTes-Hx
-LTes-Hx
-UTes-Hx
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
 20
 INPUTS 4
 TTesPortLeft10
@@ -77,11 +95,11 @@ MfrTes-Hx= MfrTes-Hx_A
 UNIT 452 TYPE 931
 !Hx-Tes
 PARAMETERS 6
-diHx-Tes
-LHx-Tes
-UHx-Tes
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
 20
 INPUTS 4
 TExHxX2
@@ -99,11 +117,11 @@ MfrHx-Tes= MfrHx-Tes_A
 UNIT 453 TYPE 931
 !Col-Hx
 PARAMETERS 6
-diCol-Hx
-LCol-Hx
-UCol-Hx
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
 20
 INPUTS 4
 TCol
@@ -121,11 +139,11 @@ MfrCol-Hx= MfrCol-Hx_A
 UNIT 454 TYPE 931
 !Hx-Col
 PARAMETERS 6
-diHx-Col
-LHx-Col
-UHx-Col
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
 20
 INPUTS 4
 TExHxX1

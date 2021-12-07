@@ -1,5 +1,6 @@
 # pylint: skip-file
 import re
+import typing as _tp
 
 from PyQt5.QtWidgets import QMessageBox
 
@@ -9,6 +10,8 @@ from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
 import trnsysGUI.hydraulicLoops.export as _hle
+import trnsysGUI.hydraulicLoops.model as _hlm
+
 import jinja2 as _jinja
 
 
@@ -401,17 +404,31 @@ class Export(object):
         return f
 
     def exportFluids(self) -> str:
+        def getValueOrVariableName(valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1) -> _tp.Union[float, str]:
+            if isinstance(valueOrVariable, float):
+                return valueOrVariable * factor
+
+            if isinstance(valueOrVariable, _hlm.Variable):
+                if factor == 1:
+                    return valueOrVariable.name
+
+                return f"{valueOrVariable.name}*{factor}"
+
+            raise ValueError(f"Can't deal with type {type(valueOrVariable).__name__}.")
+
         template = """\
 ** Fluids:
-EQUATIONS {{2 * fluids|length}} 
+EQUATIONS {{2 * fluids|length}}
 {% for fluid in fluids -%}
 ** {{fluid.name}}
-F{{fluid.name}}Rho = {{fluid.densityInKgPerM3}} ! [kg/m^3]
-F{{fluid.name}}Cp = {{fluid.specificHeatCapacityInJPerKgK / 1000}} ! [kJ/(kg*K)]
+{% set rho = getValueOrVariableName(fluid.densityInKgPerM3) -%}
+{% set cp = getValueOrVariableName(fluid.specificHeatCapacityInJPerKgK, 1e-3) -%}
+F{{fluid.name}}Rho = {{rho}} ! [kg/m^3]
+F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
 {% endfor -%}
 """
         fluids = self.editor.fluids.fluids
-        return self._render(template, fluids=fluids)
+        return self._render(template, fluids=fluids, getValueOrVariableName=getValueOrVariableName)
 
     def exportHydraulicLoops(self) -> str:
         template = """\
@@ -428,9 +445,9 @@ EQUATIONS {{2 * loops|length}}
 {% endfor -%}
 """
         loops = self.editor.hydraulicLoops.hydraulicLoops
-        return self._render(template, loops=loops)
+        return self._render(template, loops=loops, getCp=_hle.getHeatCapacityName, getRho=_hle.getDensityName)
 
     @staticmethod
     def _render(template: str, /, **kwargs):
         compiledTemplate = _jinja.Template(template)
-        return compiledTemplate.render(**kwargs, getCp=_hle.getHeatCapacityName, getRho=_hle.getDensityName)
+        return compiledTemplate.render(**kwargs)

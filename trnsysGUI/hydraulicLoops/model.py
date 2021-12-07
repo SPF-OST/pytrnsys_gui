@@ -13,6 +13,7 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc  # type: ignore[name-defined]
 
 Fluid = _ser.Fluid
+Variable = _ser.Variable
 
 
 class Name(_abc.ABC):
@@ -159,8 +160,8 @@ class HydraulicLoops:
 
 
 class Fluids:
-    WATER = _ser.Fluid("water", specificHeatCapacityInJPerKgK=418.45, densityInKgPerM3=997)
-    BRINE = _ser.Fluid("brine", specificHeatCapacityInJPerKgK=2360, densityInKgPerM3=1113.2)
+    WATER = _ser.Fluid("water", specificHeatCapacityInJPerKgK=Variable("CPWAT_SI"), densityInKgPerM3=Variable("RHOWAT"))
+    BRINE = _ser.Fluid("brine", specificHeatCapacityInJPerKgK=Variable("CPBRI_SI"), densityInKgPerM3=Variable("RHOBRI"))
 
     def __init__(self, fluids: _tp.Sequence[_ser.Fluid]) -> None:
         duplicateNames = _getDuplicates(f.name for f in fluids)
