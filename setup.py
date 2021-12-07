@@ -71,6 +71,7 @@ setuptools.setup(
         "bokeh",
         "dataclasses_jsonschema",
         "appdirs",
+        "Jinja2"
     ],
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",

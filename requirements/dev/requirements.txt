@@ -16,7 +16,7 @@ appdirs==1.4.4
     # via
     #   black
     #   pytrnsys-gui
-astroid==2.5.2
+astroid==2.9.0
     # via pylint
 atomicwrites==1.4.0
     # via pytest
@@ -75,6 +75,7 @@ isort==5.8.0
 jinja2==2.11.3
     # via
     #   bokeh
+    #   pytrnsys-gui
     #   sphinx
 jsonschema==3.2.0
     # via dataclasses-jsonschema
@@ -97,7 +98,7 @@ mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
-mypy==0.812
+mypy==0.910
     # via -r requirements\dev\../ci/test/requirements.in
 numpy==1.20.1
     # via
@@ -129,6 +130,8 @@ pip-tools==5.5.0
     # via -r requirements\dev\requirements.in
 pkginfo==1.7.0
     # via twine
+platformdirs==2.4.0
+    # via pylint
 pluggy==0.13.1
     # via pytest
 py==1.10.0
@@ -137,7 +140,7 @@ pygments==2.8.0
     # via
     #   readme-renderer
     #   sphinx
-pylint==2.7.4
+pylint==2.12.2
     # via -r requirements\dev\../ci/test/requirements.in
 pyparsing==2.4.7
     # via
@@ -223,6 +226,7 @@ sphinxcontrib-serializinghtml==1.1.4
     # via sphinx
 toml==0.10.2
     # via
+    #   mypy
     #   pylint
     #   pytest
 tomli==1.0.4
@@ -233,12 +237,12 @@ tqdm==4.59.0
     # via twine
 twine==3.4.1
     # via -r requirements\dev\requirements.in
-typed-ast==1.4.2
-    # via mypy
-typing-extensions==3.7.4.3
+typing-extensions==4.0.1
     # via
+    #   astroid
     #   bokeh
     #   mypy
+    #   pylint
 urllib3==1.26.3
     # via requests
 webencodings==0.5.1

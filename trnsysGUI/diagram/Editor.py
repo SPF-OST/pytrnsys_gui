@@ -375,9 +375,8 @@ class Editor(QWidget):
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
 
-            isValidSinglePipeConnection = (
-                isinstance(startPort, SinglePipePortItem)
-                and isinstance(endPort, SinglePipePortItem)
+            isValidSinglePipeConnection = isinstance(startPort, SinglePipePortItem) and isinstance(
+                endPort, SinglePipePortItem
             )
             if isValidSinglePipeConnection:
                 command = CreateSinglePipeConnectionCommand(startPort, endPort, self)
@@ -492,6 +491,8 @@ class Editor(QWidget):
 
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
+        fullExportText += exporter.exportFluids() + "\n"
+        fullExportText += exporter.exportHydraulicLoops() + "\n"
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
         fullExportText += exporter.exportPrintPipeLosses()
 
@@ -749,19 +750,23 @@ class Editor(QWidget):
         self._decodeFluidsAndHydraulicLoops(blocklist)
 
     def _decodeFluidsAndHydraulicLoops(self, blocklist):
-        if "fluids" not in blocklist:
+        singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
+        if "fluids" not in blocklist or "hydraulicLoops" not in blocklist:
+            assert (
+                "fluids" not in blocklist and "hydraulicLoops" not in blocklist
+            ), "Found eiter fluids or hydraulic loops in project file, but not both."
+
             fluids = _hlm.Fluids([])
+            hydraulicLoops = _hlmig.createLoops(singlePipeConnections, fluids.WATER)
+
         else:
             serializedFluids = blocklist["fluids"]
             fluids = _hlm.Fluids.createFromJson(serializedFluids)
-        self.fluids = fluids
 
-        singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
-        if "hydraulicLoops" not in blocklist:
-            hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
-        else:
             serializedHydraulicLoops = blocklist["hydraulicLoops"]
-            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(serializedHydraulicLoops, singlePipeConnections, self.fluids)
+            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(serializedHydraulicLoops, singlePipeConnections, fluids)
+
+        self.fluids = fluids
         self.hydraulicLoops = hydraulicLoops
 
     def exportSvg(self):

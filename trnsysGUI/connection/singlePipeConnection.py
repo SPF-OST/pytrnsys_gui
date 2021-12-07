@@ -16,6 +16,7 @@ import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.serialization as _ser
 import trnsysGUI.singlePipeSegmentItem as _spsi
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
+import trnsysGUI.hydraulicLoops.export as _hle
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -133,8 +134,10 @@ class SinglePipeConnection(_cb.ConnectionBase):
         unitText = ""
         ambientT = 20
 
-        densityVar = "RhoWat"
-        specHeatVar = "CPWat"
+        loop = self._editor.hydraulicLoops.getLoopForExistingConnection(self)
+
+        densityVar = _hle.getDensityName(loop)
+        specHeatVar = _hle.getHeatCapacityName(loop)
 
         equationConstant1 = 1
         equationConstant2 = 3
@@ -143,9 +146,6 @@ class SinglePipeConnection(_cb.ConnectionBase):
         inputNumbers = 4
 
         # Fixed strings
-        diameterPrefix = "di"
-        lengthPrefix = "L"
-        lossPrefix = "U"
         tempRoomVar = "TRoomStore"
         initialValueS = "20 0.0 20 20"
         powerPrefix = "P"
@@ -157,9 +157,10 @@ class SinglePipeConnection(_cb.ConnectionBase):
         unitText += "!" + self.displayName + "\n"
         unitText += "PARAMETERS " + str(parameterNumber) + "\n"
 
-        unitText += diameterPrefix + self.displayName + "\n"
-        unitText += lengthPrefix + self.displayName + "\n"
-        unitText += lossPrefix + self.displayName + "\n"
+        unitText += f"{self.diameterInCm} ! diameter [cm]\n"
+        unitText += f"{self.lengthInM} ! length [m]\n"
+        uValueInkJPerHourM2K = self.uValueInWPerM2K / 1000 * 60 * 60
+        unitText += f"{uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)] (= {self.uValueInWPerM2K} W/(m^2*K))\n"
         unitText += densityVar + "\n"
         unitText += specHeatVar + "\n"
         unitText += str(ambientT) + "\n"
@@ -249,7 +250,7 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
     DEFAULT_DIAMETER_IN_CM = 2
     DEFAULT_LENGTH_IN_M = 2.0
-    DEFAULT_U_VALUE_IN_W_PER_M2_K = 320
+    DEFAULT_U_VALUE_IN_W_PER_M2_K = 0.8333
 
     connectionId: int
     name: str

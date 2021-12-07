@@ -8,6 +8,8 @@ from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[a
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
+import trnsysGUI.hydraulicLoops.export as _hle
+import jinja2 as _jinja
 
 
 class Export(object):
@@ -397,3 +399,38 @@ class Export(object):
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
+
+    def exportFluids(self) -> str:
+        template = """\
+** Fluids:
+EQUATIONS {{2 * fluids|length}} 
+{% for fluid in fluids -%}
+** {{fluid.name}}
+F{{fluid.name}}Rho = {{fluid.densityInKgPerM3}} ! [kg/m^3]
+F{{fluid.name}}Cp = {{fluid.specificHeatCapacityInJPerKgK}} ! [J/(kg*K)]
+{% endfor -%}
+"""
+        fluids = self.editor.fluids.fluids
+        return self._render(template, fluids=fluids)
+
+    def exportHydraulicLoops(self) -> str:
+        template = """\
+** Hydraulic loops
+EQUATIONS {{2 * loops|length}}
+{% for hydraulicLoop in loops -%}
+{% set loopName = hydraulicLoop.name.value -%}
+{% set loopRho = getRho(hydraulicLoop) -%}
+{% set loopCp = getCp(hydraulicLoop) -%}
+{% set fluid = hydraulicLoop.fluid -%}
+** {{loopName}}
+{{loopRho}} = F{{fluid.name}}Rho
+{{loopCp}} = F{{fluid.name}}Cp
+{% endfor -%}
+"""
+        loops = self.editor.hydraulicLoops.hydraulicLoops
+        return self._render(template, loops=loops)
+
+    @staticmethod
+    def _render(template: str, /, **kwargs):
+        compiledTemplate = _jinja.Template(template)
+        return compiledTemplate.render(**kwargs, getCp=_hle.getHeatCapacityName, getRho=_hle.getDensityName)
