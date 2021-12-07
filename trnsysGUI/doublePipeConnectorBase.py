@@ -104,11 +104,11 @@ class DoublePipeConnectorBase(BlockItem):
 
 
 @_dc.dataclass
-class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
-    BlockName: str
-    BlockDisplayName: str
+class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
-    id: int
+    id: int  # pylint: disable=invalid-name
     trnsysId: int
     childIds: _tp.List[int]
     portsIdsIn: _tp.List[int]

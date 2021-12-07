@@ -10,18 +10,18 @@ from trnsysGUI.storageTank.side import Side
 
 
 @_dc.dataclass
-class StorageTankVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    FlippedH: bool
-    FlippedV: bool
-    BlockName: str
-    BlockDisplayName: str
-    GroupName: str
-    size_h: int
-    StoragePosition: _tp.Tuple[float, float]
+class StorageTankVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+    FlippedH: bool  # pylint: disable=invalid-name
+    FlippedV: bool  # pylint: disable=invalid-name
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
+    GroupName: str  # pylint: disable=invalid-name
+    size_h: int  # pylint: disable=invalid-name
+    StoragePosition: _tp.Tuple[float, float]  # pylint: disable=invalid-name
     trnsysID: int
-    ID: int
-    HxList: _tp.Sequence["HeatExchangerLegacyVersion"]
-    PortPairList: _tp.Sequence["DirectPortPairLegacyVersion"]
+    ID: int  # pylint: disable=invalid-name
+    HxList: _tp.Sequence["HeatExchangerLegacyVersion"]  # pylint: disable=invalid-name
+    PortPairList: _tp.Sequence["DirectPortPairLegacyVersion"]  # pylint: disable=invalid-name
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
@@ -29,42 +29,42 @@ class StorageTankVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
 
 @_dc.dataclass
-class HeatExchangerLegacyVersion(_dcj.JsonSchemaMixin):
-    SideNr: int
-    Width: float
-    Height: float
-    Offset: _tp.Tuple[float, float]
-    DisplayName: str
-    ParentID: int
-    Port1ID: int
-    Port2ID: int
-    connTrnsysID: int
-    ID: int
+class HeatExchangerLegacyVersion(_dcj.JsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    SideNr: int  # pylint: disable=invalid-name
+    Width: float  # pylint: disable=invalid-name
+    Height: float  # pylint: disable=invalid-name
+    Offset: _tp.Tuple[float, float]  # pylint: disable=invalid-name
+    DisplayName: str  # pylint: disable=invalid-name
+    ParentID: int  # pylint: disable=invalid-name
+    Port1ID: int  # pylint: disable=invalid-name
+    Port2ID: int  # pylint: disable=invalid-name
+    connTrnsysID: int  # pylint: disable=invalid-name
+    ID: int  # pylint: disable=invalid-name
 
 
 @_dc.dataclass
-class DirectPortPairLegacyVersion(_dcj.JsonSchemaMixin):
-    Side: bool
-    Port1offset: float
-    Port2offset: float
-    Port1ID: int
-    Port2ID: int
-    ConnID: int
-    ConnCID: int
-    ConnDisName: str
-    trnsysID: int
+class DirectPortPairLegacyVersion(_dcj.JsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    Side: bool  # pylint: disable=invalid-name
+    Port1offset: float  # pylint: disable=invalid-name
+    Port2offset: float  # pylint: disable=invalid-name
+    Port1ID: int  # pylint: disable=invalid-name
+    Port2ID: int  # pylint: disable=invalid-name
+    ConnID: int  # pylint: disable=invalid-name
+    ConnCID: int  # pylint: disable=invalid-name
+    ConnDisName: str  # pylint: disable=invalid-name
+    trnsysID: int  # pylint: disable=invalid-name
 
 
 @_dc.dataclass
-class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):
+class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     isHorizontallyFlipped: bool
     isVerticallyFlipped: bool
 
-    BlockName: str
-    BlockDisplayName: str
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
 
     groupName: str
-    id: int
+    id: int  # pylint: disable=invalid-name
     trnsysId: int
 
     height: int
@@ -142,14 +142,14 @@ class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):
 
 
 @_dc.dataclass
-class StorageTank(_ser.UpgradableJsonSchemaMixin):
+class StorageTank(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     isHorizontallyFlipped: bool
     isVerticallyFlipped: bool
 
-    BlockName: str
-    BlockDisplayName: str
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
 
-    id: int
+    id: int  # pylint: disable=invalid-name
     trnsysId: int
 
     height: int
@@ -209,7 +209,7 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):
 
 @_dc.dataclass
 class Port(_dcj.JsonSchemaMixin):
-    id: int
+    id: int  # pylint: disable=invalid-name
     relativeHeight: float
 
 
@@ -264,7 +264,7 @@ class HeatExchangerVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     parentId: int
 
-    id: int
+    id: int  # pylint: disable=invalid-name
     connectionTrnsysId: int
 
     @classmethod
@@ -306,7 +306,7 @@ class HeatExchangerVersion1(_ser.UpgradableJsonSchemaMixin):
     portPair: PortPairVersion0
     width: float
     parentId: int
-    id: int
+    id: int  # pylint: disable=invalid-name
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
@@ -330,7 +330,7 @@ class HeatExchanger(_ser.UpgradableJsonSchemaMixin):
     name: str
     width: float
     parentId: int
-    id: int
+    id: int  # pylint: disable=invalid-name
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
@@ -354,7 +354,7 @@ class HeatExchanger(_ser.UpgradableJsonSchemaMixin):
 class DirectPortPairVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     portPair: PortPairVersion0
 
-    id: int
+    id: int  # pylint: disable=invalid-name
 
     connectionId: int
     trnsysId: int

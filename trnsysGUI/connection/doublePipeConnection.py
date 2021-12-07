@@ -291,10 +291,10 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
 
 
 @_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
+class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
-    id: int
+    id: int  # pylint: disable=invalid-name
     childIds: _tp.List[int]
     segmentsCorners: _tp.List[_tp.Tuple[float, float]]
     labelPos: _tp.Tuple[float, float]
