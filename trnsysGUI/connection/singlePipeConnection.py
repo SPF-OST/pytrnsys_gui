@@ -157,7 +157,8 @@ class SinglePipeConnection(_cb.ConnectionBase):
         unitText += "!" + self.displayName + "\n"
         unitText += "PARAMETERS " + str(parameterNumber) + "\n"
 
-        unitText += f"{self.diameterInCm} ! diameter [cm]\n"
+        diameterInM = self.diameterInCm / 100
+        unitText += f"{diameterInM} ! diameter [m]\n"
         unitText += f"{self.lengthInM} ! length [m]\n"
         uValueInkJPerHourM2K = self.uValueInWPerM2K / 1000 * 60 * 60
         unitText += f"{uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)] (= {self.uValueInWPerM2K} W/(m^2*K))\n"

@@ -407,7 +407,7 @@ EQUATIONS {{2 * fluids|length}}
 {% for fluid in fluids -%}
 ** {{fluid.name}}
 F{{fluid.name}}Rho = {{fluid.densityInKgPerM3}} ! [kg/m^3]
-F{{fluid.name}}Cp = {{fluid.specificHeatCapacityInJPerKgK}} ! [J/(kg*K)]
+F{{fluid.name}}Cp = {{fluid.specificHeatCapacityInJPerKgK / 1000}} ! [kJ/(kg*K)]
 {% endfor -%}
 """
         fluids = self.editor.fluids.fluids
