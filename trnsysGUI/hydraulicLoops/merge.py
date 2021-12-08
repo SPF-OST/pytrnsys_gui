@@ -3,11 +3,12 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
-from trnsysGUI.hydraulicLoops import model as _model, _helpers
-from ._dialogs.merge import dialog as _md
-from . import common as _common
+import trnsysGUI.singlePipePortItem as _spi
+
 from . import _search
-from .. import singlePipePortItem as _spi
+from . import common as _common
+from . import model as _model, _helpers
+from ._dialogs.merge import dialog as _md
 
 if _tp.TYPE_CHECKING:
     from trnsysGUI.connection import singlePipeConnection as _spc
@@ -96,8 +97,13 @@ class _Merger:
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         mergedLoopSummary: _tp.Optional[_common.MergedLoopSummary],
     ) -> _common.Cancellable[MergeSummary]:
+        connections = [*fromLoop.connections, connection, *toLoop.connections]
+        _common.setConnectionsSelected(connections, True)
+
         if not mergedLoopSummary:
             mergedLoopSummary = self._askUserForMergedLoopSummaryOrNone(fromLoop, toLoop)
+
+        _common.setConnectionsSelected(connections, False)
 
         if not mergedLoopSummary:
             return "cancelled"

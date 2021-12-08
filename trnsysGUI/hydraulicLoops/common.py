@@ -5,6 +5,9 @@ import typing as _tp
 
 from . import model as _model
 
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.connection.singlePipeConnection as _spc
+
 
 @_dc.dataclass
 class LoopSummaryBase:
@@ -41,3 +44,13 @@ class SplitLoopsSummary:
 
 T = _tp.TypeVar("T")  # pylint: disable=invalid-name
 Cancellable = _tp.Union[_tp.Literal["cancelled"], T]
+
+
+def setConnectionsSelected(
+        connections: _tp.Iterable[_spc.SinglePipeConnection],  # type: ignore[name-defined]
+        isSelected: bool) -> None:
+    for connection in connections:
+        if isSelected:
+            connection.selectConnection(deselectOthers=False)
+        else:
+            connection.deselectConnection()

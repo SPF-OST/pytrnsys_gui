@@ -958,12 +958,6 @@ class Editor(QWidget):
     def showConfigStorageDlg(self, bl):
         c = ConfigureStorageDialog(bl, self)
 
-    def testFunctionInspection(self, *args):
-        self.logger.debug("Ok, here is my log")
-        self.logger.debug(int(args[0]) + 1)
-        if len(self.connectionList) > 0:
-            self.connectionList[0].selectConnection()
-
     def getConnection(self, n):
         return self.connectionList[int(n)]
 

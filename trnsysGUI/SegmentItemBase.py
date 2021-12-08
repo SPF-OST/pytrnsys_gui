@@ -165,7 +165,7 @@ class SegmentItemBase(QGraphicsItemGroup):
             self.keyPr = 1
             self.logger.debug("Setting key to 1")
 
-            self.connection.selectConnection()
+            self.connection.selectConnection(deselectOthers=True)
 
             if self.isVertical():
                 try:
@@ -681,11 +681,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         a5 = menu.addAction("Toggle mass flow")
         a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
         return menu
-
-    def inspect(self):
-
-        self.connection.selectConnection()
-        self.connection.inspectConn()
 
     def setLabelVisible(self, isVisible: bool) -> None:
         self.label.setVisible(isVisible)

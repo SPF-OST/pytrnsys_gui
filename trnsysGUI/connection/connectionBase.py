@@ -978,8 +978,9 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         element.setPrev(ne)
 
     # Select when clicked, deselect when clicked elsewhere
-    def selectConnection(self):
-        self.deselectOtherConnections()
+    def selectConnection(self, deselectOthers: bool):
+        if deselectOthers:
+            self.deselectOtherConnections()
 
         for s in self.segments:
             s.setSelect(True)

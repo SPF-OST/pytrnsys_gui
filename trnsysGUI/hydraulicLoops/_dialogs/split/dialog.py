@@ -24,8 +24,10 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         loop: _model.HydraulicLoop,
         occupiedNames: _tp.Set[str],
         fluids: _tp.Sequence[_model.Fluid],
+        setLoop1Selected: _tp.Callable[[bool], None],
+        setLoop2Selected: _tp.Callable[[bool], None]
     ) -> _common.Cancellable[_common.SplitLoopsSummary]:
-        dialog = SplitLoopDialog(loop, occupiedNames, fluids)
+        dialog = SplitLoopDialog(loop, occupiedNames, fluids, setLoop1Selected, setLoop2Selected)
         dialog.exec()
         return dialog.splitSummary
 
@@ -34,6 +36,8 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         loop: _model.HydraulicLoop,
         occupiedNames: _tp.Set[str],
         fluids: _tp.Sequence[_model.Fluid],
+        setLoop1Selected: _tp.Callable[[bool], None],
+        setLoop2Selected: _tp.Callable[[bool], None]
     ) -> None:
         super().__init__()
         self.setupUi(self)
@@ -41,8 +45,12 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         self._loop = loop
         self._occupiedNames = occupiedNames
         self._fluids = fluids
+        self._setLoop1Selected = setLoop1Selected
+        self._setLoop2Selected = setLoop2Selected
 
         self.splitSummary: _common.Cancellable[_common.SplitLoopsSummary] = "cancelled"
+
+        self._configureGroupBoxes()
 
         self._configureNameComboBoxes()
         self.name1ComboBox.setCurrentIndex(0)
@@ -56,11 +64,37 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
 
         self._onAnyChange(self.name1ComboBox.currentText(), self.name2ComboBox.currentText())
 
+    def _configureGroupBoxes(self) -> None:
+        def onEnter1() -> None:
+            self._setLoop1Selected(True)
+
+        self.loop1GroupBox.enter.connect(onEnter1)
+
+        def onLeave1() -> None:
+            self._setLoop1Selected(False)
+
+        self.loop1GroupBox.leave.connect(onLeave1)
+
+        def onEnter2() -> None:
+            self._setLoop2Selected(True)
+
+        self.loop2GroupBox.enter.connect(onEnter2)
+
+        def onLeave2() -> None:
+            self._setLoop2Selected(False)
+
+        self.loop2GroupBox.leave.connect(onLeave2)
+
     def _configureButtons(self) -> None:
+        def deselectAllConnections() -> None:
+            self._setLoop1Selected(False)
+            self._setLoop2Selected(False)
+
         def onAbort() -> None:
             self.splitSummary = "cancelled"
             self.close()
 
+        self.abortButton.clicked.connect(deselectAllConnections)
         self.abortButton.clicked.connect(onAbort)
 
         def onApply() -> None:
@@ -78,6 +112,7 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
 
             self.close()
 
+        self.applyButton.clicked.connect(deselectAllConnections)
         self.applyButton.clicked.connect(onApply)
 
     def _createNameForValue(self, nameValue: str) -> _model.Name:

@@ -65,7 +65,9 @@ class _Splitter:
             fromConnections == otherConnections or toConnections == otherConnections  # pylint: disable=consider-using-in
         )
         if isConnectionRedundant:
-            assert fromConnections == otherConnections and toConnections == otherConnections
+            assert (not fromConnections or fromConnections == otherConnections) and (
+                not toConnections or toConnections == otherConnections
+            )
 
             self._removeConnection(connection, loop)
             return None
@@ -85,26 +87,48 @@ class _Splitter:
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         splitLoopsSummary: _tp.Optional[_common.SplitLoopsSummary],
     ) -> _common.Cancellable[SplitSummary]:
+        fromPort, toPort = _helpers.getFromAndToPort(connection)
+
+        fromConnections = _search.getReachableConnections(fromPort, ignoreConnections={connection})
+        toConnections = _search.getReachableConnections(toPort, ignoreConnections={connection})
+
         if not splitLoopsSummary:
             occupiedNames = {l.name.value for l in self._hydraulicLoops.hydraulicLoops} - {loop.name.value}
-            cancellable = _dialog.SplitLoopDialog.showDialogAndGetResult(loop, occupiedNames, self._fluids)
+
+            setLoop1Selected = self._createSetConnectionsSelectedCallback(fromConnections)
+            setLoop2Selected = self._createSetConnectionsSelectedCallback(toConnections)
+
+            connection.deselectConnection()
+
+            cancellable = _dialog.SplitLoopDialog.showDialogAndGetResult(
+                loop,
+                occupiedNames,
+                self._fluids,
+                setLoop1Selected,
+                setLoop2Selected,
+            )
             if cancellable == "cancelled":
                 return "cancelled"
             splitLoopsSummary = cancellable
 
         self._hydraulicLoops.removeLoop(loop)
 
-        fromPort, toPort = _helpers.getFromAndToPort(connection)
-
-        fromConnections = _search.getReachableConnections(fromPort, ignoreConnections={connection})
         fromLoop = _model.HydraulicLoop(
             splitLoopsSummary.fromLoop.name, splitLoopsSummary.fromLoop.fluid, [*fromConnections]
         )
 
-        toConnections = _search.getReachableConnections(toPort, ignoreConnections={connection})
         toLoop = _model.HydraulicLoop(splitLoopsSummary.toLoop.name, splitLoopsSummary.toLoop.fluid, [*toConnections])
 
         self._hydraulicLoops.addLoop(fromLoop)
         self._hydraulicLoops.addLoop(toLoop)
 
         return SplitSummary.fromLoops(loop, fromLoop, toLoop)
+
+    @staticmethod
+    def _createSetConnectionsSelectedCallback(
+        connections: _tp.Set[_spc.SinglePipeConnection],  # type: ignore[name-defined]
+    ) -> _tp.Callable[[bool], None]:
+        def callback(isSelected: bool) -> None:
+            _common.setConnectionsSelected(connections, isSelected)
+
+        return callback

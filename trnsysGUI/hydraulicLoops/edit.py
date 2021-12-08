@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from . import common as _common
 from . import model as _model
 from ._dialogs.edit import dialog as _gui, model as _gmodel
 
@@ -12,7 +13,12 @@ def edit(
 
     occupiedNames = [l.name.value for l in hydraulicLoops.hydraulicLoops if l != hydraulicLoop]
 
+    _common.setConnectionsSelected(hydraulicLoop.connections, True)
+
     okedOrCancelled = _gui.HydraulicLoopDialog.showDialog(guiHydraulicLoop, occupiedNames, fluids)
+
+    _common.setConnectionsSelected(hydraulicLoop.connections, False)
+
     if okedOrCancelled == "cancelled":
         return
 
