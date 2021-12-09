@@ -48,9 +48,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
 
-        self.groupName = ""
-        self.setDefaultGroup()
-
         self.inputs = []
         self.outputs = []
 
@@ -129,42 +126,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         if self not in self.parent.parent().trnsysObj:
             self.parent.parent().trnsysObj.append(self)
             # self.logger.debug("trnsysObj are " + str(self.parent.parent().trnsysObj))
-
-    def setDefaultGroup(self):
-        """
-        Sets the group to defaultGroup when being created.
-        Returns
-        -------
-
-        """
-        self.setBlockToGroup("defaultGroup")
-
-    def setBlockToGroup(self, newGroupName):
-        """
-        Sets the groupName of this Block to newGroupName and appends itself to the itemList of that group
-        Parameters
-        ----------
-        newGroupName
-
-        Returns
-        -------
-
-        """
-        # self.logger.debug("In setBlockToGroup")
-        if newGroupName == self.groupName:
-            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
-            return
-        else:
-            # self.logger.debug("groups is " + str(self.parent.parent().groupList))
-            for g in self.parent.parent().groupList:
-                if g.displayName == self.groupName:
-                    self.logger.debug("Found the old group " + self.groupName)
-                    g.itemList.remove(self)
-                if g.displayName == newGroupName:
-                    # self.logger.debug("Found the new group " + newGroupName)
-                    g.itemList.append(self)
-
-            self.groupName = newGroupName
 
     def setId(self, newId):
         self.id = newId
@@ -440,15 +401,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         # self.parent.parent().parent().undoStack.push(command)
         self.parent.deleteBlockCom(self)
 
-    def configGroup(self):
-        """
-        This method is called from the contextMenu and allows to pick a group for this block.
-        Returns
-        -------
-
-        """
-        self.parent.parent().showGroupChooserBlockDlg(self)
-
     def getConnections(self):
         """
         Get the connections from inputs and outputs of this block.
@@ -675,7 +627,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             self.flippedH,
             self.flippedV,
             self.rotationN,
-            self.groupName,
         )
 
         dictName = "Block-"
@@ -703,7 +654,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
-        self.setBlockToGroup(model.groupName)
 
         resBlockList.append(self)
 
@@ -823,7 +773,6 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
     flippedH: bool
     flippedV: bool
     rotationN: int
-    groupName: str
 
     @classmethod
     def from_dict(
@@ -864,7 +813,6 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
             superseded.FlippedH,
             superseded.FlippedV,
             superseded.RotationN,
-            superseded.GroupName,
         )
 
     @classmethod

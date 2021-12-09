@@ -90,7 +90,6 @@ class DoublePipeTeePiece(BlockItem):
             self.flippedH,
             self.flippedV,
             self.rotationN,
-            self.groupName,
         )
 
         dictName = "Block-"
@@ -115,7 +114,6 @@ class DoublePipeTeePiece(BlockItem):
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
-        self.setBlockToGroup(model.groupName)
 
         resBlockList.append(self)
 

@@ -149,14 +149,32 @@ MfrTes-Col_A=[450,22]
 MfrTes-Col_B=[450,23]
 
 
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 4
+** loop1
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+** loop2
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+
 UNIT 451 TYPE 931
 !Tes-Hp
 PARAMETERS 6
-diTes-Hp
-LTes-Hp
-UTes-Hp
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
 20
 INPUTS 4
 TInHx
@@ -174,11 +192,11 @@ MfrTes-Hp= MfrTes-Hp_A
 UNIT 452 TYPE 931
 !Hp-Tes
 PARAMETERS 6
-diHp-Tes
-LHp-Tes
-UHp-Tes
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
 20
 INPUTS 4
 THP
@@ -196,11 +214,11 @@ MfrHp-Tes= MfrHp-Tes_A
 UNIT 453 TYPE 931
 !Col-Tes
 PARAMETERS 6
-diCol-Tes
-LCol-Tes
-UCol-Tes
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
 20
 INPUTS 4
 TCol
@@ -218,11 +236,11 @@ MfrCol-Tes= MfrCol-Tes_A
 UNIT 454 TYPE 931
 !Tes-Col
 PARAMETERS 6
-diTes-Col
-LTes-Col
-UTes-Col
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
 20
 INPUTS 4
 TTesPortLeft10
@@ -237,39 +255,9 @@ TTes-Col= [454,1]
 PTes-Col_kW= [454,3]/3600 !kW
 MfrTes-Col= MfrTes-Col_A
 
-CONSTANTS 3
-** Fluid Loop : defaultGroup
-di_loop_0=0.05
-L_loop_0=2
-U_loop_0=10
-
-
-EQUATIONS 12
-** Fluid Loop : defaultGroup
-**di_loop_0=0.05
-**L_loop_0=2
-**U_loop_0=10
-*** Tes-Col
-diTes-Col=di_loop_0
-LTes-Col=L_loop_0
-UTes-Col=U_loop_0
-*** Tes-Hp
-diTes-Hp=di_loop_0
-LTes-Hp=L_loop_0
-UTes-Hp=U_loop_0
-*** Hp-Tes
-diHp-Tes=di_loop_0
-LHp-Tes=L_loop_0
-UHp-Tes=U_loop_0
-*** Col-Tes
-diCol-Tes=di_loop_0
-LCol-Tes=L_loop_0
-UCol-Tes=U_loop_0
-
-
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PTes-Col_kW+PTes-Hp_kW+PHp-Tes_kW+PCol-Tes_kW
+PipeLossTot=PTes-Hp_kW+PHp-Tes_kW+PCol-Tes_kW+PTes-Col_kW
 
 ASSIGN storage-tank_Mfr.prt 455
 

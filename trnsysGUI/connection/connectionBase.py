@@ -11,7 +11,6 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import massFlowSolver as _mfs
-import trnsysGUI.hydraulicLoops as _hl
 from massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
@@ -19,9 +18,6 @@ from trnsysGUI.Node import Node
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
 from trnsysGUI.TVentil import TVentil
-
-if _tp.TYPE_CHECKING:
-    import trnsysGUI.BlockItem as _bi
 
 
 def calcDist(p1, p2):
@@ -39,16 +35,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.displayName = None
 
         self.parent = parent
-        self.groupName = ""
-        self.setDefaultGroup()
-
-        # Export related
-        self.typeNumber = 0
-        self.exportConnsString = ""
-        self.exportInputName = "0"
-        self.exportInitialInput = -1
-        self.exportEquations = []
-        self._portItemsWithParent: _tp.List[_tp.Tuple[PortItemBase, _bi.BlockItem]] = []
 
         # Global
         self.id = self.parent.idGen.getID()
@@ -906,8 +892,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             self.logger.debug([i.id for i in self.parent.trnsysObj])
             return
 
-        self.removeConnFromGroup()
-
         self.logger.debug("Removing trnsysObj " + str(self))
         self.parent.connectionList.remove(self)
         del self
@@ -993,41 +977,10 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         element.setNext(pr)
         element.setPrev(ne)
 
-    # Group related
-    def setDefaultGroup(self):
-        self.setConnToGroup("defaultGroup")
-
-    def setConnToGroup(self, newGroupName):
-        self.logger.debug("In setConnToGroup")
-        if newGroupName == self.groupName:
-            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
-            return
-        else:
-            # self.logger.debug("groups is " + str(self.parent.groupList))
-            for g in self.parent.groupList:
-                self.logger.debug("At group " + str(g.displayName))
-                if g.displayName == self.groupName:
-                    self.logger.debug("Found the old group")
-                    g.itemList.remove(self)
-                if g.displayName == newGroupName:
-                    self.logger.debug("Found the new group")
-                    g.itemList.append(self)
-
-            self.groupName = newGroupName
-
-    def removeConnFromGroup(self):
-        for g in self.parent.groupList:
-            if g.displayName == self.groupName:
-                if self in g.itemList:
-                    g.itemList.remove(self)
-                else:
-                    self.logger.debug("While removing conn from group, groupName is invalid")
-            else:
-                self.logger.debug("While removeing conn from group, no group with conn.groupName")
-
     # Select when clicked, deselect when clicked elsewhere
-    def selectConnection(self):
-        self.deselectOtherConnections()
+    def selectConnection(self, deselectOthers: bool):
+        if deselectOthers:
+            self.deselectOtherConnections()
 
         for s in self.segments:
             s.setSelect(True)
@@ -1062,10 +1015,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def inspectConn(self):
         self.parent.listV.clear()
         self.parent.listV.addItem("Display name: " + self.displayName)
-        self.parent.listV.addItem("Group name: " + self.groupName)
         self.parent.listV.addItem("Parent: " + str(self.parent))
-        # self.parent.listV.addItem("Position: " + str(self.pos()))
-        # self.parent.listV.addItem("Sceneposition: " + str(self.scenePos()))
         self.parent.listV.addItem("fromPort: " + str(self.fromPort) + str(self.fromPort.id))
         self.parent.listV.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
 
@@ -1172,22 +1122,3 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
-
-    def editHydraulicLoop(self) -> None:
-        _hl.showHydraulicLoopDialog(self.fromPort, self.toPort)
-
-
-class DeleteConnectionCommandBase(QUndoCommand):
-    def __init__(self, conn, descr):
-        super().__init__(descr)
-        self.conn = conn
-        self.connFromPort = self.conn.fromPort
-        self.connToPort = self.conn.toPort
-        self.connParent = self.conn.parent
-
-    def redo(self):
-        self.conn.deleteConn()
-        self.conn = None
-
-    def undo(self):
-        self.conn = ConnectionBase(self.connFromPort, self.connToPort, self.connParent)

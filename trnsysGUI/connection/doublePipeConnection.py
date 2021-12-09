@@ -4,16 +4,17 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
+import PyQt5.QtWidgets as _qtw
+
 import dataclasses_jsonschema as _dcj
 
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
 from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
-
 
 class DoublePipeConnection(ConnectionBase):
     def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
@@ -31,7 +32,7 @@ class DoublePipeConnection(ConnectionBase):
         return rad
 
     def deleteConnCom(self):
-        command = DeleteDoublePipeConnectionCommand(self, "Delete conn comand")
+        command = DeleteDoublePipeConnectionCommand(self)
         self.parent.parent().undoStack.push(command)
 
     def encode(self):
@@ -57,7 +58,6 @@ class DoublePipeConnection(ConnectionBase):
             corners,
             labelPos,
             labelMassPos,
-            self.groupName,
             self.fromPort.id,
             self.toPort.id,
             self.trnsysId,
@@ -74,8 +74,6 @@ class DoublePipeConnection(ConnectionBase):
         self.trnsysId = model.trnsysId
         self.childIds = model.childIds
         self.setName(model.name)
-        self.groupName = "defaultGroup"
-        self.setConnToGroup(model.groupName)
 
         if len(model.segmentsCorners) > 0:
             self.loadSegments(model.segmentsCorners)
@@ -276,21 +274,31 @@ class DoublePipeConnection(ConnectionBase):
         return str(firstColumn).ljust(spacing) + comment + "\n"
 
 
-class DeleteDoublePipeConnectionCommand(DeleteConnectionCommandBase):
+class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
+    def __init__(self, conn):
+        super().__init__("Delete double pipe connection")
+        self._connection = conn
+        self._fromPort = self._connection.fromPort
+        self._toPort = self._connection.toPort
+        self._editor = self._connection.parent
+
     def undo(self):
-        self.conn = DoublePipeConnection(self.connFromPort, self.connToPort, self.connParent)
+        self._connection = DoublePipeConnection(self._fromPort, self._toPort, self._editor)
+
+    def redo(self):
+        self._connection.deleteConn()
+        self._connection = None
 
 
 @_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
+class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
-    id: int
+    id: int  # pylint: disable=invalid-name
     childIds: _tp.List[int]
     segmentsCorners: _tp.List[_tp.Tuple[float, float]]
     labelPos: _tp.Tuple[float, float]
     massFlowLabelPos: _tp.Tuple[float, float]
-    groupName: str
     fromPortId: int
     toPortId: int
     trnsysId: int
@@ -298,7 +306,7 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
     @classmethod
     def from_dict(
         cls,
-        data: _dcj.JsonDict,
+        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
         validate=True,
         validate_enums: bool = True,
     ) -> "DoublePipeConnectionModel":
@@ -310,7 +318,7 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__ConnectionDict__"] = True

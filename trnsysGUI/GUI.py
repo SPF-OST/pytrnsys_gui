@@ -428,11 +428,6 @@ class _MainWindow(QMainWindow):
             self.logger.info("Canceling")
             return
 
-    def createGroup(self):
-        self.centralWidget.selectionMode = True
-        self.centralWidget.groupMode = True
-        self.centralWidget.multipleSelectMode = False
-
     def tidyUp(self):
         self.logger.info("Tidying up...")
         self.centralWidget.cleanUpConnections()

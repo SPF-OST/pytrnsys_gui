@@ -37,7 +37,7 @@ class segmentDlg(QDialog):
         if newName.lower() == str(self.seg.connection.displayName).lower():
             self.close()
         elif newName != "" and not self.nameExists(newName):
-            self.seg.connection.setDisplayName(newName)
+            self.seg.connection.setName(newName)
             for segment in self.seg.connection.segments:
                 segment.setToolTip(newName)
             self.close()

@@ -1,28 +1,41 @@
+from __future__ import annotations
+
 import typing as tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QLinearGradient, QBrush, QPen
-from PyQt5.QtWidgets import QGraphicsLineItem
+from PyQt5.QtWidgets import QGraphicsLineItem, QMenu
 
 from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
 if tp.TYPE_CHECKING:
-    from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]  # pylint: disable=unused-import
+    from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]  # pylint: disable=unused-import
 
 
 class SinglePipeSegmentItem(SegmentItemBase):
-    def __init__(self, startNode, endNode, parent: "ConnectionBase"):
+    def __init__(self, startNode, endNode, parent: SinglePipeConnection):
         super().__init__(startNode, endNode, parent)
+
+        self._singlePipeConnection = parent
 
         self.singleLine = QGraphicsLineItem(self)
         self.linearGrad = None
         self.initGrad()
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
-        return SinglePipeSegmentItem(startNode, endNode, self.connection)
+        return SinglePipeSegmentItem(startNode, endNode, self._singlePipeConnection)
+
+    def _getContextMenu(self) -> QMenu:
+        menu = super()._getContextMenu()
+
+        editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
+
+        editHydraulicLoopAction.triggered.connect(self._singlePipeConnection.editHydraulicLoop)
+
+        return menu
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.initGrad()

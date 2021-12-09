@@ -172,7 +172,6 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
             self.flippedV,
             self.name,
             self.displayName,
-            self.groupName,
             self.id,
             self.trnsysId,
             self.h,
@@ -257,8 +256,6 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         if shallSetNamesAndIDs:
             self.trnsysId = model.trnsysId
             self.id = model.id
-            self.groupName = "defaultGroup"
-            self.setBlockToGroup(model.groupName)
 
         for heatExchangerModel in model.heatExchangers:
             self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)
@@ -413,8 +410,8 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         ddcxPath = ddcxPath + ".ddcx"
         self.exportDck()
         if _os.path.isfile(ddcxPath):
-            infile = open(ddcxPath, "r")
-            lines = infile.readlines()
+            with open(ddcxPath, "r", encoding="windows-1252") as infile:
+                lines = infile.readlines()
             for line in lines:
                 if line[0] == "T":
                     equations.append(line.replace("\n", ""))
@@ -595,7 +592,7 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
                 errorConnList = errorConnList + connName2 + "\n"
         if errorConnList != "":
             msgBox = QMessageBox()
-            msgBox.setText("%s is connected wrongly, right click StorageTank to invert connection." % (errorConnList))
+            msgBox.setText(f"{errorConnList} is connected wrongly, right click StorageTank to invert connection.")
             msgBox.exec()
             noError = False
         else:
@@ -641,9 +638,7 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         self.tree = MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName("%sTree" % self.displayName)
-        # for i in range(1, self.model.columnCount()-1):
-        #     self.tree.hideColumn(i)
+        self.tree.setObjectName(f"{self.displayName}Tree")
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
@@ -688,7 +683,7 @@ class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,to
         self.displayName = newName
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
-        self.tree.setObjectName("%sTree" % self.displayName)
+        self.tree.setObjectName(f"{self.displayName}Tree")
         self.logger.debug(_os.path.dirname(self.path))
         destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
         if _os.path.split(self.path)[-1] == "" or _os.path.split(self.path)[-1] == "ddck":

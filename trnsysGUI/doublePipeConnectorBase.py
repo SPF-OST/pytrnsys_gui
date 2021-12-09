@@ -70,7 +70,6 @@ class DoublePipeConnectorBase(BlockItem):
             self.flippedH,
             self.flippedV,
             self.rotationN,
-            self.groupName
         )
 
         dictName = "Block-"
@@ -94,7 +93,6 @@ class DoublePipeConnectorBase(BlockItem):
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
-        self.setBlockToGroup(model.groupName)
 
         resBlockList.append(self)
 
@@ -106,11 +104,11 @@ class DoublePipeConnectorBase(BlockItem):
 
 
 @_dc.dataclass
-class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
-    BlockName: str
-    BlockDisplayName: str
+class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
-    id: int
+    id: int  # pylint: disable=invalid-name
     trnsysId: int
     childIds: _tp.List[int]
     portsIdsIn: _tp.List[int]
@@ -118,7 +116,6 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
     flippedH: bool
     flippedV: bool
     rotationN: int
-    groupName: str
 
     @classmethod
     def from_dict(
@@ -135,9 +132,9 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code #6
+        validate_enums: bool = True,
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
+        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code  # 2
         data[".__BlockDict__"] = True
         return data
 

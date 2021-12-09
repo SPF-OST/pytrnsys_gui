@@ -28,14 +28,17 @@ def main():
         dest="shallPerformStaticChecks",
     )
     parser.add_argument(
-        "-l", "--lint", help="Perform linting", action="store_true", dest="shallLint"
+        "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
     )
     parser.add_argument(
         "-t",
         "--type",
         help="Perform type checking",
-        action="store_true",
-        dest="shallTypeCheck",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="mypyArguments",
     )
     parser.add_argument(
         "-u",
@@ -67,21 +70,16 @@ def main():
 
     _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
-    if (
-        arguments.shallRunAll
-        or arguments.shallPerformStaticChecks
-        or arguments.shallTypeCheck
-    ):
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
         cmd = "mypy --show-error-codes trnsysGUI tests dev-tools"
-        sp.run(cmd.split(), check=True)
+        additionalArgs = arguments.mypyArguments or ""
+        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
-    if (
-        arguments.shallRunAll
-        or arguments.shallPerformStaticChecks
-        or arguments.shallLint
-    ):
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
         cmd = "pylint trnsysGUI tests dev-tools"
-        sp.run(cmd.split(), check=True)
+        additionalArgs = arguments.lintArguments or ""
+
+        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
@@ -93,12 +91,12 @@ def main():
         or arguments.shallRunTests
         or not (
             arguments.shallPerformStaticChecks
-            or arguments.shallTypeCheck
-            or arguments.shallLint
+            or arguments.mypyArguments is not None
+            or arguments.lintArguments is not None
             or arguments.diagramsFormat
         )
     ):
-        args = [
+        additionalArgs = [
             "pytest",
             "--cov=trnsysGUI",
             f"--cov-report=html:{testResultsDirPath / 'coverage'}",
@@ -108,7 +106,7 @@ def main():
             "not manual",
             "tests",
         ]
-        sp.run(args, check=True)
+        sp.run(additionalArgs, check=True)
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:

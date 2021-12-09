@@ -6,12 +6,11 @@ import os
 import pathlib as _pl
 import pkgutil as _pu
 import shutil
-import sys
 import typing as _tp
 
 import pytrnsys.trnsys_util.deckUtils as _du
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize, Qt, QLineF, QCoreApplication, QFileInfo, QDir
+from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
@@ -35,42 +34,38 @@ from PyQt5.QtWidgets import (
 
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
+import trnsysGUI.hydraulicLoops.edit as _hledit
+import trnsysGUI.hydraulicLoops.migration as _hlmig
+import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.DifferenceDlg import DifferenceDlg
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.Graphicaltem import GraphicalItem
-from trnsysGUI.Group import Group
-from trnsysGUI.GroupChooserBlockDlg import GroupChooserBlockDlg
-from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.PumpDlg import PumpDlg
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
-from trnsysGUI.TestDlg import TestDlg
-from trnsysGUI.Test_Export import Test_Export
 from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
+from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
 from trnsysGUI.diagram.Scene import Scene
 from trnsysGUI.diagram.View import View
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.doublePipeBlockDlg import DoublePipeBlockDlg
-from trnsysGUI.groupDlg import groupDlg
-from trnsysGUI.groupsEditor import groupsEditor
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.idGenerator import IdGenerator
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 
@@ -84,12 +79,6 @@ class Editor(QWidget):
     Logically:
     A Connection is composed of a fromPort and a toPort, which gives the direction of the pipe.
     Ports are attached to Blocks.
-    Initially, there is a temporary fromPort set to None.
-    As soon any Port is clicked and dragged, tempStartPort is set to that Port and startedConnectino is set to True.
-    -> startConnection()
-    If the mouse is then released over a different Port, a Connection is created, otherwise startedConnection is set to False
-    and the process is interrupted.
-    -> createConnection()
     Visually:
     A diagram editor has a QGraphicsLineItem (connLineItem) which is set Visible only when a connection is being created
 
@@ -109,7 +98,7 @@ class Editor(QWidget):
     and pasting will load the clipboard using a slighly different decoder than for loading an entire diagram.
     When the elements are pasted, they compose a group which can be dragged around and is desintegrated when the mouse
     is released.
-    It is controlled by the attributes selectionMode and groupMode
+    It is controlled by the attribute selectionMode.
 
     Attributes
     ----------
@@ -123,8 +112,6 @@ class Editor(QWidget):
         Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
     selectionMode : bool
         Enables/disables selection rectangle in Scene
-    groupMode : bool
-        Enables creation of a new group in Scene
     alignMode : bool
         Enables mode in which a dragged block is aligned to y or x value of another one
         Toggled in the MainWindow class in toggleAlignMode()
@@ -152,11 +139,9 @@ class Editor(QWidget):
         Contains the "logical" part of the diagram
     diagramView : :obj:`QGraphicsView`
         Contains the visualization of the diagramScene
-    startedConnection : Bool
-    tempStartPort : :obj:`PortItem`
+    _currentlyDraggedConnectionFromPort : :obj:`PortItem`
     connectionList : :obj:`List` of :obj:`Connection`
     trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-    groupList : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
     graphicalObj : :obj:`List` of :obj:`GraphicalItem`
     connLine : :obj:`QLineF`
     connLineItem = :obj:`QGraphicsLineItem`
@@ -164,7 +149,7 @@ class Editor(QWidget):
     """
 
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
-        QWidget.__init__(self, parent)
+        super().__init__(parent)
 
         self.logger = logger
 
@@ -183,7 +168,6 @@ class Editor(QWidget):
         self.controlDirectory = ""
 
         self.selectionMode = False
-        self.groupMode = False
 
         self.alignMode = False
 
@@ -302,31 +286,17 @@ class Editor(QWidget):
         self.horizontalLayout.setStretchFactor(self.diagramView, 5)
         self.horizontalLayout.setStretchFactor(self.libraryBrowserView, 1)
 
-        self.startedConnection = False
-        self.tempStartPort = None
+        self._currentlyDraggedConnectionFromPort = None
         self.connectionList = []
         self.trnsysObj = []
-        self.groupList = []
         self.graphicalObj = []
-
-        self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
-        self.defaultGroup.setName("defaultGroup")
+        self.fluids: _tp.Optional[_hlm.Fluids] = None
+        self.hydraulicLoops: _tp.Optional[_hlm.HydraulicLoops] = None
 
         self.copyGroupList = QGraphicsItemGroup()
         self.selectionGroupList = QGraphicsItemGroup()
 
         self.printerUnitnr = 0
-
-        # For debug button
-        # a = 400  # Start of upmost button y-value
-        # b = 50  # distance between starts of button y-values
-        # b_start = 75
-
-        # self.button = QPushButton(self)
-        # self.button.setText("Print info")
-        # self.button.move(b_start, a)
-        # self.button.setMinimumSize(120, 40)
-        # self.button.clicked.connect(self.button1_clicked)
 
         # Different colors for connLineColor
         colorsc = "red"
@@ -363,9 +333,9 @@ class Editor(QWidget):
         self.diagramScene.addItem(self.alignXLineItem)
 
         if loadValue == "load" or loadValue == "copy":
-            self.decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
+            self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
         elif loadValue == "json":
-            self.decodeDiagram(jsonPath, loadValue=loadValue)
+            self._decodeDiagram(jsonPath, loadValue=loadValue)
 
     # Debug function
     def dumpInformation(self):
@@ -392,20 +362,7 @@ class Editor(QWidget):
 
     # Connections related methods
     def startConnection(self, port):
-        """
-        When a PortItem is clicked, it is saved into the tempStartPort
-
-        Parameters
-        ----------
-        port : :obj:`PortItem`
-
-        Returns
-        -------
-
-        """
-        self.logger.debug("port is " + str(port))
-        self.tempStartPort = port
-        self.startedConnection = True
+        self._currentlyDraggedConnectionFromPort = port
 
     def _createConnection(self, startPort, endPort) -> None:
         if startPort is not endPort:
@@ -418,35 +375,24 @@ class Editor(QWidget):
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
 
-            if isinstance(startPort, SinglePipePortItem) and isinstance(endPort, SinglePipePortItem):
-                command = CreateSinglePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
+            isValidSinglePipeConnection = isinstance(startPort, SinglePipePortItem) and isinstance(
+                endPort, SinglePipePortItem
+            )
+            if isValidSinglePipeConnection:
+                command = CreateSinglePipeConnectionCommand(startPort, endPort, self)
             elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
-                command = CreateDoublePipeConnectionCommand(startPort, endPort, self, "CreateConn Command")
+                command = CreateDoublePipeConnectionCommand(startPort, endPort, self)
             else:
                 raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
-        """
-        Qt method that sets the line signalling the creation of a new connection.
-
-        Parameters
-        ----------
-        event
-
-        Returns
-        -------
-
-        """
-        if self.startedConnection:
-            # print("Started conn, should draw")
-            tempx = self.tempStartPort.scenePos().x()
-            tempy = self.tempStartPort.scenePos().y()
+        if self._currentlyDraggedConnectionFromPort:
+            tempx = self._currentlyDraggedConnectionFromPort.scenePos().x()
+            tempy = self._currentlyDraggedConnectionFromPort.scenePos().y()
             posx = event.scenePos().x()
             posy = event.scenePos().y()
-            # print(str(posx))
-            # print(str(tempx))
 
             self.connLineItem.setVisible(True)
             self.connLine.setLine(tempx, tempy, posx, posy)
@@ -454,20 +400,28 @@ class Editor(QWidget):
             self.connLineItem.setVisible(True)
 
     def sceneMouseReleaseEvent(self, event):
-        # print("Called sceneMouseReleaseEvent with startedConnection=" + str(self.startedConnection))
-        if self.startedConnection:
-            releasePos = event.scenePos()
-            itemsAtReleasePos = self.diagramScene.items(releasePos)
-            self.logger.debug("items are " + str(itemsAtReleasePos))
-            for it in itemsAtReleasePos:
-                if type(it) == type(self.tempStartPort):
-                    self._createConnection(self.tempStartPort, it)
-                else:
-                    self.startedConnection = False
-                    self.connLineItem.setVisible(False)
+        if not self._currentlyDraggedConnectionFromPort:
+            return
 
-                    # Not necessary
-                    # self.tempStartPort = None
+        mousePosition = event.scenePos()
+
+        hitItems = self.diagramScene.items(mousePosition)
+        hitPortItems = [i for i in hitItems if type(i) == type(self._currentlyDraggedConnectionFromPort)]
+        numberOfHitPortsItems = len(hitPortItems)
+
+        if numberOfHitPortsItems == 0:
+            return
+
+        if numberOfHitPortsItems > 1:
+            raise NotImplementedError("Can't deal with overlapping port items.")
+
+        hitPortItem = hitPortItems[0]
+
+        if hitPortItem != self._currentlyDraggedConnectionFromPort:
+            self._createConnection(self._currentlyDraggedConnectionFromPort, hitPortItem)
+
+        self._currentlyDraggedConnectionFromPort = None
+        self.connLineItem.setVisible(False)
 
     def cleanUpConnections(self):
         for c in self.connectionList:
@@ -537,9 +491,9 @@ class Editor(QWidget):
 
         fullExportText += exporter.exportInputsFlowSolver()
         fullExportText += exporter.exportOutputsFlowSolver(simulationUnit)
+        fullExportText += exporter.exportFluids() + "\n"
+        fullExportText += exporter.exportHydraulicLoops() + "\n"
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
-        fullExportText += exporter.exportPrintLoops()
-        fullExportText += exporter.exportPrintPipeLoops()
         fullExportText += exporter.exportPrintPipeLosses()
 
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
@@ -684,13 +638,8 @@ class Editor(QWidget):
             self.logger.info("In deleting...")
             self.trnsysObj[0].deleteBlock()
 
-        while len(self.groupList) > 1:
-            self.groupList[-1].deleteGroup()
-
         while len(self.graphicalObj) > 0:
             self.graphicalObj[0].deleteBlock()
-
-        self.logger.debug("Groups are " + str(self.groupList))
 
     def newDiagram(self):
         self.centralWidget.delBlocks()
@@ -708,21 +657,6 @@ class Editor(QWidget):
         self.showNewDiagramDlg()
 
     # Encoding / decoding
-    def encode(self, filename, encodeList):
-        """
-        Encoding function. Not used. encodeDiagram is used instead
-        Parameters
-        ----------
-        filename : str
-        encodeList : :obj:`list` of :obj:`BlockItem` and :obj:`Connection`
-
-        Returns
-        -------
-
-        """
-        with open(filename, "w") as jsonfile:
-            json.dump(encodeList, jsonfile, indent=4, sort_keys=True, cls=Encoder)
-
     def encodeDiagram(self, filename):
         """
         Encodes the diagram to a json file.
@@ -740,73 +674,41 @@ class Editor(QWidget):
         with open(filename, "w") as jsonfile:
             json.dump(self, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
-    def decodeDiagram(self, filename, loadValue="load"):
-        """
-        Decodes a diagram saved as a json-file. It also checks which folders exist in the ddck-directory of the pro-
-        ject. It deletes all folders in the ddck-directory, which neither have a corresponding blockItem in the json-
-        file nor are the generic, hydraulic, or a Tes-folder. Such folders are created when an item is dropped, but not
-        saved in the diagram-json afterwards.
-
-        Parameters
-        ----------
-        filename : str
-
-        Returns
-        -------
-
-        """
+    def _decodeDiagram(self, filename, loadValue="load"):
         self.logger.info("Decoding " + filename)
         with open(filename, "r") as jsonfile:
             blocklist = json.load(jsonfile, cls=Decoder, editor=self)
 
-        if len(self.groupList) == 0:
-            self.logger.debug("self.group is empty, adding default group")
-            self.defaultGroup = Group(0, 0, 100, 100, self.diagramScene)
-            self.defaultGroup.setName("defaultGroup")
-
         blockFolderNames = []
 
         for j in blocklist["Blocks"]:
-            # print("J is " + str(j))
-
             for k in j:
                 if isinstance(k, BlockItem):
                     k.setParent(self.diagramView)
                     k.changeSize()
                     self.diagramScene.addItem(k)
                     blockFolderNames.append(k.displayName)
-                    # blockFolderNames.append(k.name + '_' + k.displayName)
-                    # k.setBlockToGroup("defaultGroup")
 
                 if isinstance(k, StorageTank):
-                    self.logger.debug("Loading a Storage")
-                    k.setParent(self.diagramView)
                     k.updateImage()
 
                 if isinstance(k, GraphicalItem):
                     k.setParent(self.diagramView)
                     self.diagramScene.addItem(k)
-                    # k.resizer.setPos(k.w, k.h)
-                    # k.resizer.itemChange(k.resizer.ItemPositionChange, k.resizer.pos())
 
                 if isinstance(k, dict):
                     if "__idDct__" in k:
                         # here we don't set the ids because the copyGroup would need access to idGen
                         self.logger.debug("Found the id dict while loading, not setting the ids")
-                        # global globalID
-                        # global trnsysID
-                        # global globalConnID
 
                         self.idGen.setID(k["GlobalId"])
                         self.idGen.setTrnsysID(k["trnsysID"])
                         self.idGen.setConnID(k["globalConnID"])
-                        # self.idGen.setBlockID()
 
                     if "__nameDct__" in k:
                         self.logger.debug("Found the name dict while loading")
                         if loadValue == "load":
                             self.diagramName = k["DiagramName"]
-                            # self.projectFolder = k["ProjectFolder"]
 
         blockFolderNames.append("generic")
         blockFolderNames.append("hydraulic")
@@ -844,6 +746,20 @@ class Editor(QWidget):
             self.logger.debug("Tr obj is" + str(t) + " " + str(t.trnsysId))
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " + str(t.isTempering))
+
+        self._decodeFluidsAndHydraulicLoops(blocklist)
+
+    def _decodeFluidsAndHydraulicLoops(self, blocklist):
+        self.fluids = _hlm.Fluids([])
+
+        singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
+        if "hydraulicLoops" not in blocklist:
+            hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
+        else:
+            serializedHydraulicLoops = blocklist["hydraulicLoops"]
+            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(serializedHydraulicLoops, singlePipeConnections, self.fluids)
+
+        self.hydraulicLoops = hydraulicLoops
 
     def exportSvg(self):
         """
@@ -997,10 +913,6 @@ class Editor(QWidget):
     def setitemsSelected(self, b):
         self.itemsSelected = b
 
-    # Misc
-    def editGroups(self):
-        self.showGroupsEditor()
-
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
             if isinstance(c, ConnectionBase):
@@ -1014,13 +926,6 @@ class Editor(QWidget):
         for t in self.trnsysObj:
             if isinstance(t, ConnectionBase):
                 t.updateSegGrads()
-
-    def findGroupByName(self, name):
-        for g in self.groupList:
-            if g.displayName == name:
-                return g
-
-        return None
 
     # Dialog calls
     def showBlockDlg(self, bl):
@@ -1038,15 +943,6 @@ class Editor(QWidget):
     def showGenericPortPairDlg(self, bl):
         c = GenericPortPairDlg(bl, self)
 
-    def showGroupChooserBlockDlg(self, bl):
-        c = GroupChooserBlockDlg(bl, self)
-
-    def showGroupChooserConnDlg(self, conn):
-        c = GroupChooserConnDlg(conn, self)
-
-    def showGroupDlg(self, group, itemList):
-        c = groupDlg(group, self, itemList)
-
     def showHxDlg(self, hx):
         c = hxDlg(hx, self)
 
@@ -1061,15 +957,6 @@ class Editor(QWidget):
 
     def showConfigStorageDlg(self, bl):
         c = ConfigureStorageDialog(bl, self)
-
-    def showGroupsEditor(self):
-        c = groupsEditor(self)
-
-    def testFunctionInspection(self, *args):
-        self.logger.debug("Ok, here is my log")
-        self.logger.debug(int(args[0]) + 1)
-        if len(self.connectionList) > 0:
-            self.connectionList[0].selectConnection()
 
     def getConnection(self, n):
         return self.connectionList[int(n)]
@@ -1121,116 +1008,6 @@ class Editor(QWidget):
 
         # [print(p.parent.displayName) for p in res]
         return res
-
-    def delGroup(self):
-        """
-        This is used for deleting the first connected componts group found by BFS, unused
-        Returns
-        -------
-
-        """
-        for bl in self.blockList:
-            bl.deleteBlock()
-
-    def testFunction(self):
-        """
-        This function tests whether the exporting function is working correctly by comparing
-        an exported file to a reference file.
-        Warning message will be shown if any difference is found between the files.
-        -------
-        Things to note : The fileDir must be changed to corresponding directories on the PC
-
-        """
-
-        i = 0
-        self.tester = Test_Export()
-        self.testPassed = True
-        msg = QMessageBox(self)
-        msg.setWindowTitle("Test Result")
-        # fileDir = 'U:/Desktop/TrnsysGUI/trnsysGUI/'
-        # examplesFilePath = fileDir + 'examplesNewEncoding/'
-        # exportedFilePath = fileDir + 'export_test/'
-        # originalFilePath = fileDir + 'Reference/'
-
-        if getattr(sys, "frozen", False):
-            ROOT_DIR = os.path.dirname(sys.executable)
-        elif __file__:
-            ROOT_DIR = os.path.dirname(__file__)  # This is your Project Root
-        examplesFilePath = os.path.join(ROOT_DIR, "examples")
-        exportedFilePath = os.path.join(ROOT_DIR, "export_test")
-        originalFilePath = os.path.join(ROOT_DIR, "Reference")
-
-        exportedFileList = []
-        originalFileList = []
-        exampleFileList = []
-
-        errorList1 = []
-        errorLIst2 = []
-
-        fileNoList = []
-
-        msg.setText("Test in progress")
-        msg.show()
-
-        QCoreApplication.processEvents()
-
-        # Clear the window
-        # self.delBlocks()
-
-        # open, decode and export every example file
-
-        self.testEnabled = True
-        for files in os.listdir(examplesFilePath):
-            fileName = os.path.join(examplesFilePath, files)
-            exampleFileList.append(fileName)
-            self.decodeDiagram(fileName)
-            # Export example files
-            self.exportHydraulics()
-            self.delBlocks()
-        self.testEnabled = False
-
-        # get all files from exportedFile folder and Original folder
-        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList, originalFileList)
-
-        # check if exported files exist inside reference folder
-        j = 0
-        while j < len(exportedFileList):
-            if not self.tester.checkFileExists(exportedFileList[j], originalFileList):
-                self.existReference = False
-                testDlg = TestDlg(exportedFileList[j])
-                if testDlg.exportBool:
-                    self.delBlocks()
-                    self.decodeDiagram(exampleFileList[j])
-                    self.exportHydraulics()
-                    self.delBlocks()
-                self.existReference = True
-            j += 1
-
-        # Retrieve newly added files if any
-        self.tester.retrieveFiles(exportedFilePath, originalFilePath, exportedFileList, originalFileList)
-
-        # check if the files are identical
-        fileNoList, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
-        # i, self.testPassed = self.tester.checkFiles(exportedFileList, originalFileList)
-
-        if self.testPassed:
-            msg.setText("All files tested, no discrepancy found")
-            msg.exec_()
-        else:
-            for fileNo in fileNoList:
-                errorFile = originalFileList[fileNo]
-                errorList1, errorList2 = self.tester.showDifference(exportedFileList[fileNo], originalFileList[fileNo])
-                msg.setText("%d files tested, discrepancy found in %s" % ((fileNo + 1), errorFile))
-                msg.exec_()
-                DifferenceDlg(self, errorList1, errorList2, originalFileList[fileNo])
-            # errorFile = originalFileList[i]
-            # errorList1, errorList2 = self.tester.showDifference(exportedFileList[i], originalFileList[i])
-            # msg.setText("%d files tested, discrepancy found in %s" % ((i + 1), errorFile))
-            # msg.exec_()
-            # DifferenceDlg(self, errorList1, errorList2)
-
-        # Disable test and delete the exported files
-        self.tester.deleteFiles(exportedFilePath)
 
     def printPDF(self):
         """
@@ -1435,42 +1212,8 @@ class Editor(QWidget):
             self.logger.info("Creating " + controlFolder)
             os.makedirs(controlFolder)
 
-    # def addFile(self):
-    #     fileName = QFileDialog.getOpenFileName(self, "Load file", filter="*.ddck")[0]
-    #     simpFileName = fileName.split('/')[-1]
-    #     loadPath = os.path.join(self.projectPath, 'ddck')
-    #     loadPath = os.path.join(loadPath, simpFileName)
-    #     if fileName != '':
-    #         print("file loaded into %s" % loadPath)
-    #         if Path(loadPath).exists():
-    #             qmb = QMessageBox()
-    #             qmb.setText("Warning: " +
-    #                         "A file with the same name exists already. Do you want to overwrite or cancel?")
-    #             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-    #             qmb.setDefaultButton(QMessageBox.Cancel)
-    #             ret = qmb.exec()
-    #             if ret == QMessageBox.Save:
-    #                 print("Overwriting")
-    #                 # continue
-    #             else:
-    #                 print("Canceling")
-    #                 return
-    #         shutil.copy(fileName, loadPath)
-    # def printEMF(self):
-    #     """
-    #                 ---------------------------------------------
-    #                 Export diagram as EMF onto specified folder
-    #                 fn = user input directory
-    #                 ---------------------------------------------
-    #             """
-    #     fn, _ = QFileDialog.getSaveFileName(self, 'Export EMF', None, 'EMF files (.emf);;All Files()')
-    #     if fn != '':
-    #         if QFileInfo(fn).suffix() == "": fn += '.jpg'
-    #         printer = QPrinter(QPrinter.HighResolution)
-    #         printer.setOrientation(QPrinter.Landscape)
-    #         printer.setOutputFormat(QPrinter.PdfFormat)
-    #         printer.setOutputFileName(fn)
-    #         painter = QPainter(printer)
-    #         self.diagramScene.render(painter)
-    #         painter.end()
-    #         print("File exported to %s" % fn)
+    def editHydraulicLoop(self, singlePipeConnection: SinglePipeConnection):
+        assert isinstance(singlePipeConnection.fromPort, SinglePipePortItem)
+
+        hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
+        _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
