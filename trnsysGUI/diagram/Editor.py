@@ -406,19 +406,18 @@ class Editor(QWidget):
         mousePosition = event.scenePos()
 
         hitItems = self.diagramScene.items(mousePosition)
-        hitPortItems = [i for i in hitItems if type(i) == type(self._currentlyDraggedConnectionFromPort)]
-        numberOfHitPortsItems = len(hitPortItems)
-
-        if numberOfHitPortsItems == 0:
-            return
+        hitSameTypePortItems = [i for i in hitItems if type(i) == type(self._currentlyDraggedConnectionFromPort)]
+        numberOfHitPortsItems = len(hitSameTypePortItems)
 
         if numberOfHitPortsItems > 1:
             raise NotImplementedError("Can't deal with overlapping port items.")
 
-        hitPortItem = hitPortItems[0]
+        hasPortItemBeenHit = numberOfHitPortsItems == 1
+        if hasPortItemBeenHit:
+            hitPortItem = hitSameTypePortItems[0]
 
-        if hitPortItem != self._currentlyDraggedConnectionFromPort:
-            self._createConnection(self._currentlyDraggedConnectionFromPort, hitPortItem)
+            if hitPortItem != self._currentlyDraggedConnectionFromPort:
+                self._createConnection(self._currentlyDraggedConnectionFromPort, hitPortItem)
 
         self._currentlyDraggedConnectionFromPort = None
         self.connLineItem.setVisible(False)
@@ -757,7 +756,9 @@ class Editor(QWidget):
             hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
         else:
             serializedHydraulicLoops = blocklist["hydraulicLoops"]
-            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(serializedHydraulicLoops, singlePipeConnections, self.fluids)
+            hydraulicLoops = _hlm.HydraulicLoops.createFromJson(
+                serializedHydraulicLoops, singlePipeConnections, self.fluids
+            )
 
         self.hydraulicLoops = hydraulicLoops
 
