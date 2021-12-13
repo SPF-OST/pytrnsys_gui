@@ -10,7 +10,7 @@ import typing as _tp
 
 import pytrnsys.trnsys_util.deckUtils as _du
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir
+from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
@@ -66,6 +66,7 @@ from trnsysGUI.idGenerator import IdGenerator
 from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 
@@ -402,25 +403,35 @@ class Editor(QWidget):
     def sceneMouseReleaseEvent(self, event):
         if not self._currentlyDraggedConnectionFromPort:
             return
+        fromPort = self._currentlyDraggedConnectionFromPort
+
+        self._currentlyDraggedConnectionFromPort = None
+        self.connLineItem.setVisible(False)
 
         mousePosition = event.scenePos()
+        relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
 
-        hitItems = self.diagramScene.items(mousePosition)
-        hitSameTypePortItems = [i for i in hitItems if type(i) == type(self._currentlyDraggedConnectionFromPort)]
-        numberOfHitPortsItems = len(hitSameTypePortItems)
+        numberOfHitPortsItems = len(relevantPortItems)
 
         if numberOfHitPortsItems > 1:
             raise NotImplementedError("Can't deal with overlapping port items.")
 
-        hasPortItemBeenHit = numberOfHitPortsItems == 1
-        if hasPortItemBeenHit:
-            hitPortItem = hitSameTypePortItems[0]
+        if numberOfHitPortsItems == 1:
+            toPort = relevantPortItems[0]
 
-            if hitPortItem != self._currentlyDraggedConnectionFromPort:
-                self._createConnection(self._currentlyDraggedConnectionFromPort, hitPortItem)
+            if toPort != fromPort:
+                self._createConnection(fromPort, toPort)
 
-        self._currentlyDraggedConnectionFromPort = None
-        self.connLineItem.setVisible(False)
+    def _getRelevantHitPortItems(self, mousePosition: QPointF, fromPort: PortItemBase) -> _tp.Sequence[PortItemBase]:
+        hitItems = self.diagramScene.items(mousePosition)
+        relevantPortItems = [
+            i
+            for i in hitItems
+            if isinstance(i, PortItemBase)
+            and type(i) == type(fromPort)
+            and not i.connectionList
+        ]
+        return relevantPortItems
 
     def cleanUpConnections(self):
         for c in self.connectionList:
