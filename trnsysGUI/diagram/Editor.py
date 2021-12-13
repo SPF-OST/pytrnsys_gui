@@ -242,8 +242,8 @@ class Editor(QWidget):
         self.vertL.setStretchFactor(self.listV, 1)
 
         # for file browser
-        self.projectPath = ""  # XXX
-        self.fileList = []  # XXX
+        self.projectPath = ""
+        self.fileList = []
 
         if loadValue == "new" or loadValue == "json":
             self.createProjectFolder()
@@ -254,15 +254,8 @@ class Editor(QWidget):
         self.PPL = QLineEdit(self.projectFolder)
         self.PPL.setDisabled(True)
 
-        # self.setProjectPathButton = QPushButton("Change path")
-        # self.setProjectPathButton.clicked.connect(self.setProjectPath)
-        # self.openProjectButton = QPushButton("Open Project")
-        # self.openProjectButton.clicked.connect(self.openProject)
-
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
-        # self.pathLayout.addWidget(self.setProjectPathButton)
-        # self.pathLayout.addWidget(self.openProjectButton)
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.splitter = QSplitter(
@@ -291,8 +284,8 @@ class Editor(QWidget):
         self.connectionList = []
         self.trnsysObj = []
         self.graphicalObj = []
-        self.fluids: _tp.Optional[_hlm.Fluids] = None
-        self.hydraulicLoops: _tp.Optional[_hlm.HydraulicLoops] = None
+        self.fluids = _hlm.Fluids([])
+        self.hydraulicLoops = _hlm.HydraulicLoops([])
 
         self.copyGroupList = QGraphicsItemGroup()
         self.selectionGroupList = QGraphicsItemGroup()
@@ -304,7 +297,6 @@ class Editor(QWidget):
         linePx = 4
         if colorsc == "red":
             connLinecolor = QColor(Qt.red)
-            # connLinecolor = QColor(252, 60, 60)
         elif colorsc == "blueish":
             connLinecolor = QColor(3, 124, 193)  # Blue
         elif colorsc == "darkgray":
