@@ -749,11 +749,9 @@ class Editor(QWidget):
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " + str(t.isTempering))
 
-        self._decodeFluidsAndHydraulicLoops(blocklist)
+        self._decodeHydraulicLoops(blocklist)
 
-    def _decodeFluidsAndHydraulicLoops(self, blocklist):
-        self.fluids = _hlm.Fluids([])
-
+    def _decodeHydraulicLoops(self, blocklist):
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
         if "hydraulicLoops" not in blocklist:
             hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
