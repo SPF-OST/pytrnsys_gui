@@ -10,13 +10,13 @@ class SourceSinkBase(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
-        self.w = 40
-        self.h = 40
+        self.w = 60
+        self.h = 60
 
         self.typeNumber = 2
 
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 1, self))
+        self.outputs.append(SinglePipePortItem("o", 1, self))
 
         self.changeSize()
 
@@ -27,8 +27,8 @@ class SourceSinkBase(BlockItem):
         width, _ = self._getCappedWithAndHeight()
         self._positionLabel()
 
-        self.origInputsPos = [[width, 0]]
-        self.origOutputsPos = [[width, 40]]
+        self.origInputsPos = [[20, 0]]
+        self.origOutputsPos = [[40, 0]]
 
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
