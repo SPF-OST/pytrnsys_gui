@@ -20,8 +20,6 @@ Linux.
 
 #### Getting started
 
-A video guiding through the following steps can be found on [YouTube](https://www.youtube.com/watch?v=c8VPmOCeQN8).
-
 1. Open a command prompt (e.g., by hitting the Windows-key, then typing "cmd" 
    into the search box and hitting enter). The following commands should be entered
    into the command prompt just opened.
@@ -50,8 +48,6 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
     ```commandline
     pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/v0.9.9/requirements.txt
     ```
-   (Note: In the [YouTube video](https://www.youtube.com/watch?v=c8VPmOCeQN8) the version is replaced manually, this is
-   not necessary anymore, when copying the command line above.)
    
 You can now close the command prompt opened in the first step.
 
