@@ -1,5 +1,10 @@
 # Graphical user interface for pytrnsys
 
+## Overview
+
+A short presentation (15 min) of pytrnsys and its features can be found in the following 
+[YouTube video](https://www.youtube.com/watch?v=B1BSjYRKuVM).
+
 ## Documentation
 
 You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/ 
