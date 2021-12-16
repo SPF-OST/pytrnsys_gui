@@ -14,7 +14,7 @@ class DoublePipeConnectorBase(BlockItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
-        self.w = 20
+        self.w = 40
         self.h = 20
 
         self.childIds = []
