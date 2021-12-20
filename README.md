@@ -56,6 +56,14 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
    
 You can now close the command prompt opened in the first step.
 
+Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+
+    pytrnsys-gui\pytrnsys_data\ddcks\dlls
+    
+to the respective folder of your TRNSYS installation:
+
+    ...\UserLib\ReleaseDLLs
+
 The `pytrnsys-gui` can now be started by double-clicking on the 
 `pytrnsys-gui\Scripts\pytrnsys-gui.exe` file. Example projects can be found in the
 `pytrnsys-gui\pytrnsys_gui_data\examples` directory.
@@ -129,6 +137,14 @@ specified are for a Windows environment. They are very similar for Linux.
     cd trnsysGUI
     python GUI.py
     ```
+
+Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+
+    pytrnsys\data\ddcks\dlls
+    
+to the respective folder of your TRNSYS installation:
+
+    ...\UserLib\ReleaseDLLs
     
 Beware that the GUI can only be started from within the virtual environment you created in step 1. 
 I.e., whenever you open a new console window from which you want to start the GUI you first need 
