@@ -505,12 +505,7 @@ class _MainWindow(QMainWindow):
         self.centralWidget.setConnLabelVis(self.labelVisState)
 
     def exportHydraulicsDdck(self):
-        statusQuo = self.labelVisState
-        if not statusQuo:
-            self.toggleConnLabels()
         self.centralWidget.exportHydraulics(exportTo="ddck")
-        if not statusQuo:
-            self.toggleConnLabels()
 
     def exportHydraulicControl(self):
         self.centralWidget.exportHydraulicControl()
