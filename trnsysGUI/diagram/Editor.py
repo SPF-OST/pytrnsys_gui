@@ -37,6 +37,7 @@ import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
+import massFlowSolver as _mfs
 import trnsysGUI.images as _img
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
@@ -432,6 +433,14 @@ class Editor(QWidget):
     def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
         assert exportTo in ["ddck", "mfs"]
 
+        if not self._isHydraulicConnected():
+            messageBox = QMessageBox()
+            messageBox.setWindowTitle("Hydraulic not connected")
+            messageBox.setText("You need to connect all port items before you can export the hydraulics.")
+            messageBox.setStandardButtons(QMessageBox.Ok)
+            messageBox.exec()
+            return
+
         self.logger.info("------------------------> START OF EXPORT <------------------------")
 
         self.sortTrnsysObj()
@@ -532,6 +541,19 @@ class Editor(QWidget):
             return None
 
         return exportPath
+
+    def _isHydraulicConnected(self) -> bool:
+        for obj in self.trnsysObj:
+            if not isinstance(obj, _mfs.MassFlowNetworkContributorMixin):
+                continue
+
+            internalPiping = obj.getInternalPiping()
+
+            for portItem in internalPiping.modelPortItemsToGraphicalPortItem.values():
+                if not portItem.connectionList:
+                    return False
+
+        return True
 
     def _doesFileExistAndDontOverwrite(self, folderPath):
         if not _pl.Path(folderPath).exists():
