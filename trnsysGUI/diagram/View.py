@@ -36,6 +36,9 @@ from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink
+from trnsysGUI.geotherm import Geotherm
+from trnsysGUI.water import Water
+from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.storageTank.widget import StorageTank
 
 
@@ -135,6 +138,12 @@ class View(QGraphicsView):
                 bl = Source(name, self)
             elif name == "SourceSink":
                 bl = SourceSink(name, self)
+            elif name == "Geotherm":
+                bl = Geotherm(name, self)
+            elif name == "Water":
+                bl = Water(name, self)
+            elif name == "Crystalizer":
+                bl = Crystalizer(name, self)
             else:
                 bl = BlockItem(name, self)
 

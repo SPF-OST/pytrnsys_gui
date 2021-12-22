@@ -235,6 +235,9 @@ class Editor(QWidget):
             ("Sink", _img.SINK_SVG.icon()),
             ("Source", _img.SOURCE_SVG.icon()),
             ("SourceSink", _img.SOURCE_SINK_SVG.icon()),
+            ("Geotherm", _img.GEOTHERM_SVG.icon()),
+            ("Water", _img.WATER_SVG.icon()),
+            ("Crystalizer", _img.CRYSTALIZER_SVG.icon()),
             ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
             ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
         ]
