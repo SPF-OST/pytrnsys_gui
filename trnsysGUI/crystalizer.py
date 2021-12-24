@@ -52,10 +52,10 @@ class Crystalizer(BlockItem):
         inputPort = _mfn.PortItem()
         outputPort = _mfn.PortItem()
 
-        pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
+        crystalizer = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 
         modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
-        return InternalPiping([pump], modelPortItemsToGraphicalPortItem)
+        return InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)
 
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit): # pylint: disable=too-many-locals
