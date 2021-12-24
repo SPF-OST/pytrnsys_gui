@@ -48,6 +48,9 @@ class Crystalizer(BlockItem):
         self.logger.debug("input side after change: " + str(self.inputs[0].side))
         self.logger.debug("output side after change: " + str(self.outputs[0].side))
 
+    def exportBlackBox(self):
+        return "noBlackBoxOutput", []
+
     def getInternalPiping(self) -> InternalPiping:
         inputPort = _mfn.PortItem()
         outputPort = _mfn.PortItem()
@@ -56,10 +59,3 @@ class Crystalizer(BlockItem):
 
         modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
         return InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)
-
-
-    def exportPipeAndTeeTypesForTemp(self, startingUnit): # pylint: disable=too-many-locals
-        raise NotImplementedError()
-
-    def _getExport(self, ambientT, equationConstant, nodesToIndices, openLoop, tNr, temperature, unitNumber, unitText):
-        raise NotImplementedError()
