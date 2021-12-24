@@ -4,6 +4,7 @@ import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
+import massFlowSolver.networkModel as _mfn
 
 
 class SourceSinkBase(BlockItem):
@@ -47,11 +48,14 @@ class SourceSinkBase(BlockItem):
         self.logger.debug("input side after change: " + str(self.inputs[0].side))
         self.logger.debug("output side after change: " + str(self.outputs[0].side))
 
+    def exportBlackBox(self):
+        return "noBlackBoxOutput", []
+
     def getInternalPiping(self) -> InternalPiping:
-        raise NotImplementedError()
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit): # pylint: disable=too-many-locals
-        raise NotImplementedError()
+        crystalizer = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 
-    def _getExport(self, ambientT, equationConstant, nodesToIndices, openLoop, tNr, temperature, unitNumber, unitText):
-        raise NotImplementedError()
+        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        return InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)
