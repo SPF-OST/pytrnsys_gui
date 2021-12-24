@@ -56,6 +56,5 @@ class Crystalizer(BlockItem):
         outputPort = _mfn.PortItem()
 
         crystalizer = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
-
         modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
         return InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)
