@@ -39,7 +39,6 @@ class DeleteBlockCommand(QUndoCommand):
         self.blFlippedH = bl.flippedH
         self.blFlippedV = bl.flippedV
         self.blRotation = bl.rotationN
-        self.blGroupName = bl.groupName
         self.blName = bl.name
         self.bldName = bl.displayName
         self.blPos = bl.pos()
@@ -94,9 +93,6 @@ class DeleteBlockCommand(QUndoCommand):
         bl.rotateBlockToN(self.blRotation)
         bl.displayName = self.bldName
         bl.label.setPlainText(bl.displayName)
-
-        bl.groupName = "defaultGroup"
-        bl.setBlockToGroup(self.blGroupName)
 
         bl.setPos(self.blPos)
         self.blParent.scene().addItem(bl)

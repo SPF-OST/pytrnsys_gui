@@ -8,7 +8,6 @@ from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QMenu
 
 from trnsysGUI.CornerItem import CornerItem
-from trnsysGUI.GroupChooserConnDlg import GroupChooserConnDlg
 from trnsysGUI.HorizSegmentMoveCommand import HorizSegmentMoveCommand
 
 # This is needed to avoid a circular import but still be able to type check
@@ -166,7 +165,7 @@ class SegmentItemBase(QGraphicsItemGroup):
             self.keyPr = 1
             self.logger.debug("Setting key to 1")
 
-            self.connection.selectConnection()
+            self.connection.selectConnection(deselectOthers=True)
 
             if self.isVertical():
                 try:
@@ -665,43 +664,23 @@ class SegmentItemBase(QGraphicsItemGroup):
             )
 
     def contextMenuEvent(self, event):
-        menu = QMenu()
-        a1 = menu.addAction("Rename...")
-        a1.triggered.connect(self.renameConn)
-
-        a2 = menu.addAction("Delete this connection")
-
-        a2.triggered.connect(self.connection.deleteConnCom)
-
-        a3 = menu.addAction("Invert this connection")
-
-        a3.triggered.connect(self.connection.invertConnection)
-
-        editHydraulicLoopAction = menu.addAction("Edit hydraulic loop")
-        editHydraulicLoopAction.triggered.connect(self.connection.editHydraulicLoop)
-
-        a4 = menu.addAction("Toggle name")
-
-        a4.triggered.connect(self.connection.toggleLabelVisible)
-
-        a5 = menu.addAction("Toggle mass flow")
-
-        a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
+        menu = self._getContextMenu()
 
         menu.exec(event.screenPos())
 
-    def configGroup(self):
-
-        GroupChooserConnDlg(self.connection, self.connection.parent)
-
-    def printGroup(self):
-
-        self.logger.debug(self.connection.groupName)
-
-    def inspect(self):
-
-        self.connection.selectConnection()
-        self.connection.inspectConn()
+    def _getContextMenu(self) -> QMenu:
+        menu = QMenu()
+        a1 = menu.addAction("Rename...")
+        a1.triggered.connect(self.renameConn)
+        a2 = menu.addAction("Delete this connection")
+        a2.triggered.connect(self.connection.deleteConnCom)
+        a3 = menu.addAction("Invert this connection")
+        a3.triggered.connect(self.connection.invertConnection)
+        a4 = menu.addAction("Toggle name")
+        a4.triggered.connect(self.connection.toggleLabelVisible)
+        a5 = menu.addAction("Toggle mass flow")
+        a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
+        return menu
 
     def setLabelVisible(self, isVisible: bool) -> None:
         self.label.setVisible(isVisible)

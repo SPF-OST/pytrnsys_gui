@@ -8,7 +8,7 @@ from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeBlockItemModel
-from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
+from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
 
 
 class DoublePipeTeePiece(BlockItem):
@@ -90,7 +90,6 @@ class DoublePipeTeePiece(BlockItem):
             self.flippedH,
             self.flippedV,
             self.rotationN,
-            self.groupName,
         )
 
         dictName = "Block-"
@@ -115,7 +114,6 @@ class DoublePipeTeePiece(BlockItem):
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
-        self.setBlockToGroup(model.groupName)
 
         resBlockList.append(self)
 
@@ -165,9 +163,8 @@ class DoublePipeTeePiece(BlockItem):
         unitText += "PARAMETERS 0\n"
         unitText += "INPUTS 6\n"
 
-        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-        assert len(realNodes) == 1
-        realNode = realNodes[0]
+        assert len(openLoop.realNodes) == 1
+        realNode = openLoop.realNodes[0]
 
         outputVariables = realNode.serialize(nodesToIndices).outputVariables
         for outputVariable in outputVariables:

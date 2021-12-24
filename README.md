@@ -1,5 +1,10 @@
 # Graphical user interface for pytrnsys
 
+## Overview
+
+A short presentation (15 min) of pytrnsys and its features can be found in the following 
+[YouTube video](https://www.youtube.com/watch?v=B1BSjYRKuVM).
+
 ## Documentation
 
 You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/ 
@@ -19,8 +24,6 @@ Linux.
 1. [Python 3.9](https://www.python.org/downloads/)
 
 #### Getting started
-
-A video guiding through the following steps can be found on [YouTube](https://www.youtube.com/watch?v=c8VPmOCeQN8).
 
 1. Open a command prompt (e.g., by hitting the Windows-key, then typing "cmd" 
    into the search box and hitting enter). The following commands should be entered
@@ -50,10 +53,16 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
     ```commandline
     pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/master/requirements/releases/v0.9.9/requirements.txt
     ```
-   (Note: In the [YouTube video](https://www.youtube.com/watch?v=c8VPmOCeQN8) the version is replaced manually, this is
-   not necessary anymore, when copying the command line above.)
    
 You can now close the command prompt opened in the first step.
+
+Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+
+    pytrnsys-gui\pytrnsys_data\ddcks\dlls
+    
+to the respective folder of your TRNSYS installation:
+
+    ...\UserLib\ReleaseDLLs
 
 The `pytrnsys-gui` can now be started by double-clicking on the 
 `pytrnsys-gui\Scripts\pytrnsys-gui.exe` file. Example projects can be found in the
@@ -118,7 +127,7 @@ specified are for a Windows environment. They are very similar for Linux.
    
 1. Build the python-files corresponding to the ui-file included:
     ```commandline
-   py dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
+   python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
    ```
    Note: You have to execute this file each time you pull from the source results in changes to existing ui-files or new 
    ones.  
@@ -126,8 +135,16 @@ specified are for a Windows environment. They are very similar for Linux.
 1. Now you can run `pytrnsys-gui`!
     ```commandline
     cd trnsysGUI
-    py GUI.py
+    python GUI.py
     ```
+
+Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+
+    pytrnsys\data\ddcks\dlls
+    
+to the respective folder of your TRNSYS installation:
+
+    ...\UserLib\ReleaseDLLs
     
 Beware that the GUI can only be started from within the virtual environment you created in step 1. 
 I.e., whenever you open a new console window from which you want to start the GUI you first need 

@@ -56,7 +56,6 @@ class BlockItemFourPorts(BlockItem):
             dct["FlippedH"] = self.flippedH
             dct["FlippedV"] = self.flippedV
             dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
@@ -83,8 +82,6 @@ class BlockItemFourPorts(BlockItem):
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
 
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
 
         resBlockList.append(self)
 
@@ -102,8 +99,6 @@ class BlockItemFourPorts(BlockItem):
             self.logger.debug("Output at %s" % self.name)
 
         self.setPos(float(i[self.name + "Position"][0]) + offset_x, float(i[self.name + "Position"][1] + offset_y))
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
 
         resBlockList.append(self)
 

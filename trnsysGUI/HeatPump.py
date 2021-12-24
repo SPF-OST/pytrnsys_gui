@@ -100,7 +100,6 @@ class HeatPump(BlockItem):
             dct["FlippedH"] = self.flippedH
             dct["FlippedV"] = self.flippedH
             dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
 
             dictName = "Block-"
 
@@ -127,9 +126,6 @@ class HeatPump(BlockItem):
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
 
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
-
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
@@ -146,9 +142,6 @@ class HeatPump(BlockItem):
             self.logger.debug("Output at heatExchanger")
 
         self.setPos(float(i["HeatPumpPosition"][0]) + offset_x, float(i["HeatPumpPosition"][1] + offset_y))
-        self.groupName = "defaultGroup"
-        self.setBlockToGroup(i["GroupName"])
-
         resBlockList.append(self)
 
     def exportBlackBox(self):

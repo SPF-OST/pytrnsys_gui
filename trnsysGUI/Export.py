@@ -1,5 +1,6 @@
 # pylint: skip-file
 import re
+import typing as _tp
 
 from PyQt5.QtWidgets import QMessageBox
 
@@ -8,6 +9,10 @@ from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[a
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
+import trnsysGUI.hydraulicLoops.export as _hle
+import trnsysGUI.hydraulicLoops.model as _hlm
+
+import jinja2 as _jinja
 
 
 class Export(object):
@@ -263,74 +268,12 @@ class Export(object):
 
         return f
 
-    def exportPrintLoops(self):
-        f = ""
-        loopText = ""
-        constsNr = 0
-        constString = "CONSTANTS "
-        suffix1 = "_save"
-        string1 = "dtSim/rhoWat/"
-        Pi = "3.14"
-        for g in self.editor.groupList:
-
-            loopText += "** Fluid Loop : " + g.displayName + "\n"
-
-            loopNr = self.editor.groupList.index(g)
-
-            diLp = "di_loop_" + str(loopNr)
-            LLp = "L_loop_" + str(loopNr)
-            ULp = "U_loop_" + str(loopNr)
-
-            loopText += diLp + "=" + str(g.exportDi) + "\n"
-            loopText += LLp + "=" + str(g.exportL) + "\n"
-            loopText += ULp + "=" + str(g.exportU) + "\n"
-            constsNr += 3
-            loopText += "\n"
-
-        f += constString + str(constsNr) + "\n"
-        f += loopText + "\n"
-
-        return f
-
-    def exportPrintPipeLoops(self):
-        f = ""
-        loopText = ""
-        equationString = "EQUATIONS "
-        equationNr = 0
-
-        for g in self.editor.groupList:
-            loopText += "** Fluid Loop : " + g.displayName + "\n"
-
-            loopNr = self.editor.groupList.index(g)
-
-            diLp = "di_loop_" + str(loopNr)
-            LLp = "L_loop_" + str(loopNr)
-            ULp = "U_loop_" + str(loopNr)
-
-            loopText += "**" + diLp + "=" + str(g.exportDi) + "\n"
-            loopText += "**" + LLp + "=" + str(g.exportL) + "\n"
-            loopText += "**" + ULp + "=" + str(g.exportU) + "\n"
-
-            for c in g.itemList:
-                if isinstance(c, ConnectionBase):
-                    loopText += "*** " + c.displayName + "\n"
-                    loopText += "di" + c.displayName + "=" + diLp + "\n"
-                    loopText += "L" + c.displayName + "=" + LLp + "\n"
-                    loopText += "U" + c.displayName + "=" + ULp + "\n"
-                    equationNr += 3
-
-            loopText += "\n"
-
-        f += equationString + str(equationNr) + "\n"
-        f += loopText + "\n"
-        return f
-
     def exportPrintPipeLosses(self):
         f = ""
         lossText = ""
         rightCounter = 0
 
-        for t in self.editor.groupList[0].itemList:
+        for t in self.editor.trnsysObj:
             if isinstance(t, SinglePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
@@ -459,3 +402,52 @@ class Export(object):
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
 
         return f
+
+    def exportFluids(self) -> str:
+        def getValueOrVariableName(valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1) -> _tp.Union[float, str]:
+            if isinstance(valueOrVariable, float):
+                return valueOrVariable * factor
+
+            if isinstance(valueOrVariable, _hlm.Variable):
+                if factor == 1:
+                    return valueOrVariable.name
+
+                return f"{valueOrVariable.name}*{factor}"
+
+            raise ValueError(f"Can't deal with type {type(valueOrVariable).__name__}.")
+
+        template = """\
+** Fluids:
+EQUATIONS {{2 * fluids|length}}
+{% for fluid in fluids -%}
+** {{fluid.name}}
+{% set rho = getValueOrVariableName(fluid.densityInKgPerM3) -%}
+{% set cp = getValueOrVariableName(fluid.specificHeatCapacityInJPerKgK, 1e-3) -%}
+F{{fluid.name}}Rho = {{rho}} ! [kg/m^3]
+F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
+{% endfor -%}
+"""
+        fluids = self.editor.fluids.fluids
+        return self._render(template, fluids=fluids, getValueOrVariableName=getValueOrVariableName)
+
+    def exportHydraulicLoops(self) -> str:
+        template = """\
+** Hydraulic loops
+EQUATIONS {{2 * loops|length}}
+{% for hydraulicLoop in loops -%}
+{% set loopName = hydraulicLoop.name.value -%}
+{% set loopRho = getRho(hydraulicLoop) -%}
+{% set loopCp = getCp(hydraulicLoop) -%}
+{% set fluid = hydraulicLoop.fluid -%}
+** {{loopName}}
+{{loopRho}} = F{{fluid.name}}Rho
+{{loopCp}} = F{{fluid.name}}Cp
+{% endfor -%}
+"""
+        loops = self.editor.hydraulicLoops.hydraulicLoops
+        return self._render(template, loops=loops, getCp=_hle.getHeatCapacityName, getRho=_hle.getDensityName)
+
+    @staticmethod
+    def _render(template: str, /, **kwargs):
+        compiledTemplate = _jinja.Template(template)
+        return compiledTemplate.render(**kwargs)

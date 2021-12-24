@@ -14,7 +14,7 @@ ignore=CVS
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
-ignore-patterns=_UI_.+_generated.py
+ignore-patterns=_?UI_.+_generated.py, _?QRC_.+_generated.py
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
@@ -367,7 +367,7 @@ ignore-docstrings=yes
 ignore-imports=yes
 
 # Minimum lines number of a similarity.
-min-similarity-lines=4
+min-similarity-lines=8
 
 
 [SPELLING]

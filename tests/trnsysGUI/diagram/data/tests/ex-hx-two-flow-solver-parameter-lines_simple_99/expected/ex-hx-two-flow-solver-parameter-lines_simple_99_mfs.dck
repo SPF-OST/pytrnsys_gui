@@ -149,14 +149,32 @@ MfrHx-Col_A=[450,22]
 MfrHx-Col_B=[450,23]
 
 
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 4
+** loop1
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+** loop2
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+
 UNIT 451 TYPE 931
 !Tes-Hx
 PARAMETERS 6
-diTes-Hx
-LTes-Hx
-UTes-Hx
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
 20
 INPUTS 4
 TTesPortLeft10
@@ -174,11 +192,11 @@ MfrTes-Hx= MfrTes-Hx_A
 UNIT 452 TYPE 931
 !Hx-Tes
 PARAMETERS 6
-diHx-Tes
-LHx-Tes
-UHx-Tes
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
 20
 INPUTS 4
 TExHxX2
@@ -196,11 +214,11 @@ MfrHx-Tes= MfrHx-Tes_A
 UNIT 453 TYPE 931
 !Col-Hx
 PARAMETERS 6
-diCol-Hx
-LCol-Hx
-UCol-Hx
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
 20
 INPUTS 4
 TCol
@@ -218,11 +236,11 @@ MfrCol-Hx= MfrCol-Hx_A
 UNIT 454 TYPE 931
 !Hx-Col
 PARAMETERS 6
-diHx-Col
-LHx-Col
-UHx-Col
-RhoWat
-CPWat
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
 20
 INPUTS 4
 TExHxX1
@@ -236,36 +254,6 @@ EQUATIONS 3
 THx-Col= [454,1]
 PHx-Col_kW= [454,3]/3600 !kW
 MfrHx-Col= MfrHx-Col_A
-
-CONSTANTS 3
-** Fluid Loop : defaultGroup
-di_loop_0=0.05
-L_loop_0=2
-U_loop_0=10
-
-
-EQUATIONS 12
-** Fluid Loop : defaultGroup
-**di_loop_0=0.05
-**L_loop_0=2
-**U_loop_0=10
-*** Tes-Hx
-diTes-Hx=di_loop_0
-LTes-Hx=L_loop_0
-UTes-Hx=U_loop_0
-*** Hx-Tes
-diHx-Tes=di_loop_0
-LHx-Tes=L_loop_0
-UHx-Tes=U_loop_0
-*** Col-Hx
-diCol-Hx=di_loop_0
-LCol-Hx=L_loop_0
-UCol-Hx=U_loop_0
-*** Hx-Col
-diHx-Col=di_loop_0
-LHx-Col=L_loop_0
-UHx-Col=U_loop_0
-
 
 *** Pipe losses
 EQUATIONS 1

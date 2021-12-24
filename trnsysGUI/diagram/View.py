@@ -53,12 +53,8 @@ class View(QGraphicsView):
 
         self.logger = parent.logger
 
-        # self.setMinimumSize(self.parent().horizontalLayout.height, 700)
         self.adjustSize()
-        # self.setMinimumSize(1300, 700)
         self.parent().diagramScene.viewRect2.setPos(-self.width() / 2, -self.height() / 2)
-        # self.parent().diagramScene.viewRect2.setPos(1300, 700)
-        # Use aliasing or not:
         self.setRenderHint(QPainter.Antialiasing)
 
     def dragEnterEvent(self, event):
@@ -159,48 +155,17 @@ class View(QGraphicsView):
 
             bl.oldPos = bl.scenePos()
 
-            # Debug parent of blockitem
-            # print("scene items" + str(self.scene().items()))
-            # print("scene parent" + str(self.scene().parent()))
-            # print("view children " + str(self.children()))
-            # print("view items " + str(self.children()))
-            # print("scene children" + str(self.scene().children()))
-            # print("bl parentobjects are " + str(bl.parentObject()))
-            # print("bl parent Widgets are " + str(bl.parentWidget()))
-            # print("bl scene is " + str(bl.scene()))
-
     def mouseMoveEvent(self, event):
-        QGraphicsView.mouseMoveEvent(self, event)
+        super().mouseMoveEvent(event)
         self.parent().mouseMoveEvent(event)
 
-    def mouseReleaseEvent(self, mouseEvent):
-        pass
-        # print(str(mouseEvent.pos()))
-        #     for ot in self.trnsysObj:
-        #     t.setPos(t.pos())
-        # #     self.parent().alignYLineItem.setVisible(False)
-
-        super(View, self).mouseReleaseEvent(mouseEvent)
-
     def wheelEvent(self, event):
-        super(View, self).wheelEvent(event)
-        # 67108864(dez) = 100000000000000000000000000(bin)
-        if int(event.modifiers()) == 67108864:
+        super().wheelEvent(event)
+        if int(event.modifiers()) == 0b100000000000000000000000000:
             if event.angleDelta().y() > 0:
                 self.scale(1.2, 1.2)
             else:
                 self.scale(0.8, 0.8)
-
-    def mousePressEvent(self, event):
-        # for t in self.parent().trnsysObj:
-        #     if isinstance(t, BlockItem):
-        #         t.alignMode = True
-        #         print("Changing alignmentmode")
-        # for t in self.parent().trnsysObj:
-        #     if isinstance(t, BlockItem):
-        #         t.itemChange(t.ItemPositionChange, t.pos())
-
-        super(View, self).mousePressEvent(event)
 
     def deleteBlockCom(self, bl):
         """

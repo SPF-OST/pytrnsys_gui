@@ -4,18 +4,17 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
+import PyQt5.QtWidgets as _qtw
+
 import dataclasses_jsonschema as _dcj
 
-import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _ser
 from massFlowSolver import InternalPiping  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectionBase import ConnectionBase, DeleteConnectionCommandBase  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
-from trnsysGUI.modelPortItems import ColdPortItem, HotPortItem
-
-
+from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
 
 class DoublePipeConnection(ConnectionBase):
     def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
@@ -33,7 +32,7 @@ class DoublePipeConnection(ConnectionBase):
         return rad
 
     def deleteConnCom(self):
-        command = DeleteDoublePipeConnectionCommand(self, "Delete conn comand")
+        command = DeleteDoublePipeConnectionCommand(self)
         self.parent.parent().undoStack.push(command)
 
     def encode(self):
@@ -59,7 +58,6 @@ class DoublePipeConnection(ConnectionBase):
             corners,
             labelPos,
             labelMassPos,
-            self.groupName,
             self.fromPort.id,
             self.toPort.id,
             self.trnsysId,
@@ -76,8 +74,6 @@ class DoublePipeConnection(ConnectionBase):
         self.trnsysId = model.trnsysId
         self.childIds = model.childIds
         self.setName(model.name)
-        self.groupName = "defaultGroup"
-        self.setConnToGroup(model.groupName)
 
         if len(model.segmentsCorners) > 0:
             self.loadSegments(model.segmentsCorners)
@@ -98,36 +94,6 @@ class DoublePipeConnection(ConnectionBase):
 
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
         return InternalPiping([coldPipe, hotPipe], modelPortItemsToGraphicalPortItem)
-
-    def _getConnectedRealNode(
-        self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping
-    ) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert (
-            portItem in internalPiping.modelPortItemsToGraphicalPortItem
-        ), "`portItem' doesn't belong to `internalPiping'"
-
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-
-        assert graphicalPortItem in [
-            self.fromPort,
-            self.toPort,
-        ], "This connection is not connected to `graphicalPortItem'"
-
-        blockItem: _mfs.MassFlowNetworkContributorMixin = graphicalPortItem.parent
-        blockItemInternalPiping = blockItem.getInternalPiping()
-
-        for startingNode in blockItemInternalPiping.openLoopsStartingNodes:
-            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
-            for realNode in realNodesAndPortItems.realNodes:
-                for candidatePortItem in [
-                    n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem) and type(n) is type(portItem)
-                ]:
-                    candidateGraphicalPortItem = blockItemInternalPiping.modelPortItemsToGraphicalPortItem[
-                        candidatePortItem
-                    ]
-                    if candidateGraphicalPortItem == graphicalPortItem:
-                        return realNode
-        return None
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals,too-many-statements
         unitNumber = startingUnit
@@ -258,7 +224,7 @@ class DoublePipeConnection(ConnectionBase):
         return unitText, unitNumber
 
     def _getInputs(self, nodesToIndices, openLoop, temperature):
-        realNode = self._getRealNode(openLoop)
+        realNode = self._getSingleNode(openLoop)
 
         outputVariables = realNode.serialize(nodesToIndices).outputVariables
         outputVariable = outputVariables[0]
@@ -280,16 +246,13 @@ class DoublePipeConnection(ConnectionBase):
         return unitText
 
     @staticmethod
-    def _getRealNode(openLoop):
-        realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-        assert len(realNodes) == 1
-        realNode = realNodes[0]
+    def _getSingleNode(openLoop):
+        assert len(openLoop.realNodes) == 1
+        realNode = openLoop.realNodes[0]
         return realNode
 
-    def _getEquations(
-        self, equationConstant1, equationConstant2, openLoop, nodesToIndices, unitNumber, temperature: object
-    ):
-        realNode = self._getRealNode(openLoop)
+    def _getEquations(self, equationConstant1, equationConstant2, openLoop, nodesToIndices, unitNumber, temperature):
+        realNode = self._getSingleNode(openLoop)
         outputVariables = realNode.serialize(nodesToIndices).outputVariables
         outputVariable = outputVariables[0]
 
@@ -311,21 +274,31 @@ class DoublePipeConnection(ConnectionBase):
         return str(firstColumn).ljust(spacing) + comment + "\n"
 
 
-class DeleteDoublePipeConnectionCommand(DeleteConnectionCommandBase):
+class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
+    def __init__(self, conn):
+        super().__init__("Delete double pipe connection")
+        self._connection = conn
+        self._fromPort = self._connection.fromPort
+        self._toPort = self._connection.toPort
+        self._editor = self._connection.parent
+
     def undo(self):
-        self.conn = DoublePipeConnection(self.connFromPort, self.connToPort, self.connParent)
+        self._connection = DoublePipeConnection(self._fromPort, self._toPort, self._editor)
+
+    def redo(self):
+        self._connection.deleteConn()
+        self._connection = None
 
 
 @_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
+class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
-    id: int
+    id: int  # pylint: disable=invalid-name
     childIds: _tp.List[int]
     segmentsCorners: _tp.List[_tp.Tuple[float, float]]
     labelPos: _tp.Tuple[float, float]
     massFlowLabelPos: _tp.Tuple[float, float]
-    groupName: str
     fromPortId: int
     toPortId: int
     trnsysId: int
@@ -333,7 +306,7 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
     @classmethod
     def from_dict(
         cls,
-        data: _dcj.JsonDict,
+        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
         validate=True,
         validate_enums: bool = True,
     ) -> "DoublePipeConnectionModel":
@@ -345,7 +318,7 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__ConnectionDict__"] = True
@@ -353,4 +326,4 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('0810c9ea-85df-4431-bb40-3190c25c9161')
+        return _uuid.UUID("0810c9ea-85df-4431-bb40-3190c25c9161")

@@ -14,13 +14,12 @@ from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
 import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 import trnsysGUI.serialization as _ser
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 global FilePath
@@ -48,9 +47,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
-
-        self.groupName = ""
-        self.setDefaultGroup()
 
         self.inputs = []
         self.outputs = []
@@ -101,13 +97,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.origOutputsPos = None
         self.origInputsPos = None
 
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: _mfs.InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        assert portItem in internalPiping.modelPortItemsToGraphicalPortItem, "`portItem' does not belong to this `BlockItem'."
-
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
-
-        return graphicalPortItem.getConnectedRealNode(portItem)
-
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if type(self) == BlockItem:
             raise AssertionError("`BlockItem' cannot be instantiated directly.")
@@ -137,42 +126,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         if self not in self.parent.parent().trnsysObj:
             self.parent.parent().trnsysObj.append(self)
             # self.logger.debug("trnsysObj are " + str(self.parent.parent().trnsysObj))
-
-    def setDefaultGroup(self):
-        """
-        Sets the group to defaultGroup when being created.
-        Returns
-        -------
-
-        """
-        self.setBlockToGroup("defaultGroup")
-
-    def setBlockToGroup(self, newGroupName):
-        """
-        Sets the groupName of this Block to newGroupName and appends itself to the itemList of that group
-        Parameters
-        ----------
-        newGroupName
-
-        Returns
-        -------
-
-        """
-        # self.logger.debug("In setBlockToGroup")
-        if newGroupName == self.groupName:
-            self.logger.debug("Block " + str(self) + str(self.displayName) + "is already in this group")
-            return
-        else:
-            # self.logger.debug("groups is " + str(self.parent.parent().groupList))
-            for g in self.parent.parent().groupList:
-                if g.displayName == self.groupName:
-                    self.logger.debug("Found the old group " + self.groupName)
-                    g.itemList.remove(self)
-                if g.displayName == newGroupName:
-                    # self.logger.debug("Found the new group " + newGroupName)
-                    g.itemList.append(self)
-
-            self.groupName = newGroupName
 
     def setId(self, newId):
         self.id = newId
@@ -448,15 +401,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         # self.parent.parent().parent().undoStack.push(command)
         self.parent.deleteBlockCom(self)
 
-    def configGroup(self):
-        """
-        This method is called from the contextMenu and allows to pick a group for this block.
-        Returns
-        -------
-
-        """
-        self.parent.parent().showGroupChooserBlockDlg(self)
-
     def getConnections(self):
         """
         Get the connections from inputs and outputs of this block.
@@ -577,10 +521,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
                     self.parent.parent().alignYLineItem.setLine(
-                        self.pos().x() + self.w / 2,
-                        t.pos().y(),
-                        t.pos().x() + t.w / 2,
-                        t.pos().y()
+                        self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
                     )
 
                     self.parent.parent().alignYLineItem.setVisible(True)
@@ -605,10 +546,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                 if self.elementInXBand(t):
                     value = QPointF(t.pos().x(), self.pos().y())
                     self.parent.parent().alignXLineItem.setLine(
-                        t.pos().x(),
-                        t.pos().y() + self.w / 2,
-                        t.pos().x(),
-                        self.pos().y() + t.w / 2
+                        t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
                     )
 
                     self.parent.parent().alignXLineItem.setVisible(True)
@@ -689,7 +627,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             self.flippedH,
             self.flippedV,
             self.rotationN,
-            self.groupName,
         )
 
         dictName = "Block-"
@@ -717,7 +654,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
-        self.setBlockToGroup(model.groupName)
 
         resBlockList.append(self)
 
@@ -742,8 +678,11 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
     # Export related
     def exportBlackBox(self):
         equation = []
-        if len(self.inputs + self.outputs) == 2 and self.isVisible() \
-                and not isinstance(self.outputs[0], DoublePipePortItem):
+        if (
+            len(self.inputs + self.outputs) == 2
+            and self.isVisible()
+            and not isinstance(self.outputs[0], DoublePipePortItem)
+        ):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not (files):
                 status = "noDdckFile"
@@ -802,6 +741,7 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
                 self.logger.debug("File already deleted from file list.")
                 self.logger.debug("filelist:", self.parent.parent().fileList)
 
+
 @_dc.dataclass
 class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     BlockName: str
@@ -818,7 +758,8 @@ class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('b87a3360-eaa7-48f3-9bed-d01224727cbe')
+        return _uuid.UUID("b87a3360-eaa7-48f3-9bed-d01224727cbe")
+
 
 @_dc.dataclass
 class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
@@ -832,7 +773,6 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
     flippedH: bool
     flippedV: bool
     rotationN: int
-    groupName: str
 
     @classmethod
     def from_dict(
@@ -873,9 +813,8 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
             superseded.FlippedH,
             superseded.FlippedV,
             superseded.RotationN,
-            superseded.GroupName
         )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('bbc03f36-d1a1-4d97-a9c0-d212ea3a0203')
+        return _uuid.UUID("bbc03f36-d1a1-4d97-a9c0-d212ea3a0203")

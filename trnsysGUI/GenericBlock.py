@@ -153,7 +153,6 @@ class GenericBlock(BlockItem):
             dct["FlippedH"] = self.flippedH
             dct["FlippedV"] = self.flippedV
             dct["RotationN"] = self.rotationN
-            dct["GroupName"] = self.groupName
             dct["Imagesource"] = self._imageAccessor.getResourcePath()
             dct["PortPairsNb"] = [self.getPairNb(i) for i in range(4)]
 

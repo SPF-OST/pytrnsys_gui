@@ -6,14 +6,39 @@ from massFlowSolver import networkModel as _mfn
 
 
 @_dc.dataclass
+class PortItemAndAdjacentRealNode:
+    portItem: _mfn.PortItem
+    realNode: _mfn.RealNodeBase
+
+
+@_dc.dataclass
 class InternalPiping:
     openLoopsStartingNodes: _tp.Sequence[_mfn.RealNodeBase]
     modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]
 
+    def getPortItemsAndAdjacentRealNodeForGraphicalPortItem(
+        self, graphicalPortItem: _pi.PortItemBase
+    ) -> _tp.Sequence[PortItemAndAdjacentRealNode]:
+        if graphicalPortItem not in self.modelPortItemsToGraphicalPortItem.values():
+            raise ValueError("The graphical port item is not part of this internal piping.")
+
+        portItemsAndAdjacentRealNode = []
+        for startingNode in self.openLoopsStartingNodes:
+            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
+            for realNode in realNodesAndPortItems.realNodes:
+                for candidatePortItem in [n for n in realNode.getNeighbours() if isinstance(n, _mfn.PortItem)]:
+                    candidateGraphicalPortItem = self.modelPortItemsToGraphicalPortItem[candidatePortItem]
+                    if candidateGraphicalPortItem == graphicalPortItem:
+                        portItem = candidatePortItem
+                        portItemAndAdjacentRealNode = PortItemAndAdjacentRealNode(portItem, realNode)
+
+                        portItemsAndAdjacentRealNode.append(portItemAndAdjacentRealNode)
+        return portItemsAndAdjacentRealNode
+
 
 @_dc.dataclass
 class _OpenLoop:
-    nodes: _tp.Sequence[_mfn.NodeBase]
+    realNodes: _tp.Sequence[_mfn.RealNodeBase]
 
 
 class MassFlowNetworkContributorMixin:
@@ -25,8 +50,7 @@ class MassFlowNetworkContributorMixin:
 
         allParameters = []
         for openLoop in openLoops:
-            realNodes = [n for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
-            parameters = [rn.serialize(allNodesToIndices).parameters for rn in realNodes]
+            parameters = [rn.serialize(allNodesToIndices).parameters for rn in openLoop.realNodes]
             allParameters.extend(parameters)
 
         return "\n".join(parameters.toString(descConnLength) for parameters in allParameters) + "\n"
@@ -36,7 +60,9 @@ class MassFlowNetworkContributorMixin:
 
         allInputVariables = []
         for openLoop in openLoops:
-            inputVariables = [n.serialize(nodesToIndices).inputVariable for n in openLoop.nodes if isinstance(n, _mfn.RealNodeBase)]
+            inputVariables = [
+                n.serialize(nodesToIndices).inputVariable for n in openLoop.realNodes
+            ]
             allInputVariables.extend(inputVariables)
 
         line = ""
@@ -54,9 +80,7 @@ class MassFlowNetworkContributorMixin:
         lines = []
         nodeIndex = 0
         for openLoop in openLoops:
-            for node in openLoop.nodes:
-                if not isinstance(node, _mfn.RealNodeBase):
-                    continue
+            for node in openLoop.realNodes:
                 outputVariables = node.serialize(nodesToIndices).outputVariables
                 for variableIndex, outputVariable in enumerate(outputVariables):
                     if not outputVariable:
@@ -78,15 +102,16 @@ class MassFlowNetworkContributorMixin:
         allNodesToIndices = {}
         openLoops = []
         for startingNode in internalPiping.openLoopsStartingNodes:
-            connectedNodes = _mfn.getConnectedNodes(startingNode)
-            openLoops.append(_OpenLoop(connectedNodes))
+            realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
+            realNodes = realNodesAndPortItems.realNodes
+            portItems = realNodesAndPortItems.portItems
 
-            portItems = [n for n in connectedNodes if isinstance(n, _mfn.PortItem)]
-            realNodes = [n for n in connectedNodes if isinstance(n, _mfn.RealNodeBase)]
+            openLoops.append(_OpenLoop(realNodes))
 
             portItemsToIndices = {}
             for portItem in portItems:
-                connectedRealNode = self._getConnectedRealNode(portItem, internalPiping)
+                graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[portItem]
+                connectedRealNode = graphicalPortItem.getConnectedRealNode(portItem, self)
                 if not connectedRealNode:
                     raise AssertionError("Hydraulics not connected.")
                 portItemsToIndices[portItem] = connectedRealNode.trnsysId
@@ -95,7 +120,3 @@ class MassFlowNetworkContributorMixin:
 
             allNodesToIndices |= nodesToIndices
         return openLoops, allNodesToIndices
-
-    def _getConnectedRealNode(self, portItem: _mfn.PortItem, internalPiping: InternalPiping) -> _tp.Optional[_mfn.RealNodeBase]:
-        raise NotImplementedError()
-

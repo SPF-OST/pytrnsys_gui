@@ -428,11 +428,6 @@ class _MainWindow(QMainWindow):
             self.logger.info("Canceling")
             return
 
-    def createGroup(self):
-        self.centralWidget.selectionMode = True
-        self.centralWidget.groupMode = True
-        self.centralWidget.multipleSelectMode = False
-
     def tidyUp(self):
         self.logger.info("Tidying up...")
         self.centralWidget.cleanUpConnections()
@@ -510,12 +505,7 @@ class _MainWindow(QMainWindow):
         self.centralWidget.setConnLabelVis(self.labelVisState)
 
     def exportHydraulicsDdck(self):
-        statusQuo = self.labelVisState
-        if not statusQuo:
-            self.toggleConnLabels()
         self.centralWidget.exportHydraulics(exportTo="ddck")
-        if not statusQuo:
-            self.toggleConnLabels()
 
     def exportHydraulicControl(self):
         self.centralWidget.exportHydraulicControl()

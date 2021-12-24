@@ -53,7 +53,6 @@
             }
         }
     ],
-    "groupName": "defaultGroup",
     "heatExchangers": [
         {
             "__version__": "be068f84-2627-4f53-87a9-9a1f4fd1c529",
