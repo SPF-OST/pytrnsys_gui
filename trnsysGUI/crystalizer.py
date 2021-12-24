@@ -4,6 +4,7 @@ import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
+import massFlowSolver.networkModel as _mfn
 
 
 class Crystalizer(BlockItem):
@@ -48,7 +49,14 @@ class Crystalizer(BlockItem):
         self.logger.debug("output side after change: " + str(self.outputs[0].side))
 
     def getInternalPiping(self) -> InternalPiping:
-        raise NotImplementedError()
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+
+        pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
+        return InternalPiping([pump], modelPortItemsToGraphicalPortItem)
+
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit): # pylint: disable=too-many-locals
         raise NotImplementedError()
