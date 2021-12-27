@@ -18,12 +18,10 @@ class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
 
         self.h = 40
         self.w = 40
-        self.typeNumber = 3
         self.isTempering = False
         self.positionForMassFlowSolver = 1.0
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
-
 
         self.inputs.append(SinglePipePortItem("o", 0, self))
         self.inputs.append(SinglePipePortItem("o", 1, self))

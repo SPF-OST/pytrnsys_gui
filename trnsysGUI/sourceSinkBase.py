@@ -14,8 +14,6 @@ class SourceSinkBase(BlockItem):
         self.w = 60
         self.h = 60
 
-        self.typeNumber = 2
-
         self.inputs.append(SinglePipePortItem("i", 1, self))
         self.outputs.append(SinglePipePortItem("o", 1, self))
 

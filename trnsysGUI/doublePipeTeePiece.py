@@ -18,8 +18,6 @@ class DoublePipeTeePiece(BlockItem):
         self.w = 60
         self.h = 40
 
-        self.typeNumber = 2
-
         self.inputs.append(DoublePipePortItem("i", 0, self))
         self.inputs.append(DoublePipePortItem("i", 2, self))
         self.outputs.append(DoublePipePortItem("o", 1, self))

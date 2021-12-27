@@ -18,8 +18,6 @@ class WTap_main(BlockItem):
 
         self.outputs.append(SinglePipePortItem("o", 0, self))
 
-        self.typeNumber = 4
-
         self.changeSize()
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
