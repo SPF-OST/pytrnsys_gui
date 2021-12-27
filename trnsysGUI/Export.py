@@ -60,7 +60,11 @@ class Export(object):
             f += t.exportPumpOutlets()[0]
             equationNr += t.exportPumpOutlets()[1]
 
-        f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
+        if equationNr == 0:
+            f = ""
+        else:
+            f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
+
         return f
 
     def exportMassFlows(self):  # What the controller should give
