@@ -1,7 +1,7 @@
 import typing as _tp
 
 import trnsysGUI.images as _img
-from sourceSinkBase import SourceSinkBase
+from trnsysGUI.sourceSinkBase import SourceSinkBase
 
 
 class Geotherm(SourceSinkBase):
