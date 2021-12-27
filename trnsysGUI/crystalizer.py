@@ -32,19 +32,12 @@ class Crystalizer(BlockItem):
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
-        # pylint: disable=duplicate-code  # 1
+        # pylint: disable=duplicate-code  # 2
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.logger.debug("input side before change: " + str(self.inputs[0].side))
-        self.logger.debug("output side before change: " + str(self.outputs[0].side))
-
         self.inputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
-        # pylint: disable=duplicate-code  # 1
         self.outputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
-
-        self.logger.debug("input side after change: " + str(self.inputs[0].side))
-        self.logger.debug("output side after change: " + str(self.outputs[0].side))
 
     def exportBlackBox(self):
         status = "noDdckEntry"
