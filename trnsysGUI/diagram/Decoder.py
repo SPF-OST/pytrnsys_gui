@@ -35,6 +35,12 @@ from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.source import Source
+from trnsysGUI.sink import Sink
+from trnsysGUI.sourceSink import SourceSink
+from trnsysGUI.geotherm import Geotherm
+from trnsysGUI.water import Water
+from trnsysGUI.crystalizer import Crystalizer
 
 
 class Decoder(json.JSONDecoder):
@@ -200,6 +206,30 @@ class Decoder(json.JSONDecoder):
                         )
                     elif i["BlockName"] == "DPCnr":
                         bl = DoubleDoublePipeConnector(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Sink":
+                        bl = Sink(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Source":
+                        bl = Source(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "SourceSink":
+                        bl = SourceSink(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Geotherm":
+                        bl = Geotherm(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Water":
+                        bl = Water(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "Crystalizer":
+                        bl = Crystalizer(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
 

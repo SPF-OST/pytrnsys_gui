@@ -11,7 +11,6 @@ from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
 from trnsysGUI.Connector import Connector
 from trnsysGUI.Control import Control
-from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.DeleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock
@@ -32,7 +31,14 @@ from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.sink import Sink
+from trnsysGUI.source import Source
+from trnsysGUI.sourceSink import SourceSink
+from trnsysGUI.geotherm import Geotherm
+from trnsysGUI.water import Water
+from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.storageTank.widget import StorageTank
 
 
@@ -122,6 +128,18 @@ class View(QGraphicsView):
                 bl = MasterControl(name, self)
             elif name == "Control":
                 bl = Control(name, self)
+            elif name == "Sink":
+                bl = Sink(name, self)
+            elif name == "Source":
+                bl = Source(name, self)
+            elif name == "SourceSink":
+                bl = SourceSink(name, self)
+            elif name == "Geotherm":
+                bl = Geotherm(name, self)
+            elif name == "Water":
+                bl = Water(name, self)
+            elif name == "Crystalizer":
+                bl = Crystalizer(name, self)
             else:
                 bl = BlockItem(name, self)
 

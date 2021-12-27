@@ -17,8 +17,6 @@ class TeePiece(BlockItem):
         self.w = 40
         self.h = 40
 
-        self.typeNumber = 2
-
         self.inputs.append(SinglePipePortItem("i", 0, self))
         self.inputs.append(SinglePipePortItem("i", 2, self))
         self.outputs.append(SinglePipePortItem("o", 1, self))

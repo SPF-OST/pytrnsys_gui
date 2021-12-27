@@ -24,8 +24,6 @@ class WTap(BlockItem):
         self.inputs.append(SinglePipePortItem("i", 0, self))
         self.loadedFiles = []
 
-        self.typeNumber = 5
-
         self.changeSize()
         self.addTree()
 

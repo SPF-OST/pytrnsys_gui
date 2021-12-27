@@ -24,7 +24,7 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
         super().changeSize()
 
         self.origInputsPos = [[0, 10]]
-        self.origOutputsPos = [[20, 10]]
+        self.origOutputsPos = [[40, 10]]
 
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
