@@ -49,7 +49,10 @@ class Crystalizer(BlockItem):
         self.logger.debug("output side after change: " + str(self.outputs[0].side))
 
     def exportBlackBox(self):
-        return "noBlackBoxOutput", []
+        status = "noDdckEntry"
+        equation = ["T" + self.displayName + "=1"]
+
+        return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
         inputPort = _mfn.PortItem()
