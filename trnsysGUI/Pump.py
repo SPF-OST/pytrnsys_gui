@@ -17,7 +17,6 @@ class Pump(BlockItem):
         super(Pump, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
         self.h = 40
-        self.typeNumber = 1
         self.rndPwr = np.random.randint(0, 1000)
 
         self.inputs.append(SinglePipePortItem("i", 0, self))

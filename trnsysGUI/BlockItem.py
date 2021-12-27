@@ -54,7 +54,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
         # Export related:
         self.name = trnsysType
         self.trnsysId = self.parent.parent().idGen.getTrnsysID()
-        self.typeNumber = 0
 
         # Transform related
         self.flippedV = False

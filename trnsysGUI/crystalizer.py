@@ -14,8 +14,6 @@ class Crystalizer(BlockItem):
         self.w = 120
         self.h = 40
 
-        self.typeNumber = 2
-
         self.inputs.append(SinglePipePortItem("i", 0, self))
         self.outputs.append(SinglePipePortItem("o", 2, self))
 
