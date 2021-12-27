@@ -108,9 +108,6 @@ TCol=1
 THP=1
 
 
-EQUATIONS 0
-*** Massflowrates
-
 UNIT 450 TYPE 935
 PARAMETERS 33
 8
