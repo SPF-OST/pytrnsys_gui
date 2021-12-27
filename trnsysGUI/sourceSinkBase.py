@@ -40,9 +40,6 @@ class SourceSinkBase(BlockItem):
         self.outputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
 
     def exportBlackBox(self):
-        return "noBlackBoxOutput", []
-
-    def exportBlackBox(self):
         status = "noDdckEntry"
         equation = ["T" + self.displayName + "=1"]
 
