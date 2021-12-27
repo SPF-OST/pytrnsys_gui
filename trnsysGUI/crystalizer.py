@@ -23,21 +23,22 @@ class Crystalizer(BlockItem):
         return _img.CRYSTALIZER_SVG
 
     def changeSize(self):
-        width, _ = self._getCappedWithAndHeight()
         self._positionLabel()
 
         self.origInputsPos = [[0, 20]]
         self.origOutputsPos = [[120, 20]]
 
+        # pylint: disable=duplicate-code  # 2
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
-        # pylint: disable=duplicate-code  # 2
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
+        # pylint: disable=duplicate-code  # 2
+
 
     def exportBlackBox(self):
         status = "noDdckEntry"
