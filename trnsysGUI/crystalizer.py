@@ -12,7 +12,7 @@ class Crystalizer(BlockItem):
         super().__init__(trnsysType, parent, **kwargs)
 
         self.w = 120
-        self.h = 80
+        self.h = 40
 
         self.typeNumber = 2
 
@@ -28,8 +28,8 @@ class Crystalizer(BlockItem):
         width, _ = self._getCappedWithAndHeight()
         self._positionLabel()
 
-        self.origInputsPos = [[0, 40]]
-        self.origOutputsPos = [[120, 40]]
+        self.origInputsPos = [[0, 20]]
+        self.origOutputsPos = [[120, 20]]
 
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
