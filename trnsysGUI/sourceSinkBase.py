@@ -47,9 +47,6 @@ class SourceSinkBase(BlockItem):
         self.logger.debug("output side after change: " + str(self.outputs[0].side))
 
     def exportBlackBox(self):
-        return "noBlackBoxOutput", []
-
-    def exportBlackBox(self):
         status = "noDdckEntry"
         equation = ["T" + self.displayName + "=1"]
 
