@@ -51,11 +51,22 @@ class SourceSinkBase(BlockItem):
     def exportBlackBox(self):
         return "noBlackBoxOutput", []
 
+    def exportBlackBox(self):
+        status = "noDdckEntry"
+        equation = ["T" + self.displayName + "=1"]
+
+        return status, equation
+
     def getInternalPiping(self) -> InternalPiping:
         inputPort = _mfn.PortItem()
         outputPort = _mfn.PortItem()
 
-        crystalizer = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+        pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
 
         modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
-        return InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)
+        return InternalPiping([pump], modelPortItemsToGraphicalPortItem)
+
+    def exportMassFlows(self):
+        equationNr = 1
+        massFlowLine = f"Mfr{self.displayName} = 500\n"
+        return massFlowLine, equationNr
