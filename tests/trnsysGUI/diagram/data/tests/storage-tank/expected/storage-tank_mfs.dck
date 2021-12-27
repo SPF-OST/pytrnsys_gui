@@ -111,9 +111,6 @@ THP=1
 EQUATIONS 0
 *** Massflowrates
 
-EQUATIONS 0
-*** Pump outlet temperatures
-
 UNIT 450 TYPE 935
 PARAMETERS 33
 8
