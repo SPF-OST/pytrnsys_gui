@@ -52,7 +52,7 @@
      fit-margin-top="0"
      showgrid="false"
      inkscape:document-rotation="0"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g6485"
      inkscape:document-units="mm"
      inkscape:cy="115.43518"
      inkscape:cx="127.80955"
@@ -125,8 +125,8 @@
          inkscape:rounded="0"
          inkscape:randomized="0"
          d="M 110.75,82.5 95.376524,73.625881 80.00305,64.75176 95.375,55.875 l 15.37195,-8.876759 0.002,17.750879 z"
-         transform="matrix(0.29253089,0,0,0.29253089,86.547196,95.712792)"
-         inkscape:transform-center-x="1.4987749"
+         transform="matrix(-0.29253089,0,0,0.29253089,145.52338,95.712792)"
+         inkscape:transform-center-x="-1.4987797"
          inkscape:transform-center-y="-0.00025805191" />
     </g>
     <g
