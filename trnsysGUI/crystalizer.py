@@ -35,7 +35,7 @@ class Crystalizer(BlockItem):
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.inputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
+        self.inputs[0].side = (self.rotationN + 0 + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
         # pylint: disable=duplicate-code  # 2
 
