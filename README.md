@@ -7,7 +7,7 @@ A short presentation (15 min) of pytrnsys and its features can be found in the f
 
 ## Documentation
 
-You can find the documentation under https://spf-ost.github.io/pytrnsys_gui/ 
+You can find the documentation under https://pytrnsys.readthedocs.io/ 
 
 ## Installation
 
