@@ -110,41 +110,6 @@ class DoublePipeConnection(ConnectionBase):
         eqConst7 = 7
         eqConst8 = 8
 
-        # default values
-        dpLength = 24.384
-        dpDiamIn = 0.02618
-        dpDiamOut = 0.03198
-        dpLambda = 1.37067
-        dpDepth = 3.0
-        dpFlowMode = 1
-        dpDiamCase = 0.17526
-        dpLambdaFill = 0.14537
-        dpDistPtoP = 0.06911
-        dpLambdaGap = 8.722
-        dpGapThick = 0.0000
-
-        dpRhoFlu = 1000.0
-        dpLambdaFl = 2.2068
-        dpCpFl = 4.19
-        dpViscFl = 3.078
-
-        dpTIniHot = 10.0
-        dpTIniCold = 10.0
-
-        dpLamdaSl = 8.722
-        dpRhoSl = 2500.0
-        dpCpSl = 0.84
-
-        tSurfArg = 7.96
-        amplSurfAvg = 13.32
-        dayMinSfT = 36
-
-        dpNrFlNds = 100
-        dpNrSlRad = 8
-        dpNrSlAx = 10
-        dpNrSlCirc = 4
-        dpRadNdDist = 0.0254
-
         # Fixed strings
         initialValueS = "15.0 0.0 15.0 15.0 0.0 15.0"
 
@@ -183,7 +148,7 @@ class DoublePipeConnection(ConnectionBase):
         unitText += self._addComment("dpRhoSl", "! Density of soil, kg/m^3")
         unitText += self._addComment("dpCpSl", "! Specific heat of soil, kJ/(kg*K)")
 
-        unitText += commentStars + " general temperature dependency (dependent from weather data) " + commentStars + "\n"
+        unitText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
         unitText += self._addComment("TambAvg", "! Average surface temperature, deg C")
         unitText += self._addComment("dTambAmpl", "! Amplitude of surface temperature, deg C")
         unitText += self._addComment("ddTcwOffset", "! Day of minimum surface temperature, deg C")
