@@ -253,14 +253,6 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
             for i in range(0, len(self.outputs)):
                 self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
 
-        if self.rotationN % 4 == 2:
-            for p in self.inputs:
-                if p.side == 0 or p.side == 2:
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side == 0 or p.side == 2:
-                    self.updateSide(p, 2)
-
     def updateFlipStateV(self, state):
         self.flippedV = bool(state)
 
@@ -290,6 +282,38 @@ class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
 
             for i in range(0, len(self.outputs)):
                 self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1])
+
+    def updateSidesFlippedH(self):
+        if self.rotationN % 2 == 0:
+            for p in self.inputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+            for p in self.outputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+        if self.rotationN % 2 == 1:
+            for p in self.inputs:
+                if p.side == 1 or p.side == 3:
+                    self.updateSide(p, 2)
+            for p in self.outputs:
+                if p.side == 1 or p.side == 3:
+                    self.updateSide(p, 2)
+
+    def updateSidesFlippedV(self):
+        if self.rotationN % 2 == 1:
+            for p in self.inputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+            for p in self.outputs:
+                if p.side == 0 or p.side == 2:
+                    self.updateSide(p, 2)
+        if self.rotationN % 2 == 0:
+            for p in self.inputs:
+                if p.side == 1 or p.side == 3:
+                    self.updateSide(p, 2)
+            for p in self.outputs:
+                if p.side == 1 or p.side == 3:
+                    self.updateSide(p, 2)
 
     def updateSide(self, port, n):
         port.side = (port.side + n) % 4
