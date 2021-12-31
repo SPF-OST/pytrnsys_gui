@@ -237,7 +237,7 @@ class DoublePipeConnection(ConnectionBase):
         unitText = self._addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temperature}, deg C")
 
         firstColumn = f"{outputVariable.name}"
-        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperature}, kJ/h")
+        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperature}, kg/h")
 
         parent = portItemsWithParent[1][1]
         firstColumn = f"T{parent.displayName}{temperature}"
@@ -265,7 +265,7 @@ class DoublePipeConnection(ConnectionBase):
         firstColumn = f"Mfr{self.displayName}{temperature} = {outputVariable.name}"
         unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperature}, kg/h")
         firstColumn = f"P{self.displayName}{temperature}_kW = [{unitNumber},{equationConstant2}]/3600"
-        unitText += self._addComment(firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperature}, kJ/h")
+        unitText += self._addComment(firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperature}, kW")
         return unitText
 
     @staticmethod
