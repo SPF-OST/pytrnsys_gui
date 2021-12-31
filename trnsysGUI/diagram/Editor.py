@@ -503,8 +503,8 @@ class Editor(QWidget):
             fullExportText += exporter.exportMassFlows()
             fullExportText += exporter.exportPumpOutlets()
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
-        elif exportTo == "ddck":
-            fullExportText += exporter.exportDoublePipeParameters()
+
+        fullExportText += exporter.exportDoublePipeParameters(exportTo=exportTo)
 
         fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength)
 

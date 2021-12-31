@@ -53,13 +53,16 @@ class Export(object):
 
         return problemEncountered, f
 
-    def exportDoublePipeParameters(self):
+    def exportDoublePipeParameters(self, exportTo = "ddck"):
         hydraulicContainsDoublePipe = any([isinstance(obj, DoublePipeConnection) for obj in self.trnsysObj])
 
         if hydraulicContainsDoublePipe:
             commentStars = 6 * "*"
 
-            exportText = "CONSTANTS 25\n"
+            if exportTo == "ddck":
+                exportText = "CONSTANTS 25\n"
+            elif exportTo == "mfs":
+                exportText = "CONSTANTS 28\n"
             exportText += "*** Default global PARAMETERS for TYPES 9511" + "\n"
 
             exportText += commentStars + " pipe and soil properties " + commentStars + "\n"
@@ -89,6 +92,12 @@ class Export(object):
             exportText += self._addComment("dpLamdaSl = 8.722", "! Thermal conductivity of soil, kJ/(h*m*K)")
             exportText += self._addComment("dpRhoSl = 2500.0", "! Density of soil, kg/m^3")
             exportText += self._addComment("dpCpSl = 0.84", "! Specific heat of soil, kJ/(kg*K)")
+
+            if exportTo == "mfs":
+                exportText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
+                exportText += self._addComment("TambAvg = 7.96", "! Average surface temperature, deg C")
+                exportText += self._addComment("dTambAmpl = 13.32", "! Amplitude of surface temperature, deg C")
+                exportText += self._addComment("ddTcwOffset = 36", "! Days of minimum surface temperature")
 
             exportText += commentStars + " definition of nodes " + commentStars + "\n"
             exportText += self._addComment("dpNrFlNds = 100", "! Number of fluid nodes")

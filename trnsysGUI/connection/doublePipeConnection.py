@@ -151,7 +151,7 @@ class DoublePipeConnection(ConnectionBase):
         unitText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
         unitText += self._addComment("TambAvg", "! Average surface temperature, deg C")
         unitText += self._addComment("dTambAmpl", "! Amplitude of surface temperature, deg C")
-        unitText += self._addComment("ddTcwOffset", "! Day of minimum surface temperature, deg C")
+        unitText += self._addComment("ddTcwOffset", "! Days of minimum surface temperature")
 
         unitText += commentStars + " definition of nodes " + commentStars + "\n"
         unitText += self._addComment("dpNrFlNds", "! Number of fluid nodes")
