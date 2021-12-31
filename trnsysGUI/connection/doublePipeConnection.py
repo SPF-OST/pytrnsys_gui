@@ -110,41 +110,6 @@ class DoublePipeConnection(ConnectionBase):
         eqConst7 = 7
         eqConst8 = 8
 
-        # default values
-        lPipe = 24.384
-        diPipe = 0.02618
-        doPipe = 0.03198
-        cpPipe = 1.37067
-        depthPipe = 3.0
-        dirSecondPipe = 1
-        dCasing = 0.17526
-        condInsulation = 0.14537
-        xPipeToPipe = 0.06911
-        condCap = 8.722
-        dGap = 0.0000
-
-        rhoFluidPipe = 1000.0
-        condFluidPipe = 2.2068
-        cpFluidPipe = 4.19
-        viscFluidPipe = 3.078
-
-        tiniPipeHot = 10.0
-        tiniPipeCold = 10.0
-
-        condSoil = 8.722
-        rhoSoil = 2500.0
-        cpSoil = 0.84
-
-        tSurfArg = 7.96
-        amplSurfAvg = 13.32
-        dayMinSfT = 36
-
-        nCvFluid = 100
-        nCvRad = 8
-        nCvAXSoil = 10
-        nCvCircSoil = 4
-        dRadn1 = 0.0254
-
         # Fixed strings
         initialValueS = "15.0 0.0 15.0 15.0 0.0 15.0"
 
@@ -156,51 +121,51 @@ class DoublePipeConnection(ConnectionBase):
 
         unitText += "PARAMETERS " + str(parameterNumber) + "\n"
         unitText += commentStars + " pipe and soil properties " + commentStars + "\n"
-        unitText += self._addComment(lPipe, "! Length of buried pipe")
-        unitText += self._addComment(diPipe, "! Inner diameter of pipes")
-        unitText += self._addComment(doPipe, "! Outer diameter of pipes")
-        unitText += self._addComment(cpPipe, "! Thermal conductivity of pipe material")
-        unitText += self._addComment(depthPipe, "! Buried pipe depth")
-        unitText += self._addComment(dirSecondPipe, "! Direction of second pipe flow")
-        unitText += self._addComment(dCasing, "! Diameter of casing material	")
-        unitText += self._addComment(condInsulation, "! Thermal conductivity of fill insulation")
-        unitText += self._addComment(xPipeToPipe, "! Center-to-center pipe spacing")
-        unitText += self._addComment(condCap, "! Thermal conductivity of gap material")
-        unitText += self._addComment(dGap, "! Gap thickness")
+        unitText += self._addComment("dpLength", "! Length of buried pipe, m")
+        unitText += self._addComment("dpDiamIn", "! Inner diameter of pipes, m")
+        unitText += self._addComment("dpDiamOut", "! Outer diameter of pipes, m")
+        unitText += self._addComment("dpLambda", "! Thermal conductivity of pipe material, kJ/(h*m*K)")
+        unitText += self._addComment("dpDepth", "! Buried pipe depth, m")
+        unitText += self._addComment("dpFlowMode", "! Direction of second pipe flow: 1 = same, 2 = opposite")
+        unitText += self._addComment("dpDiamCase", "! Diameter of casing material, m")
+        unitText += self._addComment("dpLambdaFill", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
+        unitText += self._addComment("dpDistPtoP", "! Center-to-center pipe spacing, m")
+        unitText += self._addComment("dpLambdaGap", "! Thermal conductivity of gap material, kJ/(h*m*K)")
+        unitText += self._addComment("dpGapThick", "! Gap thickness, m")
 
         unitText += commentStars + " fluid properties " + commentStars + "\n"
-        unitText += self._addComment(rhoFluidPipe, "! Density of fluid")
-        unitText += self._addComment(condFluidPipe, "! Thermal conductivity of fluid")
-        unitText += self._addComment(cpFluidPipe, "! Specific heat of fluid")
-        unitText += self._addComment(viscFluidPipe, "! Viscosity of fluid")
+        unitText += self._addComment("dpRhoFlu", "! Density of fluid, kg/m^3")
+        unitText += self._addComment("dpLambdaFl", "! Thermal conductivity of fluid, kJ/(h*m*K)")
+        unitText += self._addComment("dpCpFl", "! Specific heat of fluid, kJ/(kg*K)")
+        unitText += self._addComment("dpViscFl", "! Viscosity of fluid, kg/(m*h)")
 
         unitText += commentStars + " initial conditions " + commentStars + "\n"
-        unitText += self._addComment(tiniPipeHot, "! Initial fluid temperature - Pipe hot")
-        unitText += self._addComment(tiniPipeCold, "! Initial fluid temperature - Pipe cold")
+        unitText += self._addComment("dpTIniHot", "! Initial fluid temperature - Pipe hot, deg C")
+        unitText += self._addComment("dpTIniCold", "! Initial fluid temperature - Pipe cold, deg C")
 
         unitText += commentStars + " thermal properties soil " + commentStars + "\n"
-        unitText += self._addComment(condSoil, "! Thermal conductivity of soil")
-        unitText += self._addComment(rhoSoil, "! Density of soil")
-        unitText += self._addComment(cpSoil, "! Specific heat of soil")
+        unitText += self._addComment("dpLamdaSl", "! Thermal conductivity of soil, kJ/(h*m*K)")
+        unitText += self._addComment("dpRhoSl", "! Density of soil, kg/m^3")
+        unitText += self._addComment("dpCpSl", "! Specific heat of soil, kJ/(kg*K)")
 
-        unitText += commentStars + " general temperature dependency (dependent from weather data) " + commentStars + "\n"
-        unitText += self._addComment(tSurfArg, "! Average surface temperature")
-        unitText += self._addComment(amplSurfAvg, "! Amplitude of surface temperature")
-        unitText += self._addComment(dayMinSfT, "! Day of minimum surface temperature")
+        unitText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
+        unitText += self._addComment("TambAvg", "! Average surface temperature, deg C")
+        unitText += self._addComment("dTambAmpl", "! Amplitude of surface temperature, deg C")
+        unitText += self._addComment("ddTcwOffset", "! Day of minimum surface temperature, deg C")
 
         unitText += commentStars + " definition of nodes " + commentStars + "\n"
-        unitText += self._addComment(nCvFluid, "! Number of fluid nodes")
-        unitText += self._addComment(nCvRad, "! Number of radial soil nodes")
-        unitText += self._addComment(nCvAXSoil, "! Number of axial soil nodes")
-        unitText += self._addComment(nCvCircSoil, "! Number of circumferential soil nodes")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -1")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -2")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -3")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -4")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -5")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -6")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -7")
-        unitText += self._addComment(dRadn1, "! Radial distance of node -8")
+        unitText += self._addComment("dpNrFlNds", "! Number of fluid nodes")
+        unitText += self._addComment("dpNrSlRad", "! Number of radial soil nodes")
+        unitText += self._addComment("dpNrSlAx", "! Number of axial soil nodes")
+        unitText += self._addComment("dpNrSlCirc", "! Number of circumferential soil nodes")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 1, m")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 2, m")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 3, m")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 4, m")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 5, m")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 6, m")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 7, m")
+        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 8, m")
 
         openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
         assert len(openLoops) == 2
@@ -237,7 +202,7 @@ class DoublePipeConnection(ConnectionBase):
         unitText = self._addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temperature}, deg C")
 
         firstColumn = f"{outputVariable.name}"
-        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperature}, kJ/h")
+        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperature}, kg/h")
 
         parent = portItemsWithParent[1][1]
         firstColumn = f"T{parent.displayName}{temperature}"
@@ -265,7 +230,7 @@ class DoublePipeConnection(ConnectionBase):
         firstColumn = f"Mfr{self.displayName}{temperature} = {outputVariable.name}"
         unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperature}, kg/h")
         firstColumn = f"P{self.displayName}{temperature}_kW = [{unitNumber},{equationConstant2}]/3600"
-        unitText += self._addComment(firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperature}, kJ/h")
+        unitText += self._addComment(firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperature}, kW")
         return unitText
 
     @staticmethod

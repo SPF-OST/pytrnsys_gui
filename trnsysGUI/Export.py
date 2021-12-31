@@ -53,6 +53,57 @@ class Export(object):
 
         return problemEncountered, f
 
+    def exportDoublePipeParameters(self):
+        hydraulicContainsDoublePipe = any([isinstance(obj, DoublePipeConnection) for obj in self.trnsysObj])
+
+        if hydraulicContainsDoublePipe:
+            commentStars = 6 * "*"
+
+            exportText = "CONSTANTS 25\n"
+            exportText += "*** Default global PARAMETERS for TYPES 9511" + "\n"
+
+            exportText += commentStars + " pipe and soil properties " + commentStars + "\n"
+            exportText += self._addComment("dpLength = 24.384", "! Length of buried pipe, m")
+            exportText += self._addComment("dpDiamIn = 0.02618", "! Inner diameter of pipes, m")
+            exportText += self._addComment("dpDiamOut = 0.03198", "! Outer diameter of pipes, m")
+            exportText += self._addComment("dpLambda = 1.37067", "! Thermal conductivity of pipe material, kJ/(h*m*K)")
+            exportText += self._addComment("dpDepth = 3.0", "! Buried pipe depth, m")
+            exportText += self._addComment("dpFlowMode = 1", "! Direction of second pipe flow: 1 = same, 2 = opposite")
+            exportText += self._addComment("dpDiamCase = 0.17526", "! Diameter of casing material, m")
+            exportText += self._addComment("dpLambdaFill = 0.14537", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
+            exportText += self._addComment("dpDistPtoP = 0.06911", "! Center-to-center pipe spacing, m")
+            exportText += self._addComment("dpLambdaGap = 8.722", "! Thermal conductivity of gap material, kJ/(h*m*K)")
+            exportText += self._addComment("dpGapThick = 0.0000", "! Gap thickness, m")
+
+            exportText += commentStars + " fluid properties " + commentStars + "\n"
+            exportText += self._addComment("dpRhoFlu = 1000.0", "! Density of fluid, kg/m^3")
+            exportText += self._addComment("dpLambdaFl = 2.2068", "! Thermal conductivity of fluid, kJ/(h*m*K)")
+            exportText += self._addComment("dpCpFl = 4.19", "! Specific heat of fluid, kJ/(kg*K)")
+            exportText += self._addComment("dpViscFl = 3.078", "! Viscosity of fluid, kg/(m*h)")
+
+            exportText += commentStars + " initial conditions " + commentStars + "\n"
+            exportText += self._addComment("dpTIniHot = 10.0", "! Initial fluid temperature - Pipe hot, deg C")
+            exportText += self._addComment("dpTIniCold = 10.0", "! Initial fluid temperature - Pipe cold, deg C")
+
+            exportText += commentStars + " thermal properties soil " + commentStars + "\n"
+            exportText += self._addComment("dpLamdaSl = 8.722", "! Thermal conductivity of soil, kJ/(h*m*K)")
+            exportText += self._addComment("dpRhoSl = 2500.0", "! Density of soil, kg/m^3")
+            exportText += self._addComment("dpCpSl = 0.84", "! Specific heat of soil, kJ/(kg*K)")
+
+            exportText += commentStars + " definition of nodes " + commentStars + "\n"
+            exportText += self._addComment("dpNrFlNds = 100", "! Number of fluid nodes")
+            exportText += self._addComment("dpNrSlRad = 8", "! Number of radial soil nodes")
+            exportText += self._addComment("dpNrSlAx = 10", "! Number of axial soil nodes")
+            exportText += self._addComment("dpNrSlCirc = 4", "! Number of circumferential soil nodes")
+            exportText += self._addComment("dpRadNdDist = 0.0254", "! Radial distance of any node, m")
+
+            exportText += "\n"
+
+            return exportText
+
+        else:
+            return ""
+
     def exportPumpOutlets(self):
         f = "*** Pump outlet temperatures" + "\n"
         equationNr = 0
@@ -360,6 +411,11 @@ class Export(object):
             s += "\n"
         s += equationType + t.displayName + temperature + " "
         return breakline, s
+
+    @staticmethod
+    def _addComment(firstColumn, comment):
+        spacing = 40
+        return str(firstColumn).ljust(spacing) + comment + "\n"
 
     def exportTempPrinter(self, unitnr, descLen):
 
