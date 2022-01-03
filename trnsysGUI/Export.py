@@ -49,7 +49,10 @@ class Export(object):
                     lines[i] = lines[i].split("=")[0] + "=1"
                 f += lines[i] + "\n"
 
-        f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
+        if equationNr == 0:
+            f = ""
+        else:
+            f = "\nEQUATIONS " + str(equationNr) + "\n" + f + "\n"
 
         return problemEncountered, f
 
