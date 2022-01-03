@@ -13,7 +13,6 @@ from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
-import massFlowSolver as _mfs
 import trnsysGUI.images as _img
 import trnsysGUI.serialization as _ser
 from trnsysGUI import idGenerator as _id
@@ -28,7 +27,7 @@ FilePath = "res/Config.txt"
 
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
-class BlockItem(QGraphicsPixmapItem, _mfs.MassFlowNetworkContributorMixin):
+class BlockItem(QGraphicsPixmapItem):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(None)
 

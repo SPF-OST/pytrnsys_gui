@@ -7,12 +7,12 @@ import numpy as np
 
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class Pump(BlockItem):
+class Pump(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Pump, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40

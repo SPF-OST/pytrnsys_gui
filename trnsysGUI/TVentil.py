@@ -8,11 +8,12 @@ from PyQt5.QtWidgets import QGraphicsTextItem
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
+from massFlowSolver import MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class TVentil(BlockItem, _mfs.MassFlowNetworkContributorMixin):
+class TVentil(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(TVentil, self).__init__(trnsysType, parent, **kwargs)
 

@@ -7,7 +7,7 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -17,7 +17,7 @@ import trnsysGUI.images as _img
 import massFlowSolver.networkModel as _mfn
 
 
-class Radiator(BlockItem):
+class Radiator(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Radiator, self).__init__(trnsysType, parent, **kwargs)
 

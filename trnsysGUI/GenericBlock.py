@@ -11,13 +11,13 @@ from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeView
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class GenericBlock(BlockItem):
+class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(GenericBlock, self).__init__(trnsysType, parent, **kwargs)
 

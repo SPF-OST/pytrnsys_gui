@@ -16,15 +16,15 @@ import jinja2 as _jinja
 
 
 class Export(object):
-    def __init__(self, objList, editor):
+    def __init__(self, massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin], editor):
         self.logger = editor.logger
 
-        self.trnsysObj = objList
+        self._massFlowContributors = massFlowContributors
         self.editor = editor
         self.maxChar = 20
 
         o: _mfs.MassFlowNetworkContributorMixin
-        nodes = [n for o in self.trnsysObj for n in o.getInternalPiping().openLoopsStartingNodes]
+        nodes = [n for o in self._massFlowContributors for n in o.getInternalPiping().openLoopsStartingNodes]
         self.lineNumOfPar = len(nodes)
 
         self.numOfPar = 4 * self.lineNumOfPar + 1
@@ -34,7 +34,7 @@ class Export(object):
         equationNr = 0
         problemEncountered = False
 
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             status, equations = t.exportBlackBox()
 
             for equation in equations:
@@ -53,70 +53,72 @@ class Export(object):
 
         return problemEncountered, f
 
-    def exportDoublePipeParameters(self, exportTo = "ddck"):
-        hydraulicContainsDoublePipe = any([isinstance(obj, DoublePipeConnection) for obj in self.trnsysObj])
+    def exportDoublePipeParameters(self, exportTo="ddck"):
+        doesHydraulicContainDoublePipes = any([isinstance(obj, DoublePipeConnection) for obj in self._massFlowContributors])
 
-        if hydraulicContainsDoublePipe:
-            commentStars = 6 * "*"
-
-            if exportTo == "ddck":
-                exportText = "CONSTANTS 25\n"
-            elif exportTo == "mfs":
-                exportText = "CONSTANTS 28\n"
-            exportText += "*** Default global PARAMETERS for TYPES 9511" + "\n"
-
-            exportText += commentStars + " pipe and soil properties " + commentStars + "\n"
-            exportText += self._addComment("dpLength = 24.384", "! Length of buried pipe, m")
-            exportText += self._addComment("dpDiamIn = 0.02618", "! Inner diameter of pipes, m")
-            exportText += self._addComment("dpDiamOut = 0.03198", "! Outer diameter of pipes, m")
-            exportText += self._addComment("dpLambda = 1.37067", "! Thermal conductivity of pipe material, kJ/(h*m*K)")
-            exportText += self._addComment("dpDepth = 3.0", "! Buried pipe depth, m")
-            exportText += self._addComment("dpFlowMode = 1", "! Direction of second pipe flow: 1 = same, 2 = opposite")
-            exportText += self._addComment("dpDiamCase = 0.17526", "! Diameter of casing material, m")
-            exportText += self._addComment("dpLambdaFill = 0.14537", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
-            exportText += self._addComment("dpDistPtoP = 0.06911", "! Center-to-center pipe spacing, m")
-            exportText += self._addComment("dpLambdaGap = 8.722", "! Thermal conductivity of gap material, kJ/(h*m*K)")
-            exportText += self._addComment("dpGapThick = 0.0000", "! Gap thickness, m")
-
-            exportText += commentStars + " fluid properties " + commentStars + "\n"
-            exportText += self._addComment("dpRhoFlu = 1000.0", "! Density of fluid, kg/m^3")
-            exportText += self._addComment("dpLambdaFl = 2.2068", "! Thermal conductivity of fluid, kJ/(h*m*K)")
-            exportText += self._addComment("dpCpFl = 4.19", "! Specific heat of fluid, kJ/(kg*K)")
-            exportText += self._addComment("dpViscFl = 3.078", "! Viscosity of fluid, kg/(m*h)")
-
-            exportText += commentStars + " initial conditions " + commentStars + "\n"
-            exportText += self._addComment("dpTIniHot = 10.0", "! Initial fluid temperature - Pipe hot, deg C")
-            exportText += self._addComment("dpTIniCold = 10.0", "! Initial fluid temperature - Pipe cold, deg C")
-
-            exportText += commentStars + " thermal properties soil " + commentStars + "\n"
-            exportText += self._addComment("dpLamdaSl = 8.722", "! Thermal conductivity of soil, kJ/(h*m*K)")
-            exportText += self._addComment("dpRhoSl = 2500.0", "! Density of soil, kg/m^3")
-            exportText += self._addComment("dpCpSl = 0.84", "! Specific heat of soil, kJ/(kg*K)")
-
-            if exportTo == "mfs":
-                exportText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
-                exportText += self._addComment("TambAvg = 7.96", "! Average surface temperature, deg C")
-                exportText += self._addComment("dTambAmpl = 13.32", "! Amplitude of surface temperature, deg C")
-                exportText += self._addComment("ddTcwOffset = 36", "! Days of minimum surface temperature")
-
-            exportText += commentStars + " definition of nodes " + commentStars + "\n"
-            exportText += self._addComment("dpNrFlNds = 100", "! Number of fluid nodes")
-            exportText += self._addComment("dpNrSlRad = 8", "! Number of radial soil nodes")
-            exportText += self._addComment("dpNrSlAx = 10", "! Number of axial soil nodes")
-            exportText += self._addComment("dpNrSlCirc = 4", "! Number of circumferential soil nodes")
-            exportText += self._addComment("dpRadNdDist = 0.0254", "! Radial distance of any node, m")
-
-            exportText += "\n"
-
-            return exportText
-
-        else:
+        if not doesHydraulicContainDoublePipes:
             return ""
+
+        commentStars = 6 * "*"
+
+        if exportTo == "ddck":
+            exportText = "CONSTANTS 25\n"
+        elif exportTo == "mfs":
+            exportText = "CONSTANTS 28\n"
+        else:
+            raise ValueError("Unknown value for `exportTo`", exportTo)
+
+        exportText += "*** Default global PARAMETERS for TYPES 9511" + "\n"
+
+        exportText += commentStars + " pipe and soil properties " + commentStars + "\n"
+        exportText += self._addComment("dpLength = 24.384", "! Length of buried pipe, m")
+        exportText += self._addComment("dpDiamIn = 0.02618", "! Inner diameter of pipes, m")
+        exportText += self._addComment("dpDiamOut = 0.03198", "! Outer diameter of pipes, m")
+        exportText += self._addComment("dpLambda = 1.37067", "! Thermal conductivity of pipe material, kJ/(h*m*K)")
+        exportText += self._addComment("dpDepth = 3.0", "! Buried pipe depth, m")
+        exportText += self._addComment("dpFlowMode = 1", "! Direction of second pipe flow: 1 = same, 2 = opposite")
+        exportText += self._addComment("dpDiamCase = 0.17526", "! Diameter of casing material, m")
+        exportText += self._addComment("dpLambdaFill = 0.14537", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
+        exportText += self._addComment("dpDistPtoP = 0.06911", "! Center-to-center pipe spacing, m")
+        exportText += self._addComment("dpLambdaGap = 8.722", "! Thermal conductivity of gap material, kJ/(h*m*K)")
+        exportText += self._addComment("dpGapThick = 0.0000", "! Gap thickness, m")
+
+        exportText += commentStars + " fluid properties " + commentStars + "\n"
+        exportText += self._addComment("dpRhoFlu = 1000.0", "! Density of fluid, kg/m^3")
+        exportText += self._addComment("dpLambdaFl = 2.2068", "! Thermal conductivity of fluid, kJ/(h*m*K)")
+        exportText += self._addComment("dpCpFl = 4.19", "! Specific heat of fluid, kJ/(kg*K)")
+        exportText += self._addComment("dpViscFl = 3.078", "! Viscosity of fluid, kg/(m*h)")
+
+        exportText += commentStars + " initial conditions " + commentStars + "\n"
+        exportText += self._addComment("dpTIniHot = 10.0", "! Initial fluid temperature - Pipe hot, deg C")
+        exportText += self._addComment("dpTIniCold = 10.0", "! Initial fluid temperature - Pipe cold, deg C")
+
+        exportText += commentStars + " thermal properties soil " + commentStars + "\n"
+        exportText += self._addComment("dpLamdaSl = 8.722", "! Thermal conductivity of soil, kJ/(h*m*K)")
+        exportText += self._addComment("dpRhoSl = 2500.0", "! Density of soil, kg/m^3")
+        exportText += self._addComment("dpCpSl = 0.84", "! Specific heat of soil, kJ/(kg*K)")
+
+        if exportTo == "mfs":
+            exportText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
+            exportText += self._addComment("TambAvg = 7.96", "! Average surface temperature, deg C")
+            exportText += self._addComment("dTambAmpl = 13.32", "! Amplitude of surface temperature, deg C")
+            exportText += self._addComment("ddTcwOffset = 36", "! Days of minimum surface temperature")
+
+        exportText += commentStars + " definition of nodes " + commentStars + "\n"
+        exportText += self._addComment("dpNrFlNds = 100", "! Number of fluid nodes")
+        exportText += self._addComment("dpNrSlRad = 8", "! Number of radial soil nodes")
+        exportText += self._addComment("dpNrSlAx = 10", "! Number of axial soil nodes")
+        exportText += self._addComment("dpNrSlCirc = 4", "! Number of circumferential soil nodes")
+        exportText += self._addComment("dpRadNdDist = 0.0254", "! Radial distance of any node, m")
+
+        exportText += "\n"
+
+        return exportText
 
     def exportPumpOutlets(self):
         f = "*** Pump outlet temperatures" + "\n"
         equationNr = 0
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             f += t.exportPumpOutlets()[0]
             equationNr += t.exportPumpOutlets()[1]
 
@@ -131,7 +133,7 @@ class Export(object):
         f = "*** Massflowrates" + "\n"
         equationNr = 0
 
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             f += t.exportMassFlows()[0]
             equationNr += t.exportMassFlows()[1]
 
@@ -153,7 +155,7 @@ class Export(object):
         nUnit = unit
         constants = 0
         f2 = ""
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             f2 += t.exportDivSetting1()[0]
             constants += t.exportDivSetting1()[1]
 
@@ -161,7 +163,7 @@ class Export(object):
             f = "CONSTANTS " + str(constants) + "\n"
             f += f2 + "\n"
 
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             res = t.exportDivSetting2(nUnit)
             f += res[0]
             nUnit = res[1]
@@ -176,7 +178,7 @@ class Export(object):
         f += str(self.lineNumOfPar) + "\n"
 
         nameString = ""
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
 
             noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
@@ -262,13 +264,13 @@ class Export(object):
         numberOfInputs = 0
 
         counter = 0
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             res = t.exportInputsFlowSolver()
             f += res[0]
             counter += res[1]
             numberOfInputs += res[1]
 
-            if counter > 8 or t == self.trnsysObj[-1]:
+            if counter > 8 or t == self._massFlowContributors[-1]:
                 f += "\n"
                 counter = 0
 
@@ -296,7 +298,7 @@ class Export(object):
 
         tot = ""
 
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
@@ -326,7 +328,7 @@ class Export(object):
         # typeNr1 = 929 # Temperature calculation from a tee-piece
         # typeNr2 = 931 # Temperature calculation from a pipe
 
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
 
             res = t.exportPipeAndTeeTypesForTemp(unitNumber)
             f += res[0]
@@ -341,7 +343,7 @@ class Export(object):
         lossText = ""
         rightCounter = 0
 
-        for t in self.editor.trnsysObj:
+        for t in self._massFlowContributors:
             if isinstance(t, SinglePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
@@ -399,7 +401,7 @@ class Export(object):
         s = ""
         equationType = "Mfr"
         breakline = 0
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             if isinstance(t, SinglePipeConnection):
                 breakline, s = self._getEquation(breakline, s, t, "", equationType)
             if isinstance(t, DoublePipeConnection):
@@ -466,7 +468,7 @@ class Export(object):
         s = ""
         equationType = "T"
         breakline = 0
-        for t in self.trnsysObj:
+        for t in self._massFlowContributors:
             if isinstance(t, SinglePipeConnection):
                 breakline, s = self._getEquation(breakline, s, t, "", equationType)
             if isinstance(t, DoublePipeConnection):

@@ -9,14 +9,14 @@ from PyQt5.QtWidgets import QTreeView
 
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class Collector(BlockItem):
+class Collector(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 

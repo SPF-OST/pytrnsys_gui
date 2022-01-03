@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QTreeView
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
+from massFlowSolver import MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -17,7 +18,7 @@ from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class GroundSourceHx(BlockItem):
+class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(GroundSourceHx, self).__init__(trnsysType, parent, **kwargs)
 

@@ -9,6 +9,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
+from massFlowSolver import MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -16,7 +17,7 @@ from trnsysGUI.singlePipePortItem import SinglePipePortItem
 import trnsysGUI.images as _img
 
 
-class IceStorage(BlockItem):
+class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(IceStorage, self).__init__(trnsysType, parent, **kwargs)
         self.w = 120

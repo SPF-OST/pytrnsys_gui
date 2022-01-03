@@ -6,11 +6,11 @@ import os
 
 import massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class BlockItemFourPorts(BlockItem):
+class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(BlockItemFourPorts, self).__init__(trnsysType, parent, **kwargs)
 

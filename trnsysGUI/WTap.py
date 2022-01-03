@@ -10,13 +10,13 @@ from PyQt5.QtWidgets import QTreeView
 import trnsysGUI.images as _img
 import massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class WTap(BlockItem):
+class WTap(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(WTap, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
