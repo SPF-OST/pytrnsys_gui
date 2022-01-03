@@ -492,7 +492,7 @@ class Editor(QWidget):
         simulationType = 935
         descConnLength = 20
 
-        exporter = Export(self.trnsysObj, self)
+        exporter = self._createExporter()
 
         blackBoxProblem, blackBoxText = exporter.exportBlackBox(exportTo=exportTo)
         if blackBoxProblem:
@@ -549,6 +549,15 @@ class Editor(QWidget):
             return None
 
         return exportPath
+
+    def _createExporter(self) -> Export:
+        massFlowContributors = self._getMassFlowContributors()
+        exporter = Export(massFlowContributors, self)
+        return exporter
+
+    def _getMassFlowContributors(self) -> _tp.Sequence[_mfs.MassFlowNetworkContributorMixin]:
+        massFlowContributors = [o for o in self.trnsysObj if isinstance(o, _mfs.MassFlowNetworkContributorMixin)]
+        return massFlowContributors
 
     def _isHydraulicConnected(self) -> bool:
         for obj in self.trnsysObj:
@@ -614,10 +623,8 @@ class Editor(QWidget):
         fullExportText += "*************************************\n"
 
         simulationUnit = 450
-        simulationType = 935
-        descConnLength = 20
 
-        exporter = Export(self.trnsysObj, self)
+        exporter = self._createExporter()
 
         fullExportText += exporter.exportPumpOutlets()
         fullExportText += exporter.exportMassFlows()

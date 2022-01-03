@@ -4,13 +4,13 @@
 import typing as _tp
 
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from massFlowSolver.networkModel import Pipe, PortItem
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class Connector(BlockItem):
+class Connector(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent):
         super().__init__(trnsysType, parent)
         self.sizeFactor = 0.5

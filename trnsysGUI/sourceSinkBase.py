@@ -1,13 +1,13 @@
 import typing as _tp
 
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
 import massFlowSolver.networkModel as _mfn
 
 
-class SourceSinkBase(BlockItem):
+class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 

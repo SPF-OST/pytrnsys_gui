@@ -6,11 +6,11 @@ import typing as _tp
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class WTap_main(BlockItem):
+class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(WTap_main, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40

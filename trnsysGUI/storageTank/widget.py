@@ -11,7 +11,7 @@ import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 import trnsysGUI.storageTank.model as _model
 import trnsysGUI.storageTank.side as _sd
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
@@ -32,7 +32,7 @@ class PortIds:
     outputId: int
 
 
-class StorageTank(BlockItem):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
     def __init__(self, trnsysType, parent, **kwargs):

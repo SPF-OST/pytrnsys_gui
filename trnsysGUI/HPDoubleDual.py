@@ -11,13 +11,13 @@ from PyQt5.QtWidgets import QTreeView
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
-class HPDoubleDual(BlockItem):
+class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HPDoubleDual, self).__init__(trnsysType, parent, **kwargs)
 
