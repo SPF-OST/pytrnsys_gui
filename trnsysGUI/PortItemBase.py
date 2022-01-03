@@ -216,9 +216,13 @@ class PortItemBase(QGraphicsEllipseItem):
         if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, "heatExchangers"):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
-        else:
-            self.setFlag(self.ItemIsMovable, False)
-            self.scene().parent().startConnection(self)
+            return
+
+        if self.connectionList:
+            return
+        
+        self.setFlag(self.ItemIsMovable, False)
+        self.scene().parent().startConnection(self)
 
     def hoverEnterEvent(self, event):
         # self.logger.debug("Hovering")
