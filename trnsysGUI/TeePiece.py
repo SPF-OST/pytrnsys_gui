@@ -57,7 +57,7 @@ class TeePiece(BlockItem):
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 1 - 1 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
 
         return w, h
 
