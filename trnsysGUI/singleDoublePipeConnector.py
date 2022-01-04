@@ -62,8 +62,8 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         unitNumber = startingUnit
         unitText = ""
 
-        unitText += self._getEquation(self.inputs[0], "Cold")
-        unitText += self._getEquation(self.inputs[1], "Hot")
+        unitText += self._getEquation(self.inputs[0], "Hot")
+        unitText += self._getEquation(self.inputs[1], "Cold")
 
         unitNumber += 1
 
