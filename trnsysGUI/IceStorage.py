@@ -5,11 +5,10 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
-from massFlowSolver import MassFlowNetworkContributorMixin
+import massFlowSolver.networkModel as _mfn
+from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
@@ -31,6 +30,13 @@ class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.ICE_STORAGE_SVG
+
+    def getInternalPiping(self) -> InternalPiping:
+        inputPort = _mfn.PortItem()
+        outputPort = _mfn.PortItem()
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
     def changeSize(self):
         w = self.w
