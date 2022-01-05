@@ -32,7 +32,7 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         self, ports: _tp.Sequence[_pi.PortItemBase]  # type: ignore[name-defined]
     ) -> _tp.Sequence[_qtw.QUndoCommand]:
         connections: _tp.Sequence[_cb.ConnectionBase] = [  # type: ignore[name-defined]
-            c for p in ports if (c := _com.singleOrNone(p.connectionList)) is not None
+            connection for p in ports if (connection := _com.singleOrNone(p.connectionList)) is not None
         ]
 
         deleteConnectionUndoCommands = [c.createDeleteUndoCommand(self) for c in connections]
