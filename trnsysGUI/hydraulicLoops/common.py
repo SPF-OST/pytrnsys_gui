@@ -51,6 +51,6 @@ def setConnectionsSelected(
         isSelected: bool) -> None:
     for connection in connections:
         if isSelected:
-            connection.selectConnection(deselectOthers=False)
+            connection.selectConnection()
         else:
             connection.deselectConnection()

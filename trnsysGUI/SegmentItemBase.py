@@ -165,8 +165,7 @@ class SegmentItemBase(QGraphicsItemGroup):
             self.keyPr = 1
             self.logger.debug("Setting key to 1")
 
-            self.connection.selectConnection(deselectOthers=True)
-
+            self.connection.selectConnection()
             if self.isVertical():
                 try:
                     self.oldX = self.startNode.parent.scenePos().x()
@@ -673,7 +672,7 @@ class SegmentItemBase(QGraphicsItemGroup):
         a1 = menu.addAction("Rename...")
         a1.triggered.connect(self.renameConn)
         a2 = menu.addAction("Delete this connection")
-        a2.triggered.connect(self.connection.deleteConnCom)
+        a2.triggered.connect(self.connection.createDeleteUndoCommandAndAddToStack)
         a3 = menu.addAction("Invert this connection")
         a3.triggered.connect(self.connection.invertConnection)
         a4 = menu.addAction("Toggle name")
@@ -700,7 +699,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         raise NotImplementedError()
 
     @staticmethod
-
     def _createSelectPen() -> QPen:
         color = QColor(125, 242, 189)
         width = 4

@@ -72,18 +72,12 @@ class Collector(BlockItem, MassFlowNetworkContributorMixin):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        self.logger.debug(self.parent.parent())
-        # pathName = 'Collector_' + self.displayName
-        pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
+
+        pathName = self.displayName
         self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
@@ -101,19 +95,6 @@ class Collector(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    def updateTreePath(self, path):
-        """
-        When the user chooses the project path for the file explorers, this method is called
-        to update the root path.
-        """
-        pathName = self.displayName
-        self.path = os.path.join(path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        self.model.setRootPath(self.path)
-        self.tree.setRootIndex(self.model.index(self.path))
 
     def deleteBlock(self):
         """

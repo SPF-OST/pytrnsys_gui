@@ -102,19 +102,6 @@ class Boiler(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    def updateTreePath(self, path):
-        """
-        When the user chooses the project path for the file explorers, this method is called
-        to update the root path.
-        """
-        pathName = self.displayName
-        self.path = os.path.join(path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        self.model.setRootPath(self.path)
-        self.tree.setRootIndex(self.model.index(self.path))
-
     def deleteBlock(self):
         """
         Overridden method to also delete folder

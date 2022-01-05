@@ -54,7 +54,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         self.changeSize()
 
         self.path = None
-        self._addTree()
+        self.addTree()
 
     @property
     def leftDirectPortPairsPortItems(self):
@@ -617,7 +617,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
 
         return True
 
-    def _addTree(self):
+    def addTree(self):
         """
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
@@ -642,18 +642,6 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    def updateTreePath(self, path):
-        """
-        When the user chooses the project path for the file explorers, this method is called
-        to update the root path.
-        """
-        pathName = self.displayName
-        self.path = _os.path.join(path, "../ddck", pathName)
-        if not _os.path.exists(self.path):
-            _os.makedirs(self.path)
-        self.model.setRootPath(self.path)
-        self.tree.setRootIndex(self.model.index(self.path))
 
     def deleteBlock(self):
         """

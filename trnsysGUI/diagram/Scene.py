@@ -3,7 +3,7 @@
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsRectItem
+import PyQt5.QtWidgets as _qtw
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.connection.connectionBase import ConnectionBase
@@ -12,7 +12,7 @@ from trnsysGUI.ResizerItem import ResizerItem
 from trnsysGUI.storageTank.widget import StorageTank
 
 
-class Scene(QGraphicsScene):
+class Scene(_qtw.QGraphicsScene):
     """
     This class serves as container for QGraphicsItems and is used in combination with the View to display the
     diagram.
@@ -41,18 +41,19 @@ class Scene(QGraphicsScene):
 
     """
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, editor):
+        super().__init__(editor)
 
-        self.logger = parent.logger
+        self.logger = editor.logger
+        self._editor = editor
 
         self.sRstart = QPointF(-500, -400)
         self.sRh = 700
         self.sRw = 400
 
-        self.selectionRect = QGraphicsRectItem(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRw)
-        self.viewRect1 = QGraphicsRectItem(0, 0, 10, 10)
-        self.viewRect2 = QGraphicsRectItem(-800, -400, 10, 10)
+        self.selectionRect = _qtw.QGraphicsRectItem(self.sRstart.x(), self.sRstart.y(), self.sRw, self.sRw)
+        self.viewRect1 = _qtw.QGraphicsRectItem(0, 0, 10, 10)
+        self.viewRect2 = _qtw.QGraphicsRectItem(-800, -400, 10, 10)
         rectColor = QColor(100, 160, 245)
 
         p1 = QPen(rectColor, 2)
@@ -68,7 +69,7 @@ class Scene(QGraphicsScene):
         self.addItem(self.viewRect1)
         self.addItem(self.viewRect2)
 
-        self.selectedItem = None
+        self._previouslyHitItems = []
 
         self.released = False
         self.pressed = False
@@ -96,7 +97,6 @@ class Scene(QGraphicsScene):
                 self.selectionRect.setRect(rectangleR1)
 
     def mouseReleaseEvent(self, mouseEvent):
-        self.logger.debug("Releasing mouse in Scene...")
         self.parent().sceneMouseReleaseEvent(mouseEvent)
         super().mouseReleaseEvent(mouseEvent)
         self.parent().moveDirectPorts = False
@@ -107,12 +107,9 @@ class Scene(QGraphicsScene):
             self.parent().clearSelectionGroup()
 
         if self.parent().selectionMode:
-            self.logger.debug("There are elements inside the selection : " + str(self.hasElementsInRect()))
             if self.hasElementsInRect():
                 if self.parent().multipleSelectMode:
                     self.parent().createSelectionGroup(self.elementsInRect())
-                else:
-                    self.logger.info("No recognized mode for selection")
             else:
                 self.parent().selectionMode = False
 
@@ -143,59 +140,68 @@ class Scene(QGraphicsScene):
             super(Scene, self).drawBackground(painter, rect)
 
     def keyPressEvent(self, event):
-        pass
         if event.key() == Qt.Key_L:
             self.parent().moveDirectPorts = not self.parent().moveDirectPorts
-            self.logger.debug("Changing move bool to " + str(self.parent().moveDirectPorts))
+            return
 
         if event.key() == Qt.Key_Delete:
-            for c in self.parent().trnsysObj:
-                # Delete connection
-                if isinstance(c, ConnectionBase):
-                    if c.isSelected:
-                        c.deleteConnCom()
-                # Delete block
-                if isinstance(c, BlockItem):
-                    if c.isSelected:
-                        c.deleteBlockCom()
+            trnsysObjects = self.parent().trnsysObj
+            selectedObjects = [o for o in trnsysObjects if o.isSelected]
+
+            if not selectedObjects:
+                return
+
+            if len(selectedObjects) > 1:
+                messageBox = _qtw.QMessageBox()
+                messageBox.setWindowTitle("Deleting with multiple objects selected")
+                messageBox.setText(
+                    "You're trying to delete multiple selected objects at once. This is currently not supported. "
+                    "Please select and delete one object after the other."
+                )
+                messageBox.setStandardButtons(messageBox.Ok)
+                messageBox.exec()
+                return
+
+            selectedObject = selectedObjects[0]
+
+            if isinstance(selectedObject, ConnectionBase):
+                selectedObject.createDeleteUndoCommandAndAddToStack()
+            if isinstance(selectedObject, BlockItem):
+                selectedObject.deleteBlockCom()
 
     def mousePressEvent(self, event):
-        # TODO : remove resizer when click on other block items
+        if not self._editor.parent().massFlowEnabled:
+            for connection in self._editor.connectionList:
+                connection.deselectConnection()
+
+        for trnsysObject in self._editor.trnsysObj:
+            if isinstance(trnsysObject, BlockItem):
+                trnsysObject.isSelected = False
+            if isinstance(trnsysObject, StorageTank):
+                for heatExchanger in trnsysObject.heatExchangers:
+                    heatExchanger.unhighlightHx()
+
+        self.parent().clearSelectionGroup()
+        self.parent().selectionMode = True
+        self.parent().multipleSelectMode = True
+
+        self.parent().alignYLineItem.setVisible(False)
+
+        if self._previouslyHitItems is not None:
+            for item in self._previouslyHitItems:
+                if isinstance(item, (GraphicalItem, BlockItem)) and hasattr(item, "resizer"):
+                    self.removeItem(item.resizer)
+                    item.deleteResizer()
+                if isinstance(item, ResizerItem):
+                    self.removeItem(item)
+                    item.parent.deleteResizer()
+
+            self._previouslyHitItems.clear()
+
         super().mousePressEvent(event)
 
-        if len(self.items(event.scenePos())) > 0:
-            self.selectedItem = self.items(event.scenePos())
-
-        if len(self.items(event.scenePos())) == 0:
-            self.logger.debug("No items here!")
-            self.parent().clearSelectionGroup()
-            self.parent().selectionMode = True
-            self.parent().multipleSelectMode = True
-            for c in self.parent().connectionList:
-                if not self.parent().parent().massFlowEnabled:
-                    c.deselectConnection()
-
-            self.parent().alignYLineItem.setVisible(False)
-
-            for st in self.parent().trnsysObj:
-                if isinstance(st, StorageTank):
-                    for hx in st.heatExchangers:
-                        hx.unhighlightHx()
-
-            if self.selectedItem is not None:
-                for items in self.selectedItem:
-                    if isinstance(items, GraphicalItem) and hasattr(items, "resizer"):
-                        self.removeItem(items.resizer)
-                        items.deleteResizer()
-                    if isinstance(items, BlockItem) and hasattr(items, "resizer"):
-                        self.removeItem(items.resizer)
-                        items.deleteResizer()
-                    if isinstance(items, ResizerItem):
-                        self.removeItem(items)
-                        items.parent.deleteResizer()
-
-            if self.selectedItem is not None:
-                self.selectedItem.clear()
+        hitItems = self.items(event.scenePos())
+        self._previouslyHitItems = hitItems
 
         if self.parent().selectionMode:
             self.pressed = True
