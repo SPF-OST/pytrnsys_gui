@@ -151,16 +151,7 @@ class Scene(_qtw.QGraphicsScene):
             if not selectedObjects:
                 return
 
-            if len(selectedObjects) > 1:
-                messageBox = _qtw.QMessageBox()
-                messageBox.setWindowTitle("Deleting with multiple objects selected")
-                messageBox.setText(
-                    "You're trying to delete multiple selected objects at once. This is currently not supported. "
-                    "Please select and delete one object after the other."
-                )
-                messageBox.setStandardButtons(messageBox.Ok)
-                messageBox.exec()
-                return
+            assert len(selectedObjects) == 1, "It shouldn't be possible select more than one object"
 
             selectedObject = selectedObjects[0]
 
