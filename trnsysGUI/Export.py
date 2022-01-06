@@ -277,10 +277,10 @@ class Export(object):
                 f += "\n"
                 counter = 0
 
-        f += "*** Initial Inputs (TRNSYS requires them to be there but the storage tank doesn't use them.)*\n"
+        f += "*** Initial Inputs (TRNSYS requires them to be there.)*\n"
         counter = 0
         for _ in range(numberOfInputs):
-            f += "-1 "
+            f += "0 "
             if counter > 8:
                 f += "\n"
                 counter = 0

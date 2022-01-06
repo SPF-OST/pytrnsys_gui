@@ -17,6 +17,7 @@ from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.HPDoubleDual import HPDoubleDual
+from trnsysGUI.HPDual import HPDual
 from trnsysGUI.HeatPump import HeatPump
 from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
 from trnsysGUI.IceStorage import IceStorage
@@ -110,6 +111,8 @@ class View(QGraphicsView):
                 bl = HeatPumpTwoHx(name, self)
             elif name == "HPDoubleDual":
                 bl = HPDoubleDual(name, self)
+            elif name == "HPDual":
+                bl = HPDual(name, self)
             elif name == "Boiler":
                 bl = Boiler(name, self)
             elif name == "AirSourceHP":
