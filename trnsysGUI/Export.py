@@ -270,21 +270,24 @@ class Export(object):
         for t in self._massFlowContributors:
             res = t.exportInputsFlowSolver()
             f += res[0]
-            counter += res[1]
+            counter += res[1] #DC this is a very strange way to print values, I would like to have 10 values per line and the fact that two go together makes it complicated
             numberOfInputs += res[1]
 
-            if counter > 8 or t == self._massFlowContributors[-1]:
+            if counter > 9 or t == self._massFlowContributors[-1]:
                 f += "\n"
                 counter = 0
 
-        f += "*** Initial Inputs (TRNSYS requires them to be there.)*\n"
+        f += "*** Initial Inputs\n"
         counter = 0
         for _ in range(numberOfInputs):
             f += "0 "
-            if counter > 8:
+            counter += 1
+            # DC if we use 10 per line its way easier to count and see if it is well done.
+            # Above should be the same but some elements give two at once and depending if they are at then end of the line 11 values show up
+            if counter > 9:
                 f += "\n"
                 counter = 0
-            counter += 1
+
 
         f += "\n\n"
 
