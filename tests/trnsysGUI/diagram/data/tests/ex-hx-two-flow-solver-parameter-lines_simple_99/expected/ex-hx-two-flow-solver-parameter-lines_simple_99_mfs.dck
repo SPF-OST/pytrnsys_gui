@@ -121,8 +121,8 @@ PARAMETERS 33
 2 4 0 0        !8 : Hx-Col
 INPUTS 8! for Type 935
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
-*** Initial Inputs (TRNSYS requires them to be there but the storage tank doesn't use them.)*
--1 -1 -1 -1 -1 -1 -1 -1 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 
 
 EQUATIONS 16	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrTesDpL50-10_A=[450,1]
