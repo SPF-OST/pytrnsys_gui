@@ -58,7 +58,7 @@ from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSingleP
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
-from trnsysGUI.diagram.Scene import Scene
+from trnsysGUI.diagram.scene import Scene
 from trnsysGUI.diagram.view import View
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.doublePipeBlockDlg import DoublePipeBlockDlg
@@ -94,13 +94,6 @@ class Editor(QWidget):
     A diagram can be saved to a json file by calling encodeDiagram and can then be loaded by calling decodeDiagram wiht
     appropiate filenames.
 
-    Function of copy-paste:
-    Copying a rectangular part of the diagram to the clipboard is just encoding the diagram to the file clipboard.json,
-    and pasting will load the clipboard using a slighly different decoder than for loading an entire diagram.
-    When the elements are pasted, they compose a group which can be dragged around and is desintegrated when the mouse
-    is released.
-    It is controlled by the attribute selectionMode.
-
     Attributes
     ----------
     projectFolder : str
@@ -111,15 +104,9 @@ class Editor(QWidget):
         Default saving location is trnsysGUI/diagrams, path only set if "save as" used
     idGen : :obj:`IdGenerator`
         Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
-    selectionMode : bool
-        Enables/disables selection rectangle in Scene
     alignMode : bool
         Enables mode in which a dragged block is aligned to y or x value of another one
         Toggled in the MainWindow class in toggleAlignMode()
-    pasting : bool
-        Used to allow dragging of the copygroup right after pasting. Set to true after decodingPaste is called.
-        Set to false as soon as releasedMouse after decodePaste.
-    itemsSelected : bool
 
     editorMode : int
         Mode 0: Pipes are PolySun-like
@@ -168,12 +155,7 @@ class Editor(QWidget):
         self.controlExists = 0
         self.controlDirectory = ""
 
-        self.selectionMode = False
-
         self.alignMode = False
-
-        self.pasting = False
-        self.itemsSelected = False
 
         self.moveDirectPorts = False
 
@@ -806,33 +788,6 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def clearCopyGroup(self):
-
-        for it in self.copyGroupList.childItems():
-            self.copyGroupList.removeFromGroup(it)
-
-        self.pasting = False
-
-    def createSelectionGroup(self, selectionList):
-        for t in selectionList:
-            if isinstance(t, BlockItem):
-                self.selectionGroupList.addToGroup(t)
-            if isinstance(t, GraphicalItem):
-                self.selectionGroupList.addToGroup(t)
-
-        self.selectionMode = False
-
-        self.diagramScene.addItem(self.selectionGroupList)
-        self.selectionGroupList.setFlags(self.selectionGroupList.ItemIsMovable)
-
-        self.itemsSelected = True
-
-    def clearSelectionGroup(self):
-        for it in self.selectionGroupList.childItems():
-            self.selectionGroupList.removeFromGroup(it)
-
-        self.itemsSelected = False
-
     # Saving related
     def save(self, showWarning=True):
         """
@@ -934,9 +889,6 @@ class Editor(QWidget):
 
     def setSnapSize(self, s):
         self.snapSize = s
-
-    def setitemsSelected(self, b):
-        self.itemsSelected = b
 
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:

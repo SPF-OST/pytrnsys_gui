@@ -59,7 +59,6 @@ class View(QGraphicsView):
         self._editor = editor
 
         self.adjustSize()
-        self.parent().diagramScene.viewRect2.setPos(-self.width() / 2, -self.height() / 2)
         self.setRenderHint(QPainter.Antialiasing)
 
     def dragEnterEvent(self, event):  # pylint: disable=no-self-use
