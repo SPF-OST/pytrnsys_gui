@@ -30,14 +30,13 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
 
     def _createChildDeleteConnectionUndoCommandsForPorts(
         self, ports: _tp.Sequence[_pi.PortItemBase]  # type: ignore[name-defined]
-    ) -> _tp.Sequence[_qtw.QUndoCommand]:
+    ) -> None:
         connections: _tp.Sequence[_cb.ConnectionBase] = [  # type: ignore[name-defined]
             connection for p in ports if (connection := _com.singleOrNone(p.connectionList)) is not None
         ]
 
-        deleteConnectionUndoCommands = [c.createDeleteUndoCommand(self) for c in connections]
-
-        return deleteConnectionUndoCommands
+        for connection in connections:
+            connection.createDeleteUndoCommand(self)
 
     def redo(self):
         super().redo()
