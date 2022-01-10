@@ -31,9 +31,9 @@ class DoublePipeConnection(ConnectionBase):
         rad = 4
         return rad
 
-    def deleteConnCom(self):
-        command = DeleteDoublePipeConnectionCommand(self)
-        self.parent.parent().undoStack.push(command)
+    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
+        undoCommand = DeleteDoublePipeConnectionCommand(self, parentCommand)
+        return undoCommand
 
     def encode(self):
         if len(self.segments) > 0:
@@ -240,9 +240,9 @@ class DoublePipeConnection(ConnectionBase):
 
 
 class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
-    def __init__(self, conn):
-        super().__init__("Delete double pipe connection")
-        self._connection = conn
+    def __init__(self, doublePipeConnection: DoublePipeConnection, parentCommand: _qtw.QUndoCommand = None) -> None:
+        super().__init__("Delete double pipe connection", parentCommand)
+        self._connection = doublePipeConnection
         self._fromPort = self._connection.fromPort
         self._toPort = self._connection.toPort
         self._editor = self._connection.parent

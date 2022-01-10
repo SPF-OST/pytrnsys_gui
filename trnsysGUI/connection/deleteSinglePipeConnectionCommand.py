@@ -17,8 +17,9 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         hydraulicLoops: _hlmodel.HydraulicLoops,
         fluids: _tp.Sequence[_hlmodel.Fluid],
         defaultFluid: _hlmodel.Fluid,
+        parentCommand: _tp.Optional[_qtw.QUndoCommand]
     ):
-        super().__init__("Delete single pipe connection")
+        super().__init__("Delete single pipe connection", parentCommand)
         self._connection: _tp.Optional[_spc.SinglePipeConnection] = connection  # type: ignore[name-defined]
         self._hydraulicLoops = hydraulicLoops
         self._fluids = fluids

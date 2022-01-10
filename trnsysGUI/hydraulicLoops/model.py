@@ -149,6 +149,9 @@ class HydraulicLoops:
     def removeLoop(self, loop: HydraulicLoop) -> None:
         self.hydraulicLoops.remove(loop)
 
+    def clear(self):
+        self.hydraulicLoops = []
+
     def generateName(self) -> AutomaticallyGeneratedName:
         for i in range(1, 100000):
             candidateName = f"loop{i}"

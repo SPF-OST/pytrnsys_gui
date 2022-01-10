@@ -32,8 +32,6 @@ class Encoder(json.JSONEncoder):
         logger = obj.logger
 
         if isinstance(obj, _de.Editor):
-            logger.debug("Is diagram or copygroup")
-
             res = {}
             blockDct = {".__BlockDct__": True}
 

@@ -869,34 +869,21 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         # self.printConnNodes()
 
     def deleteConn(self):
-        self.logger.debug("Deleting connection " + self.displayName + " " + str(self))
-        self.logger.debug("fromPort is at " + str(self.fromPort.parent.displayName))
-        self.logger.debug("toPort is at " + str(self.toPort.parent.displayName))
-
         self.clearConn()
         self.fromPort.connectionList.remove(self)
-
-        # self.logger.debug("Connectionlist of fromPort after removal is:")
-        # [self.logger.debug(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.fromPort.connectionList ]
-
         self.toPort.connectionList.remove(self)
 
-        # self.logger.debug("Connectionlist of toPort after removal is:")
-        # [self.logger.debug(c.displayName + ": from " + str(c.fromPort.parent) + " to " + str(c.toPort.parent)) for c in self.toPort.connectionList ]
-
-        if self in self.parent.trnsysObj:
-            self.parent.trnsysObj.remove(self)
-        else:
-            self.logger.debug("-------> tr obj are " + str(self.parent.trnsysObj))
-            self.logger.debug(self.id)
-            self.logger.debug([i.id for i in self.parent.trnsysObj])
+        if self not in self.parent.trnsysObj:
             return
 
-        self.logger.debug("Removing trnsysObj " + str(self))
+        self.parent.trnsysObj.remove(self)
         self.parent.connectionList.remove(self)
-        del self
 
-    def deleteConnCom(self):
+    def createDeleteUndoCommandAndAddToStack(self) -> None:
+        deleteConnectionCommand = self.createDeleteUndoCommand()
+        self.parent.parent().undoStack.push(deleteConnectionCommand)
+
+    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[QUndoCommand] = None) -> QUndoCommand:
         raise NotImplementedError()
 
     # Gradient related
@@ -977,21 +964,13 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         element.setNext(pr)
         element.setPrev(ne)
 
-    # Select when clicked, deselect when clicked elsewhere
-    def selectConnection(self, deselectOthers: bool):
-        if deselectOthers:
-            self.deselectOtherConnections()
-
+    def selectConnection(self):
         for s in self.segments:
             s.setSelect(True)
 
         self.isSelected = True
 
         self.setLabelsSelected(True)
-
-    def deselectOtherConnections(self):
-        for c in self.parent.connectionList:
-            c.deselectConnection()
 
     def deselectConnection(self):
         for s in self.segments:

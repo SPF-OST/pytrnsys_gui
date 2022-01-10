@@ -9,6 +9,8 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
+import PyQt5.QtWidgets as _qtw
+
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
 import trnsysGUI.PortItemBase as _pib
@@ -65,12 +67,12 @@ class SinglePipeConnection(_cb.ConnectionBase):
     def editHydraulicLoop(self) -> None:
         self._editor.editHydraulicLoop(self)
 
-    def deleteConnCom(self):
-        deleteConnectionCommand = _dspc.DeleteSinglePipeConnectionCommand(
-            self, self._editor.hydraulicLoops, self._editor.fluids.fluids, self._editor.fluids.WATER
+    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
+        undoCommand = _dspc.DeleteSinglePipeConnectionCommand(
+            self, self._editor.hydraulicLoops, self._editor.fluids.fluids, self._editor.fluids.WATER, parentCommand
         )
 
-        self.parent.parent().undoStack.push(deleteConnectionCommand)
+        return undoCommand
 
     def encode(self):
         if len(self.segments) > 0:

@@ -117,6 +117,9 @@ class BlockItem(QGraphicsPixmapItem):
 
         raise exception
 
+    def addTree(self):
+        pass
+
     # Setter functions
     def setParent(self, p):
         self.parent = p
@@ -402,25 +405,13 @@ class BlockItem(QGraphicsPixmapItem):
                 p.connectionList[0].deleteConn()
 
     def deleteBlock(self):
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
-        self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
-        try:
+        if widgetToRemove:
             widgetToRemove.hide()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        del self
 
     def deleteBlockCom(self):
-        # command = trnsysGUI.DeleteBlockCommand.DeleteBlockCommand(self, "Delete block command")
-        # self.parent.parent().parent().undoStack.push(command)
         self.parent.deleteBlockCom(self)
 
     def getConnections(self):
@@ -456,12 +447,7 @@ class BlockItem(QGraphicsPixmapItem):
         """
         self.logger.debug("Inside Block Item mouse click")
 
-        # Set flag for selected Block
-        for c in self.parent.parent().trnsysObj:
-            if isinstance(c, BlockItem):
-                c.isSelected = False
         self.isSelected = True
-
         if self.name == "GenericBlock" or self.name == "StorageTank":
             return
         try:
