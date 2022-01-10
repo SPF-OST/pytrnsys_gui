@@ -133,29 +133,27 @@ PARAMETERS 393
 88 90 0 0      !97 : PiPuOvRt
 10 5 0 0       !98 : PiDhwMains
 INPUTS 98! for Type 935
-MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 0,0 
-MfrsupplyWater MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 
-0,0 0,0 0,0 0,0 0,0 0,0 0,0 MfrPuSh1 MfrPuSh2 
-0,0 0,0 0,0 MfrPuSh3 0,0 0,0 MfrPuSh4 0,0 0,0 
-MfrPuSh5 0,0 0,0 MfrPUSh6 0,0 0,0 0,0 0,0 0,0 
-0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
-0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
-0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 MfrPuHxDhwSec 
-0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
-0,0 0,0 0,0 0,0 0,0 0,0 MfrPuOverflowSh 0,0 0,0 
+MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 0,0 MfrsupplyWater 
+MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 MfrPuSh1 MfrPuSh2 0,0 0,0 0,0 
+MfrPuSh3 0,0 0,0 MfrPuSh4 0,0 0,0 MfrPuSh5 0,0 0,0 MfrPUSh6 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 MfrPuHxDhwSec 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 MfrPuOverflowSh 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
-*** Initial Inputs (TRNSYS requires them to be there but the storage tank doesn't use them.)*
--1 -1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 -1 -1 
--1 -1 -1 -1 -1 -1 -1 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 
 
 EQUATIONS 214	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrPuAux_A=[450,1]

@@ -15,6 +15,7 @@ from trnsysGUI.GenericBlock import GenericBlock
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.HPDoubleDual import HPDoubleDual
+from trnsysGUI.HPDual import HPDual
 from trnsysGUI.HeatPump import HeatPump
 from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
 from trnsysGUI.IceStorage import IceStorage
@@ -169,6 +170,10 @@ class Decoder(json.JSONDecoder):
                         )
                     elif i["BlockName"] == "HPDoubleDual":
                         bl = HPDoubleDual(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "HPDual":
+                        bl = HPDual(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "ExternalHx":

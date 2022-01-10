@@ -191,6 +191,7 @@ class Editor(QWidget):
             ("HP", _img.HP_SVG.icon()),
             ("HPTwoHx", _img.HP_TWO_HX_SVG.icon()),
             ("HPDoubleDual", _img.HP_DOUBLE_DUAL_SVG.icon()),
+            ("HPDual", _img.HP_DUAL_SVG.icon()),
             ("AirSourceHP", _img.AIR_SOURCE_HP_SVG.icon()),
             ("StorageTank", _img.STORAGE_TANK_SVG.icon()),
             ("IceStorage", _img.ICE_STORAGE_SVG.icon()),

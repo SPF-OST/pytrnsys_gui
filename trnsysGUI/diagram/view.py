@@ -17,6 +17,7 @@ from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
 from trnsysGUI.Graphicaltem import GraphicalItem  # type: ignore[attr-defined]
 from trnsysGUI.GroundSourceHx import GroundSourceHx  # type: ignore[attr-defined]
 from trnsysGUI.HPDoubleDual import HPDoubleDual  # type: ignore[attr-defined]
+from trnsysGUI.HPDual import HPDual
 from trnsysGUI.HeatPump import HeatPump  # type: ignore[attr-defined]
 from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx  # type: ignore[attr-defined]
 from trnsysGUI.IceStorage import IceStorage  # type: ignore[attr-defined]
@@ -113,6 +114,8 @@ class View(QGraphicsView):
                 blockItem = HeatPumpTwoHx(name, self)
             elif name == "HPDoubleDual":
                 blockItem = HPDoubleDual(name, self)
+            elif name == "HPDual":
+                bl = HPDual(name, self)
             elif name == "Boiler":
                 blockItem = Boiler(name, self)
             elif name == "AirSourceHP":
