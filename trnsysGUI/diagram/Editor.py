@@ -8,6 +8,8 @@ import pkgutil as _pu
 import shutil
 import typing as _tp
 
+from math import sqrt
+
 import pytrnsys.trnsys_util.deckUtils as _du
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF
@@ -70,7 +72,6 @@ from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
-
 
 class Editor(QWidget):
     """
@@ -399,6 +400,30 @@ class Editor(QWidget):
             self.connLine.setLine(tempx, tempy, posx, posy)
             self.connLineItem.setLine(self.connLine)
             self.connLineItem.setVisible(True)
+
+            fromPort = self._currentlyDraggedConnectionFromPort
+
+            mousePosition = event.scenePos()
+            relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
+
+            numberOfHitPortsItems = len(relevantPortItems)
+
+            if numberOfHitPortsItems > 1:
+                raise NotImplementedError("Can't deal with overlapping port items.")
+
+            if numberOfHitPortsItems == 1:
+                toPort = relevantPortItems[0]
+
+                x_coordinate = toPort.scenePos().x()
+                y_coordinate = toPort.scenePos().y()
+
+                distance = sqrt((mousePosition.x() - x_coordinate) ** 2 + (mousePosition.y() - y_coordinate) ** 2)
+                if distance <= 3.5:
+                    toPort.setRect(-4, -4, 10, 10)
+                    toPort.innerCircle.setRect(-4, -4, 10, 10)
+                else:
+                    toPort.setRect(-4, -4, 7, 7)
+                    toPort.innerCircle.setRect(-4, -4, 6.5, 6.5)
 
     def sceneMouseReleaseEvent(self, event):
         if not self._currentlyDraggedConnectionFromPort:
