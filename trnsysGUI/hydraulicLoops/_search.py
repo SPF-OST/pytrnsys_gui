@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing as _tp
 
-import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.singlePipePortItem as _spi
 

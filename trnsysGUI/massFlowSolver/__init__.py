@@ -2,7 +2,7 @@ import dataclasses as _dc
 import typing as _tp
 
 import trnsysGUI.PortItemBase as _pi
-from massFlowSolver import networkModel as _mfn
+from trnsysGUI.massFlowSolver import networkModel as _mfn
 
 
 @_dc.dataclass
@@ -14,10 +14,10 @@ class PortItemAndAdjacentRealNode:
 @_dc.dataclass
 class InternalPiping:
     openLoopsStartingNodes: _tp.Sequence[_mfn.RealNodeBase]
-    modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]
+    modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]  # type: ignore[name-defined]
 
     def getPortItemsAndAdjacentRealNodeForGraphicalPortItem(
-        self, graphicalPortItem: _pi.PortItemBase
+        self, graphicalPortItem: _pi.PortItemBase  # type: ignore[name-defined]
     ) -> _tp.Sequence[PortItemAndAdjacentRealNode]:
         if graphicalPortItem not in self.modelPortItemsToGraphicalPortItem.values():
             raise ValueError("The graphical port item is not part of this internal piping.")
@@ -60,9 +60,7 @@ class MassFlowNetworkContributorMixin:
 
         allInputVariables = []
         for openLoop in openLoops:
-            inputVariables = [
-                n.serialize(nodesToIndices).inputVariable for n in openLoop.realNodes
-            ]
+            inputVariables = [n.serialize(nodesToIndices).inputVariable for n in openLoop.realNodes]
             allInputVariables.extend(inputVariables)
 
         line = ""
@@ -74,32 +72,38 @@ class MassFlowNetworkContributorMixin:
 
         return line, len(allInputVariables)
 
-    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):
+    def exportOutputsFlowSolver(
+            self, prefix, abc, equationNumber, simulationUnit  # pylint: disable=unused-argument
+    ):
         openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
 
-        lines = []
-        nodeIndex = 0
-        for openLoop in openLoops:
-            for node in openLoop.realNodes:
-                outputVariables = node.serialize(nodesToIndices).outputVariables
-                for variableIndex, outputVariable in enumerate(outputVariables):
-                    if not outputVariable:
-                        continue
+        realNodes = [n for l in openLoops for n in l.realNodes]
 
-                    index = equationNumber + nodeIndex * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE + variableIndex
-                    line = f"{outputVariable.name}=[{simulationUnit},{index}]"
-                    lines.append(line)
-                nodeIndex += 1
+        lines = self._getOutputLines(realNodes, nodesToIndices, equationNumber, simulationUnit)
 
         joinedLines = "\n".join(lines) + "\n"
         nLinesGenerated = len(lines)
-        nextEquationNumber = equationNumber + nodeIndex * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE
+        nextEquationNumber = equationNumber + len(realNodes) * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE
 
         return joinedLines, nextEquationNumber, nLinesGenerated
 
+    @staticmethod
+    def _getOutputLines(realNodes, nodesToIndices, equationNumber, simulationUnit):
+        lines = []
+        for nodeIndex, node in enumerate(realNodes):
+            outputVariables = node.serialize(nodesToIndices).outputVariables
+            for variableIndex, outputVariable in enumerate(outputVariables):
+                if not outputVariable:
+                    continue
+
+                index = equationNumber + nodeIndex * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE + variableIndex
+                line = f"{outputVariable.name}=[{simulationUnit},{index}]"
+                lines.append(line)
+        return lines
+
     def _getOpenLoopsAndNodeToIndices(self) -> _tp.Tuple[_tp.Sequence[_OpenLoop], _tp.Mapping[_mfn.NodeBase, int]]:
         internalPiping = self.getInternalPiping()
-        allNodesToIndices = {}
+        allNodesToIndices: _tp.Dict[_mfn.NodeBase, int] = {}
         openLoops = []
         for startingNode in internalPiping.openLoopsStartingNodes:
             realNodesAndPortItems = _mfn.getConnectedRealNodesAndPortItems(startingNode)
@@ -116,7 +120,14 @@ class MassFlowNetworkContributorMixin:
                     raise AssertionError("Hydraulics not connected.")
                 portItemsToIndices[portItem] = connectedRealNode.trnsysId
             realNodesToIndices = {n: n.trnsysId for n in realNodes}
-            nodesToIndices = portItemsToIndices | realNodesToIndices
+
+            # Jump through some hoops to make `mypy` type check this
+            # (see https://github.com/python/mypy/issues/1114)
+            nodesAndIndex = [
+                *list(portItemsToIndices.items()),
+                *list(realNodesToIndices.items()),
+            ]
+            nodesToIndices = dict(nodesAndIndex)
 
             allNodesToIndices |= nodesToIndices
         return openLoops, allNodesToIndices

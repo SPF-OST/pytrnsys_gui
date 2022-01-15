@@ -10,8 +10,8 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
-import massFlowSolver as _mfs
-from massFlowSolver import InternalPiping
+import trnsysGUI.massFlowSolver as _mfs
+from trnsysGUI.massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node

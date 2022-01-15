@@ -1,7 +1,7 @@
 import typing as _tp
 
-import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
 
 

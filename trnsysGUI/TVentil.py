@@ -5,10 +5,10 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QGraphicsTextItem
 
-import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
-from massFlowSolver import MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 

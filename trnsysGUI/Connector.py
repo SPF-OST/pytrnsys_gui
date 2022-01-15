@@ -4,8 +4,8 @@
 import typing as _tp
 
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from massFlowSolver.networkModel import Pipe, PortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver.networkModel import Pipe, PortItem
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 

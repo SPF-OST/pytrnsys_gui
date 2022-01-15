@@ -4,7 +4,7 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QMessageBox
 
-import massFlowSolver as _mfs  # type: ignore[attr-defined]
+from trnsysGUI import massFlowSolver as _mfs
 from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
