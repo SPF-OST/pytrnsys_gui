@@ -8,13 +8,14 @@ import PyQt5.QtWidgets as _qtw
 
 import dataclasses_jsonschema as _dcj
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _ser
-from massFlowSolver import InternalPiping  # type: ignore[attr-defined]
+from trnsysGUI.massFlowSolver import InternalPiping  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
 from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
+
 
 class DoublePipeConnection(ConnectionBase):
     def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):

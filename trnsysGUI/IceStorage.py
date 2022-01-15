@@ -7,8 +7,8 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-import massFlowSolver.networkModel as _mfn
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView

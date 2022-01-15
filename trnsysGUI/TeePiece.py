@@ -3,10 +3,10 @@
 
 import typing as _tp
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 

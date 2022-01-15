@@ -11,8 +11,8 @@ import dataclasses_jsonschema as _dcj
 
 import PyQt5.QtWidgets as _qtw
 
-import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.serialization as _ser

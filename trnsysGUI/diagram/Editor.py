@@ -31,7 +31,7 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
-import massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver as _mfs
 import pytrnsys.trnsys_util.deckUtils as _du
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs

@@ -6,7 +6,7 @@ import dataclasses_jsonschema as _dcj
 
 import trnsysGUI.images as _img
 import trnsysGUI.serialization as _ser
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 
 

@@ -7,11 +7,11 @@ import typing as _tp
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
 import trnsysGUI.storageTank.model as _model
 import trnsysGUI.storageTank.side as _sd
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
