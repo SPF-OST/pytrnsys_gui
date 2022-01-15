@@ -83,6 +83,8 @@ keyring==23.0.1
     # via twine
 kiwisolver==1.3.1
     # via matplotlib
+lark==1.0.0
+    # via pytrnsys-gui
 lazy-object-proxy==1.6.0
     # via astroid
 markupsafe==2.0.1

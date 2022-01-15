@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import setuptools
 import pathlib as _pl
 import itertools as _it
@@ -58,6 +55,7 @@ setuptools.setup(
             "images/*.svg",
             "templates/run.config",
             "templates/generic/*.ddck",
+            "ddck/ddck.lark"
         ]
     },
     data_files=_getDataFilePairs(),
@@ -71,7 +69,8 @@ setuptools.setup(
         "bokeh",
         "dataclasses_jsonschema",
         "appdirs",
-        "Jinja2"
+        "Jinja2",
+        "lark"
     ],
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",

@@ -1,0 +1,90 @@
+?start: ddck
+
+ddck: block+
+
+?block: equations | unit
+
+unit: header parameters inputs
+
+header: "UNIT" unit_number "TYPE" type_number
+
+unit_number: POSITIVE_INT
+
+type_number: POSITIVE_INT
+
+parameters: "PARAMETERS" number_of_parameters parameter+
+
+number_of_parameters: POSITIVE_INT
+
+parameter: variable_name
+    | SIGNED_NUMBER -> literal
+
+inputs: "INPUTS" number_of_inputs input+
+
+number_of_inputs: POSITIVE_INT
+
+input: variable_name
+    | SIGNED_NUMBER -> literal
+
+equations: "EQUATIONS" number_of_equations equation+
+
+number_of_equations: POSITIVE_INT
+
+equation: assignment_target "=" sum
+
+assignment_target: explicit_var_name
+
+?sum: product
+    | sum "+" product -> plus
+    | sum "-" product -> minus
+
+?product: atom
+    | product "*" atom -> times
+    | product "/" atom -> divided_by
+
+?atom: NUMBER -> number
+    | "-" atom -> negate
+    | variable_name
+    | output
+    | "(" sum ")"
+    | NAME "(" (sum ("," sum)* )? ")" -> func_call
+
+
+output: "[" unit_number "," output_number "]"
+
+output_number: INT
+
+?variable_name: explicit_var_name | computed_var_name
+
+explicit_var_name: "$" NAME -> shared_var
+    | NAME -> private_var
+
+computed_var_name: "@" port_name "." computed_var_name_type
+
+port_name: NAME
+
+!computed_var_name_type: "temp" | "mfr"
+
+NAME: LETTER (LETTER|DIGIT|"_")*
+
+POSITIVE_INT: POSITIVE_DIGIT DIGIT*
+
+POSITIVE_DIGIT: "1".."9"
+
+SIGNED_NUMBER: ("+"?|"-") NUMBER
+
+COMMENT: /(\*\*|!)[^\n]*/
+
+%import common.INT
+
+%import common.NUMBER
+
+%import common.LETTER
+
+%import common.DIGIT
+
+%import common.WS
+
+%ignore COMMENT
+
+%ignore WS
