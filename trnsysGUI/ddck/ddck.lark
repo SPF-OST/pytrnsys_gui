@@ -54,16 +54,19 @@ output: "[" unit_number "," output_number "]"
 
 output_number: INT
 
-?variable_name: explicit_var_name | computed_var_name
+?variable_name: explicit_var_name
+    | COMPUTED_VAR_NAME -> computed_var
 
-explicit_var_name: "$" NAME -> shared_var
+explicit_var_name: SHARED_VAR_NAME -> shared_var
     | NAME -> private_var
 
-computed_var_name: "@" port_name "." computed_var_name_type
+SHARED_VAR_NAME: "$" NAME
 
-port_name: NAME
+COMPUTED_VAR_NAME: "@" PORT_NAME "." PORT_PROPERTY
 
-!computed_var_name_type: "temp" | "mfr"
+PORT_NAME: NAME
+
+PORT_PROPERTY: "temp" | "mfr"
 
 NAME: LETTER (LETTER|DIGIT|"_")*
 
