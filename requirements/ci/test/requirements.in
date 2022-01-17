@@ -8,4 +8,6 @@ pylint
 
 PyQT5-stubs
 
+pydot
+
 -e file:.#egg=pytrnsys-gui

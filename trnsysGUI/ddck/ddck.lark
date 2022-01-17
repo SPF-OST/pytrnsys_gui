@@ -2,11 +2,11 @@
 
 ddck: block+
 
-?block: equations | unit
+?block: equations | constants | unit | assign
 
-unit: header parameters inputs
+unit: header parameters inputs [labels]
 
-header: "UNIT" unit_number "TYPE" type_number
+header: "UNIT"i unit_number "TYPE"i type_number
 
 unit_number: POSITIVE_INT
 
@@ -25,6 +25,16 @@ number_of_inputs: POSITIVE_INT
 
 input: variable_name
     | SIGNED_NUMBER -> literal
+
+labels: "LABELS" number_of_labels label+
+
+number_of_labels: POSITIVE_INT
+
+label: NAME
+
+constants: "CONSTANTS" number_of_constants equation+
+
+number_of_constants: POSITIVE_INT
 
 equations: "EQUATIONS" number_of_equations equation+
 
@@ -64,6 +74,14 @@ output_number: INT
 
 explicit_var_name: SHARED_VAR_NAME -> shared_var
     | NAME -> private_var
+
+assign: "ASSIGN" file_path logical_unit
+
+file_path: FILE_PATH
+
+logical_unit: INT | NAME
+
+FILE_PATH: /[A-Za-z_\-\\:\.]+/
 
 SHARED_VAR_NAME: "$" NAME
 
