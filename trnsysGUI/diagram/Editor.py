@@ -12,7 +12,7 @@ from math import sqrt
 
 import pytrnsys.trnsys_util.deckUtils as _du
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF
+from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF, QEvent
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
@@ -390,40 +390,70 @@ class Editor(QWidget):
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
-        if self._currentlyDraggedConnectionFromPort:
-            tempx = self._currentlyDraggedConnectionFromPort.scenePos().x()
-            tempy = self._currentlyDraggedConnectionFromPort.scenePos().y()
-            posx = event.scenePos().x()
-            posy = event.scenePos().y()
+        """
+        This function is for dragging and connecting one port to another.
+        When dragging, the fromPort will remain enlarged and black in color and when the toPort is hovered over, it will be
+        enlarged and turn red.
+        A port's details will also be displayed at the widget when they are hovered over.
+        """
+        fromPort = self._currentlyDraggedConnectionFromPort
+        if not fromPort:
+            return
 
-            self.connLineItem.setVisible(True)
-            self.connLine.setLine(tempx, tempy, posx, posy)
-            self.connLineItem.setLine(self.connLine)
-            self.connLineItem.setVisible(True)
+        fromX = fromPort.scenePos().x()
+        fromY = fromPort.scenePos().y()
 
-            fromPort = self._currentlyDraggedConnectionFromPort
+        toX = event.scenePos().x()
+        toY = event.scenePos().y()
 
-            mousePosition = event.scenePos()
-            relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
+        self.connLine.setLine(fromX, fromY, toX, toY)
+        self.connLineItem.setLine(self.connLine)
+        self.connLineItem.setVisible(True)
 
-            numberOfHitPortsItems = len(relevantPortItems)
+        hitPortItem = self._getHitPortItemOrNone(event)
 
-            if numberOfHitPortsItems > 1:
-                raise NotImplementedError("Can't deal with overlapping port items.")
+        if not hitPortItem:
+            return
 
-            if numberOfHitPortsItems == 1:
-                toPort = relevantPortItems[0]
+        mousePosition = event.scenePos()
 
-                x_coordinate = toPort.scenePos().x()
-                y_coordinate = toPort.scenePos().y()
+        portItemX = hitPortItem.scenePos().x()
+        portItemY = hitPortItem.scenePos().y()
 
-                distance = sqrt((mousePosition.x() - x_coordinate) ** 2 + (mousePosition.y() - y_coordinate) ** 2)
-                if distance <= 3.5:
-                    toPort.setRect(-4, -4, 10, 10)
-                    toPort.innerCircle.setRect(-4, -4, 10, 10)
-                else:
-                    toPort.setRect(-4, -4, 7, 7)
-                    toPort.innerCircle.setRect(-4, -4, 6.5, 6.5)
+        distance = sqrt((mousePosition.x() - portItemX) ** 2 + (mousePosition.y() - portItemY) ** 2)
+        if distance <= 3.5:
+            hitPortItem.setRect(-4, -4, 10, 10)
+            hitPortItem.innerCircle.setRect(-4, -4, 10, 10)
+            hitPortItem.innerCircle.setBrush(hitPortItem.ashColorR)
+            fromPort._debugClear()
+            hitPortItem._debugprint()
+        else:
+            hitPortItem.setRect(-4, -4, 7, 7)
+            hitPortItem.innerCircle.setRect(-4, -4, 6.5, 6.5)
+            hitPortItem.innerCircle.setBrush(hitPortItem.visibleColor)
+            hitPortItem._debugClear()
+            fromPort._debugprint()
+
+        fromPort.setRect(-4, -4, 10, 10)
+        fromPort.innerCircle.setRect(-4, -4, 10, 10)
+        fromPort.innerCircle.setBrush(hitPortItem.visibleColor)
+
+    def _getHitPortItemOrNone(self, event: QEvent) -> _tp.Optional[PortItemBase]:
+        fromPort = self._currentlyDraggedConnectionFromPort
+        mousePosition = event.scenePos()
+
+        relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
+        if not relevantPortItems:
+            return None
+
+        numberOfHitPortsItems = len(relevantPortItems)
+        if numberOfHitPortsItems > 1:
+            raise NotImplementedError("Can't deal with overlapping port items.")
+
+
+        hitPortItem = relevantPortItems[0]
+
+        return hitPortItem
 
     def sceneMouseReleaseEvent(self, event):
         if not self._currentlyDraggedConnectionFromPort:

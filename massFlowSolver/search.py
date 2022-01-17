@@ -42,14 +42,14 @@ def _expandPortItemSetByOneLayer(
 
     connectionPortItems = {p for c in relevantConnections for p in [c.fromPort, c.toPort]}
 
-    internalPortItems = {mpi for p in portItems for mpi in _getInternallyConnectedPortItems(p)}
+    internalPortItems = {mpi for p in portItems for mpi in getInternallyConnectedPortItems(p)}
 
     portItems = connectionPortItems | internalPortItems
 
     return portItems, relevantConnections
 
 
-def _getInternallyConnectedPortItems(
+def getInternallyConnectedPortItems(
     port: _spi.SinglePipePortItem,  # type: ignore[name-defined]
 ) -> _tp.Sequence[_spi.SinglePipePortItem]:  # type: ignore[name-defined]
     contributor: _mfs.MassFlowNetworkContributorMixin = port.parent  # type: ignore[name-defined]
