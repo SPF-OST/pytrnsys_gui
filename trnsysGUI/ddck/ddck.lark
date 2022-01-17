@@ -47,8 +47,13 @@ assignment_target: explicit_var_name
     | variable_name
     | output
     | "(" sum ")"
-    | NAME "(" (sum ("," sum)* )? ")" -> func_call
+    | func_call
 
+func_call: func_name func_args -> func_call
+
+func_args: "(" (sum ("," sum)* )? ")"
+
+func_name: NAME
 
 output: "[" unit_number "," output_number "]"
 
