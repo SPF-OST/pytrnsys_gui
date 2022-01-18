@@ -4,10 +4,9 @@ import typing as _tp
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
+import trnsysGUI.common as _com
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.singlePipePortItem as _spi
-
-from . import _helpers
 
 
 def getReachableConnections(
@@ -33,7 +32,7 @@ def _expandPortItemSetByOneLayer(
         ignoreConnections = set()
 
     connectedPortItems = [pi for pi in portItems if pi.connectionList]
-    connections = [_helpers.getSingle(pi.connectionList) for pi in connectedPortItems]
+    connections = [_com.getSingle(pi.connectionList) for pi in connectedPortItems]
     relevantConnections = {
         c
         for c in connections

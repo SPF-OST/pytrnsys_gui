@@ -28,8 +28,8 @@ class Collector(BlockItem, MassFlowNetworkContributorMixin):
         self.addTree()
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem()
-        outputPort = _mfn.PortItem()
+        inputPort = _mfn.PortItem("Collector Input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("Collector Output", _mfn.PortItemType.OUTPUT)
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 
         return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})

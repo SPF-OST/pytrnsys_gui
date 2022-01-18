@@ -5,7 +5,7 @@ import typing as _tp
 
 import trnsysGUI.images as _img
 from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from massFlowSolver.networkModel import Pipe, PortItem
+from massFlowSolver.networkModel import Pipe, PortItem, PortItemType
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
@@ -23,8 +23,8 @@ class Connector(BlockItem, MassFlowNetworkContributorMixin):
         self.changeSize()
 
     def getInternalPiping(self) -> InternalPiping:
-        fromPort = PortItem()
-        toPort = PortItem()
+        fromPort = PortItem("Connector Input", PortItemType.INPUT)
+        toPort = PortItem("Connector Output", PortItemType.OUTPUT)
         pipe = Pipe(self.name, self.trnsysId, fromPort, toPort)
         return InternalPiping([pipe], {fromPort: self.inputs[0], toPort: self.outputs[0]})
 

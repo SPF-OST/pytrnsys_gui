@@ -83,9 +83,15 @@ class NodeBase(_abc.ABC):
     def getNeighbours(self) -> _tp.Sequence["NodeBase"]:
         raise NotImplementedError()
 
+class PortItemType(_enum.Enum):
+    INPUT = "Input"
+    OUTPUT = "Output"
 
 @_dc.dataclass(eq=False)
 class PortItem(NodeBase, _abc.ABC):
+    name: str
+    type: PortItemType
+
     def getNeighbours(self) -> _tp.Sequence[NodeBase]:
         return []
 

@@ -24,9 +24,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
-        self.inputs.append(SinglePipePortItem("o", 0, self))
-        self.inputs.append(SinglePipePortItem("o", 1, self))
-        self.outputs.append(SinglePipePortItem("i", 2, self))
+        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(SinglePipePortItem("i", 1, self))
+        self.outputs.append(SinglePipePortItem("o", 2, self))
 
         self.changeSize()
 
@@ -168,9 +168,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         return _mfs.InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
 
     def _getModelAndMapping(self):
-        input1 = _mfn.PortItem()
-        input2 = _mfn.PortItem()
-        output = _mfn.PortItem()
+        input1 = _mfn.PortItem("TVentil Input 1", _mfn.PortItemType.INPUT)
+        input2 = _mfn.PortItem("TVentil Input 2", _mfn.PortItemType.INPUT)
+        output = _mfn.PortItem("TVentil Output", _mfn.PortItemType.OUTPUT)
         teePiece = _mfn.Diverter(self.displayName, self.trnsysId, output, input1, input2)
         modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
         return teePiece, modelPortItemsToGraphicalPortItem

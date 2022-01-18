@@ -434,10 +434,10 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         heatExchangerPortItems = {}
         heatExchangerNodes = []
         for heatExchanger in self.heatExchangers:
-            heatExchangerPortItem1 = _mfn.PortItem()
+            heatExchangerPortItem1 = _mfn.PortItem("Heat Exchanger Input", _mfn.PortItemType.INPUT)
             heatExchangerPortItems[heatExchangerPortItem1] = heatExchanger.port1
 
-            heatExchangerPortItem2 = _mfn.PortItem()
+            heatExchangerPortItem2 = _mfn.PortItem("Heat Exchanger Output", _mfn.PortItemType.OUTPUT)
             heatExchangerPortItems[heatExchangerPortItem2] = heatExchanger.port2
 
             name = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
@@ -451,10 +451,10 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         portPairsPortItems = {}
         portPairNodes = []
         for directPortPair in self.directPortPairs:
-            portPairPortItem1 = _mfn.PortItem()
+            portPairPortItem1 = _mfn.PortItem("Input", _mfn.PortItemType.INPUT)
             portPairsPortItems[portPairPortItem1] = directPortPair.fromPort
 
-            portPairPortItem2 = _mfn.PortItem()
+            portPairPortItem2 = _mfn.PortItem("Output", _mfn.PortItemType.OUTPUT)
             portPairsPortItems[portPairPortItem2] = directPortPair.toPort
 
             portPairName = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)

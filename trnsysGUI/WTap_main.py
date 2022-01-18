@@ -16,7 +16,7 @@ class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 40
         self.h = 40
 
-        self.outputs.append(SinglePipePortItem("o", 0, self))
+        self.outputs.append(SinglePipePortItem("i", 0, self))
 
         self.changeSize()
 
@@ -61,6 +61,6 @@ class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
         return resStr, equationNr
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem()
+        inputPort = _mfn.PortItem("WTap Input", _mfn.PortItemType.INPUT)
         sink = _mfn.Source(self.displayName, self.trnsysId, inputPort)
         return InternalPiping([sink], {inputPort: self.outputs[0]})

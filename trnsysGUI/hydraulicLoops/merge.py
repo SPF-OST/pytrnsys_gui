@@ -3,12 +3,14 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
+import trnsysGUI.common
 import trnsysGUI.singlePipePortItem as _spi
 
-from . import _search
 from . import common as _common
 from . import model as _model, _helpers
 from ._dialogs.merge import dialog as _md
+
+from massFlowSolver import search as _search
 
 if _tp.TYPE_CHECKING:
     from trnsysGUI.connection import singlePipeConnection as _spc
@@ -171,5 +173,5 @@ def _getLoopIgnoringConnection(
         return None
 
     loops = {hydraulicLoops.getLoopForExistingConnection(c) for c in connections}
-    loop = _helpers.getSingle(loops)
+    loop = trnsysGUI.common.getSingle(loops)
     return loop

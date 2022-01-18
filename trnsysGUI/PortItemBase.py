@@ -221,45 +221,49 @@ class PortItemBase(QGraphicsEllipseItem):
     def hoverEnterEvent(self, event):
         self.logger.debug(self.parent)
 
-        self.setRect(-4, -4, 10, 10)
-        self.innerCircle.setRect(-4, -4, 10, 10)
-        if self.name == "i":
-            self.innerCircle.setBrush(self.visibleColor)
-        if self.name == "o":
-            self.innerCircle.setBrush(self.visibleColor)
+        self.enlargePortSize()
 
-        from massFlowSolver import search as _search
-        connected = list(_search.getInternallyConnectedPortItems(self))
-        for c in connected:
-            c.innerCircle.setBrush(self.ashColorB)
+        self.highlightInternallyConnectedPortItems()
 
         self._debugprint()
 
-    def hoverLeaveEvent(self, event):
-        self.setRect(-4, -4, 7, 7)
-        self.innerCircle.setRect(-4, -4, 6.5, 6.5)
-        if len(self.connectionList) == 0:
-            if self.name == "i":
-                self.innerCircle.setBrush(self.visibleColor)
-            if self.name == "o":
-                self.innerCircle.setBrush(self.visibleColor)
-
+    def highlightInternallyConnectedPortItems(self):
         from massFlowSolver import search as _search
-        connected = list(_search.getInternallyConnectedPortItems(self))
-        for c in connected:
-            c.innerCircle.setBrush(self.visibleColor)
+        internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
+        for portItem in internallyConnectedPortItems:
+            portItem.innerCircle.setBrush(self.ashColorB)
+
+    def enlargePortSize(self):
+        self.setRect(-4, -4, 10, 10)
+        self.innerCircle.setRect(-4, -4, 10, 10)
+
+    def hoverLeaveEvent(self, event):
+        self.defaultPortSize()
+
+        self.unhighlightInternallyConnectedPortItems()
 
         self._debugClear()
 
+    def unhighlightInternallyConnectedPortItems(self):
+        from massFlowSolver import search as _search
+        internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
+        for portItem in internallyConnectedPortItems:
+            portItem.innerCircle.setBrush(self.visibleColor)
+
+    def defaultPortSize(self):
+        self.setRect(-4, -4, 7, 7)
+        self.innerCircle.setRect(-4, -4, 6.5, 6.5)
+
     def _debugprint(self):
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
+
         internalPiping = self.parent.getInternalPiping()
         portItemsAndInternalRealNode = internalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(self)
         portItems = [pr.portItem for pr in portItemsAndInternalRealNode]
         formattedPortItems = [f"{p.name} ({p.type.value})" for p in portItems]
         jointFormattedPortItems = ", ".join(formattedPortItems)
-
         self.parent.parent.parent().listV.addItem(f"Names: {jointFormattedPortItems}")
+
         self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)
 
         self.parent.parent.parent().listV.addItem("Connections:")

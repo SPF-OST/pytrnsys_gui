@@ -422,20 +422,17 @@ class Editor(QWidget):
 
         distance = sqrt((mousePosition.x() - portItemX) ** 2 + (mousePosition.y() - portItemY) ** 2)
         if distance <= 3.5:
-            hitPortItem.setRect(-4, -4, 10, 10)
-            hitPortItem.innerCircle.setRect(-4, -4, 10, 10)
+            hitPortItem.enlargePortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.ashColorR)
             fromPort._debugClear()
             hitPortItem._debugprint()
         else:
-            hitPortItem.setRect(-4, -4, 7, 7)
-            hitPortItem.innerCircle.setRect(-4, -4, 6.5, 6.5)
+            hitPortItem.defaultPortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.visibleColor)
             hitPortItem._debugClear()
             fromPort._debugprint()
 
-        fromPort.setRect(-4, -4, 10, 10)
-        fromPort.innerCircle.setRect(-4, -4, 10, 10)
+        fromPort.enlargePortSize()
         fromPort.innerCircle.setBrush(hitPortItem.visibleColor)
 
     def _getHitPortItemOrNone(self, event: QEvent) -> _tp.Optional[PortItemBase]:
@@ -449,7 +446,6 @@ class Editor(QWidget):
         numberOfHitPortsItems = len(relevantPortItems)
         if numberOfHitPortsItems > 1:
             raise NotImplementedError("Can't deal with overlapping port items.")
-
 
         hitPortItem = relevantPortItems[0]
 

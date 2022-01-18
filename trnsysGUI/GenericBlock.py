@@ -264,8 +264,8 @@ class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
         pipes = []
         portItems = {}
         for i, (graphicalInputPort, graphicalOutputPort) in enumerate(zip(self.inputs, self.outputs)):
-            inputPort = _mfn.PortItem()
-            outputPort = _mfn.PortItem()
+            inputPort = _mfn.PortItem(f"Input {i+1}", _mfn.PortItemType.INPUT)
+            outputPort = _mfn.PortItem(f"Output {i+1}", _mfn.PortItemType.OUTPUT)
             pipe = _mfn.Pipe(f"{self.displayName}X{i}", self.childIds[0], inputPort, outputPort)
 
             pipes.append(pipe)

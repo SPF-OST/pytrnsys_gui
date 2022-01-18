@@ -69,9 +69,9 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         return internalPiping
 
     def _getModelAndMapping(self):
-        input1 = _mfn.PortItem()
-        input2 = _mfn.PortItem()
-        output = _mfn.PortItem()
+        input1 = _mfn.PortItem("Tee Piece Input 1", _mfn.PortItemType.INPUT)
+        input2 = _mfn.PortItem("Tee Piece Input 2", _mfn.PortItemType.INPUT)
+        output = _mfn.PortItem("Tee Piece Output", _mfn.PortItemType.OUTPUT)
         teePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input1, input2, output)
         modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
         return teePiece, modelPortItemsToGraphicalPortItem

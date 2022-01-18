@@ -24,19 +24,17 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
 
         self.inputs.append(SinglePipePortItem("i", 0, self))
         self.inputs.append(SinglePipePortItem("i", 2, self))
-        # self.inputs.append(SinglePipePortItem("i", 2, self))
 
 
         self.outputs.append(SinglePipePortItem("o", 0, self))
         self.outputs.append(SinglePipePortItem("o", 2, self))
-        #self.outputs.append(SinglePipePortItem("o", 2, self))
+
         self.loadedFiles = []
 
         # For restoring correct order of trnsysObj list
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
-        #self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
         self.changeSize()
         self.addTree()
@@ -188,12 +186,12 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        condenserInput = _mfn.PortItem()
-        condenserOutput = _mfn.PortItem()
+        condenserInput = _mfn.PortItem("Condenser Input", _mfn.PortItemType.INPUT)
+        condenserOutput = _mfn.PortItem("Condenser Output", _mfn.PortItemType.OUTPUT)
         condenserPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], condenserInput, condenserOutput)
 
-        evaporatorInput = _mfn.PortItem()
-        evaporatorOutput = _mfn.PortItem()
+        evaporatorInput = _mfn.PortItem("Evaporator Input", _mfn.PortItemType.INPUT)
+        evaporatorOutput = _mfn.PortItem("Evaporator Output", _mfn.PortItemType.OUTPUT)
         evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[1], evaporatorInput, evaporatorOutput)
 
         modelPortItemsToGraphicalPortItem = {
