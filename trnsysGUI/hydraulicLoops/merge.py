@@ -3,14 +3,12 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
-import trnsysGUI.common
+import massFlowSolver.search as _search
+import trnsysGUI.common as _com
 import trnsysGUI.singlePipePortItem as _spi
-
-from . import common as _common
+from . import common as _lcom
 from . import model as _model, _helpers
 from ._dialogs.merge import dialog as _md
-
-from massFlowSolver import search as _search
 
 if _tp.TYPE_CHECKING:
     from trnsysGUI.connection import singlePipeConnection as _spc
@@ -18,8 +16,8 @@ if _tp.TYPE_CHECKING:
 
 @_dc.dataclass
 class MergeSummary:
-    before: _common.SplitLoopsSummary
-    after: _common.MergedLoopSummary
+    before: _lcom.SplitLoopsSummary
+    after: _lcom.MergedLoopSummary
 
     @staticmethod
     def fromLoops(
@@ -27,8 +25,8 @@ class MergeSummary:
         toLoop: _model.HydraulicLoop,
         mergedLoop: _model.HydraulicLoop,
     ) -> "MergeSummary":
-        splitLoopsSummary = _common.SplitLoopsSummary.fromLoops(fromLoop, toLoop)
-        mergedLoopSummary = _common.MergedLoopSummary.fromLoop(mergedLoop)
+        splitLoopsSummary = _lcom.SplitLoopsSummary.fromLoops(fromLoop, toLoop)
+        mergedLoopSummary = _lcom.MergedLoopSummary.fromLoop(mergedLoop)
         mergeSummary = MergeSummary(splitLoopsSummary, mergedLoopSummary)
         return mergeSummary
 
@@ -38,8 +36,8 @@ def merge(
     hydraulicLoops: _model.HydraulicLoops,
     fluids: _tp.Sequence[_model.Fluid],
     defaultFluid: _model.Fluid,
-    mergedLoopSummary: _tp.Optional[_common.MergedLoopSummary] = None,
-) -> _common.Cancellable[_tp.Optional[MergeSummary]]:
+    mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary] = None,
+) -> _lcom.Cancellable[_tp.Optional[MergeSummary]]:
     merger = _Merger(hydraulicLoops, fluids, defaultFluid)
 
     return merger.merge(connection, mergedLoopSummary)
@@ -56,8 +54,8 @@ class _Merger:
     def merge(
         self,
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
-        mergedLoopSummary: _tp.Optional[_common.MergedLoopSummary],
-    ) -> _common.Cancellable[_tp.Optional[MergeSummary]]:
+        mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary],
+    ) -> _lcom.Cancellable[_tp.Optional[MergeSummary]]:
         fromLoop, toLoop = getFromAndToLoopForNewlyCreatedConnection(self._hydraulicLoops, connection)
 
         if not fromLoop and not toLoop:
@@ -97,15 +95,15 @@ class _Merger:
         fromLoop: _model.HydraulicLoop,
         toLoop: _model.HydraulicLoop,
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
-        mergedLoopSummary: _tp.Optional[_common.MergedLoopSummary],
-    ) -> _common.Cancellable[MergeSummary]:
+        mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary],
+    ) -> _lcom.Cancellable[MergeSummary]:
         connections = [*fromLoop.connections, connection, *toLoop.connections]
-        _common.setConnectionsSelected(connections, True)
+        _lcom.setConnectionsSelected(connections, True)
 
         if not mergedLoopSummary:
             mergedLoopSummary = self._askUserForMergedLoopSummaryOrNone(fromLoop, toLoop)
 
-        _common.setConnectionsSelected(connections, False)
+        _lcom.setConnectionsSelected(connections, False)
 
         if not mergedLoopSummary:
             return "cancelled"
@@ -121,13 +119,13 @@ class _Merger:
 
     def _askUserForMergedLoopSummaryOrNone(
         self, loop1: _model.HydraulicLoop, loop2: _model.HydraulicLoop
-    ) -> _tp.Optional[_common.MergedLoopSummary]:
+    ) -> _tp.Optional[_lcom.MergedLoopSummary]:
         mergedName = self._getMergedNameOrNone(loop1.name, loop2.name)
         areSameFluids = loop1.fluid == loop2.fluid
 
         if areSameFluids and mergedName:
             mergedFluid = loop1.fluid
-            return _common.MergedLoopSummary(mergedName, mergedFluid)
+            return _lcom.MergedLoopSummary(mergedName, mergedFluid)
 
         allNames = {l.name.value for l in self._hydraulicLoops.hydraulicLoops}
         occupiedNames = allNames - {loop1.name.value, loop2.name.value}
@@ -173,5 +171,5 @@ def _getLoopIgnoringConnection(
         return None
 
     loops = {hydraulicLoops.getLoopForExistingConnection(c) for c in connections}
-    loop = trnsysGUI.common.getSingle(loops)
+    loop = _com.getSingle(loops)
     return loop

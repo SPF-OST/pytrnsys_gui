@@ -3,12 +3,11 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
+import massFlowSolver.search as _search
 from . import _helpers
 from . import common as _common
 from . import model as _model
 from ._dialogs.split import dialog as _dialog
-
-from massFlowSolver import search as _search
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc

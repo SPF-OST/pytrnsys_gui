@@ -1,10 +1,8 @@
 import typing as _tp
 
+import massFlowSolver.search as _search
 from trnsysGUI import singlePipePortItem as _spi
 from trnsysGUI.connection import singlePipeConnection as _spc
-
-from massFlowSolver import search as _search
-
 from . import model as _model
 
 

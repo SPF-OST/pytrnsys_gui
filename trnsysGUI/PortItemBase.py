@@ -234,6 +234,9 @@ class PortItemBase(QGraphicsEllipseItem):
             portItem.innerCircle.setBrush(self.ashColorB)
 
     def enlargePortSize(self):
+        if self.savedPos == False:
+            self.setPos(self.pos().x()  - 3, self.pos().y() - 3)
+            self.savedPos = True
         self.setRect(-4, -4, 10, 10)
         self.innerCircle.setRect(-4, -4, 10, 10)
 
@@ -251,6 +254,9 @@ class PortItemBase(QGraphicsEllipseItem):
             portItem.innerCircle.setBrush(self.visibleColor)
 
     def defaultPortSize(self):
+        if self.savedPos == True:
+            self.setPos(self.pos().x() + 3, self.pos().y() + 3)
+            self.savedPos = False
         self.setRect(-4, -4, 7, 7)
         self.innerCircle.setRect(-4, -4, 6.5, 6.5)
 
