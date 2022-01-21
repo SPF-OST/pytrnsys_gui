@@ -120,8 +120,8 @@ class SinglePipeConnection(_cb.ConnectionBase):
         self.setMassLabelPos(model.massFlowLabelPos)
 
     def getInternalPiping(self) -> _mfs.InternalPiping:
-        fromPort = _mfn.PortItem()
-        toPort = _mfn.PortItem()
+        fromPort = _mfn.PortItem("Input", _mfn.PortItemType.INPUT)
+        toPort = _mfn.PortItem("Output", _mfn.PortItemType.OUTPUT)
 
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
         return _mfs.InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
