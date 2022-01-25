@@ -7,13 +7,13 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-import massFlowSolver.networkModel as _mfn
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
-import trnsysGUI.images as _img
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
@@ -21,8 +21,8 @@ class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
         super(IceStorage, self).__init__(trnsysType, parent, **kwargs)
         self.w = 120
         self.h = 120
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.changeSize()
@@ -102,29 +102,6 @@ class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
-
-    def updateTreePath(self, path):
-        """
-        When the user chooses the project path for the file explorers, this method is called
-        to update the root path.
-        """
-        pathName = self.displayName
-        self.path = os.path.join(path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        self.model.setRootPath(self.path)
-        self.tree.setRootIndex(self.model.index(self.path))
 
     def deleteBlock(self):
         """

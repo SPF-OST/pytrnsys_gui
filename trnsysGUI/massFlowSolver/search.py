@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import typing as _tp
 
-import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
 import trnsysGUI.common as _com
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.singlePipePortItem as _spi
 
@@ -78,10 +78,3 @@ def getInternallyConnectedPortItems(
     incidentInternallyConnectedPortItems = allIncidentInternallyConnectedPortItems[0]
 
     return incidentInternallyConnectedPortItems
-
-
-def _getSingle(
-    connectionList: _tp.Sequence[_spc.SinglePipeConnection],  # type: ignore[name-defined]
-) -> _spc.SinglePipeConnection:  # type: ignore[name-defined]
-    assert len(connectionList) == 1
-    return connectionList[0]

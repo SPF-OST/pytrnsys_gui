@@ -5,11 +5,11 @@ import typing as _tp
 
 import numpy as np
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class Pump(BlockItem, MassFlowNetworkContributorMixin):
@@ -19,8 +19,8 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
         self.h = 40
         self.rndPwr = np.random.randint(0, 1000)
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         self.changeSize()
 

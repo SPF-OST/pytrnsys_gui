@@ -3,11 +3,11 @@
 
 import typing as _tp
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
@@ -17,9 +17,9 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 40
         self.h = 40
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 1, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
 
         self.changeSize()
 

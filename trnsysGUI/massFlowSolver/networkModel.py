@@ -45,7 +45,9 @@ class Parameters:
     neighbourIndices: _tp.Tuple[int, int, int]
 
     def toString(self, secondColumnIndent: int) -> str:
-        firstColumn = f"{self.neighbourIndices[0]} {self.neighbourIndices[1]} {self.neighbourIndices[2]} {self.nodeType} "
+        firstColumn = (
+            f"{self.neighbourIndices[0]} {self.neighbourIndices[1]} {self.neighbourIndices[2]} {self.nodeType} "
+        )
         secondColumn = f"!{self.index} : {self.name}"
 
         line = f"{firstColumn.ljust(secondColumnIndent)}{secondColumn}"
@@ -99,14 +101,14 @@ class PortItem(NodeBase, _abc.ABC):
         return f"<PortItem object at 0x{id(self):x}>"
 
 
-@_dc.dataclass(eq=False)
+@_dc.dataclass(eq=False)  # type: ignore[misc]
 class RealNodeBase(NodeBase, _abc.ABC):
     name: str
     trnsysId: int
 
     def serialize(self, nodesToIndices: _tp.Mapping[NodeBase, int]) -> SerializedNode:
         parameters = self._getParameters(nodesToIndices)
-        inputVariable = self._getInputVariable()
+        inputVariable = self._getInputVariable()  # pylint: disable=assignment-from-none
         outputVariables = self._getOutputVariables()
         return SerializedNode(parameters, inputVariable, outputVariables)
 
@@ -123,7 +125,7 @@ class RealNodeBase(NodeBase, _abc.ABC):
     def _getNeighbourIndices(self, nodesToIndices: _tp.Mapping["NodeBase", int]) -> _tp.Tuple[int, int, int]:
         raise NotImplementedError()
 
-    def _getInputVariable(self) -> _tp.Optional[InputVariable]:
+    def _getInputVariable(self) -> _tp.Optional[InputVariable]:  # pylint: disable=no-self-use
         return None
 
     def _getOutputVariables(self) -> OutputVariables:
@@ -144,7 +146,7 @@ class RealNodeBase(NodeBase, _abc.ABC):
         raise NotImplementedError()
 
 
-@_dc.dataclass(eq=False)
+@_dc.dataclass(eq=False)  # type: ignore[misc]
 class OneNeighbourBase(RealNodeBase, _abc.ABC):
     neighbour: NodeBase
 
@@ -179,7 +181,7 @@ class Sink(OneNeighbourBase):
         return 2
 
 
-@_dc.dataclass(eq=False)
+@_dc.dataclass(eq=False)  # type: ignore[misc]
 class TwoNeighboursBase(RealNodeBase, _abc.ABC):
     fromNode: NodeBase
     toNode: NodeBase
@@ -218,7 +220,7 @@ class Pump(TwoNeighboursBase):
         return InputVariable(f"Mfr{self.name}")
 
 
-@_dc.dataclass(eq=False)
+@_dc.dataclass(eq=False)  # type: ignore[misc]
 class ThreeNeighboursBase(RealNodeBase, _abc.ABC):
     node1: NodeBase
     node2: NodeBase

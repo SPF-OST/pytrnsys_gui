@@ -2,15 +2,13 @@
 # type: ignore
 
 import json
+import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
 import shutil
 import typing as _tp
 
-from math import sqrt
-
-import pytrnsys.trnsys_util.deckUtils as _du
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF, QEvent
 from PyQt5.QtGui import QColor, QPainter
@@ -34,13 +32,15 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
+import pytrnsys.trnsys_util.deckUtils as _du
+
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
-import massFlowSolver as _mfs
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver as _mfs
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
@@ -50,6 +50,7 @@ from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
+from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
@@ -59,19 +60,18 @@ from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSingleP
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.Encoder import Encoder
-from trnsysGUI.diagram.Scene import Scene
-from trnsysGUI.diagram.View import View
+from trnsysGUI.diagram.scene import Scene
+from trnsysGUI.diagram.view import View
 from trnsysGUI.diagramDlg import diagramDlg
 from trnsysGUI.doublePipeBlockDlg import DoublePipeBlockDlg
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.idGenerator import IdGenerator
-from trnsysGUI.newDiagramDlg import newDiagramDlg
 from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
-from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
+
 
 class Editor(QWidget):
     """
@@ -96,13 +96,6 @@ class Editor(QWidget):
     A diagram can be saved to a json file by calling encodeDiagram and can then be loaded by calling decodeDiagram wiht
     appropiate filenames.
 
-    Function of copy-paste:
-    Copying a rectangular part of the diagram to the clipboard is just encoding the diagram to the file clipboard.json,
-    and pasting will load the clipboard using a slighly different decoder than for loading an entire diagram.
-    When the elements are pasted, they compose a group which can be dragged around and is desintegrated when the mouse
-    is released.
-    It is controlled by the attribute selectionMode.
-
     Attributes
     ----------
     projectFolder : str
@@ -113,15 +106,9 @@ class Editor(QWidget):
         Default saving location is trnsysGUI/diagrams, path only set if "save as" used
     idGen : :obj:`IdGenerator`
         Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
-    selectionMode : bool
-        Enables/disables selection rectangle in Scene
     alignMode : bool
         Enables mode in which a dragged block is aligned to y or x value of another one
         Toggled in the MainWindow class in toggleAlignMode()
-    pasting : bool
-        Used to allow dragging of the copygroup right after pasting. Set to true after decodingPaste is called.
-        Set to false as soon as releasedMouse after decodePaste.
-    itemsSelected : bool
 
     editorMode : int
         Mode 0: Pipes are PolySun-like
@@ -170,12 +157,7 @@ class Editor(QWidget):
         self.controlExists = 0
         self.controlDirectory = ""
 
-        self.selectionMode = False
-
         self.alignMode = False
-
-        self.pasting = False
-        self.itemsSelected = False
 
         self.moveDirectPorts = False
 
@@ -420,7 +402,7 @@ class Editor(QWidget):
         portItemX = hitPortItem.scenePos().x()
         portItemY = hitPortItem.scenePos().y()
 
-        distance = sqrt((mousePosition.x() - portItemX) ** 2 + (mousePosition.y() - portItemY) ** 2)
+        distance = _math.sqrt((mousePosition.x() - portItemX) ** 2 + (mousePosition.y() - portItemY) ** 2)
         if distance <= 3.5:
             hitPortItem.enlargePortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.ashColorR)
@@ -725,27 +707,14 @@ class Editor(QWidget):
         -------
 
         """
+        self.hydraulicLoops.clear()
+
         while len(self.trnsysObj) > 0:
             self.logger.info("In deleting...")
             self.trnsysObj[0].deleteBlock()
 
         while len(self.graphicalObj) > 0:
             self.graphicalObj[0].deleteBlock()
-
-    def newDiagram(self):
-        self.centralWidget.delBlocks()
-
-        # global id
-        # global trnsysID
-        # global globalConnID
-
-        # self.id = 0
-        # self.trnsysID = 0
-        # self.globalConnID = 0
-
-        self.idGen.reset()
-        # newDiagramDlg(self)
-        self.showNewDiagramDlg()
 
     # Encoding / decoding
     def encodeDiagram(self, filename):
@@ -872,33 +841,6 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def clearCopyGroup(self):
-
-        for it in self.copyGroupList.childItems():
-            self.copyGroupList.removeFromGroup(it)
-
-        self.pasting = False
-
-    def createSelectionGroup(self, selectionList):
-        for t in selectionList:
-            if isinstance(t, BlockItem):
-                self.selectionGroupList.addToGroup(t)
-            if isinstance(t, GraphicalItem):
-                self.selectionGroupList.addToGroup(t)
-
-        self.selectionMode = False
-
-        self.diagramScene.addItem(self.selectionGroupList)
-        self.selectionGroupList.setFlags(self.selectionGroupList.ItemIsMovable)
-
-        self.itemsSelected = True
-
-    def clearSelectionGroup(self):
-        for it in self.selectionGroupList.childItems():
-            self.selectionGroupList.removeFromGroup(it)
-
-        self.itemsSelected = False
-
     # Saving related
     def save(self, showWarning=True):
         """
@@ -1001,9 +943,6 @@ class Editor(QWidget):
     def setSnapSize(self, s):
         self.snapSize = s
 
-    def setitemsSelected(self, b):
-        self.itemsSelected = b
-
     def setConnLabelVis(self, isVisible: bool) -> None:
         for c in self.trnsysObj:
             if isinstance(c, ConnectionBase):
@@ -1036,9 +975,6 @@ class Editor(QWidget):
 
     def showHxDlg(self, hx):
         c = hxDlg(hx, self)
-
-    def showNewDiagramDlg(self):
-        c = newDiagramDlg(self)
 
     def showSegmentDlg(self, seg):
         c = segmentDlg(seg, self)
@@ -1119,35 +1055,6 @@ class Editor(QWidget):
             self.diagramScene.render(painter)
             painter.end()
             self.logger.info("File exported to %s" % fn)
-
-    def setProjectPath(self):
-        """
-        This method is called when the 'Set Path' button for the file explorers is clicked.
-        It sets the project path to the one defined by the user and updates the root path of every
-        item inside the main window.
-        If the path defined by the user doesn't exist. Creates that path.
-        """
-        self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
-        if self.projectPath != "":
-            self.PPL.setText(self.projectPath)
-            # self.addButton.setEnabled(True)
-            # self.delButton.setEnabled(True)
-
-            loadPath = os.path.join(self.projectPath, "ddck")
-            if not os.path.exists(loadPath):
-                os.makedirs(loadPath)
-
-            self.createConfigBrowser(self.projectPath)
-            self.copyGenericFolder(self.projectPath)
-            self.createHydraulicDir(self.projectPath)
-            self.createWeatherAndControlDirs(self.projectPath)
-            self.createDdckTree(loadPath)
-
-            for o in self.trnsysObj:
-                if hasattr(o, "updateTreePath"):
-                    o.updateTreePath(self.projectPath)
-                elif hasattr(o, "createControlDir"):
-                    o.createControlDir()
 
     def openProject(self):
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))

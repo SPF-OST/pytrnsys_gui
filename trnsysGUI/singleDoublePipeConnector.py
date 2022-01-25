@@ -1,20 +1,20 @@
 import typing as _tp
 
-import massFlowSolver.networkModel as _mfn  # type: ignore[attr-defined]
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping
 
 
 class SingleDoublePipeConnector(DoublePipeConnectorBase):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(DoublePipePortItem("o", 2, self))
 
         self.changeSize()

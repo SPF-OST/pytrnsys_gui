@@ -5,16 +5,14 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
-from massFlowSolver import MassFlowNetworkContributorMixin
+import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
-import trnsysGUI.images as _img
+from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 
 
 class Boiler(BlockItem, MassFlowNetworkContributorMixin):
@@ -23,8 +21,8 @@ class Boiler(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 80
         self.h = 120
         self.portOffset = 5
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.changeSize()
@@ -101,19 +99,6 @@ class Boiler(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    def updateTreePath(self, path):
-        """
-        When the user chooses the project path for the file explorers, this method is called
-        to update the root path.
-        """
-        pathName = self.displayName
-        self.path = os.path.join(path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        self.model.setRootPath(self.path)
-        self.tree.setRootIndex(self.model.index(self.path))
 
     def deleteBlock(self):
         """

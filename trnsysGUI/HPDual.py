@@ -8,13 +8,13 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class HPDual(BlockItem, MassFlowNetworkContributorMixin):
@@ -22,12 +22,12 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
         super(HPDual, self).__init__(trnsysType, parent, **kwargs)
 
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.inputs.append(SinglePipePortItem("i", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
 
 
-        self.outputs.append(SinglePipePortItem("o", 0, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         self.loadedFiles = []
 

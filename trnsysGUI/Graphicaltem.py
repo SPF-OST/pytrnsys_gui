@@ -120,9 +120,6 @@ class GraphicalItem(QGraphicsPixmapItem):
             self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
         else:
             return
-        # self.resizer = ResizerItem(self)
-        # self.resizer.setPos(self.w, self.h)
-        # self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
 
     def deleteResizer(self):
         del self.resizer

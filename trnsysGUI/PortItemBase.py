@@ -11,8 +11,8 @@ from PyQt5.QtGui import QColor, QBrush, QCursor, QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 if _tp.TYPE_CHECKING:
-    import massFlowSolver.networkModel as _mfn
-    import massFlowSolver as _mfs
+    import trnsysGUI.massFlowSolver.networkModel as _mfn
+    import trnsysGUI.massFlowSolver as _mfs
     import trnsysGUI.connection.connectionBase as _cb
 
 
@@ -105,10 +105,8 @@ class PortItemBase(QGraphicsEllipseItem):
                     e = conn.segments[-1]
                     e.setLine(e.line().p1().x(), e.line().p1().y(), self.scenePos().x(), self.scenePos().y())
 
-                # global pasting
-                if not self.parent.parent.parent().pasting:
-                    for s in conn.segments:
-                        s.updateGrad()
+                for s in conn.segments:
+                    s.updateGrad()
 
         if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 1:
             for conn in self.connectionList:

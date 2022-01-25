@@ -530,26 +530,6 @@ class _MainWindow(QMainWindow):
         self.centralWidget.snapGrid = not self.centralWidget.snapGrid
         self.centralWidget.diagramScene.update()
 
-    def deleteMultiple(self):
-        # print("pressed del")
-        temp = []
-        self.logger.info("Child Items")
-        self.logger.info(self.centralWidget.selectionGroupList.childItems())
-
-        for t in self.centralWidget.selectionGroupList.childItems():
-            temp.append(t)
-            self.centralWidget.selectionGroupList.removeFromGroup(t)
-
-        for t in temp:
-            if isinstance(t, BlockItem):
-                t.deleteBlock()
-            elif isinstance(t, ConnectionBase):
-                t.deleteConn()
-            elif isinstance(t, GraphicalItem):
-                t.deleteBlock()
-            else:
-                self.logger.info("Neiter a Block nor Connection in copyGroupList ")
-
     def runMassflowSolver(self):
         self.logger.info("Running massflow solver...")
 

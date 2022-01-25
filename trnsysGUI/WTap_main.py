@@ -3,11 +3,11 @@
 
 import typing as _tp
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
@@ -16,7 +16,7 @@ class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 40
         self.h = 40
 
-        self.outputs.append(SinglePipePortItem("o", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
 
         self.changeSize()
 

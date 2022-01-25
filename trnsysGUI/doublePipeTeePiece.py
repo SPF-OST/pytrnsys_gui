@@ -2,9 +2,9 @@
 
 import typing as _tp
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeBlockItemModel

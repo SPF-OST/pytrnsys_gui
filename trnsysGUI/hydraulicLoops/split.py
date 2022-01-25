@@ -3,7 +3,8 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
-import massFlowSolver.search as _search
+import trnsysGUI.massFlowSolver.search as _search
+
 from . import _helpers
 from . import common as _common
 from . import model as _model
@@ -93,20 +94,7 @@ class _Splitter:
         toConnections = _search.getReachableConnections(toPort, ignoreConnections={connection})
 
         if not splitLoopsSummary:
-            occupiedNames = {l.name.value for l in self._hydraulicLoops.hydraulicLoops} - {loop.name.value}
-
-            setLoop1Selected = self._createSetConnectionsSelectedCallback(fromConnections)
-            setLoop2Selected = self._createSetConnectionsSelectedCallback(toConnections)
-
-            connection.deselectConnection()
-
-            cancellable = _dialog.SplitLoopDialog.showDialogAndGetResult(
-                loop,
-                occupiedNames,
-                self._fluids,
-                setLoop1Selected,
-                setLoop2Selected,
-            )
+            cancellable = self._createSplitLoopsSummary(loop, fromConnections, connection, toConnections)
             if cancellable == "cancelled":
                 return "cancelled"
             splitLoopsSummary = cancellable
@@ -123,6 +111,50 @@ class _Splitter:
         self._hydraulicLoops.addLoop(toLoop)
 
         return SplitSummary.fromLoops(loop, fromLoop, toLoop)
+
+    def _createSplitLoopsSummary(
+        self,
+        loop: _model.HydraulicLoop,
+        fromConnections: _tp.Set[_spc.SinglePipeConnection],  # type: ignore[name-defined]
+        connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
+        toConnections: _tp.Set[_spc.SinglePipeConnection],  # type: ignore[name-defined]
+    ) -> _common.Cancellable[_common.SplitLoopsSummary]:
+        if not loop.name.isUserDefined:
+            return self._createSplitLoopsSummaryForAutomaticLoop(loop)
+
+        return self._askUserForSplitLoopsSummary(loop, fromConnections, connection, toConnections)
+
+    def _createSplitLoopsSummaryForAutomaticLoop(self, loop: _model.HydraulicLoop) -> _common.SplitLoopsSummary:
+        fromLoopSummary = _common.LoopSummary(loop.name, loop.fluid)
+
+        toLoopName = self._hydraulicLoops.generateName()
+        toLoopSummary = _common.LoopSummary(toLoopName, loop.fluid)
+
+        return _common.SplitLoopsSummary(fromLoopSummary, toLoopSummary)
+
+    def _askUserForSplitLoopsSummary(
+        self,
+        loop: _model.HydraulicLoop,
+        fromConnections: _tp.Set[_spc.SinglePipeConnection],  # type: ignore[name-defined]
+        connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
+        toConnections: _tp.Set[_spc.SinglePipeConnection],  # type: ignore[name-defined]
+    ) -> _common.Cancellable[_common.SplitLoopsSummary]:
+        occupiedNames = {l.name.value for l in self._hydraulicLoops.hydraulicLoops} - {loop.name.value}
+
+        setLoop1Selected = self._createSetConnectionsSelectedCallback(fromConnections)
+        setLoop2Selected = self._createSetConnectionsSelectedCallback(toConnections)
+
+        connection.deselectConnection()
+
+        cancellable = _dialog.SplitLoopDialog.showDialogAndGetResult(
+            loop,
+            occupiedNames,
+            self._fluids,
+            setLoop1Selected,
+            setLoop2Selected,
+        )
+
+        return cancellable
 
     @staticmethod
     def _createSetConnectionsSelectedCallback(

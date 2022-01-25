@@ -1,10 +1,10 @@
 import typing as _tp
 
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.singlePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
-import massFlowSolver.networkModel as _mfn
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
@@ -14,8 +14,8 @@ class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 60
         self.h = 60
 
-        self.inputs.append(SinglePipePortItem("i", 1, self))
-        self.outputs.append(SinglePipePortItem("o", 1, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 1, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
 
         self.changeSize()
 

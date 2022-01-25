@@ -3,11 +3,11 @@
 
 import typing as _tp
 
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from massFlowSolver.networkModel import Pipe, PortItem, PortItemType
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver.networkModel import Pipe, PortItem, PortItemType
 
 
 class Connector(BlockItem, MassFlowNetworkContributorMixin):
@@ -17,8 +17,8 @@ class Connector(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 40
         self.h = 40
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         self.changeSize()
 

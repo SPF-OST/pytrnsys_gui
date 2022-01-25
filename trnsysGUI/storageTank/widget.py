@@ -7,18 +7,19 @@ import typing as _tp
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.storageTank.model as _model
 import trnsysGUI.storageTank.side as _sd
-from massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.directPortPair import DirectPortPair
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog  # type: ignore[attr-defined]
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
 
@@ -54,7 +55,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         self.changeSize()
 
         self.path = None
-        self._addTree()
+        self.addTree()
 
     @property
     def leftDirectPortPairsPortItems(self):
@@ -116,7 +117,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
     ) -> SinglePipePortItem:
         sideNr = side.toSideNr()
-        portItem = SinglePipePortItem(name, sideNr, self)
+        portItem = _cspi.createSinglePipePortItem(name, sideNr, self)
         portItem.setZValue(100)
         xPos = 0 if side == _sd.Side.LEFT else self.w
         yPos = storageTankHeight - relativeHeight * storageTankHeight
@@ -617,7 +618,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
 
         return True
 
-    def _addTree(self):
+    def addTree(self):
         """
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
@@ -642,18 +643,6 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    def updateTreePath(self, path):
-        """
-        When the user chooses the project path for the file explorers, this method is called
-        to update the root path.
-        """
-        pathName = self.displayName
-        self.path = _os.path.join(path, "../ddck", pathName)
-        if not _os.path.exists(self.path):
-            _os.makedirs(self.path)
-        self.model.setRootPath(self.path)
-        self.tree.setRootIndex(self.model.index(self.path))
 
     def deleteBlock(self):
         """

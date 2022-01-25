@@ -3,9 +3,10 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
-import massFlowSolver.search as _search
 import trnsysGUI.common as _com
+import trnsysGUI.massFlowSolver.search as _search
 import trnsysGUI.singlePipePortItem as _spi
+
 from . import common as _lcom
 from . import model as _model, _helpers
 from ._dialogs.merge import dialog as _md

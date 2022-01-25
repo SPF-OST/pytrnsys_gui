@@ -5,12 +5,12 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QGraphicsTextItem
 
-import massFlowSolver as _mfs
-import massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from massFlowSolver import MassFlowNetworkContributorMixin
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 
 
 class TVentil(BlockItem, MassFlowNetworkContributorMixin):
@@ -24,9 +24,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.inputs.append(SinglePipePortItem("i", 1, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 1, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         self.changeSize()
 
