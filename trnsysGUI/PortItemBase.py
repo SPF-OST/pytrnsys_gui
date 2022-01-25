@@ -223,44 +223,32 @@ class PortItemBase(QGraphicsEllipseItem):
 
         self.enlargePortSize()
 
-        self.highlightInternallyConnectedPortItems()
+        self._highlightInternallyConnectedPortItems()
 
-        self._debugprint()
-
-    def highlightInternallyConnectedPortItems(self):
-        from massFlowSolver import search as _search
-        internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
-        for portItem in internallyConnectedPortItems:
-            portItem.innerCircle.setBrush(self.ashColorB)
+        self.debugprint()
 
     def enlargePortSize(self):
         if self.savedPos == False:
-            self.setPos(self.pos().x()  - 3, self.pos().y() - 3)
+            self.setPos(self.pos().x() - 3, self.pos().y() - 3)
             self.savedPos = True
         self.setRect(-4, -4, 10, 10)
         self.innerCircle.setRect(-4, -4, 10, 10)
 
     def hoverLeaveEvent(self, event):
-        self.defaultPortSize()
+        self.resetPortSize()
 
-        self.unhighlightInternallyConnectedPortItems()
+        self._unhighlightInternallyConnectedPortItems()
 
         self._debugClear()
 
-    def unhighlightInternallyConnectedPortItems(self):
-        from massFlowSolver import search as _search
-        internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
-        for portItem in internallyConnectedPortItems:
-            portItem.innerCircle.setBrush(self.visibleColor)
-
-    def defaultPortSize(self):
+    def resetPortSize(self):
         if self.savedPos == True:
             self.setPos(self.pos().x() + 3, self.pos().y() + 3)
             self.savedPos = False
         self.setRect(-4, -4, 7, 7)
         self.innerCircle.setRect(-4, -4, 6.5, 6.5)
 
-    def _debugprint(self):
+    def debugprint(self):
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
 
         internalPiping = self.parent.getInternalPiping()
@@ -338,4 +326,10 @@ class PortItemBase(QGraphicsEllipseItem):
         portItem: _mfn.PortItem,
         connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
     ) -> _mfn.RealNodeBase:
+        raise NotImplementedError()
+
+    def _highlightInternallyConnectedPortItems(self):
+        raise NotImplementedError()
+
+    def _unhighlightInternallyConnectedPortItems(self):
         raise NotImplementedError()

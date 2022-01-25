@@ -424,13 +424,13 @@ class Editor(QWidget):
         if distance <= 3.5:
             hitPortItem.enlargePortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.ashColorR)
-            fromPort._debugClear()
-            hitPortItem._debugprint()
+            self.listV.clear()
+            hitPortItem.debugprint()
         else:
-            hitPortItem.defaultPortSize()
+            hitPortItem.resetPortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.visibleColor)
-            hitPortItem._debugClear()
-            fromPort._debugprint()
+            self.listV.clear()
+            fromPort.debugprint()
 
         fromPort.enlargePortSize()
         fromPort.innerCircle.setBrush(hitPortItem.visibleColor)

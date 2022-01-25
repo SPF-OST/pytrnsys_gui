@@ -6,7 +6,7 @@ import abc as _abc
 import itertools as _it
 import typing as _tp
 
-import trnsysGUI.common
+import trnsysGUI.common as _com
 
 from . import _serialization as _ser
 
@@ -134,7 +134,7 @@ class HydraulicLoops:
         self, connection: _spc.SinglePipeConnection  # type: ignore[name-defined]
     ) -> HydraulicLoop:
         loops = {l for l in self.hydraulicLoops if connection in l.connections}
-        loop = trnsysGUI.common.getSingle(loops)
+        loop = _com.getSingle(loops)
         return loop
 
     def getLoop(self, name: str) -> _tp.Optional[HydraulicLoop]:

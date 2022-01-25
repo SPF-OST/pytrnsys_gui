@@ -59,11 +59,6 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-
-
-        # self.origInputsPos = [[0, delta], [w, delta]]
-        # self.origOutputsPos = [[0, h - delta], [w, h - delta]]
-
         # upper left is reference
         self.origInputsPos = [[0, delta], [w, h - delta]]  # inlet of [evap, cond]
         self.origOutputsPos = [[0, h - delta], [w, delta]]  # outlet of [evap, cond]

@@ -18,3 +18,15 @@ class SinglePipePortItem(PortItemBase):
         selectedRealNode = connectedPortItemsAndAdjacentRealNode[0].realNode
 
         return selectedRealNode
+
+    def _highlightInternallyConnectedPortItems(self):
+        from massFlowSolver import search as _search
+        internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
+        for portItem in internallyConnectedPortItems:
+            portItem.innerCircle.setBrush(self.ashColorB)
+
+    def _unhighlightInternallyConnectedPortItems(self):
+        from massFlowSolver import search as _search
+        internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
+        for portItem in internallyConnectedPortItems:
+            portItem.innerCircle.setBrush(self.visibleColor)
