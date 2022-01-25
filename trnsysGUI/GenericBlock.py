@@ -14,15 +14,15 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+import trnsysGUI.createSinglePipePortItem as _cspi
 
 
 class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(GenericBlock, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.childIds = []
@@ -192,8 +192,8 @@ class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
         w = self.w
         delta = 4
         self.logger.debug("side is " + str(side))
-        self.inputs.append(SinglePipePortItem("i", side, self))
-        self.outputs.append(SinglePipePortItem("o", side, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", side, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", side, self))
         # Allocate id
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
@@ -264,8 +264,8 @@ class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
         pipes = []
         portItems = {}
         for i, (graphicalInputPort, graphicalOutputPort) in enumerate(zip(self.inputs, self.outputs)):
-            inputPort = _mfn.PortItem()
-            outputPort = _mfn.PortItem()
+            inputPort = _mfn.PortItem(f"Input {i+1}", _mfn.PortItemType.INPUT)
+            outputPort = _mfn.PortItem(f"Output {i+1}", _mfn.PortItemType.OUTPUT)
             pipe = _mfn.Pipe(f"{self.displayName}X{i}", self.childIds[0], inputPort, outputPort)
 
             pipes.append(pipe)

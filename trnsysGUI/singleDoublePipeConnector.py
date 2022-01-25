@@ -1,20 +1,20 @@
 import typing as _tp
 
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from trnsysGUI.massFlowSolver import InternalPiping
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.doublePipeConnectorBase import DoublePipeConnectorBase
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping
 
 
 class SingleDoublePipeConnector(DoublePipeConnectorBase):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(DoublePipePortItem("o", 2, self))
 
         self.changeSize()
@@ -42,13 +42,13 @@ class SingleDoublePipeConnector(DoublePipeConnectorBase):
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
     def getInternalPiping(self) -> InternalPiping:
-        coldInput: _mfn.PortItem = ColdPortItem()
-        coldOutput: _mfn.PortItem = ColdPortItem()
+        coldInput: _mfn.PortItem = ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
+        coldOutput: _mfn.PortItem = ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
         coldConnector = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
         coldModelPortItemsToGraphicalPortItem = {coldInput: self.outputs[0], coldOutput: self.inputs[1]}
 
-        hotInput: _mfn.PortItem = HotPortItem()
-        hotOutput: _mfn.PortItem = HotPortItem()
+        hotInput: _mfn.PortItem = HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
+        hotOutput: _mfn.PortItem = HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
         hotConnector = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput)
         hotModelPortItemsToGraphicalPortItem = {hotInput: self.inputs[0], hotOutput: self.outputs[0]}
 

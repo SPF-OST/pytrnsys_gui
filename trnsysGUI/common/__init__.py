@@ -3,16 +3,26 @@ import typing as _tp
 _T = _tp.TypeVar("_T")
 
 
-def singleOrNone(iterable: _tp.Iterable[_T]) -> _tp.Optional[_T]:
+def getSingle(iterable: _tp.Iterable[_T]) -> _T:
     """The `iterable` will be fully exhausted."""
-    lst = list(iterable)
 
-    length = len(lst)
+    value = getSingleOrNone(iterable)
 
-    if length == 0:
+    if not value:
+        raise ValueError("Expected one element but got none.")
+
+    return value
+
+
+def getSingleOrNone(iterable: _tp.Iterable[_T]) -> _tp.Optional[_T]:
+    """The `iterable` will be fully exhausted."""
+
+    values = [*iterable]
+
+    if not values:
         return None
 
-    if length == 1:
-        return lst[0]
+    if len(values) > 1:
+        raise ValueError("Expected one element but got more than one.")
 
-    raise ValueError("`iterable` contains more than one item", iterable)
+    return values[0]

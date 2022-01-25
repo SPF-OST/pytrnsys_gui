@@ -3,11 +3,11 @@
 
 import typing as _tp
 
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 
 class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
@@ -17,9 +17,9 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 40
         self.h = 40
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 1, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
 
         self.changeSize()
 
@@ -69,9 +69,9 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         return internalPiping
 
     def _getModelAndMapping(self):
-        input1 = _mfn.PortItem()
-        input2 = _mfn.PortItem()
-        output = _mfn.PortItem()
+        input1 = _mfn.PortItem("Tee Piece Input 1", _mfn.PortItemType.INPUT)
+        input2 = _mfn.PortItem("Tee Piece Input 2", _mfn.PortItemType.INPUT)
+        output = _mfn.PortItem("Tee Piece Output", _mfn.PortItemType.OUTPUT)
         teePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input1, input2, output)
         modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
         return teePiece, modelPortItemsToGraphicalPortItem

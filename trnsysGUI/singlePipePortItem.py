@@ -1,11 +1,31 @@
+from __future__ import annotations
+
 import typing as _tp
 
+import trnsysGUI.PortItemBase as _pi
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.BlockItem as _bi
 
 
-class SinglePipePortItem(PortItemBase):
+GetInternallyConnectedPortItems = _tp.Callable[["SinglePipePortItem"], _tp.Sequence["SinglePipePortItem"]]
+Side = _tp.Literal[0, 2]
+
+
+class SinglePipePortItem(_pi.PortItemBase):  # type: ignore[name-defined]
+    def __init__(
+        self,
+        name: str,
+        side: Side,
+        parent: _bi.BlockItem,  # type: ignore[name-defined]
+        getInternallyConnectedPortItems: GetInternallyConnectedPortItems,
+    ) -> None:
+        super().__init__(name, side, parent)
+
+        self._getInternallyConnectedPortItems = getInternallyConnectedPortItems
+
     def _selectConnectedRealNode(  # pylint: disable=duplicate-code  # 2
         self,
         portItem: _mfn.PortItem,
@@ -18,3 +38,11 @@ class SinglePipePortItem(PortItemBase):
         selectedRealNode = connectedPortItemsAndAdjacentRealNode[0].realNode
 
         return selectedRealNode
+
+    def _highlightInternallyConnectedPortItems(self):
+        for portItem in self._getInternallyConnectedPortItems(self):
+            portItem.innerCircle.setBrush(self.ashColorB)
+
+    def _unhighlightInternallyConnectedPortItems(self):
+        for portItem in self._getInternallyConnectedPortItems(self):
+            portItem.innerCircle.setBrush(self.visibleColor)

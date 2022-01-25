@@ -11,13 +11,13 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import trnsysGUI.massFlowSolver as _mfs
-from trnsysGUI.massFlowSolver import InternalPiping
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
 from trnsysGUI.TVentil import TVentil
+from trnsysGUI.massFlowSolver import InternalPiping
 
 
 def calcDist(p1, p2):
@@ -1073,10 +1073,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         raise NotImplementedError()
 
     def _getPortItemsWithParent(self):
-        if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
-            return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
-
-        if type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs:
+        isToPortValveOutput = type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs
+        if isToPortValveOutput:
             return [(self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)]
 
         return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]

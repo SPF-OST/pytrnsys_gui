@@ -1,10 +1,10 @@
 import typing as _tp
 
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.singlePipePortItem import SinglePipePortItem  # type: ignore[attr-defined]
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
@@ -14,8 +14,8 @@ class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 60
         self.h = 60
 
-        self.inputs.append(SinglePipePortItem("i", 1, self))
-        self.outputs.append(SinglePipePortItem("o", 1, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 1, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
 
         self.changeSize()
 
@@ -47,8 +47,8 @@ class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem()
-        outputPort = _mfn.PortItem()
+        inputPort = _mfn.PortItem("Source/Sink Input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("Source/Sink Output", _mfn.PortItemType.OUTPUT)
 
         pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
 

@@ -7,12 +7,12 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
+import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
-import trnsysGUI.images as _img
+from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 
 
 class Boiler(BlockItem, MassFlowNetworkContributorMixin):
@@ -21,8 +21,8 @@ class Boiler(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 80
         self.h = 120
         self.portOffset = 5
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.changeSize()

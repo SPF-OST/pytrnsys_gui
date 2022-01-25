@@ -29,3 +29,9 @@ class DoublePipePortItem(_pi.PortItemBase):  # type: ignore[name-defined]
         selectedRealNode = selectedRealNodes[0]
 
         return selectedRealNode
+
+    def _highlightInternallyConnectedPortItems(self):
+        pass
+
+    def _unhighlightInternallyConnectedPortItems(self):
+        pass

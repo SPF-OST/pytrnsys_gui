@@ -48,8 +48,8 @@ class ExternalHx(BlockItemFourPorts):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0, delta], [w, delta]]
-        self.origOutputsPos = [[0, h - delta], [w, h - delta]]
+        self.origInputsPos = [[0, delta], [w, h - delta]]
+        self.origOutputsPos = [[0, h - delta], [w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])

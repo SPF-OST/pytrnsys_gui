@@ -7,21 +7,21 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(AirSourceHP, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.path = ""
         self.loadedFiles = []
 
@@ -29,8 +29,8 @@ class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
         self.addTree()
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem()
-        outputPort = _mfn.PortItem()
+        inputPort = _mfn.PortItem("Condenser Input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("Condenser Output", _mfn.PortItemType.OUTPUT)
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 
         return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
@@ -58,8 +58,9 @@ class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[w, delta]]
-        self.origOutputsPos = [[w, h - delta]]
+        self.origInputsPos = [[w, h - delta]]
+        self.origOutputsPos = [[w, delta]]
+
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 

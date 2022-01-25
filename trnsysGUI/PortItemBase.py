@@ -42,14 +42,8 @@ class PortItemBase(QGraphicsEllipseItem):
 
         # This if is only for input/output having different colors
         if name == "i":
-            color = QColor(self.ashColorR)
-            # self.innerCircle.setBrush(QColor(self.ashColorR))
-            # self.innerCircle.setBrush(QColor(0, 0, 0))
             self.innerCircle.setBrush(self.visibleColor)
         if name == "o":
-            color = QColor(self.ashColorB)
-            # self.innerCircle.setBrush(QColor(self.ashColorB))
-            # self.innerCircle.setBrush(QColor(0, 0, 0))
             self.innerCircle.setBrush(self.visibleColor)
 
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
@@ -218,63 +212,55 @@ class PortItemBase(QGraphicsEllipseItem):
 
         if self.connectionList:
             return
-        
+
         self.setFlag(self.ItemIsMovable, False)
         self.scene().parent().startConnection(self)
 
     def hoverEnterEvent(self, event):
-        # self.logger.debug("Hovering")
-
         self.logger.debug(self.parent)
 
+        self.enlargePortSize()
+
+        self._highlightInternallyConnectedPortItems()
+
+        self.debugprint()
+
+    def enlargePortSize(self):
+        if self.savedPos == False:
+            self.setPos(self.pos().x() - 3, self.pos().y() - 3)
+            self.savedPos = True
         self.setRect(-4, -4, 10, 10)
         self.innerCircle.setRect(-4, -4, 10, 10)
-        if self.name == "i":
-            # self.setBrush(Qt.red)
-            # self.innerCircle.setBrush(Qt.red)
-            # self.innerCircle.setBrush(QColor(0, 0, 0))
-            self.innerCircle.setBrush(self.visibleColor)
-        if self.name == "o":
-            # self.setBrush(QColor(Qt.blue))
-            # self.innerCircle.setBrush(QColor(Qt.blue))
-            # self.innerCircle.setBrush(QColor(0, 0, 0))
-            self.innerCircle.setBrush(self.visibleColor)
-
-        self._debugprint()
 
     def hoverLeaveEvent(self, event):
-        # self.logger.debug("Leaving hover")
+        self.resetPortSize()
 
-        # self.setRect(-6, -6, 12, 12)
-        self.setRect(-4, -4, 7, 7)
-        self.innerCircle.setRect(-4, -4, 6.5, 6.5)
-        if len(self.connectionList) == 0:
-            if self.name == "i":
-                # self.setBrush(Qt.red)
-                # self.setBrush(self.ashColorR)
-                # self.innerCircle.setBrush(self.ashColorR)
-                # self.innerCircle.setBrush(QColor(0, 0, 0))
-                self.innerCircle.setBrush(self.visibleColor)
-            if self.name == "o":
-                # self.setBrush(self.ashColorR)
-                # self.innerCircle.setBrush(self.ashColorB)
-                # self.innerCircle.setBrush(QColor(0, 0, 0))
-                self.innerCircle.setBrush(self.visibleColor)
+        self._unhighlightInternallyConnectedPortItems()
 
         self._debugClear()
 
-    def _debugprint(self):
-        self.parent.parent.parent().listV.addItem("This is a PortItem")
-        self.parent.parent.parent().listV.addItem("Connections:")
-        for c in self.connectionList:
-            self.parent.parent.parent().listV.addItem(c.displayName)
-        self.parent.parent.parent().listV.addItem(
-            "Flipped state (H,V):" + str(self.parent.flippedH) + ", " + str(self.parent.flippedV)
-        )
-        self.parent.parent.parent().listV.addItem("Side: " + str(self.side))
-        self.parent.parent.parent().listV.addItem("createdAtSide: " + str(self.createdAtSide))
+    def resetPortSize(self):
+        if self.savedPos == True:
+            self.setPos(self.pos().x() + 3, self.pos().y() + 3)
+            self.savedPos = False
+        self.setRect(-4, -4, 7, 7)
+        self.innerCircle.setRect(-4, -4, 6.5, 6.5)
+
+    def debugprint(self):
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
+
+        internalPiping = self.parent.getInternalPiping()
+        portItemsAndInternalRealNode = internalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(self)
+        portItems = [pr.portItem for pr in portItemsAndInternalRealNode]
+        formattedPortItems = [f"{p.name} ({p.type.value})" for p in portItems]
+        jointFormattedPortItems = ", ".join(formattedPortItems)
+        self.parent.parent.parent().listV.addItem(f"Names: {jointFormattedPortItems}")
+
         self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)
+
+        self.parent.parent.parent().listV.addItem("Connections:")
+        for connection in self.connectionList:
+            self.parent.parent.parent().listV.addItem(connection.displayName)
 
     def _debugClear(self):
         self.parent.parent.parent().listV.clear()
@@ -338,4 +324,10 @@ class PortItemBase(QGraphicsEllipseItem):
         portItem: _mfn.PortItem,
         connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
     ) -> _mfn.RealNodeBase:
+        raise NotImplementedError()
+
+    def _highlightInternallyConnectedPortItems(self):
+        raise NotImplementedError()
+
+    def _unhighlightInternallyConnectedPortItems(self):
         raise NotImplementedError()

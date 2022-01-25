@@ -7,30 +7,29 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
-import trnsysGUI.images as _img
-
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class Radiator(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Radiator, self).__init__(trnsysType, parent, **kwargs)
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.outputs.append(SinglePipePortItem("o", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
         self.loadedFiles = []
 
         self.changeSize()
         self.addTree()
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem()
-        outputPort = _mfn.PortItem()
+        inputPort = _mfn.PortItem("Radiator Input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("Radiator Output", _mfn.PortItemType.OUTPUT)
 
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 

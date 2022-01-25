@@ -83,13 +83,13 @@ class DoublePipeConnection(ConnectionBase):
         self.setMassLabelPos(model.massFlowLabelPos)
 
     def getInternalPiping(self) -> InternalPiping:
-        coldFromPort: _mfn.PortItem = ColdPortItem()
-        coldToPort: _mfn.PortItem = ColdPortItem()
+        coldFromPort: _mfn.PortItem = ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
+        coldToPort: _mfn.PortItem = ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
         coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
         coldModelPortItemsToGraphicalPortItem = {coldFromPort: self.toPort, coldToPort: self.fromPort}
 
-        hotFromPort: _mfn.PortItem = HotPortItem()
-        hotToPort: _mfn.PortItem = HotPortItem()
+        hotFromPort: _mfn.PortItem = HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
+        hotToPort: _mfn.PortItem = HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
         hotPipe = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotFromPort, hotToPort)
         hotModelPortItemsToGraphicalPortItem = {hotFromPort: self.fromPort, hotToPort: self.toPort}
 

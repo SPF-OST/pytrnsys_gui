@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import typing as _tp
 
+import trnsysGUI.common as _com
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.singlePipePortItem as _spi
-
-from . import _helpers
 
 
 def getReachableConnections(
@@ -33,7 +32,7 @@ def _expandPortItemSetByOneLayer(
         ignoreConnections = set()
 
     connectedPortItems = [pi for pi in portItems if pi.connectionList]
-    connections = [_helpers.getSingle(pi.connectionList) for pi in connectedPortItems]
+    connections = [_com.getSingle(pi.connectionList) for pi in connectedPortItems]
     relevantConnections = {
         c
         for c in connections
@@ -42,14 +41,14 @@ def _expandPortItemSetByOneLayer(
 
     connectionPortItems = {p for c in relevantConnections for p in [c.fromPort, c.toPort]}
 
-    internalPortItems = {mpi for p in portItems for mpi in _getInternallyConnectedPortItems(p)}
+    internalPortItems = {mpi for p in portItems for mpi in getInternallyConnectedPortItems(p)}
 
     portItems = connectionPortItems | internalPortItems
 
     return portItems, relevantConnections
 
 
-def _getInternallyConnectedPortItems(
+def getInternallyConnectedPortItems(
     port: _spi.SinglePipePortItem,  # type: ignore[name-defined]
 ) -> _tp.Sequence[_spi.SinglePipePortItem]:  # type: ignore[name-defined]
     contributor: _mfs.MassFlowNetworkContributorMixin = port.parent  # type: ignore[name-defined]
@@ -79,10 +78,3 @@ def _getInternallyConnectedPortItems(
     incidentInternallyConnectedPortItems = allIncidentInternallyConnectedPortItems[0]
 
     return incidentInternallyConnectedPortItems
-
-
-def _getSingle(
-    connectionList: _tp.Sequence[_spc.SinglePipeConnection],  # type: ignore[name-defined]
-) -> _spc.SinglePipeConnection:  # type: ignore[name-defined]
-    assert len(connectionList) == 1
-    return connectionList[0]

@@ -7,13 +7,13 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
@@ -21,14 +21,14 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         super(HeatPumpTwoHx, self).__init__(trnsysType, parent, **kwargs)
 
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.inputs.append(SinglePipePortItem("i", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
 
 
-        self.outputs.append(SinglePipePortItem("o", 0, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         # For restoring correct order of trnsysObj list
@@ -61,14 +61,15 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0, delta], [w, delta], [w, h - 2 * delta]]
-        self.origOutputsPos = [[0, h - delta], [w, 2 * delta], [w, h - delta]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
-        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
-        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1])
+        self.origInputsPos = [[0, delta], [w, 2 * delta], [w, h - delta]] # inlet of [evap, cond, cond]
+        self.origOutputsPos = [[0, h - delta], [w, delta], [w, h - 2 * delta]] # outlet of [evap, cond, cond]
+
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1]) #evaporator
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1]) # top condenser
+        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1]) # bottom condenser
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1]) #evaporator
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1]) # top condenser
+        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1]) # bottom condenser
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -164,8 +165,8 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         pipes = []
         portItems = {}
         for i in range(3):
-            inputPort = _mfn.PortItem()
-            outputPort = _mfn.PortItem()
+            inputPort = _mfn.PortItem(f"Input {i+1}", _mfn.PortItemType.INPUT)
+            outputPort = _mfn.PortItem(f"Output {i+1}", _mfn.PortItemType.OUTPUT)
 
             pipe = _mfn.Pipe(f"{self.displayName}Side{i+1}", self.childIds[i], inputPort, outputPort)
             pipes.append(pipe)

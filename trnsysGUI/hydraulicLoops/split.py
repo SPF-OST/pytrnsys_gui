@@ -3,8 +3,9 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
+import trnsysGUI.massFlowSolver.search as _search
+
 from . import _helpers
-from . import _search
 from . import common as _common
 from . import model as _model
 from ._dialogs.split import dialog as _dialog

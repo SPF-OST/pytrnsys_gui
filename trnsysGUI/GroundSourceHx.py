@@ -7,15 +7,14 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.images as _img
-from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 
 
 class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
@@ -25,8 +24,8 @@ class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
         self.w = 60
         self.h = 80
 
-        self.inputs.append(SinglePipePortItem("i", 0, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.changeSize()
@@ -133,8 +132,8 @@ class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
             self.logger.debug(self.path)
 
     def getInternalPiping(self) -> _mfs.InternalPiping:
-        inputPort = _mfn.PortItem()
-        outputPort = _mfn.PortItem()
+        inputPort = _mfn.PortItem("Ground Source Input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("Ground Source Output", _mfn.PortItemType.OUTPUT)
 
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 

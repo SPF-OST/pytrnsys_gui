@@ -2,6 +2,7 @@
 # type: ignore
 
 import json
+import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
@@ -9,7 +10,7 @@ import shutil
 import typing as _tp
 
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF
+from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF, QEvent
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
@@ -31,14 +32,15 @@ from PyQt5.QtWidgets import (
     QPushButton,
 )
 
-import trnsysGUI.massFlowSolver as _mfs
 import pytrnsys.trnsys_util.deckUtils as _du
+
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver as _mfs
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
@@ -370,16 +372,66 @@ class Editor(QWidget):
             self.parent().undoStack.push(command)
 
     def sceneMouseMoveEvent(self, event):
-        if self._currentlyDraggedConnectionFromPort:
-            tempx = self._currentlyDraggedConnectionFromPort.scenePos().x()
-            tempy = self._currentlyDraggedConnectionFromPort.scenePos().y()
-            posx = event.scenePos().x()
-            posy = event.scenePos().y()
+        """
+        This function is for dragging and connecting one port to another.
+        When dragging, the fromPort will remain enlarged and black in color and when the toPort is hovered over, it will be
+        enlarged and turn red.
+        A port's details will also be displayed at the widget when they are hovered over.
+        """
+        fromPort = self._currentlyDraggedConnectionFromPort
+        if not fromPort:
+            return
 
-            self.connLineItem.setVisible(True)
-            self.connLine.setLine(tempx, tempy, posx, posy)
-            self.connLineItem.setLine(self.connLine)
-            self.connLineItem.setVisible(True)
+        fromX = fromPort.scenePos().x()
+        fromY = fromPort.scenePos().y()
+
+        toX = event.scenePos().x()
+        toY = event.scenePos().y()
+
+        self.connLine.setLine(fromX, fromY, toX, toY)
+        self.connLineItem.setLine(self.connLine)
+        self.connLineItem.setVisible(True)
+
+        hitPortItem = self._getHitPortItemOrNone(event)
+
+        if not hitPortItem:
+            return
+
+        mousePosition = event.scenePos()
+
+        portItemX = hitPortItem.scenePos().x()
+        portItemY = hitPortItem.scenePos().y()
+
+        distance = _math.sqrt((mousePosition.x() - portItemX) ** 2 + (mousePosition.y() - portItemY) ** 2)
+        if distance <= 3.5:
+            hitPortItem.enlargePortSize()
+            hitPortItem.innerCircle.setBrush(hitPortItem.ashColorR)
+            self.listV.clear()
+            hitPortItem.debugprint()
+        else:
+            hitPortItem.resetPortSize()
+            hitPortItem.innerCircle.setBrush(hitPortItem.visibleColor)
+            self.listV.clear()
+            fromPort.debugprint()
+
+        fromPort.enlargePortSize()
+        fromPort.innerCircle.setBrush(hitPortItem.visibleColor)
+
+    def _getHitPortItemOrNone(self, event: QEvent) -> _tp.Optional[PortItemBase]:
+        fromPort = self._currentlyDraggedConnectionFromPort
+        mousePosition = event.scenePos()
+
+        relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
+        if not relevantPortItems:
+            return None
+
+        numberOfHitPortsItems = len(relevantPortItems)
+        if numberOfHitPortsItems > 1:
+            raise NotImplementedError("Can't deal with overlapping port items.")
+
+        hitPortItem = relevantPortItems[0]
+
+        return hitPortItem
 
     def sceneMouseReleaseEvent(self, event):
         if not self._currentlyDraggedConnectionFromPort:

@@ -13,6 +13,7 @@ from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.serialization as _ser
 from trnsysGUI import idGenerator as _id
@@ -73,8 +74,8 @@ class BlockItem(QGraphicsPixmapItem):
         self.label.setVisible(False)
 
         if self.name == "Bvi":
-            self.inputs.append(SinglePipePortItem("i", 0, self))
-            self.outputs.append(SinglePipePortItem("o", 2, self))
+            self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+            self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         if self.name == "StorageTank":
             # Inputs get appended in ConfigStorage

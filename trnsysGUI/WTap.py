@@ -7,13 +7,13 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class WTap(BlockItem, MassFlowNetworkContributorMixin):
@@ -21,7 +21,7 @@ class WTap(BlockItem, MassFlowNetworkContributorMixin):
         super(WTap, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
         self.h = 40
-        self.inputs.append(SinglePipePortItem("i", 0, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.loadedFiles = []
 
         self.changeSize()
@@ -65,7 +65,7 @@ class WTap(BlockItem, MassFlowNetworkContributorMixin):
         return resStr, equationNr
 
     def getInternalPiping(self) -> InternalPiping:
-        portItem = _mfn.PortItem()
+        portItem = _mfn.PortItem("WTap Input", _mfn.PortItemType.INPUT)
         sink = _mfn.Sink(self.displayName, self.trnsysId, portItem)
 
         return InternalPiping([sink], {portItem: self.inputs[0]})

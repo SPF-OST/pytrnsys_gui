@@ -7,13 +7,13 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
-import trnsysGUI.images as _img
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
@@ -21,8 +21,8 @@ class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
         super(IceStorage, self).__init__(trnsysType, parent, **kwargs)
         self.w = 120
         self.h = 120
-        self.inputs.append(SinglePipePortItem("i", 2, self))
-        self.outputs.append(SinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.loadedFiles = []
 
         self.changeSize()
@@ -32,8 +32,8 @@ class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
         return _img.ICE_STORAGE_SVG
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem()
-        outputPort = _mfn.PortItem()
+        inputPort = _mfn.PortItem("IceStorage Input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("IceStorage Output", _mfn.PortItemType.OUTPUT)
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 
         return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
