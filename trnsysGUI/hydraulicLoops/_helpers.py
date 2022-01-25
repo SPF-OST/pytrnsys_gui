@@ -7,5 +7,3 @@ def getFromAndToPort(connection):
     assert isinstance(fromPort, _spi.SinglePipePortItem)
     assert isinstance(toPort, _spi.SinglePipePortItem)
     return fromPort, toPort
-
-

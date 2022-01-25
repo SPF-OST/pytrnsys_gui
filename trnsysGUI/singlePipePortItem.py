@@ -2,6 +2,7 @@ import typing as _tp
 
 import massFlowSolver as _mfs
 import massFlowSolver.networkModel as _mfn
+import massFlowSolver.search as _search
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
 
 
@@ -20,13 +21,11 @@ class SinglePipePortItem(PortItemBase):
         return selectedRealNode
 
     def _highlightInternallyConnectedPortItems(self):
-        from massFlowSolver import search as _search
         internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
         for portItem in internallyConnectedPortItems:
             portItem.innerCircle.setBrush(self.ashColorB)
 
     def _unhighlightInternallyConnectedPortItems(self):
-        from massFlowSolver import search as _search
         internallyConnectedPortItems = list(_search.getInternallyConnectedPortItems(self))
         for portItem in internallyConnectedPortItems:
             portItem.innerCircle.setBrush(self.visibleColor)

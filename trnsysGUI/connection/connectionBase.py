@@ -17,7 +17,6 @@ from trnsysGUI.CornerItem import CornerItem
 from trnsysGUI.Node import Node
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase
-from trnsysGUI.TVentil import TVentil
 
 
 def calcDist(p1, p2):
@@ -1094,10 +1093,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         raise NotImplementedError()
 
     def _getPortItemsWithParent(self):
-        if type(self.fromPort.parent) is TVentil and self.fromPort in self.fromPort.parent.outputs:
-            return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
+        # Ugly, but can't currently be avoided (otherwise we'll have a circular import)
+        from trnsysGUI.TVentil import TVentil
 
-        if type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs:
+        isToPortValveOutput = type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs
+        if isToPortValveOutput:
             return [(self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)]
 
         return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
