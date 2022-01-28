@@ -20,15 +20,14 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HeatPumpTwoHx, self).__init__(trnsysType, parent, **kwargs)
 
-
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
 
-
         self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+
         self.loadedFiles = []
 
         # For restoring correct order of trnsysObj list
@@ -61,15 +60,15 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0, delta], [w, 2 * delta], [w, h - delta]] # inlet of [evap, cond, cond]
-        self.origOutputsPos = [[0, h - delta], [w, delta], [w, h - 2 * delta]] # outlet of [evap, cond, cond]
+        self.origInputsPos = [[0, delta], [w, h - delta], [w, 2 * delta]] # inlet of [evap, cond, cond]
+        self.origOutputsPos = [[0, h - delta], [w, h - 2 * delta], [w, delta]] # outlet of [evap, cond, cond]
 
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1]) #evaporator
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1]) # top condenser
-        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1]) # bottom condenser
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1]) # bottom condenser
+        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1]) # top condenser
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1]) #evaporator
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1]) # top condenser
-        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1]) # bottom condenser
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1]) # bottom condenser
+        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1]) # top condenser
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -164,17 +163,30 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
     def getInternalPiping(self) -> InternalPiping:
         pipes = []
         portItems = {}
-        for i in range(3):
-            inputPort = _mfn.PortItem(f"Input {i+1}", _mfn.PortItemType.INPUT)
-            outputPort = _mfn.PortItem(f"Output {i+1}", _mfn.PortItemType.OUTPUT)
 
-            pipe = _mfn.Pipe(f"{self.displayName}Side{i+1}", self.childIds[i], inputPort, outputPort)
-            pipes.append(pipe)
+        evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
+        evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)
+        evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[0], evaporatorInput, evaporatorOutput)
 
-            portItems[inputPort] = self.inputs[i]
-            portItems[outputPort] = self.outputs[i]
+        condenser1Input = _mfn.PortItem("condenser1Input", _mfn.PortItemType.INPUT)
+        condenser1Output = _mfn.PortItem("condenser1Output", _mfn.PortItemType.OUTPUT)
+        condenser1Pipe = _mfn.Pipe(f"{self.displayName}Cond1", self.childIds[1], condenser1Input, condenser1Output)
 
-        return InternalPiping(pipes, portItems)
+        condenser2Input = _mfn.PortItem("condenser2Input", _mfn.PortItemType.INPUT)
+        condenser2Output = _mfn.PortItem("condenser2Output", _mfn.PortItemType.OUTPUT)
+        condenser2Pipe = _mfn.Pipe(f"{self.displayName}Cond2", self.childIds[2], condenser2Input, condenser2Output)
+
+        modelPortItemsToGraphicalPortItem = {
+            evaporatorInput: self.inputs[0],
+            evaporatorOutput: self.outputs[0],
+            condenser1Input: self.inputs[1],
+            condenser1Output: self.outputs[1],
+            condenser2Input: self.inputs[2],
+            condenser2Output: self.outputs[2]
+        }
+        nodes = [evaporatorPipe, condenser1Pipe, condenser2Pipe]
+
+        return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
     def getSubBlockOffset(self, c):
         for i in range(3):
@@ -194,12 +206,7 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, "ddck")
@@ -226,10 +233,8 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
@@ -251,7 +256,6 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)

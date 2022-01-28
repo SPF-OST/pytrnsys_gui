@@ -18,7 +18,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.h = 40
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
 
         self.changeSize()
@@ -46,18 +46,18 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
 
         self.label.setPos(lx, h - self.flippedV * (h + h / 2))
 
-        self.origInputsPos = [[0, delta], [w, delta]]
-        self.origOutputsPos = [[delta, 0]]
+        self.origInputsPos = [[0, delta]]
+        self.origOutputsPos = [[w, delta], [delta, 0]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
+        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        self.outputs[1].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
 
         return w, h
 
@@ -69,11 +69,11 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         return internalPiping
 
     def _getModelAndMapping(self):
-        input1 = _mfn.PortItem("Tee Piece Input 1", _mfn.PortItemType.INPUT)
-        input2 = _mfn.PortItem("Tee Piece Input 2", _mfn.PortItemType.INPUT)
-        output = _mfn.PortItem("Tee Piece Output", _mfn.PortItemType.OUTPUT)
-        teePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input1, input2, output)
-        modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
+        input = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        output1 = _mfn.PortItem("straightOutput", _mfn.PortItemType.OUTPUT)
+        output2 = _mfn.PortItem("orthogonalOutput", _mfn.PortItemType.OUTPUT)
+        teePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input, output1, output2)
+        modelPortItemsToGraphicalPortItem = {input: self.inputs[0], output1: self.outputs[0], output2: self.outputs[1]}
         return teePiece, modelPortItemsToGraphicalPortItem
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):

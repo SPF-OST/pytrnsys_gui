@@ -23,8 +23,8 @@ class Connector(BlockItem, MassFlowNetworkContributorMixin):
         self.changeSize()
 
     def getInternalPiping(self) -> InternalPiping:
-        fromPort = PortItem("Connector Input", PortItemType.INPUT)
-        toPort = PortItem("Connector Output", PortItemType.OUTPUT)
+        fromPort = PortItem("input", PortItemType.INPUT)
+        toPort = PortItem("output", PortItemType.OUTPUT)
         pipe = Pipe(self.name, self.trnsysId, fromPort, toPort)
         return InternalPiping([pipe], {fromPort: self.inputs[0], toPort: self.outputs[0]})
 

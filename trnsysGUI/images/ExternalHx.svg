@@ -2,7 +2,7 @@
 <svg
    inkscape:export-ydpi="96"
    inkscape:export-xdpi="96"
-   inkscape:export-filename="C:\Users\User\Desktop\ExternalHx.png"
+   inkscape:export-filename="C:\GIT\pytrnsys_gui\trnsysGUI\images\ExternalHx.png"
    sodipodi:docname="ExternalHx.svg"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
    id="svg1012"
@@ -36,27 +36,27 @@
        inkscape:collect="always"
        xlink:href="#linearGradient1382"
        id="linearGradient1048"
-       x1="118.95042"
-       y1="166.84647"
-       x2="119.81811"
-       y2="101.24467"
+       x1="119.75223"
+       y1="101.36543"
+       x2="118.43866"
+       y2="165.82825"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(-9.5225603,-9.1730227)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient1382"
        id="linearGradient13181"
-       x1="99.675247"
-       y1="92.871117"
+       x1="101.27887"
+       y1="157.55034"
        x2="100.15118"
-       y2="160.89124"
+       y2="92.470238"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      inkscape:window-maximized="1"
      inkscape:window-y="-9"
      inkscape:window-x="-9"
-     inkscape:window-height="991"
+     inkscape:window-height="1001"
      inkscape:window-width="1920"
      fit-margin-bottom="0"
      fit-margin-right="0"
@@ -95,12 +95,12 @@
      inkscape:groupmode="layer"
      inkscape:label="Ebene 1">
     <rect
-       y="76.721245"
-       x="77.109337"
-       height="95.959007"
-       width="55.959007"
+       y="76.793343"
+       x="68.403793"
+       height="95.814827"
+       width="73.370102"
        id="rect1587"
-       style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
+       style="fill:none;stroke:#000000;stroke-width:1.14421;stroke-miterlimit:4;stroke-dasharray:none"
        inkscape:export-filename="C:\Users\User\Desktop\rect1587.png"
        inkscape:export-xdpi="112.14867"
        inkscape:export-ydpi="112.14867" />
@@ -118,5 +118,27 @@
        inkscape:export-filename="C:\Users\User\Desktop\rect1587.png"
        inkscape:export-xdpi="95.952179"
        inkscape:export-ydpi="95.952179" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:14.1111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="131.67592"
+       y="129.93515"
+       id="text2618"><tspan
+         sodipodi:role="line"
+         id="tspan2616"
+         style="font-size:14.1111px;stroke-width:0.264583"
+         x="131.67592"
+         y="129.93515">2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:14.1111px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="69.76342"
+       y="129.93515"
+       id="text6884"><tspan
+         sodipodi:role="line"
+         id="tspan6882"
+         style="font-size:14.1111px;stroke-width:0.264583"
+         x="69.76342"
+         y="129.93515">1</tspan></text>
   </g>
 </svg>

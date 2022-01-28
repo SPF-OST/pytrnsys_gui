@@ -9,10 +9,11 @@ import typing as _tp
 from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItemFourPorts import BlockItemFourPorts
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-
+from trnsysGUI.massFlowSolver import InternalPiping
 
 class IceStorageTwoHx(BlockItemFourPorts):
     def __init__(self, trnsysType, parent, **kwargs):
@@ -128,3 +129,21 @@ class IceStorageTwoHx(BlockItemFourPorts):
             os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)
+
+    def getInternalPiping(self) -> InternalPiping:
+        side1Input = _mfn.PortItem("leftSideInput", _mfn.PortItemType.INPUT)
+        side1Output = _mfn.PortItem("leftSideOutput", _mfn.PortItemType.OUTPUT)
+        side1Pipe = _mfn.Pipe(f"{self.displayName}leftSide", self.childIds[0], side1Input, side1Output)
+
+        side2Input = _mfn.PortItem("rightSideInput", _mfn.PortItemType.INPUT)
+        side2Output = _mfn.PortItem("rightSideOutput", _mfn.PortItemType.OUTPUT)
+        side2Pipe = _mfn.Pipe(f"{self.displayName}rightSide", self.childIds[1], side2Input, side2Output)
+
+        modelPortItemsToGraphicalPortItem = {
+            side1Input: self.inputs[0],
+            side1Output: self.outputs[0],
+            side2Input: self.inputs[1],
+            side2Output: self.outputs[1]
+        }
+
+        return InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)

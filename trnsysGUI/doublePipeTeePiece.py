@@ -19,7 +19,7 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.h = 40
 
         self.inputs.append(DoublePipePortItem("i", 0, self))
-        self.inputs.append(DoublePipePortItem("i", 2, self))
+        self.outputs.append(DoublePipePortItem("o", 2, self))
         self.outputs.append(DoublePipePortItem("o", 1, self))
 
         self.changeSize()
@@ -43,27 +43,27 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         if rotationAngle == 270:
             return _img.DP_TEE_PIECE_ROTATED_270
 
-        raise AssertionError("Can't get here.")
+        raise AssertionError("Invalid rotation angle.")
 
     def changeSize(self):
         width, _ = self._getCappedWithAndHeight()
         self._positionLabel()
 
-        self.origInputsPos = [[0, 30], [width, 30]]
-        self.origOutputsPos = [[30, 0]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
+        self.origInputsPos = [[0, 30]]
+        self.origOutputsPos = [[width, 30], [30, 0]]
 
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
 
         # pylint: disable=duplicate-code  # 1
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         # pylint: disable=duplicate-code  # 1
-        self.outputs[0].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
+        self.outputs[1].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
 
     def encode(self):
         portListInputs = []
@@ -116,19 +116,19 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         resBlockList.append(self)
 
     def getInternalPiping(self) -> InternalPiping:
-        coldInput1: _mfn.PortItem = ColdPortItem("Cold Input 1", _mfn.PortItemType.INPUT)
-        coldInput2: _mfn.PortItem = ColdPortItem("Cold Input 2", _mfn.PortItemType.INPUT)
-        coldOutput: _mfn.PortItem = ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
-        coldTeePiece = _mfn.TeePiece(self.displayName + "Cold", self.childIds[0], coldInput1, coldInput2, coldOutput)
+        coldInput: _mfn.PortItem = ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
+        coldOutput1: _mfn.PortItem = ColdPortItem("coldStraightOutput", _mfn.PortItemType.OUTPUT)
+        coldOutput2: _mfn.PortItem = ColdPortItem("coldOrthogonalOutput", _mfn.PortItemType.OUTPUT)
+        coldTeePiece = _mfn.TeePiece(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput1, coldOutput2)
         coldModelPortItemsToGraphicalPortItem = {
-            coldInput1: self.inputs[0], coldInput2: self.inputs[1], coldOutput: self.outputs[0]}
+            coldInput: self.inputs[0], coldOutput1: self.outputs[0], coldOutput2: self.outputs[1]}
 
-        hotInput1: _mfn.PortItem = HotPortItem("Hot Input 1", _mfn.PortItemType.INPUT)
-        hotInput2: _mfn.PortItem = HotPortItem("Hot Input 2", _mfn.PortItemType.INPUT)
-        hotOutput: _mfn.PortItem = HotPortItem("Hot Output 1", _mfn.PortItemType.OUTPUT)
-        hotTeePiece = _mfn.TeePiece(self.displayName + "Hot", self.childIds[1], hotInput1, hotInput2, hotOutput)
+        hotInput: _mfn.PortItem = HotPortItem("hotInput", _mfn.PortItemType.INPUT)
+        hotOutput1: _mfn.PortItem = HotPortItem("hotStraightOutput", _mfn.PortItemType.OUTPUT)
+        hotOutput2: _mfn.PortItem = HotPortItem("hotOrthogonalOutput", _mfn.PortItemType.OUTPUT)
+        hotTeePiece = _mfn.TeePiece(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput1, hotOutput2)
         hotModelPortItemsToGraphicalPortItem = {
-            hotInput1: self.inputs[0], hotInput2: self.inputs[1], hotOutput: self.outputs[0]}
+            hotInput: self.inputs[0], hotOutput1: self.outputs[0], hotOutput2: self.outputs[1]}
 
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
 

@@ -9,10 +9,11 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
+from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin, InternalPiping
 
 
 class Boiler(BlockItem, MassFlowNetworkContributorMixin):
@@ -51,8 +52,8 @@ class Boiler(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[w, delta]]
-        self.origOutputsPos = [[w, h - delta]]
+        self.origInputsPos = [[w, h - delta]]
+        self.origOutputsPos = [[w, delta]]
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
 
@@ -106,10 +107,8 @@ class Boiler(BlockItem, MassFlowNetworkContributorMixin):
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
@@ -131,9 +130,16 @@ class Boiler(BlockItem, MassFlowNetworkContributorMixin):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\Boiler_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)
+
+    def getInternalPiping(self) -> InternalPiping:
+        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
+
+        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+
+        return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})

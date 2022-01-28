@@ -32,8 +32,8 @@ class IceStorage(BlockItem, MassFlowNetworkContributorMixin):
         return _img.ICE_STORAGE_SVG
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("IceStorage Input", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("IceStorage Output", _mfn.PortItemType.OUTPUT)
+        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 
         return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})

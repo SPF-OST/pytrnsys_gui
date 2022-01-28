@@ -37,13 +37,13 @@ class DoubleDoublePipeConnector(DoublePipeConnectorBase):
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
     def getInternalPiping(self) -> InternalPiping:
-        coldInput: _mfn.PortItem = ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
-        coldOutput: _mfn.PortItem = ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
+        coldInput: _mfn.PortItem = ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
+        coldOutput: _mfn.PortItem = ColdPortItem("coldOutput", _mfn.PortItemType.OUTPUT)
         coldTeePiece = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
         coldModelPortItemsToGraphicalPortItem = {coldInput: self.outputs[0], coldOutput: self.inputs[0]}
 
-        hotInput: _mfn.PortItem = HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
-        hotOutput: _mfn.PortItem = HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
+        hotInput: _mfn.PortItem = HotPortItem("hotInput", _mfn.PortItemType.INPUT)
+        hotOutput: _mfn.PortItem = HotPortItem("hotOutput", _mfn.PortItemType.OUTPUT)
         hotTeePiece = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput)
         hotModelPortItemsToGraphicalPortItem = {hotInput: self.inputs[0], hotOutput: self.outputs[0]}
 
