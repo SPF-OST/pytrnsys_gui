@@ -29,7 +29,7 @@ FilePath = "res/Config.txt"
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
-    def __init__(self, trnsysType, parent, **kwargs):
+    def __init__(self, trnsysType, parent, displayNamePrefix = None, displayName = None, **kwargs):
         super().__init__(None)
 
         self.logger = parent.logger
@@ -40,10 +40,12 @@ class BlockItem(QGraphicsPixmapItem):
         self.id = self.parent.parent().idGen.getID()
         self.propertyFile = []
 
-        if "displayName" in kwargs:
-            self.displayName = kwargs["displayName"]
+        if displayNamePrefix != None:
+            self.displayName = displayNamePrefix + "_" + str(self.id)
+        elif displayName != None:
+            self.displayName = displayName
         else:
-            self.displayName = trnsysType + "_" + str(self.id)
+            raise Exception('No display name defined.')
 
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
