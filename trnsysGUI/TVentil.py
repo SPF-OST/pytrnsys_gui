@@ -207,8 +207,8 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
                 unitText += outputVariable.name + "\n"
 
             unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.outputs[1].connectionList[0].displayName}\n"
             unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
 
             unitText += "***Initial values\n"
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
