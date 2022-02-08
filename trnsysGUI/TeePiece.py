@@ -1,11 +1,17 @@
 # pylint: skip-file
 # type: ignore
 
+import dataclasses as _dc
 import typing as _tp
+import uuid as _uuid
 
+import dataclasses_jsonschema as _dcj
+
+import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.serialization as _ser
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
@@ -19,7 +25,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         self.changeSize()
 
@@ -122,3 +128,114 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
             return f, unitNumber
         else:
             return "", startingUnit
+        
+    def decode(self, i, resBlockList):
+        model = TeePieceModel.from_dict(i)
+
+        self.setName(model.BlockDisplayName)
+        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.id = model.Id
+        self.trnsysId = model.trnsysId
+    
+        self.inputs[0].id = model.portsIdsIn[0]
+        self.outputs[0].id = model.portsIdsOut[0]
+        self.outputs[1].id = model.portsIdsOut[1]
+
+        self.updateFlipStateH(model.flippedH)
+        self.updateFlipStateV(model.flippedV)
+        self.rotateBlockToN(model.rotationN)
+
+        resBlockList.append(self)
+        
+    def encode(self):
+        portListInputs = []
+        portListOutputs = []
+
+        for inp in self.inputs:
+            portListInputs.append(inp.id)
+        for output in self.outputs:
+            portListOutputs.append(output.id)
+
+        blockPosition = (float(self.pos().x()), float(self.pos().y()))
+
+        teePieceModel = TeePieceModel(
+            self.name,
+            self.displayName,
+            blockPosition,
+            self.id,
+            self.trnsysId,
+            portListInputs,
+            portListOutputs,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+        )
+
+        dictName = "Block-"
+
+        dct = teePieceModel.to_dict()
+
+        return dictName, dct
+
+
+@_dc.dataclass
+class TeePieceModel(_ser.UpgradableJsonSchemaMixin):
+    BlockName: str
+    BlockDisplayName: str
+    blockPosition: _tp.Tuple[float, float]
+    Id: int
+    trnsysId: int
+    portsIdsIn: _tp.List[int]
+    portsIdsOut: _tp.List[int]
+    flippedH: bool
+    flippedV: bool
+    rotationN: int
+    
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "TeePieceModel":
+        teePieceModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(TeePieceModel, teePieceModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
+        return _bim.BlockItemModel
+
+    @classmethod
+    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TeePieceModel":
+        assert len(superseded.portsIdsIn) == 2
+        assert len(superseded.portsIdsOut) == 1
+
+        inputPortIds = [superseded.portsIdsIn[0]]
+        outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
+        
+        return TeePieceModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.blockPosition,
+            superseded.Id,
+            superseded.trnsysId,
+            inputPortIds,
+            outputPortIds,
+            superseded.flippedH,
+            superseded.flippedV,
+            superseded.rotationN,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('3fff9a8a-d40e-42e2-824d-c015116d0a1d')

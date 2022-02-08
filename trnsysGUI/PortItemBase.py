@@ -257,7 +257,7 @@ class PortItemBase(QGraphicsEllipseItem):
         portItemsAndInternalRealNode = internalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(self)
         portItems = [pr.portItem for pr in portItemsAndInternalRealNode]
         formattedPortItems = [f"{p.name} ({p.type.value})" for p in portItems]
-        jointFormattedPortItems = "\n\t".join(formattedPortItems)
+        jointFormattedPortItems = "\n".join(formattedPortItems)
         self.parent.parent.parent().listV.addItem(f"Names: {jointFormattedPortItems}")
 
         self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)

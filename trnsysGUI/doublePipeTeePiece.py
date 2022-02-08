@@ -1,14 +1,19 @@
 # pylint: skip-file
 
+import dataclasses as _dc
 import typing as _tp
+import uuid as _uuid
 
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+import dataclasses_jsonschema as _dcj
+
 import trnsysGUI.images as _img
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.serialization as _ser
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.doublePipeConnectorBase import DoublePipeBlockItemModel
 from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
+from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
@@ -20,7 +25,7 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
 
         self.inputs.append(DoublePipePortItem("i", 0, self))
         self.outputs.append(DoublePipePortItem("o", 2, self))
-        self.outputs.append(DoublePipePortItem("o", 1, self))
+        self.outputs.append(DoublePipePortItem("o", 2, self))
 
         self.changeSize()
 
@@ -76,7 +81,7 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
 
         blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-        teePieceModel = DoublePipeBlockItemModel(
+        doublePipeTeePieceModel = DoublePipeTeePieceModel(
             self.name,
             self.displayName,
             blockPosition,
@@ -91,10 +96,10 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         )
 
         dictName = "Block-"
-        return dictName, teePieceModel.to_dict()
+        return dictName, doublePipeTeePieceModel.to_dict()
 
     def decode(self, i, resBlockList):
-        model = DoublePipeBlockItemModel.from_dict(i)
+        model = DoublePipeTeePieceModel.from_dict(i)
 
         self.setName(model.BlockName)
         self.displayName = model.BlockDisplayName
@@ -103,17 +108,16 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.trnsysId = model.trnsysId
         self.childIds = model.childIds
 
-        for index, inp in enumerate(self.inputs):
-            inp.id = model.portsIdsIn[index]
-
-        for index, out in enumerate(self.outputs):
-            out.id = model.portsIdsOut[index]
+        self.inputs[0].id = model.portsIdsIn[0]
+        self.outputs[0].id = model.portsIdsOut[0]
+        self.outputs[1].id = model.portsIdsOut[1]
 
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
 
         resBlockList.append(self)
+
 
     def getInternalPiping(self) -> InternalPiping:
         coldInput: _mfn.PortItem = ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
@@ -172,8 +176,8 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
             unitText += outputVariable.name + "\n"
 
         unitText += f"T{self.inputs[0].connectionList[0].displayName}{temperature}\n"
-        unitText += f"T{self.inputs[1].connectionList[0].displayName}{temperature}\n"
         unitText += f"T{self.outputs[0].connectionList[0].displayName}{temperature}\n"
+        unitText += f"T{self.outputs[1].connectionList[0].displayName}{temperature}\n"
 
         unitText += "***Initial values\n"
         unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
@@ -183,3 +187,68 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         unitNumber += 1
 
         return unitNumber, unitText
+
+@_dc.dataclass
+class DoublePipeTeePieceModel(
+    _ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
+    blockPosition: _tp.Tuple[float, float]
+    id: int  # pylint: disable=invalid-name
+    trnsysId: int
+    childIds: _tp.List[int]
+    portsIdsIn: _tp.List[int]
+    portsIdsOut: _tp.List[int]
+    flippedH: bool
+    flippedV: bool
+    rotationN: int
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,  # pylint: disable=duplicate-code #7
+        validate_enums: bool = True,
+    ) -> "DoublePipeTeePieceModel":
+        doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(DoublePipeTeePieceModel, doublePipeTeePieceModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code  # 2
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return DoublePipeBlockItemModel
+
+    @classmethod
+    def upgrade(cls, superseded: DoublePipeBlockItemModel) -> "DoublePipeTeePieceModel":
+        assert len(superseded.portsIdsIn) == 2
+        assert len(superseded.portsIdsOut) == 1
+
+        inputPortIds = [superseded.portsIdsIn[0]]
+        outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
+
+        return DoublePipeTeePieceModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.blockPosition,
+            superseded.id,
+            superseded.trnsysId,
+            superseded.childIds,
+            inputPortIds,
+            outputPortIds,
+            superseded.flippedH,
+            superseded.flippedV,
+            superseded.rotationN,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('3fff9a8a-d40e-42e2-824d-c015116d0a1d')
