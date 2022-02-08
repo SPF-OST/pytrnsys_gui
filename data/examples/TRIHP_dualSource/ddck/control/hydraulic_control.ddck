@@ -1,0 +1,35 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 8
+*** Pump outlet temperatures
+TPuSH = TPiSHOutMix
+TtapWater = TPiDhwDemand
+TPuHpEvap = TPiGhxOut
+TPuHpShCond = TPiPuHpShIn
+TPuHpDhwCond = TPiPuHpDhwIn
+TPuDhw = TPiHxDhwOut
+TPuCirc = TPiPuCircIn
+TPuFCU = TPiFCUOutMix
+
+EQUATIONS 18
+*** Massflowrates
+MfrPuSH = 548
+xFracDivSh = 1.0
+MfrsupplyWater = 1000
+xFracDivHpEvap = 0.0
+xFracDivCondTOTesDhw = 1.0
+xFracDivSHCool = 0.0
+MfrPuHpEvap = 511
+MfrPuHpShCond = 740
+xFracDivDhw = 1.0
+xFracDivDhwOut = 1.0
+xFracDivCool = 0.0
+MfrPuHpDhwCond = 599
+xFracDivTesDhwOut = 0.0
+xFracDivHp = 0.0
+MfrPuDhw = 70
+MfrPuCirc = 385
+MfrPuFCU = 527
+xFracDivFCU = 0.0
+

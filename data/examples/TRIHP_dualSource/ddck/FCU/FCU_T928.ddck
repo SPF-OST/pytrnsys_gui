@@ -1,0 +1,147 @@
+*******************************
+**BEGIN FCU_T928.ddck 
+*******************************
+    
+*****************************************
+** Contact person : Thibault Pean, IREC
+** Creation date  : 19/04/2021
+** Last changes   : date, name 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Overall description of the ddck file
+** TODO: Any improvements needed
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+** tIn from hydraulic 
+** mIn from hydraulic
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+** which outputs will be used to connect the hydraulic slver
+** typically tOutType will be defined here to be used in the hydraulic ddck
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+EQUATIONS 2
+qSysIn_QCoolFCU  	= FCU_Qcool_kW !   
+elSysOut_ElecFCU	= FCU_FanP_kW !
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+** Re-assing here the variables necessary from other types
+** variableInternal = variableExternal
+** Exception: those from general variables
+
+***********************************
+** outputs to other ddck
+***********************************
+
+** Add here the outputs of the TYPE or TYPES that will be used in other types
+** Exception: those for printers and so on dont need to be here.
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+CONSTANTS 11
+PeakCoolingPower = 28.3 !kW  For Spanish new building in Tarragona
+PowerCoeff1 = 0.3437 !Fitted on BAXI FCU
+PowerCoeff2 = -1.2588 !Fitted on BAXI FCU
+PowerCoeff3 = 1.9151 !Fitted on BAXI FCU
+RatedPowerFCU = 10.79 ! kW for the BAXI FCU in cooling
+RatedAirFlowFCU = 2134/3.6 ! m3/h converted to l/s
+RatedFanPowerFCU = 106*3.6 ! W converted to kJ/h
+ScaleFCU = PeakCoolingPower / RatedPowerFCU
+RatedAirFlowBui = ScaleFCU * RatedAirFlowFCU
+RatedFanPowerBui = ScaleFCU * RatedFanPowerFCU
+MfrFCUNom = ScaleFCU*435 !13920 !kg/h   435 * 32 flats
+
+
+UNIT 8 TYPE 22	 Type22
+PARAMETERS 2
+0		! 1 Mode
+0		! 2 Maximum number of oscillations
+INPUTS 7
+TroomSetCool		! [unconnected] Setpoint
+Troom		! [unconnected] Controlled variable
+BoAC		! [unconnected] On / Off signal
+0,0		! [unconnected] Minimum control signal
+0,0		! [unconnected] Maximum control signal
+0,0		! [unconnected] Threshold for non-zero output
+0,0		! [unconnected] Tolerance on tracking error
+*** INITIAL INPUT VALUES
+0 0 1 0 1 0.1 0 
+*------------------------------------------------------------------------------
+
+EQUATIONS 1
+CtrlFCU = ABS([8,1])
+
+
+***********************************
+** Begin TYPE928 for FCU
+***********************************
+UNIT 2 TYPE 928	 
+PARAMETERS 10
+CPWAT		! 1 Specific heat of liquid stream
+2		! 2 Humidity mode
+RatedAirFlowBui		! 3 Rated air flow rate
+RatedFanPowerBui		! 4 Rated fan power
+0.9		! 5 Motor efficiency
+1.		! 6 Motor heat loss fraction
+3		! 7 Number of power coefficients
+PowerCoeff1		! 8 Power coefficient-1
+PowerCoeff2		! 9 Power coefficient-2
+PowerCoeff3		! 10 Power coefficient-3
+INPUTS 14
+TPiFCUIn		! [unconnected] Inlet liquid temperature
+MfrPiFCUIn		! [unconnected] Inlet liquid flow rate
+Troom		! [unconnected] Return air temperature
+0,0		! [unconnected] Return air humidity ratio
+0,0		! [unconnected] Return air %RH
+0,0		! [unconnected] Return air pressure
+CtrlFCU		! [unconnected] Fan control signal
+0,0		! [unconnected] Fan pressure rise
+0,0		! [unconnected] Coil pressure drop
+0,0		! [unconnected] Fresh air temperature
+0,0		! [unconnected] Fresh air humidity ratio
+0,0		! [unconnected] Fresh air %RH
+0,0		! [unconnected] Damper position
+0,0		! [unconnected] Coil bypass fraction
+*** INITIAL INPUT VALUES
+10 0 20.0 0.008 50.0 1.0 0.0 0. 0 20.0 0.008 50. 0. 0.1 
+*------------------------------------------------------------------------------
+! OUTPUTS
+
+EQUATIONS 5
+FCU_Tout = [2,1] !Exiting Fluid temperature [C]
+FCU_MfrOut = [2,2] !Exiting Fluid Flow rate [kg/h]
+FCU_TairOut = [2,3] !Outlet air temperature [C]
+FCU_FanP_kW = [2,8]/3600 !Fan power [kJ/h] to kW
+FCU_Qcool_kW = [2,11]/3600 !Total heat transfer to air [kJ/h] to kW, in cooling mode it is positive
+
+***********************************
+** Monthly printer
+***********************************
+
+***********************************
+** Hourly printer
+***********************************
+
+***********************************
+** Online plotter
+***********************************
+
+** only if all variables are defined locally in the ddck

@@ -33,13 +33,13 @@ MfrPuHpDhwCond = MfrHpCondNom*BoHpWWOn! Mfr pump heat pump DHW part
 
 *** Valve positions
 EQUATIONS 7
-xFracDivCondTOTesDhw = 1		! 
+xFracDivCondTOTesDhw = 0		! 
 xFracDivSHCool = CoolingOnRc
 xFracDivDhw = NOT(BoDHWTapping)
 xFracDivDhwOut = NOT(BoDHWTapping)
 xFracDivCool = 0!NOT(CoolingOnRc)
-xFracDivHp = 0
-xFracDivTesDhwOut = BoHpSHon
+xFracDivHp = BoHpWWon
+xFracDivTesDhwOut = 1!BoHpSHon
 
 EQUATIONS 4
 TdhwSet = TdhwSetProfile		! Tset DHW storage
@@ -79,9 +79,10 @@ EQUATIONS 1
 xFracDivHpEvap =  CoolingOn!1.-[442,5] 
 
 
-UNIT 82 TYPE 993      ! Input value recall (element RcA) DC CHANGED
-PARAMETERS 1     
+UNIT 82 TYPE 93      ! Input value recall (element RcA) DC CHANGED
+PARAMETERS 2     
 4    ! 1: number of variables to be remembered
+1
 INPUTS 4    
 HpIsOn BoHpWWon BoHpSHon CoolingOn  !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh     
 0 0  0  0 !0 0 0  

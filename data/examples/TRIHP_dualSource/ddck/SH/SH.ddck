@@ -32,6 +32,10 @@ EQUATIONS 3
 Tdp2In_Tes2 = TPiTesShIn
 Mfrdp2_Tes2 = MfrPiTesShIn
 Tdp2InRev_Tes2 = TPiTesShOut
+EQUATIONS 3
+Tdp3In_Tes2 = TPiTesSCIn
+Mfrdp3_Tes2 = MfrPiTesSCIn
+Tdp3InRev_Tes2 = TPiTesSCOut
 CONSTANTS 2
 zAux1_Tes2=0.00
 qAux1_Tes2=0.00
@@ -39,10 +43,11 @@ qAux1_Tes2=0.00
 *************************************
 **** Outputs to hydraulic solver ****
 *************************************
-EQUATIONS 2
+EQUATIONS 3
 *** direct port outputs
 Tdp1Out_Tes2=[50,1] ! 
 Tdp2Out_Tes2=[50,3] ! 
+Tdp3Out_Tes2=[50,5] ! 
 
 *************************************
 ****** Parameters of Type1924 *******
@@ -57,12 +62,19 @@ zOutDp1_Tes2=0.05
 CONSTANTS 2
 zInDp2_Tes2=0.05
 zOutDp2_Tes2=0.95
+*********Connecting values of DIRECT PORT=3***********
+CONSTANTS 2
+zInDp3_Tes2=0.90
+zOutDp3_Tes2=0.10
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
 *********Constant of DIRECT PORT=2***********
 CONSTANTS 1
 Dp2Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
+*********Constant of DIRECT PORT=3***********
+CONSTANTS 1
+Dp3Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
 ********** HEAT EXCHANGER CONSTANTS*******
 CONSTANTS 1
 nHxUsed_Tes2=0 
@@ -149,7 +161,7 @@ tMax_Tes2
 0	0	0 ! 17-20 unsused parameters
 zInDp1_Tes2 zOutDp1_Tes2 zero Dp1Strat_Tes2 ! 21 - 25: zIn, zOut, cp, strat
 zInDp2_Tes2 zOutDp2_Tes2 zero Dp2Strat_Tes2 ! 26 - 30: zIn, zOut, cp, strat
--1 -1 zero zero ! 31 - 35: zIn, zOut, cp, strat
+zInDp3_Tes2 zOutDp3_Tes2 zero Dp3Strat_Tes2 ! 31 - 35: zIn, zOut, cp, strat
 -1 -1 zero zero ! 36 - 40: zIn, zOut, cp, strat
 -1 -1 zero zero ! 41 - 45: zIn, zOut, cp, strat
 -1 -1 zero zero ! 46 - 50: zIn, zOut, cp, strat
@@ -186,7 +198,7 @@ INPUTS 69
 ************10 DIRECT PORTS INPUTS***************
 Tdp1In_Tes2 Mfrdp1_Tes2 Tdp1InRev_Tes2
 Tdp2In_Tes2 Mfrdp2_Tes2 Tdp2InRev_Tes2
-zero zero zero
+Tdp3In_Tes2 Mfrdp3_Tes2 Tdp3InRev_Tes2
 zero zero zero
 zero zero zero
 zero zero zero
@@ -214,9 +226,10 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
 *****************OUTPUTS****************
-EQUATIONS 2
+EQUATIONS 3
 Qdp1_Tes2=[50,31] ! 
 Qdp2_Tes2=[50,32] ! 
+Qdp3_Tes2=[50,33] ! 
 EQUATIONS 21
 TAvg_Tes2 = [50,180] ! Average storage temperature 
 ***Temperatures at 10 equallay distributed height 
@@ -259,9 +272,9 @@ unitPrinter_Tes2 ! 1: Logical unit number, -
 1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 -1  ! 4: Printing & integrating interval, h. -1 for monthly integration
 0  ! 5: Number of inputs to avoid integration
-INPUTS 8
-Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 qHeatSource_Tes2 
-zero zero zero zero zero zero zero zero 
+INPUTS 9
+Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 Qdp3_Tes2 qHeatSource_Tes2 
+zero zero zero zero zero zero zero zero zero 
 *************************************
 ********** Online Plotter ***********
 *************************************

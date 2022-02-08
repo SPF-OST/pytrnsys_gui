@@ -155,8 +155,8 @@ myFormatWeatherData = formatWeatherData   !formatWeatherData from the specific w
 CONSTANTS 8  ! Values to be filled up by GUI
 slopeSurfUser_1 = 45. ! Slope of surface-5
 aziSurfUser_1 = 0.    ! Azimuth of surface-5
-slopeSurfUser_2 = 10. ! Slope of surface-6
-aziSurfUser_2 = 110.    ! Azimuth of surface-6
+slopeSurfUser_2 = 0. ! Slope of surface-6  CHANGED TP 12-10-2021
+aziSurfUser_2 = 0. !110.    ! Azimuth of surface-6 CHANGED TP 12-10-2021
 slopeSurfUser_3 = 10. ! Slope of surface-7
 aziSurfUser_3 = 70.    ! Azimuth of surface-7
 slopeSurfUser_4 = 10. ! Slope of surface-8

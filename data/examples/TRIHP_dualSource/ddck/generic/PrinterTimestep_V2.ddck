@@ -1,0 +1,140 @@
+*******************************
+**BEGIN PrinterTimestep_V2.ddck 
+*******************************
+    
+*****************************************
+** Contact person : author   
+** Creation date  : date
+** Last changes   : date, name 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Overall description of the ddck file
+** TODO: Any improvements needed
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+
+** tIn from hydraulic 
+** mIn from hydraulic
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+** which outputs will be used to connect the hydraulic slver
+** typically tOutType will be defined here to be used in the hydraulic ddck
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+
+** Add here those variables that will go into the overall energy balance of the system
+** These values will be sued to automatically generate the energy balance
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+** Re-assing here the variables necessary from other types
+** variableInternal = variableExternal
+** Exception: those from general variables
+
+***********************************
+** outputs to other ddck
+***********************************
+
+** Add here the outputs of the TYPE or TYPES that will be used in other types
+** Exception: those for printers and so on dont need to be here.
+
+***********************************
+** Begin CONSTANTS
+***********************************
+
+***********************************
+** Begin TYPE
+***********************************
+
+CONSTANTS 1
+unitPrinterTimestep=1212
+   
+ASSIGN temp\AllVar_Timestep.Prt   unitPrinterTimestep     
+
+     
+UNIT 1212 TYPE 25      ! User defined Printer
+PARAMETERS 10     
+dtPrUser                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitPrinterTimestep     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 99
+tAmbDry relHum vWind IT_H TGHXout TRT TGhxIn TGHXmon5 ThpEvapIn MfrEvapIn THpCondIn MfrCondIn THpDesIn MfrDesIn MfrEvapIn_mod THpDesOut QHpSink_SH_kW QHpSink_DHW_kW elSysIn_Q_HpCompD TDHW_up TDHW_lo TSHC_up TSHC_lo TDHW_ON TDHW_OFF TSH_ON TSH_OFF TSC_ON TSC_OFF BoHS isSummer BoDHW BoSH BoSC BoFC BoAC MoDS TsupDHW TsupSH TsupSC TsupRF TRdSet TRdFl TRdRt MfrBuiRd FCU_Tout FCU_MfrOut FCU_TairOut FCU_FanP_kW FCU_Qcool_kW 
+PelHH_kW PelPVDC_kW PelPVAC_kW PelHeatSys_kW PelGrid_kW PelBatDC_kW SOCBat PelBatLoss_kW PelLossesDCAC PvUsed_kW BoACimb BoDCimb BoTotimb BoCharge Troom TMass
+Tdp2Out_Tes2 Tdp2In_Tes2 Mfrdp2_Tes2 Imb_Tes2 sumQv_Tes2 sumQLoss_Tes2 sumQAcum_Tes2 sumQPorts_Tes2 Tdp1In_Tes2 Tdp1Out_Tes2 Mfrdp1_Tes2 Tdp3Out_Tes2 Tdp3In_Tes2 Mfrdp3_Tes2
+frCond frCondOut PRdIn_kW QHpEvap_kW QHpSink_SC_kW THpCondOut TroomSet_Year PbuiIntGain
+Tdp1In_Tes1 Tdp1Out_Tes1 Mfrdp1_Tes1 Tdp2In_Tes1 Tdp2Out_Tes1 Mfrdp2_Tes1 Tdp3In_Tes1 Tdp3Out_Tes1 Mfrdp3_Tes1 TAvg_Tes1 Tavg_Tes2
+*******************************
+tAmbDry relHum vWind IT_H TGHXout TRT TGhxIn TGHXmon5 ThpEvapIn MfrEvapIn THpCondIn MfrCondIn THpDesIn MfrDesIn MfrEvapIn_mod THpDesOut QHpSink_SH_kW QHpSink_DHW_kW elSysIn_Q_HpCompD TDHW_up TDHW_lo TSHC_up TSHC_lo TDHW_ON TDHW_OFF TSH_ON TSH_OFF TSC_ON TSC_OFF BoHS isSummer BoDHW BoSH BoSC BoFC BoAC MoDS TsupDHW TsupSH TsupSC TsupRF TRdSet TRdFl TRdRt MfrBuiRd FCU_Tout FCU_MfrOut FCU_TairOut FCU_FanP_kW FCU_Qcool_kW 
+PelHH_kW PelPVDC_kW PelPVAC_kW PelHeatSys_kW PelGrid_kW PelBatDC_kW SOCBat PelBatLoss_kW PelLossesDCAC PvUsed_kW BoACimb BoDCimb BoTotimb BoCharge Troom TMass
+Tdp2Out_Tes2 Tdp2In_Tes2 Mfrdp2_Tes2 Imb_Tes2 sumQv_Tes2 sumQLoss_Tes2 sumQAcum_Tes2 sumQPorts_Tes2 Tdp1In_Tes2 Tdp1Out_Tes2 Mfrdp1_Tes2 Tdp3Out_Tes2 Tdp3In_Tes2 Mfrdp3_Tes2
+frCond frCondOut PRdIn_kW QHpEvap_kW QHpSink_SC_kW THpCondOut TroomSet_Year PbuiIntGain
+Tdp1In_Tes1 Tdp1Out_Tes1 Mfrdp1_Tes1 Tdp2In_Tes1 Tdp2Out_Tes1 Mfrdp2_Tes1 Tdp3In_Tes1 Tdp3Out_Tes1 Mfrdp3_Tes1 TAvg_Tes1 Tavg_Tes2
+
+
+CONSTANTS 1
+unitPrinterEBts=1213
+   
+ASSIGN temp\ENERGY_BALANCE_TS.Prt   unitPrinterEBts     
+
+     
+UNIT 1213 TYPE 25      ! User defined Printer
+PARAMETERS 10     
+dtPrUser                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitPrinterEBts     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 30
+elSysOut_CtrlDemand qSysOut_TesDhwLoss qSysOut_TesDhwAcum elSysIn_Q_TesDhwAux elSysOut_BatLoss elSysIn_Grid elSysOut_Grid 
+elSysOut_InvLoss elSysOut_BatAcumCharge elSysIn_BatAcumDischarge PelLossesDCAC elSysIn_PV qSysIn_Ghx 
+elSysIn_Q_HpCompD qSysIn_Qair qSysOut_PipeLoss qSysOut_BuiDemand	 qSysIn_BuiDemand	 elSysOut_PuShDemand	 
+qSysIn_QCoolFCU	 elSysOut_ElecFCU	 qSysOut_TesSHLoss qSysOut_TesSHAcum elSysIn_Q_TesSHAux qSysOut_DhwDemand 
+elSysOut_HHDemand qSysOut_CiBuiSH qSysOut_CiBui qSysOut_CiLoss qImb
+*******************************
+elSysOut_CtrlDemand qSysOut_TesDhwLoss qSysOut_TesDhwAcum elSysIn_Q_TesDhwAux elSysOut_BatLoss elSysIn_Grid elSysOut_Grid
+elSysOut_InvLoss elSysOut_BatAcumCharge elSysIn_BatAcumDischarge PelLossesDCAC elSysIn_PV qSysIn_Ghx
+elSysIn_Q_HpCompD qSysIn_Qair qSysOut_PipeLoss qSysOut_BuiDemand	 qSysIn_BuiDemand	 elSysOut_PuShDemand	 
+qSysIn_QCoolFCU	 elSysOut_ElecFCU	 qSysOut_TesSHLoss qSysOut_TesSHAcum elSysIn_Q_TesSHAux qSysOut_DhwDemand 
+elSysOut_HHDemand qSysOut_CiBuiSH qSysOut_CiBui qSysOut_CiLoss qImb
+
+*******************************
+
+
+***********************************
+** Monthly printer
+***********************************
+
+***********************************
+** Hourly printer
+***********************************
+
+***********************************
+** Online plotter
+***********************************
+
+** only if all variables are defined locally in the ddck

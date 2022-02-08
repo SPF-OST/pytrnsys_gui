@@ -1,0 +1,68 @@
+UNIT 162 TYPE 983     ! HP model
+PARAMETERS 14     
+tauWPstart     ! 1 
+tauWPstop     ! 2 
+TWPEvapIce     ! 3 
+EtaDefrost     ! 4 
+PelWPVen     ! 5 
+PelHpCtr_kW     ! 6 
+timeHpBlock     ! 7 
+Moloss     ! 8 
+Ctherm     ! 9 
+Ualoss     ! 10 
+MoCtrl     ! 11 
+frCOP0     ! 12 
+frCOP1     ! 13 
+frCOP2     ! 14 
+INPUTS 48     
+Coeff_a1        !  
+Coeff_a2         !  
+Coeff_a3          !  
+Coeff_a4          !  
+Coeff_a5          !  
+Coeff_a6          !  
+Coeff_a7          !  
+Coeff_a8          !  
+Coeff_a9          !  
+Coeff_a10          !  
+Coeff_b1          !  
+Coeff_b2          !  
+Coeff_b3          !  
+Coeff_b4          !  
+Coeff_b5          !  
+Coeff_b6          !  
+Coeff_b7          !  
+Coeff_b8          !  
+Coeff_b9          !  
+Coeff_b10          !  
+Coeff_c1          !  
+Coeff_c2          !  
+Coeff_c3          !  
+Coeff_c4          !  
+Coeff_c5          !  
+Coeff_c6          !  
+Coeff_c7          !  
+Coeff_c8          !  
+Coeff_c9          !  
+Coeff_c10          !  
+ThpEvapIn          !  
+MfrEvapIn_mod          !  
+THpDesIn          !  
+MfrDesIn          !  
+THpCondIn          !  
+MfrCondIn          !  
+myHpIsOn          !  
+RHamb_1          !  
+tAmbHp          !  
+frCond          !  
+frCOP          !  
+CpEvap          !  
+TminEvapTout          !  
+TEvapMaxHp          !  
+cpCond          !  
+tCondMinHP          !  
+tCondMaxHP          !  
+QthSet_HP          !  
+*** INITIAL INPUT VALUES     
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0      
+     

@@ -1,0 +1,111 @@
+****************************
+**Control Dual Source system
+*******************************
+    
+*****************************************
+** Author: Mattia Battaglia        
+** Date:  31.03.2020    
+******************************************
+***************************************************
+******** Central control ddck for the TRi-HP Desuperheater system.
+***************************************************
+
+*** Control modes
+EQUATIONS 7
+BoHpWWon = BoDHW ! Boolean value - DHW charging is needed
+BoHpSHon = BoSH    !*NOT(BoHpWWon)  Boolean value - SH charging is needed
+BoHpSCon = BoSC   !Boolean value - SC charging is needed
+HpIsOn = GT(BoHpWWon + BoHpSHon + BoHpSCon, 0.5) ! HP is on, added the cooling
+qAuxStoreDHW_KW = 0 ! No internal heat source dhw storage
+qAuxStoreSH_KW = 0 ! No internal heat source sh storage
+BoDHWTapping = GT(MfrDHWset,0) ! Bo DHW water tapped in this timestep
+
+
+*** Massflowrates
+EQUATIONS 8
+MfrPuSH = MfrBuiRd				! Mfr control pump SH-loop
+MfrsupplyWater = MfrDHWset		! Mfr tapping water
+MfrPuDHW = MfrSrcDHWHXUsed*BoDHWTapping+NOT(BoDHWTapping)*MfrSrcDHWHXUsed	! Mfr DHW water external heat exchanger source side
+MfrPuCirc = NOT(BoDHWTapping)*150	! Mfr circulation loop
+MfrPuHpEvap = MfrHpEvapNom*hpIsOn*EQL(MoDS,2)+MfrGhxFcNom*BoFC	! Mfr control pump ground source loop
+MfrPuHpShCond = MfrHpCondNom*GT(BoHpSHOn+BoHpSCon,0.5)	! Mfr pump heat pump SH part
+MfrPuHpDhwCond = MfrHpCondNom*BoHpWWOn! Mfr pump heat pump DHW part
+MfrPuFCU = MfrFCUNom*BoAC*CtrlFCU  !IMPLEMENT CONTROL OF THE FCU PUMP
+
+*** Valve positions
+EQUATIONS 8
+xFracDivCondTOTesDhw = BoHpSHOn*(1-BoHpWWOn) !+(1-BoHpSHOn)*BoHpWWOn		! 
+xFracDivHp = GT(BoHpSHOn*(1-BoHpWWOn)+(1-BoHpSHOn)*BoHpWWOn, 0.5)
+xFracDivTesDhwOut = BoHpWWOn*BoHpSHOn
+xFracDivDhw = NOT(BoDHWTapping)
+xFracDivDhwOut = NOT(BoDHWTapping)
+xFracDivSHCool = BoFC !CoolingOnRc  !CHECK WHAT's HAPPENING
+xFracDivCool = 0!NOT(CoolingOnRc)
+xFracDivFCU = 0.0   !ADD A CONTROL FOR THE FCU WITH TYPE 811 LIKE FOR SH
+
+EQUATIONS 1
+TdhwSet = TdhwSetProfile		! Tset DHW storage
+
+
+
+CONSTANTS 2
+T_set_DivSH=TRdSet 		! Set point tempertaure of the sh mixing valve
+T_set_DivHpEvap=25		! Set point tempertaure of the heat pump evaporator mixing valve
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiTeeMixSHIn
+TPiSHInMix
+MfrPiRadOut
+T_set_DivSH
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivSH
+EQUATIONS 1
+xFracDivSH =  1.-[441,5] 
+
+UNIT 442 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiHpEvapIn
+TPiHpEvapMix
+MfrPiGhxOut
+T_set_DivHpEvap
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivHpEvap
+EQUATIONS 1
+xFracDivHpEvap =  BoFC !1.-[442,5] 
+
+
+UNIT 82 TYPE 661      ! Input value recall (element RcA) DC CHANGED
+PARAMETERS 9     
+4    ! 1: number of variables to be remembered
+1 0
+1 0 
+1 0 
+1 0
+INPUTS 4    
+HpIsOn BoHpWWon BoHpSHon BoFC  !ImbHpOnErr_kWh EImbPPiShHot_kWh ImbHpDhwOnErr_kWh     
+0 0  0  0 !0 0 0  
+     
+EQUATIONS 4
+HpIsOnRc = [82,1]         
+BoHpWWonRc = [82,2]     
+BoHpSHonRc = [82,3] 
+CoolingOnRc  = [82,4]
+
+EQUATIONS 1
+PPiCircLoss_kW = PPiPuCircIn_kW+PPiPuCircOut_kW
+
+EQUATIONS 8
+*** Pump outlet temperatures
+TPuSH = TPiSHOutMix
+TtapWater = TPiDhwDemand
+TPuHpEvap = TPiGhxOut
+TPuHpShCond = TPiPuHpShIn
+TPuHpDhwCond = TPiPuHpDhwIn
+TPuDhw = TPiHxDhwOut
+TPuCirc = TPiPuCircIn
+TPuFCU = TPiFCUOutMix

@@ -1,0 +1,36 @@
+*******************************
+**BEGIN MonthlyPrinter.dck
+*******************************
+    
+*****************************************
+** Printer section.
+** Version : v0.0
+** Last Changes: Dani Carbonell        
+** Date: 30.09.2016    
+******************************************
+   
+*** qAuxStore_KW has been deleted, so make sure processing reads qAuxStoreDHW_KW and qAuxStoreSH_KW instead
+
+CONSTANTS 1
+unitPrinterEl=216
+
+ASSIGN    temp\ELECTRIC_MO.Prt      unitPrinterEl     
+UNIT 216 Type 46     ! Printegrator Monthly Values for Electricity
+PARAMETERS 6     
+unitPrinterEl     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration    
+INPUTS 9    
+Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
+*******     
+Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
+
+                    
+    
+
+*******************************
+**END MonthlyPrinter.dck
+*******************************
