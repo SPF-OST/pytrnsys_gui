@@ -275,7 +275,7 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
 
 
 @_dc.dataclass
-class TVentilModel(_ser.UpgradableJsonSchemaMixin):
+class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     BlockName: str
     BlockDisplayName: str
     blockPosition: _tp.Tuple[float, float]
@@ -312,7 +312,7 @@ class TVentilModel(_ser.UpgradableJsonSchemaMixin):
         return _bim.BlockItemModel
 
     @classmethod
-    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TVentilModel":
+    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TVentilModel": # type: ignore[override]
         assert len(superseded.portsIdsIn) == 2
         assert len(superseded.portsIdsOut) == 1
 

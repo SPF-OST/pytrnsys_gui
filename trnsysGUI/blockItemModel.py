@@ -8,18 +8,18 @@ from trnsysGUI import serialization as _ser
 
 
 @_dc.dataclass
-class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    BlockName: str
-    BlockDisplayName: str
-    BlockPosition: _tp.Tuple[float, float]
-    ID: int
+class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
+    BlockPosition: _tp.Tuple[float, float]  # pylint: disable=invalid-name
+    ID: int  # pylint: disable=invalid-name
     trnsysID: int
-    PortsIDIn: _tp.List[int]
-    PortsIDOut: _tp.List[int]
-    FlippedH: bool
-    FlippedV: bool
-    RotationN: int
-    GroupName: str
+    PortsIDIn: _tp.List[int]  # pylint: disable=invalid-name
+    PortsIDOut: _tp.List[int]  # pylint: disable=invalid-name
+    FlippedH: bool  # pylint: disable=invalid-name
+    FlippedV: bool  # pylint: disable=invalid-name
+    RotationN: int  # pylint: disable=invalid-name
+    GroupName: str  # pylint: disable=invalid-name
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
@@ -27,11 +27,11 @@ class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
 
 @_dc.dataclass
-class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
-    BlockName: str
-    BlockDisplayName: str
+class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
-    Id: int
+    Id: int  # pylint: disable=invalid-name
     trnsysId: int
     portsIdsIn: _tp.List[int]
     portsIdsOut: _tp.List[int]
@@ -42,7 +42,7 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def from_dict(
         cls,
-        data: _dcj.JsonDict,
+        data: _dcj.JsonDict,  # pylint: disable=duplicate-code
         validate=True,
         validate_enums: bool = True,
     ) -> "BlockItemModel":
@@ -65,7 +65,7 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
         return BlockItemModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel":
+    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel": # type: ignore[override]
 
         return BlockItemModel(
             superseded.BlockName,
@@ -83,3 +83,4 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("bbc03f36-d1a1-4d97-a9c0-d212ea3a0203")
+    

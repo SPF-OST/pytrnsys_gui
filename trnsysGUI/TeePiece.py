@@ -179,7 +179,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
 
 
 @_dc.dataclass
-class TeePieceModel(_ser.UpgradableJsonSchemaMixin):
+class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     BlockName: str
     BlockDisplayName: str
     blockPosition: _tp.Tuple[float, float]
@@ -216,7 +216,7 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):
         return _bim.BlockItemModel
 
     @classmethod
-    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TeePieceModel":
+    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TeePieceModel":  # type: ignore[override]
         assert len(superseded.portsIdsIn) == 2
         assert len(superseded.portsIdsOut) == 1
 

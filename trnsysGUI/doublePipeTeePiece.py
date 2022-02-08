@@ -219,7 +219,7 @@ class DoublePipeTeePieceModel(
         validate: bool = False,
         validate_enums: bool = True,
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code  # 2
+        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code
         data[".__BlockDict__"] = True
         return data
 
@@ -228,7 +228,7 @@ class DoublePipeTeePieceModel(
         return DoublePipeBlockItemModel
 
     @classmethod
-    def upgrade(cls, superseded: DoublePipeBlockItemModel) -> "DoublePipeTeePieceModel":
+    def upgrade(cls, superseded: DoublePipeBlockItemModel) -> "DoublePipeTeePieceModel": # type: ignore[override]
         assert len(superseded.portsIdsIn) == 2
         assert len(superseded.portsIdsOut) == 1
 
