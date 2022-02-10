@@ -72,8 +72,8 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
         return massFlowLine, equationNr
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("Pump Input", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Pump Output", _mfn.PortItemType.OUTPUT)
+        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
 
         pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
 

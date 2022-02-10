@@ -60,10 +60,6 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        #self.origInputsPos = [[0, delta], [w, delta]]
-        #self.origOutputsPos = [[0, h - delta], [w, h - delta]]
-
-        #upper left is reference
         self.origInputsPos  = [[0, h - 2 * delta],[w, h - delta]] # inlet of [evap, cond]
         self.origOutputsPos = [[0, h - delta],[w, delta]] # outlet of [evap, cond]
 
@@ -72,7 +68,6 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
 
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
         self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
-
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -186,12 +181,12 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        condenserInput = _mfn.PortItem("Condenser Input", _mfn.PortItemType.INPUT)
-        condenserOutput = _mfn.PortItem("Condenser Output", _mfn.PortItemType.OUTPUT)
+        condenserInput = _mfn.PortItem("condenserInput", _mfn.PortItemType.INPUT)
+        condenserOutput = _mfn.PortItem("condenserOutput", _mfn.PortItemType.OUTPUT)
         condenserPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], condenserInput, condenserOutput)
 
-        evaporatorInput = _mfn.PortItem("Evaporator Input", _mfn.PortItemType.INPUT)
-        evaporatorOutput = _mfn.PortItem("Evaporator Output", _mfn.PortItemType.OUTPUT)
+        evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
+        evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)
         evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[1], evaporatorInput, evaporatorOutput)
 
         modelPortItemsToGraphicalPortItem = {

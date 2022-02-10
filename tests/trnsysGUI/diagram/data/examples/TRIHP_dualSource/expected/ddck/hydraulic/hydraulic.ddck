@@ -89,9 +89,9 @@ PARAMETERS 353
 50 25 0 0      !52 : PiDivCool
 25 26 0 0      !53 : PiGhxIn
 26 15 0 0      !54 : PiGhxOut
-88 85 0 0      !55 : HPSide1
-59 68 0 0      !56 : HPSide2
-58 67 0 0      !57 : HPSide3
+88 85 0 0      !55 : HPEvap
+59 68 0 0      !56 : HPCond1
+58 67 0 0      !57 : HPCond2
 57 31 0 0      !58 : PiHpCondOut
 56 47 0 0      !59 : PiHpDesOut
 22 18 0 0      !60 : PiTesDhwIn
@@ -271,12 +271,12 @@ MfrPiGhxIn_A=[450,157]
 MfrPiGhxIn_B=[450,158]
 MfrPiGhxOut_A=[450,160]
 MfrPiGhxOut_B=[450,161]
-MfrHPSide1_A=[450,163]
-MfrHPSide1_B=[450,164]
-MfrHPSide2_A=[450,166]
-MfrHPSide2_B=[450,167]
-MfrHPSide3_A=[450,169]
-MfrHPSide3_B=[450,170]
+MfrHPEvap_A=[450,163]
+MfrHPEvap_B=[450,164]
+MfrHPCond1_A=[450,166]
+MfrHPCond1_B=[450,167]
+MfrHPCond2_A=[450,169]
+MfrHPCond2_B=[450,170]
 MfrPiHpCondOut_A=[450,172]
 MfrPiHpCondOut_B=[450,173]
 MfrPiHpDesOut_A=[450,175]

@@ -1,13 +1,10 @@
 # pylint: skip-file
 # type: ignore
 
-import dataclasses as _dc
 import glob
 import os
 import typing as _tp
-import uuid as _uuid
 
-import dataclasses_jsonschema as _dcj
 from PyQt5 import QtCore
 from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
@@ -15,10 +12,10 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTree
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-import trnsysGUI.serialization as _ser
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand
 from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.blockItemModel import BlockItemModel
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
@@ -29,7 +26,7 @@ FilePath = "res/Config.txt"
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
-    def __init__(self, trnsysType, parent, **kwargs):
+    def __init__(self, trnsysType, parent, displayNamePrefix = None, displayName = None, **kwargs):
         super().__init__(None)
 
         self.logger = parent.logger
@@ -40,10 +37,12 @@ class BlockItem(QGraphicsPixmapItem):
         self.id = self.parent.parent().idGen.getID()
         self.propertyFile = []
 
-        if "displayName" in kwargs:
-            self.displayName = kwargs["displayName"]
+        if displayNamePrefix != None:
+            self.displayName = displayNamePrefix + "_" + str(self.id)
+        elif displayName != None:
+            self.displayName = displayName
         else:
-            self.displayName = trnsysType + "_" + str(self.id)
+            raise Exception('No display name defined.')
 
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
@@ -751,79 +750,3 @@ class BlockItem(QGraphicsPixmapItem):
                 self.logger.debug("filelist:", self.parent.parent().fileList)
 
 
-@_dc.dataclass
-class BlockItemModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    BlockName: str
-    BlockDisplayName: str
-    BlockPosition: _tp.Tuple[float, float]
-    ID: int
-    trnsysID: int
-    PortsIDIn: _tp.List[int]
-    PortsIDOut: _tp.List[int]
-    FlippedH: bool
-    FlippedV: bool
-    RotationN: int
-    GroupName: str
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("b87a3360-eaa7-48f3-9bed-d01224727cbe")
-
-
-@_dc.dataclass
-class BlockItemModel(_ser.UpgradableJsonSchemaMixin):
-    BlockName: str
-    BlockDisplayName: str
-    blockPosition: _tp.Tuple[float, float]
-    Id: int
-    trnsysId: int
-    portsIdsIn: _tp.List[int]
-    portsIdsOut: _tp.List[int]
-    flippedH: bool
-    flippedV: bool
-    rotationN: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "BlockItemModel":
-        data.pop(".__BlockDict__")
-        blockItemModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(BlockItemModel, blockItemModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__BlockDict__"] = True
-        return data
-
-    @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return BlockItemModelVersion0
-
-    @classmethod
-    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel":
-
-        return BlockItemModel(
-            superseded.BlockName,
-            superseded.BlockDisplayName,
-            superseded.BlockPosition,
-            superseded.ID,
-            superseded.trnsysID,
-            superseded.PortsIDIn,
-            superseded.PortsIDOut,
-            superseded.FlippedH,
-            superseded.FlippedV,
-            superseded.RotationN,
-        )
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("bbc03f36-d1a1-4d97-a9c0-d212ea3a0203")

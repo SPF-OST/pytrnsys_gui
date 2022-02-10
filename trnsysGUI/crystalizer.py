@@ -47,8 +47,8 @@ class Crystalizer(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("Crystallizer Input", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Crystallizer Output", _mfn.PortItemType.OUTPUT)
+        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
 
         crystalizer = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
         modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
