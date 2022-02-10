@@ -8,7 +8,7 @@
             "Id": 134,
             "IsTempering": false,
             "PositionForMassFlowSolver": "0.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -940.0,
                 80.0
@@ -16,11 +16,11 @@
             "flippedH": true,
             "flippedV": true,
             "portsIdsIn": [
-                135,
-                136
+                137
             ],
             "portsIdsOut": [
-                137
+                135,
+                136
             ],
             "rotationN": -2,
             "trnsysId": 40
@@ -30,7 +30,7 @@
             "BlockDisplayName": "TeeHpEvap",
             "BlockName": "TeePiece",
             "Id": 138,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -940.0,
                 0.0
@@ -38,10 +38,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                139,
-                140
+                139
             ],
             "portsIdsOut": [
+                140,
                 141
             ],
             "rotationN": 2,
@@ -75,7 +75,7 @@
             "Id": 171,
             "IsTempering": false,
             "PositionForMassFlowSolver": "1.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -900.0,
                 -289.0
@@ -83,11 +83,11 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                172,
-                173
+                174
             ],
             "portsIdsOut": [
-                174
+                172,
+                173
             ],
             "rotationN": 0,
             "trnsysId": 50
@@ -125,7 +125,7 @@
             "Id": 183,
             "IsTempering": false,
             "PositionForMassFlowSolver": "0.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -538.0,
                 -91.0
@@ -133,11 +133,11 @@
             "flippedH": false,
             "flippedV": true,
             "portsIdsIn": [
-                184,
-                185
+                186
             ],
             "portsIdsOut": [
-                186
+                184,
+                185
             ],
             "rotationN": 0,
             "trnsysId": 54
@@ -147,7 +147,7 @@
             "BlockDisplayName": "TeeCoolRadIn",
             "BlockName": "TeePiece",
             "Id": 187,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -440.0,
                 -249.0
@@ -155,10 +155,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                188,
-                189
+                188
             ],
             "portsIdsOut": [
+                189,
                 190
             ],
             "rotationN": 2,
@@ -303,7 +303,7 @@
             "Id": 3065,
             "IsTempering": false,
             "PositionForMassFlowSolver": "0.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -540.0,
                 -351.0
@@ -311,11 +311,11 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                3066,
-                3067
+                3068
             ],
             "portsIdsOut": [
-                3068
+                3066,
+                3067
             ],
             "rotationN": 0,
             "trnsysId": 990
@@ -351,7 +351,7 @@
             "BlockDisplayName": "TeePieceCirc2",
             "BlockName": "TeePiece",
             "Id": 3081,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -260.0,
                 -351.0
@@ -359,10 +359,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                3082,
-                3083
+                3082
             ],
             "portsIdsOut": [
+                3083,
                 3084
             ],
             "rotationN": 0,
@@ -375,7 +375,7 @@
             "Id": 3261,
             "IsTempering": false,
             "PositionForMassFlowSolver": "0.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -460.0,
                 -529.0
@@ -383,11 +383,11 @@
             "flippedH": false,
             "flippedV": true,
             "portsIdsIn": [
-                3262,
-                3263
+                3264
             ],
             "portsIdsOut": [
-                3264
+                3262,
+                3263
             ],
             "rotationN": 1,
             "trnsysId": 1053
@@ -460,7 +460,7 @@
             "BlockDisplayName": "TeeTesShOut",
             "BlockName": "TeePiece",
             "Id": 4282,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -779.0,
                 -91.0
@@ -468,10 +468,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                4283,
-                4284
+                4283
             ],
             "portsIdsOut": [
+                4284,
                 4285
             ],
             "rotationN": 0,
@@ -505,7 +505,7 @@
             "Id": 5316,
             "IsTempering": false,
             "PositionForMassFlowSolver": "1.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -980.0,
                 -289.0
@@ -513,11 +513,11 @@
             "flippedH": true,
             "flippedV": false,
             "portsIdsIn": [
-                5317,
-                5318
+                5319
             ],
             "portsIdsOut": [
-                5319
+                5317,
+                5318
             ],
             "rotationN": 0,
             "trnsysId": 1724
@@ -569,7 +569,7 @@
             "BlockDisplayName": "TeePieceCirc1",
             "BlockName": "TeePiece",
             "Id": 5979,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -220.0,
                 -460.0
@@ -577,10 +577,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                5980,
-                5981
+                5980
             ],
             "portsIdsOut": [
+                5981,
                 5982
             ],
             "rotationN": 2,
@@ -614,7 +614,7 @@
             "Id": 60,
             "IsTempering": false,
             "PositionForMassFlowSolver": "0.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -397.0,
                 -94.0
@@ -622,11 +622,11 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                61,
-                62
+                63
             ],
             "portsIdsOut": [
-                63
+                61,
+                62
             ],
             "rotationN": 0,
             "trnsysId": 18
@@ -636,7 +636,7 @@
             "BlockDisplayName": "TeePiece_6032",
             "BlockName": "TeePiece",
             "Id": 6032,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -356.0,
                 -250.0
@@ -644,10 +644,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                6033,
-                6034
+                6033
             ],
             "portsIdsOut": [
+                6034,
                 6035
             ],
             "rotationN": 2,
@@ -658,7 +658,7 @@
             "BlockDisplayName": "TeePiece5329",
             "BlockName": "TeePiece",
             "Id": 6071,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -940.0,
                 -333.0
@@ -666,10 +666,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                6072,
-                6073
+                6072
             ],
             "portsIdsOut": [
+                6073,
                 6074
             ],
             "rotationN": 2,
@@ -680,7 +680,7 @@
             "BlockDisplayName": "TeePiece_6088",
             "BlockName": "TeePiece",
             "Id": 6088,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -861.0,
                 -509.0
@@ -688,10 +688,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                6089,
-                6090
+                6089
             ],
             "portsIdsOut": [
+                6090,
                 6091
             ],
             "rotationN": 2,
@@ -731,7 +731,7 @@
             "BlockDisplayName": "Tee_FCU",
             "BlockName": "TeePiece",
             "Id": 7540,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -266.0,
                 18.0
@@ -739,10 +739,10 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                7541,
-                7542
+                7541
             ],
             "portsIdsOut": [
+                7542,
                 7543
             ],
             "rotationN": 2,
@@ -755,8 +755,8 @@
             "Id": 7544,
             "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
             "blockPosition": [
-                -201.0,
-                -19.0
+                -202.0,
+                -22.0
             ],
             "flippedH": false,
             "flippedV": false,
@@ -776,8 +776,8 @@
             "Id": 7547,
             "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
             "blockPosition": [
-                -81.0,
-                -19.0
+                -82.0,
+                -22.0
             ],
             "flippedH": false,
             "flippedV": false,
@@ -797,7 +797,7 @@
             "Id": 7550,
             "IsTempering": false,
             "PositionForMassFlowSolver": "0.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -304.0,
                 96.0
@@ -805,11 +805,11 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                7551,
-                7552
+                7553
             ],
             "portsIdsOut": [
-                7553
+                7551,
+                7552
             ],
             "rotationN": 0,
             "trnsysId": 2464
@@ -840,7 +840,7 @@
             "Id": 7778,
             "IsTempering": false,
             "PositionForMassFlowSolver": "0.0",
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 -779.0,
                 -333.0
@@ -848,11 +848,11 @@
             "flippedH": false,
             "flippedV": false,
             "portsIdsIn": [
-                7779,
-                7780
+                7781
             ],
             "portsIdsOut": [
-                7781
+                7779,
+                7780
             ],
             "rotationN": -1,
             "trnsysId": 2538
@@ -934,37 +934,6 @@
             "trnsysId": 1938,
             "uValueInWPerM2K": 0.8333
         },
-        "Connection-6001": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1359,
-            "diameterInCm": 2,
-            "fromPortId": 310,
-            "id": 6001,
-            "labelPos": [
-                -300.0,
-                -411.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -300.0,
-                -411.0
-            ],
-            "name": "PiDhwSecOut",
-            "segmentsCorners": [
-                [
-                    -280.0,
-                    -411.0
-                ],
-                [
-                    -280.0,
-                    -480.0
-                ]
-            ],
-            "toPortId": 5981,
-            "trnsysId": 1946,
-            "uValueInWPerM2K": 0.8333
-        },
         "Connection-6007": {
             ".__ConnectionDict__": true,
             "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
@@ -985,7 +954,7 @@
             "segmentsCorners": [
                 [
                     -240.0,
-                    -420.333
+                    -420.0
                 ]
             ],
             "toPortId": 5990,
@@ -1050,33 +1019,6 @@
             "trnsysId": 1950,
             "uValueInWPerM2K": 0.8333
         },
-        "Connection-6020": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1366,
-            "diameterInCm": 2,
-            "fromPortId": 185,
-            "id": 6020,
-            "labelPos": [
-                -518.0,
-                -51.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -518.0,
-                -51.0
-            ],
-            "name": "PiHxCoolWatIn",
-            "segmentsCorners": [
-                [
-                    -518.0,
-                    -20.333
-                ]
-            ],
-            "toPortId": 177,
-            "trnsysId": 1953,
-            "uValueInWPerM2K": 0.8333
-        },
         "Connection-6039": {
             ".__ConnectionDict__": true,
             "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
@@ -1112,12 +1054,12 @@
             "fromPortId": 56,
             "id": 6049,
             "labelPos": [
-                -259.0,
+                -279.0,
                 -270.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
-                -237.75,
+                -279.0,
                 -270.0
             ],
             "name": "PiRadIn",
@@ -1245,68 +1187,6 @@
             ],
             "toPortId": 365,
             "trnsysId": 1993,
-            "uValueInWPerM2K": 0.8333
-        },
-        "Connection-6174": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1415,
-            "diameterInCm": 2,
-            "fromPortId": 6161,
-            "id": 6174,
-            "labelPos": [
-                -1039.0,
-                -91.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -988.0,
-                -129.0
-            ],
-            "name": "PiHpCondOut",
-            "segmentsCorners": [
-                [
-                    -1001.0,
-                    -91.0
-                ],
-                [
-                    -1001.0,
-                    -269.0
-                ]
-            ],
-            "toPortId": 5319,
-            "trnsysId": 2009,
-            "uValueInWPerM2K": 0.8333
-        },
-        "Connection-6180": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1417,
-            "diameterInCm": 2,
-            "fromPortId": 6160,
-            "id": 6180,
-            "labelPos": [
-                -1039.0,
-                -151.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -1184.75,
-                -311.75
-            ],
-            "name": "PiHpDesOut",
-            "segmentsCorners": [
-                [
-                    -1040.0,
-                    -151.0
-                ],
-                [
-                    -1040.0,
-                    -529.0
-                ]
-            ],
-            "toPortId": 6090,
-            "trnsysId": 2011,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-6195": {
@@ -1522,68 +1402,6 @@
             "trnsysId": 2037,
             "uValueInWPerM2K": 0.8333
         },
-        "Connection-6248": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1441,
-            "diameterInCm": 2,
-            "fromPortId": 4283,
-            "id": 6248,
-            "labelPos": [
-                -779.0,
-                -71.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -923.0,
-                -68.0
-            ],
-            "name": "PiHpCondIn",
-            "segmentsCorners": [
-                [
-                    -909.0,
-                    -71.0
-                ],
-                [
-                    -909.0,
-                    -71.0
-                ]
-            ],
-            "toPortId": 6164,
-            "trnsysId": 2038,
-            "uValueInWPerM2K": 0.8333
-        },
-        "Connection-6251": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1442,
-            "diameterInCm": 2,
-            "fromPortId": 6073,
-            "id": 6251,
-            "labelPos": [
-                -1040.0,
-                -353.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -980.0,
-                -353.0
-            ],
-            "name": "PiHpDesIn",
-            "segmentsCorners": [
-                [
-                    -1020.0,
-                    -353.0
-                ],
-                [
-                    -1020.0,
-                    -131.0
-                ]
-            ],
-            "toPortId": 6163,
-            "trnsysId": 2039,
-            "uValueInWPerM2K": 0.8333
-        },
         "Connection-6255": {
             ".__ConnectionDict__": true,
             "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
@@ -1615,37 +1433,6 @@
             "trnsysId": 2041,
             "uValueInWPerM2K": 0.8333
         },
-        "Connection-6258": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1445,
-            "diameterInCm": 2,
-            "fromPortId": 3082,
-            "id": 6258,
-            "labelPos": [
-                -260.0,
-                -331.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -260.0,
-                -331.0
-            ],
-            "name": "PiHxDhwSecIn",
-            "segmentsCorners": [
-                [
-                    -280.0,
-                    -331.0
-                ],
-                [
-                    -280.0,
-                    -331.0
-                ]
-            ],
-            "toPortId": 312,
-            "trnsysId": 2042,
-            "uValueInWPerM2K": 0.8333
-        },
         "Connection-6261": {
             ".__ConnectionDict__": true,
             "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
@@ -1654,7 +1441,7 @@
             "fromPortId": 311,
             "id": 6261,
             "labelPos": [
-                -440.0,
+                -380.0,
                 -331.0
             ],
             "lengthInM": 2.0,
@@ -1747,7 +1534,7 @@
             "fromPortId": 6213,
             "id": 6275,
             "labelPos": [
-                -560.0,
+                -580.0,
                 -269.0
             ],
             "lengthInM": 2.0,
@@ -1809,7 +1596,7 @@
             "fromPortId": 6033,
             "id": 6281,
             "labelPos": [
-                -336.0,
+                -356.0,
                 -270.0
             ],
             "lengthInM": 2.0,
@@ -1830,37 +1617,6 @@
             ],
             "toPortId": 55,
             "trnsysId": 2051,
-            "uValueInWPerM2K": 0.8333
-        },
-        "Connection-6284": {
-            ".__ConnectionDict__": true,
-            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
-            "connectionId": 1455,
-            "diameterInCm": 2,
-            "fromPortId": 179,
-            "id": 6284,
-            "labelPos": [
-                -580.0,
-                60.0
-            ],
-            "lengthInM": 2.0,
-            "massFlowLabelPos": [
-                -600.0,
-                60.0
-            ],
-            "name": "Conn1455",
-            "segmentsCorners": [
-                [
-                    -460.0,
-                    60.0
-                ],
-                [
-                    -460.0,
-                    -249.0
-                ]
-            ],
-            "toPortId": 190,
-            "trnsysId": 2052,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-6293": {
@@ -1933,7 +1689,7 @@
             "fromPortId": 61,
             "id": 6300,
             "labelPos": [
-                -457.0,
+                -397.0,
                 -74.0
             ],
             "lengthInM": 2.0,
@@ -1995,13 +1751,13 @@
             "fromPortId": 6162,
             "id": 7417,
             "labelPos": [
-                -1219.0,
+                -1159.0,
                 -71.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
-                -1154.0,
-                -59.0
+                -1159.0,
+                -71.0
             ],
             "name": "PiHPEvapOut",
             "segmentsCorners": [
@@ -2084,7 +1840,7 @@
             "fromPortId": 7541,
             "id": 7557,
             "labelPos": [
-                -246.0,
+                -266.0,
                 -2.0
             ],
             "lengthInM": 2.0,
@@ -2100,7 +1856,7 @@
                 ],
                 [
                     -233.5,
-                    1.0
+                    -2.0
                 ]
             ],
             "toPortId": 7545,
@@ -2115,19 +1871,19 @@
             "fromPortId": 7546,
             "id": 7560,
             "labelPos": [
-                -141.0,
-                1.0
+                -162.0,
+                -2.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
-                -161.0,
-                1.0
+                -162.0,
+                -2.0
             ],
             "name": "PiFCUIn",
             "segmentsCorners": [
                 [
                     -121.0,
-                    1.0
+                    -2.0
                 ],
                 [
                     -121.0,
@@ -2173,27 +1929,19 @@
             "fromPortId": 7549,
             "id": 7566,
             "labelPos": [
-                -141.0,
-                81.0
+                0.0,
+                0.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
-                -81.0,
-                81.0
+                0.0,
+                0.0
             ],
             "name": "PiFCUOut",
             "segmentsCorners": [
                 [
-                    -135.0,
-                    81.0
-                ],
-                [
-                    -135.0,
-                    80.0
-                ],
-                [
                     -172.5,
-                    80.0
+                    78.0
                 ],
                 [
                     -172.5,
@@ -2243,7 +1991,7 @@
             "fromPortId": 7551,
             "id": 7580,
             "labelPos": [
-                -364.0,
+                -304.0,
                 116.0
             ],
             "lengthInM": 2.0,
@@ -2417,11 +2165,255 @@
             "trnsysId": 2545,
             "uValueInWPerM2K": 0.8333
         },
+        "Connection-7864": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1819,
+            "diameterInCm": 2,
+            "fromPortId": 3082,
+            "id": 7864,
+            "labelPos": [
+                -260.0,
+                -331.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -260.0,
+                -331.0
+            ],
+            "name": "PiHxDhwSecIn",
+            "segmentsCorners": [
+                [
+                    -283.0,
+                    -331.0
+                ],
+                [
+                    -283.0,
+                    -331.0
+                ]
+            ],
+            "toPortId": 310,
+            "trnsysId": 2573,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-7865": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1820,
+            "diameterInCm": 2,
+            "fromPortId": 312,
+            "id": 7865,
+            "labelPos": [
+                -300.0,
+                -411.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -300.0,
+                -411.0
+            ],
+            "name": "PiDhwSecOut",
+            "segmentsCorners": [
+                [
+                    -280.0,
+                    -411.0
+                ],
+                [
+                    -280.0,
+                    -480.0
+                ]
+            ],
+            "toPortId": 5981,
+            "trnsysId": 2574,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-7867": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1822,
+            "diameterInCm": 2,
+            "fromPortId": 4283,
+            "id": 7867,
+            "labelPos": [
+                -779.0,
+                -71.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -779.0,
+                -71.0
+            ],
+            "name": "PiHpCondIn",
+            "segmentsCorners": [
+                [
+                    -912.0,
+                    -71.0
+                ],
+                [
+                    -912.0,
+                    -71.0
+                ]
+            ],
+            "toPortId": 6160,
+            "trnsysId": 2576,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-7868": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1823,
+            "diameterInCm": 2,
+            "fromPortId": 6163,
+            "id": 7868,
+            "labelPos": [
+                -1039.0,
+                -91.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -1039.0,
+                -91.0
+            ],
+            "name": "PiHpCondOut",
+            "segmentsCorners": [
+                [
+                    -1000.0,
+                    -91.0
+                ],
+                [
+                    -1000.0,
+                    -269.0
+                ]
+            ],
+            "toPortId": 5319,
+            "trnsysId": 2577,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-7869": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1824,
+            "diameterInCm": 2,
+            "fromPortId": 6073,
+            "id": 7869,
+            "labelPos": [
+                -980.0,
+                -353.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -980.0,
+                -353.0
+            ],
+            "name": "PiHpDesIn",
+            "segmentsCorners": [
+                [
+                    -1021.0,
+                    -353.0
+                ],
+                [
+                    -1021.0,
+                    -131.0
+                ]
+            ],
+            "toPortId": 6161,
+            "trnsysId": 2578,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-7870": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1825,
+            "diameterInCm": 2,
+            "fromPortId": 6164,
+            "id": 7870,
+            "labelPos": [
+                -1039.0,
+                -151.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -1039.0,
+                -151.0
+            ],
+            "name": "PiHpDesOut",
+            "segmentsCorners": [
+                [
+                    -1039.0,
+                    -151.0
+                ],
+                [
+                    -1039.0,
+                    -529.0
+                ]
+            ],
+            "toPortId": 6090,
+            "trnsysId": 2579,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-7872": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1827,
+            "diameterInCm": 2,
+            "fromPortId": 185,
+            "id": 7872,
+            "labelPos": [
+                -518.0,
+                -51.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -518.0,
+                -51.0
+            ],
+            "name": "PiHxCoolWatIn",
+            "segmentsCorners": [
+                [
+                    -518.0,
+                    60.0
+                ]
+            ],
+            "toPortId": 177,
+            "trnsysId": 2581,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-7873": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 1828,
+            "diameterInCm": 2,
+            "fromPortId": 179,
+            "id": 7873,
+            "labelPos": [
+                -600.0,
+                -20.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -600.0,
+                -20.0
+            ],
+            "name": "Conn1455",
+            "segmentsCorners": [
+                [
+                    -460.0,
+                    -20.0
+                ],
+                [
+                    -460.0,
+                    -249.0
+                ]
+            ],
+            "toPortId": 190,
+            "trnsysId": 2582,
+            "uValueInWPerM2K": 0.8333
+        },
         "IDs": {
-            "GlobalId": 7864,
+            "GlobalId": 7875,
             "__idDct__": true,
-            "globalConnID": 1819,
-            "trnsysID": 2573
+            "globalConnID": 1830,
+            "trnsysID": 2584
         },
         "Strings": {
             "DiagramName": "TRIHP_dualSource.json",
@@ -2436,18 +2428,18 @@
                 1976,
                 2539,
                 2030,
-                2038,
                 2033,
                 2540,
                 1240,
                 2541,
-                2039,
                 2037,
-                2011,
                 1974,
-                2009,
                 1980,
-                2032
+                2032,
+                2576,
+                2577,
+                2578,
+                2579
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
@@ -2473,10 +2465,10 @@
             "connectionsTrnsysId": [
                 1948,
                 1950,
-                1946,
-                2042,
                 2041,
-                1949
+                1949,
+                2573,
+                2574
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
@@ -2485,7 +2477,6 @@
         {
             "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
             "connectionsTrnsysId": [
-                1953,
                 2058,
                 2050,
                 2057,
@@ -2494,7 +2485,8 @@
                 2055,
                 1959,
                 2049,
-                2052
+                2581,
+                2582
             ],
             "fluidName": "water",
             "hasUserDefinedName": false,
