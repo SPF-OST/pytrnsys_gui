@@ -154,3 +154,4 @@ class ExternalHx(BlockItemFourPorts):
         }
 
         return InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
+    

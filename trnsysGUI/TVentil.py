@@ -29,9 +29,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         self.changeSize()
 
@@ -316,8 +316,8 @@ class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-
         assert len(superseded.portsIdsIn) == 2
         assert len(superseded.portsIdsOut) == 1
 
-        inputPortIds = [superseded.portsIdsIn[0]]
-        outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
+        inputPortIds = [superseded.portsIdsOut[0]]
+        outputPortIds = [superseded.portsIdsIn[0], superseded.portsIdsIn[1]]
 
         return TVentilModel(
             superseded.BlockName,
