@@ -5,14 +5,15 @@ import os
 import shutil
 import typing as _tp
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItemFourPorts import BlockItemFourPorts
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
 from trnsysGUI.MyQTreeView import MyQTreeView
+from trnsysGUI.massFlowSolver import InternalPiping
+
 import trnsysGUI.images as _img
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 class PitStorage(BlockItemFourPorts):
@@ -67,12 +68,7 @@ class PitStorage(BlockItemFourPorts):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, "ddck")
@@ -99,10 +95,8 @@ class PitStorage(BlockItemFourPorts):
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
@@ -124,9 +118,26 @@ class PitStorage(BlockItemFourPorts):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\IceStorage_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)
+
+    def getInternalPiping(self) -> InternalPiping:
+        side1Input = _mfn.PortItem("variableInput", _mfn.PortItemType.INPUT)
+        side1Output = _mfn.PortItem("deepOutput", _mfn.PortItemType.OUTPUT)
+        side1Pipe = _mfn.Pipe(f"{self.displayName}Side1", self.childIds[0], side1Input, side1Output)
+
+        side2Input = _mfn.PortItem("deepInput", _mfn.PortItemType.INPUT)
+        side2Output = _mfn.PortItem("shallowOutput", _mfn.PortItemType.OUTPUT)
+        side2Pipe = _mfn.Pipe(f"{self.displayName}Side2", self.childIds[1], side2Input, side2Output)
+
+        modelPortItemsToGraphicalPortItem = {
+            side1Input: self.inputs[0],
+            side1Output: self.outputs[0],
+            side2Input: self.inputs[1],
+            side2Output: self.outputs[1]
+        }
+
+        return InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)

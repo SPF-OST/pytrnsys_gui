@@ -121,7 +121,7 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylin
     def from_dict(
         cls,
         data: _dcj.JsonDict,
-        validate=True,  # pylint: disable=duplicate-code #7
+        validate=True,  # pylint: disable=duplicate-code
         validate_enums: bool = True,
     ) -> "DoublePipeBlockItemModel":
         data.pop(".__BlockDict__")
@@ -134,7 +134,7 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylin
         validate: bool = False,
         validate_enums: bool = True,
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code  # 2
+        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code
         data[".__BlockDict__"] = True
         return data
 

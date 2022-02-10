@@ -1,14 +1,19 @@
 # pylint: skip-file
 # type: ignore
 
+import dataclasses as _dc
 import typing as _tp
+import uuid as _uuid
 
+import dataclasses_jsonschema as _dcj
 from PyQt5.QtWidgets import QGraphicsTextItem
 
+import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.serialization as _ser
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 
@@ -24,9 +29,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 1, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
 
         self.changeSize()
 
@@ -52,18 +57,19 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         self.label.setPos(lx, h - self.flippedV * (h + h / 2))
         self.posLabel.setPos(lx + 5, -15)
 
-        self.origInputsPos = [[0, delta], [delta, 0]]
-        self.origOutputsPos = [[w, delta]]
+        self.origInputsPos = [[w, delta]]
+        self.origOutputsPos = [[0, delta], [delta, 0]]
+
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.inputs[1].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        self.inputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
+        self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
+        self.outputs[1].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
 
         return w, h
 
@@ -90,21 +96,66 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
 
     def setPositionForMassFlowSolver(self, f):
         self.positionForMassFlowSolver = f
+        
 
     def encode(self):
-        dictName, dct = super(TVentil, self).encode()
+        portListInputs = []
+        portListOutputs = []
+
+        for inp in self.inputs:
+            portListInputs.append(inp.id)
+        for output in self.outputs:
+            portListOutputs.append(output.id)
+
+        blockPosition = (float(self.pos().x()), float(self.pos().y()))
+
+        tVentilModel = TVentilModel(
+            self.name,
+            self.displayName,
+            blockPosition,
+            self.id,
+            self.trnsysId,
+            portListInputs,
+            portListOutputs,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+        )
+
+        dictName = "Block-"
+
+        dct = tVentilModel.to_dict()
+
         dct["IsTempering"] = self.isTempering
         dct["PositionForMassFlowSolver"] = self.positionForMassFlowSolver
         return dictName, dct
+    
 
     def decode(self, i, resBlockList):
-        super().decode(i, resBlockList)
+        model = TVentilModel.from_dict(i)
+
+        self.setName(model.BlockDisplayName)
+        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
+        self.id = model.Id
+        self.trnsysId = model.trnsysId
+
+        self.inputs[0].id = model.portsIdsIn[0]
+        self.outputs[0].id = model.portsIdsOut[0]
+        self.outputs[1].id = model.portsIdsOut[1]
+
+        self.updateFlipStateH(model.flippedH)
+        self.updateFlipStateV(model.flippedV)
+        self.rotateBlockToN(model.rotationN)
+
+        resBlockList.append(self)
+
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
             self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
         else:
             self.isTempering = i["IsTempering"]
             self.positionForMassFlowSolver = i["PositionForMassFlowSolver"]
+
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         super(TVentil, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
@@ -168,11 +219,11 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         return _mfs.InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
 
     def _getModelAndMapping(self):
-        input1 = _mfn.PortItem("TVentil Input 1", _mfn.PortItemType.INPUT)
-        input2 = _mfn.PortItem("TVentil Input 2", _mfn.PortItemType.INPUT)
-        output = _mfn.PortItem("TVentil Output", _mfn.PortItemType.OUTPUT)
-        teePiece = _mfn.Diverter(self.displayName, self.trnsysId, output, input1, input2)
-        modelPortItemsToGraphicalPortItem = {input1: self.inputs[0], input2: self.inputs[1], output: self.outputs[0]}
+        input = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        output1 = _mfn.PortItem("straightOutput", _mfn.PortItemType.OUTPUT)
+        output2 = _mfn.PortItem("orthogonalOutput", _mfn.PortItemType.OUTPUT)
+        teePiece = _mfn.Diverter(self.displayName, self.trnsysId, input, output1, output2)
+        modelPortItemsToGraphicalPortItem = {input: self.inputs[0], output1: self.outputs[0], output2: self.outputs[1]}
         return teePiece, modelPortItemsToGraphicalPortItem
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
@@ -205,9 +256,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
 
                 unitText += outputVariable.name + "\n"
 
-            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
             unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.inputs[1].connectionList[0].displayName}\n"
+            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.outputs[1].connectionList[0].displayName}\n"
 
             unitText += "***Initial values\n"
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
@@ -221,3 +272,66 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
             return f, unitNumber
         else:
             return "", startingUnit
+
+
+@_dc.dataclass
+class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    BlockName: str
+    BlockDisplayName: str
+    blockPosition: _tp.Tuple[float, float]
+    Id: int
+    trnsysId: int
+    portsIdsIn: _tp.List[int]
+    portsIdsOut: _tp.List[int]
+    flippedH: bool
+    flippedV: bool
+    rotationN: int
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,
+        validate_enums: bool = True,
+    ) -> "TVentilModel":
+        tVentilModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(TVentilModel, tVentilModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
+        return _bim.BlockItemModel
+
+    @classmethod
+    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TVentilModel": # type: ignore[override]
+        assert len(superseded.portsIdsIn) == 2
+        assert len(superseded.portsIdsOut) == 1
+
+        inputPortIds = [superseded.portsIdsOut[0]]
+        outputPortIds = [superseded.portsIdsIn[0], superseded.portsIdsIn[1]]
+
+        return TVentilModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.blockPosition,
+            superseded.Id,
+            superseded.trnsysId,
+            inputPortIds,
+            outputPortIds,
+            superseded.flippedH,
+            superseded.flippedV,
+            superseded.rotationN,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID('3fff9a8a-d40e-42e2-824d-c015116d0a1d')

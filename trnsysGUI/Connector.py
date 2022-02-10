@@ -11,8 +11,8 @@ from trnsysGUI.massFlowSolver.networkModel import Pipe, PortItem, PortItemType
 
 
 class Connector(BlockItem, MassFlowNetworkContributorMixin):
-    def __init__(self, trnsysType, parent):
-        super().__init__(trnsysType, parent)
+    def __init__(self, trnsysType, parent, **kwargs):
+        super(Connector, self).__init__(trnsysType, parent, **kwargs)
         self.sizeFactor = 0.5
         self.w = 40
         self.h = 40
@@ -23,8 +23,8 @@ class Connector(BlockItem, MassFlowNetworkContributorMixin):
         self.changeSize()
 
     def getInternalPiping(self) -> InternalPiping:
-        fromPort = PortItem("Connector Input", PortItemType.INPUT)
-        toPort = PortItem("Connector Output", PortItemType.OUTPUT)
+        fromPort = PortItem("input", PortItemType.INPUT)
+        toPort = PortItem("output", PortItemType.OUTPUT)
         pipe = Pipe(self.name, self.trnsysId, fromPort, toPort)
         return InternalPiping([pipe], {fromPort: self.inputs[0], toPort: self.outputs[0]})
 

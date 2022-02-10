@@ -28,8 +28,8 @@ class Radiator(BlockItem, MassFlowNetworkContributorMixin):
         self.addTree()
 
     def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("Radiator Input", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Radiator Output", _mfn.PortItemType.OUTPUT)
+        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
 
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 

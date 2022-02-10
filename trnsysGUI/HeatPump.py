@@ -176,12 +176,12 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        condenserInput = _mfn.PortItem("Condenser Input", _mfn.PortItemType.INPUT)
-        condenserOutput = _mfn.PortItem("Condenser Output", _mfn.PortItemType.OUTPUT)
+        condenserInput = _mfn.PortItem("condenserInput", _mfn.PortItemType.INPUT)
+        condenserOutput = _mfn.PortItem("condenserOutput", _mfn.PortItemType.OUTPUT)
         condenserPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], condenserInput, condenserOutput)
 
-        evaporatorInput = _mfn.PortItem("Evaporator Input", _mfn.PortItemType.INPUT)
-        evaporatorOutput = _mfn.PortItem("Evaporator Output", _mfn.PortItemType.OUTPUT)
+        evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
+        evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)
         evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[1], evaporatorInput, evaporatorOutput)
 
         modelPortItemsToGraphicalPortItem = {

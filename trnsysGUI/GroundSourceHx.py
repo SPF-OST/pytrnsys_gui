@@ -132,8 +132,8 @@ class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
             self.logger.debug(self.path)
 
     def getInternalPiping(self) -> _mfs.InternalPiping:
-        inputPort = _mfn.PortItem("Ground Source Input", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Ground Source Output", _mfn.PortItemType.OUTPUT)
+        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
 
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
 
