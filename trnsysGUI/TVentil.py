@@ -222,7 +222,7 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
         input = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
         output1 = _mfn.PortItem("straightOutput", _mfn.PortItemType.OUTPUT)
         output2 = _mfn.PortItem("orthogonalOutput", _mfn.PortItemType.OUTPUT)
-        teePiece = _mfn.Diverter(self.displayName, self.trnsysId, output2, input, output1)
+        teePiece = _mfn.Diverter(self.displayName, self.trnsysId, input, output1, output2)
         modelPortItemsToGraphicalPortItem = {input: self.inputs[0], output1: self.outputs[0], output2: self.outputs[1]}
         return teePiece, modelPortItemsToGraphicalPortItem
 
@@ -256,9 +256,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
 
                 unitText += outputVariable.name + "\n"
 
-            unitText += f"T{self.outputs[1].connectionList[0].displayName}\n"
             unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
             unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
+            unitText += f"T{self.outputs[1].connectionList[0].displayName}\n"
 
             unitText += "***Initial values\n"
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
