@@ -445,9 +445,9 @@ CtrlHP
 
 
 CONSTANTS 1
-unitPrinterTimestepHP=1312
+unitPrtrTimestHP=1312
    
-ASSIGN temp\HP_Timestep.Prt   unitPrinterTimestepHP     
+ASSIGN temp\HP_Timestep.Prt   unitPrtrTimestHP     
 
      
 UNIT 1312 TYPE 25      ! User defined Printer
@@ -455,7 +455,7 @@ PARAMETERS 10
 dtPrUser                  ! 1 Printing interval
 tStrtUser            ! 2 Start time
 tEndUser                ! 3 Stop time
-unitPrinterTimestepHP     ! 4 Logical unit
+unitPrtrTimestHP     ! 4 Logical unit
 0     ! 5 Units printing mode
 0     ! 6 Relative or absolute start time
 -1     ! 7 Overwrite or Append

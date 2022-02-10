@@ -12,5 +12,5 @@ import os
 if __name__ == '__main__':
 
     pathConfig = os.getcwd()
-    configFile = "run_aems.config"
+    configFile = "run.config"
     runTool = runTrnsys.RunParallelTrnsys(pathConfig, configFile=configFile)

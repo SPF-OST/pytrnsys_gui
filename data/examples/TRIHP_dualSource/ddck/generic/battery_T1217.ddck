@@ -30,8 +30,8 @@ elSysOut_BatLoss   = PelBatLoss_kW
 elSysIn_Grid = PelGrid_del 
 elSysOut_Grid  = PelGrid_exp
 elSysOut_InvLoss = PelLossesDCAC
-elSysOut_BatAcumCharge = max(PelBatDC_kW,0)
-elSysIn_BatAcumDischarge = min(PelBatDC_kW,0)
+elSysOut_BatAcumCh = max(PelBatDC_kW,0)
+elSysIn_BatAcumDis = min(PelBatDC_kW,0)
 elSysOut_BatStandby = PelBatStandby_kW
 
 *************************************************************************************************
