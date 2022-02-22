@@ -730,7 +730,7 @@ class Editor(QWidget):
 
         """
         self.logger.info("filename is at encoder " + str(filename))
-        # if filename != "":
+        
         with open(filename, "w") as jsonfile:
             json.dump(self, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
@@ -870,6 +870,29 @@ class Editor(QWidget):
         self.encodeDiagram(diagramPath)
         msgb = QMessageBox(self)
         msgb.setText("Saved diagram at " + diagramPath)
+        msgb.exec()
+        
+    def exportJsonFile(self):
+        jsonFileName = "connection.json"
+        jsonFilePath = os.path.join(self.projectFolder, jsonFileName)
+    
+        if os.path.isfile(jsonFilePath):
+            qmb = QMessageBox(self)
+            qmb.setText("Warning: This Json file exists already. Do you want to overwrite or cancel?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+
+            if ret != QMessageBox.Save:
+                self.logger.info("Canceling")
+                return
+
+            self.logger.info("Overwriting")
+            self.encodeDiagram(jsonFilePath)
+            
+        self.encodeDiagram(jsonFilePath)
+        msgb = QMessageBox(self)
+        msgb.setText("Saved Json file at " + jsonFilePath)
         msgb.exec()
 
     def saveToProject(self):

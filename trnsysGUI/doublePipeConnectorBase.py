@@ -5,7 +5,7 @@ import uuid as _uuid
 import dataclasses_jsonschema as _dcj
 
 import trnsysGUI.images as _img
-import trnsysGUI.serialization as _ser
+import pytrnsys.utils.serialization as _ser # type: ignore
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 

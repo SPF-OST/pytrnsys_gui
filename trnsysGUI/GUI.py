@@ -117,7 +117,6 @@ class _MainWindow(QMainWindow):
         )
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
-
         # Tool bar
         tb = self.addToolBar("Main Toolbar...")
         tb.setObjectName("Toolbar")
@@ -198,6 +197,9 @@ class _MainWindow(QMainWindow):
 
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
+        
+        exportJsonFileActionMenu = QAction("Export connection.json", self)
+        exportJsonFileActionMenu.triggered.connect(self.exportJson)
 
         self.projectMenu = QMenu("Project")
         self.projectMenu.addAction(runMassflowSolverActionMenu)
@@ -208,6 +210,7 @@ class _MainWindow(QMainWindow):
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
+        self.projectMenu.addAction(exportJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
@@ -408,6 +411,13 @@ class _MainWindow(QMainWindow):
             showErrorMessageBox(errorMessage)
 
         return
+    
+    def exportJson(self):
+        try:
+            self.centralWidget.exportJsonFile()   
+        except Exception as error:
+            errorMessage = f"The json file could not be generated: {error}"
+            showErrorMessageBox(errorMessage)
 
     def renameDia(self):
         self.logger.info("Renaming diagram...")

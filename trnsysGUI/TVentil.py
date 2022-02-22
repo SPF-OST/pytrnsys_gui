@@ -13,7 +13,7 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.serialization as _ser
+import pytrnsys.utils.serialization as _ser
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 

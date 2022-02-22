@@ -9,7 +9,7 @@ import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.serialization as _ser
+import pytrnsys.utils.serialization as _ser # type: ignore
 from trnsysGUI.massFlowSolver import InternalPiping  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]

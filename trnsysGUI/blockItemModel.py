@@ -3,8 +3,7 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
-
-from trnsysGUI import serialization as _ser
+import pytrnsys.utils.serialization as _ser # type: ignore
 
 
 @_dc.dataclass
