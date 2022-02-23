@@ -190,17 +190,17 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):
             f += "PARAMETERS 1" + "\n"
             f += "5 !Nb.of iterations before fixing the value \n"
             f += "INPUTS 4 \n"
-
+ 
             if (
                 self.outputs[0].pos().y() == self.inputs[0].pos().y()
                 or self.outputs[0].pos().x() == self.inputs[0].pos().x()
             ):
-                first = self.inputs[0]
-                second = self.inputs[1]
+                first = self.outputs[0]
+                second = self.outputs[1]
 
             f += "T" + first.connectionList[0].displayName + "\n"
             f += "T" + second.connectionList[0].displayName + "\n"
-            f += "Mfr" + self.outputs[0].connectionList[0].displayName + "\n"
+            f += "Mfr" + self.inputs[0].connectionList[0].displayName + "\n"
 
             f += "T_set_" + self.displayName + "\n"
             f += "*** INITIAL INPUT VALUES" + "\n"
