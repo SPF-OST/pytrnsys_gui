@@ -12,7 +12,7 @@
 CONSTANTS 4
 dghxProbes = 0.032  ! 10: inner diameter of the pipes, m
 nGhxProbes = 4
-calcRand = 1 ! 1: old Randaussen approach of EWS. If nBorehole>1 the MfrGHX/Nbore, 2: Lamarche-g-Functions, 3: read-in g-function
+calcRand = 2 ! 1: old Randaussen approach of EWS. If nBorehole>1 the MfrGHX/Nbore, 2: Lamarche-g-Functions, 3: read-in g-function
 lghxProbes = 300
 
 

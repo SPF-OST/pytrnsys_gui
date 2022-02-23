@@ -148,8 +148,8 @@ PelPVDC = PelPVRoofDC				! Power DC in kJ/h
 PelPVRoof_kW = PelMaxPower_kW   	! Power AC in kW
 PelPVDC_kW = PelArrayMPP_kW  		! Power DC in kW
 PelPVAC_kW = PelPVRoof_kW
-inverterEffDCAC_mp = 0.96![154,13]		! Inverter efficiency at mpp
-inverterEffDCAC = 0.96!MAX(inverterEffDCAC_mp,0.887) !MAX(inverterEffDCAC_mp,0.000000001) ! Prevent division by 0  JS: Set minimum to 0.887 because this efficiency is used by battery basic_battery.ddck
+inverterEffDCAC_mp = [154,13]		! Inverter efficiency at mpp
+inverterEffDCAC = MAX(inverterEffDCAC_mp,0.887) !MAX(inverterEffDCAC_mp,0.000000001) ! Prevent division by 0  JS: Set minimum to 0.887 because this efficiency is used by battery basic_battery.ddck
 ** inverterEffDCAC_op = [154,17]	! We assume an mpp tracker, so this output is not used
 PvInverterLoss_kW = PelPVDC_kW-PelPVAC_kW
 

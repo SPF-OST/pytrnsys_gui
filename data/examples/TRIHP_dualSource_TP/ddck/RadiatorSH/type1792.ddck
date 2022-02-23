@@ -47,7 +47,7 @@ elSysOut_PuShDemand	= PelPuSh_kW  ! To be moved and generated automatically to h
 
 EQUATIONS 6
 myTrdSet = TrdSet
-myCoolingOn = CoolingOn
+myCoolingOn = BoFC  !only for FREE cooling
 myAreaBui = AreaBui
 myTroomRc = TroomRc
 myTroomSetCool = TroomSetCool
@@ -65,9 +65,10 @@ MfrBuiRd  = MfrBuiHeatRd + MfrBuiCoolRd
 
 
 CONSTANTS 4    
-MfrBuiRdNom = 200*nParallelPipe !20*nParallelPipe !PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom))     ! Nominal mass flow of heat distribution system [kg/h] !JS: Divide by factor of 4 to have more realistic values
+MfrBuiRdNom = 44*3600/4.18/5
+!previous calc of flow: 200*nParallelPipe !20*nParallelPipe !PheatRadNom/(CPWAT*(TBuiFlNom-TBuiRtNom))     ! Nominal mass flow of heat distribution system [kg/h] !JS: Divide by factor of 4 to have more realistic values
 PheatRadNom = MfrBuiRdNom*CPWAT*(TBuiFlNom-TBuiRtNom)
-pGainRad = 0.6     
+pGainRad = 0.6   
 iGainRad = 0.05     
 
 
@@ -92,7 +93,7 @@ myTroomRc         !  Building: 1- (air temperature of zone)  TAIR   1 ->Feedback
 22 18 2      
      
 EQUATIONS 3    
-PIDRadBuiMin = 0.15  !  0.05    !0.01 
+PIDRadBuiMin = 0.05  !  0.05    !0.01 
 PIDBuiOut =  [41,1]
 PIDRadBui = MIN(GT(PIDBuiOut,PIDRadBuiMin)*PIDBuiOut,1) ![41,1]*BoHS     
 **MfrBuiRd  = NOT(BoAuxWWOn)*MfrBuiRdNom*PIDRadBui*BoHS*LE(myTroomRc,myTroomSet+1)  ! DC : added LT(Troom,tRoomSet+1) to avoid heating in spring/summer when tRoom =25 °C     
@@ -117,8 +118,8 @@ myTroomRc         !  Building: 1- (air temperature of zone)  TAIR   1 ->Feedback
 EQUATIONS 4    
 PIDRadCoolBuiMin = 0.15  !  0.05    !0.01   
 PIDRaCooldBui = MIN(MAX([44,1],PIDRadCoolBuiMin),1) ! DC, JEREMIAS you had [41,1]
-MfrBuiCoolRd  = MfrBuiRdNom*myCoolingOn  ! JS: cooling no longer uses PID, but instead a deadband
-MfrBuiHeatRd  = MfrBuiRdNom*NOT(myCoolingOn)*PIDRadBui
+MfrBuiCoolRd  = MfrBuiRdNom*myCoolingOn  ! JS: cooling no longer uses PID, but instead a deadband 
+MfrBuiHeatRd  = MfrBuiRdNom*(1-myCoolingOn)*PIDRadBui
 
 
 *******************************************************
@@ -311,7 +312,7 @@ MfrBuiRd PRdIn_KW  PheatBui_kW
 	
 UNIT 59 TYPE 65     ! Online Plotter Building (element OpB)
 PARAMETERS 12     
-4     ! 1 Nb. of left-axis variables
+6     ! 1 Nb. of left-axis variables
 7     ! 2 Nb. of right-axis variables
 -5     ! 3 Left axis minimum
 60     ! 4 Left axis maximum
@@ -323,11 +324,11 @@ nPlotsPerSim     ! 7 Number of plots per simulation
 -1     ! 10 Logical unit for output file
 0     ! 11 Output file units
 0     ! 12 Output file delimiter
-INPUTS 11     
-Tamb  myTroomRc  TRdFl TrdRt  
+INPUTS 13     
+Tamb  myTroomRc myTroomSet TRdFl TrdRt  PIDRadBui
 BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW   ImbRad
 *******
-Tamb  myTroomRc  TRdFl TrdRt  
+Tamb  myTroomRc myTroomSet TRdFl TrdRt  PIDRadBui
 BoHS RadFloorLoss_kW PIDRadBui MfrBuiRd   PRdIn_KW    PheatBuiRad_kW  ImbRad
 ****
 LABELS  3     

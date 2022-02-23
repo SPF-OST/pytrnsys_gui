@@ -30,4 +30,4 @@ PvMaxPInv = 12500
 PvMaxVInv = 1000
 PvMinVInv = 200
 
-ASSIGN PATH$\generic\140911_FRONIUS_SYMO_Inverter.dat unitReadInvPv
+ASSIGN PATH$\generic\140911_FRONIUS_SYMO_Inverter_Cst96.dat unitReadInvPv

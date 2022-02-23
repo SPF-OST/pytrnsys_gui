@@ -23,10 +23,10 @@ unitPrinterEl     ! 1: Logical unit number, -
 -1     ! 4: Printing & integrating interval, h. -1 for monthly integration
 1     ! 5: Number of inputs to avoid integration, -
 1     ! 6: Output number to avoid integration    
-INPUTS 7
-Time  PelHpTot_kW  PelPuSh_kW    PelContr_kW  PelHpComp_kW  qAuxStoreDHW_KW qAuxStoreSH_KW
+INPUTS 9    
+Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
 *******     
-Time  PelHpTot_kW  PelPuSh_kW    PelContr_kW  PelHpComp_kW  qAuxStoreDHW_KW qAuxStoreSH_KW
+Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
 
                     
     

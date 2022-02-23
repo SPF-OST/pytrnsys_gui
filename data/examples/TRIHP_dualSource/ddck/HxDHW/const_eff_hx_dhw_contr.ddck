@@ -97,11 +97,9 @@ TDhwSetPoint		! [unconnected] Cold-Side Set Temperature
 ** Begin TYPE Recall
 ***********************************
 
-UNIT 18 TYPE 661 
-PARAMETERS 5     
-2   ! 1: number of variables to be remembered  
-1 0
-1 0 
+UNIT 18 TYPE 993 
+PARAMETERS 1     
+2   ! 1: number of variables to be remembered    
 INPUTS 2     
 TSourceDHWHXIn MfrSrcDHWHXUsed
 0.0 0.0 
