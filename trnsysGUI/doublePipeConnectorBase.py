@@ -4,10 +4,10 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
+import pytrnsys.utils.serialization as _ser  # type: ignore
 import trnsysGUI.images as _img
-import pytrnsys.utils.serialization as _ser # type: ignore
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
+from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
 class DoublePipeConnectorBase(BlockItem, MassFlowNetworkContributorMixin):
