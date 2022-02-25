@@ -40,11 +40,7 @@ class PortItemBase(QGraphicsEllipseItem):
 
         self.visibleColor = QColor(0, 0, 0)
 
-        # This if is only for input/output having different colors
-        if name == "i":
-            self.innerCircle.setBrush(self.visibleColor)
-        if name == "o":
-            self.innerCircle.setBrush(self.visibleColor)
+        self.innerCircle.setBrush(self.visibleColor)
 
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
