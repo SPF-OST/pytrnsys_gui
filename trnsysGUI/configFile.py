@@ -77,6 +77,10 @@ class configFile:
             self.lines.insert(lineNameRef, 'string projectPath "%s"\n' % self.projectFolder)
         else:
             self.lines[lineProjectPath] = 'string projectPath "%s"\n' % self.projectFolder
+            
+        linePathToConnectionInfo = self.statementChecker("string pathToConnectionInfo")
+        if linePathToConnectionInfo != -1:
+            self.lines[linePathToConnectionInfo] = 'string pathToConnectionInfo "%s\connection.json"\n' % self.projectFolder
 
         lineDdck = self.statementChecker("USED DDCKs")
         if lineDdck == -1:

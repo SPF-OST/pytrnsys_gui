@@ -885,7 +885,7 @@ class Editor(QWidget):
 
         """
         with open(filePath, "w") as jsonfile:
-            json.dump(self, jsonfile, indent=4, cls=ConnectionEncoder)
+            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=ConnectionEncoder)
 
     # Saving related
     def save(self, showWarning=True):
