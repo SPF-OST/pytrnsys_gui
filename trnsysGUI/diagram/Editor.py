@@ -1270,6 +1270,5 @@ class Editor(QWidget):
         for path in self.projectDdckFiles:
             if path.name == "generic":
                 continue
-            ddckFilePath = path.parts[-2] + "\\" + path.parts[-1]
-            ddckFilePaths.append(ddckFilePath)
+            ddckFilePaths.append(path.name)
         self.ddckFilePaths = ddckFilePaths

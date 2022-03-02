@@ -522,6 +522,7 @@ class _MainWindow(QMainWindow):
 
     def exportDck(self):
         try:
+            self.centralWidget.exportJsonFile()
             buildDck.buildDck(self.projectFolder)
         except Exception as error:
             errorMessage = f"The deck file could not be generated: {error}"

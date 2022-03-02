@@ -39,7 +39,6 @@ class TestAutomaticConnection:
     def testConnectionJson(self, project: _Project, request: _pt.FixtureRequest):
         baseDirPath = _DATA_DIR_ / project.projectName / "base"
         expectedDirPath = _DATA_DIR_ / project.projectName / "expected"
-
         baseJsonFilePath = baseDirPath / "connection.json"
         expectedJsonFilePath = expectedDirPath / "connection.json"
 
@@ -54,15 +53,13 @@ class TestAutomaticConnection:
         editor = self._createEditor(baseDirPath)
         editor.exportJsonFile()
 
-        with open(baseJsonFilePath, "r", encoding="utf8") as baseJsonFile, open(
-                expectedJsonFilePath, "r", encoding="utf8") as expectedJsonFile:
-            baseJsonText = baseJsonFile.read()
-            expectedJsonText = expectedJsonFile.read()
+        baseJsonText = baseJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
+        expectedJsonText = expectedJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
 
         assert baseJsonText == expectedJsonText
 
     @staticmethod
-    def _createEditor(projectFolderPath): # pylint: disable=duplicate-code
+    def _createEditor(projectFolderPath):  # pylint: disable=duplicate-code
         logger = _log.Logger("root")
         editor = _de.Editor(
             parent=None,

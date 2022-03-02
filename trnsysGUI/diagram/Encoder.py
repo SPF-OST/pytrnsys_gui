@@ -78,7 +78,7 @@ class ConnectionEncoder(json.JSONEncoder):
                     if isinstance(component, BlockItem) and hasattr(component, "path"):
                         if not isinstance(component, StorageTank):
                             split = component.path.split("\\")
-                            componentFilePath = split[-2] + "\\" + split[-1]
+                            componentFilePath = split[-1]
                             if componentFilePath == filePath:
                                 for input in component.inputs:
                                     internalPiping = input.parent.getInternalPiping()
