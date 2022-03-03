@@ -59,7 +59,7 @@ from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoubleP
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
-from trnsysGUI.diagram.Encoder import Encoder, ConnectionEncoder
+from trnsysGUI.diagram.Encoder import Encoder, ddckPlaceHolderValueToJsonEncoder
 from trnsysGUI.diagram.scene import Scene
 from trnsysGUI.diagram.view import View
 from trnsysGUI.diagramDlg import diagramDlg
@@ -264,7 +264,7 @@ class Editor(QWidget):
             self.copyGenericFolder(self.projectFolder)
             self.createHydraulicDir(self.projectFolder)
             self.createWeatherAndControlDirs(self.projectFolder)
-            
+
         self.projectDdckFiles = []
 
         self.ddckFilePaths = []
@@ -847,10 +847,10 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def exportJsonFile(self):
+    def exportDdckPlaceHolderValueJsonFile(self):
         self._updateDdckFilePaths()
-        
-        jsonFileName = "connection.json"
+
+        jsonFileName = "DdckPlaceHolderValue.json"
         jsonFilePath = os.path.join(self.projectFolder, jsonFileName)
 
         if os.path.isfile(jsonFilePath):
@@ -865,14 +865,14 @@ class Editor(QWidget):
                 return
 
             self.logger.info("Overwriting")
-            self._encodeConnectionToJson(jsonFilePath)
+            self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
         else:
-            self._encodeConnectionToJson(jsonFilePath)
+            self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
         msgb = QMessageBox(self)
         msgb.setText("Saved Json file at " + jsonFilePath)
         msgb.exec()
-        
-    def _encodeConnectionToJson(self, filePath):
+
+    def _encodeDdckPlaceHolderValueToJson(self, filePath):
         """
         Encodes the connection names to a json file.
 
@@ -884,8 +884,11 @@ class Editor(QWidget):
         -------
 
         """
+
+        ddckPlaceHolderValueDictionary = ddckPlaceHolderValueToJsonEncoder(self.ddckFilePaths, self.trnsysObj)
+
         with open(filePath, "w") as jsonfile:
-            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=ConnectionEncoder)
+            json.dump(ddckPlaceHolderValueDictionary, jsonfile, indent=4, sort_keys=True)
 
     # Saving related
     def save(self, showWarning=True):
@@ -1261,11 +1264,11 @@ class Editor(QWidget):
 
         hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
-        
+
     def _updateDdckFilePaths(self):
         projectDdckFiles = _pl.Path(self.projectFolder + "\\ddck")
         self.projectDdckFiles = list(projectDdckFiles.iterdir())
-        
+
         ddckFilePaths = []
         for path in self.projectDdckFiles:
             if path.name == "generic":

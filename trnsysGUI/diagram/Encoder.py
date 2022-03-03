@@ -68,28 +68,26 @@ class Encoder(json.JSONEncoder):
             # return super().default(obj)
 
 
-class ConnectionEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, _de.Editor):
-            connection = {}
-            for filePath in obj.ddckFilePaths:
-                inputDct = {}
-                for component in obj.trnsysObj:
-                    if isinstance(component, BlockItem) and hasattr(component, "path"):
-                        if not isinstance(component, StorageTank):
-                            split = component.path.split("\\")
-                            componentFilePath = split[-1]
-                            if componentFilePath == filePath:
-                                for input in component.inputs:
-                                    internalPiping = input.parent.getInternalPiping()
-                                    portItemsAndInternalRealNode = internalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(
-                                        input)
-                                    portItems = [pr.portItem for pr in portItemsAndInternalRealNode]
-                                    formattedPortItems = [f"{p.name}" for p in portItems]
-                                    inputDct[formattedPortItems[0]] = {
-                                        "@temp": "T" + input.connectionList[0].displayName,
-                                        "@mfr": "Mfr" + input.connectionList[0].displayName}
-                                break
+def ddckPlaceHolderValueToJsonEncoder(ddckFilePaths, trnsysObj):
+    ddckPlaceHolderValueDictionary = {}
+    for component in trnsysObj:
+        if isinstance(component, BlockItem) and hasattr(component, "path"):
+            if not isinstance(component, StorageTank):
+                split = component.path.split("\\")
+                componentFilePath = split[-1]
+                for filePath in ddckFilePaths:
+                    inputDct = {}
+                    if componentFilePath == filePath:
+                        for input in component.inputs:
+                            internalPiping = input.parent.getInternalPiping()
+                            portItemsAndInternalRealNode = internalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(
+                                input)
+                            portItems = [pr.portItem for pr in portItemsAndInternalRealNode]
+                            formattedPortItems = [f"{p.name}" for p in portItems]
+                            inputDct[formattedPortItems[0]] = {
+                                "@temp": "T" + input.connectionList[0].displayName,
+                                "@mfr": "Mfr" + input.connectionList[0].displayName}
+                        break
                 if inputDct != {}:
-                    connection[f"{filePath}"] = inputDct
-            return connection
+                    ddckPlaceHolderValueDictionary[f"{filePath}"] = inputDct
+    return ddckPlaceHolderValueDictionary

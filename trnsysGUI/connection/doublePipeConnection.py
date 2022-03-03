@@ -7,7 +7,7 @@ import uuid as _uuid
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
-import pytrnsys.utils.serialization as _ser  # type: ignore
+import pytrnsys.utils.serialization as _ser
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]

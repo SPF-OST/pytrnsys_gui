@@ -2,7 +2,7 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
-import pytrnsys.utils.serialization as _ser # type: ignore
+import pytrnsys.utils.serialization as _ser
 
 
 @_dc.dataclass

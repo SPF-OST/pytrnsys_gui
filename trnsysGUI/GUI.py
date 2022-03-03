@@ -198,8 +198,8 @@ class _MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
         
-        exportJsonFileActionMenu = QAction("Export connection.json", self)
-        exportJsonFileActionMenu.triggered.connect(self.exportJson)
+        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export DdckPlaceHolderValue.json", self)
+        exportDdckPlaceHolderValueJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValueJson)
 
         self.projectMenu = QMenu("Project")
         self.projectMenu.addAction(runMassflowSolverActionMenu)
@@ -210,7 +210,7 @@ class _MainWindow(QMainWindow):
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
-        self.projectMenu.addAction(exportJsonFileActionMenu)
+        self.projectMenu.addAction(exportDdckPlaceHolderValueJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
@@ -412,9 +412,9 @@ class _MainWindow(QMainWindow):
 
         return
     
-    def exportJson(self):
+    def exportDdckPlaceHolderValueJson(self):
         try:
-            self.centralWidget.exportJsonFile()   
+            self.centralWidget.exportDdckPlaceHolderValueJsonFile()   
         except Exception as error:
             errorMessage = f"The json file could not be generated: {error}"
             showErrorMessageBox(errorMessage)
@@ -522,7 +522,7 @@ class _MainWindow(QMainWindow):
 
     def exportDck(self):
         try:
-            self.centralWidget.exportJsonFile()
+            self.centralWidget.exportDdckPlaceHolderValueJsonFile()
             buildDck.buildDck(self.projectFolder)
         except Exception as error:
             errorMessage = f"The deck file could not be generated: {error}"

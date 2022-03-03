@@ -37,10 +37,10 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects(_DATA_DIR_)]
 class TestAutomaticConnection:
     @_pt.mark.parametrize("project", TEST_CASES)
     def testConnectionJson(self, project: _Project, request: _pt.FixtureRequest):
-        baseDirPath = _DATA_DIR_ / project.projectName / "base"
+        actualDirPath = _DATA_DIR_ / project.projectName / "TRIHP_dualSource"
         expectedDirPath = _DATA_DIR_ / project.projectName / "expected"
-        baseJsonFilePath = baseDirPath / "connection.json"
-        expectedJsonFilePath = expectedDirPath / "connection.json"
+        actualJsonFilePath = actualDirPath / "DdckPlaceHolderValue.json"
+        expectedJsonFilePath = expectedDirPath / "DdckPlaceHolderValue.json"
 
         # The following line is required otherwise QT will crash
         application = _qtw.QApplication([])
@@ -50,13 +50,13 @@ class TestAutomaticConnection:
 
         request.addfinalizer(quitApplication)
 
-        editor = self._createEditor(baseDirPath)
-        editor.exportJsonFile()
+        editor = self._createEditor(actualDirPath)
+        editor.exportDdckPlaceHolderValueJsonFile()
 
-        baseJsonText = baseJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
+        actualJsonText = actualJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
         expectedJsonText = expectedJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
 
-        assert baseJsonText == expectedJsonText
+        assert actualJsonText == expectedJsonText
 
     @staticmethod
     def _createEditor(projectFolderPath):  # pylint: disable=duplicate-code

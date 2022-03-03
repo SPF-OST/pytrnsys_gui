@@ -17,7 +17,7 @@ class buildDck:
         self.pathConfig = pathConfig
         self.path = pathConfig
         
-        self.connectionInfo = "default"
+        self.DdckPlaceHolderValueJsonPath = None
 
         self.defaultInputs()
         self.cmds = []
@@ -65,7 +65,7 @@ class buildDck:
         """
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.connectionInfo)
+        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.DdckPlaceHolderValueJsonPath)
         deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
@@ -146,7 +146,7 @@ class buildDck:
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
         if "pathToConnectionInfo" in self.inputs:
-            self.connectionInfo = self.inputs["pathToConnectionInfo"]
+            self.DdckPlaceHolderValueJsonPath = self.inputs["pathToConnectionInfo"]
         if self.inputs["addResultsFolder"] == False:
             pass
         else:
