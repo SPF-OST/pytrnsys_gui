@@ -4,8 +4,8 @@ import dataclasses as _dc
 import typing as _tp
 
 import trnsysGUI.massFlowSolver.search as _search
-
 from . import _helpers
+from . import _loopWideDefaults as _lwd
 from . import common as _common
 from . import model as _model
 from ._dialogs.split import dialog as _dialog
@@ -101,11 +101,21 @@ class _Splitter:
 
         self._hydraulicLoops.removeLoop(loop)
 
+        fromLoopName = splitLoopsSummary.fromLoop.name
+        toLoopName = splitLoopsSummary.toLoop.name
+
+        useLoopWideDefaults = loop.useLoopWideDefaults
+        if useLoopWideDefaults:
+            _lwd.resetConnectionPropertiesToLoopWideDefaults([*fromConnections], fromLoopName.value)
+            _lwd.resetConnectionPropertiesToLoopWideDefaults([*toConnections], toLoopName.value)
+
         fromLoop = _model.HydraulicLoop(
-            splitLoopsSummary.fromLoop.name, splitLoopsSummary.fromLoop.fluid, [*fromConnections]
+            fromLoopName, splitLoopsSummary.fromLoop.fluid, useLoopWideDefaults, [*fromConnections]
         )
 
-        toLoop = _model.HydraulicLoop(splitLoopsSummary.toLoop.name, splitLoopsSummary.toLoop.fluid, [*toConnections])
+        toLoop = _model.HydraulicLoop(
+            toLoopName, splitLoopsSummary.toLoop.fluid, useLoopWideDefaults, [*toConnections]
+        )
 
         self._hydraulicLoops.addLoop(fromLoop)
         self._hydraulicLoops.addLoop(toLoop)

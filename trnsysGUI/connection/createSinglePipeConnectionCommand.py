@@ -8,6 +8,7 @@ import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.hydraulicLoops.merge as _hlmerge
 import trnsysGUI.hydraulicLoops.split as _hlsplit
 import trnsysGUI.singlePipePortItem as _spi
+import trnsysGUI.common.result as _res
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -40,13 +41,19 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
             self._editor.fluids.WATER,
             mergedLoopSummary,
         )
-        if cancellable == "cancelled":
+        if cancellable == "cancelled" or _res.isError(cancellable):
+            if _res.isError(cancellable):
+                error = _res.error(cancellable)
+                _res.showErrorMessageBox(error, "Cannot create connection")
+
             self._connection.deleteConn()
             self._connection = None
             self.setObsolete(True)
             return
 
-        self._mergeSummary = cancellable
+        mergeSummary = cancellable
+
+        self._mergeSummary = mergeSummary
 
     def undo(self):
         splitLoopsSummary = self._mergeSummary.before if self._mergeSummary else None  # pylint: disable=no-member

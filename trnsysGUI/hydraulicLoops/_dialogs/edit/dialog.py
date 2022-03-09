@@ -18,7 +18,7 @@ except ImportError as importError:
         "`pytrnsys_gui` directory."
     ) from importError
 
-from trnsysGUI.hydraulicLoops import model as _model
+import trnsysGUI.hydraulicLoops.model as _model
 
 from . import model as _gmodel
 
@@ -32,21 +32,38 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         self._occupiedNames = occupiedNames
         self._fluids = fluids
 
-        self._configureLoopNameLineEdit()
-        self.loopName.setText(self._hydraulicLoop.name)
-
-        self._configureFluidComboBox()
-
-        fluidIndex = self.fluidComboBox.findData(self._hydraulicLoop.fluid)
-        assert fluidIndex >= 0
-        self.fluidComboBox.setCurrentIndex(fluidIndex)
+        self._configureAndInitializeLoopGroupBox()
 
         self._configureBulkOperations()
 
         self._reloadConnections()
 
+    def _configureAndInitializeLoopGroupBox(self) -> None:
+        self._configureLoopNameLineEdit()
+        self.loopName.setText(self._hydraulicLoop.name)
+
+        self._configureFluidComboBox()
+        fluidIndex = self.fluidComboBox.findData(self._hydraulicLoop.fluid)
+        assert fluidIndex >= 0
+        self.fluidComboBox.setCurrentIndex(fluidIndex)
+
+        self._setUseLoopWideDefaults(self._hydraulicLoop.useLoopWideDefaults)
+        self._configureUseLoopWideDefaultsCheckbox()
+
+    def _configureUseLoopWideDefaultsCheckbox(self) -> None:
+        def onToggled(isSet: bool) -> None:
+            if isSet and not self._doesUserSayContinueWithEnablingLoopWideDefaults():
+                self.useLoopWideDefaultsCheckBox.setChecked(False)
+                return
+
+            self._setUseLoopWideDefaults(isSet)
+
+            self.adjustSize()
+
+        self.useLoopWideDefaultsCheckBox.toggled.connect(onToggled)
+
     def _configureLoopNameLineEdit(self) -> None:
-        def onNameChanged(newName) -> None:
+        def onNameChanged(newName: str) -> None:
             self._hydraulicLoop.name = newName
 
             isNameEmpty = not newName
@@ -179,6 +196,26 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         nPipes = len(self._hydraulicLoop.connections)
         individualPipeLengthM = loopLengthInM / nPipes
         return individualPipeLengthM
+
+    def _doesUserSayContinueWithEnablingLoopWideDefaults(self):
+        messageBox = _qtw.QMessageBox(self)
+        messageBox.setWindowTitle("Do you want to proceed?")
+        messageBox.setText(
+            "The values of the length, diameter and U-Value for every pipe in the loop will be "
+            "lost upon OK'ing the main dialog when enabling loop wide defaults. Do you want to proceed?"
+        )
+        messageBox.setStandardButtons(messageBox.Yes | messageBox.No)
+        pressedButton = messageBox.exec()
+        shallContinue = (pressedButton == messageBox.Yes)
+        return shallContinue
+
+    def _setUseLoopWideDefaults(self, isSet: bool) -> None:
+        self._hydraulicLoop.useLoopWideDefaults = isSet
+        self.useLoopWideDefaultsCheckBox.setChecked(isSet)
+        isEnabled = not isSet
+        self.bulkOperationsGroupBox.setVisible(isEnabled)
+        self.pipesGroupBox.setVisible(isEnabled)
+        self.adjustSize()
 
     @classmethod
     def showDialog(

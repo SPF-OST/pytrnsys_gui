@@ -1,12 +1,10 @@
-# pylint: skip-file
-# type: ignore
-
 import copy as _cp
 import dataclasses as _dc
 import json as _json
 import uuid as _uuid
 import typing as _tp
 
+import dataclasses_jsonschema as _dcj
 import pytest as _pt
 
 import pytrnsys.utils.serialization as _ser
@@ -312,3 +310,23 @@ class TestSerialization:
         ]
 
         assert team.members == expectedMembers
+
+    def testDataclassInUnion(self):
+        dataClass = DataClass(Variable("Voldemort"))
+
+        json = dataClass.to_json()
+
+        assert json == """{"values": {"name": "Voldemort"}}"""
+
+
+@_dc.dataclass
+class Variable(_dcj.JsonSchemaMixin):
+    name: str
+
+
+Value = _tp.Union[Variable, float]
+
+
+@_dc.dataclass
+class DataClass(_dcj.JsonSchemaMixin):
+    values: Value

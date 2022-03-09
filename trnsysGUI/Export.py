@@ -9,7 +9,7 @@ from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[a
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
-import trnsysGUI.hydraulicLoops.export as _hle
+import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.hydraulicLoops.model as _hlm
 
 import jinja2 as _jinja
@@ -514,19 +514,33 @@ F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
     def exportHydraulicLoops(self) -> str:
         template = """\
 ** Hydraulic loops
-EQUATIONS {{2 * loops|length}}
+EQUATIONS {{nEquations}}
 {% for hydraulicLoop in loops -%}
 {% set loopName = hydraulicLoop.name.value -%}
-{% set loopRho = getRho(hydraulicLoop) -%}
-{% set loopCp = getCp(hydraulicLoop) -%}
+{% set loopRho = names.getDensityName(loopName) -%}
+{% set loopCp = names.getHeatCapacityName(loopName) -%}
 {% set fluid = hydraulicLoop.fluid -%}
+{% set loopLen = names.getDefaultLengthName(loopName) -%}
+{% set loopDia = names.getDefaultDiameterName(loopName) -%}
+{% set loopUVal = names.getDefaultUValueName(loopName) -%}
+{% set loopNPipes = names.getNumberOfPipesName(loopName) -%}
 ** {{loopName}}
+{% if hydraulicLoop.useLoopWideDefaults -%}
+{{loopNPipes}} = {{hydraulicLoop.connections | length}}
+{{loopLen}} = 
+{{loopDia}} =
+{{loopUVal}} =
+{% endif -%}
 {{loopRho}} = F{{fluid.name}}Rho
 {{loopCp}} = F{{fluid.name}}Cp
+
 {% endfor -%}
 """
         loops = self.editor.hydraulicLoops.hydraulicLoops
-        return self._render(template, loops=loops, getCp=_hle.getHeatCapacityName, getRho=_hle.getDensityName)
+
+        nEquations = sum(6 if l.useLoopWideDefaults else 2 for l in loops)
+
+        return self._render(template, loops=loops, nEquations=nEquations, names=_names)
 
     @staticmethod
     def _render(template: str, /, **kwargs):

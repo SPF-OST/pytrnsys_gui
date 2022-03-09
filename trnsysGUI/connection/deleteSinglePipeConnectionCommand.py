@@ -4,7 +4,8 @@ import typing as _tp
 
 from PyQt5 import QtWidgets as _qtw
 
-import trnsysGUI.connection.singlePipeConnection as _spc  # pylint: disable=cyclic-import
+import pytrnsys.utils.result as _res
+import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.hydraulicLoops.merge as _hlmerge
 import trnsysGUI.hydraulicLoops.model as _hlmodel
 import trnsysGUI.hydraulicLoops.split as _hlsplit
@@ -46,7 +47,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         self._connection = None
 
     def undo(self) -> None:
-        self._connection = _spc.SinglePipeConnection(
+        self._connection = _spc.SinglePipeConnection(  # type: ignore[attr-defined]
             self._fromPort, self._toPort, self._connectionParent
         )
 
@@ -55,4 +56,4 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         cancellable = _hlmerge.merge(
             self._connection, self._hydraulicLoops, self._fluids, self._defaultFluid, mergedLoopSummary
         )
-        assert cancellable != "cancelled"
+        assert cancellable != "cancelled" and not _res.isError(cancellable)
