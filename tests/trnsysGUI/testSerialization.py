@@ -34,7 +34,9 @@ class PersonVersion1(_ser.UpgradableJsonSchemaMixin):
         return PersonVersion0
 
     @classmethod
-    def upgrade(cls, superseded: PersonVersion0) -> "PersonVersion1":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "PersonVersion1":
+        assert isinstance(superseded, PersonVersion0)
+
         lastName = ""
         heightInCm = round(superseded.heightInM * 100)
         return PersonVersion1(
@@ -62,7 +64,9 @@ class Person(HasTitle, _ser.UpgradableJsonSchemaMixin):
         return PersonVersion1
 
     @classmethod
-    def upgrade(cls, superseded: PersonVersion1) -> "Person":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "Person":
+        assert isinstance(superseded, PersonVersion1)
+
         title = ""
         ageInYears = superseded.age
         return Person(title, superseded.lastName, ageInYears, superseded.heightInCm)
@@ -133,29 +137,29 @@ class TestSerialization:
     }
 
     def testSerialization(self):
-        p0 = PersonVersion0(firstName="Damian", age=32, heightInM=1.73)
-        assert p0.to_dict() == self.SERIALIZED_P0
+        person0 = PersonVersion0(firstName="Damian", age=32, heightInM=1.73)
+        assert person0.to_dict() == self.SERIALIZED_P0
 
-        p1 = PersonVersion1(
+        person1 = PersonVersion1(
             firstName="Damian", lastName="Birchler", age=32, heightInCm=173
         )
-        assert p1.to_dict() == self.SERIALIZED_P1
+        assert person1.to_dict() == self.SERIALIZED_P1
 
-        p = Person(title="Mr.", lastName="Birchler", ageInYears=32, heightInCm=173)
-        assert p.to_dict() == self.SERIALIZED_P
+        person = Person(title="Mr.", lastName="Birchler", ageInYears=32, heightInCm=173)
+        assert person.to_dict() == self.SERIALIZED_P
 
-        t = Team([p0, p1, p])
-        assert t.to_dict() == self.SERIALIZED_T0
+        team = Team([person0, person1, person])
+        assert team.to_dict() == self.SERIALIZED_T0
 
     def testStandardUseCase(self):
         json = _json.dumps(self.SERIALIZED_P0)
 
-        p = Person.from_json(json)
+        person = Person.from_json(json)
 
-        assert p.title is ""
-        assert p.lastName is ""
-        assert p.ageInYears == self.SERIALIZED_P0["age"]
-        assert p.heightInCm == self.SERIALIZED_P0["heightInM"] * 100
+        assert person.title == ""
+        assert person.lastName == ""
+        assert person.ageInYears == self.SERIALIZED_P0["age"]
+        assert person.heightInCm == self.SERIALIZED_P0["heightInM"] * 100
 
     def testWrongVersionRaises(self):
         serializedP1 = _cp.deepcopy(self.SERIALIZED_P1)
@@ -193,13 +197,13 @@ class TestSerialization:
     def testLoadVersion1(self):
         json = _json.dumps(self.SERIALIZED_P1)
 
-        p1 = PersonVersion1.from_json(json)
-        p = Person.from_json(json)
+        person1 = PersonVersion1.from_json(json)
+        person = Person.from_json(json)
 
-        assert p.title is ""
-        assert p.lastName == p1.lastName
-        assert p.ageInYears == p1.age
-        assert p.heightInCm == p1.heightInCm
+        assert person.title == ""
+        assert person.lastName == person1.lastName
+        assert person.ageInYears == person1.age
+        assert person.heightInCm == person1.heightInCm
 
     def testWrongFormatRaises(self):
         phonyP1 = self.SERIALIZED_P0.copy()
@@ -311,10 +315,11 @@ class TestSerialization:
 
         assert team.members == expectedMembers
 
-    def testDataclassInUnion(self):
-        dataClass = DataClass(Variable("Voldemort"))
+    @staticmethod
+    def testDataclassInUnion():
+        outerObject = OuterClass(Variable("Voldemort"))
 
-        json = dataClass.to_json()
+        json = outerObject.to_json()
 
         assert json == """{"values": {"name": "Voldemort"}}"""
 
@@ -328,5 +333,5 @@ Value = _tp.Union[Variable, float]
 
 
 @_dc.dataclass
-class DataClass(_dcj.JsonSchemaMixin):
+class OuterClass(_dcj.JsonSchemaMixin):
     values: Value
