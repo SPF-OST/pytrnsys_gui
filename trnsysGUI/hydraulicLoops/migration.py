@@ -1,11 +1,8 @@
 import typing as _tp
 
+import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.massFlowSolver.search as _search
 import trnsysGUI.singlePipePortItem as _spi
-import trnsysGUI.connection.singlePipeConnection as _spc
-
-from . import _loopWideDefaults as _lwd
-
 from . import model as _model
 
 
@@ -24,10 +21,8 @@ def createLoops(
 
         name = loops.generateName()
 
-        useLoopWideDefaults = True
-        _lwd.resetConnectionPropertiesToLoopWideDefaults(reachableConnections, name.value)
+        useLoopWideDefaults = False
         loop = _model.HydraulicLoop(name, fluid, useLoopWideDefaults, reachableConnections)
-
 
         loops.addLoop(loop)
 
