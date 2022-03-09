@@ -3,22 +3,19 @@
 
 from __future__ import annotations
 
-import dataclasses as _dc
 import typing as _tp
-import uuid as _uuid
-
-import dataclasses_jsonschema as _dcj
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.massFlowSolver as _mfs
-import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.serialization as _ser
-import trnsysGUI.singlePipeSegmentItem as _spsi
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
-import trnsysGUI.hydraulicLoops.export as _hle
+import trnsysGUI.connection.singlePipeConnectionModel as _model
+import trnsysGUI.connection.values as _values
+import trnsysGUI.hydraulicLoops.names as _names
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.singlePipeSegmentItem as _spsi
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -29,33 +26,10 @@ class SinglePipeConnection(_cb.ConnectionBase):
         super().__init__(fromPort, toPort, parent)
 
         self._editor = parent
-        self._diameterInCm = ConnectionModel.DEFAULT_DIAMETER_IN_CM
-        self._uValueInWPerM2K = ConnectionModel.DEFAULT_U_VALUE_IN_W_PER_M2_K
-        self._lengthInM = ConnectionModel.DEFAULT_LENGTH_IN_M
 
-    @property
-    def diameterInCm(self) -> float:
-        return self._diameterInCm
-
-    @diameterInCm.setter
-    def diameterInCm(self, diameterInCm: float) -> None:
-        self._diameterInCm = diameterInCm
-
-    @property
-    def uValueInWPerM2K(self) -> float:
-        return self._uValueInWPerM2K
-
-    @uValueInWPerM2K.setter
-    def uValueInWPerM2K(self, uValueInWPerM2K: float) -> None:
-        self._uValueInWPerM2K = uValueInWPerM2K
-
-    @property
-    def lengthInM(self) -> float:
-        return self._lengthInM
-
-    @lengthInM.setter
-    def lengthInM(self, lengthInM: float) -> None:
-        self._lengthInM = lengthInM
+        self.diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
+        self.uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
+        self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
 
     def _createSegmentItem(self, startNode, endNode):
         return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
@@ -89,7 +63,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
             cornerTupel = (s.pos().x(), s.pos().y())
             corners.append(cornerTupel)
 
-        connectionModel = ConnectionModel(
+        connectionModel = _model.ConnectionModel(
             self.connId,
             self.displayName,
             self.id,
@@ -108,7 +82,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
         return dictName, connectionModel.to_dict()
 
     def decode(self, i):
-        model = ConnectionModel.from_dict(i)
+        model = _model.ConnectionModel.from_dict(i)
 
         self.id = model.id
         self.connId = model.connectionId
@@ -120,6 +94,10 @@ class SinglePipeConnection(_cb.ConnectionBase):
 
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
+
+        self.diameterInCm = model.diameterInCm
+        self.uValueInWPerM2K = model.uValueInWPerM2K
+        self.lengthInM = model.lengthInM
 
     def getInternalPiping(self) -> _mfs.InternalPiping:
         fromPort = _mfn.PortItem("Input", _mfn.PortItemType.INPUT)
@@ -138,8 +116,8 @@ class SinglePipeConnection(_cb.ConnectionBase):
 
         loop = self._editor.hydraulicLoops.getLoopForExistingConnection(self)
 
-        densityVar = _hle.getDensityName(loop)
-        specHeatVar = _hle.getHeatCapacityName(loop)
+        densityVar = _names.getDensityName(loop.name.value)
+        specHeatVar = _names.getHeatCapacityName(loop.name.value)
 
         equationConstant1 = 1
         equationConstant2 = 3
@@ -159,11 +137,16 @@ class SinglePipeConnection(_cb.ConnectionBase):
         unitText += "!" + self.displayName + "\n"
         unitText += "PARAMETERS " + str(parameterNumber) + "\n"
 
-        diameterInM = self.diameterInCm / 100
+        lengthInM = _getConvertedValueOrName(self.lengthInM)
+        diameterInM = _getConvertedValueOrName(self.diameterInCm, 1/100)
+        uValueInkJPerHourM2K = _getConvertedValueOrName(self.uValueInWPerM2K, 60*60/1000)
+
         unitText += f"{diameterInM} ! diameter [m]\n"
-        unitText += f"{self.lengthInM} ! length [m]\n"
-        uValueInkJPerHourM2K = self.uValueInWPerM2K / 1000 * 60 * 60
-        unitText += f"{uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)] (= {self.uValueInWPerM2K} W/(m^2*K))\n"
+        unitText += f"{lengthInM} ! length [m]\n"
+
+        uValueInSIUnitsComment = f" (= {self.uValueInWPerM2K} W/(m^2*K))" if isinstance(self.uValueInWPerM2K, float) else ""
+        unitText += f"{uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)]{uValueInSIUnitsComment}\n"
+
         unitText += densityVar + "\n"
         unitText += specHeatVar + "\n"
         unitText += str(ambientT) + "\n"
@@ -230,95 +213,12 @@ class SinglePipeConnection(_cb.ConnectionBase):
         return unitText, unitNumber
 
 
-@_dc.dataclass
-class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    ConnCID: int
-    ConnDisplayName: str
-    ConnID: int
-    CornerPositions: _tp.List[_tp.Tuple[float, float]]
-    FirstSegmentLabelPos: _tp.Tuple[float, float]
-    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]
-    GroupName: str
-    PortFromID: int
-    PortToID: int
-    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
-    trnsysID: int
+def _getConvertedValueOrName(valueOrName: _values.Value, conversionFactor=1.0) -> _tp.Union[float, str]:
+    if isinstance(valueOrName, _values.Variable):
+        return valueOrName.name
 
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("7a15d665-f634-4037-b5af-3662b487a214")
+    value = valueOrName
+
+    return value * conversionFactor
 
 
-@_dc.dataclass
-class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
-    DEFAULT_DIAMETER_IN_CM = 2
-    DEFAULT_LENGTH_IN_M = 2.0
-    DEFAULT_U_VALUE_IN_W_PER_M2_K = 0.8333
-
-    connectionId: int
-    name: str
-    id: int
-    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
-    labelPos: _tp.Tuple[float, float]
-    massFlowLabelPos: _tp.Tuple[float, float]
-    fromPortId: int
-    toPortId: int
-    trnsysId: int
-    diameterInCm: float
-    uValueInWPerM2K: float
-    lengthInM: float
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "ConnectionModel":
-        data.pop(".__ConnectionDict__")
-        connectionModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(ConnectionModel, connectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__ConnectionDict__"] = True
-        return data
-
-    @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return ConnectionModelVersion0
-
-    @classmethod
-    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
-        firstSegmentLabelPos = (
-            superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
-            superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
-        )
-        firstSegmentMassFlowLabelPos = (
-            superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
-            superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
-        )
-
-        return ConnectionModel(
-            superseded.ConnCID,
-            superseded.ConnDisplayName,
-            superseded.ConnID,
-            superseded.CornerPositions,
-            firstSegmentLabelPos,
-            firstSegmentMassFlowLabelPos,
-            superseded.PortFromID,
-            superseded.PortToID,
-            superseded.trnsysID,
-            cls.DEFAULT_DIAMETER_IN_CM,
-            cls.DEFAULT_U_VALUE_IN_W_PER_M2_K,
-            cls.DEFAULT_LENGTH_IN_M,
-        )
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("332cd663-684d-414a-b1ec-33fd036f0f17")

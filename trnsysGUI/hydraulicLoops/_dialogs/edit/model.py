@@ -24,4 +24,5 @@ class Connection:
 class HydraulicLoop:
     name: str
     fluid: _ser.Fluid
+    useLoopWideDefaults: bool
     connections: _tp.Sequence[Connection]

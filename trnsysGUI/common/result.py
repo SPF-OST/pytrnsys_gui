@@ -38,7 +38,8 @@ def error(result: Result[_T]) -> Error:
     return _tp.cast(Error, result)
 
 
-def showErrorMessageBox(_error: Error) -> None:
+def showErrorMessageBox(_error: Error, title: str) -> None:
     messageBox = _qtw.QMessageBox()
+    messageBox.setWindowTitle(title)
     messageBox.setText(_error.message)
     messageBox.exec()
