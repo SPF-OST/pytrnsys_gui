@@ -355,18 +355,23 @@ EQUATIONS 10
 ** loop1
 Lloop1Rho = FwaterRho
 Lloop1Cp = FwaterCp
+
 ** loop2
 Lloop2Rho = FwaterRho
 Lloop2Cp = FwaterCp
+
 ** loop3
 Lloop3Rho = FwaterRho
 Lloop3Cp = FwaterCp
+
 ** loop4
 Lloop4Rho = FwaterRho
 Lloop4Cp = FwaterCp
+
 ** loop5
 Lloop5Rho = FwaterRho
 Lloop5Cp = FwaterCp
+
 
 UNIT 451 TYPE 929
 !DivSh
