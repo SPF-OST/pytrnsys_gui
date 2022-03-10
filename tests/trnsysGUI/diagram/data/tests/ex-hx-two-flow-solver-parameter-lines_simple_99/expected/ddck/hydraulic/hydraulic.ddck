@@ -62,12 +62,20 @@ FwaterRho = RHOWAT ! [kg/m^3]
 FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
 
 ** Hydraulic loops
-EQUATIONS 4
+EQUATIONS 12
 ** loop1
+loop1NPipes = 2
+loop1Len = 2.0 ! [m]
+loop1Dia = 0.02 ! [m]
+loop1UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
 Lloop1Rho = FwaterRho
 Lloop1Cp = FwaterCp
 
 ** loop2
+loop2NPipes = 2
+loop2Len = 2.0 ! [m]
+loop2Dia = 0.02 ! [m]
+loop2UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
 Lloop2Rho = FwaterRho
 Lloop2Cp = FwaterCp
 
@@ -75,9 +83,9 @@ Lloop2Cp = FwaterCp
 UNIT 451 TYPE 931
 !Tes-Hx
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -97,9 +105,9 @@ MfrTes-Hx= MfrTes-Hx_A
 UNIT 452 TYPE 931
 !Hx-Tes
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -119,9 +127,9 @@ MfrHx-Tes= MfrHx-Tes_A
 UNIT 453 TYPE 931
 !Col-Hx
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -141,9 +149,9 @@ MfrCol-Hx= MfrCol-Hx_A
 UNIT 454 TYPE 931
 !Hx-Col
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20

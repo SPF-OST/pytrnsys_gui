@@ -351,24 +351,44 @@ FwaterRho = RHOWAT ! [kg/m^3]
 FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
 
 ** Hydraulic loops
-EQUATIONS 10
+EQUATIONS 30
 ** loop1
+loop1NPipes = 15
+loop1Len = 2.0 ! [m]
+loop1Dia = 0.02 ! [m]
+loop1UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
 Lloop1Rho = FwaterRho
 Lloop1Cp = FwaterCp
 
 ** loop2
+loop2NPipes = 7
+loop2Len = 2.0 ! [m]
+loop2Dia = 0.02 ! [m]
+loop2UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
 Lloop2Rho = FwaterRho
 Lloop2Cp = FwaterCp
 
 ** loop3
+loop3NPipes = 6
+loop3Len = 2.0 ! [m]
+loop3Dia = 0.02 ! [m]
+loop3UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
 Lloop3Rho = FwaterRho
 Lloop3Cp = FwaterCp
 
 ** loop4
+loop4NPipes = 10
+loop4Len = 2.0 ! [m]
+loop4Dia = 0.02 ! [m]
+loop4UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
 Lloop4Rho = FwaterRho
 Lloop4Cp = FwaterCp
 
 ** loop5
+loop5NPipes = 10
+loop5Len = 2.0 ! [m]
+loop5Dia = 0.02 ! [m]
+loop5UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
 Lloop5Rho = FwaterRho
 Lloop5Cp = FwaterCp
 
@@ -526,9 +546,9 @@ TDivCool= [460,1]
 UNIT 461 TYPE 931
 !PiHpToTesShIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -593,9 +613,9 @@ TDivHp= [464,1]
 UNIT 465 TYPE 931
 !PiHxDhwIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -630,9 +650,9 @@ TTeePieceCirc1= [466,1]
 UNIT 467 TYPE 931
 !PiDhwSecOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop3Dia ! diameter [m]
+loop3Len ! length [m]
+loop3UVal ! U-value [kJ/(h*m^2*K)]
 Lloop3Rho
 Lloop3Cp
 20
@@ -652,9 +672,9 @@ MfrPiDhwSecOut= MfrPiDhwSecOut_A
 UNIT 468 TYPE 931
 !PiPuCircIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop3Dia ! diameter [m]
+loop3Len ! length [m]
+loop3UVal ! U-value [kJ/(h*m^2*K)]
 Lloop3Rho
 Lloop3Cp
 20
@@ -674,9 +694,9 @@ MfrPiPuCircIn= MfrPiPuCircIn_A
 UNIT 469 TYPE 931
 !PiPuCircOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop3Dia ! diameter [m]
+loop3Len ! length [m]
+loop3UVal ! U-value [kJ/(h*m^2*K)]
 Lloop3Rho
 Lloop3Cp
 20
@@ -696,9 +716,9 @@ MfrPiPuCircOut= MfrPiPuCircOut_A
 UNIT 470 TYPE 931
 !PiDhwDemand
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop3Dia ! diameter [m]
+loop3Len ! length [m]
+loop3UVal ! U-value [kJ/(h*m^2*K)]
 Lloop3Rho
 Lloop3Cp
 20
@@ -718,9 +738,9 @@ MfrPiDhwDemand= MfrPiDhwDemand_A
 UNIT 471 TYPE 931
 !PiHxCoolWatIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -755,9 +775,9 @@ TTeePiece_6032= [472,1]
 UNIT 473 TYPE 931
 !PiSHInMix
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -777,9 +797,9 @@ MfrPiSHInMix= MfrPiSHInMix_A
 UNIT 474 TYPE 931
 !PiRadIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -814,9 +834,9 @@ TTeePiece5329= [475,1]
 UNIT 476 TYPE 931
 !PiTesDhwToDes
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -836,9 +856,9 @@ MfrPiTesDhwToDes= MfrPiTesDhwToDes_A
 UNIT 477 TYPE 931
 !PiHpToTesDhwIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -873,9 +893,9 @@ TTeePiece_6088= [478,1]
 UNIT 479 TYPE 931
 !PiDesToCond
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -895,9 +915,9 @@ MfrPiDesToCond= MfrPiDesToCond_A
 UNIT 480 TYPE 931
 !PiHxCoolBriOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -932,9 +952,9 @@ TTeePiece3852= [481,1]
 UNIT 482 TYPE 931
 !PiHxCoolBriIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -954,9 +974,9 @@ MfrPiHxCoolBriIn= MfrPiHxCoolBriIn_A
 UNIT 483 TYPE 931
 !PiDivCool
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -976,9 +996,9 @@ MfrPiDivCool= MfrPiDivCool_A
 UNIT 484 TYPE 931
 !PiGhxIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -998,9 +1018,9 @@ MfrPiGhxIn= MfrPiGhxIn_A
 UNIT 485 TYPE 931
 !PiGhxOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -1020,9 +1040,9 @@ MfrPiGhxOut= MfrPiGhxOut_A
 UNIT 486 TYPE 931
 !PiHpCondOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1042,9 +1062,9 @@ MfrPiHpCondOut= MfrPiHpCondOut_A
 UNIT 487 TYPE 931
 !PiHpDesOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1064,9 +1084,9 @@ MfrPiHpDesOut= MfrPiHpDesOut_A
 UNIT 488 TYPE 931
 !PiTesDhwIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -1086,9 +1106,9 @@ MfrPiTesDhwIn= MfrPiTesDhwIn_A
 UNIT 489 TYPE 931
 !PiCircIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -1108,9 +1128,9 @@ MfrPiCircIn= MfrPiCircIn_A
 UNIT 490 TYPE 931
 !PiCircOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -1130,9 +1150,9 @@ MfrPiCircOut= MfrPiCircOut_A
 UNIT 491 TYPE 931
 !PiPuHpDhwIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1152,9 +1172,9 @@ MfrPiPuHpDhwIn= MfrPiPuHpDhwIn_A
 UNIT 492 TYPE 931
 !PiPuHpShIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1174,9 +1194,9 @@ MfrPiPuHpShIn= MfrPiPuHpShIn_A
 UNIT 493 TYPE 931
 !PiHpTeeToDiv
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1196,9 +1216,9 @@ MfrPiHpTeeToDiv= MfrPiHpTeeToDiv_A
 UNIT 494 TYPE 931
 !PiHpToTesShOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1218,9 +1238,9 @@ MfrPiHpToTesShOut= MfrPiHpToTesShOut_A
 UNIT 495 TYPE 931
 !PiHpCondIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1240,9 +1260,9 @@ MfrPiHpCondIn= MfrPiHpCondIn_A
 UNIT 496 TYPE 931
 !PiHpDesIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1262,9 +1282,9 @@ MfrPiHpDesIn= MfrPiHpDesIn_A
 UNIT 497 TYPE 931
 !PiDhwMains
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop3Dia ! diameter [m]
+loop3Len ! length [m]
+loop3UVal ! U-value [kJ/(h*m^2*K)]
 Lloop3Rho
 Lloop3Cp
 20
@@ -1284,9 +1304,9 @@ MfrPiDhwMains= MfrPiDhwMains_A
 UNIT 498 TYPE 931
 !PiHxDhwSecIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop3Dia ! diameter [m]
+loop3Len ! length [m]
+loop3UVal ! U-value [kJ/(h*m^2*K)]
 Lloop3Rho
 Lloop3Cp
 20
@@ -1306,9 +1326,9 @@ MfrPiHxDhwSecIn= MfrPiHxDhwSecIn_A
 UNIT 499 TYPE 931
 !PiHxDhwOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -1328,9 +1348,9 @@ MfrPiHxDhwOut= MfrPiHxDhwOut_A
 UNIT 500 TYPE 931
 !PiPuDhwOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -1350,9 +1370,9 @@ MfrPiPuDhwOut= MfrPiPuDhwOut_A
 UNIT 501 TYPE 931
 !PiTesDhwOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)]
 Lloop2Rho
 Lloop2Cp
 20
@@ -1372,9 +1392,9 @@ MfrPiTesDhwOut= MfrPiTesDhwOut_A
 UNIT 502 TYPE 931
 !PiTesShOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -1394,9 +1414,9 @@ MfrPiTesShOut= MfrPiTesShOut_A
 UNIT 503 TYPE 931
 !PiTeeMixSHIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -1416,9 +1436,9 @@ MfrPiTeeMixSHIn= MfrPiTeeMixSHIn_A
 UNIT 504 TYPE 931
 !PiSHOutMix
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -1438,9 +1458,9 @@ MfrPiSHOutMix= MfrPiSHOutMix_A
 UNIT 505 TYPE 931
 !Conn1455
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -1460,9 +1480,9 @@ MfrConn1455= MfrConn1455_A
 UNIT 506 TYPE 931
 !PiTesShIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -1482,9 +1502,9 @@ MfrPiTesShIn= MfrPiTesShIn_A
 UNIT 507 TYPE 931
 !PiRadOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -1504,9 +1524,9 @@ MfrPiRadOut= MfrPiRadOut_A
 UNIT 508 TYPE 931
 !PiDivSHCool
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)]
 Lloop4Rho
 Lloop4Cp
 20
@@ -1526,9 +1546,9 @@ MfrPiDivSHCool= MfrPiDivSHCool_A
 UNIT 509 TYPE 931
 !PiTesDhwCond
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1548,9 +1568,9 @@ MfrPiTesDhwCond= MfrPiTesDhwCond_A
 UNIT 510 TYPE 931
 !PiHpToTesDhwOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1570,9 +1590,9 @@ MfrPiHpToTesDhwOut= MfrPiHpToTesDhwOut_A
 UNIT 511 TYPE 931
 !PiCondToDes
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)]
 Lloop1Rho
 Lloop1Cp
 20
@@ -1592,9 +1612,9 @@ MfrPiCondToDes= MfrPiCondToDes_A
 UNIT 512 TYPE 931
 !PiPuGhxOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -1614,9 +1634,9 @@ MfrPiPuGhxOut= MfrPiPuGhxOut_A
 UNIT 513 TYPE 931
 !PiHPEvapOut
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -1636,9 +1656,9 @@ MfrPiHPEvapOut= MfrPiHPEvapOut_A
 UNIT 514 TYPE 931
 !PiDivCooltoHp
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -1658,9 +1678,9 @@ MfrPiDivCooltoHp= MfrPiDivCooltoHp_A
 UNIT 515 TYPE 931
 !PiHpEvapMix
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20
@@ -1680,9 +1700,9 @@ MfrPiHpEvapMix= MfrPiHpEvapMix_A
 UNIT 516 TYPE 931
 !PiHPEvapIn
 PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+loop5Dia ! diameter [m]
+loop5Len ! length [m]
+loop5UVal ! U-value [kJ/(h*m^2*K)]
 Lloop5Rho
 Lloop5Cp
 20

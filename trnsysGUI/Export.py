@@ -2,17 +2,17 @@
 import re
 import typing as _tp
 
+import jinja2 as _jinja
 from PyQt5.QtWidgets import QMessageBox
 
+import trnsysGUI.connection.values as _values
+import trnsysGUI.hydraulicLoops.model as _hlm
+import trnsysGUI.hydraulicLoops.names as _names
 from trnsysGUI import massFlowSolver as _mfs
-from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
-import trnsysGUI.hydraulicLoops.names as _names
-import trnsysGUI.hydraulicLoops.model as _hlm
-
-import jinja2 as _jinja
 
 
 class Export(object):
@@ -527,9 +527,9 @@ EQUATIONS {{nEquations}}
 ** {{loopName}}
 {% if hydraulicLoop.useLoopWideDefaults -%}
 {{loopNPipes}} = {{hydraulicLoop.connections | length}}
-{{loopLen}} = 
-{{loopDia}} =
-{{loopUVal}} =
+{{loopLen}} = {{values.DEFAULT_LENGTH_IN_M}} ! [m]
+{{loopDia}} = {{values.DEFAULT_DIAMETER_IN_CM / 100}} ! [m]
+{{loopUVal}} = {{values.DEFAULT_U_VALUE_IN_W_PER_M2_K * 60*60/1000}} ! [kJ/(h*m^2*K)] (= {{values.DEFAULT_U_VALUE_IN_W_PER_M2_K}} W/(m^2*K))
 {% endif -%}
 {{loopRho}} = F{{fluid.name}}Rho
 {{loopCp}} = F{{fluid.name}}Cp
@@ -540,7 +540,7 @@ EQUATIONS {{nEquations}}
 
         nEquations = sum(6 if l.useLoopWideDefaults else 2 for l in loops)
 
-        return self._render(template, loops=loops, nEquations=nEquations, names=_names)
+        return self._render(template, loops=loops, nEquations=nEquations, names=_names, values=_values)
 
     @staticmethod
     def _render(template: str, /, **kwargs):
