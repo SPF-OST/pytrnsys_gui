@@ -26,7 +26,7 @@ FilePath = "res/Config.txt"
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
-    def __init__(self, trnsysType, parent, displayNamePrefix = None, displayName = None, **kwargs):
+    def __init__(self, trnsysType, parent, displayNamePrefix=None, displayName=None, **kwargs):
         super().__init__(None)
 
         self.logger = parent.logger
@@ -687,9 +687,9 @@ class BlockItem(QGraphicsPixmapItem):
     def exportBlackBox(self):
         equation = []
         if (
-            len(self.inputs + self.outputs) == 2
-            and self.isVisible()
-            and not isinstance(self.outputs[0], DoublePipePortItem)
+                len(self.inputs + self.outputs) == 2
+                and self.isVisible()
+                and not isinstance(self.outputs[0], DoublePipePortItem)
         ):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not (files):
@@ -748,5 +748,3 @@ class BlockItem(QGraphicsPixmapItem):
             except ValueError:
                 self.logger.debug("File already deleted from file list.")
                 self.logger.debug("filelist:", self.parent.parent().fileList)
-
-
