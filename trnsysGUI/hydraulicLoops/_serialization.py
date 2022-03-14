@@ -47,7 +47,7 @@ class HydraulicLoop(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoop":
-        assert isinstance(superseded, HydraulicLoop)
+        assert isinstance(superseded, HydraulicLoopVersion0)
 
         useLoopWideDefaults = False
 
