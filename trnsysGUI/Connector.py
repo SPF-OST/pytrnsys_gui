@@ -25,7 +25,7 @@ class Connector(BlockItem, MassFlowNetworkContributorMixin):
     def getInternalPiping(self) -> InternalPiping:
         fromPort = PortItem("input", PortItemType.INPUT)
         toPort = PortItem("output", PortItemType.OUTPUT)
-        pipe = Pipe(self.name, self.trnsysId, fromPort, toPort)
+        pipe = Pipe(self.displayName, self.trnsysId, fromPort, toPort)
         return InternalPiping([pipe], {fromPort: self.inputs[0], toPort: self.outputs[0]})
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
