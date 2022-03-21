@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import glob
 import os
 import typing as _tp
@@ -13,8 +10,8 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTree
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.MoveCommand import MoveCommand
-from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
+from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
 from trnsysGUI.blockItemModel import BlockItemModel
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
@@ -482,6 +479,8 @@ class BlockItem(QGraphicsPixmapItem):
     def _getPixmap(self) -> QPixmap:
         imageAccessor = self._getImageAccessor()
 
+        assert imageAccessor
+        
         image = imageAccessor.image(width=self.w, height=self.h).mirrored(
             horizontal=self.flippedH, vertical=self.flippedV
         )

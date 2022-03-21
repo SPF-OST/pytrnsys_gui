@@ -3,6 +3,7 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
+
 import pytrnsys.utils.serialization as _ser
 
 
@@ -40,20 +41,20 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-man
 
     @classmethod
     def from_dict(
-        cls,
-        data: _dcj.JsonDict,  # pylint: disable=duplicate-code
-        validate=True,
-        validate_enums: bool = True,
+            cls,
+            data: _dcj.JsonDict,  # pylint: disable=duplicate-code
+            validate=True,
+            validate_enums: bool = True,
     ) -> "BlockItemModel":
         data.pop(".__BlockDict__")
         blockItemModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(BlockItemModel, blockItemModel)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,  # pylint: disable=duplicate-code
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
@@ -64,7 +65,7 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-man
         return BlockItemModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel": # type: ignore[override]
+    def upgrade(cls, superseded: BlockItemModelVersion0) -> "BlockItemModel":  # type: ignore[override]
 
         return BlockItemModel(
             superseded.BlockName,
@@ -82,4 +83,3 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-man
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("bbc03f36-d1a1-4d97-a9c0-d212ea3a0203")
-    

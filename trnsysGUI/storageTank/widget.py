@@ -13,14 +13,14 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.storageTank.model as _model
 import trnsysGUI.storageTank.side as _sd
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
+from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
-from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog  # type: ignore[attr-defined]
+from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
 
 InOut = _tp.Literal["In", "Out"]
@@ -33,7 +33,8 @@ class PortIds:
     outputId: int
 
 
-class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+class StorageTank(BlockItem,
+                  MassFlowNetworkContributorMixin):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
     def __init__(self, trnsysType, parent, **kwargs):
@@ -85,13 +86,13 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
             heatExchanger.parent = self
 
     def addDirectPortPair(  # pylint: disable=too-many-arguments
-        self,
-        trnsysId: int,
-        side: _sd.Side,
-        relativeInputHeight: float,
-        relativeOutputHeight: float,
-        storageTankHeight: float,
-        portIds: _tp.Optional[PortIds] = None,
+            self,
+            trnsysId: int,
+            side: _sd.Side,
+            relativeInputHeight: float,
+            relativeOutputHeight: float,
+            storageTankHeight: float,
+            portIds: _tp.Optional[PortIds] = None,
     ):
         inputPort = self._createPort("i", relativeInputHeight, storageTankHeight, side)
         outputPort = self._createPort("o", relativeOutputHeight, storageTankHeight, side)
@@ -114,7 +115,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         self.outputs.append(directPortPair.toPort)
 
     def _createPort(
-        self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
+            self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
     ) -> SinglePipePortItem:
         sideNr = side.toSideNr()
         portItem = _cspi.createSinglePipePortItem(name, sideNr, self)
@@ -232,12 +233,12 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         self._decodeInternal(i, offsetX, offsetY, resBlockList, shallSetNamesAndIDs=True)
 
     def _decodeInternal(  # pylint: disable=too-many-arguments
-        self,
-        i,
-        offsetX,
-        offsetY,
-        resBlockList,
-        shallSetNamesAndIDs: bool,
+            self,
+            i,
+            offsetX,
+            offsetY,
+            resBlockList,
+            shallSetNamesAndIDs: bool,
     ):
         self.logger.debug("Loading a Storage in Decoder")
 
@@ -267,8 +268,8 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         resBlockList.append(self)
 
     def _decodeDirectPortPair(
-        self,
-        portPairModel: _model.DirectPortPair,
+            self,
+            portPairModel: _model.DirectPortPair,
     ) -> None:
         portPair = portPairModel.portPair
 
@@ -290,7 +291,8 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         name = heatExchangerModel.name + nameSuffix
 
         heatExchanger = self.addHeatExchanger(
-            name, portPair.trnsysId, portPair.side, portPair.inputPort.relativeHeight, portPair.outputPort.relativeHeight
+            name, portPair.trnsysId, portPair.side, portPair.inputPort.relativeHeight,
+            portPair.outputPort.relativeHeight
         )
 
         if shallSetNamesAndIDs:
@@ -300,7 +302,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         heatExchanger.port2.id = portPair.outputPort.id
 
     def decodePaste(  # pylint: disable=too-many-arguments
-        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
+            self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
     ):
         self._decodeInternal(i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=False)
 
@@ -327,7 +329,7 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         raise ValueError("Port item doesn't belong to this storage tank.")
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(
-        self, generator: _id.IdGenerator
+            self, generator: _id.IdGenerator
     ) -> None:  # type: ignore[attr-defined]
         for heatExchanger in self.heatExchangers:
             if heatExchanger.trnsysId == generator.UNINITIALIZED_ID:
@@ -650,10 +652,8 @@ class StorageTank(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disabl
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         _sh.rmtree(self.path)

@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 from __future__ import annotations
 
 import typing as _tp

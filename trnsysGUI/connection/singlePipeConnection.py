@@ -1,37 +1,52 @@
-# pylint: skip-file
-# type: ignore
-
 from __future__ import annotations
 
 import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
+import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
-import PyQt5.QtWidgets as _qtw
-
-import trnsysGUI.massFlowSolver as _mfs
-import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.connection.connectionBase as _cb
 import pytrnsys.utils.serialization as _ser
-import trnsysGUI.singlePipeSegmentItem as _spsi
+import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
 import trnsysGUI.hydraulicLoops.export as _hle
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.singlePipePortItem as _sppi
+import trnsysGUI.singlePipeSegmentItem as _spsi
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
 class SinglePipeConnection(_cb.ConnectionBase):
-    def __init__(self, fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, parent: _ed.Editor):
+    def __init__(self, fromPort: _sppi.SinglePipePortItem, toPort: _sppi.SinglePipePortItem,
+                 parent: _ed.Editor):  # type: ignore[name-defined]
         super().__init__(fromPort, toPort, parent)
 
         self._editor = parent
         self._diameterInCm = ConnectionModel.DEFAULT_DIAMETER_IN_CM
         self._uValueInWPerM2K = ConnectionModel.DEFAULT_U_VALUE_IN_W_PER_M2_K
         self._lengthInM = ConnectionModel.DEFAULT_LENGTH_IN_M
+
+    @property
+    def fromPort(self) -> _sppi.SinglePipePortItem:
+        assert isinstance(self._fromPort, _sppi.SinglePipePortItem)
+        return self._fromPort
+
+    @fromPort.setter
+    def fromPort(self, fromPort: _sppi.SinglePipePortItem) -> None:
+        self._fromPort = fromPort
+
+    @property
+    def toPort(self) -> _sppi.SinglePipePortItem:
+        assert isinstance(self._toPort, _sppi.SinglePipePortItem)
+        return self._toPort
+
+    @toPort.setter
+    def toPort(self, toPort: _sppi.SinglePipePortItem) -> None:
+        self._toPort = toPort
 
     @property
     def diameterInCm(self) -> float:
@@ -201,11 +216,11 @@ class SinglePipeConnection(_cb.ConnectionBase):
 
         else:
             f += (
-                "Error: NO VALUE\n" * 3
-                + "at connection with parents "
-                + str(self.fromPort.parent)
-                + str(self.toPort.parent)
-                + "\n"
+                    "Error: NO VALUE\n" * 3
+                    + "at connection with parents "
+                    + str(self.fromPort.parent)
+                    + str(self.toPort.parent)
+                    + "\n"
             )
 
         unitText += "***Initial values\n"
@@ -214,14 +229,14 @@ class SinglePipeConnection(_cb.ConnectionBase):
         unitText += "EQUATIONS " + str(equationNr) + "\n"
         unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
         unitText += (
-            powerPrefix
-            + self.displayName
-            + "_kW"
-            + "= ["
-            + str(unitNumber)
-            + ","
-            + str(equationConstant2)
-            + "]/3600 !kW\n"
+                powerPrefix
+                + self.displayName
+                + "_kW"
+                + "= ["
+                + str(unitNumber)
+                + ","
+                + str(equationConstant2)
+                + "]/3600 !kW\n"
         )
         unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A\n\n"
 
@@ -251,7 +266,7 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
 @_dc.dataclass
 class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
-    DEFAULT_DIAMETER_IN_CM = 2
+    DEFAULT_DIAMETER_IN_CM = 2.0
     DEFAULT_LENGTH_IN_M = 2.0
     DEFAULT_U_VALUE_IN_W_PER_M2_K = 0.8333
 
@@ -270,20 +285,20 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
+            cls,
+            data: _dcj.JsonDict,
+            validate=True,
+            validate_enums: bool = True,
     ) -> "ConnectionModel":
         data.pop(".__ConnectionDict__")
         connectionModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(ConnectionModel, connectionModel)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,  # pylint: disable=duplicate-code
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__ConnectionDict__"] = True

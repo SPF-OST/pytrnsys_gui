@@ -33,7 +33,6 @@ from PyQt5.QtWidgets import (
 )
 
 import pytrnsys.trnsys_util.deckUtils as _du
-
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
@@ -167,7 +166,7 @@ class Editor(QWidget):
         self.snapGrid = False
         self.snapSize = 20
 
-        self.trnsysPath = _pl.Path(r"C:\Trnsys17\Exe\TRNExe.exe")
+        self.trnsysPath = _pl.Path(r"C:\Trnsys18\Exe\TRNExe.exe")
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -496,7 +495,7 @@ class Editor(QWidget):
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
         if exportTo == "mfs":
-            mfsFileName = self.diagramName.split(".")[0] + "_mfs.dck"
+            mfsFileName = self.diagramName.rsplit('.', 1)[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
         elif exportTo == "ddck":
             exportPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")

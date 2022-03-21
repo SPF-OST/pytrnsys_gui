@@ -6,7 +6,7 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.images as _img
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
+from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
@@ -119,20 +119,20 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylin
 
     @classmethod
     def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,  # pylint: disable=duplicate-code
-        validate_enums: bool = True,
+            cls,
+            data: _dcj.JsonDict,
+            validate=True,  # pylint: disable=duplicate-code
+            validate_enums: bool = True,
     ) -> "DoublePipeBlockItemModel":
         data.pop(".__BlockDict__")
         doublePipeBlockItemModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(DoublePipeBlockItemModel, doublePipeBlockItemModel)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code
         data[".__BlockDict__"] = True
