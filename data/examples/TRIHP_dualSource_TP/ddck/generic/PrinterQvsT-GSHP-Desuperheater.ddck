@@ -1,0 +1,60 @@
+*******************************
+**BEGIN UserPrinter.dck
+*******************************
+    
+*****************************************
+** Heat pump section.
+** Version : v0.0
+** Last Changes: Dani Carbonell        
+** Date: 30.09.2016    
+******************************************
+
+   
+
+CONSTANTS 1
+unitPrinterQvsT=224
+   
+ASSIGN temp\QVsT.Plt   unitPrinterQvsT     
+
+     
+UNIT 224 TYPE 25      ! User defined Printer
+PARAMETERS 10     
+dtPrUser                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitPrinterQvsT     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 16
+QHpEvap_kW  ThpEvapIn  QHpCond_kW  THpCondOut QHpDes_kW  THpDesOut  PRdIn_kW  TRdFl  TRdRt     
+Pdhw_kW TPiDHWDemand TLoadDHWHXOut TLoadDHWHXIn PPiCircLoss_kW   TGHXout Qghx_kW
+******     
+QHpEvap_kW  ThpEvapIn  QHpCond_kW  THpCondOut QHpDes_kW  THpDesOut  PRdIn_kW  TRdFl  TRdRt     
+Pdhw_kW TPiDHWDemand TLoadDHWHXOut TLoadDHWHXIn PPiCircLoss_kW   TGHXout Qghx_kW
+
+**ASSIGN temp\MassFlows.Plt   225    
+**     
+**UNIT 225 TYPE 25      ! User defined Printer
+**PARAMETERS 10     
+**dtPrUser                  ! 1 Printing interval
+**tStrtUser            ! 2 Start time
+**tEndUser                ! 3 Stop time
+**225     ! 4 Logical unit
+**0     ! 5 Units printing mode
+**0     ! 6 Relative or absolute start time
+**-1     ! 7 Overwrite or Append
+**-1     ! 8 Print header
+**0     ! 9 Delimiter
+**1     ! 10 Print labels
+**INPUTS 7     
+**MfrPiInHxTes  MfrPiHpToTesDHWIn  MfrPiHpToTesSHIn  MfrPiTesDHWIn  MfrPiSHTesIn  MfrPiIceIn  MfrPiIceOut           
+****   
+**MfrPiInHxTes  MfrPiHpToTesDHWIn  MfrPiHpToTesSHIn  MfrPiTesDHWIn  MfrPiSHTesIn  MfrPiIceIn  MfrPiIceOut           
+  
+*******************************
+**END UserPrinter.dck
+*******************************

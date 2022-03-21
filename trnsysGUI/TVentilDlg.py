@@ -135,9 +135,11 @@ class TVentilDlg(QDialog):
 
     def setNewFlipStateH(self, state):
         self.block.updateFlipStateH(state)
+        self.block.updateSidesFlippedH()
 
     def setNewFlipStateV(self, state):
         self.block.updateFlipStateV(state)
+        self.block.updateSidesFlippedV()
 
     def setNewComplexState(self, state):
         self.block.setComplexDiv(state)

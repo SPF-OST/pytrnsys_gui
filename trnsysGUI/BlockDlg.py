@@ -1,8 +1,4 @@
-# pylint: skip-file
-# type: ignore
-
-import os
-
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
     QLabel,
@@ -14,7 +10,6 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QFileDialog,
 )
-from PyQt5.QtGui import QIcon
 
 import trnsysGUI.BlockItem as _bi
 
@@ -79,8 +74,6 @@ class BlockDlg(QDialog):
             self.close()
         elif newName != "" and not self.nameExists(newName):
             self.block.setName(newName)
-            # self.block.label.setPlainText(newName)
-            # self.block.displayName = newName
             self.close()
         elif newName == "":
             msgb = QMessageBox()

@@ -1,0 +1,218 @@
+*******************************
+**BEGIN battery.ddck
+*******************************
+    
+	
+*****************************************
+** Electrical battery data section. 
+** Author : Robert Haberl (RH)
+** History: 
+**** DC adapted to TriHp
+**** DC first version in ddck format 25.02.2019
+******************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** None
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+** None
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 7
+elSysOut_BatLoss   = PelBatLoss_kW
+elSysIn_Grid = PelGrid_del 
+elSysOut_Grid  = PelGrid_exp
+elSysOut_InvLoss = PelLossesDCAC
+elSysOut_BatAcumCh = max(PelBatDC_kW,0)
+elSysIn_BatAcumDis = min(PelBatDC_kW,0)
+elSysOut_BatStandby = PelBatStandby_kW
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+**PelPVAC_kW,FCellToBat_kW,PelFuelCellToBui_kW
+EQUATIONS 1
+myPelSystem_kW = (PelHpTot_kW+PelContr_kW+PelPuSH_kW+PelPuDHW_kW+qAuxStoreDHW_KW+qAuxStoreSH_KW)
+
+**********************************************
+** Dependencies with overall variables 
+** Tamb HT cpWat
+** 
+**********************************************
+**None
+
+
+EQUATIONS 2    ! Stromverbrauch und Stromnetzbilanz THIS WILL BE ELIMINATED           ! System electricity consumption [kW]
+PelHeatSys_kW = myPelSystem_kW
+PelUsedTotal_kW = PelHeatSys_kW + PelHH_kW + PelBatStandby_kW    !kW, Total konsumierter Strom des Geb√§udes [kW]
+
+**********************************
+** Generic constants
+**********************************
+
+CONSTANTS 3 !Needed to run but no need here
+PelFuelCell_kW = 0
+PelFuelCellToBat_kW = 0
+PelFuelCellToBui_kW = 0
+
+CONSTANTS 11   ! PARAMETERS FOR TYPE1217
+BatMode = 2				! (1)-NoBat-Autoconsum (2)-Bat-Autoconsum (3)-Bat-Setpoints
+minElBatFactor = 0.001
+CapBatMax_kWh = 125    		!kWh, Maximale Batteriekapazit‰t zur Zeit 0 [kWh]
+maxBatteryPower_kW = 62.5 		!CapBatMaxT0_kWh * 12./50.    !kW, Maximum battery charging power [kW]
+MinPelFromToBat_kW = minElBatFactor*maxBatteryPower_kW    !kW, Minimum delivered power from the battery
+SOCBeginBat = 0.3
+FrBatSOCmin = 0.2    !0-1, Minimaler Ladeanteil der Batterie
+FrBatSOCmax = 1    !0-1, Minimaler Ladeanteil der Batterie
+PelBatStandby_kW = 0.005    !kW, Standbyverluste + Reglerverbrauch Batterie
+!inverterEffDCAC = 0.9
+effBatDischarge = 0.98
+effBatCharge = 0.98
+
+
+
+
+
+UNIT 6 TYPE 661    !Type993-release.dll, Input value recall for Controller Values
+PARAMETERS 3
+1  !, 1, number of variables to be remembered
+1
+SOCBeginBat
+INPUTS 1
+5,1  
+*** INITIAL INPUT VALUES
+SOCBeginBat   ! 1-10
+
+EQUATIONS 1   !, Recalled values for collector control
+SOCBatRc = [6,1]  !0/1
+
+
+
+*------------------------------------------------------------------------------
+* Model ELectrical Balance (Type 1217)
+* 
+
+UNIT 5 TYPE 1217	 Electrical_Balance
+PARAMETERS 11
+BatMode					! Running mode & configuration of the electrical system 
+CapBatMax_kWh			! kWh - Maximum Battery Capacity
+FrBatSOCmin				! 0-1 - Minimum SOC (State of Charge) fraction of the battery
+FrBatSOCmax				! 0-1 - Maximum SOC (State of Charge) fraction of the battery
+SOCBeginBat				! 0-1 - Initial SOC (State of Charge) fraction of the battery at initial time
+maxBatteryPower_kW		! kW  - Maximum battery charging/discharging power
+MinPelFromToBat_kW		! kW  - Minimum delivered power from the battery
+PelBatStandby_kW			! kW  - Standby and regulation losses of the battery
+inverterEffDCAC			! 0-1 - Efficiency of the inverter. Conversion from DC to AC
+effBatDischarge			! 0-1 - Efficiency when battery is discharging
+effBatCharge			! 0-1 - Efficiency when battery is charging
+INPUTS 6
+6,1					! 0-1 - SOC at the beginning of the timestep
+PelPVAC_kW 				! kW - PV generation power
+PelHH_kW				! kW - Household electrical power
+PelHeatSys_kW 			! kW - Heat system electrical power
+0,0					! kW - Set value for the charging(+)/discharging(-) power of the battery from external controller
+0,0					! kW - Set value for the delivered(+)/exported(-) power from/to the grid			
+*** INITIAL INPUT VALUES
+SOCBeginBat 0 0 0 0 0 
+*------------------------------------------------------------------------------
+
+EQUATIONS 13
+SOCBat = [5,1]				! 0-1 	SOC (State of Charge) of the battery at the end of the time step
+SOCBat_kWh = [5,2]				!	SOCBat_kWh			! kWh 	State of the capacity of the battery
+PelBatDC_kW = [5,3]				!	PelBatDC_kW 		! kW	Power charging(+);discharging(-) the battery
+!PelBatStandby_kW = [5,4]				!	PelBatStandby_kW 	! kW	Standby power consumption of the battery
+PelBatLoss_kW = [5,5]				!   PelBatLoss_kW 		! kW	Power loosses of the battery -	(elSysOut_BatLoss in PyTRNSYS)
+PelLossesDCAC = [5,6]				!	PelLossesDCAC 		! kW	Power loosses in the inverter - (elSysOut_InvLoss in PyTRNSYS)
+!PelPVDC_kW = [5,9]				!	PelPVDC_kW			! kW	PV Production DC - 
+!PelPVAC_kW = [5,10]				!	PelPVAC_kW			! kW	PV Production AC -
+!PelUsedTotal_kW = [5,11]				!	PelUsedTotal_kW		! kW	Total Power consumed (HH + HeatSys + BatStandby)
+PvUsed_kW = [5,12]				!	PvUsed_kW 			! kW	PV production instantly consumed
+PelGrid_kW = [5,13]				!	PelGrid_kW			! kW	Power delivered(+)/Exported(-) from/to the grid
+PelGrid_del = [5,14]				!	PelGrid_del			! kW	Power delivered from the grid -  (PelFromGrid_kW/ElSysIn_Grid in PyTRNSYS)
+PelGrid_exp = [5,15]				!	PelGrid_exp			! kW	Power evxported to the grid	- 	 (PvToGrid_kW/elSysOut_PvToGrid in PYTRNSYS)
+BoACimb = GT(ABS([5,16]),0.0001)*[5,16]		!ACimb				! 0-1	Flag indicating an error in the AC energy balance (Error=1)
+BoDCimb = GT(ABS([5,17]),0.0001)*[5,17]			!DCimb				! 0-1	Flag indicating an error in the DC energy balance (Error=1)
+BoTotimb = GT(ABS([5,18]),0.0001)*[5,18]				!Totimb				! 0-1	Flag indicating an error in the Total energy balance (Error=1)
+BoCharge = GT(ABS([5,19]),0.0001)*[5,19]				! 0-1	Flag indicating if battery is charging(1) or discharging(0)		
+
+
+
+*******************************
+**Monthly printer
+*******************************
+
+CONSTANTS 1
+unitPrinterBat=308
+
+ASSIGN    temp\ELECTRIC_BAT_PV_MO.Prt      unitPrinterBat
+
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
+PARAMETERS 6
+unitPrinterBat  !, 1, Logical unit number, -
+-1   !, 2, Logical unit for monthly summaries, -
+1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1   !, 4, Printing & integrating interval, h. -1 for monthly integration
+1    !, 5, Number of inputs to avoid integration, -
+1    !, 6, Output number to avoid integration
+INPUTS 11
+Time  PelBatDC_kW PelBatStandby_kW PelBatLoss_kW PelLossesDCAC PelPVDC_kW PelPVAC_kW PelUsedTotal_kW PvUsed_kW PelGrid_kW PelGrid_del PelGrid_exp     
+*******
+Time  PelBatDC_kW PelBatStandby_kW PelBatLoss_kW PelLossesDCAC PelPVDC_kW PelPVAC_kW PelUsedTotal_kW PvUsed_kW PelGrid_kW PelGrid_del PelGrid_exp     
+
+
+*******************************
+**Hourly Battery printer
+*******************************
+
+CONSTANTS 1
+unitPrinterBat_h=309
+
+ASSIGN    temp\ELECTRIC_BAT_HR.Prt      unitPrinterBat_h
+
+UNIT 308 Type 46    !, Printegrator Monthly Values for Electricity
+PARAMETERS 6
+unitPrinterBat_h  !, 1, Logical unit number, -
+-1   !, 2, Logical unit for monthly summaries, -
+1    !, 3, Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1   !, 4, Printing & integrating interval, h. -1 for monthly integration
+1    !, 5, Number of inputs to avoid integration, -
+1    !, 6, Output number to avoid integration
+INPUTS 13
+Time  SOCBat_kWh SOCBat  PelBatDC_kW PelBatStandby_kW PelBatLoss_kW PelLossesDCAC PelPVDC_kW PelPVAC_kW PelUsedTotal_kW PvUsed_kW PelGrid_kW PelGrid_del PelGrid_exp     
+*******
+Time  SOCBat_kWh SOCBat  PelBatDC_kW PelBatStandby_kW PelBatLoss_kW PelLossesDCAC PelPVDC_kW PelPVAC_kW PelUsedTotal_kW PvUsed_kW PelGrid_kW PelGrid_del PelGrid_exp     
+
+
+
+UNIT 155 TYPE 65     ! Online Plotter PV
+PARAMETERS 12     
+8    ! 1 Nb. of left-axis variables
+6     ! 2 Nb. of right-axis variables
+-100     ! 3 Left axis minimum
+100     ! 4 Left axis maximum
+-2    ! 5 Right axis minimum
+5     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 14
+elSysIn_PV  SOCBat_kWh SOCBat  PelBatDC_kW PelBatStandby_kW PelBatLoss_kW PelLossesDCAC PelPVDC_kW PelPVAC_kW PelUsedTotal_kW PvUsed_kW PelGrid_kW PelGrid_del PelGrid_exp     
+**     
+elSysIn_PV  SOCBat_kWh SOCBat  PelBatDC_kW PelBatStandby_kW PelBatLoss_kW PelLossesDCAC PelPVDC_kW PelPVAC_kW PelUsedTotal_kW PvUsed_kW PelGrid_kW PelGrid_del PelGrid_exp      
+LABELS  3    
+Pel
+SoC
+Battery     
+		

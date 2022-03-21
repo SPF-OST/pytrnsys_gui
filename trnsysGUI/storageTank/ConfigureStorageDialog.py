@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 from __future__ import annotations
 
 import typing as _tp
@@ -28,7 +25,7 @@ import trnsysGUI.modifyRelativeHeightsDialog as _mhd
 import trnsysGUI.storageTank.side as _sd
 
 if _tp.TYPE_CHECKING:
-    import trnsysGUI.StorageTank as _st
+    import trnsysGUI.storageTank.widget as _st
     import trnsysGUI.diagram.Editor as _ed
 
 
@@ -36,9 +33,9 @@ class ConfigureStorageDialog(QDialog):
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
 
-    def __init__(self, storage: _st.StorageTank, parent: _ed.Editor):
-        super().__init__(parent)
-        self.parent = parent
+    def __init__(self, storage: _st.StorageTank, editor: _ed.Editor):  # type: ignore[name-defined]
+        super().__init__(editor)
+        self._editor = editor
         self.storage = storage
         self.n = 0
         self.m = 0
@@ -194,13 +191,13 @@ class ConfigureStorageDialog(QDialog):
         self._loadDirectPortPairs()
 
         # This is to ensure that only one list element is selected
-        self.rightHeatExchangersItemListWidget.setSelectionMode(1)
-        self.leftHeatExchangersItemListWidget.setSelectionMode(1)
+        self.rightHeatExchangersItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
+        self.leftHeatExchangersItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
         self.rightHeatExchangersItemListWidget.clicked.connect(self.listWRClicked)
         self.leftHeatExchangersItemListWidget.clicked.connect(self.listWLClicked)
 
-        self._rightDirectPortPairsItemListWidget.setSelectionMode(1)
-        self._leftDirectPortPairsItemListWidget.setSelectionMode(1)
+        self._rightDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
+        self._leftDirectPortPairsItemListWidget.setSelectionMode(QListWidget.SelectionMode(1))
         self._rightDirectPortPairsItemListWidget.clicked.connect(self.listWR2Clicked)
         self._leftDirectPortPairsItemListWidget.clicked.connect(self.listWL2Clicked)
 
@@ -223,13 +220,13 @@ class ConfigureStorageDialog(QDialog):
     @staticmethod
     def _getHeatExchangerListItemText(h):
         return (
-            h.displayName
-            + ", y_offset = "
-            + "%d" % int(h.relativeInputHeight * 100)
-            + "%"
-            + " to "
-            + "%d" % int(h.relativeOutputHeight * 100)
-            + "%"
+                h.displayName
+                + ", y_offset = "
+                + "%d" % int(h.relativeInputHeight * 100)
+                + "%"
+                + " to "
+                + "%d" % int(h.relativeOutputHeight * 100)
+                + "%"
         )
 
     def _loadDirectPortPairs(self):
@@ -250,10 +247,10 @@ class ConfigureStorageDialog(QDialog):
     @staticmethod
     def _getDirectPortPairListItemText(directPortPair: _dpp.DirectPortPair):
         return (
-            "Port pair from "
-            + "%d%%" % int(directPortPair.relativeInputHeight * 100)
-            + " to "
-            + "%d%%" % int(directPortPair.relativeOutputHeight * 100)
+                "Port pair from "
+                + "%d%%" % int(directPortPair.relativeInputHeight * 100)
+                + " to "
+                + "%d%%" % int(directPortPair.relativeOutputHeight * 100)
         )
 
     def listWLClicked(self):
@@ -279,29 +276,28 @@ class ConfigureStorageDialog(QDialog):
         try:
             _inputPercentageHeight = float(self.offsetLeI.text())
         except:
-            self.parent.logger.warning('HX input height is not a number.')
+            self._editor.logger.warning('HX input height is not a number.')
             return
 
         try:
             _outputPercentageHeight = float(self.offsetLeO.text())
         except:
-            self.parent.logger.warning('HX output height is not a number.')
+            self._editor.logger.warning('HX output height is not a number.')
             return
 
-
         if (
-            self.minOffsetDistance()
-            and _inputPercentageHeight > _outputPercentageHeight
-            and self.offsetsInRange()
+                self.minOffsetDistance()
+                and _inputPercentageHeight > _outputPercentageHeight
+                and self.offsetsInRange()
         ):
             if self.rButton.isChecked():
-                self.parent.logger.debug('Adding HX on righthand side.')
+                self._editor.logger.debug('Adding HX on righthand side.')
                 self._addHxR()
             elif self.lButton.isChecked():
-                self.parent.logger.debug('Adding HX on lefthand side.')
+                self._editor.logger.debug('Adding HX on lefthand side.')
                 self._addHxL()
             else:
-                self.parent.logger.warning('No side selected for heat exchanger.')
+                self._editor.logger.warning('No side selected for heat exchanger.')
                 return
         else:
             msgb = QMessageBox()
@@ -333,7 +329,7 @@ class ConfigureStorageDialog(QDialog):
         relativeInputHeight = float(self.offsetLeI.text()) / 100
         relativeOutputHeight = float(self.offsetLeO.text()) / 100
 
-        trnsysId = self.parent.idGen.getTrnsysID()
+        trnsysId = self._editor.idGen.getTrnsysID()  # type: ignore[attr-defined]
         self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
 
         self._loadHeatExchangers()
@@ -342,31 +338,31 @@ class ConfigureStorageDialog(QDialog):
         try:
             _inputPortPercentageHeight = float(self.manPortLeI.text())
         except:
-            self.parent.logger.warning('Input port height is not a number.')
+            self._editor.logger.warning('Input port height is not a number.')
             return
 
         try:
             _outputPortPercentageHeight = float(self.manPortLeO.text())
         except:
-            self.parent.logger.warning('Output port height is not a number.')
+            self._editor.logger.warning('Output port height is not a number.')
             return
 
         if max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100 or min(_inputPortPercentageHeight,
-                                                                                          _outputPortPercentageHeight) <= 0:
+                                                                                      _outputPortPercentageHeight) <= 0:
             messageBox = QMessageBox()
             messageBox.setText(
                 'Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %).')
             messageBox.exec_()
             return
 
-        trnsysId = self.parent.idGen.getTrnsysID()
+        trnsysId = self._editor.idGen.getTrnsysID()
 
         if self.manlButton.isChecked():
             _pairSide = _sd.Side.LEFT
         elif self.manrButton.isChecked():
             _pairSide = _sd.Side.RIGHT
         else:
-            self.parent.logger.warning('No side selected for port pair.')
+            self._editor.logger.warning('No side selected for port pair.')
             return
 
         self.storage.addDirectPortPair(
@@ -505,7 +501,7 @@ class ConfigureStorageDialog(QDialog):
         selectedItem.setText(newText)
 
     def _getFirstSelectedDirectPortPairListWidgetItem(
-        self,
+            self,
     ) -> _tp.Optional[QListWidgetItem]:
         leftSelectedItems = self._leftDirectPortPairsItemListWidget.selectedItems()
         if leftSelectedItems:

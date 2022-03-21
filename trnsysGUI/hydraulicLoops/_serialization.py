@@ -2,7 +2,7 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
-from trnsysGUI import serialization as _ser
+import pytrnsys.utils.serialization as _ser
 
 
 @_dc.dataclass

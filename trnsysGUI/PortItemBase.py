@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 from __future__ import annotations
 
 import typing as _tp
@@ -40,11 +37,7 @@ class PortItemBase(QGraphicsEllipseItem):
 
         self.visibleColor = QColor(0, 0, 0)
 
-        # This if is only for input/output having different colors
-        if name == "i":
-            self.innerCircle.setBrush(self.visibleColor)
-        if name == "o":
-            self.innerCircle.setBrush(self.visibleColor)
+        self.innerCircle.setBrush(self.visibleColor)
 
         self.setCursor(QCursor(QtCore.Qt.CrossCursor))
         # self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
@@ -70,9 +63,9 @@ class PortItemBase(QGraphicsEllipseItem):
     def itemChange(self, change, value):
         # TODO : here to merge segments when moving blockitems
         if (
-            self.parent.parent.parent().moveDirectPorts
-            and hasattr(self.parent, "heatExchangers")
-            and change == self.ItemPositionChange
+                self.parent.parent.parent().moveDirectPorts
+                and hasattr(self.parent, "heatExchangers")
+                and change == self.ItemPositionChange
         ):
             if not self.savePos is None:
                 self.logger.debug("val is " + str(value))
@@ -129,9 +122,9 @@ class PortItemBase(QGraphicsEllipseItem):
                                 nextSeg = conn.segments[2]
                                 if nextSeg.isHorizontal() and seg.isHorizontal():
                                     if (
-                                        int(seg.endNode.parent.pos().y() - 0)
-                                        <= int(nextSeg.line().p2().y())
-                                        <= int(seg.endNode.parent.pos().y() + 0)
+                                            int(seg.endNode.parent.pos().y() - 0)
+                                            <= int(nextSeg.line().p2().y())
+                                            <= int(seg.endNode.parent.pos().y() + 0)
                                     ):
                                         self.logger.debug("both segments are horizontal from fromport")
                                         # verSeg.deleteSegment()
@@ -147,7 +140,8 @@ class PortItemBase(QGraphicsEllipseItem):
                             cor.setPos(self.scenePos().x(), cor.pos().y())
 
                             seg = conn.segments[0]  # first segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
+                                        cor.scenePos().y())
 
                 elif conn.toPort is self:
                     if (conn.fromPort.createdAtSide != 1 and conn.fromPort.createdAtSide != 3) or not conn.segments[
@@ -169,9 +163,9 @@ class PortItemBase(QGraphicsEllipseItem):
                                 nextSeg = conn.segments[-3]
                                 if nextSeg.isHorizontal() and seg.isHorizontal():
                                     if (
-                                        int(nextSeg.endNode.parent.pos().y() - 0)
-                                        <= int(seg.line().p2().y())
-                                        <= int(nextSeg.endNode.parent.pos().y() + 0)
+                                            int(nextSeg.endNode.parent.pos().y() - 0)
+                                            <= int(seg.line().p2().y())
+                                            <= int(nextSeg.endNode.parent.pos().y() + 0)
                                     ):
                                         self.logger.debug("both segments are horizontal from toport")
                                         self.hideCorners(conn)
@@ -186,14 +180,16 @@ class PortItemBase(QGraphicsEllipseItem):
                             self.logger.debug("Inside 2nd")
 
                             seg = conn.segments[-1]  # last segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
+                                        cor.scenePos().y())
                         elif len(conn.getCorners()) == 2 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(self.scenePos().x(), cor.pos().y())
                             self.logger.debug("Inside 3rd")
 
                             seg = conn.segments[-1]  # last segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(),
+                                        cor.scenePos().y())
 
                 else:
                     self.logger.debug("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
@@ -251,6 +247,7 @@ class PortItemBase(QGraphicsEllipseItem):
         self.innerCircle.setRect(-4, -4, 6.5, 6.5)
 
     def debugprint(self):
+
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
 
         internalPiping = self.parent.getInternalPiping()
@@ -282,9 +279,9 @@ class PortItemBase(QGraphicsEllipseItem):
         cor2.setVisible(True)
 
     def getConnectedRealNode(
-        self,
-        portItem: _mfn.PortItem,
-        massFlowContributor: _mfs.MassFlowNetworkContributorMixin,
+            self,
+            portItem: _mfn.PortItem,
+            massFlowContributor: _mfs.MassFlowNetworkContributorMixin,
     ) -> _tp.Optional[_mfn.RealNodeBase]:
         connectedMassFlowContributor = self._getConnectedMassFlowContributor(massFlowContributor)
         if not connectedMassFlowContributor:
@@ -301,7 +298,7 @@ class PortItemBase(QGraphicsEllipseItem):
         return selectedConnectedRealNode
 
     def _getConnectedMassFlowContributor(
-        self, massFlowContributor: _mfs.MassFlowNetworkContributorMixin
+            self, massFlowContributor: _mfs.MassFlowNetworkContributorMixin
     ) -> _tp.Optional[_mfs.MassFlowNetworkContributorMixin]:
         if massFlowContributor == self.parent:
             return self._getConnectionOrNone()
@@ -324,9 +321,9 @@ class PortItemBase(QGraphicsEllipseItem):
         return connection
 
     def _selectConnectedRealNode(
-        self,
-        portItem: _mfn.PortItem,
-        connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
+            self,
+            portItem: _mfn.PortItem,
+            connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
     ) -> _mfn.RealNodeBase:
         raise NotImplementedError()
 

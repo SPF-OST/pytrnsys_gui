@@ -1,0 +1,20 @@
+*****************************************
+**BEGIN Dual source dual sink control
+*****************************************
+    
+*****************************************
+** Contact person : M. Neugebauer   
+** Creation date  : 27.05.2021 
+** Last changes   : --.--.----, XX 
+*****************************************
+
+***************************************************************************
+** Description: 
+** dual source dual sink mock controller
+** TODO: ...
+***************************************************************************
+
+EQUATIONS 3
+HpReverted = (1-BoHS)*BoSC				! 0 = not reverted, 1 = reverted (for active cooling)
+HpSourceMode = MoDS			! 1 = air, 2 = brine
+HpSinkMode = 1*BoSC + 2*GT(BoSH*(1-BoDHW)+(1-BoSH)*BoDHW, 0.5) + 3*BoSH*BoDHW + 1*(1-BoSH)*(1-BoSC)*(1-BoDHW)! 1 = condenser, 2 = sequential, 3 = parallel

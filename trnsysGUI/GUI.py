@@ -8,8 +8,8 @@ import subprocess
 import sys
 
 from PyQt5.QtWidgets import *
-from pytrnsys.utils import log
 
+import pytrnsys.utils.result as _res
 import trnsysGUI.arguments as args
 import trnsysGUI.buildDck as buildDck
 import trnsysGUI.common.cancelled as _ccl
@@ -19,15 +19,14 @@ import trnsysGUI.project as _prj
 import trnsysGUI.settings as _settings
 import trnsysGUI.settingsDlg as _sdlg
 import trnsysGUI.tracing as trc
+from pytrnsys.utils import log
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.connection.connectionBase import ConnectionBase
-from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
+from trnsysGUI.configFile import configFile
 from trnsysGUI.errors import showErrorMessageBox
 from trnsysGUI.storageTank.widget import StorageTank
-from trnsysGUI.configFile import configFile
 
 __version__ = "1.0.0"
 __author__ = "Stefano Marti"
@@ -117,7 +116,6 @@ class _MainWindow(QMainWindow):
         )
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
-
         # Tool bar
         tb = self.addToolBar("Main Toolbar...")
         tb.setObjectName("Toolbar")
@@ -199,6 +197,9 @@ class _MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
+        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export DdckPlaceHolderValue.json", self)
+        exportDdckPlaceHolderValueJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValueJson)
+
         self.projectMenu = QMenu("Project")
         self.projectMenu.addAction(runMassflowSolverActionMenu)
         self.projectMenu.addAction(openVisualizerActionMenu)
@@ -208,6 +209,7 @@ class _MainWindow(QMainWindow):
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
+        self.projectMenu.addAction(exportDdckPlaceHolderValueJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
@@ -409,6 +411,13 @@ class _MainWindow(QMainWindow):
 
         return
 
+    def exportDdckPlaceHolderValueJson(self):
+        try:
+            self.centralWidget.exportDdckPlaceHolderValueJsonFile()
+        except Exception as error:
+            errorMessage = f"The json file could not be generated: {error}"
+            showErrorMessageBox(errorMessage)
+
     def renameDia(self):
         self.logger.info("Renaming diagram...")
         self.centralWidget.showDiagramDlg()
@@ -511,10 +520,11 @@ class _MainWindow(QMainWindow):
         self.centralWidget.exportHydraulicControl()
 
     def exportDck(self):
-        try:
-            buildDck.buildDck(self.projectFolder)
-        except Exception as error:
-            errorMessage = f"The deck file could not be generated: {error}"
+        self.centralWidget.exportDdckPlaceHolderValueJsonFile()
+        trnsysDeck = buildDck.buildDck(self.projectFolder)
+        result = trnsysDeck.buildTrnsysDeck()
+        if _res.isError(result):
+            errorMessage = f"The deck file could not be generated: {result.message}"
             showErrorMessageBox(errorMessage)
 
     def toggleEditorMode(self):
@@ -649,8 +659,8 @@ class _MainWindow(QMainWindow):
                     self.noErrorConns = False
 
                 elif (
-                    objInput == connToInputFromPort
-                    and objOutput == connToOutputFromPort
+                        objInput == connToInputFromPort
+                        and objOutput == connToOutputFromPort
                 ):
                     msgBox = QMessageBox()
                     msgBox.setText(

@@ -1,16 +1,16 @@
 import typing as _tp
 
-import trnsysGUI.massFlowSolver as _mfs
-import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.PortItemBase as _pi
 import trnsysGUI.doublePipeModelPortItems as _dpmpi
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class DoublePipePortItem(_pi.PortItemBase):  # type: ignore[name-defined]
+class DoublePipePortItem(_pi.PortItemBase):
     def _selectConnectedRealNode(  # pylint: disable=duplicate-code  # 1
-        self,
-        portItem: _mfn.PortItem,
-        connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
+            self,
+            portItem: _mfn.PortItem,
+            connectedPortItemsAndAdjacentRealNode: _tp.Sequence[_mfs.PortItemAndAdjacentRealNode],
     ) -> _mfn.RealNodeBase:
         assert isinstance(
             portItem, (_dpmpi.ColdPortItem, _dpmpi.HotPortItem)
@@ -23,7 +23,7 @@ class DoublePipePortItem(_pi.PortItemBase):  # type: ignore[name-defined]
         ]
 
         assert (
-            len(selectedRealNodes) == 1
+                len(selectedRealNodes) == 1
         ), "Only exactly one hot (or cold) model port item should be connected to a double pipe graphical port item."
 
         selectedRealNode = selectedRealNodes[0]

@@ -8,7 +8,7 @@ import uuid as _uuid
 
 import appdirs as _ad
 
-import trnsysGUI.serialization as _ser
+import pytrnsys.utils.serialization as _ser
 
 
 @_dc.dataclass
