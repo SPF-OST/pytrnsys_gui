@@ -13,15 +13,15 @@ import trnsysGUI.hydraulicLoops.split as _hlsplit
 
 class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=too-many-instance-attributes
     def __init__(
-        self,
-        connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
-        hydraulicLoops: _hlmodel.HydraulicLoops,
-        fluids: _tp.Sequence[_hlmodel.Fluid],
-        defaultFluid: _hlmodel.Fluid,
-        parentCommand: _tp.Optional[_qtw.QUndoCommand]
+            self,
+            connection: _spc.SinglePipeConnection,
+            hydraulicLoops: _hlmodel.HydraulicLoops,
+            fluids: _tp.Sequence[_hlmodel.Fluid],
+            defaultFluid: _hlmodel.Fluid,
+            parentCommand: _tp.Optional[_qtw.QUndoCommand]
     ):
         super().__init__("Delete single pipe connection", parentCommand)
-        self._connection: _tp.Optional[_spc.SinglePipeConnection] = connection  # type: ignore[name-defined]
+        self._connection: _tp.Optional[_spc.SinglePipeConnection] = connection
         self._hydraulicLoops = hydraulicLoops
         self._fluids = fluids
         self._defaultFluid = defaultFluid
@@ -47,7 +47,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         self._connection = None
 
     def undo(self) -> None:
-        self._connection = _spc.SinglePipeConnection(  # type: ignore[attr-defined]
+        self._connection = _spc.SinglePipeConnection(
             self._fromPort, self._toPort, self._connectionParent
         )
 

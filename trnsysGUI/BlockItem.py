@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import glob
 import os
 import typing as _tp
@@ -13,8 +10,8 @@ from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTree
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.MoveCommand import MoveCommand
-from trnsysGUI.ResizerItem import ResizerItem
+from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
+from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
 from trnsysGUI.blockItemModel import BlockItemModel
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
@@ -26,7 +23,7 @@ FilePath = "res/Config.txt"
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):
-    def __init__(self, trnsysType, parent, displayNamePrefix = None, displayName = None, **kwargs):
+    def __init__(self, trnsysType, parent, displayNamePrefix=None, displayName=None, **kwargs):
         super().__init__(None)
 
         self.logger = parent.logger
@@ -482,6 +479,8 @@ class BlockItem(QGraphicsPixmapItem):
     def _getPixmap(self) -> QPixmap:
         imageAccessor = self._getImageAccessor()
 
+        assert imageAccessor
+        
         image = imageAccessor.image(width=self.w, height=self.h).mirrored(
             horizontal=self.flippedH, vertical=self.flippedV
         )
@@ -687,9 +686,9 @@ class BlockItem(QGraphicsPixmapItem):
     def exportBlackBox(self):
         equation = []
         if (
-            len(self.inputs + self.outputs) == 2
-            and self.isVisible()
-            and not isinstance(self.outputs[0], DoublePipePortItem)
+                len(self.inputs + self.outputs) == 2
+                and self.isVisible()
+                and not isinstance(self.outputs[0], DoublePipePortItem)
         ):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
             if not (files):
@@ -748,5 +747,3 @@ class BlockItem(QGraphicsPixmapItem):
             except ValueError:
                 self.logger.debug("File already deleted from file list.")
                 self.logger.debug("filelist:", self.parent.parent().fileList)
-
-

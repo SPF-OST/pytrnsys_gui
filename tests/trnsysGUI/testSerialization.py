@@ -7,7 +7,7 @@ import typing as _tp
 import dataclasses_jsonschema as _dcj
 import pytest as _pt
 
-import trnsysGUI.serialization as _ser
+import pytrnsys.utils.serialization as _ser
 
 
 @_dc.dataclass

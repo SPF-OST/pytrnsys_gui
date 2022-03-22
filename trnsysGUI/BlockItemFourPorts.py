@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import glob
 import os
 
@@ -82,7 +79,6 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
 
-
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
@@ -153,9 +149,9 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
     def getSubBlockOffset(self, c):
         for i in range(2):
             if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
+                    self.inputs[i] == c.toPort
+                    or self.inputs[i] == c.fromPort
+                    or self.outputs[i] == c.toPort
+                    or self.outputs[i] == c.fromPort
             ):
                 return i

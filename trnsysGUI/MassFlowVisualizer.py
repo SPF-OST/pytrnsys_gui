@@ -182,7 +182,6 @@ class MassFlowVisualizer(QDialog):
         if timeStep == self.maxTimeStep:
             self.logger.debug("reached end of data, returning")
             self.qtm.stop()
-            return
 
         if self.loadedFile:
             i = 0

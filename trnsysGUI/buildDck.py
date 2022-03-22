@@ -1,12 +1,15 @@
 # pylint: skip-file
 # type: ignore
 
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
-import numpy as num
-import os
-import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
-import pytrnsys.utils.log as log
 import logging
+import os
+import typing as _tp
+
+import numpy as num
+
+import pytrnsys.trnsys_util.buildTrnsysDeck as build
+import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.utils.result as _res
 
 logger = logging.getLogger("root")
 
@@ -17,17 +20,12 @@ class buildDck:
         self.pathConfig = pathConfig
         self.path = pathConfig
 
-        self.defaultInputs()
+        self._ddckPlaceHolderValueJsonPath = None
+
+        self._defaultInputs()
         self.cmds = []
 
-        self.readConfig(self.pathConfig, "run.config")
-        self.getConfig()
-
-        self.nameBase = self.inputs["nameRef"]
-
-        self.buildTrnsysDeck()
-
-    def defaultInputs(self):
+    def _defaultInputs(self):
 
         self.inputs = {}
         self.inputs["ignoreOnlinePlotter"] = False
@@ -55,21 +53,29 @@ class buildDck:
 
         self.variablesOutput = []
 
-    def buildTrnsysDeck(self):
+    def buildTrnsysDeck(self) -> _res.Result[_tp.Optional[str]]:
         """
         It builds a TRNSYS Deck from a listDdck with pathDdck using the BuildingTrnsysDeck Class.
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
 
         """
+        self._readConfig(self.pathConfig, "run.config")
+        self._getConfig()
+
+        self.nameBase = self.inputs["nameRef"]
+
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck)
-        deck.readDeckList(
+        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self._ddckPlaceHolderValueJsonPath)
+        result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
             dictPaths=self.dictDdckPaths,
             replaceLineList=self.replaceLines,
         )
+
+        if _res.isError(result):
+            return _res.error(result)
 
         deck.overwriteForcedByUser = self.overwriteForcedByUser
         deck.writeDeck(addedLines=deckExplanation)
@@ -80,7 +86,6 @@ class buildDck:
         deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
 
         if self.inputs["generateUnitTypesUsed"] == True:
-
             deck.saveUnitTypeFile()
 
         if self.inputs["addAutomaticEnergyBalance"] == True:
@@ -89,7 +94,7 @@ class buildDck:
 
         return deck.nameDeck
 
-    def addParametricVariations(self, variations):
+    def _addParametricVariations(self, variations):
         """
         it fills a variableOutput with a list of all variations to run
         format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
@@ -129,7 +134,7 @@ class buildDck:
 
             self.variablesOutput = variations
 
-    def readConfig(self, path, name, parseFileCreated=False):
+    def _readConfig(self, path, name, parseFileCreated=False):
 
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
@@ -143,6 +148,8 @@ class buildDck:
         # logger.propagate = False
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
+        if "pathToConnectionInfo" in self.inputs:
+            self._ddckPlaceHolderValueJsonPath = self.inputs["pathToConnectionInfo"]
         if self.inputs["addResultsFolder"] == False:
             pass
         else:
@@ -151,7 +158,7 @@ class buildDck:
             if not os.path.isdir(self.path):
                 os.mkdir(self.path)
 
-    def getConfig(self):
+    def _getConfig(self):
         """
         Reads the config file.
 
@@ -246,7 +253,7 @@ class buildDck:
                 pass
 
         if len(self.variation) > 0:
-            self.addParametricVariations(self.variation)
+            self._addParametricVariations(self.variation)
             self.variationsUsed = True
         else:
             self.variationsUsed = False

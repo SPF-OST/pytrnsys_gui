@@ -8,8 +8,8 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
-import trnsysGUI.storageTank.widget as _stw
 import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.storageTank.widget as _stw
 
 _DATA_DIR = _pl.Path(__file__).parent / "data"
 
@@ -87,7 +87,7 @@ class TestEditor:
         storageTanks = [
             o
             for o in editor.trnsysObj
-            if isinstance(o, _stw.StorageTank)  # type: ignore[attr-defined] # pylint: disable=no-member
+            if isinstance(o, _stw.StorageTank)  # pylint: disable=no-member
         ]
 
         for storageTank in storageTanks:
@@ -117,8 +117,8 @@ class TestEditor:
 
 class _Helper:
     def __init__(
-        self,
-        project: _Project,
+            self,
+            project: _Project,
     ):
         self._project = project
 

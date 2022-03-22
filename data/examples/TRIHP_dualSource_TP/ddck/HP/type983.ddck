@@ -1,0 +1,474 @@
+***************************************
+**BEGIN Dual source dual sink heat pump
+***************************************
+    
+*****************************************
+** Contact person : M. Neugebauer   
+** Creation date  : 26.05.2021 
+** Last changes   : --.--.----, XX 
+*****************************************
+
+***************************************************************************
+** Description: 
+** heat pump base ddck for model 980
+** TODO: ...
+***************************************************************************
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+EQUATIONS 8
+!ThpEvapIn = LT(ABS(HpSourceMode-2),0.1)*(NOT(HpReverted)*TPiHpEvapIn + HpReverted*TPiHpCondIn) + LT(ABS(HpSourceMode-1),0.1)*tAmbHp			! Temperature of the evaporator inlet, deg C    
+ThpEvapIn = LT(ABS(HpSourceMode-2),0.1)*(NOT(HpReverted)*TPiHpEvapIn + HpReverted*TPiHpCondIn) + LT(ABS(HpSourceMode-1),0.1)*(NOT(HpReverted)*tAmbHp + HpReverted*TPiHpCondIn)			! Temperature of the evaporator inlet, deg C    
+MfrEvapIn = NOT(HpReverted)*ABS(MfrPiHpEvapIn) + HpReverted*ABS(MfrPiHpCondIn)	! Mass flow rate into evaporator, kg/h   
+MfrEvapIn_mod = LT(ABS(HpSourceMode-2),0.1)*MfrEvapIn + HpIsOn*(LT(ABS(HpSourceMode-1),0.1)*MfrHpEvapAirNom*NOT(HpReverted) + LT(ABS(HpSourceMode-1),0.1)*MfrEvapIn*HpReverted)  !modified flow, to take into account the air flow rate in case of using air source  
+!THpCondIn = NOT(HpReverted)*TPiHpCondIn + HpReverted*TPiHpEvapIn				! Temperature of the condenser inlet, deg C        
+THpCondIn = LT(ABS(HpSourceMode-2),0.1)*(NOT(HpReverted)*TPiHpCondIn + HpReverted*TPiHpEvapIn) + LT(ABS(HpSourceMode-1),0.1)*(NOT(HpReverted)*TPiHpCondIn + HpReverted*tAmbHp)				! Temperature of the condenser inlet, deg C        
+MfrCondIn = NOT(HpReverted)*ABS(MfrPiHpCondIn) + HpReverted*ABS(MfrPiHpEvapIn)	! Mass flow rate into condenser, kg/h 
+MfrCondIn_mod = LT(ABS(HpSourceMode-2),0.1)*MfrCondIn + HpIsOn*(LT(ABS(HpSourceMode-1),0.1)*MfrHpEvapAirNom*HpReverted + LT(ABS(HpSourceMode-1),0.1)*MfrCondIn*NOT(HpReverted))
+THpDesIn = TPiHpDesIn			! Temperature of the desuperheater inlet, deg C        
+MfrDesIn = ABS(MfrPiHpDesIn)	! Mass flow rate into desuperheater, kg/h 
+
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+EQUATIONS 3
+THpEvapOut = [162,1]	! Temperature of the evaporator outlet, deg C 
+THpDesOut = [162,3]		! Temperature of the desuperheater outlet, deg C
+THpCondOut = [162,5]	! Temperature of the condenser outlet, deg C 
+ 
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 2
+elSysIn_Q_HpCompD  = PelHpComp_kW
+!qSysIn_Q_HpComp = PelHpComp_kW    !ALREADY inlcuded with the electricity term?
+qSysIn_Qair = QHpEvap_kW*EQL(MoDS,1)
+!qSysIn_Qground = QHpEvap_kW*EQL(MoDS,2) ALREADY INCLUDED IN THE GHX
+
+*************************************************************************************************
+** Dependencies with other types
+** If only one dependency defined here. 
+** If a variable is used more than once, redefine it here, e.g. varUsedInside=varFromAnotherDeck
+*************************************************************************************************
+
+EQUATIONS 2
+myHpIsOn = hpIsOn				! control signal for the heat pump
+localSourceMode = HpSourceMode	! source mode: 0 = off, 1 = air, 2 = brine
+
+***********************************
+** outputs to other ddck
+***********************************
+EQUATIONS 1
+MfrHpPD = MfrHpPDNew*relaxMfrHpPD + (1-relaxMfrHpPD)*MfrHpPDRc	! IS THIS NEEDED?
+
+**************************************
+** Dependencies with overall variables 
+**************************************
+EQUATIONS 1
+tAmbHp = Tamb ! 15 
+
+***********************************
+** Type specific constants
+***********************************
+CONSTANTS 3 ! Heat Pump: Size              
+sizeHpUsed = sizeHpNom 					! change this to scale the heat pump   
+SizeHpRatio  = sizeHpUsed/sizeHpNom     
+timeHpBlock = 0 !CHANGED FROM 5  
+EQUATIONS 4        
+MfrHpEvapNom = SizeHpRatio*MfrHpEvapRef
+MfrHpCondNom = SizeHpRatio*MfrHpCondRef	! adapt cond to corrected evap MfrHpEvapNom*ratioCondEvap                                     !  
+MfrGhxFcNom = SizeHpRatio*MfrHpEvapFCRef
+MfrHpEvapAirNom = SizeHpRatio*MfrHpEvapRefAir
+
+CONSTANTS 5
+Moloss = 0     
+Ctherm = 4      
+Ualoss = 0       
+PID_MinCR = 0.3
+PID_MaxCR = 1
+
+EQUATIONS 3
+TsupHP_SP = TsupDHW*BoDHW + TsupSH*BoSH*(1-BoDHW) + TsupSC*BoSC
+TsupHP_Meas = EQL(HpSinkMode,1)*THpCondOut + EQL(HpSinkMode,2)*THpDesOut + EQL(HpSinkMode,3)*THpDesOut  !TO BE IMPROVED, ALSO FOR COOLING, Where Tcondout should be replaced by Tevapout
+Err_TsupHPcool = (TsupHP_SP + 3 - THpEvapOut)*BoSC
+
+!Err_TsupHP = TsupHP_SP + 5 - TsupHP_Meas
+!TsupHP_MeasCool = - TsupHP_Meas*BoSC  !negative in cooling
+!TsupHP_SPcool = - TsupHP_SP*BoSC !negative in cooling
+
+CONSTANTS 4
+MoCtrl = 1 ! 1: ctrl by the frCond provided, 2: ctrl by capacity QthSet_HP
+frCOP0 = 0.8
+frCOP1 = 1.5234
+frCOP2 = -1.3374
+
+EQUATIONS 3
+frCond = HpIsOn*([111,1]*(1-BoSC) + 1*BoSC) !Min(Max(-Err_TsupHPcool/10.0,0.1),1) !  !TO BE DETERMINED BY A CONTROLLER
+frCOP = frCOP2*frCond**2 + frCOP1*frCond + frCOP0  !CURVE PLF = f(PLR) fitted with exp. data DSHP in both heating and cooling
+QthSet_HP = 0
+
+
+
+!UNIT 111 TYPE 1669
+!TRACE START STOP
+!PARAMETERS 3
+!1		! 1 Number of Signals
+!1		! 2 Maximum Rate of Increase
+!1		! 3 Maximum Rate of Decrease
+!INPUTS 3
+!5		! [unconnected] Upper Setpoint Value
+!0	! [unconnected] Lower Setpoint Value
+!Err_TsupHP		! [unconnected] Input Value
+!*** INITIAL INPUT VALUES
+!5.0 0.0 5.0 
+!5.0 0.0 5.0 
+!*------------------------------------------------------------------------------
+
+
+UNIT 111 TYPE 22
+PARAMETERS 2
+0		! 1 Mode
+25		! 2 Maximum number of oscillations
+INPUTS 7
+TsupHP_SP		! [unconnected] Setpoint
+TsupHP_Meas		! [unconnected] Controlled variable
+1		! [unconnected] On / Off signal
+0		! [unconnected] Minimum control signal CHANGED FROM 0?
+1		! [unconnected] Maximum control signal
+0.1		! [unconnected] Threshold for non-zero output
+0		! [unconnected] Tolerance on tracking error
+*** INITIAL INPUT VALUES
+0 0 1 0 1 0.1 0 
+0 0 1 0 1 0.1 0 
+
+
+
+! UNIT 112 TYPE 22
+! PARAMETERS 2
+! 0		! 1 Mode
+! 25		! 2 Maximum number of oscillations
+! INPUTS 7
+! TsupHP_SP		! [unconnected] Setpoint
+! TsupHP_Meas	! [unconnected] Controlled variable
+! 0,0		! [unconnected] On / Off signal
+! 0,0		! [unconnected] Minimum control signal CHANGED FROM 0?
+! 0,0		! [unconnected] Maximum control signal
+! 0,0		! [unconnected] Threshold for non-zero output
+! 0,0		! [unconnected] Tolerance on tracking error
+! *** INITIAL INPUT VALUES
+! 0 0 1 -1 1 0.1 0 
+! 0 0 1 -1 1 0.1 0 
+
+
+***********************************
+** Begin PD controller  NOT USED???
+***********************************
+CONSTANTS 5
+MfrHpCondMin = MfrHpCondNom*0.4	! chosen without any knowledge of actual system
+MfrHpCondMax = MfrHpCondNom 	! chosen without any knowledge of actual system
+dMfrHpCondInc = 4*MfrHpCondNom
+dMfrHpCondDec = -dMfrHpCondInc
+dtSetHp = 5
+
+EQUATIONS 1
+dTProHpPID= HpIsOn*(THpCondOut-THpCondIn)+NOT(HpIsOn)*5
+
+! CONTROL OF ASHP MASSFLOW. 
+UNIT 157 TYPE 889     ! Adapted PD-controller
+PARAMETERS 9     
+1				! 1: mode of timesteps: 1= use previous value, 0 = use current value
+MfrHpCondMin	! 2: lowest possible output value
+MfrHpCondMax	! 3: highest possible output value
+-1				! 4: mode of action: 1 = positive, (increase in manipulated value causes increase in process variable), -1 = negative
+MfrHpCondNom	! 5: By how much shall the manipulated variable be changed per hour if the process variable is 1 unit off?
+4				! 6: A high value for D counteracts overshoot / counteracts high rates of increase or decrease in the process variable.
+120				! 7: maximum rate of setpoint change per hour
+dMfrHpCondInc	! 8: maximum rate of increase of the manipulated variable (positive value)
+dMfrHpCondDec	! 9: maximum rate of decrease of the manipulated variable (negative value)
+
+INPUTS 5     
+dTProHpPID	! 1: process variable
+dtSetHp		! 2: setpoint
+Nix			! 3: freeze manipulated variable (1) or let act (0)
+Nix			! 4: Manual (1) or automatic (0) manipulated variable
+Nix			! 5: manual manipulated variable
+*** INITIAL INPUT VALUES     
+0.0   0.0   0.0   0.0    0.0     
+*** OUTUPUTS     
+** 1: manipulated variable, 2: current setpoint, 3: current deviation      
+      
+EQUATIONS 5    ! ASHP ON-Signal and mass flow
+MfrHpPDNew = [157,1]     
+SETPHPPD = [157,2]     
+DevHPPD = [157,3]    
+MfrPuHpPD = HpIsOn*MfrHpPD   
+relaxMfrHpPD = 1     
+
+CONSTANTS 6
+tauWPstart = 10
+tauWPstop = 20
+TWPEvapIce = -100
+EtaDefrost = 0.4
+PelWPVen = 0
+PelHpCtr_kW = 0
+
+UNIT 162 TYPE 983     ! HP model
+TRACE START STOP
+PARAMETERS 14     
+tauWPstart     ! 1 
+tauWPstop     ! 2 
+TWPEvapIce     ! 3 
+EtaDefrost     ! 4 
+PelWPVen     ! 5 
+PelHpCtr_kW     ! 6 
+timeHpBlock     ! 7 
+Moloss     ! 8 
+Ctherm     ! 9 
+Ualoss     ! 10 
+MoCtrl     ! 11 
+frCOP0     ! 12 
+frCOP1     ! 13 
+frCOP2     ! 14 
+INPUTS 48     
+Coeff_a1        !  
+Coeff_a2         !  
+Coeff_a3          !  
+Coeff_a4          !  
+Coeff_a5          !  
+Coeff_a6          !  
+Coeff_a7          !  
+Coeff_a8          !  
+Coeff_a9          !  
+Coeff_a10          !  
+Coeff_b1          !  
+Coeff_b2          !  
+Coeff_b3          !  
+Coeff_b4          !  
+Coeff_b5          !  
+Coeff_b6          !  
+Coeff_b7          !  
+Coeff_b8          !  
+Coeff_b9          !  
+Coeff_b10          !  
+Coeff_c1          !  
+Coeff_c2          !  
+Coeff_c3          !  
+Coeff_c4          !  
+Coeff_c5          !  
+Coeff_c6          !  
+Coeff_c7          !  
+Coeff_c8          !  
+Coeff_c9          !  
+Coeff_c10          !  
+ThpEvapIn          !  
+MfrEvapIn_mod          !  
+THpDesIn          !  
+MfrDesIn          !  
+THpCondIn          !  
+MfrCondIn_mod          !  
+myHpIsOn          !  
+RHamb_1          !  
+tAmbHp          !  
+frCond          !  
+frCOP          !  
+CpEvap          !  
+TminEvapTout          !  
+TEvapMaxHp          !  
+cpCond          !  
+tCondMinHP          !  
+tCondMaxHP          !  
+QthSet_HP          !  
+*** INITIAL INPUT VALUES     
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0      
+     
+    
+EQUATIONS 18	! Heat Pump: Outputs
+MfrHpEvapOut = LT(ABS(HpSourceMode-2),0.1)*[162,2]					! Mfr,evap,out, kg/h there is only a flow back to the hydraulics if we are using ground source
+MfrHpCondOut = [162,6]*NOT(HpIsBlock)	! Mfr,cond,out, kg/h
+MfrHpDesOut = [162,4]*NOT(HpIsBlock)	! Mfr,des,out, kg/h
+PelHpComp_kW = [162,7]					! electricity consumption of compressor, kW
+PelHpTot_kW = [162,8]					! electricity consumption total, kW
+QHpEvap_kW = [162,9]					! Heat input evaporator, kW
+QHpCond_kW = [162,11]					! Heat output condenser, kW
+QHpDes_kW = [162,10]					! Heat output desuperheater, kW
+COQHp = [162,12]
+QHpLossStart_kW = [162,13]				! Start losses, kW
+QHpDefrost_kW = [162,14]				! Defrosting losses, kW   
+HpIsBlock = [162,21] !BrineTooColdTimer			! OR([162,21],BrineTooColdTimer)
+frCondOut = [162,22]
+BrineTooCold = OR(LT(THpEvapIn,TMinEvapTin),(LT(THpEvapOut,TMinEvapTout)))
+QHpSink_kW = QHpCond_kW + QHpDes_kW		! Overall heat output, kW
+QHpSink_SH_kW = QHpSink_kW*BoSH*(1-BoDHW)
+QHpSink_DHW_kW = QHpSink_kW*BoDHW
+QHpSink_SC_kW = QHpSink_kW*BoSC
+
+UNIT 163 TYPE 817     ! Timer or time delay FIXED TO 5 VARIABLES. WE CAN'T CHANGE IT !!
+PARAMETERS 10    
+1			! 3: mode of timer 1: 1= from first trigger on; 2 = from last trigger on
+timeHpBlock	! 4: lenght of time for timer 1 [h]
+0			! 5: mode of timer 2: 1= from first trigger on; 2 = from last trigger on
+0			! 6: lenght of time for timer 2 [h]
+0			! 7: mode of timer 3: 1= from first trigger on; 2 = from last trigger on
+0			! 8: lenght of time for timer 3 [h]
+0			! 9: mode of timer 4: 1= from first trigger on; 2 = from last trigger on
+0			! 10: lenght of time for timer 4 [h]
+0
+0
+INPUTS 5
+BrineTooCold Nix  Nix  Nix Nix
+0.0 0.0 0.0 0.0 0.0
+EQUATIONS 1
+BrineTooColdTimer = [163,1]
+
+UNIT 82 TYPE 661      ! Input value recall (element RcA) DC CHANGED
+PARAMETERS 9     
+4   ! 1: number of variables to be remembered
+1 0
+1 0
+1 0
+1 0
+
+INPUTS 4    
+HpIsBlock THpCondOut myHpIsOn MfrHpPDRc   
+0 0  0  0  !0 0 0  
+
+EQUATIONS 6
+BoHpStart = myHpIsOn*NOT(myHpIsOnRc)
+HpStartPerH = BoHpStart/dtsim
+HpIsBlockRc = [82,1]
+THpOutRc = [82,2]
+myHpIsOnRc = [82,3]
+MfrHpPDRc = [82,4]
+
+EQUATIONS 2
+dtEvap = ThpEvapIn-THpEvapOut
+dtCond = THpCondOut-THpCondIn
+
+***********************************
+** Monthly printer
+***********************************
+CONSTANTS 1
+unitPrintHp = 31
+
+ASSIGN temp\HEAT_PUMP_MO.Prt unitPrintHp 
+
+UNIT 32 TYPE 46
+PARAMETERS 6
+unitPrintHp	! 1: Logical unit number, -
+-1			! 2: Logical unit for monthly summaries, -
+1			! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1			! 4: Printing & integrating interval, h. -1 for monthly integration
+1			! 5: Number of inputs to avoid integration, -
+1			! 6: Output number to avoid integration
+INPUTS 7
+Time  QHpEvap_kW  QHpCond_kW  QHpDes_kW  QHpSink_kW  PelHpComp_kW  PelHpTot_kW
+**
+Time  QHpEvap_kW  QHpCond_kW  QHpDes_kW  QHpSink_kW  PelHpComp_kW  PelHpTot_kW
+
+***********************************
+** Hourly printer
+***********************************
+CONSTANTS 1
+unitHourlyHp = 33
+
+ASSIGN    temp\HEAT_PUMP_HR.Prt    unitHourlyHp     
+
+UNIT 34 TYPE 46     ! Printegrator Monthly Values for System
+PARAMETERS 9   
+unitHourlyHp	! 1: Logical unit number, -
+-1				! 2: Logical unit for monthly summaries, -
+1				! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1				! 4: Printing & integrating interval, h. -1 for monthly integration
+4				! 5: Number of inputs to avoid integration, -
+6				! 6: Output number to avoid integration
+7				! 7: Output number to avoid integration
+8				! 8: Output number to avoid integration
+9				! 9: Output number to avoid integration
+INPUTS 13
+Time  QHpEvap_kW  QHpCond_kW  QHpDes_kW  QHpSink_kW  PelHpComp_kW  PelHpTot_kW  ThpEvapIn  THpEvapOut  THpCondIn  THpCondOut  THpDesIn  THpDesOut
+**
+Time  QHpEvap_kW  QHpCond_kW  QHpDes_kW  QHpSink_kW  PelHpComp_kW  PelHpTot_kW  ThpEvapIn  THpEvapOut  THpCondIn  THpCondOut  THpDesIn  THpDesOut
+
+UNIT 89 TYPE 65     ! Online Plotter Hpiliary (Element Hp)
+PARAMETERS 12
+10				! 1 Nb. of left-axis variables
+10				! 2 Nb. of right-axis variables
+-10				! 3 Left axis minimum
+70				! 4 Left axis maximum
+0				! 5 Right axis minimum
+100				! 6 Right axis maximum
+nPlotsPerSim	! 7 Number of plots per simulation
+12				! 8 X-axis gridpoints
+1				! 9 Shut off Online w/o removing
+-1				! 10 Logical unit for output file
+0				! 11 Output file units
+0				! 12 Output file delimiter
+INPUTS 20
+ThpEvapIn THpEvapOut THpCondIn THpCondOut THpDesIn THpDesOut myHpIsOn HpIsBlock Nix Nix
+MfrEvapIn_mod MfrCondIn MfrDesIn QHpEvap_kW QHpCond_kW QHpDes_kW QHpSink_kW frCond dtEvap dtCond
+**
+ThpEvapIn THpEvapOut THpCondIn THpCondOut THpDesIn THpDesOut myHpIsOn HpIsBlock Nix Nix
+MfrEvapIn_mod MfrCondIn MfrDesIn QHpEvap_kW QHpCond_kW QHpDes_kW QHpSink_kW frCond dtEvap dtCond
+LABELS  3     
+Temperatures     
+massFlow_and_Heat_transf     
+HP    
+
+
+
+UNIT 90 TYPE 65     ! Online Plotter Hpiliary (Element Hp)
+PARAMETERS 12
+4				! 1 Nb. of left-axis variables
+6				! 2 Nb. of right-axis variables
+-10				! 3 Left axis minimum
+70				! 4 Left axis maximum
+0				! 5 Right axis minimum
+10				! 6 Right axis maximum
+nPlotsPerSim	! 7 Number of plots per simulation
+12				! 8 X-axis gridpoints
+1				! 9 Shut off Online w/o removing
+-1				! 10 Logical unit for output file
+0				! 11 Output file units
+0				! 12 Output file delimiter
+INPUTS 10
+PID_MinCR PID_MaxCR TsupHP_SP TsupHP_Meas frCond frCOP HpSourceMode TEvapMaxHp PIDRadBui Err_TsupHPcool
+**
+PID_MinCR PID_MaxCR TsupHP_SP TsupHP_Meas frCond frCOP HpSourceMode TEvapMaxHp PIDRadBui Err_TsupHPcool
+LABELS  3     
+Temperatures     
+massFlow_and_Heat_transf     
+CtrlHP
+
+
+CONSTANTS 1
+unitPrtrTimestHP=1312
+   
+ASSIGN temp\HP_Timestep.Prt   unitPrtrTimestHP     
+
+     
+UNIT 1312 TYPE 25      ! User defined Printer
+PARAMETERS 10     
+dtPrUser                  ! 1 Printing interval
+tStrtUser            ! 2 Start time
+tEndUser                ! 3 Stop time
+unitPrtrTimestHP     ! 4 Logical unit
+0     ! 5 Units printing mode
+0     ! 6 Relative or absolute start time
+-1     ! 7 Overwrite or Append
+-1     ! 8 Print header
+0     ! 9 Delimiter
+1     ! 10 Print labels
+INPUTS 16
+ThpEvapIn MfrEvapIn_mod THpDesIn MfrDesIn THpCondIn  MfrCondIn MfrCondIn_mod THpEvapOut THpDesOut THpCondOut HpSourceMode HpReverted MfrPuHpEvap MfrPuHpShCond cpCond cpEvap
+*******************************
+ThpEvapIn MfrEvapIn_mod THpDesIn MfrDesIn THpCondIn  MfrCondIn MfrCondIn_mod THpEvapOut THpDesOut THpCondOut HpSourceMode HpReverted MfrPuHpEvap MfrPuHpShCond cpCond cpEvap
+
+
+
+*******************************
+**END BW-HeatPump.dck
+*******************************

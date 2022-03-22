@@ -183,9 +183,7 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        pipes = []
-        portItems = {}
-
+        
         evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
         evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)
         evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[0], evaporatorInput, evaporatorOutput)

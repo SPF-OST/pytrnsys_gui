@@ -16,17 +16,17 @@ if _tp.TYPE_CHECKING:
 
 class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
     def __init__(
-        self,
-        fromPort: _spi.SinglePipePortItem,  # type: ignore[name-defined]
-        toPort: _spi.SinglePipePortItem,  # type: ignore[name-defined]
-        editor: _ed.Editor,  # type: ignore[name-defined]
+            self,
+            fromPort: _spi.SinglePipePortItem,
+            toPort: _spi.SinglePipePortItem,
+            editor: _ed.Editor,  # type: ignore[name-defined]
     ):
         super().__init__("Create single pipe connection")
         self._fromPort = fromPort
         self._toPort = toPort
         self._editor = editor
 
-        self._connection: _tp.Optional[_spc.SinglePipeConnection] = None  # type: ignore[name-defined]
+        self._connection: _tp.Optional[_spc.SinglePipeConnection] = None
         self._mergeSummary: _tp.Optional[_hlmerge.MergeSummary] = None
 
     def redo(self):

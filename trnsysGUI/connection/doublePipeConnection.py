@@ -5,16 +5,15 @@ import typing as _tp
 import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
-
 import dataclasses_jsonschema as _dcj
 
+import pytrnsys.utils.serialization as _ser
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.serialization as _ser
-from trnsysGUI.massFlowSolver import InternalPiping  # type: ignore[attr-defined]
-from trnsysGUI.PortItemBase import PortItemBase  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
-from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
+from trnsysGUI.PortItemBase import PortItemBase
+from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
+from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
+from trnsysGUI.massFlowSolver import InternalPiping  # type: ignore[attr-defined]
 
 
 class DoublePipeConnection(ConnectionBase):
@@ -223,7 +222,7 @@ class DoublePipeConnection(ConnectionBase):
         outputVariable = outputVariables[0]
 
         firstColumn = (
-            "T" + self.displayName + temperature + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
+                "T" + self.displayName + temperature + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
         )
         unitText = self._addComment(
             firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperature}, deg C"
@@ -271,20 +270,20 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pyli
 
     @classmethod
     def from_dict(
-        cls,
-        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
-        validate=True,
-        validate_enums: bool = True,
+            cls,
+            data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
+            validate=True,
+            validate_enums: bool = True,
     ) -> "DoublePipeConnectionModel":
         data.pop(".__ConnectionDict__")
         doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__ConnectionDict__"] = True

@@ -1,0 +1,158 @@
+**************************************************
+** BEGIN propane dual source
+**************************************************
+** Heat pump data for propane dual source
+** Data obtained from experiments (Maike Schubert)
+** See pytrnsys_trihp\pytrnsys_trihp\heatPumpFit
+** Author : Martin Neugebauer
+**************************************************
+
+*********************************
+** constants independent of modes
+*********************************
+CONSTANTS 3
+sizeHpNom = 10
+tCondMaxHp = 70.0
+tCondMinHP = 0.0
+
+
+**************************************************
+** adjustements to HpSourceMode (1: air, 2: brine)
+**************************************************
+EQUATIONS 9
+!MfrHpEvapRef = HpReverted*1500 + NOT(HpReverted)*(LT(ABS(HpSourceMode-1),0.1)*9065 + LT(ABS(HpSourceMode-2),0.1)*2000)   ! kg/h air mass flow 7400 m3/h  vs water/brine mass flow 2 m3/h
+!MfrHpCondRef = NOT(HpReverted)*1500 + HpReverted*(LT(ABS(HpSourceMode-1),0.1)*9065 + LT(ABS(HpSourceMode-2),0.1)*2000)! or 0.48*3600
+MfrHpEvapRef = 2000 !LT(ABS(HpSourceMode-1),0.1)*9065 + LT(ABS(HpSourceMode-2),0.1)*2000   ! kg/h air mass flow 7400 m3/h  vs water/brine mass flow 2 m3/h
+MfrHpEvapRefAir = 9065
+MfrHpCondRef = 1500 ! or 0.48*3600
+MfrHpEvapFCRef = 2000 ! For the free cooling
+TEvapMaxHp = LT(ABS(HpSourceMode-1),0.1)*40 + LT(ABS(HpSourceMode-2),0.1)*35		! deg C
+TMinEvapTin = LT(ABS(HpSourceMode-1),0.1)*(-8) + LT(ABS(HpSourceMode-2),0.1)*5		! deg C
+TMinEvapTout = TMinEvapTin - 3
+cpEvap = CpWat*HpReverted + NOT(HpReverted)*(LT(ABS(HpSourceMode-1),0.1)*cpAir + LT(ABS(HpSourceMode-2),0.1)*cpBri)		! kJ/kgK
+cpCond = CpWat*NOT(HpReverted) + HpReverted*(LT(ABS(HpSourceMode-1),0.1)*cpAir + LT(ABS(HpSourceMode-2),0.1)*cpBri)
+
+********************************************************************
+** adjustements to HpSinkMode (1: condenser (H heating, C cooling), 2: sequential, 3: parallel)
+********************************************************************
+CONSTANTS 1
+DSHXratio = 0.2
+
+CONSTANTS 70	! Coefficients for the different modes
+!In mode 1, we use only the condenser, so a_i = 0 (no heat in desuperheater)
+!The fitting for the condenser is given with b_i, depending on heating or cooling
+M1H_b1 = sizeHpRatio*12.78942
+M1H_b2 = sizeHpRatio*66.25744
+M1H_b3 = sizeHpRatio*0.0
+M1H_b4 = sizeHpRatio*0.0
+M1H_b5 = sizeHpRatio*-331.95903
+M1H_b6 = sizeHpRatio*0.0
+M1H_b7 = sizeHpRatio*-20.88375
+M1H_b8 = sizeHpRatio*410.91017
+M1H_b9 = sizeHpRatio*0.0
+M1H_b10 = sizeHpRatio*-0.16091
+
+M1C_b1 = sizeHpRatio*-28.44524
+M1C_b2 = sizeHpRatio*1281.24913
+M1C_b3 = sizeHpRatio*0.0
+M1C_b4 = sizeHpRatio*0.0
+M1C_b5 = sizeHpRatio*-2679.67583
+M1C_b6 = sizeHpRatio*0.0
+M1C_b7 = sizeHpRatio*242.74969
+M1C_b8 = sizeHpRatio*-6728.23727
+M1C_b9 = sizeHpRatio*0.0
+M1C_b10 = sizeHpRatio*-0.16085
+
+!Efficiency for both heating and cooling in Mode 1
+M1H_c1 = 4.60489
+M1H_c2 = 8.40101
+M1H_c3 = 0.0
+M1H_c4 = 0.0
+M1H_c5 = -99.36904
+M1H_c6 = 0.0
+M1H_c7 = -4.83104
+M1H_c8 = 115.72851
+M1H_c9 = 0.0
+M1H_c10= -57.41639
+
+M1C_c1 = -15.00459
+M1C_c2 = 467.83103
+M1C_c3 = 0.0
+M1C_c4 = 0.0
+M1C_c5 = 2237.34373
+M1C_c6 = 0.0
+M1C_c7 = 180.91148
+M1C_c8 = -5207.12867
+M1C_c9 = 0.0
+M1C_c10= -49.66244
+
+!In mode 2, we have heating in both HXs, split between them with the DSHXratio
+M2_a1 = DSHXratio*sizeHpRatio*12.78942
+M2_a2 = DSHXratio*sizeHpRatio*66.25744
+M2_a3 = DSHXratio*sizeHpRatio*0.0
+M2_a4 = DSHXratio*sizeHpRatio*0.0
+M2_a5 = DSHXratio*sizeHpRatio*-331.95903
+M2_a6 = DSHXratio*sizeHpRatio*0.0
+M2_a7 = DSHXratio*sizeHpRatio*-20.88375
+M2_a8 = DSHXratio*sizeHpRatio*410.91017
+M2_a9 = DSHXratio*sizeHpRatio*0.0
+M2_a10 = DSHXratio*sizeHpRatio*-0.16091
+
+M2_b1 = (1.0-DSHXratio)*sizeHpRatio*12.78942
+M2_b2 = (1.0-DSHXratio)*sizeHpRatio*66.25744
+M2_b3 = (1.0-DSHXratio)*sizeHpRatio*0.0
+M2_b4 = (1.0-DSHXratio)*sizeHpRatio*0.0
+M2_b5 = (1.0-DSHXratio)*sizeHpRatio*-331.95903
+M2_b6 = (1.0-DSHXratio)*sizeHpRatio*0.0
+M2_b7 = (1.0-DSHXratio)*sizeHpRatio*-20.88375
+M2_b8 = (1.0-DSHXratio)*sizeHpRatio*410.91017
+M2_b9 = (1.0-DSHXratio)*sizeHpRatio*0.0
+M2_b10 = (1.0-DSHXratio)*sizeHpRatio*-0.16091
+
+M2_c1 = 4.60489
+M2_c2 = 8.40101
+M2_c3 = 0.0
+M2_c4 = 0.0
+M2_c5 = -99.36904
+M2_c6 = 0.0
+M2_c7 = -4.83104
+M2_c8 = 115.72851
+M2_c9 = 0.0
+M2_c10= -57.41639
+
+!MODE 3 IS NOT IMPLEMENTED YET AS IT WONT BE USED
+
+EQUATIONS 30	! Conditional setup of coefficients
+Coeff_a1 = M2_a1*EQL(HpSinkMode,2)   !Coeffs a_i are 0 if mode 1
+Coeff_a2 = M2_a2*EQL(HpSinkMode,2)
+Coeff_a3 = M2_a3*EQL(HpSinkMode,2)
+Coeff_a4 = M2_a4*EQL(HpSinkMode,2)
+Coeff_a5 = M2_a5*EQL(HpSinkMode,2)
+Coeff_a6 = M2_a6*EQL(HpSinkMode,2)
+Coeff_a7 = M2_a7*EQL(HpSinkMode,2)
+Coeff_a8 = M2_a8*EQL(HpSinkMode,2)
+Coeff_a9 = M2_a9*EQL(HpSinkMode,2)
+Coeff_a10 =M2_a10*EQL(HpSinkMode,2)
+
+Coeff_b1 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b1 + EQL(HpSinkMode,1)*HpReverted*M1C_b1 + EQL(HpSinkMode,2)*M2_b1
+Coeff_b2 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b2 + EQL(HpSinkMode,1)*HpReverted*M1C_b2 + EQL(HpSinkMode,2)*M2_b2
+Coeff_b3 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b3 + EQL(HpSinkMode,1)*HpReverted*M1C_b3 + EQL(HpSinkMode,2)*M2_b3
+Coeff_b4 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b4 + EQL(HpSinkMode,1)*HpReverted*M1C_b4 + EQL(HpSinkMode,2)*M2_b4
+Coeff_b5 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b5 + EQL(HpSinkMode,1)*HpReverted*M1C_b5 + EQL(HpSinkMode,2)*M2_b5
+Coeff_b6 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b6 + EQL(HpSinkMode,1)*HpReverted*M1C_b6 + EQL(HpSinkMode,2)*M2_b6
+Coeff_b7 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b7 + EQL(HpSinkMode,1)*HpReverted*M1C_b7 + EQL(HpSinkMode,2)*M2_b7
+Coeff_b8 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b8 + EQL(HpSinkMode,1)*HpReverted*M1C_b8 + EQL(HpSinkMode,2)*M2_b8
+Coeff_b9 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b9 + EQL(HpSinkMode,1)*HpReverted*M1C_b9 + EQL(HpSinkMode,2)*M2_b9
+Coeff_b10 =EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_b10 + EQL(HpSinkMode,1)*HpReverted*M1C_b10 + EQL(HpSinkMode,2)*M2_b10
+
+Coeff_c1 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c1 + EQL(HpSinkMode,1)*HpReverted*M1C_c1 + EQL(HpSinkMode,2)*M2_c1
+Coeff_c2 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c2 + EQL(HpSinkMode,1)*HpReverted*M1C_c2 + EQL(HpSinkMode,2)*M2_c2
+Coeff_c3 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c3 + EQL(HpSinkMode,1)*HpReverted*M1C_c3 + EQL(HpSinkMode,2)*M2_c3
+Coeff_c4 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c4 + EQL(HpSinkMode,1)*HpReverted*M1C_c4 + EQL(HpSinkMode,2)*M2_c4
+Coeff_c5 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c5 + EQL(HpSinkMode,1)*HpReverted*M1C_c5 + EQL(HpSinkMode,2)*M2_c5
+Coeff_c6 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c6 + EQL(HpSinkMode,1)*HpReverted*M1C_c6 + EQL(HpSinkMode,2)*M2_c6
+Coeff_c7 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c7 + EQL(HpSinkMode,1)*HpReverted*M1C_c7 + EQL(HpSinkMode,2)*M2_c7
+Coeff_c8 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c8 + EQL(HpSinkMode,1)*HpReverted*M1C_c8 + EQL(HpSinkMode,2)*M2_c8
+Coeff_c9 = EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c9 + EQL(HpSinkMode,1)*HpReverted*M1C_c9 + EQL(HpSinkMode,2)*M2_c9
+Coeff_c10 =EQL(HpSinkMode,1)*NOT(HpReverted)*M1H_c10 + EQL(HpSinkMode,1)*HpReverted*M1C_c10 + EQL(HpSinkMode,2)*M2_c10
+

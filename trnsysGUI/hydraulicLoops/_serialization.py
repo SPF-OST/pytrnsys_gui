@@ -2,8 +2,7 @@ import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
-from trnsysGUI import serialization as _ser
-from trnsysGUI.serialization import UpgradableJsonSchemaMixinVersion0
+import pytrnsys.utils.serialization as _ser
 
 
 @_dc.dataclass
@@ -47,7 +46,7 @@ class HydraulicLoop(_ser.UpgradableJsonSchemaMixin):
     connectionsTrnsysId: _tp.Sequence[int]
 
     @classmethod
-    def upgrade(cls, superseded: UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoop":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HydraulicLoop":
         assert isinstance(superseded, HydraulicLoopVersion0)
 
         useLoopWideDefaults = False
@@ -61,7 +60,7 @@ class HydraulicLoop(_ser.UpgradableJsonSchemaMixin):
         )
 
     @classmethod
-    def getSupersededClass(cls) -> _tp.Type[UpgradableJsonSchemaMixinVersion0]:
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return HydraulicLoopVersion0
 
     @classmethod

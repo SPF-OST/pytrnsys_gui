@@ -17,7 +17,7 @@ class Connection:
     diameterInCm: float
     uValueInWPerM2K: float
     lengthInM: float
-    connection: _spc.SinglePipeConnection  # type: ignore[name-defined]
+    connection: _spc.SinglePipeConnection
 
 
 @_dc.dataclass

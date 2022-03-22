@@ -1,13 +1,9 @@
-# pylint: skip-file
-# type: ignore
-
 from __future__ import annotations
 
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
 import trnsysGUI.connection.singlePipeConnectionModel as _model
@@ -15,6 +11,7 @@ import trnsysGUI.connection.values as _values
 import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.singlePipeSegmentItem as _spsi
 
 if _tp.TYPE_CHECKING:
@@ -22,7 +19,8 @@ if _tp.TYPE_CHECKING:
 
 
 class SinglePipeConnection(_cb.ConnectionBase):
-    def __init__(self, fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, parent: _ed.Editor):
+    def __init__(self, fromPort: _sppi.SinglePipePortItem, toPort: _sppi.SinglePipePortItem,
+                 parent: _ed.Editor):  # type: ignore[name-defined]
         super().__init__(fromPort, toPort, parent)
 
         self._editor = parent
@@ -30,6 +28,24 @@ class SinglePipeConnection(_cb.ConnectionBase):
         self.diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
         self.uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+
+    @property
+    def fromPort(self) -> _sppi.SinglePipePortItem:
+        assert isinstance(self._fromPort, _sppi.SinglePipePortItem)
+        return self._fromPort
+
+    @fromPort.setter
+    def fromPort(self, fromPort: _sppi.SinglePipePortItem) -> None:
+        self._fromPort = fromPort
+
+    @property
+    def toPort(self) -> _sppi.SinglePipePortItem:
+        assert isinstance(self._toPort, _sppi.SinglePipePortItem)
+        return self._toPort
+
+    @toPort.setter
+    def toPort(self, toPort: _sppi.SinglePipePortItem) -> None:
+        self._toPort = toPort
 
     def _createSegmentItem(self, startNode, endNode):
         return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
@@ -184,11 +200,11 @@ class SinglePipeConnection(_cb.ConnectionBase):
 
         else:
             f += (
-                "Error: NO VALUE\n" * 3
-                + "at connection with parents "
-                + str(self.fromPort.parent)
-                + str(self.toPort.parent)
-                + "\n"
+                    "Error: NO VALUE\n" * 3
+                    + "at connection with parents "
+                    + str(self.fromPort.parent)
+                    + str(self.toPort.parent)
+                    + "\n"
             )
 
         unitText += "***Initial values\n"
@@ -197,14 +213,14 @@ class SinglePipeConnection(_cb.ConnectionBase):
         unitText += "EQUATIONS " + str(equationNr) + "\n"
         unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
         unitText += (
-            powerPrefix
-            + self.displayName
-            + "_kW"
-            + "= ["
-            + str(unitNumber)
-            + ","
-            + str(equationConstant2)
-            + "]/3600 !kW\n"
+                powerPrefix
+                + self.displayName
+                + "_kW"
+                + "= ["
+                + str(unitNumber)
+                + ","
+                + str(equationConstant2)
+                + "]/3600 !kW\n"
         )
         unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A\n\n"
 
@@ -220,5 +236,3 @@ def _getConvertedValueOrName(valueOrName: _values.Value, conversionFactor=1.0) -
     value = valueOrName
 
     return value * conversionFactor
-
-

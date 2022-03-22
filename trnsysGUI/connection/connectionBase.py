@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 from __future__ import annotations
 
 import math as _math
@@ -12,11 +9,11 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
 import trnsysGUI.massFlowSolver as _mfs
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.CornerItem import CornerItem
-from trnsysGUI.Node import Node
+from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
+from trnsysGUI.Node import Node  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
-from trnsysGUI.SegmentItemBase import SegmentItemBase
-from trnsysGUI.TVentil import TVentil
+from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
+from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.massFlowSolver import InternalPiping
 
 
@@ -30,9 +27,9 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
         self.logger = parent.logger
 
-        self.fromPort = fromPort
-        self.toPort = toPort
-        self.displayName = None
+        self._fromPort = fromPort
+        self._toPort = toPort
+        self.displayName = ""
 
         self.parent = parent
 
@@ -53,6 +50,22 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.temperature = 0
 
         self.initNew(parent)
+
+    @property
+    def fromPort(self) -> PortItemBase:
+        return self._fromPort
+
+    @fromPort.setter
+    def fromPort(self, fromPort: PortItemBase) -> None:
+        self._fromPort = fromPort
+
+    @property
+    def toPort(self) -> PortItemBase:
+        return self._toPort
+
+    @toPort.setter
+    def toPort(self, toPort: PortItemBase) -> None:
+        self._toPort = toPort
 
     def _createSegmentItem(self, startNode, endNode):
         raise NotImplementedError()
@@ -87,10 +100,16 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     def setLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
+
+        assert self.firstS
+
         self.firstS.label.setPos(pos)
 
     def setMassLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
+
+        assert self.firstS
+
         self.firstS.labelMass.setPos(pos)
 
     @staticmethod
@@ -301,9 +320,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     # Label related
     def setLabelVisible(self, isVisible: bool) -> None:
+        assert self.firstS
         self.firstS.setLabelVisible(isVisible)
 
     def toggleLabelVisible(self) -> None:
+        assert self.firstS
         self.firstS.toggleLabelVisible()
 
     def updateSegLabels(self):
@@ -320,9 +341,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.firstS.label.setRotation(angle)
 
     def setMassFlowLabelVisible(self, isVisible: bool) -> None:
+        assert self.firstS
         self.firstS.setMassFlowLabelVisible(isVisible)
 
     def toggleMassFlowLabelVisible(self) -> None:
+        assert self.firstS
         self.firstS.toggleMassFlowLabelVisible()
 
     def getRadius(self):
@@ -793,7 +816,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                             # self.logger.debug("distFactor " +  str(distFactor))
 
                             # normalVec = QPointF(-distFactor/normVec * vecp2p1.y(), distFactor/normVec * vecp2p1.x())
-                            normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(), distFactor / normVec * vecp2p1.y())
+                            normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(),
+                                                  distFactor / normVec * vecp2p1.y())
 
                             # self.logger.debug("vector is " + str(normVecp2p1))
                             # self.logger.debug("collisionpos is " + str(collisionPos))
@@ -981,6 +1005,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.setLabelsSelected(False)
 
     def setLabelsSelected(self, isSelected: bool) -> None:
+        assert self.firstS
         self._setBold(self.firstS.label, isSelected)
         self._setBold(self.firstS.labelMass, isSelected)
 

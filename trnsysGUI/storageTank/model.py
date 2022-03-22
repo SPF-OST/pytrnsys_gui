@@ -1,10 +1,10 @@
 import dataclasses as _dc
-import uuid as _uuid
 import typing as _tp
+import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
-import trnsysGUI.serialization as _ser
+import pytrnsys.utils.serialization as _ser
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.storageTank.side import Side
 
@@ -98,9 +98,9 @@ class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=to
 
     @classmethod
     def _upgradeHeatExchangers(
-        cls,
-        supersededHeatExchangers: _tp.Sequence[HeatExchangerLegacyVersion],
-        storageTankHeight: float,
+            cls,
+            supersededHeatExchangers: _tp.Sequence[HeatExchangerLegacyVersion],
+            storageTankHeight: float,
     ) -> _tp.Sequence["HeatExchanger"]:
         heatExchangers = []
         for supersededHeatExchanger in supersededHeatExchangers:
@@ -116,9 +116,9 @@ class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=to
 
     @classmethod
     def _upgradeDirectPortPairs(
-        cls,
-        supersededPairs: _tp.Sequence[DirectPortPairLegacyVersion],
-        storageTankHeight: float,
+            cls,
+            supersededPairs: _tp.Sequence[DirectPortPairLegacyVersion],
+            storageTankHeight: float,
     ) -> _tp.Sequence["DirectPortPair"]:
         directPortPairs = []
         for supersededPair in supersededPairs:
@@ -161,22 +161,22 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-i
 
     @classmethod
     def from_dict(
-        cls,
-        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 2
-        validate=True,
-        validate_enums: bool = True,
+            cls,
+            data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 2
+            validate=True,
+            validate_enums: bool = True,
     ) -> "StorageTank":
         data.pop(".__BlockDict__")
         storageTank = super().from_dict(data, validate, validate_enums)
         return _tp.cast(StorageTank, storageTank)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)   # pylint: disable=duplicate-code  # 1
+        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code  # 1
         data[".__BlockDict__"] = True
         return data
 
@@ -269,9 +269,9 @@ class HeatExchangerVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def createFromLegacyHeatExchanger(
-        cls,
-        superseded: HeatExchangerLegacyVersion,
-        storageTankHeight: float,
+            cls,
+            superseded: HeatExchangerLegacyVersion,
+            storageTankHeight: float,
     ) -> "HeatExchangerVersion0":
         absoluteInputHeight = storageTankHeight - superseded.Offset[1]
         absoluteOutputHeight = absoluteInputHeight - superseded.Height
@@ -361,7 +361,7 @@ class DirectPortPairVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
     @classmethod
     def createFromLegacyPortPair(
-        cls, superseded: DirectPortPairLegacyVersion, storageTankHeight: float
+            cls, superseded: DirectPortPairLegacyVersion, storageTankHeight: float
     ) -> "DirectPortPairVersion0":
         absoluteInputHeight = storageTankHeight - superseded.Port1offset
         relativeInputHeight = round(absoluteInputHeight / storageTankHeight, 2)

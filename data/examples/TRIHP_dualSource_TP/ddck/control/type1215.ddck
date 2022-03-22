@@ -1,0 +1,204 @@
+*******************************
+**BEGIN Control-Type1215.ddck 
+*******************************
+    
+*****************************************
+** Contact person : Thibault Pean   
+** Creation date  : 15.06.2021
+** Last changes   : 06.2021 
+*****************************************
+
+***************************************************************************
+** Description: 
+** Control of dual source system. 
+** Heating curve and auxiliary on/off for DHW ans SH
+***************************************************************************
+
+***********************************
+** Connectors with hydraulic solver
+***********************************
+
+***********************************
+** outputs to hydraulic solver
+***********************************
+
+******************************************************************************************
+** outputs to energy balance in kWh and ABSOLUTE value
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+elSysOut_CtrlDemand  = PelContr_kW 
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+EQUATIONS 5
+TDHW_up = T9_Tes1    !from Tank DHW (T1 bottom of tank, T10 top of tank)
+TDHW_lo = T7_Tes1	   !from Tank DHW
+TSHC_up = T8_Tes2    !from Tank SH
+TSHC_lo = T3_Tes2    !from Tank SH, lower because it is needed in cooling mode too
+Tgrd = TGhxOut   !From borehole 
+
+
+***********************************
+** outputs to other ddck
+***********************************
+
+EQUATIONS 13
+BoHS = [2,1]!*NOT(isSummer)     ! Boolean for heating season on, 0/1  HpReverted
+isSummer = GE(MOD(time,8760),3624)*LE(MOD(time,8760),6552)   ! From June to September included
+BoDHW = [2,2]
+BoSH = [2,3]
+BoSC = [2,4]
+BoFC = [2,5]
+BoAC = [2,6]
+MoDS = [2,7]  !HpSourceMode
+TsupDHW = [2,8]
+TsupSH = [2,9]
+TsupSC = [2,10]
+TsupRF = [2,11]
+TRdSet = Max(TsupRF,Troom)
+
+!HpReverted = BoHS !or inverse?
+!HpSourceMode = MoDS
+
+*************************************************
+*****PARAMETERS OF TYPE 1215 ***To be modified at python level *****
+*************************************************
+
+CONSTANTS 17
+TstartHS = 18   !Reference outdoor temperature, below which heating season starts
+TdbHS = 1  	!Dead-band temperature for hysteresis. Heating season will stop when the outdoor temperature rises above Tstart+Tdb
+MoHCcalc = 1  !mode for heat curve calculation: 1 = very simple, 2 = simplified, 3 = detailed   
+mrad   = 1.1    ! heating curve exponent 1:linear 1.4 getting flatter at low T
+slopeHC = 0.3 !Slope of heating curve
+TambHCref = 2.0 ! Design outdoor temperature (for heating curve) in degC, +2 degC for Tarragona
+TsupRef = 35.0   !Design supply temperature (for heating curve)
+MoHC = 2  !Mode for using the heating curve: 1: use the heating curve, 2: use the set-points provided as inputs
+TminDHW = 30  ![degC]
+TmaxDHW = 60  ![degC]
+TminSH = 20  ![degC]
+TmaxSH = 45  ![degC]
+TchSource_H = 14.0   !Temperature to switch between air or ground source in heating mode [degC], 14 degC for the DSHP
+TchSource_C = 24.0   !Temperature to switch between air or ground source in cooling mode [degC], set very low to force using ground when both temps. close
+dTsource = 1.0 ![degC]
+dT_freecool = 0.5   ![degC]
+dT_activecool = 1.0   ![degC]
+
+**********************************************************
+************* OTHER CONSTANTS ****************************
+**********************************************************
+
+CONSTANTS 2
+tavgTamb = 96  ! time for averaging of outdoor temperature for the evaluation of heating season or no heating season, h
+PelContr_kW = 0.005     ! Electricity consumption of additional controller to burner controller [kW]
+
+**********************************************************
+************* INPUTS OF TYPE 1215 ************************
+**********************************************************
+
+EQUATIONS 10
+TDHW_ON = 47
+TDHW_OFF = 55
+TSH_ON = 30
+TSH_OFF = 35
+TSC_ON = 15
+TSC_OFF = 8
+TsupDHW_in = TDHW_OFF + 5
+TsupSH_in = TSH_OFF + 2
+TsupSC_in = TSC_OFF - 3
+TroomSet_Year = TroomSet*NOT(isSummer)+TroomSetCool*isSummer
+
+
+
+*********************************************************************
+******** Controller Heating System and Heat Pump
+*********************************************************************
+
+UNIT 2 TYPE 1215  ! version v0 
+TRACE START STOP
+PARAMETERS 17     
+TstartHS   !1 Reference outdoor temperature, below which heating season starts
+TdbHS 	!2 Dead-band temperature for hysteresis. Heating season will stop when the outdoor temperature rises above Tstart+Tdb
+MoHCcalc  !3 mode for heat curve calculation: 1 = very simple, 2 = simplified, 3 = detailed   
+mrad    !4 heating curve exponent 1:linear 1.4 getting flatter at low T
+slopeHC !5 Slope of heating curve
+TambHCref !6 Design outdoor temperature (for heating curve) in degC, +2 degC for Tarragona
+TsupRef   !7 Design supply temperature (for heating curve)
+MoHC !8 Mode for using the heating curve: 1: use the heating curve, 2: use the set-points provided as inputs
+TminDHW  !9 [degC]
+TmaxDHW  !10 [degC]
+TminSH  !11 [degC]
+TmaxSH  !12 [degC]
+TchSource_H   !13 Temperature to switch between air or ground source in heating mode [degC], 14 degC for the DSHP
+TchSource_C    !14 Temperature to switch between air or ground source in heating mode [degC], set very low to force using ground when both temps. close
+dTsource !15 [degC]
+dT_freecool  !16 [degC]
+dT_activecool   !17 [degC]
+
+INPUTS 18    
+Tamb24      ! 1: Tamb ->TambHS is used for determination of heating season
+TDHW_up
+TDHW_lo
+TDHW_ON
+TDHW_OFF
+TSHC_up
+TSHC_lo
+TSH_ON
+TSH_OFF
+TSC_ON
+TSC_OFF
+TroomSet_Year	
+Tamb	
+Tgrd	
+Troom	
+TsupDHW_in	
+TsupSH_in	
+TsupSC_in	
+
+
+*** INITIAL INPUT VALUES     
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+			
+UNIT 4 Type 816     ! Transient Value Averaging for ambient temperature (heating system control)
+PARAMETERS 2     
+1     !  1: number of values for input
+tavgTamb     !  2: time of averaging (dt in hours)
+     
+INPUTS 1     
+Tamb     ! T_ambient
+*** INITIAL INPUT VALUES     
+10     
+EQUATIONS 1     
+Tamb24 = [4,1]      ! 24h average of Tamb, �C
+
+UNIT 89 TYPE 65     ! Online Plotter Control (Element Hp)
+PARAMETERS 12     
+10    ! 1 Nb. of left-axis variables
+10    ! 2 Nb. of right-axis variables
+-10   ! 3 Left axis minimum
+70    ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+5   ! 6 Right axis maximum
+nPlotsPerSim ! 7 Number of plots per simulation
+12    ! 8 X-axis gridpoints
+0     ! 9 Shut off Online w/o removing
+-1    ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20     
+TDHW_up TDHW_lo TDHW_ON TDHW_OFF TSHC_up TSHC_lo TSH_ON TSH_OFF TSC_ON TSC_OFF
+BoHS BoSH BoDHW BoSC BoAC BoFC MoDS TsupSH TsupDHW TsupSC
+**
+TDHW_up TDHW_lo TDHW_ON TDHW_OFF TSHC_up TSHC_lo TSH_ON TSH_OFF TSC_ON TSC_OFF
+BoHS BoSH BoDHW BoSC BoAC BoFC MoDS TsupSH TsupDHW TsupSC
+LABELS  3     
+Temperatures     
+Boolean     
+Control    
+
+*******************************
+**END Control-Type1215.ddck
+*******************************

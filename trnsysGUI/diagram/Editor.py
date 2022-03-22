@@ -33,7 +33,6 @@ from PyQt5.QtWidgets import (
 )
 
 import pytrnsys.trnsys_util.deckUtils as _du
-
 import trnsysGUI as _tgui
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
@@ -59,7 +58,7 @@ from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoubleP
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
-from trnsysGUI.diagram.Encoder import Encoder
+import trnsysGUI.diagram.Encoder as _enc
 from trnsysGUI.diagram.scene import Scene
 from trnsysGUI.diagram.view import View
 from trnsysGUI.diagramDlg import diagramDlg
@@ -167,7 +166,7 @@ class Editor(QWidget):
         self.snapGrid = False
         self.snapSize = 20
 
-        self.trnsysPath = _pl.Path(r"C:\Trnsys17\Exe\TRNExe.exe")
+        self.trnsysPath = _pl.Path(r"C:\Trnsys18\Exe\TRNExe.exe")
 
         self.horizontalLayout = QHBoxLayout(self)
         self.libraryBrowserView = QListView(self)
@@ -265,6 +264,12 @@ class Editor(QWidget):
             self.createHydraulicDir(self.projectFolder)
             self.createWeatherAndControlDirs(self.projectFolder)
 
+        self.projectDdckFiles = []
+
+        self.ddckFilePaths = []
+
+        self._updateDdckFilePaths()
+
         self.horizontalLayout.addLayout(self.vertL)
         self.horizontalLayout.addWidget(self.diagramView)
         self.horizontalLayout.addLayout(self.fileBrowserLayout)
@@ -351,9 +356,9 @@ class Editor(QWidget):
     def _createConnection(self, startPort, endPort) -> None:
         if startPort is not endPort:
             if (
-                isinstance(startPort.parent, StorageTank)
-                and isinstance(endPort.parent, StorageTank)
-                and startPort.parent != endPort.parent
+                    isinstance(startPort.parent, StorageTank)
+                    and isinstance(endPort.parent, StorageTank)
+                    and startPort.parent != endPort.parent
             ):
                 msgSTank = QMessageBox(self)
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
@@ -461,8 +466,8 @@ class Editor(QWidget):
             i
             for i in hitItems
             if isinstance(i, PortItemBase)
-            and type(i) == type(fromPort)
-            and not i.connectionList
+               and type(i) == type(fromPort)
+               and not i.connectionList
         ]
         return relevantPortItems
 
@@ -490,7 +495,7 @@ class Editor(QWidget):
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
         if exportTo == "mfs":
-            mfsFileName = self.diagramName.split(".")[0] + "_mfs.dck"
+            mfsFileName = self.diagramName.rsplit(".", 1)[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
         elif exportTo == "ddck":
             exportPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
@@ -730,9 +735,9 @@ class Editor(QWidget):
 
         """
         self.logger.info("filename is at encoder " + str(filename))
-        # if filename != "":
+
         with open(filename, "w") as jsonfile:
-            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=Encoder)
+            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=_enc.Encoder)
 
     def _decodeDiagram(self, filename, loadValue="load"):
         self.logger.info("Decoding " + filename)
@@ -841,6 +846,46 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
+    def exportDdckPlaceHolderValueJsonFile(self):
+        self._updateDdckFilePaths()
+
+        jsonFileName = "DdckPlaceHolderValue.json"
+        jsonFilePath = os.path.join(self.projectFolder, jsonFileName)
+
+        if os.path.isfile(jsonFilePath):
+            qmb = QMessageBox(self)
+            qmb.setText("This Json file exists already. Do you want to overwrite or cancel?")
+            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
+            qmb.setDefaultButton(QMessageBox.Cancel)
+            ret = qmb.exec()
+
+            if ret != QMessageBox.Save:
+                return
+
+        self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
+
+        msgb = QMessageBox(self)
+        msgb.setText("Saved Json file at " + jsonFilePath)
+        msgb.exec()
+
+    def _encodeDdckPlaceHolderValueToJson(self, filePath):
+        """
+        Encodes the connection names to a json file.
+
+        Parameters
+        ----------
+        filePath : str
+
+        Returns
+        -------
+
+        """
+
+        ddckPlaceHolderValueDictionary = _enc.ddckPlaceHolderValueToJsonEncoder(self.ddckFilePaths, self.trnsysObj)
+
+        with open(filePath, "w") as jsonfile:
+            json.dump(ddckPlaceHolderValueDictionary, jsonfile, indent=4, sort_keys=True)
+
     # Saving related
     def save(self, showWarning=True):
         """
@@ -895,7 +940,7 @@ class Editor(QWidget):
                 )
             else:
                 self.saveAsPath = _pl.Path(
-                    self.saveAsPath.stem[0 : self.saveAsPath.name.index(self.diagramName)] + newName
+                    self.saveAsPath.stem[0: self.saveAsPath.name.index(self.diagramName)] + newName
                 )
 
         self.diagramName = newName
@@ -1215,3 +1260,14 @@ class Editor(QWidget):
 
         hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
+
+    def _updateDdckFilePaths(self):
+        projectDdckFiles = _pl.Path(self.projectFolder + "\\ddck")
+        self.projectDdckFiles = list(projectDdckFiles.iterdir())
+
+        ddckFilePaths = []
+        for path in self.projectDdckFiles:
+            if path.name == "generic":
+                continue
+            ddckFilePaths.append(path.name)
+        self.ddckFilePaths = ddckFilePaths

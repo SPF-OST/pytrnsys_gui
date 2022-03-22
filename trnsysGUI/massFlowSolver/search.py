@@ -3,16 +3,16 @@ from __future__ import annotations
 import typing as _tp
 
 import trnsysGUI.common as _com
+import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.singlePipePortItem as _spi
 
 
 def getReachableConnections(
-    port: _spi.SinglePipePortItem,  # type: ignore[name-defined]
-    ignoreConnections: _tp.Set[_spc.SinglePipeConnection] = None,  # type: ignore[name-defined]
-) -> _tp.Set[_spc.SinglePipeConnection]:  # type: ignore[name-defined]
+        port: _spi.SinglePipePortItem,
+        ignoreConnections: _tp.Set[_spc.SinglePipeConnection] = None,
+) -> _tp.Set[_spc.SinglePipeConnection]:
     assert len(port.connectionList) <= 1
 
     portItems = {port}
@@ -25,9 +25,9 @@ def getReachableConnections(
 
 
 def _expandPortItemSetByOneLayer(
-    portItems: set[_spi.SinglePipePortItem],  # type: ignore[name-defined]
-    ignoreConnections: _tp.Optional[set[_spc.SinglePipeConnection]] = None,  # type: ignore[name-defined]
-) -> _tp.Tuple[set[_spi.SinglePipePortItem], set[_spc.SinglePipeConnection]]:  # type: ignore[name-defined]
+        portItems: set[_spi.SinglePipePortItem],
+        ignoreConnections: _tp.Optional[set[_spc.SinglePipeConnection]] = None,
+) -> _tp.Tuple[set[_spi.SinglePipePortItem], set[_spc.SinglePipeConnection]]:
     if ignoreConnections is None:
         ignoreConnections = set()
 
@@ -36,28 +36,29 @@ def _expandPortItemSetByOneLayer(
     relevantConnections = {
         c
         for c in connections
-        if isinstance(c, _spc.SinglePipeConnection) and c not in ignoreConnections  # type: ignore[attr-defined]
+        if isinstance(c, _spc.SinglePipeConnection) and c not in ignoreConnections
     }
 
     connectionPortItems = {p for c in relevantConnections for p in [c.fromPort, c.toPort]}
-
+    
     internalPortItems = {mpi for p in portItems for mpi in getInternallyConnectedPortItems(p)}
 
     portItems = connectionPortItems | internalPortItems
-
+        
     return portItems, relevantConnections
 
 
 def getInternallyConnectedPortItems(
-    port: _spi.SinglePipePortItem,  # type: ignore[name-defined]
-) -> _tp.Sequence[_spi.SinglePipePortItem]:  # type: ignore[name-defined]
+        port: _spi.SinglePipePortItem,
+) -> _tp.Sequence[_spi.SinglePipePortItem]:
     contributor: _mfs.MassFlowNetworkContributorMixin = port.parent  # type: ignore[name-defined]
     internalPiping = contributor.getInternalPiping()
 
     graphicalPortItems = internalPiping.modelPortItemsToGraphicalPortItem
     startingNodes = internalPiping.openLoopsStartingNodes
 
-    allInternallyConnectedModelPortItems = [_mfn.getConnectedRealNodesAndPortItems(sn).portItems for sn in startingNodes]
+    allInternallyConnectedModelPortItems = [_mfn.getConnectedRealNodesAndPortItems(sn).portItems for sn in
+                                            startingNodes]
 
     allInternallyConnectedPortItems = []
     for internallyConnectedModelPortItems in allInternallyConnectedModelPortItems:
