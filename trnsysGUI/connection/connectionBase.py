@@ -107,7 +107,9 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     def setMassLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
+
         assert self.firstS
+
         self.firstS.labelMass.setPos(pos)
 
     @staticmethod

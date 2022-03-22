@@ -197,7 +197,7 @@ class _MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export DdckPlaceHolderValue.json", self)
+        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export Ddck placerholder JSON file", self)
         exportDdckPlaceHolderValueJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValueJson)
 
         self.projectMenu = QMenu("Project")
@@ -521,8 +521,8 @@ class _MainWindow(QMainWindow):
 
     def exportDck(self):
         self.centralWidget.exportDdckPlaceHolderValueJsonFile()
-        trnsysDeck = buildDck.buildDck(self.projectFolder)
-        result = trnsysDeck.buildTrnsysDeck()
+        builder = buildDck.buildDck(self.projectFolder)
+        result = builder.buildTrnsysDeck()
         if _res.isError(result):
             errorMessage = f"The deck file could not be generated: {result.message}"
             showErrorMessageBox(errorMessage)
