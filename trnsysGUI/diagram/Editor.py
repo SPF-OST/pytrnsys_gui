@@ -33,7 +33,10 @@ from PyQt5.QtWidgets import (
 )
 
 import pytrnsys.trnsys_util.deckUtils as _du
+import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
+import trnsysGUI.diagram.Encoder as _enc
+import trnsysGUI.placeholders as _ph
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
@@ -58,7 +61,6 @@ from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoubleP
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
-from trnsysGUI.diagram.Encoder import Encoder, ddckPlaceHolderValueToJsonEncoder
 from trnsysGUI.diagram.scene import Scene
 from trnsysGUI.diagram.view import View
 from trnsysGUI.diagramDlg import diagramDlg
@@ -263,12 +265,6 @@ class Editor(QWidget):
             self.copyGenericFolder(self.projectFolder)
             self.createHydraulicDir(self.projectFolder)
             self.createWeatherAndControlDirs(self.projectFolder)
-
-        self.projectDdckFiles = []
-
-        self.ddckFilePaths = []
-
-        self._updateDdckFilePaths()
 
         self.horizontalLayout.addLayout(self.vertL)
         self.horizontalLayout.addWidget(self.diagramView)
@@ -495,7 +491,7 @@ class Editor(QWidget):
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
         if exportTo == "mfs":
-            mfsFileName = self.diagramName.rsplit('.', 1)[0] + "_mfs.dck"
+            mfsFileName = self.diagramName.rsplit(".", 1)[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
         elif exportTo == "ddck":
             exportPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
@@ -737,7 +733,7 @@ class Editor(QWidget):
         self.logger.info("filename is at encoder " + str(filename))
 
         with open(filename, "w") as jsonfile:
-            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=Encoder)
+            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=_enc.Encoder)
 
     def _decodeDiagram(self, filename, loadValue="load"):
         self.logger.info("Decoding " + filename)
@@ -846,9 +842,7 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def exportDdckPlaceHolderValueJsonFile(self):
-        self._updateDdckFilePaths()
-
+    def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
         jsonFileName = "DdckPlaceHolderValue.json"
         jsonFilePath = os.path.join(self.projectFolder, jsonFileName)
 
@@ -860,18 +854,17 @@ class Editor(QWidget):
             ret = qmb.exec()
 
             if ret != QMessageBox.Save:
-                self.logger.info("Canceling")
                 return
 
-            self.logger.info("Overwriting")
-            self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
-        else:
-            self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
+        result = self._encodeDdckPlaceHolderValuesToJson(jsonFilePath)
+        if _res.isError(result):
+            return _res.error(result)
+        
         msgb = QMessageBox(self)
         msgb.setText("Saved Json file at " + jsonFilePath)
         msgb.exec()
 
-    def _encodeDdckPlaceHolderValueToJson(self, filePath):
+    def _encodeDdckPlaceHolderValuesToJson(self, filePath) -> _res.Result[None]:
         """
         Encodes the connection names to a json file.
 
@@ -883,11 +876,16 @@ class Editor(QWidget):
         -------
 
         """
+        ddckFileNames = self._updateDdckFilePaths()
 
-        ddckPlaceHolderValueDictionary = ddckPlaceHolderValueToJsonEncoder(self.ddckFilePaths, self.trnsysObj)
+        result = _ph.getPlaceholderValues(ddckFileNames, self.trnsysObj)
+        if _res.isError(result):
+            return _res.error(result)
+
+        ddckPlaceHolderValuesDictionary = _res.value(result)
 
         with open(filePath, "w") as jsonfile:
-            json.dump(ddckPlaceHolderValueDictionary, jsonfile, indent=4, sort_keys=True)
+            json.dump(ddckPlaceHolderValuesDictionary, jsonfile, indent=4, sort_keys=True)
 
     # Saving related
     def save(self, showWarning=True):
@@ -1265,12 +1263,14 @@ class Editor(QWidget):
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
 
     def _updateDdckFilePaths(self):
-        projectDdckFiles = _pl.Path(self.projectFolder + "\\ddck")
-        self.projectDdckFiles = list(projectDdckFiles.iterdir())
+        projectFolderDdckPath = _pl.Path(self.projectFolder + "\\ddck")
 
-        ddckFilePaths = []
-        for path in self.projectDdckFiles:
+        projectDdckFiles = list(projectFolderDdckPath.iterdir())
+
+        ddckFileNames = []
+        for path in projectDdckFiles:
             if path.name == "generic":
                 continue
-            ddckFilePaths.append(path.name)
-        self.ddckFilePaths = ddckFilePaths
+            ddckFileNames.append(path.name)
+
+        return ddckFileNames

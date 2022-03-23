@@ -207,7 +207,7 @@ class DoublePipeTeePieceModel(
     def from_dict(
         cls,
         data: _dcj.JsonDict,
-        validate=True,  # pylint: disable=duplicate-code #7
+        validate=True,  # pylint: disable=duplicate-code
         validate_enums: bool = True,
     ) -> "DoublePipeTeePieceModel":
         doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums)

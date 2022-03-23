@@ -201,8 +201,8 @@ class _MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export DdckPlaceHolderValue.json", self)
-        exportDdckPlaceHolderValueJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValueJson)
+        exportDdckPlaceHolderValuesJsonFileActionMenu = QAction("Export Placeholder JSON", self)
+        exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
 
         self.projectMenu = QMenu("Project")
         self.projectMenu.addAction(runMassflowSolverActionMenu)
@@ -213,7 +213,7 @@ class _MainWindow(QMainWindow):
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
-        self.projectMenu.addAction(exportDdckPlaceHolderValueJsonFileActionMenu)
+        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
@@ -415,11 +415,10 @@ class _MainWindow(QMainWindow):
 
         return
 
-    def exportDdckPlaceHolderValueJson(self):
-        try:
-            self.centralWidget.exportDdckPlaceHolderValueJsonFile()
-        except Exception as error:
-            errorMessage = f"The json file could not be generated: {error}"
+    def exportDdckPlaceHolderValuesJson(self):
+        result = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
+        if _res.isError(result):
+            errorMessage = f"The json file could not be generated: {result.message}"
             showErrorMessageBox(errorMessage)
 
     def renameDia(self):
@@ -524,12 +523,16 @@ class _MainWindow(QMainWindow):
         self.centralWidget.exportHydraulicControl()
 
     def exportDck(self):
-        self.centralWidget.exportDdckPlaceHolderValueJsonFile()
-        trnsysDeck = buildDck.buildDck(self.projectFolder)
-        result = trnsysDeck.buildTrnsysDeck()
-        if _res.isError(result):
-            errorMessage = f"The deck file could not be generated: {result.message}"
+        jsonResult = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
+        if _res.isError(jsonResult):
+            errorMessage = f"The json file could not be generated: {jsonResult.message}"
             showErrorMessageBox(errorMessage)
+        else:
+            builder = buildDck.buildDck(self.projectFolder)
+            result = builder.buildTrnsysDeck()
+            if _res.isError(result):
+                errorMessage = f"The deck file could not be generated: {result.message}"
+                showErrorMessageBox(errorMessage)
 
     def toggleEditorMode(self):
         self.logger.info("Toggling editor mode")

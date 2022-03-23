@@ -41,7 +41,7 @@ class DoublePipeConnection(ConnectionBase):
             labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
         else:
             self.logger.debug("This connection has no segment")
-            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()
+            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 1
             labelPos = defaultPos
             labelMassPos = defaultPos
 

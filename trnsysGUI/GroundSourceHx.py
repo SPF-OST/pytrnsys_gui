@@ -95,6 +95,9 @@ class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
+        
+    def hasDdckPlaceHolders(self):
+        return True
 
     def deleteBlock(self):
         """

@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
@@ -14,13 +16,13 @@ from PyQt5.QtWidgets import (
 import trnsysGUI.BlockItem as _bi
 
 
-class BlockDlg(QDialog):
+class BlockDlg(QDialog):  # pylint: disable=too-many-instance-attributes
     def __init__(self, block: _bi.BlockItem, parent=None):
-        super(BlockDlg, self).__init__(parent)
+        super().__init__(parent)
         nameLabel = QLabel("Name:")
         self.logger = parent.logger
         self.block = block
-        self.le = QLineEdit(self.block.label.toPlainText())
+        self.lineEdit = QLineEdit(self.block.label.toPlainText())
         self.setWindowIcon(QIcon(block.pixmap()))
         self.loadButton = QPushButton("Load")
         self.okButton = QPushButton("OK")
@@ -50,7 +52,7 @@ class BlockDlg(QDialog):
         buttonLayout.addWidget(self.cancelButton)
         layout = QGridLayout()
         layout.addWidget(nameLabel, 0, 0)
-        layout.addWidget(self.le, 0, 1)
+        layout.addWidget(self.lineEdit, 0, 1)
         layout.addLayout(flipLayout, 1, 0, 2, 0)
         layout.addLayout(buttonLayout, 2, 0, 2, 0)
         self.setLayout(layout)
@@ -69,7 +71,7 @@ class BlockDlg(QDialog):
 
     def acceptedEdit(self):
         self.logger.debug("Changing displayName")
-        newName = self.le.text()
+        newName = self.lineEdit.text()
         if newName.lower() == str(self.block.displayName).lower():
             self.close()
         elif newName != "" and not self.nameExists(newName):
@@ -95,9 +97,9 @@ class BlockDlg(QDialog):
     def cancel(self):
         self.close()
 
-    def nameExists(self, n):
-        for t in self.parent().trnsysObj:
-            if str(t.displayName).lower() == n.lower():
+    def nameExists(self, name):
+        for item in self.parent().trnsysObj:
+            if str(item.displayName).lower() == name.lower():
                 return True
         return False
 
@@ -114,8 +116,7 @@ class BlockDlg(QDialog):
                 self.block.propertyFile.append(fileName)
         else:
             self.logger.debug("No filename chosen")
-        pass
 
     def disableLoad(self):
-        if self.block.name == "TeePiece" or self.block.name == "WTap_main":
+        if self.block.name in ("TeePiece", "WTap_main"):
             self.loadButton.setDisabled(True)

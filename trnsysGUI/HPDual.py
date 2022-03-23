@@ -21,10 +21,8 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HPDual, self).__init__(trnsysType, parent, **kwargs)
 
-
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
-
 
         self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
@@ -60,11 +58,11 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos  = [[0, h - 2 * delta],[w, h - delta]] # inlet of [evap, cond]
-        self.origOutputsPos = [[0, h - delta],[w, delta]] # outlet of [evap, cond]
+        self.origInputsPos = [[0, h - 2 * delta], [w, h - delta]]  # inlet of [evap, cond]
+        self.origOutputsPos = [[0, h - delta], [w, delta]]  # outlet of [evap, cond]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1]) #evap
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[0][1]) #cond
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])  # evap
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[0][1])  # cond
 
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
         self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
@@ -74,7 +72,6 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.inputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        #self.inputs[2].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[1].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
@@ -147,8 +144,6 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
             self.logger.debug("Output at heatExchanger")
 
         self.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1] + offset_y))
-        # self.trnsysId = i["trnsysID"]
-        # self.id = i["ID"]
 
         resBlockList.append(self)
 
@@ -199,28 +194,13 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
 
         return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
-    # def getInternalPiping(self) -> InternalPiping:
-    #     pipes = []
-    #     portItems = {}
-    #     for i in range(3):
-    #         inputPort = _mfn.PortItem()
-    #         outputPort = _mfn.PortItem()
-    #
-    #         pipe = _mfn.Pipe(f"{self.displayName}Side{i+1}", self.childIds[i], inputPort, outputPort)
-    #         pipes.append(pipe)
-    #
-    #         portItems[inputPort] = self.inputs[i]
-    #         portItems[outputPort] = self.outputs[i]
-    #
-    #     return InternalPiping(pipes, portItems)
-
     def getSubBlockOffset(self, c):
         for i in range(3):
             if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
+                    self.inputs[i] == c.toPort
+                    or self.inputs[i] == c.fromPort
+                    or self.outputs[i] == c.toPort
+                    or self.outputs[i] == c.fromPort
             ):
                 return i
 
@@ -232,12 +212,7 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, "ddck")
@@ -258,16 +233,6 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    # def loadFile(self, file):
-    #     filePath = self.parent.parent().projectPath
-    #     msgB = QMessageBox()
-    #     if filePath == '':
-    #         msgB.setText("Please select a project path before loading!")
-    #         msgB.exec_()
-    #     else:
-    #         self.logger.debug("file loaded into %s" % filePath)
-    #         shutil.copy(file, filePath)
-
     def updateTreePath(self, path):
         """
         When the user chooses the project path for the file explorers, this method is called
@@ -280,6 +245,9 @@ class HPDual(BlockItem, MassFlowNetworkContributorMixin):
             os.makedirs(self.path)
         self.model.setRootPath(self.path)
         self.tree.setRootIndex(self.model.index(self.path))
+
+    def hasDdckPlaceHolders(self):
+        return True
 
     def deleteBlock(self):
         """

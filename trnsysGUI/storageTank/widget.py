@@ -34,7 +34,8 @@ class PortIds:
 
 
 class StorageTank(BlockItem,
-                  MassFlowNetworkContributorMixin):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+                  MassFlowNetworkContributorMixin):
+    # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
     def __init__(self, trnsysType, parent, **kwargs):

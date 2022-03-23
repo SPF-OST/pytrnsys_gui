@@ -40,11 +40,11 @@ def _expandPortItemSetByOneLayer(
     }
 
     connectionPortItems = {p for c in relevantConnections for p in [c.fromPort, c.toPort]}
-    
+
     internalPortItems = {mpi for p in portItems for mpi in getInternallyConnectedPortItems(p)}
 
     portItems = connectionPortItems | internalPortItems
-        
+
     return portItems, relevantConnections
 
 

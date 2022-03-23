@@ -20,7 +20,7 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-class SinglePipeConnection(_cb.ConnectionBase):
+class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
     def __init__(self, fromPort: _sppi.SinglePipePortItem, toPort: _sppi.SinglePipePortItem,
                  parent: _ed.Editor):  # type: ignore[name-defined]
         super().__init__(fromPort, toPort, parent)
@@ -95,12 +95,12 @@ class SinglePipeConnection(_cb.ConnectionBase):
             labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
         else:
             self.logger.debug("This connection has no segment")
-            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()
+            defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 2
             labelPos = defaultPos
             labelMassPos = defaultPos
 
         corners = []
-        for s in self.getCorners():
+        for s in self.getCorners():  # pylint: disable=invalid-name
             cornerTupel = (s.pos().x(), s.pos().y())
             corners.append(cornerTupel)
 
@@ -143,8 +143,8 @@ class SinglePipeConnection(_cb.ConnectionBase):
         pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
         return _mfs.InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        f = ""
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals, too-many-statements
+        lines = ""
         unitNumber = startingUnit
         typeNr2 = 931  # Temperature calculation from a pipe
 
@@ -196,7 +196,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
 
         portItemsWithParent = self._getPortItemsWithParent()
 
-        if len(portItemsWithParent) == 2 or True:
+        if len(portItemsWithParent) == 2:
             portItem = portItemsWithParent[0][0]
             parent = portItemsWithParent[0][1]
             if hasattr(parent, "getSubBlockOffset"):
@@ -215,7 +215,7 @@ class SinglePipeConnection(_cb.ConnectionBase):
                 unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
         else:
-            f += (
+            lines += (
                     "Error: NO VALUE\n" * 3
                     + "at connection with parents "
                     + str(self.fromPort.parent)
@@ -246,17 +246,17 @@ class SinglePipeConnection(_cb.ConnectionBase):
 
 
 @_dc.dataclass
-class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
-    ConnCID: int
-    ConnDisplayName: str
-    ConnID: int
-    CornerPositions: _tp.List[_tp.Tuple[float, float]]
-    FirstSegmentLabelPos: _tp.Tuple[float, float]
-    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]
-    GroupName: str
-    PortFromID: int
-    PortToID: int
-    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]
+class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+    ConnCID: int  # pylint: disable=invalid-name
+    ConnDisplayName: str  # pylint: disable=invalid-name
+    ConnID: int  # pylint: disable=invalid-name
+    CornerPositions: _tp.List[_tp.Tuple[float, float]]  # pylint: disable=invalid-name
+    FirstSegmentLabelPos: _tp.Tuple[float, float]  # pylint: disable=invalid-name
+    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]  # pylint: disable=invalid-name
+    GroupName: str  # pylint: disable=invalid-name
+    PortFromID: int  # pylint: disable=invalid-name
+    PortToID: int  # pylint: disable=invalid-name
+    SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]  # pylint: disable=invalid-name
     trnsysID: int
 
     @classmethod
@@ -265,14 +265,14 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
 
 
 @_dc.dataclass
-class ConnectionModel(_ser.UpgradableJsonSchemaMixin):
+class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     DEFAULT_DIAMETER_IN_CM = 2.0
     DEFAULT_LENGTH_IN_M = 2.0
     DEFAULT_U_VALUE_IN_W_PER_M2_K = 0.8333
 
     connectionId: int
     name: str
-    id: int
+    id: int  # pylint: disable=invalid-name
     segmentsCorners: _tp.List[_tp.Tuple[float, float]]
     labelPos: _tp.Tuple[float, float]
     massFlowLabelPos: _tp.Tuple[float, float]

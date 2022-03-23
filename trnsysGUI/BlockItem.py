@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name
+
 import glob
 import os
 import typing as _tp
@@ -7,7 +9,6 @@ from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
-import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
@@ -16,13 +17,13 @@ from trnsysGUI.blockItemModel import BlockItemModel
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
-global FilePath
-FilePath = "res/Config.txt"
+FILEPATH = "res/Config.txt"
 
 
+# pylint: disable = fixme
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
-class BlockItem(QGraphicsPixmapItem):
+class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(self, trnsysType, parent, displayNamePrefix=None, displayName=None, **kwargs):
         super().__init__(None)
 
@@ -34,9 +35,9 @@ class BlockItem(QGraphicsPixmapItem):
         self.id = self.parent.parent().idGen.getID()
         self.propertyFile = []
 
-        if displayNamePrefix != None:
+        if displayNamePrefix:
             self.displayName = displayNamePrefix + "_" + str(self.id)
-        elif displayName != None:
+        elif displayName:
             self.displayName = displayName
         else:
             raise Exception('No display name defined.')
@@ -46,6 +47,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         self.inputs = []
         self.outputs = []
+
+        self.path = None
 
         # Export related:
         self.name = trnsysType
@@ -69,20 +72,6 @@ class BlockItem(QGraphicsPixmapItem):
         self.label = QGraphicsTextItem(self.displayName, self)
         self.label.setVisible(False)
 
-        if self.name == "Bvi":
-            self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-            self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-
-        if self.name == "StorageTank":
-            # Inputs get appended in ConfigStorage
-            pass
-
-        self.logger.debug("Block name is " + str(self.name))
-
-        # Update size for generic block:
-        if self.name == "Bvi":
-            self.changeSize()
-
         # Experimental, used for detecting genereated blocks attached to storage ports
         self.inFirstRow = False
 
@@ -93,7 +82,7 @@ class BlockItem(QGraphicsPixmapItem):
         self.origInputsPos = None
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        if type(self) == BlockItem:
+        if isinstance(self, BlockItem):
             raise AssertionError("`BlockItem' cannot be instantiated directly.")
 
         currentClassName = BlockItem.__name__
@@ -116,6 +105,9 @@ class BlockItem(QGraphicsPixmapItem):
 
     def addTree(self):
         pass
+
+    def hasDdckPlaceHolders(self):  # pylint: disable = no-self-use
+        return False
 
     # Setter functions
     def setParent(self, p):
@@ -160,15 +152,14 @@ class BlockItem(QGraphicsPixmapItem):
 
     def launchNotepadFile(self):
         self.logger.debug("Launching notpad")
-        global FilePath
-        os.system("start notepad++ " + FilePath)
+        os.system("start notepad++ " + FILEPATH)
 
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
         if hasattr(self, "isTempering"):
             self.parent.parent().showTVentilDlg(self)
         elif self.name == "Pump":
             self.parent.parent().showPumpDlg(self)
-        elif self.name == "TeePiece" or self.name == "WTap_main":
+        elif self.name in ("TeePiece", "WTap_main"):
             self.parent.parent().showBlockDlg(self)
         elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
             self.parent.parent().showDoublePipeBlockDlg(self)
@@ -190,36 +181,24 @@ class BlockItem(QGraphicsPixmapItem):
                 self.parent.parent().parent().undoStack.push(command)
                 self.oldPos = self.scenePos()
 
-        super(BlockItem, self).mouseReleaseEvent(event)
+        super().mouseReleaseEvent(event)
 
     # Transform related
     def changeSize(self):
         self._positionLabel()
 
-        w, h = self._getCappedWithAndHeight()
-
-        if self.name == "Bvi":
-            delta = 4
-
-            self.inputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, h / 3)
-            self.outputs[0].setPos(-2 * delta + 4 * self.flippedH * delta + self.flippedH * w, 2 * h / 3)
-            self.inputs[0].side = 0 + 2 * self.flippedH
-            self.outputs[0].side = 0 + 2 * self.flippedH
-
     def _positionLabel(self):
         width, height = self._getCappedWithAndHeight()
         rect = self.label.boundingRect()
-        labelWidth, lableHeight = rect.width(), rect.height()
+        labelWidth = rect.width()
         labelPosX = (height - labelWidth) / 2
         self.label.setPos(labelPosX, width)
 
     def _getCappedWithAndHeight(self):
         width = self.w
         height = self.h
-        if height < 20:
-            height = 20
-        if width < 40:
-            width = 40
+        height = max(height, 20)
+        width = max(width, 40)
         return width, height
 
     def updateFlipStateH(self, state):
@@ -231,26 +210,28 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedHInt = 1 if self.flippedH else -1
 
         if self.flippedH:
-            for i in range(0, len(self.inputs)):
-                distanceToMirrorAxis = self.w / 2.0 - self.origInputsPos[i][0]
-                self.inputs[i].setPos(
-                    self.origInputsPos[i][0] + 2.0 * distanceToMirrorAxis,
-                    self.inputs[i].pos().y(),
+            for i, inputPort in enumerate(self.inputs):
+                distanceToMirrorAxis = self.w / 2.0 - self.origInputsPos[i][0]  # pylint:disable=unsubscriptable-object
+                inputPort.setPos(
+                    self.origInputsPos[i][0] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
+                    inputPort.pos().y(),
                 )
 
-            for i in range(0, len(self.outputs)):
-                distanceToMirrorAxis = self.w / 2.0 - self.origOutputsPos[i][0]
-                self.outputs[i].setPos(
-                    self.origOutputsPos[i][0] + 2.0 * distanceToMirrorAxis,
-                    self.outputs[i].pos().y(),
+            for i, outPort in enumerate(self.outputs):
+                distanceToMirrorAxis = self.w / 2.0 - self.origOutputsPos[i][0]  # pylint:disable=unsubscriptable-object
+                outPort.setPos(
+                    self.origOutputsPos[i][0] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
+                    outPort.pos().y(),
                 )
 
         else:
-            for i in range(0, len(self.inputs)):
-                self.inputs[i].setPos(self.origInputsPos[i][0], self.inputs[i].pos().y())
+            for i, inputPort in enumerate(self.inputs):
+                inputPort.setPos(self.origInputsPos[i][0],  # pylint: disable = unsubscriptable-object
+                                 inputPort.pos().y())
 
-            for i in range(0, len(self.outputs)):
-                self.outputs[i].setPos(self.origOutputsPos[i][0], self.outputs[i].pos().y())
+            for i, outputPort in enumerate(self.outputs):
+                outputPort.setPos(self.origOutputsPos[i][0],  # pylint: disable = unsubscriptable-object
+                                  outputPort.pos().y())
 
     def updateFlipStateV(self, state):
         self.flippedV = bool(state)
@@ -261,62 +242,63 @@ class BlockItem(QGraphicsPixmapItem):
         self.flippedVInt = 1 if self.flippedV else -1
 
         if self.flippedV:
-            for i in range(0, len(self.inputs)):
-                distanceToMirrorAxis = self.h / 2.0 - self.origInputsPos[i][1]
-                self.inputs[i].setPos(
-                    self.inputs[i].pos().x(),
-                    self.origInputsPos[i][1] + 2.0 * distanceToMirrorAxis,
+            for i, inputPort in enumerate(self.inputs):
+                distanceToMirrorAxis = self.h / 2.0 - self.origInputsPos[i][1]  # pylint:disable=unsubscriptable-object
+                inputPort.setPos(
+                    inputPort.pos().x(),
+                    self.origInputsPos[i][1] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
                 )
 
-            for i in range(0, len(self.outputs)):
-                distanceToMirrorAxis = self.h / 2.0 - self.origOutputsPos[i][1]
-                self.outputs[i].setPos(
-                    self.outputs[i].pos().x(),
-                    self.origOutputsPos[i][1] + 2.0 * distanceToMirrorAxis,
+            for i, outputPort in enumerate(self.outputs):
+                distanceToMirrorAxis = self.h / 2.0 - self.origOutputsPos[i][1]  # pylint:disable=unsubscriptable-object
+                outputPort.setPos(
+                    outputPort.pos().x(),
+                    self.origOutputsPos[i][1] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
                 )
 
         else:
-            for i in range(0, len(self.inputs)):
-                self.inputs[i].setPos(self.inputs[i].pos().x(), self.origInputsPos[i][1])
+            for i, inputPort in enumerate(self.inputs):
+                inputPort.setPos(inputPort.pos().x(),
+                                 self.origInputsPos[i][1])  # pylint: disable = unsubscriptable-object
 
-            for i in range(0, len(self.outputs)):
-                self.outputs[i].setPos(self.outputs[i].pos().x(), self.origOutputsPos[i][1])
+            for i, outputPort in enumerate(self.outputs):
+                outputPort.setPos(outputPort.pos().x(),
+                                  self.origOutputsPos[i][1])  # pylint: disable = unsubscriptable-object
 
     def updateSidesFlippedH(self):
         if self.rotationN % 2 == 0:
             for p in self.inputs:
-                if p.side == 0 or p.side == 2:
+                if p.side in (0, 2):
                     self.updateSide(p, 2)
             for p in self.outputs:
-                if p.side == 0 or p.side == 2:
+                if p.side in (0, 2):
                     self.updateSide(p, 2)
         if self.rotationN % 2 == 1:
             for p in self.inputs:
-                if p.side == 1 or p.side == 3:
+                if p.side in (1, 3):
                     self.updateSide(p, 2)
             for p in self.outputs:
-                if p.side == 1 or p.side == 3:
+                if p.side in (1, 3):
                     self.updateSide(p, 2)
 
     def updateSidesFlippedV(self):
         if self.rotationN % 2 == 1:
             for p in self.inputs:
-                if p.side == 0 or p.side == 2:
+                if p.side in (0, 2):
                     self.updateSide(p, 2)
             for p in self.outputs:
-                if p.side == 0 or p.side == 2:
+                if p.side in (0, 2):
                     self.updateSide(p, 2)
         if self.rotationN % 2 == 0:
             for p in self.inputs:
-                if p.side == 1 or p.side == 3:
+                if p.side in (1, 3):
                     self.updateSide(p, 2)
             for p in self.outputs:
-                if p.side == 1 or p.side == 3:
+                if p.side in (1, 3):
                     self.updateSide(p, 2)
 
-    def updateSide(self, port, n):
+    def updateSide(self, port, n):  # pylint: disable=no-self-use
         port.side = (port.side + n) % 4
-        # self.logger.debug("Port side is " + str(port.side))
 
     def rotateBlockCW(self):
         # Rotate block clockwise
@@ -428,7 +410,7 @@ class BlockItem(QGraphicsPixmapItem):
         return c
 
     # Scaling related
-    def mousePressEvent(self, event):  # create resizer
+    def mousePressEvent(self, event):  # pylint: disable = unused-argument
         """
         Using try catch to avoid creating extra resizers.
 
@@ -445,24 +427,18 @@ class BlockItem(QGraphicsPixmapItem):
         self.logger.debug("Inside Block Item mouse click")
 
         self.isSelected = True
-        if self.name == "GenericBlock" or self.name == "StorageTank":
+        if self.name in ("GenericBlock", "StorageTank"):
             return
         try:
             self.resizer
         except AttributeError:
-            self.resizer = ResizerItem(self)
+            self.resizer = ResizerItem(self)  # pylint: disable = attribute-defined-outside-init
             self.resizer.setPos(self.w, self.h)
             self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
-        else:
-            return
 
     def setItemSize(self, w, h):
         self.logger.debug("Inside block item set item size")
         self.w, self.h = w, h
-        # if h < 20:
-        #     self.h = 20
-        # if w < 40:
-        #     self.w = 40
 
     def updateImage(self):
         self.logger.debug("Inside block item update image")
@@ -477,10 +453,10 @@ class BlockItem(QGraphicsPixmapItem):
             self.updateFlipStateV(self.flippedV)
 
     def _getPixmap(self) -> QPixmap:
-        imageAccessor = self._getImageAccessor()
+        imageAccessor = self._getImageAccessor()  # pylint: disable = assignment-from-no-return
 
         assert imageAccessor
-        
+
         image = imageAccessor.image(width=self.w, height=self.h).mirrored(
             horizontal=self.flippedH, vertical=self.flippedV
         )
@@ -498,7 +474,6 @@ class BlockItem(QGraphicsPixmapItem):
 
     # AlignMode related
     def itemChange(self, change, value):
-        # self.logger.debug(change, value)
         # Snap grid excludes alignment
 
         if change == self.ItemPositionChange:
@@ -508,19 +483,11 @@ class BlockItem(QGraphicsPixmapItem):
                 self.logger.debug(type(value))
                 value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
                 return value
-            else:
-                # if self.hasElementsInYBand() and not self.elementInY() and not self.aligned:
-                if self.parent.parent().alignMode:
-                    if self.hasElementsInYBand():
-                        return self.alignBlock(value)
-                    else:
-                        # self.aligned = False
-                        return value
-
-                else:
-                    return value
-        else:
-            return super(BlockItem, self).itemChange(change, value)
+            if self.parent.parent().alignMode:
+                if self.hasElementsInYBand():
+                    return self.alignBlock(value)
+            return value
+        return super().itemChange(change, value)
 
     def alignBlock(self, value):
         for t in self.parent.parent().trnsysObj:
@@ -547,8 +514,6 @@ class BlockItem(QGraphicsPixmapItem):
                     )
                     self.parent.mouseReleaseEvent(e)
                     self.parent.parent().alignMode = False
-                    # self.setPos(self.pos().x(), t.pos().y())
-                    # self.aligned = True
 
                 if self.elementInXBand(t):
                     value = QPointF(t.pos().x(), self.pos().y())
@@ -629,7 +594,7 @@ class BlockItem(QGraphicsPixmapItem):
             blockPosition,
             self.id,
             self.trnsysId,
-            portListInputs,
+            portListInputs,  # pylint: disable = duplicate-code # 1
             portListOutputs,
             self.flippedH,
             self.flippedV,
@@ -664,7 +629,8 @@ class BlockItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
+    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList,
+                    **kwargs):  # pylint: disable=unused-argument
         self.setPos(
             float(i["BlockPosition"][0] + offset_x),
             float(i["BlockPosition"][1] + offset_y),
@@ -674,11 +640,11 @@ class BlockItem(QGraphicsPixmapItem):
         self.updateFlipStateV(i["FlippedV"])
         self.rotateBlockToN(i["RotationN"])
 
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
+        for x, inputPort in enumerate(self.inputs):
+            inputPort.id = i["PortsIDIn"][x]
 
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
+        for x, outputPort in enumerate(self.outputs):
+            outputPort.id = i["PortsIDOut"][x]
 
         resBlockList.append(self)
 
@@ -691,16 +657,16 @@ class BlockItem(QGraphicsPixmapItem):
                 and not isinstance(self.outputs[0], DoublePipePortItem)
         ):
             files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-            if not (files):
+            if not files:
                 status = "noDdckFile"
             else:
                 status = "noDdckEntry"
             lines = []
             for file in files:
-                infile = open(file, "r")
-                lines += infile.readlines()
-            for i in range(len(lines)):
-                if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
+                with open(file, "r") as infile:  # pylint: disable=unspecified-encoding
+                    lines += infile.readlines()
+            for i, line in enumerate(lines):
+                if "output" in line.lower() and "to" in line.lower() and "hydraulic" in line.lower():
                     for j in range(i, len(lines) - i):
                         if lines[j][0] == "T":
                             outputT = lines[j].split("=")[0].replace(" ", "")
@@ -711,30 +677,30 @@ class BlockItem(QGraphicsPixmapItem):
         else:
             status = "noBlackBoxOutput"
 
-        if status == "noDdckFile" or status == "noDdckEntry":
+        if status in ("noDdckFile", "noDdckEntry"):
             equation.append("T" + self.displayName + "=1")
 
         return status, equation
 
-    def exportPumpOutlets(self):
+    def exportPumpOutlets(self):  # pylint: disable=no-self-use
         return "", 0
 
-    def exportMassFlows(self):
+    def exportMassFlows(self):  # pylint: disable=no-self-use
         return "", 0
 
-    def exportDivSetting1(self):
+    def exportDivSetting1(self):  # pylint: disable=no-self-use
         return "", 0
 
-    def exportDivSetting2(self, nUnit):
+    def exportDivSetting2(self, nUnit):  # pylint: disable=no-self-use
         return "", nUnit
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):
+    def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=no-self-use
         return "", startingUnit
 
-    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
+    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:  # pylint: disable=unused-argument
         return f"T{self.displayName}"
 
-    def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:
+    def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:  # pylint: disable=unused-argument
         return self.trnsysId
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:

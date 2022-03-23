@@ -4,6 +4,7 @@ import pathlib as _pl
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
+import pytrnsys.utils.result as _res
 import trnsysGUI.diagram.Editor as _de
 
 _DATA_DIR_ = _pl.Path(__file__).parent / "data"
@@ -26,7 +27,8 @@ class TestAutomaticConnection:
         request.addfinalizer(quitApplication)
 
         editor = self._createEditor(actualDirPath)
-        editor.exportDdckPlaceHolderValuesJsonFile()
+        result = editor.exportDdckPlaceHolderValuesJsonFile()
+        assert not _res.isError(result)
 
         actualJsonText = actualJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
         expectedJsonText = expectedJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
