@@ -1,3 +1,5 @@
+# pylint: disable = invalid-name
+
 import glob
 import os
 
@@ -7,9 +9,9 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
-class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
+class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = too-many-instance-attributes
     def __init__(self, trnsysType, parent, **kwargs):
-        super(BlockItemFourPorts, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.logger = parent.logger
 
@@ -27,39 +29,38 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
         self.changeSize()
 
     def encode(self):
-        if self.isVisible():
-            self.logger.debug("Encoding a %s block" % self.name)
+        if not self.isVisible():
+            return None
+        self.logger.debug(f"Encoding a {self.name} block")
 
-            # childIdList = []
+        portListInputs = []
+        portListOutputs = []
 
-            portListInputs = []
-            portListOutputs = []
+        for inputPort in self.inputs:
+            portListInputs.append(inputPort.id)
+        for outputPort in self.outputs:
+            portListOutputs.append(outputPort.id)
 
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
+        dct = {}
+        dct[".__BlockDict__"] = True
+        dct["BlockName"] = self.name
+        dct["BlockDisplayName"] = self.displayName
+        dct["PortsIDIn"] = portListInputs
+        dct["PortsIDOut"] = portListOutputs
+        dct[self.name + "Position"] = (float(self.pos().x()), float(self.pos().y()))
+        dct["ID"] = self.id
+        dct["trnsysID"] = self.trnsysId
+        dct["childIds"] = self.childIds
+        dct["FlippedH"] = self.flippedH
+        dct["FlippedV"] = self.flippedV
+        dct["RotationN"] = self.rotationN
 
-            dct = {}
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct[self.name + "Position"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["childIds"] = self.childIds
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
+        dictName = "Block-"
 
-            dictName = "Block-"
-
-            return dictName, dct
+        return dictName, dct
 
     def decode(self, i, resBlockList):
-        self.logger.debug("Loading a %s block" % self.name)
+        self.logger.debug(f"Loading a {self.name} block")
 
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
@@ -67,13 +68,13 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
         self.displayName = i["BlockDisplayName"]
         self.changeSize()
 
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
-            self.logger.debug("Input at %s" % self.name)
+        for x, inputPort in enumerate(self.inputs):
+            inputPort.id = i["PortsIDIn"][x]
+            self.logger.debug(f"Input at {self.name}")
 
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
-            self.logger.debug("Output at %s" % self.name)
+        for x, outputPort in enumerate(self.outputs):
+            outputPort.id = i["PortsIDOut"][x]
+            self.logger.debug(f"Output at {self.name}")
 
         self.setPos(float(i[self.name + "Position"][0]), float(i[self.name + "Position"][1]))
         self.trnsysId = i["trnsysID"]
@@ -82,17 +83,17 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.logger.debug("Loading a %s block in Decoder" % self.name)
+        self.logger.debug(f"Loading a {self.name} block in Decoder")
 
         self.changeSize()
 
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
-            self.logger.debug("Input at %s" % self.name)
+        for x, inputPort in enumerate(self.inputs):
+            inputPort.id = i["PortsIDIn"][x]
+            self.logger.debug(f"Input at {self.name}")
 
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
-            self.logger.debug("Output at %s" % self.name)
+        for x, outputPort in enumerate(self.outputs):
+            outputPort.id = i["PortsIDOut"][x]
+            self.logger.debug(f"Output at {self.name}")
 
         self.setPos(float(i[self.name + "Position"][0]) + offset_x, float(i[self.name + "Position"][1] + offset_y))
 
@@ -101,16 +102,16 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
     def exportBlackBox(self):
         equations = []
         files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not (files):
+        if not files:
             status = "noDdckFile"
         else:
             status = "noDdckEntry"
         lines = []
         for file in files:
-            infile = open(file, "r")
-            lines += infile.readlines()
-        for i in range(len(lines)):
-            if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
+            with open(file, "r") as infile:  # pylint: disable = unspecified-encoding
+                lines += infile.readlines()
+        for i, line in enumerate(lines):
+            if "output" in line.lower() and "to" in line.lower() and "hydraulic" in line.lower():
                 counter = 1
                 for j in range(i, len(lines) - i):
                     if lines[j][0] == "T":
@@ -122,7 +123,7 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
                         break
                 break
 
-        if status == "noDdckFile" or status == "noDdckEntry":
+        if status in ("noDdckFile", "noDdckEntry"):
             equations.append("T" + self.displayName + "X1" + "=1")
             equations.append("T" + self.displayName + "X2" + "=1")
 
@@ -146,7 +147,7 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
 
         return InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
 
-    def getSubBlockOffset(self, c):
+    def getSubBlockOffset(self, c):  # pylint: disable = invalid-name
         for i in range(2):
             if (
                     self.inputs[i] == c.toPort
@@ -155,3 +156,4 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):
                     or self.outputs[i] == c.fromPort
             ):
                 return i
+        return None

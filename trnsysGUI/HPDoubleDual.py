@@ -61,15 +61,15 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0, h - 2 * delta], [w, h - delta], [w, 2 * delta]] # inlet of [evap, cond, cond]
-        self.origOutputsPos = [[0, h - delta], [w, h - 2 * delta], [w, delta]] # outlet of [evap, cond, cond]
+        self.origInputsPos = [[0, h - 2 * delta], [w, h - delta], [w, 2 * delta]]  # inlet of [evap, cond, cond]
+        self.origOutputsPos = [[0, h - delta], [w, h - 2 * delta], [w, delta]]  # outlet of [evap, cond, cond]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1]) #evaporator
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1]) # bottom condenser
-        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1]) # top condenser
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1]) #evaporator
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1]) # bottom condenser
-        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1]) # top condenser
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])  # evaporator
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])  # bottom condenser
+        self.inputs[2].setPos(self.origInputsPos[2][0], self.origInputsPos[2][1])  # top condenser
+        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])  # evaporator
+        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])  # bottom condenser
+        self.outputs[2].setPos(self.origOutputsPos[2][0], self.origOutputsPos[2][1])  # top condenser
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
@@ -149,8 +149,6 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
             self.logger.debug("Output at heatExchanger")
 
         self.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1] + offset_y))
-        # self.trnsysId = i["trnsysID"]
-        # self.id = i["ID"]
 
         resBlockList.append(self)
 
@@ -183,7 +181,6 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        
         evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
         evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)
         evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[0], evaporatorInput, evaporatorOutput)
@@ -211,10 +208,10 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
     def getSubBlockOffset(self, c):
         for i in range(3):
             if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
+                    self.inputs[i] == c.toPort
+                    or self.inputs[i] == c.fromPort
+                    or self.outputs[i] == c.toPort
+                    or self.outputs[i] == c.fromPort
             ):
                 return i
 
@@ -247,6 +244,9 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
+    def hasDdckPlaceHolders(self):
+        return True
+
     def deleteBlock(self):
         """
         Overridden method to also delete folder
@@ -276,7 +276,6 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\HPTwoHx_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)

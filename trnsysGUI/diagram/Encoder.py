@@ -5,7 +5,6 @@ import json
 
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.diagram import Editor as _de
-from trnsysGUI.storageTank.widget import StorageTank
 
 
 class Encoder(json.JSONEncoder):
@@ -66,28 +65,3 @@ class Encoder(json.JSONEncoder):
         else:
             logger.debug("This is a strange object in Encoder" + type(obj))
             # return super().default(obj)
-
-
-def ddckPlaceHolderValueToJsonEncoder(ddckFilePaths, trnsysObj):
-    ddckPlaceHolderValueDictionary = {}
-    for component in trnsysObj:
-        if isinstance(component, BlockItem) and hasattr(component, "path"):
-            if not isinstance(component, StorageTank):
-                split = component.path.split("\\")
-                componentFilePath = split[-1]
-                for filePath in ddckFilePaths:
-                    inputDct = {}
-                    if componentFilePath == filePath:
-                        for input in component.inputs:
-                            internalPiping = input.parent.getInternalPiping()
-                            portItemsAndInternalRealNode = internalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(
-                                input)
-                            portItems = [pr.portItem for pr in portItemsAndInternalRealNode]
-                            formattedPortItems = [f"{p.name}" for p in portItems]
-                            inputDct[formattedPortItems[0]] = {
-                                "@temp": "T" + input.connectionList[0].displayName,
-                                "@mfr": "Mfr" + input.connectionList[0].displayName}
-                        break
-                if inputDct != {}:
-                    ddckPlaceHolderValueDictionary[f"{filePath}"] = inputDct
-    return ddckPlaceHolderValueDictionary

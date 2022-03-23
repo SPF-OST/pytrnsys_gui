@@ -39,7 +39,6 @@ class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
         return _img.AIR_SOURCE_HP_SVG
 
     def changeSize(self):
-        # self.logger.debug("passing through c change size")
         w = self.w
         h = self.h
 
@@ -80,12 +79,7 @@ class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
         self.logger.debug(self.parent.parent())
         pathName = self.displayName
         if self.parent.parent().projectPath == "":
-            # self.path = os.path.dirname(__file__)
-            # self.path = os.path.join(self.path, 'default')
             self.path = self.parent.parent().projectFolder
-            # now = datetime.now()
-            # self.fileName = now.strftime("%Y%m%d%H%M%S")
-            # self.path = os.path.join(self.path, self.fileName)
         else:
             self.path = self.parent.parent().projectPath
         self.path = os.path.join(self.path, "ddck")
@@ -100,11 +94,12 @@ class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
-        # for i in range(1, self.model.columnCount()-1):
-        #     self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
+
+    def hasDdckPlaceHolders(self):
+        return True
 
     def deleteBlock(self):
         """
@@ -112,10 +107,8 @@ class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
@@ -137,7 +130,6 @@ class AirSourceHP(BlockItem, MassFlowNetworkContributorMixin):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\AirSourceHP_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)

@@ -21,7 +21,6 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
-
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
 
@@ -62,8 +61,8 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
         self.origInputsPos = [[0, delta], [w, h - delta]]  # inlet of [evap, cond]
         self.origOutputsPos = [[0, h - delta], [w, delta]]  # outlet of [evap, cond]
 
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1]) #evaporator
-        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1]) #condenser
+        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])  # evaporator
+        self.inputs[1].setPos(self.origInputsPos[1][0], self.origInputsPos[1][1])  # condenser
 
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
         self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
@@ -197,10 +196,10 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
     def getSubBlockOffset(self, c):
         for i in range(2):
             if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
+                    self.inputs[i] == c.toPort
+                    or self.inputs[i] == c.fromPort
+                    or self.outputs[i] == c.toPort
+                    or self.outputs[i] == c.fromPort
             ):
                 return i
 
@@ -232,6 +231,9 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
+
+    def hasDdckPlaceHolders(self):
+        return True
 
     def deleteBlock(self):
         """

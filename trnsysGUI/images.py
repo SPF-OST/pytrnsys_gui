@@ -8,7 +8,6 @@ AIR_SOURCE_HP_PNG = _ia.ImageAccessor.createForPackageResource("images/AirSource
 AIR_SOURCE_HP_SVG = _ia.ImageAccessor.createForPackageResource("images/AirSourceHP.svg")
 BOILER_PNG = _ia.ImageAccessor.createForPackageResource("images/Boiler.png")
 BOILER_SVG = _ia.ImageAccessor.createForPackageResource("images/Boiler.svg")
-BVI_PNG = _ia.ImageAccessor.createForPackageResource("images/Bvi.png")
 COLLECTOR_PNG = _ia.ImageAccessor.createForPackageResource("images/Collector.png")
 COLLECTOR_SVG = _ia.ImageAccessor.createForPackageResource("images/Collector.svg")
 CONNECTOR_PNG = _ia.ImageAccessor.createForPackageResource("images/Connector.png")

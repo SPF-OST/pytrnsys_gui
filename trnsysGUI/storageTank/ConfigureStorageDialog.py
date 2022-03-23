@@ -1,3 +1,5 @@
+# pylint: disable = invalid-name
+
 from __future__ import annotations
 
 import typing as _tp
@@ -29,16 +31,17 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-class ConfigureStorageDialog(QDialog):
+class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-attributes
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
 
     def __init__(self, storage: _st.StorageTank, editor: _ed.Editor):  # type: ignore[name-defined]
+        # pylint: disable = too-many-locals, too-many-statements
         super().__init__(editor)
         self._editor = editor
         self.storage = storage
-        self.n = 0
-        self.m = 0
+        self.n = 0  # pylint: disable = invalid-name
+        self.m = 0  # pylint: disable = invalid-name
 
         spacerHeight = 15
 
@@ -49,7 +52,7 @@ class ConfigureStorageDialog(QDialog):
         self.tabs.addTab(self.tab1, "Heat exchangers")
         self.tabs.addTab(self.tab2, "Direct ports")
 
-        h0 = QHBoxLayout()
+        h0 = QHBoxLayout()  # pylint: disable = invalid-name
         description = QLabel("Please configure the storage tank:")
         exportButton = QPushButton("Export ddck")
         exportButton.clicked.connect(self.storage.exportDck)
@@ -59,11 +62,11 @@ class ConfigureStorageDialog(QDialog):
 
         tankNameLabel = QLabel()
         tankNameLabel.setText("<b>Tank name: </b>")
-        self.le = QLineEdit(self.storage.label.toPlainText())
+        self.lineEdit = QLineEdit(self.storage.label.toPlainText())
 
-        gl = QGridLayout()
+        gridLayout = QGridLayout()
         hxsLabel = QLabel("<b>Heat Exchangers </b>")
-        gl.addWidget(hxsLabel, 0, 0, 1, 2)
+        gridLayout.addWidget(hxsLabel, 0, 0, 1, 2)
 
         qhbL = QHBoxLayout()
 
@@ -81,31 +84,31 @@ class ConfigureStorageDialog(QDialog):
         self.lButton = QRadioButton("Left side")
         self.rButton = QRadioButton("Right side")
 
-        gl.addWidget(offsetLabel, 3, 0, 1, 1)
-        gl.addWidget(offsetLeILabel, 4, 0, 1, 1)
-        gl.addWidget(self.offsetLeI, 5, 0, 1, 3)
-        gl.addWidget(offsetLeOLabel, 6, 0, 1, 1)
-        gl.addWidget(self.offsetLeO, 7, 0, 1, 3)
+        gridLayout.addWidget(offsetLabel, 3, 0, 1, 1)
+        gridLayout.addWidget(offsetLeILabel, 4, 0, 1, 1)
+        gridLayout.addWidget(self.offsetLeI, 5, 0, 1, 3)
+        gridLayout.addWidget(offsetLeOLabel, 6, 0, 1, 1)
+        gridLayout.addWidget(self.offsetLeO, 7, 0, 1, 3)
 
         self.hxNameLe = QLineEdit()
         self.hxNameLe.setPlaceholderText("Enter a name...")
-        gl.addWidget(self.hxNameLe, 8, 0, 1, 3)
+        gridLayout.addWidget(self.hxNameLe, 8, 0, 1, 3)
 
-        gl.addWidget(self.lButton, 9, 0, 1, 1)
-        gl.addWidget(self.rButton, 9, 2, 1, 1)
+        gridLayout.addWidget(self.lButton, 9, 0, 1, 1)
+        gridLayout.addWidget(self.rButton, 9, 2, 1, 1)
 
         addButton = QPushButton("Add...")
         addButton.clicked.connect(self.addHx)
-        gl.addWidget(addButton, 10, 0, 1, 1)
+        gridLayout.addWidget(addButton, 10, 0, 1, 1)
         removeButton = QPushButton("Remove...")
         removeButton.clicked.connect(self.removeHxL)
         removeButton.clicked.connect(self.removeHxR)
-        gl.addWidget(removeButton, 10, 1, 1, 1)
+        gridLayout.addWidget(removeButton, 10, 1, 1, 1)
         modifyButton = QPushButton("Modify")
         modifyButton.clicked.connect(self.modifyHx)
-        gl.addWidget(modifyButton, 10, 2, 1, 1)
+        gridLayout.addWidget(modifyButton, 10, 2, 1, 1)
         spaceHx = QSpacerItem(self.width(), spacerHeight)
-        gl.addItem(spaceHx, 11, 0, 1, 2)
+        gridLayout.addItem(spaceHx, 11, 0, 1, 2)
 
         manPortLay = QVBoxLayout()
         qhbL2 = QHBoxLayout()
@@ -165,27 +168,27 @@ class ConfigureStorageDialog(QDialog):
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
 
-        L = QVBoxLayout()
-        L.addLayout(h0)
-        L.addWidget(tankNameLabel)
-        L.addWidget(self.le)
+        layout = QVBoxLayout()
+        layout.addLayout(h0)
+        layout.addWidget(tankNameLabel)
+        layout.addWidget(self.lineEdit)
 
         t1Layout = QVBoxLayout()
         t1Layout.addLayout(qhbL)
-        t1Layout.addLayout(gl)
+        t1Layout.addLayout(gridLayout)
 
         self.tab1.setLayout(t1Layout)
 
         self.tab2.setLayout(manPortLay)
 
-        L.addWidget(self.tabs)
+        layout.addWidget(self.tabs)
 
-        L.addWidget(increaseSizeButton)
-        L.addWidget(decreaseSizeButton)
-        L.addWidget(self.okButton)
-        L.addWidget(self.cancelButton)
+        layout.addWidget(increaseSizeButton)
+        layout.addWidget(decreaseSizeButton)
+        layout.addWidget(self.okButton)
+        layout.addWidget(self.cancelButton)
 
-        self.setLayout(L)
+        self.setLayout(layout)
 
         self._loadHeatExchangers()
         self._loadDirectPortPairs()
@@ -218,15 +221,9 @@ class ConfigureStorageDialog(QDialog):
                 self.rightHeatExchangersItemListWidget.addItem(item)
 
     @staticmethod
-    def _getHeatExchangerListItemText(h):
+    def _getHeatExchangerListItemText(h):  # pylint: disable = invalid-name
         return (
-                h.displayName
-                + ", y_offset = "
-                + "%d" % int(h.relativeInputHeight * 100)
-                + "%"
-                + " to "
-                + "%d" % int(h.relativeOutputHeight * 100)
-                + "%"
+            f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
         )
 
     def _loadDirectPortPairs(self):
@@ -247,10 +244,8 @@ class ConfigureStorageDialog(QDialog):
     @staticmethod
     def _getDirectPortPairListItemText(directPortPair: _dpp.DirectPortPair):
         return (
-                "Port pair from "
-                + "%d%%" % int(directPortPair.relativeInputHeight * 100)
-                + " to "
-                + "%d%%" % int(directPortPair.relativeOutputHeight * 100)
+            f"Port pair from {int(directPortPair.relativeInputHeight * 100)}% to "
+            f"{int(directPortPair.relativeOutputHeight * 100)}%"
         )
 
     def listWLClicked(self):
@@ -275,13 +270,13 @@ class ConfigureStorageDialog(QDialog):
         """
         try:
             _inputPercentageHeight = float(self.offsetLeI.text())
-        except:
+        except ValueError:
             self._editor.logger.warning('HX input height is not a number.')
             return
 
         try:
             _outputPercentageHeight = float(self.offsetLeO.text())
-        except:
+        except ValueError:
             self._editor.logger.warning('HX output height is not a number.')
             return
 
@@ -337,13 +332,13 @@ class ConfigureStorageDialog(QDialog):
     def addPortPair(self):
         try:
             _inputPortPercentageHeight = float(self.manPortLeI.text())
-        except:
+        except ValueError:
             self._editor.logger.warning('Input port height is not a number.')
             return
 
         try:
             _outputPortPercentageHeight = float(self.manPortLeO.text())
-        except:
+        except ValueError:
             self._editor.logger.warning('Output port height is not a number.')
             return
 
@@ -527,16 +522,14 @@ class ConfigureStorageDialog(QDialog):
         self.storage.updateImage()
 
     def acceptedEdit(self):
-        # print("Changing displayName")
-        test = self.le.text()
-        if self.le.text() == "":
+        if self.lineEdit.text() == "":
             qmb = QMessageBox()
             qmb.setText("Please set a name for this storage tank.")
             qmb.setStandardButtons(QMessageBox.Ok)
             qmb.setDefaultButton(QMessageBox.Ok)
             qmb.exec()
             return
-        self.storage.setName(self.le.text())
+        self.storage.setName(self.lineEdit.text())
         self.close()
 
     def cancel(self):
