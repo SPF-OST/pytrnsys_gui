@@ -197,7 +197,7 @@ class _MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export Ddck placerholder JSON file", self)
+        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export json-file containing connection information", self)
         exportDdckPlaceHolderValueJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValueJson)
 
         self.projectMenu = QMenu("Project")
@@ -214,12 +214,8 @@ class _MainWindow(QMainWindow):
         pytrnsysOnlineDocAction = QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
 
-        pytrnsysGuiOnlineDocAction = QAction("GUI online documentation", self)
-        pytrnsysGuiOnlineDocAction.triggered.connect(self.openPytrnsysGuiOnlineDoc)
-
         self.helpMenu = QMenu("Help")
         self.helpMenu.addAction(pytrnsysOnlineDocAction)
-        self.helpMenu.addAction(pytrnsysGuiOnlineDocAction)
 
         # Menu bar
         self.mb = self.menuBar()
@@ -585,12 +581,6 @@ class _MainWindow(QMainWindow):
             os.system("start \"\" https://pytrnsys.readthedocs.io")
         except:
             self.logger.warning("Could not open pytrnsys online documentation. (Works on Windows only.)")
-
-    def openPytrnsysGuiOnlineDoc(self):
-        try:
-            os.system("start \"\" https://spf-ost.github.io/pytrnsys_gui")
-        except:
-            self.logger.warning("Could not open pytrnsys-gui online documentation. (Works on Windows only.)")
 
     def exportPDF(self):
         self.centralWidget.printPDF()
