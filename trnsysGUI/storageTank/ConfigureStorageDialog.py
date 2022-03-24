@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pathlib as _pl
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
@@ -522,15 +523,38 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         self.storage.updateImage()
 
     def acceptedEdit(self):
-        if self.lineEdit.text() == "":
+        newName = self.lineEdit.text()
+        if newName.lower() == str(self.storage.displayName).lower():
+            self.close()
+            return
+        elif self.lineEdit.text() == "":
             qmb = QMessageBox()
             qmb.setText("Please set a name for this storage tank.")
             qmb.setStandardButtons(QMessageBox.Ok)
             qmb.setDefaultButton(QMessageBox.Ok)
             qmb.exec()
             return
+        elif self._nameExists(newName) or self._nameExistsInDdckFolder(newName):
+            msgb = QMessageBox()
+            msgb.setText("Name already exist!")
+            msgb.exec()
+            return
         self.storage.setName(self.lineEdit.text())
         self.close()
+
+    def _nameExists(self, name):
+        for item in self.parent().trnsysObj:
+            if str(item.displayName).lower() == name.lower():
+                return True
+        return False
+
+    def _nameExistsInDdckFolder(self, name):
+        projectFolderDdckPath = _pl.Path(self.parent().projectFolder + "\\ddck")
+        projectDdckFiles = list(projectFolderDdckPath.iterdir())
+        for file in projectDdckFiles:
+            if file.name.lower() == name.lower():
+                return True
+        return False
 
     def cancel(self):
         self.close()

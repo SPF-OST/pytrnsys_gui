@@ -1,5 +1,7 @@
 # pylint: disable=invalid-name
 
+import pathlib as _pl
+
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
@@ -74,17 +76,17 @@ class BlockDlg(QDialog):  # pylint: disable=too-many-instance-attributes
         newName = self.lineEdit.text()
         if newName.lower() == str(self.block.displayName).lower():
             self.close()
-        elif newName != "" and not self.nameExists(newName):
-            self.block.setName(newName)
-            self.close()
         elif newName == "":
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self.nameExists(newName):
+        elif self._nameExists(newName) or self._nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()
+        else:
+            self.block.setName(newName)
+            self.close()
 
     def setNewFlipStateH(self, state):
         self.block.updateFlipStateH(state)
@@ -97,16 +99,23 @@ class BlockDlg(QDialog):  # pylint: disable=too-many-instance-attributes
     def cancel(self):
         self.close()
 
-    def nameExists(self, name):
+    def _nameExists(self, name):
         for item in self.parent().trnsysObj:
             if str(item.displayName).lower() == name.lower():
+                return True
+        return False
+
+    def _nameExistsInDdckFolder(self, name):
+        projectFolderDdckPath = _pl.Path(self.parent().projectFolder + "\\ddck")
+        projectDdckFiles = list(projectFolderDdckPath.iterdir())
+        for file in projectDdckFiles:
+            if file.name.lower() == name.lower():
                 return True
         return False
 
     # unused
     def loadFile(self):
         self.logger.debug("Opening diagram")
-        # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.ddck")[0]
         if fileName != "":
             if len(self.block.propertyFile) < 2:
