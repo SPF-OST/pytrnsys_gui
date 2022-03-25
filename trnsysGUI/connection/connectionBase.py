@@ -211,7 +211,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self.parent.trnsysObj.append(self)
 
-        self.displayName = "Conn" + str(self.connId)
+        self.displayName = "Pi" + self.fromPort.parent.displayName + "To" + self.toPort.parent.displayName
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")
@@ -741,7 +741,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                             self.logger.debug("Can't build bridge because one segment is almost verical")
 
                         else:
-
                             node1 = Node()
                             node2 = Node()
 
@@ -813,9 +812,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     # Delete a connection
     def clearConn(self):
         # Deletes all segments and corners in connection
-        # self.logger.debug("Connection was before: ")
-        # self.printConnNodes()
-
         walker = self.endNode
 
         items = self.parent.diagramScene.items()
@@ -839,25 +835,19 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             walker = walker.prevN()
 
             while walker.prevN() is not self.startNode:
-                # self.logger.debug("Del corner...")
                 if not isinstance(walker.parent, ConnectionBase):
                     self.parent.diagramScene.removeItem(walker.parent)
                 else:
                     self.logger.debug("Caution, this is a disrupt.")
                 walker = walker.prevN()
-                # del (walker.nextN())
 
             if not isinstance(walker.parent, ConnectionBase):
                 self.parent.diagramScene.removeItem(walker.parent)
             else:
                 self.logger.debug("Caution.")
-                # del walker
 
             self.startNode.setNext(self.endNode)
             self.endNode.setPrev(self.startNode)
-
-        # self.logger.debug("Connection is now: ")
-        # self.printConnNodes()
 
     def deleteConn(self):
         self.clearConn()
@@ -994,9 +984,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.logger.debug("It has startNode " + str(self.startNode))
         self.logger.debug("It has endNode " + str(self.endNode))
 
-        # self.printConnNodes()
         self.logger.debug("\n")
-        # self.printConnSegs()
         self.logger.debug("It goes from " + self.fromPort.parent.displayName + " to " + self.toPort.parent.displayName)
         self.logger.debug("------------------------------------")
 

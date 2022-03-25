@@ -36,13 +36,13 @@ import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
 import trnsysGUI.diagram.Encoder as _enc
-import trnsysGUI.placeholders as _ph
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.placeholders as _ph
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
@@ -859,7 +859,7 @@ class Editor(QWidget):
         result = self._encodeDdckPlaceHolderValuesToJson(jsonFilePath)
         if _res.isError(result):
             return _res.error(result)
-        
+
         msgb = QMessageBox(self)
         msgb.setText("Saved Json file at " + jsonFilePath)
         msgb.exec()
