@@ -9,7 +9,7 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
+import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc  # pylint: disable=cyclic-import
 import trnsysGUI.hydraulicLoops.export as _hle
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn

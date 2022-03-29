@@ -843,6 +843,9 @@ class Editor(QWidget):
         painter.end()
 
     def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
+        if not self._isHydraulicConnected():
+            return _res.Error(f"You need to connect all port items before you can export the hydraulics.")
+
         jsonFileName = "DdckPlaceHolderValue.json"
         jsonFilePath = os.path.join(self.projectFolder, jsonFileName)
 
@@ -1274,3 +1277,17 @@ class Editor(QWidget):
             ddckFileNames.append(path.name)
 
         return ddckFileNames
+
+    def nameExists(self, name):
+        for item in self.trnsysObj:
+            if str(item.displayName).lower() == name.lower():
+                return True
+        return False
+
+    def nameExistsInDdckFolder(self, name):
+        projectFolderDdckPath = _pl.Path(self.projectFolder + "\\ddck")
+        projectDdckFiles = list(projectFolderDdckPath.iterdir())
+        for file in projectDdckFiles:
+            if file.name.lower() == name.lower():
+                return True
+        return False

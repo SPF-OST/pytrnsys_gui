@@ -4,7 +4,7 @@ import typing as _tp
 
 from PyQt5 import QtWidgets as _qtw
 
-import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.connection.singlePipeConnection as _spc  # pylint: disable=cyclic-import
 import trnsysGUI.hydraulicLoops.merge as _hlmerge
 import trnsysGUI.hydraulicLoops.model as _hlmodel
 import trnsysGUI.hydraulicLoops.split as _hlsplit
