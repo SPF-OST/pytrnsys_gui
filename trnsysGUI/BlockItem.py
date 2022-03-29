@@ -36,7 +36,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.propertyFile = []
 
         if displayNamePrefix:
-            self.displayName = displayNamePrefix + "_" + str(self.id)
+            self.displayName = displayNamePrefix + str(self.id)
         elif displayName:
             self.displayName = displayName
         else:

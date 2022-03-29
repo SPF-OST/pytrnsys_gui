@@ -40,8 +40,8 @@ class TestAutomaticConnection:
     def testConnectionJson(self, project: _Project, request: _pt.FixtureRequest):
         actualDirPath = _DATA_DIR_ / project.projectName / "TRIHP_dualSource"
         expectedDirPath = _DATA_DIR_ / project.projectName / "expected"
-        actualJsonFilePath = actualDirPath / "DdckPlaceHolderValue.json"
-        expectedJsonFilePath = expectedDirPath / "DdckPlaceHolderValue.json"
+        actualJsonFilePath = actualDirPath / "DdckPlaceHolderValues.json"
+        expectedJsonFilePath = expectedDirPath / "DdckPlaceHolderValues.json"
 
         # The following line is required otherwise QT will crash
         application = _qtw.QApplication([])
