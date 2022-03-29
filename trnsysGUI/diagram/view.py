@@ -101,9 +101,9 @@ class View(QGraphicsView):
             elif componentType == "Radiator":
                 blockItem = Radiator(componentType, self, displayNamePrefix="Rad")
             elif componentType == "WTap":
-                blockItem = WTap(componentType, self, displayNamePrefix="WatTap")
+                blockItem = WTap(componentType, self, displayNamePrefix="WtTap")
             elif componentType == "WTap_main":
-                blockItem = WTap_main(componentType, self, displayNamePrefix="WatSuppl")
+                blockItem = WTap_main(componentType, self, displayNamePrefix="WtSpp")
             elif componentType == "Connector":
                 blockItem = Connector(componentType, self, displayNamePrefix="Conn")
             elif componentType == "GenericBlock":
@@ -112,11 +112,11 @@ class View(QGraphicsView):
             elif componentType == "HPTwoHx":
                 blockItem = HeatPumpTwoHx(componentType, self, displayNamePrefix="HP")
             elif componentType == "HPDoubleDual":
-                blockItem = HPDoubleDual(componentType, self, displayNamePrefix="HPDual")
+                blockItem = HPDoubleDual(componentType, self, displayNamePrefix="HPDD")
             elif componentType == "HPDual":
-                blockItem = HPDual(componentType, self, displayNamePrefix="HPDual")
+                blockItem = HPDual(componentType, self, displayNamePrefix="HPDSr")
             elif componentType == "Boiler":
-                blockItem = Boiler(componentType, self, displayNamePrefix="Boiler")
+                blockItem = Boiler(componentType, self, displayNamePrefix="Boilr")
             elif componentType == "AirSourceHP":
                 blockItem = AirSourceHP(componentType, self, displayNamePrefix="Ashp")
             elif componentType == "PV":
@@ -136,7 +136,7 @@ class View(QGraphicsView):
             elif componentType == "Sink":
                 blockItem = Sink(componentType, self, displayNamePrefix="QSink")
             elif componentType == "Source":
-                blockItem = Source(componentType, self, displayNamePrefix="QSource")
+                blockItem = Source(componentType, self, displayNamePrefix="QSrc")
             elif componentType == "SourceSink":
                 blockItem = SourceSink(componentType, self, displayNamePrefix="QExch")
             elif componentType == "Geotherm":
