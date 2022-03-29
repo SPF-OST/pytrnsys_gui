@@ -1,5 +1,7 @@
+import dataclasses as _dc
 import logging as _log
 import pathlib as _pl
+import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
@@ -10,13 +12,36 @@ import trnsysGUI.diagram.Editor as _de
 _DATA_DIR_ = _pl.Path(__file__).parent / "data"
 
 
-class TestAutomaticConnection:
-    def testConnectionJson(self, request: _pt.FixtureRequest):
-        actualDirPath = _DATA_DIR_ / "TRIHP_dualSource"
-        expectedDirPath = _DATA_DIR_ / "expected"
+@_dc.dataclass
+class _Project:
+    projectName: str
+    shallCopyFolderFromExamples: bool
 
-        actualJsonFilePath = actualDirPath / "DdckPlaceHolderValue.json"
-        expectedJsonFilePath = expectedDirPath / "DdckPlaceHolderValue.json"
+    @staticmethod
+    def createForProject(projectName: str) -> "_Project":
+        return _Project(projectName, False)
+
+    @property
+    def testId(self) -> str:
+        return f"{self.projectName}"
+
+
+def getProjects(path: _pl.Path) -> _tp.Iterable[_Project]:
+    for projectDirPath in path.iterdir():
+        projectName = projectDirPath.name
+        yield _Project.createForProject(projectName)
+
+
+TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects(_DATA_DIR_)]
+
+
+class TestAutomaticConnection:
+    @_pt.mark.parametrize("project", TEST_CASES)
+    def testConnectionJson(self, project: _Project, request: _pt.FixtureRequest):
+        actualDirPath = _DATA_DIR_ / project.projectName / "TRIHP_dualSource"
+        expectedDirPath = _DATA_DIR_ / project.projectName / "expected"
+        actualJsonFilePath = actualDirPath / "DdckPlaceHolderValues.json"
+        expectedJsonFilePath = expectedDirPath / "DdckPlaceHolderValues.json"
 
         # The following line is required otherwise QT will crash
         application = _qtw.QApplication([])

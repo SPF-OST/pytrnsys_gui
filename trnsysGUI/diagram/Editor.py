@@ -846,7 +846,7 @@ class Editor(QWidget):
         if not self._isHydraulicConnected():
             return _res.Error(f"You need to connect all port items before you can export the hydraulics.")
 
-        jsonFileName = "DdckPlaceHolderValue.json"
+        jsonFileName = "DdckPlaceHolderValues.json"
         jsonFilePath = os.path.join(self.projectFolder, jsonFileName)
 
         if os.path.isfile(jsonFilePath):
