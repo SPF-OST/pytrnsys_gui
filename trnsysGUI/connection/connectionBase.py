@@ -15,7 +15,7 @@ from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
 from trnsysGUI.Node import Node  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
-from trnsysGUI.TVentil import TVentil
+from trnsysGUI.TVentil import TVentil  # pylint: disable=cyclic-import
 from trnsysGUI.massFlowSolver import InternalPiping
 
 
@@ -211,7 +211,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self.parent.trnsysObj.append(self)
 
-        self.displayName = "Pi" + self.fromPort.parent.displayName + "To" + self.toPort.parent.displayName
+        self.displayName = "Pi" + self.fromPort.parent.displayName + "_" + self.toPort.parent.displayName
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")

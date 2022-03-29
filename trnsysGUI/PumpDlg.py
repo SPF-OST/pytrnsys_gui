@@ -1,8 +1,6 @@
 # pylint: skip-file
 # type: ignore
 
-import pathlib as _pl
-
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
@@ -67,7 +65,7 @@ class PumpDlg(QDialog):
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
         self.tab2 = QWidget()
-        
+
         # Add tabs
         self.tabs.addTab(self.tab1, "Diagram")
         self.tabs.addTab(self.tab2, "Adjust Mass Flow Rate")
@@ -96,7 +94,7 @@ class PumpDlg(QDialog):
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self._nameExists(newName) or self._nameExistsInDdckFolder(newName):
+        elif self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()
@@ -118,17 +116,3 @@ class PumpDlg(QDialog):
 
     def cancel(self):
         self.close()
-
-    def _nameExists(self, n):
-        for t in self.parent().trnsysObj:
-            if str(t.displayName).lower() == n.lower():
-                return True
-        return False
-
-    def _nameExistsInDdckFolder(self, name):
-        projectFolderDdckPath = _pl.Path(self.parent().projectFolder + "\\ddck")
-        projectDdckFiles = list(projectFolderDdckPath.iterdir())
-        for file in projectDdckFiles:
-            if file.name.lower() == name.lower():
-                return True
-        return False

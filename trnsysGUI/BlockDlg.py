@@ -1,7 +1,5 @@
 # pylint: disable=invalid-name
 
-import pathlib as _pl
-
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QDialog,
@@ -80,7 +78,7 @@ class BlockDlg(QDialog):  # pylint: disable=too-many-instance-attributes
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self._nameExists(newName) or self._nameExistsInDdckFolder(newName):
+        elif self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()
@@ -98,20 +96,6 @@ class BlockDlg(QDialog):  # pylint: disable=too-many-instance-attributes
 
     def cancel(self):
         self.close()
-
-    def _nameExists(self, name):
-        for item in self.parent().trnsysObj:
-            if str(item.displayName).lower() == name.lower():
-                return True
-        return False
-
-    def _nameExistsInDdckFolder(self, name):
-        projectFolderDdckPath = _pl.Path(self.parent().projectFolder + "\\ddck")
-        projectDdckFiles = list(projectFolderDdckPath.iterdir())
-        for file in projectDdckFiles:
-            if file.name.lower() == name.lower():
-                return True
-        return False
 
     # unused
     def loadFile(self):
