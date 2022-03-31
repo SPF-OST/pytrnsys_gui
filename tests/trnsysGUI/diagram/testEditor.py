@@ -1,5 +1,7 @@
 import dataclasses as _dc
+import json as _json
 import logging as _log
+import os as _os
 import pathlib as _pl
 import re as _re
 import shutil as _sh
@@ -9,6 +11,7 @@ import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
 import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.diagram.Encoder as _enc
 import trnsysGUI.storageTank.widget as _stw
 
 _DATA_DIR = _pl.Path(__file__).parent / "data"
@@ -52,7 +55,8 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 class TestEditor:
     @_pt.mark.parametrize("project", TEST_CASES)
-    def testStorageAndHydraulicExports(self, project: _Project, request: _pt.FixtureRequest):
+    def testStorageAndHydraulicExports(self, project: _Project,  # pylint: disable=too-many-locals
+                                       request: _pt.FixtureRequest):
         helper = _Helper(project)
         helper.setup()
 
@@ -81,6 +85,22 @@ class TestEditor:
 
             ddcxFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddcx"
             helper.ensureFilesAreEqual(ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False)
+
+        newestFormatFolderPath = projectFolderPath / "NewestFormat"
+
+        if newestFormatFolderPath.exists():
+            _sh.rmtree(newestFormatFolderPath)
+
+        _os.mkdir(newestFormatFolderPath)
+
+        newestFormatJsonPath = newestFormatFolderPath / f"{newestFormatFolderPath.name}.json"
+
+        with open(newestFormatJsonPath, "w") as jsonfile:  # pylint: disable=unspecified-encoding
+            _json.dump(self._createEditor(projectFolderPath), jsonfile, indent=4, sort_keys=True, cls=_enc.Encoder)
+
+        assert self._createEditor(newestFormatFolderPath)
+
+        _sh.rmtree(newestFormatFolderPath)
 
     def _exportStorageTanksAndGetNames(self, projectFolderPath: _pl.Path) -> _tp.Sequence[str]:
         editor = self._createEditor(projectFolderPath)
