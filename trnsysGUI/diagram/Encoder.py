@@ -1,5 +1,4 @@
-# pylint: skip-file
-# type: ignore
+# pylint: disable=invalid-name
 
 import json
 
@@ -16,7 +15,7 @@ class Encoder(json.JSONEncoder):
     and Id-generator) has the key ".__BlockDct__", although there are also other elements in there.
     """
 
-    def default(self, obj):
+    def default(self, obj):  # pylint: disable=arguments-renamed
         """
 
         Parameters
@@ -34,13 +33,13 @@ class Encoder(json.JSONEncoder):
             res = {}
             blockDct = {".__BlockDct__": True}
 
-            for t in obj.trnsysObj:
-                if isinstance(t, BlockItem) and not t.isVisible():
-                    logger.debug("Invisible block [probably an insideBlock?]" + str(t) + str(t.displayName))
+            for item in obj.trnsysObj:
+                if isinstance(item, BlockItem) and not item.isVisible():
+                    logger.debug("Invisible block [probably an insideBlock?]" + str(item) + str(item.displayName))
                     continue
 
-                dictName, dct = t.encode()
-                blockDct[dictName + str(t.id)] = dct
+                dictName, dct = item.encode()
+                blockDct[dictName + str(item.id)] = dct
 
             idDict = {
                 "__idDct__": True,
@@ -53,15 +52,14 @@ class Encoder(json.JSONEncoder):
             nameDict = {"__nameDct__": True, "DiagramName": obj.diagramName, "ProjectFolder": obj.projectFolder}
             blockDct["Strings"] = nameDict
 
-            for gi in obj.graphicalObj:
-                dictName, dct = gi.encode()
-                blockDct[dictName + str(gi.id)] = dct
+            for graphicalItem in obj.graphicalObj:
+                dictName, dct = graphicalItem.encode()
+                blockDct[dictName + str(graphicalItem.id)] = dct
 
             res["Blocks"] = blockDct
 
             res["hydraulicLoops"] = obj.hydraulicLoops.toJson()
 
             return res
-        else:
-            logger.debug("This is a strange object in Encoder" + type(obj))
-            # return super().default(obj)
+        logger.debug("This is a strange object in Encoder" + type(obj))
+        return None
