@@ -309,7 +309,7 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
         return ConnectionModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":
+    def upgrade(cls, superseded: ConnectionModelVersion0) -> "ConnectionModel":  # type: ignore[override]
         firstSegmentLabelPos = (
             superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
             superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
