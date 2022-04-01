@@ -100,8 +100,6 @@ class TestEditor:
 
         assert self._createEditor(newestFormatFolderPath)
 
-        _sh.rmtree(newestFormatFolderPath)
-
     def _exportStorageTanksAndGetNames(self, projectFolderPath: _pl.Path) -> _tp.Sequence[str]:
         editor = self._createEditor(projectFolderPath)
         storageTanks = [

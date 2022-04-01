@@ -77,8 +77,8 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         qhbL.addWidget(self.rightHeatExchangersItemListWidget)
 
         offsetLabel = QLabel("Height offsets in percent")
-        offsetLeILabel = QLabel("Input (upper port): ")
-        offsetLeOLabel = QLabel("Output (lower port):")
+        offsetLeILabel = QLabel("Input: ")
+        offsetLeOLabel = QLabel("Output:")
         self.offsetLeI = QLineEdit("0")
         self.offsetLeO = QLineEdit("0")
         self.lButton = QRadioButton("Left side")
@@ -280,11 +280,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
             self._editor.logger.warning('HX output height is not a number.')
             return
 
-        if (
-                self.minOffsetDistance()
-                and _inputPercentageHeight > _outputPercentageHeight
-                and self.offsetsInRange()
-        ):
+        if self.minOffsetDistance() and self.offsetsInRange():
             if self.rButton.isChecked():
                 self._editor.logger.debug('Adding HX on righthand side.')
                 self._addHxR()
@@ -297,12 +293,12 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         else:
             msgb = QMessageBox()
             msgb.setText(
-                "At least 20% of difference and larger top port than bottom port needed and valid range (0, 100)"
+                "At least 9% of difference and valid range (0, 100)"
             )
             msgb.exec_()
 
     def minOffsetDistance(self):
-        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 5
+        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 9
 
     def offsetsInRange(self):
         return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
@@ -324,7 +320,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         relativeInputHeight = float(self.offsetLeI.text()) / 100
         relativeOutputHeight = float(self.offsetLeO.text()) / 100
 
-        trnsysId = self._editor.idGen.getTrnsysID()  # type: ignore[attr-defined]
+        trnsysId = self._editor.idGen.getTrnsysID()
         self.storage.addHeatExchanger(name, trnsysId, side, relativeInputHeight, relativeOutputHeight)
 
         self._loadHeatExchangers()
