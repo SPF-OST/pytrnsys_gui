@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 
-import trnsysGUI.Pump as _pmp
+import trnsysGUI.pump as _pmp
 
 
 class PumpDlg(QDialog):
@@ -55,7 +55,7 @@ class PumpDlg(QDialog):
 
         positionLayout = QHBoxLayout()
         self.PumpPowerLabel = QLabel("Mass Flow Rate")
-        self.LineEdit = QLineEdit(str(self.block.rndPwr))
+        self.LineEdit = QLineEdit(str(self.block.massFlowRateInKgPerH))
         self.PumpPowerLabel2 = QLabel("kg/h")
         positionLayout.addWidget(self.PumpPowerLabel)
         positionLayout.addWidget(self.LineEdit)
@@ -112,7 +112,7 @@ class PumpDlg(QDialog):
         self.block.updateSidesFlippedV()
 
     def setPumpPower(self):
-        self.block.rndPwr = int(self.LineEdit.text())
+        self.block.massFlowRateInKgPerH = int(self.LineEdit.text())
 
     def cancel(self):
         self.close()

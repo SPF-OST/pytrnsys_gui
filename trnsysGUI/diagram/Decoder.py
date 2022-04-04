@@ -23,7 +23,7 @@ from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
 from trnsysGUI.MasterControl import MasterControl
 from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
-from trnsysGUI.Pump import Pump
+from trnsysGUI.pump import Pump
 from trnsysGUI.Radiator import Radiator
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil

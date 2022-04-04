@@ -1,11 +1,12 @@
 import dataclasses as _dc
 import logging as _log
 import pathlib as _pl
-import re as _re
 import shutil as _sh
+import subprocess as _sp
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
+import pandas as _pd
 import pytest as _pt
 
 import trnsysGUI.diagram.Editor as _de
@@ -52,7 +53,7 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 class TestEditor:
     @_pt.mark.parametrize("project", TEST_CASES)
-    def testStorageAndHydraulicExports(self, project: _Project, request: _pt.FixtureRequest):
+    def testStorageAndHydraulicExports(self, project: _Project, request: _pt.FixtureRequest) -> None:
         helper = _Helper(project)
         helper.setup()
 
@@ -68,19 +69,19 @@ class TestEditor:
 
         self._exportHydraulic(projectFolderPath, _format="mfs")
         mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
-        helper.ensureFilesAreEqual(mfsDdckRelativePath, shallReplaceRandomizedFlowRates=True)
+        helper.ensureFilesAreEqual(mfsDdckRelativePath)
 
         self._exportHydraulic(projectFolderPath, _format="ddck")
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
-        helper.ensureFilesAreEqual(hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False)
+        helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
 
         storageTankNames = self._exportStorageTanksAndGetNames(projectFolderPath)
         for storageTankName in storageTankNames:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
-            helper.ensureFilesAreEqual(ddckFileRelativePath, shallReplaceRandomizedFlowRates=False)
+            helper.ensureFilesAreEqual(ddckFileRelativePath)
 
             ddcxFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddcx"
-            helper.ensureFilesAreEqual(ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False)
+            helper.ensureFilesAreEqual(ddcxFileRelativePath)
 
     def _exportStorageTanksAndGetNames(self, projectFolderPath: _pl.Path) -> _tp.Sequence[str]:
         editor = self._createEditor(projectFolderPath)
@@ -97,10 +98,42 @@ class TestEditor:
 
         return storageTankNames
 
+    @_pt.mark.parametrize("project", TEST_CASES)
+    def testMassFlowSolver(self, project: _Project, request: _pt.FixtureRequest) -> None:
+        helper = _Helper(project)
+        helper.setup()
+
+        # The following line is required otherwise QT will crash
+        application = _qtw.QApplication([])
+
+        def quitApplication():
+            application.quit()
+
+        request.addfinalizer(quitApplication)
+
+        projectFolderPath = helper.actualProjectFolderPath
+
+        self._exportMassFlowSolverDeckAndRunTrnsys(projectFolderPath)
+
+        massFlowRatesPrintFile = f"{project.projectName}_Mfr.prt"
+        helper.ensureCSVsAreEqual(massFlowRatesPrintFile)
+
+        temperaturesPintFileName = f"{project.projectName}_T.prt"
+        helper.ensureCSVsAreEqual(temperaturesPintFileName)
+
+    def _exportMassFlowSolverDeckAndRunTrnsys(self, projectFolderPath):
+        exportedFilePath = self._exportHydraulic(projectFolderPath, _format="mfs")
+        editor = self._createEditor(projectFolderPath)
+        assert editor.trnsysPath and editor.trnsysPath.is_file()
+        _sp.run(
+            [str(editor.trnsysPath), exportedFilePath, "/H"], check=True
+        )
+
     @classmethod
-    def _exportHydraulic(cls, projectFolderPath, *, _format):
+    def _exportHydraulic(cls, projectFolderPath, *, _format) -> str:
         editor = cls._createEditor(projectFolderPath)
-        editor.exportHydraulics(exportTo=_format)
+        exportedFilePath = editor.exportHydraulics(exportTo=_format)
+        return exportedFilePath
 
     @staticmethod
     def _createEditor(projectFolderPath):
@@ -134,18 +167,30 @@ class _Helper:
         if self._project.shallCopyFolderFromExamples:
             self._copyExampleToTestInputFolder()
 
-    def ensureFilesAreEqual(self, fileRelativePathAsString: str, shallReplaceRandomizedFlowRates: bool):
-        fileRelativePath = _pl.Path(fileRelativePathAsString)
-        actualFilePath = self.actualProjectFolderPath / fileRelativePath
-        expectedFilePath = self._expectedProjectFolderPath / fileRelativePath
-
+    def ensureFilesAreEqual(self, fileRelativePathAsString: str) -> None:
+        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
         actualContent = actualFilePath.read_text()
         expectedContent = expectedFilePath.read_text()
 
-        if shallReplaceRandomizedFlowRates:
-            actualContent = self._replaceRandomizedFlowRatesWithPlaceHolder(actualContent, placeholder="XXX")
-
         assert actualContent == expectedContent
+
+    def _getActualAndExpectedFilePath(self, fileRelativePathAsString):
+        fileRelativePath = _pl.Path(fileRelativePathAsString)
+        actualFilePath = self.actualProjectFolderPath / fileRelativePath
+        expectedFilePath = self._expectedProjectFolderPath / fileRelativePath
+        return actualFilePath, expectedFilePath
+
+    def ensureCSVsAreEqual(self, fileRelativePathAsString: str, absoluteTolerance: float = 1e-10) -> None:
+        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
+
+        actualDf: _pd.DataFrame = _pd.read_csv(actualFilePath, delim_whitespace=True)
+        expectedDf: _pd.DataFrame = _pd.read_csv(expectedFilePath, delim_whitespace=True)
+
+        assert actualDf.shape == expectedDf.shape
+
+        maxAbsoluteDifference = (actualDf - expectedDf).max().max()
+
+        assert maxAbsoluteDifference <= absoluteTolerance
 
     def _copyExampleToTestInputFolder(self):
         if self.actualProjectFolderPath.exists():
@@ -155,17 +200,6 @@ class _Helper:
         exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / self._project.projectName
 
         _sh.copytree(exampleFolderPath, self.actualProjectFolderPath)
-
-    @classmethod
-    def _replaceRandomizedFlowRatesWithPlaceHolder(cls, actualContent, placeholder):
-        pattern = r"^(?P<variableName>Mfr[^ \t=]+)[ \t]+=[ \t]+[0-9\.]+"
-
-        def replaceValueWithPlaceHolder(match: _tp.Match):
-            return cls._processMatch(match, placeholder)
-
-        actualContent = _re.sub(pattern, replaceValueWithPlaceHolder, actualContent, flags=_re.MULTILINE)
-
-        return actualContent
 
     @staticmethod
     def _processMatch(match: _tp.Match, placeholder: str) -> str:
