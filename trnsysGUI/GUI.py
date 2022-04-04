@@ -170,7 +170,7 @@ class _MainWindow(QMainWindow):
             self.loadTrnsysPath()
 
         setTransysPath = QAction("Set TRNSYS path", self)
-        setTransysPath.triggered.connect(self.askForSaveAndLoadSettings)
+        setTransysPath.triggered.connect(askForSaveAndLoadSettings)
         self.fileMenu.addAction(setTransysPath)
 
         self.editMenu = QMenu("Edit")
