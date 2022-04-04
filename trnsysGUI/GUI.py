@@ -165,8 +165,12 @@ class _MainWindow(QMainWindow):
         debugConnections.triggered.connect(self.debugConns)
         self.fileMenu.addAction(debugConnections)
 
+        def askForSaveAndLoadSettings() -> None:
+            self.askUserForSettingsValuesAndSave()
+            self.loadTrnsysPath()
+
         setTransysPath = QAction("Set TRNSYS path", self)
-        setTransysPath.triggered.connect(self.askUserForSettingsValuesAndSave)
+        setTransysPath.triggered.connect(askForSaveAndLoadSettings)
         self.fileMenu.addAction(setTransysPath)
 
         self.editMenu = QMenu("Edit")
