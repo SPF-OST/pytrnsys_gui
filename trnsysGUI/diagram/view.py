@@ -25,7 +25,7 @@ from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx  # type: ignore[attr-defin
 from trnsysGUI.MasterControl import MasterControl  # type: ignore[attr-defined]
 from trnsysGUI.PV import PV  # type: ignore[attr-defined]
 from trnsysGUI.PitStorage import PitStorage  # type: ignore[attr-defined]
-from trnsysGUI.Pump import Pump  # type: ignore[attr-defined]
+from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
 from trnsysGUI.Radiator import Radiator  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.TeePiece import TeePiece  # type: ignore[attr-defined]
