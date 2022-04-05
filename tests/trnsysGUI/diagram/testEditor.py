@@ -1,5 +1,4 @@
 import dataclasses as _dc
-import json as _json
 import logging as _log
 import os as _os
 import pathlib as _pl
@@ -10,8 +9,10 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
+from pytrnsys.utils import log
+import trnsysGUI.GUI as _GUI
 import trnsysGUI.diagram.Editor as _de
-import trnsysGUI.diagram.Encoder as _enc
+import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
 
 _DATA_DIR = _pl.Path(__file__).parent / "data"
@@ -70,15 +71,17 @@ class TestEditor:
 
         projectFolderPath = helper.actualProjectFolderPath
 
-        self._exportHydraulic(projectFolderPath, _format="mfs")
+        editor = self._createEditor(projectFolderPath)
+
+        editor.exportHydraulics(exportTo="mfs")
         mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
         helper.ensureFilesAreEqual(mfsDdckRelativePath, shallReplaceRandomizedFlowRates=True)
 
-        self._exportHydraulic(projectFolderPath, _format="ddck")
+        editor.exportHydraulics(exportTo="ddck")
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
         helper.ensureFilesAreEqual(hydraulicDdckRelativePath, shallReplaceRandomizedFlowRates=False)
 
-        storageTankNames = self._exportStorageTanksAndGetNames(projectFolderPath)
+        storageTankNames = self._exportStorageTanksAndGetNames(editor)
         for storageTankName in storageTankNames:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath, shallReplaceRandomizedFlowRates=False)
@@ -86,22 +89,31 @@ class TestEditor:
             ddcxFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddcx"
             helper.ensureFilesAreEqual(ddcxFileRelativePath, shallReplaceRandomizedFlowRates=False)
 
-        newestFormatFolderPath = projectFolderPath / "NewestFormat"
+        oldFormatJsonPath = projectFolderPath / f"{projectFolderPath.name}.json"
 
-        if newestFormatFolderPath.exists():
-            _sh.rmtree(newestFormatFolderPath)
+        projectInOldJsonFormat = _prj.LoadProject(oldFormatJsonPath)
 
-        _os.mkdir(newestFormatFolderPath)
+        logger = log.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
 
-        newestFormatJsonPath = newestFormatFolderPath / f"{newestFormatFolderPath.name}.json"
+        mainWindow = _GUI.MainWindow(logger, projectInOldJsonFormat)  # type: ignore[attr-defined]
 
-        with open(newestFormatJsonPath, "w") as jsonfile:  # pylint: disable=unspecified-encoding
-            _json.dump(self._createEditor(projectFolderPath), jsonfile, indent=4, sort_keys=True, cls=_enc.Encoder)
+        newProjectFolderPath = projectFolderPath.parent / "actual"
 
-        assert self._createEditor(newestFormatFolderPath)
+        if newProjectFolderPath.exists():
+            _sh.rmtree(newProjectFolderPath)
 
-    def _exportStorageTanksAndGetNames(self, projectFolderPath: _pl.Path) -> _tp.Sequence[str]:
-        editor = self._createEditor(projectFolderPath)
+        _os.mkdir(newProjectFolderPath)
+
+        mainWindow.copyContentToNewFolder(newProjectFolderPath, projectFolderPath)
+
+        newestFormatJsonPath = newProjectFolderPath / f"{newProjectFolderPath.name}.json"
+
+        editor.encodeDiagram(newestFormatJsonPath)
+
+        assert self._createEditor(newProjectFolderPath)
+
+    @classmethod
+    def _exportStorageTanksAndGetNames(cls, editor: _de.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
         storageTanks = [
             o
             for o in editor.trnsysObj
@@ -114,11 +126,6 @@ class TestEditor:
         storageTankNames = [t.displayName for t in storageTanks]
 
         return storageTankNames
-
-    @classmethod
-    def _exportHydraulic(cls, projectFolderPath, *, _format):
-        editor = cls._createEditor(projectFolderPath)
-        editor.exportHydraulics(exportTo=_format)
 
     @staticmethod
     def _createEditor(projectFolderPath):

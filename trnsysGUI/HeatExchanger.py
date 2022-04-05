@@ -203,8 +203,8 @@ class HeatExchanger(QGraphicsItemGroup):
         self.relativeOutputHeight = relativeOutputHeight
         self.relativeInputHeight = relativeInputHeight
 
-        relativeHeight = relativeInputHeight - relativeOutputHeight
-        absoluteHeight = abs(relativeHeight * storageTankHeight)
+        relativeHeight = abs(relativeInputHeight - relativeOutputHeight)
+        absoluteHeight = relativeHeight * storageTankHeight
 
         self.h = absoluteHeight - absoluteHeight % self.COIL_HEIGHT_IN_PIXELS
 
@@ -223,6 +223,6 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def _getPos(self):
         x = 0 if self.sSide == 0 else self._storageTankWidth
-        topPort = max(self.relativeInputHeight, self.relativeOutputHeight)
-        y = self._storageTankHeight - topPort * self._storageTankHeight
+        topPortRelativeHeight = max(self.relativeInputHeight, self.relativeOutputHeight)
+        y = self._storageTankHeight - topPortRelativeHeight * self._storageTankHeight
         return x, y
