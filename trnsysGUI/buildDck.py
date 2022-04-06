@@ -19,13 +19,11 @@ class buildDck:
 
         self.pathConfig = pathConfig
         self.path = pathConfig
-
         self.ddckPlaceHolderValuesJsonPath = None
-
-        self.defaultInputs()
+        self._defaultInputs()
         self.cmds = []
 
-    def defaultInputs(self):
+    def _defaultInputs(self):
 
         self.inputs = {}
         self.inputs["ignoreOnlinePlotter"] = False
@@ -59,8 +57,8 @@ class buildDck:
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
 
         """
-        self.readConfig(self.pathConfig, "run.config")
-        self.getConfig()
+        self._readConfig(self.pathConfig, "run.config")
+        self._getConfig()
 
         self.nameBase = self.inputs["nameRef"]
 
@@ -94,7 +92,7 @@ class buildDck:
 
         return deck.nameDeck
 
-    def addParametricVariations(self, variations):
+    def _addParametricVariations(self, variations):
         """
         it fills a variableOutput with a list of all variations to run
         format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
@@ -134,7 +132,7 @@ class buildDck:
 
             self.variablesOutput = variations
 
-    def readConfig(self, path, name, parseFileCreated=False):
+    def _readConfig(self, path, name, parseFileCreated=False):
 
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
@@ -156,7 +154,7 @@ class buildDck:
             if not os.path.isdir(self.path):
                 os.mkdir(self.path)
 
-    def getConfig(self):
+    def _getConfig(self):
         """
         Reads the config file.
 
@@ -251,7 +249,7 @@ class buildDck:
                 pass
 
         if len(self.variation) > 0:
-            self.addParametricVariations(self.variation)
+            self._addParametricVariations(self.variation)
             self.variationsUsed = True
         else:
             self.variationsUsed = False

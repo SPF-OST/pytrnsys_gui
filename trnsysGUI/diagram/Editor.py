@@ -851,7 +851,7 @@ class Editor(QWidget):
 
         if os.path.isfile(jsonFilePath):
             qmb = QMessageBox(self)
-            qmb.setText("Warning: This Json file exists already. Do you want to overwrite or cancel?")
+            qmb.setText("This Json file exists already. Do you want to overwrite or cancel?")
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()

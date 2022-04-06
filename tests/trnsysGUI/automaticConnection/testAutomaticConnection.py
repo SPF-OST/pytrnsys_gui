@@ -1,7 +1,5 @@
-import dataclasses as _dc
 import logging as _log
 import pathlib as _pl
-import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
@@ -10,29 +8,6 @@ import pytrnsys.utils.result as _res
 import trnsysGUI.diagram.Editor as _de
 
 _DATA_DIR_ = _pl.Path(__file__).parent / "data"
-
-
-@_dc.dataclass
-class _Project:
-    projectName: str
-    shallCopyFolderFromExamples: bool
-
-    @staticmethod
-    def createForProject(projectName: str) -> "_Project":
-        return _Project(projectName, False)
-
-    @property
-    def testId(self) -> str:
-        return f"{self.projectName}"
-
-
-def getProjects(path: _pl.Path) -> _tp.Iterable[_Project]:
-    for projectDirPath in path.iterdir():
-        projectName = projectDirPath.name
-        yield _Project.createForProject(projectName)
-
-
-TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects(_DATA_DIR_)]
 
 
 class TestAutomaticConnection:
