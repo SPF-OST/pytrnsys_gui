@@ -20,12 +20,12 @@ class buildDck:
         self.pathConfig = pathConfig
         self.path = pathConfig
 
-        self._ddckPlaceHolderValueJsonPath = None
+        self.DdckPlaceHolderValueJsonPath = None
 
-        self._defaultInputs()
+        self.defaultInputs()
         self.cmds = []
 
-    def _defaultInputs(self):
+    def defaultInputs(self):
 
         self.inputs = {}
         self.inputs["ignoreOnlinePlotter"] = False
@@ -59,14 +59,14 @@ class buildDck:
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
 
         """
-        self._readConfig(self.pathConfig, "run.config")
-        self._getConfig()
+        self.readConfig(self.pathConfig, "run.config")
+        self.getConfig()
 
         self.nameBase = self.inputs["nameRef"]
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self._ddckPlaceHolderValueJsonPath)
+        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self.DdckPlaceHolderValueJsonPath)
         result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
@@ -94,7 +94,7 @@ class buildDck:
 
         return deck.nameDeck
 
-    def _addParametricVariations(self, variations):
+    def addParametricVariations(self, variations):
         """
         it fills a variableOutput with a list of all variations to run
         format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
@@ -134,7 +134,7 @@ class buildDck:
 
             self.variablesOutput = variations
 
-    def _readConfig(self, path, name, parseFileCreated=False):
+    def readConfig(self, path, name, parseFileCreated=False):
 
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
@@ -149,7 +149,7 @@ class buildDck:
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
         if "pathToConnectionInfo" in self.inputs:
-            self._ddckPlaceHolderValueJsonPath = self.inputs["pathToConnectionInfo"]
+            self.DdckPlaceHolderValueJsonPath = self.inputs["pathToConnectionInfo"]
         if self.inputs["addResultsFolder"] == False:
             pass
         else:
@@ -158,7 +158,7 @@ class buildDck:
             if not os.path.isdir(self.path):
                 os.mkdir(self.path)
 
-    def _getConfig(self):
+    def getConfig(self):
         """
         Reads the config file.
 
@@ -253,7 +253,7 @@ class buildDck:
                 pass
 
         if len(self.variation) > 0:
-            self._addParametricVariations(self.variation)
+            self.addParametricVariations(self.variation)
             self.variationsUsed = True
         else:
             self.variationsUsed = False

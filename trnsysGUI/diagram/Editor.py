@@ -58,7 +58,7 @@ from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoubleP
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
-import trnsysGUI.diagram.Encoder as _enc
+from trnsysGUI.diagram.Encoder import Encoder, ddckPlaceHolderValueToJsonEncoder
 from trnsysGUI.diagram.scene import Scene
 from trnsysGUI.diagram.view import View
 from trnsysGUI.diagramDlg import diagramDlg
@@ -495,7 +495,7 @@ class Editor(QWidget):
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
         if exportTo == "mfs":
-            mfsFileName = self.diagramName.rsplit(".", 1)[0] + "_mfs.dck"
+            mfsFileName = self.diagramName.rsplit('.', 1)[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
         elif exportTo == "ddck":
             exportPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
@@ -737,7 +737,7 @@ class Editor(QWidget):
         self.logger.info("filename is at encoder " + str(filename))
 
         with open(filename, "w") as jsonfile:
-            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=_enc.Encoder)
+            json.dump(self, jsonfile, indent=4, sort_keys=True, cls=Encoder)
 
     def _decodeDiagram(self, filename, loadValue="load"):
         self.logger.info("Decoding " + filename)
@@ -854,16 +854,19 @@ class Editor(QWidget):
 
         if os.path.isfile(jsonFilePath):
             qmb = QMessageBox(self)
-            qmb.setText("This Json file exists already. Do you want to overwrite or cancel?")
+            qmb.setText("Warning: This Json file exists already. Do you want to overwrite or cancel?")
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
 
             if ret != QMessageBox.Save:
+                self.logger.info("Canceling")
                 return
 
-        self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
-
+            self.logger.info("Overwriting")
+            self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
+        else:
+            self._encodeDdckPlaceHolderValueToJson(jsonFilePath)
         msgb = QMessageBox(self)
         msgb.setText("Saved Json file at " + jsonFilePath)
         msgb.exec()
@@ -881,7 +884,7 @@ class Editor(QWidget):
 
         """
 
-        ddckPlaceHolderValueDictionary = _enc.ddckPlaceHolderValueToJsonEncoder(self.ddckFilePaths, self.trnsysObj)
+        ddckPlaceHolderValueDictionary = ddckPlaceHolderValueToJsonEncoder(self.ddckFilePaths, self.trnsysObj)
 
         with open(filePath, "w") as jsonfile:
             json.dump(ddckPlaceHolderValueDictionary, jsonfile, indent=4, sort_keys=True)

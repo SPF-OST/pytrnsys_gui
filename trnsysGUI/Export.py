@@ -377,7 +377,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName.rsplit(".", 1)[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self.editor.diagramName.rsplit('.', 1)[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -444,7 +444,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName.rsplit(".", 1)[0] + "_T.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self.editor.diagramName.rsplit('.', 1)[0] + "_T.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
