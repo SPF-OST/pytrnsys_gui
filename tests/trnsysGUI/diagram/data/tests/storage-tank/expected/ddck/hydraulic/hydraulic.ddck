@@ -18,22 +18,28 @@ TCol=1
 THP=1
 
 UNIT 450 TYPE 935
-PARAMETERS 33
-8
-6 5 0 0        !1 : InHx
-7 8 0 0        !2 : TesDpL50-10
-8 7 0 0        !3 : Col
-6 5 0 0        !4 : HP
-1 4 0 0        !5 : Tes-Hp
-4 1 0 0        !6 : Hp-Tes
-3 2 0 0        !7 : Col-Tes
-2 3 0 0        !8 : Tes-Col
-INPUTS 8! for Type 935
-0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+PARAMETERS 49
+12
+6 8 0 0        !1 : InHx
+12 5 0 0       !2 : TesDpL50-10
+5 11 0 0       !3 : Col
+9 6 0 0        !4 : HP
+2 3 0 0        !5 : Tes-Col
+1 4 0 0        !6 : PiTes_HP
+8 9 0 1        !7 : Pump109
+1 7 0 0        !8 : PiTes_Pump109
+7 4 0 0        !9 : PiPump109_HP
+11 12 0 1      !10 : Pump114
+3 10 0 0       !11 : PiCol_Pump114
+10 2 0 0       !12 : PiPump114_Tes
+INPUTS 12! for Type 935
+0,0 0,0 0,0 0,0 0,0 0,0 MfrPump109 0,0 0,0 MfrPump114 
+0,0 0,0 
 *** Initial Inputs
-0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 
 
-EQUATIONS 16	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+EQUATIONS 24	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrInHx_A=[450,1]
 MfrInHx_B=[450,2]
 MfrTesDpL50-10_A=[450,4]
@@ -42,14 +48,22 @@ MfrCol_A=[450,7]
 MfrCol_B=[450,8]
 MfrHP_A=[450,10]
 MfrHP_B=[450,11]
-MfrTes-Hp_A=[450,13]
-MfrTes-Hp_B=[450,14]
-MfrHp-Tes_A=[450,16]
-MfrHp-Tes_B=[450,17]
-MfrCol-Tes_A=[450,19]
-MfrCol-Tes_B=[450,20]
-MfrTes-Col_A=[450,22]
-MfrTes-Col_B=[450,23]
+MfrTes-Col_A=[450,13]
+MfrTes-Col_B=[450,14]
+MfrPiTes_HP_A=[450,16]
+MfrPiTes_HP_B=[450,17]
+MfrPump109_A=[450,19]
+MfrPump109_B=[450,20]
+MfrPiTes_Pump109_A=[450,22]
+MfrPiTes_Pump109_B=[450,23]
+MfrPiPump109_HP_A=[450,25]
+MfrPiPump109_HP_B=[450,26]
+MfrPump114_A=[450,28]
+MfrPump114_B=[450,29]
+MfrPiCol_Pump114_A=[450,31]
+MfrPiCol_Pump114_B=[450,32]
+MfrPiPump114_Tes_A=[450,34]
+MfrPiPump114_Tes_B=[450,35]
 
 
 ** Fluids:
@@ -71,72 +85,6 @@ Lloop2Rho = FwaterRho
 Lloop2Cp = FwaterCp
 
 UNIT 451 TYPE 931
-!Tes-Hp
-PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop2Rho
-Lloop2Cp
-20
-INPUTS 4
-TInHx
-MfrTes-Hp_A
-TRoomStore
-THP
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-TTes-Hp= [451,1]
-PTes-Hp_kW= [451,3]/3600 !kW
-MfrTes-Hp= MfrTes-Hp_A
-
-UNIT 452 TYPE 931
-!Hp-Tes
-PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop2Rho
-Lloop2Cp
-20
-INPUTS 4
-THP
-MfrHp-Tes_A
-TRoomStore
-TInHx
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-THp-Tes= [452,1]
-PHp-Tes_kW= [452,3]/3600 !kW
-MfrHp-Tes= MfrHp-Tes_A
-
-UNIT 453 TYPE 931
-!Col-Tes
-PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop1Rho
-Lloop1Cp
-20
-INPUTS 4
-TCol
-MfrCol-Tes_A
-TRoomStore
-TTesPortLeft50
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-TCol-Tes= [453,1]
-PCol-Tes_kW= [453,3]/3600 !kW
-MfrCol-Tes= MfrCol-Tes_A
-
-UNIT 454 TYPE 931
 !Tes-Col
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -154,22 +102,132 @@ TCol
 20 0.0 20 20
 
 EQUATIONS 3
-TTes-Col= [454,1]
-PTes-Col_kW= [454,3]/3600 !kW
+TTes-Col= [451,1]
+PTes-Col_kW= [451,3]/3600 !kW
 MfrTes-Col= MfrTes-Col_A
+
+UNIT 452 TYPE 931
+!PiTes_HP
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TInHx
+MfrPiTes_HP_A
+TRoomStore
+THP
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTes_HP= [452,1]
+PPiTes_HP_kW= [452,3]/3600 !kW
+MfrPiTes_HP= MfrPiTes_HP_A
+
+UNIT 453 TYPE 931
+!PiTes_Pump109
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TInHx
+MfrPiTes_Pump109_A
+TRoomStore
+TPump109
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTes_Pump109= [453,1]
+PPiTes_Pump109_kW= [453,3]/3600 !kW
+MfrPiTes_Pump109= MfrPiTes_Pump109_A
+
+UNIT 454 TYPE 931
+!PiPump109_HP
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TPump109
+MfrPiPump109_HP_A
+TRoomStore
+THP
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPump109_HP= [454,1]
+PPiPump109_HP_kW= [454,3]/3600 !kW
+MfrPiPump109_HP= MfrPiPump109_HP_A
+
+UNIT 455 TYPE 931
+!PiCol_Pump114
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TCol
+MfrPiCol_Pump114_A
+TRoomStore
+TPump114
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiCol_Pump114= [455,1]
+PPiCol_Pump114_kW= [455,3]/3600 !kW
+MfrPiCol_Pump114= MfrPiCol_Pump114_A
+
+UNIT 456 TYPE 931
+!PiPump114_Tes
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TPump114
+MfrPiPump114_Tes_A
+TRoomStore
+TTesPortLeft50
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPump114_Tes= [456,1]
+PPiPump114_Tes_kW= [456,3]/3600 !kW
+MfrPiPump114_Tes= MfrPiPump114_Tes_A
 
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PTes-Hp_kW+PHp-Tes_kW+PCol-Tes_kW+PTes-Col_kW
+PipeLossTot=PTes-Col_kW+PPiTes_HP_kW+PPiTes_Pump109_kW+PPiPump109_HP_kW+PPiCol_Pump114_kW+PPiPump114_Tes_kW
 
-ASSIGN storage-tank_Mfr.prt 455
+ASSIGN storage-tank_Mfr.prt 457
 
-UNIT 455 TYPE 25! User defined Printer
+UNIT 457 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-455! 4 Logical unit
+457! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -177,19 +235,19 @@ STOP! 3 Stop time
 0! 9 Delimiter
 1! 10 Print labels
 
-INPUTS 4
-MfrTes-Hp MfrHp-Tes MfrCol-Tes MfrTes-Col 
+INPUTS 6
+MfrTes-Col MfrPiTes_HP MfrPiTes_Pump109 MfrPiPump109_HP MfrPiCol_Pump114 MfrPiPump114_Tes 
 ***
-MfrTes-Hp MfrHp-Tes MfrCol-Tes MfrTes-Col 
+MfrTes-Col MfrPiTes_HP MfrPiTes_Pump109 MfrPiPump109_HP MfrPiCol_Pump114 MfrPiPump114_Tes 
 
-ASSIGN storage-tank_T.prt 456
+ASSIGN storage-tank_T.prt 458
 
-UNIT 456 TYPE 25! User defined Printer
+UNIT 458 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-456! 4 Logical unit
+458! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -197,8 +255,8 @@ STOP! 3 Stop time
 0! 9 Delimiter
 1! 10 Print labels
 
-INPUTS 4
-TTes-Hp THp-Tes TCol-Tes TTes-Col 
+INPUTS 6
+TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes 
 ***
-TTes-Hp THp-Tes TCol-Tes TTes-Col 
+TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes 
 

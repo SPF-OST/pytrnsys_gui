@@ -1,17 +1,5 @@
 {
     "Blocks": {
-        "..__GroupDct-defaultGroup": {
-            ".__GroupDict__": true,
-            "GroupName": "defaultGroup",
-            "Position": [
-                0,
-                0
-            ],
-            "Size": [
-                100,
-                100
-            ]
-        },
         ".__BlockDct__": true,
         "Block-1": {
             ".__BlockDict__": true,
@@ -22,36 +10,38 @@
                 {
                     "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
                     "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
                         "inputPort": {
                             "id": 8,
                             "relativeHeight": 0.5
                         },
-                        "name": "Conn2",
                         "outputPort": {
                             "id": 9,
                             "relativeHeight": 0.1
                         },
-                        "side": "left"
+                        "side": "left",
+                        "trnsysId": 58
                     }
                 }
             ],
-            "groupName": "defaultGroup",
             "heatExchangers": [
                 {
-                    "__version__": "68c5cebb-0c47-4dec-8c85-8872b7f6c238",
+                    "__version__": "be068f84-2627-4f53-87a9-9a1f4fd1c529",
                     "id": 80,
+                    "name": "InHx",
                     "parentId": 1,
                     "portPair": {
+                        "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
                         "inputPort": {
                             "id": 81,
                             "relativeHeight": 0.9
                         },
-                        "name": "InHx",
                         "outputPort": {
                             "id": 82,
                             "relativeHeight": 0.8
                         },
-                        "side": "right"
+                        "side": "right",
+                        "trnsysId": 57
                     },
                     "width": 40
                 }
@@ -66,54 +56,110 @@
             ],
             "trnsysId": 1
         },
+        "Block-109": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Pump109",
+            "BlockName": "Pump",
+            "Id": 109,
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
+            "blockPosition": [
+                -42.0,
+                -258.0
+            ],
+            "flippedH": false,
+            "flippedV": false,
+            "massFlowRateInKgPerH": 500,
+            "portsIdsIn": [
+                110
+            ],
+            "portsIdsOut": [
+                111
+            ],
+            "rotationN": 0,
+            "trnsysId": 61
+        },
+        "Block-114": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Pump114",
+            "BlockName": "Pump",
+            "Id": 114,
+            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
+            "blockPosition": [
+                -488.0,
+                -393.0
+            ],
+            "flippedH": false,
+            "flippedV": false,
+            "massFlowRateInKgPerH": 500,
+            "portsIdsIn": [
+                115
+            ],
+            "portsIdsOut": [
+                116
+            ],
+            "rotationN": 0,
+            "trnsysId": 64
+        },
         "Block-24": {
             ".__BlockDict__": true,
             "BlockDisplayName": "Col",
             "BlockName": "Collector",
-            "BlockPosition": [
+            "Id": 24,
+            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "blockPosition": [
                 -833.0,
                 -402.0
             ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 24,
-            "PortsIDIn": [
+            "flippedH": false,
+            "flippedV": false,
+            "portsIdsIn": [
                 25
             ],
-            "PortsIDOut": [
+            "portsIdsOut": [
                 26
             ],
-            "RotationN": 0,
-            "trnsysID": 9
+            "rotationN": 0,
+            "trnsysId": 9
         },
         "Block-86": {
             ".__BlockDict__": true,
             "BlockDisplayName": "HP",
             "BlockName": "AirSourceHP",
-            "BlockPosition": [
+            "Id": 86,
+            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
+            "blockPosition": [
                 -74.0,
                 -427.0
             ],
-            "FlippedH": false,
-            "FlippedV": false,
-            "GroupName": "defaultGroup",
-            "ID": 86,
-            "PortsIDIn": [
+            "flippedH": false,
+            "flippedV": false,
+            "portsIdsIn": [
                 87
             ],
-            "PortsIDOut": [
+            "portsIdsOut": [
                 88
             ],
-            "RotationN": 0,
-            "trnsysID": 46
+            "rotationN": 0,
+            "trnsysId": 46
         },
         "Connection-100": {
             ".__ConnectionDict__": true,
-            "ConnCID": 46,
-            "ConnDisplayName": "Tes-Col",
-            "ConnID": 100,
-            "CornerPositions": [
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 46,
+            "diameterInCm": 2.0,
+            "fromPortId": 9,
+            "id": 100,
+            "labelPos": [
+                -514.0,
+                -295.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -267.0,
+                -314.0
+            ],
+            "name": "Tes-Col",
+            "segmentsCorners": [
                 [
                     -490.0,
                     -314.0
@@ -123,233 +169,207 @@
                     -302.0
                 ]
             ],
-            "FirstSegmentLabelPos": [
-                -247.0,
-                19.0
-            ],
-            "FirstSegmentMassFlowLabelPos": [
+            "toPortId": 25,
+            "trnsysId": 52,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-108": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 52,
+            "diameterInCm": 2.0,
+            "fromPortId": 81,
+            "id": 108,
+            "labelPos": [
                 0.0,
                 0.0
             ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 9,
-            "PortToID": 25,
-            "SegmentPositions": [
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                0.0,
+                0.0
+            ],
+            "name": "PiTes_HP",
+            "segmentsCorners": [
                 [
-                    -267.0,
-                    -314.0,
-                    -490.0,
-                    -314.0
+                    -112.0,
+                    -410.0
                 ],
                 [
-                    -490.0,
-                    -314.0,
-                    -490.0,
-                    -302.0
+                    -112.0,
+                    -487.0
                 ],
                 [
-                    -490.0,
-                    -302.0,
-                    -713.0,
-                    -302.0
+                    73.0,
+                    -487.0
+                ],
+                [
+                    73.0,
+                    -407.0
                 ]
             ],
-            "trnsysID": 52
+            "toPortId": 88,
+            "trnsysId": 60,
+            "uValueInWPerM2K": 0.8333
         },
-        "Connection-89": {
+        "Connection-112": {
             ".__ConnectionDict__": true,
-            "ConnCID": 41,
-            "ConnDisplayName": "Tes-Hp",
-            "ConnID": 89,
-            "CornerPositions": [
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 53,
+            "diameterInCm": 2.0,
+            "fromPortId": 82,
+            "id": 112,
+            "labelPos": [
+                -139.0,
+                -400.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -139.0,
+                -400.0
+            ],
+            "name": "PiTes_Pump109",
+            "segmentsCorners": [
                 [
-                    -109.0,
+                    -93.5,
                     -400.0
                 ],
                 [
-                    -109.0,
-                    -226.4
-                ],
-                [
-                    76.0,
-                    -226.4
-                ],
-                [
-                    76.0,
-                    -327.0
+                    -93.5,
+                    -238.0
                 ]
             ],
-            "FirstSegmentLabelPos": [
-                0.0,
-                0.0
-            ],
-            "FirstSegmentMassFlowLabelPos": [
-                0.0,
-                0.0
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 82,
-            "PortToID": 88,
-            "SegmentPositions": [
-                [
-                    -139.0,
-                    -400.0,
-                    -109.0,
-                    -400.0
-                ],
-                [
-                    -109.0,
-                    -400.0,
-                    -109.0,
-                    -226.4
-                ],
-                [
-                    -109.0,
-                    -226.4,
-                    76.0,
-                    -226.4
-                ],
-                [
-                    76.0,
-                    -226.4,
-                    76.0,
-                    -327.0
-                ],
-                [
-                    76.0,
-                    -327.0,
-                    46.0,
-                    -327.0
-                ]
-            ],
-            "trnsysID": 47
+            "toPortId": 110,
+            "trnsysId": 62,
+            "uValueInWPerM2K": 0.8333
         },
-        "Connection-92": {
+        "Connection-113": {
             ".__ConnectionDict__": true,
-            "ConnCID": 42,
-            "ConnDisplayName": "Hp-Tes",
-            "ConnID": 92,
-            "CornerPositions": [
-                [
-                    76.0,
-                    -407.0
-                ],
-                [
-                    76.0,
-                    -479.0
-                ],
-                [
-                    -109.0,
-                    -479.0
-                ],
-                [
-                    -109.0,
-                    -410.0
-                ]
-            ],
-            "FirstSegmentLabelPos": [
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 54,
+            "diameterInCm": 2.0,
+            "fromPortId": 111,
+            "id": 113,
+            "labelPos": [
                 0.0,
                 0.0
             ],
-            "FirstSegmentMassFlowLabelPos": [
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
                 0.0,
                 0.0
             ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 87,
-            "PortToID": 81,
-            "SegmentPositions": [
+            "name": "PiPump109_HP",
+            "segmentsCorners": [
                 [
-                    46.0,
-                    -407.0,
-                    76.0,
-                    -407.0
+                    73.0,
+                    -238.0
                 ],
                 [
-                    76.0,
-                    -407.0,
-                    76.0,
-                    -479.0
-                ],
-                [
-                    76.0,
-                    -479.0,
-                    -109.0,
-                    -479.0
-                ],
-                [
-                    -109.0,
-                    -479.0,
-                    -109.0,
-                    -410.0
-                ],
-                [
-                    -109.0,
-                    -410.0,
-                    -139.0,
-                    -410.0
+                    73.0,
+                    -327.0
                 ]
             ],
-            "trnsysID": 48
+            "toPortId": 87,
+            "trnsysId": 63,
+            "uValueInWPerM2K": 0.8333
         },
-        "Connection-97": {
+        "Connection-117": {
             ".__ConnectionDict__": true,
-            "ConnCID": 45,
-            "ConnDisplayName": "Col-Tes",
-            "ConnID": 97,
-            "CornerPositions": [
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 55,
+            "diameterInCm": 2.0,
+            "fromPortId": 26,
+            "id": 117,
+            "labelPos": [
+                -713.0,
+                -382.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -713.0,
+                -382.0
+            ],
+            "name": "PiCol_Pump114",
+            "segmentsCorners": [
                 [
-                    -490.0,
+                    -603.5,
                     -382.0
                 ],
                 [
-                    -490.0,
+                    -603.5,
+                    -373.0
+                ]
+            ],
+            "toPortId": 115,
+            "trnsysId": 65,
+            "uValueInWPerM2K": 0.8333
+        },
+        "Connection-118": {
+            ".__ConnectionDict__": true,
+            "__version__": "332cd663-684d-414a-b1ec-33fd036f0f17",
+            "connectionId": 56,
+            "diameterInCm": 2.0,
+            "fromPortId": 116,
+            "id": 118,
+            "labelPos": [
+                -448.0,
+                -373.0
+            ],
+            "lengthInM": 2.0,
+            "massFlowLabelPos": [
+                -448.0,
+                -373.0
+            ],
+            "name": "PiPump114_Tes",
+            "segmentsCorners": [
+                [
+                    -360.5,
+                    -373.0
+                ],
+                [
+                    -360.5,
                     -362.0
                 ]
             ],
-            "FirstSegmentLabelPos": [
-                153.0,
-                -37.0
-            ],
-            "FirstSegmentMassFlowLabelPos": [
-                0.0,
-                0.0
-            ],
-            "GroupName": "defaultGroup",
-            "PortFromID": 26,
-            "PortToID": 8,
-            "SegmentPositions": [
-                [
-                    -713.0,
-                    -382.0,
-                    -490.0,
-                    -382.0
-                ],
-                [
-                    -490.0,
-                    -382.0,
-                    -490.0,
-                    -362.0
-                ],
-                [
-                    -490.0,
-                    -362.0,
-                    -267.0,
-                    -362.0
-                ]
-            ],
-            "trnsysID": 51
+            "toPortId": 8,
+            "trnsysId": 66,
+            "uValueInWPerM2K": 0.8333
         },
         "IDs": {
-            "GlobalId": 107,
+            "GlobalId": 120,
             "__idDct__": true,
-            "globalConnID": 51,
-            "trnsysID": 57
+            "globalConnID": 58,
+            "trnsysID": 68
         },
         "Strings": {
             "DiagramName": "storage-tank.json",
-            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\pytrnsys_gui\\data\\examples\\storage-tank",
+            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\pytrnsys_gui\\tests\\trnsysGUI\\diagram\\data\\tests\\storage-tank\\storage-tank",
             "__nameDct__": true
         }
-    }
+    },
+    "hydraulicLoops": [
+        {
+            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "connectionsTrnsysId": [
+                52,
+                65,
+                66
+            ],
+            "fluidName": "water",
+            "hasUserDefinedName": false,
+            "name": "loop1"
+        },
+        {
+            "__version__": "0047cab1-dd67-42ee-af45-5e5d30d97a92",
+            "connectionsTrnsysId": [
+                60,
+                62,
+                63
+            ],
+            "fluidName": "water",
+            "hasUserDefinedName": false,
+            "name": "loop2"
+        }
+    ]
 }
