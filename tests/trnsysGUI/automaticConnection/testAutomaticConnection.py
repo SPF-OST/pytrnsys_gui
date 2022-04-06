@@ -11,10 +11,9 @@ _DATA_DIR_ = _pl.Path(__file__).parent / "data"
 
 
 class TestAutomaticConnection:
-    @_pt.mark.parametrize("project", TEST_CASES)
-    def testConnectionJson(self, project: _Project, request: _pt.FixtureRequest):
-        actualDirPath = _DATA_DIR_ / project.projectName / "TRIHP_dualSource"
-        expectedDirPath = _DATA_DIR_ / project.projectName / "expected"
+    def testConnectionJson(self, request: _pt.FixtureRequest):
+        actualDirPath = _DATA_DIR_ / "TRIHP_dualSource"
+        expectedDirPath = _DATA_DIR_ / "expected"
         actualJsonFilePath = actualDirPath / "DdckPlaceHolderValues.json"
         expectedJsonFilePath = expectedDirPath / "DdckPlaceHolderValues.json"
 
