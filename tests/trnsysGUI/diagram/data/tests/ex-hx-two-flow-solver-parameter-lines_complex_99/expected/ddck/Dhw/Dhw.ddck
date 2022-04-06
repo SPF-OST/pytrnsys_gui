@@ -25,8 +25,8 @@ elSysIn_Q_TesDhwAux = qHeatSource_Tes2
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
-Tdp1In_Tes2 = TPiHxDhwSecFl
-Mfrdp1_Tes2 = MfrPiHxDhwSecFl
+Tdp1In_Tes2 = TPiHxDHW_Dhw
+Mfrdp1_Tes2 = MfrPiHxDHW_Dhw
 Tdp1InRev_Tes2 = TPiTesDhwtoPuHx
 EQUATIONS 3
 Tdp2In_Tes2 = TPiDhwMains
