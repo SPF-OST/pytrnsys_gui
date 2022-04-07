@@ -1285,8 +1285,8 @@ class Editor(QWidget):
         return False
 
     def nameExistsInDdckFolder(self, name):
-        projectFolderDdckPath = _pl.Path(self.projectFolder + "\\ddck")
-        projectDdckFiles = list(projectFolderDdckPath.iterdir())
+        projectFolderDdckPath = _pl.Path(self.projectFolder) / "ddck"
+        projectDdckFiles = projectFolderDdckPath.iterdir()
         for file in projectDdckFiles:
             if file.name.lower() == name.lower():
                 return True

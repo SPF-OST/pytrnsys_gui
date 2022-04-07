@@ -60,7 +60,6 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint:
         return dictName, dct
 
     def decode(self, i, resBlockList):
-        self.logger.debug(f"Loading a {self.name} block")
 
         self.flippedH = i["FlippedH"]
         self.flippedV = i["FlippedV"]
@@ -70,11 +69,9 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint:
 
         for x, inputPort in enumerate(self.inputs):
             inputPort.id = i["PortsIDIn"][x]
-            self.logger.debug(f"Input at {self.name}")
 
         for x, outputPort in enumerate(self.outputs):
             outputPort.id = i["PortsIDOut"][x]
-            self.logger.debug(f"Output at {self.name}")
 
         self.setPos(float(i[self.name + "Position"][0]), float(i[self.name + "Position"][1]))
         self.trnsysId = i["trnsysID"]
@@ -83,17 +80,14 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint:
         resBlockList.append(self)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.logger.debug(f"Loading a {self.name} block in Decoder")
 
         self.changeSize()
 
         for x, inputPort in enumerate(self.inputs):
             inputPort.id = i["PortsIDIn"][x]
-            self.logger.debug(f"Input at {self.name}")
 
         for x, outputPort in enumerate(self.outputs):
             outputPort.id = i["PortsIDOut"][x]
-            self.logger.debug(f"Output at {self.name}")
 
         self.setPos(float(i[self.name + "Position"][0]) + offset_x, float(i[self.name + "Position"][1] + offset_y))
 

@@ -201,7 +201,7 @@ class _MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValuesJsonFileActionMenu = QAction("Export Placeholder JSON", self)
+        exportDdckPlaceHolderValuesJsonFileActionMenu = QAction("Export ddck placeholder values JSON file", self)
         exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
 
         self.projectMenu = QMenu("Project")
@@ -525,14 +525,17 @@ class _MainWindow(QMainWindow):
     def exportDck(self):
         jsonResult = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
         if _res.isError(jsonResult):
-            errorMessage = f"The json file could not be generated: {jsonResult.message}"
+            errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
             showErrorMessageBox(errorMessage)
-        else:
-            builder = buildDck.buildDck(self.projectFolder)
-            result = builder.buildTrnsysDeck()
-            if _res.isError(result):
-                errorMessage = f"The deck file could not be generated: {result.message}"
-                showErrorMessageBox(errorMessage)
+
+			return
+
+        builder = buildDck.buildDck(self.projectFolder)
+
+        result = builder.buildTrnsysDeck()
+        if _res.isError(result):
+            errorMessage = f"The deck file could not be generated: {result.message}"
+            showErrorMessageBox(errorMessage)
 
     def toggleEditorMode(self):
         self.logger.info("Toggling editor mode")

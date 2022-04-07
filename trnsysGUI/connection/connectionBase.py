@@ -267,7 +267,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         rad = self.getRadius()
 
-        for x, segmentsCorner in enumerate(segmentsCorners):  # pylint: disable = invalid-name, unused-variable
+        for segmentsCorner in segmentsCorners:
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
 
             cor.setPos(float(segmentsCorner[0]), float(segmentsCorner[1]))
