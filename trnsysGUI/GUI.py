@@ -527,8 +527,7 @@ class _MainWindow(QMainWindow):
         if _res.isError(jsonResult):
             errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
             showErrorMessageBox(errorMessage)
-
-			return
+            return
 
         builder = buildDck.buildDck(self.projectFolder)
 
