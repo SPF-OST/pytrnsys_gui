@@ -26,7 +26,7 @@ class TestAutomaticConnection:
         request.addfinalizer(quitApplication)
 
         editor = self._createEditor(actualDirPath)
-        result = editor.exportDdckPlaceHolderValuesJsonFile()
+        result = editor.encodeDdckPlaceHolderValuesToJson(actualJsonFilePath)
         assert not _res.isError(result)
 
         actualJsonText = actualJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding

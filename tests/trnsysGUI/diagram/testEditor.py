@@ -1,7 +1,7 @@
 import dataclasses as _dc
 import logging as _log
 import pathlib as _pl
-import shutil as _sh
+import shutil as _su
 import subprocess as _sp
 import typing as _tp
 
@@ -167,6 +167,18 @@ class _Helper:
         if self._project.shallCopyFolderFromExamples:
             self._copyExampleToTestInputFolder()
 
+        self._removeGeneratedFiles()
+
+    def _removeGeneratedFiles(self):
+        for child in self.actualProjectFolderPath.iterdir():
+            if child.name in ("ddck", f"{self._project.projectName}.json"):
+                continue
+
+            if child.is_dir():
+                _su.rmtree(child)
+            else:
+                child.unlink()
+
     def ensureFilesAreEqual(self, fileRelativePathAsString: str) -> None:
         actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
         actualContent = actualFilePath.read_text()
@@ -194,19 +206,9 @@ class _Helper:
 
     def _copyExampleToTestInputFolder(self):
         if self.actualProjectFolderPath.exists():
-            _sh.rmtree(self.actualProjectFolderPath)
+            _su.rmtree(self.actualProjectFolderPath)
 
         pytrnsysGuiDir = _pl.Path(__file__).parents[3]
         exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / self._project.projectName
 
-        _sh.copytree(exampleFolderPath, self.actualProjectFolderPath)
-
-    @staticmethod
-    def _processMatch(match: _tp.Match, placeholder: str) -> str:
-        matchedText = match[0]
-        if matchedText == "MfrsupplyWater = 1000":
-            return matchedText
-
-        variableName = match["variableName"]
-
-        return f"{variableName} = {placeholder}"
+        _su.copytree(exampleFolderPath, self.actualProjectFolderPath)

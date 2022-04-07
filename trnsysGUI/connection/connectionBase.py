@@ -60,17 +60,9 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def fromPort(self) -> PortItemBase:
         return self._fromPort
 
-    @fromPort.setter
-    def fromPort(self, fromPort: PortItemBase) -> None:
-        self._fromPort = fromPort
-
     @property
     def toPort(self) -> PortItemBase:
         return self._toPort
-
-    @toPort.setter
-    def toPort(self, toPort: PortItemBase) -> None:
-        self._toPort = toPort
 
     def _createSegmentItem(self, startNode, endNode):
         raise NotImplementedError()

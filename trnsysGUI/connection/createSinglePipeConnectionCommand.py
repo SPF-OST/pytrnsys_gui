@@ -4,11 +4,13 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
+import pytrnsys.utils.result as _res
+
+import trnsysGUI.errors as _err
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.hydraulicLoops.merge as _hlmerge
 import trnsysGUI.hydraulicLoops.split as _hlsplit
 import trnsysGUI.singlePipePortItem as _spi
-import trnsysGUI.common.result as _res
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -44,7 +46,7 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
         if cancellable == "cancelled" or _res.isError(cancellable):
             if _res.isError(cancellable):
                 error = _res.error(cancellable)
-                _res.showErrorMessageBox(error, "Cannot create connection")
+                _err.showErrorMessageBox(error.message, "Cannot create connection")
 
             self._connection.deleteConn()
             self._connection = None

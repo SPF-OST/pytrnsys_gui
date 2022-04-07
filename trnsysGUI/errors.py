@@ -1,9 +1,9 @@
 import PyQt5.QtWidgets as _qtw
 
 
-def showErrorMessageBox(errorMessage: str) -> None:
+def showErrorMessageBox(errorMessage: str, title: str = "Error") -> None:
     messageBox = _qtw.QMessageBox()
-    messageBox.setWindowTitle("Error")
+    messageBox.setWindowTitle(title)
     messageBox.setText(
         errorMessage
     )

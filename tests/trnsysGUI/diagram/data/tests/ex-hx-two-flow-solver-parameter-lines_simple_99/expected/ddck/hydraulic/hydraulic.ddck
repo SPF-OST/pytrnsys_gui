@@ -80,9 +80,11 @@ EQUATIONS 4
 ** loop2
 Lloop2Rho = FwaterRho
 Lloop2Cp = FwaterCp
+
 ** loop1
 Lloop1Rho = FwaterRho
 Lloop1Cp = FwaterCp
+
 
 UNIT 451 TYPE 931
 !Hx-Col

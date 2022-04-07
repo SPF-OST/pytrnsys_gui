@@ -352,9 +352,9 @@ class Editor(QWidget):
     def _createConnection(self, startPort, endPort) -> None:
         if startPort is not endPort:
             if (
-                    isinstance(startPort.parent, StorageTank)
-                    and isinstance(endPort.parent, StorageTank)
-                    and startPort.parent != endPort.parent
+                isinstance(startPort.parent, StorageTank)
+                and isinstance(endPort.parent, StorageTank)
+                and startPort.parent != endPort.parent
             ):
                 msgSTank = QMessageBox(self)
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
@@ -459,11 +459,7 @@ class Editor(QWidget):
     def _getRelevantHitPortItems(self, mousePosition: QPointF, fromPort: PortItemBase) -> _tp.Sequence[PortItemBase]:
         hitItems = self.diagramScene.items(mousePosition)
         relevantPortItems = [
-            i
-            for i in hitItems
-            if isinstance(i, PortItemBase)
-               and type(i) == type(fromPort)
-               and not i.connectionList
+            i for i in hitItems if isinstance(i, PortItemBase) and type(i) == type(fromPort) and not i.connectionList
         ]
         return relevantPortItems
 
@@ -846,39 +842,39 @@ class Editor(QWidget):
         if not self._isHydraulicConnected():
             return _res.Error(f"You need to connect all port items before you can export the hydraulics.")
 
-        jsonFileName = "DdckPlaceHolderValues.json"
-        jsonFilePath = os.path.join(self.projectFolder, jsonFileName)
+        jsonFilePath = _pl.Path(self.projectFolder) / "DdckPlaceHolderValues.json"
 
-        if os.path.isfile(jsonFilePath):
+        if jsonFilePath.is_dir():
             qmb = QMessageBox(self)
-            qmb.setText("Warning: This Json file exists already. Do you want to overwrite or cancel?")
+            qmb.setText(
+                f"A folder already exits at f{jsonFilePath}. Chose a different location or delete the folder first."
+            )
+            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.exec()
+
+            return None
+
+        if jsonFilePath.is_file():
+            qmb = QMessageBox(self)
+            qmb.setText("The file already exists. Do you want to overwrite it or cancel?")
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
             qmb.setDefaultButton(QMessageBox.Cancel)
             ret = qmb.exec()
 
             if ret != QMessageBox.Save:
-                return
+                return None
 
-        result = self._encodeDdckPlaceHolderValuesToJson(jsonFilePath)
+        result = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
         if _res.isError(result):
             return _res.error(result)
 
         msgb = QMessageBox(self)
-        msgb.setText("Saved Json file at " + jsonFilePath)
+        msgb.setText(f"Saved place holder values JSON file at f{jsonFilePath}.")
         msgb.exec()
 
-    def _encodeDdckPlaceHolderValuesToJson(self, filePath) -> _res.Result[None]:
-        """
-        Encodes the connection names to a json file.
+        return None
 
-        Parameters
-        ----------
-        filePath : str
-
-        Returns
-        -------
-
-        """
+    def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _res.Result[None]:
         ddckFileNames = self._updateDdckFilePaths()
 
         result = _ph.getPlaceholderValues(ddckFileNames, self.trnsysObj)
@@ -887,8 +883,8 @@ class Editor(QWidget):
 
         ddckPlaceHolderValuesDictionary = _res.value(result)
 
-        with open(filePath, "w") as jsonfile:
-            json.dump(ddckPlaceHolderValuesDictionary, jsonfile, indent=4, sort_keys=True)
+        jsonContent = json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
+        filePath.write_text(jsonContent)
 
     # Saving related
     def save(self, showWarning=True):
@@ -944,7 +940,7 @@ class Editor(QWidget):
                 )
             else:
                 self.saveAsPath = _pl.Path(
-                    self.saveAsPath.stem[0: self.saveAsPath.name.index(self.diagramName)] + newName
+                    self.saveAsPath.stem[0 : self.saveAsPath.name.index(self.diagramName)] + newName
                 )
 
         self.diagramName = newName

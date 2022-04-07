@@ -3,8 +3,8 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
+import pytrnsys.utils.result as _res
 import trnsysGUI.common as _com
-import trnsysGUI.common.result as _res
 import trnsysGUI.massFlowSolver.search as _search
 import trnsysGUI.singlePipePortItem as _spi
 from . import _loopWideDefaults as _lwd

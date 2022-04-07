@@ -4,8 +4,9 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
+import pytrnsys.utils.serialization as _ser
+
 import trnsysGUI.connection.values as _values
-from trnsysGUI import serialization as _ser
 
 
 @_dc.dataclass

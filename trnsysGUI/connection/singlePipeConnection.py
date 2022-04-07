@@ -19,8 +19,12 @@ if _tp.TYPE_CHECKING:
 
 
 class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
-    def __init__(self, fromPort: _sppi.SinglePipePortItem, toPort: _sppi.SinglePipePortItem,
-                 parent: _ed.Editor):  # type: ignore[name-defined]
+    def __init__(
+        self,
+            fromPort: _sppi.SinglePipePortItem,
+            toPort: _sppi.SinglePipePortItem,
+            parent: _ed.Editor  # type: ignore[name-defined]
+    ):
         super().__init__(fromPort, toPort, parent)
 
         self._editor = parent
@@ -28,6 +32,16 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
         self.uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+
+    @property
+    def fromPort(self) -> _sppi.SinglePipePortItem:
+        assert isinstance(self._fromPort, _sppi.SinglePipePortItem)
+        return self._fromPort
+
+    @property
+    def toPort(self) -> _sppi.SinglePipePortItem:
+        assert isinstance(self._toPort, _sppi.SinglePipePortItem)
+        return self._toPort
 
     def _createSegmentItem(self, startNode, endNode):
         return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
@@ -136,13 +150,15 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitText += "PARAMETERS " + str(parameterNumber) + "\n"
 
         lengthInM = _getConvertedValueOrName(self.lengthInM)
-        diameterInM = _getConvertedValueOrName(self.diameterInCm, 1/100)
-        uValueInkJPerHourM2K = _getConvertedValueOrName(self.uValueInWPerM2K, 60*60/1000)
+        diameterInM = _getConvertedValueOrName(self.diameterInCm, 1 / 100)
+        uValueInkJPerHourM2K = _getConvertedValueOrName(self.uValueInWPerM2K, 60 * 60 / 1000)
 
         unitText += f"{diameterInM} ! diameter [m]\n"
         unitText += f"{lengthInM} ! length [m]\n"
 
-        uValueInSIUnitsComment = f" (= {self.uValueInWPerM2K} W/(m^2*K))" if isinstance(self.uValueInWPerM2K, float) else ""
+        uValueInSIUnitsComment = (
+            f" (= {self.uValueInWPerM2K} W/(m^2*K))" if isinstance(self.uValueInWPerM2K, float) else ""
+        )
         unitText += f"{uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)]{uValueInSIUnitsComment}\n"
 
         unitText += densityVar + "\n"
@@ -182,11 +198,11 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         else:
             lines += (
-                    "Error: NO VALUE\n" * 3
-                    + "at connection with parents "
-                    + str(self.fromPort.parent)
-                    + str(self.toPort.parent)
-                    + "\n"
+                "Error: NO VALUE\n" * 3
+                + "at connection with parents "
+                + str(self.fromPort.parent)
+                + str(self.toPort.parent)
+                + "\n"
             )
 
         unitText += "***Initial values\n"
@@ -195,14 +211,14 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitText += "EQUATIONS " + str(equationNr) + "\n"
         unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
         unitText += (
-                powerPrefix
-                + self.displayName
-                + "_kW"
-                + "= ["
-                + str(unitNumber)
-                + ","
-                + str(equationConstant2)
-                + "]/3600 !kW\n"
+            powerPrefix
+            + self.displayName
+            + "_kW"
+            + "= ["
+            + str(unitNumber)
+            + ","
+            + str(equationConstant2)
+            + "]/3600 !kW\n"
         )
         unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A\n\n"
 

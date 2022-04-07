@@ -5,10 +5,10 @@ import typing as _tp
 from PyQt5 import QtWidgets as _qtw
 
 import pytrnsys.utils.result as _res
-import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.hydraulicLoops.merge as _hlmerge
+import trnsysGUI.connection.singlePipeConnection as _spc  # pylint: disable=cyclic-import
+import trnsysGUI.hydraulicLoops.merge as _hlmerge  # pylint: disable=cyclic-import
 import trnsysGUI.hydraulicLoops.model as _hlmodel
-import trnsysGUI.hydraulicLoops.split as _hlsplit
+import trnsysGUI.hydraulicLoops.split as _hlsplit  # pylint: disable=cyclic-import
 
 
 class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=too-many-instance-attributes
