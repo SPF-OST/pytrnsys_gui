@@ -98,6 +98,7 @@ class TestEditor:
 
         return storageTankNames
 
+    @_pt.mark.linux
     @_pt.mark.parametrize("project", TEST_CASES)
     def testMassFlowSolver(self, project: _Project, request: _pt.FixtureRequest) -> None:
         helper = _Helper(project)
