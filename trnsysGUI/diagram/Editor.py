@@ -490,7 +490,7 @@ class Editor(QWidget):
             mfsFileName = self.diagramName.rsplit(".", 1)[0] + "_mfs.dck"
             exportPath = os.path.join(self.projectFolder, mfsFileName)
         elif exportTo == "ddck":
-            exportPath = os.path.join(ddckFolder, "hydraulic\\hydraulic.ddck")
+            exportPath = os.path.join(ddckFolder, "hydraulic", "hydraulic.ddck")
 
         if self._doesFileExistAndDontOverwrite(exportPath):
             return None
@@ -498,7 +498,7 @@ class Editor(QWidget):
         self.logger.info("Printing the TRNSYS file...")
 
         if exportTo == "mfs":
-            header = open(os.path.join(ddckFolder, "generic\\head.ddck"), "r")
+            header = open(os.path.join(ddckFolder, "generic", "head.ddck"), "r", encoding="windows-1252")
             headerLines = header.readlines()
             for line in headerLines:
                 if line[:4] == "STOP":
@@ -631,7 +631,7 @@ class Editor(QWidget):
 
         ddckFolder = os.path.join(self.projectFolder, "ddck")
 
-        hydCtrlPath = os.path.join(ddckFolder, "control\\hydraulic_control.ddck")
+        hydCtrlPath = os.path.join(ddckFolder, "control", "hydraulic_control.ddck")
         if _pl.Path(hydCtrlPath).exists():
             qmb = QMessageBox(self)
             qmb.setText(
@@ -1198,7 +1198,6 @@ class Editor(QWidget):
         with open(self.configToEdit, "r") as file:
             lines = file.readlines()
         localPathStr = "string LOCAL$ %s" % str(localDdckPath)
-        # localPathStr.replace('/', '\\')
         lines[21] = localPathStr + "\n"
 
         with open(self.configToEdit, "w") as file:
@@ -1262,7 +1261,7 @@ class Editor(QWidget):
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
 
     def _updateDdckFilePaths(self):
-        projectFolderDdckPath = _pl.Path(self.projectFolder + "\\ddck")
+        projectFolderDdckPath = _pl.Path(self.projectFolder) / "ddck"
 
         projectDdckFiles = list(projectFolderDdckPath.iterdir())
 
