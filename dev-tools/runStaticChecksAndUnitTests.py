@@ -74,19 +74,19 @@ def main():
     _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = "mypy --show-error-codes pytrnsys tests dev-tools"
+        cmd = "mypy --show-error-codes trnsysGUI tests dev-tools"
         additionalArgs = arguments.mypyArguments or ""
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
-        cmd = "pylint pytrnsys tests dev-tools"
+        cmd = "pylint trnsysGUI tests dev-tools"
         additionalArgs = arguments.lintArguments or ""
 
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results pytrnsys"
+        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
         sp.run(cmd.split(), check=True)
 
     if (
@@ -104,7 +104,7 @@ def main():
 
         cmd = [
             "pytest",
-            "--cov=pytrnsys",
+            "--cov=trnsysGUI",
             f"--cov-report=html:{testResultsDirPath / 'coverage'}",
             "--cov-report=term",
             f"--html={testResultsDirPath / 'report' / 'report.html'}",
