@@ -2,12 +2,12 @@
 
 # Run from top-level directory
 
+import argparse as ap
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import argparse as ap
-import time
 import sys
+import time
 
 
 def main():
@@ -44,8 +44,11 @@ def main():
         "-u",
         "--unit",
         help="Perform unit tests",
-        action="store_true",
-        dest="shallRunTests",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="pytestMarkersExpression",
     )
     parser.add_argument(
         "-d",
@@ -71,24 +74,24 @@ def main():
     _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = "mypy --show-error-codes trnsysGUI tests dev-tools"
+        cmd = "mypy --show-error-codes pytrnsys tests dev-tools"
         additionalArgs = arguments.mypyArguments or ""
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
-        cmd = "pylint trnsysGUI tests dev-tools"
+        cmd = "pylint pytrnsys tests dev-tools"
         additionalArgs = arguments.lintArguments or ""
 
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
+        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results pytrnsys"
         sp.run(cmd.split(), check=True)
 
     if (
         arguments.shallRunAll
-        or arguments.shallRunTests
+        or arguments.pytestMarkersExpression is not None
         or not (
             arguments.shallPerformStaticChecks
             or arguments.mypyArguments is not None
@@ -96,17 +99,20 @@ def main():
             or arguments.diagramsFormat
         )
     ):
-        additionalArgs = [
+        markersExpression = arguments.pytestMarkersExpression or "not ci and not linux"
+        additionalArgs = ["-m", markersExpression]
+
+        cmd = [
             "pytest",
-            "--cov=trnsysGUI",
+            "--cov=pytrnsys",
             f"--cov-report=html:{testResultsDirPath / 'coverage'}",
             "--cov-report=term",
             f"--html={testResultsDirPath / 'report' / 'report.html'}",
-            "-m",
-            "not manual",
-            "tests",
         ]
-        sp.run(additionalArgs, check=True)
+
+        args = [*cmd, *additionalArgs, "tests"]
+
+        sp.run(args, check=True)
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:
