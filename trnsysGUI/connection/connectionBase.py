@@ -1,3 +1,5 @@
+# pylint: disable = too-many-lines
+
 from __future__ import annotations
 
 import math as _math
@@ -13,17 +15,18 @@ from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
 from trnsysGUI.Node import Node  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
-from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
+from trnsysGUI.TVentil import TVentil  # pylint: disable=cyclic-import
 from trnsysGUI.massFlowSolver import InternalPiping
 
 
-def calcDist(p1, p2):
+def calcDist(p1, p2):  # pylint: disable = invalid-name
     vec = p1 - p2
     norm = _math.sqrt(vec.x() ** 2 + vec.y() ** 2)
     return norm
 
 
 class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
+    # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
         self.logger = parent.logger
 
@@ -34,7 +37,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.parent = parent
 
         # Global
-        self.id = self.parent.idGen.getID()
+        self.id = self.parent.idGen.getID()  # pylint: disable = invalid-name
         self.connId = self.parent.idGen.getConnID()
         self.trnsysId = self.parent.idGen.getTrnsysID()
 
@@ -49,30 +52,24 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.mass = 0  # comment out
         self.temperature = 0
 
+        self.startPos = None
+
         self.initNew(parent)
 
     @property
     def fromPort(self) -> PortItemBase:
         return self._fromPort
 
-    @fromPort.setter
-    def fromPort(self, fromPort: PortItemBase) -> None:
-        self._fromPort = fromPort
-
     @property
     def toPort(self) -> PortItemBase:
         return self._toPort
-
-    @toPort.setter
-    def toPort(self, toPort: PortItemBase) -> None:
-        self._toPort = toPort
 
     def _createSegmentItem(self, startNode, endNode):
         raise NotImplementedError()
 
     def isVisible(self):
         res = True
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             if not s.isVisible():
                 res = False
 
@@ -81,7 +78,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     # Setter
     def setName(self, newName):
         self.displayName = newName
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             s.label.setPlainText(newName)
 
     def setMassAndTemperature(self, mass, temp):
@@ -89,10 +86,12 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         To show the mass and temperature during mass flow visualization
         """
         self.mass = float(mass)
-        self.mass = "{:,}".format(self.mass)
+        self.mass = f"{self.mass:,}"
+
         self.temperature = temp
-        for s in self.segments:
-            s.labelMass.setPlainText("M: %s kg/h   T: %s\u2103" % (self.mass.replace(",", "'"), self.temperature))
+        for s in self.segments:  # pylint: disable = invalid-name
+            replacedMass = self.mass.replace(",", "'")
+            s.labelMass.setPlainText(f"M: {replacedMass} kg/h   T: {self.temperature}\u2103")
 
     def setDisplayName(self, newName):
         self.displayName = newName
@@ -120,7 +119,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def setStartPort(self, newStartPort):
         self.fromPort = newStartPort
         self.startPos = newStartPort.scenePos()
-        # self.fromPort.posCallbacks.append(self.setStartPos)
 
     def setEndPort(self, newEndPort):
         self.toPort = newEndPort
@@ -154,7 +152,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             else:
                 col = QColor(255, 0, 0)
 
-            for s in self.segments:
+            for s in self.segments:  # pylint: disable = invalid-name
                 self.logger.debug("Value: " + str(value))
                 s.setColorAndWidthAccordingToMassflow(col, value)
 
@@ -172,9 +170,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         corners = self.getCorners()
 
-        for i in range(len(corners)):
-            if corners[i] == searchCorner:
-                # self.logger.debug("Found a corner")
+        for i, corner in enumerate(corners):
+            if corner == searchCorner:
                 return i
         self.logger.debug("corner not found is " + str(searchCorner))
 
@@ -206,7 +203,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self.parent.trnsysObj.append(self)
 
-        self.displayName = "Conn" + str(self.connId)
+        self.displayName = "Pi" + self.fromPort.parent.displayName + "_" + self.toPort.parent.displayName
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")
@@ -262,10 +259,10 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         rad = self.getRadius()
 
-        for x in range(len(segmentsCorners)):
+        for segmentsCorner in segmentsCorners:
             cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
 
-            cor.setPos(float(segmentsCorners[x][0]), float(segmentsCorners[x][1]))
+            cor.setPos(float(segmentsCorner[0]), float(segmentsCorner[1]))
             cor.setFlag(cor.ItemSendsScenePositionChanges, True)
 
             cor.setZValue(100)
@@ -283,29 +280,23 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self._createSegmentItem(tempNode, tempNode.nextN())
 
-        # self.parent.diagramScene.addItem(lastSeg)
-
         self.printConn()
 
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             pos1 = None
             pos2 = None
 
             if isinstance(s.startNode.parent, ConnectionBase) and s.startNode.prevNode is None:
-                # self.logger.debug("startnode is at connection")
                 pos1 = s.startNode.parent.fromPort.scenePos().x(), s.startNode.parent.fromPort.scenePos().y()
             if isinstance(s.endNode.parent, ConnectionBase) and s.endNode.nextNode is None:
-                # self.logger.debug("endnode is at connection")
                 pos2 = s.endNode.parent.toPort.scenePos().x(), s.endNode.parent.toPort.scenePos().y()
 
-            if type(s.startNode.parent) is CornerItem:
-                # self.logger.debug("startnode is at corner")
+            if isinstance(s.startNode.parent, CornerItem):
                 self.logger.debug(
                     str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos())
                 )
                 pos1 = s.startNode.parent.scenePos().x(), s.startNode.parent.scenePos().y()
-            if type(s.endNode.parent) is CornerItem:
-                # self.logger.debug("endnode is at corner")
+            if isinstance(s.endNode.parent, CornerItem):
                 pos2 = s.endNode.parent.scenePos().x(), s.endNode.parent.scenePos().y()
 
             self.logger.debug("pos1 is " + str(pos1))
@@ -328,7 +319,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.firstS.toggleLabelVisible()
 
     def updateSegLabels(self):
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             s.label.setPlainText(self.displayName)
 
     def positionLabel(self):
@@ -352,7 +343,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         raise NotImplementedError()
 
     # Makes 90deg angles of connection
-    def niceConn(self):
+    def niceConn(self):  # pylint: disable = too-many-locals, too-many-statements
         """
         Creates the segments and corners depending on the side of the fromPort and toPort
         Returns
@@ -408,12 +399,12 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
-            baseline_h = max(pos1.y(), pos2.y()) + 100.6
+            baseLineHeight = max(pos1.y(), pos2.y()) + 100.6
 
-            p1 = QPointF(pos1.x() + portOffset, pos1.y())
-            p2 = QPointF(p1.x(), baseline_h)
-            p3 = QPointF(pos2.x() + portOffset, baseline_h)
-            p4 = QPointF(p3.x(), pos2.y())
+            p1 = QPointF(pos1.x() + portOffset, pos1.y())  # pylint: disable = invalid-name
+            p2 = QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
+            p3 = QPointF(pos2.x() + portOffset, baseLineHeight)  # pylint: disable = invalid-name
+            p4 = QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
 
             seg1.setLine(pos1, p1)
             seg2.setLine(p1, p2)
@@ -475,13 +466,12 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
-            baseline_h = max(pos1.y(), pos2.y()) + 100.6
+            baseLineHeight = max(pos1.y(), pos2.y()) + 100.6
 
-            # p1 = QPointF(pos1.x() + 50, pos1.y())
-            p1 = QPointF(pos1.x() - portOffset, pos1.y())
-            p2 = QPointF(p1.x(), baseline_h)
-            p3 = QPointF(pos2.x() - portOffset, baseline_h)
-            p4 = QPointF(p3.x(), pos2.y())
+            p1 = QPointF(pos1.x() - portOffset, pos1.y())  # pylint: disable = invalid-name
+            p2 = QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
+            p3 = QPointF(pos2.x() - portOffset, baseLineHeight)  # pylint: disable = invalid-name
+            p4 = QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
 
             seg1.setLine(pos1, p1)
             seg2.setLine(p1, p2)
@@ -506,6 +496,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         elif self.fromPort.side == 1:
             self.fromPort.createdAtSide = 1
+            # pylint: disable = fixme
             # todo :  when rotated, it cause a problem because side gets changed
 
             self.logger.debug("NiceConn from 1")
@@ -528,7 +519,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(corner1)
 
-                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
+                # position of the connecting node
+                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, p1)
                 seg2.setLine(p1, pos2)
@@ -564,8 +556,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
                 offsetPoint = pos1.y() - 15.666
 
-                help_point_1 = QPointF(pos1.x(), offsetPoint)
-                help_point_2 = QPointF(pos2.x(), offsetPoint)
+                help_point_1 = QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
+                help_point_2 = QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, help_point_1)
                 seg2.setLine(help_point_1, help_point_2)
@@ -607,7 +599,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                 self.parent.diagramScene.addItem(seg2)
                 self.parent.diagramScene.addItem(corner1)
 
-                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # position of the connecting node
+                # position of the connecting node
+                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, p1)
                 seg2.setLine(p1, pos2)
@@ -642,8 +635,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
                 offsetPoint = pos1.y() + 15.666
 
-                help_point_1 = QPointF(pos1.x(), offsetPoint)
-                help_point_2 = QPointF(pos2.x(), offsetPoint)
+                help_point_1 = QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
+                help_point_2 = QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, help_point_1)
                 seg2.setLine(help_point_1, help_point_2)
@@ -665,9 +658,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                 self.firstS = self.getFirstSeg()
 
         else:
-            # if((self.fromPort.side == 2) and (self.toPort.side == 0)) or (
-            #         (self.fromPort.side == 0) and (self.toPort.side == 2) or (self.fromPort.side == 1) and (
-            #         self.toPort.side in [0, 1, 2]) or (self.fromPort.side in [0, 1, 2]) and (self.toPort.side == 1)):
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
@@ -688,7 +678,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner2.node)
 
-            # self.logger.debug("niceConn...")
             self.parent.diagramScene.addItem(seg1)
             self.parent.diagramScene.addItem(seg2)
             self.parent.diagramScene.addItem(seg3)
@@ -713,8 +702,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
             self.logger.debug("Here in niceconn")
 
-            help_point_1 = QPointF(midx, pos1.y())
-            help_point_2 = QPointF(midx, pos2.y())
+            help_point_1 = QPointF(midx, pos1.y())  # pylint: disable = invalid-name
+            help_point_2 = QPointF(midx, pos2.y())  # pylint: disable = invalid-name
 
             corner1.setPos(help_point_1)
             corner2.setPos(help_point_2)
@@ -723,42 +712,27 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             self.logger.debug("Conn has now " + str(self.firstS))
 
     # Unused
-    def buildBridges(self):
+    def buildBridges(self):  # pylint: disable = too-many-locals, too-many-statements
         # This function finds the colliding line segments and creates the interrupted line effect
 
-        # Debug:
-        # self.logger.debug("Segments in brigdes function is " + str(self.segments))
-        # self.logger.debug("Length of segments is " + str(len(self.segments)))
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             col = s.collidingItems()
             # Why do the child segments have again colliding Items?
-            # self.logger.debug("Start and end of loop segment is " + str(s.startNode) + " and " + str(s.endNode))
-            # self.logger.debug("Col items are " + str(col))
 
-            for c in col:
-                if type(c) is SegmentItemBase:
-                    # self.logger.debug("There is a segment colliding....")
-                    # self.logger.debug("c.hasBridge is " + str(c.hasBridge))
-                    # self.logger.debug("s.hasBridge is " + str(s.hasBridge))
-
+            for c in col:  # pylint: disable = invalid-name
+                if isinstance(c, SegmentItemBase):
                     # Both have no bridge and do not collide at the endpoints:
-                    # if (s.hasBridge == False) and (c.hasBridge == False) and (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
                     if (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
-
-                        # self.logger.debug("Self has startnode " + str(s.startNode) + " and endnode " + str(
-                        #     s.endNode) + " c has startNode " + str(c.startNode) + " and endnode " + str(c.endNode))
-
                         qp1 = s.line().p1()
                         qp2 = s.line().p2()
-                        qp1_ = c.line().p1()
-                        qp2_ = c.line().p2()
+                        qp1_ = c.line().p1()  # pylint: disable = invalid-name
+                        qp2_ = c.line().p2()  # pylint: disable = invalid-name
 
                         eps2 = 5
                         if abs(qp1.x() - qp2.x()) < eps2 or abs(qp1_.x() - qp2_.x()) < eps2:
                             self.logger.debug("Can't build bridge because one segment is almost verical")
 
                         else:
-
                             node1 = Node()
                             node2 = Node()
 
@@ -786,43 +760,32 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                             self.parent.diagramScene.addItem(s.firstChild)
                             self.parent.diagramScene.addItem(s.secondChild)
 
-                            # self.logger.debug("Points are " + str(qp1) + str(qp2) + str(qp1_) + str(qp2_))
-                            # eps1 = 1
-                            # if (abs(qp2.x() - qp1.x()) > eps1) and (abs(qp2_.x() - qp1_.x()) > eps1) :
-
+                            # pylint: disable = invalid-name
                             n1 = (qp1.y() * qp2.x() - qp2.y() * qp1.x()) / (qp2.x() - qp1.x())
+                            # pylint: disable = invalid-name
                             n2 = (qp1_.y() * qp2_.x() - qp2_.y() * qp1_.x()) / (qp2_.x() - qp1_.x())
 
-                            m1 = (qp2.y() - qp1.y()) / (qp2.x() - qp1.x())
-                            m2 = (qp2_.y() - qp1_.y()) / (qp2_.x() - qp1_.x())
+                            m1 = (qp2.y() - qp1.y()) / (qp2.x() - qp1.x())  # pylint: disable = invalid-name
+                            m2 = (qp2_.y() - qp1_.y()) / (qp2_.x() - qp1_.x())  # pylint: disable = invalid-name
 
-                            # self.logger.debug("division by " + str(m1) + "    " + str(m2))
                             collisionPos = QPointF((n1 - n2) / (m2 - m1), m1 * (n1 - n2) / (m2 - m1) + n1)
 
-                            vecp2p1 = qp2 - qp1
-                            vecp2p1_ = qp2_ - qp1_
+                            vecp2p1 = qp2 - qp1  # pylint: disable = invalid-name
+                            vecp2p1_ = qp2_ - qp1_  # pylint: disable = invalid-name
 
                             normVec = _math.sqrt(vecp2p1.x() ** 2 + vecp2p1.y() ** 2)
-                            normVec_ = _math.sqrt(vecp2p1_.x() ** 2 + vecp2p1_.y() ** 2)
+                            normVec_ = _math.sqrt(vecp2p1_.x() ** 2 + vecp2p1_.y() ** 2)  # pylint:disable=invalid-name
 
                             # Compute angle between lines
                             scalarProd = vecp2p1.x() * vecp2p1_.x() + vecp2p1.y() + vecp2p1_.y()
                             angleBetween = _math.acos(scalarProd / (normVec * normVec_))
-                            # self.logger.debug(str(degrees(angleBetween)))
 
                             # Almost working: if line approaches 90 deg or if lines touch because too steep, problem
-                            f = 10
+                            f = 10  # pylint: disable = invalid-name
                             distFactor = max(f * 1 / angleBetween, f)
-                            # self.logger.debug("distFactor " +  str(distFactor))
 
-                            # normalVec = QPointF(-distFactor/normVec * vecp2p1.y(), distFactor/normVec * vecp2p1.x())
                             normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(),
                                                   distFactor / normVec * vecp2p1.y())
-
-                            # self.logger.debug("vector is " + str(normVecp2p1))
-                            # self.logger.debug("collisionpos is " + str(collisionPos))
-                            # newPos1 = collisionPos - normalVec
-                            # newPos2 = collisionPos + normalVec
 
                             newPos1 = collisionPos - normVecp2p1
                             newPos2 = collisionPos + normVecp2p1
@@ -838,30 +801,22 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                             self.parent.diagramScene.removeItem(s)
                             self.segments.remove(s)
 
-                            # self.logger.debug("s.bridged element is " + str(s.bridgedSegment))
-                            # self.logger.debug("c.bridged element is " + str(c.bridgedSegment))
-                            # self.logger.debug(len(self.segments))
-
     # Delete a connection
     def clearConn(self):
         # Deletes all segments and corners in connection
-        # self.logger.debug("Connection was before: ")
-        # self.printConnNodes()
-
         walker = self.endNode
 
         items = self.parent.diagramScene.items()
 
-        for it in items:
-            if isinstance(it, SegmentItemBase):
-                if it.startNode.lastNode() is self.endNode or it.startNode.firstNode() is self.startNode:
-                    # self.logger.debug("Del segment")
-                    self.parent.diagramScene.removeItem(it)
-            if type(it) is QGraphicsTextItem:
-                if isinstance(it.parent, PortItemBase):
-                    self.logger.debug("it has " + str(it.parent()))
+        for item in items:
+            if isinstance(item, SegmentItemBase):
+                if item.startNode.lastNode() is self.endNode or item.startNode.firstNode() is self.startNode:
+                    self.parent.diagramScene.removeItem(item)
+            if isinstance(item, QGraphicsTextItem):
+                if isinstance(item.parent, PortItemBase):
+                    self.logger.debug("it has " + str(item.parent()))
                     self.logger.debug("Deleting it")
-                    self.parent.diagramScene.removeItem(it)
+                    self.parent.diagramScene.removeItem(item)
 
         for seg in self.segments:
             self.parent.diagramScene.removeItem(seg.label)
@@ -872,25 +827,19 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             walker = walker.prevN()
 
             while walker.prevN() is not self.startNode:
-                # self.logger.debug("Del corner...")
                 if not isinstance(walker.parent, ConnectionBase):
                     self.parent.diagramScene.removeItem(walker.parent)
                 else:
                     self.logger.debug("Caution, this is a disrupt.")
                 walker = walker.prevN()
-                # del (walker.nextN())
 
             if not isinstance(walker.parent, ConnectionBase):
                 self.parent.diagramScene.removeItem(walker.parent)
             else:
                 self.logger.debug("Caution.")
-                # del walker
 
             self.startNode.setNext(self.endNode)
             self.endNode.setPrev(self.startNode)
-
-        # self.logger.debug("Connection is now: ")
-        # self.printConnNodes()
 
     def deleteConn(self):
         self.clearConn()
@@ -922,22 +871,18 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         # Returns the cummulative length of line up to given node
         # Assumes that segments is ordered correctly!
         res = 0
-        # self.logger.debug("Segments has len " + str(len(self.segments)))
         if node == self.startNode:
             return res
 
         for i in self.segments:
-            # self.logger.debug("Adding " + str(calcDist(i.line().p1(), i.line().p2())))
             res += calcDist(i.line().p1(), i.line().p2())
             if i.endNode == node:
-                # self.logger.debug("Breaking")
                 break
 
-        # self.logger.debug("Node " + str(node) + " has pL " + str(res) + "\n")
         return res
 
     def updateSegGrads(self):
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             s.updateGrad()
 
     # Invert connection
@@ -953,11 +898,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.toPort = self.fromPort
         self.fromPort = temp
 
-        sn = self.startNode
+        startingNode = self.startNode
         self.startNode = self.endNode
-        self.endNode = sn
+        self.endNode = startingNode
 
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             temp2 = s.startNode
             s.startNode = s.endNode
             s.endNode = temp2
@@ -976,20 +921,20 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         while element.nextN() is not None:
             temp = element.nextN()
-            pr = element.prevN()
-            ne = element.nextN()
+            previousNode = element.prevN()
+            nextNode = element.nextN()
 
-            element.setNext(pr)
-            element.setPrev(ne)
+            element.setNext(previousNode)
+            element.setPrev(nextNode)
             element = temp
 
-        pr = element.prevN()
-        ne = element.nextN()
-        element.setNext(pr)
-        element.setPrev(ne)
+        previousNode = element.prevN()
+        nextNode = element.nextN()
+        element.setNext(previousNode)
+        element.setPrev(nextNode)
 
     def selectConnection(self):
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             s.setSelect(True)
 
         self.isSelected = True
@@ -997,7 +942,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.setLabelsSelected(True)
 
     def deselectConnection(self):
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             s.updateGrad()
 
         self.isSelected = False
@@ -1031,9 +976,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.logger.debug("It has startNode " + str(self.startNode))
         self.logger.debug("It has endNode " + str(self.endNode))
 
-        # self.printConnNodes()
         self.logger.debug("\n")
-        # self.printConnSegs()
         self.logger.debug("It goes from " + self.fromPort.parent.displayName + " to " + self.toPort.parent.displayName)
         self.logger.debug("------------------------------------")
 
@@ -1056,7 +999,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     def printConnSegs(self):
         self.logger.debug("These are the segments in order")
-        for s in self.segments:
+        for s in self.segments:  # pylint: disable = invalid-name
             self.logger.debug(
                 "Segment is "
                 + str(s)
@@ -1076,19 +1019,19 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         raise NotImplementedError()
 
     # Export related
-    def exportBlackBox(self):
+    def exportBlackBox(self):  # pylint: disable = no-self-use
         return "noBlackBoxOutput", []
 
-    def exportPumpOutlets(self):
+    def exportPumpOutlets(self):  # pylint: disable = no-self-use
         return "", 0
 
-    def exportMassFlows(self):
+    def exportMassFlows(self):  # pylint: disable = no-self-use
         return "", 0
 
-    def exportDivSetting1(self):
+    def exportDivSetting1(self):  # pylint: disable = no-self-use
         return "", 0
 
-    def exportDivSetting2(self, nUnit):
+    def exportDivSetting2(self, nUnit):  # pylint: disable = no-self-use
         return "", nUnit
 
     def getInternalPiping(self) -> InternalPiping:
@@ -1098,7 +1041,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         raise NotImplementedError()
 
     def _getPortItemsWithParent(self):
-        isToPortValveOutput = type(self.toPort.parent) is TVentil and self.fromPort in self.toPort.parent.outputs
+        isToPortValveOutput = isinstance(self.toPort.parent, TVentil) and self.fromPort in self.toPort.parent.outputs
         if isToPortValveOutput:
             return [(self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)]
 
@@ -1106,11 +1049,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
     def findStoragePort(self, virtualBlock):
         portToPrint = None
-        for p in virtualBlock.inputs + virtualBlock.outputs:
-            if self in p.connectionList:
+        for port in virtualBlock.inputs + virtualBlock.outputs:
+            if self in port.connectionList:
                 # Found the port of the generated block adjacent to this pipe
                 # Assumes 1st connection is with storageTank
-                if self.fromPort == p:
+                if self.fromPort == port:
                     if self.toPort.connectionList[0].fromPort == self.toPort:
                         portToPrint = self.toPort.connectionList[0].toPort
                     else:

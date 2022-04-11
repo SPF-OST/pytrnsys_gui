@@ -1,3 +1,5 @@
+# pylint: disable = invalid-name
+
 from __future__ import annotations
 
 import typing as _tp
@@ -13,7 +15,7 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.connectionBase as _cb
 
 
-class PortItemBase(QGraphicsEllipseItem):
+class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance-attributes
     def __init__(self, name, side, parent):
         self.parent = parent
 
@@ -24,7 +26,7 @@ class PortItemBase(QGraphicsEllipseItem):
         self.createdAtSide = side
         self.posCallbacks = []
         self.connectionList = []
-        self.id = self.parent.parent.parent().idGen.getID()
+        self.id = self.parent.parent.parent().idGen.getID()  # pylint: disable = invalid-name
 
         self.color = "white"
         self.ashColorR = QColor(239, 57, 75)
@@ -46,7 +48,7 @@ class PortItemBase(QGraphicsEllipseItem):
         self.setBrush(QBrush(QtCore.Qt.white))
 
         # Hacky fix for no border of ellipse
-        p1 = QPen(QColor(0, 0, 0, 0), 0)
+        p1 = QPen(QColor(0, 0, 0, 0), 0)  # pylint: disable = invalid-name
         self.setPen(p1)
 
         self.setFlag(self.ItemSendsScenePositionChanges, True)
@@ -56,11 +58,12 @@ class PortItemBase(QGraphicsEllipseItem):
         self.savePos = None
         self.savedPos = False
 
-    def setParent(self, p):
+    def setParent(self, p):  # pylint: disable = invalid-name
         self.parent = p
         self.setParentItem(p)
 
     def itemChange(self, change, value):
+        # pylint: disable = fixme, too-many-branches, too-many-statements, too-many-nested-blocks
         # TODO : here to merge segments when moving blockitems
         if (
                 self.parent.parent.parent().moveDirectPorts
@@ -80,25 +83,14 @@ class PortItemBase(QGraphicsEllipseItem):
                 conn.positionLabel()
 
                 if conn.fromPort is self:
-                    # self.logger.debug("This port is the starting port of connection")
-                    # nextNodeInConn = conn.startNode.nextN()
-                    # self.logger.debug("Type of parent is " + str(type(nextNodeInConn.parent)))
-
-                    e = conn.segments[0]
+                    e = conn.segments[0]  # pylint: disable = invalid-name
                     e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(), e.line().p2().y())
 
                 if conn.toPort is self:
-                    # self.logger.debug("This port is the ending port of connection")
-                    # nextNodeInConn = conn.endNode.prevN()
-                    # self.logger.debug("nextnodeinconn is " + str(conn.endNode.prevN()))
-                    # self.logger.debug("nextNode is " + str(nextNodeInConn))
-                    # self.logger.debug("Type of parent is " + str(type(nextNodeInConn.parent)))
-
-                    # New
-                    e = conn.segments[-1]
+                    e = conn.segments[-1]  # pylint: disable = invalid-name
                     e.setLine(e.line().p1().x(), e.line().p1().y(), self.scenePos().x(), self.scenePos().y())
 
-                for s in conn.segments:
+                for s in conn.segments:  # pylint: disable = invalid-name
                     s.updateGrad()
 
         if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 1:
@@ -107,7 +99,7 @@ class PortItemBase(QGraphicsEllipseItem):
                 conn.positionLabel()
 
                 if conn.fromPort is self:
-                    if (self.createdAtSide != 1 and self.createdAtSide != 3) or not conn.segments[0].isVertical():
+                    if (self.createdAtSide not in (1, 3)) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             self.logger.debug("inside here")
                             cor = conn.getCorners()[0]
@@ -127,7 +119,6 @@ class PortItemBase(QGraphicsEllipseItem):
                                             <= int(seg.endNode.parent.pos().y() + 0)
                                     ):
                                         self.logger.debug("both segments are horizontal from fromport")
-                                        # verSeg.deleteSegment()
                                         self.hideCorners(conn)
                                         verSeg.setVisible(False)
                                     else:
@@ -144,9 +135,7 @@ class PortItemBase(QGraphicsEllipseItem):
                                         cor.scenePos().y())
 
                 elif conn.toPort is self:
-                    if (conn.fromPort.createdAtSide != 1 and conn.fromPort.createdAtSide != 3) or not conn.segments[
-                        0
-                    ].isVertical():
+                    if (conn.fromPort.createdAtSide not in (1, 3)) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(cor.pos().x(), self.scenePos().y())
@@ -195,12 +184,12 @@ class PortItemBase(QGraphicsEllipseItem):
                     self.logger.debug("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")
 
         if change == self.ItemScenePositionHasChanged:
-            for cb in self.posCallbacks:
+            for cb in self.posCallbacks:  # pylint: disable = invalid-name
                 cb(value)
             return value
         return super().itemChange(change, value)
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event):  # pylint: disable = unused-argument
         if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, "heatExchangers"):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
@@ -212,7 +201,7 @@ class PortItemBase(QGraphicsEllipseItem):
         self.setFlag(self.ItemIsMovable, False)
         self.scene().parent().startConnection(self)
 
-    def hoverEnterEvent(self, event):
+    def hoverEnterEvent(self, event):  # pylint: disable = unused-argument
         self.logger.debug(self.parent)
 
         self.enlargePortSize()
@@ -224,13 +213,13 @@ class PortItemBase(QGraphicsEllipseItem):
         self.debugprint()
 
     def enlargePortSize(self):
-        if self.savedPos == False:
+        if not self.savedPos:
             self.setPos(self.pos().x() - 3, self.pos().y() - 3)
             self.savedPos = True
         self.setRect(-4, -4, 10, 10)
         self.innerCircle.setRect(-4, -4, 10, 10)
 
-    def hoverLeaveEvent(self, event):
+    def hoverLeaveEvent(self, event):  # pylint: disable = unused-argument
         self.resetPortSize()
 
         self.innerCircle.setBrush(self.visibleColor)
@@ -240,7 +229,7 @@ class PortItemBase(QGraphicsEllipseItem):
         self._debugClear()
 
     def resetPortSize(self):
-        if self.savedPos == True:
+        if self.savedPos:
             self.setPos(self.pos().x() + 3, self.pos().y() + 3)
             self.savedPos = False
         self.setRect(-4, -4, 7, 7)
@@ -266,13 +255,13 @@ class PortItemBase(QGraphicsEllipseItem):
     def _debugClear(self):
         self.parent.parent.parent().listV.clear()
 
-    def hideCorners(self, connection):
+    def hideCorners(self, connection):  # pylint: disable = no-self-use
         cor = connection.getCorners()[0]
         cor2 = connection.getCorners()[-1]
         cor.setVisible(False)
         cor2.setVisible(False)
 
-    def showCorners(self, connection):
+    def showCorners(self, connection):  # pylint: disable = no-self-use
         cor = connection.getCorners()[0]
         cor2 = connection.getCorners()[-1]
         cor.setVisible(True)
@@ -302,13 +291,13 @@ class PortItemBase(QGraphicsEllipseItem):
     ) -> _tp.Optional[_mfs.MassFlowNetworkContributorMixin]:
         if massFlowContributor == self.parent:
             return self._getConnectionOrNone()
-        else:
-            connection = self._getConnectionOrNone()
 
-            if not connection or connection != massFlowContributor:
-                raise ValueError("`massFlowContributor' is not adjacent to this port item.")
+        connection = self._getConnectionOrNone()
 
-            return self.parent
+        if not connection or connection != massFlowContributor:
+            raise ValueError("`massFlowContributor' is not adjacent to this port item.")
+
+        return self.parent
 
     def _getConnectionOrNone(self) -> _tp.Optional[_cb.ConnectionBase]:
         if not self.connectionList:

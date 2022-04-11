@@ -34,7 +34,8 @@ class PortIds:
 
 
 class StorageTank(BlockItem,
-                  MassFlowNetworkContributorMixin):  # pylint: disable=too-many-instance-attributes,too-many-public-methods
+                  MassFlowNetworkContributorMixin):
+    # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
     def __init__(self, trnsysType, parent, **kwargs):
@@ -494,18 +495,12 @@ class StorageTank(BlockItem,
             ret = qmb.exec()
             if ret == QMessageBox.Save:
                 self.logger.debug("Overwriting")
-                # continue
             else:
                 self.logger.debug("Canceling")
                 return
 
         nPorts = len(self.directPortPairs)
         nHx = len(self.heatExchangers)
-
-        self.logger.debug("Storage Type: " + str(self.storageType))
-        self.logger.debug("nTes: " + str(self.nTes))
-        self.logger.debug("nPorts: " + str(nPorts))
-        self.logger.debug("nHx: " + str(nHx))
 
         tool = Type1924_TesPlugFlow()
 
@@ -570,9 +565,6 @@ class StorageTank(BlockItem,
         for _ in range(inputs["nHeatSources"]):
             dictInputAux = {"zAux": 0.0, "qAux": 0.0}
             auxiliaryPorts.append(dictInputAux)
-
-        exportPath = _os.path.join(self.path, self.displayName + ".ddck")
-        self.logger.debug(exportPath)
 
         tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
 

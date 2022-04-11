@@ -3,10 +3,11 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
+import pytrnsys.utils.result as _res
 import trnsysGUI.common as _com
 import trnsysGUI.massFlowSolver.search as _search
 import trnsysGUI.singlePipePortItem as _spi
-
+from . import _loopWideDefaults as _lwd
 from . import common as _lcom
 from . import model as _model, _helpers
 from ._dialogs.merge import dialog as _md
@@ -38,7 +39,7 @@ def merge(
     fluids: _tp.Sequence[_model.Fluid],
     defaultFluid: _model.Fluid,
     mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary] = None,
-) -> _lcom.Cancellable[_tp.Optional[MergeSummary]]:
+) -> _lcom.Cancellable[_res.Result[_tp.Optional[MergeSummary]]]:
     merger = _Merger(hydraulicLoops, fluids, defaultFluid)
 
     return merger.merge(connection, mergedLoopSummary)
@@ -56,7 +57,7 @@ class _Merger:
         self,
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary],
-    ) -> _lcom.Cancellable[_tp.Optional[MergeSummary]]:
+    ) -> _lcom.Cancellable[_res.Result[_tp.Optional[MergeSummary]]]:
         fromLoop, toLoop = getFromAndToLoopForNewlyCreatedConnection(self._hydraulicLoops, connection)
 
         if not fromLoop and not toLoop:
@@ -88,7 +89,10 @@ class _Merger:
     def _createLoop(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         name = self._hydraulicLoops.generateName()
         connections = [connection]
-        loop = _model.HydraulicLoop(name, self._defaultFluid, connections)
+
+        useLoopWideDefaults = True
+        loop = _model.HydraulicLoop(name, self._defaultFluid, useLoopWideDefaults, connections)
+
         self._hydraulicLoops.addLoop(loop)
 
     def _mergeLoops(
@@ -97,7 +101,14 @@ class _Merger:
         toLoop: _model.HydraulicLoop,
         connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
         mergedLoopSummary: _tp.Optional[_lcom.MergedLoopSummary],
-    ) -> _lcom.Cancellable[MergeSummary]:
+    ) -> _lcom.Cancellable[_res.Result[MergeSummary]]:
+        if fromLoop.useLoopWideDefaults != toLoop.useLoopWideDefaults:
+            return _res.Error(
+                "Cannot merge two loops with different settings for using loop-wide defaults. "
+                "Change the loops so that their settings match and try again."
+            )
+        mergedUseLoopWideDefaults = fromLoop.useLoopWideDefaults
+
         connections = [*fromLoop.connections, connection, *toLoop.connections]
         _lcom.setConnectionsSelected(connections, True)
 
@@ -111,7 +122,16 @@ class _Merger:
 
         mergedConnections = [*fromLoop.connections, *toLoop.connections, connection]
         mergedConnections.sort(key=lambda c: c.displayName)
-        mergedLoop = _model.HydraulicLoop(mergedLoopSummary.name, mergedLoopSummary.fluid, mergedConnections)
+
+        mergedName = mergedLoopSummary.name
+
+        if mergedUseLoopWideDefaults:
+            _lwd.resetConnectionPropertiesToLoopWideDefaults(mergedConnections, mergedName.value)
+
+        mergedLoop = _model.HydraulicLoop(
+            mergedName, mergedLoopSummary.fluid, mergedUseLoopWideDefaults, mergedConnections
+        )
+
         self._hydraulicLoops.removeLoop(fromLoop)
         self._hydraulicLoops.removeLoop(toLoop)
         self._hydraulicLoops.addLoop(mergedLoop)

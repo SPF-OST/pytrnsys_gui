@@ -96,16 +96,17 @@ class Collector(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
+    def hasDdckPlaceHolders(self):
+        return True
+
     def deleteBlock(self):
         """
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.deleteConns()
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
         self.parent.scene().removeItem(self)
         widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
         try:
@@ -130,27 +131,8 @@ class Collector(BlockItem, MassFlowNetworkContributorMixin):
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
         self.logger.debug(os.path.dirname(self.path))
-        # destPath = str(os.path.dirname(self.path))+'\\Collector_'+self.displayName
         destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
         if os.path.exists(self.path):
             os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)
-
-    # def exportBlackBox(self):
-    #     equation = []
-    #     if len(self.inputs + self.outputs) == 2 and self.isVisible():
-    #         files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-    #         lines = []
-    #         for file in files:
-    #             infile = open(file, 'r')
-    #             lines += infile.readlines()
-    #         for i in range(len(lines)):
-    #             if 'output' in lines[i].lower() and 'to' in lines[i].lower() and 'hydraulic' in lines[i].lower():
-    #                 for j in range(i, len(lines) - i):
-    #                     if lines[j][0] == "T":
-    #                         outputT = lines[j].split("=")[0].replace(" ", "")
-    #                         break
-    #                 break
-    #         equation = ["T" + self.displayName + "=" + outputT + "\n"]
-    #     return equation

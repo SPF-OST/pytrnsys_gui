@@ -118,20 +118,19 @@ class TVentilDlg(QDialog):
         if newName.lower() == str(self.block.displayName).lower():
             self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
             self.close()
-        elif newName != "" and not self.nameExists(newName) and newName != self.block.displayName:
-            # self.block.setName(newName)
-            self.block.label.setPlainText(newName)
-            self.block.displayName = newName
-            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
-            self.close()
         elif newName == "":
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self.nameExists(newName):
+        elif self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()
+        else:
+            self.block.label.setPlainText(newName)
+            self.block.displayName = newName
+            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
+            self.close()
 
     def setNewFlipStateH(self, state):
         self.block.updateFlipStateH(state)
@@ -153,9 +152,3 @@ class TVentilDlg(QDialog):
 
     def cancel(self):
         self.close()
-
-    def nameExists(self, n):
-        for t in self.parent().trnsysObj:
-            if str(t.displayName).lower() == n.lower():
-                return True
-        return False

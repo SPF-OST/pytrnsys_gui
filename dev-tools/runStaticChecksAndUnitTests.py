@@ -2,12 +2,12 @@
 
 # Run from top-level directory
 
+import argparse as ap
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import argparse as ap
-import time
 import sys
+import time
 
 
 def main():
@@ -44,8 +44,11 @@ def main():
         "-u",
         "--unit",
         help="Perform unit tests",
-        action="store_true",
-        dest="shallRunTests",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="pytestMarkersExpression",
     )
     parser.add_argument(
         "-d",
@@ -88,7 +91,7 @@ def main():
 
     if (
         arguments.shallRunAll
-        or arguments.shallRunTests
+        or arguments.pytestMarkersExpression is not None
         or not (
             arguments.shallPerformStaticChecks
             or arguments.mypyArguments is not None
@@ -96,17 +99,20 @@ def main():
             or arguments.diagramsFormat
         )
     ):
-        additionalArgs = [
+        markersExpression = arguments.pytestMarkersExpression or "not ci and not linux"
+        additionalArgs = ["-m", markersExpression]
+
+        cmd = [
             "pytest",
             "--cov=trnsysGUI",
             f"--cov-report=html:{testResultsDirPath / 'coverage'}",
             "--cov-report=term",
             f"--html={testResultsDirPath / 'report' / 'report.html'}",
-            "-m",
-            "not manual",
-            "tests",
         ]
-        sp.run(additionalArgs, check=True)
+
+        args = [*cmd, *additionalArgs, "tests"]
+
+        sp.run(args, check=True)
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:

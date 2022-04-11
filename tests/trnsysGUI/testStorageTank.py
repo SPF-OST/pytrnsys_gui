@@ -1,8 +1,8 @@
 import cgitb as _cgitb
 import json as _json
 import logging as _log
-import unittest.mock as _mock
 import pathlib as _pl
+import unittest.mock as _mock
 
 from PyQt5 import QtWidgets as _widgets
 
@@ -71,7 +71,7 @@ class TestStorageTank:
 
         storageTank.exportDck()
 
-        actualDdckPath = tmp_path / "ddck" / "StorageTank_7701" / "Dhw.ddck"
+        actualDdckPath = tmp_path / "ddck" / "StorageTank7701" / "Dhw.ddck"
         actualDdckContent = actualDdckPath.read_text()
         print(actualDdckContent)
 

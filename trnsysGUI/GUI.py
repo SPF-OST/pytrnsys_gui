@@ -165,8 +165,12 @@ class _MainWindow(QMainWindow):
         debugConnections.triggered.connect(self.debugConns)
         self.fileMenu.addAction(debugConnections)
 
+        def askForSaveAndLoadSettings() -> None:
+            self.askUserForSettingsValuesAndSave()
+            self.loadTrnsysPath()
+
         setTransysPath = QAction("Set TRNSYS path", self)
-        setTransysPath.triggered.connect(self.askUserForSettingsValuesAndSave)
+        setTransysPath.triggered.connect(askForSaveAndLoadSettings)
         self.fileMenu.addAction(setTransysPath)
 
         self.editMenu = QMenu("Edit")
@@ -197,8 +201,8 @@ class _MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValueJsonFileActionMenu = QAction("Export Ddck placerholder JSON file", self)
-        exportDdckPlaceHolderValueJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValueJson)
+        exportDdckPlaceHolderValuesJsonFileActionMenu = QAction("Export ddck placeholder values JSON file", self)
+        exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
 
         self.projectMenu = QMenu("Project")
         self.projectMenu.addAction(runMassflowSolverActionMenu)
@@ -209,7 +213,7 @@ class _MainWindow(QMainWindow):
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
-        self.projectMenu.addAction(exportDdckPlaceHolderValueJsonFileActionMenu)
+        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
@@ -411,11 +415,10 @@ class _MainWindow(QMainWindow):
 
         return
 
-    def exportDdckPlaceHolderValueJson(self):
-        try:
-            self.centralWidget.exportDdckPlaceHolderValueJsonFile()
-        except Exception as error:
-            errorMessage = f"The json file could not be generated: {error}"
+    def exportDdckPlaceHolderValuesJson(self):
+        result = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
+        if _res.isError(result):
+            errorMessage = f"The json file could not be generated: {result.message}"
             showErrorMessageBox(errorMessage)
 
     def renameDia(self):
@@ -520,8 +523,14 @@ class _MainWindow(QMainWindow):
         self.centralWidget.exportHydraulicControl()
 
     def exportDck(self):
-        self.centralWidget.exportDdckPlaceHolderValueJsonFile()
+        jsonResult = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
+        if _res.isError(jsonResult):
+            errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
+            showErrorMessageBox(errorMessage)
+            return
+
         builder = buildDck.buildDck(self.projectFolder)
+
         result = builder.buildTrnsysDeck()
         if _res.isError(result):
             errorMessage = f"The deck file could not be generated: {result.message}"

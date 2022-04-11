@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 
-import trnsysGUI.Pump as _pmp
+import trnsysGUI.pump as _pmp
 
 
 class PumpDlg(QDialog):
@@ -55,7 +55,7 @@ class PumpDlg(QDialog):
 
         positionLayout = QHBoxLayout()
         self.PumpPowerLabel = QLabel("Mass Flow Rate")
-        self.LineEdit = QLineEdit(str(self.block.rndPwr))
+        self.LineEdit = QLineEdit(str(self.block.massFlowRateInKgPerH))
         self.PumpPowerLabel2 = QLabel("kg/h")
         positionLayout.addWidget(self.PumpPowerLabel)
         positionLayout.addWidget(self.LineEdit)
@@ -65,15 +65,13 @@ class PumpDlg(QDialog):
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
         self.tab2 = QWidget()
+
         # Add tabs
         self.tabs.addTab(self.tab1, "Diagram")
         self.tabs.addTab(self.tab2, "Adjust Mass Flow Rate")
         self.tab1.setLayout(tab1Layout)
         self.tab2.setLayout(positionLayout)
-        # self.tab2 = layout
-        # self.tabs.resize(300, 200)
 
-        # self.tabs.addTab(self.tab2, "Tab 2")
         self.layout2 = QGridLayout(self)
         self.layout2.addWidget(self.tabs, 0, 0)
         self.layout2.addLayout(buttonLayout, 2, 0, 3, 0)
@@ -92,19 +90,18 @@ class PumpDlg(QDialog):
         self.setPumpPower()
         if newName.lower() == str(self.block.displayName).lower():
             self.close()
-        elif newName != "" and not self.nameExists(newName):
-            # self.block.setName(newName)
-            self.block.label.setPlainText(newName)
-            self.block.displayName = newName
-            self.close()
         elif newName == "":
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self.nameExists(newName):
+        elif self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()
+        else:
+            self.block.label.setPlainText(newName)
+            self.block.displayName = newName
+            self.close()
 
     def setNewFlipStateH(self, state):
         self.block.updateFlipStateH(state)
@@ -115,13 +112,7 @@ class PumpDlg(QDialog):
         self.block.updateSidesFlippedV()
 
     def setPumpPower(self):
-        self.block.rndPwr = int(self.LineEdit.text())
+        self.block.massFlowRateInKgPerH = int(self.LineEdit.text())
 
     def cancel(self):
         self.close()
-
-    def nameExists(self, n):
-        for t in self.parent().trnsysObj:
-            if str(t.displayName).lower() == n.lower():
-                return True
-        return False

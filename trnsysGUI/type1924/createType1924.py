@@ -2,6 +2,8 @@
 # type: ignore
 
 import os
+import pathlib as _pl
+
 import numpy as num
 
 
@@ -982,7 +984,6 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getInsulationPlateParValues(nTes)
         lines = lines + self.getParameters(self.inputs)
 
-        nameWithPath = "%s\%s.%s" % (path, (tankName), self.extension)
-        outfile = open(nameWithPath, "w")
-        outfile.writelines(lines)
-        outfile.close()
+        outputFilePath = _pl.Path(path) / f"{tankName}.{self.extension}"
+        outputContent = "".join(lines)
+        outputFilePath.write_text(outputContent)

@@ -108,23 +108,39 @@ TExHxX2=1
 TCol=1
 
 
-UNIT 450 TYPE 935
-PARAMETERS 33
-8
-6 5 0 0        !1 : TesDpL50-10
-7 8 0 0        !2 : ExHxSide1
-5 6 0 0        !3 : ExHxSide2
-8 7 0 0        !4 : Col
-1 3 0 0        !5 : Tes-Hx
-3 1 0 0        !6 : Hx-Tes
-4 2 0 0        !7 : Col-Hx
-2 4 0 0        !8 : Hx-Col
-INPUTS 8! for Type 935
-0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
-*** Initial Inputs
-0 0 0 0 0 0 0 0 
+EQUATIONS 2
+*** Massflowrates
+MfrPump88 = 300
+MfrPump93 = 200
 
-EQUATIONS 16	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+EQUATIONS 2
+*** Pump outlet temperatures
+TPump88 = TPiTes_Pump88
+TPump93 = TPiPump93_Col
+
+UNIT 450 TYPE 935
+PARAMETERS 49
+12
+6 8 0 0        !1 : TesDpL50-10
+11 5 0 0       !2 : ExHxSide1
+9 6 0 0        !3 : ExHxSide2
+5 12 0 0       !4 : Col
+2 4 0 0        !5 : Hx-Col
+3 1 0 0        !6 : PiExHx_Tes
+8 9 0 1        !7 : Pump88
+1 7 0 0        !8 : PiTes_Pump88
+7 3 0 0        !9 : PiPump88_ExHx
+12 11 0 1      !10 : Pump93
+10 2 0 0       !11 : PiPump93_ExHx
+10 4 0 0       !12 : PiPump93_Col
+INPUTS 12! for Type 935
+0,0 0,0 0,0 0,0 0,0 0,0 MfrPump88 0,0 0,0 MfrPump93 
+0,0 0,0 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 
+
+EQUATIONS 24	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MfrTesDpL50-10_A=[450,1]
 MfrTesDpL50-10_B=[450,2]
 MfrExHxSide1_A=[450,4]
@@ -133,14 +149,22 @@ MfrExHxSide2_A=[450,7]
 MfrExHxSide2_B=[450,8]
 MfrCol_A=[450,10]
 MfrCol_B=[450,11]
-MfrTes-Hx_A=[450,13]
-MfrTes-Hx_B=[450,14]
-MfrHx-Tes_A=[450,16]
-MfrHx-Tes_B=[450,17]
-MfrCol-Hx_A=[450,19]
-MfrCol-Hx_B=[450,20]
-MfrHx-Col_A=[450,22]
-MfrHx-Col_B=[450,23]
+MfrHx-Col_A=[450,13]
+MfrHx-Col_B=[450,14]
+MfrPiExHx_Tes_A=[450,16]
+MfrPiExHx_Tes_B=[450,17]
+MfrPump88_A=[450,19]
+MfrPump88_B=[450,20]
+MfrPiTes_Pump88_A=[450,22]
+MfrPiTes_Pump88_B=[450,23]
+MfrPiPump88_ExHx_A=[450,25]
+MfrPiPump88_ExHx_B=[450,26]
+MfrPump93_A=[450,28]
+MfrPump93_B=[450,29]
+MfrPiPump93_ExHx_A=[450,31]
+MfrPiPump93_ExHx_B=[450,32]
+MfrPiPump93_Col_A=[450,34]
+MfrPiPump93_Col_B=[450,35]
 
 
 ** Fluids:
@@ -154,80 +178,16 @@ FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
 
 ** Hydraulic loops
 EQUATIONS 4
-** loop1
-Lloop1Rho = FwaterRho
-Lloop1Cp = FwaterCp
 ** loop2
 Lloop2Rho = FwaterRho
 Lloop2Cp = FwaterCp
 
+** loop1
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+
+
 UNIT 451 TYPE 931
-!Tes-Hx
-PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop1Rho
-Lloop1Cp
-20
-INPUTS 4
-TTesPortLeft10
-MfrTes-Hx_A
-TRoomStore
-TExHxX2
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-TTes-Hx= [451,1]
-PTes-Hx_kW= [451,3]/3600 !kW
-MfrTes-Hx= MfrTes-Hx_A
-
-UNIT 452 TYPE 931
-!Hx-Tes
-PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop1Rho
-Lloop1Cp
-20
-INPUTS 4
-TExHxX2
-MfrHx-Tes_A
-TRoomStore
-TTesPortLeft50
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-THx-Tes= [452,1]
-PHx-Tes_kW= [452,3]/3600 !kW
-MfrHx-Tes= MfrHx-Tes_A
-
-UNIT 453 TYPE 931
-!Col-Hx
-PARAMETERS 6
-0.02 ! diameter [m]
-2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop2Rho
-Lloop2Cp
-20
-INPUTS 4
-TCol
-MfrCol-Hx_A
-TRoomStore
-TExHxX1
-***Initial values
-20 0.0 20 20
-
-EQUATIONS 3
-TCol-Hx= [453,1]
-PCol-Hx_kW= [453,3]/3600 !kW
-MfrCol-Hx= MfrCol-Hx_A
-
-UNIT 454 TYPE 931
 !Hx-Col
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -245,22 +205,132 @@ TCol
 20 0.0 20 20
 
 EQUATIONS 3
-THx-Col= [454,1]
-PHx-Col_kW= [454,3]/3600 !kW
+THx-Col= [451,1]
+PHx-Col_kW= [451,3]/3600 !kW
 MfrHx-Col= MfrHx-Col_A
+
+UNIT 452 TYPE 931
+!PiExHx_Tes
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TExHxX2
+MfrPiExHx_Tes_A
+TRoomStore
+TTesPortLeft50
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiExHx_Tes= [452,1]
+PPiExHx_Tes_kW= [452,3]/3600 !kW
+MfrPiExHx_Tes= MfrPiExHx_Tes_A
+
+UNIT 453 TYPE 931
+!PiTes_Pump88
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TTesPortLeft10
+MfrPiTes_Pump88_A
+TRoomStore
+TPump88
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTes_Pump88= [453,1]
+PPiTes_Pump88_kW= [453,3]/3600 !kW
+MfrPiTes_Pump88= MfrPiTes_Pump88_A
+
+UNIT 454 TYPE 931
+!PiPump88_ExHx
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TPump88
+MfrPiPump88_ExHx_A
+TRoomStore
+TExHxX2
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPump88_ExHx= [454,1]
+PPiPump88_ExHx_kW= [454,3]/3600 !kW
+MfrPiPump88_ExHx= MfrPiPump88_ExHx_A
+
+UNIT 455 TYPE 931
+!PiPump93_ExHx
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TPump93
+MfrPiPump93_ExHx_A
+TRoomStore
+TExHxX1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPump93_ExHx= [455,1]
+PPiPump93_ExHx_kW= [455,3]/3600 !kW
+MfrPiPump93_ExHx= MfrPiPump93_ExHx_A
+
+UNIT 456 TYPE 931
+!PiPump93_Col
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TPump93
+MfrPiPump93_Col_A
+TRoomStore
+TCol
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPump93_Col= [456,1]
+PPiPump93_Col_kW= [456,3]/3600 !kW
+MfrPiPump93_Col= MfrPiPump93_Col_A
 
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PTes-Hx_kW+PHx-Tes_kW+PCol-Hx_kW+PHx-Col_kW
+PipeLossTot=PHx-Col_kW+PPiExHx_Tes_kW+PPiTes_Pump88_kW+PPiPump88_ExHx_kW+PPiPump93_ExHx_kW+PPiPump93_Col_kW
 
-ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 455
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 457
 
-UNIT 455 TYPE 25! User defined Printer
+UNIT 457 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-455! 4 Logical unit
+457! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -268,19 +338,19 @@ STOP! 3 Stop time
 0! 9 Delimiter
 1! 10 Print labels
 
-INPUTS 4
-MfrTes-Hx MfrHx-Tes MfrCol-Hx MfrHx-Col 
+INPUTS 6
+MfrHx-Col MfrPiExHx_Tes MfrPiTes_Pump88 MfrPiPump88_ExHx MfrPiPump93_ExHx MfrPiPump93_Col 
 ***
-MfrTes-Hx MfrHx-Tes MfrCol-Hx MfrHx-Col 
+MfrHx-Col MfrPiExHx_Tes MfrPiTes_Pump88 MfrPiPump88_ExHx MfrPiPump93_ExHx MfrPiPump93_Col 
 
-ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_T.prt 456
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_T.prt 458
 
-UNIT 456 TYPE 25! User defined Printer
+UNIT 458 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-456! 4 Logical unit
+458! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -288,10 +358,10 @@ STOP! 3 Stop time
 0! 9 Delimiter
 1! 10 Print labels
 
-INPUTS 4
-TTes-Hx THx-Tes TCol-Hx THx-Col 
+INPUTS 6
+THx-Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col 
 ***
-TTes-Hx THx-Tes TCol-Hx THx-Col 
+THx-Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col 
 
 CONSTANTS 1
 TRoomStore=1

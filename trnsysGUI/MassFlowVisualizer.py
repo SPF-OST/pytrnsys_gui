@@ -177,7 +177,9 @@ class MassFlowVisualizer(QDialog):
         self.qtm.start(1000)
 
     def advance(self):
-        if self.timeStep == self.maxTimeStep:
+        timeStep = int(self.timeStep)
+
+        if timeStep == self.maxTimeStep:
             self.logger.debug("reached end of data, returning")
             self.qtm.stop()
 
@@ -189,41 +191,41 @@ class MassFlowVisualizer(QDialog):
                         "Mfr" + t.displayName in self.massFlowData.columns
                         and "T" + t.displayName in self.tempMassFlowData
                     ):
-                        mass = str(round(self.massFlowData["Mfr" + t.displayName].iloc[self.timeStep]))
-                        mass1Dp = str(round(self.massFlowData["Mfr" + t.displayName].iloc[self.timeStep], 1))
-                        temperature = str(round(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
-                        self.logger.debug("Found connection in ts " + str(self.timeStep) + " " + str(i))
+                        mass = str(round(self.massFlowData["Mfr" + t.displayName].iloc[timeStep]))
+                        mass1Dp = str(round(self.massFlowData["Mfr" + t.displayName].iloc[timeStep], 1))
+                        temperature = str(round(self.tempMassFlowData["T" + t.displayName].iloc[timeStep]))
+                        self.logger.debug("Found connection in ts " + str(timeStep) + " " + str(i))
                         self.logger.debug("mass flow value of %s : " % t.displayName)
                         t.setMassAndTemperature(mass1Dp, temperature)
                         thickValue = self.getThickness(mass)
                         self.logger.debug("Thickvalue: " + str(thickValue))
-                        if self.massFlowData["Mfr" + t.displayName].iloc[self.timeStep] == 0:
+                        if self.massFlowData["Mfr" + t.displayName].iloc[timeStep] == 0:
                             t.setColor(thickValue, mfr="ZeroMfr")
-                        elif round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep])) == self.maxValue:
+                        elif round(abs(self.tempMassFlowData["T" + t.displayName].iloc[timeStep])) == self.maxValue:
                             t.setColor(thickValue, mfr="max")
-                        elif round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep])) == self.minValue:
+                        elif round(abs(self.tempMassFlowData["T" + t.displayName].iloc[timeStep])) == self.minValue:
                             t.setColor(thickValue, mfr="min")
                         elif (
                             self.minValue
-                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[timeStep]))
                             <= self.lowerQuarter
                         ):
                             t.setColor(thickValue, mfr="minTo25")
                         elif (
                             self.lowerQuarter
-                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[timeStep]))
                             <= self.medianValue
                         ):
                             t.setColor(thickValue, mfr="25To50")
                         elif (
                             self.medianValue
-                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[timeStep]))
                             <= self.upperQuarter
                         ):
                             t.setColor(thickValue, mfr="50To75")
                         elif (
                             self.upperQuarter
-                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[self.timeStep]))
+                            < round(abs(self.tempMassFlowData["T" + t.displayName].iloc[timeStep]))
                             < self.maxValue
                         ):
                             t.setColor(thickValue, mfr="75ToMax")
@@ -232,7 +234,7 @@ class MassFlowVisualizer(QDialog):
                         i += 1
                 else:
                     if "xFrac" + t.displayName in self.massFlowData.columns:
-                        valvePosition = str(self.massFlowData["xFrac" + t.displayName].iloc[self.timeStep])
+                        valvePosition = str(self.massFlowData["xFrac" + t.displayName].iloc[timeStep])
                         t.setPositionForMassFlowSolver(valvePosition)
                         t.posLabel.setPlainText(valvePosition)
                         self.logger.debug("valve position: " + str(valvePosition))

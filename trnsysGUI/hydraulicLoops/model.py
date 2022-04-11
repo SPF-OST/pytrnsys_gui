@@ -44,11 +44,13 @@ class HydraulicLoop:
         self,
         name: Name,
         fluid: _ser.Fluid,
+        useLoopWideDefaults: bool,
         connections: _tp.Sequence[_spc.SinglePipeConnection],  # type: ignore[name-defined]
     ) -> None:
         self.name = name
         self.fluid = fluid
         self.connections: _tp.List[_spc.SinglePipeConnection] = [*connections]  # type: ignore[name-defined]
+        self.useLoopWideDefaults = useLoopWideDefaults
 
     def addConnection(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         if self.containsConnection(connection):
@@ -74,7 +76,7 @@ class HydraulicLoops:
                 f"Hydraulic loop names must be unique (the following names were duplicated: {','.join(duplicateNames)})."
             )
 
-        self.hydraulicLoops = [*hydraulicLoops]
+        self.hydraulicLoops = list(hydraulicLoops)
 
     @classmethod
     def createFromJson(
@@ -106,9 +108,11 @@ class HydraulicLoops:
         fluid = fluids.getFluid(serializedLoop.fluidName)
         assert fluid, f"Unknown fluid {serializedLoop.fluidName}"
 
+        useLoopWideDefaults = serializedLoop.useLoopWideDefaults
+
         connections = [connectionsByTrnsysId[i] for i in serializedLoop.connectionsTrnsysId]
 
-        loop = HydraulicLoop(name, fluid, connections)
+        loop = HydraulicLoop(name, fluid, useLoopWideDefaults, connections)
         return loop
 
     def toJson(self) -> _tp.Sequence[_tp.Dict]:
@@ -116,7 +120,7 @@ class HydraulicLoops:
         for loop in self.hydraulicLoops:
             connectionTrnsysIds = [c.trnsysId for c in loop.connections]
             serializedLoop = _ser.HydraulicLoop(
-                loop.name.value, loop.name.isUserDefined, loop.fluid.name, connectionTrnsysIds
+                loop.name.value, loop.name.isUserDefined, loop.fluid.name, loop.useLoopWideDefaults, connectionTrnsysIds
             )
             json = serializedLoop.to_dict()
             result.append(json)

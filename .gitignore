@@ -28,8 +28,4 @@ docs/trnsysGUI.uml
 
 /.tgitconfig
 
-pytrnsysgui_dev/
 
-*.log
-
-*.lst
