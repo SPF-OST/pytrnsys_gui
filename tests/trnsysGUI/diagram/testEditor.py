@@ -3,6 +3,7 @@ import logging as _log
 import pathlib as _pl
 import shutil as _su
 import subprocess as _sp
+import sys as _sys
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
@@ -85,11 +86,7 @@ class TestEditor:
 
     def _exportStorageTanksAndGetNames(self, projectFolderPath: _pl.Path) -> _tp.Sequence[str]:
         editor = self._createEditor(projectFolderPath)
-        storageTanks = [
-            o
-            for o in editor.trnsysObj
-            if isinstance(o, _stw.StorageTank)  # pylint: disable=no-member
-        ]
+        storageTanks = [o for o in editor.trnsysObj if isinstance(o, _stw.StorageTank)]  # pylint: disable=no-member
 
         for storageTank in storageTanks:
             storageTank.exportDck()
@@ -124,10 +121,22 @@ class TestEditor:
 
     def _exportMassFlowSolverDeckAndRunTrnsys(self, projectFolderPath):
         exportedFilePath = self._exportHydraulic(projectFolderPath, _format="mfs")
-        editor = self._createEditor(projectFolderPath)
-        assert editor.trnsysPath and editor.trnsysPath.is_file()
+
+        trnsysExePath = _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnExe.exe")
+
+        runningOnWindows = _sys.platform.startswith("windows")
+        if runningOnWindows:
+            _sp.run(
+                [str(trnsysExePath), str(exportedFilePath), "/H"], check=True
+            )
+            return
+
+        # Running on Linux using Wine
+        zDrivePath = _pl.PureWindowsPath("Z:")
+        exportedFileWindowswPath = zDrivePath / exportedFilePath
+
         _sp.run(
-            [str(editor.trnsysPath), exportedFilePath, "/H"], check=True
+            ["wine", str(trnsysExePath), str(exportedFileWindowswPath), "/H"], check=True
         )
 
     @classmethod
@@ -151,8 +160,8 @@ class TestEditor:
 
 class _Helper:
     def __init__(
-            self,
-            project: _Project,
+        self,
+        project: _Project,
     ):
         self._project = project
 
