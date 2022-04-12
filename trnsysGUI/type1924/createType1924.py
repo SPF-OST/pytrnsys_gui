@@ -985,5 +985,4 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getParameters(self.inputs)
 
         outputFilePath = _pl.Path(path) / f"{tankName}.{self.extension}"
-        outputContent = "".join(lines)
-        outputFilePath.write_text(outputContent)
+        outputFilePath.write_text(lines)
