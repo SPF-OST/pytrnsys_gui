@@ -5,12 +5,14 @@ import uuid as _uuid
 import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
+import trnsysGUI.BlockItem as _bi
+import trnsysGUI.doublePipeModelPortItems as _dpmpi
 import trnsysGUI.images as _img
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class DoublePipeConnectorBase(BlockItem, MassFlowNetworkContributorMixin):
+class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -20,6 +22,14 @@ class DoublePipeConnectorBase(BlockItem, MassFlowNetworkContributorMixin):
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
+
+        coldInput = _dpmpi.ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
+        coldOutput = _dpmpi.ColdPortItem("coldOutput", _mfn.PortItemType.OUTPUT)
+        self._coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
+
+        hotInput = _dpmpi.HotPortItem("hotInput", _mfn.PortItemType.INPUT)
+        hotOutput = _dpmpi.HotPortItem("hotOutput", _mfn.PortItemType.OUTPUT)
+        self._hotPipe = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         raise NotImplementedError()
@@ -96,11 +106,8 @@ class DoublePipeConnectorBase(BlockItem, MassFlowNetworkContributorMixin):
 
         resBlockList.append(self)
 
-    def getInternalPiping(self) -> InternalPiping:
-        raise NotImplementedError
-
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        raise NotImplementedError
+    def getInternalPiping(self) -> _mfs.InternalPiping:
+        raise NotImplementedError()
 
 
 @_dc.dataclass
@@ -119,20 +126,20 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylin
 
     @classmethod
     def from_dict(
-            cls,
-            data: _dcj.JsonDict,
-            validate=True,  # pylint: disable=duplicate-code
-            validate_enums: bool = True,
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,
     ) -> "DoublePipeBlockItemModel":
         data.pop(".__BlockDict__")
         doublePipeBlockItemModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(DoublePipeBlockItemModel, doublePipeBlockItemModel)
 
     def to_dict(
-            self,
-            omit_none: bool = True,
-            validate: bool = False,
-            validate_enums: bool = True,
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code
         data[".__BlockDict__"] = True
@@ -140,4 +147,4 @@ class DoublePipeBlockItemModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylin
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('e5149c30-9f05-4a3a-8a3c-9ada74143802')
+        return _uuid.UUID("e5149c30-9f05-4a3a-8a3c-9ada74143802")

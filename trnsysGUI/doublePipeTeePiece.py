@@ -10,7 +10,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import pytrnsys.utils.serialization as _ser
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.doublePipeConnectorBase import DoublePipeBlockItemModel
+from trnsysGUI.connectors.doublePipeConnectorBase import DoublePipeBlockItemModel
 from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
 from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin

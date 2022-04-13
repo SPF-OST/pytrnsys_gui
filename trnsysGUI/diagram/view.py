@@ -10,7 +10,7 @@ from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
-from trnsysGUI.Connector import Connector  # type: ignore[attr-defined]
+from trnsysGUI.connectors.connector import Connector  # type: ignore[attr-defined]
 from trnsysGUI.Control import Control  # type: ignore[attr-defined]
 from trnsysGUI.ExternalHx import ExternalHx  # type: ignore[attr-defined]
 from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
@@ -33,10 +33,10 @@ from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
 from trnsysGUI.WTap_main import WTap_main  # type: ignore[attr-defined]
 from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.deleteBlockCommand import DeleteBlockCommand
-from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.geotherm import Geotherm
-from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink

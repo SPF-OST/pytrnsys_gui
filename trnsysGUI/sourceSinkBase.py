@@ -1,4 +1,5 @@
 import typing as _tp
+import pathlib as _pl
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
@@ -18,6 +19,10 @@ class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
         self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
 
         self.changeSize()
+
+        ddckFilePath = _pl.Path(self.parent.parent().projectPath) / "ddck" / f"{self.displayName}.ddck"
+
+        self.path = str(ddckFilePath)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         raise NotImplementedError()
@@ -59,3 +64,6 @@ class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
         equationNr = 1
         massFlowLine = f"Mfr{self.displayName} = 500\n"
         return massFlowLine, equationNr
+
+    def hasDdckPlaceHolders(self):
+        return True

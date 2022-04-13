@@ -85,9 +85,11 @@ class NodeBase(_abc.ABC):
     def getNeighbours(self) -> _tp.Sequence["NodeBase"]:
         raise NotImplementedError()
 
+
 class PortItemType(_enum.Enum):
     INPUT = "Input"
     OUTPUT = "Output"
+
 
 @_dc.dataclass(eq=False)
 class PortItem(NodeBase, _abc.ABC):
@@ -108,8 +110,8 @@ class RealNodeBase(NodeBase, _abc.ABC):
 
     def serialize(self, nodesToIndices: _tp.Mapping[NodeBase, int]) -> SerializedNode:
         parameters = self._getParameters(nodesToIndices)
-        inputVariable = self._getInputVariable()  # pylint: disable=assignment-from-none
-        outputVariables = self._getOutputVariables()
+        inputVariable = self.getInputVariable()  # pylint: disable=assignment-from-none
+        outputVariables = self.getOutputVariables()
         return SerializedNode(parameters, inputVariable, outputVariables)
 
     def _getParameters(self, nodesToIndices: _tp.Mapping[NodeBase, int]) -> Parameters:
@@ -125,10 +127,10 @@ class RealNodeBase(NodeBase, _abc.ABC):
     def _getNeighbourIndices(self, nodesToIndices: _tp.Mapping["NodeBase", int]) -> _tp.Tuple[int, int, int]:
         raise NotImplementedError()
 
-    def _getInputVariable(self) -> _tp.Optional[InputVariable]:  # pylint: disable=no-self-use
+    def getInputVariable(self) -> _tp.Optional[InputVariable]:  # pylint: disable=no-self-use
         return None
 
-    def _getOutputVariables(self) -> OutputVariables:
+    def getOutputVariables(self) -> OutputVariables:
         return (
             self._getOutputVariable(1, "A"),
             self._getOutputVariable(2, "B"),
@@ -165,7 +167,7 @@ class Source(OneNeighbourBase):
     def _getNumberOfOutputVariables(self) -> OutputVariableIndex:
         return 2
 
-    def _getInputVariable(self) -> _tp.Optional[InputVariable]:
+    def getInputVariable(self) -> _tp.Optional[InputVariable]:
         return InputVariable(f"Mfr{self.name}")
 
 
@@ -216,7 +218,7 @@ class Pump(TwoNeighboursBase):
     def _getNodeType(self) -> NodeType:
         return NodeType.PUMP
 
-    def _getInputVariable(self) -> _tp.Optional[InputVariable]:
+    def getInputVariable(self) -> _tp.Optional[InputVariable]:
         return InputVariable(f"Mfr{self.name}")
 
 
@@ -244,7 +246,7 @@ class Diverter(ThreeNeighboursBase):
     def _getNodeType(self) -> NodeType:
         return NodeType.DIVERTER
 
-    def _getInputVariable(self) -> _tp.Optional[InputVariable]:
+    def getInputVariable(self) -> _tp.Optional[InputVariable]:
         return InputVariable(f"xFrac{self.name}")
 
 
