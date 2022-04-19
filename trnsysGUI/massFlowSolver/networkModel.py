@@ -69,7 +69,7 @@ class PortItem(NodeBase, _abc.ABC):
     def getNeighbours(self) -> _tp.Sequence[NodeBase]:
         return []
 
-    def canConnectTo(self, other: "PortItem") -> bool:
+    def canOverlapWith(self, other: "PortItem") -> bool:
         return other != self
 
     def __repr__(self):

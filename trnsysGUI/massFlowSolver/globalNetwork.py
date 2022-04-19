@@ -71,7 +71,7 @@ def _getInternalPortItemToExternalRealNode(
             graphicalPortItem = modelsToGraphicalPortItem[portItem]
             candidates = graphicalPortItemsToModels[graphicalPortItem]
 
-            externalPortItem = _com.getSingle(c for c in candidates if c.canConnectTo(portItem))
+            externalPortItem = _com.getSingle(c for c in candidates if c.canOverlapWith(portItem))
 
             externalRealNode = modelPortItemsToRealNode[externalPortItem]
 
