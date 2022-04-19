@@ -538,7 +538,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
             msgb.setText("Name already exist!")
             msgb.exec()
             return
-        self.storage.setName(self.lineEdit.text())
+        self.storage.setDisplayName(self.lineEdit.text())
         self.close()
 
     def cancel(self):

@@ -88,7 +88,7 @@ class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixi
     def decode(self, i, resBlockList):
         model = DoublePipeBlockItemModel.from_dict(i)
 
-        self.setName(model.BlockDisplayName)
+        self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
         self.id = model.id
         self.trnsysId = model.trnsysId

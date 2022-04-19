@@ -101,8 +101,7 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
     def decode(self, i, resBlockList):
         model = DoublePipeTeePieceModel.from_dict(i)
 
-        self.setName(model.BlockName)
-        self.displayName = model.BlockDisplayName
+        self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
         self.id = model.id
         self.trnsysId = model.trnsysId

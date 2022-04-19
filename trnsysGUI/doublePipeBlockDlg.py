@@ -63,7 +63,7 @@ class DoublePipeBlockDlg(QDialog):
             msgb.setText("Name already exist!")
             msgb.exec()
         else:
-            self.block.setName(newName)
+            self.block.setDisplayName(newName)
             self.close()
 
     def cancel(self):

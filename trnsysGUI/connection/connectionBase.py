@@ -205,7 +205,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")
-            self.initSegmentM0()
+            self._initSegmentM0()
         elif self.parent.editorMode == 1:
             self.logger.debug("Creating a new connection in mode 1")
             self._initializeSingleSegmentConnection()
@@ -216,7 +216,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.fromPort.connectionList.append(self)
         self.toPort.connectionList.append(self)
 
-    def initSegmentM0(self):
+    def _initSegmentM0(self):
         self.startNode.setParent(self)
         self.endNode.setParent(self)
 

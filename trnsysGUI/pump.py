@@ -104,7 +104,7 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
     def decode(self, i: _dcj.JsonDict, resBlockList) -> None:
         model = PumpModel.from_dict(i)
 
-        self.setName(model.BlockDisplayName)
+        self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
         self.id = model.Id
         self.trnsysId = model.trnsysId

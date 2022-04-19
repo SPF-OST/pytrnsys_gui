@@ -132,7 +132,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
     def decode(self, i, resBlockList):
         model = TeePieceModel.from_dict(i)
 
-        self.setName(model.BlockDisplayName)
+        self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
         self.id = model.Id
         self.trnsysId = model.trnsysId

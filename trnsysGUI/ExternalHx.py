@@ -118,7 +118,7 @@ class ExternalHx(BlockItemFourPorts):
             self.logger.debug("Deleted widget")
         del self
 
-    def setName(self, newName):
+    def setDisplayName(self, newName):
         """
         Overridden method to also change folder name
         """

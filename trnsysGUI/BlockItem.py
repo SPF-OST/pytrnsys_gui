@@ -120,7 +120,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def setId(self, newId):
         self.id = newId
 
-    def setName(self, newName):
+    def setDisplayName(self, newName):
         self.displayName = newName
         self.label.setPlainText(newName)
 
@@ -607,7 +607,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def decode(self, i, resBlockList):
         model = BlockItemModel.from_dict(i)
 
-        self.setName(model.BlockDisplayName)
+        self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
         self.id = model.Id
         self.trnsysId = model.trnsysId

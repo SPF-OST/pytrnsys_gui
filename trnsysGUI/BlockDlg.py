@@ -83,7 +83,7 @@ class BlockDlg(QDialog):  # pylint: disable=too-many-instance-attributes
             msgb.setText("Name already exist!")
             msgb.exec()
         else:
-            self.block.setName(newName)
+            self.block.setDisplayName(newName)
             self.close()
 
     def setNewFlipStateH(self, state):
