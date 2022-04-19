@@ -869,15 +869,15 @@ class Editor(QWidget):
             return _res.error(result)
 
         msgb = QMessageBox(self)
-        msgb.setText(f"Saved place holder values JSON file at f{jsonFilePath}.")
+        msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
         msgb.exec()
 
         return None
 
     def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _res.Result[None]:
-        ddckFileNames = self._updateDdckFilePaths()
+        ddckDirNames = self._getDdckDirNames()
 
-        result = _ph.getPlaceholderValues(ddckFileNames, self.trnsysObj)
+        result = _ph.getPlaceholderValues(ddckDirNames, self.trnsysObj)
         if _res.isError(result):
             return _res.error(result)
 
@@ -1260,18 +1260,18 @@ class Editor(QWidget):
         hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
 
-    def _updateDdckFilePaths(self):
-        projectFolderDdckPath = _pl.Path(self.projectFolder) / "ddck"
+    def _getDdckDirNames(self) -> _tp.Sequence[str]:
+        ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
 
-        projectDdckFiles = list(projectFolderDdckPath.iterdir())
+        componentDdckDirPaths = list(ddckDirPath.iterdir())
 
-        ddckFileNames = []
-        for path in projectDdckFiles:
-            if path.name == "generic":
+        ddckDirNames = []
+        for componentDirPath in componentDdckDirPaths:
+            if componentDirPath.name == "generic":
                 continue
-            ddckFileNames.append(path.name)
+            ddckDirNames.append(componentDirPath.name)
 
-        return ddckFileNames
+        return ddckDirNames
 
     def nameExists(self, name):
         for item in self.trnsysObj:

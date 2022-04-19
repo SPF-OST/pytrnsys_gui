@@ -7,7 +7,7 @@ import typing as tp
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.Collector import Collector
-from trnsysGUI.Connector import Connector
+from trnsysGUI.connectors.connector import Connector
 from trnsysGUI.Control import Control
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.ExternalHx import ExternalHx
@@ -32,9 +32,9 @@ from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
-from trnsysGUI.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
-from trnsysGUI.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.source import Source
 from trnsysGUI.sink import Sink

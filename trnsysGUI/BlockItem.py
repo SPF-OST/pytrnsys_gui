@@ -694,7 +694,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def exportDivSetting2(self, nUnit):  # pylint: disable=no-self-use
         return "", nUnit
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=no-self-use
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:  # pylint: disable=no-self-use
         return "", startingUnit
 
     def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:  # pylint: disable=unused-argument

@@ -290,22 +290,29 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
             self, massFlowContributor: _mfs.MassFlowNetworkContributorMixin
     ) -> _tp.Optional[_mfs.MassFlowNetworkContributorMixin]:
         if massFlowContributor == self.parent:
-            return self._getConnectionOrNone()
+            return self.getConnectionOrNone()
 
-        connection = self._getConnectionOrNone()
+        connection = self.getConnectionOrNone()
 
         if not connection or connection != massFlowContributor:
             raise ValueError("`massFlowContributor' is not adjacent to this port item.")
 
         return self.parent
 
-    def _getConnectionOrNone(self) -> _tp.Optional[_cb.ConnectionBase]:
+    def getConnectionOrNone(self) -> _tp.Optional[_cb.ConnectionBase]:
         if not self.connectionList:
             return None
 
         assert len(self.connectionList) == 1
 
         connection = self.connectionList[0]
+
+        return connection
+
+    def getConnection(self) -> _cb.ConnectionBase:
+        connection = self.getConnectionOrNone()
+
+        assert connection
 
         return connection
 
