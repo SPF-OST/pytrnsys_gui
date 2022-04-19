@@ -1,10 +1,10 @@
 import typing as _tp
 
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.massFlowSolver.search as _search
 import trnsysGUI.singlePipePortItem as _spi
-from . import model as _model
 from . import _loopWideDefaults as _lwd
+from . import search
+from . import model as _model
 
 
 def createLoops(
@@ -17,7 +17,7 @@ def createLoops(
         nextConnection = todo[0]
         assert isinstance(nextConnection.fromPort, _spi.SinglePipePortItem)
 
-        reachableConnections = [*_search.getReachableConnections(nextConnection.fromPort)]
+        reachableConnections = [*search.getReachableConnections(nextConnection.fromPort)]
         todo = [c for c in todo if c not in reachableConnections]
 
         name = loops.generateName()

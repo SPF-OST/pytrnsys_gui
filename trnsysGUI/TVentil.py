@@ -234,14 +234,14 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
             unitText += "PARAMETERS 0\n"
             unitText += "INPUTS 6\n"
 
-            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+            openLoops, _ = self._getOpenLoopsAndNodeToIndices()
             assert len(openLoops) == 1
             openLoop = openLoops[0]
 
             assert len(openLoop.realNodes) == 1
             realNode = openLoop.realNodes[0]
 
-            outputVariables = realNode.serialize(nodesToIndices).outputVariables
+            outputVariables = realNode.getOutputVariables()
             for outputVariable in outputVariables:
                 if not outputVariable:
                     continue

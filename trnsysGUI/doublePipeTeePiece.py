@@ -167,7 +167,7 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         assert len(openLoop.realNodes) == 1
         realNode = openLoop.realNodes[0]
 
-        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+        outputVariables = realNode.getOutputVariables()
         for outputVariable in outputVariables:
             if not outputVariable:
                 continue

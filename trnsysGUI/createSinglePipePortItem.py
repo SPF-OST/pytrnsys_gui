@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import typing as _tp
 
-import trnsysGUI.massFlowSolver.search as _search
+from trnsysGUI.hydraulicLoops import search
+
 import trnsysGUI.singlePipePortItem as _spc
 
 if _tp.TYPE_CHECKING:
@@ -12,4 +13,4 @@ if _tp.TYPE_CHECKING:
 def createSinglePipePortItem(
         name: str, side: _spc.Side, parent: _bi.BlockItem
 ) -> _spc.SinglePipePortItem:
-    return _spc.SinglePipePortItem(name, side, parent, _search.getInternallyConnectedPortItems)
+    return _spc.SinglePipePortItem(name, side, parent, search.getInternallyConnectedPortItems)

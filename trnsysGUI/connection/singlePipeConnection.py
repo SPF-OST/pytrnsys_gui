@@ -168,14 +168,14 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         unitText += "INPUTS " + str(inputNumbers) + "\n"
 
-        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+        openLoops, _ = self._getOpenLoopsAndNodeToIndices()
         assert len(openLoops) == 1
         openLoop = openLoops[0]
 
         assert len(openLoop.realNodes) == 1
         realNode = openLoop.realNodes[0]
 
-        outputVariables = realNode.serialize(nodesToIndices).outputVariables
+        outputVariables = realNode.getOutputVariables()
 
         portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
 

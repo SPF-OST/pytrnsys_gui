@@ -521,7 +521,7 @@ class Editor(QWidget):
 
         simulationUnit = 450
         simulationType = 935
-        descConnLength = 20
+        descConnLength = 15
 
         exporter = self._createExporter()
 
@@ -583,7 +583,14 @@ class Editor(QWidget):
 
     def _createExporter(self) -> Export:
         massFlowContributors = self._getMassFlowContributors()
-        exporter = Export(massFlowContributors, self)
+        exporter = Export(
+            self.diagramName,
+            massFlowContributors,
+            self.hydraulicLoops.hydraulicLoops,
+            self.fluids.fluids,
+            self.logger,
+            self,
+        )
         return exporter
 
     def _getMassFlowContributors(self) -> _tp.Sequence[_mfs.MassFlowNetworkContributorMixin]:

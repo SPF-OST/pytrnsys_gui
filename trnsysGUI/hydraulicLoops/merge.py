@@ -5,9 +5,9 @@ import typing as _tp
 
 import pytrnsys.utils.result as _res
 import trnsysGUI.common as _com
-import trnsysGUI.massFlowSolver.search as _search
 import trnsysGUI.singlePipePortItem as _spi
 from . import _loopWideDefaults as _lwd
+from . import search
 from . import common as _lcom
 from . import model as _model, _helpers
 from ._dialogs.merge import dialog as _md
@@ -187,7 +187,7 @@ def _getLoopIgnoringConnection(
     connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
     hydraulicLoops: _model.HydraulicLoops,
 ) -> _tp.Optional[_model.HydraulicLoop]:
-    connections = _search.getReachableConnections(portItem, ignoreConnections={connection})
+    connections = search.getReachableConnections(portItem, ignoreConnections={connection})
     if not connections:
         return None
 

@@ -3,9 +3,9 @@ from __future__ import annotations
 import dataclasses as _dc
 import typing as _tp
 
-import trnsysGUI.massFlowSolver.search as _search
 from . import _helpers
 from . import _loopWideDefaults as _lwd
+from . import search
 from . import common as _common
 from . import model as _model
 from ._dialogs.split import dialog as _dialog
@@ -51,8 +51,8 @@ class _Splitter:
     ) -> _common.Cancellable[_tp.Optional[SplitSummary]]:
         fromPort, toPort = _helpers.getFromAndToPort(connection)
 
-        fromConnections = _search.getReachableConnections(fromPort, ignoreConnections={connection})
-        toConnections = _search.getReachableConnections(toPort, ignoreConnections={connection})
+        fromConnections = search.getReachableConnections(fromPort, ignoreConnections={connection})
+        toConnections = search.getReachableConnections(toPort, ignoreConnections={connection})
 
         loop = self._hydraulicLoops.getLoopForExistingConnection(connection)
 
@@ -90,8 +90,8 @@ class _Splitter:
     ) -> _common.Cancellable[SplitSummary]:
         fromPort, toPort = _helpers.getFromAndToPort(connection)
 
-        fromConnections = _search.getReachableConnections(fromPort, ignoreConnections={connection})
-        toConnections = _search.getReachableConnections(toPort, ignoreConnections={connection})
+        fromConnections = search.getReachableConnections(fromPort, ignoreConnections={connection})
+        toConnections = search.getReachableConnections(toPort, ignoreConnections={connection})
 
         if not splitLoopsSummary:
             cancellable = self._createSplitLoopsSummary(loop, fromConnections, connection, toConnections)

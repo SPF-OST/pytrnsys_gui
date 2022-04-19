@@ -1,6 +1,5 @@
 __all__ = [
     "NodeType",
-    "Parameters",
     "NodeBase",
     "PortItem",
     "RealNodeBase",
@@ -34,28 +33,6 @@ class NodeType(_enum.IntEnum):
 
 
 @_dc.dataclass(eq=False)
-class Parameters:
-    UNUSED_INDEX_VALUE = 0
-
-    name: str
-    index: int
-
-    nodeType: NodeType
-
-    neighbourIndices: _tp.Tuple[int, int, int]
-
-    def toString(self, secondColumnIndent: int) -> str:
-        firstColumn = (
-            f"{self.neighbourIndices[0]} {self.neighbourIndices[1]} {self.neighbourIndices[2]} {self.nodeType} "
-        )
-        secondColumn = f"!{self.index} : {self.name}"
-
-        line = f"{firstColumn.ljust(secondColumnIndent)}{secondColumn}"
-
-        return line
-
-
-@_dc.dataclass(eq=False)
 class InputVariable:
     UNDEFINED_INPUT_VARIABLE_VALUE = "0,0"
     name: str
@@ -71,13 +48,6 @@ OutputVariableIndex = _tp.Literal[1, 2, 3]
 MAX_N_OUTPUT_VARIABLES_PER_NODE = 3
 
 OutputVariables = _tp.Tuple[_tp.Optional[OutputVariable], _tp.Optional[OutputVariable], _tp.Optional[OutputVariable]]
-
-
-@_dc.dataclass(eq=False)
-class SerializedNode:
-    parameters: Parameters
-    inputVariable: _tp.Optional[InputVariable]
-    outputVariables: OutputVariables
 
 
 class NodeBase(_abc.ABC):
@@ -99,6 +69,9 @@ class PortItem(NodeBase, _abc.ABC):
     def getNeighbours(self) -> _tp.Sequence[NodeBase]:
         return []
 
+    def canConnectTo(self, other: "PortItem") -> bool:
+        return other != self
+
     def __repr__(self):
         return f"<PortItem object at 0x{id(self):x}>"
 
@@ -108,23 +81,8 @@ class RealNodeBase(NodeBase, _abc.ABC):
     name: str
     trnsysId: int
 
-    def serialize(self, nodesToIndices: _tp.Mapping[NodeBase, int]) -> SerializedNode:
-        parameters = self._getParameters(nodesToIndices)
-        inputVariable = self.getInputVariable()  # pylint: disable=assignment-from-none
-        outputVariables = self.getOutputVariables()
-        return SerializedNode(parameters, inputVariable, outputVariables)
-
-    def _getParameters(self, nodesToIndices: _tp.Mapping[NodeBase, int]) -> Parameters:
-        index = nodesToIndices[self]
-        neighbourIndices = self._getNeighbourIndices(nodesToIndices)
-        return Parameters(self.name, index, self._getNodeType(), neighbourIndices)
-
     @_abc.abstractmethod
-    def _getNodeType(self) -> NodeType:
-        raise NotImplementedError()
-
-    @_abc.abstractmethod
-    def _getNeighbourIndices(self, nodesToIndices: _tp.Mapping["NodeBase", int]) -> _tp.Tuple[int, int, int]:
+    def getNodeType(self) -> NodeType:
         raise NotImplementedError()
 
     def getInputVariable(self) -> _tp.Optional[InputVariable]:  # pylint: disable=no-self-use
@@ -157,12 +115,8 @@ class OneNeighbourBase(RealNodeBase, _abc.ABC):
 
 
 class Source(OneNeighbourBase):
-    def _getNodeType(self) -> NodeType:
+    def getNodeType(self) -> NodeType:
         return NodeType.SOURCE
-
-    def _getNeighbourIndices(self, nodesToIndices: _tp.Mapping["NodeBase", int]) -> _tp.Tuple[int, int, int]:
-        neighbourIndex = nodesToIndices[self.neighbour]
-        return neighbourIndex, Parameters.UNUSED_INDEX_VALUE, Parameters.UNUSED_INDEX_VALUE
 
     def _getNumberOfOutputVariables(self) -> OutputVariableIndex:
         return 2
@@ -172,12 +126,8 @@ class Source(OneNeighbourBase):
 
 
 class Sink(OneNeighbourBase):
-    def _getNodeType(self) -> NodeType:
+    def getNodeType(self) -> NodeType:
         return NodeType.SINK
-
-    def _getNeighbourIndices(self, nodesToIndices: _tp.Mapping["NodeBase", int]) -> _tp.Tuple[int, int, int]:
-        neighbourIndex = nodesToIndices[self.neighbour]
-        return neighbourIndex, Parameters.UNUSED_INDEX_VALUE, Parameters.UNUSED_INDEX_VALUE
 
     def _getNumberOfOutputVariables(self) -> OutputVariableIndex:
         return 2
@@ -191,26 +141,12 @@ class TwoNeighboursBase(RealNodeBase, _abc.ABC):
     def getNeighbours(self) -> _tp.Sequence[NodeBase]:
         return [self.fromNode, self.toNode]
 
-    def getOtherNeighbour(self, neighbour: NodeBase) -> NodeBase:
-        if neighbour not in self.getNeighbours():
-            raise ValueError("`neighbour' is not one of our neighbours")
-
-        if neighbour is self.fromNode:
-            return self.toNode
-
-        return self.fromNode
-
-    def _getNeighbourIndices(self, nodesToIndices: _tp.Mapping["NodeBase", int]) -> _tp.Tuple[int, int, int]:
-        fromIndex = nodesToIndices[self.fromNode]
-        toIndex = nodesToIndices[self.toNode]
-        return fromIndex, toIndex, Parameters.UNUSED_INDEX_VALUE
-
     def _getNumberOfOutputVariables(self) -> OutputVariableIndex:
         return 2
 
 
 class Pipe(TwoNeighboursBase):
-    def _getNodeType(self) -> NodeType:
+    def getNodeType(self) -> NodeType:
         return NodeType.PIPE
 
     @property
@@ -223,8 +159,9 @@ class Pipe(TwoNeighboursBase):
         assert isinstance(self.toNode, PortItem)
         return self.toNode
 
+
 class Pump(TwoNeighboursBase):
-    def _getNodeType(self) -> NodeType:
+    def getNodeType(self) -> NodeType:
         return NodeType.PUMP
 
     def getInputVariable(self) -> _tp.Optional[InputVariable]:
@@ -240,19 +177,12 @@ class ThreeNeighboursBase(RealNodeBase, _abc.ABC):
     def getNeighbours(self) -> _tp.Sequence[NodeBase]:
         return [self.node1, self.node2, self.node3]
 
-    def _getNeighbourIndices(self, nodesToIndices: _tp.Mapping["NodeBase", int]) -> _tp.Tuple[int, int, int]:
-        node1Index = nodesToIndices[self.node1]
-        node2Index = nodesToIndices[self.node2]
-        node3Index = nodesToIndices[self.node3]
-        neighbourIndices = (node1Index, node2Index, node3Index)
-        return neighbourIndices
-
     def _getNumberOfOutputVariables(self) -> OutputVariableIndex:
         return 3
 
 
 class Diverter(ThreeNeighboursBase):
-    def _getNodeType(self) -> NodeType:
+    def getNodeType(self) -> NodeType:
         return NodeType.DIVERTER
 
     def getInputVariable(self) -> _tp.Optional[InputVariable]:
@@ -260,7 +190,7 @@ class Diverter(ThreeNeighboursBase):
 
 
 class TeePiece(ThreeNeighboursBase):
-    def _getNodeType(self) -> NodeType:
+    def getNodeType(self) -> NodeType:
         return NodeType.TEE_PIECE
 
 

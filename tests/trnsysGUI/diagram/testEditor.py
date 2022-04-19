@@ -95,7 +95,7 @@ class TestEditor:
 
         return storageTankNames
 
-    @_pt.mark.linux
+    @_pt.mark.linux_ci
     @_pt.mark.parametrize("project", TEST_CASES)
     def testMassFlowSolver(self, project: _Project, request: _pt.FixtureRequest) -> None:
         helper = _Helper(project)
@@ -124,7 +124,7 @@ class TestEditor:
 
         trnsysExePath = _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnExe.exe")
 
-        runningOnWindows = _sys.platform.startswith("windows")
+        runningOnWindows = _sys.platform.startswith("win32")
         if runningOnWindows:
             _sp.run(
                 [str(trnsysExePath), str(exportedFilePath), "/H"], check=True

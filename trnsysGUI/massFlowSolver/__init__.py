@@ -35,6 +35,23 @@ class InternalPiping:
                         portItemsAndAdjacentRealNode.append(portItemAndAdjacentRealNode)
         return portItemsAndAdjacentRealNode
 
+    def getAllRealNodes(self) -> _tp.Sequence[_mfn.RealNodeBase]:
+        allRealNodes: _tp.List[_mfn.RealNodeBase] = []
+        for startingNode in self.openLoopsStartingNodes:
+            visitedNodes = {startingNode}
+            stack = [startingNode]
+            while stack:
+                currentNode = stack.pop()
+                unvisitedNodes = [
+                    n for n in currentNode.getNeighbours() if n not in visitedNodes and isinstance(n, _mfn.RealNodeBase)
+                ]
+                visitedNodes.update(unvisitedNodes)
+                stack.extend(unvisitedNodes)
+
+            allRealNodes.extend(visitedNodes)
+
+        return allRealNodes
+
 
 @_dc.dataclass
 class _OpenLoop:
@@ -45,22 +62,12 @@ class MassFlowNetworkContributorMixin:
     def getInternalPiping(self) -> InternalPiping:
         raise NotImplementedError()
 
-    def exportParametersFlowSolver(self, descConnLength):
-        openLoops, allNodesToIndices = self._getOpenLoopsAndNodeToIndices()
-
-        allParameters = []
-        for openLoop in openLoops:
-            parameters = [rn.serialize(allNodesToIndices).parameters for rn in openLoop.realNodes]
-            allParameters.extend(parameters)
-
-        return "\n".join(parameters.toString(descConnLength) for parameters in allParameters) + "\n"
-
     def exportInputsFlowSolver(self):
-        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+        openLoops, _ = self._getOpenLoopsAndNodeToIndices()
 
         allInputVariables = []
         for openLoop in openLoops:
-            inputVariables = [n.serialize(nodesToIndices).inputVariable for n in openLoop.realNodes]
+            inputVariables = [n.getInputVariable() for n in openLoop.realNodes]
             allInputVariables.extend(inputVariables)
 
         line = ""
@@ -72,14 +79,12 @@ class MassFlowNetworkContributorMixin:
 
         return line, len(allInputVariables)
 
-    def exportOutputsFlowSolver(
-            self, prefix, abc, equationNumber, simulationUnit  # pylint: disable=unused-argument
-    ):
-        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
+    def exportOutputsFlowSolver(self, prefix, abc, equationNumber, simulationUnit):  # pylint: disable=unused-argument
+        openLoops, _ = self._getOpenLoopsAndNodeToIndices()
 
         realNodes = [n for l in openLoops for n in l.realNodes]
 
-        lines = self._getOutputLines(realNodes, nodesToIndices, equationNumber, simulationUnit)
+        lines = self._getOutputLines(realNodes, equationNumber, simulationUnit)
 
         joinedLines = "\n".join(lines) + "\n"
         nLinesGenerated = len(lines)
@@ -88,10 +93,10 @@ class MassFlowNetworkContributorMixin:
         return joinedLines, nextEquationNumber, nLinesGenerated
 
     @staticmethod
-    def _getOutputLines(realNodes, nodesToIndices, equationNumber, simulationUnit):
+    def _getOutputLines(realNodes: _tp.Sequence[_mfn.RealNodeBase], equationNumber, simulationUnit):
         lines = []
         for nodeIndex, node in enumerate(realNodes):
-            outputVariables = node.serialize(nodesToIndices).outputVariables
+            outputVariables = node.getOutputVariables()
             for variableIndex, outputVariable in enumerate(outputVariables):
                 if not outputVariable:
                     continue

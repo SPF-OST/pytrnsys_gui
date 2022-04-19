@@ -1,30 +1,54 @@
 # pylint: skip-file
+import dataclasses as _dc
+import logging as _log
 import re
 import typing as _tp
 
 import jinja2 as _jinja
-from PyQt5.QtWidgets import QMessageBox
 
+import trnsysGUI.TVentil as _tventil
+import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.connection.values as _values
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.hydraulicLoops.names as _names
-from trnsysGUI import massFlowSolver as _mfs
-from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.massFlowSolver.globalNetwork as _gn
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+
+_UNUSED_INDEX = 0
 
 
-class Export(object):
-    def __init__(self, massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin], editor):
-        self.logger = editor.logger
+@_dc.dataclass
+class _SerializedNode:
+    name: str
+    index: int
+    nodeType: int
+    neighborIndexes: _tp.Tuple[int, int, int]
 
+
+class Export:
+    def __init__(
+        self,
+        diagramName: str,
+        massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
+        hydraulicLoops: _tp.Sequence[_hlm.HydraulicLoop],
+        fluids: _tp.Sequence[_hlm.Fluid],
+        logger: _log.Logger,
+        editor,
+    ) -> None:
+        self._hydraulicLoops = hydraulicLoops
+        self._fluids = fluids
+        self._diagramName = diagramName
         self._massFlowContributors = massFlowContributors
-        self.editor = editor
+        self.logger = logger
+        self._editor = editor
+
         self.maxChar = 20
 
         o: _mfs.MassFlowNetworkContributorMixin
-        nodes = [n for o in self._massFlowContributors for n in o.getInternalPiping().openLoopsStartingNodes]
+        nodes = [n for c in self._massFlowContributors for n in c.getInternalPiping().openLoopsStartingNodes]
         self.lineNumOfPar = len(nodes)
 
         self.numOfPar = 4 * self.lineNumOfPar + 1
@@ -57,7 +81,9 @@ class Export(object):
         return problemEncountered, f
 
     def exportDoublePipeParameters(self, exportTo="ddck"):
-        doesHydraulicContainDoublePipes = any([isinstance(obj, DoublePipeConnection) for obj in self._massFlowContributors])
+        doesHydraulicContainDoublePipes = any(
+            [isinstance(obj, _dpc.DoublePipeConnection) for obj in self._massFlowContributors]
+        )
 
         if not doesHydraulicContainDoublePipes:
             return ""
@@ -102,7 +128,9 @@ class Export(object):
         exportText += self._addComment("dpCpSl = 0.84", "! Specific heat of soil, kJ/(kg*K)")
 
         if exportTo == "mfs":
-            exportText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
+            exportText += (
+                commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
+            )
             exportText += self._addComment("TambAvg = 7.96", "! Average surface temperature, deg C")
             exportText += self._addComment("dTambAmpl = 13.32", "! Amplitude of surface temperature, deg C")
             exportText += self._addComment("ddTcwOffset = 36", "! Days of minimum surface temperature")
@@ -140,7 +168,6 @@ class Export(object):
             f += t.exportMassFlows()[0]
             equationNr += t.exportMassFlows()[1]
 
-
         if equationNr == 0:
             f = ""
         else:
@@ -173,44 +200,78 @@ class Export(object):
 
         return f
 
-    def exportParametersFlowSolver(self, simulationUnit, simulationType, descConnLength):
-        # If not all ports of an object are connected, less than 4 numbers will show up
-        f = ""
-        f += "UNIT " + str(simulationUnit) + " TYPE " + str(simulationType) + "\n"
-        f += "PARAMETERS " + str(self.numOfPar) + "\n"
-        f += str(self.lineNumOfPar) + "\n"
-
-        nameString = ""
-        for t in self._massFlowContributors:
-
-            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
+    def exportParametersFlowSolver(self, simulationUnit: int, simulationType: int, descConnLength: int) -> str:
+        massFlowContributors = []
+        for massFlowContributor in self._massFlowContributors:
+            noHydraulicConnection = (
+                not isinstance(massFlowContributor, _cb.ConnectionBase)
+                and not massFlowContributor.outputs  # type: ignore[attr-defined]
+                and not massFlowContributor.inputs  # type: ignore[attr-defined]
+            )
 
             if noHydraulicConnection:
                 continue
-            else:
-                ObjToCheck = t.exportParametersFlowSolver(descConnLength)
-                f += ObjToCheck
-                ObjToCheck = str(ObjToCheck).split(": ")[-1].rstrip()
 
-                if len(ObjToCheck) > self.maxChar - 5:
-                    nameString += ObjToCheck + "\n"
+            massFlowContributors.append(massFlowContributor)
 
-        if nameString != "":
-            msgBox = QMessageBox()
-            msgBox.setText(
-                "The following variable names :\n%shas longer than %d characters!" % (nameString, self.maxChar - 5)
-            )
-            msgBox.exec_()
+        serializedNodes = self._getSerializedNodes(massFlowContributors)
 
-        tempS = f
-        self.logger.debug("param solver text is ")
-        self.logger.debug(f)
-        t = self.convertToStringList(tempS)
-        self.logger.debug("And now the ids come")
+        lines = []
+        for serializedNode in serializedNodes:
+            neighborIndexes = serializedNode.neighborIndexes
 
-        f = "\n".join(t[0:3]) + "\n" + self.correctIds(t[3:]) + "\n"
+            firstColumn = f"{neighborIndexes[0]} {neighborIndexes[1]} {neighborIndexes[2]} {serializedNode.nodeType} "
+            secondColumn = f"!{serializedNode.index} : {serializedNode.name}"
 
-        return f
+            line = f"{firstColumn.ljust(descConnLength)}{secondColumn}"
+
+            lines.append(line)
+
+        jointLines = "\n".join(lines)
+
+        resultText = f"""\
+UNIT {simulationUnit} TYPE {simulationType}
+PARAMETERS {len(serializedNodes) * 4 + 1}
+{len(serializedNodes)}
+{jointLines}
+"""
+
+        return resultText
+
+    @staticmethod
+    def _getSerializedNodes(
+        massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
+    ) -> _tp.Sequence[_SerializedNode]:
+        globalNetwork = _gn.getGlobalNetwork(massFlowContributors)
+
+        realNodesToIndex = {r: i for i, r in enumerate(globalNetwork.realNodes, start=1)}
+
+        serializedNodes = []
+        for index, realNode in enumerate(globalNetwork.realNodes, start=1):
+            neighborIndexes = []
+            for neighbor in realNode.getNeighbours():
+                if isinstance(neighbor, _mfn.RealNodeBase):
+                    neighborIndex = realNodesToIndex[neighbor]
+                elif isinstance(neighbor, _mfn.PortItem):
+                    externalRealNode = globalNetwork.internalPortItemToExternalRealNode[neighbor]
+                    neighborIndex = realNodesToIndex[externalRealNode]
+                else:
+                    raise AssertionError("Can't get here.")
+
+                neighborIndexes.append(neighborIndex)
+
+            nUnusedIndexes = 3 - len(neighborIndexes)
+            unusedIndexes = nUnusedIndexes * [_UNUSED_INDEX]
+
+            indexes = neighborIndexes + unusedIndexes
+            assert len(indexes) == 3
+            indexesTuple = (indexes[0], indexes[1], indexes[2])
+
+            serializedNode = _SerializedNode(realNode.name, index, realNode.getNodeType(), indexesTuple)
+
+            serializedNodes.append(serializedNode)
+
+        return serializedNodes
 
     def convertToStringList(self, l):
         res = []
@@ -229,7 +290,7 @@ class Export(object):
         self.logger.debug(a)
         return a
 
-    def correctIds(self, lineList):
+    def _correctIds(self, lineList):
         fileCopy = lineList[:]
         self.logger.debug("fds" + str(fileCopy))
         fileCopy = [" " + l for l in fileCopy]
@@ -270,7 +331,9 @@ class Export(object):
         for t in self._massFlowContributors:
             res = t.exportInputsFlowSolver()
             f += res[0]
-            counter += res[1] #DC this is a very strange way to print values, I would like to have 10 values per line and the fact that two go together makes it complicated
+            counter += res[
+                1
+            ]  # DC this is a very strange way to print values, I would like to have 10 values per line and the fact that two go together makes it complicated
             numberOfInputs += res[1]
 
             if counter > 9 or t == self._massFlowContributors[-1]:
@@ -288,7 +351,6 @@ class Export(object):
                 f += "\n"
                 counter = 0
 
-
         f += "\n\n"
 
         return f
@@ -305,7 +367,7 @@ class Export(object):
         tot = ""
 
         for t in self._massFlowContributors:
-            noHydraulicConnection = not isinstance(t, ConnectionBase) and not t.outputs and not t.inputs
+            noHydraulicConnection = not isinstance(t, _cb.ConnectionBase) and not t.outputs and not t.inputs
 
             if noHydraulicConnection:
                 continue
@@ -340,7 +402,7 @@ class Export(object):
             f += res[0]
             unitNumber = res[1]
 
-        self.editor.printerUnitnr = unitNumber
+        self._editor.printerUnitnr = unitNumber
 
         return f
 
@@ -350,12 +412,12 @@ class Export(object):
         rightCounter = 0
 
         for t in self._massFlowContributors:
-            if isinstance(t, SinglePipeConnection):
+            if isinstance(t, _spc.SinglePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
                 lossText += "P" + t.displayName + "_kW"
                 rightCounter += 1
-            if isinstance(t, DoublePipeConnection):
+            if isinstance(t, _dpc.DoublePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
                 lossText += "P" + t.displayName + "Cold_kW" + "+"
@@ -377,7 +439,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName.rsplit(".", 1)[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self._diagramName.rsplit(".", 1)[0] + "_Mfr.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -408,12 +470,12 @@ class Export(object):
         equationType = "Mfr"
         breakline = 0
         for t in self._massFlowContributors:
-            if isinstance(t, SinglePipeConnection):
+            if isinstance(t, _spc.SinglePipeConnection):
                 breakline, s = self._getEquation(breakline, s, t, "", equationType)
-            if isinstance(t, DoublePipeConnection):
+            if isinstance(t, _dpc.DoublePipeConnection):
                 breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
                 breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
-            if isinstance(t, TVentil) and t.isVisible():
+            if isinstance(t, _tventil.TVentil) and t.isVisible():
                 breakline += 1
                 if breakline % 8 == 0:
                     s += "\n"
@@ -444,7 +506,7 @@ class Export(object):
         delimiter = 0
         printLabels = 1
 
-        f = "ASSIGN " + self.editor.diagramName.rsplit(".", 1)[0] + "_T.prt " + str(unitnr) + "\n\n"
+        f = "ASSIGN " + self._diagramName.rsplit(".", 1)[0] + "_T.prt " + str(unitnr) + "\n\n"
 
         f += "UNIT " + str(unitnr) + " TYPE " + str(typenr)
         f += " " * (descLen - len(f)) + "! User defined Printer" + "\n"
@@ -475,9 +537,9 @@ class Export(object):
         equationType = "T"
         breakline = 0
         for t in self._massFlowContributors:
-            if isinstance(t, SinglePipeConnection):
+            if isinstance(t, _spc.SinglePipeConnection):
                 breakline, s = self._getEquation(breakline, s, t, "", equationType)
-            if isinstance(t, DoublePipeConnection):
+            if isinstance(t, _dpc.DoublePipeConnection):
                 breakline, s = self._getEquation(breakline, s, t, "Cold", equationType)
                 breakline, s = self._getEquation(breakline, s, t, "Hot", equationType)
         f += "INPUTS " + str(breakline) + "\n" + s + "\n" + "***" + "\n" + s + "\n\n"
@@ -485,7 +547,9 @@ class Export(object):
         return f
 
     def exportFluids(self) -> str:
-        def getValueOrVariableName(valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1) -> _tp.Union[float, str]:
+        def getValueOrVariableName(
+            valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1
+        ) -> _tp.Union[float, str]:
             if isinstance(valueOrVariable, float):
                 return valueOrVariable * factor
 
@@ -508,7 +572,7 @@ F{{fluid.name}}Rho = {{rho}} ! [kg/m^3]
 F{{fluid.name}}Cp = {{cp}} ! [kJ/(kg*K)]
 {% endfor -%}
 """
-        fluids = self.editor.fluids.fluids
+        fluids = self._fluids
         return self._render(template, fluids=fluids, getValueOrVariableName=getValueOrVariableName)
 
     def exportHydraulicLoops(self) -> str:
@@ -536,7 +600,7 @@ EQUATIONS {{nEquations}}
 
 {% endfor -%}
 """
-        loops = self.editor.hydraulicLoops.hydraulicLoops
+        loops = self._hydraulicLoops
 
         nEquations = sum(6 if l.useLoopWideDefaults else 2 for l in loops)
 
