@@ -13,10 +13,8 @@ import trnsysGUI.massFlowSolver as _mfs
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
 from trnsysGUI.Node import Node  # type: ignore[attr-defined]
-from trnsysGUI.PortItemBase import PortItemBase
-from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
-from trnsysGUI.TVentil import TVentil  # pylint: disable=cyclic-import
-from trnsysGUI.massFlowSolver import InternalPiping
+import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.SegmentItemBase as _sib
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -27,7 +25,7 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
 
 class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes
-    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
+    def __init__(self, fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, parent):
         self.logger = parent.logger
 
         self._fromPort = fromPort
@@ -41,13 +39,13 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.connId = self.parent.idGen.getConnID()
         self.trnsysId = self.parent.idGen.getTrnsysID()
 
-        self.segments: _tp.List[SegmentItemBase] = []
+        self.segments: _tp.List[_sib.SegmentItemBase] = []  # type: ignore[name-defined]
 
         self.isSelected = False
 
         self.startNode = Node()
         self.endNode = Node()
-        self.firstS: _tp.Optional[SegmentItemBase] = None
+        self.firstS: _tp.Optional[_sib.SegmentItemBase] = None  # type: ignore[name-defined]
 
         self.mass = 0  # comment out
         self.temperature = 0
@@ -57,11 +55,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         self.initNew(parent)
 
     @property
-    def fromPort(self) -> PortItemBase:
+    def fromPort(self) -> _pib.PortItemBase:
         return self._fromPort
 
     @property
-    def toPort(self) -> PortItemBase:
+    def toPort(self) -> _pib.PortItemBase:
         return self._toPort
 
     def _createSegmentItem(self, startNode, endNode):
@@ -720,7 +718,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             # Why do the child segments have again colliding Items?
 
             for c in col:  # pylint: disable = invalid-name
-                if isinstance(c, SegmentItemBase):
+                if isinstance(c, _sib.SegmentItemBase):
                     # Both have no bridge and do not collide at the endpoints:
                     if (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
                         qp1 = s.line().p1()
@@ -809,11 +807,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         items = self.parent.diagramScene.items()
 
         for item in items:
-            if isinstance(item, SegmentItemBase):
+            if isinstance(item, _sib.SegmentItemBase):
                 if item.startNode.lastNode() is self.endNode or item.startNode.firstNode() is self.startNode:
                     self.parent.diagramScene.removeItem(item)
             if isinstance(item, QGraphicsTextItem):
-                if isinstance(item.parent, PortItemBase):
+                if isinstance(item.parent, _pib.PortItemBase):
                     self.logger.debug("it has " + str(item.parent()))
                     self.logger.debug("Deleting it")
                     self.parent.diagramScene.removeItem(item)
@@ -1034,18 +1032,11 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def exportDivSetting2(self, nUnit):  # pylint: disable = no-self-use
         return "", nUnit
 
-    def getInternalPiping(self) -> InternalPiping:
+    def getInternalPiping(self) -> _mfs.InternalPiping:
         raise NotImplementedError()
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError()
-
-    def _getPortItemsWithParent(self):
-        isToPortValveOutput = isinstance(self.toPort.parent, TVentil) and self.fromPort in self.toPort.parent.outputs
-        if isToPortValveOutput:
-            return [(self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)]
-
-        return [(self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)]
 
     def findStoragePort(self, virtualBlock):
         portToPrint = None

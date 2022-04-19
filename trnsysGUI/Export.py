@@ -79,7 +79,7 @@ class Export(object):
         exportText += self._addComment("dpDiamOut = 0.03198", "! Outer diameter of pipes, m")
         exportText += self._addComment("dpLambda = 1.37067", "! Thermal conductivity of pipe material, kJ/(h*m*K)")
         exportText += self._addComment("dpDepth = 3.0", "! Buried pipe depth, m")
-        exportText += self._addComment("dpFlowMode = 1", "! Direction of second pipe flow: 1 = same, 2 = opposite")
+        exportText += self._addComment("dpFlowMode = 2", "! Direction of second pipe flow: 1 = same, 2 = opposite")
         exportText += self._addComment("dpDiamCase = 0.17526", "! Diameter of casing material, m")
         exportText += self._addComment("dpLambdaFill = 0.14537", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
         exportText += self._addComment("dpDistPtoP = 0.06911", "! Center-to-center pipe spacing, m")

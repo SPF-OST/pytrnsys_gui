@@ -44,7 +44,6 @@ class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
         self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
         # pylint: disable=duplicate-code  # 1
 
-
     def exportBlackBox(self):
         status = "noDdckEntry"
         equation = ["T" + self.displayName + "=1"]

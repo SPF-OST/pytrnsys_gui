@@ -8,24 +8,43 @@ import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
+import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.PortItemBase import PortItemBase
-from trnsysGUI.connection.connectionBase import ConnectionBase
-from trnsysGUI.doublePipeModelPortItems import ColdPortItem, HotPortItem
-from trnsysGUI.doublePipeSegmentItem import DoublePipeSegmentItem
-from trnsysGUI.massFlowSolver import InternalPiping  # type: ignore[attr-defined]
+import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.doublePipeModelPortItems as _dpmpi
+import trnsysGUI.doublePipeSegmentItem as _dpsi
+import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 
 
-class DoublePipeConnection(ConnectionBase):
-    def __init__(self, fromPort: PortItemBase, toPort: PortItemBase, parent):
+class DoublePipeConnection(_cb.ConnectionBase):
+    def __init__(self, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem, parent):
         super().__init__(fromPort, toPort, parent)
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
+        coldFromPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
+        coldToPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
+        self._coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
+
+        hotFromPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
+        hotToPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
+        self._hotPipe = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotFromPort, hotToPort)
+
+    @property
+    def fromPort(self) -> _dppi.DoublePipePortItem:
+        assert isinstance(self._fromPort, _dppi.DoublePipePortItem)
+        return self._fromPort
+
+    @property
+    def toPort(self) -> _dppi.DoublePipePortItem:
+        assert isinstance(self._toPort, _dppi.DoublePipePortItem)
+        return self._toPort
+
     def _createSegmentItem(self, startNode, endNode):
-        return DoublePipeSegmentItem(startNode, endNode, self)
+        return _dpsi.DoublePipeSegmentItem(startNode, endNode, self)
 
     def getRadius(self):
         rad = 4
@@ -81,19 +100,19 @@ class DoublePipeConnection(ConnectionBase):
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
 
-    def getInternalPiping(self) -> InternalPiping:
-        coldFromPort: _mfn.PortItem = ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
-        coldToPort: _mfn.PortItem = ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
-        coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
-        coldModelPortItemsToGraphicalPortItem = {coldFromPort: self.toPort, coldToPort: self.fromPort}
+    def getInternalPiping(self) -> _mfs.InternalPiping:
+        coldModelPortItemsToGraphicalPortItem = {
+            self._coldPipe.fromPort: self.toPort,
+            self._coldPipe.toPort: self.fromPort,
+        }
 
-        hotFromPort: _mfn.PortItem = HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
-        hotToPort: _mfn.PortItem = HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
-        hotPipe = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotFromPort, hotToPort)
-        hotModelPortItemsToGraphicalPortItem = {hotFromPort: self.fromPort, hotToPort: self.toPort}
+        hotModelPortItemsToGraphicalPortItem = {
+            self._hotPipe.fromPort: self.fromPort,
+            self._hotPipe.toPort: self.toPort
+        }
 
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
-        return InternalPiping([coldPipe, hotPipe], modelPortItemsToGraphicalPortItem)
+        return _mfs.InternalPiping([self._coldPipe, self._hotPipe], modelPortItemsToGraphicalPortItem)
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals,too-many-statements
         unitNumber = startingUnit
@@ -167,70 +186,59 @@ class DoublePipeConnection(ConnectionBase):
         unitText += self._addComment("dpRadNdDist", "! Radial distance of node 7, m")
         unitText += self._addComment("dpRadNdDist", "! Radial distance of node 8, m")
 
-        openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
-        assert len(openLoops) == 2
-        coldOpenLoop = openLoops[0]
-        hotOpenLoop = openLoops[1]
-
         unitText += "INPUTS " + str(inputNumbers) + "\n"
-        unitText += self._getInputs(nodesToIndices, coldOpenLoop, "Cold")
-        unitText += self._getInputs(nodesToIndices, hotOpenLoop, "Hot")
+        unitText += self._getInputs("Cold", self._coldPipe, self.toPort, self.fromPort)
+        unitText += self._getInputs("Hot", self._hotPipe, self.fromPort, self.toPort)
 
         unitText += "***Initial values\n"
         unitText += initialValueS + "\n\n"
 
         unitText += "EQUATIONS " + str(equationNr) + "\n"
-        unitText += self._getEquations(eqConst1, eqConst7, coldOpenLoop, nodesToIndices, unitNumber, "Cold")
-        unitText += self._getEquations(eqConst3, eqConst8, hotOpenLoop, nodesToIndices, unitNumber, "Hot")
+        unitText += self._getEquations("Cold", self._coldPipe, eqConst1, eqConst7, unitNumber)
+        unitText += self._getEquations("Hot", self._hotPipe, eqConst3, eqConst8, unitNumber)
 
         unitNumber += 1
         unitText += "\n"
 
         return unitText, unitNumber
 
-    def _getInputs(self, nodesToIndices, openLoop, temperature):
-        realNode = self._getSingleNode(openLoop)
+    def _getInputs(
+        self,
+        temperatureSuffix: str,
+        pipe: _mfn.Pipe,
+        pipeFromPort: _dppi.DoublePipePortItem,
+        pipeToPort: _dppi.DoublePipePortItem
+    ) -> str:
+        mfrName = _helpers.getMfrName(pipe)
 
-        outputVariables = realNode.serialize(nodesToIndices).outputVariables
-        outputVariable = outputVariables[0]
+        fromBlockItem = pipeFromPort.parent
+        firstColumn = f"T{fromBlockItem.displayName}{temperatureSuffix}"
+        unitText = self._addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temperatureSuffix}, deg C")
 
-        portItemsWithParent = self._getPortItemsWithParent()
-        assert len(portItemsWithParent) == 2
+        firstColumn = f"{mfrName}"
+        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperatureSuffix}, kg/h")
 
-        parent = portItemsWithParent[0][1]
-        firstColumn = f"T{parent.displayName}{temperature}"
-        unitText = self._addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temperature}, deg C")
-
-        firstColumn = f"{outputVariable.name}"
-        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperature}, kg/h")
-
-        parent = portItemsWithParent[1][1]
-        firstColumn = f"T{parent.displayName}{temperature}"
+        toBlockItem = pipeToPort.parent
+        firstColumn = f"T{toBlockItem.displayName}{temperatureSuffix}"
         unitText += self._addComment(firstColumn, "! Other side of pipe, deg C")
 
         return unitText
 
-    @staticmethod
-    def _getSingleNode(openLoop):
-        assert len(openLoop.realNodes) == 1
-        realNode = openLoop.realNodes[0]
-        return realNode
-
-    def _getEquations(self, equationConstant1, equationConstant2, openLoop, nodesToIndices, unitNumber, temperature):
-        realNode = self._getSingleNode(openLoop)
-        outputVariables = realNode.serialize(nodesToIndices).outputVariables
-        outputVariable = outputVariables[0]
+    def _getEquations(self, temperatureSuffix: str, pipe: _mfn.Pipe, equationConstant1, equationConstant2, unitNumber):
+        mfrName = _helpers.getMfrName(pipe)
 
         firstColumn = (
-                "T" + self.displayName + temperature + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
+            "T" + self.displayName + temperatureSuffix + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
         )
         unitText = self._addComment(
-            firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperature}, deg C"
+            firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperatureSuffix}, deg C"
         )
-        firstColumn = f"Mfr{self.displayName}{temperature} = {outputVariable.name}"
-        unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperature}, kg/h")
-        firstColumn = f"P{self.displayName}{temperature}_kW = [{unitNumber},{equationConstant2}]/3600"
-        unitText += self._addComment(firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperature}, kW")
+        firstColumn = f"Mfr{self.displayName}{temperatureSuffix} = {mfrName}"
+        unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperatureSuffix}, kg/h")
+        firstColumn = f"P{self.displayName}{temperatureSuffix}_kW = [{unitNumber},{equationConstant2}]/3600"
+        unitText += self._addComment(
+            firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperatureSuffix}, kW"
+        )
         return unitText
 
     @staticmethod
@@ -270,20 +278,20 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pyli
 
     @classmethod
     def from_dict(
-            cls,
-            data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
-            validate=True,
-            validate_enums: bool = True,
+        cls,
+        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
+        validate=True,
+        validate_enums: bool = True,
     ) -> "DoublePipeConnectionModel":
         data.pop(".__ConnectionDict__")
         doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
 
     def to_dict(
-            self,
-            omit_none: bool = True,
-            validate: bool = False,
-            validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__ConnectionDict__"] = True

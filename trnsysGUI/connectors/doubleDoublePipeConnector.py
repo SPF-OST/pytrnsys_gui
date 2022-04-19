@@ -8,7 +8,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
-from . import _helpers
+from trnsysGUI import connectorsAndPipesExportHelpers as _helpers
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.doublePipeConnection as _dpc
@@ -84,5 +84,7 @@ EQUATIONS 2
         hotMfr = _helpers.getMfrName(pipe)
         posFlowHotInputTemp = f"T{posFlowInputConnection.displayName}{temperatureSuffix}"
         negFlowHotInputTemp = f"T{negFlowInputConnection.displayName}{temperatureSuffix}"
-        hotEquation = _helpers.getEquation(hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp)
+        hotEquation = _helpers.getEquation(
+            hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp
+        )
         return hotEquation

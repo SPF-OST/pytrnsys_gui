@@ -6,6 +6,8 @@ import trnsysGUI.BlockItem as _bi
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
+import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+
 
 class Connector(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
@@ -65,10 +67,7 @@ class Connector(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         tempName = self.getTemperatureVariableName(self.inputs[0])
-        inputModelPort = self._modelPipe.fromNode
-        outputVariables = self._modelPipe.getOutputVariables()
-        assert len(outputVariables) == 1
-        mfrName = outputVariables[0].name
+        mfrName = _helpers.getMfrName(self._modelPipe)
 
         fromConnection = self.inputs[0].getConnection()
         toConnection = self.outputs[0].getConnection()

@@ -7,7 +7,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
-from . import _helpers
+from trnsysGUI import connectorsAndPipesExportHelpers as _helpers
 
 
 class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
@@ -74,7 +74,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
 
         raise AssertionError("Found no internal SingleDoublePipeConnector-Connection.")
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:  # pylint: disable=too-many-locals
         doubleConnection = self.outputs[0].getConnection()
 
         hotInputSingleConnection = self.inputs[0].getConnection()
@@ -85,14 +85,18 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         posFlowColdInputTemp = f"T{doubleConnection.displayName}Cold"
         negFlowColdInputTemp = f"T{coldOutputSingleConnection.displayName}"
 
-        coldEquation = _helpers.getEquation(coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp)
+        coldEquation = _helpers.getEquation(
+            coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp
+        )
 
         hotOutputTemp = f"T{self.displayName}Hot"
         hotMfr = _helpers.getMfrName(self._hotPipe)
         posFlowHotInputTemp = f"T{hotInputSingleConnection.displayName}"
         negFlowHotInputTemp = f"T{doubleConnection.displayName}Hot"
 
-        hotEquation = _helpers.getEquation(hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp)
+        hotEquation = _helpers.getEquation(
+            hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp
+        )
 
         equations = f"""\
 EQUATIONS 2

@@ -213,6 +213,15 @@ class Pipe(TwoNeighboursBase):
     def _getNodeType(self) -> NodeType:
         return NodeType.PIPE
 
+    @property
+    def fromPort(self) -> PortItem:
+        assert isinstance(self.fromNode, PortItem)
+        return self.fromNode
+
+    @property
+    def toPort(self) -> PortItem:
+        assert isinstance(self.toNode, PortItem)
+        return self.toNode
 
 class Pump(TwoNeighboursBase):
     def _getNodeType(self) -> NodeType:

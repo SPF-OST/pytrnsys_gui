@@ -13,6 +13,7 @@ import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.singlePipeSegmentItem as _spsi
+from trnsysGUI import PortItemBase as _pib, BlockItem as _bi, TVentil as _tventil
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -21,9 +22,9 @@ if _tp.TYPE_CHECKING:
 class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
-            fromPort: _sppi.SinglePipePortItem,
-            toPort: _sppi.SinglePipePortItem,
-            parent: _ed.Editor  # type: ignore[name-defined]
+        fromPort: _sppi.SinglePipePortItem,
+        toPort: _sppi.SinglePipePortItem,
+        parent: _ed.Editor  # type: ignore[name-defined]
     ):
         super().__init__(fromPort, toPort, parent)
 
@@ -176,7 +177,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         outputVariables = realNode.serialize(nodesToIndices).outputVariables
 
-        portItemsWithParent = self._getPortItemsWithParent()
+        portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
 
         if len(portItemsWithParent) == 2:
             portItem = portItemsWithParent[0][0]
@@ -225,6 +226,17 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitNumber += 1
 
         return unitText, unitNumber
+
+    def _getFromAndToPortsAndParentBlockItems(
+        self,
+    ) -> _tp.Tuple[_tp.Tuple[_pib.PortItemBase, _bi.BlockItem], _tp.Tuple[_pib.PortItemBase, _bi.BlockItem]]:
+        isToPortValveOutput = (
+            isinstance(self.toPort.parent, _tventil.TVentil) and self.fromPort in self.toPort.parent.outputs
+        )
+        if isToPortValveOutput:
+            return (self.toPort, self.toPort.parent), (self.fromPort, self.fromPort.parent)
+
+        return (self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)
 
 
 def _getConvertedValueOrName(valueOrName: _values.Value, conversionFactor=1.0) -> _tp.Union[float, str]:

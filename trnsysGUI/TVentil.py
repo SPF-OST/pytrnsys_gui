@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QGraphicsTextItem
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemModel as _bim
-import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.createSinglePipePortItem as _cspi  # pylint: disable=cyclic-import
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
