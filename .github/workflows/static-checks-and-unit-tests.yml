@@ -70,7 +70,7 @@ jobs:
     - name: Generate class and package diagrams
       run: python dev-tools/runStaticChecksAndUnitTests.py --diagram=dot --keep-results
     - name: Test with pytest
-      run: python dev-tools/runStaticChecksAndUnitTests.py --unit "linux" --keep-results
+      run: python dev-tools/runStaticChecksAndUnitTests.py --unit "linux or linux_ci" --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v2
       with:
