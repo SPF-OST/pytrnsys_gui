@@ -92,10 +92,7 @@ class buildDck:
             deck.automaticEnegyBalanceStaff()
             deck.writeDeck()  # Deck rewritten with added printer
 
-        dckAnalysisResult = deck.analyseDck()
-
-        if _res.isError(dckAnalysisResult):
-            return _res.error(dckAnalysisResult)
+        deck.analyseDck()
 
         return deck.nameDeck
 
