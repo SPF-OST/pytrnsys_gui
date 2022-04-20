@@ -649,7 +649,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "unitPrinter_Tes%d = %d \n" % (nTes, nPrinterUnit)
         lines = lines + line
-        line = "ASSIGN temp\TES%d_MO.Prt unitPrinter_Tes%d\n" % (nTes, nTes)
+        line = "ASSIGN temp\\TES%d_MO.Prt unitPrinter_Tes%d\n" % (nTes, nTes)
         lines = lines + line
         line = "UNIT %d TYPE 46\n" % nPrinterUnit
         lines = lines + line
@@ -807,7 +807,7 @@ class Type1924_TesPlugFlow:
 
     def getHead(self):
 
-        header = open("C:\Daten\OngoingProject\SolTherm2050\Simulations\ddck\Generic\Head.ddck", "r")
+        header = open(r"C:\Daten\OngoingProject\SolTherm2050\Simulations\ddck\Generic\Head.ddck", "r")
         lines = header.read()
         header.close()
 

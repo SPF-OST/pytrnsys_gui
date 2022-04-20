@@ -238,40 +238,58 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
         return resultText
 
-    @staticmethod
+    @classmethod
     def _getSerializedNodes(
+        cls,
         massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
     ) -> _tp.Sequence[_SerializedNode]:
         globalNetwork = _gn.getGlobalNetwork(massFlowContributors)
+        internalPortItemToExternalRealNode = globalNetwork.internalPortItemToExternalRealNode
 
         realNodesToIndex = {r: i for i, r in enumerate(globalNetwork.realNodes, start=1)}
 
         serializedNodes = []
         for index, realNode in enumerate(globalNetwork.realNodes, start=1):
-            neighborIndexes = []
-            for neighbor in realNode.getNeighbours():
-                if isinstance(neighbor, _mfn.RealNodeBase):
-                    neighborIndex = realNodesToIndex[neighbor]
-                elif isinstance(neighbor, _mfn.PortItem):
-                    externalRealNode = globalNetwork.internalPortItemToExternalRealNode[neighbor]
-                    neighborIndex = realNodesToIndex[externalRealNode]
-                else:
-                    raise AssertionError("Can't get here.")
+            neighborsAndUnusedIndexes = cls._getNeighborAndUnusedIndexes(
+                realNode, realNodesToIndex, internalPortItemToExternalRealNode
+            )
 
-                neighborIndexes.append(neighborIndex)
-
-            nUnusedIndexes = 3 - len(neighborIndexes)
-            unusedIndexes = nUnusedIndexes * [_UNUSED_INDEX]
-
-            indexes = neighborIndexes + unusedIndexes
-            assert len(indexes) == 3
-            indexesTuple = (indexes[0], indexes[1], indexes[2])
-
-            serializedNode = _SerializedNode(realNode.name, index, realNode.getNodeType(), indexesTuple)
+            serializedNode = _SerializedNode(realNode.name, index, realNode.getNodeType(), neighborsAndUnusedIndexes)
 
             serializedNodes.append(serializedNode)
 
         return serializedNodes
+
+    @staticmethod
+    def _getNeighborAndUnusedIndexes(
+        realNode: _mfn.RealNodeBase,
+        realNodesToIndex: _tp.Mapping[_mfn.RealNodeBase, int],
+        internalPortItemToExternalRealNode: _tp.Mapping[_mfn.PortItem, _mfn.RealNodeBase],
+    ) -> _tp.Tuple[int, int, int]:
+        neighborIndexes = []
+        for neighbor in realNode.getNeighbours():
+            if isinstance(neighbor, _mfn.RealNodeBase):
+                neighborIndex = realNodesToIndex[neighbor]
+            elif isinstance(neighbor, _mfn.PortItem):
+                externalRealNode = internalPortItemToExternalRealNode[neighbor]
+                neighborIndex = realNodesToIndex[externalRealNode]
+            else:
+                raise AssertionError("Can't get here.")
+
+            neighborIndexes.append(neighborIndex)
+
+        nNeighborIndexes = len(neighborIndexes)
+
+        assert nNeighborIndexes > 0
+        neighborAndUnusedIndexes = [neighborIndexes[0], _UNUSED_INDEX, _UNUSED_INDEX]
+
+        if nNeighborIndexes > 1:
+            neighborAndUnusedIndexes[1] = neighborIndexes[1]
+
+        if nNeighborIndexes > 2:
+            neighborAndUnusedIndexes[2] = neighborIndexes[2]
+
+        return neighborAndUnusedIndexes[0], neighborAndUnusedIndexes[1], neighborAndUnusedIndexes[2]
 
     def convertToStringList(self, l):
         res = []

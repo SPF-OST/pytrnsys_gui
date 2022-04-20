@@ -70,6 +70,7 @@ class PortItem(NodeBase, _abc.ABC):
         return []
 
     def canOverlapWith(self, other: "PortItem") -> bool:
+        """Can this model port item overlap with `other` under a graphical port item?"""
         return other != self
 
     def __repr__(self):

@@ -109,8 +109,8 @@ class FileOrderingDialog(QDialog):
             lines = file.readlines()
             lines.append("\n")
 
-        header = "LOCAL$ generic\head.ddck\n"
-        end = "LOCAL$ generic\end.ddck"
+        header = "LOCAL$ generic\\head.ddck\n"
+        end = r"LOCAL$ generic\end.ddck"
 
         lines.append(header)
         for items in self.finalPathList:
