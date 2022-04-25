@@ -106,9 +106,9 @@ class Decoder(json.JSONDecoder):
                         bl = Pump(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] == "Collector":
+                    elif i["BlockName"] in ("Collector", "Kollektor"):
                         bl = Collector(
-                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                            "Collector", self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "HP":
                         bl = HeatPump(

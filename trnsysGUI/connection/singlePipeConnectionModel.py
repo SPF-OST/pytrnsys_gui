@@ -16,11 +16,12 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint
     ConnID: int  # pylint: disable=invalid-name
     CornerPositions: _tp.List[_tp.Tuple[float, float]]  # pylint: disable=invalid-name
     FirstSegmentLabelPos: _tp.Tuple[float, float]  # pylint: disable=invalid-name
-    FirstSegmentMassFlowLabelPos: _tp.Tuple[float, float]  # pylint: disable=invalid-name
+    FirstSegmentMassFlowLabelPos: _tp.Optional[_tp.Tuple[float, float]]  # pylint: disable=invalid-name
     GroupName: str  # pylint: disable=invalid-name
     PortFromID: int  # pylint: disable=invalid-name
     PortToID: int  # pylint: disable=invalid-name
     SegmentPositions: _tp.List[_tp.Tuple[float, float, float, float]]  # pylint: disable=invalid-name
+    isVirtualConn: _tp.Optional[bool]
     trnsysID: int
 
     @classmethod
@@ -76,10 +77,14 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
             superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
             superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
         )
-        firstSegmentMassFlowLabelPos = (
-            superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
-            superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
-        )
+
+        if superseded.FirstSegmentMassFlowLabelPos:
+            firstSegmentMassFlowLabelPos = (
+                superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
+                superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
+            )
+        else:
+            firstSegmentMassFlowLabelPos = firstSegmentLabelPos
 
         return ConnectionModel(
             superseded.ConnCID,
