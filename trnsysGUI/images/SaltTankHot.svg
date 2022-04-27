@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="SaltTankHot.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg103"
+   version="1.1"
+   viewBox="0 0 120 120"
+   height="120mm"
+   width="120mm">
+  <defs
+     id="defs97" />
+  <sodipodi:namedview
+     inkscape:window-maximized="1"
+     inkscape:window-y="-8"
+     inkscape:window-x="1912"
+     inkscape:window-height="1017"
+     inkscape:window-width="1920"
+     fit-margin-bottom="0"
+     fit-margin-right="0"
+     fit-margin-left="0"
+     fit-margin-top="0"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="mm"
+     inkscape:cy="217.20857"
+     inkscape:cx="84.826237"
+     inkscape:zoom="0.7"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata100">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-34.494049,-73.803574)"
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Ebene 1">
+    <rect
+       y="93.601456"
+       x="35.430099"
+       height="87.903114"
+       width="118.17984"
+       id="rect836"
+       style="fill:#ff0000;stroke:#000000;stroke-width:1.88606;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke" />
+    <ellipse
+       ry="12.259865"
+       rx="58.818295"
+       cy="93.741821"
+       cx="94.403275"
+       id="path848"
+       style="fill:#ff0000;stroke:#000000;stroke-width:2.01549;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 134.49405,93.803573 V 73.803574"
+       id="path846" />
+    <path
+       id="path844"
+       d="M 54.494049,93.803573 V 73.803574"
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
+    <path
+       d="m 153.25937,180.22263 a 58.818295,12.259865 0 0 1 -29.40915,10.61735 58.818295,12.259865 0 0 1 -58.818298,0 58.818295,12.259865 0 0 1 -29.409146,-10.61735"
+       sodipodi:arc-type="arc"
+       sodipodi:open="true"
+       sodipodi:end="3.1415927"
+       sodipodi:start="0"
+       sodipodi:ry="12.259865"
+       sodipodi:rx="58.818295"
+       sodipodi:cy="180.22263"
+       sodipodi:cx="94.441071"
+       sodipodi:type="arc"
+       style="fill:#ff0000;stroke:#000000;stroke-width:2.01549;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;paint-order:markers fill stroke"
+       id="ellipse850" />
+  </g>
+</svg>
