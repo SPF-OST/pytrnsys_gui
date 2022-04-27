@@ -40,9 +40,9 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
     fromPortId: int
     toPortId: int
     trnsysId: int
-    diameterInCm: _values.Value
-    uValueInWPerM2K: _values.Value
-    lengthInM: _values.Value
+    diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
+    uValueInWPerM2K: _values.Value = _values.DEFAULT_LENGTH_IN_M
+    lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
 
     @classmethod
     def from_dict(
