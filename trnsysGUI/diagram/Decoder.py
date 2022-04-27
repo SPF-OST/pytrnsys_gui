@@ -29,6 +29,7 @@ from trnsysGUI.Radiator import Radiator
 from trnsysGUI.SaltTankCold import SaltTankCold
 from trnsysGUI.SaltTankHot import SaltTankHot
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.SteamPowerBlock import SteamPowerBlock
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
@@ -133,12 +134,16 @@ class Decoder(json.JSONDecoder):
                         bl = Radiator(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] in ("tankCold", "coldStore"):
+                    elif i["BlockName"] in ("SaltTankCold", "coldStore"):
                         bl = SaltTankCold(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] in ("tankHot", "hotStore"):
+                    elif i["BlockName"] in ("SaltTankHot", "hotStore"):
                         bl = SaltTankHot(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] in ("powerBlock", "SteamPowerBlock"):
+                        bl = SteamPowerBlock(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "WTap":

@@ -30,6 +30,7 @@ from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
 from trnsysGUI.Radiator import Radiator  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
+from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.TeePiece import TeePiece  # type: ignore[attr-defined]
 from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
@@ -109,6 +110,8 @@ class View(QGraphicsView):
                 blockItem = SaltTankCold(componentType, self, displayNamePrefix="ClSt")
             elif componentType == "hotStore":
                 blockItem = SaltTankHot(componentType, self, displayNamePrefix="HtSt")
+            elif componentType == "powerBlock":
+                blockItem = SteamPowerBlock(componentType, self, displayNamePrefix="StPB")
             elif componentType == "WTap":
                 blockItem = WTap(componentType, self, displayNamePrefix="WtTap")
             elif componentType == "WTap_main":
