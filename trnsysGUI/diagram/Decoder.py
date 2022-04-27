@@ -26,6 +26,8 @@ from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.pump import Pump
 from trnsysGUI.Radiator import Radiator
+from trnsysGUI.SaltTankCold import SaltTankCold
+from trnsysGUI.SaltTankHot import SaltTankHot
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
@@ -111,7 +113,7 @@ class Decoder(json.JSONDecoder):
                         bl = Collector(
                             "Collector", self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] == "CentralReceiver":
+                    elif i["BlockName"] in ("CentralReceiver", "CR"):
                         bl = CentralReceiver(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
@@ -129,6 +131,14 @@ class Decoder(json.JSONDecoder):
                         )
                     elif i["BlockName"] == "Radiator":
                         bl = Radiator(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] in ("tankCold", "coldStore"):
+                        bl = SaltTankCold(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] in ("tankHot", "hotStore"):
+                        bl = SaltTankHot(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "WTap":

@@ -212,8 +212,8 @@ class Editor(QWidget):
             ("CR", _img.CENTRAL_RECEVIER_SVG.icon()),
             ("PT", _img.PT_FIELD_SVG.icon()),
             ("power block", _img.STEAM_POWER_BLOCK_SVG.icon()),
-            ("cold store", _img.SALT_TANK_COLD_SVG.icon()),
-            ("hot store", _img.SALT_TANK_HOT_SVG.icon()),
+            ("coldStore", _img.SALT_TANK_COLD_SVG.icon()),
+            ("hotStore", _img.SALT_TANK_HOT_SVG.icon()),
             ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
             ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
         ]

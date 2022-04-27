@@ -28,6 +28,8 @@ from trnsysGUI.PV import PV  # type: ignore[attr-defined]
 from trnsysGUI.PitStorage import PitStorage  # type: ignore[attr-defined]
 from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
 from trnsysGUI.Radiator import Radiator  # type: ignore[attr-defined]
+from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
+from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.TeePiece import TeePiece  # type: ignore[attr-defined]
 from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
@@ -103,6 +105,10 @@ class View(QGraphicsView):
                 blockItem = PitStorage(componentType, self, displayNamePrefix="PitSt")
             elif componentType == "Radiator":
                 blockItem = Radiator(componentType, self, displayNamePrefix="Rad")
+            elif componentType == "coldStore":
+                blockItem = SaltTankCold(componentType, self, displayNamePrefix="ClSt")
+            elif componentType == "hotStore":
+                blockItem = SaltTankHot(componentType, self, displayNamePrefix="HtSt")
             elif componentType == "WTap":
                 blockItem = WTap(componentType, self, displayNamePrefix="WtTap")
             elif componentType == "WTap_main":
