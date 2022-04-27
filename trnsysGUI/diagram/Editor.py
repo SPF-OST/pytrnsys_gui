@@ -1274,8 +1274,6 @@ class Editor(QWidget):
 
         ddckDirNames = []
         for componentDirPath in componentDdckDirPaths:
-            if componentDirPath.name == "generic":
-                continue
             ddckDirNames.append(componentDirPath.name)
 
         return ddckDirNames

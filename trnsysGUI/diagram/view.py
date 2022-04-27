@@ -81,13 +81,13 @@ class View(QGraphicsView):
             elif componentType == "TeePiece":
                 blockItem = TeePiece(componentType, self, displayNamePrefix="Tee")
             elif componentType == "DPTee":
-                blockItem = DoublePipeTeePiece(componentType, self, displayNamePrefix="DPTee")
+                blockItem = DoublePipeTeePiece(componentType, self, displayNamePrefix="DTee")
             elif componentType == "SPCnr":
-                blockItem = SingleDoublePipeConnector(componentType, self, displayNamePrefix="SPCnr")
+                blockItem = SingleDoublePipeConnector(componentType, self, displayNamePrefix="SCnr")
             elif componentType == "DPCnr":
-                blockItem = DoubleDoublePipeConnector(componentType, self, displayNamePrefix="DPCnr")
+                blockItem = DoubleDoublePipeConnector(componentType, self, displayNamePrefix="DCnr")
             elif componentType == "TVentil":
-                blockItem = TVentil(componentType, self, displayNamePrefix="Valve")
+                blockItem = TVentil(componentType, self, displayNamePrefix="Val")
             elif componentType == "Pump":
                 blockItem = Pump(componentType, self, displayNamePrefix="Pump")
             elif componentType == "Collector":
@@ -95,28 +95,28 @@ class View(QGraphicsView):
             elif componentType == "HP":
                 blockItem = HeatPump(componentType, self, displayNamePrefix="HP")
             elif componentType == "IceStorage":
-                blockItem = IceStorage(componentType, self, displayNamePrefix="IceSt")
+                blockItem = IceStorage(componentType, self, displayNamePrefix="IceS")
             elif componentType == "PitStorage":
-                blockItem = PitStorage(componentType, self, displayNamePrefix="PitSt")
+                blockItem = PitStorage(componentType, self, displayNamePrefix="PitS")
             elif componentType == "Radiator":
                 blockItem = Radiator(componentType, self, displayNamePrefix="Rad")
             elif componentType == "WTap":
-                blockItem = WTap(componentType, self, displayNamePrefix="WtTap")
+                blockItem = WTap(componentType, self, displayNamePrefix="WtTp")
             elif componentType == "WTap_main":
-                blockItem = WTap_main(componentType, self, displayNamePrefix="WtSpp")
+                blockItem = WTap_main(componentType, self, displayNamePrefix="WtSp")
             elif componentType == "Connector":
                 blockItem = Connector(componentType, self, displayNamePrefix="Conn")
             elif componentType == "GenericBlock":
-                blockItem = GenericBlock(componentType, self, displayNamePrefix="GenBl")
+                blockItem = GenericBlock(componentType, self, displayNamePrefix="GBlk")
                 self.parent().showGenericPortPairDlg(blockItem)
             elif componentType == "HPTwoHx":
                 blockItem = HeatPumpTwoHx(componentType, self, displayNamePrefix="HP")
             elif componentType == "HPDoubleDual":
                 blockItem = HPDoubleDual(componentType, self, displayNamePrefix="HPDD")
             elif componentType == "HPDual":
-                blockItem = HPDual(componentType, self, displayNamePrefix="HPDSr")
+                blockItem = HPDual(componentType, self, displayNamePrefix="HPDS")
             elif componentType == "Boiler":
-                blockItem = Boiler(componentType, self, displayNamePrefix="Boilr")
+                blockItem = Boiler(componentType, self, displayNamePrefix="Bolr")
             elif componentType == "AirSourceHP":
                 blockItem = AirSourceHP(componentType, self, displayNamePrefix="Ashp")
             elif componentType == "PV":
@@ -126,7 +126,7 @@ class View(QGraphicsView):
             elif componentType == "ExternalHx":
                 blockItem = ExternalHx(componentType, self, displayNamePrefix="Hx")
             elif componentType == "IceStorageTwoHx":
-                blockItem = IceStorageTwoHx(componentType, self, displayNamePrefix="IceSt")
+                blockItem = IceStorageTwoHx(componentType, self, displayNamePrefix="IceS")
             elif componentType == "GraphicalItem":
                 blockItem = GraphicalItem(self)
             elif componentType == "MasterControl":
@@ -134,19 +134,19 @@ class View(QGraphicsView):
             elif componentType == "Control":
                 blockItem = Control(componentType, self)
             elif componentType == "Sink":
-                blockItem = Sink(componentType, self, displayNamePrefix="QSink")
+                blockItem = Sink(componentType, self, displayNamePrefix="QSnk")
             elif componentType == "Source":
                 blockItem = Source(componentType, self, displayNamePrefix="QSrc")
             elif componentType == "SourceSink":
-                blockItem = SourceSink(componentType, self, displayNamePrefix="QExch")
+                blockItem = SourceSink(componentType, self, displayNamePrefix="QExc")
             elif componentType == "Geotherm":
-                blockItem = Geotherm(componentType, self, displayNamePrefix="GeoTh")
+                blockItem = Geotherm(componentType, self, displayNamePrefix="GeoT")
             elif componentType == "Water":
                 blockItem = Water(componentType, self, displayNamePrefix="QWat")
             elif componentType == "Crystalizer":
-                blockItem = Crystalizer(componentType, self, displayNamePrefix="Cryst")
+                blockItem = Crystalizer(componentType, self, displayNamePrefix="Cryt")
             else:
-                blockItem = BlockItem(componentType, self, displayNamePrefix="Block")
+                blockItem = BlockItem(componentType, self, displayNamePrefix="Blk")
 
             snapSize = self.parent().snapSize
             if self.parent().snapGrid:
