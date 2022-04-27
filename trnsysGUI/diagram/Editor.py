@@ -209,6 +209,11 @@ class Editor(QWidget):
             ("Geotherm", _img.GEOTHERM_SVG.icon()),
             ("Water", _img.WATER_SVG.icon()),
             ("Crystalizer", _img.CRYSTALIZER_SVG.icon()),
+            ("CR", _img.CENTRAL_RECEVIER_SVG.icon()),
+            ("PT", _img.PT_FIELD_SVG.icon()),
+            ("power block", _img.STEAM_POWER_BLOCK_SVG.icon()),
+            ("cold store", _img.SALT_TANK_COLD_SVG.icon()),
+            ("hot store", _img.SALT_TANK_HOT_SVG.icon()),
             ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
             ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
         ]
