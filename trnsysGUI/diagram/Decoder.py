@@ -6,6 +6,7 @@ import typing as tp
 
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
+from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
 from trnsysGUI.connectors.connector import Connector
 from trnsysGUI.Control import Control
@@ -109,6 +110,10 @@ class Decoder(json.JSONDecoder):
                     elif i["BlockName"] in ("Collector", "Kollektor"):
                         bl = Collector(
                             "Collector", self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "CentralReceiver":
+                        bl = CentralReceiver(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "HP":
                         bl = HeatPump(

@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QGraphicsView
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
+from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
 from trnsysGUI.connectors.connector import Connector  # type: ignore[attr-defined]
 from trnsysGUI.Control import Control  # type: ignore[attr-defined]
@@ -92,6 +93,8 @@ class View(QGraphicsView):
                 blockItem = Pump(componentType, self, displayNamePrefix="Pump")
             elif componentType == "Collector":
                 blockItem = Collector(componentType, self, displayNamePrefix="Coll")
+            elif componentType == "CR":
+                blockItem = CentralReceiver(componentType, self, displayNamePrefix="CR")
             elif componentType == "HP":
                 blockItem = HeatPump(componentType, self, displayNamePrefix="HP")
             elif componentType == "IceStorage":
