@@ -97,8 +97,6 @@ class View(QGraphicsView):
                 blockItem = Pump(componentType, self, displayNamePrefix="Pump")
             elif componentType == "Collector":
                 blockItem = Collector(componentType, self, displayNamePrefix="Coll")
-            elif componentType == "CR":
-                blockItem = CentralReceiver(componentType, self, displayNamePrefix="CR")
             elif componentType == "HP":
                 blockItem = HeatPump(componentType, self, displayNamePrefix="HP")
             elif componentType == "IceStorage":
@@ -107,12 +105,6 @@ class View(QGraphicsView):
                 blockItem = PitStorage(componentType, self, displayNamePrefix="PitSt")
             elif componentType == "Radiator":
                 blockItem = Radiator(componentType, self, displayNamePrefix="Rad")
-            elif componentType == "coldStore":
-                blockItem = SaltTankCold(componentType, self, displayNamePrefix="ClSt")
-            elif componentType == "hotStore":
-                blockItem = SaltTankHot(componentType, self, displayNamePrefix="HtSt")
-            elif componentType == "powerBlock":
-                blockItem = SteamPowerBlock(componentType, self, displayNamePrefix="StPB")
             elif componentType == "WTap":
                 blockItem = WTap(componentType, self, displayNamePrefix="WtTap")
             elif componentType == "WTap_main":
@@ -158,8 +150,6 @@ class View(QGraphicsView):
                 blockItem = Water(componentType, self, displayNamePrefix="QWat")
             elif componentType == "Crystalizer":
                 blockItem = Crystalizer(componentType, self, displayNamePrefix="Cryt")
-            elif componentType == "ParabolicTroughField":
-                blockItem = ParabolicTroughField(componentType, self, displayNamePrefix="PT")
             else:
                 blockItem = BlockItem(componentType, self, displayNamePrefix="Blk")
 
