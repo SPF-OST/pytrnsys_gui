@@ -157,7 +157,7 @@ class View(QGraphicsView):
             elif componentType == "Water":
                 blockItem = Water(componentType, self, displayNamePrefix="QWat")
             elif componentType == "Crystalizer":
-                blockItem = Crystalizer(componentType, self, displayNamePrefix="Cryst")
+                blockItem = Crystalizer(componentType, self, displayNamePrefix="Cryt")
             elif componentType == "ParabolicTroughField":
                 blockItem = ParabolicTroughField(componentType, self, displayNamePrefix="PT")
             else:
