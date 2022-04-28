@@ -102,7 +102,7 @@ class View(QGraphicsView):
             elif componentType == "HP":
                 blockItem = HeatPump(componentType, self, displayNamePrefix="HP")
             elif componentType == "IceStorage":
-                blockItem = IceStorage(componentType, self, displayNamePrefix="IceSt")
+                blockItem = IceStorage(componentType, self, displayNamePrefix="IceS")
             elif componentType == "ParabolicTroughField":
                 blockItem = ParabolicTroughField(componentType, self, displayNamePrefix="PT")
             elif componentType == "PitStorage":
