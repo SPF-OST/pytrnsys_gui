@@ -44,13 +44,13 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
 
     def getInternalPiping(self) -> _mfs.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
-            self._coldPipe.fromNode: self.outputs[0],
-            self._coldPipe.toNode: self.inputs[0],
+            self._coldPipe.fromPort: self.outputs[0],
+            self._coldPipe.toPort: self.inputs[0],
         }
 
         hotModelPortItemsToGraphicalPortItem = {
-            self._hotPipe.fromNode: self.inputs[0],
-            self._hotPipe.toNode: self.outputs[0],
+            self._hotPipe.fromPort: self.inputs[0],
+            self._hotPipe.toPort: self.outputs[0],
         }
 
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem

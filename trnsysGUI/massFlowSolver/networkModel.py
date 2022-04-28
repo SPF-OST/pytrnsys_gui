@@ -61,7 +61,7 @@ class PortItemType(_enum.Enum):
     OUTPUT = "Output"
 
 
-@_dc.dataclass(eq=False)
+@_dc.dataclass(eq=False, repr=False)
 class PortItem(NodeBase, _abc.ABC):
     name: str
     type: PortItemType
@@ -72,9 +72,6 @@ class PortItem(NodeBase, _abc.ABC):
     def canOverlapWith(self, other: "PortItem") -> bool:
         """Can this model port item overlap with `other` under a graphical port item?"""
         return other != self
-
-    def __repr__(self):
-        return f"<PortItem object at 0x{id(self):x}>"
 
 
 @_dc.dataclass(eq=False)  # type: ignore[misc]

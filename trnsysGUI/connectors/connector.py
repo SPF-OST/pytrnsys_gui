@@ -13,9 +13,7 @@ class Connector(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
-        fromPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
-        toPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
-        self._modelPipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
+        self._updateModelPipe(self.displayName)
 
         self.sizeFactor = 0.5
         self.w = 40
@@ -28,11 +26,15 @@ class Connector(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
 
     def getInternalPiping(self) -> _mfs.InternalPiping:
         return _mfs.InternalPiping(
-            [self._modelPipe], {self._modelPipe.fromNode: self.inputs[0], self._modelPipe.toNode: self.outputs[0]}
+            [self._modelPipe], {self._modelPipe.fromPort: self.inputs[0], self._modelPipe.toPort: self.outputs[0]}
         )
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.CONNECTOR_PNG
+
+    def setDisplayName(self, newName: str) -> None:
+        super().setDisplayName(newName)
+        self._updateModelPipe(newName)
 
     def changeSize(self):
         width = self.w
@@ -80,3 +82,8 @@ EQUATIONS 1
 {equation}
 """
         return equations, startingUnit
+
+    def _updateModelPipe(self, displayName: str) -> None:
+        fromPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        toPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
+        self._modelPipe = _mfn.Pipe(displayName, self.trnsysId, fromPort, toPort)

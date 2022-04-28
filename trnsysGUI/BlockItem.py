@@ -120,7 +120,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def setId(self, newId):
         self.id = newId
 
-    def setDisplayName(self, newName):
+    def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self.label.setPlainText(newName)
 
