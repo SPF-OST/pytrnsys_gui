@@ -24,6 +24,7 @@ from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx  # type: ignore[attr-defined]
 from trnsysGUI.IceStorage import IceStorage  # type: ignore[attr-defined]
 from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx  # type: ignore[attr-defined]
 from trnsysGUI.MasterControl import MasterControl  # type: ignore[attr-defined]
+from trnsysGUI.ParabolicTroughField import ParabolicTroughField  # type: ignore[attr-defined]
 from trnsysGUI.PV import PV  # type: ignore[attr-defined]
 from trnsysGUI.PitStorage import PitStorage  # type: ignore[attr-defined]
 from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
@@ -103,7 +104,7 @@ class View(QGraphicsView):
             elif componentType == "IceStorage":
                 blockItem = IceStorage(componentType, self, displayNamePrefix="IceSt")
             elif componentType == "ParabolicTroughField":
-                blockItem = PitStorage(componentType, self, displayNamePrefix="PT")
+                blockItem = ParabolicTroughField(componentType, self, displayNamePrefix="PT")
             elif componentType == "PitStorage":
                 blockItem = PitStorage(componentType, self, displayNamePrefix="PitSt")
             elif componentType == "Radiator":
