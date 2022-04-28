@@ -22,6 +22,7 @@ from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
 from trnsysGUI.IceStorage import IceStorage
 from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
 from trnsysGUI.MasterControl import MasterControl
+from trnsysGUI.ParabolicTroughField import ParabolicTroughField
 from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.pump import Pump
@@ -164,6 +165,10 @@ class Decoder(json.JSONDecoder):
                         )
                     elif i["BlockName"] == "AirSourceHP":
                         bl = AirSourceHP(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] in ("ParabolicTroughField", "PT"):
+                        bl = ParabolicTroughField(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "PV":
