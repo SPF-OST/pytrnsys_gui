@@ -161,7 +161,7 @@ class View(QGraphicsView):
             elif componentType == "ParabolicTroughField":
                 blockItem = ParabolicTroughField(componentType, self, displayNamePrefix="PT")
             else:
-                blockItem = BlockItem(componentType, self, displayNamePrefix="Block")
+                blockItem = BlockItem(componentType, self, displayNamePrefix="Blk")
 
             snapSize = self.parent().snapSize
             if self.parent().snapGrid:
