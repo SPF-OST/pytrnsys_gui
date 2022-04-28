@@ -25,13 +25,11 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
-        coldFromPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
-        coldToPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
-        self._coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
+        self._updateModelPipes(self.displayName)
 
-        hotFromPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
-        hotToPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
-        self._hotPipe = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotFromPort, hotToPort)
+    def setDisplayName(self, newName: str) -> None:
+        super().setDisplayName(newName)
+        self._updateModelPipes(newName)
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -92,7 +90,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.connId = model.connectionId
         self.trnsysId = model.trnsysId
         self.childIds = model.childIds
-        self.setName(model.name)
+        self.setDisplayName(model.name)
 
         if len(model.segmentsCorners) > 0:
             self.loadSegments(model.segmentsCorners)
@@ -203,11 +201,11 @@ class DoublePipeConnection(_cb.ConnectionBase):
         return unitText, unitNumber
 
     def _getInputs(
-        self,
-        temperatureSuffix: str,
-        pipe: _mfn.Pipe,
-        pipeFromPort: _dppi.DoublePipePortItem,
-        pipeToPort: _dppi.DoublePipePortItem
+            self,
+            temperatureSuffix: str,
+            pipe: _mfn.Pipe,
+            pipeFromPort: _dppi.DoublePipePortItem,
+            pipeToPort: _dppi.DoublePipePortItem
     ) -> str:
         mfrName = _helpers.getMfrName(pipe)
 
@@ -225,26 +223,37 @@ class DoublePipeConnection(_cb.ConnectionBase):
         return unitText
 
     def _getEquations(self, temperatureSuffix: str, pipe: _mfn.Pipe, equationConstant1, equationConstant2, unitNumber):
-        mfrName = _helpers.getMfrName(pipe)
-
         firstColumn = (
-            "T" + self.displayName + temperatureSuffix + " = [" + str(unitNumber) + "," + str(equationConstant1) + "]"
+            f"T{pipe.name} = [{unitNumber},{equationConstant1}]"
         )
         unitText = self._addComment(
             firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperatureSuffix}, deg C"
         )
-        firstColumn = f"Mfr{self.displayName}{temperatureSuffix} = {mfrName}"
+
+        mfrName = _helpers.getMfrName(pipe)
+        firstColumn = f"Mfr{pipe.name} = {mfrName}"
         unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperatureSuffix}, kg/h")
-        firstColumn = f"P{self.displayName}{temperatureSuffix}_kW = [{unitNumber},{equationConstant2}]/3600"
+
+        firstColumn = f"P{pipe.name}_kW = [{unitNumber},{equationConstant2}]/3600"
         unitText += self._addComment(
             firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperatureSuffix}, kW"
         )
+
         return unitText
 
     @staticmethod
     def _addComment(firstColumn, comment):
         spacing = 40
         return str(firstColumn).ljust(spacing) + comment + "\n"
+
+    def _updateModelPipes(self, displayName: str):
+        coldFromPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
+        coldToPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
+        self._coldPipe = _mfn.Pipe(displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
+
+        hotFromPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
+        hotToPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
+        self._hotPipe = _mfn.Pipe(displayName + "Hot", self.childIds[1], hotFromPort, hotToPort)
 
 
 class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):

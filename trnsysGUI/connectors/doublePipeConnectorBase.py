@@ -23,13 +23,7 @@ class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixi
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
-        coldInput = _dpmpi.ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
-        coldOutput = _dpmpi.ColdPortItem("coldOutput", _mfn.PortItemType.OUTPUT)
-        self._coldPipe = _mfn.Pipe(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput)
-
-        hotInput = _dpmpi.HotPortItem("hotInput", _mfn.PortItemType.INPUT)
-        hotOutput = _dpmpi.HotPortItem("hotOutput", _mfn.PortItemType.OUTPUT)
-        self._hotPipe = _mfn.Pipe(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput)
+        self._updateModelPipes(self.displayName)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         raise NotImplementedError()
@@ -41,17 +35,6 @@ class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixi
     def rotateBlockCCW(self):
         super().rotateBlockCCW()
         self._flipPipes()
-
-    def _flipPipes(self):
-        angle = (self.rotationN % 4) * 90
-        if angle == 0:
-            self.updateFlipStateV(False)
-        elif angle == 90:
-            self.updateFlipStateV(True)
-        elif angle == 180:
-            self.updateFlipStateV(True)
-        elif angle == 270:
-            self.updateFlipStateV(False)
 
     def resetRotation(self):
         super().resetRotation()
@@ -108,6 +91,30 @@ class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixi
 
     def getInternalPiping(self) -> _mfs.InternalPiping:
         raise NotImplementedError()
+
+    def _updateModelPipes(self, displayName: str) -> None:
+        coldInput = _dpmpi.ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
+        coldOutput = _dpmpi.ColdPortItem("coldOutput", _mfn.PortItemType.OUTPUT)
+        self._coldPipe = _mfn.Pipe(displayName + "Cold", self.childIds[0], coldInput, coldOutput)
+
+        hotInput = _dpmpi.HotPortItem("hotInput", _mfn.PortItemType.INPUT)
+        hotOutput = _dpmpi.HotPortItem("hotOutput", _mfn.PortItemType.OUTPUT)
+        self._hotPipe = _mfn.Pipe(displayName + "Hot", self.childIds[1], hotInput, hotOutput)
+
+    def setDisplayName(self, newName):
+        super().setDisplayName(newName)
+        self._updateModelPipes(newName)
+
+    def _flipPipes(self):
+        angle = (self.rotationN % 4) * 90
+        if angle == 0:
+            self.updateFlipStateV(False)
+        elif angle == 90:
+            self.updateFlipStateV(True)
+        elif angle == 180:
+            self.updateFlipStateV(True)
+        elif angle == 270:
+            self.updateFlipStateV(False)
 
 
 @_dc.dataclass

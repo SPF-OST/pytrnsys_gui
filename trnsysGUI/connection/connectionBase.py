@@ -73,12 +73,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         return res
 
-    # Setter
-    def setName(self, newName):
-        self.displayName = newName
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.label.setPlainText(newName)
-
     def setMassAndTemperature(self, mass, temp):
         """
         To show the mass and temperature during mass flow visualization
@@ -91,7 +85,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             replacedMass = self.mass.replace(",", "'")
             s.labelMass.setPlainText(f"M: {replacedMass} kg/h   T: {self.temperature}\u2103")
 
-    def setDisplayName(self, newName):
+    def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self.updateSegLabels()
 

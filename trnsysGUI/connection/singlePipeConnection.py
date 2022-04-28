@@ -100,7 +100,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.id = model.id
         self.connId = model.connectionId
         self.trnsysId = model.trnsysId
-        self.setName(model.name)
+        self.setDisplayName(model.name)
 
         if len(model.segmentsCorners) > 0:
             self.loadSegments(model.segmentsCorners)
