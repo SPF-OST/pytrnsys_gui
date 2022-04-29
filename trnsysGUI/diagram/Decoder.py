@@ -115,7 +115,7 @@ class Decoder(json.JSONDecoder):
                         bl = Collector(
                             "Collector", self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] in ("CentralReceiver", "CR"):
+                    elif i["BlockName"] == "CSP_CR":
                         bl = CentralReceiver(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
@@ -135,15 +135,15 @@ class Decoder(json.JSONDecoder):
                         bl = Radiator(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] in ("SaltTankCold", "coldStore"):
+                    elif i["BlockName"] == "coldSaltTank":
                         bl = SaltTankCold(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] in ("SaltTankHot", "hotStore"):
+                    elif i["BlockName"] == "hotSaltTank":
                         bl = SaltTankHot(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] in ("powerBlock", "SteamPowerBlock"):
+                    elif i["BlockName"]  == "powerBlock":
                         bl = SteamPowerBlock(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
@@ -167,7 +167,7 @@ class Decoder(json.JSONDecoder):
                         bl = AirSourceHP(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] in ("ParabolicTroughField", "PT"):
+                    elif i["BlockName"] == "CSP_PT":
                         bl = ParabolicTroughField(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
