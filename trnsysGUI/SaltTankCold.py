@@ -4,9 +4,9 @@
 import typing as _tp
 
 import trnsysGUI.images as _img
-from trnsysGUI.SaltTank import SaltTank
+from trnsysGUI.SaltTankBase import SaltTankBase
 
-class SaltTankCold(SaltTank):
+class SaltTankCold(SaltTankBase):
 
     def __init__(self, trnsysType, parent, **kwargs):
         super(SaltTankCold, self).__init__(trnsysType, parent, **kwargs)

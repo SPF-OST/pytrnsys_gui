@@ -1,6 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
+import abc as _abc
 import os
 import shutil
 import typing as _tp
@@ -16,7 +17,7 @@ from trnsysGUI.MyQTreeView import MyQTreeView
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
-class SaltTank(BlockItem, MassFlowNetworkContributorMixin):
+class SaltTankBase(BlockItem, MassFlowNetworkContributorMixin):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -29,6 +30,10 @@ class SaltTank(BlockItem, MassFlowNetworkContributorMixin):
 
         self.changeSize()
         self.addTree()
+
+    @_abc.abstractmethod
+    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+        raise NotImplementedError()
 
     def getInternalPiping(self) -> InternalPiping:
         inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
