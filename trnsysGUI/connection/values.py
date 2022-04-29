@@ -11,6 +11,6 @@ class Variable(_dcj.JsonSchemaMixin):
 
 Value = _tp.Union[Variable, float]
 
-DEFAULT_DIAMETER_IN_CM = 2
+DEFAULT_DIAMETER_IN_CM = 2.0
 DEFAULT_LENGTH_IN_M = 2.0
 DEFAULT_U_VALUE_IN_W_PER_M2_K = 0.8333
