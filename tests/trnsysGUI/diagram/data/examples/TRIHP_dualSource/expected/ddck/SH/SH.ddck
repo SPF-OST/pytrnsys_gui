@@ -286,6 +286,6 @@ T1_Tes2 T2_Tes2 T3_Tes2 T4_Tes2 T5_Tes2 T6_Tes2 T7_Tes2 T8_Tes2 T9_Tes2 T10_Tes2
 LABELS  3         
 Temperatures  
 MassFlows  
-Tes%d 
+Tes2 
 
 
