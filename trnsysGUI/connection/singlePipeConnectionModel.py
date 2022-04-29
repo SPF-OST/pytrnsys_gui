@@ -30,6 +30,64 @@ class ConnectionModelVersion0(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint
 
 
 @_dc.dataclass
+class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    connectionId: int
+    name: str
+    groupName: _tp.Optional[str]
+    id: int  # pylint: disable=invalid-name
+    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
+    labelPos: _tp.Tuple[float, float]
+    massFlowLabelPos: _tp.Tuple[float, float]
+    fromPortId: int
+    toPortId: int
+    trnsysId: int
+    diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
+    uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
+    lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return ConnectionModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModelVersion1":
+        assert isinstance(superseded, ConnectionModelVersion0)
+
+        firstSegmentLabelPos = (
+            superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
+            superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
+        )
+
+        if superseded.FirstSegmentMassFlowLabelPos:
+            firstSegmentMassFlowLabelPos = (
+                superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
+                superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
+            )
+        else:
+            firstSegmentMassFlowLabelPos = firstSegmentLabelPos
+
+        return ConnectionModelVersion1(
+            superseded.ConnCID,
+            superseded.ConnDisplayName,
+            None,
+            superseded.ConnID,
+            superseded.CornerPositions,
+            firstSegmentLabelPos,
+            firstSegmentMassFlowLabelPos,
+            superseded.PortFromID,
+            superseded.PortToID,
+            superseded.trnsysID,
+            _values.DEFAULT_DIAMETER_IN_CM,
+            _values.DEFAULT_U_VALUE_IN_W_PER_M2_K,
+            _values.DEFAULT_LENGTH_IN_M,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("332cd663-684d-414a-b1ec-33fd036f0f17")
+
+
+@_dc.dataclass
 class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
@@ -40,9 +98,9 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
     fromPortId: int
     toPortId: int
     trnsysId: int
-    diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
-    uValueInWPerM2K: _values.Value = _values.DEFAULT_LENGTH_IN_M
-    lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+    diameterInCm: _values.Value
+    uValueInWPerM2K: _values.Value
+    lengthInM: _values.Value
 
     @classmethod
     def from_dict(
@@ -67,40 +125,27 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return ConnectionModelVersion0
+        return ConnectionModelVersion1
 
     @classmethod
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModel":
-        assert isinstance(superseded, ConnectionModelVersion0)
-
-        firstSegmentLabelPos = (
-            superseded.SegmentPositions[0][0] + superseded.FirstSegmentLabelPos[0],
-            superseded.SegmentPositions[0][1] + superseded.FirstSegmentLabelPos[1],
-        )
-
-        if superseded.FirstSegmentMassFlowLabelPos:
-            firstSegmentMassFlowLabelPos = (
-                superseded.SegmentPositions[0][0] + superseded.FirstSegmentMassFlowLabelPos[0],
-                superseded.SegmentPositions[0][1] + superseded.FirstSegmentMassFlowLabelPos[1],
-            )
-        else:
-            firstSegmentMassFlowLabelPos = firstSegmentLabelPos
+        assert isinstance(superseded, ConnectionModelVersion1)
 
         return ConnectionModel(
-            superseded.ConnCID,
-            superseded.ConnDisplayName,
-            superseded.ConnID,
-            superseded.CornerPositions,
-            firstSegmentLabelPos,
-            firstSegmentMassFlowLabelPos,
-            superseded.PortFromID,
-            superseded.PortToID,
-            superseded.trnsysID,
-            _values.DEFAULT_DIAMETER_IN_CM,
-            _values.DEFAULT_U_VALUE_IN_W_PER_M2_K,
-            _values.DEFAULT_LENGTH_IN_M,
+            superseded.connectionId,
+            superseded.name,
+            superseded.id,
+            superseded.segmentsCorners,
+            superseded.labelPos,
+            superseded.massFlowLabelPos,
+            superseded.fromPortId,
+            superseded.toPortId,
+            superseded.trnsysId,
+            superseded.diameterInCm,
+            superseded.uValueInWPerM2K,
+            superseded.lengthInM,
         )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("332cd663-684d-414a-b1ec-33fd036f0f17")
+        return _uuid.UUID("f03faf46-4d0e-4407-a604-90925d83d43a")
