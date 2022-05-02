@@ -16,16 +16,16 @@ class HeatExchanger(QGraphicsItemGroup):
     PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS = 8
 
     def __init__(
-        self,
-        trnsysId,
-        sideNr,
-        width,
-        relativeInputHeight,
-        relativeOutputHeight,
-        storageTankWidth,
-        storageTankHeight,
-        parent,
-        name
+            self,
+            trnsysId,
+            sideNr,
+            width,
+            relativeInputHeight,
+            relativeOutputHeight,
+            storageTankWidth,
+            storageTankHeight,
+            parent,
+            name
     ):
         super().__init__(parent)
         self.parent = parent
@@ -97,7 +97,6 @@ class HeatExchanger(QGraphicsItemGroup):
         self.logger.debug("pressed")
 
     def renameHx(self):
-        # dia = hxDlg(self, self.scene().parent())
         self.scene().parent().showHxDlg(self)
 
     def rename(self, newName):
@@ -192,11 +191,11 @@ class HeatExchanger(QGraphicsItemGroup):
         self._lines = []
 
     def _setRelativeHeightsAndTankSize(
-        self,
-        storageTankWidth,
-        storageTankHeight,
-        relativeInputHeight,
-        relativeOutputHeight,
+            self,
+            storageTankWidth,
+            storageTankHeight,
+            relativeInputHeight,
+            relativeOutputHeight,
     ):
         self._storageTankWidth = storageTankWidth
         self._storageTankHeight = storageTankHeight
@@ -204,7 +203,7 @@ class HeatExchanger(QGraphicsItemGroup):
         self.relativeOutputHeight = relativeOutputHeight
         self.relativeInputHeight = relativeInputHeight
 
-        relativeHeight = relativeInputHeight - relativeOutputHeight
+        relativeHeight = abs(relativeInputHeight - relativeOutputHeight)
         absoluteHeight = relativeHeight * storageTankHeight
 
         self.h = absoluteHeight - absoluteHeight % self.COIL_HEIGHT_IN_PIXELS
@@ -215,10 +214,15 @@ class HeatExchanger(QGraphicsItemGroup):
         x, y = self._getPos()
         sign = 1 if self.sSide == 0 else -1
         xWithProtrusion = x - sign * self.PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS
-        self.port1.setPos(xWithProtrusion, y)
-        self.port2.setPos(xWithProtrusion, y + self.h)
+        if self.relativeInputHeight > self.relativeOutputHeight:
+            self.port1.setPos(xWithProtrusion, y)
+            self.port2.setPos(xWithProtrusion, y + self.h)
+        else:
+            self.port1.setPos(xWithProtrusion, y + self.h)
+            self.port2.setPos(xWithProtrusion, y)
 
     def _getPos(self):
         x = 0 if self.sSide == 0 else self._storageTankWidth
-        y = self._storageTankHeight - self.relativeInputHeight * self._storageTankHeight
+        topPortRelativeHeight = max(self.relativeInputHeight, self.relativeOutputHeight)
+        y = self._storageTankHeight - topPortRelativeHeight * self._storageTankHeight
         return x, y
