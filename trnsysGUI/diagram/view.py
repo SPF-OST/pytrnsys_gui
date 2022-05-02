@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QGraphicsView
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
+from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
 from trnsysGUI.connectors.connector import Connector  # type: ignore[attr-defined]
 from trnsysGUI.Control import Control  # type: ignore[attr-defined]
@@ -23,10 +24,14 @@ from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx  # type: ignore[attr-defined]
 from trnsysGUI.IceStorage import IceStorage  # type: ignore[attr-defined]
 from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx  # type: ignore[attr-defined]
 from trnsysGUI.MasterControl import MasterControl  # type: ignore[attr-defined]
+from trnsysGUI.ParabolicTroughField import ParabolicTroughField  # type: ignore[attr-defined]
 from trnsysGUI.PV import PV  # type: ignore[attr-defined]
 from trnsysGUI.PitStorage import PitStorage  # type: ignore[attr-defined]
 from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
 from trnsysGUI.Radiator import Radiator  # type: ignore[attr-defined]
+from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
+from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
+from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.TeePiece import TeePiece  # type: ignore[attr-defined]
 from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
@@ -145,6 +150,16 @@ class View(QGraphicsView):
                 blockItem = Water(componentType, self, displayNamePrefix="QWat")
             elif componentType == "Crystalizer":
                 blockItem = Crystalizer(componentType, self, displayNamePrefix="Cryt")
+            elif componentType == "powerBlock":
+                blockItem = SteamPowerBlock(componentType, self, displayNamePrefix="StPB")
+            elif componentType == "ParabolicTroughField":
+                blockItem = ParabolicTroughField(componentType, self, displayNamePrefix="PT")
+            elif componentType == "CR":
+                blockItem = CentralReceiver(componentType, self, displayNamePrefix="CR")
+            elif componentType == "coldStore":
+                blockItem = SaltTankCold(componentType, self, displayNamePrefix="ClSt")
+            elif componentType == "hotStore":
+                blockItem = SaltTankHot(componentType, self, displayNamePrefix="HtSt")
             else:
                 blockItem = BlockItem(componentType, self, displayNamePrefix="Blk")
 

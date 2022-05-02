@@ -6,6 +6,7 @@ import typing as tp
 
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
+from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
 from trnsysGUI.connectors.connector import Connector
 from trnsysGUI.Control import Control
@@ -21,11 +22,15 @@ from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
 from trnsysGUI.IceStorage import IceStorage
 from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
 from trnsysGUI.MasterControl import MasterControl
+from trnsysGUI.ParabolicTroughField import ParabolicTroughField
 from trnsysGUI.PV import PV
 from trnsysGUI.PitStorage import PitStorage
 from trnsysGUI.pump import Pump
 from trnsysGUI.Radiator import Radiator
+from trnsysGUI.SaltTankCold import SaltTankCold
+from trnsysGUI.SaltTankHot import SaltTankHot
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.SteamPowerBlock import SteamPowerBlock
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.WTap import WTap
@@ -110,6 +115,10 @@ class Decoder(json.JSONDecoder):
                         bl = Collector(
                             "Collector", self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
+                    elif i["BlockName"] == "CSP_CR":
+                        bl = CentralReceiver(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
                     elif i["BlockName"] == "HP":
                         bl = HeatPump(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
@@ -124,6 +133,18 @@ class Decoder(json.JSONDecoder):
                         )
                     elif i["BlockName"] == "Radiator":
                         bl = Radiator(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "coldSaltTank":
+                        bl = SaltTankCold(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "hotSaltTank":
+                        bl = SaltTankHot(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"]  == "powerBlock":
+                        bl = SteamPowerBlock(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "WTap":
@@ -144,6 +165,10 @@ class Decoder(json.JSONDecoder):
                         )
                     elif i["BlockName"] == "AirSourceHP":
                         bl = AirSourceHP(
+                            i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
+                    elif i["BlockName"] == "CSP_PT":
+                        bl = ParabolicTroughField(
                             i["BlockName"], self.editor.diagramView, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
                     elif i["BlockName"] == "PV":
