@@ -124,12 +124,16 @@ specified are for a Windows environment. They are very similar for Linux.
     pip install wheel
     pip install -r requirements\dev\requirements.txt
     ```
-4. Run `setup.py` with `dev` tag
+4. Build the python-files corresponding to the ui-file included:
+   ```commandline
+   python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
+   ```
+5. Run `setup.py` with `dev` tag
    ```commandline
    setup.py egg_info -b dev
    ```
    Note: This will build python-files corresponding to the ui-file automatically everytime GUI is launched.
-5. Now you can run `pytrnsys-gui`!
+6. Now you can run `pytrnsys-gui`!
     ```commandline
     cd trnsysGUI
     python GUI.py
