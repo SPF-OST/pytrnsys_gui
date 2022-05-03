@@ -115,24 +115,25 @@ specified are for a Windows environment. They are very similar for Linux.
     ```commandline
     py -3.9 -m venv venv
     ```
-1. Activate it:
+2. Activate it:
     ```commandline
     venv\Scripts\activate
     ```
-1. Install the requirements:
+3. Install the requirements:
     ```commandline
     pip install wheel
     pip install -r requirements\dev\requirements.txt
     ```
-   
-1. Build the python-files corresponding to the ui-file included:
-    ```commandline
+4. Build the python-files corresponding to the ui-file included:
+   ```commandline
    python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
    ```
-   Note: You have to execute this file each time you pull from the source results in changes to existing ui-files or new 
-   ones.  
-   
-1. Now you can run `pytrnsys-gui`!
+5. Run `setup.py` with `dev` tag
+   ```commandline
+   setup.py egg_info -b dev
+   ```
+   Note: This will build python-files corresponding to the ui-file automatically everytime GUI is launched.
+6. Now you can run `pytrnsys-gui`!
     ```commandline
     cd trnsysGUI
     python GUI.py

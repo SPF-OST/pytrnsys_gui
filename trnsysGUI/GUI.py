@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 
+import pkg_resources
 from PyQt5.QtWidgets import *
 
 import pytrnsys.utils.result as _res
@@ -738,5 +739,14 @@ def main():
     tracer.run(lambda: app.exec())
 
 
+def generateUI():
+    if pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local.endswith('dev'):
+        uiGenerateFilePath = _pl.Path(
+            __file__).parent.parent / "dev-tools" / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
+        cmd = ["python.exe", uiGenerateFilePath]
+        subprocess.run(cmd, check=True)
+
+
 if __name__ == "__main__":
+    generateUI()
     main()
