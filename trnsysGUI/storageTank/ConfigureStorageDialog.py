@@ -42,6 +42,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         self.storage = storage
         self.n = 0  # pylint: disable = invalid-name
         self.m = 0  # pylint: disable = invalid-name
+        self.minimumPortDistance = 9
 
         spacerHeight = 15
 
@@ -293,12 +294,12 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         else:
             msgb = QMessageBox()
             msgb.setText(
-                "At least 9% of difference needed and valid range (0, 100)"
+                f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)"
             )
             msgb.exec_()
 
     def minOffsetDistance(self):
-        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= 9
+        return abs(float(self.offsetLeI.text()) - float(self.offsetLeO.text())) >= self.minimumPortDistance
 
     def offsetsInRange(self):
         return (0 <= float(self.offsetLeI.text()) <= 100) and (0 <= float(self.offsetLeO.text()) <= 100)
