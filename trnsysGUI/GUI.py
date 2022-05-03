@@ -739,10 +739,14 @@ def main():
     tracer.run(lambda: app.exec())
 
 
-if __name__ == "__main__":
+def generateUI():
     if pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local.endswith('dev'):
         uiGenerateFilePath = _pl.Path(
             __file__).parent.parent / "dev-tools" / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
         cmd = ["python.exe", uiGenerateFilePath]
         subprocess.run(cmd, check=True)
+
+
+if __name__ == "__main__":
+    generateUI()
     main()
