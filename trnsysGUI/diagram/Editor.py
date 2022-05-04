@@ -922,6 +922,8 @@ class Editor(QWidget):
         self.encodeDiagram(diagramPath)
         msgb = QMessageBox(self)
         msgb.setText("Saved diagram at " + diagramPath)
+        msgb.setStandardButtons(QMessageBox.Ok)
+        msgb.setDefaultButton(QMessageBox.Ok)
         msgb.exec()
 
     def saveToProject(self):
