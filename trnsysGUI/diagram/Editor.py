@@ -920,7 +920,8 @@ class Editor(QWidget):
             self.encodeDiagram(diagramPath)
 
         self.encodeDiagram(diagramPath)
-        msgb = QMessageBox(self)
+        msgb = QMessageBox()
+        msgb.setWindowTitle("Successful Operation")
         msgb.setText("Saved diagram at " + diagramPath)
         msgb.setStandardButtons(QMessageBox.Ok)
         msgb.setDefaultButton(QMessageBox.Ok)
