@@ -876,7 +876,7 @@ class Editor(QWidget):
             return _res.error(result)
 
         msgb = QMessageBox()
-        msgb.setWindowTitle("Successful Operation")
+        msgb.setWindowTitle("Saved successfully")
         msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
         msgb.setStandardButtons(QMessageBox.Ok)
         msgb.setDefaultButton(QMessageBox.Ok)
@@ -925,7 +925,7 @@ class Editor(QWidget):
         self.encodeDiagram(diagramPath)
         if showWarning:
             msgb = QMessageBox()
-            msgb.setWindowTitle("Successful Operation")
+            msgb.setWindowTitle("Saved successfully")
             msgb.setText("Saved diagram at " + diagramPath)
             msgb.setStandardButtons(QMessageBox.Ok)
             msgb.setDefaultButton(QMessageBox.Ok)
