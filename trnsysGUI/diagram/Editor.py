@@ -875,8 +875,11 @@ class Editor(QWidget):
         if _res.isError(result):
             return _res.error(result)
 
-        msgb = QMessageBox(self)
+        msgb = QMessageBox()
+        msgb.setWindowTitle("Successful Operation")
         msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
+        msgb.setStandardButtons(QMessageBox.Ok)
+        msgb.setDefaultButton(QMessageBox.Ok)
         msgb.exec()
 
         return None
@@ -920,12 +923,13 @@ class Editor(QWidget):
             self.encodeDiagram(diagramPath)
 
         self.encodeDiagram(diagramPath)
-        msgb = QMessageBox()
-        msgb.setWindowTitle("Successful Operation")
-        msgb.setText("Saved diagram at " + diagramPath)
-        msgb.setStandardButtons(QMessageBox.Ok)
-        msgb.setDefaultButton(QMessageBox.Ok)
-        msgb.exec()
+        if showWarning:
+            msgb = QMessageBox()
+            msgb.setWindowTitle("Successful Operation")
+            msgb.setText("Saved diagram at " + diagramPath)
+            msgb.setStandardButtons(QMessageBox.Ok)
+            msgb.setDefaultButton(QMessageBox.Ok)
+            msgb.exec()
 
     def saveToProject(self):
         projectPath = self.projectPath
