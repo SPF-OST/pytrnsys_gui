@@ -408,7 +408,7 @@ T1_Tes7703 T2_Tes7703 T3_Tes7703 T4_Tes7703 T5_Tes7703 T6_Tes7703 T7_Tes7703 T8_
 LABELS  3         
 Temperatures  
 MassFlows  
-Tes%d 
+Tes7703
 
 
 """
