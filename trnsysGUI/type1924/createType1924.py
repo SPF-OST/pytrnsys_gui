@@ -765,7 +765,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         line = "MassFlows  \n"
         lines = lines + line
-        line = "Tes%d \n"
+        line = "Tes%d\n" % (nTes)
         lines = lines + line
 
         lines = lines + "\n"
