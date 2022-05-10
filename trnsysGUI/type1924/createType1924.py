@@ -123,7 +123,8 @@ class Type1924_TesPlugFlow:
 
         return lines
 
-    def getOneHxParValues(self, nTes, idHx):
+    @staticmethod
+    def getOneHxParValues(nTes, idHx):
 
         lines = "*********Constant values of HX=%d***********\n" % idHx
 
@@ -854,30 +855,13 @@ class Type1924_TesPlugFlow:
         nAux = self.inputs["nHeatSources"]
         nUnit = self.inputs["nUnit"]
 
-        ddcxLines = ""
+        for idPort in range(nPorts):
+            line = self._getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
+            lines = lines + line
 
-        for idPort in range(self.nMaxPorts):
-            if idPort <= nPorts - 1:
-                line = self._getOnePortInputs(nTes, idPort + 1, self.connectorsPort)
-                lines = lines + line
-                inputTemperature = line.split("\n")[1].split("=")[0].replace(" ", "")
-                ddcxLine = (
-                        "T"
-                        + tankName
-                        + "Port"
-                        + self.connectorsPort[idPort]["side"]
-                        + str(int(round(self.connectorsPort[idPort]["zIn"] * 100, 0)))
-                        + "="
-                        + inputTemperature
-                        + "\n"
-                )
-
-                ddcxLines = ddcxLines + ddcxLine
-
-        for idHx in range(self.nMaxHx):
-            if idHx <= nHxs - 1:
-                line = self.getOneHxInputs(nTes, idHx + 1, self.connectorsHx)
-                lines = lines + line
+        for idHx in range(nHxs):
+            line = self.getOneHxInputs(nTes, idHx + 1, self.connectorsHx)
+            lines = lines + line
 
         line = self.getHeatSourcesValues(nTes, nAux, self.connectorsAux)
         lines = lines + line
@@ -891,11 +875,26 @@ class Type1924_TesPlugFlow:
             line = "*** direct port outputs\n"
             lines = lines + line
 
+        ddcxLines = ""
+
         counter = 1
         for idPort in range(nPorts):
             outputTemperature = "Tdp%dOut_Tes%d" % (idPort + 1, nTes)
             line = outputTemperature + "=[%d,%d] ! \n" % (nUnit, counter)
             lines = lines + line
+
+            ddcxLine = (
+                    "T"
+                    + tankName
+                    + "Port"
+                    + self.connectorsPort[idPort]["side"]
+                    + str(int(round(self.connectorsPort[idPort]["zIn"] * 100, 0)))
+                    + "="
+                    + outputTemperature
+                    + "\n"
+            )
+            ddcxLines = ddcxLines + ddcxLine
+
             ddcxLine = (
                     "T"
                     + tankName
@@ -907,6 +906,7 @@ class Type1924_TesPlugFlow:
                     + "\n"
             )
             ddcxLines = ddcxLines + ddcxLine
+
             counter = counter + 2
 
         nEq = nHxs
@@ -951,31 +951,25 @@ class Type1924_TesPlugFlow:
         line = "ratioTes%d = Vol_Tes%d / VStoreRef\n" % (nTes, nTes)
         lines = lines + line
 
-        for idPort in range(self.nMaxPorts):
-            if idPort <= nPorts - 1:
+        for idPort in range(nPorts):
+            line = self.getOnePortParConn(idPort, nTes, self.connectorsPort)
+            lines = lines + line
 
-                line = self.getOnePortParConn(idPort, nTes, self.connectorsPort)
-                lines = lines + line
+        for idHx in range(nHxs):
+            line = self.getOneHxParConnValues(nTes, idHx + 1, self.connectorsHx)
+            lines = lines + line
 
-        for idHx in range(self.nMaxHx):
-            if idHx <= nHxs - 1:
-                line = self.getOneHxParConnValues(nTes, idHx + 1, self.connectorsHx)
-                lines = lines + line
-
-        for idPort in range(self.nMaxPorts):
-            if idPort <= nPorts - 1:
-
-                line = self.getOnePortPar(idPort, nTes)
-                lines = lines + line
+        for idPort in range(nPorts):
+            line = self.getOnePortPar(idPort, nTes)
+            lines = lines + line
 
         lines = lines + "********** HEAT EXCHANGER CONSTANTS*******\n"
         lines = lines + "CONSTANTS 1\n"
         lines = lines + "nHxUsed_Tes%d=%d \n" % (nTes, nHxs)
 
-        for idHx in range(self.nMaxHx):
-            if idHx <= nHxs - 1:
-                line = self.getOneHxParValues(nTes, idHx + 1)
-                lines = lines + line
+        for idHx in range(nHxs):
+            line = self.getOneHxParValues(nTes, idHx + 1)
+            lines = lines + line
 
         lines = lines + self.getSensorPositionValues(nTes)
         lines = lines + self.getHeighAvgSensorParValues(nTes)
