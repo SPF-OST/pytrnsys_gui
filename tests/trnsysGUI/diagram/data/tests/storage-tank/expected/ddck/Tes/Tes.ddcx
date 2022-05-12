@@ -3,6 +3,6 @@
 *************************************
 ** This file is used to store the black box component outputs of Tes
 
-TTesPortLeft50=Tdp1In_Tes1
+TTesPortLeft50=Tdp1Out_Tes1
 TTesPortLeft10=Tdp1Out_Tes1
 TInHx=Thx1Out_Tes1

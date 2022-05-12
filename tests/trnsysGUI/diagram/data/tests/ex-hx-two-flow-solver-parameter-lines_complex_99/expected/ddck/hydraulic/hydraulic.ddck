@@ -12,13 +12,13 @@ qSysOut_PipeLoss = PipeLossTot
 EQUATIONS 19
 *** Black box component temperatures
 TFloor1=1
-TShPortLeft90=Tdp1In_Tes1
+TShPortLeft90=Tdp1Out_Tes1
 TShPortLeft2=Tdp1Out_Tes1
-TDhwPortLeft50=Tdp1In_Tes2
-TDhwPortRight1=Tdp2In_Tes2
-TDhwPortRight50=Tdp3In_Tes2
+TDhwPortLeft50=Tdp1Out_Tes2
 TDhwPortLeft1=Tdp1Out_Tes2
+TDhwPortRight1=Tdp2Out_Tes2
 TDhwPortRight97=Tdp2Out_Tes2
+TDhwPortRight50=Tdp3Out_Tes2
 TDhwPortRight99=Tdp3Out_Tes2
 TsupplyWater=Tcw
 THxDHWX1=1
