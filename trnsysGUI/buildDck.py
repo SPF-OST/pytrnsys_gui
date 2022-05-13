@@ -92,6 +92,8 @@ class buildDck:
             deck.automaticEnegyBalanceStaff()
             deck.writeDeck()  # Deck rewritten with added printer
 
+        deck.analyseDck()
+
         return deck.nameDeck
 
     def _addParametricVariations(self, variations):
