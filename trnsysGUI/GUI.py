@@ -35,7 +35,7 @@ __email__ = "stefano.marti@spf.ch"
 __status__ = "Prototype"
 
 
-class _MainWindow(QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self, logger, project: _prj.Project, parent=None):
         super().__init__(parent)
 
@@ -283,6 +283,9 @@ class _MainWindow(QMainWindow):
 
         oldProjectFolderPath = _pl.Path(self.projectFolder)
 
+        self.copyContentsToNewFolder(newProjectFolderPath, oldProjectFolderPath)
+
+    def copyContentsToNewFolder(self, newProjectFolderPath, oldProjectFolderPath):
         self._copyContents(oldProjectFolderPath, newProjectFolderPath)
         newJsonFilePath = self._changeAndGetNewJsonFileName(newProjectFolderPath, oldProjectFolderPath)
 
@@ -716,7 +719,7 @@ def main():
         return
     project = _ccl.value(maybeCancelled)
 
-    form = _MainWindow(logger, project)
+    form = MainWindow(logger, project)
     form.showMaximized()
     form.show()
     form.ensureSettingsExist()

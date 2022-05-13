@@ -1,5 +1,6 @@
 import dataclasses as _dc
 import logging as _log
+import os as _os
 import pathlib as _pl
 import shutil as _su
 import subprocess as _sp
@@ -10,7 +11,10 @@ import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 import pytest as _pt
 
+from pytrnsys.utils import log
+import trnsysGUI.GUI as _GUI
 import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
 
 _DATA_DIR = _pl.Path(__file__).parent / "data"
@@ -54,7 +58,8 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 class TestEditor:
     @_pt.mark.parametrize("project", TEST_CASES)
-    def testStorageAndHydraulicExports(self, project: _Project, request: _pt.FixtureRequest) -> None:
+    def testStorageAndHydraulicExports(self, project: _Project,  # pylint: disable=too-many-locals
+                                       request: _pt.FixtureRequest) -> None:
         helper = _Helper(project)
         helper.setup()
 
@@ -68,15 +73,16 @@ class TestEditor:
 
         projectFolderPath = helper.actualProjectFolderPath
 
-        self._exportHydraulic(projectFolderPath, _format="mfs")
+        editor = self._createEditor(projectFolderPath)
+        editor.exportHydraulics(exportTo="mfs")
         mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
         helper.ensureFilesAreEqual(mfsDdckRelativePath)
 
-        self._exportHydraulic(projectFolderPath, _format="ddck")
+        editor.exportHydraulics(exportTo="ddck")
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
         helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
 
-        storageTankNames = self._exportStorageTanksAndGetNames(projectFolderPath)
+        storageTankNames = self._exportStorageTanksAndGetNames(editor)
         for storageTankName in storageTankNames:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath)
@@ -84,8 +90,31 @@ class TestEditor:
             ddcxFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddcx"
             helper.ensureFilesAreEqual(ddcxFileRelativePath)
 
-    def _exportStorageTanksAndGetNames(self, projectFolderPath: _pl.Path) -> _tp.Sequence[str]:
-        editor = self._createEditor(projectFolderPath)
+        oldFormatJsonPath = projectFolderPath / f"{projectFolderPath.name}.json"
+
+        projectInOldJsonFormat = _prj.LoadProject(oldFormatJsonPath)
+
+        logger = log.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
+
+        mainWindow = _GUI.MainWindow(logger, projectInOldJsonFormat)  # type: ignore[attr-defined]
+
+        newProjectFolderPath = projectFolderPath.parent / "actual"
+
+        if newProjectFolderPath.exists():
+            _su.rmtree(newProjectFolderPath)
+
+        _os.mkdir(newProjectFolderPath)
+
+        mainWindow.copyContentsToNewFolder(newProjectFolderPath, projectFolderPath)
+
+        newestFormatJsonPath = newProjectFolderPath / f"{newProjectFolderPath.name}.json"
+
+        editor.encodeDiagram(newestFormatJsonPath)
+
+        assert self._createEditor(newProjectFolderPath)
+
+    @classmethod
+    def _exportStorageTanksAndGetNames(cls, editor: _de.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
         storageTanks = [o for o in editor.trnsysObj if isinstance(o, _stw.StorageTank)]  # pylint: disable=no-member
 
         for storageTank in storageTanks:
@@ -160,8 +189,8 @@ class TestEditor:
 
 class _Helper:
     def __init__(
-        self,
-        project: _Project,
+            self,
+            project: _Project,
     ):
         self._project = project
 
