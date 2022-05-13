@@ -126,7 +126,7 @@ python-dateutil==2.8.1
     #   dataclasses-jsonschema
     #   matplotlib
     #   pandas
-pytrnsys==0.5.2
+pytrnsys==0.6.0
     # via pytrnsys-gui
 pytz==2021.1
     # via pandas
