@@ -152,13 +152,13 @@ class View(QGraphicsView):
                 blockItem = Crystalizer(componentType, self, displayNamePrefix="Cryt")
             elif componentType == "powerBlock":
                 blockItem = SteamPowerBlock(componentType, self, displayNamePrefix="StPB")
-            elif componentType == "ParabolicTroughField":
+            elif componentType == "CSP_PT":
                 blockItem = ParabolicTroughField(componentType, self, displayNamePrefix="PT")
-            elif componentType == "CR":
+            elif componentType == "CSP_CR":
                 blockItem = CentralReceiver(componentType, self, displayNamePrefix="CR")
-            elif componentType == "coldStore":
+            elif componentType == "coldSaltTank":
                 blockItem = SaltTankCold(componentType, self, displayNamePrefix="ClSt")
-            elif componentType == "hotStore":
+            elif componentType == "hotSaltTank":
                 blockItem = SaltTankHot(componentType, self, displayNamePrefix="HtSt")
             else:
                 blockItem = BlockItem(componentType, self, displayNamePrefix="Blk")
