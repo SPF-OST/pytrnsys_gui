@@ -83,7 +83,10 @@ class buildDck:
             return
         self.overwriteForcedByUser = deck.overwriteForcedByUser
 
-        deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
+
+        result = deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
+        if _res.isError(result):
+            return _res.error(result)
 
         if self.inputs["generateUnitTypesUsed"] == True:
             deck.saveUnitTypeFile()
