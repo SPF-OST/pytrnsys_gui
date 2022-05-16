@@ -195,7 +195,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self.parent.trnsysObj.append(self)
 
-        self.displayName = "Pi" + self.fromPort.parent.displayName + "_" + self.toPort.parent.displayName
+        self.displayName = self.fromPort.parent.displayName + "_" + self.toPort.parent.displayName
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")

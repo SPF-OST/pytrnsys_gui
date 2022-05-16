@@ -96,7 +96,7 @@ class View(QGraphicsView):
             elif componentType == "Pump":
                 blockItem = Pump(componentType, self, displayNamePrefix="Pump")
             elif componentType == "Collector":
-                blockItem = Collector(componentType, self, displayNamePrefix="Coll")
+                blockItem = Collector(componentType, self, displayNamePrefix="Col")
             elif componentType == "HP":
                 blockItem = HeatPump(componentType, self, displayNamePrefix="HP")
             elif componentType == "IceStorage":
