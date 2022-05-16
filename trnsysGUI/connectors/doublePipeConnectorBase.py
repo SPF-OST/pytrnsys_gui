@@ -93,12 +93,12 @@ class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixi
         raise NotImplementedError()
 
     def _updateModelPipes(self, displayName: str) -> None:
-        coldInput = _dpmpi.ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
-        coldOutput = _dpmpi.ColdPortItem("coldOutput", _mfn.PortItemType.OUTPUT)
+        coldInput = _dpmpi.ColdPortItem("ColdIn", _mfn.PortItemType.INPUT)
+        coldOutput = _dpmpi.ColdPortItem("ColdOut", _mfn.PortItemType.OUTPUT)
         self._coldPipe = _mfn.Pipe(displayName + "Cold", self.childIds[0], coldInput, coldOutput)
 
-        hotInput = _dpmpi.HotPortItem("hotInput", _mfn.PortItemType.INPUT)
-        hotOutput = _dpmpi.HotPortItem("hotOutput", _mfn.PortItemType.OUTPUT)
+        hotInput = _dpmpi.HotPortItem("HotIn", _mfn.PortItemType.INPUT)
+        hotOutput = _dpmpi.HotPortItem("HotOut", _mfn.PortItemType.OUTPUT)
         self._hotPipe = _mfn.Pipe(displayName + "Hot", self.childIds[1], hotInput, hotOutput)
 
     def setDisplayName(self, newName):

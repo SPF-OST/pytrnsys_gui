@@ -455,10 +455,10 @@ class StorageTank(BlockItem,
         portPairsPortItems = {}
         portPairNodes = []
         for directPortPair in self.directPortPairs:
-            portPairPortItem1 = _mfn.PortItem("Input", _mfn.PortItemType.INPUT)
+            portPairPortItem1 = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
             portPairsPortItems[portPairPortItem1] = directPortPair.fromPort
 
-            portPairPortItem2 = _mfn.PortItem("Output", _mfn.PortItemType.OUTPUT)
+            portPairPortItem2 = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
             portPairsPortItems[portPairPortItem2] = directPortPair.toPort
 
             portPairName = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)

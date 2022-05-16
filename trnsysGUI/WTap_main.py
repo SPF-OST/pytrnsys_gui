@@ -61,6 +61,6 @@ class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
         return resStr, equationNr
 
     def getInternalPiping(self) -> InternalPiping:
-        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
         source = _mfn.Source(self.displayName, self.trnsysId, outputPort)
         return InternalPiping([source], {outputPort: self.outputs[0]})

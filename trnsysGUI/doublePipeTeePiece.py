@@ -119,16 +119,16 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
 
 
     def getInternalPiping(self) -> InternalPiping:
-        coldInput: _mfn.PortItem = ColdPortItem("coldInput", _mfn.PortItemType.INPUT)
-        coldOutput1: _mfn.PortItem = ColdPortItem("coldStraightOutput", _mfn.PortItemType.OUTPUT)
-        coldOutput2: _mfn.PortItem = ColdPortItem("coldOrthogonalOutput", _mfn.PortItemType.OUTPUT)
+        coldInput: _mfn.PortItem = ColdPortItem("ColdIn", _mfn.PortItemType.INPUT)
+        coldOutput1: _mfn.PortItem = ColdPortItem("ColdStrOut", _mfn.PortItemType.OUTPUT)
+        coldOutput2: _mfn.PortItem = ColdPortItem("ColdOrtOut", _mfn.PortItemType.OUTPUT)
         coldTeePiece = _mfn.TeePiece(self.displayName + "Cold", self.childIds[0], coldInput, coldOutput1, coldOutput2)
         coldModelPortItemsToGraphicalPortItem = {
             coldInput: self.inputs[0], coldOutput1: self.outputs[0], coldOutput2: self.outputs[1]}
 
-        hotInput: _mfn.PortItem = HotPortItem("hotInput", _mfn.PortItemType.INPUT)
-        hotOutput1: _mfn.PortItem = HotPortItem("hotStraightOutput", _mfn.PortItemType.OUTPUT)
-        hotOutput2: _mfn.PortItem = HotPortItem("hotOrthogonalOutput", _mfn.PortItemType.OUTPUT)
+        hotInput: _mfn.PortItem = HotPortItem("HotIn", _mfn.PortItemType.INPUT)
+        hotOutput1: _mfn.PortItem = HotPortItem("HotStrOut", _mfn.PortItemType.OUTPUT)
+        hotOutput2: _mfn.PortItem = HotPortItem("HotOrtOut", _mfn.PortItemType.OUTPUT)
         hotTeePiece = _mfn.TeePiece(self.displayName + "Hot", self.childIds[1], hotInput, hotOutput1, hotOutput2)
         hotModelPortItemsToGraphicalPortItem = {
             hotInput: self.inputs[0], hotOutput1: self.outputs[0], hotOutput2: self.outputs[1]}
