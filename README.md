@@ -51,7 +51,7 @@ directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys
          
 1. Install `pytrnsys-gui` and its requirements:
     ```commandline
-    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/v0.9.12/requirements/release/requirements.txt
+    pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/v0.9.12-reqs/requirements/release/requirements.txt
     ```
    
 You can now close the command prompt opened in the first step.
