@@ -525,7 +525,7 @@ class Editor(QWidget):
             fullExportText += "qSysOut_PipeLoss = PipeLossTot\n"
 
         simulationUnit = 450
-        simulationType = 935
+        simulationType = 9351
         descConnLength = 15
 
         exporter = self._createExporter()
