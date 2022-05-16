@@ -341,7 +341,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
     def exportInputsFlowSolver(self):
         f = ""
-        f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 935\n"
+        f += "INPUTS " + str(self.lineNumOfPar) + "! for Type 9351\n"
 
         numberOfInputs = 0
 
