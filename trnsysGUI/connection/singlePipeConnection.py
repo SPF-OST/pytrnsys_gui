@@ -182,20 +182,14 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         if len(portItemsWithParent) == 2:
             portItem = portItemsWithParent[0][0]
             parent = portItemsWithParent[0][1]
-            if hasattr(parent, "getSubBlockOffset"):
-                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
-            else:
-                unitText += parent.getTemperatureVariableName(portItem) + "\n"
+            unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
             unitText += f"{outputVariables[0].name}\n"
             unitText += tempRoomVar + "\n"
 
             portItem = portItemsWithParent[1][0]
             parent = portItemsWithParent[1][1]
-            if hasattr(parent, "getSubBlockOffset"):
-                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
-            else:
-                unitText += parent.getTemperatureVariableName(portItem) + "\n"
+            unitText += parent.getTemperatureVariableName(portItem) + "\n"
 
         else:
             lines += (

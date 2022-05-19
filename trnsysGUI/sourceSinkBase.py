@@ -44,12 +44,6 @@ class SourceSinkBase(BlockItem, MassFlowNetworkContributorMixin):
         self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
         # pylint: disable=duplicate-code  # 1
 
-    def exportBlackBox(self):
-        status = "noDdckEntry"
-        equation = ["T" + self.displayName + "=1"]
-
-        return status, equation
-
     def getInternalPiping(self) -> InternalPiping:
         inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
         outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)

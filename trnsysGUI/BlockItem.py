@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import glob
 import os
 import typing as _tp
 
@@ -650,37 +649,17 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
     # Export related
     def exportBlackBox(self):
-        equation = []
-        if (
-                len(self.inputs + self.outputs) == 2
-                and self.isVisible()
-                and not isinstance(self.outputs[0], DoublePipePortItem)
-        ):
-            files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-            if not files:
-                status = "noDdckFile"
-            else:
-                status = "noDdckEntry"
-            lines = []
-            for file in files:
-                with open(file, "r") as infile:  # pylint: disable=unspecified-encoding
-                    lines += infile.readlines()
-            for i, line in enumerate(lines):
-                if "output" in line.lower() and "to" in line.lower() and "hydraulic" in line.lower():
-                    for j in range(i, len(lines) - i):
-                        if lines[j][0] == "T":
-                            outputT = lines[j].split("=")[0].replace(" ", "")
-                            status = "success"
-                            break
-                    equation = ["T" + self.displayName + "=" + outputT]
-                    break
+        equations = []
+        if (len(self.outputs) >= 1 and self.isVisible() and not isinstance(self.outputs[0], DoublePipePortItem)):
+            for outputPort in self.outputs:
+                outputName = self.getTemperatureVariableName(outputPort)
+                status = "success"
+                line = f"{outputName}={outputName[:-1]}"
+                equations.append(line)
         else:
             status = "noBlackBoxOutput"
 
-        if status in ("noDdckFile", "noDdckEntry"):
-            equation.append("T" + self.displayName + "=1")
-
-        return status, equation
+        return status, equations
 
     def exportPumpOutlets(self):  # pylint: disable=no-self-use
         return "", 0
@@ -697,13 +676,30 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:  # pylint: disable=no-self-use
         return "", startingUnit
 
-    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:  # pylint: disable=unused-argument
+    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
+        for port in portItem.getInternallyConnectedPortItems(portItem):
+            if port.name == "i":
+                continue
+            formattedPortItems = self.getPortName(port)
+            return f"T{self.displayName}{formattedPortItems[0]}H"
+        # This is for component with no output, e.g. WTap
         return f"T{self.displayName}"
+
+    def getPortName(self, port):
+        # pylint: disable=assignment-from-no-return
+        internalPipe = self.getInternalPiping()
+        portItemsNode = internalPipe.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(port)
+        portItems = [pr.portItem for pr in portItemsNode]
+        formattedPortItems = [f"{p.name}" for p in portItems]
+        return formattedPortItems
 
     def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:  # pylint: disable=unused-argument
         return self.trnsysId
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
+        pass
+
+    def getInternalPiping(self):
         pass
 
     def deleteLoadedFile(self):

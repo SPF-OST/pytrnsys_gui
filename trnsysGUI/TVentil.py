@@ -160,6 +160,12 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
             self.isTempering = i["IsTempering"]
             self.positionForMassFlowSolver = i["PositionForMassFlowSolver"]
 
+    def getTemperatureVariableName(self, portItem) -> str:  # pylint: disable=unused-argument
+        return f"T{self.displayName}"
+
+    def exportBlackBox(self):
+        return "noBlackBoxOutput", []
+
     def exportMassFlows(self):
         if not self.isTempering:
             resStr = "xFrac" + self.displayName + " = " + str(self.positionForMassFlowSolver) + "\n"

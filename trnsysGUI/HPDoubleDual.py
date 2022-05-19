@@ -1,7 +1,6 @@
 # pylint: skip-file
 # type: ignore
 
-import glob
 import os
 import shutil
 import typing as _tp
@@ -151,34 +150,6 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         self.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1] + offset_y))
 
         resBlockList.append(self)
-
-    def exportBlackBox(self):
-        equation = []
-        files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not (files):
-            status = "noDdckFile"
-            for i in range(1, 3):
-                equation.append("T" + self.displayName + "X" + str(i) + "=1")
-        else:
-            status = "noDdckEntry"
-        lines = []
-        for file in files:
-            infile = open(file, "r")
-            lines += infile.readlines()
-        for i in range(len(lines)):
-            if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
-                counter = 1
-                for j in range(i, len(lines) - i):
-                    if lines[j][0] == "T":
-                        outputT = lines[j].split("=")[0].replace(" ", "")
-                        equation.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
-                        counter += 1
-                    if counter == 4:
-                        status = "success"
-                        break
-                break
-
-        return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
         evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)

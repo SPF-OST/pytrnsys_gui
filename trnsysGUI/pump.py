@@ -58,6 +58,9 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
 
         return width, height
 
+    def getTemperatureVariableName(self, portItem) -> str:  # pylint: disable=unused-argument
+        return f"T{self.displayName}"
+
     def exportBlackBox(self):
         return "noBlackBoxOutput", []
 
@@ -147,10 +150,10 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
         return _tp.cast(PumpModel, pumpModel)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code 2
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,  # pylint: disable=duplicate-code 2
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True

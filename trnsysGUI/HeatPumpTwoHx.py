@@ -151,13 +151,6 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
 
         resBlockList.append(self)
 
-    def exportBlackBox(self):
-        equations = ["T" + self.displayName + "X1" + "=1"]
-        equations.append("T" + self.displayName + "X2" + "=1")
-        equations.append("T" + self.displayName + "X3" + "=1")
-        status = "success"
-        return status, equations
-
     def getInternalPiping(self) -> InternalPiping:
         evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
         evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)

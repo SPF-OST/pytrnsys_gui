@@ -30,13 +30,13 @@ class _SerializedNode:
 
 class Export:
     def __init__(
-        self,
-        diagramName: str,
-        massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
-        hydraulicLoops: _tp.Sequence[_hlm.HydraulicLoop],
-        fluids: _tp.Sequence[_hlm.Fluid],
-        logger: _log.Logger,
-        editor,
+            self,
+            diagramName: str,
+            massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
+            hydraulicLoops: _tp.Sequence[_hlm.HydraulicLoop],
+            fluids: _tp.Sequence[_hlm.Fluid],
+            logger: _log.Logger,
+            editor,
     ) -> None:
         self._hydraulicLoops = hydraulicLoops
         self._fluids = fluids
@@ -107,7 +107,8 @@ class Export:
         exportText += self._addComment("dpDepth = 3.0", "! Buried pipe depth, m")
         exportText += self._addComment("dpFlowMode = 2", "! Direction of second pipe flow: 1 = same, 2 = opposite")
         exportText += self._addComment("dpDiamCase = 0.17526", "! Diameter of casing material, m")
-        exportText += self._addComment("dpLambdaFill = 0.14537", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
+        exportText += self._addComment("dpLambdaFill = 0.14537",
+                                       "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
         exportText += self._addComment("dpDistPtoP = 0.06911", "! Center-to-center pipe spacing, m")
         exportText += self._addComment("dpLambdaGap = 8.722", "! Thermal conductivity of gap material, kJ/(h*m*K)")
         exportText += self._addComment("dpGapThick = 0.0000", "! Gap thickness, m")
@@ -129,7 +130,7 @@ class Export:
 
         if exportTo == "mfs":
             exportText += (
-                commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
+                    commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
             )
             exportText += self._addComment("TambAvg = 7.96", "! Average surface temperature, deg C")
             exportText += self._addComment("dTambAmpl = 13.32", "! Amplitude of surface temperature, deg C")
@@ -204,9 +205,9 @@ class Export:
         massFlowContributors = []
         for massFlowContributor in self._massFlowContributors:
             noHydraulicConnection = (
-                not isinstance(massFlowContributor, _cb.ConnectionBase)
-                and not massFlowContributor.outputs  # type: ignore[attr-defined]
-                and not massFlowContributor.inputs  # type: ignore[attr-defined]
+                    not isinstance(massFlowContributor, _cb.ConnectionBase)
+                    and not massFlowContributor.outputs  # type: ignore[attr-defined]
+                    and not massFlowContributor.inputs  # type: ignore[attr-defined]
             )
 
             if noHydraulicConnection:
@@ -240,8 +241,8 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
     @classmethod
     def _getSerializedNodes(
-        cls,
-        massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
+            cls,
+            massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
     ) -> _tp.Sequence[_SerializedNode]:
         globalNetwork = _gn.getGlobalNetwork(massFlowContributors)
         internalPortItemToExternalRealNode = globalNetwork.internalPortItemToExternalRealNode
@@ -262,9 +263,9 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
     @staticmethod
     def _getNeighborAndUnusedIndexes(
-        realNode: _mfn.RealNodeBase,
-        realNodesToIndex: _tp.Mapping[_mfn.RealNodeBase, int],
-        internalPortItemToExternalRealNode: _tp.Mapping[_mfn.PortItem, _mfn.RealNodeBase],
+            realNode: _mfn.RealNodeBase,
+            realNodesToIndex: _tp.Mapping[_mfn.RealNodeBase, int],
+            internalPortItemToExternalRealNode: _tp.Mapping[_mfn.PortItem, _mfn.RealNodeBase],
     ) -> _tp.Tuple[int, int, int]:
         neighborIndexes = []
         for neighbor in realNode.getNeighbours():
@@ -304,7 +305,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
         return res
 
     def findId(self, s):
-        a = s[s.find("!") + 1 : s.find(" ", s.find("!"))]
+        a = s[s.find("!") + 1: s.find(" ", s.find("!"))]
         self.logger.debug(a)
         return a
 
@@ -330,7 +331,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
                             ids[i] = str(counter)
 
                     fileCopyTempLine = fileCopy[l]
-                    rest = fileCopyTempLine[fileCopyTempLine.find("!") :]
+                    rest = fileCopyTempLine[fileCopyTempLine.find("!"):]
                     res[l] = ids[0] + " " + ids[1] + " " + ids[2] + " " + ids[3]
                     res[l] += " " * (descConnlen - len(res[l])) + rest
 
@@ -415,7 +416,6 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
         # typeNr2 = 931 # Temperature calculation from a pipe
 
         for t in self._massFlowContributors:
-
             res = t.exportPipeAndTeeTypesForTemp(unitNumber)
             f += res[0]
             unitNumber = res[1]
@@ -566,7 +566,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
     def exportFluids(self) -> str:
         def getValueOrVariableName(
-            valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1
+                valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1
         ) -> _tp.Union[float, str]:
             if isinstance(valueOrVariable, float):
                 return valueOrVariable * factor

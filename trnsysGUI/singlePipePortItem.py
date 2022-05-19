@@ -23,7 +23,7 @@ class SinglePipePortItem(_pi.PortItemBase):
     ) -> None:
         super().__init__(name, side, parent)
 
-        self._getInternallyConnectedPortItems = getInternallyConnectedPortItems
+        self.getInternallyConnectedPortItems = getInternallyConnectedPortItems
 
     def _selectConnectedRealNode(  # pylint: disable=duplicate-code  # 2
             self,
@@ -39,9 +39,9 @@ class SinglePipePortItem(_pi.PortItemBase):
         return selectedRealNode
 
     def _highlightInternallyConnectedPortItems(self):
-        for portItem in self._getInternallyConnectedPortItems(self):
+        for portItem in self.getInternallyConnectedPortItems(self):
             portItem.innerCircle.setBrush(self.ashColorB)
 
     def _unhighlightInternallyConnectedPortItems(self):
-        for portItem in self._getInternallyConnectedPortItems(self):
+        for portItem in self.getInternallyConnectedPortItems(self):
             portItem.innerCircle.setBrush(self.visibleColor)

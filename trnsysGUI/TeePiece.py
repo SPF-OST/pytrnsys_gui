@@ -7,11 +7,11 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
+import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import pytrnsys.utils.serialization as _ser
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
@@ -82,6 +82,12 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         modelPortItemsToGraphicalPortItem = {input: self.inputs[0], output1: self.outputs[0], output2: self.outputs[1]}
         return teePiece, modelPortItemsToGraphicalPortItem
 
+    def getTemperatureVariableName(self, portItem) -> str:  # pylint: disable=unused-argument
+        return f"T{self.displayName}"
+
+    def exportBlackBox(self):
+        return "noBlackBoxOutput", []
+
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
             f = ""
@@ -128,7 +134,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
             return f, unitNumber
         else:
             return "", startingUnit
-        
+
     def decode(self, i, resBlockList):
         model = TeePieceModel.from_dict(i)
 
@@ -136,7 +142,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
         self.id = model.Id
         self.trnsysId = model.trnsysId
-    
+
         self.inputs[0].id = model.portsIdsIn[0]
         self.outputs[0].id = model.portsIdsOut[0]
         self.outputs[1].id = model.portsIdsOut[1]
@@ -146,7 +152,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.rotateBlockToN(model.rotationN)
 
         resBlockList.append(self)
-        
+
     def encode(self):
         portListInputs = []
         portListOutputs = []
@@ -190,22 +196,22 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many
     flippedH: bool
     flippedV: bool
     rotationN: int
-    
+
     @classmethod
     def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,
-        validate_enums: bool = True,
+            cls,
+            data: _dcj.JsonDict,
+            validate=True,
+            validate_enums: bool = True,
     ) -> "TeePieceModel":
         teePieceModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(TeePieceModel, teePieceModel)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,  # pylint: disable=duplicate-code
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
@@ -222,7 +228,7 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many
 
         inputPortIds = [superseded.portsIdsIn[0]]
         outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
-        
+
         return TeePieceModel(
             superseded.BlockName,
             superseded.BlockDisplayName,

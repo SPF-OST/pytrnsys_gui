@@ -1,8 +1,5 @@
 # pylint: disable = invalid-name
 
-import glob
-import os
-
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
@@ -92,36 +89,6 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint:
         self.setPos(float(i[self.name + "Position"][0]) + offset_x, float(i[self.name + "Position"][1] + offset_y))
 
         resBlockList.append(self)
-
-    def exportBlackBox(self):
-        equations = []
-        files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not files:
-            status = "noDdckFile"
-        else:
-            status = "noDdckEntry"
-        lines = []
-        for file in files:
-            with open(file, "r") as infile:  # pylint: disable = unspecified-encoding
-                lines += infile.readlines()
-        for i, line in enumerate(lines):
-            if "output" in line.lower() and "to" in line.lower() and "hydraulic" in line.lower():
-                counter = 1
-                for j in range(i, len(lines) - i):
-                    if lines[j][0] == "T":
-                        outputT = lines[j].split("=")[0].replace(" ", "")
-                        equations.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
-                        counter += 1
-                    if counter == 3:
-                        status = "success"
-                        break
-                break
-
-        if status in ("noDdckFile", "noDdckEntry"):
-            equations.append("T" + self.displayName + "X1" + "=1")
-            equations.append("T" + self.displayName + "X2" + "=1")
-
-        return status, equations
 
     def getInternalPiping(self) -> InternalPiping:
         side1Input = _mfn.PortItem("Side Input 1", _mfn.PortItemType.INPUT)

@@ -1,12 +1,11 @@
 import typing as _tp
 
+import trnsysGUI.BlockItem as _bi
+import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-import trnsysGUI.BlockItem as _bi
 import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-
-import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 
 
 class Connector(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
@@ -63,6 +62,9 @@ class Connector(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4  # pylint: disable=duplicate-code  # 1
 
         return width, height
+
+    def getTemperatureVariableName(self, portItem) -> str:  # pylint: disable=unused-argument
+        return f"T{self.displayName}"
 
     def exportBlackBox(self):
         return "noBlackBoxOutput", []

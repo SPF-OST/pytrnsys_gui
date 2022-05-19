@@ -51,10 +51,6 @@ class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
 
         return w, h
 
-    def exportBlackBox(self):
-        equation = ["T" + self.displayName + "=Tcw"]
-        return "success", equation
-
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"
         equationNr = 1
