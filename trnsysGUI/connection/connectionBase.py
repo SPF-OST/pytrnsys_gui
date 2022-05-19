@@ -9,12 +9,12 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
-import trnsysGUI.massFlowSolver as _mfs
-from trnsysGUI import idGenerator as _id
-from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
-from trnsysGUI.Node import Node  # type: ignore[attr-defined]
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.SegmentItemBase as _sib
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.idGenerator as _id
+import trnsysGUI.CornerItem as _ci
+import trnsysGUI.Node as _node
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -23,9 +23,11 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
     return norm
 
 
-class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
+class ConnectionBase(_ip.HasInternalPiping):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(self, fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, parent):
+        assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
+
         self.logger = parent.logger
 
         self._fromPort = fromPort
@@ -43,8 +45,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self.isSelected = False
 
-        self.startNode = Node()
-        self.endNode = Node()
+        self.startNode = _node.Node()  # type: ignore[attr-defined]
+        self.endNode = _node.Node()  # type: ignore[attr-defined]
         self.firstS: _tp.Optional[_sib.SegmentItemBase] = None  # type: ignore[name-defined]
 
         self.mass = 0  # comment out
@@ -54,6 +56,9 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
         self.initNew(parent)
 
+    def getDisplayName(self) -> str:
+        return self.displayName
+
     @property
     def fromPort(self) -> _pib.PortItemBase:
         return self._fromPort
@@ -61,6 +66,9 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     @property
     def toPort(self) -> _pib.PortItemBase:
         return self._toPort
+
+    def _updateModels(self, newDisplayName: str) -> None:
+        raise NotImplementedError()
 
     def _createSegmentItem(self, startNode, endNode):
         raise NotImplementedError()
@@ -88,6 +96,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self.updateSegLabels()
+        self._updateModels(newName)
 
     def setLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
@@ -252,7 +261,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
         rad = self.getRadius()
 
         for segmentsCorner in segmentsCorners:
-            cor = CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
+            cor = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, tempNode, tempNode.nextN(), self)
 
             cor.setPos(float(segmentsCorner[0]), float(segmentsCorner[1]))
             cor.setFlag(cor.ItemSendsScenePositionChanges, True)
@@ -283,12 +292,12 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             if isinstance(s.endNode.parent, ConnectionBase) and s.endNode.nextNode is None:
                 pos2 = s.endNode.parent.toPort.scenePos().x(), s.endNode.parent.toPort.scenePos().y()
 
-            if isinstance(s.startNode.parent, CornerItem):
+            if isinstance(s.startNode.parent, _ci.CornerItem):
                 self.logger.debug(
                     str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos())
                 )
                 pos1 = s.startNode.parent.scenePos().x(), s.startNode.parent.scenePos().y()
-            if isinstance(s.endNode.parent, CornerItem):
+            if isinstance(s.endNode.parent, _ci.CornerItem):
                 pos2 = s.endNode.parent.scenePos().x(), s.endNode.parent.scenePos().y()
 
             self.logger.debug("pos1 is " + str(pos1))
@@ -359,10 +368,10 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             portOffset = 30
             self.clearConn()
 
-            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
-            corner3 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
-            corner4 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
+            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
+            corner3 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
+            corner4 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
 
             corner1.node.setNext(corner2.node)
             corner2.node.setNext(corner3.node)
@@ -426,10 +435,10 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             portOffset = 30
             self.clearConn()
 
-            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
-            corner3 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
-            corner4 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
+            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
+            corner3 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
+            corner4 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
 
             corner1.node.setNext(corner2.node)
             corner2.node.setNext(corner3.node)
@@ -499,7 +508,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             pos2 = self.toPort.scenePos()
 
             if pos2.y() <= pos1.y():
-                corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
+                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
                 seg1 = self._createSegmentItem(self.startNode, corner1.node)
                 seg2 = self._createSegmentItem(corner1.node, self.endNode)
@@ -527,8 +536,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
 
             else:
                 self.logger.debug("To port below from port")
-                corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-                corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+                corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
                 corner1.node.setNext(corner2.node)
 
@@ -579,7 +588,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             pos2 = self.toPort.scenePos()
 
             if pos2.y() >= pos1.y():
-                corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
+                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
 
                 seg1 = self._createSegmentItem(self.startNode, corner1.node)
                 seg2 = self._createSegmentItem(corner1.node, self.endNode)
@@ -606,8 +615,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                 self.firstS = self.getFirstSeg()
             else:
                 self.logger.debug("To port above from port")
-                corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-                corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+                corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
                 corner1.node.setNext(corner2.node)
 
@@ -658,8 +667,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
             self.logger.debug("Ports are directed to each other")
             self.clearConn()
 
-            corner1 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
+            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
+            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
             corner1.node.setNext(corner2.node)
 
@@ -725,8 +734,8 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
                             self.logger.debug("Can't build bridge because one segment is almost verical")
 
                         else:
-                            node1 = Node()
-                            node2 = Node()
+                            node1 = _node.Node()
+                            node2 = _node.Node()
 
                             node1.setPrev(s.startNode)
                             node1.setNext(node2)
@@ -1010,10 +1019,6 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def decode(self, i):
         raise NotImplementedError()
 
-    # Export related
-    def exportBlackBox(self):  # pylint: disable = no-self-use
-        return "noBlackBoxOutput", []
-
     def exportPumpOutlets(self):  # pylint: disable = no-self-use
         return "", 0
 
@@ -1026,7 +1031,7 @@ class ConnectionBase(_mfs.MassFlowNetworkContributorMixin):
     def exportDivSetting2(self, nUnit):  # pylint: disable = no-self-use
         return "", nUnit
 
-    def getInternalPiping(self) -> _mfs.InternalPiping:
+    def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):

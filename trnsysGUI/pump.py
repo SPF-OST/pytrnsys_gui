@@ -9,13 +9,14 @@ import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.BlockItem as _bi
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.temperatures as _temps
 
 _DEFAULT_MASS_FLOW_RATE = 500
 
 
-class Pump(BlockItem, MassFlowNetworkContributorMixin):
+class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-instance-attributes
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
         self.w = 40
@@ -26,7 +27,14 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
+        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        self._modelPump = _mfn.Pump(inputPort, outputPort)
+
         self.changeSize()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PUMP_SVG
@@ -58,11 +66,12 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
 
         return width, height
 
-    def exportBlackBox(self):
-        return "noBlackBoxOutput", []
-
     def exportPumpOutlets(self):
-        equation = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
+        temperatureVariableName = _temps.getTemperatureVariableName(self, self._modelPump)
+        inputConnection = self.inputs[0].getConnection()
+        inputConnectionNode = inputConnection.getInternalPiping().getNode(self.inputs[0], _mfn.PortItemType.STANDARD)
+        inputTemperatureVariable = _temps.getTemperatureVariableName(inputConnection, inputConnectionNode)
+        equation = f"{temperatureVariableName} = {inputTemperatureVariable}\n"
         equationNr = 1
         return equation, equationNr
 
@@ -71,13 +80,12 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
         massFlowLine = f"Mfr{self.displayName} = {self.massFlowRateInKgPerH}\n"
         return massFlowLine, equationNr
 
-    def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
-        pump = _mfn.Pump(self.displayName, self.trnsysId, inputPort, outputPort)
-
-        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
-        return InternalPiping([pump], modelPortItemsToGraphicalPortItem)
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        modelPortItemsToGraphicalPortItem = {
+            self._modelPump.fromPort: self.inputs[0],
+            self._modelPump.toPort: self.outputs[0],
+        }
+        return _ip.InternalPiping([self._modelPump], modelPortItemsToGraphicalPortItem)
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         inputPortIds = [p.id for p in self.inputs]
@@ -95,7 +103,7 @@ class Pump(BlockItem, MassFlowNetworkContributorMixin):
             self.flippedH,
             self.flippedV,
             self.rotationN,
-            self.massFlowRateInKgPerH
+            self.massFlowRateInKgPerH,
         )
 
         return "Block-", pumpModel.to_dict()
@@ -137,10 +145,10 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
 
     @classmethod
     def from_dict(
-            cls,  # pylint: disable = duplicate-code 2
-            data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
-            validate=True,
-            validate_enums: bool = True,
+        cls,  # pylint: disable = duplicate-code 2
+        data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
+        validate=True,
+        validate_enums: bool = True,
     ) -> "PumpModel":
         pumpModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(PumpModel, pumpModel)
@@ -174,7 +182,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
             superseded.flippedH,
             superseded.flippedV,
             superseded.rotationN,
-            _DEFAULT_MASS_FLOW_RATE
+            _DEFAULT_MASS_FLOW_RATE,
         )
 
     @classmethod

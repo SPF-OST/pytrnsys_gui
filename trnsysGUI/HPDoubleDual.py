@@ -1,7 +1,5 @@
 # pylint: skip-file
-# type: ignore
 
-import glob
 import os
 import shutil
 import typing as _tp
@@ -10,14 +8,14 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
+class HPDoubleDual(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HPDoubleDual, self).__init__(trnsysType, parent, **kwargs)
 
@@ -39,6 +37,9 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
 
         self.changeSize()
         self.addTree()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.HP_DOUBLE_DUAL_SVG
@@ -152,46 +153,18 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
 
         resBlockList.append(self)
 
-    def exportBlackBox(self):
-        equation = []
-        files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not (files):
-            status = "noDdckFile"
-            for i in range(1, 3):
-                equation.append("T" + self.displayName + "X" + str(i) + "=1")
-        else:
-            status = "noDdckEntry"
-        lines = []
-        for file in files:
-            infile = open(file, "r")
-            lines += infile.readlines()
-        for i in range(len(lines)):
-            if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
-                counter = 1
-                for j in range(i, len(lines) - i):
-                    if lines[j][0] == "T":
-                        outputT = lines[j].split("=")[0].replace(" ", "")
-                        equation.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
-                        counter += 1
-                    if counter == 4:
-                        status = "success"
-                        break
-                break
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemDirection.INPUT)
+        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemDirection.OUTPUT)
+        evaporatorPipe = _mfn.Pipe(evaporatorInput, evaporatorOutput, "Evap")
 
-        return status, equation
+        condenser1Input = _mfn.PortItem("CondIn1", _mfn.PortItemDirection.INPUT)
+        condenser1Output = _mfn.PortItem("CondOut1", _mfn.PortItemDirection.OUTPUT)
+        condenser1Pipe = _mfn.Pipe(condenser1Input, condenser1Output, "Cond1")
 
-    def getInternalPiping(self) -> InternalPiping:
-        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemType.INPUT)
-        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemType.OUTPUT)
-        evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[0], evaporatorInput, evaporatorOutput)
-
-        condenser1Input = _mfn.PortItem("CondIn1", _mfn.PortItemType.INPUT)
-        condenser1Output = _mfn.PortItem("CondOut1", _mfn.PortItemType.OUTPUT)
-        condenser1Pipe = _mfn.Pipe(f"{self.displayName}Cond1", self.childIds[1], condenser1Input, condenser1Output)
-
-        condenser2Input = _mfn.PortItem("CondIn2", _mfn.PortItemType.INPUT)
-        condenser2Output = _mfn.PortItem("CondOut2", _mfn.PortItemType.OUTPUT)
-        condenser2Pipe = _mfn.Pipe(f"{self.displayName}Cond2", self.childIds[2], condenser2Input, condenser2Output)
+        condenser2Input = _mfn.PortItem("CondIn2", _mfn.PortItemDirection.INPUT)
+        condenser2Output = _mfn.PortItem("CondOut2", _mfn.PortItemDirection.OUTPUT)
+        condenser2Pipe = _mfn.Pipe(condenser2Input, condenser2Output, "Cond2")
 
         modelPortItemsToGraphicalPortItem = {
             evaporatorInput: self.inputs[0],
@@ -203,7 +176,7 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         }
         nodes = [evaporatorPipe, condenser1Pipe, condenser2Pipe]
 
-        return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
     def getSubBlockOffset(self, c):
         for i in range(3):

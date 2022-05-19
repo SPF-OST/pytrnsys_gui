@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import os
 import shutil
@@ -9,8 +8,8 @@ import typing as _tp
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 import trnsysGUI.images as _img
 
 

@@ -1,7 +1,5 @@
 # pylint: skip-file
-# type: ignore
 
-import glob
 import os
 import shutil
 import typing as _tp
@@ -10,14 +8,14 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
+class HeatPump(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -35,6 +33,9 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
 
         self.changeSize()
         self.addTree()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.HP_SVG
@@ -146,42 +147,14 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
         self.setPos(float(i["HeatPumpPosition"][0]) + offset_x, float(i["HeatPumpPosition"][1] + offset_y))
         resBlockList.append(self)
 
-    def exportBlackBox(self):
-        equation = []
-        files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not (files):
-            status = "noDdckFile"
-            for i in range(1, 3):
-                equation.append("T" + self.displayName + "X" + str(i) + "=1")
-        else:
-            status = "noDdckEntry"
-        lines = []
-        for file in files:
-            infile = open(file, "r")
-            lines += infile.readlines()
-        for i in range(len(lines)):
-            if "output" in lines[i].lower() and "to" in lines[i].lower() and "hydraulic" in lines[i].lower():
-                counter = 1
-                for j in range(i, len(lines) - i):
-                    if lines[j][0] == "T":
-                        outputT = lines[j].split("=")[0].replace(" ", "")
-                        equation.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
-                        counter += 1
-                    if counter == 3:
-                        status = "success"
-                        break
-                break
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        condenserInput = _mfn.PortItem("CondIn", _mfn.PortItemDirection.INPUT)
+        condenserOutput = _mfn.PortItem("CondOut", _mfn.PortItemDirection.OUTPUT)
+        condenserPipe = _mfn.Pipe(condenserInput, condenserOutput, "Cond")
 
-        return status, equation
-
-    def getInternalPiping(self) -> InternalPiping:
-        condenserInput = _mfn.PortItem("CondIn", _mfn.PortItemType.INPUT)
-        condenserOutput = _mfn.PortItem("CondOut", _mfn.PortItemType.OUTPUT)
-        condenserPipe = _mfn.Pipe(f"{self.displayName}Cond", self.childIds[0], condenserInput, condenserOutput)
-
-        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemType.INPUT)
-        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemType.OUTPUT)
-        evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[1], evaporatorInput, evaporatorOutput)
+        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemDirection.INPUT)
+        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemDirection.OUTPUT)
+        evaporatorPipe = _mfn.Pipe(evaporatorInput, evaporatorOutput, "Evap")
 
         modelPortItemsToGraphicalPortItem = {
             condenserInput: self.inputs[1],
@@ -191,7 +164,7 @@ class HeatPump(BlockItem, MassFlowNetworkContributorMixin):
         }
         nodes = [condenserPipe, evaporatorPipe]
 
-        return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
     def getSubBlockOffset(self, c):
         for i in range(2):

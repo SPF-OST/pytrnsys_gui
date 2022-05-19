@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import glob
 import os
 import typing as _tp
 
@@ -10,12 +9,12 @@ from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping
+import trnsysGUI.PortItemBase as _pib
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
 from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
 from trnsysGUI.blockItemModel import BlockItemModel
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
 
 FILEPATH = "res/Config.txt"
 
@@ -45,8 +44,8 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         if "loadedBlock" not in kwargs:
             self.parent.parent().trnsysObj.append(self)
 
-        self.inputs = []
-        self.outputs = []
+        self.inputs: _tp.Sequence[_pib.PortItemBase] = []
+        self.outputs: _tp.Sequence[_pib.PortItemBase] = []
 
         self.path = None
 
@@ -106,9 +105,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def addTree(self):
         pass
 
-    def hasDdckPlaceHolders(self):  # pylint: disable = no-self-use
-        return False
-
     # Setter functions
     def setParent(self, p):
         self.parent = p
@@ -123,6 +119,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self.label.setPlainText(newName)
+        self._updateModels(newName)
+
+    def _updateModels(self, newDisplayName: str) -> None:
+        pass
 
     # Interaction related
     def contextMenuEvent(self, event):
@@ -648,40 +648,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         resBlockList.append(self)
 
-    # Export related
-    def exportBlackBox(self):
-        equation = []
-        if (
-                len(self.inputs + self.outputs) == 2
-                and self.isVisible()
-                and not isinstance(self.outputs[0], DoublePipePortItem)
-        ):
-            files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-            if not files:
-                status = "noDdckFile"
-            else:
-                status = "noDdckEntry"
-            lines = []
-            for file in files:
-                with open(file, "r") as infile:  # pylint: disable=unspecified-encoding
-                    lines += infile.readlines()
-            for i, line in enumerate(lines):
-                if "output" in line.lower() and "to" in line.lower() and "hydraulic" in line.lower():
-                    for j in range(i, len(lines) - i):
-                        if lines[j][0] == "T":
-                            outputT = lines[j].split("=")[0].replace(" ", "")
-                            status = "success"
-                            break
-                    equation = ["T" + self.displayName + "=" + outputT]
-                    break
-        else:
-            status = "noBlackBoxOutput"
-
-        if status in ("noDdckFile", "noDdckEntry"):
-            equation.append("T" + self.displayName + "=1")
-
-        return status, equation
-
     def exportPumpOutlets(self):  # pylint: disable=no-self-use
         return "", 0
 
@@ -697,14 +663,11 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:  # pylint: disable=no-self-use
         return "", startingUnit
 
-    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:  # pylint: disable=unused-argument
-        return f"T{self.displayName}"
-
-    def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:  # pylint: disable=unused-argument
-        return self.trnsysId
-
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
+
+    def getInternalPiping(self) -> trnsysGUI.internalPiping.InternalPiping:
+        raise NotImplementedError()
 
     def deleteLoadedFile(self):
         for items in self.loadedFiles:

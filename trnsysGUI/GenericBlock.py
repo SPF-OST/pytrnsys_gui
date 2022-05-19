@@ -8,16 +8,16 @@ import typing as _tp
 
 from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeView
 
-import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.images as _img
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+from trnsysGUI.BlockItem import BlockItem
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
+class GenericBlock(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super(GenericBlock, self).__init__(trnsysType, parent, **kwargs)
 
@@ -36,6 +36,9 @@ class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
 
         self.changeSize()
         self.addTree()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.GENERIC_BLOCK_PNG
@@ -258,21 +261,21 @@ class GenericBlock(BlockItem, MassFlowNetworkContributorMixin):
         pixmap = self._getPixmap()
         self.setPixmap(pixmap)
 
-    def getInternalPiping(self) -> InternalPiping:
+    def getInternalPiping(self) -> _ip.InternalPiping:
         assert len(self.inputs) == len(self.outputs)
 
         pipes = []
         portItems = {}
         for i, (graphicalInputPort, graphicalOutputPort) in enumerate(zip(self.inputs, self.outputs)):
-            inputPort = _mfn.PortItem(f"In{i+1}", _mfn.PortItemType.INPUT)
-            outputPort = _mfn.PortItem(f"Out{i+1}", _mfn.PortItemType.OUTPUT)
-            pipe = _mfn.Pipe(f"{self.displayName}X{i}", self.childIds[0], inputPort, outputPort)
+            inputPort = _mfn.PortItem(f"In{i+1}", _mfn.PortItemDirection.INPUT)
+            outputPort = _mfn.PortItem(f"Out{i+1}", _mfn.PortItemDirection.OUTPUT)
+            pipe = _mfn.Pipe(f"{self.displayName}X{i}", inputPort, outputPort)
 
             pipes.append(pipe)
             portItems[inputPort] = graphicalInputPort
             portItems[outputPort] = graphicalOutputPort
 
-        return InternalPiping(pipes, portItems)
+        return _ip.InternalPiping(pipes, portItems)
 
     def getSubBlockOffset(self, c):
         for i in range(len(self.inputs)):

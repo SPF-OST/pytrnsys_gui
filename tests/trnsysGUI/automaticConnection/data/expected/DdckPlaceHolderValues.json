@@ -1,60 +1,102 @@
 {
+    "Dhw": {
+        "In": {
+            "@mfr": "MPiCircIn_A",
+            "@temp": "TPiCircIn"
+        },
+        "Out": {
+            "@temp": "TDhwDpR70_90"
+        }
+    },
     "FCU": {
         "In": {
-            "@mfr": "MfrPiFCUIn",
+            "@mfr": "MPiFCUIn_A",
             "@temp": "TPiFCUIn"
+        },
+        "Out": {
+            "@temp": "TFCU"
         }
     },
     "Ghx": {
         "In": {
-            "@mfr": "MfrPiHxCoolBriOut",
+            "@mfr": "MPiHxCoolBriOut_A",
             "@temp": "TPiHxCoolBriOut"
+        },
+        "Out": {
+            "@temp": "TGhx"
         }
     },
     "HP": {
         "CondIn1": {
-            "@mfr": "MfrPiHpCondIn",
+            "@mfr": "MPiHpCondIn_A",
             "@temp": "TPiHpCondIn"
         },
         "CondIn2": {
-            "@mfr": "MfrPiHpDesIn",
+            "@mfr": "MPiHpDesIn_A",
             "@temp": "TPiHpDesIn"
         },
+        "CondOut1": {
+            "@temp": "THPCond1"
+        },
+        "CondOut2": {
+            "@temp": "THPCond2"
+        },
         "EvapIn": {
-            "@mfr": "MfrPiGhxToHP",
+            "@mfr": "MPiGhxToHP_A",
             "@temp": "TPiGhxToHP"
+        },
+        "EvapOut": {
+            "@temp": "THPEvap"
         }
     },
     "HxCool": {
         "In1": {
-            "@mfr": "MfrPiHpToHxCool",
+            "@mfr": "MPiHpToHxCool_A",
             "@temp": "TPiHpToHxCool"
         },
         "In2": {
-            "@mfr": "MfrPiHxCoolWatIn",
+            "@mfr": "MPiHxCoolWatIn_A",
             "@temp": "TPiHxCoolWatIn"
+        },
+        "Out1": {
+            "@temp": "THxCoolSide1"
+        },
+        "Out2": {
+            "@temp": "THxCoolSide2"
         }
     },
     "HxDHW": {
         "In1": {
-            "@mfr": "MfrPiDhwToHxDhw",
+            "@mfr": "MPiDhwToHxDhw_A",
             "@temp": "TPiDhwToHxDhw"
         },
         "In2": {
-            "@mfr": "MfrPiSupplyToHxDhw",
+            "@mfr": "MPiSupplyToHxDhw_A",
             "@temp": "TPiSupplyToHxDhw"
+        },
+        "Out1": {
+            "@temp": "THxDHWSide1"
+        },
+        "Out2": {
+            "@temp": "THxDHWSide2"
         }
     },
     "RadiatorSH": {
         "In": {
-            "@mfr": "MfrPiRadIn",
+            "@mfr": "MPiRadIn_A",
             "@temp": "TPiRadIn"
+        },
+        "Out": {
+            "@temp": "TRadiatorSH"
         }
     },
-    "tapWater": {
+    "SH": {
         "In": {
-            "@mfr": "MfrPiToDhwDem",
-            "@temp": "TPiToDhwDem"
+            "@mfr": "MPiTesSCIn_A",
+            "@temp": "TPiTesSCIn"
+        },
+        "Out": {
+            "@temp": "TSHDpR90_10"
         }
     }
 }

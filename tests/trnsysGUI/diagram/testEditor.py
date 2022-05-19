@@ -11,8 +11,8 @@ import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 import pytest as _pt
 
-from pytrnsys.utils import log
-import trnsysGUI.GUI as _GUI
+import pytrnsys.utils.log as _ulog
+import trnsysGUI.GUI as _gui
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
@@ -36,7 +36,7 @@ class _Project:
 
     @property
     def testId(self) -> str:
-        return f"{self.projectName} [in {self.testCasesDirName}]"
+        return f"{self.testCasesDirName}/{self.projectName}"
 
 
 def getProjects() -> _tp.Iterable[_Project]:
@@ -58,8 +58,9 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 class TestEditor:
     @_pt.mark.parametrize("project", TEST_CASES)
-    def testStorageAndHydraulicExports(self, project: _Project,  # pylint: disable=too-many-locals
-                                       request: _pt.FixtureRequest) -> None:
+    def testStorageAndHydraulicExports(  # pylint: disable=too-many-locals
+        self, project: _Project, request: _pt.FixtureRequest
+    ) -> None:
         helper = _Helper(project)
         helper.setup()
 
@@ -94,9 +95,9 @@ class TestEditor:
 
         projectInOldJsonFormat = _prj.LoadProject(oldFormatJsonPath)
 
-        logger = log.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
+        logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
 
-        mainWindow = _GUI.MainWindow(logger, projectInOldJsonFormat)  # type: ignore[attr-defined]
+        mainWindow = _gui.MainWindow(logger, projectInOldJsonFormat)  # type: ignore[attr-defined]
 
         newProjectFolderPath = projectFolderPath.parent / "actual"
 
@@ -155,18 +156,14 @@ class TestEditor:
 
         runningOnWindows = _sys.platform.startswith("win32")
         if runningOnWindows:
-            _sp.run(
-                [str(trnsysExePath), str(exportedFilePath), "/H"], check=True
-            )
+            _sp.run([str(trnsysExePath), str(exportedFilePath), "/H"], check=True)
             return
 
         # Running on Linux using Wine
         zDrivePath = _pl.PureWindowsPath("Z:")
         exportedFileWindowswPath = zDrivePath / exportedFilePath
 
-        _sp.run(
-            ["wine", str(trnsysExePath), str(exportedFileWindowswPath), "/H"], check=True
-        )
+        _sp.run(["wine", str(trnsysExePath), str(exportedFileWindowswPath), "/H"], check=True)
 
     @classmethod
     def _exportHydraulic(cls, projectFolderPath, *, _format) -> str:
@@ -189,8 +186,8 @@ class TestEditor:
 
 class _Helper:
     def __init__(
-            self,
-            project: _Project,
+        self,
+        project: _Project,
     ):
         self._project = project
 
@@ -238,6 +235,11 @@ class _Helper:
         expectedDf: _pd.DataFrame = _pd.read_csv(expectedFilePath, delim_whitespace=True)
 
         assert actualDf.shape == expectedDf.shape
+
+        actualColumns = "\n".join(sorted(actualDf.columns))  # pylint: disable=no-member
+        expectedColumns = "\n".join(sorted(expectedDf.columns))  # pylint: disable=no-member
+
+        assert actualColumns == expectedColumns
 
         maxAbsoluteDifference = (actualDf - expectedDf).max().max()
 

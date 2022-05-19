@@ -9,19 +9,18 @@
 EQUATIONS 1
 qSysOut_PipeLoss = PipeLossTot
 
-EQUATIONS 5
+EQUATIONS 4
 *** Black box component temperatures
-TTesPortLeft50=Tdp1Out_Tes1
-TTesPortLeft10=Tdp1Out_Tes1
-TInHx=Thx1Out_Tes1
-TCol=1
-THP=1
+TTesInHxH=TTesInHx
+TTesDpL50_10H=TTesDpL50_10
+TColH=TCol
+THPH=THP
 
 UNIT 450 TYPE 9351
 PARAMETERS 49
 12
-6 8 0 0        !1 : InHx
-12 5 0 0       !2 : TesDpL50-10
+6 8 0 0        !1 : TesInHx
+12 5 0 0       !2 : TesDpL50_10
 5 11 0 0       !3 : Col
 9 6 0 0        !4 : HP
 2 3 0 0        !5 : Tes-Col
@@ -40,30 +39,30 @@ INPUTS 12! for Type 9351
 0 0 
 
 EQUATIONS 24	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
-MfrInHx_A=[450,1]
-MfrInHx_B=[450,2]
-MfrTesDpL50-10_A=[450,4]
-MfrTesDpL50-10_B=[450,5]
-MfrCol_A=[450,7]
-MfrCol_B=[450,8]
-MfrHP_A=[450,10]
-MfrHP_B=[450,11]
-MfrTes-Col_A=[450,13]
-MfrTes-Col_B=[450,14]
-MfrPiTes_HP_A=[450,16]
-MfrPiTes_HP_B=[450,17]
-MfrPump109_A=[450,19]
-MfrPump109_B=[450,20]
-MfrPiTes_Pump109_A=[450,22]
-MfrPiTes_Pump109_B=[450,23]
-MfrPiPump109_HP_A=[450,25]
-MfrPiPump109_HP_B=[450,26]
-MfrPump114_A=[450,28]
-MfrPump114_B=[450,29]
-MfrPiCol_Pump114_A=[450,31]
-MfrPiCol_Pump114_B=[450,32]
-MfrPiPump114_Tes_A=[450,34]
-MfrPiPump114_Tes_B=[450,35]
+MTesInHx_A=[450,1]
+MTesInHx_B=[450,2]
+MTesDpL50_10_A=[450,4]
+MTesDpL50_10_B=[450,5]
+MCol_A=[450,7]
+MCol_B=[450,8]
+MHP_A=[450,10]
+MHP_B=[450,11]
+MTes-Col_A=[450,13]
+MTes-Col_B=[450,14]
+MPiTes_HP_A=[450,16]
+MPiTes_HP_B=[450,17]
+MPump109_A=[450,19]
+MPump109_B=[450,20]
+MPiTes_Pump109_A=[450,22]
+MPiTes_Pump109_B=[450,23]
+MPiPump109_HP_A=[450,25]
+MPiPump109_HP_B=[450,26]
+MPump114_A=[450,28]
+MPump114_B=[450,29]
+MPiCol_Pump114_A=[450,31]
+MPiCol_Pump114_B=[450,32]
+MPiPump114_Tes_A=[450,34]
+MPiPump114_Tes_B=[450,35]
 
 
 ** Fluids:
@@ -96,17 +95,17 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TTesPortLeft10
-MfrTes-Col_A
+TTesDpL50_10H
+MTes-Col_A
 TRoomStore
-TCol
+TColH
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TTes-Col= [451,1]
+TTes-Col = [451,1]
 PTes-Col_kW= [451,3]/3600 !kW
-MfrTes-Col= MfrTes-Col_A
+MTes-Col = MTes-Col_A
 
 UNIT 452 TYPE 931
 !PiTes_HP
@@ -118,17 +117,17 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TInHx
-MfrPiTes_HP_A
+TTesInHxH
+MPiTes_HP_A
 TRoomStore
-THP
+THPH
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTes_HP= [452,1]
+TPiTes_HP = [452,1]
 PPiTes_HP_kW= [452,3]/3600 !kW
-MfrPiTes_HP= MfrPiTes_HP_A
+MPiTes_HP = MPiTes_HP_A
 
 UNIT 453 TYPE 931
 !PiTes_Pump109
@@ -140,17 +139,17 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TInHx
-MfrPiTes_Pump109_A
+TTesInHxH
+MPiTes_Pump109_A
 TRoomStore
 TPump109
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTes_Pump109= [453,1]
+TPiTes_Pump109 = [453,1]
 PPiTes_Pump109_kW= [453,3]/3600 !kW
-MfrPiTes_Pump109= MfrPiTes_Pump109_A
+MPiTes_Pump109 = MPiTes_Pump109_A
 
 UNIT 454 TYPE 931
 !PiPump109_HP
@@ -163,16 +162,16 @@ Lloop2Cp
 20
 INPUTS 4
 TPump109
-MfrPiPump109_HP_A
+MPiPump109_HP_A
 TRoomStore
-THP
+THPH
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPump109_HP= [454,1]
+TPiPump109_HP = [454,1]
 PPiPump109_HP_kW= [454,3]/3600 !kW
-MfrPiPump109_HP= MfrPiPump109_HP_A
+MPiPump109_HP = MPiPump109_HP_A
 
 UNIT 455 TYPE 931
 !PiCol_Pump114
@@ -184,17 +183,17 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TCol
-MfrPiCol_Pump114_A
+TColH
+MPiCol_Pump114_A
 TRoomStore
 TPump114
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiCol_Pump114= [455,1]
+TPiCol_Pump114 = [455,1]
 PPiCol_Pump114_kW= [455,3]/3600 !kW
-MfrPiCol_Pump114= MfrPiCol_Pump114_A
+MPiCol_Pump114 = MPiCol_Pump114_A
 
 UNIT 456 TYPE 931
 !PiPump114_Tes
@@ -207,16 +206,16 @@ Lloop1Cp
 20
 INPUTS 4
 TPump114
-MfrPiPump114_Tes_A
+MPiPump114_Tes_A
 TRoomStore
-TTesPortLeft50
+TTesDpL50_10H
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPump114_Tes= [456,1]
+TPiPump114_Tes = [456,1]
 PPiPump114_Tes_kW= [456,3]/3600 !kW
-MfrPiPump114_Tes= MfrPiPump114_Tes_A
+MPiPump114_Tes = MPiPump114_Tes_A
 
 *** Pipe losses
 EQUATIONS 1
@@ -238,9 +237,11 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 6
-MfrTes-Col MfrPiTes_HP MfrPiTes_Pump109 MfrPiPump109_HP MfrPiCol_Pump114 MfrPiPump114_Tes 
+MTes-Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
+
 ***
-MfrTes-Col MfrPiTes_HP MfrPiTes_Pump109 MfrPiPump109_HP MfrPiCol_Pump114 MfrPiPump114_Tes 
+MTes-Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
+
 
 ASSIGN storage-tank_T.prt 458
 
@@ -258,7 +259,9 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 6
-TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes 
+TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
+
 ***
-TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes 
+TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
+
 

@@ -18,7 +18,7 @@ from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.internalPiping as _ip
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
@@ -33,8 +33,7 @@ class PortIds:
     outputId: int
 
 
-class StorageTank(BlockItem,
-                  MassFlowNetworkContributorMixin):
+class StorageTank(BlockItem, _ip.HasInternalPiping):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
@@ -59,6 +58,12 @@ class StorageTank(BlockItem,
         self.path = None
         self.addTree()
 
+    def getDisplayName(self) -> str:
+        return self.displayName
+
+    def hasDdckPlaceHolders(self) -> bool:
+        return True
+
     @property
     def leftDirectPortPairsPortItems(self):
         return self._getDirectPortPairPortItems(_sd.Side.LEFT)
@@ -68,9 +73,7 @@ class StorageTank(BlockItem,
         return self._getDirectPortPairPortItems(_sd.Side.RIGHT)
 
     def _getDirectPortPairPortItems(self, side: _sd.Side):
-        return [
-            p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]
-        ]
+        return [p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]]
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.STORAGE_TANK_SVG
@@ -87,13 +90,13 @@ class StorageTank(BlockItem,
             heatExchanger.parent = self
 
     def addDirectPortPair(  # pylint: disable=too-many-arguments
-            self,
-            trnsysId: int,
-            side: _sd.Side,
-            relativeInputHeight: float,
-            relativeOutputHeight: float,
-            storageTankHeight: float,
-            portIds: _tp.Optional[PortIds] = None,
+        self,
+        trnsysId: int,
+        side: _sd.Side,
+        relativeInputHeight: float,
+        relativeOutputHeight: float,
+        storageTankHeight: float,
+        portIds: _tp.Optional[PortIds] = None,
     ):
         inputPort = self._createPort("i", relativeInputHeight, storageTankHeight, side)
         outputPort = self._createPort("o", relativeOutputHeight, storageTankHeight, side)
@@ -107,16 +110,15 @@ class StorageTank(BlockItem,
             inputPort.id = portIds.inputId
             outputPort.id = portIds.outputId
 
-        directPortPair = DirectPortPair(
-            trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side
-        )
+        directPortPair = DirectPortPair(trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side)
 
         self.directPortPairs.append(directPortPair)
-        self.inputs.append(directPortPair.fromPort)
-        self.outputs.append(directPortPair.toPort)
+
+        self.inputs = [*self.inputs, directPortPair.fromPort]
+        self.outputs = [*self.outputs, directPortPair.toPort]
 
     def _createPort(
-            self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
+        self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
     ) -> SinglePipePortItem:
         sideNr = side.toSideNr()
         portItem = _cspi.createSinglePipePortItem(name, sideNr, self)
@@ -234,12 +236,12 @@ class StorageTank(BlockItem,
         self._decodeInternal(i, offsetX, offsetY, resBlockList, shallSetNamesAndIDs=True)
 
     def _decodeInternal(  # pylint: disable=too-many-arguments
-            self,
-            i,
-            offsetX,
-            offsetY,
-            resBlockList,
-            shallSetNamesAndIDs: bool,
+        self,
+        i,
+        offsetX,
+        offsetY,
+        resBlockList,
+        shallSetNamesAndIDs: bool,
     ):
         self.logger.debug("Loading a Storage in Decoder")
 
@@ -269,8 +271,8 @@ class StorageTank(BlockItem,
         resBlockList.append(self)
 
     def _decodeDirectPortPair(
-            self,
-            portPairModel: _model.DirectPortPair,
+        self,
+        portPairModel: _model.DirectPortPair,
     ) -> None:
         portPair = portPairModel.portPair
 
@@ -292,8 +294,7 @@ class StorageTank(BlockItem,
         name = heatExchangerModel.name + nameSuffix
 
         heatExchanger = self.addHeatExchanger(
-            name, portPair.trnsysId, portPair.side, portPair.inputPort.relativeHeight,
-            portPair.outputPort.relativeHeight
+            name, portPair.trnsysId, portPair.side, portPair.inputPort.relativeHeight, portPair.outputPort.relativeHeight
         )
 
         if shallSetNamesAndIDs:
@@ -303,34 +304,12 @@ class StorageTank(BlockItem,
         heatExchanger.port2.id = portPair.outputPort.id
 
     def decodePaste(  # pylint: disable=too-many-arguments
-            self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
+        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
     ):
         self._decodeInternal(i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=False)
 
-    def getTemperatureVariableName(self, portItem: SinglePipePortItem) -> str:
-        directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
-        if directPortPair:
-            return self._getTemperatureVariableNameForDirectPortPairPortItem(directPortPair, portItem)
-
-        heatExchanger = self._getHeatExchangerForPortItem(portItem)
-        if heatExchanger:
-            return self._getTemperatureVariableNameForHeatExchangerPortItem(heatExchanger)
-
-        raise ValueError("Port item doesn't belong to this storage tank.")
-
-    def getFlowSolverParametersId(self, portItem: SinglePipePortItem) -> int:
-        directPortPair = self._getDirectPortPairForPortItemOrNone(portItem)
-        if directPortPair:
-            return directPortPair.trnsysId
-
-        heatExchanger = self._getHeatExchangerForPortItem(portItem)
-        if heatExchanger:
-            return heatExchanger.trnsysId
-
-        raise ValueError("Port item doesn't belong to this storage tank.")
-
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(
-            self, generator: _id.IdGenerator
+        self, generator: _id.IdGenerator
     ) -> None:  # type: ignore[attr-defined]
         for heatExchanger in self.heatExchangers:
             if heatExchanger.trnsysId == generator.UNINITIALIZED_ID:
@@ -364,17 +343,6 @@ class StorageTank(BlockItem,
 
         return sequence[0]
 
-    def _getTemperatureVariableNameForDirectPortPairPortItem(self, directPortPair, portItem):
-        isInputPort = directPortPair.fromPort == portItem
-        relativeHeightInPercent = (
-            directPortPair.relativeInputHeightPercent if isInputPort else directPortPair.relativeOutputHeightPercent
-        )
-        return f"T{self.displayName}Port{directPortPair.side.formatDdck()}{relativeHeightInPercent}"
-
-    @staticmethod
-    def _getTemperatureVariableNameForHeatExchangerPortItem(heatExchanger):
-        return f"T{heatExchanger.displayName}"
-
     # Misc
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -407,24 +375,7 @@ class StorageTank(BlockItem,
     def mouseDoubleClickEvent(self, event):
         ConfigureStorageDialog(self, self.scene().parent())
 
-    # Export related
-    def exportBlackBox(self):
-        equations = []
-        ddcxPath = _os.path.join(self.path, self.displayName)
-        ddcxPath = ddcxPath + ".ddcx"
-        self.exportDck()
-        if _os.path.isfile(ddcxPath):
-            with open(ddcxPath, "r", encoding="windows-1252") as infile:
-                lines = infile.readlines()
-            for line in lines:
-                if line[0] == "T":
-                    equations.append(line.replace("\n", ""))
-            return "success", equations
-
-        self.logger.warning("No file at " + ddcxPath)
-        return "noDdckFile", equations
-
-    def getInternalPiping(self) -> InternalPiping:
+    def getInternalPiping(self) -> _ip.InternalPiping:
         heatExchangerNodes, heatExchangerPortItems = self._createHeatExchangerNodes()
 
         portPairNodes, portPairsPortItems = self._createPortPairNodes()
@@ -432,21 +383,19 @@ class StorageTank(BlockItem,
         nodes = [*heatExchangerNodes, *portPairNodes]
         modelPortItemsToGraphicalPortItem = heatExchangerPortItems | portPairsPortItems
 
-        return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
     def _createHeatExchangerNodes(self):
         heatExchangerPortItems = {}
         heatExchangerNodes = []
         for heatExchanger in self.heatExchangers:
-            heatExchangerPortItem1 = _mfn.PortItem("Heat Exchanger Input", _mfn.PortItemType.INPUT)
+            heatExchangerPortItem1 = _mfn.PortItem("Heat Exchanger Input", _mfn.PortItemDirection.INPUT)
             heatExchangerPortItems[heatExchangerPortItem1] = heatExchanger.port1
 
-            heatExchangerPortItem2 = _mfn.PortItem("Heat Exchanger Output", _mfn.PortItemType.OUTPUT)
+            heatExchangerPortItem2 = _mfn.PortItem("Heat Exchanger Output", _mfn.PortItemDirection.OUTPUT)
             heatExchangerPortItems[heatExchangerPortItem2] = heatExchanger.port2
 
-            name = self._getMassFlowVariableSuffixForHeatExchanger(heatExchanger)
-
-            node = _mfn.Pipe(name, heatExchanger.trnsysId, heatExchangerPortItem1, heatExchangerPortItem2)
+            node = _mfn.Pipe(heatExchangerPortItem1, heatExchangerPortItem2, name=heatExchanger.displayName)
             heatExchangerNodes.append(node)
 
         return heatExchangerNodes, heatExchangerPortItems
@@ -455,28 +404,25 @@ class StorageTank(BlockItem,
         portPairsPortItems = {}
         portPairNodes = []
         for directPortPair in self.directPortPairs:
-            portPairPortItem1 = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
+            portPairPortItem1 = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
             portPairsPortItems[portPairPortItem1] = directPortPair.fromPort
 
-            portPairPortItem2 = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
+            portPairPortItem2 = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
             portPairsPortItems[portPairPortItem2] = directPortPair.toPort
 
-            portPairName = self._getMassFlowVariableSuffixForDirectPortPair(directPortPair)
+            nodeName = self._getDirectPortPairNodeName(directPortPair)
 
-            node = _mfn.Pipe(portPairName, directPortPair.trnsysId, portPairPortItem1, portPairPortItem2)
+            node = _mfn.Pipe(portPairPortItem1, portPairPortItem2, nodeName)
             portPairNodes.append(node)
 
         return portPairNodes, portPairsPortItems
 
-    def _getMassFlowVariableSuffixForDirectPortPair(self, directPortPair: DirectPortPair):
-        return (
-            f"{self.displayName}Dp{'L' if directPortPair.side.isLeft else 'R'}"
-            f"{directPortPair.relativeInputHeightPercent}-{directPortPair.relativeOutputHeightPercent}"
-        )
-
     @staticmethod
-    def _getMassFlowVariableSuffixForHeatExchanger(heatExchanger):
-        return heatExchanger.displayName
+    def _getDirectPortPairNodeName(directPortPair: DirectPortPair):
+        return (
+            f"Dp{'L' if directPortPair.side.isLeft else 'R'}"
+            f"{directPortPair.relativeInputHeightPercent}_{directPortPair.relativeOutputHeightPercent}"
+        )
 
     def exportDck(self):  # pylint: disable=too-many-locals,too-many-statements
 

@@ -4,16 +4,20 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
+import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
 import trnsysGUI.connection.singlePipeConnectionModel as _model
 import trnsysGUI.connection.values as _values
+import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.hydraulicLoops.names as _names
-import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.internalPiping as _pi
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.singlePipeSegmentItem as _spsi
-from trnsysGUI import PortItemBase as _pib, BlockItem as _bi, TVentil as _tventil
+import trnsysGUI.temperatures as _temps
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -24,7 +28,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self,
         fromPort: _sppi.SinglePipePortItem,
         toPort: _sppi.SinglePipePortItem,
-        parent: _ed.Editor  # type: ignore[name-defined]
+        parent: _ed.Editor,  # type: ignore[name-defined]
     ):
         super().__init__(fromPort, toPort, parent)
 
@@ -33,6 +37,8 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
         self.uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+
+        self._updateModels(self.displayName)
 
     @property
     def fromPort(self) -> _sppi.SinglePipePortItem:
@@ -46,6 +52,11 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
     def _createSegmentItem(self, startNode, endNode):
         return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
+
+    def _updateModels(self, newDisplayName: str) -> None:
+        fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        toPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        self.modelPipe = _mfn.Pipe(fromPort, toPort)
 
     def getRadius(self):
         rad = 2
@@ -112,12 +123,10 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.uValueInWPerM2K = model.uValueInWPerM2K
         self.lengthInM = model.lengthInM
 
-    def getInternalPiping(self) -> _mfs.InternalPiping:
-        fromPort = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
-        toPort = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
-
-        pipe = _mfn.Pipe(self.displayName, self.trnsysId, fromPort, toPort)
-        return _mfs.InternalPiping([pipe], {fromPort: self.fromPort, toPort: self.toPort})
+    def getInternalPiping(self) -> _pi.InternalPiping:
+        return _pi.InternalPiping(
+            [self.modelPipe], {self.modelPipe.fromPort: self.fromPort, self.modelPipe.toPort: self.toPort}
+        )
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals, too-many-statements
         lines = ""
@@ -168,34 +177,22 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         unitText += "INPUTS " + str(inputNumbers) + "\n"
 
-        openLoops, _ = self._getOpenLoopsAndNodeToIndices()
-        assert len(openLoops) == 1
-        openLoop = openLoops[0]
-
-        assert len(openLoop.realNodes) == 1
-        realNode = openLoop.realNodes[0]
-
-        outputVariables = realNode.getOutputVariables()
+        massFlowVariableName = _mnames.getMassFlowVariableName(self, self.modelPipe, self.modelPipe.fromPort)
 
         portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
 
         if len(portItemsWithParent) == 2:
-            portItem = portItemsWithParent[0][0]
-            parent = portItemsWithParent[0][1]
-            if hasattr(parent, "getSubBlockOffset"):
-                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
-            else:
-                unitText += parent.getTemperatureVariableName(portItem) + "\n"
-
-            unitText += f"{outputVariables[0].name}\n"
+            temperatureVariableName = self._getTemperatureVariableName(
+                portItemsWithParent[0][1], portItemsWithParent[0][0]
+            )
+            unitText += temperatureVariableName + "\n"
+            unitText += massFlowVariableName + "\n"
             unitText += tempRoomVar + "\n"
 
-            portItem = portItemsWithParent[1][0]
-            parent = portItemsWithParent[1][1]
-            if hasattr(parent, "getSubBlockOffset"):
-                unitText += "T" + parent.displayName + "X" + str(parent.getSubBlockOffset(self) + 1) + "\n"
-            else:
-                unitText += parent.getTemperatureVariableName(portItem) + "\n"
+            temperatureVariableName = self._getTemperatureVariableName(
+                portItemsWithParent[1][1], portItemsWithParent[1][0]
+            )
+            unitText += temperatureVariableName + "\n"
 
         else:
             lines += (
@@ -210,7 +207,8 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitText += initialValueS + "\n\n"
 
         unitText += "EQUATIONS " + str(equationNr) + "\n"
-        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
+        temperatureVariableName = _temps.getTemperatureVariableName(self, self.modelPipe)
+        unitText += f"{temperatureVariableName} = [{unitNumber},{equationConstant1}]\n"
         unitText += (
             powerPrefix
             + self.displayName
@@ -221,15 +219,24 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             + str(equationConstant2)
             + "]/3600 !kW\n"
         )
-        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A\n\n"
+        canonicalMfrName = _helpers.getCanonicalMfrName(self, self.modelPipe)
+        inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
+        unitText += f"{canonicalMfrName} = {inputMfrName}\n\n"
 
         unitNumber += 1
 
         return unitText, unitNumber
 
+    @staticmethod
+    def _getTemperatureVariableName(parent, portItem):
+        parentInternalPiping = parent.getInternalPiping()
+        node = parentInternalPiping.getNode(portItem, _mfn.PortItemType.STANDARD)
+        temperatureVariableName = _temps.getTemperatureVariableName(parent, node)
+        return temperatureVariableName
+
     def _getFromAndToPortsAndParentBlockItems(
         self,
-    ) -> _tp.Tuple[_tp.Tuple[_pib.PortItemBase, _bi.BlockItem], _tp.Tuple[_pib.PortItemBase, _bi.BlockItem]]:
+    ) -> _tp.Tuple[_tp.Tuple[_pib.PortItemBase, _pi.InternalPiping], _tp.Tuple[_pib.PortItemBase, _pi.InternalPiping]]:
         isToPortValveOutput = (
             isinstance(self.toPort.parent, _tventil.TVentil) and self.fromPort in self.toPort.parent.outputs
         )

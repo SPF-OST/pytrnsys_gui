@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import os
 import shutil
@@ -9,14 +8,14 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _Ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class Radiator(BlockItem, MassFlowNetworkContributorMixin):
+class Radiator(BlockItem, _Ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super(Radiator, self).__init__(trnsysType, parent, **kwargs)
 
@@ -27,12 +26,15 @@ class Radiator(BlockItem, MassFlowNetworkContributorMixin):
         self.changeSize()
         self.addTree()
 
-    def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
-        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+    def getInternalPiping(self) -> _Ip.InternalPiping:
+        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        pipe = _mfn.Pipe(inputPort, outputPort)
 
-        return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+        return _Ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.RADIATOR_SVG

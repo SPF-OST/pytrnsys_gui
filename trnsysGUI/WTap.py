@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import os
 import shutil
@@ -9,14 +8,14 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class WTap(BlockItem, MassFlowNetworkContributorMixin):
+class WTap(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super(WTap, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
@@ -27,6 +26,9 @@ class WTap(BlockItem, MassFlowNetworkContributorMixin):
         self.changeSize()
         self.addTree()
 
+    def getDisplayName(self) -> str:
+        return self.displayName
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.W_TAP_SVG
 
@@ -36,7 +38,6 @@ class WTap(BlockItem, MassFlowNetworkContributorMixin):
 
         """ Resize block function """
         delta = 20
-        deltaHF = 0.45
 
         # Limit the block size:
         if h < 20:
@@ -64,11 +65,11 @@ class WTap(BlockItem, MassFlowNetworkContributorMixin):
         equationNr = 1
         return resStr, equationNr
 
-    def getInternalPiping(self) -> InternalPiping:
-        portItem = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
-        sink = _mfn.Sink(self.displayName, self.trnsysId, portItem)
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        portItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        sink = _mfn.Sink(portItem)
 
-        return InternalPiping([sink], {portItem: self.inputs[0]})
+        return _ip.InternalPiping([sink], {portItem: self.inputs[0]})
 
     def addTree(self):
         """
@@ -98,9 +99,6 @@ class WTap(BlockItem, MassFlowNetworkContributorMixin):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    def hasDdckPlaceHolders(self):
-        return True
 
     def deleteBlock(self):
         """

@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 
 import os
@@ -9,11 +8,11 @@ import typing as _tp
 from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItemFourPorts import BlockItemFourPorts
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import InternalPiping
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class IceStorageTwoHx(BlockItemFourPorts):
@@ -126,14 +125,14 @@ class IceStorageTwoHx(BlockItemFourPorts):
             self.path = destPath
             self.logger.debug(self.path)
 
-    def getInternalPiping(self) -> InternalPiping:
-        side1Input = _mfn.PortItem("LeftIn", _mfn.PortItemType.INPUT)
-        side1Output = _mfn.PortItem("LeftOut", _mfn.PortItemType.OUTPUT)
-        side1Pipe = _mfn.Pipe(f"{self.displayName}leftSide", self.childIds[0], side1Input, side1Output)
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        side1Input = _mfn.PortItem("LeftIn", _mfn.PortItemDirection.INPUT)
+        side1Output = _mfn.PortItem("LeftOut", _mfn.PortItemDirection.OUTPUT)
+        side1Pipe = _mfn.Pipe(side1Input, side1Output, "leftSide")
 
-        side2Input = _mfn.PortItem("RightIn", _mfn.PortItemType.INPUT)
-        side2Output = _mfn.PortItem("RightOut", _mfn.PortItemType.OUTPUT)
-        side2Pipe = _mfn.Pipe(f"{self.displayName}rightSide", self.childIds[1], side2Input, side2Output)
+        side2Input = _mfn.PortItem("RightIn", _mfn.PortItemDirection.INPUT)
+        side2Output = _mfn.PortItem("RightOut", _mfn.PortItemDirection.OUTPUT)
+        side2Pipe = _mfn.Pipe(side2Input, side2Output, "rightSide")
 
         modelPortItemsToGraphicalPortItem = {
             side1Input: self.inputs[0],
@@ -142,4 +141,4 @@ class IceStorageTwoHx(BlockItemFourPorts):
             side2Output: self.outputs[1]
         }
 
-        return InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)

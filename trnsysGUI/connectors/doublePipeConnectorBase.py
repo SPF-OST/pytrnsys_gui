@@ -3,16 +3,14 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
-
 import pytrnsys.utils.serialization as _ser
+
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.doublePipeModelPortItems as _dpmpi
 import trnsysGUI.images as _img
-import trnsysGUI.massFlowSolver as _mfs
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.internalPiping as _ip
 
 
-class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixin):
+class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -23,7 +21,11 @@ class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixi
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
-        self._updateModelPipes(self.displayName)
+    def getDisplayName(self) -> str:
+        return self.displayName
+
+    def _updateModels(self, newDisplayName: str) -> None:
+        raise NotImplementedError()
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         raise NotImplementedError()
@@ -89,21 +91,8 @@ class DoublePipeConnectorBase(_bi.BlockItem, _mfs.MassFlowNetworkContributorMixi
 
         resBlockList.append(self)
 
-    def getInternalPiping(self) -> _mfs.InternalPiping:
+    def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
-
-    def _updateModelPipes(self, displayName: str) -> None:
-        coldInput = _dpmpi.ColdPortItem("ColdIn", _mfn.PortItemType.INPUT)
-        coldOutput = _dpmpi.ColdPortItem("ColdOut", _mfn.PortItemType.OUTPUT)
-        self._coldPipe = _mfn.Pipe(displayName + "Cold", self.childIds[0], coldInput, coldOutput)
-
-        hotInput = _dpmpi.HotPortItem("HotIn", _mfn.PortItemType.INPUT)
-        hotOutput = _dpmpi.HotPortItem("HotOut", _mfn.PortItemType.OUTPUT)
-        self._hotPipe = _mfn.Pipe(displayName + "Hot", self.childIds[1], hotInput, hotOutput)
-
-    def setDisplayName(self, newName):
-        super().setDisplayName(newName)
-        self._updateModelPipes(newName)
 
     def _flipPipes(self):
         angle = (self.rotationN % 4) * 90

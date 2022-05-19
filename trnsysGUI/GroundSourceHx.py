@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import os
 import shutil
@@ -9,15 +8,15 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.internalPiping
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
+from trnsysGUI.internalPiping import HasInternalPiping
 
 
-class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
+class GroundSourceHx(BlockItem, HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super(GroundSourceHx, self).__init__(trnsysType, parent, **kwargs)
 
@@ -30,6 +29,9 @@ class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
 
         self.changeSize()
         self.addTree()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.GROUND_SOURCE_HX_SVG
@@ -134,9 +136,9 @@ class GroundSourceHx(BlockItem, MassFlowNetworkContributorMixin):
             self.path = destPath
             self.logger.debug(self.path)
 
-    def getInternalPiping(self) -> _mfs.InternalPiping:
-        inputPort = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
-        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+    def getInternalPiping(self) -> trnsysGUI.internalPiping.InternalPiping:
+        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        pipe = _mfn.Pipe(inputPort, outputPort)
 
-        return _mfs.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+        return trnsysGUI.internalPiping.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})

@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import os
 import shutil
@@ -11,12 +10,12 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
+import trnsysGUI.internalPiping as _ip
 
 
-class ParabolicTroughField(BlockItem, MassFlowNetworkContributorMixin):
+class ParabolicTroughField(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -29,12 +28,15 @@ class ParabolicTroughField(BlockItem, MassFlowNetworkContributorMixin):
         self.changeSize()
         self.addTree()
 
-    def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
-        pipe = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+    def getDisplayName(self) -> str:
+        return self.displayName
 
-        return InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        pipe = _mfn.Pipe(inputPort, outputPort)
+
+        return _ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PT_FIELD_SVG
