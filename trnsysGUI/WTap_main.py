@@ -1,16 +1,16 @@
 # pylint: skip-file
-# type: ignore
 
 import typing as _tp
 
+import trnsysGUI.BlockItem as _bi
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.temperatures as _temps
 
 
-class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
+class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super(WTap_main, self).__init__(trnsysType, parent, **kwargs)
         self.w = 40
@@ -18,7 +18,13 @@ class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
 
         self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
 
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        self._modelSource = _mfn.Source(outputPort)
+
         self.changeSize()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.W_TAP_MAIN_SVG
@@ -51,16 +57,21 @@ class WTap_main(BlockItem, MassFlowNetworkContributorMixin):
 
         return w, h
 
-    def exportBlackBox(self):
-        equation = ["T" + self.displayName + "=Tcw"]
-        return "success", equation
-
     def exportMassFlows(self):
         resStr = "Mfr" + self.displayName + " = 1000" + "\n"
         equationNr = 1
         return resStr, equationNr
 
-    def getInternalPiping(self) -> InternalPiping:
-        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
-        source = _mfn.Source(self.displayName, self.trnsysId, outputPort)
-        return InternalPiping([source], {outputPort: self.outputs[0]})
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        return _ip.InternalPiping([self._modelSource], {self._modelSource.portItem: self.outputs[0]})
+
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+        temperatureVariable = _temps.getTemperatureVariableName(self, self._modelSource)
+        equations = f"""\
+! {self.displayName}
+EQUATIONS 2
+Tcw = 1
+{temperatureVariable} = Tcw
+
+"""
+        return equations, startingUnit

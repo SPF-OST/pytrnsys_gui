@@ -1,5 +1,4 @@
 # pylint: skip-file
-# type: ignore
 
 import os
 import shutil
@@ -9,14 +8,14 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
+class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super(HeatPumpTwoHx, self).__init__(trnsysType, parent, **kwargs)
 
@@ -38,6 +37,9 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
 
         self.changeSize()
         self.addTree()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.HP_TWO_HX_SVG
@@ -151,25 +153,18 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
 
         resBlockList.append(self)
 
-    def exportBlackBox(self):
-        equations = ["T" + self.displayName + "X1" + "=1"]
-        equations.append("T" + self.displayName + "X2" + "=1")
-        equations.append("T" + self.displayName + "X3" + "=1")
-        status = "success"
-        return status, equations
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemDirection.INPUT)
+        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemDirection.OUTPUT)
+        evaporatorPipe = _mfn.Pipe(evaporatorInput, evaporatorOutput, "Evap")
 
-    def getInternalPiping(self) -> InternalPiping:
-        evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
-        evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)
-        evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[0], evaporatorInput, evaporatorOutput)
+        condenser1Input = _mfn.PortItem("CondIn1", _mfn.PortItemDirection.INPUT)
+        condenser1Output = _mfn.PortItem("CondOut1", _mfn.PortItemDirection.OUTPUT)
+        condenser1Pipe = _mfn.Pipe(condenser1Input, condenser1Output, "Cond1")
 
-        condenser1Input = _mfn.PortItem("condenser1Input", _mfn.PortItemType.INPUT)
-        condenser1Output = _mfn.PortItem("condenser1Output", _mfn.PortItemType.OUTPUT)
-        condenser1Pipe = _mfn.Pipe(f"{self.displayName}Cond1", self.childIds[1], condenser1Input, condenser1Output)
-
-        condenser2Input = _mfn.PortItem("condenser2Input", _mfn.PortItemType.INPUT)
-        condenser2Output = _mfn.PortItem("condenser2Output", _mfn.PortItemType.OUTPUT)
-        condenser2Pipe = _mfn.Pipe(f"{self.displayName}Cond2", self.childIds[2], condenser2Input, condenser2Output)
+        condenser2Input = _mfn.PortItem("CondIn2", _mfn.PortItemDirection.INPUT)
+        condenser2Output = _mfn.PortItem("CondOut2", _mfn.PortItemDirection.OUTPUT)
+        condenser2Pipe = _mfn.Pipe(condenser2Input, condenser2Output, "Cond2")
 
         modelPortItemsToGraphicalPortItem = {
             evaporatorInput: self.inputs[0],
@@ -181,7 +176,7 @@ class HeatPumpTwoHx(BlockItem, MassFlowNetworkContributorMixin):
         }
         nodes = [evaporatorPipe, condenser1Pipe, condenser2Pipe]
 
-        return InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
     def getSubBlockOffset(self, c):
         for i in range(3):

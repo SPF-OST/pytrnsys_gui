@@ -1,15 +1,12 @@
 # pylint: disable = invalid-name
 
-import glob
-import os
-
+import trnsysGUI.BlockItem as _bi
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
 
 
-class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = too-many-instance-attributes
+class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -27,6 +24,9 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint:
         self.childIds.append(self.parent.parent().idGen.getTrnsysID())
 
         self.changeSize()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def encode(self):
         if not self.isVisible():
@@ -93,61 +93,31 @@ class BlockItemFourPorts(BlockItem, MassFlowNetworkContributorMixin):  # pylint:
 
         resBlockList.append(self)
 
-    def exportBlackBox(self):
-        equations = []
-        files = glob.glob(os.path.join(self.path, "**/*.ddck"), recursive=True)
-        if not files:
-            status = "noDdckFile"
-        else:
-            status = "noDdckEntry"
-        lines = []
-        for file in files:
-            with open(file, "r") as infile:  # pylint: disable = unspecified-encoding
-                lines += infile.readlines()
-        for i, line in enumerate(lines):
-            if "output" in line.lower() and "to" in line.lower() and "hydraulic" in line.lower():
-                counter = 1
-                for j in range(i, len(lines) - i):
-                    if lines[j][0] == "T":
-                        outputT = lines[j].split("=")[0].replace(" ", "")
-                        equations.append("T" + self.displayName + "X" + str(counter) + "=1 ! suggestion: " + outputT)
-                        counter += 1
-                    if counter == 3:
-                        status = "success"
-                        break
-                break
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        side1Input = _mfn.PortItem("In1", _mfn.PortItemDirection.INPUT)
+        side1Output = _mfn.PortItem("Out1", _mfn.PortItemDirection.OUTPUT)
+        side1Pipe = _mfn.Pipe(side1Input, side1Output, name="Side1")
 
-        if status in ("noDdckFile", "noDdckEntry"):
-            equations.append("T" + self.displayName + "X1" + "=1")
-            equations.append("T" + self.displayName + "X2" + "=1")
-
-        return status, equations
-
-    def getInternalPiping(self) -> InternalPiping:
-        side1Input = _mfn.PortItem("Side Input 1", _mfn.PortItemType.INPUT)
-        side1Output = _mfn.PortItem("Side Output 1", _mfn.PortItemType.OUTPUT)
-        side1Pipe = _mfn.Pipe(f"{self.displayName}Side1", self.childIds[0], side1Input, side1Output)
-
-        side2Input = _mfn.PortItem("Side Input 2", _mfn.PortItemType.INPUT)
-        side2Output = _mfn.PortItem("Side Output 2", _mfn.PortItemType.OUTPUT)
-        side2Pipe = _mfn.Pipe(f"{self.displayName}Side2", self.childIds[1], side2Input, side2Output)
+        side2Input = _mfn.PortItem("In2", _mfn.PortItemDirection.INPUT)
+        side2Output = _mfn.PortItem("Out2", _mfn.PortItemDirection.OUTPUT)
+        side2Pipe = _mfn.Pipe(side2Input, side2Output, name="Side2")
 
         modelPortItemsToGraphicalPortItem = {
             side1Input: self.inputs[0],
             side1Output: self.outputs[0],
             side2Input: self.inputs[1],
-            side2Output: self.outputs[1]
+            side2Output: self.outputs[1],
         }
 
-        return InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)
 
     def getSubBlockOffset(self, c):  # pylint: disable = invalid-name
         for i in range(2):
             if (
-                    self.inputs[i] == c.toPort
-                    or self.inputs[i] == c.fromPort
-                    or self.outputs[i] == c.toPort
-                    or self.outputs[i] == c.fromPort
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
             ):
                 return i
         return None

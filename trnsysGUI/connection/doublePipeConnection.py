@@ -9,12 +9,12 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.doublePipePortItem as _dppi
+import trnsysGUI.internalPiping
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.doublePipeModelPortItems as _dpmpi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
-import trnsysGUI.massFlowSolver as _mfs
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.temperatures as _temps
 
 
 class DoublePipeConnection(_cb.ConnectionBase):
@@ -25,11 +25,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
-        self._updateModelPipes(self.displayName)
-
-    def setDisplayName(self, newName: str) -> None:
-        super().setDisplayName(newName)
-        self._updateModelPipes(newName)
+        self._updateModels(self.displayName)
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -98,19 +94,21 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
 
-    def getInternalPiping(self) -> _mfs.InternalPiping:
+    def getInternalPiping(self) -> trnsysGUI.internalPiping.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
-            self._coldPipe.fromPort: self.toPort,
-            self._coldPipe.toPort: self.fromPort,
+            self.coldModelPipe.fromPort: self.toPort,
+            self.coldModelPipe.toPort: self.fromPort,
         }
 
         hotModelPortItemsToGraphicalPortItem = {
-            self._hotPipe.fromPort: self.fromPort,
-            self._hotPipe.toPort: self.toPort
+            self.hotModelPipe.fromPort: self.fromPort,
+            self.hotModelPipe.toPort: self.toPort,
         }
 
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
-        return _mfs.InternalPiping([self._coldPipe, self._hotPipe], modelPortItemsToGraphicalPortItem)
+        return trnsysGUI.internalPiping.InternalPiping(
+            [self.coldModelPipe, self.hotModelPipe], modelPortItemsToGraphicalPortItem
+        )
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals,too-many-statements
         unitNumber = startingUnit
@@ -185,15 +183,15 @@ class DoublePipeConnection(_cb.ConnectionBase):
         unitText += self._addComment("dpRadNdDist", "! Radial distance of node 8, m")
 
         unitText += "INPUTS " + str(inputNumbers) + "\n"
-        unitText += self._getInputs("Cold", self._coldPipe, self.toPort, self.fromPort)
-        unitText += self._getInputs("Hot", self._hotPipe, self.fromPort, self.toPort)
+        unitText += self._getInputs("Cold", self.coldModelPipe, self.toPort, self.fromPort)
+        unitText += self._getInputs("Hot", self.hotModelPipe, self.fromPort, self.toPort)
 
         unitText += "***Initial values\n"
         unitText += initialValueS + "\n\n"
 
         unitText += "EQUATIONS " + str(equationNr) + "\n"
-        unitText += self._getEquations("Cold", self._coldPipe, eqConst1, eqConst7, unitNumber)
-        unitText += self._getEquations("Hot", self._hotPipe, eqConst3, eqConst8, unitNumber)
+        unitText += self._getEquations("Cold", self.coldModelPipe, eqConst1, eqConst7, unitNumber)
+        unitText += self._getEquations("Hot", self.hotModelPipe, eqConst3, eqConst8, unitNumber)
 
         unitNumber += 1
         unitText += "\n"
@@ -201,13 +199,13 @@ class DoublePipeConnection(_cb.ConnectionBase):
         return unitText, unitNumber
 
     def _getInputs(
-            self,
-            temperatureSuffix: str,
-            pipe: _mfn.Pipe,
-            pipeFromPort: _dppi.DoublePipePortItem,
-            pipeToPort: _dppi.DoublePipePortItem
+        self,
+        temperatureSuffix: str,
+        pipe: _mfn.Pipe,
+        pipeFromPort: _dppi.DoublePipePortItem,
+        pipeToPort: _dppi.DoublePipePortItem,
     ) -> str:
-        mfrName = _helpers.getMfrName(pipe)
+        mfrName = _helpers.getInputMfrName(self, pipe)
 
         fromBlockItem = pipeFromPort.parent
         firstColumn = f"T{fromBlockItem.displayName}{temperatureSuffix}"
@@ -223,18 +221,18 @@ class DoublePipeConnection(_cb.ConnectionBase):
         return unitText
 
     def _getEquations(self, temperatureSuffix: str, pipe: _mfn.Pipe, equationConstant1, equationConstant2, unitNumber):
-        firstColumn = (
-            f"T{pipe.name} = [{unitNumber},{equationConstant1}]"
-        )
+        temperatureVariableName = _temps.getTemperatureVariableName(self, pipe)
+        firstColumn = f"{temperatureVariableName} = [{unitNumber},{equationConstant1}]"
         unitText = self._addComment(
             firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperatureSuffix}, deg C"
         )
 
-        mfrName = _helpers.getMfrName(pipe)
-        firstColumn = f"Mfr{pipe.name} = {mfrName}"
+        mfrName = _helpers.getInputMfrName(self, pipe)
+        canonicalMfrName = _helpers.getCanonicalMfrName(self, pipe)
+        firstColumn = f"{canonicalMfrName} = {mfrName}"
         unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperatureSuffix}, kg/h")
 
-        firstColumn = f"P{pipe.name}_kW = [{unitNumber},{equationConstant2}]/3600"
+        firstColumn = f"P{self.displayName}{pipe.name}_kW = [{unitNumber},{equationConstant2}]/3600"
         unitText += self._addComment(
             firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperatureSuffix}, kW"
         )
@@ -246,14 +244,14 @@ class DoublePipeConnection(_cb.ConnectionBase):
         spacing = 40
         return str(firstColumn).ljust(spacing) + comment + "\n"
 
-    def _updateModelPipes(self, displayName: str):
-        coldFromPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
-        coldToPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
-        self._coldPipe = _mfn.Pipe(displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
+    def _updateModels(self, newDisplayName: str):
+        coldFromPort: _mfn.PortItem = _mfn.PortItem("ColdIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
+        coldToPort: _mfn.PortItem = _mfn.PortItem("ColdOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
+        self.coldModelPipe = _mfn.Pipe(coldFromPort, coldToPort, name="Cold")
 
-        hotFromPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
-        hotToPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
-        self._hotPipe = _mfn.Pipe(displayName + "Hot", self.childIds[1], hotFromPort, hotToPort)
+        hotFromPort: _mfn.PortItem = _mfn.PortItem("HotIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
+        hotToPort: _mfn.PortItem = _mfn.PortItem("HotOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
+        self.hotModelPipe = _mfn.Pipe(hotFromPort, hotToPort, name="Hot")
 
 
 class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):

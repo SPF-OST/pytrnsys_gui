@@ -41,7 +41,7 @@ import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.images as _img
-import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.placeholders as _ph
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
@@ -50,8 +50,8 @@ from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.TVentil import TVentil
@@ -598,13 +598,13 @@ class Editor(QWidget):
         )
         return exporter
 
-    def _getMassFlowContributors(self) -> _tp.Sequence[_mfs.MassFlowNetworkContributorMixin]:
-        massFlowContributors = [o for o in self.trnsysObj if isinstance(o, _mfs.MassFlowNetworkContributorMixin)]
+    def _getMassFlowContributors(self) -> _tp.Sequence[_ip.HasInternalPiping]:
+        massFlowContributors = [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)]
         return massFlowContributors
 
     def _isHydraulicConnected(self) -> bool:
         for obj in self.trnsysObj:
-            if not isinstance(obj, _mfs.MassFlowNetworkContributorMixin):
+            if not isinstance(obj, _ip.HasInternalPiping):
                 continue
 
             internalPiping = obj.getInternalPiping()
@@ -688,7 +688,7 @@ class Editor(QWidget):
         return hydCtrlPath
 
     def sortTrnsysObj(self):
-        res = self.trnsysObj.sort(key=self.sortId)
+        self.trnsysObj.sort(key=self.sortId)
         for s in self.trnsysObj:
             self.logger.debug("s has tr id " + str(s.trnsysId) + " has dname " + s.displayName)
 
@@ -812,7 +812,6 @@ class Editor(QWidget):
         for t in self.trnsysObj:
             t.assignIDsToUninitializedValuesAfterJsonFormatMigration(self.idGen)
 
-            self.logger.debug("Tr obj is" + str(t) + " " + str(t.trnsysId))
             if hasattr(t, "isTempering"):
                 self.logger.debug("tv has " + str(t.isTempering))
 
@@ -1064,9 +1063,6 @@ class Editor(QWidget):
         painter.drawEllipse(20, 20, 20, 20)
         painter.end()
 
-    def setTrnsysIdBack(self):
-        self.idGen.trnsysID = max(t.trnsysId for t in self.trnsysObj)
-
     def findStorageCorrespPorts1(self, portList):
         """
         This function gets the ports on the other side of pipes connected to a port of the StorageTank. Unused
@@ -1097,7 +1093,7 @@ class Editor(QWidget):
                     else:
                         self.logger.debug("Port is not fromPort nor toPort")
 
-        # [print(p.parent.displayName) for p in res]
+        # [print(p.parent.newDisplayName) for p in res]
         return res
 
     def printPDF(self):

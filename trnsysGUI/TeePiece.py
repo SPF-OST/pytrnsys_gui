@@ -1,24 +1,26 @@
 # pylint: skip-file
-# type: ignore
 
 import dataclasses as _dc
 import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
+import pytrnsys.utils.serialization as _ser
 
+import trnsysGUI.BlockItem as _bi
+import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _names
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import pytrnsys.utils.serialization as _ser
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.temperatures as _temps
 
 
-class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
+class TeePiece(_bi.BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
-        super(TeePiece, self).__init__(trnsysType, parent, **kwargs)
+        super().__init__(trnsysType, parent, **kwargs)
 
         self.w = 40
         self.h = 40
@@ -27,7 +29,18 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
+        self._updateModels(self.displayName)
+
         self.changeSize()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
+
+    def _updateModels(self, newDisplayName: str) -> None:
+        input = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        output1 = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT)
+        output2 = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT)
+        self._modelTeePiece = _mfn.TeePiece(input, output1, output2)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.TEE_PIECE_SVG
@@ -67,68 +80,65 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
 
         return w, h
 
-    def getInternalPiping(self) -> InternalPiping:
-        teePiece, modelPortItemsToGraphicalPortItem = self._getModelAndMapping()
-
-        internalPiping = InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        modelPortItemsToGraphicalPortItem = {
+            self._modelTeePiece.input: self.inputs[0],
+            self._modelTeePiece.output1: self.outputs[0],
+            self._modelTeePiece.output2: self.outputs[1],
+        }
+        internalPiping = _ip.InternalPiping([self._modelTeePiece], modelPortItemsToGraphicalPortItem)
 
         return internalPiping
 
-    def _getModelAndMapping(self):
-        input = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
-        output1 = _mfn.PortItem("straightOutput", _mfn.PortItemType.OUTPUT)
-        output2 = _mfn.PortItem("orthogonalOutput", _mfn.PortItemType.OUTPUT)
-        teePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input, output1, output2)
-        modelPortItemsToGraphicalPortItem = {input: self.inputs[0], output1: self.outputs[0], output2: self.outputs[1]}
-        return teePiece, modelPortItemsToGraphicalPortItem
-
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
-        if self.isVisible():
-            f = ""
-            unitNumber = startingUnit
-            tNr = 929  # Temperature calculation from a tee-piece
+        f = ""
+        unitNumber = startingUnit
+        tNr = 929  # Temperature calculation from a tee-piece
 
-            unitText = ""
-            ambientT = 20
+        unitText = ""
+        ambientT = 20
 
-            equationConstant = 1
+        equationConstant = 1
 
-            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-            unitText += "!" + self.displayName + "\n"
-            unitText += "PARAMETERS 0\n"
-            unitText += "INPUTS 6\n"
+        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
+        unitText += "!" + self.displayName + "\n"
+        unitText += "PARAMETERS 0\n"
+        unitText += "INPUTS 6\n"
 
-            openLoops, nodesToIndices = self._getOpenLoopsAndNodeToIndices()
-            assert len(openLoops) == 1
-            openLoop = openLoops[0]
+        portItems = self._modelTeePiece.getPortItems()
+        massFlowVariableNames = [
+            _names.getMassFlowVariableName(self, self._modelTeePiece, portItems[0]),
+            _names.getMassFlowVariableName(self, self._modelTeePiece, portItems[1]),
+            _names.getMassFlowVariableName(self, self._modelTeePiece, portItems[2]),
+        ]
 
-            assert len(openLoop.realNodes) == 1
-            realNode = openLoop.realNodes[0]
+        unitText += "\n".join(massFlowVariableNames) + "\n"
 
-            outputVariables = realNode.getOutputVariables()
-            for outputVariable in outputVariables:
-                if not outputVariable:
-                    continue
+        temperatureVariableNames = [
+            self._getTemperatureVariableName(self.inputs[0]),
+            self._getTemperatureVariableName(self.outputs[0]),
+            self._getTemperatureVariableName(self.outputs[1]),
+        ]
 
-                unitText += outputVariable.name + "\n"
+        unitText += "\n".join(temperatureVariableNames) + "\n"
 
-            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.outputs[1].connectionList[0].displayName}\n"
+        unitText += "***Initial values\n"
+        unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
-            unitText += "***Initial values\n"
-            unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
+        unitText += "EQUATIONS 1\n"
+        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
 
-            unitText += "EQUATIONS 1\n"
-            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+        unitNumber += 1
+        f += unitText + "\n"
 
-            unitNumber += 1
-            f += unitText + "\n"
+        return f, unitNumber
 
-            return f, unitNumber
-        else:
-            return "", startingUnit
-        
+    def _getTemperatureVariableName(self, portItem: _pib.PortItemBase) -> str:
+        connection = portItem.connectionList[0]
+        node = connection.getInternalPiping().getNode(portItem, _mfn.PortItemType.STANDARD)
+        temperatureVariableName = _temps.getTemperatureVariableName(connection, node)
+        return temperatureVariableName
+
     def decode(self, i, resBlockList):
         model = TeePieceModel.from_dict(i)
 
@@ -136,7 +146,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
         self.id = model.Id
         self.trnsysId = model.trnsysId
-    
+
         self.inputs[0].id = model.portsIdsIn[0]
         self.outputs[0].id = model.portsIdsOut[0]
         self.outputs[1].id = model.portsIdsOut[1]
@@ -146,7 +156,7 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         self.rotateBlockToN(model.rotationN)
 
         resBlockList.append(self)
-        
+
     def encode(self):
         portListInputs = []
         portListOutputs = []
@@ -190,7 +200,7 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many
     flippedH: bool
     flippedV: bool
     rotationN: int
-    
+
     @classmethod
     def from_dict(
         cls,
@@ -222,7 +232,7 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many
 
         inputPortIds = [superseded.portsIdsIn[0]]
         outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
-        
+
         return TeePieceModel(
             superseded.BlockName,
             superseded.BlockDisplayName,
@@ -238,4 +248,4 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('3fff9a8a-d40e-42e2-824d-c015116d0a1d')
+        return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")

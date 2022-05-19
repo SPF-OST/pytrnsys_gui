@@ -4,10 +4,10 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.massFlowSolver import InternalPiping, MassFlowNetworkContributorMixin
+import trnsysGUI.internalPiping as _ip
 
 
-class Crystalizer(BlockItem, MassFlowNetworkContributorMixin):
+class Crystalizer(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -18,6 +18,9 @@ class Crystalizer(BlockItem, MassFlowNetworkContributorMixin):
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
         self.changeSize()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.CRYSTALIZER_SVG
@@ -39,17 +42,10 @@ class Crystalizer(BlockItem, MassFlowNetworkContributorMixin):
         self.outputs[0].side = (self.rotationN + 2 + 2 * self.flippedH) % 4
         # pylint: disable=duplicate-code  # 2
 
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
 
-    def exportBlackBox(self):
-        status = "noDdckEntry"
-        equation = ["T" + self.displayName + "=1"]
-
-        return status, equation
-
-    def getInternalPiping(self) -> InternalPiping:
-        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
-        outputPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
-
-        crystalizer = _mfn.Pipe(self.displayName, self.trnsysId, inputPort, outputPort)
+        crystalizer = _mfn.Pipe(inputPort, outputPort)
         modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], outputPort: self.outputs[0]}
-        return InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)
+        return _ip.InternalPiping([crystalizer], modelPortItemsToGraphicalPortItem)

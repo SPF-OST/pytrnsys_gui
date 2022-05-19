@@ -1,3 +1,5 @@
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
@@ -6,8 +8,9 @@ def getEquation(outputTemp: str, massFlowRate: str, posFlowInputTemp: str, negFl
     return coldEquation
 
 
-def getMfrName(pipe: _mfn.Pipe) -> str:
-    outputVariable = pipe.getOutputVariables()[0]
-    assert outputVariable
-    mfrName = outputVariable.name
-    return mfrName
+def getInputMfrName(hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe) -> str:
+    return _mnames.getMassFlowVariableName(hasInternalPiping, pipe, pipe.fromPort)
+
+
+def getCanonicalMfrName(hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe) -> str:
+    return _mnames.getCanonicalMassFlowVariableName(hasInternalPiping, pipe)
