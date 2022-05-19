@@ -103,9 +103,9 @@ EQUATIONS 5
 *** Black box component temperatures
 TTesPortLeft50=1
 TTesPortLeft10=1
-TExHxX1=1
-TExHxX2=1
-TCol=1
+TExHxOut1H=1
+TExHxOut2H=1
+TColOutH=1
 
 
 EQUATIONS 2
@@ -197,10 +197,10 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TExHxX1
+TExHxOut1H
 MfrHx-Col_A
 TRoomStore
-TCol
+TColOutH
 ***Initial values
 20 0.0 20 20
 
@@ -219,7 +219,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TExHxX2
+TExHxOut2H
 MfrPiExHx_Tes_A
 TRoomStore
 TTesPortLeft50
@@ -266,7 +266,7 @@ INPUTS 4
 TPump88
 MfrPiPump88_ExHx_A
 TRoomStore
-TExHxX2
+TExHxOut2H
 ***Initial values
 20 0.0 20 20
 
@@ -288,7 +288,7 @@ INPUTS 4
 TPump93
 MfrPiPump93_ExHx_A
 TRoomStore
-TExHxX1
+TExHxOut1H
 ***Initial values
 20 0.0 20 20
 
@@ -310,7 +310,7 @@ INPUTS 4
 TPump93
 MfrPiPump93_Col_A
 TRoomStore
-TCol
+TColOutH
 ***Initial values
 20 0.0 20 20
 

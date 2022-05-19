@@ -11,7 +11,7 @@ qSysOut_PipeLoss = PipeLossTot
 
 EQUATIONS 19
 *** Black box component temperatures
-TFloor1=1
+TFloor1OutH=TFloor1Out
 TShPortLeft90=Tdp1Out_Tes1
 TShPortLeft2=Tdp1Out_Tes1
 TDhwPortLeft50=Tdp1Out_Tes2
@@ -20,16 +20,16 @@ TDhwPortRight1=Tdp2Out_Tes2
 TDhwPortRight97=Tdp2Out_Tes2
 TDhwPortRight50=Tdp3Out_Tes2
 TDhwPortRight99=Tdp3Out_Tes2
-TsupplyWater=Tcw
-THxDHWX1=1
-THxDHWX2=1
-THPX1=1
-THPX2=1
-TFloor2=1
-TFloor3=1
-TFloor4=1
-TFloor5=1
-TFloor6=1
+TsupplyWaterOutH=TsupplyWaterOut
+THxDHWOut1H=THxDHWOut1
+THxDHWOut2H=THxDHWOut2
+THPEvapOutH=THPEvapOut
+THPCondOutH=THPCondOut
+TFloor2OutH=TFloor2Out
+TFloor3OutH=TFloor3Out
+TFloor4OutH=TFloor4Out
+TFloor5OutH=TFloor5Out
+TFloor6OutH=TFloor6Out
 
 UNIT 450 TYPE 935
 PARAMETERS 393
@@ -524,7 +524,7 @@ INPUTS 4
 TPuAuxEvap
 MfrPiHpEvapIn_A
 TRoomStore
-THPX1
+THPEvapOutH
 ***Initial values
 20 0.0 20 20
 
@@ -561,7 +561,7 @@ INPUTS 4
 TPuSh1
 MfrPiFlFloor1_A
 TRoomStore
-TFloor1
+TFloor1OutH
 ***Initial values
 20 0.0 20 20
 
@@ -598,7 +598,7 @@ INPUTS 4
 TPuSh2
 MfrPiFlFloor2_A
 TRoomStore
-TFloor2
+TFloor2OutH
 ***Initial values
 20 0.0 20 20
 
@@ -620,7 +620,7 @@ INPUTS 4
 TPuSh3
 MfrPiFlFloor3_A
 TRoomStore
-TFloor3
+TFloor3OutH
 ***Initial values
 20 0.0 20 20
 
@@ -642,7 +642,7 @@ INPUTS 4
 TPuSh4
 MfrPiFlFloor4_A
 TRoomStore
-TFloor4
+TFloor4OutH
 ***Initial values
 20 0.0 20 20
 
@@ -664,7 +664,7 @@ INPUTS 4
 TPuSh5
 MfrPiFlFloor5_A
 TRoomStore
-TFloor5
+TFloor5OutH
 ***Initial values
 20 0.0 20 20
 
@@ -686,7 +686,7 @@ INPUTS 4
 TPUSh6
 MfrPiFlFloor6_A
 TRoomStore
-TFloor6
+TFloor6OutH
 ***Initial values
 20 0.0 20 20
 
@@ -765,7 +765,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TFloor5
+TFloor5OutH
 MfrPiRtFloor5_A
 TRoomStore
 TTeeShRt5
@@ -809,7 +809,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TFloor4
+TFloor4OutH
 MfrPiRtFloor4_A
 TRoomStore
 TTeeShRt4
@@ -831,7 +831,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TFloor3
+TFloor3OutH
 MfrPiRtFloor3_A
 TRoomStore
 TTeeShRt3
@@ -853,7 +853,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TFloor2
+TFloor2OutH
 MfrPiRtFloor2_A
 TRoomStore
 TTeeShRt2
@@ -941,7 +941,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TFloor1
+TFloor1OutH
 MfrPiRtFloor1_A
 TRoomStore
 TTeeShRt1
@@ -1221,7 +1221,7 @@ Lloop3Rho
 Lloop3Cp
 20
 INPUTS 4
-THPX1
+THPEvapOutH
 MfrPiHpEvapOut_A
 TRoomStore
 TPuAuxEvap
@@ -1246,7 +1246,7 @@ INPUTS 4
 TDivAux
 MfrPiHxDhwPriFl_A
 TRoomStore
-THxDHWX1
+THxDHWOut1H
 ***Initial values
 20 0.0 20 20
 
@@ -1265,7 +1265,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-THxDHWX1
+THxDHWOut1H
 MfrPiHxDhwPriRt_A
 TRoomStore
 TTeeAuxHxRt
@@ -1589,7 +1589,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TFloor6
+TFloor6OutH
 MfrPiFloor6Rt_A
 TRoomStore
 TTeeShRt6
@@ -1736,7 +1736,7 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TsupplyWater
+TsupplyWaterOutH
 MfrPiDhwMains_A
 TRoomStore
 TDhwPortRight1
@@ -1761,7 +1761,7 @@ INPUTS 4
 TPuHxDhwSec
 MfrPiPuHxDhw2HxDHW_A
 TRoomStore
-THxDHWX2
+THxDHWOut2H
 ***Initial values
 20 0.0 20 20
 
@@ -1780,7 +1780,7 @@ Lloop4Rho
 Lloop4Cp
 20
 INPUTS 4
-THxDHWX2
+THxDHWOut2H
 MfrPiHxDHW_Dhw_A
 TRoomStore
 TDhwPortLeft50
@@ -1802,7 +1802,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-THPX2
+THPCondOutH
 MfrPiHP_PuAux_A
 TRoomStore
 TPuAux
@@ -1827,7 +1827,7 @@ INPUTS 4
 TTeeAuxHxRt
 MfrPiTeeAuxHxRt_HP_A
 TRoomStore
-THPX2
+THPCondOutH
 ***Initial values
 20 0.0 20 20
 

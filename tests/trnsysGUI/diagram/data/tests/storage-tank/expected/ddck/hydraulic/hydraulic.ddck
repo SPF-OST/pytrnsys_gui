@@ -14,8 +14,8 @@ EQUATIONS 5
 TTesPortLeft50=Tdp1Out_Tes1
 TTesPortLeft10=Tdp1Out_Tes1
 TInHx=Thx1Out_Tes1
-TCol=1
-THP=1
+TColOutH=TColOut
+THPOutH=THPOut
 
 UNIT 450 TYPE 935
 PARAMETERS 49
@@ -99,7 +99,7 @@ INPUTS 4
 TTesPortLeft10
 MfrTes-Col_A
 TRoomStore
-TCol
+TColOutH
 ***Initial values
 20 0.0 20 20
 
@@ -121,7 +121,7 @@ INPUTS 4
 TInHx
 MfrPiTes_HP_A
 TRoomStore
-THP
+THPOutH
 ***Initial values
 20 0.0 20 20
 
@@ -165,7 +165,7 @@ INPUTS 4
 TPump109
 MfrPiPump109_HP_A
 TRoomStore
-THP
+THPOutH
 ***Initial values
 20 0.0 20 20
 
@@ -184,7 +184,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TCol
+TColOutH
 MfrPiCol_Pump114_A
 TRoomStore
 TPump114

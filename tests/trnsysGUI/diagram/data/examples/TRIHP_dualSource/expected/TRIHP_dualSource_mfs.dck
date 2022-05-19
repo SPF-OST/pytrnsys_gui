@@ -101,12 +101,12 @@ CPBRI_SI = CPBRI*1000 ! J/(kgK)
 
 EQUATIONS 20
 *** Black box component temperatures
-TRadiatorSH=1
-TsupplyWater=1
-THxCoolX1=1
-THxCoolX2=1
-THxDHWX1=1
-THxDHWX2=1
+TRadiatorSHOutH=1
+TsupplyWaterOutH=1
+THxCoolOut1H=1
+THxCoolOut2H=1
+THxDHWOut1H=1
+THxDHWOut2H=1
 TDhwPortLeft95=1
 TDhwPortLeft35=1
 TDhwPortRight5=1
@@ -117,10 +117,10 @@ TSHPortLeft95=1
 TSHPortLeft5=1
 TSHPortRight5=1
 TSHPortRight95=1
-TGhx=1
-THPX1=1
-THPX2=1
-THPX3=1
+TGhxOutH=1
+THPEvapOutH=1
+THPCondOut1H=1
+THPCondOut2H=1
 
 
 EQUATIONS 16
@@ -723,7 +723,7 @@ INPUTS 4
 TDivDhwOut
 MfrPiHxDhwIn_A
 TRoomStore
-THxDHWX1
+THxDHWOut1H
 ***Initial values
 20 0.0 20 20
 
@@ -863,7 +863,7 @@ INPUTS 4
 TPuSH
 MfrPiRadIn_A
 TRoomStore
-TRadiatorSH
+TRadiatorSHOutH
 ***Initial values
 20 0.0 20 20
 
@@ -978,7 +978,7 @@ Lloop5Rho
 Lloop5Cp
 20
 INPUTS 4
-THxCoolX1
+THxCoolOut1H
 MfrPiHxCoolBriOut_A
 TRoomStore
 TDivCool
@@ -1018,7 +1018,7 @@ INPUTS 4
 TTeePiece3852
 MfrPiHxCoolBriIn_A
 TRoomStore
-THxCoolX1
+THxCoolOut1H
 ***Initial values
 20 0.0 20 20
 
@@ -1062,7 +1062,7 @@ INPUTS 4
 TDivCool
 MfrPiGhxIn_A
 TRoomStore
-TGhx
+TGhxOutH
 ***Initial values
 20 0.0 20 20
 
@@ -1081,7 +1081,7 @@ Lloop5Rho
 Lloop5Cp
 20
 INPUTS 4
-TGhx
+TGhxOutH
 MfrPiGhxOut_A
 TRoomStore
 TPuHpEvap
@@ -1257,7 +1257,7 @@ Lloop3Rho
 Lloop3Cp
 20
 INPUTS 4
-TsupplyWater
+TsupplyWaterOutH
 MfrPiDhwMains_A
 TRoomStore
 TTeePieceCirc2
@@ -1279,7 +1279,7 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-THxDHWX1
+THxDHWOut1H
 MfrPiHxDhwOut_A
 TRoomStore
 TPuDhw
@@ -1433,7 +1433,7 @@ Lloop4Rho
 Lloop4Cp
 20
 INPUTS 4
-TRadiatorSH
+TRadiatorSHOutH
 MfrPiRadOut_A
 TRoomStore
 TDivSh
@@ -1565,7 +1565,7 @@ Lloop5Rho
 Lloop5Cp
 20
 INPUTS 4
-THPX1
+THPEvapOutH
 MfrPiHPEvapOut_A
 TRoomStore
 TTeeHpEvap
@@ -1634,7 +1634,7 @@ INPUTS 4
 TDivHpEvap
 MfrPiHPEvapIn_A
 TRoomStore
-THPX1
+THPEvapOutH
 ***Initial values
 20 0.0 20 20
 
@@ -1653,7 +1653,7 @@ Lloop3Rho
 Lloop3Cp
 20
 INPUTS 4
-THxDHWX2
+THxDHWOut2H
 MfrPiDhwSecOut_A
 TRoomStore
 TTeePieceCirc1
@@ -1678,7 +1678,7 @@ INPUTS 4
 TTeePieceCirc2
 MfrPiHxDhwSecIn_A
 TRoomStore
-THxDHWX2
+THxDHWOut2H
 ***Initial values
 20 0.0 20 20
 
@@ -1697,7 +1697,7 @@ Lloop4Rho
 Lloop4Cp
 20
 INPUTS 4
-THxCoolX2
+THxCoolOut2H
 MfrPiHxCoolWatIn_A
 TRoomStore
 TDivSHCool
@@ -1722,7 +1722,7 @@ INPUTS 4
 TTeeCoolRadIn
 MfrConn1455_A
 TRoomStore
-THxCoolX2
+THxCoolOut2H
 ***Initial values
 20 0.0 20 20
 
@@ -1741,7 +1741,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-THPX3
+THPCondOut2H
 MfrPiHpDesOut_A
 TRoomStore
 TTeePiece_6088
@@ -1766,7 +1766,7 @@ INPUTS 4
 TTeePiece5329
 MfrPiHpDesIn_A
 TRoomStore
-THPX3
+THPCondOut2H
 ***Initial values
 20 0.0 20 20
 
@@ -1785,7 +1785,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-THPX2
+THPCondOut1H
 MfrPiHpCondOut_A
 TRoomStore
 TDivHp
@@ -1810,7 +1810,7 @@ INPUTS 4
 TTeeTesShOut
 MfrPiHpCondIn_A
 TRoomStore
-THPX2
+THPCondOut1H
 ***Initial values
 20 0.0 20 20
 
