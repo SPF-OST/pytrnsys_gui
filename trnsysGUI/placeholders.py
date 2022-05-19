@@ -1,5 +1,5 @@
-import typing as _tp
 import pathlib as _pl
+import typing as _tp
 
 import pytrnsys.utils.result as _res
 from trnsysGUI.BlockItem import BlockItem
@@ -23,21 +23,22 @@ def getPlaceholderValues(ddckDirNames: _tp.Sequence[str], trnsysObjects) -> _res
                 f"{componentName} is not a ddck template path"
             )
 
-        inputDct = {}
+        placeholderDct = {}
         for inputPort in component.inputs:
-            internalPiping = inputPort.parent.getInternalPiping()
-            portItemsInternalRealNode = internalPiping.getPortItemsAndAdjacentRealNodeForGraphicalPortItem(
-                inputPort)
-            portItems = [pr.portItem for pr in portItemsInternalRealNode]
-            formattedPortItems = [f"{p.name}" for p in portItems]
-            inputDct[formattedPortItems[0]] = {
+            formattedPortItems = component.getPortName(inputPort)
+            placeholderDct[formattedPortItems[0]] = {
                 "@temp": "T" + inputPort.connectionList[0].displayName,
                 "@mfr": "Mfr" + inputPort.connectionList[0].displayName}
 
-        if not inputDct:
+        for outputPort in component.outputs:
+            formattedPortItems = component.getPortName(outputPort)
+            placeholderDct[formattedPortItems[0]] = {
+                "@temp": "T" + outputPort.parent.displayName + formattedPortItems[0]}
+
+        if not placeholderDct:
             return _res.Error(
                 f"{componentName} doesn't have connection name for placeholder"
             )
-        ddckPlaceHolderValuesDictionary[componentName] = inputDct
+        ddckPlaceHolderValuesDictionary[componentName] = placeholderDct
 
     return ddckPlaceHolderValuesDictionary
