@@ -70,7 +70,7 @@ class Export:
             f = ""
             for i in range(len(lines)):
                 if "=" in lines[i]:
-                    lines[i] = lines[i].split("=")[0] + "=1"
+                    lines[i] = lines[i].split("=")[0] + "= 1"
                 f += lines[i] + "\n"
 
         if equationNr == 0:
@@ -412,8 +412,6 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
         f = ""
         unitNumber = startingUnit
-        # typeNr1 = 929 # Temperature calculation from a tee-piece
-        # typeNr2 = 931 # Temperature calculation from a pipe
 
         for t in self._massFlowContributors:
             res = t.exportPipeAndTeeTypesForTemp(unitNumber)
@@ -433,19 +431,19 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
             if isinstance(t, _spc.SinglePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
-                lossText += "P" + t.displayName + "_kW"
+                lossText += f"P{t.displayName}_kW"
                 rightCounter += 1
             if isinstance(t, _dpc.DoublePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
-                lossText += "P" + t.displayName + "Cold_kW" + "+"
-                lossText += "P" + t.displayName + "Hot_kW"
+                lossText += f"P{t.displayName}Cold_kW+"
+                lossText += f"P{t.displayName}Hot_kW"
                 rightCounter += 1
 
         if rightCounter == 0:
             lossText += "0"
 
-        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText + "\n\n"
+        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot = " + lossText + "\n\n"
         return f
 
     def exportMassFlowPrinter(self, unitnr, descLen):

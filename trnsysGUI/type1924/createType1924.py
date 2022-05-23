@@ -72,9 +72,9 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 2\n"
         lines = lines + line
 
-        line = "zInDp%d_Tes%d=%.2f\n" % (idPort + 1, nTes, connectorPort[idPort]["zIn"])
+        line = "zInDp%d_Tes%d = %.2f\n" % (idPort + 1, nTes, connectorPort[idPort]["zIn"])
         lines = lines + line
-        line = "zOutDp%d_Tes%d=%.2f\n" % (idPort + 1, nTes, connectorPort[idPort]["zOut"])
+        line = "zOutDp%d_Tes%d = %.2f\n" % (idPort + 1, nTes, connectorPort[idPort]["zOut"])
         lines = lines + line
 
         return lines
@@ -85,7 +85,7 @@ class Type1924_TesPlugFlow:
 
         line = "CONSTANTS 1\n"
         lines = lines + line
-        line = "Dp%dStrat_Tes%d=0 ! 0: no forced stratification ; 1: force to stratify\n" % (idPort + 1, nTes)
+        line = "Dp%dStrat_Tes%d = 0 ! 0: no forced stratification ; 1: force to stratify\n" % (idPort + 1, nTes)
         lines = lines + line
 
         return lines
@@ -99,7 +99,7 @@ class Type1924_TesPlugFlow:
 
         z = 0.05
         for i in range(10):
-            line = "zSen%d_Tes%d=%.2f\n" % (i + 1, nTes, z)
+            line = "zSen%d_Tes%d = %.2f\n" % (i + 1, nTes, z)
             lines = lines + line
             z = z + 0.1
 
@@ -112,13 +112,13 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 4\n"
         lines = lines + line
 
-        line = "zInhx%d_Tes%d=%.2f\n" % (idHx, nTes, connectHx[idHx - 1]["zIn"])
+        line = "zInhx%d_Tes%d = %.2f\n" % (idHx, nTes, connectHx[idHx - 1]["zIn"])
         lines = lines + line
-        line = "zOuthx%d_Tes%d=%.2f\n" % (idHx, nTes, connectHx[idHx - 1]["zOut"])
+        line = "zOuthx%d_Tes%d = %.2f\n" % (idHx, nTes, connectHx[idHx - 1]["zOut"])
         lines = lines + line
-        line = "Cphx%d_Tes%d=%s\n" % (idHx, nTes, connectHx[idHx - 1]["cp"])
+        line = "Cphx%d_Tes%d = %s\n" % (idHx, nTes, connectHx[idHx - 1]["cp"])
         lines = lines + line
-        line = "Rhohx%d_Tes%d=%s\n" % (idHx, nTes, connectHx[idHx - 1]["rho"])
+        line = "Rhohx%d_Tes%d = %s\n" % (idHx, nTes, connectHx[idHx - 1]["rho"])
         lines = lines + line
 
         return lines
@@ -131,40 +131,40 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 15\n"
         lines = lines + line
 
-        line = "dInHx%d_Tes%d=0.05 ! m only if modHx%d=1\n" % (idHx, nTes, idHx)
+        line = "dInHx%d_Tes%d = 0.05 ! m only if modHx%d=1\n" % (idHx, nTes, idHx)
         lines = lines + line
-        line = "dOutHx%d_Tes%d=0.06 ! m only if modHx%d=1\n" % (idHx, nTes, idHx)
-        lines = lines + line
-
-        line = "LHx%d_Tes%d=20 ! m only if modHx%d=1\n" % (idHx, nTes, idHx)
-        lines = lines + line
-        line = "LamHx%d_Tes%d=50 ! W/mK only if modHx%d=1\n" % (idHx, nTes, idHx)
-        lines = lines + line
-        line = "brineConcHx%d_Tes%d=30 ! [0-100] only if modHx%d=1\n" % (idHx, nTes, idHx)
+        line = "dOutHx%d_Tes%d = 0.06 ! m only if modHx%d=1\n" % (idHx, nTes, idHx)
         lines = lines + line
 
-        line = "VHx%d_Tes%d=0. \n" % (idHx, nTes)
+        line = "LHx%d_Tes%d = 20 ! m only if modHx%d=1\n" % (idHx, nTes, idHx)
         lines = lines + line
-        line = "nCvHx%d_Tes%d=20 \n" % (idHx, nTes)
+        line = "LamHx%d_Tes%d = 50 ! W/mK only if modHx%d=1\n" % (idHx, nTes, idHx)
         lines = lines + line
-
-        line = "modHx%d_Tes%d=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n" % (idHx, nTes)
-        lines = lines + line
-        line = "nNuHx%d_Tes%d=0.5 !  only if modHx%d=1\n" % (idHx, nTes, idHx)
-        lines = lines + line
-        line = "cNuHx%d_Tes%d=0.25 !  only if modHx%d=1\n" % (idHx, nTes, idHx)
+        line = "brineConcHx%d_Tes%d = 30 ! [0-100] only if modHx%d=1\n" % (idHx, nTes, idHx)
         lines = lines + line
 
-        line = "dUaMfrHx%d_Tes%d=0.375 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
+        line = "VHx%d_Tes%d = 0. \n" % (idHx, nTes)
         lines = lines + line
-        line = "dUadTHx%d_Tes%d=0.0 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
-        lines = lines + line
-        line = "dUaTHx%d_Tes%d=0.458 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
-        lines = lines + line
-        line = "UaHx%d_Tes%d=1105*ratioTes%d ! kJ/hK only if modHx%d=0\n" % (idHx, nTes, nTes, idHx)
+        line = "nCvHx%d_Tes%d = 20 \n" % (idHx, nTes)
         lines = lines + line
 
-        line = "startUpHx%d_Tes%d=0. ! only if modHx%d=0\n" % (idHx, nTes, idHx)
+        line = "modHx%d_Tes%d = 1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)\n" % (idHx, nTes)
+        lines = lines + line
+        line = "nNuHx%d_Tes%d = 0.5 !  only if modHx%d=1\n" % (idHx, nTes, idHx)
+        lines = lines + line
+        line = "cNuHx%d_Tes%d = 0.25 !  only if modHx%d=1\n" % (idHx, nTes, idHx)
+        lines = lines + line
+
+        line = "dUaMfrHx%d_Tes%d = 0.375 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
+        lines = lines + line
+        line = "dUadTHx%d_Tes%d = 0.0 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
+        lines = lines + line
+        line = "dUaTHx%d_Tes%d = 0.458 ! only if modHx%d=0\n" % (idHx, nTes, idHx)
+        lines = lines + line
+        line = "UaHx%d_Tes%d = 1105*ratioTes%d ! kJ/hK only if modHx%d=0\n" % (idHx, nTes, nTes, idHx)
+        lines = lines + line
+
+        line = "startUpHx%d_Tes%d = 0. ! only if modHx%d=0\n" % (idHx, nTes, idHx)
         lines = lines + line
 
         return lines
@@ -249,7 +249,7 @@ class Type1924_TesPlugFlow:
         line = "CONSTANTS 10\n"
         lines = lines + line
 
-        line = "Ufoam_Tes%d= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n" % (nTes)
+        line = "Ufoam_Tes%d = 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) \n" % (nTes)
         lines = lines + line
         line = "Ubot_Tes%d = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)\n" % (nTes)
         lines = lines + line
@@ -304,29 +304,29 @@ class Type1924_TesPlugFlow:
     def getFirst12ParVar(self, nTes):
 
         lines = "CONSTANTS 12\n"
-        line = "Vol_Tes%d=1          ! 1: m3, volume of store\n" % nTes
+        line = "Vol_Tes%d = 1          ! 1: m3, volume of store\n" % nTes
         lines = lines + line
-        line = "RhoWat_Tes%d=RhoWat  ! 2: kg/m3, density of storage media\n" % nTes
+        line = "RhoWat_Tes%d = RhoWat  ! 2: kg/m3, density of storage media\n" % nTes
         lines = lines + line
-        line = "CpWat_Tes%d=CpWat    ! 3: kJ/kgK, specific heat of storage media\n" % nTes
+        line = "CpWat_Tes%d = CpWat    ! 3: kJ/kgK, specific heat of storage media\n" % nTes
         lines = lines + line
-        line = "lamZ_Tes%d=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES\n" % nTes
+        line = "lamZ_Tes%d = 0.6       ! 4: W/mK, effective vertical thermal conductivity of TES\n" % nTes
         lines = lines + line
-        line = "Heigh_Tes%d=1.       ! 5: m, storage height\n" % nTes
+        line = "Heigh_Tes%d = 1.       ! 5: m, storage height\n" % nTes
         lines = lines + line
-        line = "Tini_Tes%d=60.       ! 6: oC, initial temperature\n" % nTes
+        line = "Tini_Tes%d = 60.       ! 6: oC, initial temperature\n" % nTes
         lines = lines + line
-        line = "nCvMax_Tes%d=400     ! 7: -, minimum relative plug height\n" % nTes
+        line = "nCvMax_Tes%d = 400     ! 7: -, minimum relative plug height\n" % nTes
         lines = lines + line
-        line = "nCvMin_Tes%d=20      ! 8: -, maximum relative plug height\n" % nTes
+        line = "nCvMin_Tes%d = 20      ! 8: -, maximum relative plug height\n" % nTes
         lines = lines + line
-        line = "maxTDiff_Tes%d=0.015 ! 9: K, maximum temperature difference between plugs\n" % nTes
+        line = "maxTDiff_Tes%d = 0.015 ! 9: K, maximum temperature difference between plugs\n" % nTes
         lines = lines + line
-        line = "readMode_Tes%d=0     ! 10: 1: from table, 0: Tini and CapTot\n" % nTes
+        line = "readMode_Tes%d = 0     ! 10: 1: from table, 0: Tini and CapTot\n" % nTes
         lines = lines + line
-        line = "Tref_Tes%d=273.15    ! 11: oC, reference temperature\n" % nTes
+        line = "Tref_Tes%d = 273.15    ! 11: oC, reference temperature\n" % nTes
         lines = lines + line
-        line = "Tmax_Tes%d=100.       ! 6: oC, initial temperature\n" % nTes
+        line = "Tmax_Tes%d = 100.      ! 6: oC, initial temperature\n" % nTes
         lines = lines + line
 
         line = self.getUaParValues(nTes, self.Ua)
@@ -381,9 +381,9 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
             for i in range(nHeatSources):
-                line = "zAux%d_Tes%d=%.2f\n" % (i + 1, nTes, connectorAux[i]["zAux"])
+                line = "zAux%d_Tes%d = %.2f\n" % (i + 1, nTes, connectorAux[i]["zAux"])
                 lines = lines + line
-                line = "qAux%d_Tes%d=%.2f\n" % (i + 1, nTes, connectorAux[i]["qAux"])
+                line = "qAux%d_Tes%d = %.2f\n" % (i + 1, nTes, connectorAux[i]["qAux"])
                 lines = lines + line
 
             line = "\n"
@@ -431,8 +431,8 @@ class Type1924_TesPlugFlow:
         parId = 71
         for i in range(self.nMaxAvgSensor):
             line = (
-                "zSenAvgBot%d_Tes%d zSenAvgTop%d_Tes%d ! %d-%d : relative position of lower and upper edge temeprature sensors\n"
-                % (i + 1, nTes, i + 1, nTes, parId, parId + 1)
+                    "zSenAvgBot%d_Tes%d zSenAvgTop%d_Tes%d ! %d-%d : relative position of lower and upper edge temeprature sensors\n"
+                    % (i + 1, nTes, i + 1, nTes, parId, parId + 1)
             )
             lines = lines + line
             parId = parId + 2
@@ -446,23 +446,23 @@ class Type1924_TesPlugFlow:
         lines = lines + "CONSTANTS 4\n"
 
         line = (
-            "MoInsPlate_Tes%d=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
-            % nTes
+                "MoInsPlate_Tes%d = 0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
+                % nTes
         )
         lines = lines + line
         line = (
-            "zInsPlate_Tes%d=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
-            % nTes
+                "zInsPlate_Tes%d = 0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
+                % nTes
         )
         lines = lines + line
         line = (
-            "TinsPlate_Tes%d=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
-            % nTes
+                "TinsPlate_Tes%d = 0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
+                % nTes
         )
         lines = lines + line
         line = (
-            "UAinsPlate_Tes%d=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
-            % nTes
+                "UAinsPlate_Tes%d = 0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
+                % nTes
         )
         lines = lines + line
 
@@ -472,23 +472,23 @@ class Type1924_TesPlugFlow:
 
         lines = ""
         line = (
-            "MoInsPlate_Tes%d ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
-            % nTes
+                "MoInsPlate_Tes%d ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled \n"
+                % nTes
         )
         lines = lines + line
         line = (
-            "zInsPlate_Tes%d  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
-            % nTes
+                "zInsPlate_Tes%d  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1\n"
+                % nTes
         )
         lines = lines + line
         line = (
-            "TinsPlate_Tes%d  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
-            % nTes
+                "TinsPlate_Tes%d  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)\n"
+                % nTes
         )
         lines = lines + line
         line = (
-            "UAinsPlate_Tes%d ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
-            % nTes
+                "UAinsPlate_Tes%d ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)\n"
+                % nTes
         )
         lines = lines + line
 
@@ -576,7 +576,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
 
         for idPort in range(nPorts):
-            line = "Qdp%d_Tes%d=[%d,%d] ! \n" % (idPort + 1, nTes, nUnit, 30 + idPort + 1)
+            line = "Qdp%d_Tes%d = [%d,%d] ! \n" % (idPort + 1, nTes, nUnit, 30 + idPort + 1)
             lines = lines + line
 
         nEq = 21
@@ -590,7 +590,7 @@ class Type1924_TesPlugFlow:
         counter = 21
         for i in range(10):
             height = 0.05 + 0.1 * i
-            line = "T%d_Tes%d =[%d,%d] !temperature at %.2f \n" % (i + 1, nTes, nUnit, counter, height)
+            line = "T%d_Tes%d = [%d,%d] !temperature at %.2f \n" % (i + 1, nTes, nUnit, counter, height)
             lines = lines + line
             counter = counter + 1
 
@@ -598,7 +598,7 @@ class Type1924_TesPlugFlow:
         lines = lines + line
         counter = 71
         for i in range(10):
-            line = "Tsen%d_Tes%d =[%d,%d] ! temperature at user defined sensor height Tsen%d_Tes%d \n" % (
+            line = "Tsen%d_Tes%d = [%d,%d] ! temperature at user defined sensor height Tsen%d_Tes%d \n" % (
                 i + 1,
                 nTes,
                 nUnit,
@@ -616,7 +616,7 @@ class Type1924_TesPlugFlow:
 
         counter = 102
         for idHx in range(nHx):
-            line = "Qhx%dOut_Tes%d=[%d,%d] ! \n" % (idHx + 1, nTes, nUnit, counter + 2)
+            line = "Qhx%dOut_Tes%d = [%d,%d] ! \n" % (idHx + 1, nTes, nUnit, counter + 2)
             lines = lines + line
             counter = counter + 10
 
@@ -629,16 +629,18 @@ class Type1924_TesPlugFlow:
         line = "EQUATIONS 5\n"
         lines = lines + line
 
-        line = "Qv_Tes%d     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QLoss_Tes%d  = [%d,177] ! Heat Losses of the Tes [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QAcum_Tes%d  = [%d,178] ! Sensible accumulated heat [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QPorts_Tes%d = [%d,179] ! Heat Input by direct ports [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QImb_Tes%d   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n"%(nTes,nUnit)
-        lines=lines+line
+        line = "Qv_Tes%d = [%d,176]     ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n" % (
+        nTes, nUnit)
+        lines = lines + line
+        line = "QLoss_Tes%d = [%d,177]  ! Heat Losses of the Tes [kW]\n" % (nTes, nUnit)
+        lines = lines + line
+        line = "QAcum_Tes%d = [%d,178]  ! Sensible accumulated heat [kW]\n" % (nTes, nUnit)
+        lines = lines + line
+        line = "QPorts_Tes%d = [%d,179] ! Heat Input by direct ports [kW]\n" % (nTes, nUnit)
+        lines = lines + line
+        line = "QImb_Tes%d = [%d,64]    ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n" % (
+        nTes, nUnit)
+        lines = lines + line
 
         return lines
 
@@ -671,7 +673,7 @@ class Type1924_TesPlugFlow:
 
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
-        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d "%(nTes,nTes,nTes,nTes,nTes)
+        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d " % (nTes, nTes, nTes, nTes, nTes)
         lines = lines + line
         for i in range(inputs["nPorts"]):
             line = "Qdp%d_Tes%d " % (i + 1, nTes)
@@ -832,7 +834,7 @@ class Type1924_TesPlugFlow:
             lines = lines + self.sLine
             lines = lines + "** outputs to energy balance in kWh\n"
             lines = (
-                lines + "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
+                    lines + "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
             )
             lines = lines + self.sLine
             lines = lines + "EQUATIONS 3\n"
@@ -880,7 +882,7 @@ class Type1924_TesPlugFlow:
         counter = 1
         for idPort in range(nPorts):
             outputTemperature = "Tdp%dOut_Tes%d" % (idPort + 1, nTes)
-            line = outputTemperature + "=[%d,%d] ! \n" % (nUnit, counter)
+            line = outputTemperature + " = [%d,%d] ! \n" % (nUnit, counter)
             lines = lines + line
 
             ddcxLine = (
@@ -889,7 +891,7 @@ class Type1924_TesPlugFlow:
                     + "Port"
                     + self.connectorsPort[idPort]["side"]
                     + str(int(round(self.connectorsPort[idPort]["zIn"] * 100, 0)))
-                    + "="
+                    + " = "
                     + outputTemperature
                     + "\n"
             )
@@ -901,7 +903,7 @@ class Type1924_TesPlugFlow:
                     + "Port"
                     + self.connectorsPort[idPort]["side"]
                     + str(int(self.connectorsPort[idPort]["zOut"] * 100))
-                    + "="
+                    + " = "
                     + outputTemperature
                     + "\n"
             )
@@ -919,9 +921,9 @@ class Type1924_TesPlugFlow:
         counter = 102
         for idHx in range(nHxs):
             outputTemperature = "Thx%dOut_Tes%d" % (idHx + 1, nTes)
-            line = outputTemperature + "=[%d,%d] ! \n" % (nUnit, counter)
+            line = outputTemperature + " = [%d,%d] ! \n" % (nUnit, counter)
             lines = lines + line
-            ddcxLine = "T" + self.connectorsHx[idHx]["Name"] + "=" + outputTemperature + "\n"
+            ddcxLine = "T" + self.connectorsHx[idHx]["Name"] + " = " + outputTemperature + "\n"
             ddcxLines = ddcxLines + ddcxLine
             # line="Qhx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter+2);lines=lines+line
             counter = counter + 10
@@ -942,7 +944,7 @@ class Type1924_TesPlugFlow:
 
         if nTes == 1:
             lines = lines + "CONSTANTS 3\n"
-            line = "TRoomStore=15 ! \n"
+            line = "TRoomStore = 15 ! \n"
             lines = lines + line
             line = "VStoreRef = 0.763\n"
             lines = lines + line
@@ -965,7 +967,7 @@ class Type1924_TesPlugFlow:
 
         lines = lines + "********** HEAT EXCHANGER CONSTANTS*******\n"
         lines = lines + "CONSTANTS 1\n"
-        lines = lines + "nHxUsed_Tes%d=%d \n" % (nTes, nHxs)
+        lines = lines + "nHxUsed_Tes%d = %d \n" % (nTes, nHxs)
 
         for idHx in range(nHxs):
             line = self.getOneHxParValues(nTes, idHx + 1)

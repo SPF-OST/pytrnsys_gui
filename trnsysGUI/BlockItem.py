@@ -654,7 +654,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
             for outputPort in self.outputs:
                 outputName = self.getTemperatureVariableName(outputPort)
                 status = "success"
-                line = f"{outputName}={outputName[:-1]}"
+                line = f"{outputName} = {outputName[:-1]}"
                 equations.append(line)
         else:
             status = "noBlackBoxOutput"

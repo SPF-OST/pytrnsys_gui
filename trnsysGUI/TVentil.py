@@ -235,8 +235,8 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
 
             equationConstant = 1
 
-            unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-            unitText += "!" + self.displayName + "\n"
+            unitText += f"UNIT {str(unitNumber)} TYPE {str(tNr)}\n"
+            unitText += f"!{self.displayName}\n"
             unitText += "PARAMETERS 0\n"
             unitText += "INPUTS 6\n"
 
@@ -262,7 +262,7 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
             unitText += "EQUATIONS 1\n"
-            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+            unitText += f"T{self.displayName} = [{str(unitNumber)},{str(equationConstant)}]\n"
 
             unitNumber += 1
             lines += unitText + "\n"

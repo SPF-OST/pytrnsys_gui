@@ -159,8 +159,8 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         return unitText, unitNumber
 
     def _getExport(self, ambientT, equationConstant, nodesToIndices, openLoop, tNr, temperature, unitNumber, unitText):
-        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-        unitText += "!" + self.displayName + temperature + "\n"
+        unitText += f"UNIT {str(unitNumber)} TYPE {str(tNr)}\n"
+        unitText += f"!{self.displayName}{temperature}\n"
         unitText += "PARAMETERS 0\n"
         unitText += "INPUTS 6\n"
 
@@ -182,7 +182,7 @@ class DoublePipeTeePiece(BlockItem, MassFlowNetworkContributorMixin):
         unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
         unitText += "EQUATIONS 1\n"
-        unitText += "T" + self.displayName + temperature + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n\n"
+        unitText += f"T{self.displayName}{temperature} = [{str(unitNumber)},{str(equationConstant)}]\n\n"
         unitNumber += 1
 
         return unitNumber, unitText

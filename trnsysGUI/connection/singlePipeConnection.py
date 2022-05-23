@@ -146,9 +146,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         # Momentarily hardcoded
         equationNr = 3
 
-        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-        unitText += "!" + self.displayName + "\n"
-        unitText += "PARAMETERS " + str(parameterNumber) + "\n"
+        unitText += f"UNIT {str(unitNumber)} TYPE {str(typeNr2)}\n"
+        unitText += f"!{self.displayName}\n"
+        unitText += f"PARAMETERS {str(parameterNumber)}\n"
 
         lengthInM = _getConvertedValueOrName(self.lengthInM)
         diameterInM = _getConvertedValueOrName(self.diameterInCm, 1 / 100)
@@ -166,7 +166,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitText += specHeatVar + "\n"
         unitText += str(ambientT) + "\n"
 
-        unitText += "INPUTS " + str(inputNumbers) + "\n"
+        unitText += f"INPUTS {str(inputNumbers)}\n"
 
         openLoops, _ = self._getOpenLoopsAndNodeToIndices()
         assert len(openLoops) == 1
@@ -201,21 +201,12 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             )
 
         unitText += "***Initial values\n"
-        unitText += initialValueS + "\n\n"
+        unitText += f"{initialValueS}\n\n"
 
-        unitText += "EQUATIONS " + str(equationNr) + "\n"
-        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant1) + "]\n"
-        unitText += (
-            powerPrefix
-            + self.displayName
-            + "_kW"
-            + "= ["
-            + str(unitNumber)
-            + ","
-            + str(equationConstant2)
-            + "]/3600 !kW\n"
-        )
-        unitText += "Mfr" + self.displayName + "= " + "Mfr" + self.displayName + "_A\n\n"
+        unitText += f"EQUATIONS {str(equationNr)}\n"
+        unitText += f"T{self.displayName} = [{str(unitNumber)},{str(equationConstant1)}]\n"
+        unitText += f"{powerPrefix}{self.displayName}_kW = [{str(unitNumber)},{str(equationConstant2)}]/3600 !kW\n"
+        unitText += f"Mfr{self.displayName} = Mfr{self.displayName}_A\n\n"
 
         unitNumber += 1
 

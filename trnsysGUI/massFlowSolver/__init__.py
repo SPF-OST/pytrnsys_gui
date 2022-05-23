@@ -102,7 +102,7 @@ class MassFlowNetworkContributorMixin:
                     continue
 
                 index = equationNumber + nodeIndex * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE + variableIndex
-                line = f"{outputVariable.name}=[{simulationUnit},{index}]"
+                line = f"{outputVariable.name} = [{simulationUnit},{index}]"
                 lines.append(line)
         return lines
 

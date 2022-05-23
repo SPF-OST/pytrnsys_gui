@@ -133,11 +133,11 @@ class DoublePipeConnection(_cb.ConnectionBase):
         # Momentarily hardcoded
         equationNr = 6
 
-        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-        unitText += "!" + self.displayName + "\n"
+        unitText += f"UNIT {str(unitNumber)} TYPE {str(typeNr2)}\n"
+        unitText += f"!{self.displayName}\n"
 
-        unitText += "PARAMETERS " + str(parameterNumber) + "\n"
-        unitText += commentStars + " pipe and soil properties " + commentStars + "\n"
+        unitText += f"PARAMETERS {str(parameterNumber)}\n"
+        unitText += f"{commentStars} pipe and soil properties {commentStars}\n"
         unitText += self._addComment("dpLength", "! Length of buried pipe, m")
         unitText += self._addComment("dpDiamIn", "! Inner diameter of pipes, m")
         unitText += self._addComment("dpDiamOut", "! Outer diameter of pipes, m")
@@ -150,27 +150,27 @@ class DoublePipeConnection(_cb.ConnectionBase):
         unitText += self._addComment("dpLambdaGap", "! Thermal conductivity of gap material, kJ/(h*m*K)")
         unitText += self._addComment("dpGapThick", "! Gap thickness, m")
 
-        unitText += commentStars + " fluid properties " + commentStars + "\n"
+        unitText += f"{commentStars} fluid properties {commentStars}\n"
         unitText += self._addComment("dpRhoFlu", "! Density of fluid, kg/m^3")
         unitText += self._addComment("dpLambdaFl", "! Thermal conductivity of fluid, kJ/(h*m*K)")
         unitText += self._addComment("dpCpFl", "! Specific heat of fluid, kJ/(kg*K)")
         unitText += self._addComment("dpViscFl", "! Viscosity of fluid, kg/(m*h)")
 
-        unitText += commentStars + " initial conditions " + commentStars + "\n"
+        unitText += f"{commentStars} initial conditions {commentStars}\n"
         unitText += self._addComment("dpTIniHot", "! Initial fluid temperature - Pipe hot, deg C")
         unitText += self._addComment("dpTIniCold", "! Initial fluid temperature - Pipe cold, deg C")
 
-        unitText += commentStars + " thermal properties soil " + commentStars + "\n"
+        unitText += f"{commentStars} thermal properties soil {commentStars}\n"
         unitText += self._addComment("dpLamdaSl", "! Thermal conductivity of soil, kJ/(h*m*K)")
         unitText += self._addComment("dpRhoSl", "! Density of soil, kg/m^3")
         unitText += self._addComment("dpCpSl", "! Specific heat of soil, kJ/(kg*K)")
 
-        unitText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
+        unitText += f"{commentStars} general temperature dependency (dependent on weather data) {commentStars}\n"
         unitText += self._addComment("TambAvg", "! Average surface temperature, deg C")
         unitText += self._addComment("dTambAmpl", "! Amplitude of surface temperature, deg C")
         unitText += self._addComment("ddTcwOffset", "! Days of minimum surface temperature")
 
-        unitText += commentStars + " definition of nodes " + commentStars + "\n"
+        unitText += f"{commentStars} definition of nodes {commentStars}\n"
         unitText += self._addComment("dpNrFlNds", "! Number of fluid nodes")
         unitText += self._addComment("dpNrSlRad", "! Number of radial soil nodes")
         unitText += self._addComment("dpNrSlAx", "! Number of axial soil nodes")
@@ -184,14 +184,14 @@ class DoublePipeConnection(_cb.ConnectionBase):
         unitText += self._addComment("dpRadNdDist", "! Radial distance of node 7, m")
         unitText += self._addComment("dpRadNdDist", "! Radial distance of node 8, m")
 
-        unitText += "INPUTS " + str(inputNumbers) + "\n"
+        unitText += f"INPUTS {str(inputNumbers)}\n"
         unitText += self._getInputs("Cold", self._coldPipe, self.toPort, self.fromPort)
         unitText += self._getInputs("Hot", self._hotPipe, self.fromPort, self.toPort)
 
         unitText += "***Initial values\n"
-        unitText += initialValueS + "\n\n"
+        unitText += f"{initialValueS}\n\n"
 
-        unitText += "EQUATIONS " + str(equationNr) + "\n"
+        unitText += f"EQUATIONS {str(equationNr)}\n"
         unitText += self._getEquations("Cold", self._coldPipe, eqConst1, eqConst7, unitNumber)
         unitText += self._getEquations("Hot", self._hotPipe, eqConst3, eqConst8, unitNumber)
 
