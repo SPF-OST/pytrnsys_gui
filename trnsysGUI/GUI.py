@@ -328,33 +328,14 @@ class MainWindow(QMainWindow):
     def runSimulation(self):
         ddckPath = os.path.join(self.projectFolder, "ddck")
 
-        #   Check hydraulic.ddck
-        hydraulicPath = os.path.join(ddckPath, "hydraulic\\hydraulic.ddck")
-        if not os.path.isfile(hydraulicPath):
-            self.exportHydraulicsDdck()
-        infile = open(hydraulicPath, "r")
-        hydraulicLines = infile.readlines()
-        blackBoxLines = []
-        for i in range(len(hydraulicLines)):
-            if "Black box component temperatures" in hydraulicLines[i]:
-                j = i + 1
-                while hydraulicLines[j] != "\n":
-                    blackBoxLines.append(hydraulicLines[j])
-                    j += 1
-                break
-        messageText = "Is this correct?\n\n"
-        for line in blackBoxLines:
-            messageText += line
-        qmb = QMessageBox()
-        qmb.setText(messageText)
-        qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        qmb.setDefaultButton(QMessageBox.No)
-        ret = qmb.exec()
-        if ret == QMessageBox.No:
+        #   Check if hydraulic directory is empty
+        hydraulicPath = os.path.join(ddckPath, "hydraulic")
+        fileInHydraulicPath = os.listdir(hydraulicPath)
+        fileType = [file.rsplit(".", 1)[1] for file in fileInHydraulicPath]
+        if "ddck" not in fileType:
+            messageText = "There is no ddck-file in hydraulic folder.\n"
             qmb = QMessageBox()
-            qmb.setText(
-                "Please make sure the black box component temperatures are correct in hydraulic.ddck before starting a simluation."
-            )
+            qmb.setText(messageText)
             qmb.setStandardButtons(QMessageBox.Ok)
             qmb.setDefaultButton(QMessageBox.Ok)
             qmb.exec()
@@ -378,9 +359,6 @@ class MainWindow(QMainWindow):
             errorMessage += "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
             showErrorMessageBox(errorMessage)
             return
-
-        #   Update run.config
-        self.updateRun()
 
         #   Start simulation
         runApp = RunMain()
