@@ -11,13 +11,13 @@ qSysOut_PipeLoss = PipeLossTot
 
 EQUATIONS 5
 *** Black box component temperatures
-TTesPortLeft50=Tdp1Out_Tes1
-TTesPortLeft10=Tdp1Out_Tes1
-TExHxOut1H=TExHxOut1
-TExHxOut2H=TExHxOut2
-TColOutH=TColOut
+TTesPortLeft50 = Tdp1Out_Tes1
+TTesPortLeft10 = Tdp1Out_Tes1
+TExHxOut1H = TExHxOut1
+TExHxOut2H = TExHxOut2
+TColOutH = TColOut
 
-UNIT 450 TYPE 935
+UNIT 450 TYPE 9351
 PARAMETERS 49
 12
 6 8 0 0        !1 : TesDpL50-10
@@ -32,7 +32,7 @@ PARAMETERS 49
 12 11 0 1      !10 : Pump93
 10 2 0 0       !11 : PiPump93_ExHx
 10 4 0 0       !12 : PiPump93_Col
-INPUTS 12! for Type 935
+INPUTS 12! for Type 9351
 0,0 0,0 0,0 0,0 0,0 0,0 MfrPump88 0,0 0,0 MfrPump93 
 0,0 0,0 
 *** Initial Inputs
@@ -40,30 +40,30 @@ INPUTS 12! for Type 935
 0 0 
 
 EQUATIONS 24	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
-MfrTesDpL50-10_A=[450,1]
-MfrTesDpL50-10_B=[450,2]
-MfrExHxSide1_A=[450,4]
-MfrExHxSide1_B=[450,5]
-MfrExHxSide2_A=[450,7]
-MfrExHxSide2_B=[450,8]
-MfrCol_A=[450,10]
-MfrCol_B=[450,11]
-MfrHx-Col_A=[450,13]
-MfrHx-Col_B=[450,14]
-MfrPiExHx_Tes_A=[450,16]
-MfrPiExHx_Tes_B=[450,17]
-MfrPump88_A=[450,19]
-MfrPump88_B=[450,20]
-MfrPiTes_Pump88_A=[450,22]
-MfrPiTes_Pump88_B=[450,23]
-MfrPiPump88_ExHx_A=[450,25]
-MfrPiPump88_ExHx_B=[450,26]
-MfrPump93_A=[450,28]
-MfrPump93_B=[450,29]
-MfrPiPump93_ExHx_A=[450,31]
-MfrPiPump93_ExHx_B=[450,32]
-MfrPiPump93_Col_A=[450,34]
-MfrPiPump93_Col_B=[450,35]
+MfrTesDpL50-10_A = [450,1]
+MfrTesDpL50-10_B = [450,2]
+MfrExHxSide1_A = [450,4]
+MfrExHxSide1_B = [450,5]
+MfrExHxSide2_A = [450,7]
+MfrExHxSide2_B = [450,8]
+MfrCol_A = [450,10]
+MfrCol_B = [450,11]
+MfrHx-Col_A = [450,13]
+MfrHx-Col_B = [450,14]
+MfrPiExHx_Tes_A = [450,16]
+MfrPiExHx_Tes_B = [450,17]
+MfrPump88_A = [450,19]
+MfrPump88_B = [450,20]
+MfrPiTes_Pump88_A = [450,22]
+MfrPiTes_Pump88_B = [450,23]
+MfrPiPump88_ExHx_A = [450,25]
+MfrPiPump88_ExHx_B = [450,26]
+MfrPump93_A = [450,28]
+MfrPump93_B = [450,29]
+MfrPiPump93_ExHx_A = [450,31]
+MfrPiPump93_ExHx_B = [450,32]
+MfrPiPump93_Col_A = [450,34]
+MfrPiPump93_Col_B = [450,35]
 
 
 ** Fluids:
@@ -104,9 +104,9 @@ TColOutH
 20 0.0 20 20
 
 EQUATIONS 3
-THx-Col= [451,1]
-PHx-Col_kW= [451,3]/3600 !kW
-MfrHx-Col= MfrHx-Col_A
+THx-Col = [451,1]
+PHx-Col_kW = [451,3]/3600 !kW
+MfrHx-Col = MfrHx-Col_A
 
 UNIT 452 TYPE 931
 !PiExHx_Tes
@@ -126,9 +126,9 @@ TTesPortLeft50
 20 0.0 20 20
 
 EQUATIONS 3
-TPiExHx_Tes= [452,1]
-PPiExHx_Tes_kW= [452,3]/3600 !kW
-MfrPiExHx_Tes= MfrPiExHx_Tes_A
+TPiExHx_Tes = [452,1]
+PPiExHx_Tes_kW = [452,3]/3600 !kW
+MfrPiExHx_Tes = MfrPiExHx_Tes_A
 
 UNIT 453 TYPE 931
 !PiTes_Pump88
@@ -148,9 +148,9 @@ TPump88
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTes_Pump88= [453,1]
-PPiTes_Pump88_kW= [453,3]/3600 !kW
-MfrPiTes_Pump88= MfrPiTes_Pump88_A
+TPiTes_Pump88 = [453,1]
+PPiTes_Pump88_kW = [453,3]/3600 !kW
+MfrPiTes_Pump88 = MfrPiTes_Pump88_A
 
 UNIT 454 TYPE 931
 !PiPump88_ExHx
@@ -170,9 +170,9 @@ TExHxOut2H
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPump88_ExHx= [454,1]
-PPiPump88_ExHx_kW= [454,3]/3600 !kW
-MfrPiPump88_ExHx= MfrPiPump88_ExHx_A
+TPiPump88_ExHx = [454,1]
+PPiPump88_ExHx_kW = [454,3]/3600 !kW
+MfrPiPump88_ExHx = MfrPiPump88_ExHx_A
 
 UNIT 455 TYPE 931
 !PiPump93_ExHx
@@ -192,9 +192,9 @@ TExHxOut1H
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPump93_ExHx= [455,1]
-PPiPump93_ExHx_kW= [455,3]/3600 !kW
-MfrPiPump93_ExHx= MfrPiPump93_ExHx_A
+TPiPump93_ExHx = [455,1]
+PPiPump93_ExHx_kW = [455,3]/3600 !kW
+MfrPiPump93_ExHx = MfrPiPump93_ExHx_A
 
 UNIT 456 TYPE 931
 !PiPump93_Col
@@ -214,13 +214,13 @@ TColOutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPump93_Col= [456,1]
-PPiPump93_Col_kW= [456,3]/3600 !kW
-MfrPiPump93_Col= MfrPiPump93_Col_A
+TPiPump93_Col = [456,1]
+PPiPump93_Col_kW = [456,3]/3600 !kW
+MfrPiPump93_Col = MfrPiPump93_Col_A
 
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PHx-Col_kW+PPiExHx_Tes_kW+PPiTes_Pump88_kW+PPiPump88_ExHx_kW+PPiPump93_ExHx_kW+PPiPump93_Col_kW
+PipeLossTot = PHx-Col_kW+PPiExHx_Tes_kW+PPiTes_Pump88_kW+PPiPump88_ExHx_kW+PPiPump93_ExHx_kW+PPiPump93_Col_kW
 
 ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 457
 

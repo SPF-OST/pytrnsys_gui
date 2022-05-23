@@ -11,27 +11,27 @@ qSysOut_PipeLoss = PipeLossTot
 
 EQUATIONS 19
 *** Black box component temperatures
-TFloor1OutH=TFloor1Out
-TShPortLeft90=Tdp1Out_Tes1
-TShPortLeft2=Tdp1Out_Tes1
-TDhwPortLeft50=Tdp1Out_Tes2
-TDhwPortLeft1=Tdp1Out_Tes2
-TDhwPortRight1=Tdp2Out_Tes2
-TDhwPortRight97=Tdp2Out_Tes2
-TDhwPortRight50=Tdp3Out_Tes2
-TDhwPortRight99=Tdp3Out_Tes2
-TsupplyWaterOutH=TsupplyWaterOut
-THxDHWOut1H=THxDHWOut1
-THxDHWOut2H=THxDHWOut2
-THPEvapOutH=THPEvapOut
-THPCondOutH=THPCondOut
-TFloor2OutH=TFloor2Out
-TFloor3OutH=TFloor3Out
-TFloor4OutH=TFloor4Out
-TFloor5OutH=TFloor5Out
-TFloor6OutH=TFloor6Out
+TFloor1OutH = TFloor1Out
+TShPortLeft90 = Tdp1Out_Tes1
+TShPortLeft2 = Tdp1Out_Tes1
+TDhwPortLeft50 = Tdp1Out_Tes2
+TDhwPortLeft1 = Tdp1Out_Tes2
+TDhwPortRight1 = Tdp2Out_Tes2
+TDhwPortRight97 = Tdp2Out_Tes2
+TDhwPortRight50 = Tdp3Out_Tes2
+TDhwPortRight99 = Tdp3Out_Tes2
+TsupplyWaterOutH = TsupplyWaterOut
+THxDHWOut1H = THxDHWOut1
+THxDHWOut2H = THxDHWOut2
+THPEvapOutH = THPEvapOut
+THPCondOutH = THPCondOut
+TFloor2OutH = TFloor2Out
+TFloor3OutH = TFloor3Out
+TFloor4OutH = TFloor4Out
+TFloor5OutH = TFloor5Out
+TFloor6OutH = TFloor6Out
 
-UNIT 450 TYPE 935
+UNIT 450 TYPE 9351
 PARAMETERS 393
 98
 97 20 0 1      !1 : PuAux
@@ -132,7 +132,7 @@ PARAMETERS 393
 13 4 0 0       !96 : PiHxDHW_Dhw
 15 1 0 0       !97 : PiHP_PuAux
 8 15 0 0       !98 : PiTeeAuxHxRt_HP
-INPUTS 98! for Type 935
+INPUTS 98! for Type 9351
 MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 0,0 MfrsupplyWater 
 MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 MfrPuSh1 MfrPuSh2 0,0 0,0 0,0 MfrPuSh3 0,0 
@@ -156,220 +156,220 @@ MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0
 0 0 0 0 0 0 0 0 
 
 EQUATIONS 214	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
-MfrPuAux_A=[450,1]
-MfrPuAux_B=[450,2]
-MfrFloor1_A=[450,4]
-MfrFloor1_B=[450,5]
-MfrShDpL90-2_A=[450,7]
-MfrShDpL90-2_B=[450,8]
-MfrDhwDpL50-1_A=[450,10]
-MfrDhwDpL50-1_B=[450,11]
-MfrDhwDpR1-97_A=[450,13]
-MfrDhwDpR1-97_B=[450,14]
-MfrDhwDpR50-99_A=[450,16]
-MfrDhwDpR50-99_B=[450,17]
-MfrDivAux_A=[450,19]
-MfrDivAux_B=[450,20]
-MfrDivAux_C=[450,21]
-MfrTeeAuxHxRt_A=[450,22]
-MfrTeeAuxHxRt_B=[450,23]
-MfrTeeAuxHxRt_C=[450,24]
-MfrtapWater_A=[450,25]
-MfrtapWater_B=[450,26]
-MfrsupplyWater_A=[450,28]
-MfrsupplyWater_B=[450,29]
-MfrPuCirc_A=[450,31]
-MfrPuCirc_B=[450,32]
-MfrHxDHWSide1_A=[450,34]
-MfrHxDHWSide1_B=[450,35]
-MfrHxDHWSide2_A=[450,37]
-MfrHxDHWSide2_B=[450,38]
-MfrPuAuxEvap_A=[450,40]
-MfrPuAuxEvap_B=[450,41]
-MfrHPCond_A=[450,43]
-MfrHPCond_B=[450,44]
-MfrHPEvap_A=[450,46]
-MfrHPEvap_B=[450,47]
-MfrTeeCircOut_A=[450,49]
-MfrTeeCircOut_B=[450,50]
-MfrTeeCircOut_C=[450,51]
-MfrPiDhwCircRtPu_A=[450,52]
-MfrPiDhwCircRtPu_B=[450,53]
-MfrPiDhwCirctoTap_A=[450,55]
-MfrPiDhwCirctoTap_B=[450,56]
-MfrPiAuxToDiv_A=[450,58]
-MfrPiAuxToDiv_B=[450,59]
-MfrPiHpEvapIn_A=[450,61]
-MfrPiHpEvapIn_B=[450,62]
-MfrTeeShRt1_A=[450,64]
-MfrTeeShRt1_B=[450,65]
-MfrTeeShRt1_C=[450,66]
-MfrFloor2_A=[450,67]
-MfrFloor2_B=[450,68]
-MfrPuSh1_A=[450,70]
-MfrPuSh1_B=[450,71]
-MfrPuSh2_A=[450,73]
-MfrPuSh2_B=[450,74]
-MfrPiFlFloor1_A=[450,76]
-MfrPiFlFloor1_B=[450,77]
-MfrTeeShOut1_A=[450,79]
-MfrTeeShOut1_B=[450,80]
-MfrTeeShOut1_C=[450,81]
-MfrPiFlFloor2_A=[450,82]
-MfrPiFlFloor2_B=[450,83]
-MfrPuSh3_A=[450,85]
-MfrPuSh3_B=[450,86]
-MfrFloor3_A=[450,88]
-MfrFloor3_B=[450,89]
-MfrPiFlFloor3_A=[450,91]
-MfrPiFlFloor3_B=[450,92]
-MfrPuSh4_A=[450,94]
-MfrPuSh4_B=[450,95]
-MfrFloor4_A=[450,97]
-MfrFloor4_B=[450,98]
-MfrPiFlFloor4_A=[450,100]
-MfrPiFlFloor4_B=[450,101]
-MfrPuSh5_A=[450,103]
-MfrPuSh5_B=[450,104]
-MfrFloor5_A=[450,106]
-MfrFloor5_B=[450,107]
-MfrPiFlFloor5_A=[450,109]
-MfrPiFlFloor5_B=[450,110]
-MfrPUSh6_A=[450,112]
-MfrPUSh6_B=[450,113]
-MfrFloor6_A=[450,115]
-MfrFloor6_B=[450,116]
-MfrPiFlFloor6_A=[450,118]
-MfrPiFlFloor6_B=[450,119]
-MfrTeeShRt5_A=[450,121]
-MfrTeeShRt5_B=[450,122]
-MfrTeeShRt5_C=[450,123]
-MfrTeeShRt4_A=[450,124]
-MfrTeeShRt4_B=[450,125]
-MfrTeeShRt4_C=[450,126]
-MfrTeeShRt3_A=[450,127]
-MfrTeeShRt3_B=[450,128]
-MfrTeeShRt3_C=[450,129]
-MfrTeeShRt2_A=[450,130]
-MfrTeeShRt2_B=[450,131]
-MfrTeeShRt2_C=[450,132]
-MfrPiRtFloor5_A=[450,133]
-MfrPiRtFloor5_B=[450,134]
-MfrPiShRt5to4_A=[450,136]
-MfrPiShRt5to4_B=[450,137]
-MfrPiRtFloor4_A=[450,139]
-MfrPiRtFloor4_B=[450,140]
-MfrPiRtFloor3_A=[450,142]
-MfrPiRtFloor3_B=[450,143]
-MfrPiRtFloor2_A=[450,145]
-MfrPiRtFloor2_B=[450,146]
-MfrPiShRt4to3_A=[450,148]
-MfrPiShRt4to3_B=[450,149]
-MfrPiShRt3to2_A=[450,151]
-MfrPiShRt3to2_B=[450,152]
-MfrPiShRt2to1_A=[450,154]
-MfrPiShRt2to1_B=[450,155]
-MfrPiRtFloor1_A=[450,157]
-MfrPiRtFloor1_B=[450,158]
-MfrPiShFltoPu1_A=[450,160]
-MfrPiShFltoPu1_B=[450,161]
-MfrTeeShOut2_A=[450,163]
-MfrTeeShOut2_B=[450,164]
-MfrTeeShOut2_C=[450,165]
-MfrTeeShOut3_A=[450,166]
-MfrTeeShOut3_B=[450,167]
-MfrTeeShOut3_C=[450,168]
-MfrTeeShOut4_A=[450,169]
-MfrTeeShOut4_B=[450,170]
-MfrTeeShOut4_C=[450,171]
-MfrTeeShOut5_A=[450,172]
-MfrTeeShOut5_B=[450,173]
-MfrTeeShOut5_C=[450,174]
-MfrPiShFl1to2_A=[450,175]
-MfrPiShFl1to2_B=[450,176]
-MfrPiShFlToPu2_A=[450,178]
-MfrPiShFlToPu2_B=[450,179]
-MfrPiShFl2to3_A=[450,181]
-MfrPiShFl2to3_B=[450,182]
-MfrPiShFlToPu3_A=[450,184]
-MfrPiShFlToPu3_B=[450,185]
-MfrPiShFl3to4_A=[450,187]
-MfrPiShFl3to4_B=[450,188]
-MfrPiShFlToPu4_A=[450,190]
-MfrPiShFlToPu4_B=[450,191]
-MfrPiShFl4to5_A=[450,193]
-MfrPiShFl4to5_B=[450,194]
-MfrPiShFlToPu5_A=[450,196]
-MfrPiShFlToPu5_B=[450,197]
-MfrPiHpEvapOut_A=[450,199]
-MfrPiHpEvapOut_B=[450,200]
-MfrPiHxDhwPriFl_A=[450,202]
-MfrPiHxDhwPriFl_B=[450,203]
-MfrPiHxDhwPriRt_A=[450,205]
-MfrPiHxDhwPriRt_B=[450,206]
-MfrPuHxDhwSec_A=[450,208]
-MfrPuHxDhwSec_B=[450,209]
-MfrPiTesDhwtoPuHx_A=[450,211]
-MfrPiTesDhwtoPuHx_B=[450,212]
-MfrTeeAuxShFl_A=[450,214]
-MfrTeeAuxShFl_B=[450,215]
-MfrTeeAuxShFl_C=[450,216]
-MfrPiAuxtoTeeShFl_A=[450,217]
-MfrPiAuxtoTeeShFl_B=[450,218]
-MfrPiShPriFl_A=[450,220]
-MfrPiShPriFl_B=[450,221]
-MfrPiTeeShFlTes_A=[450,223]
-MfrPiTeeShFlTes_B=[450,224]
-MfrTeeAuxShRt_A=[450,226]
-MfrTeeAuxShRt_B=[450,227]
-MfrTeeAuxShRt_C=[450,228]
-MfrPiShPriRt_A=[450,229]
-MfrPiShPriRt_B=[450,230]
-MfrPiTeeHxDhwRt_A=[450,232]
-MfrPiTeeHxDhwRt_B=[450,233]
-MfrPiTeeShRtTes_A=[450,235]
-MfrPiTeeShRtTes_B=[450,236]
-MfrPiPuDhwCircOut_A=[450,238]
-MfrPiPuDhwCircOut_B=[450,239]
-MfrTeeShOut6_A=[450,241]
-MfrTeeShOut6_B=[450,242]
-MfrTeeShOut6_C=[450,243]
-MfrPiShFl5to6_A=[450,244]
-MfrPiShFl5to6_B=[450,245]
-MfrPiShFlToPu6_A=[450,247]
-MfrPiShFlToPu6_B=[450,248]
-MfrPuOverflowSh_A=[450,250]
-MfrPuOverflowSh_B=[450,251]
-MfrPiPuOvFl_A=[450,253]
-MfrPiPuOvFl_B=[450,254]
-MfrTeeShRt6_A=[450,256]
-MfrTeeShRt6_B=[450,257]
-MfrTeeShRt6_C=[450,258]
-MfrPiFloor6Rt_A=[450,259]
-MfrPiFloor6Rt_B=[450,260]
-MfrPiPuOvRt6to5_A=[450,262]
-MfrPiPuOvRt6to5_B=[450,263]
-MfrTeeDhwOut_A=[450,265]
-MfrTeeDhwOut_B=[450,266]
-MfrTeeDhwOut_C=[450,267]
-MfrPiDhwtoTCirc_A=[450,268]
-MfrPiDhwtoTCirc_B=[450,269]
-MfrPiTesDhwTapOut_A=[450,271]
-MfrPiTesDhwTapOut_B=[450,272]
-MfrPiDhwCircTesOut_A=[450,274]
-MfrPiDhwCircTesOut_B=[450,275]
-MfrPiPuOvRt_A=[450,277]
-MfrPiPuOvRt_B=[450,278]
-MfrPiDhwMains_A=[450,280]
-MfrPiDhwMains_B=[450,281]
-MfrPiPuHxDhw2HxDHW_A=[450,283]
-MfrPiPuHxDhw2HxDHW_B=[450,284]
-MfrPiHxDHW_Dhw_A=[450,286]
-MfrPiHxDHW_Dhw_B=[450,287]
-MfrPiHP_PuAux_A=[450,289]
-MfrPiHP_PuAux_B=[450,290]
-MfrPiTeeAuxHxRt_HP_A=[450,292]
-MfrPiTeeAuxHxRt_HP_B=[450,293]
+MfrPuAux_A = [450,1]
+MfrPuAux_B = [450,2]
+MfrFloor1_A = [450,4]
+MfrFloor1_B = [450,5]
+MfrShDpL90-2_A = [450,7]
+MfrShDpL90-2_B = [450,8]
+MfrDhwDpL50-1_A = [450,10]
+MfrDhwDpL50-1_B = [450,11]
+MfrDhwDpR1-97_A = [450,13]
+MfrDhwDpR1-97_B = [450,14]
+MfrDhwDpR50-99_A = [450,16]
+MfrDhwDpR50-99_B = [450,17]
+MfrDivAux_A = [450,19]
+MfrDivAux_B = [450,20]
+MfrDivAux_C = [450,21]
+MfrTeeAuxHxRt_A = [450,22]
+MfrTeeAuxHxRt_B = [450,23]
+MfrTeeAuxHxRt_C = [450,24]
+MfrtapWater_A = [450,25]
+MfrtapWater_B = [450,26]
+MfrsupplyWater_A = [450,28]
+MfrsupplyWater_B = [450,29]
+MfrPuCirc_A = [450,31]
+MfrPuCirc_B = [450,32]
+MfrHxDHWSide1_A = [450,34]
+MfrHxDHWSide1_B = [450,35]
+MfrHxDHWSide2_A = [450,37]
+MfrHxDHWSide2_B = [450,38]
+MfrPuAuxEvap_A = [450,40]
+MfrPuAuxEvap_B = [450,41]
+MfrHPCond_A = [450,43]
+MfrHPCond_B = [450,44]
+MfrHPEvap_A = [450,46]
+MfrHPEvap_B = [450,47]
+MfrTeeCircOut_A = [450,49]
+MfrTeeCircOut_B = [450,50]
+MfrTeeCircOut_C = [450,51]
+MfrPiDhwCircRtPu_A = [450,52]
+MfrPiDhwCircRtPu_B = [450,53]
+MfrPiDhwCirctoTap_A = [450,55]
+MfrPiDhwCirctoTap_B = [450,56]
+MfrPiAuxToDiv_A = [450,58]
+MfrPiAuxToDiv_B = [450,59]
+MfrPiHpEvapIn_A = [450,61]
+MfrPiHpEvapIn_B = [450,62]
+MfrTeeShRt1_A = [450,64]
+MfrTeeShRt1_B = [450,65]
+MfrTeeShRt1_C = [450,66]
+MfrFloor2_A = [450,67]
+MfrFloor2_B = [450,68]
+MfrPuSh1_A = [450,70]
+MfrPuSh1_B = [450,71]
+MfrPuSh2_A = [450,73]
+MfrPuSh2_B = [450,74]
+MfrPiFlFloor1_A = [450,76]
+MfrPiFlFloor1_B = [450,77]
+MfrTeeShOut1_A = [450,79]
+MfrTeeShOut1_B = [450,80]
+MfrTeeShOut1_C = [450,81]
+MfrPiFlFloor2_A = [450,82]
+MfrPiFlFloor2_B = [450,83]
+MfrPuSh3_A = [450,85]
+MfrPuSh3_B = [450,86]
+MfrFloor3_A = [450,88]
+MfrFloor3_B = [450,89]
+MfrPiFlFloor3_A = [450,91]
+MfrPiFlFloor3_B = [450,92]
+MfrPuSh4_A = [450,94]
+MfrPuSh4_B = [450,95]
+MfrFloor4_A = [450,97]
+MfrFloor4_B = [450,98]
+MfrPiFlFloor4_A = [450,100]
+MfrPiFlFloor4_B = [450,101]
+MfrPuSh5_A = [450,103]
+MfrPuSh5_B = [450,104]
+MfrFloor5_A = [450,106]
+MfrFloor5_B = [450,107]
+MfrPiFlFloor5_A = [450,109]
+MfrPiFlFloor5_B = [450,110]
+MfrPUSh6_A = [450,112]
+MfrPUSh6_B = [450,113]
+MfrFloor6_A = [450,115]
+MfrFloor6_B = [450,116]
+MfrPiFlFloor6_A = [450,118]
+MfrPiFlFloor6_B = [450,119]
+MfrTeeShRt5_A = [450,121]
+MfrTeeShRt5_B = [450,122]
+MfrTeeShRt5_C = [450,123]
+MfrTeeShRt4_A = [450,124]
+MfrTeeShRt4_B = [450,125]
+MfrTeeShRt4_C = [450,126]
+MfrTeeShRt3_A = [450,127]
+MfrTeeShRt3_B = [450,128]
+MfrTeeShRt3_C = [450,129]
+MfrTeeShRt2_A = [450,130]
+MfrTeeShRt2_B = [450,131]
+MfrTeeShRt2_C = [450,132]
+MfrPiRtFloor5_A = [450,133]
+MfrPiRtFloor5_B = [450,134]
+MfrPiShRt5to4_A = [450,136]
+MfrPiShRt5to4_B = [450,137]
+MfrPiRtFloor4_A = [450,139]
+MfrPiRtFloor4_B = [450,140]
+MfrPiRtFloor3_A = [450,142]
+MfrPiRtFloor3_B = [450,143]
+MfrPiRtFloor2_A = [450,145]
+MfrPiRtFloor2_B = [450,146]
+MfrPiShRt4to3_A = [450,148]
+MfrPiShRt4to3_B = [450,149]
+MfrPiShRt3to2_A = [450,151]
+MfrPiShRt3to2_B = [450,152]
+MfrPiShRt2to1_A = [450,154]
+MfrPiShRt2to1_B = [450,155]
+MfrPiRtFloor1_A = [450,157]
+MfrPiRtFloor1_B = [450,158]
+MfrPiShFltoPu1_A = [450,160]
+MfrPiShFltoPu1_B = [450,161]
+MfrTeeShOut2_A = [450,163]
+MfrTeeShOut2_B = [450,164]
+MfrTeeShOut2_C = [450,165]
+MfrTeeShOut3_A = [450,166]
+MfrTeeShOut3_B = [450,167]
+MfrTeeShOut3_C = [450,168]
+MfrTeeShOut4_A = [450,169]
+MfrTeeShOut4_B = [450,170]
+MfrTeeShOut4_C = [450,171]
+MfrTeeShOut5_A = [450,172]
+MfrTeeShOut5_B = [450,173]
+MfrTeeShOut5_C = [450,174]
+MfrPiShFl1to2_A = [450,175]
+MfrPiShFl1to2_B = [450,176]
+MfrPiShFlToPu2_A = [450,178]
+MfrPiShFlToPu2_B = [450,179]
+MfrPiShFl2to3_A = [450,181]
+MfrPiShFl2to3_B = [450,182]
+MfrPiShFlToPu3_A = [450,184]
+MfrPiShFlToPu3_B = [450,185]
+MfrPiShFl3to4_A = [450,187]
+MfrPiShFl3to4_B = [450,188]
+MfrPiShFlToPu4_A = [450,190]
+MfrPiShFlToPu4_B = [450,191]
+MfrPiShFl4to5_A = [450,193]
+MfrPiShFl4to5_B = [450,194]
+MfrPiShFlToPu5_A = [450,196]
+MfrPiShFlToPu5_B = [450,197]
+MfrPiHpEvapOut_A = [450,199]
+MfrPiHpEvapOut_B = [450,200]
+MfrPiHxDhwPriFl_A = [450,202]
+MfrPiHxDhwPriFl_B = [450,203]
+MfrPiHxDhwPriRt_A = [450,205]
+MfrPiHxDhwPriRt_B = [450,206]
+MfrPuHxDhwSec_A = [450,208]
+MfrPuHxDhwSec_B = [450,209]
+MfrPiTesDhwtoPuHx_A = [450,211]
+MfrPiTesDhwtoPuHx_B = [450,212]
+MfrTeeAuxShFl_A = [450,214]
+MfrTeeAuxShFl_B = [450,215]
+MfrTeeAuxShFl_C = [450,216]
+MfrPiAuxtoTeeShFl_A = [450,217]
+MfrPiAuxtoTeeShFl_B = [450,218]
+MfrPiShPriFl_A = [450,220]
+MfrPiShPriFl_B = [450,221]
+MfrPiTeeShFlTes_A = [450,223]
+MfrPiTeeShFlTes_B = [450,224]
+MfrTeeAuxShRt_A = [450,226]
+MfrTeeAuxShRt_B = [450,227]
+MfrTeeAuxShRt_C = [450,228]
+MfrPiShPriRt_A = [450,229]
+MfrPiShPriRt_B = [450,230]
+MfrPiTeeHxDhwRt_A = [450,232]
+MfrPiTeeHxDhwRt_B = [450,233]
+MfrPiTeeShRtTes_A = [450,235]
+MfrPiTeeShRtTes_B = [450,236]
+MfrPiPuDhwCircOut_A = [450,238]
+MfrPiPuDhwCircOut_B = [450,239]
+MfrTeeShOut6_A = [450,241]
+MfrTeeShOut6_B = [450,242]
+MfrTeeShOut6_C = [450,243]
+MfrPiShFl5to6_A = [450,244]
+MfrPiShFl5to6_B = [450,245]
+MfrPiShFlToPu6_A = [450,247]
+MfrPiShFlToPu6_B = [450,248]
+MfrPuOverflowSh_A = [450,250]
+MfrPuOverflowSh_B = [450,251]
+MfrPiPuOvFl_A = [450,253]
+MfrPiPuOvFl_B = [450,254]
+MfrTeeShRt6_A = [450,256]
+MfrTeeShRt6_B = [450,257]
+MfrTeeShRt6_C = [450,258]
+MfrPiFloor6Rt_A = [450,259]
+MfrPiFloor6Rt_B = [450,260]
+MfrPiPuOvRt6to5_A = [450,262]
+MfrPiPuOvRt6to5_B = [450,263]
+MfrTeeDhwOut_A = [450,265]
+MfrTeeDhwOut_B = [450,266]
+MfrTeeDhwOut_C = [450,267]
+MfrPiDhwtoTCirc_A = [450,268]
+MfrPiDhwtoTCirc_B = [450,269]
+MfrPiTesDhwTapOut_A = [450,271]
+MfrPiTesDhwTapOut_B = [450,272]
+MfrPiDhwCircTesOut_A = [450,274]
+MfrPiDhwCircTesOut_B = [450,275]
+MfrPiPuOvRt_A = [450,277]
+MfrPiPuOvRt_B = [450,278]
+MfrPiDhwMains_A = [450,280]
+MfrPiDhwMains_B = [450,281]
+MfrPiPuHxDhw2HxDHW_A = [450,283]
+MfrPiPuHxDhw2HxDHW_B = [450,284]
+MfrPiHxDHW_Dhw_A = [450,286]
+MfrPiHxDHW_Dhw_B = [450,287]
+MfrPiHP_PuAux_A = [450,289]
+MfrPiHP_PuAux_B = [450,290]
+MfrPiTeeAuxHxRt_HP_A = [450,292]
+MfrPiTeeAuxHxRt_HP_B = [450,293]
 
 
 ** Fluids:
@@ -413,7 +413,7 @@ TPiHxDhwPriFl
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivAux= [451,1]
+TDivAux = [451,1]
 
 UNIT 452 TYPE 929
 !TeeAuxHxRt
@@ -428,7 +428,7 @@ TPiHxDhwPriRt
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeAuxHxRt= [452,1]
+TTeeAuxHxRt = [452,1]
 
 UNIT 453 TYPE 929
 !TeeCircOut
@@ -443,7 +443,7 @@ TPiDhwCircRtPu
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeCircOut= [453,1]
+TTeeCircOut = [453,1]
 
 UNIT 454 TYPE 931
 !PiDhwCircRtPu
@@ -463,9 +463,9 @@ TPuCirc
 20 0.0 20 20
 
 EQUATIONS 3
-TPiDhwCircRtPu= [454,1]
-PPiDhwCircRtPu_kW= [454,3]/3600 !kW
-MfrPiDhwCircRtPu= MfrPiDhwCircRtPu_A
+TPiDhwCircRtPu = [454,1]
+PPiDhwCircRtPu_kW = [454,3]/3600 !kW
+MfrPiDhwCircRtPu = MfrPiDhwCircRtPu_A
 
 UNIT 455 TYPE 931
 !PiDhwCirctoTap
@@ -485,9 +485,9 @@ TtapWater
 20 0.0 20 20
 
 EQUATIONS 3
-TPiDhwCirctoTap= [455,1]
-PPiDhwCirctoTap_kW= [455,3]/3600 !kW
-MfrPiDhwCirctoTap= MfrPiDhwCirctoTap_A
+TPiDhwCirctoTap = [455,1]
+PPiDhwCirctoTap_kW = [455,3]/3600 !kW
+MfrPiDhwCirctoTap = MfrPiDhwCirctoTap_A
 
 UNIT 456 TYPE 931
 !PiAuxToDiv
@@ -507,9 +507,9 @@ TDivAux
 20 0.0 20 20
 
 EQUATIONS 3
-TPiAuxToDiv= [456,1]
-PPiAuxToDiv_kW= [456,3]/3600 !kW
-MfrPiAuxToDiv= MfrPiAuxToDiv_A
+TPiAuxToDiv = [456,1]
+PPiAuxToDiv_kW = [456,3]/3600 !kW
+MfrPiAuxToDiv = MfrPiAuxToDiv_A
 
 UNIT 457 TYPE 931
 !PiHpEvapIn
@@ -529,9 +529,9 @@ THPEvapOutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiHpEvapIn= [457,1]
-PPiHpEvapIn_kW= [457,3]/3600 !kW
-MfrPiHpEvapIn= MfrPiHpEvapIn_A
+TPiHpEvapIn = [457,1]
+PPiHpEvapIn_kW = [457,3]/3600 !kW
+MfrPiHpEvapIn = MfrPiHpEvapIn_A
 
 UNIT 458 TYPE 929
 !TeeShRt1
@@ -546,7 +546,7 @@ TPiRtFloor1
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShRt1= [458,1]
+TTeeShRt1 = [458,1]
 
 UNIT 459 TYPE 931
 !PiFlFloor1
@@ -566,9 +566,9 @@ TFloor1OutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiFlFloor1= [459,1]
-PPiFlFloor1_kW= [459,3]/3600 !kW
-MfrPiFlFloor1= MfrPiFlFloor1_A
+TPiFlFloor1 = [459,1]
+PPiFlFloor1_kW = [459,3]/3600 !kW
+MfrPiFlFloor1 = MfrPiFlFloor1_A
 
 UNIT 460 TYPE 929
 !TeeShOut1
@@ -583,7 +583,7 @@ TPiShFltoPu1
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShOut1= [460,1]
+TTeeShOut1 = [460,1]
 
 UNIT 461 TYPE 931
 !PiFlFloor2
@@ -603,9 +603,9 @@ TFloor2OutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiFlFloor2= [461,1]
-PPiFlFloor2_kW= [461,3]/3600 !kW
-MfrPiFlFloor2= MfrPiFlFloor2_A
+TPiFlFloor2 = [461,1]
+PPiFlFloor2_kW = [461,3]/3600 !kW
+MfrPiFlFloor2 = MfrPiFlFloor2_A
 
 UNIT 462 TYPE 931
 !PiFlFloor3
@@ -625,9 +625,9 @@ TFloor3OutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiFlFloor3= [462,1]
-PPiFlFloor3_kW= [462,3]/3600 !kW
-MfrPiFlFloor3= MfrPiFlFloor3_A
+TPiFlFloor3 = [462,1]
+PPiFlFloor3_kW = [462,3]/3600 !kW
+MfrPiFlFloor3 = MfrPiFlFloor3_A
 
 UNIT 463 TYPE 931
 !PiFlFloor4
@@ -647,9 +647,9 @@ TFloor4OutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiFlFloor4= [463,1]
-PPiFlFloor4_kW= [463,3]/3600 !kW
-MfrPiFlFloor4= MfrPiFlFloor4_A
+TPiFlFloor4 = [463,1]
+PPiFlFloor4_kW = [463,3]/3600 !kW
+MfrPiFlFloor4 = MfrPiFlFloor4_A
 
 UNIT 464 TYPE 931
 !PiFlFloor5
@@ -669,9 +669,9 @@ TFloor5OutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiFlFloor5= [464,1]
-PPiFlFloor5_kW= [464,3]/3600 !kW
-MfrPiFlFloor5= MfrPiFlFloor5_A
+TPiFlFloor5 = [464,1]
+PPiFlFloor5_kW = [464,3]/3600 !kW
+MfrPiFlFloor5 = MfrPiFlFloor5_A
 
 UNIT 465 TYPE 931
 !PiFlFloor6
@@ -691,9 +691,9 @@ TFloor6OutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiFlFloor6= [465,1]
-PPiFlFloor6_kW= [465,3]/3600 !kW
-MfrPiFlFloor6= MfrPiFlFloor6_A
+TPiFlFloor6 = [465,1]
+PPiFlFloor6_kW = [465,3]/3600 !kW
+MfrPiFlFloor6 = MfrPiFlFloor6_A
 
 UNIT 466 TYPE 929
 !TeeShRt5
@@ -708,7 +708,7 @@ TPiRtFloor5
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShRt5= [466,1]
+TTeeShRt5 = [466,1]
 
 UNIT 467 TYPE 929
 !TeeShRt4
@@ -723,7 +723,7 @@ TPiRtFloor4
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShRt4= [467,1]
+TTeeShRt4 = [467,1]
 
 UNIT 468 TYPE 929
 !TeeShRt3
@@ -738,7 +738,7 @@ TPiRtFloor3
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShRt3= [468,1]
+TTeeShRt3 = [468,1]
 
 UNIT 469 TYPE 929
 !TeeShRt2
@@ -753,7 +753,7 @@ TPiRtFloor2
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShRt2= [469,1]
+TTeeShRt2 = [469,1]
 
 UNIT 470 TYPE 931
 !PiRtFloor5
@@ -773,9 +773,9 @@ TTeeShRt5
 20 0.0 20 20
 
 EQUATIONS 3
-TPiRtFloor5= [470,1]
-PPiRtFloor5_kW= [470,3]/3600 !kW
-MfrPiRtFloor5= MfrPiRtFloor5_A
+TPiRtFloor5 = [470,1]
+PPiRtFloor5_kW = [470,3]/3600 !kW
+MfrPiRtFloor5 = MfrPiRtFloor5_A
 
 UNIT 471 TYPE 931
 !PiShRt5to4
@@ -795,9 +795,9 @@ TTeeShRt4
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShRt5to4= [471,1]
-PPiShRt5to4_kW= [471,3]/3600 !kW
-MfrPiShRt5to4= MfrPiShRt5to4_A
+TPiShRt5to4 = [471,1]
+PPiShRt5to4_kW = [471,3]/3600 !kW
+MfrPiShRt5to4 = MfrPiShRt5to4_A
 
 UNIT 472 TYPE 931
 !PiRtFloor4
@@ -817,9 +817,9 @@ TTeeShRt4
 20 0.0 20 20
 
 EQUATIONS 3
-TPiRtFloor4= [472,1]
-PPiRtFloor4_kW= [472,3]/3600 !kW
-MfrPiRtFloor4= MfrPiRtFloor4_A
+TPiRtFloor4 = [472,1]
+PPiRtFloor4_kW = [472,3]/3600 !kW
+MfrPiRtFloor4 = MfrPiRtFloor4_A
 
 UNIT 473 TYPE 931
 !PiRtFloor3
@@ -839,9 +839,9 @@ TTeeShRt3
 20 0.0 20 20
 
 EQUATIONS 3
-TPiRtFloor3= [473,1]
-PPiRtFloor3_kW= [473,3]/3600 !kW
-MfrPiRtFloor3= MfrPiRtFloor3_A
+TPiRtFloor3 = [473,1]
+PPiRtFloor3_kW = [473,3]/3600 !kW
+MfrPiRtFloor3 = MfrPiRtFloor3_A
 
 UNIT 474 TYPE 931
 !PiRtFloor2
@@ -861,9 +861,9 @@ TTeeShRt2
 20 0.0 20 20
 
 EQUATIONS 3
-TPiRtFloor2= [474,1]
-PPiRtFloor2_kW= [474,3]/3600 !kW
-MfrPiRtFloor2= MfrPiRtFloor2_A
+TPiRtFloor2 = [474,1]
+PPiRtFloor2_kW = [474,3]/3600 !kW
+MfrPiRtFloor2 = MfrPiRtFloor2_A
 
 UNIT 475 TYPE 931
 !PiShRt4to3
@@ -883,9 +883,9 @@ TTeeShRt3
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShRt4to3= [475,1]
-PPiShRt4to3_kW= [475,3]/3600 !kW
-MfrPiShRt4to3= MfrPiShRt4to3_A
+TPiShRt4to3 = [475,1]
+PPiShRt4to3_kW = [475,3]/3600 !kW
+MfrPiShRt4to3 = MfrPiShRt4to3_A
 
 UNIT 476 TYPE 931
 !PiShRt3to2
@@ -905,9 +905,9 @@ TTeeShRt2
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShRt3to2= [476,1]
-PPiShRt3to2_kW= [476,3]/3600 !kW
-MfrPiShRt3to2= MfrPiShRt3to2_A
+TPiShRt3to2 = [476,1]
+PPiShRt3to2_kW = [476,3]/3600 !kW
+MfrPiShRt3to2 = MfrPiShRt3to2_A
 
 UNIT 477 TYPE 931
 !PiShRt2to1
@@ -927,9 +927,9 @@ TTeeShRt1
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShRt2to1= [477,1]
-PPiShRt2to1_kW= [477,3]/3600 !kW
-MfrPiShRt2to1= MfrPiShRt2to1_A
+TPiShRt2to1 = [477,1]
+PPiShRt2to1_kW = [477,3]/3600 !kW
+MfrPiShRt2to1 = MfrPiShRt2to1_A
 
 UNIT 478 TYPE 931
 !PiRtFloor1
@@ -949,9 +949,9 @@ TTeeShRt1
 20 0.0 20 20
 
 EQUATIONS 3
-TPiRtFloor1= [478,1]
-PPiRtFloor1_kW= [478,3]/3600 !kW
-MfrPiRtFloor1= MfrPiRtFloor1_A
+TPiRtFloor1 = [478,1]
+PPiRtFloor1_kW = [478,3]/3600 !kW
+MfrPiRtFloor1 = MfrPiRtFloor1_A
 
 UNIT 479 TYPE 931
 !PiShFltoPu1
@@ -971,9 +971,9 @@ TPuSh1
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFltoPu1= [479,1]
-PPiShFltoPu1_kW= [479,3]/3600 !kW
-MfrPiShFltoPu1= MfrPiShFltoPu1_A
+TPiShFltoPu1 = [479,1]
+PPiShFltoPu1_kW = [479,3]/3600 !kW
+MfrPiShFltoPu1 = MfrPiShFltoPu1_A
 
 UNIT 480 TYPE 929
 !TeeShOut2
@@ -988,7 +988,7 @@ TPiShFlToPu2
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShOut2= [480,1]
+TTeeShOut2 = [480,1]
 
 UNIT 481 TYPE 929
 !TeeShOut3
@@ -1003,7 +1003,7 @@ TPiShFlToPu3
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShOut3= [481,1]
+TTeeShOut3 = [481,1]
 
 UNIT 482 TYPE 929
 !TeeShOut4
@@ -1018,7 +1018,7 @@ TPiShFlToPu4
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShOut4= [482,1]
+TTeeShOut4 = [482,1]
 
 UNIT 483 TYPE 929
 !TeeShOut5
@@ -1033,7 +1033,7 @@ TPiShFlToPu5
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShOut5= [483,1]
+TTeeShOut5 = [483,1]
 
 UNIT 484 TYPE 931
 !PiShFl1to2
@@ -1053,9 +1053,9 @@ TTeeShOut2
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFl1to2= [484,1]
-PPiShFl1to2_kW= [484,3]/3600 !kW
-MfrPiShFl1to2= MfrPiShFl1to2_A
+TPiShFl1to2 = [484,1]
+PPiShFl1to2_kW = [484,3]/3600 !kW
+MfrPiShFl1to2 = MfrPiShFl1to2_A
 
 UNIT 485 TYPE 931
 !PiShFlToPu2
@@ -1075,9 +1075,9 @@ TPuSh2
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFlToPu2= [485,1]
-PPiShFlToPu2_kW= [485,3]/3600 !kW
-MfrPiShFlToPu2= MfrPiShFlToPu2_A
+TPiShFlToPu2 = [485,1]
+PPiShFlToPu2_kW = [485,3]/3600 !kW
+MfrPiShFlToPu2 = MfrPiShFlToPu2_A
 
 UNIT 486 TYPE 931
 !PiShFl2to3
@@ -1097,9 +1097,9 @@ TTeeShOut3
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFl2to3= [486,1]
-PPiShFl2to3_kW= [486,3]/3600 !kW
-MfrPiShFl2to3= MfrPiShFl2to3_A
+TPiShFl2to3 = [486,1]
+PPiShFl2to3_kW = [486,3]/3600 !kW
+MfrPiShFl2to3 = MfrPiShFl2to3_A
 
 UNIT 487 TYPE 931
 !PiShFlToPu3
@@ -1119,9 +1119,9 @@ TPuSh3
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFlToPu3= [487,1]
-PPiShFlToPu3_kW= [487,3]/3600 !kW
-MfrPiShFlToPu3= MfrPiShFlToPu3_A
+TPiShFlToPu3 = [487,1]
+PPiShFlToPu3_kW = [487,3]/3600 !kW
+MfrPiShFlToPu3 = MfrPiShFlToPu3_A
 
 UNIT 488 TYPE 931
 !PiShFl3to4
@@ -1141,9 +1141,9 @@ TTeeShOut4
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFl3to4= [488,1]
-PPiShFl3to4_kW= [488,3]/3600 !kW
-MfrPiShFl3to4= MfrPiShFl3to4_A
+TPiShFl3to4 = [488,1]
+PPiShFl3to4_kW = [488,3]/3600 !kW
+MfrPiShFl3to4 = MfrPiShFl3to4_A
 
 UNIT 489 TYPE 931
 !PiShFlToPu4
@@ -1163,9 +1163,9 @@ TPuSh4
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFlToPu4= [489,1]
-PPiShFlToPu4_kW= [489,3]/3600 !kW
-MfrPiShFlToPu4= MfrPiShFlToPu4_A
+TPiShFlToPu4 = [489,1]
+PPiShFlToPu4_kW = [489,3]/3600 !kW
+MfrPiShFlToPu4 = MfrPiShFlToPu4_A
 
 UNIT 490 TYPE 931
 !PiShFl4to5
@@ -1185,9 +1185,9 @@ TTeeShOut5
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFl4to5= [490,1]
-PPiShFl4to5_kW= [490,3]/3600 !kW
-MfrPiShFl4to5= MfrPiShFl4to5_A
+TPiShFl4to5 = [490,1]
+PPiShFl4to5_kW = [490,3]/3600 !kW
+MfrPiShFl4to5 = MfrPiShFl4to5_A
 
 UNIT 491 TYPE 931
 !PiShFlToPu5
@@ -1207,9 +1207,9 @@ TPuSh5
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFlToPu5= [491,1]
-PPiShFlToPu5_kW= [491,3]/3600 !kW
-MfrPiShFlToPu5= MfrPiShFlToPu5_A
+TPiShFlToPu5 = [491,1]
+PPiShFlToPu5_kW = [491,3]/3600 !kW
+MfrPiShFlToPu5 = MfrPiShFlToPu5_A
 
 UNIT 492 TYPE 931
 !PiHpEvapOut
@@ -1229,9 +1229,9 @@ TPuAuxEvap
 20 0.0 20 20
 
 EQUATIONS 3
-TPiHpEvapOut= [492,1]
-PPiHpEvapOut_kW= [492,3]/3600 !kW
-MfrPiHpEvapOut= MfrPiHpEvapOut_A
+TPiHpEvapOut = [492,1]
+PPiHpEvapOut_kW = [492,3]/3600 !kW
+MfrPiHpEvapOut = MfrPiHpEvapOut_A
 
 UNIT 493 TYPE 931
 !PiHxDhwPriFl
@@ -1251,9 +1251,9 @@ THxDHWOut1H
 20 0.0 20 20
 
 EQUATIONS 3
-TPiHxDhwPriFl= [493,1]
-PPiHxDhwPriFl_kW= [493,3]/3600 !kW
-MfrPiHxDhwPriFl= MfrPiHxDhwPriFl_A
+TPiHxDhwPriFl = [493,1]
+PPiHxDhwPriFl_kW = [493,3]/3600 !kW
+MfrPiHxDhwPriFl = MfrPiHxDhwPriFl_A
 
 UNIT 494 TYPE 931
 !PiHxDhwPriRt
@@ -1273,9 +1273,9 @@ TTeeAuxHxRt
 20 0.0 20 20
 
 EQUATIONS 3
-TPiHxDhwPriRt= [494,1]
-PPiHxDhwPriRt_kW= [494,3]/3600 !kW
-MfrPiHxDhwPriRt= MfrPiHxDhwPriRt_A
+TPiHxDhwPriRt = [494,1]
+PPiHxDhwPriRt_kW = [494,3]/3600 !kW
+MfrPiHxDhwPriRt = MfrPiHxDhwPriRt_A
 
 UNIT 495 TYPE 931
 !PiTesDhwtoPuHx
@@ -1295,9 +1295,9 @@ TPuHxDhwSec
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTesDhwtoPuHx= [495,1]
-PPiTesDhwtoPuHx_kW= [495,3]/3600 !kW
-MfrPiTesDhwtoPuHx= MfrPiTesDhwtoPuHx_A
+TPiTesDhwtoPuHx = [495,1]
+PPiTesDhwtoPuHx_kW = [495,3]/3600 !kW
+MfrPiTesDhwtoPuHx = MfrPiTesDhwtoPuHx_A
 
 UNIT 496 TYPE 929
 !TeeAuxShFl
@@ -1312,7 +1312,7 @@ TPiTeeShFlTes
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeAuxShFl= [496,1]
+TTeeAuxShFl = [496,1]
 
 UNIT 497 TYPE 931
 !PiAuxtoTeeShFl
@@ -1332,9 +1332,9 @@ TTeeAuxShFl
 20 0.0 20 20
 
 EQUATIONS 3
-TPiAuxtoTeeShFl= [497,1]
-PPiAuxtoTeeShFl_kW= [497,3]/3600 !kW
-MfrPiAuxtoTeeShFl= MfrPiAuxtoTeeShFl_A
+TPiAuxtoTeeShFl = [497,1]
+PPiAuxtoTeeShFl_kW = [497,3]/3600 !kW
+MfrPiAuxtoTeeShFl = MfrPiAuxtoTeeShFl_A
 
 UNIT 498 TYPE 931
 !PiShPriFl
@@ -1354,9 +1354,9 @@ TShPortLeft90
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShPriFl= [498,1]
-PPiShPriFl_kW= [498,3]/3600 !kW
-MfrPiShPriFl= MfrPiShPriFl_A
+TPiShPriFl = [498,1]
+PPiShPriFl_kW = [498,3]/3600 !kW
+MfrPiShPriFl = MfrPiShPriFl_A
 
 UNIT 499 TYPE 931
 !PiTeeShFlTes
@@ -1376,9 +1376,9 @@ TTeeShOut1
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTeeShFlTes= [499,1]
-PPiTeeShFlTes_kW= [499,3]/3600 !kW
-MfrPiTeeShFlTes= MfrPiTeeShFlTes_A
+TPiTeeShFlTes = [499,1]
+PPiTeeShFlTes_kW = [499,3]/3600 !kW
+MfrPiTeeShFlTes = MfrPiTeeShFlTes_A
 
 UNIT 500 TYPE 929
 !TeeAuxShRt
@@ -1393,7 +1393,7 @@ TPiShPriRt
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeAuxShRt= [500,1]
+TTeeAuxShRt = [500,1]
 
 UNIT 501 TYPE 931
 !PiShPriRt
@@ -1413,9 +1413,9 @@ TTeeAuxShRt
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShPriRt= [501,1]
-PPiShPriRt_kW= [501,3]/3600 !kW
-MfrPiShPriRt= MfrPiShPriRt_A
+TPiShPriRt = [501,1]
+PPiShPriRt_kW = [501,3]/3600 !kW
+MfrPiShPriRt = MfrPiShPriRt_A
 
 UNIT 502 TYPE 931
 !PiTeeHxDhwRt
@@ -1435,9 +1435,9 @@ TTeeAuxHxRt
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTeeHxDhwRt= [502,1]
-PPiTeeHxDhwRt_kW= [502,3]/3600 !kW
-MfrPiTeeHxDhwRt= MfrPiTeeHxDhwRt_A
+TPiTeeHxDhwRt = [502,1]
+PPiTeeHxDhwRt_kW = [502,3]/3600 !kW
+MfrPiTeeHxDhwRt = MfrPiTeeHxDhwRt_A
 
 UNIT 503 TYPE 931
 !PiTeeShRtTes
@@ -1457,9 +1457,9 @@ TTeeAuxShRt
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTeeShRtTes= [503,1]
-PPiTeeShRtTes_kW= [503,3]/3600 !kW
-MfrPiTeeShRtTes= MfrPiTeeShRtTes_A
+TPiTeeShRtTes = [503,1]
+PPiTeeShRtTes_kW = [503,3]/3600 !kW
+MfrPiTeeShRtTes = MfrPiTeeShRtTes_A
 
 UNIT 504 TYPE 931
 !PiPuDhwCircOut
@@ -1479,9 +1479,9 @@ TDhwPortRight50
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPuDhwCircOut= [504,1]
-PPiPuDhwCircOut_kW= [504,3]/3600 !kW
-MfrPiPuDhwCircOut= MfrPiPuDhwCircOut_A
+TPiPuDhwCircOut = [504,1]
+PPiPuDhwCircOut_kW = [504,3]/3600 !kW
+MfrPiPuDhwCircOut = MfrPiPuDhwCircOut_A
 
 UNIT 505 TYPE 929
 !TeeShOut6
@@ -1496,7 +1496,7 @@ TPiShFlToPu6
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShOut6= [505,1]
+TTeeShOut6 = [505,1]
 
 UNIT 506 TYPE 931
 !PiShFl5to6
@@ -1516,9 +1516,9 @@ TTeeShOut6
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFl5to6= [506,1]
-PPiShFl5to6_kW= [506,3]/3600 !kW
-MfrPiShFl5to6= MfrPiShFl5to6_A
+TPiShFl5to6 = [506,1]
+PPiShFl5to6_kW = [506,3]/3600 !kW
+MfrPiShFl5to6 = MfrPiShFl5to6_A
 
 UNIT 507 TYPE 931
 !PiShFlToPu6
@@ -1538,9 +1538,9 @@ TPUSh6
 20 0.0 20 20
 
 EQUATIONS 3
-TPiShFlToPu6= [507,1]
-PPiShFlToPu6_kW= [507,3]/3600 !kW
-MfrPiShFlToPu6= MfrPiShFlToPu6_A
+TPiShFlToPu6 = [507,1]
+PPiShFlToPu6_kW = [507,3]/3600 !kW
+MfrPiShFlToPu6 = MfrPiShFlToPu6_A
 
 UNIT 508 TYPE 931
 !PiPuOvFl
@@ -1560,9 +1560,9 @@ TPuOverflowSh
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPuOvFl= [508,1]
-PPiPuOvFl_kW= [508,3]/3600 !kW
-MfrPiPuOvFl= MfrPiPuOvFl_A
+TPiPuOvFl = [508,1]
+PPiPuOvFl_kW = [508,3]/3600 !kW
+MfrPiPuOvFl = MfrPiPuOvFl_A
 
 UNIT 509 TYPE 929
 !TeeShRt6
@@ -1577,7 +1577,7 @@ TPiFloor6Rt
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeShRt6= [509,1]
+TTeeShRt6 = [509,1]
 
 UNIT 510 TYPE 931
 !PiFloor6Rt
@@ -1597,9 +1597,9 @@ TTeeShRt6
 20 0.0 20 20
 
 EQUATIONS 3
-TPiFloor6Rt= [510,1]
-PPiFloor6Rt_kW= [510,3]/3600 !kW
-MfrPiFloor6Rt= MfrPiFloor6Rt_A
+TPiFloor6Rt = [510,1]
+PPiFloor6Rt_kW = [510,3]/3600 !kW
+MfrPiFloor6Rt = MfrPiFloor6Rt_A
 
 UNIT 511 TYPE 931
 !PiPuOvRt6to5
@@ -1619,9 +1619,9 @@ TTeeShRt5
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPuOvRt6to5= [511,1]
-PPiPuOvRt6to5_kW= [511,3]/3600 !kW
-MfrPiPuOvRt6to5= MfrPiPuOvRt6to5_A
+TPiPuOvRt6to5 = [511,1]
+PPiPuOvRt6to5_kW = [511,3]/3600 !kW
+MfrPiPuOvRt6to5 = MfrPiPuOvRt6to5_A
 
 UNIT 512 TYPE 929
 !TeeDhwOut
@@ -1636,7 +1636,7 @@ TPiDhwtoTCirc
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TTeeDhwOut= [512,1]
+TTeeDhwOut = [512,1]
 
 UNIT 513 TYPE 931
 !PiDhwtoTCirc
@@ -1656,9 +1656,9 @@ TTeeCircOut
 20 0.0 20 20
 
 EQUATIONS 3
-TPiDhwtoTCirc= [513,1]
-PPiDhwtoTCirc_kW= [513,3]/3600 !kW
-MfrPiDhwtoTCirc= MfrPiDhwtoTCirc_A
+TPiDhwtoTCirc = [513,1]
+PPiDhwtoTCirc_kW = [513,3]/3600 !kW
+MfrPiDhwtoTCirc = MfrPiDhwtoTCirc_A
 
 UNIT 514 TYPE 931
 !PiTesDhwTapOut
@@ -1678,9 +1678,9 @@ TTeeDhwOut
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTesDhwTapOut= [514,1]
-PPiTesDhwTapOut_kW= [514,3]/3600 !kW
-MfrPiTesDhwTapOut= MfrPiTesDhwTapOut_A
+TPiTesDhwTapOut = [514,1]
+PPiTesDhwTapOut_kW = [514,3]/3600 !kW
+MfrPiTesDhwTapOut = MfrPiTesDhwTapOut_A
 
 UNIT 515 TYPE 931
 !PiDhwCircTesOut
@@ -1700,9 +1700,9 @@ TTeeDhwOut
 20 0.0 20 20
 
 EQUATIONS 3
-TPiDhwCircTesOut= [515,1]
-PPiDhwCircTesOut_kW= [515,3]/3600 !kW
-MfrPiDhwCircTesOut= MfrPiDhwCircTesOut_A
+TPiDhwCircTesOut = [515,1]
+PPiDhwCircTesOut_kW = [515,3]/3600 !kW
+MfrPiDhwCircTesOut = MfrPiDhwCircTesOut_A
 
 UNIT 516 TYPE 931
 !PiPuOvRt
@@ -1722,9 +1722,9 @@ TTeeShRt6
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPuOvRt= [516,1]
-PPiPuOvRt_kW= [516,3]/3600 !kW
-MfrPiPuOvRt= MfrPiPuOvRt_A
+TPiPuOvRt = [516,1]
+PPiPuOvRt_kW = [516,3]/3600 !kW
+MfrPiPuOvRt = MfrPiPuOvRt_A
 
 UNIT 517 TYPE 931
 !PiDhwMains
@@ -1744,9 +1744,9 @@ TDhwPortRight1
 20 0.0 20 20
 
 EQUATIONS 3
-TPiDhwMains= [517,1]
-PPiDhwMains_kW= [517,3]/3600 !kW
-MfrPiDhwMains= MfrPiDhwMains_A
+TPiDhwMains = [517,1]
+PPiDhwMains_kW = [517,3]/3600 !kW
+MfrPiDhwMains = MfrPiDhwMains_A
 
 UNIT 518 TYPE 931
 !PiPuHxDhw2HxDHW
@@ -1766,9 +1766,9 @@ THxDHWOut2H
 20 0.0 20 20
 
 EQUATIONS 3
-TPiPuHxDhw2HxDHW= [518,1]
-PPiPuHxDhw2HxDHW_kW= [518,3]/3600 !kW
-MfrPiPuHxDhw2HxDHW= MfrPiPuHxDhw2HxDHW_A
+TPiPuHxDhw2HxDHW = [518,1]
+PPiPuHxDhw2HxDHW_kW = [518,3]/3600 !kW
+MfrPiPuHxDhw2HxDHW = MfrPiPuHxDhw2HxDHW_A
 
 UNIT 519 TYPE 931
 !PiHxDHW_Dhw
@@ -1788,9 +1788,9 @@ TDhwPortLeft50
 20 0.0 20 20
 
 EQUATIONS 3
-TPiHxDHW_Dhw= [519,1]
-PPiHxDHW_Dhw_kW= [519,3]/3600 !kW
-MfrPiHxDHW_Dhw= MfrPiHxDHW_Dhw_A
+TPiHxDHW_Dhw = [519,1]
+PPiHxDHW_Dhw_kW = [519,3]/3600 !kW
+MfrPiHxDHW_Dhw = MfrPiHxDHW_Dhw_A
 
 UNIT 520 TYPE 931
 !PiHP_PuAux
@@ -1810,9 +1810,9 @@ TPuAux
 20 0.0 20 20
 
 EQUATIONS 3
-TPiHP_PuAux= [520,1]
-PPiHP_PuAux_kW= [520,3]/3600 !kW
-MfrPiHP_PuAux= MfrPiHP_PuAux_A
+TPiHP_PuAux = [520,1]
+PPiHP_PuAux_kW = [520,3]/3600 !kW
+MfrPiHP_PuAux = MfrPiHP_PuAux_A
 
 UNIT 521 TYPE 931
 !PiTeeAuxHxRt_HP
@@ -1832,13 +1832,13 @@ THPCondOutH
 20 0.0 20 20
 
 EQUATIONS 3
-TPiTeeAuxHxRt_HP= [521,1]
-PPiTeeAuxHxRt_HP_kW= [521,3]/3600 !kW
-MfrPiTeeAuxHxRt_HP= MfrPiTeeAuxHxRt_HP_A
+TPiTeeAuxHxRt_HP = [521,1]
+PPiTeeAuxHxRt_HP_kW = [521,3]/3600 !kW
+MfrPiTeeAuxHxRt_HP = MfrPiTeeAuxHxRt_HP_A
 
 *** Pipe losses
 EQUATIONS 1
-PipeLossTot=PPiDhwCircRtPu_kW+PPiDhwCirctoTap_kW+PPiAuxToDiv_kW+PPiHpEvapIn_kW+PPiFlFloor1_kW+PPiFlFloor2_kW+PPiFlFloor3_kW+PPiFlFloor4_kW+PPiFlFloor5_kW+PPiFlFloor6_kW+PPiRtFloor5_kW+PPiShRt5to4_kW+PPiRtFloor4_kW+PPiRtFloor3_kW+PPiRtFloor2_kW+PPiShRt4to3_kW+PPiShRt3to2_kW+PPiShRt2to1_kW+PPiRtFloor1_kW+PPiShFltoPu1_kW+PPiShFl1to2_kW+PPiShFlToPu2_kW+PPiShFl2to3_kW+PPiShFlToPu3_kW+PPiShFl3to4_kW+PPiShFlToPu4_kW+PPiShFl4to5_kW+PPiShFlToPu5_kW+PPiHpEvapOut_kW+PPiHxDhwPriFl_kW+PPiHxDhwPriRt_kW+PPiTesDhwtoPuHx_kW+PPiAuxtoTeeShFl_kW+PPiShPriFl_kW+PPiTeeShFlTes_kW+PPiShPriRt_kW+PPiTeeHxDhwRt_kW+PPiTeeShRtTes_kW+PPiPuDhwCircOut_kW+PPiShFl5to6_kW+PPiShFlToPu6_kW+PPiPuOvFl_kW+PPiFloor6Rt_kW+PPiPuOvRt6to5_kW+PPiDhwtoTCirc_kW+PPiTesDhwTapOut_kW+PPiDhwCircTesOut_kW+PPiPuOvRt_kW+PPiDhwMains_kW+PPiPuHxDhw2HxDHW_kW+PPiHxDHW_Dhw_kW+PPiHP_PuAux_kW+PPiTeeAuxHxRt_HP_kW
+PipeLossTot = PPiDhwCircRtPu_kW+PPiDhwCirctoTap_kW+PPiAuxToDiv_kW+PPiHpEvapIn_kW+PPiFlFloor1_kW+PPiFlFloor2_kW+PPiFlFloor3_kW+PPiFlFloor4_kW+PPiFlFloor5_kW+PPiFlFloor6_kW+PPiRtFloor5_kW+PPiShRt5to4_kW+PPiRtFloor4_kW+PPiRtFloor3_kW+PPiRtFloor2_kW+PPiShRt4to3_kW+PPiShRt3to2_kW+PPiShRt2to1_kW+PPiRtFloor1_kW+PPiShFltoPu1_kW+PPiShFl1to2_kW+PPiShFlToPu2_kW+PPiShFl2to3_kW+PPiShFlToPu3_kW+PPiShFl3to4_kW+PPiShFlToPu4_kW+PPiShFl4to5_kW+PPiShFlToPu5_kW+PPiHpEvapOut_kW+PPiHxDhwPriFl_kW+PPiHxDhwPriRt_kW+PPiTesDhwtoPuHx_kW+PPiAuxtoTeeShFl_kW+PPiShPriFl_kW+PPiTeeShFlTes_kW+PPiShPriRt_kW+PPiTeeHxDhwRt_kW+PPiTeeShRtTes_kW+PPiPuDhwCircOut_kW+PPiShFl5to6_kW+PPiShFlToPu6_kW+PPiPuOvFl_kW+PPiFloor6Rt_kW+PPiPuOvRt6to5_kW+PPiDhwtoTCirc_kW+PPiTesDhwTapOut_kW+PPiDhwCircTesOut_kW+PPiPuOvRt_kW+PPiDhwMains_kW+PPiPuHxDhw2HxDHW_kW+PPiHxDHW_Dhw_kW+PPiHP_PuAux_kW+PPiTeeAuxHxRt_HP_kW
 
 ASSIGN ex-hx-two-flow-solver-parameter-lines_complex_99_Mfr.prt 522
 
