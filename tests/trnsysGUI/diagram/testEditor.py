@@ -221,7 +221,7 @@ class _Helper:
     def ensureFilesAreEqual(self, fileRelativePathAsString: str) -> None:
         actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
         actualContent = actualFilePath.read_text()
-        expectedContent = expectedFilePath.read_text()
+        expectedContent = expectedFilePath.read_text(encoding="windows-1252")
 
         assert actualContent == expectedContent
 
