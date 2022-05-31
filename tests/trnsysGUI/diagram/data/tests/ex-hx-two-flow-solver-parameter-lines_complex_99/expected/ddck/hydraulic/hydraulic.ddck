@@ -31,7 +31,7 @@ TFloor4=1
 TFloor5=1
 TFloor6=1
 
-UNIT 450 TYPE 935
+UNIT 450 TYPE 9351
 PARAMETERS 393
 98
 97 20 0 1      !1 : PuAux
@@ -132,7 +132,7 @@ PARAMETERS 393
 13 4 0 0       !96 : PiHxDHW_Dhw
 15 1 0 0       !97 : PiHP_PuAux
 8 15 0 0       !98 : PiTeeAuxHxRt_HP
-INPUTS 98! for Type 935
+INPUTS 98! for Type 9351
 MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 0,0 MfrsupplyWater 
 MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 MfrPuSh1 MfrPuSh2 0,0 0,0 0,0 MfrPuSh3 0,0 

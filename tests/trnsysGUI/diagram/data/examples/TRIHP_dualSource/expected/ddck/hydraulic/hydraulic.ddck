@@ -32,7 +32,7 @@ THPX1=1 ! suggestion: THpEvapOut
 THPX2=1 ! suggestion: THpCondOut
 THPX3=1 ! suggestion: THpDesOut
 
-UNIT 450 TYPE 935
+UNIT 450 TYPE 9351
 PARAMETERS 353
 88
 41 71 0 0      !1 : RadiatorSH
@@ -123,7 +123,7 @@ PARAMETERS 353
 42 55 0 0      !86 : PiHpDesIn
 54 31 0 0      !87 : PiHpCondOut
 29 54 0 0      !88 : PiHpCondIn
-INPUTS 88! for Type 935
+INPUTS 88! for Type 9351
 0,0 MfrPuSH xFracDivSh 0,0 MfrsupplyWater xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
 xFracDivSHCool 0,0 0,0 0,0 MfrPuHpEvap MfrPuHpShCond 0,0 0,0 0,0 0,0 0,0 
 xFracDivDhw 0,0 xFracDivDhwOut xFracDivCool 0,0 MfrPuHpDhwCond 0,0 0,0 xFracDivTesDhwOut xFracDivHp 
