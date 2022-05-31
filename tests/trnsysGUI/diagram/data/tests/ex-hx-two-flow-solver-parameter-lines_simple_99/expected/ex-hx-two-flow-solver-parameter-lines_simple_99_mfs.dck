@@ -118,7 +118,7 @@ EQUATIONS 2
 TPump88 = TPiTes_Pump88
 TPump93 = TPiPump93_Col
 
-UNIT 450 TYPE 935
+UNIT 450 TYPE 9351
 PARAMETERS 49
 12
 6 8 0 0        !1 : TesDpL50-10
@@ -133,7 +133,7 @@ PARAMETERS 49
 12 11 0 1      !10 : Pump93
 10 2 0 0       !11 : PiPump93_ExHx
 10 4 0 0       !12 : PiPump93_Col
-INPUTS 12! for Type 935
+INPUTS 12! for Type 9351
 0,0 0,0 0,0 0,0 0,0 0,0 MfrPump88 0,0 0,0 MfrPump93 
 0,0 0,0 
 *** Initial Inputs
