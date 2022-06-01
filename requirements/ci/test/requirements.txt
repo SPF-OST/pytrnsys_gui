@@ -126,8 +126,10 @@ python-dateutil==2.8.1
     #   dataclasses-jsonschema
     #   matplotlib
     #   pandas
-pytrnsys==0.6.4
-    # via pytrnsys-gui
+git+https://github.com/SPF-OST/pytrnsys.git@master#egg=pytrnsys
+    # via
+    #   -r requirements\ci\test\requirements.in
+    #   pytrnsys-gui
 pytz==2021.1
     # via pandas
 pyvirtualdisplay==3.0
