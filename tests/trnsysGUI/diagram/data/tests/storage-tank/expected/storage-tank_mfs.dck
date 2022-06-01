@@ -118,7 +118,7 @@ EQUATIONS 2
 TPump109 = TPiTes_Pump109
 TPump114 = TPiCol_Pump114
 
-UNIT 450 TYPE 935
+UNIT 450 TYPE 9351
 PARAMETERS 49
 12
 6 8 0 0        !1 : InHx
@@ -133,7 +133,7 @@ PARAMETERS 49
 11 12 0 1      !10 : Pump114
 3 10 0 0       !11 : PiCol_Pump114
 10 2 0 0       !12 : PiPump114_Tes
-INPUTS 12! for Type 935
+INPUTS 12! for Type 9351
 0,0 0,0 0,0 0,0 0,0 0,0 MfrPump109 0,0 0,0 MfrPump114 
 0,0 0,0 
 *** Initial Inputs
