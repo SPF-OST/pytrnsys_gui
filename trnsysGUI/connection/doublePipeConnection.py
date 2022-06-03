@@ -247,12 +247,12 @@ class DoublePipeConnection(_cb.ConnectionBase):
         return str(firstColumn).ljust(spacing) + comment + "\n"
 
     def _updateModelPipes(self, displayName: str):
-        coldFromPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Input", _mfn.PortItemType.INPUT)
-        coldToPort: _mfn.PortItem = _dpmpi.ColdPortItem("Cold Output", _mfn.PortItemType.OUTPUT)
+        coldFromPort: _mfn.PortItem = _dpmpi.ColdPortItem("ColdIn", _mfn.PortItemType.INPUT)
+        coldToPort: _mfn.PortItem = _dpmpi.ColdPortItem("ColdOut", _mfn.PortItemType.OUTPUT)
         self._coldPipe = _mfn.Pipe(displayName + "Cold", self.childIds[0], coldFromPort, coldToPort)
 
-        hotFromPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Input", _mfn.PortItemType.INPUT)
-        hotToPort: _mfn.PortItem = _dpmpi.HotPortItem("Hot Output", _mfn.PortItemType.OUTPUT)
+        hotFromPort: _mfn.PortItem = _dpmpi.HotPortItem("HotIn", _mfn.PortItemType.INPUT)
+        hotToPort: _mfn.PortItem = _dpmpi.HotPortItem("HotOut", _mfn.PortItemType.OUTPUT)
         self._hotPipe = _mfn.Pipe(displayName + "Hot", self.childIds[1], hotFromPort, hotToPort)
 
 

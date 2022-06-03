@@ -134,12 +134,12 @@ class ExternalHx(BlockItemFourPorts):
             self.logger.debug(self.path)
 
     def getInternalPiping(self) -> InternalPiping:
-        side1Input = _mfn.PortItem("side1Input", _mfn.PortItemType.INPUT)
-        side1Output = _mfn.PortItem("side1Output", _mfn.PortItemType.OUTPUT)
+        side1Input = _mfn.PortItem("In1", _mfn.PortItemType.INPUT)
+        side1Output = _mfn.PortItem("Out1", _mfn.PortItemType.OUTPUT)
         side1Pipe = _mfn.Pipe(f"{self.displayName}Side1", self.childIds[0], side1Input, side1Output)
 
-        side2Input = _mfn.PortItem("side2Input", _mfn.PortItemType.INPUT)
-        side2Output = _mfn.PortItem("side2Output", _mfn.PortItemType.OUTPUT)
+        side2Input = _mfn.PortItem("In2", _mfn.PortItemType.INPUT)
+        side2Output = _mfn.PortItem("Out2", _mfn.PortItemType.OUTPUT)
         side2Pipe = _mfn.Pipe(f"{self.displayName}Side2", self.childIds[1], side2Input, side2Output)
 
         modelPortItemsToGraphicalPortItem = {

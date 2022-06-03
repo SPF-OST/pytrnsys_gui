@@ -75,9 +75,9 @@ class TeePiece(BlockItem, MassFlowNetworkContributorMixin):
         return internalPiping
 
     def _getModelAndMapping(self):
-        input = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
-        output1 = _mfn.PortItem("straightOutput", _mfn.PortItemType.OUTPUT)
-        output2 = _mfn.PortItem("orthogonalOutput", _mfn.PortItemType.OUTPUT)
+        input = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
+        output1 = _mfn.PortItem("StrOut", _mfn.PortItemType.OUTPUT)
+        output2 = _mfn.PortItem("OrtOut", _mfn.PortItemType.OUTPUT)
         teePiece = _mfn.TeePiece(self.displayName, self.trnsysId, input, output1, output2)
         modelPortItemsToGraphicalPortItem = {input: self.inputs[0], output1: self.outputs[0], output2: self.outputs[1]}
         return teePiece, modelPortItemsToGraphicalPortItem

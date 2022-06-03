@@ -210,9 +210,9 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
         return _mfs.InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
 
     def _getModelAndMapping(self):
-        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
-        output1 = _mfn.PortItem("straightOutput", _mfn.PortItemType.OUTPUT)
-        output2 = _mfn.PortItem("orthogonalOutput", _mfn.PortItemType.OUTPUT)
+        inputPort = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
+        output1 = _mfn.PortItem("StrOut", _mfn.PortItemType.OUTPUT)
+        output2 = _mfn.PortItem("OrtOut", _mfn.PortItemType.OUTPUT)
         teePiece = _mfn.Diverter(self.displayName, self.trnsysId, inputPort, output1, output2)
         modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], output1: self.outputs[0],
                                              output2: self.outputs[1]}
