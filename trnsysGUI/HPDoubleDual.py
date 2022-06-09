@@ -181,16 +181,16 @@ class HPDoubleDual(BlockItem, MassFlowNetworkContributorMixin):
         return status, equation
 
     def getInternalPiping(self) -> InternalPiping:
-        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemType.INPUT)
-        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemType.OUTPUT)
+        evaporatorInput = _mfn.PortItem("evaporatorInput", _mfn.PortItemType.INPUT)
+        evaporatorOutput = _mfn.PortItem("evaporatorOutput", _mfn.PortItemType.OUTPUT)
         evaporatorPipe = _mfn.Pipe(f"{self.displayName}Evap", self.childIds[0], evaporatorInput, evaporatorOutput)
 
-        condenser1Input = _mfn.PortItem("CondIn1", _mfn.PortItemType.INPUT)
-        condenser1Output = _mfn.PortItem("CondOut1", _mfn.PortItemType.OUTPUT)
+        condenser1Input = _mfn.PortItem("condenser1Input", _mfn.PortItemType.INPUT)
+        condenser1Output = _mfn.PortItem("condenser1Output", _mfn.PortItemType.OUTPUT)
         condenser1Pipe = _mfn.Pipe(f"{self.displayName}Cond1", self.childIds[1], condenser1Input, condenser1Output)
 
-        condenser2Input = _mfn.PortItem("CondIn2", _mfn.PortItemType.INPUT)
-        condenser2Output = _mfn.PortItem("CondOut2", _mfn.PortItemType.OUTPUT)
+        condenser2Input = _mfn.PortItem("condenser2Input", _mfn.PortItemType.INPUT)
+        condenser2Output = _mfn.PortItem("condenser2Output", _mfn.PortItemType.OUTPUT)
         condenser2Pipe = _mfn.Pipe(f"{self.displayName}Cond2", self.childIds[2], condenser2Input, condenser2Output)
 
         modelPortItemsToGraphicalPortItem = {

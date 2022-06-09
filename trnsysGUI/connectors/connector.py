@@ -84,6 +84,6 @@ EQUATIONS 1
         return equations, startingUnit
 
     def _updateModelPipe(self, displayName: str) -> None:
-        fromPort = _mfn.PortItem("In", _mfn.PortItemType.INPUT)
-        toPort = _mfn.PortItem("Out", _mfn.PortItemType.OUTPUT)
+        fromPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
+        toPort = _mfn.PortItem("output", _mfn.PortItemType.OUTPUT)
         self._modelPipe = _mfn.Pipe(displayName, self.trnsysId, fromPort, toPort)

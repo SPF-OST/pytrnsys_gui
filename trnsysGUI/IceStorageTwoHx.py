@@ -127,12 +127,12 @@ class IceStorageTwoHx(BlockItemFourPorts):
             self.logger.debug(self.path)
 
     def getInternalPiping(self) -> InternalPiping:
-        side1Input = _mfn.PortItem("LeftIn", _mfn.PortItemType.INPUT)
-        side1Output = _mfn.PortItem("LeftOut", _mfn.PortItemType.OUTPUT)
+        side1Input = _mfn.PortItem("leftSideInput", _mfn.PortItemType.INPUT)
+        side1Output = _mfn.PortItem("leftSideOutput", _mfn.PortItemType.OUTPUT)
         side1Pipe = _mfn.Pipe(f"{self.displayName}leftSide", self.childIds[0], side1Input, side1Output)
 
-        side2Input = _mfn.PortItem("RightIn", _mfn.PortItemType.INPUT)
-        side2Output = _mfn.PortItem("RightOut", _mfn.PortItemType.OUTPUT)
+        side2Input = _mfn.PortItem("rightSideInput", _mfn.PortItemType.INPUT)
+        side2Output = _mfn.PortItem("rightSideOutput", _mfn.PortItemType.OUTPUT)
         side2Pipe = _mfn.Pipe(f"{self.displayName}rightSide", self.childIds[1], side2Input, side2Output)
 
         modelPortItemsToGraphicalPortItem = {

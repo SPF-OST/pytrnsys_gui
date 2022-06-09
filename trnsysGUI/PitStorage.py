@@ -125,12 +125,12 @@ class PitStorage(BlockItemFourPorts):
             self.logger.debug(self.path)
 
     def getInternalPiping(self) -> InternalPiping:
-        side1Input = _mfn.PortItem("VarIn", _mfn.PortItemType.INPUT)
-        side1Output = _mfn.PortItem("DeepOut", _mfn.PortItemType.OUTPUT)
+        side1Input = _mfn.PortItem("variableInput", _mfn.PortItemType.INPUT)
+        side1Output = _mfn.PortItem("deepOutput", _mfn.PortItemType.OUTPUT)
         side1Pipe = _mfn.Pipe(f"{self.displayName}Side1", self.childIds[0], side1Input, side1Output)
 
-        side2Input = _mfn.PortItem("DeepIn", _mfn.PortItemType.INPUT)
-        side2Output = _mfn.PortItem("ShlwOut", _mfn.PortItemType.OUTPUT)
+        side2Input = _mfn.PortItem("deepInput", _mfn.PortItemType.INPUT)
+        side2Output = _mfn.PortItem("shallowOutput", _mfn.PortItemType.OUTPUT)
         side2Pipe = _mfn.Pipe(f"{self.displayName}Side2", self.childIds[1], side2Input, side2Output)
 
         modelPortItemsToGraphicalPortItem = {
