@@ -181,7 +181,7 @@ class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
             _mnames.getMassFlowVariableName(self, teePiece, portItems[2]),
         ]
 
-        unitText += "\n".join(massFlowVariableNames)
+        unitText += "\n".join(massFlowVariableNames) + "\n"
 
         unitText += f"T{self.inputs[0].connectionList[0].displayName}{temperature}\n"
         unitText += f"T{self.outputs[0].connectionList[0].displayName}{temperature}\n"
