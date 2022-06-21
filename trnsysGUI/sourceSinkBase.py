@@ -20,12 +20,18 @@ class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
 
         self.changeSize()
 
-        ddckFilePath = _pl.Path(self.parent.parent().projectPath) / "ddck" / f"{self.displayName}.ddck"
-
-        self.path = str(ddckFilePath)
+        self._updateDdckFilePath()
 
     def getDisplayName(self) -> str:
         return self.displayName
+
+    def setDisplayName(self, newName: str) -> None:
+        super().setDisplayName(newName)
+        self._updateDdckFilePath()
+
+    def _updateDdckFilePath(self):
+        ddckFilePath = _pl.Path(self.parent.parent().projectPath) / "ddck" / f"{self.displayName}.ddck"
+        self.path = str(ddckFilePath)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         raise NotImplementedError()
