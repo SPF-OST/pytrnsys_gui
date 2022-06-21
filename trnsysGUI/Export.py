@@ -88,7 +88,7 @@ class Export:
 
     def exportDoublePipeParameters(self, exportTo="ddck"):
         doesHydraulicContainDoublePipes = any(
-            [isinstance(obj, _dpc.DoublePipeConnection) for obj in self._hasInternalPipings]
+            isinstance(obj, _dpc.DoublePipeConnection) for obj in self._hasInternalPipings
         )
 
         if not doesHydraulicContainDoublePipes:
