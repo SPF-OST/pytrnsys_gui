@@ -9,8 +9,8 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel
-from trnsysGUI.MyQTreeView import MyQTreeView
+from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
+from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class Control(BlockItem):

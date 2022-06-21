@@ -8,16 +8,16 @@ import dataclasses_jsonschema as _dcj
 from PyQt5.QtWidgets import QGraphicsTextItem
 
 import pytrnsys.utils.serialization as _ser
+import trnsysGUI.BlockItem as _bi
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.createSinglePipePortItem as _cspi  # pylint: disable=cyclic-import
 import trnsysGUI.images as _img
-import trnsysGUI.massFlowSolver as _mfs
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.massFlowSolver import MassFlowNetworkContributorMixin
 
 
-class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = too-many-instance-attributes
+class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
     def __init__(self, trnsysType, parent, **kwargs):
         super().__init__(trnsysType, parent, **kwargs)
 
@@ -32,7 +32,15 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
 
+        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        output1 = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT)
+        output2 = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT)
+        self.modelDiverter = _mfn.Diverter(inputPort, output1, output2)
+
         self.changeSize()
+
+    def getDisplayName(self) -> str:
+        return self.displayName
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.T_VENTIL_SVG
@@ -162,7 +170,8 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
 
     def exportMassFlows(self):
         if not self.isTempering:
-            resStr = "xFrac" + self.displayName + " = " + str(self.positionForMassFlowSolver) + "\n"
+            mfsInputVariableName = _mnames.getInputVariableName(self, self.modelDiverter)
+            resStr = f"{mfsInputVariableName} = {self.positionForMassFlowSolver}\n"
             equationNr = 1
             return resStr, equationNr
         return "", 0
@@ -184,8 +193,8 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
             lines += "INPUTS 4 \n"
 
             if (
-                    self.outputs[0].pos().y() == self.inputs[0].pos().y()
-                    or self.outputs[0].pos().x() == self.inputs[0].pos().x()
+                self.outputs[0].pos().y() == self.inputs[0].pos().y()
+                or self.outputs[0].pos().x() == self.inputs[0].pos().x()
             ):
                 first = self.outputs[0]
                 second = self.outputs[1]
@@ -198,25 +207,21 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
             lines += "*** INITIAL INPUT VALUES" + "\n"
             lines += "35.0 21.0 800.0 T_set_" + self.displayName + "\n"
 
+            mfsInputVariableName = _mnames.getInputVariableName(self, self.modelDiverter)
             lines += "EQUATIONS 1\n"
-            lines += f"xFrac{self.displayName} =  1.-[{nUnit},5] \n\n"
+            lines += f"{mfsInputVariableName} =  1.-[{nUnit},5] \n\n"
 
             return lines, nUnit
         return "", nUnit
 
-    def getInternalPiping(self) -> _mfs.InternalPiping:
-        teePiece, modelPortItemsToGraphicalPortItem = self._getModelAndMapping()
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        modelPortItemsToGraphicalPortItem = {
+            self.modelDiverter.input: self.inputs[0],
+            self.modelDiverter.output1: self.outputs[0],
+            self.modelDiverter.output2: self.outputs[1],
+        }
 
-        return _mfs.InternalPiping([teePiece], modelPortItemsToGraphicalPortItem)
-
-    def _getModelAndMapping(self):
-        inputPort = _mfn.PortItem("input", _mfn.PortItemType.INPUT)
-        output1 = _mfn.PortItem("straightOutput", _mfn.PortItemType.OUTPUT)
-        output2 = _mfn.PortItem("orthogonalOutput", _mfn.PortItemType.OUTPUT)
-        teePiece = _mfn.Diverter(self.displayName, self.trnsysId, inputPort, output1, output2)
-        modelPortItemsToGraphicalPortItem = {inputPort: self.inputs[0], output1: self.outputs[0],
-                                             output2: self.outputs[1]}
-        return teePiece, modelPortItemsToGraphicalPortItem
+        return _ip.InternalPiping([self.modelDiverter], modelPortItemsToGraphicalPortItem)
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         if self.isVisible():
@@ -234,19 +239,14 @@ class TVentil(BlockItem, MassFlowNetworkContributorMixin):  # pylint: disable = 
             unitText += "PARAMETERS 0\n"
             unitText += "INPUTS 6\n"
 
-            openLoops, _ = self._getOpenLoopsAndNodeToIndices()
-            assert len(openLoops) == 1
-            openLoop = openLoops[0]
+            portItems = self.modelDiverter.getPortItems()
+            massFlowVariableNames = [
+                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[0]),
+                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[1]),
+                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[2]),
+            ]
 
-            assert len(openLoop.realNodes) == 1
-            realNode = openLoop.realNodes[0]
-
-            outputVariables = realNode.getOutputVariables()
-            for outputVariable in outputVariables:
-                if not outputVariable:
-                    continue
-
-                unitText += outputVariable.name + "\n"
+            unitText += "\n".join(massFlowVariableNames) + "\n"
 
             unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
             unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
@@ -280,19 +280,19 @@ class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-
 
     @classmethod
     def from_dict(
-            cls,  # pylint: disable = duplicate-code
-            data: _dcj.JsonDict,  # pylint: disable = duplicate-code
-            validate=True,
-            validate_enums: bool = True,
+        cls,  # pylint: disable = duplicate-code
+        data: _dcj.JsonDict,  # pylint: disable = duplicate-code
+        validate=True,
+        validate_enums: bool = True,
     ) -> "TVentilModel":
         tVentilModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(TVentilModel, tVentilModel)
 
     def to_dict(
-            self,
-            omit_none: bool = True,
-            validate: bool = False,
-            validate_enums: bool = True,  # pylint: disable=duplicate-code
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
     ) -> _dcj.JsonDict:  # pylint: disable = duplicate-code
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
@@ -325,4 +325,4 @@ class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('3fff9a8a-d40e-42e2-824d-c015116d0a1d')
+        return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")

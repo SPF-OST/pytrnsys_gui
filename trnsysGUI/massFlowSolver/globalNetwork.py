@@ -2,43 +2,54 @@ import dataclasses as _dc
 import typing as _tp
 
 import trnsysGUI.PortItemBase as _pib
-
-import trnsysGUI.massFlowSolver as _mfs
-import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.common as _com
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+
+
+@_dc.dataclass
+class NodeWithParent:
+    node: _mfn.Node
+    parent: _ip.HasInternalPiping
 
 
 @_dc.dataclass
 class GlobalNetwork:
-    realNodes: _tp.Sequence[_mfn.RealNodeBase]
-    internalPortItemToExternalRealNode: _tp.Mapping[_mfn.PortItem, _mfn.RealNodeBase]
+    nodesWithParent: _tp.Sequence[NodeWithParent]
+    internalPortItemToExternalNode: _tp.Mapping[_mfn.PortItem, _mfn.Node]
 
 
-def getGlobalNetwork(massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin]) -> GlobalNetwork:
-    allRealNodes, modelsToGraphicalPortItem = _getAllRealNodesAndModelsToGraphicalPortItem(massFlowContributors)
+def getGlobalNetwork(hasInternalPipings: _tp.Sequence[_ip.HasInternalPiping]) -> GlobalNetwork:
+    allNodesWithParent, modelsToGraphicalPortItem = (
+        _getAllNodesWithParentAndModelsToGraphicalPortItem(hasInternalPipings)
+    )
 
-    modelPortItemsToRealNode = {n: rn for rn in allRealNodes for n in rn.getNeighbours() if isinstance(n, _mfn.PortItem)}
+    allNodes = [nwp.node for nwp in allNodesWithParent]
+
+    modelPortItemsToNode = {
+        mpi: n for n in allNodes for mpi in n.getPortItems()
+    }
 
     graphicalPortItemsToModels = _getGraphicalPortItemsToModels(modelsToGraphicalPortItem)
 
-    internalPortItemToExternalRealNode = _getInternalPortItemToExternalRealNode(
-        allRealNodes, modelsToGraphicalPortItem, graphicalPortItemsToModels, modelPortItemsToRealNode
+    internalPortItemToExternalNode = _getInternalPortItemToExternalNode(
+        allNodes, modelsToGraphicalPortItem, graphicalPortItemsToModels, modelPortItemsToNode
     )
 
-    return GlobalNetwork(allRealNodes, internalPortItemToExternalRealNode)
+    return GlobalNetwork(allNodesWithParent, internalPortItemToExternalNode)
 
 
-def _getAllRealNodesAndModelsToGraphicalPortItem(
-    massFlowContributors: _tp.Sequence[_mfs.MassFlowNetworkContributorMixin],
-) -> _tp.Tuple[_tp.Sequence[_mfn.RealNodeBase], _tp.Mapping[_mfn.PortItem, _pib.PortItemBase]]:
-    allRealNodes: _tp.List[_mfn.RealNodeBase] = []
+def _getAllNodesWithParentAndModelsToGraphicalPortItem(
+    hasInternalPipings: _tp.Sequence[_ip.HasInternalPiping],
+) -> _tp.Tuple[_tp.Sequence[NodeWithParent], _tp.Mapping[_mfn.PortItem, _pib.PortItemBase]]:
+    allNodes: _tp.List[NodeWithParent] = []
     modelsToGraphicalPortItem: _tp.Dict[_mfn.PortItem, _pib.PortItemBase] = {}
-    for massFlowContributor in massFlowContributors:
-        internalPiping = massFlowContributor.getInternalPiping()
-        realNodes = internalPiping.getAllRealNodes()
-        allRealNodes.extend(realNodes)
+    for hasInternalPiping in hasInternalPipings:
+        internalPiping = hasInternalPiping.getInternalPiping()
+        nodesWithParent = [NodeWithParent(n, hasInternalPiping) for n in internalPiping.nodes]
+        allNodes.extend(nodesWithParent)
         modelsToGraphicalPortItem.update(internalPiping.modelPortItemsToGraphicalPortItem)
-    return allRealNodes, modelsToGraphicalPortItem
+    return allNodes, modelsToGraphicalPortItem
 
 
 def _getGraphicalPortItemsToModels(
@@ -55,26 +66,24 @@ def _getGraphicalPortItemsToModels(
     return graphicalPortItemsToModels
 
 
-def _getInternalPortItemToExternalRealNode(
-    allRealNodes: _tp.Sequence[_mfn.RealNodeBase],
+def _getInternalPortItemToExternalNode(
+    nodes: _tp.Sequence[_mfn.Node],
     modelsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pib.PortItemBase],
     graphicalPortItemsToModels: _tp.Mapping[_pib.PortItemBase, _tp.Sequence[_mfn.PortItem]],
-    modelPortItemsToRealNode: _tp.Mapping[_mfn.PortItem, _mfn.RealNodeBase],
-) -> _tp.Mapping[_mfn.PortItem, _mfn.RealNodeBase]:
+    modelPortItemsToNode: _tp.Mapping[_mfn.PortItem, _mfn.Node],
+) -> _tp.Mapping[_mfn.PortItem, _mfn.Node]:
     portItemsToJoin = {}
-    for internalRealNode in allRealNodes:
-        for neighbor in internalRealNode.getNeighbours():
-            if not isinstance(neighbor, _mfn.PortItem):
-                continue
-
-            portItem = neighbor
+    for internalNode in nodes:
+        for portItem in internalNode.getPortItems():
             graphicalPortItem = modelsToGraphicalPortItem[portItem]
             candidates = graphicalPortItemsToModels[graphicalPortItem]
 
-            externalPortItem = _com.getSingle(c for c in candidates if c.canOverlapWith(portItem))
+            externalPortItem = _com.getSingle(
+                c for c in candidates if c != portItem and c.canOverlapWith(portItem)
+            )
 
-            externalRealNode = modelPortItemsToRealNode[externalPortItem]
+            externalNode = modelPortItemsToNode[externalPortItem]
 
-            portItemsToJoin[portItem] = externalRealNode
+            portItemsToJoin[portItem] = externalNode
 
     return portItemsToJoin
