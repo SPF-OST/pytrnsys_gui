@@ -188,18 +188,18 @@ class MassFlowVisualizer(QDialog):
             for t in self.parent.centralWidget.trnsysObj:
                 if isinstance(t, SinglePipeConnection):
                     if (
-                        "Mfr" + t.displayName in self.massFlowData.columns
+                        "M" + t.displayName in self.massFlowData.columns
                         and "T" + t.displayName in self.tempMassFlowData
                     ):
-                        mass = str(round(self.massFlowData["Mfr" + t.displayName].iloc[timeStep]))
-                        mass1Dp = str(round(self.massFlowData["Mfr" + t.displayName].iloc[timeStep], 1))
+                        mass = str(round(self.massFlowData["M" + t.displayName].iloc[timeStep]))
+                        mass1Dp = str(round(self.massFlowData["M" + t.displayName].iloc[timeStep], 1))
                         temperature = str(round(self.tempMassFlowData["T" + t.displayName].iloc[timeStep]))
                         self.logger.debug("Found connection in ts " + str(timeStep) + " " + str(i))
                         self.logger.debug("mass flow value of %s : " % t.displayName)
                         t.setMassAndTemperature(mass1Dp, temperature)
                         thickValue = self.getThickness(mass)
                         self.logger.debug("Thickvalue: " + str(thickValue))
-                        if self.massFlowData["Mfr" + t.displayName].iloc[timeStep] == 0:
+                        if self.massFlowData["M" + t.displayName].iloc[timeStep] == 0:
                             t.setColor(thickValue, mfr="ZeroMfr")
                         elif round(abs(self.tempMassFlowData["T" + t.displayName].iloc[timeStep])) == self.maxValue:
                             t.setColor(thickValue, mfr="max")
