@@ -512,7 +512,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         self._changeSize(-self.HEIGHT_INCREMENT, -self.WIDTH_INCREMENT)
 
     def _changeSize(self, deltaH, deltaW):
-        self.storage.updatePortItemPositions(deltaH, deltaW)
+        self.storage.updatePortItemPositionsAfterTankSizeChange(deltaH, deltaW)
         self.storage.h += deltaH
         self.storage.w += deltaW
         self.storage.updateHeatExchangersAfterTankSizeChange()

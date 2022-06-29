@@ -16,6 +16,7 @@ def getMassFlowVariableName(
 
     return f"M{displayName}{nodeNameOrEmpty}_{postfix}"
 
+
 def getCanonicalMassFlowVariableName(
     hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe
 ) -> str:
@@ -36,6 +37,6 @@ def _getPostfix(node: _mfn.Node, portItem: _mfn.PortItem) -> str:
 
 def getInputVariableName(hasInternalPiping: _ip.HasInternalPiping, node: _mfn.Node) -> str:
     prefix = node.getInputVariablePrefix()
-    nodeNamerOrEmtpy = node.name or ""
+    nodeNameOrEmtpy = node.name or ""
     displayName = hasInternalPiping.getDisplayName()
-    return f"{prefix}{displayName}{nodeNamerOrEmtpy}"
+    return f"{prefix}{displayName}{nodeNameOrEmtpy}"

@@ -2,11 +2,9 @@ import pathlib as _pl
 import typing as _tp
 
 import pytrnsys.utils.result as _res
-
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 
@@ -39,41 +37,18 @@ def getPlaceholderValues(ddckDirNames: _tp.Sequence[str], trnsysObjects) -> _res
                     }
                 elif modelPortItem.direction == _mfn.PortItemDirection.INPUT:
                     graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[modelPortItem]
+                    inputConnection = graphicalPortItem.getConnection()
 
-                    inputTemperatureVariableName = _getInputTemperatureVariableName(modelPortItem, graphicalPortItem)
-                    inputMfrVariableName = _getInputMassFlowVariableName(modelPortItem, graphicalPortItem)
+                    inputTemperatureVariableName = _cnames.getTemperatureVariableName(
+                        inputConnection, modelPortItem.type
+                    )
+                    inputMfrVariableName = _cnames.getInputMassFlowVariableName(graphicalPortItem, modelPortItem.type)
 
                     placeholders[modelPortItem.name] = {
                         "@temp": inputTemperatureVariableName,
-                        "@mfr": inputMfrVariableName
+                        "@mfr": inputMfrVariableName,
                     }
 
         allPlaceholders[componentName] = placeholders
 
     return allPlaceholders
-
-
-def _getInputTemperatureVariableName(modelPortItem: _mfn.PortItem, graphicalPortItem: _pib.PortItemBase) -> str:
-    connection = graphicalPortItem.getConnection()
-    connectionInternalPiping = connection.getInternalPiping()
-    connectionNode = connectionInternalPiping.getNode(graphicalPortItem, modelPortItem.type)
-    variableName = _temps.getTemperatureVariableName(connection, connectionNode)
-    return variableName
-
-
-def _getInputMassFlowVariableName(modelPortItem: _mfn.PortItem, graphicalPortItem: _pib.PortItemBase) -> str:
-    connection = graphicalPortItem.getConnection()
-    connectionInternalPiping = connection.getInternalPiping()
-    connectionNode = connectionInternalPiping.getNode(graphicalPortItem, modelPortItem.type)
-
-    assert isinstance(connectionNode, _mfn.Pipe)
-
-    connectionPortItem = connectionInternalPiping.getModelPortItem(graphicalPortItem, modelPortItem.type)
-
-    oppositePortItem = (
-        connectionNode.fromPort if connectionNode.toPort == connectionPortItem else connectionNode.toPort
-    )
-
-    variableName = _mnames.getMassFlowVariableName(connection, connectionNode, oppositePortItem)
-
-    return variableName
