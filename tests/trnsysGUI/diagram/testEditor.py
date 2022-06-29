@@ -88,9 +88,6 @@ class TestEditor:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath)
 
-            ddcxFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddcx"
-            helper.ensureFilesAreEqual(ddcxFileRelativePath)
-
         oldFormatJsonPath = projectFolderPath / f"{projectFolderPath.name}.json"
 
         projectInOldJsonFormat = _prj.LoadProject(oldFormatJsonPath)

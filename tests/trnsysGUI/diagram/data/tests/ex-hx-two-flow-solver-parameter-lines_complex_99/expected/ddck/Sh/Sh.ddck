@@ -26,7 +26,7 @@ elSysIn_Q_TesShAux = qHeatSource_Tes1
 *************************************
 EQUATIONS 3
 Tdp1In_Tes1 = TPiShPriFl
-Mfrdp1_Tes1 = MfrPiShPriFl
+Mfrdp1_Tes1 = MPiShPriFl_A
 Tdp1InRev_Tes1 = TPiShPriRt
 CONSTANTS 2
 zAux1_Tes1=0.00
@@ -37,7 +37,7 @@ qAux1_Tes1=0.00
 *************************************
 EQUATIONS 1
 *** direct port outputs
-Tdp1Out_Tes1=[50,1] ! 
+TShDpL90_2=[50,1]
 
 *************************************
 ****** Parameters of Type1924 *******

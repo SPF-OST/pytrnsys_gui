@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 import random
 
 from PyQt5.QtCore import Qt
@@ -79,12 +81,12 @@ class HeatExchanger(QGraphicsItemGroup):
     def setId(self, newId):
         self.id = newId
 
-    def setParent(self, p):
-        self.parent = p
+    def setParent(self, parent):
+        self.parent = parent
 
-        if p.name == "StorageTank":
+        if parent.name == "StorageTank":
             self.logger.debug("p is a StorageTank")
-            self.setParentItem(p)
+            self.setParentItem(parent)
         else:
             self.logger.debug(
                 "A non-Storage-Tank block is trying to set parent of heatExchanger"

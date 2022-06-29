@@ -26,19 +26,19 @@ elSysIn_Q_TesDhwAux = qHeatSource_Tes7703
 *************************************
 EQUATIONS 3
 Tdp1In_Tes7703 = Tdpp0ExtFromPortConn
-Mfrdp1_Tes7703 = Mfrdpp0ExtFromPortConn
+Mfrdp1_Tes7703 = Mdpp0ExtFromPortConn_A
 Tdp1InRev_Tes7703 = Tdpp0ExtToPortConn
 EQUATIONS 3
 Tdp2In_Tes7703 = Tdpp1ExtFromPortConn
-Mfrdp2_Tes7703 = Mfrdpp1ExtFromPortConn
+Mfrdp2_Tes7703 = Mdpp1ExtFromPortConn_A
 Tdp2InRev_Tes7703 = Tdpp1ExtToPortConn
 EQUATIONS 3
 Tdp3In_Tes7703 = Tdpp2ExtFromPortConn
-Mfrdp3_Tes7703 = Mfrdpp2ExtFromPortConn
+Mfrdp3_Tes7703 = Mdpp2ExtFromPortConn_A
 Tdp3InRev_Tes7703 = Tdpp2ExtToPortConn
 EQUATIONS 3
 Thx1In_Tes7703 = Thx0ExtFromPortConn
-Mfrhx1_Tes7703 = Mfrhx0ExtFromPortConn
+Mfrhx1_Tes7703 = Mhx0ExtFromPortConn_A
 Thx1InRev_Tes7703 = Thx0ExtToPortConn
 CONSTANTS 2
 zAux1_Tes7703=0.00
@@ -49,12 +49,12 @@ qAux1_Tes7703=0.00
 *************************************
 EQUATIONS 3
 *** direct port outputs
-Tdp1Out_Tes7703=[50,1] ! 
-Tdp2Out_Tes7703=[50,3] ! 
-Tdp3Out_Tes7703=[50,5] ! 
+TDhwDpL95_35=[50,1]
+TDhwDpR70_90=[50,3]
+TDhwDpR5_95=[50,5]
 EQUATIONS 1
 *** heat exchanger outputs
-Thx1Out_Tes7703=[50,102] ! 
+TDhwSolarHx=[50,102]
 
 *************************************
 ****** Parameters of Type1924 *******

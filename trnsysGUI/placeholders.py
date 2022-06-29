@@ -39,12 +39,14 @@ def getPlaceholderValues(ddckDirNames: _tp.Sequence[str], trnsysObjects) -> _res
                     graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[modelPortItem]
                     inputConnection = graphicalPortItem.getConnection()
 
-                    inputTemperatureVariableName = _cnames.getTemperatureVariableName(inputConnection, modelPortItem.type)
+                    inputTemperatureVariableName = _cnames.getTemperatureVariableName(
+                        inputConnection, modelPortItem.type
+                    )
                     inputMfrVariableName = _cnames.getInputMassFlowVariableName(graphicalPortItem, modelPortItem.type)
 
                     placeholders[modelPortItem.name] = {
                         "@temp": inputTemperatureVariableName,
-                        "@mfr": inputMfrVariableName
+                        "@mfr": inputMfrVariableName,
                     }
 
         allPlaceholders[componentName] = placeholders

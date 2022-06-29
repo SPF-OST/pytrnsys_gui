@@ -40,10 +40,11 @@ class DoublePipeConnection(_cb.ConnectionBase):
     def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
         if portItemType == _mfn.PortItemType.COLD:
             return self.coldModelPipe
-        elif portItemType == _mfn.PortItemType.HOT:
+
+        if portItemType == _mfn.PortItemType.HOT:
             return self.hotModelPipe
-        else:
-            raise AssertionError(f"Don't have a model pipe of type {portItemType}.")
+
+        raise ValueError(f"Don't have a model pipe of type {portItemType}.")
 
     def _createSegmentItem(self, startNode, endNode):
         return _dpsi.DoublePipeSegmentItem(startNode, endNode, self)

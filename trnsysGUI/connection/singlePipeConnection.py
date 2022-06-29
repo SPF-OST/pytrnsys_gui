@@ -50,9 +50,10 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return self._toPort
 
     def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
-        assert (
-            portItemType == _mfn.PortItemType.STANDARD
-        ), f"Single pipe connections can only have model port items of type {_mfn.PortItemType.STANDARD}"
+        if portItemType != _mfn.PortItemType.STANDARD:
+            raise ValueError(
+                f"Single pipe connections can only have model port items of type {_mfn.PortItemType.STANDARD}"
+            )
 
         return self.modelPipe
 

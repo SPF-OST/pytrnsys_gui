@@ -17,7 +17,7 @@ import trnsysGUI.storageTank.side as _sd
 import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
+from trnsysGUI.heatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
