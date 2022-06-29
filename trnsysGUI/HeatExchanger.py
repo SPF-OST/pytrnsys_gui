@@ -1,6 +1,3 @@
-# pylint: skip-file
-# type: ignore
-
 import random
 
 from PyQt5.QtCore import Qt
@@ -8,6 +5,7 @@ from PyQt5.QtGui import QPen, QColor
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsLineItem, QMenu
 
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 class HeatExchanger(QGraphicsItemGroup):
@@ -55,7 +53,15 @@ class HeatExchanger(QGraphicsItemGroup):
 
         self.displayName = name
 
+        self._updateModelPipe()
+
         self._draw()
+
+    def _updateModelPipe(self) -> None:
+        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        modelPipe = _mfn.Pipe(inputPort, outputPort, name=self.displayName)
+        self.modelPipe = modelPipe
 
     def _draw(self):
         self.port1.setZValue(100)
@@ -101,6 +107,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def rename(self, newName):
         self.displayName = newName
+        self._updateModelPipe()
 
     def highlightHx(self):
         for ch in self.childItems():

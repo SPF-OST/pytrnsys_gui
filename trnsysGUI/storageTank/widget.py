@@ -7,18 +7,20 @@ import typing as _tp
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
 
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.storageTank.model as _model
 import trnsysGUI.storageTank.side as _sd
+import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.HeatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
-import trnsysGUI.internalPiping as _ip
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
@@ -152,7 +154,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         super().updateImage()
         self.label.setPos(self.label.pos().x(), self.h)
 
-    def updatePortItemPositions(self, deltaH, deltaW):
+    def updatePortItemPositionsAfterTankSizeChange(self, deltaH, deltaW):
         for portItem in self.inputs + self.outputs:
             oldRelativeHeight = portItem.pos().y() / self.h
             if portItem.side == 0:
@@ -376,53 +378,24 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         ConfigureStorageDialog(self, self.scene().parent())
 
     def getInternalPiping(self) -> _ip.InternalPiping:
-        heatExchangerNodes, heatExchangerPortItems = self._createHeatExchangerNodes()
+        heatExchangerNodes = [hx.modelPipe for hx in self.heatExchangers]
+        heatExchangerPortItems = {
+            mpi: gpi
+            for hx in self.heatExchangers
+            for mpi, gpi in [(hx.modelPipe.fromPort, hx.port1), (hx.modelPipe.toPort, hx.port2)]
+        }
 
-        portPairNodes, portPairsPortItems = self._createPortPairNodes()
+        portPairNodes = [pp.modelPipe for pp in self.directPortPairs]
+        portPairsPortItems = {
+            mpi: gpi
+            for pp in self.directPortPairs
+            for mpi, gpi in [(pp.modelPipe.fromPort, pp.fromPort), (pp.modelPipe.toPort, pp.toPort)]
+        }
 
         nodes = [*heatExchangerNodes, *portPairNodes]
         modelPortItemsToGraphicalPortItem = heatExchangerPortItems | portPairsPortItems
 
         return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
-
-    def _createHeatExchangerNodes(self):
-        heatExchangerPortItems = {}
-        heatExchangerNodes = []
-        for heatExchanger in self.heatExchangers:
-            heatExchangerPortItem1 = _mfn.PortItem("Heat Exchanger Input", _mfn.PortItemDirection.INPUT)
-            heatExchangerPortItems[heatExchangerPortItem1] = heatExchanger.port1
-
-            heatExchangerPortItem2 = _mfn.PortItem("Heat Exchanger Output", _mfn.PortItemDirection.OUTPUT)
-            heatExchangerPortItems[heatExchangerPortItem2] = heatExchanger.port2
-
-            node = _mfn.Pipe(heatExchangerPortItem1, heatExchangerPortItem2, name=heatExchanger.displayName)
-            heatExchangerNodes.append(node)
-
-        return heatExchangerNodes, heatExchangerPortItems
-
-    def _createPortPairNodes(self):
-        portPairsPortItems = {}
-        portPairNodes = []
-        for directPortPair in self.directPortPairs:
-            portPairPortItem1 = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
-            portPairsPortItems[portPairPortItem1] = directPortPair.fromPort
-
-            portPairPortItem2 = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
-            portPairsPortItems[portPairPortItem2] = directPortPair.toPort
-
-            nodeName = self._getDirectPortPairNodeName(directPortPair)
-
-            node = _mfn.Pipe(portPairPortItem1, portPairPortItem2, nodeName)
-            portPairNodes.append(node)
-
-        return portPairNodes, portPairsPortItems
-
-    @staticmethod
-    def _getDirectPortPairNodeName(directPortPair: DirectPortPair):
-        return (
-            f"Dp{'L' if directPortPair.side.isLeft else 'R'}"
-            f"{directPortPair.relativeInputHeightPercent}_{directPortPair.relativeOutputHeightPercent}"
-        )
 
     def exportDck(self):  # pylint: disable=too-many-locals,too-many-statements
 
@@ -461,46 +434,57 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
-            incomingConnection = directPortPair.fromPort.connectionList[0]
-            temperatureName = "T" + incomingConnection.displayName
-            massFlowRateName = "Mfr" + incomingConnection.displayName
+            fromPort = directPortPair.fromPort
+            incomingConnection = fromPort.getConnection()
+            inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
+            massFlowRateName = _cnames.getInputMassFlowVariableName(fromPort, _mfn.PortItemType.STANDARD)
 
-            outgoingConnection = directPortPair.toPort.connectionList[0]
-            reverseTemperatureName = "T" + outgoingConnection.displayName
+            outgoingConnection = directPortPair.toPort.getConnection()
+            reverseInputTemperatureName = _cnames.getTemperatureVariableName(
+                outgoingConnection, _mfn.PortItemType.STANDARD
+            )
 
             inputPos = directPortPair.relativeInputHeight
             outputPos = directPortPair.relativeOutputHeight
 
+            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, directPortPair.modelPipe)
+
             directPairsPort = {
-                "T": temperatureName,
+                "T": inputTemperatureName,
                 "side": directPortPair.side.formatDdck(),
                 "Mfr": massFlowRateName,
-                "Trev": reverseTemperatureName,
+                "Trev": reverseInputTemperatureName,
                 "zIn": inputPos,
                 "zOut": outputPos,
+                "Tout": outputTemperatureName,
             }
             directPairsPorts.append(directPairsPort)
 
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
             heatExchangerName = heatExchanger.displayName
-            incomingConnection = heatExchanger.port1.connectionList[0]
-            temperatureName = "T" + incomingConnection.displayName
-            massFlowRateName = "Mfr" + incomingConnection.displayName
+            incomingConnection = heatExchanger.port1.getConnection()
+            inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
+            massFlowRateName = _cnames.getInputMassFlowVariableName(heatExchanger.port1, _mfn.PortItemType.STANDARD)
 
-            outgoingConnection = heatExchanger.port2.connectionList[0]
-            reverseTemperatureName = "T" + outgoingConnection.displayName
+            outgoingConnection = heatExchanger.port2.getConnection()
+            reverseInputTemperatureName = _cnames.getTemperatureVariableName(
+                outgoingConnection, _mfn.PortItemType.STANDARD
+            )
 
             inputPos = heatExchanger.relativeInputHeight
             outputPos = heatExchanger.relativeOutputHeight
 
+            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, heatExchanger.modelPipe)
+
             heatExchangerPort = {
                 "Name": heatExchangerName,
-                "T": temperatureName,
+                "T": inputTemperatureName,
                 "Mfr": massFlowRateName,
-                "Trev": reverseTemperatureName,
+                "Trev": reverseInputTemperatureName,
                 "zIn": inputPos,
                 "zOut": outputPos,
+                "Tout": outputTemperatureName,
                 "cp": "cpwat",
                 "rho": "rhowat",
             }

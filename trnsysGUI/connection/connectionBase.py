@@ -9,12 +9,13 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
-import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.SegmentItemBase as _sib
-import trnsysGUI.internalPiping as _ip
-import trnsysGUI.idGenerator as _id
 import trnsysGUI.CornerItem as _ci
 import trnsysGUI.Node as _node
+import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.SegmentItemBase as _sib
+import trnsysGUI.idGenerator as _id
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -58,6 +59,9 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def getDisplayName(self) -> str:
         return self.displayName
+
+    def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
+        raise NotImplementedError()
 
     @property
     def fromPort(self) -> _pib.PortItemBase:
