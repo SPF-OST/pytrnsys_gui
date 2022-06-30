@@ -26,19 +26,19 @@ elSysIn_Q_TesDhwAux = qHeatSource_Tes7703
 *************************************
 EQUATIONS 3
 Tdp1In_Tes7703 = Tdpp0ExtFromPortConn
-Mfrdp1_Tes7703 = Mdpp0ExtFromPortConn_A
+Mfrdp1_Tes7703 = MDhwDpL95_35_A
 Tdp1InRev_Tes7703 = Tdpp0ExtToPortConn
 EQUATIONS 3
 Tdp2In_Tes7703 = Tdpp1ExtFromPortConn
-Mfrdp2_Tes7703 = Mdpp1ExtFromPortConn_A
+Mfrdp2_Tes7703 = MDhwDpR70_90_A
 Tdp2InRev_Tes7703 = Tdpp1ExtToPortConn
 EQUATIONS 3
 Tdp3In_Tes7703 = Tdpp2ExtFromPortConn
-Mfrdp3_Tes7703 = Mdpp2ExtFromPortConn_A
+Mfrdp3_Tes7703 = MDhwDpR5_95_A
 Tdp3InRev_Tes7703 = Tdpp2ExtToPortConn
 EQUATIONS 3
 Thx1In_Tes7703 = Thx0ExtFromPortConn
-Mfrhx1_Tes7703 = Mhx0ExtFromPortConn_A
+Mfrhx1_Tes7703 = MDhwSolarHx_A
 Thx1InRev_Tes7703 = Thx0ExtToPortConn
 CONSTANTS 2
 zAux1_Tes7703=0.00

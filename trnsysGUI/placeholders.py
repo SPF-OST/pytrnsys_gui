@@ -5,6 +5,7 @@ import pytrnsys.utils.result as _res
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 
@@ -42,7 +43,7 @@ def getPlaceholderValues(ddckDirNames: _tp.Sequence[str], trnsysObjects) -> _res
                     inputTemperatureVariableName = _cnames.getTemperatureVariableName(
                         inputConnection, modelPortItem.type
                     )
-                    inputMfrVariableName = _cnames.getInputMassFlowVariableName(graphicalPortItem, modelPortItem.type)
+                    inputMfrVariableName = _mnames.getMassFlowVariableName(component, node, modelPortItem)
 
                     placeholders[modelPortItem.name] = {
                         "@temp": inputTemperatureVariableName,

@@ -26,11 +26,11 @@ elSysIn_Q_TesSHAux = qHeatSource_Tes2
 *************************************
 EQUATIONS 3
 Tdp1In_Tes2 = TPiHpToTesShIn
-Mfrdp1_Tes2 = MPiHpToTesShIn_A
+Mfrdp1_Tes2 = MSHDpL95_5_A
 Tdp1InRev_Tes2 = TPiHpToTesShOut
 EQUATIONS 3
 Tdp2In_Tes2 = TPiTesShIn
-Mfrdp2_Tes2 = MPiTesShIn_A
+Mfrdp2_Tes2 = MSHDpR5_95_A
 Tdp2InRev_Tes2 = TPiTesShOut
 CONSTANTS 2
 zAux1_Tes2=0.00

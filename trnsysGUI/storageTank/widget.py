@@ -11,16 +11,17 @@ import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.storageTank.model as _model
 import trnsysGUI.storageTank.side as _sd
 import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.heatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
+from trnsysGUI.heatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
@@ -434,10 +435,11 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
-            fromPort = directPortPair.fromPort
-            incomingConnection = fromPort.getConnection()
+            incomingConnection = directPortPair.fromPort.getConnection()
             inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
-            massFlowRateName = _cnames.getInputMassFlowVariableName(fromPort, _mfn.PortItemType.STANDARD)
+
+            modelPipe = directPortPair.modelPipe
+            massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
 
             outgoingConnection = directPortPair.toPort.getConnection()
             reverseInputTemperatureName = _cnames.getTemperatureVariableName(
@@ -447,7 +449,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             inputPos = directPortPair.relativeInputHeight
             outputPos = directPortPair.relativeOutputHeight
 
-            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, directPortPair.modelPipe)
+            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, modelPipe)
 
             directPairsPort = {
                 "T": inputTemperatureName,
@@ -463,9 +465,12 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
             heatExchangerName = heatExchanger.displayName
+
             incomingConnection = heatExchanger.port1.getConnection()
             inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
-            massFlowRateName = _cnames.getInputMassFlowVariableName(heatExchanger.port1, _mfn.PortItemType.STANDARD)
+
+            modelPipe = heatExchanger.modelPipe
+            massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
 
             outgoingConnection = heatExchanger.port2.getConnection()
             reverseInputTemperatureName = _cnames.getTemperatureVariableName(
@@ -475,7 +480,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             inputPos = heatExchanger.relativeInputHeight
             outputPos = heatExchanger.relativeOutputHeight
 
-            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, heatExchanger.modelPipe)
+            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, modelPipe)
 
             heatExchangerPort = {
                 "Name": heatExchangerName,
