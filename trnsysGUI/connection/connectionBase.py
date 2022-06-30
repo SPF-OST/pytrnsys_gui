@@ -1023,16 +1023,16 @@ class ConnectionBase(_ip.HasInternalPiping):
     def decode(self, i):
         raise NotImplementedError()
 
-    def exportPumpOutlets(self):  # pylint: disable = no-self-use
+    def exportPumpOutlets(self):
         return "", 0
 
-    def exportMassFlows(self):  # pylint: disable = no-self-use
+    def exportMassFlows(self):
         return "", 0
 
-    def exportDivSetting1(self):  # pylint: disable = no-self-use
+    def exportDivSetting1(self):
         return "", 0
 
-    def exportDivSetting2(self, nUnit):  # pylint: disable = no-self-use
+    def exportDivSetting2(self, nUnit):
         return "", nUnit
 
     def getInternalPiping(self) -> _ip.InternalPiping:

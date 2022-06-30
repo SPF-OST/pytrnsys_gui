@@ -9,5 +9,4 @@ pylint
 
 PyQT5-stubs
 
--e file:.#egg=pytrnsys-gui
-git+https://github.com/SPF-OST/pytrnsys.git@master#egg=pytrnsys
+-c ../../release/requirements.txt

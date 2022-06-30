@@ -27,7 +27,7 @@ from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
 
 InOut = _tp.Literal["In", "Out"]
-_T = _tp.TypeVar("_T", covariant=True)
+_T_co = _tp.TypeVar("_T_co", covariant=True)
 
 
 @_dc.dataclass
@@ -335,7 +335,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         return directPortPair
 
     @staticmethod
-    def _getSingleOrNone(iterable: _tp.Iterable[_T]) -> _tp.Optional[_T]:
+    def _getSingleOrNone(iterable: _tp.Iterable[_T_co]) -> _tp.Optional[_T_co]:
         sequence = list(iterable)
 
         if not sequence:

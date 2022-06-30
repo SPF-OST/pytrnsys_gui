@@ -24,6 +24,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install wheel
+        pip install -r requirements/release/requirements.txt
         pip install -r requirements/ci/test/requirements.txt
     - name: Generate UI code from Qt Creator Studio .ui files
       run: python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
