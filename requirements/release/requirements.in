@@ -1,0 +1,2 @@
+-e file:.#egg=pytrnsys-gui
+git+https://github.com/SPF-OST/pytrnsys.git@master#egg=pytrnsys
