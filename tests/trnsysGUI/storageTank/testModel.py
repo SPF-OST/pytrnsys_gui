@@ -7,7 +7,7 @@ class TestModel:
     DATA_DIR_PATH = _pl.Path(__file__).parent.parent / "data"
     EXPECTED_DIR_PATH = DATA_DIR_PATH / "expected"
 
-    def testConvertFromOldestToNewestFormat(self):  # pylint: disable=no-self-use
+    def testConvertFromOldestToNewestFormat(self):
         expectedPath = self.EXPECTED_DIR_PATH / "storageTankConvertedFromOldestToNewestBeforeSettingInvalidIDs.json"
         expectedStorageTankJson = expectedPath.read_text()
 
@@ -17,7 +17,7 @@ class TestModel:
 
         assert actualStorageTankJson == expectedStorageTankJson
 
-    def testRoundTripWithNewestFormat(self):  # pylint: disable=no-self-use
+    def testRoundTripWithNewestFormat(self):
         newestFormatPath = self.EXPECTED_DIR_PATH / "storageTankNewestFormat.json"
         newestFormatJson = newestFormatPath.read_text()
 

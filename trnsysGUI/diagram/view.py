@@ -67,11 +67,11 @@ class View(QGraphicsView):
         self.adjustSize()
         self.setRenderHint(QPainter.Antialiasing)
 
-    def dragEnterEvent(self, event):  # pylint: disable=no-self-use
+    def dragEnterEvent(self, event):
         if event.mimeData().hasFormat("component/name"):
             event.accept()
 
-    def dragMoveEvent(self, event):  # pylint: disable=no-self-use
+    def dragMoveEvent(self, event):
         if event.mimeData().hasFormat("component/name"):
             event.accept()
 

@@ -8,7 +8,7 @@ astroid==2.11.6
     # via pylint
 atomicwrites==1.4.0
     # via pytest
-attrs==20.3.0
+attrs==21.4.0
     # via
     #   -c requirements\ci\test\../../release/requirements.txt
     #   pytest
@@ -32,7 +32,7 @@ mypy-extensions==0.4.3
     # via mypy
 mypy==0.961
     # via -r requirements\ci\test\requirements.in
-packaging==20.9
+packaging==21.3
     # via
     #   -c requirements\ci\test\../../release/requirements.txt
     #   pytest
@@ -44,7 +44,7 @@ py==1.11.0
     # via pytest
 pylint==2.14.4
     # via -r requirements\ci\test\requirements.in
-pyparsing==2.4.7
+pyparsing==3.0.9
     # via
     #   -c requirements\ci\test\../../release/requirements.txt
     #   packaging

@@ -392,7 +392,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
 
         return self.createIndex(row, column)
 
-    def parent(self, _: _qtc.QModelIndex) -> _qtc.QModelIndex:  # type: ignore[override] # pylint: disable=no-self-use
+    def parent(self, _: _qtc.QModelIndex) -> _qtc.QModelIndex:  # type: ignore[override]
         return _qtc.QModelIndex()
 
     @staticmethod

@@ -297,7 +297,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                 if p.side in (1, 3):
                     self.updateSide(p, 2)
 
-    def updateSide(self, port, n):  # pylint: disable=no-self-use
+    def updateSide(self, port, n):
         port.side = (port.side + n) % 4
 
     def rotateBlockCW(self):
@@ -648,19 +648,19 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         resBlockList.append(self)
 
-    def exportPumpOutlets(self):  # pylint: disable=no-self-use
+    def exportPumpOutlets(self):
         return "", 0
 
-    def exportMassFlows(self):  # pylint: disable=no-self-use
+    def exportMassFlows(self):
         return "", 0
 
-    def exportDivSetting1(self):  # pylint: disable=no-self-use
+    def exportDivSetting1(self):
         return "", 0
 
-    def exportDivSetting2(self, nUnit):  # pylint: disable=no-self-use
+    def exportDivSetting2(self, nUnit):
         return "", nUnit
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:  # pylint: disable=no-self-use
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         return "", startingUnit
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:

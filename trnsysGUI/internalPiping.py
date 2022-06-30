@@ -71,7 +71,7 @@ class HasInternalPiping:
     def getDisplayName(self) -> str:
         raise NotImplementedError()
 
-    def hasDdckPlaceHolders(self) -> bool:  # pylint: disable=no-self-use
+    def hasDdckPlaceHolders(self) -> bool:
         return False
 
     def getInternalPiping(self) -> InternalPiping:
