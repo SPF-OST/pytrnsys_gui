@@ -26,7 +26,7 @@ elSysIn_Q_TesShAux = qHeatSource_Tes1
 *************************************
 EQUATIONS 3
 Tdp1In_Tes1 = TPiShPriFl
-Mfrdp1_Tes1 = MPiShPriFl_A
+Mfrdp1_Tes1 = MShDpL90_2_A
 Tdp1InRev_Tes1 = TPiShPriRt
 CONSTANTS 2
 zAux1_Tes1=0.00

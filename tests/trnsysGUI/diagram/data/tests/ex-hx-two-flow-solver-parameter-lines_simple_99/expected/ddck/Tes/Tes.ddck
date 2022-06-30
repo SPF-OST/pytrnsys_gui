@@ -26,7 +26,7 @@ elSysIn_Q_TesTesAux = qHeatSource_Tes1
 *************************************
 EQUATIONS 3
 Tdp1In_Tes1 = TPiExHx_Tes
-Mfrdp1_Tes1 = MPiExHx_Tes_A
+Mfrdp1_Tes1 = MTesDpL50_10_A
 Tdp1InRev_Tes1 = TPiTes_Pump88
 CONSTANTS 2
 zAux1_Tes1=0.00

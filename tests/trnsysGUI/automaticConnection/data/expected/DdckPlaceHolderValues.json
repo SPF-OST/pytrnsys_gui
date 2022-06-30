@@ -1,7 +1,7 @@
 {
     "Dhw": {
         "In": {
-            "@mfr": "MPiCircIn_A",
+            "@mfr": "MDhwDpR70_90_A",
             "@temp": "TPiCircIn"
         },
         "Out": {
@@ -10,7 +10,7 @@
     },
     "FCU": {
         "In": {
-            "@mfr": "MPiFCUIn_A",
+            "@mfr": "MFCU_A",
             "@temp": "TPiFCUIn"
         },
         "Out": {
@@ -19,7 +19,7 @@
     },
     "Ghx": {
         "In": {
-            "@mfr": "MPiHxCoolBriOut_A",
+            "@mfr": "MGhx_A",
             "@temp": "TPiHxCoolBriOut"
         },
         "Out": {
@@ -28,11 +28,11 @@
     },
     "HP": {
         "CondIn1": {
-            "@mfr": "MPiHpCondIn_A",
+            "@mfr": "MHPCond1_A",
             "@temp": "TPiHpCondIn"
         },
         "CondIn2": {
-            "@mfr": "MPiHpDesIn_A",
+            "@mfr": "MHPCond2_A",
             "@temp": "TPiHpDesIn"
         },
         "CondOut1": {
@@ -42,7 +42,7 @@
             "@temp": "THPCond2"
         },
         "EvapIn": {
-            "@mfr": "MPiGhxToHP_A",
+            "@mfr": "MHPEvap_A",
             "@temp": "TPiGhxToHP"
         },
         "EvapOut": {
@@ -51,11 +51,11 @@
     },
     "HxCool": {
         "In1": {
-            "@mfr": "MPiHpToHxCool_A",
+            "@mfr": "MHxCoolSide1_A",
             "@temp": "TPiHpToHxCool"
         },
         "In2": {
-            "@mfr": "MPiHxCoolWatIn_A",
+            "@mfr": "MHxCoolSide2_A",
             "@temp": "TPiHxCoolWatIn"
         },
         "Out1": {
@@ -67,11 +67,11 @@
     },
     "HxDHW": {
         "In1": {
-            "@mfr": "MPiDhwToHxDhw_A",
+            "@mfr": "MHxDHWSide1_A",
             "@temp": "TPiDhwToHxDhw"
         },
         "In2": {
-            "@mfr": "MPiSupplyToHxDhw_A",
+            "@mfr": "MHxDHWSide2_A",
             "@temp": "TPiSupplyToHxDhw"
         },
         "Out1": {
@@ -83,7 +83,7 @@
     },
     "RadiatorSH": {
         "In": {
-            "@mfr": "MPiRadIn_A",
+            "@mfr": "MRadiatorSH_A",
             "@temp": "TPiRadIn"
         },
         "Out": {
@@ -92,7 +92,7 @@
     },
     "SH": {
         "In": {
-            "@mfr": "MPiTesSCIn_A",
+            "@mfr": "MSHDpR90_10_A",
             "@temp": "TPiTesSCIn"
         },
         "Out": {
