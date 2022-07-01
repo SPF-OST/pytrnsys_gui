@@ -65,11 +65,19 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     @property
     def fromPort(self) -> _pib.PortItemBase:
-        return self._fromPort
+        raise NotImplementedError()
+
+    @fromPort.setter
+    def fromPort(self, fromPort: _pib.PortItemBase) -> None:
+        raise NotImplementedError()
 
     @property
     def toPort(self) -> _pib.PortItemBase:
-        return self._toPort
+        raise NotImplementedError()
+
+    @toPort.setter
+    def toPort(self, toPort: _pib.PortItemBase) -> None:
+        raise NotImplementedError()
 
     def _updateModels(self, newDisplayName: str) -> None:
         raise NotImplementedError()

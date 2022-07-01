@@ -8,6 +8,7 @@ import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
+import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
@@ -33,10 +34,22 @@ class DoublePipeConnection(_cb.ConnectionBase):
         assert isinstance(self._fromPort, _dppi.DoublePipePortItem)
         return self._fromPort
 
+    @fromPort.setter
+    def fromPort(self, fromPort: _pib.PortItemBase) -> None:
+        if not isinstance(fromPort, _dppi.DoublePipePortItem):
+            raise ValueError(f"`toPort` must be an instance of f{_dppi.DoublePipePortItem.__name__}")
+        self._fromPort = fromPort
+
     @property
     def toPort(self) -> _dppi.DoublePipePortItem:
         assert isinstance(self._toPort, _dppi.DoublePipePortItem)
         return self._toPort
+
+    @toPort.setter
+    def toPort(self, toPort: _pib.PortItemBase) -> None:
+        if not isinstance(toPort, _dppi.DoublePipePortItem):
+            raise ValueError(f"`toPort` must be an instance of f{_dppi.DoublePipePortItem.__name__}")
+        self._toPort = toPort
 
     def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
         if portItemType == _mfn.PortItemType.COLD:
