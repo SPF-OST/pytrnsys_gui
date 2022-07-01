@@ -83,7 +83,7 @@ class RealNodeBase(NodeBase, _abc.ABC):
     def getNodeType(self) -> NodeType:
         raise NotImplementedError()
 
-    def getInputVariable(self) -> _tp.Optional[InputVariable]:  # pylint: disable=no-self-use
+    def getInputVariable(self) -> _tp.Optional[InputVariable]:
         return None
 
     def getOutputVariables(self) -> OutputVariables:

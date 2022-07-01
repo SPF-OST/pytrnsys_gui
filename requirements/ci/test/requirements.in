@@ -9,4 +9,5 @@ pylint
 
 PyQT5-stubs
 
+-c ../../release/requirements.txt
 -e file:.#egg=pytrnsys-gui

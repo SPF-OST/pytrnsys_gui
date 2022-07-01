@@ -24,7 +24,7 @@ from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
 
 InOut = _tp.Literal["In", "Out"]
-_T = _tp.TypeVar("_T", covariant=True)
+_T_co = _tp.TypeVar("_T_co", covariant=True)
 
 
 @_dc.dataclass
@@ -33,8 +33,7 @@ class PortIds:
     outputId: int
 
 
-class StorageTank(BlockItem,
-                  MassFlowNetworkContributorMixin):
+class StorageTank(BlockItem, MassFlowNetworkContributorMixin):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
@@ -48,8 +47,6 @@ class StorageTank(BlockItem,
         self.directPortPairs: _tp.List[DirectPortPair] = []
 
         self.heatExchangers: _tp.List[HeatExchanger] = []
-
-        self.blackBoxEquations = []
 
         self.nTes = self.parent.parent().idGen.getStoragenTes()
         self.storageType = self.parent.parent().idGen.getStorageType()
@@ -68,9 +65,7 @@ class StorageTank(BlockItem,
         return self._getDirectPortPairPortItems(_sd.Side.RIGHT)
 
     def _getDirectPortPairPortItems(self, side: _sd.Side):
-        return [
-            p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]
-        ]
+        return [p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]]
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.STORAGE_TANK_SVG
@@ -87,13 +82,13 @@ class StorageTank(BlockItem,
             heatExchanger.parent = self
 
     def addDirectPortPair(  # pylint: disable=too-many-arguments
-            self,
-            trnsysId: int,
-            side: _sd.Side,
-            relativeInputHeight: float,
-            relativeOutputHeight: float,
-            storageTankHeight: float,
-            portIds: _tp.Optional[PortIds] = None,
+        self,
+        trnsysId: int,
+        side: _sd.Side,
+        relativeInputHeight: float,
+        relativeOutputHeight: float,
+        storageTankHeight: float,
+        portIds: _tp.Optional[PortIds] = None,
     ):
         inputPort = self._createPort("i", relativeInputHeight, storageTankHeight, side)
         outputPort = self._createPort("o", relativeOutputHeight, storageTankHeight, side)
@@ -107,16 +102,14 @@ class StorageTank(BlockItem,
             inputPort.id = portIds.inputId
             outputPort.id = portIds.outputId
 
-        directPortPair = DirectPortPair(
-            trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side
-        )
+        directPortPair = DirectPortPair(trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side)
 
         self.directPortPairs.append(directPortPair)
         self.inputs.append(directPortPair.fromPort)
         self.outputs.append(directPortPair.toPort)
 
     def _createPort(
-            self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
+        self, name: str, relativeHeight: float, storageTankHeight: float, side: _sd.Side
     ) -> SinglePipePortItem:
         sideNr = side.toSideNr()
         portItem = _cspi.createSinglePipePortItem(name, sideNr, self)
@@ -234,12 +227,12 @@ class StorageTank(BlockItem,
         self._decodeInternal(i, offsetX, offsetY, resBlockList, shallSetNamesAndIDs=True)
 
     def _decodeInternal(  # pylint: disable=too-many-arguments
-            self,
-            i,
-            offsetX,
-            offsetY,
-            resBlockList,
-            shallSetNamesAndIDs: bool,
+        self,
+        i,
+        offsetX,
+        offsetY,
+        resBlockList,
+        shallSetNamesAndIDs: bool,
     ):
         self.logger.debug("Loading a Storage in Decoder")
 
@@ -269,8 +262,8 @@ class StorageTank(BlockItem,
         resBlockList.append(self)
 
     def _decodeDirectPortPair(
-            self,
-            portPairModel: _model.DirectPortPair,
+        self,
+        portPairModel: _model.DirectPortPair,
     ) -> None:
         portPair = portPairModel.portPair
 
@@ -292,8 +285,7 @@ class StorageTank(BlockItem,
         name = heatExchangerModel.name + nameSuffix
 
         heatExchanger = self.addHeatExchanger(
-            name, portPair.trnsysId, portPair.side, portPair.inputPort.relativeHeight,
-            portPair.outputPort.relativeHeight
+            name, portPair.trnsysId, portPair.side, portPair.inputPort.relativeHeight, portPair.outputPort.relativeHeight
         )
 
         if shallSetNamesAndIDs:
@@ -303,7 +295,7 @@ class StorageTank(BlockItem,
         heatExchanger.port2.id = portPair.outputPort.id
 
     def decodePaste(  # pylint: disable=too-many-arguments
-            self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
+        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
     ):
         self._decodeInternal(i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=False)
 
@@ -330,7 +322,7 @@ class StorageTank(BlockItem,
         raise ValueError("Port item doesn't belong to this storage tank.")
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(
-            self, generator: _id.IdGenerator
+        self, generator: _id.IdGenerator
     ) -> None:  # type: ignore[attr-defined]
         for heatExchanger in self.heatExchangers:
             if heatExchanger.trnsysId == generator.UNINITIALIZED_ID:
@@ -353,7 +345,7 @@ class StorageTank(BlockItem,
         return directPortPair
 
     @staticmethod
-    def _getSingleOrNone(iterable: _tp.Iterable[_T]) -> _tp.Optional[_T]:
+    def _getSingleOrNone(iterable: _tp.Iterable[_T_co]) -> _tp.Optional[_T_co]:
         sequence = list(iterable)
 
         if not sequence:

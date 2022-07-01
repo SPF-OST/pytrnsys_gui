@@ -4,7 +4,7 @@ import trnsysGUI.storageTank.model as _stm
 
 
 class TestModel:
-    def testConvertFromOldestToNewestFormat(self):  # pylint: disable=no-self-use
+    def testConvertFromOldestToNewestFormat(self):
         expectedPath = (
             _pl.Path(__file__).parent.parent
             / "data"
@@ -18,7 +18,7 @@ class TestModel:
 
         assert actualStorageTankJson == expectedStorageTankJson
 
-    def testRoundTripWithNewestFormat(self):  # pylint: disable=no-self-use
+    def testRoundTripWithNewestFormat(self):
         newestFormatPath = _pl.Path(__file__).parent.parent / "data" / "storageTankNewestFormat.json"
         newestFormatJson = newestFormatPath.read_text()
 
