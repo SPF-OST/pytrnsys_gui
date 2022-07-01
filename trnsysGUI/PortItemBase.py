@@ -255,13 +255,13 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
     def _debugClear(self):
         self.parent.parent.parent().listV.clear()
 
-    def hideCorners(self, connection):  # pylint: disable = no-self-use
+    def hideCorners(self, connection):
         cor = connection.getCorners()[0]
         cor2 = connection.getCorners()[-1]
         cor.setVisible(False)
         cor2.setVisible(False)
 
-    def showCorners(self, connection):  # pylint: disable = no-self-use
+    def showCorners(self, connection):
         cor = connection.getCorners()[0]
         cor2 = connection.getCorners()[-1]
         cor.setVisible(True)

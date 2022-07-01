@@ -1,10 +1,11 @@
 # pylint: skip-file
+
 import dataclasses as _dc
 import logging as _log
 import re
 import typing as _tp
 
-import jinja2 as _jinja
+import jinja2 as _jinja  # type: ignore[import]
 
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
