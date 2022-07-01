@@ -44,22 +44,10 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         assert isinstance(self._fromPort, _sppi.SinglePipePortItem)
         return self._fromPort
 
-    @fromPort.setter
-    def fromPort(self, fromPort: _pib.PortItemBase) -> None:
-        if not isinstance(fromPort, _sppi.SinglePipePortItem):
-            raise ValueError(f"`toPort` must be an instance of f{_sppi.SinglePipePortItem.__name__}")
-        self._fromPort = fromPort
-
     @property
     def toPort(self) -> _sppi.SinglePipePortItem:
         assert isinstance(self._toPort, _sppi.SinglePipePortItem)
         return self._toPort
-
-    @toPort.setter
-    def toPort(self, toPort: _pib.PortItemBase) -> None:
-        if not isinstance(toPort, _sppi.SinglePipePortItem):
-            raise ValueError(f"`toPort` must be an instance of f{_sppi.SinglePipePortItem.__name__}")
-        self._fromPort = toPort
 
     def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
         if portItemType != _mfn.PortItemType.STANDARD:

@@ -7,5 +7,6 @@ black
 
 sphinx
 
+-c ../release/requirements.txt
 -c ../ci/test/requirements.txt
 -e file:../pytrnsys#egg=pytrnsys
