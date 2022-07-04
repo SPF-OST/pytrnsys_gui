@@ -1,0 +1,4 @@
+-r dev-3rd-party.in
+
+-e file:../pytrnsys#egg=pytrnsys
+-e file:.#egg=pytrnsys-gui
