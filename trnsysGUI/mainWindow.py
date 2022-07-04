@@ -1,32 +1,22 @@
-# pylint: skip-file
 # type: ignore
+# pylint: skip-file
 
 import os
 import pathlib as _pl
 import shutil
 import subprocess
-import sys
 
-import pkg_resources
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QUndoStack, QMessageBox, QFileDialog
 
-import pytrnsys.utils.result as _res
-import trnsysGUI.arguments as args
-import trnsysGUI.buildDck as buildDck
-import trnsysGUI.common.cancelled as _ccl
-import trnsysGUI.diagram.Editor as _de
-import trnsysGUI.images as _img
-import trnsysGUI.project as _prj
-import trnsysGUI.settings as _settings
-import trnsysGUI.settingsDlg as _sdlg
-import trnsysGUI.tracing as trc
-from pytrnsys.utils import log
+from pytrnsys.utils import result as _res
+from trnsysGUI import project as _prj, images as _img, errors as _err, buildDck as buildDck, settings as _settings, settingsDlg as _sdlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
+from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.configFile import configFile
-from trnsysGUI.errors import showErrorMessageBox
+from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
 
 
@@ -334,7 +324,7 @@ class MainWindow(QMainWindow):
             errorMessage += (
                 "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
             )
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             return
 
         #   Update run.config
@@ -346,7 +336,7 @@ class MainWindow(QMainWindow):
 
         if executionFailed:
             errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
 
         return
 
@@ -354,14 +344,14 @@ class MainWindow(QMainWindow):
         processPath = os.path.join(self.projectFolder, "process.config")
         if not os.path.isfile(processPath):
             errorMessage = f"No such file: {processPath}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             return
         processApp = ProcessMain()
         executionFailed, errorStatement = processApp.processAction(self.logger, self.centralWidget.projectFolder)
 
         if executionFailed:
             errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
 
         return
 
@@ -369,7 +359,7 @@ class MainWindow(QMainWindow):
         result = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
         if _res.isError(result):
             errorMessage = f"The json file could not be generated: {result.message}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
 
     def renameDia(self):
         self.logger.info("Renaming diagram...")
@@ -468,7 +458,7 @@ class MainWindow(QMainWindow):
         jsonResult = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
         if _res.isError(jsonResult):
             errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             return
 
         builder = buildDck.buildDck(self.projectFolder)
@@ -476,7 +466,7 @@ class MainWindow(QMainWindow):
         result = builder.buildTrnsysDeck()
         if _res.isError(result):
             errorMessage = f"The deck file could not be generated: {result.message}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
 
     def toggleEditorMode(self):
         self.logger.info("Toggling editor mode")
@@ -503,7 +493,7 @@ class MainWindow(QMainWindow):
 
         if not self.centralWidget.trnsysPath.is_file():
             errorMessage = "TRNExe.exe not found! Consider correcting the path in the settings."
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             return None
 
         try:
@@ -514,7 +504,7 @@ class MainWindow(QMainWindow):
             return mfrFile, tempFile
         except Exception as exception:
             errorMessage = f"An exception occurred while trying to execute the mass flow solver: {exception}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             self.logger.error(errorMessage)
 
             return None
@@ -628,39 +618,3 @@ class MainWindow(QMainWindow):
             )
 
         raise AssertionError(f"Unknown `project' type: {type(project)}")
-
-
-def main():
-    arguments = args.getArgsOrExit()
-
-    logger = log.setup_custom_logger("root", arguments.logLevel)
-    app = QApplication(sys.argv)
-    app.setApplicationName("Diagram Creator")
-
-    maybeCancelled = _prj.getProject()
-    if _ccl.isCancelled(maybeCancelled):
-        return
-    project = _ccl.value(maybeCancelled)
-
-    form = MainWindow(logger, project)
-    form.showMaximized()
-    form.show()
-    form.ensureSettingsExist()
-    form.loadTrnsysPath()
-
-    tracer = trc.createTracer(arguments.shallTrace)
-    tracer.run(lambda: app.exec())
-
-
-def generateUI():
-    if pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local.endswith("dev"):
-        uiGenerateFilePath = (
-            _pl.Path(__file__).parent.parent / "dev-tools" / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
-        )
-        cmd = ["python.exe", uiGenerateFilePath]
-        subprocess.run(cmd, check=True)
-
-
-if __name__ == "__main__":
-    generateUI()
-    main()

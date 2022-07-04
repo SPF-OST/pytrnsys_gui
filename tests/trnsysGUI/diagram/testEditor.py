@@ -12,7 +12,7 @@ import pandas as _pd
 import pytest as _pt
 
 import pytrnsys.utils.log as _ulog
-import trnsysGUI.GUI as _gui
+import trnsysGUI.mainWindow as _mw
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
@@ -94,7 +94,7 @@ class TestEditor:
 
         logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
 
-        mainWindow = _gui.MainWindow(logger, projectInOldJsonFormat)  # type: ignore[attr-defined]
+        mainWindow = _mw.MainWindow(logger, projectInOldJsonFormat)  # type: ignore[attr-defined]
 
         newProjectFolderPath = projectFolderPath.parent / "actual"
 
