@@ -1,0 +1,4 @@
+-r core-3rd-party.in
+
+pytrnsys==0.6.4
+pytrnsys-gui==0.9.13

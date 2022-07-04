@@ -1,0 +1,14 @@
+wheel
+
+twine
+
+pip-tools
+pip-compile-multi
+black
+
+sphinx
+
+-r test.in
+
+-e file:../pytrnsys#egg=pytrnsys
+-e file:.#egg=pytrnsys-gui
