@@ -14,7 +14,8 @@ _BASE_DIRECTORY = _pl.Path(__file__).parents[1]
 
 @_dc.dataclass(frozen=True, order=True)
 class _VersionedPackage:
-    name: str
+    name: str = _dc.field(compare=False)
+    canonicalName: str
     version: str
 
     _VERSIONED_PACKAGE_REGEX = _re.compile(r"^([^#\s=]+)==([^#\s=]+)$")
@@ -30,11 +31,11 @@ class _VersionedPackage:
 
         canonicalName = cls._getCanonicalPipPackageName(name)
 
-        return _VersionedPackage(canonicalName, version)
+        return _VersionedPackage(name, canonicalName, version)
 
     @staticmethod
     def _getCanonicalPipPackageName(name) -> str:
-        return _re.sub(r"(-+|\.+|_+)", "_", name).lower()
+        return _re.sub(r"[\-_.]+", "_", name).lower()
 
     def __str__(self):
         return f"{self.name}=={self.version}"
@@ -62,17 +63,22 @@ def _checkRequirements() -> _res.Result[None]:
     missingVersions = requiredVersions - installedVersions
     if missingVersions:
         formattedMissingVersions = "\n".join(f"\t{v}" for v in sorted(missingVersions))
-        errorMessage = rf"""\
+        errorMessage = f"""\
 The following packages are required but not installed:
 {formattedMissingVersions}
 
-Probably the file {release3rdPartyTxtFilePath} was changed by someone else on GitHub.
-Consider re-running (don't forget to activate your virtual environment first)
+Probably the file {release3rdPartyTxtFilePath} was changed by
+someone else on GitHub. Consider re-running (don't forget to
+activate your virtual environment first)
 
-    `python -m pip install requirements\dev.txt`
+    `python -m pip install requirements\\dev.txt`
 
-    (or `python -m piptools sync requirements\dev.txt` if you're using `pip-tools`
-    [if you don't know what that means use the command just above])
+(or
+
+    `python -m piptools sync requirements\\dev.txt`
+    
+if you're using `pip-tools` [if you don't know what that means 
+use the command just above])
 
 followed by
 
