@@ -29,11 +29,6 @@ from trnsysGUI.configFile import configFile
 from trnsysGUI.errors import showErrorMessageBox
 from trnsysGUI.storageTank.widget import StorageTank
 
-__version__ = "1.0.0"
-__author__ = "Stefano Marti"
-__email__ = "stefano.marti@spf.ch"
-__status__ = "Prototype"
-
 
 class MainWindow(QMainWindow):
     def __init__(self, logger, project: _prj.Project, parent=None):
@@ -322,33 +317,6 @@ class MainWindow(QMainWindow):
         hydraulicPath = os.path.join(ddckPath, "hydraulic\\hydraulic.ddck")
         if not os.path.isfile(hydraulicPath):
             self.exportHydraulicsDdck()
-        infile = open(hydraulicPath, "r")
-        hydraulicLines = infile.readlines()
-        blackBoxLines = []
-        for i in range(len(hydraulicLines)):
-            if "Black box component temperatures" in hydraulicLines[i]:
-                j = i + 1
-                while hydraulicLines[j] != "\n":
-                    blackBoxLines.append(hydraulicLines[j])
-                    j += 1
-                break
-        messageText = "Is this correct?\n\n"
-        for line in blackBoxLines:
-            messageText += line
-        qmb = QMessageBox()
-        qmb.setText(messageText)
-        qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        qmb.setDefaultButton(QMessageBox.No)
-        ret = qmb.exec()
-        if ret == QMessageBox.No:
-            qmb = QMessageBox()
-            qmb.setText(
-                "Please make sure the black box component temperatures are correct in hydraulic.ddck before starting a simluation."
-            )
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
-            return
 
         #   Check ddcks of storage tanks
         storageWithoutFile = []
