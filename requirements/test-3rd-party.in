@@ -1,3 +1,5 @@
+-r release-3rd-party.in
+
 wheel
 
 pytest
@@ -8,5 +10,3 @@ mypy
 pylint
 
 PyQT5-stubs
-
--c ../../release/requirements.txt
