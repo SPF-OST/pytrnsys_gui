@@ -1,0 +1,4 @@
+-r test-3rd-party.in
+
+pytrnsys==0.6.4
+-e file:.#egg=pytrnsys-gui

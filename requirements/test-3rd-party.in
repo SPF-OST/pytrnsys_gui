@@ -1,3 +1,5 @@
+-r release-3rd-party.in
+
 wheel
 
 pytest
@@ -9,5 +11,3 @@ pylint
 
 PyQT5-stubs
 
--c ../../release/requirements.txt
--e file:.#egg=pytrnsys-gui
