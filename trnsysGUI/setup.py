@@ -11,17 +11,17 @@ import pytrnsys.utils.result as _res
 
 _BASE_DIRECTORY = _pl.Path(__file__).parents[1]
 
-_VERSIONED_PACKAGE_REGEX = _re.compile(r"^([^#\s=]+)==([^#\s=]+)$")
-
 
 @_dc.dataclass(frozen=True, order=True)
 class _VersionedPackage:
     name: str
     version: str
 
+    _VERSIONED_PACKAGE_REGEX = _re.compile(r"^([^#\s=]+)==([^#\s=]+)$")
+
     @classmethod
     def create(cls, serializedVersionedPackage: str) -> "_VersionedPackage":
-        match = _VERSIONED_PACKAGE_REGEX.match(serializedVersionedPackage)
+        match = cls._VERSIONED_PACKAGE_REGEX.match(serializedVersionedPackage)
         if not match:
             raise ValueError(f"Not a package version specification: {serializedVersionedPackage}")
 
@@ -94,10 +94,11 @@ def _getRequiredVersions(release3rdPartyTxtFilePath: _pl.Path) -> _tp.Set[_Versi
 
     requiredVersions = set()
     for line in lines:
-        match = _VERSIONED_PACKAGE_REGEX.match(line)
-        if not match:
+        try:
+            requiredVersion = _VersionedPackage.create(line)
+        except ValueError:
             continue
-        requiredVersion = _VersionedPackage.create(match.group())
+
         requiredVersions.add(requiredVersion)
     return requiredVersions
 
