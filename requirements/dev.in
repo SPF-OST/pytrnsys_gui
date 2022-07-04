@@ -1,14 +1,4 @@
-wheel
-
-twine
-
-pip-tools
-pip-compile-multi
-black
-
-sphinx
-
--r test.in
+-r dev-3rd-party.in
 
 -e file:../pytrnsys#egg=pytrnsys
 -e file:.#egg=pytrnsys-gui

@@ -1,0 +1,13 @@
+-r release-3rd-party.in
+
+wheel
+
+pytest
+pytest-cov
+pytest-html
+pytest-xvfb
+mypy
+pylint
+
+PyQT5-stubs
+

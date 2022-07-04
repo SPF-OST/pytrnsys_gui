@@ -1,8 +1,11 @@
 PyQT5
 matplotlib
 numpy
+scipy
 pandas
+seaborn
 bokeh
 dataclasses_jsonschema
+lark
 appdirs
 Jinja2
