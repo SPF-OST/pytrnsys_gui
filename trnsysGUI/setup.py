@@ -34,7 +34,7 @@ class _VersionedPackage:
 
     @staticmethod
     def _getCanonicalPipPackageName(name) -> str:
-        return _re.sub(r"(-+|\.+|_+)", "-", name).lower()
+        return _re.sub(r"(-+|\.+|_+)", "_", name).lower()
 
     def __str__(self):
         return f"{self.name}=={self.version}"
