@@ -6,7 +6,7 @@
 #    pip-compile-multi
 #
 -r test-3rd-party.txt
-file:.#egg=pytrnsys-gui
+-e file:.
     # via -r requirements\test.in
 pytrnsys==0.6.4
     # via

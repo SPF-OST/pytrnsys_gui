@@ -6,11 +6,11 @@
 #    pip-compile-multi
 #
 -r dev-3rd-party.txt
-file:../pytrnsys#egg=pytrnsys
+-e file:../pytrnsys
     # via
     #   -r requirements\dev.in
     #   pytrnsys-gui
-file:.#egg=pytrnsys-gui
+-e file:.
     # via -r requirements\dev.in
 
 # The following packages are considered to be unsafe in a requirements file:
