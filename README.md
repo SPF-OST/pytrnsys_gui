@@ -122,7 +122,7 @@ specified are for a Windows environment. They are very similar for Linux.
 3. Install the requirements:
     ```commandline
     pip install wheel
-    pip install -r requirements\dev.txt
+    python -m pip install -r requirements\dev.txt
     ```
 4. Generate Python files from the include Qt creator files:
    ```commandline
