@@ -13,6 +13,7 @@ import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.internalPiping as _pi
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.singlePipeSegmentItem as _spsi
@@ -226,7 +227,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             + str(equationConstant2)
             + "]/3600 !kW\n"
         )
-        canonicalMfrName = _helpers.getCanonicalMfrName(self, self.modelPipe)
+        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.modelPipe)
         inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
         unitText += f"{canonicalMfrName} = {inputMfrName}\n\n"
 

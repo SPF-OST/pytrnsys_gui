@@ -10,7 +10,3 @@ def getEquation(outputTemp: str, massFlowRate: str, posFlowInputTemp: str, negFl
 
 def getInputMfrName(hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe) -> str:
     return _mnames.getMassFlowVariableName(hasInternalPiping, pipe, pipe.fromPort)
-
-
-def getCanonicalMfrName(hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe) -> str:
-    return _mnames.getCanonicalMassFlowVariableName(hasInternalPiping, pipe)

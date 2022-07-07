@@ -5,16 +5,18 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
+import pytrnsys.utils.serialization as _ser
 from PyQt5.QtWidgets import QGraphicsTextItem
 
-import pytrnsys.utils.serialization as _ser
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi  # pylint: disable=cyclic-import
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.temperatures as _temps
 
 
 class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
@@ -248,15 +250,20 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
 
             unitText += "\n".join(massFlowVariableNames) + "\n"
 
-            unitText += f"T{self.inputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.outputs[0].connectionList[0].displayName}\n"
-            unitText += f"T{self.outputs[1].connectionList[0].displayName}\n"
+            temperatureVariableNames = [
+                _cnames.getTemperatureVariableName(self.inputs[0].getConnection(), _mfn.PortItemType.STANDARD),
+                _cnames.getTemperatureVariableName(self.outputs[0].getConnection(), _mfn.PortItemType.STANDARD),
+                _cnames.getTemperatureVariableName(self.outputs[1].getConnection(), _mfn.PortItemType.STANDARD)
+            ]
+
+            unitText += "\n".join(temperatureVariableNames) + "\n"
 
             unitText += "***Initial values\n"
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
             unitText += "EQUATIONS 1\n"
-            unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+            temperatureVariableName = _temps.getInternalTemperatureVariableName(self, self.modelDiverter)
+            unitText += f"{temperatureVariableName}= [{unitNumber},{equationConstant}]\n"
 
             unitNumber += 1
             lines += unitText + "\n"

@@ -6,14 +6,15 @@ import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
-
 import pytrnsys.utils.serialization as _ser
+
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 
@@ -236,7 +237,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         )
 
         mfrName = _helpers.getInputMfrName(self, pipe)
-        canonicalMfrName = _helpers.getCanonicalMfrName(self, pipe)
+        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, pipe)
         firstColumn = f"{canonicalMfrName} = {mfrName}"
         unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperatureSuffix}, kg/h")
 

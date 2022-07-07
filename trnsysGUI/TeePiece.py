@@ -10,6 +10,7 @@ import pytrnsys.utils.serialization as _ser
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
@@ -115,9 +116,9 @@ class TeePiece(_bi.BlockItem, _ip.HasInternalPiping):
         unitText += "\n".join(massFlowVariableNames) + "\n"
 
         temperatureVariableNames = [
-            self._getTemperatureVariableName(self.inputs[0]),
-            self._getTemperatureVariableName(self.outputs[0]),
-            self._getTemperatureVariableName(self.outputs[1]),
+            _cnames.getTemperatureVariableName(self.inputs[0].getConnection(), _mfn.PortItemType.STANDARD),
+            _cnames.getTemperatureVariableName(self.outputs[0].getConnection(), _mfn.PortItemType.STANDARD),
+            _cnames.getTemperatureVariableName(self.outputs[1].getConnection(), _mfn.PortItemType.STANDARD)
         ]
 
         unitText += "\n".join(temperatureVariableNames) + "\n"
@@ -126,7 +127,8 @@ class TeePiece(_bi.BlockItem, _ip.HasInternalPiping):
         unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
         unitText += "EQUATIONS 1\n"
-        unitText += "T" + self.displayName + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n"
+        temperatureVariableName = _temps.getInternalTemperatureVariableName(self, self._modelTeePiece)
+        unitText += f"{temperatureVariableName}= [{unitNumber},{equationConstant}]\n"
 
         unitNumber += 1
         f += unitText + "\n"
