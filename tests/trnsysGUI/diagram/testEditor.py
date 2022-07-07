@@ -131,7 +131,7 @@ class TestEditor:
 
         convertedJsonFilePath = convertedProjectFolderPath / f"{convertedProjectFolderPath.name}.json"
         convertedProject = _prj.LoadProject(convertedJsonFilePath)
-        _mw.MainWindow(logger, convertedProject)
+        _mw.MainWindow(logger, convertedProject)  # type: ignore[attr-defined]
 
     @_pt.mark.linux_ci
     @_pt.mark.parametrize("project", TEST_CASES)
