@@ -134,7 +134,7 @@ class TestEditor:
 
         convertedJsonFilePath = convertedProjectFolderPath / f"{convertedProjectFolderPath.name}.json"
         convertedProject = _prj.LoadProject(convertedJsonFilePath)
-        _mw.MainWindow(logger, convertedProject)
+        _mw.MainWindow(logger, convertedProject)  # type: ignore[attr-defined]
 
     @_pt.mark.linux_ci
     @_pt.mark.parametrize("testProject", TEST_CASES)
@@ -153,8 +153,8 @@ class TestEditor:
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
         project = _prj.LoadProject(projectJsonFilePath)
-        logger = _ulog.setup_custom_logger("root", "DEBUG")
-        mainWindow = _mw.MainWindow(logger, project)
+        logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
+        mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
 
         self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.centralWidget)
 
@@ -172,26 +172,30 @@ class TestEditor:
     def _assertMassFlowVisualizerLoadsData(
         massFlowRatesPrintFilePath: _pl.Path,
         temperaturesPrintFilePath: _pl.Path,
-        mainWindow: _mw.MainWindow,
+        mainWindow: _mw.MainWindow,  # type: ignore[name-defined]
     ):
         blockItemsAndConnections = mainWindow.centralWidget.trnsysObj
         singlePipeConnections = [o for o in blockItemsAndConnections if isinstance(o, _spc.SinglePipeConnection)]
         valves = [o for o in blockItemsAndConnections if isinstance(o, _tv.TVentil)]
 
         for singlePipeConnection in singlePipeConnections:
-            singlePipeConnection.firstS.labelMass.setPlainText("")
+            firstSegment = singlePipeConnection.firstS
+            assert firstSegment
+
+            firstSegment.labelMass.setPlainText("")
+
         for valve in valves:
             valve.posLabel.setPlainText("")
 
-        massFlowSolverVisualizer = _mfv.MassFlowVisualizer(
+        massFlowSolverVisualizer = _mfv.MassFlowVisualizer(  # type: ignore[attr-defined]  # pylint: disable=unused-variable
             mainWindow, massFlowRatesPrintFilePath, temperaturesPrintFilePath
         )
 
-        areAllMassFlowLabelsSet = all(s.firstS.labelMass.toPlainText() for s in singlePipeConnections)
+        areAllMassFlowLabelsSet = all(s.firstS and s.firstS.labelMass.toPlainText() for s in singlePipeConnections)
         areAllValvePositionLabelsSet = all(v.posLabel.toPlainText() for v in valves)
         assert areAllMassFlowLabelsSet and areAllValvePositionLabelsSet
 
-    def _exportMassFlowSolverDeckAndRunTrnsys(self, editor: _de.Editor):
+    def _exportMassFlowSolverDeckAndRunTrnsys(self, editor: _de.Editor):  # type: ignore[name-defined]
         exportedFilePath = self._exportHydraulic(editor, _format="mfs")
 
         trnsysExePath = _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnExe.exe")
@@ -208,7 +212,7 @@ class TestEditor:
         _sp.run(["wine", str(trnsysExePath), str(exportedFileWindowswPath), "/H"], check=True)
 
     @classmethod
-    def _exportHydraulic(cls, editor: _de.Editor, *, _format) -> str:
+    def _exportHydraulic(cls, editor: _de.Editor, *, _format) -> str:  # type: ignore[name-defined]
         exportedFilePath = editor.exportHydraulics(exportTo=_format)
         return exportedFilePath
 
