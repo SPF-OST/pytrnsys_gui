@@ -122,11 +122,11 @@ class ConnectionBase(_ip.HasInternalPiping):
         return pos
 
     def setStartPort(self, newStartPort):
-        self.fromPort = newStartPort
+        self._fromPort = newStartPort
         self.startPos = newStartPort.scenePos()
 
     def setEndPort(self, newEndPort):
-        self.toPort = newEndPort
+        self._toPort = newEndPort
 
     def setStartPos(self):
         pass
@@ -198,8 +198,8 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def switchPorts(self):
         temp = self.fromPort
-        self.fromPort = self.toPort
-        self.toPort = temp
+        self._fromPort = self.toPort
+        self._toPort = temp
 
     # Initialization
     def initNew(self, parent):
@@ -900,8 +900,8 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         # Invert ports
         temp = self.toPort
-        self.toPort = self.fromPort
-        self.fromPort = temp
+        self._toPort = self.fromPort
+        self._fromPort = temp
 
         startingNode = self.startNode
         self.startNode = self.endNode
@@ -921,7 +921,6 @@ class ConnectionBase(_ip.HasInternalPiping):
             s.updateGrad()
 
     def invertNodes(self):
-        temp = None
         element = self.startNode
 
         while element.nextN() is not None:
@@ -939,16 +938,16 @@ class ConnectionBase(_ip.HasInternalPiping):
         element.setPrev(nextNode)
 
     def selectConnection(self):
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.setSelect(True)
+        for segment in self.segments:
+            segment.setSelect(True)
 
         self.isSelected = True
 
         self.setLabelsSelected(True)
 
     def deselectConnection(self):
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.updateGrad()
+        for segment in self.segments:
+            segment.updateGrad()
 
         self.isSelected = False
 
