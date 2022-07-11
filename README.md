@@ -122,17 +122,17 @@ specified are for a Windows environment. They are very similar for Linux.
 3. Install the requirements:
     ```commandline
     pip install wheel
-    pip install -r requirements\dev\requirements.txt
+    python -m pip install -r requirements\dev.txt
     ```
-4. Build the python-files corresponding to the ui-file included:
+4. Generate Python files from the include Qt creator files:
    ```commandline
    python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
    ```
-5. Run `setup.py` with `dev` tag
+5. Tag the editable install of `pytrnsys-gui`
    ```commandline
    setup.py egg_info -b dev
    ```
-   Note: This will build python-files corresponding to the ui-file automatically everytime GUI is launched.
+   (By adding this tag we make sure that the Qt Creator .ui files are re-generated each time the GUI is started.)
 6. Now you can run `pytrnsys-gui`!
     ```commandline
     cd trnsysGUI

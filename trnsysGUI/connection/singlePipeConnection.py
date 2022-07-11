@@ -50,6 +50,14 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         assert isinstance(self._toPort, _sppi.SinglePipePortItem)
         return self._toPort
 
+    def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
+        if portItemType != _mfn.PortItemType.STANDARD:
+            raise ValueError(
+                f"Single pipe connections can only have model port items of type {_mfn.PortItemType.STANDARD}"
+            )
+
+        return self.modelPipe
+
     def _createSegmentItem(self, startNode, endNode):
         return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
 
@@ -177,7 +185,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         unitText += "INPUTS " + str(inputNumbers) + "\n"
 
-        massFlowVariableName = _mnames.getMassFlowVariableName(self, self.modelPipe, self.modelPipe.fromPort)
+        massFlowVariableName = _helpers.getInputMfrName(self, self.modelPipe)
 
         portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
 
@@ -219,7 +227,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             + str(equationConstant2)
             + "]/3600 !kW\n"
         )
-        canonicalMfrName = _helpers.getCanonicalMfrName(self, self.modelPipe)
+        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.modelPipe)
         inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
         unitText += f"{canonicalMfrName} = {inputMfrName}\n\n"
 

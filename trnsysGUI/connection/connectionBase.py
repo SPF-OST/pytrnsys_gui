@@ -9,12 +9,13 @@ from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
 
-import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.SegmentItemBase as _sib
-import trnsysGUI.internalPiping as _ip
-import trnsysGUI.idGenerator as _id
 import trnsysGUI.CornerItem as _ci
 import trnsysGUI.Node as _node
+import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.SegmentItemBase as _sib
+import trnsysGUI.idGenerator as _id
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -58,6 +59,9 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def getDisplayName(self) -> str:
         return self.displayName
+
+    def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
+        raise NotImplementedError()
 
     @property
     def fromPort(self) -> _pib.PortItemBase:
@@ -118,11 +122,11 @@ class ConnectionBase(_ip.HasInternalPiping):
         return pos
 
     def setStartPort(self, newStartPort):
-        self.fromPort = newStartPort
+        self._fromPort = newStartPort
         self.startPos = newStartPort.scenePos()
 
     def setEndPort(self, newEndPort):
-        self.toPort = newEndPort
+        self._toPort = newEndPort
 
     def setStartPos(self):
         pass
@@ -194,8 +198,8 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def switchPorts(self):
         temp = self.fromPort
-        self.fromPort = self.toPort
-        self.toPort = temp
+        self._fromPort = self.toPort
+        self._toPort = temp
 
     # Initialization
     def initNew(self, parent):
@@ -896,8 +900,8 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         # Invert ports
         temp = self.toPort
-        self.toPort = self.fromPort
-        self.fromPort = temp
+        self._toPort = self.fromPort
+        self._fromPort = temp
 
         startingNode = self.startNode
         self.startNode = self.endNode
@@ -917,7 +921,6 @@ class ConnectionBase(_ip.HasInternalPiping):
             s.updateGrad()
 
     def invertNodes(self):
-        temp = None
         element = self.startNode
 
         while element.nextN() is not None:
@@ -935,16 +938,16 @@ class ConnectionBase(_ip.HasInternalPiping):
         element.setPrev(nextNode)
 
     def selectConnection(self):
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.setSelect(True)
+        for segment in self.segments:
+            segment.setSelect(True)
 
         self.isSelected = True
 
         self.setLabelsSelected(True)
 
     def deselectConnection(self):
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.updateGrad()
+        for segment in self.segments:
+            segment.updateGrad()
 
         self.isSelected = False
 
@@ -1019,16 +1022,16 @@ class ConnectionBase(_ip.HasInternalPiping):
     def decode(self, i):
         raise NotImplementedError()
 
-    def exportPumpOutlets(self):  # pylint: disable = no-self-use
+    def exportPumpOutlets(self):
         return "", 0
 
-    def exportMassFlows(self):  # pylint: disable = no-self-use
+    def exportMassFlows(self):
         return "", 0
 
-    def exportDivSetting1(self):  # pylint: disable = no-self-use
+    def exportDivSetting1(self):
         return "", 0
 
-    def exportDivSetting2(self, nUnit):  # pylint: disable = no-self-use
+    def exportDivSetting2(self, nUnit):
         return "", nUnit
 
     def getInternalPiping(self) -> _ip.InternalPiping:

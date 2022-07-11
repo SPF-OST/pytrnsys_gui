@@ -204,7 +204,7 @@ class Fluids:
         return fluid
 
 
-_TValue = _tp.TypeVar("_TValue", covariant=True)
+_TValue_co = _tp.TypeVar("_TValue_co", covariant=True)
 
 
 class _SupportsLessThan(_tp.Protocol):
@@ -222,7 +222,7 @@ def _getDuplicates(values: _tp.Iterable[_SupportsLessThanT]) -> _tp.Sequence[_Su
     return duplicateValues
 
 
-def _getSingleOrNone(values: _tp.Iterable[_TValue]) -> _tp.Optional[_TValue]:
+def _getSingleOrNone(values: _tp.Iterable[_TValue_co]) -> _tp.Optional[_TValue_co]:
     valuesList = [*values]
     if not valuesList:
         return None

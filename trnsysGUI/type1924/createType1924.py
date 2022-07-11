@@ -245,7 +245,6 @@ class Type1924_TesPlugFlow:
     def getUaParValues(self, nTes, Ua):
 
         lines = ""
-        myList = []
         line = "CONSTANTS 10\n"
         lines = lines + line
 
@@ -694,9 +693,8 @@ class Type1924_TesPlugFlow:
 
         return lines
 
-    def getOnlinePlotter(self, nTes, nUnit, inputs):
+    def getOnlinePlotter(self, nTes):
 
-        nPrinterUnit = nUnit + 1
         lines = ""
         lines = lines + self.sLine
         line = "********** Online Plotter ***********\n"
@@ -803,7 +801,7 @@ class Type1924_TesPlugFlow:
         lines = lines + self.getInputs(inputs)
         lines = lines + self.getOutputs(inputs)
         lines = lines + self.getMonthyPrinter(nTes, nUnit, inputs)
-        lines = lines + self.getOnlinePlotter(nTes, nUnit, inputs)
+        lines = lines + self.getOnlinePlotter(nTes)
         return lines
 
     def getHead(self):
@@ -875,38 +873,11 @@ class Type1924_TesPlugFlow:
             line = "*** direct port outputs\n"
             lines = lines + line
 
-        ddcxLines = ""
-
         counter = 1
-        for idPort in range(nPorts):
-            outputTemperature = "Tdp%dOut_Tes%d" % (idPort + 1, nTes)
-            line = outputTemperature + "=[%d,%d] ! \n" % (nUnit, counter)
+        for port in self.connectorsPort:
+            outputTemperature = port["Tout"]
+            line = f"{outputTemperature}=[{nUnit},{counter}]\n"
             lines = lines + line
-
-            ddcxLine = (
-                    "T"
-                    + tankName
-                    + "Port"
-                    + self.connectorsPort[idPort]["side"]
-                    + str(int(round(self.connectorsPort[idPort]["zIn"] * 100, 0)))
-                    + "="
-                    + outputTemperature
-                    + "\n"
-            )
-            ddcxLines = ddcxLines + ddcxLine
-
-            ddcxLine = (
-                    "T"
-                    + tankName
-                    + "Port"
-                    + self.connectorsPort[idPort]["side"]
-                    + str(int(self.connectorsPort[idPort]["zOut"] * 100))
-                    + "="
-                    + outputTemperature
-                    + "\n"
-            )
-            ddcxLines = ddcxLines + ddcxLine
-
             counter = counter + 2
 
         nEq = nHxs
@@ -917,23 +888,11 @@ class Type1924_TesPlugFlow:
             lines = lines + line
 
         counter = 102
-        for idHx in range(nHxs):
-            outputTemperature = "Thx%dOut_Tes%d" % (idHx + 1, nTes)
-            line = outputTemperature + "=[%d,%d] ! \n" % (nUnit, counter)
+        for hx in self.connectorsHx:
+            outputTemperature = hx["Tout"]
+            line = f"{outputTemperature}=[{nUnit},{counter}]\n"
             lines = lines + line
-            ddcxLine = "T" + self.connectorsHx[idHx]["Name"] + "=" + outputTemperature + "\n"
-            ddcxLines = ddcxLines + ddcxLine
-            # line="Qhx%dOut_Tes%d=[%d,%d] ! \n"%(idHx+1,nTes,nUnit,counter+2);lines=lines+line
             counter = counter + 10
-
-        if ddcxLines != "":
-            header = self.sLine + "**BEGIN " + tankName + ".ddcx\n" + self.sLine
-            header = header + "** This file is used to store the black box component outputs of " + tankName + "\n\n"
-            ddcxLines = header + ddcxLines
-            outfileDdcxPath = os.path.join(path, tankName)
-            outfileDdcx = open(outfileDdcxPath + ".ddcx", "w")
-            outfileDdcx.writelines(ddcxLines)
-            outfileDdcx.close()
 
         lines = lines + "\n"
 

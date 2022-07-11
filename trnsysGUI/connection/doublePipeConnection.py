@@ -6,14 +6,16 @@ import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
-
 import pytrnsys.utils.serialization as _ser
-import trnsysGUI.doublePipePortItem as _dppi
-import trnsysGUI.internalPiping
-import trnsysGUI.massFlowSolver.networkModel as _mfn
+
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.doublePipeSegmentItem as _dpsi
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.doublePipePortItem as _dppi
+import trnsysGUI.doublePipeSegmentItem as _dpsi
+import trnsysGUI.internalPiping
+import trnsysGUI.massFlowSolver.names as _mnames
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 
 
@@ -36,6 +38,15 @@ class DoublePipeConnection(_cb.ConnectionBase):
     def toPort(self) -> _dppi.DoublePipePortItem:
         assert isinstance(self._toPort, _dppi.DoublePipePortItem)
         return self._toPort
+
+    def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
+        if portItemType == _mfn.PortItemType.COLD:
+            return self.coldModelPipe
+
+        if portItemType == _mfn.PortItemType.HOT:
+            return self.hotModelPipe
+
+        raise ValueError(f"Don't have a model pipe of type {portItemType}.")
 
     def _createSegmentItem(self, startNode, endNode):
         return _dpsi.DoublePipeSegmentItem(startNode, endNode, self)
@@ -183,8 +194,8 @@ class DoublePipeConnection(_cb.ConnectionBase):
         unitText += self._addComment("dpRadNdDist", "! Radial distance of node 8, m")
 
         unitText += "INPUTS " + str(inputNumbers) + "\n"
-        unitText += self._getInputs("Cold", self.coldModelPipe, self.toPort, self.fromPort)
-        unitText += self._getInputs("Hot", self.hotModelPipe, self.fromPort, self.toPort)
+        unitText += self._getInputs(_mfn.PortItemType.COLD, self.coldModelPipe, self.toPort, self.fromPort)
+        unitText += self._getInputs(_mfn.PortItemType.HOT, self.hotModelPipe, self.fromPort, self.toPort)
 
         unitText += "***Initial values\n"
         unitText += initialValueS + "\n\n"
@@ -200,23 +211,21 @@ class DoublePipeConnection(_cb.ConnectionBase):
 
     def _getInputs(
         self,
-        temperatureSuffix: str,
+        portItemType: _mfn.PortItemType,
         pipe: _mfn.Pipe,
         pipeFromPort: _dppi.DoublePipePortItem,
         pipeToPort: _dppi.DoublePipePortItem,
     ) -> str:
+        incomingConnection = pipeFromPort.getConnection()
+        temperatureName = _cnames.getTemperatureVariableName(incomingConnection, portItemType)
+        unitText = self._addComment(temperatureName, f"! Inlet fluid temperature - Pipe {portItemType.name}, deg C")
+
         mfrName = _helpers.getInputMfrName(self, pipe)
+        unitText += self._addComment(mfrName, f"! Inlet fluid flow rate - Pipe {portItemType.name}, kg/h")
 
-        fromBlockItem = pipeFromPort.parent
-        firstColumn = f"T{fromBlockItem.displayName}{temperatureSuffix}"
-        unitText = self._addComment(firstColumn, f"! Inlet fluid temperature - Pipe {temperatureSuffix}, deg C")
-
-        firstColumn = f"{mfrName}"
-        unitText += self._addComment(firstColumn, f"! Inlet fluid flow rate - Pipe {temperatureSuffix}, kg/h")
-
-        toBlockItem = pipeToPort.parent
-        firstColumn = f"T{toBlockItem.displayName}{temperatureSuffix}"
-        unitText += self._addComment(firstColumn, "! Other side of pipe, deg C")
+        outgoingConnection = pipeToPort.getConnection()
+        revTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, portItemType)
+        unitText += self._addComment(revTemperatureName, f"! Other side of pipe - Pipe {portItemType.name}, deg C")
 
         return unitText
 
@@ -228,7 +237,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         )
 
         mfrName = _helpers.getInputMfrName(self, pipe)
-        canonicalMfrName = _helpers.getCanonicalMfrName(self, pipe)
+        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, pipe)
         firstColumn = f"{canonicalMfrName} = {mfrName}"
         unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperatureSuffix}, kg/h")
 

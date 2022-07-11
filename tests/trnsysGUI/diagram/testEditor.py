@@ -5,15 +5,16 @@ import pathlib as _pl
 import shutil as _su
 import subprocess as _sp
 import sys as _sys
+import time as _time
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 import pytest as _pt
-
 import pytrnsys.utils.log as _ulog
-import trnsysGUI.GUI as _gui
+
 import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
 
@@ -88,32 +89,6 @@ class TestEditor:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath)
 
-            ddcxFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddcx"
-            helper.ensureFilesAreEqual(ddcxFileRelativePath)
-
-        oldFormatJsonPath = projectFolderPath / f"{projectFolderPath.name}.json"
-
-        projectInOldJsonFormat = _prj.LoadProject(oldFormatJsonPath)
-
-        logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
-
-        mainWindow = _gui.MainWindow(logger, projectInOldJsonFormat)  # type: ignore[attr-defined]
-
-        newProjectFolderPath = projectFolderPath.parent / "actual"
-
-        if newProjectFolderPath.exists():
-            _su.rmtree(newProjectFolderPath)
-
-        _os.mkdir(newProjectFolderPath)
-
-        mainWindow.copyContentsToNewFolder(newProjectFolderPath, projectFolderPath)
-
-        newestFormatJsonPath = newProjectFolderPath / f"{newProjectFolderPath.name}.json"
-
-        editor.encodeDiagram(newestFormatJsonPath)
-
-        assert self._createEditor(newProjectFolderPath)
-
     @classmethod
     def _exportStorageTanksAndGetNames(cls, editor: _de.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
         storageTanks = [o for o in editor.trnsysObj if isinstance(o, _stw.StorageTank)]  # pylint: disable=no-member
@@ -124,6 +99,39 @@ class TestEditor:
         storageTankNames = [t.displayName for t in storageTanks]
 
         return storageTankNames
+
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testSaveAndReloadProject(  # pylint: disable=too-many-locals
+        self, testProject: _Project, request: _pt.FixtureRequest
+    ) -> None:
+        # The following line is required otherwise QT will crash
+        application = _qtw.QApplication([])
+
+        def quitApplication():
+            application.quit()
+
+        request.addfinalizer(quitApplication)
+
+        logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
+
+        helper = _Helper(testProject)
+        helper.setup()
+
+        jsonFilePath = helper.actualProjectFolderPath / f"{helper.actualProjectFolderPath.name}.json"
+        project = _prj.LoadProject(jsonFilePath)
+        mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
+
+        convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
+        while convertedProjectFolderPath.exists():
+            _su.rmtree(convertedProjectFolderPath)
+            _time.sleep(0.5)
+        _os.mkdir(convertedProjectFolderPath)
+
+        mainWindow.copyContentsToNewFolder(convertedProjectFolderPath, helper.actualProjectFolderPath)
+
+        convertedJsonFilePath = convertedProjectFolderPath / f"{convertedProjectFolderPath.name}.json"
+        convertedProject = _prj.LoadProject(convertedJsonFilePath)
+        _mw.MainWindow(logger, convertedProject)  # type: ignore[attr-defined]
 
     @_pt.mark.linux_ci
     @_pt.mark.parametrize("project", TEST_CASES)

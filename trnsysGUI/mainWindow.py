@@ -1,38 +1,23 @@
-# pylint: skip-file
 # type: ignore
+# pylint: skip-file
 
 import os
 import pathlib as _pl
 import shutil
 import subprocess
-import sys
 
-import pkg_resources
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QUndoStack, QMessageBox, QFileDialog
 
-import pytrnsys.utils.result as _res
-import trnsysGUI.arguments as args
-import trnsysGUI.buildDck as buildDck
-import trnsysGUI.common.cancelled as _ccl
-import trnsysGUI.diagram.Editor as _de
-import trnsysGUI.images as _img
-import trnsysGUI.project as _prj
-import trnsysGUI.settings as _settings
-import trnsysGUI.settingsDlg as _sdlg
-import trnsysGUI.tracing as trc
-from pytrnsys.utils import log
+from pytrnsys.utils import result as _res
+from trnsysGUI import project as _prj, images as _img, errors as _err, buildDck as buildDck, settings as _settings, settingsDlg as _sdlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
+from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.configFile import configFile
-from trnsysGUI.errors import showErrorMessageBox
+from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
-
-__version__ = "1.0.0"
-__author__ = "Stefano Marti"
-__email__ = "stefano.marti@spf.ch"
-__status__ = "Prototype"
 
 
 class MainWindow(QMainWindow):
@@ -57,19 +42,13 @@ class MainWindow(QMainWindow):
         loadDiaAction = QAction(_img.OUTBOX_PNG.icon(), "Open", self)
         loadDiaAction.triggered.connect(self.loadDia)
 
-        updateConfigAction = QAction(
-            _img.UPDATE_CONFIG_PNG.icon(), "Update run.config", self
-        )
+        updateConfigAction = QAction(_img.UPDATE_CONFIG_PNG.icon(), "Update run.config", self)
         updateConfigAction.triggered.connect(self.updateRun)
 
-        runSimulationAction = QAction(
-            _img.RUN_SIMULATION_PNG.icon(), "Run simulation", self
-        )
+        runSimulationAction = QAction(_img.RUN_SIMULATION_PNG.icon(), "Run simulation", self)
         runSimulationAction.triggered.connect(self.runSimulation)
 
-        processSimulationAction = QAction(
-            _img.PROCESS_SIMULATION_PNG.icon(), "Process data", self
-        )
+        processSimulationAction = QAction(_img.PROCESS_SIMULATION_PNG.icon(), "Process data", self)
         processSimulationAction.triggered.connect(self.processSimulation)
 
         deleteDiaAction = QAction(_img.TRASH_PNG.icon(), "Delete diagram", self)
@@ -84,9 +63,7 @@ class MainWindow(QMainWindow):
         toggleConnLabels = QAction(_img.LABEL_TOGGLE_PNG.icon(), "Toggle labels", self)
         toggleConnLabels.triggered.connect(self.toggleConnLabels)
 
-        exportHydraulicsAction = QAction(
-            _img.EXPORT_HYDRAULICS_PNG.icon(), "Export hydraulic.ddck", self
-        )
+        exportHydraulicsAction = QAction(_img.EXPORT_HYDRAULICS_PNG.icon(), "Export hydraulic.ddck", self)
         exportHydraulicsAction.triggered.connect(self.exportHydraulicsDdck)
 
         exportHydCtrlAction = QAction(
@@ -107,14 +84,10 @@ class MainWindow(QMainWindow):
         toggleAlignModeAction.triggered.connect(self.toggleAlignMode)
         toggleAlignModeAction.setShortcut("q")
 
-        runMassflowSolverAction = QAction(
-            _img.RUN_MFS_PNG.icon(), "Run the massflow solver", self
-        )
+        runMassflowSolverAction = QAction(_img.RUN_MFS_PNG.icon(), "Run the massflow solver", self)
         runMassflowSolverAction.triggered.connect(self.runAndVisMf)
 
-        openVisualizerAction = QAction(
-            _img.VIS_MFS_PNG.icon(), "Start visualization of mass flows", self
-        )
+        openVisualizerAction = QAction(_img.VIS_MFS_PNG.icon(), "Start visualization of mass flows", self)
         openVisualizerAction.triggered.connect(self.visualizeMf)
 
         # Tool bar
@@ -202,7 +175,9 @@ class MainWindow(QMainWindow):
         processSimulationActionMenu = QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValuesJsonFileActionMenu = QAction("Export json-file containing connection information", self)
+        exportDdckPlaceHolderValuesJsonFileActionMenu = QAction(
+            "Export json-file containing connection information", self
+        )
         exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
 
         self.projectMenu = QMenu("Project")
@@ -332,41 +307,12 @@ class MainWindow(QMainWindow):
         hydraulicPath = os.path.join(ddckPath, "hydraulic\\hydraulic.ddck")
         if not os.path.isfile(hydraulicPath):
             self.exportHydraulicsDdck()
-        infile = open(hydraulicPath, "r")
-        hydraulicLines = infile.readlines()
-        blackBoxLines = []
-        for i in range(len(hydraulicLines)):
-            if "Black box component temperatures" in hydraulicLines[i]:
-                j = i + 1
-                while hydraulicLines[j] != "\n":
-                    blackBoxLines.append(hydraulicLines[j])
-                    j += 1
-                break
-        messageText = "Is this correct?\n\n"
-        for line in blackBoxLines:
-            messageText += line
-        qmb = QMessageBox()
-        qmb.setText(messageText)
-        qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        qmb.setDefaultButton(QMessageBox.No)
-        ret = qmb.exec()
-        if ret == QMessageBox.No:
-            qmb = QMessageBox()
-            qmb.setText(
-                "Please make sure the black box component temperatures are correct in hydraulic.ddck before starting a simluation."
-            )
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
-            return
 
         #   Check ddcks of storage tanks
         storageWithoutFile = []
         for object in self.centralWidget.trnsysObj:
             if isinstance(object, StorageTank):
-                storageTankFile = os.path.join(
-                    object.displayName, object.displayName + ".ddck"
-                )
+                storageTankFile = os.path.join(object.displayName, object.displayName + ".ddck")
                 storageTankPath = os.path.join(ddckPath, storageTankFile)
                 if not (os.path.isfile(storageTankPath)):
                     storageWithoutFile.append(object.displayName + "\n")
@@ -375,8 +321,10 @@ class MainWindow(QMainWindow):
             errorMessage = "The following storage tank(s) do(es) not have a corresponding ddck:\n\n"
             for storage in storageWithoutFile:
                 errorMessage += storage
-            errorMessage += "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
-            showErrorMessageBox(errorMessage)
+            errorMessage += (
+                "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
+            )
+            _err.showErrorMessageBox(errorMessage)
             return
 
         #   Update run.config
@@ -384,15 +332,11 @@ class MainWindow(QMainWindow):
 
         #   Start simulation
         runApp = RunMain()
-        executionFailed, errorStatement = runApp.runAction(
-            self.logger, self.centralWidget.projectFolder
-        )
+        executionFailed, errorStatement = runApp.runAction(self.logger, self.centralWidget.projectFolder)
 
         if executionFailed:
-            errorMessage = (
-                f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
-            )
-            showErrorMessageBox(errorMessage)
+            errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
+            _err.showErrorMessageBox(errorMessage)
 
         return
 
@@ -400,18 +344,14 @@ class MainWindow(QMainWindow):
         processPath = os.path.join(self.projectFolder, "process.config")
         if not os.path.isfile(processPath):
             errorMessage = f"No such file: {processPath}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             return
         processApp = ProcessMain()
-        executionFailed, errorStatement = processApp.processAction(
-            self.logger, self.centralWidget.projectFolder
-        )
+        executionFailed, errorStatement = processApp.processAction(self.logger, self.centralWidget.projectFolder)
 
         if executionFailed:
-            errorMessage = (
-                f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
-            )
-            showErrorMessageBox(errorMessage)
+            errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
+            _err.showErrorMessageBox(errorMessage)
 
         return
 
@@ -419,7 +359,7 @@ class MainWindow(QMainWindow):
         result = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
         if _res.isError(result):
             errorMessage = f"The json file could not be generated: {result.message}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
 
     def renameDia(self):
         self.logger.info("Renaming diagram...")
@@ -427,9 +367,7 @@ class MainWindow(QMainWindow):
 
     def deleteDia(self):
         qmb = QMessageBox()
-        qmb.setText(
-            'Are you sure you want to delete the diagram? (There is no possibility to "undo".)'
-        )
+        qmb.setText('Are you sure you want to delete the diagram? (There is no possibility to "undo".)')
         qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         qmb.setDefaultButton(QMessageBox.Cancel)
         ret = qmb.exec()
@@ -473,16 +411,12 @@ class MainWindow(QMainWindow):
 
     def visualizeMf(self):
         qmb = QMessageBox()
-        qmb.setText(
-            "Please select the mass flow rate prt-file that you want to visualize."
-        )
+        qmb.setText("Please select the mass flow rate prt-file that you want to visualize.")
         qmb.setStandardButtons(QMessageBox.Ok)
         qmb.setDefaultButton(QMessageBox.Ok)
         qmb.exec()
 
-        mfrFile = QFileDialog.getOpenFileName(self, "Open diagram", filter="*Mfr.prt")[
-            0
-        ].replace("/", "\\")
+        mfrFile = QFileDialog.getOpenFileName(self, "Open diagram", filter="*Mfr.prt")[0].replace("/", "\\")
         tempFile = mfrFile.replace("Mfr", "T")
         self.calledByVisualizeMf = True
         if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
@@ -494,9 +428,7 @@ class MainWindow(QMainWindow):
     def openFile(self):
         self.logger.info("Opening diagram")
         qmb = QMessageBox()
-        qmb.setText(
-            "Are you sure you want to open another project? Unsaved progress on the current one will be lost."
-        )
+        qmb.setText("Are you sure you want to open another project? Unsaved progress on the current one will be lost.")
         qmb.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
         qmb.setDefaultButton(QMessageBox.Cancel)
         ret = qmb.exec()
@@ -526,7 +458,7 @@ class MainWindow(QMainWindow):
         jsonResult = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
         if _res.isError(jsonResult):
             errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             return
 
         builder = buildDck.buildDck(self.projectFolder)
@@ -534,7 +466,7 @@ class MainWindow(QMainWindow):
         result = builder.buildTrnsysDeck()
         if _res.isError(result):
             errorMessage = f"The deck file could not be generated: {result.message}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
 
     def toggleEditorMode(self):
         self.logger.info("Toggling editor mode")
@@ -561,24 +493,18 @@ class MainWindow(QMainWindow):
 
         if not self.centralWidget.trnsysPath.is_file():
             errorMessage = "TRNExe.exe not found! Consider correcting the path in the settings."
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             return None
 
         try:
-            subprocess.run(
-                [str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True
-            )
-            mfrFile = os.path.join(
-                self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt"
-            )
-            tempFile = os.path.join(
-                self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt"
-            )
+            subprocess.run([str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True)
+            mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt")
+            tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt")
             self.calledByVisualizeMf = False
             return mfrFile, tempFile
         except Exception as exception:
             errorMessage = f"An exception occurred while trying to execute the mass flow solver: {exception}"
-            showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage)
             self.logger.error(errorMessage)
 
             return None
@@ -590,19 +516,15 @@ class MainWindow(QMainWindow):
         pass
 
     def openPytrnsysOnlineDoc(self):
-        os.system("start \"\" https://pytrnsys.readthedocs.io")
+        os.system('start "" https://pytrnsys.readthedocs.io')
 
     def exportPDF(self):
         self.centralWidget.printPDF()
 
     def closeEvent(self, e):
         qmb = QMessageBox()
-        qmb.setText(
-            "Do you want to save the current state of the project before closing the program?"
-        )
-        qmb.setStandardButtons(
-            QMessageBox.Save | QMessageBox.Close | QMessageBox.Cancel
-        )
+        qmb.setText("Do you want to save the current state of the project before closing the program?")
+        qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Close | QMessageBox.Cancel)
         qmb.setDefaultButton(QMessageBox.Cancel)
         ret = qmb.exec()
         if ret == QMessageBox.Cancel:
@@ -651,22 +573,13 @@ class MainWindow(QMainWindow):
 
                 if objInput == connToInputToPort and objOutput == connToOutputToPort:
                     msgBox = QMessageBox()
-                    msgBox.setText(
-                        "both %s and %s are input ports into %s"
-                        % (connName1, connName2, objName)
-                    )
+                    msgBox.setText("both %s and %s are input ports into %s" % (connName1, connName2, objName))
                     msgBox.exec_()
                     self.noErrorConns = False
 
-                elif (
-                        objInput == connToInputFromPort
-                        and objOutput == connToOutputFromPort
-                ):
+                elif objInput == connToInputFromPort and objOutput == connToOutputFromPort:
                     msgBox = QMessageBox()
-                    msgBox.setText(
-                        "both %s and %s are output ports from %s"
-                        % (connName1, connName2, objName)
-                    )
+                    msgBox.setText("both %s and %s are output ports from %s" % (connName1, connName2, objName))
                     msgBox.exec_()
                     self.noErrorConns = False
         return self.noErrorConns
@@ -705,38 +618,3 @@ class MainWindow(QMainWindow):
             )
 
         raise AssertionError(f"Unknown `project' type: {type(project)}")
-
-
-def main():
-    arguments = args.getArgsOrExit()
-
-    logger = log.setup_custom_logger("root", arguments.logLevel)
-    app = QApplication(sys.argv)
-    app.setApplicationName("Diagram Creator")
-
-    maybeCancelled = _prj.getProject()
-    if _ccl.isCancelled(maybeCancelled):
-        return
-    project = _ccl.value(maybeCancelled)
-
-    form = MainWindow(logger, project)
-    form.showMaximized()
-    form.show()
-    form.ensureSettingsExist()
-    form.loadTrnsysPath()
-
-    tracer = trc.createTracer(arguments.shallTrace)
-    tracer.run(lambda: app.exec())
-
-
-def generateUI():
-    if pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local.endswith('dev'):
-        uiGenerateFilePath = _pl.Path(
-            __file__).parent.parent / "dev-tools" / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
-        cmd = ["python.exe", uiGenerateFilePath]
-        subprocess.run(cmd, check=True)
-
-
-if __name__ == "__main__":
-    generateUI()
-    main()

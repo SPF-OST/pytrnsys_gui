@@ -82,7 +82,7 @@ class Node(_abc.ABC):
     def getNodeType(self) -> NodeType:
         raise NotImplementedError()
 
-    def hasInput(self) -> bool:  # pylint: disable=no-self-use
+    def hasInput(self) -> bool:
         return False
 
     def getInputVariablePrefix(self) -> str:
@@ -102,7 +102,7 @@ class Source(OneNeighbourBase):
     def getNodeType(self) -> NodeType:
         return NodeType.SOURCE
 
-    def hasInput(self) -> bool:  # pylint: disable=no-self-use
+    def hasInput(self) -> bool:
         return True
 
     def getInputVariablePrefix(self) -> str:
@@ -133,7 +133,7 @@ class Pump(TwoNeighboursBase):
     def getNodeType(self) -> NodeType:
         return NodeType.PUMP
 
-    def hasInput(self) -> bool:  # pylint: disable=no-self-use
+    def hasInput(self) -> bool:
         return True
 
     def getInputVariablePrefix(self) -> str:
@@ -157,7 +157,7 @@ class Diverter(ThreeNeighboursBase):
     def getNodeType(self) -> NodeType:
         return NodeType.DIVERTER
 
-    def hasInput(self) -> bool:  # pylint: disable=no-self-use
+    def hasInput(self) -> bool:
         return True
 
     def getInputVariablePrefix(self) -> str:

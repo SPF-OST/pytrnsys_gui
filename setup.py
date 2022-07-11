@@ -61,7 +61,7 @@ setuptools.setup(
         ]
     },
     data_files=_getDataFilePairs(),
-    entry_points={"console_scripts": ["pytrnsys-gui=trnsysGUI.GUI:main"]},
+    entry_points={"console_scripts": ["pytrnsys-gui=trnsysGUI.gui:main"]},
     install_requires=[
         "pytrnsys",
         "PyQT5",

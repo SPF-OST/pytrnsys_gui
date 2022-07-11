@@ -4,11 +4,8 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.common as _com
-
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.PortItemBase as _pi
-import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.common as _com
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -25,15 +22,11 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         self._createChildDeleteConnectionUndoCommands(blockItem)
 
     def _createChildDeleteConnectionUndoCommands(self, blockItem):
-        self._createChildDeleteConnectionUndoCommandsForPorts(blockItem.inputs)
-        self._createChildDeleteConnectionUndoCommandsForPorts(blockItem.outputs)
+        portItems = [*blockItem.inputs, *blockItem.outputs]
 
-    def _createChildDeleteConnectionUndoCommandsForPorts(
-        self, ports: _tp.Sequence[_pi.PortItemBase]  # type: ignore[name-defined]
-    ) -> None:
-        connections: _tp.Sequence[_cb.ConnectionBase] = [  # type: ignore[name-defined]
-            connection for p in ports if (connection := _com.getSingleOrNone(p.connectionList)) is not None
-        ]
+        connections = {
+            connection for p in portItems if (connection := _com.getSingleOrNone(p.connectionList)) is not None
+        }
 
         for connection in connections:
             connection.createDeleteUndoCommand(self)

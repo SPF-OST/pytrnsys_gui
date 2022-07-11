@@ -1,0 +1,8 @@
+-r test-3rd-party.in
+
+twine
+
+pip-compile-multi
+black
+
+sphinx
