@@ -834,10 +834,10 @@ class Type1924_TesPlugFlow:
             )
             lines = lines + self.sLine
             lines = lines + "EQUATIONS 3\n"
-            lines = lines + ("qSysOut_Tes%sLoss = QLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
-            lines = lines + ("qSysOut_Tes%sAcum = QAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
+            lines = lines + ("qSysOut_%sLoss = QLoss_Tes%d\n" % (tankName, self.inputs["nTes"]))
+            lines = lines + ("qSysOut_%sAcum = QAcum_Tes%d\n" % (tankName, self.inputs["nTes"]))
 
-            lines = lines + ("elSysIn_Q_Tes%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
+            lines = lines + ("elSysIn_Q_%sAux = qHeatSource_Tes%d\n" % (tankName, self.inputs["nTes"]))
 
         elif typeFile == "dck":
             self.extension = "dck"
