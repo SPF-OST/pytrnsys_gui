@@ -1,0 +1,9 @@
+*************************************
+**BEGIN TesSh.ddcx
+*************************************
+** This file is used to store the black box component outputs of TesSh
+
+TTesShPortRight1=Tdp1Out_Tes2
+TTesShPortRight99=Tdp1Out_Tes2
+TTesShPortLeft99=Tdp2Out_Tes2
+TTesShPortLeft1=Tdp2Out_Tes2

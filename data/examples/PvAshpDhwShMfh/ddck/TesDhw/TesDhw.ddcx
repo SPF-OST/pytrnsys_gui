@@ -1,0 +1,11 @@
+*************************************
+**BEGIN TesDhw.ddcx
+*************************************
+** This file is used to store the black box component outputs of TesDhw
+
+TTesDhwPortLeft90=Tdp1Out_Tes1
+TTesDhwPortLeft10=Tdp1Out_Tes1
+TTesDhwPortRight1=Tdp2Out_Tes1
+TTesDhwPortRight99=Tdp2Out_Tes1
+TTesDhwPortRight65=Tdp3Out_Tes1
+TTesDhwPortRight95=Tdp3Out_Tes1

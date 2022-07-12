@@ -1,0 +1,124 @@
+*******************************
+**BEGIN Control-Cooling-888.ddck 
+**
+**Control BigIce
+*******************************
+    
+*****************************************
+** Author: Dani Carbonell        
+** Date:  23.04.2018    
+******************************************
+***************************************************
+******** Cooling Section***************************
+***************************************************
+
+EQUATIONS 17
+tMaxTes = 95
+TTesDhwAuxOff = T6_Tes1
+TTesDhwAuxOn  = T9_Tes1
+TTesDhwBot = T1_Tes1
+TTesShBot = T1_Tes2
+TTesDhwTop = T9_Tes1
+TTesShTop = T9_Tes2
+TCollectorOn = T3_Tes1
+TProAuxDhwTes = T9_Tes1
+TesOverheat = OR(GT(T10_Tes1,tMaxTes)*NOT(TesOverheatRc) + GT(T10_Tes1Rc,tMaxTes-5)*TesOverheatRc,GT(T10_Tes2,tMaxTes)*NOT(TesOverheatRc) + GT(T10_Tes2Rc,tMaxTes-5)*TesOverheatRc)
+
+TProWs     = MIN(TTesDhwBot,TTesShBot)*BoHS + TTesDhwBot*NOT(BoHS) !	MIN(TTesDhwAuxOn,TsensorTesSh)*BoHS + TTesDhwAuxOn*NOT(BoHS)  	! 4 Used for ProWs 
+TTesSolar = TProWs
+TsensorTesSh = T8_Tes2
+TPROAUXShTes = T8_Tes2
+TPIRADIN=TRdFl
+** TROOMSTOre=15
+tSetBoiler = (TRdSet)*NOT(HpForDhwIsNeeded)+(TdhwSet+10)*HpForDhwIsNeeded
+
+
+auxOn = OR(HpForDHWIsNeeded,HpForSHIsNeeded)
+** qAux1_Tes2 = 0
+
+EQUATIONS 11
+*** Massflowrates
+MfrPuAux = MfrPuHpPD*auxOnRc
+MfrPuSh = MfrBuiRd
+MfrWtSp = MfrDHWset
+MfrPuCirc = 50
+MfrPuDHW = MfrSrcDHWHXUsed
+
+xFracMixAux = HpForDHWIsNRc
+xFracDivDhw = NOT(GT(MfrDHWset,0))
+xFracDivDhwOut = NOT(GT(MfrDHWset,0))
+xFracDivSolarDhwSh = (AND(xFracDivSolarDhwShRc,GT(TTesDhwBotRc+15,TTesShBotRc))+NOT(xFracDivSolarDhwShRc)*LT(TTesShBotRc,TTesDhwBotRc))*BoHS
+
+
+CoolingOn=0
+hpIsOn=auxOnRc
+
+UNIT 63 TYPE 993     ! Input value recall (element RcC)
+PARAMETERS 1     
+4    ! 1: number of variables to be remembered
+**     
+INPUTS 4
+TesOverheat   T10_Tes1 T10_Tes2 xFracDivSolarDhwSh
+0.0    20  20 0.0
+
+EQUATIONS 4               ! Recalled values for collector control
+TesOverheatRc = [63,1]     ! recalled value of boolean for storage protection, 0/1
+T10_Tes1Rc = [63,2]     ! recalled value from upper storage part for storage protection, °C
+T10_Tes2Rc = [63,3]     ! recalled value from upper storage part for storage protection, °C
+xFracDivSolarDhwShRc = [63,4]
+
+
+***********************************
+** Dependencies with other ddck
+***********************************
+
+EQUATIONS 4
+mySenTesSolarTop = MIN(TTesDhwTop,TTesShTop)*BoHS + TTesDhwTop*NOT(BoHS) !@dependencyDdck
+mySenTesSolarBot = MIN(TTesDhwBot,TTesShBot)*BoHS + TTesDhwBot*NOT(BoHS) !@dependencyDdck
+tSetAux = TdhwSetProfile
+TdhwSet = tSetAux
+    
+
+
+***********************************
+** Begin TYPE Recall
+***********************************
+
+UNIT 18 TYPE 993 
+PARAMETERS 1     
+6   ! 1: number of variables to be remembered    
+INPUTS 6     
+auxOn TTesDhwBot TTesShBot hpIsOn MfrSrcDHWHXUsed HpForDHWIsNeeded
+0.0  0.0 0.0 0.0 0.0 0.0 0.0
+EQUATIONS 6    ! outputs of Input Value Recall
+auxOnRc = [18,1]      
+TTesDhwBotRc = [18,2]
+TTesShBotRc = [18,3]
+hpIsOnRc = [18,4]
+MfrSrcDHWHXUsedRc = [18,5]
+HpForDHWIsNRc= [18,6]
+
+UNIT 89 TYPE 65     ! Online Plotter Control (Element Hp)
+PARAMETERS 12     
+10    ! 1 Nb. of left-axis variables
+10    ! 2 Nb. of right-axis variables
+0   ! 3 Left axis minimum
+2    ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+2   ! 6 Right axis maximum
+nPlotsPerSim ! 7 Number of plots per simulation
+12    ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1    ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20     
+xFracMixAux xFracDivDhw xFracDivDhwOut xFracDivSolarDhwSh Nix Nix  Nix Nix Nix Nix
+ Nix Nix Nix  Nix Nix Nix Nix Nix  Nix Nix
+**
+xFracMixAux xFracDivDhw xFracDivDhwOut xFracDivSolarDhwSh Nix Nix  Nix Nix Nix Nix
+ Nix Nix Nix  Nix Nix Nix Nix Nix  Nix Nix
+LABELS  3     
+Temperatures     
+Boolean     
+Control5    
