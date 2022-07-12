@@ -75,7 +75,7 @@
             "__version__": "3fff9a8a-d40e-42e2-824d-c015116d0a1d",
             "blockPosition": [
                 460.0,
-                200.0
+                198.0
             ],
             "flippedH": false,
             "flippedV": false,
@@ -227,7 +227,7 @@
                         },
                         "outputPort": {
                             "id": 19,
-                            "relativeHeight": 0.01
+                            "relativeHeight": 0.35
                         },
                         "side": "left",
                         "trnsysId": 11
@@ -428,8 +428,8 @@
             "Id": 78,
             "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
             "blockPosition": [
-                761.0,
-                120.0
+                762.0,
+                118.0
             ],
             "flippedH": false,
             "flippedV": false,
@@ -498,7 +498,7 @@
             "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
             "blockPosition": [
                 540.0,
-                200.0
+                198.0
             ],
             "flippedH": true,
             "flippedV": false,
@@ -732,18 +732,18 @@
             "id": 184,
             "labelPos": [
                 300.0,
-                217.8
+                177.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
                 300.0,
-                217.8
+                177.0
             ],
             "name": "TesSh_TeeAuxRt",
             "segmentsCorners": [
                 [
                     276.0,
-                    217.8
+                    177.0
                 ],
                 [
                     276.0,
@@ -773,11 +773,11 @@
             "name": "TesDhw_TeeAuxRt",
             "segmentsCorners": [
                 [
-                    266.0,
+                    233.0,
                     8.0
                 ],
                 [
-                    266.0,
+                    233.0,
                     199.0
                 ]
             ],
@@ -1166,8 +1166,8 @@
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
-                649.0,
-                104.0
+                500.0,
+                100.0
             ],
             "name": "MixSh_RadFloor",
             "segmentsCorners": [
@@ -1177,7 +1177,7 @@
                 ],
                 [
                     630.5,
-                    140.0
+                    138.0
                 ]
             ],
             "toPortId": 79,
@@ -1193,12 +1193,12 @@
             "id": 199,
             "labelPos": [
                 480.0,
-                200.0
+                198.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
                 480.0,
-                200.0
+                198.0
             ],
             "name": "TeeSh_MixSh",
             "segmentsCorners": [
@@ -1220,18 +1220,18 @@
             "id": 200,
             "labelPos": [
                 460.0,
-                220.0
+                218.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
                 460.0,
-                220.0
+                218.0
             ],
             "name": "TeeSh_TesSh",
             "segmentsCorners": [
                 [
                     440.0,
-                    220.0
+                    218.0
                 ],
                 [
                     440.0,
@@ -1251,22 +1251,22 @@
             "id": 201,
             "labelPos": [
                 540.0,
-                220.0
+                218.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
                 540.0,
-                220.0
+                218.0
             ],
             "name": "PuSh_TeeSh",
             "segmentsCorners": [
                 [
                     520.0,
-                    220.0
+                    218.0
                 ],
                 [
                     520.0,
-                    220.0
+                    218.0
                 ]
             ],
             "toPortId": 102,
@@ -1281,23 +1281,23 @@
             "fromPortId": 80,
             "id": 202,
             "labelPos": [
-                761.0,
-                220.0
+                762.0,
+                218.0
             ],
             "lengthInM": 2.0,
             "massFlowLabelPos": [
-                761.0,
-                220.0
+                762.0,
+                218.0
             ],
             "name": "RadFloor_PuSh",
             "segmentsCorners": [
                 [
                     670.5,
-                    220.0
+                    218.0
                 ],
                 [
                     670.5,
-                    220.0
+                    218.0
                 ]
             ],
             "toPortId": 97,
@@ -1305,10 +1305,10 @@
             "uValueInWPerM2K": 0.8333
         },
         "IDs": {
-            "GlobalId": 217,
+            "GlobalId": 218,
             "__idDct__": true,
-            "globalConnID": 138,
-            "trnsysID": 166
+            "globalConnID": 139,
+            "trnsysID": 167
         },
         "Strings": {
             "DiagramName": "PvAshpDhwShMfh.json",

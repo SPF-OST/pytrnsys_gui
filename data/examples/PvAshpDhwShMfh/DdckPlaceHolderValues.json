@@ -1,0 +1,54 @@
+{
+    "Ashp": {
+        "In": {
+            "@mfr": "MTeeAuxRt_Ashp_A",
+            "@temp": "TTeeAuxRt_Ashp"
+        },
+        "Out": {
+            "@temp": "TAshp"
+        }
+    },
+    "HxDhw": {
+        "In1": {
+            "@mfr": "MDivDhwOut_HxDhw_A",
+            "@temp": "TDivDhwOut_HxDhw"
+        },
+        "In2": {
+            "@mfr": "MTeeCirc2_HxDhw_A",
+            "@temp": "TTeeCirc2_HxDhw"
+        },
+        "Out1": {
+            "@temp": "THxDhwSide1"
+        },
+        "Out2": {
+            "@temp": "THxDhwSide2"
+        }
+    },
+    "RadFloor": {
+        "In": {
+            "@mfr": "MMixSh_RadFloor_A",
+            "@temp": "TMixSh_RadFloor"
+        },
+        "Out": {
+            "@temp": "TRadFloor"
+        }
+    },
+    "TesDhw": {
+        "In": {
+            "@mfr": "MDivDhw_TesDhw2_A",
+            "@temp": "TDivDhw_TesDhw2"
+        },
+        "Out": {
+            "@temp": "TTesDhwDpR65_95"
+        }
+    },
+    "TesSh": {
+        "In": {
+            "@mfr": "MMixAux_TesSh_A",
+            "@temp": "TMixAux_TesSh"
+        },
+        "Out": {
+            "@temp": "TTesShDpL99_1"
+        }
+    }
+}
