@@ -1,0 +1,989 @@
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+*************************************
+EQUATIONS 1
+qSysOut_PipeLoss = PipeLossTot
+
+EQUATIONS 9
+*** Black box component temperatures
+TTesDhwDpL90_10H=Tdp1Out_Tes1
+TTesDhwDpR1_99H=Tdp2Out_Tes1
+TTesDhwDpR65_95H=Tdp3Out_Tes1
+TTesShDpR1_99H=Tdp1Out_Tes2
+TTesShDpL99_1H=Tdp2Out_Tes2
+THxDhwSide1H=THxDhwSide1
+THxDhwSide2H=THxDhwSide2
+TRadFloorH=TRadFloor
+TAshpH=TAshp
+
+UNIT 450 TYPE 9351
+PARAMETERS 197
+49
+26 32 0 0      !1 : TesDhwDpL90_10
+36 33 0 0      !2 : TesDhwDpR1_99
+35 34 0 0      !3 : TesDhwDpR65_95
+47 44 0 0      !4 : TesShDpR1_99
+27 31 0 0      !5 : TesShDpL99_1
+38 39 0 0      !6 : HxDhwSide1
+42 40 0 0      !7 : HxDhwSide2
+37 36 35 3     !8 : DivDhw
+41 0 0 5       !9 : WtTp
+43 0 0 4       !10 : WtSp
+24 25 0 1      !11 : PuCirc
+41 40 24 2     !12 : TeeCirc1
+42 43 25 2     !13 : TeeCirc2
+39 37 0 1      !14 : PuDhw
+45 49 0 0      !15 : RadFloor
+45 44 46 3     !16 : MixSh
+38 33 34 3     !17 : DivDhwOut
+49 48 0 1      !18 : PuSh
+47 48 46 2     !19 : TeeSh
+30 31 32 2     !20 : TeeAuxRt
+30 29 0 0      !21 : Ashp
+28 27 26 3     !22 : MixAux
+29 28 0 1      !23 : PuAux
+12 11 0 0      !24 : PiTeeCirc1_PuCirc
+11 13 0 0      !25 : PiPuCirc_TeeCirc2
+22 1 0 0       !26 : MixAux_TesDhw
+22 5 0 0       !27 : MixAux_TesSh
+23 22 0 0      !28 : PuAux_MixAux
+21 23 0 0      !29 : Ashp_PuAux
+20 21 0 0      !30 : TeeAuxRt_Ashp
+5 20 0 0       !31 : TesSh_TeeAuxRt
+1 20 0 0       !32 : TesDhw_TeeAuxRt
+2 17 0 0       !33 : TesDhw_DivDhwOut1
+3 17 0 0       !34 : TesDhw_DivDhwOut2
+8 3 0 0        !35 : DivDhw_TesDhw2
+8 2 0 0        !36 : DivDhw_TesDhw1
+14 8 0 0       !37 : PuDhw_DivDhw
+17 6 0 0       !38 : DivDhwOut_HxDhw
+6 14 0 0       !39 : HxDhw_PuDhw
+7 12 0 0       !40 : HxDhw_TeeCirc1
+12 9 0 0       !41 : TeeCirc1_WtTp
+13 7 0 0       !42 : TeeCirc2_HxDhw
+10 13 0 0      !43 : WtSp_TeeCirc2
+4 16 0 0       !44 : TesSh_MixSh
+16 15 0 0      !45 : MixSh_RadFloor
+19 16 0 0      !46 : TeeSh_MixSh
+19 4 0 0       !47 : TeeSh_TesSh
+18 19 0 0      !48 : PuSh_TeeSh
+15 18 0 0      !49 : RadFloor_PuSh
+INPUTS 49! for Type 9351
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 xFracDivDhw 0,0 MfrWtSp 
+MfrPuCirc 0,0 0,0 MfrPuDhw 0,0 xFracMixSh xFracDivDhwOut MfrPuSh 0,0 0,0 
+0,0 xFracMixAux MfrPuAux 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 
+
+EQUATIONS 104	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MTesDhwDpL90_10_A=[450,1]
+MTesDhwDpL90_10_B=[450,2]
+MTesDhwDpR1_99_A=[450,4]
+MTesDhwDpR1_99_B=[450,5]
+MTesDhwDpR65_95_A=[450,7]
+MTesDhwDpR65_95_B=[450,8]
+MTesShDpR1_99_A=[450,10]
+MTesShDpR1_99_B=[450,11]
+MTesShDpL99_1_A=[450,13]
+MTesShDpL99_1_B=[450,14]
+MHxDhwSide1_A=[450,16]
+MHxDhwSide1_B=[450,17]
+MHxDhwSide2_A=[450,19]
+MHxDhwSide2_B=[450,20]
+MDivDhw_A=[450,22]
+MDivDhw_B=[450,23]
+MDivDhw_C=[450,24]
+MWtTp_A=[450,25]
+MWtSp_A=[450,28]
+MPuCirc_A=[450,31]
+MPuCirc_B=[450,32]
+MTeeCirc1_A=[450,34]
+MTeeCirc1_B=[450,35]
+MTeeCirc1_C=[450,36]
+MTeeCirc2_A=[450,37]
+MTeeCirc2_B=[450,38]
+MTeeCirc2_C=[450,39]
+MPuDhw_A=[450,40]
+MPuDhw_B=[450,41]
+MRadFloor_A=[450,43]
+MRadFloor_B=[450,44]
+MMixSh_A=[450,46]
+MMixSh_B=[450,47]
+MMixSh_C=[450,48]
+MDivDhwOut_A=[450,49]
+MDivDhwOut_B=[450,50]
+MDivDhwOut_C=[450,51]
+MPuSh_A=[450,52]
+MPuSh_B=[450,53]
+MTeeSh_A=[450,55]
+MTeeSh_B=[450,56]
+MTeeSh_C=[450,57]
+MTeeAuxRt_A=[450,58]
+MTeeAuxRt_B=[450,59]
+MTeeAuxRt_C=[450,60]
+MAshp_A=[450,61]
+MAshp_B=[450,62]
+MMixAux_A=[450,64]
+MMixAux_B=[450,65]
+MMixAux_C=[450,66]
+MPuAux_A=[450,67]
+MPuAux_B=[450,68]
+MPiTeeCirc1_PuCirc_A=[450,70]
+MPiTeeCirc1_PuCirc_B=[450,71]
+MPiPuCirc_TeeCirc2_A=[450,73]
+MPiPuCirc_TeeCirc2_B=[450,74]
+MMixAux_TesDhw_A=[450,76]
+MMixAux_TesDhw_B=[450,77]
+MMixAux_TesSh_A=[450,79]
+MMixAux_TesSh_B=[450,80]
+MPuAux_MixAux_A=[450,82]
+MPuAux_MixAux_B=[450,83]
+MAshp_PuAux_A=[450,85]
+MAshp_PuAux_B=[450,86]
+MTeeAuxRt_Ashp_A=[450,88]
+MTeeAuxRt_Ashp_B=[450,89]
+MTesSh_TeeAuxRt_A=[450,91]
+MTesSh_TeeAuxRt_B=[450,92]
+MTesDhw_TeeAuxRt_A=[450,94]
+MTesDhw_TeeAuxRt_B=[450,95]
+MTesDhw_DivDhwOut1_A=[450,97]
+MTesDhw_DivDhwOut1_B=[450,98]
+MTesDhw_DivDhwOut2_A=[450,100]
+MTesDhw_DivDhwOut2_B=[450,101]
+MDivDhw_TesDhw2_A=[450,103]
+MDivDhw_TesDhw2_B=[450,104]
+MDivDhw_TesDhw1_A=[450,106]
+MDivDhw_TesDhw1_B=[450,107]
+MPuDhw_DivDhw_A=[450,109]
+MPuDhw_DivDhw_B=[450,110]
+MDivDhwOut_HxDhw_A=[450,112]
+MDivDhwOut_HxDhw_B=[450,113]
+MHxDhw_PuDhw_A=[450,115]
+MHxDhw_PuDhw_B=[450,116]
+MHxDhw_TeeCirc1_A=[450,118]
+MHxDhw_TeeCirc1_B=[450,119]
+MTeeCirc1_WtTp_A=[450,121]
+MTeeCirc1_WtTp_B=[450,122]
+MTeeCirc2_HxDhw_A=[450,124]
+MTeeCirc2_HxDhw_B=[450,125]
+MWtSp_TeeCirc2_A=[450,127]
+MWtSp_TeeCirc2_B=[450,128]
+MTesSh_MixSh_A=[450,130]
+MTesSh_MixSh_B=[450,131]
+MMixSh_RadFloor_A=[450,133]
+MMixSh_RadFloor_B=[450,134]
+MTeeSh_MixSh_A=[450,136]
+MTeeSh_MixSh_B=[450,137]
+MTeeSh_TesSh_A=[450,139]
+MTeeSh_TesSh_B=[450,140]
+MPuSh_TeeSh_A=[450,142]
+MPuSh_TeeSh_B=[450,143]
+MRadFloor_PuSh_A=[450,145]
+MRadFloor_PuSh_B=[450,146]
+
+
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 16
+** loop1
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+
+** loop2
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+
+** loop3
+loop3NPipes = 6
+loop3Len = 2.0 ! [m]
+loop3Dia = 0.02 ! [m]
+loop3UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop3Rho = FwaterRho
+Lloop3Cp = FwaterCp
+
+** loop6
+loop6NPipes = 6
+loop6Len = 2.0*40 ! [m]
+loop6Dia = 0.02 ! [m]
+loop6UVal = 2.99988/40 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop6Rho = FwaterRho
+Lloop6Cp = FwaterCp
+
+
+UNIT 451 TYPE 929
+!DivDhw
+PARAMETERS 0
+INPUTS 6
+MDivDhw_A
+MDivDhw_B
+MDivDhw_C
+TPuDhw_DivDhw
+TDivDhw_TesDhw1
+TDivDhw_TesDhw2
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivDhw= [451,1]
+
+! WtSp
+EQUATIONS 1
+** Tcw = 1
+TWtSp = Tcw
+
+UNIT 452 TYPE 929
+!TeeCirc1
+PARAMETERS 0
+INPUTS 6
+MTeeCirc1_A
+MTeeCirc1_B
+MTeeCirc1_C
+TTeeCirc1_WtTp
+THxDhw_TeeCirc1
+TPiTeeCirc1_PuCirc
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeCirc1= [452,1]
+
+UNIT 453 TYPE 929
+!TeeCirc2
+PARAMETERS 0
+INPUTS 6
+MTeeCirc2_A
+MTeeCirc2_B
+MTeeCirc2_C
+TTeeCirc2_HxDhw
+TWtSp_TeeCirc2
+TPiPuCirc_TeeCirc2
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeCirc2= [453,1]
+
+UNIT 454 TYPE 929
+!MixSh
+PARAMETERS 0
+INPUTS 6
+MMixSh_A
+MMixSh_B
+MMixSh_C
+TMixSh_RadFloor
+TTesSh_MixSh
+TTeeSh_MixSh
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixSh= [454,1]
+
+UNIT 455 TYPE 929
+!DivDhwOut
+PARAMETERS 0
+INPUTS 6
+MDivDhwOut_A
+MDivDhwOut_B
+MDivDhwOut_C
+TDivDhwOut_HxDhw
+TTesDhw_DivDhwOut1
+TTesDhw_DivDhwOut2
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDivDhwOut= [455,1]
+
+UNIT 456 TYPE 929
+!TeeSh
+PARAMETERS 0
+INPUTS 6
+MTeeSh_A
+MTeeSh_B
+MTeeSh_C
+TTeeSh_TesSh
+TPuSh_TeeSh
+TTeeSh_MixSh
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeSh= [456,1]
+
+UNIT 457 TYPE 929
+!TeeAuxRt
+PARAMETERS 0
+INPUTS 6
+MTeeAuxRt_A
+MTeeAuxRt_B
+MTeeAuxRt_C
+TTeeAuxRt_Ashp
+TTesSh_TeeAuxRt
+TTesDhw_TeeAuxRt
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TTeeAuxRt= [457,1]
+
+UNIT 458 TYPE 929
+!MixAux
+PARAMETERS 0
+INPUTS 6
+MMixAux_A
+MMixAux_B
+MMixAux_C
+TPuAux_MixAux
+TMixAux_TesSh
+TMixAux_TesDhw
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixAux= [458,1]
+
+UNIT 459 TYPE 931
+!PiTeeCirc1_PuCirc
+PARAMETERS 6
+loop6Dia ! diameter [m]
+loop6Len ! length [m]
+loop6UVal ! U-value [kJ/(h*m^2*K)]
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+TTeeCirc1
+MPiTeeCirc1_PuCirc_A
+TRoomStore
+TPuCirc
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiTeeCirc1_PuCirc = [459,1]
+PPiTeeCirc1_PuCirc= [459,3]/3600 !kW
+MPiTeeCirc1_PuCirc = MPiTeeCirc1_PuCirc_A
+
+UNIT 460 TYPE 931
+!PiPuCirc_TeeCirc2
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+TPuCirc
+MPiPuCirc_TeeCirc2_A
+TRoomStore
+TTeeCirc2
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPiPuCirc_TeeCirc2 = [460,1]
+PPiPuCirc_TeeCirc2= [460,3]/3600 !kW
+MPiPuCirc_TeeCirc2 = MPiPuCirc_TeeCirc2_A
+
+UNIT 461 TYPE 931
+!MixAux_TesDhw
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.9988 ! U-value [kJ/(h*m^2*K)] (= 0.833 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TMixAux
+MMixAux_TesDhw_A
+TRoomStore
+TTesDhwDpL90_10H
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TMixAux_TesDhw = [461,1]
+PMixAux_TesDhw_kW= [461,3]/3600 !kW
+MMixAux_TesDhw = MMixAux_TesDhw_A
+
+UNIT 462 TYPE 931
+!MixAux_TesSh
+PARAMETERS 6
+0.02 ! diameter [m]
+200.0 ! length [m]
+0.029988000000000004 ! U-value [kJ/(h*m^2*K)] (= 0.00833 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TMixAux
+MMixAux_TesSh_A
+TRoomStore
+TTesShDpL99_1H
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TMixAux_TesSh = [462,1]
+PMixAux_TesSh_kW= [462,3]/3600 !kW
+MMixAux_TesSh = MMixAux_TesSh_A
+
+UNIT 463 TYPE 931
+!PuAux_MixAux
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.9988 ! U-value [kJ/(h*m^2*K)] (= 0.833 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TPuAux
+MPuAux_MixAux_A
+TRoomStore
+TMixAux
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPuAux_MixAux = [463,1]
+PPuAux_MixAux_kW= [463,3]/3600 !kW
+MPuAux_MixAux = MPuAux_MixAux_A
+
+UNIT 464 TYPE 931
+!Ashp_PuAux
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.9988 ! U-value [kJ/(h*m^2*K)] (= 0.833 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TAshpH
+MAshp_PuAux_A
+TRoomStore
+TPuAux
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TAshp_PuAux = [464,1]
+PAshp_PuAux_kW= [464,3]/3600 !kW
+MAshp_PuAux = MAshp_PuAux_A
+
+UNIT 465 TYPE 931
+!TeeAuxRt_Ashp
+PARAMETERS 6
+0.02 ! diameter [m]
+200.0 ! length [m]
+0.029988000000000004 ! U-value [kJ/(h*m^2*K)] (= 0.00833 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TTeeAuxRt
+MTeeAuxRt_Ashp_A
+TRoomStore
+TAshpH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTeeAuxRt_Ashp = [465,1]
+PTeeAuxRt_Ashp_kW= [465,3]/3600 !kW
+MTeeAuxRt_Ashp = MTeeAuxRt_Ashp_A
+
+UNIT 466 TYPE 931
+!TesSh_TeeAuxRt
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.9988 ! U-value [kJ/(h*m^2*K)] (= 0.833 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TTesShDpL99_1H
+MTesSh_TeeAuxRt_A
+TRoomStore
+TTeeAuxRt
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTesSh_TeeAuxRt = [466,1]
+PTesSh_TeeAuxRt_kW= [466,3]/3600 !kW
+MTesSh_TeeAuxRt = MTesSh_TeeAuxRt_A
+
+UNIT 467 TYPE 931
+!TesDhw_TeeAuxRt
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.9988 ! U-value [kJ/(h*m^2*K)] (= 0.833 W/(m^2*K))
+Lloop1Rho
+Lloop1Cp
+20
+INPUTS 4
+TTesDhwDpL90_10H
+MTesDhw_TeeAuxRt_A
+TRoomStore
+TTeeAuxRt
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTesDhw_TeeAuxRt = [467,1]
+PTesDhw_TeeAuxRt_kW= [467,3]/3600 !kW
+MTesDhw_TeeAuxRt = MTesDhw_TeeAuxRt_A
+
+UNIT 468 TYPE 931
+!TesDhw_DivDhwOut1
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TTesDhwDpR1_99H
+MTesDhw_DivDhwOut1_A
+TRoomStore
+TDivDhwOut
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTesDhw_DivDhwOut1 = [468,1]
+PTesDhw_DivDhwOut1= [468,3]/3600 !kW
+MTesDhw_DivDhwOut1 = MTesDhw_DivDhwOut1_A
+
+UNIT 469 TYPE 931
+!TesDhw_DivDhwOut2
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TTesDhwDpR65_95H
+MTesDhw_DivDhwOut2_A
+TRoomStore
+TDivDhwOut
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTesDhw_DivDhwOut2 = [469,1]
+PTesDhw_DivDhwOut2= [469,3]/3600 !kW
+MTesDhw_DivDhwOut2 = MTesDhw_DivDhwOut2_A
+
+UNIT 470 TYPE 931
+!DivDhw_TesDhw2
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TDivDhw
+MDivDhw_TesDhw2_A
+TRoomStore
+TTesDhwDpR65_95H
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TDivDhw_TesDhw2 = [470,1]
+PDivDhw_TesDhw2_kW= [470,3]/3600 !kW
+MDivDhw_TesDhw2 = MDivDhw_TesDhw2_A
+
+UNIT 471 TYPE 931
+!DivDhw_TesDhw1
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TDivDhw
+MDivDhw_TesDhw1_A
+TRoomStore
+TTesDhwDpR1_99H
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TDivDhw_TesDhw1 = [471,1]
+PDivDhw_TesDhw1_kW= [471,3]/3600 !kW
+MDivDhw_TesDhw1 = MDivDhw_TesDhw1_A
+
+UNIT 472 TYPE 931
+!PuDhw_DivDhw
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TPuDhw
+MPuDhw_DivDhw_A
+TRoomStore
+TDivDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPuDhw_DivDhw = [472,1]
+PPuDhw_DivDhw_kW= [472,3]/3600 !kW
+MPuDhw_DivDhw = MPuDhw_DivDhw_A
+
+UNIT 473 TYPE 931
+!DivDhwOut_HxDhw
+PARAMETERS 6
+0.02 ! diameter [m]
+100.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+TDivDhwOut
+MDivDhwOut_HxDhw_A
+TRoomStore
+THxDhwSide1H
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TDivDhwOut_HxDhw = [473,1]
+PDivDhwOut_HxDhw_kW= [473,3]/3600 !kW
+MDivDhwOut_HxDhw = MDivDhwOut_HxDhw_A
+
+UNIT 474 TYPE 931
+!HxDhw_PuDhw
+PARAMETERS 6
+0.02 ! diameter [m]
+400.0 ! length [m]
+0.014997600000000002 ! U-value [kJ/(h*m^2*K)] (= 0.004166 W/(m^2*K))
+Lloop2Rho
+Lloop2Cp
+20
+INPUTS 4
+THxDhwSide1H
+MHxDhw_PuDhw_A
+TRoomStore
+TPuDhw
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+THxDhw_PuDhw = [474,1]
+PHxDhw_PuDhw_kW= [474,3]/3600 !kW
+MHxDhw_PuDhw = MHxDhw_PuDhw_A
+
+UNIT 475 TYPE 931
+!HxDhw_TeeCirc1
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+THxDhwSide2H
+MHxDhw_TeeCirc1_A
+TRoomStore
+TTeeCirc1
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+THxDhw_TeeCirc1 = [475,1]
+PHxDhw_TeeCirc1_kW= [475,3]/3600 !kW
+MHxDhw_TeeCirc1 = MHxDhw_TeeCirc1_A
+
+UNIT 476 TYPE 931
+!TeeCirc1_WtTp
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+TTeeCirc1
+MTeeCirc1_WtTp_A
+TRoomStore
+TWtTp
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTeeCirc1_WtTp = [476,1]
+PTeeCirc1_WtTp_kW= [476,3]/3600 !kW
+MTeeCirc1_WtTp = MTeeCirc1_WtTp_A
+
+UNIT 477 TYPE 931
+!TeeCirc2_HxDhw
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+TTeeCirc2
+MTeeCirc2_HxDhw_A
+TRoomStore
+THxDhwSide2H
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTeeCirc2_HxDhw = [477,1]
+PTeeCirc2_HxDhw_kW= [477,3]/3600 !kW
+MTeeCirc2_HxDhw = MTeeCirc2_HxDhw_A
+
+UNIT 478 TYPE 931
+!WtSp_TeeCirc2
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop6Rho
+Lloop6Cp
+20
+INPUTS 4
+TWtSp
+MWtSp_TeeCirc2_A
+TRoomStore
+TTeeCirc2
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TWtSp_TeeCirc2 = [478,1]
+PWtSp_TeeCirc2_kW= [478,3]/3600 !kW
+MWtSp_TeeCirc2 = MWtSp_TeeCirc2_A
+
+UNIT 479 TYPE 931
+!TesSh_MixSh
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop3Rho
+Lloop3Cp
+20
+INPUTS 4
+TTesShDpR1_99H
+MTesSh_MixSh_A
+TRoomStore
+TMixSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTesSh_MixSh = [479,1]
+PTesSh_MixSh_kW= [479,3]/3600 !kW
+MTesSh_MixSh = MTesSh_MixSh_A
+
+UNIT 480 TYPE 931
+!MixSh_RadFloor
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop3Rho
+Lloop3Cp
+20
+INPUTS 4
+TMixSh
+MMixSh_RadFloor_A
+TRoomStore
+TRadFloorH
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TMixSh_RadFloor = [480,1]
+PMixSh_RadFloor_kW= [480,3]/3600 !kW
+MMixSh_RadFloor = MMixSh_RadFloor_A
+
+UNIT 481 TYPE 931
+!TeeSh_MixSh
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop3Rho
+Lloop3Cp
+20
+INPUTS 4
+TTeeSh
+MTeeSh_MixSh_A
+TRoomStore
+TMixSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTeeSh_MixSh = [481,1]
+PTeeSh_MixSh_kW= [481,3]/3600 !kW
+MTeeSh_MixSh = MTeeSh_MixSh_A
+
+UNIT 482 TYPE 931
+!TeeSh_TesSh
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop3Rho
+Lloop3Cp
+20
+INPUTS 4
+TTeeSh
+MTeeSh_TesSh_A
+TRoomStore
+TTesShDpR1_99H
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TTeeSh_TesSh = [482,1]
+PTeeSh_TesSh_kW= [482,3]/3600 !kW
+MTeeSh_TesSh = MTeeSh_TesSh_A
+
+UNIT 483 TYPE 931
+!PuSh_TeeSh
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop3Rho
+Lloop3Cp
+20
+INPUTS 4
+TPuSh
+MPuSh_TeeSh_A
+TRoomStore
+TTeeSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TPuSh_TeeSh = [483,1]
+PPuSh_TeeSh_kW= [483,3]/3600 !kW
+MPuSh_TeeSh = MPuSh_TeeSh_A
+
+UNIT 484 TYPE 931
+!RadFloor_PuSh
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop3Rho
+Lloop3Cp
+20
+INPUTS 4
+TRadFloorH
+MRadFloor_PuSh_A
+TRoomStore
+TPuSh
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 3
+TRadFloor_PuSh = [484,1]
+PRadFloor_PuSh_kW= [484,3]/3600 !kW
+MRadFloor_PuSh = MRadFloor_PuSh_A
+
+*** Pipe losses
+EQUATIONS 2
+PipeLossTot=PMixAux_TesDhw_kW+PMixAux_TesSh_kW+PPuAux_MixAux_kW+PAshp_PuAux_kW+PTeeAuxRt_Ashp_kW+PTesSh_TeeAuxRt_kW+PTesDhw_TeeAuxRt_kW+PTesDhw_DivDhwOut1+PTesDhw_DivDhwOut2+PDivDhw_TesDhw2_kW+PDivDhw_TesDhw1_kW+PPuDhw_DivDhw_kW+PDivDhwOut_HxDhw_kW+PHxDhw_PuDhw_kW+PTeeCirc1_WtTp_kW+PWtSp_TeeCirc2_kW+PTesSh_MixSh_kW+PMixSh_RadFloor_kW+PTeeSh_MixSh_kW+PTeeSh_TesSh_kW+PPuSh_TeeSh_kW+PRadFloor_PuSh_kW
+PPiCircLoss_kW = PPiTeeCirc1_PuCirc+PPiPuCirc_TeeCirc2+PTeeCirc2_HxDhw_kW+PHxDhw_TeeCirc1_kW																						
+
+ASSIGN PvAshpDhwShMfh_Mfr.prt 485
+
+UNIT 485 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+485! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 30
+xFracDivDhw xFracMixSh xFracDivDhwOut xFracMixAux MPiTeeCirc1_PuCirc MPiPuCirc_TeeCirc2 MMixAux_TesDhw MMixAux_TesSh
+MPuAux_MixAux MAshp_PuAux MTeeAuxRt_Ashp MTesSh_TeeAuxRt MTesDhw_TeeAuxRt MTesDhw_DivDhwOut1 MTesDhw_DivDhwOut2 MDivDhw_TesDhw2
+MDivDhw_TesDhw1 MPuDhw_DivDhw MDivDhwOut_HxDhw MHxDhw_PuDhw MHxDhw_TeeCirc1 MTeeCirc1_WtTp MTeeCirc2_HxDhw MWtSp_TeeCirc2
+MTesSh_MixSh MMixSh_RadFloor MTeeSh_MixSh MTeeSh_TesSh MPuSh_TeeSh MRadFloor_PuSh
+
+***
+xFracDivDhw xFracMixSh xFracDivDhwOut xFracMixAux MPiTeeCirc1_PuCirc MPiPuCirc_TeeCirc2 MMixAux_TesDhw MMixAux_TesSh
+MPuAux_MixAux MAshp_PuAux MTeeAuxRt_Ashp MTesSh_TeeAuxRt MTesDhw_TeeAuxRt MTesDhw_DivDhwOut1 MTesDhw_DivDhwOut2 MDivDhw_TesDhw2
+MDivDhw_TesDhw1 MPuDhw_DivDhw MDivDhwOut_HxDhw MHxDhw_PuDhw MHxDhw_TeeCirc1 MTeeCirc1_WtTp MTeeCirc2_HxDhw MWtSp_TeeCirc2
+MTesSh_MixSh MMixSh_RadFloor MTeeSh_MixSh MTeeSh_TesSh MPuSh_TeeSh MRadFloor_PuSh
+
+
+ASSIGN PvAshpDhwShMfh_T.prt 486
+
+UNIT 486 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+486! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 26
+TPiTeeCirc1_PuCirc TPiPuCirc_TeeCirc2 TMixAux_TesDhw TMixAux_TesSh TPuAux_MixAux TAshp_PuAux TTeeAuxRt_Ashp TTesSh_TeeAuxRt
+TTesDhw_TeeAuxRt TTesDhw_DivDhwOut1 TTesDhw_DivDhwOut2 TDivDhw_TesDhw2 TDivDhw_TesDhw1 TPuDhw_DivDhw TDivDhwOut_HxDhw THxDhw_PuDhw
+THxDhw_TeeCirc1 TTeeCirc1_WtTp TTeeCirc2_HxDhw TWtSp_TeeCirc2 TTesSh_MixSh TMixSh_RadFloor TTeeSh_MixSh TTeeSh_TesSh
+TPuSh_TeeSh TRadFloor_PuSh
+
+***
+TPiTeeCirc1_PuCirc TPiPuCirc_TeeCirc2 TMixAux_TesDhw TMixAux_TesSh TPuAux_MixAux TAshp_PuAux TTeeAuxRt_Ashp TTesSh_TeeAuxRt
+TTesDhw_TeeAuxRt TTesDhw_DivDhwOut1 TTesDhw_DivDhwOut2 TDivDhw_TesDhw2 TDivDhw_TesDhw1 TPuDhw_DivDhw TDivDhwOut_HxDhw THxDhw_PuDhw
+THxDhw_TeeCirc1 TTeeCirc1_WtTp TTeeCirc2_HxDhw TWtSp_TeeCirc2 TTesSh_MixSh TMixSh_RadFloor TTeeSh_MixSh TTeeSh_TesSh
+TPuSh_TeeSh TRadFloor_PuSh
+
+
