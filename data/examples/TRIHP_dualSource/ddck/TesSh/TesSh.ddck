@@ -1,5 +1,5 @@
 *************************************
-**BEGIN SH.ddck
+**BEGIN TesSh.ddck
 *************************************
 
 *************************************
@@ -17,20 +17,20 @@
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
-qSysOut_TesSHLoss = QLoss_Tes2
-qSysOut_TesSHAcum = QAcum_Tes2
-elSysIn_Q_TesSHAux = qHeatSource_Tes2
+qSysOut_TesShLoss = QLoss_Tes2
+qSysOut_TesShAcum = QAcum_Tes2
+elSysIn_Q_TesShAux = qHeatSource_Tes2
 
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
 Tdp1In_Tes2 = TPiHpToTesShIn
-Mfrdp1_Tes2 = MSHDpL95_5_A
+Mfrdp1_Tes2 = MTesShDpL95_5_A
 Tdp1InRev_Tes2 = TPiHpToTesShOut
 EQUATIONS 3
 Tdp2In_Tes2 = TPiTesShIn
-Mfrdp2_Tes2 = MSHDpR5_95_A
+Mfrdp2_Tes2 = MTesShDpR5_95_A
 Tdp2InRev_Tes2 = TPiTesShOut
 CONSTANTS 2
 zAux1_Tes2=0.00
@@ -41,8 +41,8 @@ qAux1_Tes2=0.00
 *************************************
 EQUATIONS 2
 *** direct port outputs
-TSHDpL95_5=[50,1]
-TSHDpR5_95=[50,3]
+TTesShDpL95_5=[50,1]
+TTesShDpR5_95=[50,3]
 
 *************************************
 ****** Parameters of Type1924 *******

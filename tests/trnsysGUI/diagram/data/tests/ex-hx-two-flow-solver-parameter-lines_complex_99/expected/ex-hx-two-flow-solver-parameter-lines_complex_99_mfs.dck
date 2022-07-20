@@ -87,10 +87,10 @@ NPlotsPerSim = 18
 **************************************
 
 CONSTANTS 7 
-CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
-RHOBRI = 1016.0  ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
-CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 °C
-RHOWAT = 998.0   ! density of Water  [kg/m³] at20 °C
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 degC Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/m3]; Value for an average pipe temperature with 55 degC Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 degC
+RHOWAT = 998.0   ! density of Water  [kg/m3] at20 degC
 LAMWAT = 0.58    ! heat conductivity W/(mK) 
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
@@ -102,10 +102,10 @@ CPBRI_SI = CPBRI*1000 ! J/(kgK)
 EQUATIONS 14
 *** Black box component temperatures
 TFloor1H=1
-TShDpL90_2H=1
-TDhwDpL50_1H=1
-TDhwDpR1_97H=1
-TDhwDpR50_99H=1
+TTesShDpL90_2H=1
+TTesDhwDpL50_1H=1
+TTesDhwDpR1_97H=1
+TTesDhwDpR50_99H=1
 THxDHWSide1H=1
 THxDHWSide2H=1
 THPCondH=1
@@ -153,10 +153,10 @@ PARAMETERS 393
 98
 97 20 0 1      !1 : PuAux
 26 53 0 0      !2 : Floor1
-74 77 0 0      !3 : ShDpL90_2
-96 71 0 0      !4 : DhwDpL50_1
-94 91 0 0      !5 : DhwDpR1_97
-80 92 0 0      !6 : DhwDpR50_99
+74 77 0 0      !3 : TesShDpL90_2
+96 71 0 0      !4 : TesDhwDpL50_1
+94 91 0 0      !5 : TesDhwDpR1_97
+80 92 0 0      !6 : TesDhwDpR50_99
 20 73 68 3     !7 : DivAux
 98 78 69 2     !8 : TeeAuxHxRt
 19 0 0 5       !9 : tapWater
@@ -277,14 +277,14 @@ MPuAux_A=[450,1]
 MPuAux_B=[450,2]
 MFloor1_A=[450,4]
 MFloor1_B=[450,5]
-MShDpL90_2_A=[450,7]
-MShDpL90_2_B=[450,8]
-MDhwDpL50_1_A=[450,10]
-MDhwDpL50_1_B=[450,11]
-MDhwDpR1_97_A=[450,13]
-MDhwDpR1_97_B=[450,14]
-MDhwDpR50_99_A=[450,16]
-MDhwDpR50_99_B=[450,17]
+MTesShDpL90_2_A=[450,7]
+MTesShDpL90_2_B=[450,8]
+MTesDhwDpL50_1_A=[450,10]
+MTesDhwDpL50_1_B=[450,11]
+MTesDhwDpR1_97_A=[450,13]
+MTesDhwDpR1_97_B=[450,14]
+MTesDhwDpR50_99_A=[450,16]
+MTesDhwDpR50_99_B=[450,17]
 MDivAux_A=[450,19]
 MDivAux_B=[450,20]
 MDivAux_C=[450,21]
@@ -1407,7 +1407,7 @@ Lloop4Rho
 Lloop4Cp
 20
 INPUTS 4
-TDhwDpL50_1H
+TTesDhwDpL50_1H
 MPiTesDhwtoPuHx_A
 TRoomStore
 TPuHxDhwSec
@@ -1469,7 +1469,7 @@ INPUTS 4
 TTeeAuxShFl
 MPiShPriFl_A
 TRoomStore
-TShDpL90_2H
+TTesShDpL90_2H
 ***Initial values
 20 0.0 20 20
 
@@ -1525,7 +1525,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TShDpL90_2H
+TTesShDpL90_2H
 MPiShPriRt_A
 TRoomStore
 TTeeAuxShRt
@@ -1594,7 +1594,7 @@ INPUTS 4
 TPuCirc
 MPiPuDhwCircOut_A
 TRoomStore
-TDhwDpR50_99H
+TTesDhwDpR50_99H
 ***Initial values
 20 0.0 20 20
 
@@ -1790,7 +1790,7 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TDhwDpR1_97H
+TTesDhwDpR1_97H
 MPiTesDhwTapOut_A
 TRoomStore
 TTeeDhwOut
@@ -1812,7 +1812,7 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TDhwDpR50_99H
+TTesDhwDpR50_99H
 MPiDhwCircTesOut_A
 TRoomStore
 TTeeDhwOut
@@ -1859,7 +1859,7 @@ INPUTS 4
 TsupplyWater
 MPiDhwMains_A
 TRoomStore
-TDhwDpR1_97H
+TTesDhwDpR1_97H
 ***Initial values
 20 0.0 20 20
 
@@ -1903,7 +1903,7 @@ INPUTS 4
 THxDHWSide2H
 MPiHxDHW_Dhw_A
 TRoomStore
-TDhwDpL50_1H
+TTesDhwDpL50_1H
 ***Initial values
 20 0.0 20 20
 

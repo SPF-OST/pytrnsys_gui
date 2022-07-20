@@ -1,5 +1,5 @@
 *************************************
-**BEGIN Sh.ddck
+**BEGIN TesDhw.ddck
 *************************************
 
 *************************************
@@ -17,17 +17,25 @@
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
-qSysOut_TesShLoss = QLoss_Tes1
-qSysOut_TesShAcum = QAcum_Tes1
-elSysIn_Q_TesShAux = qHeatSource_Tes1
+qSysOut_TesDhwLoss = QLoss_Tes1
+qSysOut_TesDhwAcum = QAcum_Tes1
+elSysIn_Q_TesDhwAux = qHeatSource_Tes1
 
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
-Tdp1In_Tes1 = TPiShPriFl
-Mfrdp1_Tes1 = MShDpL90_2_A
-Tdp1InRev_Tes1 = TPiShPriRt
+Tdp1In_Tes1 = TPiHpToTesDhwIn
+Mfrdp1_Tes1 = MTesDhwDpL95_35_A
+Tdp1InRev_Tes1 = TPiHpToTesDhwOut
+EQUATIONS 3
+Tdp2In_Tes1 = TPiTesDhwIn
+Mfrdp2_Tes1 = MTesDhwDpR5_95_A
+Tdp2InRev_Tes1 = TPiTesDhwOut
+EQUATIONS 3
+Tdp3In_Tes1 = TPiCircIn
+Mfrdp3_Tes1 = MTesDhwDpR70_90_A
+Tdp3InRev_Tes1 = TPiCircOut
 CONSTANTS 2
 zAux1_Tes1=0.00
 qAux1_Tes1=0.00
@@ -35,9 +43,11 @@ qAux1_Tes1=0.00
 *************************************
 **** Outputs to hydraulic solver ****
 *************************************
-EQUATIONS 1
+EQUATIONS 3
 *** direct port outputs
-TShDpL90_2=[50,1]
+TTesDhwDpL95_35=[50,1]
+TTesDhwDpR5_95=[50,3]
+TTesDhwDpR70_90=[50,5]
 
 *************************************
 ****** Parameters of Type1924 *******
@@ -48,11 +58,25 @@ VStoreRef = 0.763
 ratioTes1 = Vol_Tes1 / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
-zInDp1_Tes1=0.90
-zOutDp1_Tes1=0.02
+zInDp1_Tes1=0.95
+zOutDp1_Tes1=0.35
+*********Connecting values of DIRECT PORT=2***********
+CONSTANTS 2
+zInDp2_Tes1=0.05
+zOutDp2_Tes1=0.95
+*********Connecting values of DIRECT PORT=3***********
+CONSTANTS 2
+zInDp3_Tes1=0.70
+zOutDp3_Tes1=0.90
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
+*********Constant of DIRECT PORT=2***********
+CONSTANTS 1
+Dp2Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
+*********Constant of DIRECT PORT=3***********
+CONSTANTS 1
+Dp3Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
 ********** HEAT EXCHANGER CONSTANTS*******
 CONSTANTS 1
 nHxUsed_Tes1=0 
@@ -138,8 +162,8 @@ UaTop_Tes1 ! W/k
 tMax_Tes1
 0	0	0 ! 17-20 unsused parameters
 zInDp1_Tes1 zOutDp1_Tes1 zero Dp1Strat_Tes1 ! 21 - 25: zIn, zOut, cp, strat
--1 -1 zero zero ! 26 - 30: zIn, zOut, cp, strat
--1 -1 zero zero ! 31 - 35: zIn, zOut, cp, strat
+zInDp2_Tes1 zOutDp2_Tes1 zero Dp2Strat_Tes1 ! 26 - 30: zIn, zOut, cp, strat
+zInDp3_Tes1 zOutDp3_Tes1 zero Dp3Strat_Tes1 ! 31 - 35: zIn, zOut, cp, strat
 -1 -1 zero zero ! 36 - 40: zIn, zOut, cp, strat
 -1 -1 zero zero ! 41 - 45: zIn, zOut, cp, strat
 -1 -1 zero zero ! 46 - 50: zIn, zOut, cp, strat
@@ -175,8 +199,8 @@ zAux1_Tes1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero
 INPUTS 69
 ************10 DIRECT PORTS INPUTS***************
 Tdp1In_Tes1 Mfrdp1_Tes1 Tdp1InRev_Tes1
-zero zero zero
-zero zero zero
+Tdp2In_Tes1 Mfrdp2_Tes1 Tdp2InRev_Tes1
+Tdp3In_Tes1 Mfrdp3_Tes1 Tdp3InRev_Tes1
 zero zero zero
 zero zero zero
 zero zero zero
@@ -204,8 +228,10 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
 *****************OUTPUTS****************
-EQUATIONS 1
+EQUATIONS 3
 Qdp1_Tes1=[50,31] ! 
+Qdp2_Tes1=[50,32] ! 
+Qdp3_Tes1=[50,33] ! 
 EQUATIONS 21
 TAvg_Tes1 = [50,180] ! Average storage temperature 
 ***Temperatures at 10 equallay distributed height 
@@ -248,9 +274,9 @@ unitPrinter_Tes1 ! 1: Logical unit number, -
 1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 -1  ! 4: Printing & integrating interval, h. -1 for monthly integration
 0  ! 5: Number of inputs to avoid integration
-INPUTS 7
-Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 qHeatSource_Tes1 
-zero zero zero zero zero zero zero 
+INPUTS 9
+Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qdp2_Tes1 Qdp3_Tes1 qHeatSource_Tes1 
+zero zero zero zero zero zero zero zero zero 
 *************************************
 ********** Online Plotter ***********
 *************************************

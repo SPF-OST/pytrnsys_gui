@@ -1,5 +1,5 @@
 *************************************
-**BEGIN Dhw.ddck
+**BEGIN TesDhw.ddck
 *************************************
 
 *************************************
@@ -26,15 +26,15 @@ elSysIn_Q_TesDhwAux = qHeatSource_Tes2
 *************************************
 EQUATIONS 3
 Tdp1In_Tes2 = TPiHxDHW_Dhw
-Mfrdp1_Tes2 = MDhwDpL50_1_A
+Mfrdp1_Tes2 = MTesDhwDpL50_1_A
 Tdp1InRev_Tes2 = TPiTesDhwtoPuHx
 EQUATIONS 3
 Tdp2In_Tes2 = TPiDhwMains
-Mfrdp2_Tes2 = MDhwDpR1_97_A
+Mfrdp2_Tes2 = MTesDhwDpR1_97_A
 Tdp2InRev_Tes2 = TPiTesDhwTapOut
 EQUATIONS 3
 Tdp3In_Tes2 = TPiPuDhwCircOut
-Mfrdp3_Tes2 = MDhwDpR50_99_A
+Mfrdp3_Tes2 = MTesDhwDpR50_99_A
 Tdp3InRev_Tes2 = TPiDhwCircTesOut
 CONSTANTS 2
 zAux1_Tes2=0.00
@@ -45,9 +45,9 @@ qAux1_Tes2=0.00
 *************************************
 EQUATIONS 3
 *** direct port outputs
-TDhwDpL50_1=[50,1]
-TDhwDpR1_97=[50,3]
-TDhwDpR50_99=[50,5]
+TTesDhwDpL50_1=[50,1]
+TTesDhwDpR1_97=[50,3]
+TTesDhwDpR50_99=[50,5]
 
 *************************************
 ****** Parameters of Type1924 *******

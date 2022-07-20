@@ -12,7 +12,7 @@
 ** Basic TRNSYS variables including fluid properties
 ***************************************************************************
 
-VERSION 17    
+VERSION 18
 
 ************************************** 
 ***Simulation time              ******
@@ -87,10 +87,10 @@ NPlotsPerSim = 18
 **************************************
 
 CONSTANTS 7 
-CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
-RHOBRI = 1016.0  ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
-CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 °C
-RHOWAT = 998.0   ! density of Water  [kg/m³] at20 °C
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 degC Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/m3]; Value for an average pipe temperature with 55 degC Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 degC
+RHOWAT = 998.0   ! density of Water  [kg/m3] at20 degC
 LAMWAT = 0.58    ! heat conductivity W/(mK) 
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
@@ -106,11 +106,11 @@ THxCoolSide1H=1
 THxCoolSide2H=1
 THxDHWSide1H=1
 THxDHWSide2H=1
-TDhwDpL95_35H=1
-TDhwDpR5_95H=1
-TDhwDpR70_90H=1
-TSHDpL95_5H=1
-TSHDpR5_95H=1
+TTesDhwDpL95_35H=1
+TTesDhwDpR5_95H=1
+TTesDhwDpR70_90H=1
+TTesShDpL95_5H=1
+TTesShDpR5_95H=1
 TGhxH=1
 THPEvapH=1
 THPCond1H=1
@@ -165,11 +165,11 @@ PARAMETERS 353
 82 81 0 0      !14 : HxDHWSide2
 52 76 0 1      !15 : PuHpEvap
 60 28 0 1      !16 : PuHpShCond
-44 74 0 0      !17 : DhwDpL95_35
-56 66 0 0      !18 : DhwDpR5_95
-57 58 0 0      !19 : DhwDpR70_90
-28 62 0 0      !20 : SHDpL95_5
-70 67 0 0      !21 : SHDpR5_95
+44 74 0 0      !17 : TesDhwDpL95_35
+56 66 0 0      !18 : TesDhwDpR5_95
+57 58 0 0      !19 : TesDhwDpR70_90
+28 62 0 0      !20 : TesShDpL95_5
+70 67 0 0      !21 : TesShDpR5_95
 65 56 57 3     !22 : DivDhw
 82 63 37 2     !23 : TeePieceCirc2
 33 66 58 3     !24 : DivDhwOut
@@ -295,16 +295,16 @@ MPuHpEvap_A=[450,43]
 MPuHpEvap_B=[450,44]
 MPuHpShCond_A=[450,46]
 MPuHpShCond_B=[450,47]
-MDhwDpL95_35_A=[450,49]
-MDhwDpL95_35_B=[450,50]
-MDhwDpR5_95_A=[450,52]
-MDhwDpR5_95_B=[450,53]
-MDhwDpR70_90_A=[450,55]
-MDhwDpR70_90_B=[450,56]
-MSHDpL95_5_A=[450,58]
-MSHDpL95_5_B=[450,59]
-MSHDpR5_95_A=[450,61]
-MSHDpR5_95_B=[450,62]
+MTesDhwDpL95_35_A=[450,49]
+MTesDhwDpL95_35_B=[450,50]
+MTesDhwDpR5_95_A=[450,52]
+MTesDhwDpR5_95_B=[450,53]
+MTesDhwDpR70_90_A=[450,55]
+MTesDhwDpR70_90_B=[450,56]
+MTesShDpL95_5_A=[450,58]
+MTesShDpL95_5_B=[450,59]
+MTesShDpR5_95_A=[450,61]
+MTesShDpR5_95_B=[450,62]
 MDivDhw_A=[450,64]
 MDivDhw_B=[450,65]
 MDivDhw_C=[450,66]
@@ -653,7 +653,7 @@ INPUTS 4
 TPuHpShCond
 MPiHpToTesShIn_A
 TRoomStore
-TSHDpL95_5H
+TTesShDpL95_5H
 ***Initial values
 20 0.0 20 20
 
@@ -919,7 +919,7 @@ INPUTS 4
 TPuHpDhwCond
 MPiHpToTesDhwIn_A
 TRoomStore
-TDhwDpL95_35H
+TTesDhwDpL95_35H
 ***Initial values
 20 0.0 20 20
 
@@ -1103,7 +1103,7 @@ INPUTS 4
 TDivDhw
 MPiTesDhwIn_A
 TRoomStore
-TDhwDpR5_95H
+TTesDhwDpR5_95H
 ***Initial values
 20 0.0 20 20
 
@@ -1125,7 +1125,7 @@ INPUTS 4
 TDivDhw
 MPiCircIn_A
 TRoomStore
-TDhwDpR70_90H
+TTesDhwDpR70_90H
 ***Initial values
 20 0.0 20 20
 
@@ -1144,7 +1144,7 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TDhwDpR70_90H
+TTesDhwDpR70_90H
 MPiCircOut_A
 TRoomStore
 TDivDhwOut
@@ -1232,7 +1232,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TSHDpL95_5H
+TTesShDpL95_5H
 MPiHpToTesShOut_A
 TRoomStore
 TTeeTesShOut
@@ -1320,7 +1320,7 @@ Lloop2Rho
 Lloop2Cp
 20
 INPUTS 4
-TDhwDpR5_95H
+TTesDhwDpR5_95H
 MPiTesDhwOut_A
 TRoomStore
 TDivDhwOut
@@ -1342,7 +1342,7 @@ Lloop4Rho
 Lloop4Cp
 20
 INPUTS 4
-TSHDpR5_95H
+TTesShDpR5_95H
 MPiTesShOut_A
 TRoomStore
 TTeeCoolRadIn
@@ -1411,7 +1411,7 @@ INPUTS 4
 TDivSHCool
 MPiTesShIn_A
 TRoomStore
-TSHDpR5_95H
+TTesShDpR5_95H
 ***Initial values
 20 0.0 20 20
 
@@ -1496,7 +1496,7 @@ Lloop1Rho
 Lloop1Cp
 20
 INPUTS 4
-TDhwDpL95_35H
+TTesDhwDpL95_35H
 MPiHpToTesDhwOut_A
 TRoomStore
 TDivTesDhwOut
