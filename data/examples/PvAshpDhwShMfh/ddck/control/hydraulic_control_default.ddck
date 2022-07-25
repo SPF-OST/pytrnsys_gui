@@ -1,0 +1,27 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 5
+*** Pump outlet temperatures
+TWtTp = TTeeCirc1_WtTp
+TPuCirc = TPiTeeCirc1_PuCirc
+TPuDhw = THxDhw_PuDhw
+TPuSh = TRadFloor_PuSh
+TPuAux = TAshp_PuAux
+
+CONSTANTS 1
+T_set_MixSh=TRdSet
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TTesSh_MixSh
+TTeeSh_MixSh
+MMixSh_RadFloor
+T_set_MixSh
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_MixSh
+EQUATIONS 1
+xFracMixSh =  1.-[441,5] 
+

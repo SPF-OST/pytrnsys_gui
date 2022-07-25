@@ -167,7 +167,7 @@
         },
         "Block-1975": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "Dhw",
+            "BlockDisplayName": "TesDhw",
             "BlockName": "StorageTank",
             "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
             "directPortPairs": [
@@ -233,7 +233,7 @@
         },
         "Block-2026": {
             ".__BlockDict__": true,
-            "BlockDisplayName": "SH",
+            "BlockDisplayName": "TesSh",
             "BlockName": "StorageTank",
             "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
             "directPortPairs": [
@@ -2265,14 +2265,14 @@
             "uValueInWPerM2K": 0.8333
         },
         "IDs": {
-            "GlobalId": 7558,
+            "GlobalId": 7559,
             "__idDct__": true,
-            "globalConnID": 1765,
-            "trnsysID": 2487
+            "globalConnID": 1766,
+            "trnsysID": 2488
         },
         "Strings": {
             "DiagramName": "TRIHP_dualSource.json",
-            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\pytrnsys_gui\\data\\examples\\TRIHP_dualSource",
+            "ProjectFolder": "C:\\GIT\\pytrnsys_gui\\data\\examples\\TRIHP_dualSource",
             "__nameDct__": true
         }
     },

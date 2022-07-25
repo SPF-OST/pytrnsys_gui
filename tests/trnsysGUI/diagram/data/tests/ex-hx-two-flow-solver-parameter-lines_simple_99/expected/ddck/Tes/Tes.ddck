@@ -17,9 +17,9 @@
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
-qSysOut_TesTesLoss = QLoss_Tes1
-qSysOut_TesTesAcum = QAcum_Tes1
-elSysIn_Q_TesTesAux = qHeatSource_Tes1
+qSysOut_TesLoss = QLoss_Tes1
+qSysOut_TesAcum = QAcum_Tes1
+elSysIn_Q_TesAux = qHeatSource_Tes1
 
 *************************************
 *** Inputs from hydraulic solver ****
