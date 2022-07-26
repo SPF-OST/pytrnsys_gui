@@ -1,13 +1,14 @@
-# pylint: skip-file
-# type: ignore
-
 import datetime as _dt
 import itertools as _it
+import typing as _tp
 
 import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import numpy as _np
 import pandas as _pd
+import pandas as pd
+import pytrnsys.utils.result as _res
 
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.names as _cnames
@@ -15,28 +16,137 @@ import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
+Quantiles = _tp.Tuple[float, float, float, float]
+
+
+_TCo = _tp.TypeVar("_TCo", covariant=True)
+
+
+def _getGlobalQuantiles(df: _pd.DataFrame) -> Quantiles:
+    values = df.to_numpy().reshape(-1)
+    numericValues = values[~_pd.isna(values)]
+    quantiles = _np.quantile(numericValues, q=(0, 0.25, 0.5, 0.75, 1))
+    return tuple(quantiles)
+
+
+def _getMapping(quantiles: Quantiles, values: _tp.Tuple[_TCo, _TCo, _TCo, _TCo, _TCo, _TCo]) -> pd.Series:
+    lowerBounds = [-_np.inf, *quantiles]
+    upperBounds = [*quantiles, +_np.inf]
+    intervalIndex = _pd.IntervalIndex.from_arrays(lowerBounds, upperBounds)
+    return pd.Series(data=values, index=intervalIndex)
+
 
 class MassFlowVisualizer(_qtw.QDialog):
-    def __init__(self, parent, mfrFile, tempFile):
+    @classmethod
+    def createAndShow(cls, parent, mfrFile, tempFile) -> _res.Result[None]:
+        massFlowData = _pd.read_csv(mfrFile, sep="\t").rename(columns=lambda x: x.strip())
+        temperatureData = _pd.read_csv(tempFile, sep="\t").rename(columns=lambda x: x.strip())
 
-        super(MassFlowVisualizer, self).__init__(parent)
+        trnsysObjects = parent.centralWidget.trnsysObj
+        connections = [o for o in trnsysObjects if isinstance(o, _spc.SinglePipeConnection)]
+        valves = [o for o in trnsysObjects if isinstance(o, _tv.TVentil)]
 
+        result = cls._getDataAndMassFlowAndTemperatureQuantiles(connections, valves, massFlowData, temperatureData, mfrFile, tempFile)
+        if _res.isError(result):
+            return _res.error(result)
+        data, massFlowQuantiles, temperatureQuantiles = _res.value(result)
+
+        visualizer = MassFlowVisualizer(parent, data, massFlowQuantiles, temperatureQuantiles)
+        visualizer.show()
+
+        return None
+
+    @staticmethod
+    def _getDataAndMassFlowAndTemperatureQuantiles(
+        connections: _tp.Sequence[_spc.SinglePipeConnection],
+        valves: _tp.Sequence[_tv.TVentil],
+        massFlowData: _pd.DataFrame,
+        temperatureData: _pd.DataFrame,
+        mfrFile: str,
+        tempFile: str,
+    ) -> _res.Result[_tp.Tuple[_pd.DataFrame, Quantiles, Quantiles]]:
+        errorMessages = []
+
+        connectionMfrNames = {_mnames.getCanonicalMassFlowVariableName(c, c.modelPipe) for c in connections}
+        foundConnectionMfrNames = connectionMfrNames & massFlowData.columns
+        if not foundConnectionMfrNames:
+            errorMessage = f"""\
+Could not find any mass flow rates for single pipes in {mfrFile}.
+Please check whether the column names in {mfrFile} corresponding to
+to pipe mass flow rates match the format M<pipe name>. If they don't
+match, change the name and try loading
+the file again."""
+            errorMessages.append(errorMessage)
+
+        connectionTemperatureNames = {
+            _cnames.getTemperatureVariableName(c, _mfn.PortItemType.STANDARD) for c in connections
+        }
+        foundConnectionTemperatureNames = connectionTemperatureNames & temperatureData.columns
+        if not foundConnectionTemperatureNames:
+            errorMessage = f"""\
+Could not find any temperatures for single pipes in {tempFile}.
+Please check whether the column names in {tempFile} corresponding
+to connection temperatures match the format T<pipe name>. If they
+don't match, change the name and try loading the file again."""
+            errorMessages.append(errorMessage)
+
+        valvePositionNames = {_mnames.getInputVariableName(v, v.modelDiverter) for v in valves}
+        foundValvePositionNames = valvePositionNames & massFlowData.columns
+        if not foundValvePositionNames:
+            errorMessage = f"""\
+Could not find any valve positions in {mfrFile}.
+Please check whether the column names in {mfrFile} corresponding to
+valve positions match the format xFrac<valve name>. If they don't match,
+change the name and try loading the file again."""
+            errorMessages.append(errorMessage)
+
+        if errorMessages:
+            jointErrorMessage = "\n\n".join(errorMessages)
+            return _res.Error(jointErrorMessage)
+
+        if not (massFlowData.index == temperatureData.index).all():
+            return _res.Error(
+                f"Temperature data in {tempFile} and mass flow data in {mfrFile} seem to have different steps. Aborting."
+            )
+
+        relevantMasFlowDataColumns = foundConnectionMfrNames | foundValvePositionNames
+        relevantTemperatureDataColumns = foundConnectionTemperatureNames
+        data = _pd.concat(
+            [massFlowData[relevantMasFlowDataColumns], temperatureData[relevantTemperatureDataColumns]], axis="columns"
+        )
+
+        massFlowQuantiles = _getGlobalQuantiles(data[connectionMfrNames])
+        temperatureQuantiles = _getGlobalQuantiles(data[connectionTemperatureNames].abs())
+
+        return data, massFlowQuantiles, temperatureQuantiles
+
+    def __init__(
+        self, parent, data: _pd.DataFrame, massFlowQuantiles: Quantiles, temperatureQuantiles: Quantiles
+    ) -> None:
+        super().__init__(parent)
+        self.parent = parent
         self.logger = parent.logger
 
-        self.dataFilePath = mfrFile
-        self.tempDatafilePath = tempFile
-        self.loadedFile = False
-        self.tempLoadedFile = False
-        self.loadFile()
-        self.loadTempFile()
-        self.maxTimeStep = len(self.massFlowData.index) - 1
+        self._data = data
+        self._massFlowToWidthMapping = _getMapping(massFlowQuantiles, (2, 4, 4, 6, 6, 8))
+
+        colors = (
+            _qtg.QColor(0, 0, 204),  # deep blue
+            _qtg.QColor(0, 128, 255),  # blue
+            _qtg.QColor(102, 255, 255),  # light blue
+            _qtg.QColor(255, 153, 153),  # light red
+            _qtg.QColor(255, 51, 51),  # red
+            _qtg.QColor(153, 0, 0),  # deep red
+        )
+        self._temperatureToColorMapping = _getMapping(temperatureQuantiles, colors)
+
+        self.maxTimeStep = data.shape[1]
         self.showMass = False
 
         self.setMinimumSize(1000, 200)
 
-        self.parent = parent
         self.timeStep = 0
-        self.timeSteps = len(self.massFlowData.index) - 1  # 0 to 364
+        self.timeSteps = data.shape[1]
 
         # threshold values for positive list
         self.medianValue = 0
@@ -124,14 +234,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.advance()
 
         self.setWindowTitle("Flow visualizer")
-        ph = parent.geometry().height()
-        pw = parent.geometry().width()
-        px = parent.geometry().x()
-        py = parent.geometry().y()
-        dw = self.width()
-        dh = self.height()
         self.move(parent.centralWidget.diagramView.geometry().topLeft())
-        self.show()
 
     def togglePause(self):
         if self.paused:
@@ -162,16 +265,6 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         self.logger.debug("%s %s %s" % (str(self.minValue), str(self.medianValue), str(self.maxValue)))
 
-    def loadFile(self):
-        if not self.loadedFile:
-            self.massFlowData = _pd.read_csv(self.dataFilePath, sep="\t").rename(columns=lambda x: x.strip())
-        self.loadedFile = True
-
-    def loadTempFile(self):
-        if not self.tempLoadedFile:
-            self.tempMassFlowData = _pd.read_csv(self.tempDatafilePath, sep="\t").rename(columns=lambda x: x.strip())
-        self.tempLoadedFile = True
-
     def start(self):
 
         self.paused = False
@@ -187,68 +280,32 @@ class MassFlowVisualizer(_qtw.QDialog):
             self.logger.debug("reached end of data, returning")
             self.qtm.stop()
 
-        if self.loadedFile:
-            i = 0
-            for t in self.parent.centralWidget.trnsysObj:
-                if isinstance(t, _spc.SinglePipeConnection):
-                    mfrVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.modelPipe)
-                    temperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.STANDARD)
+        trnsysObjects = self.parent.centralWidget.trnsysObj
 
-                    if (
-                        mfrVariableName in self.massFlowData.columns
-                        and temperatureVariableName in self.tempMassFlowData
-                    ):
-                        mass = str(round(self.massFlowData[mfrVariableName].iloc[timeStep]))
-                        mass1Dp = str(round(self.massFlowData[mfrVariableName].iloc[timeStep], 1))
-                        temperature = str(round(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
-                        self.logger.debug("Found connection in ts " + str(timeStep) + " " + str(i))
-                        self.logger.debug("mass flow value of %s : " % t.displayName)
-                        t.setMassAndTemperature(mass1Dp, temperature)
-                        thickValue = self.getThickness(mass)
-                        self.logger.debug("Thickvalue: " + str(thickValue))
-                        if self.massFlowData[mfrVariableName].iloc[timeStep] == 0:
-                            t.setColor(thickValue, mfr="ZeroMfr")
-                        elif round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep])) == self.maxValue:
-                            t.setColor(thickValue, mfr="max")
-                        elif round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep])) == self.minValue:
-                            t.setColor(thickValue, mfr="min")
-                        elif (
-                            self.minValue
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
-                            <= self.lowerQuarter
-                        ):
-                            t.setColor(thickValue, mfr="minTo25")
-                        elif (
-                            self.lowerQuarter
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
-                            <= self.medianValue
-                        ):
-                            t.setColor(thickValue, mfr="25To50")
-                        elif (
-                            self.medianValue
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
-                            <= self.upperQuarter
-                        ):
-                            t.setColor(thickValue, mfr="50To75")
-                        elif (
-                            self.upperQuarter
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
-                            < self.maxValue
-                        ):
-                            t.setColor(thickValue, mfr="75ToMax")
-                        else:
-                            t.setColor(thickValue, mfr="test")
-                        i += 1
-                elif isinstance(t, _tv.TVentil):
-                    valvePositionVariableName = _mnames.getInputVariableName(t, t.modelDiverter)
-                    if valvePositionVariableName in self.massFlowData.columns:
-                        valvePosition = str(self.massFlowData[valvePositionVariableName].iloc[timeStep])
-                        t.setPositionForMassFlowSolver(valvePosition)
-                        t.posLabel.setPlainText(valvePosition)
-                        self.logger.debug("valve position: " + str(valvePosition))
+        connections = [o for o in trnsysObjects if isinstance(o, _spc.SinglePipeConnection)]
+        for connection in connections:
+            mfrVariableName = _mnames.getCanonicalMassFlowVariableName(connection, connection.modelPipe)
+            temperatureVariableName = _cnames.getTemperatureVariableName(connection, _mfn.PortItemType.STANDARD)
 
-        else:
-            return
+            if mfrVariableName in self._data and temperatureVariableName in self._data:
+                mass = self._data[mfrVariableName].iloc[timeStep]
+                temperature = self._data[temperatureVariableName].iloc[timeStep]
+
+                connection.setMassAndTemperature(mass, temperature)
+
+                width = self._massFlowToWidthMapping[mass]
+                color = self._temperatureToColorMapping[temperature]
+
+                connection.setColorAndWidthAccordingToMassflow(color, width)
+
+            valves = [o for o in trnsysObjects if isinstance(o, _tv.TVentil)]
+            for valve in valves:
+                valvePositionVariableName = _mnames.getInputVariableName(valve, valve.modelDiverter)
+                if valvePositionVariableName in self._data:
+                    valvePosition = str(self._data[valvePositionVariableName].iloc[timeStep])
+                    valve.setPositionForMassFlowSolver(valvePosition)
+                    valve.posLabel.setPlainText(valvePosition)
+                    self.logger.debug("valve position: " + str(valvePosition))
 
     def pauseVis(self):
         self.paused = True
@@ -267,13 +324,9 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.slider.setMaximum(self.timeSteps)
         self.slider.setTickInterval(1)
         self.slider.setTickPosition(2)
-        if self.checkTimeStep and self.checkTempTimeStep():
-            self.slider.setVisible(True)
-            self.slider.setEnabled(False)
-            self.increaseValue()
-        else:
-            self.slider.setVisible(True)
-            self.slider.setEnabled(True)
+        self.slider.setVisible(True)
+        self.slider.setEnabled(False)
+        self.increaseValue()
 
     def testValChange(self):
         """
@@ -319,32 +372,6 @@ class MassFlowVisualizer(_qtw.QDialog):
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)
 
-    def checkTimeStep(self):
-        """
-        Check individual columns of the data frame, If a column has rows with different values, return False.
-        Else, continue to next column. Return True if no such column can be found.
-
-        False indicates the rows are not identical and slider should be enabled
-        True indicates the rows are identical and slider should be disabled
-
-        """
-        massFlowDataDup = self.massFlowData
-        massFlowDataDup = massFlowDataDup.drop(massFlowDataDup.index[0])
-        for items in round(abs(massFlowDataDup)).nunique().iteritems():
-            if items[0] != "TIME":
-                if items[1] > 1:
-                    return False
-        return True
-
-    def checkTempTimeStep(self):
-        tempMassFlowDataDup = self.tempMassFlowData
-        tempMassFlowDataDup = tempMassFlowDataDup.drop(tempMassFlowDataDup.index[0])
-        for items in tempMassFlowDataDup.nunique().iteritems():
-            if items[0] != "TIME":
-                if items[1] > 1:
-                    return False
-        return True
-
     def getThresholdValues(self):
         """
         Access the data frame, convert into a nested list.
@@ -358,7 +385,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         -------
         """
 
-        data = self.massFlowData.values.tolist()  # data frame converted to nested list
+        data = self._data.values.tolist()  # data frame converted to nested list
         for sublist in data:  # delete the time column from the list
             del sublist[0]
         data = list(_it.chain.from_iterable(data))  # nested list combined into one list
@@ -399,7 +426,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         -------
         """
 
-        data = self.tempMassFlowData.values.tolist()  # data frame converted to nested list
+        data = self._data.values.tolist()  # data frame converted to nested list
         for sublist in data:  # delete the time column from the list
             del sublist[0]
         data = list(_it.chain.from_iterable(data))  # nested list combined into one list
@@ -420,12 +447,10 @@ class MassFlowVisualizer(_qtw.QDialog):
         """
         Gets the time of the current time step
         """
-        data = self.massFlowData
-        timeColumn = data[data.columns[0]]
-        self.logger.debug(str(timeColumn[row]))
-        return timeColumn[row]
+        return self._data.index[row]
 
-    def convertTime(self, time):
+    @staticmethod
+    def convertTime(time):
         """
         Convert the time into YYYY--MM--DD HH:MM:SS format
         """

@@ -9,7 +9,14 @@ import subprocess
 from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QUndoStack, QMessageBox, QFileDialog
 
 from pytrnsys.utils import result as _res
-from trnsysGUI import project as _prj, images as _img, errors as _err, buildDck as buildDck, settings as _settings, settingsDlg as _sdlg
+from trnsysGUI import (
+    project as _prj,
+    images as _img,
+    errors as _err,
+    buildDck as buildDck,
+    settings as _settings,
+    settingsDlg as _sdlg,
+)
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
@@ -398,15 +405,25 @@ class MainWindow(QMainWindow):
         self.calledByVisualizeMf = True
         filePaths = self.runMassflowSolver()
         if not filePaths:
-            self.logger.error("Could not execute runMassflowSolver")
+            _err.showErrorMessageBox(
+                f"An error occurred while running TRNSYS to compute the mass flows",
+                "Error visualizing mass flows",
+            )
             return
 
         mfrFile, tempFile = filePaths
         if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
-            self.logger.error("No mfrFile or tempFile found!")
+            _err.showErrorMessageBox(
+                f"Could not find mass flow file ({mfrFile}) or temperature file ({tempFile})",
+                "Error visualizing mass flows",
+            )
             return
 
-        MassFlowVisualizer(self, mfrFile, tempFile)
+        result = MassFlowVisualizer.createAndShow(self, mfrFile, tempFile)
+        if _res.isError(result):
+            _err.showErrorMessageBox(result.message, "Error visualizing mass flows")
+            return
+
         self.massFlowEnabled = True
 
     def visualizeMf(self):

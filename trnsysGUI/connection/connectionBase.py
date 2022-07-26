@@ -50,9 +50,6 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.endNode = _node.Node()  # type: ignore[attr-defined]
         self.firstS: _tp.Optional[_sib.SegmentItemBase] = None  # type: ignore[name-defined]
 
-        self.mass = 0  # comment out
-        self.temperature = 0
-
         self.startPos = None
 
         self.initNew(parent)
@@ -85,17 +82,13 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         return res
 
-    def setMassAndTemperature(self, mass, temp):
+    def setMassAndTemperature(self, mass: float, temperature: float) -> None:
         """
         To show the mass and temperature during mass flow visualization
         """
-        self.mass = float(mass)
-        self.mass = f"{self.mass:,}"
-
-        self.temperature = temp
-        for s in self.segments:  # pylint: disable = invalid-name
-            replacedMass = self.mass.replace(",", "'")
-            s.labelMass.setPlainText(f"M: {replacedMass} kg/h   T: {self.temperature}\u2103")
+        formattedMass = f"{mass:,.1f}".replace(",", "'")
+        label = f"M: {formattedMass} kg/h, T: {temperature} °C"
+        self.firstS.labelMass.setPlainText(label)
 
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
@@ -134,35 +127,9 @@ class ConnectionBase(_ip.HasInternalPiping):
     def setEndPos(self):
         pass
 
-    def setColor(self, value, **kwargs):
-        col = QColor(0, 0, 0)
-
-        if "mfr" in kwargs:
-            if kwargs["mfr"] == "NegMfr":
-                col = QColor(0, 0, 255)
-            elif kwargs["mfr"] == "ZeroMfr":
-                col = QColor(142, 142, 142)  # Gray
-            elif kwargs["mfr"] == "min":
-                col = QColor(0, 0, 204)  # deep blue
-            elif kwargs["mfr"] == "max":
-                col = QColor(153, 0, 0)  # deep red
-            elif kwargs["mfr"] == "minTo25":
-                col = QColor(0, 128, 255)  # blue
-            elif kwargs["mfr"] == "25To50":
-                col = QColor(102, 255, 255)  # light blue
-            elif kwargs["mfr"] == "50To75":
-                col = QColor(255, 153, 153)  # light red
-            elif kwargs["mfr"] == "75ToMax":
-                col = QColor(255, 51, 51)  # red
-            else:
-                col = QColor(255, 0, 0)
-
-            for s in self.segments:  # pylint: disable = invalid-name
-                self.logger.debug("Value: " + str(value))
-                s.setColorAndWidthAccordingToMassflow(col, value)
-
-        else:
-            self.logger.debug("No color to set in Connection.setColor()")
+    def setColorAndWidthAccordingToMassflow(self, color: QColor, width: float) -> None:
+        for segment in self.segments:
+            segment.setColorAndWidthAccordingToMassflow(color, width)
 
     # Getters
     def getStartPoint(self):
