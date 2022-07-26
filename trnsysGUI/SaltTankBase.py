@@ -40,9 +40,11 @@ class SaltTankBase(BlockItem, _ip.HasInternalPiping):
     def getInternalPiping(self) -> _ip.InternalPiping:
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
-        pipe = _mfn.Pipe(inputPort, outputPort)
 
-        return _ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
+        sink = _mfn.Sink(inputPort)
+        source = _mfn.Source(outputPort)
+
+        return _ip.InternalPiping([sink, source], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
     def changeSize(self):
         w = self.w
