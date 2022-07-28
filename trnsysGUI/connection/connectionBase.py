@@ -82,14 +82,6 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         return res
 
-    def setMassAndTemperature(self, mass: float, temperature: float) -> None:
-        """
-        To show the mass and temperature during mass flow visualization
-        """
-        formattedMass = f"{mass:,.1f}".replace(",", "'")
-        label = f"M: {formattedMass} kg/h, T: {temperature} °C"
-        self.firstS.labelMass.setPlainText(label)
-
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self.updateSegLabels()

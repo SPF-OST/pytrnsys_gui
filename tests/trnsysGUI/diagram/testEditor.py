@@ -13,10 +13,10 @@ import pandas as _pd
 import pytest as _pt
 import pytrnsys.utils.log as _ulog
 
-import trnsysGUI.MassFlowVisualizer as _mfv
+from trnsysGUI import massFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.diagram.Editor as _de
+import trnsysGUI.diagram.Editor as _ed
 import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
@@ -93,7 +93,7 @@ class TestEditor:
             helper.ensureFilesAreEqual(ddckFileRelativePath)
 
     @classmethod
-    def _exportStorageTanksAndGetNames(cls, editor: _de.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
+    def _exportStorageTanksAndGetNames(cls, editor: _ed.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
         storageTanks = [o for o in editor.trnsysObj if isinstance(o, _stw.StorageTank)]  # pylint: disable=no-member
 
         for storageTank in storageTanks:
@@ -138,7 +138,9 @@ class TestEditor:
 
     @_pt.mark.linux_ci
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testMassFlowSolver(self, testProject: _Project, request: _pt.FixtureRequest) -> None:
+    def testMassFlowSolver(  # pylint: disable=too-many-locals
+            self, testProject: _Project, request: _pt.FixtureRequest
+    ) -> None:
         helper = _Helper(testProject)
         helper.setup()
 
@@ -155,8 +157,9 @@ class TestEditor:
         project = _prj.LoadProject(projectJsonFilePath)
         logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
+        editor = mainWindow.centralWidget
 
-        self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.centralWidget)
+        self._exportMassFlowSolverDeckAndRunTrnsys(editor)
 
         massFlowRatesPrintFileName = f"{testProject.projectName}_Mfr.prt"
         helper.ensureCSVsAreEqual(massFlowRatesPrintFileName)
@@ -166,15 +169,15 @@ class TestEditor:
 
         massFlowRatesPrintFilePath = helper.actualProjectFolderPath / massFlowRatesPrintFileName
         temperaturesPrintFilePath = helper.actualProjectFolderPath / temperaturesPintFileName
-        self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow)
+        self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, editor)
 
     @staticmethod
     def _assertMassFlowVisualizerLoadsData(
         massFlowRatesPrintFilePath: _pl.Path,
         temperaturesPrintFilePath: _pl.Path,
-        mainWindow: _mw.MainWindow,  # type: ignore[name-defined]
+        editor: _ed.Editor,  # type: ignore[name-defined]
     ):
-        blockItemsAndConnections = mainWindow.centralWidget.trnsysObj
+        blockItemsAndConnections = editor.trnsysObj
         singlePipeConnections = [o for o in blockItemsAndConnections if isinstance(o, _spc.SinglePipeConnection)]
         valves = [o for o in blockItemsAndConnections if isinstance(o, _tv.TVentil)]
 
@@ -187,15 +190,13 @@ class TestEditor:
         for valve in valves:
             valve.posLabel.setPlainText("")
 
-        massFlowSolverVisualizer = _mfv.MassFlowVisualizer(  # type: ignore[attr-defined]  # pylint: disable=unused-variable
-            mainWindow, massFlowRatesPrintFilePath, temperaturesPrintFilePath
-        )
+        _mfv.MassFlowVisualizer.createAndShow(editor, massFlowRatesPrintFilePath, temperaturesPrintFilePath)
 
         areAllMassFlowLabelsSet = all(s.firstS and s.firstS.labelMass.toPlainText() for s in singlePipeConnections)
         areAllValvePositionLabelsSet = all(v.posLabel.toPlainText() for v in valves)
         assert areAllMassFlowLabelsSet and areAllValvePositionLabelsSet
 
-    def _exportMassFlowSolverDeckAndRunTrnsys(self, editor: _de.Editor):  # type: ignore[name-defined]
+    def _exportMassFlowSolverDeckAndRunTrnsys(self, editor: _ed.Editor):  # type: ignore[name-defined]
         exportedFilePath = self._exportHydraulic(editor, _format="mfs")
 
         trnsysExePath = _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnExe.exe")
@@ -212,14 +213,14 @@ class TestEditor:
         _sp.run(["wine", str(trnsysExePath), str(exportedFileWindowswPath), "/H"], check=True)
 
     @classmethod
-    def _exportHydraulic(cls, editor: _de.Editor, *, _format) -> str:  # type: ignore[name-defined]
+    def _exportHydraulic(cls, editor: _ed.Editor, *, _format) -> str:  # type: ignore[name-defined]
         exportedFilePath = editor.exportHydraulics(exportTo=_format)
         return exportedFilePath
 
     @staticmethod
     def _createEditor(projectFolderPath):
         logger = _log.Logger("root")
-        editor = _de.Editor(
+        editor = _ed.Editor(
             parent=None,
             projectFolder=str(projectFolderPath),
             jsonPath=None,

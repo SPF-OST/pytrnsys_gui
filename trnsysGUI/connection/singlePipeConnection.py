@@ -253,6 +253,14 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         return (self.fromPort, self.fromPort.parent), (self.toPort, self.toPort.parent)
 
+    def setMassAndTemperature(self, mass: float, temperature: float) -> None:
+        """
+        To show the mass and temperature during mass flow visualization
+        """
+        formattedMass = f"{mass:,.1f}".replace(",", "'")
+        label = f"M: {formattedMass} kg/h, T: {temperature} °C"
+        self.firstS.labelMass.setPlainText(label)  # type: ignore[union-attr]
+
 
 def _getConvertedValueOrName(valueOrName: _values.Value, conversionFactor=1.0) -> _tp.Union[float, str]:
     if isinstance(valueOrName, _values.Variable):

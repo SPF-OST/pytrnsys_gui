@@ -5,10 +5,11 @@ import os
 import pathlib as _pl
 import shutil
 import subprocess
+import typing as _tp
 
+import pytrnsys.utils.result as _res
 from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QUndoStack, QMessageBox, QFileDialog
 
-from pytrnsys.utils import result as _res
 from trnsysGUI import (
     project as _prj,
     images as _img,
@@ -18,7 +19,7 @@ from trnsysGUI import (
     settingsDlg as _sdlg,
 )
 from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
+from trnsysGUI.massFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
 from trnsysGUI.RunMain import RunMain
 from trnsysGUI.common import cancelled as _ccl
@@ -38,7 +39,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
         self.labelVisState = False
-        self.massFlowEnabled = False
         self.calledByVisualizeMf = False
         self.currentFile = "Untitled"
 
@@ -403,7 +403,7 @@ class MainWindow(QMainWindow):
 
     def runAndVisMf(self):
         self.calledByVisualizeMf = True
-        filePaths = self.runMassflowSolver()
+        filePaths = self.runMassFlowSolverAndGetMassFlowsAndTemperatureFilePathsOrNone()
         if not filePaths:
             _err.showErrorMessageBox(
                 f"An error occurred while running TRNSYS to compute the mass flows",
@@ -411,20 +411,21 @@ class MainWindow(QMainWindow):
             )
             return
 
-        mfrFile, tempFile = filePaths
-        if not os.path.isfile(mfrFile) or not os.path.isfile(tempFile):
+        massFlowsFilePath, temperaturesFilePath = filePaths
+        if not massFlowsFilePath.is_file() or not temperaturesFilePath.is_file():
             _err.showErrorMessageBox(
-                f"Could not find mass flow file ({mfrFile}) or temperature file ({tempFile})",
+                f"Could not find mass flow file ({massFlowsFilePath}) or temperature file ({temperaturesFilePath})",
                 "Error visualizing mass flows",
             )
             return
 
-        result = MassFlowVisualizer.createAndShow(self, mfrFile, tempFile)
+        editor = self.centralWidget
+        result = MassFlowVisualizer.createAndShow(editor, massFlowsFilePath, temperaturesFilePath)
         if _res.isError(result):
             _err.showErrorMessageBox(result.message, "Error visualizing mass flows")
             return
 
-        self.massFlowEnabled = True
+        editor.massFlowEnabled = True
 
     def visualizeMf(self):
         qmb = QMessageBox()
@@ -433,14 +434,29 @@ class MainWindow(QMainWindow):
         qmb.setDefaultButton(QMessageBox.Ok)
         qmb.exec()
 
-        mfrFile = QFileDialog.getOpenFileName(self, "Open diagram", filter="*Mfr.prt")[0].replace("/", "\\")
-        tempFile = mfrFile.replace("Mfr", "T")
+        massFlowsFilePath = _pl.Path(
+            QFileDialog.getOpenFileName(self, "Open diagram", filter="*Mfr.prt")[0]
+        )
+
+        massFlowsFileName = massFlowsFilePath.name
+        temperaturesFileName = massFlowsFileName[:-len('Mfr.prt')] + "T.prt"
+        temperaturesFilePath = massFlowsFilePath.parent / temperaturesFileName
         self.calledByVisualizeMf = True
-        if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
-            MassFlowVisualizer(self, mfrFile, tempFile)
-            self.massFlowEnabled = True
-        else:
-            self.logger.info("No mfrFile or tempFile found!")
+        if not massFlowsFilePath.is_file() or not temperaturesFilePath.is_file():
+            _err.showErrorMessageBox(
+                f"Could not open mass flow solver data files {massFlowsFilePath} and/or {temperaturesFilePath}.",
+                "Error visualizing mass flows"
+            )
+            return
+
+        editor = self.centralWidget
+
+        result = MassFlowVisualizer.createAndShow(editor, massFlowsFilePath, temperaturesFilePath)
+        if _res.isError(result):
+            _err.showErrorMessageBox(result.message, "Error visualizing mass flows")
+            return
+
+        editor.massFlowEnabled = True
 
     def openFile(self):
         self.logger.info("Opening diagram")
@@ -498,7 +514,7 @@ class MainWindow(QMainWindow):
         self.centralWidget.snapGrid = not self.centralWidget.snapGrid
         self.centralWidget.diagramScene.update()
 
-    def runMassflowSolver(self):
+    def runMassFlowSolverAndGetMassFlowsAndTemperatureFilePathsOrNone(self) -> _tp.Optional[_tp.Tuple[_pl.Path, _pl.Path]]:
         self.logger.info("Running massflow solver...")
 
         exportPath = self.centralWidget.exportHydraulics(exportTo="mfs")
@@ -515,16 +531,17 @@ class MainWindow(QMainWindow):
 
         try:
             subprocess.run([str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True)
-            mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt")
-            tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt")
-            self.calledByVisualizeMf = False
-            return mfrFile, tempFile
         except Exception as exception:
             errorMessage = f"An exception occurred while trying to execute the mass flow solver: {exception}"
             _err.showErrorMessageBox(errorMessage)
             self.logger.error(errorMessage)
-
             return None
+
+        projectFolderPath = _pl.Path(self.projectFolder)
+        mfrFilePath = projectFolderPath / f"{projectFolderPath.name}_Mfr.prt"
+        temperatureFilePath = projectFolderPath / f"{projectFolderPath.name}_T.prt"
+        self.calledByVisualizeMf = False
+        return mfrFilePath, temperatureFilePath
 
     def movePorts(self):
         self.centralWidget.moveDirectPorts = True

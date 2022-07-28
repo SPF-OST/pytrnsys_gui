@@ -327,6 +327,8 @@ class Editor(QWidget):
         elif loadValue == "json":
             self._decodeDiagram(jsonPath, loadValue=loadValue)
 
+        self.massFlowEnabled = False
+
     # Debug function
     def dumpInformation(self):
         self.logger.debug("Diagram information:")
