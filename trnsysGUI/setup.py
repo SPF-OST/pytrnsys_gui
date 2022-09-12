@@ -58,7 +58,7 @@ def _checkRequirements() -> _res.Result[None]:
 
     requiredVersions = _getRequiredVersions(release3rdPartyTxtFilePath)
 
-    installedVersions = _getInstalledVersions()
+    installedVersions = _getInstalledNonEditableVersions()
 
     missingVersions = requiredVersions - installedVersions
     if missingVersions:
@@ -89,9 +89,11 @@ followed by
     return None
 
 
-def _getInstalledVersions() -> _tp.Set[_VersionedPackage]:
+def _getInstalledNonEditableVersions() -> _tp.Set[_VersionedPackage]:
     completedPipFreezeProcess = _sp.run("pip freeze".split(), capture_output=True, text=True, check=True)
-    installedVersions = {_VersionedPackage.create(v) for v in completedPipFreezeProcess.stdout.split()}
+    serializedInstalledVersions = completedPipFreezeProcess.stdout.split()
+    serializedNonEditableInstalledVersions = [v for v in serializedInstalledVersions if not v.startswith("-e")]
+    installedVersions = {_VersionedPackage.create(v) for v in serializedNonEditableInstalledVersions}
     return installedVersions
 
 
