@@ -8,10 +8,12 @@ from PyQt5.QtCore import QPointF, QEvent, QTimer
 from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
 
-import trnsysGUI.images as _img
-import trnsysGUI.internalPiping
 import trnsysGUI.PortItemBase as _pib
-from trnsysGUI import idGenerator as _id
+import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
+
+import trnsysGUI.idGenerator as _id
+
 from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
 from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
 from trnsysGUI.blockItemModel import BlockItemModel
@@ -666,7 +668,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
 
-    def getInternalPiping(self) -> trnsysGUI.internalPiping.InternalPiping:
+    def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
 
     def deleteLoadedFile(self):
