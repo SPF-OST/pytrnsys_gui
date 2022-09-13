@@ -131,16 +131,8 @@ class DoublePipeConnection(_cb.ConnectionBase):
         parameterNumber = 35
         inputNumbers = 6
 
-        eqConst1 = 1
-        eqConst3 = 3
-        eqConst7 = 7
-        eqConst8 = 8
-
         # Fixed strings
         initialValueS = "15.0 0.0 15.0 15.0 0.0 15.0"
-
-        # Momentarily hardcoded
-        equationNr = 6
 
         unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
         unitText += "!" + self.displayName + "\n"
@@ -200,12 +192,35 @@ class DoublePipeConnection(_cb.ConnectionBase):
         unitText += "***Initial values\n"
         unitText += initialValueS + "\n\n"
 
-        unitText += "EQUATIONS " + str(equationNr) + "\n"
-        unitText += self._getEquations("Cold", self.coldModelPipe, eqConst1, eqConst7, unitNumber)
-        unitText += self._getEquations("Hot", self.hotModelPipe, eqConst3, eqConst8, unitNumber)
+        coldPIpeName = self.coldModelPipe.name
+        coldPipePrefix = f"{self.displayName}{coldPIpeName}"
 
+        hotPipeName = self.hotModelPipe.name
+        hotPipePrefix = f"{self.displayName}{hotPipeName}"
+
+        unitText += f"""\
+EQUATIONS 14
+{_temps.getTemperatureVariableName(self, self.coldModelPipe)} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
+{_mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)} = [{unitNumber},2]  ! Outlet mass flow rate, kg/h"
+
+{_temps.getTemperatureVariableName(self, self.hotModelPipe)} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
+{_mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)} = [{unitNumber},4]  ! Outlet mass flow rate, kg/h"
+
+Q{coldPipePrefix}Conv = [{unitNumber},7]  ! Convected heat [kJ]
+Q{coldPipePrefix}Int = [{unitNumber},9]  ! Change in fluid's internal heat content compared to previous time step [kJ]
+Q{coldPipePrefix}Diss = [{unitNumber},11]  ! Dissipated heat to casing (aka gravel) [kJ]
+
+Q{hotPipePrefix}Conv = [{unitNumber},8]  ! Convected heat [kJ]
+Q{hotPipePrefix}Int = [{unitNumber},10]  ! Change in fluid's internal heat content compared to previous time step [kJ]
+Q{hotPipePrefix}Diss = [{unitNumber},12]  ! Dissipated heat to casing (aka gravel) [kJ]
+
+Q{self.displayName}Exch = [{unitNumber},13]  ! Dissipated heat from cold pipe to hot pipe [kJ]
+Q{self.displayName}GrSl = [{unitNumber},14]  ! Dissipated heat from gravel to soil [kJ]
+Q{self.displayName}SlFf = [{unitNumber},15]  ! Dissipated heat from soil to "far field" [kJ]
+Q{self.displayName}SlInt = [{unitNumber},16]  ! Change in soil's internal heat content compared to previous time step [kJ]
+
+"""
         unitNumber += 1
-        unitText += "\n"
 
         return unitText, unitNumber
 
@@ -226,25 +241,6 @@ class DoublePipeConnection(_cb.ConnectionBase):
         outgoingConnection = pipeToPort.getConnection()
         revTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, portItemType)
         unitText += self._addComment(revTemperatureName, f"! Other side of pipe - Pipe {portItemType.name}, deg C")
-
-        return unitText
-
-    def _getEquations(self, temperatureSuffix: str, pipe: _mfn.Pipe, equationConstant1, equationConstant2, unitNumber):
-        temperatureVariableName = _temps.getTemperatureVariableName(self, pipe)
-        firstColumn = f"{temperatureVariableName} = [{unitNumber},{equationConstant1}]"
-        unitText = self._addComment(
-            firstColumn, f"! {equationConstant1}: Outlet fluid temperature pipe {temperatureSuffix}, deg C"
-        )
-
-        mfrName = _helpers.getInputMfrName(self, pipe)
-        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, pipe)
-        firstColumn = f"{canonicalMfrName} = {mfrName}"
-        unitText += self._addComment(firstColumn, f"! Outlet mass flow rate pipe {temperatureSuffix}, kg/h")
-
-        firstColumn = f"P{self.displayName}{pipe.name}_kW = [{unitNumber},{equationConstant2}]/3600"
-        unitText += self._addComment(
-            firstColumn, f"! {equationConstant2}: Delivered energy pipe {temperatureSuffix}, kW"
-        )
 
         return unitText
 

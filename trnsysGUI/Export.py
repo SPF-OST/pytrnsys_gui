@@ -466,7 +466,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
                 inputVariableName = _mnames.getInputVariableName(hasInternalPiping, hasInternalPiping.modelDiverter)
                 allVariableNames.append(inputVariableName)
 
-        variableNameOctets = [allVariableNames[s : s + 8] for s in range(0, len(allVariableNames), 8)]
+        variableNameOctets = [allVariableNames[s: s + 8] for s in range(0, len(allVariableNames), 8)]
 
         formattedInputVariables = "\n".join(" ".join(o) for o in variableNameOctets) + "\n"
 
