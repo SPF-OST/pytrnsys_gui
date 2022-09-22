@@ -32,7 +32,6 @@ class segmentDlg(QDialog):
         self.show()
 
     def acceptedEdit(self):
-        # print("Changing displayName")
         newName = self.le.text()
         if newName.lower() == str(self.seg.connection.displayName).lower():
             self.close()
