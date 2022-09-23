@@ -60,9 +60,9 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
         return dictName, dct
 
     def decode(self, i, resBlockList):
-
-        self.flippedH = i["FlippedH"]
-        self.flippedV = i["FlippedV"]
+        self.updateFlipStateH(i["FlippedH"])
+        self.updateFlipStateV(i["FlippedV"])
+        self.rotateBlockToN(i["RotationN"])
         self.childIds = i["childIds"]
         self.displayName = i["BlockDisplayName"]
         self.changeSize()
@@ -82,6 +82,10 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
 
         self.changeSize()
+
+        self.updateFlipStateH(i["FlippedH"])
+        self.updateFlipStateV(i["FlippedV"])
+        self.rotateBlockToN(i["RotationN"])
 
         for x, inputPort in enumerate(self.inputs):
             inputPort.id = i["PortsIDIn"][x]
