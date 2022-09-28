@@ -50,9 +50,6 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.endNode = _node.Node()  # type: ignore[attr-defined]
         self.firstS: _tp.Optional[_sib.SegmentItemBase] = None  # type: ignore[name-defined]
 
-        self.mass = 0  # comment out
-        self.temperature = 0
-
         self.startPos = None
 
         self.initNew(parent)
@@ -84,18 +81,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                 res = False
 
         return res
-
-    def setMassAndTemperature(self, mass, temp):
-        """
-        To show the mass and temperature during mass flow visualization
-        """
-        self.mass = float(mass)
-        self.mass = f"{self.mass:,}"
-
-        self.temperature = temp
-        for s in self.segments:  # pylint: disable = invalid-name
-            replacedMass = self.mass.replace(",", "'")
-            s.labelMass.setPlainText(f"M: {replacedMass} kg/h   T: {self.temperature}\u2103")
 
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName

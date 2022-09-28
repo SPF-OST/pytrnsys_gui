@@ -6,8 +6,8 @@ import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
-import pytrnsys.utils.serialization as _ser
 
+import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
@@ -17,6 +17,9 @@ import trnsysGUI.internalPiping
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+
+from . import _helpers as _chelpers
+from . import _massFlowLabels as _mfl
 
 
 class DoublePipeConnection(_cb.ConnectionBase):
@@ -123,74 +126,64 @@ class DoublePipeConnection(_cb.ConnectionBase):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals,too-many-statements
         unitNumber = startingUnit
-        typeNr2 = 9511  # Temperature calculation from a pipe
 
-        unitText = ""
-        commentStars = 6 * "*"
-
-        parameterNumber = 35
         inputNumbers = 6
 
+        unitText = f"""\
+UNIT {unitNumber} TYPE 9511
+! {self.displayName}
+PARAMETERS 36
+****** pipe and soil properties ******
+dpLength                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+"""
+
         # Fixed strings
-        initialValueS = "15.0 0.0 15.0 15.0 0.0 15.0"
-
-        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-        unitText += "!" + self.displayName + "\n"
-
-        unitText += "PARAMETERS " + str(parameterNumber) + "\n"
-        unitText += commentStars + " pipe and soil properties " + commentStars + "\n"
-        unitText += self._addComment("dpLength", "! Length of buried pipe, m")
-        unitText += self._addComment("dpDiamIn", "! Inner diameter of pipes, m")
-        unitText += self._addComment("dpDiamOut", "! Outer diameter of pipes, m")
-        unitText += self._addComment("dpLambda", "! Thermal conductivity of pipe material, kJ/(h*m*K)")
-        unitText += self._addComment("dpDepth", "! Buried pipe depth, m")
-        unitText += self._addComment("dpFlowMode", "! Direction of second pipe flow: 1 = same, 2 = opposite")
-        unitText += self._addComment("dpDiamCase", "! Diameter of casing material, m")
-        unitText += self._addComment("dpLambdaFill", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
-        unitText += self._addComment("dpDistPtoP", "! Center-to-center pipe spacing, m")
-        unitText += self._addComment("dpLambdaGap", "! Thermal conductivity of gap material, kJ/(h*m*K)")
-        unitText += self._addComment("dpGapThick", "! Gap thickness, m")
-
-        unitText += commentStars + " fluid properties " + commentStars + "\n"
-        unitText += self._addComment("dpRhoFlu", "! Density of fluid, kg/m^3")
-        unitText += self._addComment("dpLambdaFl", "! Thermal conductivity of fluid, kJ/(h*m*K)")
-        unitText += self._addComment("dpCpFl", "! Specific heat of fluid, kJ/(kg*K)")
-        unitText += self._addComment("dpViscFl", "! Viscosity of fluid, kg/(m*h)")
-
-        unitText += commentStars + " initial conditions " + commentStars + "\n"
-        unitText += self._addComment("dpTIniHot", "! Initial fluid temperature - Pipe hot, deg C")
-        unitText += self._addComment("dpTIniCold", "! Initial fluid temperature - Pipe cold, deg C")
-
-        unitText += commentStars + " thermal properties soil " + commentStars + "\n"
-        unitText += self._addComment("dpLamdaSl", "! Thermal conductivity of soil, kJ/(h*m*K)")
-        unitText += self._addComment("dpRhoSl", "! Density of soil, kg/m^3")
-        unitText += self._addComment("dpCpSl", "! Specific heat of soil, kJ/(kg*K)")
-
-        unitText += commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
-        unitText += self._addComment("TambAvg", "! Average surface temperature, deg C")
-        unitText += self._addComment("dTambAmpl", "! Amplitude of surface temperature, deg C")
-        unitText += self._addComment("ddTcwOffset", "! Days of minimum surface temperature")
-
-        unitText += commentStars + " definition of nodes " + commentStars + "\n"
-        unitText += self._addComment("dpNrFlNds", "! Number of fluid nodes")
-        unitText += self._addComment("dpNrSlRad", "! Number of radial soil nodes")
-        unitText += self._addComment("dpNrSlAx", "! Number of axial soil nodes")
-        unitText += self._addComment("dpNrSlCirc", "! Number of circumferential soil nodes")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 1, m")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 2, m")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 3, m")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 4, m")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 5, m")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 6, m")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 7, m")
-        unitText += self._addComment("dpRadNdDist", "! Radial distance of node 8, m")
-
         unitText += "INPUTS " + str(inputNumbers) + "\n"
         unitText += self._getInputs(_mfn.PortItemType.COLD, self.coldModelPipe, self.toPort, self.fromPort)
         unitText += self._getInputs(_mfn.PortItemType.HOT, self.hotModelPipe, self.fromPort, self.toPort)
 
         unitText += "***Initial values\n"
-        unitText += initialValueS + "\n\n"
+        unitText += "15.0 0.0 15.0 15.0 0.0 15.0\n\n"
 
         coldPIpeName = self.coldModelPipe.name
         coldPipePrefix = f"{self.displayName}{coldPIpeName}"
@@ -198,13 +191,19 @@ class DoublePipeConnection(_cb.ConnectionBase):
         hotPipeName = self.hotModelPipe.name
         hotPipePrefix = f"{self.displayName}{hotPipeName}"
 
-        unitText += f"""\
-EQUATIONS 14
-{_temps.getTemperatureVariableName(self, self.coldModelPipe)} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
-{_mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)} = [{unitNumber},2]  ! Outlet mass flow rate, kg/h"
+        coldPipeHeatLossVariableName = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.COLD)
+        hotPipeHeatLossVariableName = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.HOT)
 
+        coldCanonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)
+        coldInputMfrName = _helpers.getInputMfrName(self, self.coldModelPipe)
+
+        hotCanonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)
+        hotInputMfrName = _helpers.getInputMfrName(self, self.hotModelPipe)
+
+        unitText += f"""\
+EQUATIONS 16
+{_temps.getTemperatureVariableName(self, self.coldModelPipe)} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
 {_temps.getTemperatureVariableName(self, self.hotModelPipe)} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
-{_mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)} = [{unitNumber},4]  ! Outlet mass flow rate, kg/h"
 
 Q{coldPipePrefix}Conv = [{unitNumber},7]  ! Convected heat [kJ]
 Q{coldPipePrefix}Int = [{unitNumber},9]  ! Change in fluid's internal heat content compared to previous time step [kJ]
@@ -219,6 +218,12 @@ Q{self.displayName}GrSl = [{unitNumber},14]  ! Dissipated heat from gravel to so
 Q{self.displayName}SlFf = [{unitNumber},15]  ! Dissipated heat from soil to "far field" [kJ]
 Q{self.displayName}SlInt = [{unitNumber},16]  ! Change in soil's internal heat content compared to previous time step [kJ]
 
+{coldCanonicalMfrName} = {coldInputMfrName}
+{hotCanonicalMfrName} = {hotInputMfrName}
+
+{coldPipeHeatLossVariableName} = Q{hotPipePrefix}Diss
+{hotPipeHeatLossVariableName} = Q{coldPipePrefix}Diss
+
 """
         unitNumber += 1
 
@@ -231,15 +236,13 @@ Q{self.displayName}SlInt = [{unitNumber},16]  ! Change in soil's internal heat c
         pipeFromPort: _dppi.DoublePipePortItem,
         pipeToPort: _dppi.DoublePipePortItem,
     ) -> str:
-        incomingConnection = pipeFromPort.getConnection()
-        temperatureName = _cnames.getTemperatureVariableName(incomingConnection, portItemType)
+        temperatureName = _chelpers.getTemperatureVariableName(pipeFromPort.parent, pipeFromPort, portItemType)
         unitText = self._addComment(temperatureName, f"! Inlet fluid temperature - Pipe {portItemType.name}, deg C")
 
         mfrName = _helpers.getInputMfrName(self, pipe)
         unitText += self._addComment(mfrName, f"! Inlet fluid flow rate - Pipe {portItemType.name}, kg/h")
 
-        outgoingConnection = pipeToPort.getConnection()
-        revTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, portItemType)
+        revTemperatureName = _chelpers.getTemperatureVariableName(pipeToPort.parent, pipeToPort, portItemType)
         unitText += self._addComment(revTemperatureName, f"! Other side of pipe - Pipe {portItemType.name}, deg C")
 
         return unitText
@@ -257,6 +260,16 @@ Q{self.displayName}SlInt = [{unitNumber},16]  ! Change in soil's internal heat c
         hotFromPort: _mfn.PortItem = _mfn.PortItem("HotIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
         hotToPort: _mfn.PortItem = _mfn.PortItem("HotOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self.hotModelPipe = _mfn.Pipe(hotFromPort, hotToPort, name="Hot")
+
+    def setMassFlowAndTemperature(self, coldMassFlow: float, coldTemperature: float, hotMassFlow: float, hotTemperature: float) -> None:
+        formattedColdMassFlowAndTemperature = _mfl.getFormattedMassFlowAndTemperature(coldMassFlow, coldTemperature)
+        formattedHotMassFlowAndTemperature = _mfl.getFormattedMassFlowAndTemperature(hotMassFlow, hotTemperature)
+        labelText = f"""\
+Cold: {formattedColdMassFlowAndTemperature}
+Hot: {formattedHotMassFlowAndTemperature}
+"""
+        for segment in self.segments:
+            segment.labelMass.setPlainText(labelText)
 
 
 class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):

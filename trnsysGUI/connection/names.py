@@ -7,3 +7,9 @@ def getTemperatureVariableName(connection: _cb.ConnectionBase, portItemType: _mf
     modelPipe = connection.getModelPipe(portItemType)
     variableName = _temps.getTemperatureVariableName(connection, modelPipe)
     return variableName
+
+
+def getHeatLossVariableName(connection: _cb.ConnectionBase, portItemType: _mfn.PortItemType) -> str:
+    modelPipe = connection.getModelPipe(portItemType)
+    variableName = f"P{connection.getDisplayName()}{modelPipe.name or ''}_kW"
+    return variableName
