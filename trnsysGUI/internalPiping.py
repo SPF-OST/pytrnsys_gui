@@ -72,7 +72,10 @@ class HasInternalPiping:
         raise NotImplementedError()
 
     def hasDdckPlaceHolders(self) -> bool:
-        return False
+        return True
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return True
 
     def getInternalPiping(self) -> InternalPiping:
         raise NotImplementedError()

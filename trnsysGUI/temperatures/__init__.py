@@ -11,7 +11,7 @@ def getInternalTemperatureVariableName(hasInternalPiping: _ip.HasInternalPiping,
 def getTemperatureVariableName(hasInternalPiping: _ip.HasInternalPiping, node: _mfn.Node) -> str:
     internalName = getInternalTemperatureVariableName(hasInternalPiping, node)
 
-    if not hasInternalPiping.hasDdckPlaceHolders():
+    if not hasInternalPiping.shallRenameOutputTemperaturesInHydraulicFile():
         return internalName
 
     return f"{internalName}H"

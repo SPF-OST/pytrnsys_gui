@@ -9,7 +9,6 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
@@ -17,9 +16,15 @@ import trnsysGUI.internalPiping
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
-
 from . import _helpers as _chelpers
 from . import _massFlowLabels as _mfl
+
+
+@_dc.dataclass
+class HeatLossVariable:
+    name: str
+    outputNumber: int
+    comment: str
 
 
 class DoublePipeConnection(_cb.ConnectionBase):
@@ -185,49 +190,66 @@ dpRadNdDist                             ! Radial distance of node 10, m
         unitText += "***Initial values\n"
         unitText += "15.0 0.0 15.0 15.0 0.0 15.0\n\n"
 
-        coldPIpeName = self.coldModelPipe.name
-        coldPipePrefix = f"{self.displayName}{coldPIpeName}"
+        heatLossVariables = self.getHeatLossVariables()
 
-        hotPipeName = self.hotModelPipe.name
-        hotPipePrefix = f"{self.displayName}{hotPipeName}"
-
-        coldPipeHeatLossVariableName = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.COLD)
-        hotPipeHeatLossVariableName = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.HOT)
-
-        coldCanonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)
-        coldInputMfrName = _helpers.getInputMfrName(self, self.coldModelPipe)
-
-        hotCanonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)
-        hotInputMfrName = _helpers.getInputMfrName(self, self.hotModelPipe)
+        formattedHeatLossVariables = "\n".join(
+            f"{v.name} = [{unitNumber},{v.outputNumber}] ! {v.comment}" for v in heatLossVariables
+        )
 
         unitText += f"""\
-EQUATIONS 16
+EQUATIONS {4 + len(heatLossVariables)}
 {_temps.getTemperatureVariableName(self, self.coldModelPipe)} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
+{_mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)} = [{unitNumber},2]  ! Outlet mass flow rate, kg/h"
+
 {_temps.getTemperatureVariableName(self, self.hotModelPipe)} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
+{_mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)} = [{unitNumber},4]  ! Outlet mass flow rate, kg/h"
 
-Q{coldPipePrefix}Conv = [{unitNumber},7]  ! Convected heat [kJ]
-Q{coldPipePrefix}Int = [{unitNumber},9]  ! Change in fluid's internal heat content compared to previous time step [kJ]
-Q{coldPipePrefix}Diss = [{unitNumber},11]  ! Dissipated heat to casing (aka gravel) [kJ]
-
-Q{hotPipePrefix}Conv = [{unitNumber},8]  ! Convected heat [kJ]
-Q{hotPipePrefix}Int = [{unitNumber},10]  ! Change in fluid's internal heat content compared to previous time step [kJ]
-Q{hotPipePrefix}Diss = [{unitNumber},12]  ! Dissipated heat to casing (aka gravel) [kJ]
-
-Q{self.displayName}Exch = [{unitNumber},13]  ! Dissipated heat from cold pipe to hot pipe [kJ]
-Q{self.displayName}GrSl = [{unitNumber},14]  ! Dissipated heat from gravel to soil [kJ]
-Q{self.displayName}SlFf = [{unitNumber},15]  ! Dissipated heat from soil to "far field" [kJ]
-Q{self.displayName}SlInt = [{unitNumber},16]  ! Change in soil's internal heat content compared to previous time step [kJ]
-
-{coldCanonicalMfrName} = {coldInputMfrName}
-{hotCanonicalMfrName} = {hotInputMfrName}
-
-{coldPipeHeatLossVariableName} = Q{hotPipePrefix}Diss
-{hotPipeHeatLossVariableName} = Q{coldPipePrefix}Diss
-
+{formattedHeatLossVariables}
 """
         unitNumber += 1
 
         return unitText, unitNumber
+
+    def getHeatLossVariables(self) -> _tp.Sequence[HeatLossVariable]:
+        return [
+            self._getHeatLossVariable("Conv", _mfn.PortItemType.COLD, 7, "Convected heat [kJ]"),
+            self._getHeatLossVariable(
+                "Int",
+                _mfn.PortItemType.COLD,
+                9,
+                "Change in fluid's internal heat content compared to previous time step [kJ]",
+            ),
+            self._getHeatLossVariable("Diss", _mfn.PortItemType.COLD, 11, "Dissipated heat to casing (aka gravel) [kJ]"),
+            self._getHeatLossVariable("Conv", _mfn.PortItemType.HOT, 8, "Convected heat [kJ]"),
+            self._getHeatLossVariable(
+                "Int",
+                _mfn.PortItemType.HOT,
+                10,
+                "Change in fluid's internal heat content compared to previous time step [kJ]",
+            ),
+            self._getHeatLossVariable("Diss", _mfn.PortItemType.HOT, 12, "Dissipated heat to casing (aka gravel) [kJ]"),
+            self._getHeatLossVariable("Exch", None, 13, "Dissipated heat from cold pipe to hot pipe [kJ]"),
+            self._getHeatLossVariable("GrSl", None, 14, "Dissipated heat from gravel to soil [kJ]"),
+            self._getHeatLossVariable("SlFf", None, 15, 'Dissipated heat from soil to "far field" [kJ]'),
+            self._getHeatLossVariable(
+                "SlInt", None, 16, "Change in soil's internal heat content compared to previous time step [kJ]"
+            ),
+        ]
+
+    def _getHeatLossVariable(
+        self, postfix: str, portItemType: _tp.Union[_mfn.PortItemType, None], outputNumber: int, comment: str
+    ) -> HeatLossVariable:
+        prefix = self._getHeatLossVariablePrefix(portItemType)
+        variableName = f"{prefix}{postfix}"
+        return HeatLossVariable(variableName, outputNumber, comment)
+
+    def _getHeatLossVariablePrefix(self, portItemType: _tp.Union[_mfn.PortItemType, None]):
+        if not portItemType:
+            return self.displayName
+
+        assert portItemType in [_mfn.PortItemType.COLD, _mfn.PortItemType.HOT]
+        pipeName = self.coldModelPipe.name if portItemType == _mfn.PortItemType.COLD else self.hotModelPipe.name
+        return f"{self.displayName}{pipeName}"
 
     def _getInputs(
         self,
@@ -253,15 +275,17 @@ Q{self.displayName}SlInt = [{unitNumber},16]  ! Change in soil's internal heat c
         return str(firstColumn).ljust(spacing) + comment + "\n"
 
     def _updateModels(self, newDisplayName: str):
-        coldFromPort: _mfn.PortItem = _mfn.PortItem("ColdIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-        coldToPort: _mfn.PortItem = _mfn.PortItem("ColdOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
+        coldFromPort: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
+        coldToPort: _mfn.PortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
         self.coldModelPipe = _mfn.Pipe(coldFromPort, coldToPort, name="Cold")
 
-        hotFromPort: _mfn.PortItem = _mfn.PortItem("HotIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-        hotToPort: _mfn.PortItem = _mfn.PortItem("HotOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
+        hotFromPort: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
+        hotToPort: _mfn.PortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self.hotModelPipe = _mfn.Pipe(hotFromPort, hotToPort, name="Hot")
 
-    def setMassFlowAndTemperature(self, coldMassFlow: float, coldTemperature: float, hotMassFlow: float, hotTemperature: float) -> None:
+    def setMassFlowAndTemperature(
+        self, coldMassFlow: float, coldTemperature: float, hotMassFlow: float, hotTemperature: float
+    ) -> None:
         formattedColdMassFlowAndTemperature = _mfl.getFormattedMassFlowAndTemperature(coldMassFlow, coldTemperature)
         formattedHotMassFlowAndTemperature = _mfl.getFormattedMassFlowAndTemperature(hotMassFlow, hotTemperature)
         labelText = f"""\

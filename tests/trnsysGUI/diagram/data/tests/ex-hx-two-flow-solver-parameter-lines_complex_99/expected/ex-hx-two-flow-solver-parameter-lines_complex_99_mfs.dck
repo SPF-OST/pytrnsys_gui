@@ -584,7 +584,7 @@ TPuCirc
 
 EQUATIONS 3
 TPiDhwCircRtPu = [454,1]
-PPiDhwCircRtPu_kW= [454,3]/3600 !kW
+PPiDhwCircRtPu_kW = [454,3]/3600 ! kW
 MPiDhwCircRtPu = MPiDhwCircRtPu_A
 
 UNIT 455 TYPE 931
@@ -606,7 +606,7 @@ TtapWater
 
 EQUATIONS 3
 TPiDhwCirctoTap = [455,1]
-PPiDhwCirctoTap_kW= [455,3]/3600 !kW
+PPiDhwCirctoTap_kW = [455,3]/3600 ! kW
 MPiDhwCirctoTap = MPiDhwCirctoTap_A
 
 UNIT 456 TYPE 931
@@ -628,7 +628,7 @@ TDivAux
 
 EQUATIONS 3
 TPiAuxToDiv = [456,1]
-PPiAuxToDiv_kW= [456,3]/3600 !kW
+PPiAuxToDiv_kW = [456,3]/3600 ! kW
 MPiAuxToDiv = MPiAuxToDiv_A
 
 UNIT 457 TYPE 931
@@ -650,7 +650,7 @@ THPEvapH
 
 EQUATIONS 3
 TPiHpEvapIn = [457,1]
-PPiHpEvapIn_kW= [457,3]/3600 !kW
+PPiHpEvapIn_kW = [457,3]/3600 ! kW
 MPiHpEvapIn = MPiHpEvapIn_A
 
 UNIT 458 TYPE 929
@@ -687,7 +687,7 @@ TFloor1H
 
 EQUATIONS 3
 TPiFlFloor1 = [459,1]
-PPiFlFloor1_kW= [459,3]/3600 !kW
+PPiFlFloor1_kW = [459,3]/3600 ! kW
 MPiFlFloor1 = MPiFlFloor1_A
 
 UNIT 460 TYPE 929
@@ -724,7 +724,7 @@ TFloor2H
 
 EQUATIONS 3
 TPiFlFloor2 = [461,1]
-PPiFlFloor2_kW= [461,3]/3600 !kW
+PPiFlFloor2_kW = [461,3]/3600 ! kW
 MPiFlFloor2 = MPiFlFloor2_A
 
 UNIT 462 TYPE 931
@@ -746,7 +746,7 @@ TFloor3H
 
 EQUATIONS 3
 TPiFlFloor3 = [462,1]
-PPiFlFloor3_kW= [462,3]/3600 !kW
+PPiFlFloor3_kW = [462,3]/3600 ! kW
 MPiFlFloor3 = MPiFlFloor3_A
 
 UNIT 463 TYPE 931
@@ -768,7 +768,7 @@ TFloor4H
 
 EQUATIONS 3
 TPiFlFloor4 = [463,1]
-PPiFlFloor4_kW= [463,3]/3600 !kW
+PPiFlFloor4_kW = [463,3]/3600 ! kW
 MPiFlFloor4 = MPiFlFloor4_A
 
 UNIT 464 TYPE 931
@@ -790,7 +790,7 @@ TFloor5H
 
 EQUATIONS 3
 TPiFlFloor5 = [464,1]
-PPiFlFloor5_kW= [464,3]/3600 !kW
+PPiFlFloor5_kW = [464,3]/3600 ! kW
 MPiFlFloor5 = MPiFlFloor5_A
 
 UNIT 465 TYPE 931
@@ -812,7 +812,7 @@ TFloor6H
 
 EQUATIONS 3
 TPiFlFloor6 = [465,1]
-PPiFlFloor6_kW= [465,3]/3600 !kW
+PPiFlFloor6_kW = [465,3]/3600 ! kW
 MPiFlFloor6 = MPiFlFloor6_A
 
 UNIT 466 TYPE 929
@@ -894,7 +894,7 @@ TTeeShRt5
 
 EQUATIONS 3
 TPiRtFloor5 = [470,1]
-PPiRtFloor5_kW= [470,3]/3600 !kW
+PPiRtFloor5_kW = [470,3]/3600 ! kW
 MPiRtFloor5 = MPiRtFloor5_A
 
 UNIT 471 TYPE 931
@@ -916,7 +916,7 @@ TTeeShRt4
 
 EQUATIONS 3
 TPiShRt5to4 = [471,1]
-PPiShRt5to4_kW= [471,3]/3600 !kW
+PPiShRt5to4_kW = [471,3]/3600 ! kW
 MPiShRt5to4 = MPiShRt5to4_A
 
 UNIT 472 TYPE 931
@@ -938,7 +938,7 @@ TTeeShRt4
 
 EQUATIONS 3
 TPiRtFloor4 = [472,1]
-PPiRtFloor4_kW= [472,3]/3600 !kW
+PPiRtFloor4_kW = [472,3]/3600 ! kW
 MPiRtFloor4 = MPiRtFloor4_A
 
 UNIT 473 TYPE 931
@@ -960,7 +960,7 @@ TTeeShRt3
 
 EQUATIONS 3
 TPiRtFloor3 = [473,1]
-PPiRtFloor3_kW= [473,3]/3600 !kW
+PPiRtFloor3_kW = [473,3]/3600 ! kW
 MPiRtFloor3 = MPiRtFloor3_A
 
 UNIT 474 TYPE 931
@@ -982,7 +982,7 @@ TTeeShRt2
 
 EQUATIONS 3
 TPiRtFloor2 = [474,1]
-PPiRtFloor2_kW= [474,3]/3600 !kW
+PPiRtFloor2_kW = [474,3]/3600 ! kW
 MPiRtFloor2 = MPiRtFloor2_A
 
 UNIT 475 TYPE 931
@@ -1004,7 +1004,7 @@ TTeeShRt3
 
 EQUATIONS 3
 TPiShRt4to3 = [475,1]
-PPiShRt4to3_kW= [475,3]/3600 !kW
+PPiShRt4to3_kW = [475,3]/3600 ! kW
 MPiShRt4to3 = MPiShRt4to3_A
 
 UNIT 476 TYPE 931
@@ -1026,7 +1026,7 @@ TTeeShRt2
 
 EQUATIONS 3
 TPiShRt3to2 = [476,1]
-PPiShRt3to2_kW= [476,3]/3600 !kW
+PPiShRt3to2_kW = [476,3]/3600 ! kW
 MPiShRt3to2 = MPiShRt3to2_A
 
 UNIT 477 TYPE 931
@@ -1048,7 +1048,7 @@ TTeeShRt1
 
 EQUATIONS 3
 TPiShRt2to1 = [477,1]
-PPiShRt2to1_kW= [477,3]/3600 !kW
+PPiShRt2to1_kW = [477,3]/3600 ! kW
 MPiShRt2to1 = MPiShRt2to1_A
 
 UNIT 478 TYPE 931
@@ -1070,7 +1070,7 @@ TTeeShRt1
 
 EQUATIONS 3
 TPiRtFloor1 = [478,1]
-PPiRtFloor1_kW= [478,3]/3600 !kW
+PPiRtFloor1_kW = [478,3]/3600 ! kW
 MPiRtFloor1 = MPiRtFloor1_A
 
 UNIT 479 TYPE 931
@@ -1092,7 +1092,7 @@ TPuSh1
 
 EQUATIONS 3
 TPiShFltoPu1 = [479,1]
-PPiShFltoPu1_kW= [479,3]/3600 !kW
+PPiShFltoPu1_kW = [479,3]/3600 ! kW
 MPiShFltoPu1 = MPiShFltoPu1_A
 
 UNIT 480 TYPE 929
@@ -1174,7 +1174,7 @@ TTeeShOut2
 
 EQUATIONS 3
 TPiShFl1to2 = [484,1]
-PPiShFl1to2_kW= [484,3]/3600 !kW
+PPiShFl1to2_kW = [484,3]/3600 ! kW
 MPiShFl1to2 = MPiShFl1to2_A
 
 UNIT 485 TYPE 931
@@ -1196,7 +1196,7 @@ TPuSh2
 
 EQUATIONS 3
 TPiShFlToPu2 = [485,1]
-PPiShFlToPu2_kW= [485,3]/3600 !kW
+PPiShFlToPu2_kW = [485,3]/3600 ! kW
 MPiShFlToPu2 = MPiShFlToPu2_A
 
 UNIT 486 TYPE 931
@@ -1218,7 +1218,7 @@ TTeeShOut3
 
 EQUATIONS 3
 TPiShFl2to3 = [486,1]
-PPiShFl2to3_kW= [486,3]/3600 !kW
+PPiShFl2to3_kW = [486,3]/3600 ! kW
 MPiShFl2to3 = MPiShFl2to3_A
 
 UNIT 487 TYPE 931
@@ -1240,7 +1240,7 @@ TPuSh3
 
 EQUATIONS 3
 TPiShFlToPu3 = [487,1]
-PPiShFlToPu3_kW= [487,3]/3600 !kW
+PPiShFlToPu3_kW = [487,3]/3600 ! kW
 MPiShFlToPu3 = MPiShFlToPu3_A
 
 UNIT 488 TYPE 931
@@ -1262,7 +1262,7 @@ TTeeShOut4
 
 EQUATIONS 3
 TPiShFl3to4 = [488,1]
-PPiShFl3to4_kW= [488,3]/3600 !kW
+PPiShFl3to4_kW = [488,3]/3600 ! kW
 MPiShFl3to4 = MPiShFl3to4_A
 
 UNIT 489 TYPE 931
@@ -1284,7 +1284,7 @@ TPuSh4
 
 EQUATIONS 3
 TPiShFlToPu4 = [489,1]
-PPiShFlToPu4_kW= [489,3]/3600 !kW
+PPiShFlToPu4_kW = [489,3]/3600 ! kW
 MPiShFlToPu4 = MPiShFlToPu4_A
 
 UNIT 490 TYPE 931
@@ -1306,7 +1306,7 @@ TTeeShOut5
 
 EQUATIONS 3
 TPiShFl4to5 = [490,1]
-PPiShFl4to5_kW= [490,3]/3600 !kW
+PPiShFl4to5_kW = [490,3]/3600 ! kW
 MPiShFl4to5 = MPiShFl4to5_A
 
 UNIT 491 TYPE 931
@@ -1328,7 +1328,7 @@ TPuSh5
 
 EQUATIONS 3
 TPiShFlToPu5 = [491,1]
-PPiShFlToPu5_kW= [491,3]/3600 !kW
+PPiShFlToPu5_kW = [491,3]/3600 ! kW
 MPiShFlToPu5 = MPiShFlToPu5_A
 
 UNIT 492 TYPE 931
@@ -1350,7 +1350,7 @@ TPuAuxEvap
 
 EQUATIONS 3
 TPiHpEvapOut = [492,1]
-PPiHpEvapOut_kW= [492,3]/3600 !kW
+PPiHpEvapOut_kW = [492,3]/3600 ! kW
 MPiHpEvapOut = MPiHpEvapOut_A
 
 UNIT 493 TYPE 931
@@ -1372,7 +1372,7 @@ THxDHWSide1H
 
 EQUATIONS 3
 TPiHxDhwPriFl = [493,1]
-PPiHxDhwPriFl_kW= [493,3]/3600 !kW
+PPiHxDhwPriFl_kW = [493,3]/3600 ! kW
 MPiHxDhwPriFl = MPiHxDhwPriFl_A
 
 UNIT 494 TYPE 931
@@ -1394,7 +1394,7 @@ TTeeAuxHxRt
 
 EQUATIONS 3
 TPiHxDhwPriRt = [494,1]
-PPiHxDhwPriRt_kW= [494,3]/3600 !kW
+PPiHxDhwPriRt_kW = [494,3]/3600 ! kW
 MPiHxDhwPriRt = MPiHxDhwPriRt_A
 
 UNIT 495 TYPE 931
@@ -1416,7 +1416,7 @@ TPuHxDhwSec
 
 EQUATIONS 3
 TPiTesDhwtoPuHx = [495,1]
-PPiTesDhwtoPuHx_kW= [495,3]/3600 !kW
+PPiTesDhwtoPuHx_kW = [495,3]/3600 ! kW
 MPiTesDhwtoPuHx = MPiTesDhwtoPuHx_A
 
 UNIT 496 TYPE 929
@@ -1453,7 +1453,7 @@ TTeeAuxShFl
 
 EQUATIONS 3
 TPiAuxtoTeeShFl = [497,1]
-PPiAuxtoTeeShFl_kW= [497,3]/3600 !kW
+PPiAuxtoTeeShFl_kW = [497,3]/3600 ! kW
 MPiAuxtoTeeShFl = MPiAuxtoTeeShFl_A
 
 UNIT 498 TYPE 931
@@ -1475,7 +1475,7 @@ TTesShDpL90_2H
 
 EQUATIONS 3
 TPiShPriFl = [498,1]
-PPiShPriFl_kW= [498,3]/3600 !kW
+PPiShPriFl_kW = [498,3]/3600 ! kW
 MPiShPriFl = MPiShPriFl_A
 
 UNIT 499 TYPE 931
@@ -1497,7 +1497,7 @@ TTeeShOut1
 
 EQUATIONS 3
 TPiTeeShFlTes = [499,1]
-PPiTeeShFlTes_kW= [499,3]/3600 !kW
+PPiTeeShFlTes_kW = [499,3]/3600 ! kW
 MPiTeeShFlTes = MPiTeeShFlTes_A
 
 UNIT 500 TYPE 929
@@ -1534,7 +1534,7 @@ TTeeAuxShRt
 
 EQUATIONS 3
 TPiShPriRt = [501,1]
-PPiShPriRt_kW= [501,3]/3600 !kW
+PPiShPriRt_kW = [501,3]/3600 ! kW
 MPiShPriRt = MPiShPriRt_A
 
 UNIT 502 TYPE 931
@@ -1556,7 +1556,7 @@ TTeeAuxHxRt
 
 EQUATIONS 3
 TPiTeeHxDhwRt = [502,1]
-PPiTeeHxDhwRt_kW= [502,3]/3600 !kW
+PPiTeeHxDhwRt_kW = [502,3]/3600 ! kW
 MPiTeeHxDhwRt = MPiTeeHxDhwRt_A
 
 UNIT 503 TYPE 931
@@ -1578,7 +1578,7 @@ TTeeAuxShRt
 
 EQUATIONS 3
 TPiTeeShRtTes = [503,1]
-PPiTeeShRtTes_kW= [503,3]/3600 !kW
+PPiTeeShRtTes_kW = [503,3]/3600 ! kW
 MPiTeeShRtTes = MPiTeeShRtTes_A
 
 UNIT 504 TYPE 931
@@ -1600,7 +1600,7 @@ TTesDhwDpR50_99H
 
 EQUATIONS 3
 TPiPuDhwCircOut = [504,1]
-PPiPuDhwCircOut_kW= [504,3]/3600 !kW
+PPiPuDhwCircOut_kW = [504,3]/3600 ! kW
 MPiPuDhwCircOut = MPiPuDhwCircOut_A
 
 UNIT 505 TYPE 929
@@ -1637,7 +1637,7 @@ TTeeShOut6
 
 EQUATIONS 3
 TPiShFl5to6 = [506,1]
-PPiShFl5to6_kW= [506,3]/3600 !kW
+PPiShFl5to6_kW = [506,3]/3600 ! kW
 MPiShFl5to6 = MPiShFl5to6_A
 
 UNIT 507 TYPE 931
@@ -1659,7 +1659,7 @@ TPUSh6
 
 EQUATIONS 3
 TPiShFlToPu6 = [507,1]
-PPiShFlToPu6_kW= [507,3]/3600 !kW
+PPiShFlToPu6_kW = [507,3]/3600 ! kW
 MPiShFlToPu6 = MPiShFlToPu6_A
 
 UNIT 508 TYPE 931
@@ -1681,7 +1681,7 @@ TPuOverflowSh
 
 EQUATIONS 3
 TPiPuOvFl = [508,1]
-PPiPuOvFl_kW= [508,3]/3600 !kW
+PPiPuOvFl_kW = [508,3]/3600 ! kW
 MPiPuOvFl = MPiPuOvFl_A
 
 UNIT 509 TYPE 929
@@ -1718,7 +1718,7 @@ TTeeShRt6
 
 EQUATIONS 3
 TPiFloor6Rt = [510,1]
-PPiFloor6Rt_kW= [510,3]/3600 !kW
+PPiFloor6Rt_kW = [510,3]/3600 ! kW
 MPiFloor6Rt = MPiFloor6Rt_A
 
 UNIT 511 TYPE 931
@@ -1740,7 +1740,7 @@ TTeeShRt5
 
 EQUATIONS 3
 TPiPuOvRt6to5 = [511,1]
-PPiPuOvRt6to5_kW= [511,3]/3600 !kW
+PPiPuOvRt6to5_kW = [511,3]/3600 ! kW
 MPiPuOvRt6to5 = MPiPuOvRt6to5_A
 
 UNIT 512 TYPE 929
@@ -1777,7 +1777,7 @@ TTeeCircOut
 
 EQUATIONS 3
 TPiDhwtoTCirc = [513,1]
-PPiDhwtoTCirc_kW= [513,3]/3600 !kW
+PPiDhwtoTCirc_kW = [513,3]/3600 ! kW
 MPiDhwtoTCirc = MPiDhwtoTCirc_A
 
 UNIT 514 TYPE 931
@@ -1799,7 +1799,7 @@ TTeeDhwOut
 
 EQUATIONS 3
 TPiTesDhwTapOut = [514,1]
-PPiTesDhwTapOut_kW= [514,3]/3600 !kW
+PPiTesDhwTapOut_kW = [514,3]/3600 ! kW
 MPiTesDhwTapOut = MPiTesDhwTapOut_A
 
 UNIT 515 TYPE 931
@@ -1821,7 +1821,7 @@ TTeeDhwOut
 
 EQUATIONS 3
 TPiDhwCircTesOut = [515,1]
-PPiDhwCircTesOut_kW= [515,3]/3600 !kW
+PPiDhwCircTesOut_kW = [515,3]/3600 ! kW
 MPiDhwCircTesOut = MPiDhwCircTesOut_A
 
 UNIT 516 TYPE 931
@@ -1843,7 +1843,7 @@ TTeeShRt6
 
 EQUATIONS 3
 TPiPuOvRt = [516,1]
-PPiPuOvRt_kW= [516,3]/3600 !kW
+PPiPuOvRt_kW = [516,3]/3600 ! kW
 MPiPuOvRt = MPiPuOvRt_A
 
 UNIT 517 TYPE 931
@@ -1865,7 +1865,7 @@ TTesDhwDpR1_97H
 
 EQUATIONS 3
 TPiDhwMains = [517,1]
-PPiDhwMains_kW= [517,3]/3600 !kW
+PPiDhwMains_kW = [517,3]/3600 ! kW
 MPiDhwMains = MPiDhwMains_A
 
 UNIT 518 TYPE 931
@@ -1887,7 +1887,7 @@ THxDHWSide2H
 
 EQUATIONS 3
 TPiPuHxDhw2HxDHW = [518,1]
-PPiPuHxDhw2HxDHW_kW= [518,3]/3600 !kW
+PPiPuHxDhw2HxDHW_kW = [518,3]/3600 ! kW
 MPiPuHxDhw2HxDHW = MPiPuHxDhw2HxDHW_A
 
 UNIT 519 TYPE 931
@@ -1909,7 +1909,7 @@ TTesDhwDpL50_1H
 
 EQUATIONS 3
 TPiHxDHW_Dhw = [519,1]
-PPiHxDHW_Dhw_kW= [519,3]/3600 !kW
+PPiHxDHW_Dhw_kW = [519,3]/3600 ! kW
 MPiHxDHW_Dhw = MPiHxDHW_Dhw_A
 
 UNIT 520 TYPE 931
@@ -1931,7 +1931,7 @@ TPuAux
 
 EQUATIONS 3
 TPiHP_PuAux = [520,1]
-PPiHP_PuAux_kW= [520,3]/3600 !kW
+PPiHP_PuAux_kW = [520,3]/3600 ! kW
 MPiHP_PuAux = MPiHP_PuAux_A
 
 UNIT 521 TYPE 931
@@ -1953,7 +1953,7 @@ THPCondH
 
 EQUATIONS 3
 TPiTeeAuxHxRt_HP = [521,1]
-PPiTeeAuxHxRt_HP_kW= [521,3]/3600 !kW
+PPiTeeAuxHxRt_HP_kW = [521,3]/3600 ! kW
 MPiTeeAuxHxRt_HP = MPiTeeAuxHxRt_HP_A
 
 *** Pipe losses

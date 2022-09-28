@@ -29,6 +29,12 @@ class WTap(BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return True
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return False
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.W_TAP_SVG
 

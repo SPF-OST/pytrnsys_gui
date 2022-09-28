@@ -539,7 +539,7 @@ TTesShDpL95_5H
 
 EQUATIONS 3
 TPiHpToTesShIn = [461,1]
-PPiHpToTesShIn_kW= [461,3]/3600 !kW
+PPiHpToTesShIn_kW = [461,3]/3600 ! kW
 MPiHpToTesShIn = MPiHpToTesShIn_A
 
 UNIT 462 TYPE 929
@@ -606,7 +606,7 @@ THxDHWSide1H
 
 EQUATIONS 3
 TPiHxDhwIn = [465,1]
-PPiHxDhwIn_kW= [465,3]/3600 !kW
+PPiHxDhwIn_kW = [465,3]/3600 ! kW
 MPiHxDhwIn = MPiHxDhwIn_A
 
 UNIT 466 TYPE 929
@@ -643,7 +643,7 @@ TPuCirc
 
 EQUATIONS 3
 TPiPuCircIn = [467,1]
-PPiPuCircIn_kW= [467,3]/3600 !kW
+PPiPuCircIn_kW = [467,3]/3600 ! kW
 MPiPuCircIn = MPiPuCircIn_A
 
 UNIT 468 TYPE 931
@@ -665,7 +665,7 @@ TTeePieceCirc2
 
 EQUATIONS 3
 TPiPuCircOut = [468,1]
-PPiPuCircOut_kW= [468,3]/3600 !kW
+PPiPuCircOut_kW = [468,3]/3600 ! kW
 MPiPuCircOut = MPiPuCircOut_A
 
 UNIT 469 TYPE 931
@@ -687,7 +687,7 @@ TtapWater
 
 EQUATIONS 3
 TPiDhwDemand = [469,1]
-PPiDhwDemand_kW= [469,3]/3600 !kW
+PPiDhwDemand_kW = [469,3]/3600 ! kW
 MPiDhwDemand = MPiDhwDemand_A
 
 UNIT 470 TYPE 929
@@ -724,7 +724,7 @@ TDivSh
 
 EQUATIONS 3
 TPiSHInMix = [471,1]
-PPiSHInMix_kW= [471,3]/3600 !kW
+PPiSHInMix_kW = [471,3]/3600 ! kW
 MPiSHInMix = MPiSHInMix_A
 
 UNIT 472 TYPE 931
@@ -746,7 +746,7 @@ TRadiatorSHH
 
 EQUATIONS 3
 TPiRadIn = [472,1]
-PPiRadIn_kW= [472,3]/3600 !kW
+PPiRadIn_kW = [472,3]/3600 ! kW
 MPiRadIn = MPiRadIn_A
 
 UNIT 473 TYPE 929
@@ -783,7 +783,7 @@ TDivHp
 
 EQUATIONS 3
 TPiTesDhwToDes = [474,1]
-PPiTesDhwToDes_kW= [474,3]/3600 !kW
+PPiTesDhwToDes_kW = [474,3]/3600 ! kW
 MPiTesDhwToDes = MPiTesDhwToDes_A
 
 UNIT 475 TYPE 931
@@ -805,7 +805,7 @@ TTesDhwDpL95_35H
 
 EQUATIONS 3
 TPiHpToTesDhwIn = [475,1]
-PPiHpToTesDhwIn_kW= [475,3]/3600 !kW
+PPiHpToTesDhwIn_kW = [475,3]/3600 ! kW
 MPiHpToTesDhwIn = MPiHpToTesDhwIn_A
 
 UNIT 476 TYPE 929
@@ -842,7 +842,7 @@ TDivCondTOTesDhw
 
 EQUATIONS 3
 TPiDesToCond = [477,1]
-PPiDesToCond_kW= [477,3]/3600 !kW
+PPiDesToCond_kW = [477,3]/3600 ! kW
 MPiDesToCond = MPiDesToCond_A
 
 UNIT 478 TYPE 931
@@ -864,7 +864,7 @@ TDivCool
 
 EQUATIONS 3
 TPiHxCoolBriOut = [478,1]
-PPiHxCoolBriOut_kW= [478,3]/3600 !kW
+PPiHxCoolBriOut_kW = [478,3]/3600 ! kW
 MPiHxCoolBriOut = MPiHxCoolBriOut_A
 
 UNIT 479 TYPE 929
@@ -901,7 +901,7 @@ THxCoolSide1H
 
 EQUATIONS 3
 TPiHxCoolBriIn = [480,1]
-PPiHxCoolBriIn_kW= [480,3]/3600 !kW
+PPiHxCoolBriIn_kW = [480,3]/3600 ! kW
 MPiHxCoolBriIn = MPiHxCoolBriIn_A
 
 UNIT 481 TYPE 931
@@ -923,7 +923,7 @@ TDivCool
 
 EQUATIONS 3
 TPiDivCool = [481,1]
-PPiDivCool_kW= [481,3]/3600 !kW
+PPiDivCool_kW = [481,3]/3600 ! kW
 MPiDivCool = MPiDivCool_A
 
 UNIT 482 TYPE 931
@@ -945,7 +945,7 @@ TGhxH
 
 EQUATIONS 3
 TPiGhxIn = [482,1]
-PPiGhxIn_kW= [482,3]/3600 !kW
+PPiGhxIn_kW = [482,3]/3600 ! kW
 MPiGhxIn = MPiGhxIn_A
 
 UNIT 483 TYPE 931
@@ -967,7 +967,7 @@ TPuHpEvap
 
 EQUATIONS 3
 TPiGhxOut = [483,1]
-PPiGhxOut_kW= [483,3]/3600 !kW
+PPiGhxOut_kW = [483,3]/3600 ! kW
 MPiGhxOut = MPiGhxOut_A
 
 UNIT 484 TYPE 931
@@ -989,7 +989,7 @@ TTesDhwDpR5_95H
 
 EQUATIONS 3
 TPiTesDhwIn = [484,1]
-PPiTesDhwIn_kW= [484,3]/3600 !kW
+PPiTesDhwIn_kW = [484,3]/3600 ! kW
 MPiTesDhwIn = MPiTesDhwIn_A
 
 UNIT 485 TYPE 931
@@ -1011,7 +1011,7 @@ TTesDhwDpR70_90H
 
 EQUATIONS 3
 TPiCircIn = [485,1]
-PPiCircIn_kW= [485,3]/3600 !kW
+PPiCircIn_kW = [485,3]/3600 ! kW
 MPiCircIn = MPiCircIn_A
 
 UNIT 486 TYPE 931
@@ -1033,7 +1033,7 @@ TDivDhwOut
 
 EQUATIONS 3
 TPiCircOut = [486,1]
-PPiCircOut_kW= [486,3]/3600 !kW
+PPiCircOut_kW = [486,3]/3600 ! kW
 MPiCircOut = MPiCircOut_A
 
 UNIT 487 TYPE 931
@@ -1055,7 +1055,7 @@ TPuHpDhwCond
 
 EQUATIONS 3
 TPiPuHpDhwIn = [487,1]
-PPiPuHpDhwIn_kW= [487,3]/3600 !kW
+PPiPuHpDhwIn_kW = [487,3]/3600 ! kW
 MPiPuHpDhwIn = MPiPuHpDhwIn_A
 
 UNIT 488 TYPE 931
@@ -1077,7 +1077,7 @@ TPuHpShCond
 
 EQUATIONS 3
 TPiPuHpShIn = [488,1]
-PPiPuHpShIn_kW= [488,3]/3600 !kW
+PPiPuHpShIn_kW = [488,3]/3600 ! kW
 MPiPuHpShIn = MPiPuHpShIn_A
 
 UNIT 489 TYPE 931
@@ -1099,7 +1099,7 @@ TDivCondTOTesDhw
 
 EQUATIONS 3
 TPiHpTeeToDiv = [489,1]
-PPiHpTeeToDiv_kW= [489,3]/3600 !kW
+PPiHpTeeToDiv_kW = [489,3]/3600 ! kW
 MPiHpTeeToDiv = MPiHpTeeToDiv_A
 
 UNIT 490 TYPE 931
@@ -1121,7 +1121,7 @@ TTeeTesShOut
 
 EQUATIONS 3
 TPiHpToTesShOut = [490,1]
-PPiHpToTesShOut_kW= [490,3]/3600 !kW
+PPiHpToTesShOut_kW = [490,3]/3600 ! kW
 MPiHpToTesShOut = MPiHpToTesShOut_A
 
 UNIT 491 TYPE 931
@@ -1143,7 +1143,7 @@ TTeePieceCirc2
 
 EQUATIONS 3
 TPiDhwMains = [491,1]
-PPiDhwMains_kW= [491,3]/3600 !kW
+PPiDhwMains_kW = [491,3]/3600 ! kW
 MPiDhwMains = MPiDhwMains_A
 
 UNIT 492 TYPE 931
@@ -1165,7 +1165,7 @@ TPuDhw
 
 EQUATIONS 3
 TPiHxDhwOut = [492,1]
-PPiHxDhwOut_kW= [492,3]/3600 !kW
+PPiHxDhwOut_kW = [492,3]/3600 ! kW
 MPiHxDhwOut = MPiHxDhwOut_A
 
 UNIT 493 TYPE 931
@@ -1187,7 +1187,7 @@ TDivDhw
 
 EQUATIONS 3
 TPiPuDhwOut = [493,1]
-PPiPuDhwOut_kW= [493,3]/3600 !kW
+PPiPuDhwOut_kW = [493,3]/3600 ! kW
 MPiPuDhwOut = MPiPuDhwOut_A
 
 UNIT 494 TYPE 931
@@ -1209,7 +1209,7 @@ TDivDhwOut
 
 EQUATIONS 3
 TPiTesDhwOut = [494,1]
-PPiTesDhwOut_kW= [494,3]/3600 !kW
+PPiTesDhwOut_kW = [494,3]/3600 ! kW
 MPiTesDhwOut = MPiTesDhwOut_A
 
 UNIT 495 TYPE 931
@@ -1231,7 +1231,7 @@ TTeeCoolRadIn
 
 EQUATIONS 3
 TPiTesShOut = [495,1]
-PPiTesShOut_kW= [495,3]/3600 !kW
+PPiTesShOut_kW = [495,3]/3600 ! kW
 MPiTesShOut = MPiTesShOut_A
 
 UNIT 496 TYPE 931
@@ -1253,7 +1253,7 @@ TTeePiece_6032
 
 EQUATIONS 3
 TPiTeeMixSHIn = [496,1]
-PPiTeeMixSHIn_kW= [496,3]/3600 !kW
+PPiTeeMixSHIn_kW = [496,3]/3600 ! kW
 MPiTeeMixSHIn = MPiTeeMixSHIn_A
 
 UNIT 497 TYPE 931
@@ -1275,7 +1275,7 @@ TPuSH
 
 EQUATIONS 3
 TPiSHOutMix = [497,1]
-PPiSHOutMix_kW= [497,3]/3600 !kW
+PPiSHOutMix_kW = [497,3]/3600 ! kW
 MPiSHOutMix = MPiSHOutMix_A
 
 UNIT 498 TYPE 931
@@ -1297,7 +1297,7 @@ TTesShDpR5_95H
 
 EQUATIONS 3
 TPiTesShIn = [498,1]
-PPiTesShIn_kW= [498,3]/3600 !kW
+PPiTesShIn_kW = [498,3]/3600 ! kW
 MPiTesShIn = MPiTesShIn_A
 
 UNIT 499 TYPE 931
@@ -1319,7 +1319,7 @@ TDivSh
 
 EQUATIONS 3
 TPiRadOut = [499,1]
-PPiRadOut_kW= [499,3]/3600 !kW
+PPiRadOut_kW = [499,3]/3600 ! kW
 MPiRadOut = MPiRadOut_A
 
 UNIT 500 TYPE 931
@@ -1341,7 +1341,7 @@ TDivSHCool
 
 EQUATIONS 3
 TPiDivSHCool = [500,1]
-PPiDivSHCool_kW= [500,3]/3600 !kW
+PPiDivSHCool_kW = [500,3]/3600 ! kW
 MPiDivSHCool = MPiDivSHCool_A
 
 UNIT 501 TYPE 931
@@ -1363,7 +1363,7 @@ TDivTesDhwOut
 
 EQUATIONS 3
 TPiTesDhwCond = [501,1]
-PPiTesDhwCond_kW= [501,3]/3600 !kW
+PPiTesDhwCond_kW = [501,3]/3600 ! kW
 MPiTesDhwCond = MPiTesDhwCond_A
 
 UNIT 502 TYPE 931
@@ -1385,7 +1385,7 @@ TDivTesDhwOut
 
 EQUATIONS 3
 TPiHpToTesDhwOut = [502,1]
-PPiHpToTesDhwOut_kW= [502,3]/3600 !kW
+PPiHpToTesDhwOut_kW = [502,3]/3600 ! kW
 MPiHpToTesDhwOut = MPiHpToTesDhwOut_A
 
 UNIT 503 TYPE 931
@@ -1407,7 +1407,7 @@ TTeePiece5329
 
 EQUATIONS 3
 TPiCondToDes = [503,1]
-PPiCondToDes_kW= [503,3]/3600 !kW
+PPiCondToDes_kW = [503,3]/3600 ! kW
 MPiCondToDes = MPiCondToDes_A
 
 UNIT 504 TYPE 931
@@ -1429,7 +1429,7 @@ TDivHpEvap
 
 EQUATIONS 3
 TPiPuGhxOut = [504,1]
-PPiPuGhxOut_kW= [504,3]/3600 !kW
+PPiPuGhxOut_kW = [504,3]/3600 ! kW
 MPiPuGhxOut = MPiPuGhxOut_A
 
 UNIT 505 TYPE 931
@@ -1451,7 +1451,7 @@ TTeeHpEvap
 
 EQUATIONS 3
 TPiHPEvapOut = [505,1]
-PPiHPEvapOut_kW= [505,3]/3600 !kW
+PPiHPEvapOut_kW = [505,3]/3600 ! kW
 MPiHPEvapOut = MPiHPEvapOut_A
 
 UNIT 506 TYPE 931
@@ -1473,7 +1473,7 @@ TTeePiece3852
 
 EQUATIONS 3
 TPiDivCooltoHp = [506,1]
-PPiDivCooltoHp_kW= [506,3]/3600 !kW
+PPiDivCooltoHp_kW = [506,3]/3600 ! kW
 MPiDivCooltoHp = MPiDivCooltoHp_A
 
 UNIT 507 TYPE 931
@@ -1495,7 +1495,7 @@ TTeeHpEvap
 
 EQUATIONS 3
 TPiHpEvapMix = [507,1]
-PPiHpEvapMix_kW= [507,3]/3600 !kW
+PPiHpEvapMix_kW = [507,3]/3600 ! kW
 MPiHpEvapMix = MPiHpEvapMix_A
 
 UNIT 508 TYPE 931
@@ -1517,7 +1517,7 @@ THPEvapH
 
 EQUATIONS 3
 TPiHPEvapIn = [508,1]
-PPiHPEvapIn_kW= [508,3]/3600 !kW
+PPiHPEvapIn_kW = [508,3]/3600 ! kW
 MPiHPEvapIn = MPiHPEvapIn_A
 
 UNIT 509 TYPE 931
@@ -1539,7 +1539,7 @@ TTeePieceCirc1
 
 EQUATIONS 3
 TPiDhwSecOut = [509,1]
-PPiDhwSecOut_kW= [509,3]/3600 !kW
+PPiDhwSecOut_kW = [509,3]/3600 ! kW
 MPiDhwSecOut = MPiDhwSecOut_A
 
 UNIT 510 TYPE 931
@@ -1561,7 +1561,7 @@ THxDHWSide2H
 
 EQUATIONS 3
 TPiHxDhwSecIn = [510,1]
-PPiHxDhwSecIn_kW= [510,3]/3600 !kW
+PPiHxDhwSecIn_kW = [510,3]/3600 ! kW
 MPiHxDhwSecIn = MPiHxDhwSecIn_A
 
 UNIT 511 TYPE 931
@@ -1583,7 +1583,7 @@ TDivSHCool
 
 EQUATIONS 3
 TPiHxCoolWatIn = [511,1]
-PPiHxCoolWatIn_kW= [511,3]/3600 !kW
+PPiHxCoolWatIn_kW = [511,3]/3600 ! kW
 MPiHxCoolWatIn = MPiHxCoolWatIn_A
 
 UNIT 512 TYPE 931
@@ -1605,7 +1605,7 @@ THxCoolSide2H
 
 EQUATIONS 3
 TConn1455 = [512,1]
-PConn1455_kW= [512,3]/3600 !kW
+PConn1455_kW = [512,3]/3600 ! kW
 MConn1455 = MConn1455_A
 
 UNIT 513 TYPE 931
@@ -1627,7 +1627,7 @@ TTeePiece_6088
 
 EQUATIONS 3
 TPiHpDesOut = [513,1]
-PPiHpDesOut_kW= [513,3]/3600 !kW
+PPiHpDesOut_kW = [513,3]/3600 ! kW
 MPiHpDesOut = MPiHpDesOut_A
 
 UNIT 514 TYPE 931
@@ -1649,7 +1649,7 @@ THPCond2H
 
 EQUATIONS 3
 TPiHpDesIn = [514,1]
-PPiHpDesIn_kW= [514,3]/3600 !kW
+PPiHpDesIn_kW = [514,3]/3600 ! kW
 MPiHpDesIn = MPiHpDesIn_A
 
 UNIT 515 TYPE 931
@@ -1671,7 +1671,7 @@ TDivHp
 
 EQUATIONS 3
 TPiHpCondOut = [515,1]
-PPiHpCondOut_kW= [515,3]/3600 !kW
+PPiHpCondOut_kW = [515,3]/3600 ! kW
 MPiHpCondOut = MPiHpCondOut_A
 
 UNIT 516 TYPE 931
@@ -1693,7 +1693,7 @@ THPCond1H
 
 EQUATIONS 3
 TPiHpCondIn = [516,1]
-PPiHpCondIn_kW= [516,3]/3600 !kW
+PPiHpCondIn_kW = [516,3]/3600 ! kW
 MPiHpCondIn = MPiHpCondIn_A
 
 *** Pipe losses

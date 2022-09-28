@@ -571,7 +571,7 @@ class Editor(QWidget):
             hydraulicFolder = os.path.split(exportPath)[0]
             if not (os.path.isdir(hydraulicFolder)):
                 os.makedirs(hydraulicFolder)
-            f = open(exportPath, "w")
+            f = open(exportPath, "w", encoding="UTF-8")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
@@ -849,7 +849,7 @@ class Editor(QWidget):
         self.diagramScene.render(painter)
         painter.end()
 
-    def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
+    def exportDdckPlaceHolderValuesJsonFile(self, shallShowMessageOnSuccess: bool = True) -> _res.Result[None]:
         if not self._isHydraulicConnected():
             return _res.Error(f"You need to connect all port items before you can export the hydraulics.")
 
@@ -879,19 +879,20 @@ class Editor(QWidget):
         if _res.isError(result):
             return _res.error(result)
 
-        msgb = QMessageBox()
-        msgb.setWindowTitle("Saved successfully")
-        msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
-        msgb.setStandardButtons(QMessageBox.Ok)
-        msgb.setDefaultButton(QMessageBox.Ok)
-        msgb.exec()
+        if shallShowMessageOnSuccess:
+            msgb = QMessageBox()
+            msgb.setWindowTitle("Saved successfully")
+            msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
+            msgb.setStandardButtons(QMessageBox.Ok)
+            msgb.setDefaultButton(QMessageBox.Ok)
+            msgb.exec()
 
         return None
 
     def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _res.Result[None]:
         ddckDirNames = self._getDdckDirNames()
 
-        result = _ph.getPlaceholderValues(ddckDirNames, self.trnsysObj)
+        result = _ph.getPlaceholderValues(ddckDirNames, self.trnsysObj, self.hydraulicLoops)
         if _res.isError(result):
             return _res.error(result)
 

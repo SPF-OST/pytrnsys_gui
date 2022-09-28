@@ -27,6 +27,12 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return False
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return False
+
     def getInternalPiping(self) -> _ip.InternalPiping:
         return _ip.InternalPiping(
             [self._modelPipe], {self._modelPipe.fromPort: self.inputs[0], self._modelPipe.toPort: self.outputs[0]}

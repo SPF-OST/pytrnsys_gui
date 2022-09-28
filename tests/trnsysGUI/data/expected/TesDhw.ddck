@@ -77,8 +77,8 @@ zOutDp3_Tes7703=0.95
 CONSTANTS 4
 zInhx1_Tes7703=0.30
 zOuthx1_Tes7703=0.12
-Cphx1_Tes7703=cpwat
-Rhohx1_Tes7703=rhowat
+Cphx1_Tes7703=LhxLoop0Cp
+Rhohx1_Tes7703=LhxLoop0Rho
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes7703=0 ! 0: no forced stratification ; 1: force to stratify

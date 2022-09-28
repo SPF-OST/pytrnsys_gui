@@ -205,7 +205,7 @@ TColH
 
 EQUATIONS 3
 TTes-Col = [451,1]
-PTes-Col_kW= [451,3]/3600 !kW
+PTes-Col_kW = [451,3]/3600 ! kW
 MTes-Col = MTes-Col_A
 
 UNIT 452 TYPE 931
@@ -227,7 +227,7 @@ THPH
 
 EQUATIONS 3
 TPiTes_HP = [452,1]
-PPiTes_HP_kW= [452,3]/3600 !kW
+PPiTes_HP_kW = [452,3]/3600 ! kW
 MPiTes_HP = MPiTes_HP_A
 
 UNIT 453 TYPE 931
@@ -249,7 +249,7 @@ TPump109
 
 EQUATIONS 3
 TPiTes_Pump109 = [453,1]
-PPiTes_Pump109_kW= [453,3]/3600 !kW
+PPiTes_Pump109_kW = [453,3]/3600 ! kW
 MPiTes_Pump109 = MPiTes_Pump109_A
 
 UNIT 454 TYPE 931
@@ -271,7 +271,7 @@ THPH
 
 EQUATIONS 3
 TPiPump109_HP = [454,1]
-PPiPump109_HP_kW= [454,3]/3600 !kW
+PPiPump109_HP_kW = [454,3]/3600 ! kW
 MPiPump109_HP = MPiPump109_HP_A
 
 UNIT 455 TYPE 931
@@ -293,7 +293,7 @@ TPump114
 
 EQUATIONS 3
 TPiCol_Pump114 = [455,1]
-PPiCol_Pump114_kW= [455,3]/3600 !kW
+PPiCol_Pump114_kW = [455,3]/3600 ! kW
 MPiCol_Pump114 = MPiCol_Pump114_A
 
 UNIT 456 TYPE 931
@@ -315,7 +315,7 @@ TTesDpL50_10H
 
 EQUATIONS 3
 TPiPump114_Tes = [456,1]
-PPiPump114_Tes_kW= [456,3]/3600 !kW
+PPiPump114_Tes_kW = [456,3]/3600 ! kW
 MPiPump114_Tes = MPiPump114_Tes_A
 
 *** Pipe losses

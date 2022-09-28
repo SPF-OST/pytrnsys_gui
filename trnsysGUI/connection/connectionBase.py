@@ -57,6 +57,12 @@ class ConnectionBase(_ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return False
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return False
+
     def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:
         raise NotImplementedError()
 

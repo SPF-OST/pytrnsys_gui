@@ -160,7 +160,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         # Fixed strings
         tempRoomVar = "TRoomStore"
         initialValueS = "20 0.0 20 20"
-        powerPrefix = "P"
 
         # Momentarily hardcoded
         equationNr = 3
@@ -233,7 +232,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
     def _getFromAndToPortsAndParentBlockItems(
         self,
-    ) -> _tp.Tuple[_tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping], _tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping]]:
+    ) -> _tp.Tuple[
+        _tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping], _tp.Tuple[_pib.PortItemBase, _pi.HasInternalPiping]
+    ]:
         isToPortValveOutput = (
             isinstance(self.toPort.parent, _tventil.TVentil) and self.fromPort in self.toPort.parent.outputs
         )

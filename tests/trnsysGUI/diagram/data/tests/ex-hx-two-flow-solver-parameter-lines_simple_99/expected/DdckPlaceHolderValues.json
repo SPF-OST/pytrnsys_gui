@@ -1,0 +1,33 @@
+{
+    "Col": {
+        "In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MCol_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "THx-Col"
+        },
+        "Out": {
+            "@temp": "TCol"
+        }
+    },
+    "ExHx": {
+        "Side1In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MExHxSide1_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TPiPump93_ExHx"
+        },
+        "Side1Out": {
+            "@temp": "TExHxSide1"
+        },
+        "Side2In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MExHxSide2_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiPump88_ExHx"
+        },
+        "Side2Out": {
+            "@temp": "TExHxSide2"
+        }
+    }
+}

@@ -62,7 +62,7 @@ class Export:
         equationNr = 0
 
         for t in self._hasInternalPipings:
-            if not t.hasDdckPlaceHolders():
+            if not t.shallRenameOutputTemperaturesInHydraulicFile():
                 continue
 
             equations = _thyd.export(t)
@@ -118,8 +118,8 @@ dpCpFl = 4.19 ! Specific heat of fluid, kJ/kg.K
 dpViscFl = 3.078  ! Viscosity of fluid in kg/m.hr
 
 ****** Initial conditions ******
-dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in °C
-dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in °C
+dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in �C
+dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in �C
 
 ****** Soil's thermal properties ******
 dpLamdaSl = 8.64  ! Thermal conductivity of soil in kJ/hr.m.K

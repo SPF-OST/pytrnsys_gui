@@ -104,7 +104,7 @@ TColH
 
 EQUATIONS 3
 THx-Col = [451,1]
-PHx-Col_kW= [451,3]/3600 !kW
+PHx-Col_kW = [451,3]/3600 ! kW
 MHx-Col = MHx-Col_A
 
 UNIT 452 TYPE 931
@@ -126,7 +126,7 @@ TTesDpL50_10H
 
 EQUATIONS 3
 TPiExHx_Tes = [452,1]
-PPiExHx_Tes_kW= [452,3]/3600 !kW
+PPiExHx_Tes_kW = [452,3]/3600 ! kW
 MPiExHx_Tes = MPiExHx_Tes_A
 
 UNIT 453 TYPE 931
@@ -148,7 +148,7 @@ TPump88
 
 EQUATIONS 3
 TPiTes_Pump88 = [453,1]
-PPiTes_Pump88_kW= [453,3]/3600 !kW
+PPiTes_Pump88_kW = [453,3]/3600 ! kW
 MPiTes_Pump88 = MPiTes_Pump88_A
 
 UNIT 454 TYPE 931
@@ -170,7 +170,7 @@ TExHxSide2H
 
 EQUATIONS 3
 TPiPump88_ExHx = [454,1]
-PPiPump88_ExHx_kW= [454,3]/3600 !kW
+PPiPump88_ExHx_kW = [454,3]/3600 ! kW
 MPiPump88_ExHx = MPiPump88_ExHx_A
 
 UNIT 455 TYPE 931
@@ -192,7 +192,7 @@ TExHxSide1H
 
 EQUATIONS 3
 TPiPump93_ExHx = [455,1]
-PPiPump93_ExHx_kW= [455,3]/3600 !kW
+PPiPump93_ExHx_kW = [455,3]/3600 ! kW
 MPiPump93_ExHx = MPiPump93_ExHx_A
 
 UNIT 456 TYPE 931
@@ -214,7 +214,7 @@ TColH
 
 EQUATIONS 3
 TPiPump93_Col = [456,1]
-PPiPump93_Col_kW= [456,3]/3600 !kW
+PPiPump93_Col_kW = [456,3]/3600 ! kW
 MPiPump93_Col = MPiPump93_Col_A
 
 *** Pipe losses

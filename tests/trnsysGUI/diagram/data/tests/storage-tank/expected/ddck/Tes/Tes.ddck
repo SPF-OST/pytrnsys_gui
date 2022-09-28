@@ -61,8 +61,8 @@ zOutDp1_Tes1=0.10
 CONSTANTS 4
 zInhx1_Tes1=0.90
 zOuthx1_Tes1=0.80
-Cphx1_Tes1=cpwat
-Rhohx1_Tes1=rhowat
+Cphx1_Tes1=Lloop2Cp
+Rhohx1_Tes1=Lloop2Rho
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
