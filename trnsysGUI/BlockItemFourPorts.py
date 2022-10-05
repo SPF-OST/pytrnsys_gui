@@ -3,7 +3,6 @@
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
