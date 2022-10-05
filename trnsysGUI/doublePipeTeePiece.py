@@ -38,15 +38,21 @@ class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return False
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return False
+
     def _updateModels(self, newDisplayName: str) -> None:
-        coldInput: _mfn.PortItem = _mfn.PortItem("ColdIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-        coldOutput1: _mfn.PortItem = _mfn.PortItem("ColdStrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
-        coldOutput2: _mfn.PortItem = _mfn.PortItem("ColdOrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
+        coldInput: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
+        coldOutput1: _mfn.PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
+        coldOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
         self._coldTeePiece = _mfn.TeePiece(coldInput, coldOutput1, coldOutput2, name="Cold")
 
-        hotInput: _mfn.PortItem = _mfn.PortItem("HotIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-        hotOutput1: _mfn.PortItem = _mfn.PortItem("HotStrIn", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
-        hotOutput2: _mfn.PortItem = _mfn.PortItem("HotOrtIn", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
+        hotInput: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
+        hotOutput1: _mfn.PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
+        hotOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self._hotTeePiece = _mfn.TeePiece(hotInput, hotOutput1, hotOutput2, name="Hot")
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:

@@ -36,6 +36,12 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
     def getDisplayName(self) -> str:
         return self.displayName
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return False
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return False
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PUMP_SVG
 

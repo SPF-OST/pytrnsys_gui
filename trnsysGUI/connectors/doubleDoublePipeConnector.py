@@ -26,12 +26,12 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         self.changeSize()
 
     def _updateModels(self, newDisplayName: str) -> None:
-        coldInput = _mfn.PortItem("ColdIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-        coldOutput = _mfn.PortItem("ColdOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
+        coldInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
+        coldOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
         self._coldPipe = _mfn.Pipe(coldInput, coldOutput, "Cold")
 
-        hotInput = _mfn.PortItem("HotIn", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-        hotOutput = _mfn.PortItem("HotOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
+        hotInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
+        hotOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self._hotPipe = _mfn.Pipe(hotInput, hotOutput, "Hot")
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:

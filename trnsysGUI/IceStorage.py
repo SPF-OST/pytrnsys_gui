@@ -71,9 +71,6 @@ class IceStorage(BlockItem, _ip.HasInternalPiping):
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
         return w, h
 
-    def hasDdckPlaceHolders(self):
-        return True
-
     def addTree(self):
         """
         When a blockitem is added to the main window.

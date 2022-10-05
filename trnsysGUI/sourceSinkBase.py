@@ -65,6 +65,3 @@ class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
         equationNr = 1
         massFlowLine = f"Mfr{self.displayName} = 500\n"
         return massFlowLine, equationNr
-
-    def hasDdckPlaceHolders(self):
-        return True

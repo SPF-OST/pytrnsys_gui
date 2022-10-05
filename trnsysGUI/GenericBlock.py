@@ -267,9 +267,9 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         pipes = []
         portItems = {}
         for i, (graphicalInputPort, graphicalOutputPort) in enumerate(zip(self.inputs, self.outputs)):
-            inputPort = _mfn.PortItem(f"In{i+1}", _mfn.PortItemDirection.INPUT)
-            outputPort = _mfn.PortItem(f"Out{i+1}", _mfn.PortItemDirection.OUTPUT)
-            pipe = _mfn.Pipe(f"{self.displayName}X{i}", inputPort, outputPort)
+            inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+            outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+            pipe = _mfn.Pipe(inputPort, outputPort, name=f"Side{i}")
 
             pipes.append(pipe)
             portItems[inputPort] = graphicalInputPort

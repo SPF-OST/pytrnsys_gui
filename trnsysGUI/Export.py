@@ -8,6 +8,7 @@ import jinja2 as _jinja
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.connection.values as _values
 import trnsysGUI.hydraulicLoops.model as _hlm
@@ -61,7 +62,7 @@ class Export:
         equationNr = 0
 
         for t in self._hasInternalPipings:
-            if not t.hasDdckPlaceHolders():
+            if not t.shallRenameOutputTemperaturesInHydraulicFile():
                 continue
 
             equations = _thyd.export(t)
@@ -94,63 +95,57 @@ class Export:
         if not doesHydraulicContainDoublePipes:
             return ""
 
-        commentStars = 6 * "*"
+        constantsBlock = """\
+*** Default global PARAMETERS for TYPES 9511 ***
+CONSTANTS 25
 
+****** Pipe and soil properties ******
+dpLength = 579.404 ! Length of buried pipe in m
+dpDiamIn = 0.4028 ! Inner diameter of pipes in m
+dpDiamOut = 0.429 ! Outer diameter of pipes in m
+dpLambda = 175 ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth = 1.8 ! Buried pipe depth in m
+dpDiamCase = 2 ! Diameter of casing material in m
+dpLambdaFill = 7  ! Thermal conductivity of fill insulation in kJ/hr.m.K
+dpDistPtoP = 0.55  ! Center-to-center pipe spacing in m
+dpLambdaGap = 1.44  ! Thermal conductivity of gap material in kJ/hr.m.K (gravel)
+dpGapThick = 0  ! Gap thickness in m
+
+****** Fluid properties ******
+dpRhoFlu = 1000.0 ! Density of fluid, kg/m^3
+dpLambdaFl = LamWat*3.6  ! Thermal conductivity of fluid in kJ/hr.m.K
+dpCpFl = 4.19 ! Specific heat of fluid, kJ/kg.K
+dpViscFl = 3.078  ! Viscosity of fluid in kg/m.hr
+
+****** Initial conditions ******
+dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in �C
+dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in �C
+
+****** Soil's thermal properties ******
+dpLamdaSl = 8.64  ! Thermal conductivity of soil in kJ/hr.m.K
+dpRhoSl = 1800  ! Density of soil in kg/m^3
+dpCpSl = 1.0  ! Specific heat of soil in kJ/kg.K
+
+****** Definition of nodes ******
+dpNrFlNds = 60  ! Number of fluid nodes
+dpNrSlRad = 10  ! Number of radial soil nodes
+dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
+dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
+dpNrSlAx = 20  ! Number of axial soil nodes
+dpNrSlCirc = 4  ! Number of circumferential soil nodes
+"""
+        massFlowSolverConstantsBlock = """\
+CONSTANTS 3
+TambAvg = 7.96 ! Average surface temperature in °C
+dTambAmpl = 13.32 ! Amplitude of surface temperature in °C
+ddTcwOffset = 36 ! Days of minimum surface temperature
+"""
         if exportTo == "ddck":
-            exportText = "CONSTANTS 25\n"
+            return constantsBlock
         elif exportTo == "mfs":
-            exportText = "CONSTANTS 28\n"
+            return constantsBlock + "\n\n" + massFlowSolverConstantsBlock
         else:
             raise ValueError("Unknown value for `exportTo`", exportTo)
-
-        exportText += "*** Default global PARAMETERS for TYPES 9511" + "\n"
-
-        exportText += commentStars + " pipe and soil properties " + commentStars + "\n"
-        exportText += self._addComment("dpLength = 24.384", "! Length of buried pipe, m")
-        exportText += self._addComment("dpDiamIn = 0.02618", "! Inner diameter of pipes, m")
-        exportText += self._addComment("dpDiamOut = 0.03198", "! Outer diameter of pipes, m")
-        exportText += self._addComment("dpLambda = 1.37067", "! Thermal conductivity of pipe material, kJ/(h*m*K)")
-        exportText += self._addComment("dpDepth = 3.0", "! Buried pipe depth, m")
-        exportText += self._addComment("dpFlowMode = 2", "! Direction of second pipe flow: 1 = same, 2 = opposite")
-        exportText += self._addComment("dpDiamCase = 0.17526", "! Diameter of casing material, m")
-        exportText += self._addComment("dpLambdaFill = 0.14537", "! Thermal conductivity of fill insulation, kJ/(h*m*K)")
-        exportText += self._addComment("dpDistPtoP = 0.06911", "! Center-to-center pipe spacing, m")
-        exportText += self._addComment("dpLambdaGap = 8.722", "! Thermal conductivity of gap material, kJ/(h*m*K)")
-        exportText += self._addComment("dpGapThick = 0.0000", "! Gap thickness, m")
-
-        exportText += commentStars + " fluid properties " + commentStars + "\n"
-        exportText += self._addComment("dpRhoFlu = 1000.0", "! Density of fluid, kg/m^3")
-        exportText += self._addComment("dpLambdaFl = 2.2068", "! Thermal conductivity of fluid, kJ/(h*m*K)")
-        exportText += self._addComment("dpCpFl = 4.19", "! Specific heat of fluid, kJ/(kg*K)")
-        exportText += self._addComment("dpViscFl = 3.078", "! Viscosity of fluid, kg/(m*h)")
-
-        exportText += commentStars + " initial conditions " + commentStars + "\n"
-        exportText += self._addComment("dpTIniHot = 10.0", "! Initial fluid temperature - Pipe hot, deg C")
-        exportText += self._addComment("dpTIniCold = 10.0", "! Initial fluid temperature - Pipe cold, deg C")
-
-        exportText += commentStars + " thermal properties soil " + commentStars + "\n"
-        exportText += self._addComment("dpLamdaSl = 8.722", "! Thermal conductivity of soil, kJ/(h*m*K)")
-        exportText += self._addComment("dpRhoSl = 2500.0", "! Density of soil, kg/m^3")
-        exportText += self._addComment("dpCpSl = 0.84", "! Specific heat of soil, kJ/(kg*K)")
-
-        if exportTo == "mfs":
-            exportText += (
-                commentStars + " general temperature dependency (dependent on weather data) " + commentStars + "\n"
-            )
-            exportText += self._addComment("TambAvg = 7.96", "! Average surface temperature, deg C")
-            exportText += self._addComment("dTambAmpl = 13.32", "! Amplitude of surface temperature, deg C")
-            exportText += self._addComment("ddTcwOffset = 36", "! Days of minimum surface temperature")
-
-        exportText += commentStars + " definition of nodes " + commentStars + "\n"
-        exportText += self._addComment("dpNrFlNds = 100", "! Number of fluid nodes")
-        exportText += self._addComment("dpNrSlRad = 8", "! Number of radial soil nodes")
-        exportText += self._addComment("dpNrSlAx = 10", "! Number of axial soil nodes")
-        exportText += self._addComment("dpNrSlCirc = 4", "! Number of circumferential soil nodes")
-        exportText += self._addComment("dpRadNdDist = 0.0254", "! Radial distance of any node, m")
-
-        exportText += "\n"
-
-        return exportText
 
     def exportPumpOutlets(self):
         f = "*** Pump outlet temperatures" + "\n"
@@ -396,13 +391,13 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
             if isinstance(t, _spc.SinglePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
-                lossText += "P" + t.displayName + "_kW"
+                lossText += _cnames.getHeatLossVariableName(t, _mfn.PortItemType.STANDARD)
                 rightCounter += 1
             if isinstance(t, _dpc.DoublePipeConnection):
                 if rightCounter != 0:
                     lossText += "+"
-                lossText += "P" + t.displayName + "Cold_kW" + "+"
-                lossText += "P" + t.displayName + "Hot_kW"
+                lossText += _cnames.getHeatLossVariableName(t, _mfn.PortItemType.COLD) + "+"
+                lossText += _cnames.getHeatLossVariableName(t, _mfn.PortItemType.HOT)
                 rightCounter += 1
 
         if rightCounter == 0:
@@ -466,7 +461,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
                 inputVariableName = _mnames.getInputVariableName(hasInternalPiping, hasInternalPiping.modelDiverter)
                 allVariableNames.append(inputVariableName)
 
-        variableNameOctets = [allVariableNames[s : s + 8] for s in range(0, len(allVariableNames), 8)]
+        variableNameOctets = [allVariableNames[s: s + 8] for s in range(0, len(allVariableNames), 8)]
 
         formattedInputVariables = "\n".join(" ".join(o) for o in variableNameOctets) + "\n"
 
@@ -478,11 +473,6 @@ INPUTS {len(allVariableNames)}
 
 """
         return f
-
-    @staticmethod
-    def _addComment(firstColumn, comment):
-        spacing = 40
-        return str(firstColumn).ljust(spacing) + comment + "\n"
 
     def exportTempPrinter(self, unitnr, descLen):
 

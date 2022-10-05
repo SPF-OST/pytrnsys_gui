@@ -24,6 +24,12 @@ class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return False
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return False
+
     def _updateModels(self, newDisplayName: str) -> None:
         raise NotImplementedError()
 

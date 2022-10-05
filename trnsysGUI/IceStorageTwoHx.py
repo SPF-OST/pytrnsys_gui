@@ -87,9 +87,6 @@ class IceStorageTwoHx(BlockItemFourPorts):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    def hasDdckPlaceHolders(self):
-        return True
-
     def deleteBlock(self):
         """
         Overridden method to also delete folder
@@ -126,13 +123,13 @@ class IceStorageTwoHx(BlockItemFourPorts):
             self.logger.debug(self.path)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
-        side1Input = _mfn.PortItem("LeftIn", _mfn.PortItemDirection.INPUT)
-        side1Output = _mfn.PortItem("LeftOut", _mfn.PortItemDirection.OUTPUT)
-        side1Pipe = _mfn.Pipe(side1Input, side1Output, "leftSide")
+        side1Input = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        side1Output = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        side1Pipe = _mfn.Pipe(side1Input, side1Output, "Left")
 
-        side2Input = _mfn.PortItem("RightIn", _mfn.PortItemDirection.INPUT)
-        side2Output = _mfn.PortItem("RightOut", _mfn.PortItemDirection.OUTPUT)
-        side2Pipe = _mfn.Pipe(side2Input, side2Output, "rightSide")
+        side2Input = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        side2Output = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        side2Pipe = _mfn.Pipe(side2Input, side2Output, "Right")
 
         modelPortItemsToGraphicalPortItem = {
             side1Input: self.inputs[0],

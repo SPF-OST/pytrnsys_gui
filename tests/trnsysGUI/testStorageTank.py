@@ -4,13 +4,16 @@ import logging as _log
 import pathlib as _pl
 import shutil as _sh
 import time as _time
+import typing as _tp
 import unittest.mock as _mock
 
 from PyQt5 import QtWidgets as _widgets
 
-import trnsysGUI.storageTank.widget as _st
+import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.storageTank.widget as _st
 
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
@@ -74,9 +77,10 @@ class TestStorageTank:
         legacyJson = self.LEGACY_JSON_PATH.read_text()
         storageTank = self._deserializeStorageTank(legacyJson, diagramViewMock)
 
-        self._setupExternalConnectionMocks(storageTank)
+        hydraulicLoops = _hlm.HydraulicLoops([])
+        self._setupExternalConnectionMocks(storageTank, hydraulicLoops)
 
-        storageTank.exportDck()
+        storageTank.exportDck(hydraulicLoops)
 
         actualDdckPath = self.ACTUAL_DIR_PATH / "ddck" / "StorageTank7701" / "TesDhw.ddck"
         actualDdckContent = actualDdckPath.read_text()
@@ -94,7 +98,7 @@ class TestStorageTank:
         self.ACTUAL_DIR_PATH.mkdir()
 
     @classmethod
-    def _setupExternalConnectionMocks(cls, storageTank):
+    def _setupExternalConnectionMocks(cls, storageTank: _st.StorageTank, hydraulicLoops: _hlm.HydraulicLoops) -> None:
         for i, heatExchanger in enumerate(storageTank.heatExchangers):
             externalFromPortConnection = cls._createConnectionMock(f"hx{i}ExtFromPortConn", toPort=heatExchanger.port1)
             heatExchanger.port1.connectionList.append(externalFromPortConnection)
@@ -102,19 +106,31 @@ class TestStorageTank:
             externalToPortConnection = cls._createConnectionMock(f"hx{i}ExtToPortConn", fromPort=heatExchanger.port2)
             heatExchanger.port2.connectionList.append(externalToPortConnection)
 
+            cls._addLoop(externalFromPortConnection, externalToPortConnection, i, hydraulicLoops, namePrefix="hx")
+
         for i, directPortPair in enumerate(storageTank.directPortPairs):
             externalFromPortConnection = cls._createConnectionMock(
                 f"dpp{i}ExtFromPortConn", toPort=directPortPair.fromPort
             )
             directPortPair.fromPort.connectionList.append(externalFromPortConnection)
 
-            externalToPortConnection = cls._createConnectionMock(
-                f"dpp{i}ExtToPortConn", fromPort=directPortPair.toPort
-            )
+            externalToPortConnection = cls._createConnectionMock(f"dpp{i}ExtToPortConn", fromPort=directPortPair.toPort)
             directPortPair.toPort.connectionList.append(externalToPortConnection)
 
+            cls._addLoop(externalFromPortConnection, externalToPortConnection, i, hydraulicLoops, namePrefix="dp")
+
+    @classmethod
+    def _addLoop(cls, externalFromPortConnection, externalToPortConnection, i, hydraulicLoops, namePrefix):
+        fluid = _hlm.Fluids.BRINE if i % 2 == 0 else _hlm.Fluids.WATER
+        connections = [externalFromPortConnection, externalToPortConnection]
+        name = _hlm.UserDefinedName(f"{namePrefix}Loop{i}")
+        loop = _hlm.HydraulicLoop(name, fluid, useLoopWideDefaults=True, connections=connections)
+        hydraulicLoops.addLoop(loop)
+
     @staticmethod
-    def _createConnectionMock(displayName: str, fromPort=_StrictMock(), toPort=_StrictMock()) -> _StrictMock:
+    def _createConnectionMock(
+        displayName: str, fromPort=_StrictMock(), toPort=_StrictMock()
+    ) -> _spc.SinglePipeConnection:
         modelPipe = _mfn.Pipe(
             _mfn.PortItem("In", _mfn.PortItemDirection.INPUT), _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         )
@@ -127,7 +143,7 @@ class TestStorageTank:
 
             return modelPipe
 
-        return _StrictMock(
+        mock = _StrictMock(
             displayName=displayName,
             getDisplayName=lambda: displayName,
             fromPort=fromPort,
@@ -136,7 +152,10 @@ class TestStorageTank:
             getModelPipe=getModelPipe,
             getInternalPiping=getInternalPiping,
             hasDdckPlaceHolders=lambda: False,
+            shallRenameOutputTemperaturesInHydraulicFile=lambda: False,
         )
+
+        return _tp.cast(_spc.SinglePipeConnection, mock)
 
     @staticmethod
     def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectPath):

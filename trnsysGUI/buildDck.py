@@ -92,7 +92,7 @@ class buildDck:
             deck.saveUnitTypeFile()
 
         if self.inputs["addAutomaticEnergyBalance"] == True:
-            deck.automaticEnegyBalanceStaff()
+            deck.addAutomaticEnergyBalancePrinters()
             deck.writeDeck()  # Deck rewritten with added printer
 
         deck.analyseDck()

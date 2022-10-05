@@ -10,8 +10,8 @@ import trnsysGUI.diagram.Editor as _de
 _DATA_DIR_ = _pl.Path(__file__).parent / "data"
 
 
-class TestAutomaticConnection:
-    def testConnectionJson(self, request: _pt.FixtureRequest):
+class TestPlaceholders:
+    def testPlaceholders(self, request: _pt.FixtureRequest):
         actualDirPath = _DATA_DIR_ / "TRIHP_dualSource"
         expectedDirPath = _DATA_DIR_ / "expected"
         actualJsonFilePath = actualDirPath / "DdckPlaceHolderValues.json"

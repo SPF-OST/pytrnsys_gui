@@ -1,0 +1,116 @@
+{
+    "Floor1": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MFloor1_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiFlFloor1"
+        },
+        "Out": {
+            "@temp": "TFloor1"
+        }
+    },
+    "Floor2": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MFloor2_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiFlFloor2"
+        },
+        "Out": {
+            "@temp": "TFloor2"
+        }
+    },
+    "Floor3": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MFloor3_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiFlFloor3"
+        },
+        "Out": {
+            "@temp": "TFloor3"
+        }
+    },
+    "Floor4": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MFloor4_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiFlFloor4"
+        },
+        "Out": {
+            "@temp": "TFloor4"
+        }
+    },
+    "Floor5": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MFloor5_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiFlFloor5"
+        },
+        "Out": {
+            "@temp": "TFloor5"
+        }
+    },
+    "Floor6": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MFloor6_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiFlFloor6"
+        },
+        "Out": {
+            "@temp": "TFloor6"
+        }
+    },
+    "HP": {
+        "CondIn": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MHPCond_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiTeeAuxHxRt_HP"
+        },
+        "CondOut": {
+            "@temp": "THPCond"
+        },
+        "EvapIn": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MHPEvap_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TPiHpEvapIn"
+        },
+        "EvapOut": {
+            "@temp": "THPEvap"
+        }
+    },
+    "HxDHW": {
+        "Side1In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MHxDHWSide1_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TPiHxDhwPriFl"
+        },
+        "Side1Out": {
+            "@temp": "THxDHWSide1"
+        },
+        "Side2In": {
+            "@cp": "Lloop4Cp",
+            "@mfr": "MHxDHWSide2_A",
+            "@rho": "Lloop4Rho",
+            "@temp": "TPiPuHxDhw2HxDHW"
+        },
+        "Side2Out": {
+            "@temp": "THxDHWSide2"
+        }
+    },
+    "tapWater": {
+        "In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MtapWater_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TPiDhwCirctoTap"
+        }
+    }
+}

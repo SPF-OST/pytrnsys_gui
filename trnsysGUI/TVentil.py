@@ -44,6 +44,12 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
     def getDisplayName(self) -> str:
         return self.displayName
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return False
+
+    def shallRenameOutputTemperaturesInHydraulicFile(self):
+        return False
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.T_VENTIL_SVG
 

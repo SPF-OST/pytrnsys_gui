@@ -1,0 +1,24 @@
+{
+    "Col": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MCol_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TTes-Col"
+        },
+        "Out": {
+            "@temp": "TCol"
+        }
+    },
+    "HP": {
+        "In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MHP_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TPiPump109_HP"
+        },
+        "Out": {
+            "@temp": "THP"
+        }
+    }
+}

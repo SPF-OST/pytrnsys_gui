@@ -10,6 +10,8 @@ import numpy as _np
 import pandas as _pd
 
 import trnsysGUI.TVentil as _tv
+import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.massFlowSolver.names as _mnames
@@ -154,7 +156,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.showMass = not self.showMass
 
         for t in self.parent.centralWidget.trnsysObj:
-            if isinstance(t, _spc.SinglePipeConnection):
+            if isinstance(t, _cb.ConnectionBase):
                 if self.showMass:
                     t.firstS.labelMass.setVisible(True)
                 else:
@@ -198,47 +200,60 @@ class MassFlowVisualizer(_qtw.QDialog):
                         mfrVariableName in self.massFlowData.columns
                         and temperatureVariableName in self.tempMassFlowData
                     ):
-                        mass = str(round(self.massFlowData[mfrVariableName].iloc[timeStep]))
-                        mass1Dp = str(round(self.massFlowData[mfrVariableName].iloc[timeStep], 1))
-                        temperature = str(round(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
-                        self.logger.debug("Found connection in ts " + str(timeStep) + " " + str(i))
-                        self.logger.debug("mass flow value of %s : " % t.displayName)
-                        t.setMassAndTemperature(mass1Dp, temperature)
-                        thickValue = self.getThickness(mass)
+                        massFlow = self._getMassFlow(mfrVariableName, timeStep)
+                        temperature = self._getTemperature(temperatureVariableName, timeStep)
+
+                        t.setMassFlowAndTemperature(massFlow, temperature)
+                        thickValue = self.getThickness(massFlow)
                         self.logger.debug("Thickvalue: " + str(thickValue))
                         if self.massFlowData[mfrVariableName].iloc[timeStep] == 0:
                             t.setColor(thickValue, mfr="ZeroMfr")
-                        elif round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep])) == self.maxValue:
+                        elif round(abs(temperature)) == self.maxValue:
                             t.setColor(thickValue, mfr="max")
-                        elif round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep])) == self.minValue:
+                        elif round(abs(temperature)) == self.minValue:
                             t.setColor(thickValue, mfr="min")
                         elif (
                             self.minValue
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
+                            < round(abs(temperature))
                             <= self.lowerQuarter
                         ):
                             t.setColor(thickValue, mfr="minTo25")
                         elif (
                             self.lowerQuarter
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
+                            < round(abs(temperature))
                             <= self.medianValue
                         ):
                             t.setColor(thickValue, mfr="25To50")
                         elif (
                             self.medianValue
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
+                            < round(abs(temperature))
                             <= self.upperQuarter
                         ):
                             t.setColor(thickValue, mfr="50To75")
                         elif (
                             self.upperQuarter
-                            < round(abs(self.tempMassFlowData[temperatureVariableName].iloc[timeStep]))
+                            < round(abs(temperature))
                             < self.maxValue
                         ):
                             t.setColor(thickValue, mfr="75ToMax")
                         else:
                             t.setColor(thickValue, mfr="test")
                         i += 1
+                if isinstance(t, _dpc.DoublePipeConnection):
+                    coldMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.coldModelPipe)
+                    coldTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.COLD)
+
+                    hotMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.hotModelPipe)
+                    hotTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.HOT)
+
+                    coldMassFlow = self._getMassFlow(coldMassFlowVariableName, timeStep)
+                    coldTemperature = self._getTemperature(coldTemperatureVariableName, timeStep)
+
+                    hotMassFlow = self._getMassFlow(hotMassFlowVariableName, timeStep)
+                    hotTemperature = self._getTemperature(hotTemperatureVariableName, timeStep)
+
+                    t.setMassFlowAndTemperature(coldMassFlow, coldTemperature, hotMassFlow, hotTemperature)
+
                 elif isinstance(t, _tv.TVentil):
                     valvePositionVariableName = _mnames.getInputVariableName(t, t.modelDiverter)
                     if valvePositionVariableName in self.massFlowData.columns:
@@ -249,6 +264,13 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         else:
             return
+
+    def _getMassFlow(self, mfrVariableName: str, timeStep: int) -> float:
+        mass = self.massFlowData[mfrVariableName].iloc[timeStep]
+        return mass
+
+    def _getTemperature(self, temperatureVariableName: str, timeStep: int) -> float:
+        return self.tempMassFlowData[temperatureVariableName].iloc[timeStep]
 
     def pauseVis(self):
         self.paused = True
@@ -373,8 +395,8 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.minValueMfr = _np.min(noDuplicateData)  # minimum value excluding 0
         self.maxValueMfr = _np.max(noDuplicateData)  # max value
 
-    def getThickness(self, mass):
-        mass = abs(float(mass))
+    def getThickness(self, mass: float) -> int:
+        mass = abs(mass)
         if mass == self.minValueMfr:
             return 2
         elif self.minValueMfr < mass <= self.medianValueMfr:

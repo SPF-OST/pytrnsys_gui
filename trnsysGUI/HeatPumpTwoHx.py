@@ -154,16 +154,16 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
         resBlockList.append(self)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
-        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemDirection.INPUT)
-        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemDirection.OUTPUT)
+        evaporatorInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        evaporatorOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         evaporatorPipe = _mfn.Pipe(evaporatorInput, evaporatorOutput, "Evap")
 
-        condenser1Input = _mfn.PortItem("CondIn1", _mfn.PortItemDirection.INPUT)
-        condenser1Output = _mfn.PortItem("CondOut1", _mfn.PortItemDirection.OUTPUT)
+        condenser1Input = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        condenser1Output = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         condenser1Pipe = _mfn.Pipe(condenser1Input, condenser1Output, "Cond1")
 
-        condenser2Input = _mfn.PortItem("CondIn2", _mfn.PortItemDirection.INPUT)
-        condenser2Output = _mfn.PortItem("CondOut2", _mfn.PortItemDirection.OUTPUT)
+        condenser2Input = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        condenser2Output = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         condenser2Pipe = _mfn.Pipe(condenser2Input, condenser2Output, "Cond2")
 
         modelPortItemsToGraphicalPortItem = {
@@ -216,9 +216,6 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    def hasDdckPlaceHolders(self):
-        return True
 
     def deleteBlock(self):
         """

@@ -148,12 +148,12 @@ class HeatPump(BlockItem, _ip.HasInternalPiping):
         resBlockList.append(self)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
-        condenserInput = _mfn.PortItem("CondIn", _mfn.PortItemDirection.INPUT)
-        condenserOutput = _mfn.PortItem("CondOut", _mfn.PortItemDirection.OUTPUT)
+        condenserInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        condenserOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         condenserPipe = _mfn.Pipe(condenserInput, condenserOutput, "Cond")
 
-        evaporatorInput = _mfn.PortItem("EvapIn", _mfn.PortItemDirection.INPUT)
-        evaporatorOutput = _mfn.PortItem("EvapOut", _mfn.PortItemDirection.OUTPUT)
+        evaporatorInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        evaporatorOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         evaporatorPipe = _mfn.Pipe(evaporatorInput, evaporatorOutput, "Evap")
 
         modelPortItemsToGraphicalPortItem = {
@@ -204,9 +204,6 @@ class HeatPump(BlockItem, _ip.HasInternalPiping):
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
-
-    def hasDdckPlaceHolders(self):
-        return True
 
     def deleteBlock(self):
         """

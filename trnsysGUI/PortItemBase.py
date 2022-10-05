@@ -25,7 +25,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         self.side = side
         self.createdAtSide = side
         self.posCallbacks = []
-        self.connectionList: _tp.Sequence[_cb.ConnectionBase] = []
+        self.connectionList: list[_cb.ConnectionBase] = []
         self.id = self.parent.parent.parent().idGen.getID()  # pylint: disable = invalid-name
 
         self.color = "white"

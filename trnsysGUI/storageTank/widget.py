@@ -25,6 +25,8 @@ from trnsysGUI.heatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
+import trnsysGUI.hydraulicLoops.model as _hlm
+import trnsysGUI.hydraulicLoops.names as _lnames
 
 InOut = _tp.Literal["In", "Out"]
 _T_co = _tp.TypeVar("_T_co", covariant=True)
@@ -65,7 +67,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         return self.displayName
 
     def hasDdckPlaceHolders(self) -> bool:
-        return True
+        return False
 
     @property
     def leftDirectPortPairsPortItems(self):
@@ -398,9 +400,9 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
-    def exportDck(self):  # pylint: disable=too-many-locals,too-many-statements
+    def exportDck(self, hydraulicLoops: _hlm.HydraulicLoops) -> None:  # pylint: disable=too-many-locals,too-many-statements
 
-        if not self._checkConnExists():
+        if not self._areAllPortsConnected():
             msgb = QMessageBox()
             msgb.setText("Please connect all ports before exporting!")
             msgb.exec_()
@@ -433,6 +435,17 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             "nHeatSources": 1,
         }
 
+        directPairsPorts = self._getDirectPairPortsForExport()
+
+        heatExchangerPorts = self._getHeatExchangerPortsForExport(hydraulicLoops)
+
+        auxiliaryPorts = self._getAuxiliaryPortForExport(inputs)
+
+        tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
+
+        tool.createDDck(self.path, self.displayName, typeFile="ddck")
+
+    def _getDirectPairPortsForExport(self):
         directPairsPorts = []
         for directPortPair in self.directPortPairs:
             incomingConnection = directPortPair.fromPort.getConnection()
@@ -461,49 +474,59 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
                 "Tout": outputTemperatureName,
             }
             directPairsPorts.append(directPairsPort)
+        return directPairsPorts
 
+    def _getHeatExchangerPortsForExport(self, hydraulicLoops: _hlm.HydraulicLoops):
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
-            heatExchangerName = heatExchanger.displayName
-
-            incomingConnection = heatExchanger.port1.getConnection()
-            inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
-
-            modelPipe = heatExchanger.modelPipe
-            massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
-
-            outgoingConnection = heatExchanger.port2.getConnection()
-            reverseInputTemperatureName = _cnames.getTemperatureVariableName(
-                outgoingConnection, _mfn.PortItemType.STANDARD
-            )
-
-            inputPos = heatExchanger.relativeInputHeight
-            outputPos = heatExchanger.relativeOutputHeight
-
-            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, modelPipe)
-
-            heatExchangerPort = {
-                "Name": heatExchangerName,
-                "T": inputTemperatureName,
-                "Mfr": massFlowRateName,
-                "Trev": reverseInputTemperatureName,
-                "zIn": inputPos,
-                "zOut": outputPos,
-                "Tout": outputTemperatureName,
-                "cp": "cpwat",
-                "rho": "rhowat",
-            }
+            heatExchangerPort = self._getHeatExchangerPortForExport(heatExchanger, hydraulicLoops)
 
             heatExchangerPorts.append(heatExchangerPort)
+        return heatExchangerPorts
 
+    def _getHeatExchangerPortForExport(self, heatExchanger, hydraulicLoops):  # pylint: disable=too-many-locals
+        heatExchangerName = heatExchanger.displayName
+
+        incomingConnection = heatExchanger.port1.getConnection()
+        inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
+        modelPipe = heatExchanger.modelPipe
+        massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
+
+        outgoingConnection = heatExchanger.port2.getConnection()
+        reverseInputTemperatureName = _cnames.getTemperatureVariableName(
+            outgoingConnection, _mfn.PortItemType.STANDARD
+
+        )
+
+        inputPos = heatExchanger.relativeInputHeight
+        outputPos = heatExchanger.relativeOutputHeight
+
+        outputTemperatureName = _temps.getInternalTemperatureVariableName(self, modelPipe)
+
+        loop = hydraulicLoops.getLoopForExistingConnection(incomingConnection)
+        loopName = loop.name.value
+
+        heatExchangerPort = {
+            "Name": heatExchangerName,
+            "T": inputTemperatureName,
+            "Mfr": massFlowRateName,
+            "Trev": reverseInputTemperatureName,
+            "zIn": inputPos,
+            "zOut": outputPos,
+            "Tout": outputTemperatureName,
+            "cp": _lnames.getHeatCapacityName(loopName),
+            "rho": _lnames.getDensityName(loopName),
+        }
+
+        return heatExchangerPort
+
+    @staticmethod
+    def _getAuxiliaryPortForExport(inputs):
         auxiliaryPorts = []
         for _ in range(inputs["nHeatSources"]):
             dictInputAux = {"zAux": 0.0, "qAux": 0.0}
             auxiliaryPorts.append(dictInputAux)
-
-        tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
-
-        tool.createDDck(self.path, self.displayName, typeFile="ddck")
+        return auxiliaryPorts
 
     def _debugConn(self):
         self.logger.debug("Debugging conn")
@@ -530,7 +553,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         return noError
 
-    def _checkConnExists(self):
+    def _areAllPortsConnected(self):
         for heatExchanger in self.heatExchangers:
             if not heatExchanger.port1.connectionList:
                 return False

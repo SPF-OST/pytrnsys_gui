@@ -83,21 +83,24 @@ class TestEditor:
         mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
         helper.ensureFilesAreEqual(mfsDdckRelativePath)
 
-        editor.exportHydraulics(exportTo="ddck")
-        hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
-        helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
-
         storageTankNames = self._exportStorageTanksAndGetNames(editor)
         for storageTankName in storageTankNames:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath)
+
+        editor.exportHydraulics(exportTo="ddck")
+        hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
+        helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
+
+        editor.exportDdckPlaceHolderValuesJsonFile(shallShowMessageOnSuccess=False)
+        helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
 
     @classmethod
     def _exportStorageTanksAndGetNames(cls, editor: _de.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
         storageTanks = [o for o in editor.trnsysObj if isinstance(o, _stw.StorageTank)]  # pylint: disable=no-member
 
         for storageTank in storageTanks:
-            storageTank.exportDck()
+            storageTank.exportDck(editor.hydraulicLoops)
 
         storageTankNames = [t.displayName for t in storageTanks]
 

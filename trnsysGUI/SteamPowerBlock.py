@@ -101,9 +101,6 @@ class SteamPowerBlock(BlockItem, _ip.HasInternalPiping):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    def hasDdckPlaceHolders(self):
-        return True
-
     def deleteBlock(self):
         """
         Overridden method to also delete folder

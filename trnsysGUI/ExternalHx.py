@@ -94,9 +94,6 @@ class ExternalHx(BlockItemFourPorts):
         self.tree.setSortingEnabled(True)
         self.parent.parent().splitter.addWidget(self.tree)
 
-    def hasDdckPlaceHolders(self):
-        return True
-
     def deleteBlock(self):
         """
         Overridden method to also delete folder
@@ -133,12 +130,12 @@ class ExternalHx(BlockItemFourPorts):
             self.logger.debug(self.path)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
-        side1Input = _mfn.PortItem("In1", _mfn.PortItemDirection.INPUT)
-        side1Output = _mfn.PortItem("Out1", _mfn.PortItemDirection.OUTPUT)
+        side1Input = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        side1Output = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         side1Pipe = _mfn.Pipe(side1Input, side1Output, name="Side1")
 
-        side2Input = _mfn.PortItem("In2", _mfn.PortItemDirection.INPUT)
-        side2Output = _mfn.PortItem("Out2", _mfn.PortItemDirection.OUTPUT)
+        side2Input = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        side2Output = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         side2Pipe = _mfn.Pipe(side2Input, side2Output, name="Side2")
 
         modelPortItemsToGraphicalPortItem = {
