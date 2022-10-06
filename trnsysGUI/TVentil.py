@@ -209,7 +209,7 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
 
             lines += "T" + first.connectionList[0].displayName + "\n"
             lines += "T" + second.connectionList[0].displayName + "\n"
-            lines += "Mfr" + self.inputs[0].connectionList[0].displayName + "\n"
+            lines += "M" + self.inputs[0].connectionList[0].displayName + "\n"
 
             lines += "T_set_" + self.displayName + "\n"
             lines += "*** INITIAL INPUT VALUES" + "\n"
