@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses as _dc
+import enum as _enum
 import typing as _tp
 import uuid as _uuid
 
@@ -9,6 +10,7 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
@@ -21,10 +23,20 @@ from . import _massFlowLabels as _mfl
 
 
 @_dc.dataclass
-class HeatLossVariable:
+class _HeatLossVariable:
     name: str
     outputNumber: int
     comment: str
+
+
+class _HeatLossVariablePostfixes(_enum.Enum):
+    PIPE_TO_GRAVEL = "Diss"
+    CONVECTED = "Conv"
+    PIPE_INTERNAL_CHANGE = "Int"
+    COLD_TO_HOT = "Exch"
+    GRAVEL_TO_SOIL = "GrSl"
+    SOIL_TO_FAR_FIELD = "SlFf"
+    SOIL_INTERNAL_CHANGE = "SlInt"
 
 
 class DoublePipeConnection(_cb.ConnectionBase):
@@ -129,7 +141,9 @@ class DoublePipeConnection(_cb.ConnectionBase):
             [self.coldModelPipe, self.hotModelPipe], modelPortItemsToGraphicalPortItem
         )
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals,too-many-statements
+    def exportPipeAndTeeTypesForTemp(
+        self, startingUnit: int
+    ) -> _tp.Tuple[str, int]:  # pylint: disable=too-many-locals,too-many-statements
         unitNumber = startingUnit
 
         inputNumbers = 6
@@ -190,14 +204,25 @@ dpRadNdDist                             ! Radial distance of node 10, m
         unitText += "***Initial values\n"
         unitText += "15.0 0.0 15.0 15.0 0.0 15.0\n\n"
 
-        heatLossVariables = self.getHeatLossVariables()
+        heatLossVariables = self._getHeatLossVariables()
 
         formattedHeatLossVariables = "\n".join(
             f"{v.name} = [{unitNumber},{v.outputNumber}] ! {v.comment}" for v in heatLossVariables
         )
 
+        coldPipeLossToGravel = self._getHeatLossVariableName(
+            _HeatLossVariablePostfixes.PIPE_TO_GRAVEL, _mfn.PortItemType.COLD
+        )
+        coldPipeLossToHotPipe = self._getHeatLossVariableName(_HeatLossVariablePostfixes.COLD_TO_HOT)
+        coldPipeLoss = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.COLD)
+
+        hotPipeLossToGravel = self._getHeatLossVariableName(
+            _HeatLossVariablePostfixes.PIPE_TO_GRAVEL, _mfn.PortItemType.HOT
+        )
+        hotPipeLoss = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.HOT)
+
         unitText += f"""\
-EQUATIONS {4 + len(heatLossVariables)}
+EQUATIONS {6 + len(heatLossVariables)}
 {_temps.getTemperatureVariableName(self, self.coldModelPipe)} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
 {_mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)} = [{unitNumber},2]  ! Outlet mass flow rate, kg/h"
 
@@ -205,45 +230,83 @@ EQUATIONS {4 + len(heatLossVariables)}
 {_mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)} = [{unitNumber},4]  ! Outlet mass flow rate, kg/h"
 
 {formattedHeatLossVariables}
+
+{coldPipeLoss} = {coldPipeLossToGravel} - {coldPipeLossToHotPipe}
+{hotPipeLoss} = {hotPipeLossToGravel} + {coldPipeLossToHotPipe}
 """
         unitNumber += 1
 
         return unitText, unitNumber
 
-    def getHeatLossVariables(self) -> _tp.Sequence[HeatLossVariable]:
+    def _getHeatLossVariables(self) -> _tp.Sequence[_HeatLossVariable]:
         return [
-            self._getHeatLossVariable("Conv", _mfn.PortItemType.COLD, 7, "Convected heat [kJ]"),
             self._getHeatLossVariable(
-                "Int",
+                _HeatLossVariablePostfixes.CONVECTED, _mfn.PortItemType.COLD, 7, "Convected heat [kJ]"
+            ),
+            self._getHeatLossVariable(
+                _HeatLossVariablePostfixes.PIPE_INTERNAL_CHANGE,
                 _mfn.PortItemType.COLD,
                 9,
                 "Change in fluid's internal heat content compared to previous time step [kJ]",
             ),
-            self._getHeatLossVariable("Diss", _mfn.PortItemType.COLD, 11, "Dissipated heat to casing (aka gravel) [kJ]"),
-            self._getHeatLossVariable("Conv", _mfn.PortItemType.HOT, 8, "Convected heat [kJ]"),
             self._getHeatLossVariable(
-                "Int",
+                _HeatLossVariablePostfixes.PIPE_TO_GRAVEL,
+                _mfn.PortItemType.COLD,
+                11,
+                "Dissipated heat to casing (aka gravel) [kJ]",
+            ),
+            self._getHeatLossVariable(
+                _HeatLossVariablePostfixes.CONVECTED, _mfn.PortItemType.HOT, 8, "Convected heat [kJ]"
+            ),
+            self._getHeatLossVariable(
+                _HeatLossVariablePostfixes.PIPE_INTERNAL_CHANGE,
                 _mfn.PortItemType.HOT,
                 10,
                 "Change in fluid's internal heat content compared to previous time step [kJ]",
             ),
-            self._getHeatLossVariable("Diss", _mfn.PortItemType.HOT, 12, "Dissipated heat to casing (aka gravel) [kJ]"),
-            self._getHeatLossVariable("Exch", None, 13, "Dissipated heat from cold pipe to hot pipe [kJ]"),
-            self._getHeatLossVariable("GrSl", None, 14, "Dissipated heat from gravel to soil [kJ]"),
-            self._getHeatLossVariable("SlFf", None, 15, 'Dissipated heat from soil to "far field" [kJ]'),
             self._getHeatLossVariable(
-                "SlInt", None, 16, "Change in soil's internal heat content compared to previous time step [kJ]"
+                _HeatLossVariablePostfixes.PIPE_TO_GRAVEL,
+                _mfn.PortItemType.HOT,
+                12,
+                "Dissipated heat to casing (aka gravel) [kJ]",
+            ),
+            self._getHeatLossVariable(
+                _HeatLossVariablePostfixes.COLD_TO_HOT, None, 13, "Dissipated heat from cold pipe to hot pipe [kJ]"
+            ),
+            self._getHeatLossVariable(
+                _HeatLossVariablePostfixes.GRAVEL_TO_SOIL, None, 14, "Dissipated heat from gravel to soil [kJ]"
+            ),
+            self._getHeatLossVariable(
+                _HeatLossVariablePostfixes.SOIL_TO_FAR_FIELD, None, 15, 'Dissipated heat from soil to "far field" [kJ]'
+            ),
+            self._getHeatLossVariable(
+                _HeatLossVariablePostfixes.SOIL_INTERNAL_CHANGE,
+                None,
+                16,
+                "Change in soil's internal heat content compared to previous time step [kJ]",
             ),
         ]
 
     def _getHeatLossVariable(
-        self, postfix: str, portItemType: _tp.Union[_mfn.PortItemType, None], outputNumber: int, comment: str
-    ) -> HeatLossVariable:
-        prefix = self._getHeatLossVariablePrefix(portItemType)
-        variableName = f"{prefix}{postfix}"
-        return HeatLossVariable(variableName, outputNumber, comment)
+        self,
+        postfix: _HeatLossVariablePostfixes,
+        portItemType: _tp.Optional[_mfn.PortItemType],
+        outputNumber: int,
+        comment: str,
+    ) -> _HeatLossVariable:
+        variableName = self._getHeatLossVariableName(postfix, portItemType)
+        return _HeatLossVariable(variableName, outputNumber, comment)
 
-    def _getHeatLossVariablePrefix(self, portItemType: _tp.Union[_mfn.PortItemType, None]):
+    def _getHeatLossVariableName(
+        self,
+        postfix: _HeatLossVariablePostfixes,
+        portItemType: _tp.Optional[_mfn.PortItemType] = None,
+    ) -> str:
+        prefix = self._getHeatLossVariablePrefix(portItemType)
+        variableName = f"{prefix}{postfix.value}"
+        return variableName
+
+    def _getHeatLossVariablePrefix(self, portItemType: _tp.Optional[_mfn.PortItemType]):
         if not portItemType:
             return self.displayName
 
