@@ -221,13 +221,16 @@ dpRadNdDist                             ! Radial distance of node 10, m
         )
         hotPipeLoss = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.HOT)
 
+        coldMfrName = _helpers.getInputMfrName(self, self.coldModelPipe)
+        hotMfrName = _helpers.getInputMfrName(self, self.hotModelPipe)
+
         unitText += f"""\
 EQUATIONS {6 + len(heatLossVariables)}
 {_temps.getTemperatureVariableName(self, self.coldModelPipe)} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
-{_mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)} = [{unitNumber},2]  ! Outlet mass flow rate, kg/h"
+{_mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)} = {coldMfrName}  ! Outlet mass flow rate, kg/h
 
 {_temps.getTemperatureVariableName(self, self.hotModelPipe)} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
-{_mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)} = [{unitNumber},4]  ! Outlet mass flow rate, kg/h"
+{_mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)} = {hotMfrName}  ! Outlet mass flow rate, kg/h
 
 {formattedHeatLossVariables}
 
