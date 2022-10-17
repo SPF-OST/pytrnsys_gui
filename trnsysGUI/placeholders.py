@@ -68,16 +68,16 @@ def _getPlaceholdersForPort(
         inputTemperatureVariableName = _cnames.getTemperatureVariableName(inputConnection, modelPortItem.type)
         inputMfrVariableName = _mnames.getMassFlowVariableName(component, node, modelPortItem)
 
-        fluid = _getLoop(hydraulicLoops, inputConnection)
+        loop = _getLoop(hydraulicLoops, inputConnection)
 
-        placeholdersForPort = _createPlaceholdersDict(inputMfrVariableName, inputTemperatureVariableName, fluid)
+        placeholdersForPort = _createInputPlaceholdersDict(inputMfrVariableName, inputTemperatureVariableName, loop)
     else:
         raise AssertionError(f"Unknown {_mfn.PortItemDirection.__name__}: {modelPortItem.direction}")
 
     return placeholdersForPort
 
 
-def _createPlaceholdersDict(
+def _createInputPlaceholdersDict(
     inputMfrVariableName: str, inputTemperatureVariableName: str, loop: _tp.Optional[_hlm.HydraulicLoop]
 ) -> _tp.Dict[str, str]:
     if not loop:
