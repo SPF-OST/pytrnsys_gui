@@ -571,7 +571,7 @@ class Editor(QWidget):
             hydraulicFolder = os.path.split(exportPath)[0]
             if not (os.path.isdir(hydraulicFolder)):
                 os.makedirs(hydraulicFolder)
-            f = open(exportPath, "w", encoding="UTF-8")
+            f = open(exportPath, "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()

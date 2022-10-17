@@ -118,8 +118,8 @@ dpCpFl = 4.19 ! Specific heat of fluid, kJ/kg.K
 dpViscFl = 3.078  ! Viscosity of fluid in kg/m.hr
 
 ****** Initial conditions ******
-dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in �C
-dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in �C
+dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in degrees celsius
+dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in degrees celsius
 
 ****** Soil's thermal properties ******
 dpLamdaSl = 8.64  ! Thermal conductivity of soil in kJ/hr.m.K
@@ -136,8 +136,8 @@ dpNrSlCirc = 4  ! Number of circumferential soil nodes
 """
         massFlowSolverConstantsBlock = """\
 CONSTANTS 3
-TambAvg = 7.96 ! Average surface temperature in °C
-dTambAmpl = 13.32 ! Amplitude of surface temperature in °C
+TambAvg = 7.96 ! Average surface temperature in degrees celsius
+dTambAmpl = 13.32 ! Amplitude of surface temperature in n degrees celsius
 ddTcwOffset = 36 ! Days of minimum surface temperature
 """
         if exportTo == "ddck":
