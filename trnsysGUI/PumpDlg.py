@@ -85,7 +85,6 @@ class PumpDlg(QDialog):
         self.show()
 
     def acceptedEdit(self):
-        self.logger.debug("Changing displayName")
         newName = self.le.text()
         self.setPumpPower()
         if newName.lower() == str(self.block.displayName).lower():
