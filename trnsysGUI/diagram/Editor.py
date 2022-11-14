@@ -2,13 +2,13 @@
 # type: ignore
 
 import json
-import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
 import shutil
 import typing as _tp
 
+import math as _math
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF, QEvent
 from PyQt5.QtGui import QColor, QPainter
@@ -35,6 +35,7 @@ from PyQt5.QtWidgets import (
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.diagram.Encoder as _enc
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
@@ -512,17 +513,35 @@ class Editor(QWidget):
                     fullExportText += line
             header.close()
         elif exportTo == "ddck":
-            fullExportText += "*************************************\n"
-            fullExportText += "** BEGIN hydraulic.ddck\n"
-            fullExportText += "*************************************\n\n"
-            fullExportText += "*************************************\n"
-            fullExportText += "** Outputs to energy balance in kWh\n"
-            fullExportText += (
-                "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
-            )
-            fullExportText += "*************************************\n"
-            fullExportText += "EQUATIONS 1\n"
-            fullExportText += "qSysOut_PipeLoss = PipeLossTot\n"
+            SinglePipeTotals = _cnames.EnergyBalanceTotals.SinglePipe
+            DoublePipeTotals = _cnames.EnergyBalanceTotals.DoublePipe
+
+            energyBalanceEquations = f"""\
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+
+*************************************
+EQUATIONS 7
+*** single pipes
+qSysIn_{SinglePipeTotals.CONVECTED} = {SinglePipeTotals.CONVECTED}
+qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
+qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
+
+*** double pipes
+qSysIn_{DoublePipeTotals.CONVECTED} = {DoublePipeTotals.CONVECTED}
+qSysOut_{DoublePipeTotals.DISSIPATION_TO_FAR_FIELD} = {DoublePipeTotals.DISSIPATION_TO_FAR_FIELD}
+qSysOut_{DoublePipeTotals.PIPE_INTERNAL_CHANGE} = {DoublePipeTotals.PIPE_INTERNAL_CHANGE}
+qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNAL_CHANGE}
+
+"""
+
+            fullExportText += energyBalanceEquations
 
         simulationUnit = 450
         simulationType = 9351
@@ -549,7 +568,8 @@ class Editor(QWidget):
         fullExportText += exporter.exportFluids() + "\n"
         fullExportText += exporter.exportHydraulicLoops() + "\n"
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
-        fullExportText += exporter.exportPrintPipeLosses()
+        fullExportText += exporter.exportSinglePipeEnergyBalanceVariables()
+        fullExportText += exporter.exportDoublePipeEnergyBalanceVariables()
 
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)

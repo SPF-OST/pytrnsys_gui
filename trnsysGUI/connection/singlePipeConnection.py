@@ -8,7 +8,6 @@ import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
-import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnectionModel as _model
 import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
@@ -19,7 +18,6 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.singlePipeSegmentItem as _spsi
 import trnsysGUI.temperatures as _temps
-
 from . import _helpers as _chelpers
 from . import _massFlowLabels as _mfl
 
@@ -141,94 +139,73 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         )
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals, too-many-statements
-        lines = ""
         unitNumber = startingUnit
-        typeNr2 = 931  # Temperature calculation from a pipe
-
-        unitText = ""
-        ambientT = 20
 
         loop = self._editor.hydraulicLoops.getLoopForExistingConnection(self)
 
         densityVar = _names.getDensityName(loop.name.value)
         specHeatVar = _names.getHeatCapacityName(loop.name.value)
-
-        equationConstant1 = 1
-        parameterNumber = 6
-        inputNumbers = 4
-
-        # Fixed strings
-        tempRoomVar = "TRoomStore"
-        initialValueS = "20 0.0 20 20"
-
-        # Momentarily hardcoded
-        equationNr = 3
-
-        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(typeNr2) + "\n"
-        unitText += "!" + self.displayName + "\n"
-        unitText += "PARAMETERS " + str(parameterNumber) + "\n"
-
         lengthInM = _getConvertedValueOrName(self.lengthInM)
         diameterInM = _getConvertedValueOrName(self.diameterInCm, 1 / 100)
         uValueInkJPerHourM2K = _getConvertedValueOrName(self.uValueInWPerM2K, 60 * 60 / 1000)
-
-        unitText += f"{diameterInM} ! diameter [m]\n"
-        unitText += f"{lengthInM} ! length [m]\n"
-
         uValueInSIUnitsComment = (
             f" (= {self.uValueInWPerM2K} W/(m^2*K))" if isinstance(self.uValueInWPerM2K, float) else ""
         )
-        unitText += f"{uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)]{uValueInSIUnitsComment}\n"
 
-        unitText += densityVar + "\n"
-        unitText += specHeatVar + "\n"
-        unitText += str(ambientT) + "\n"
-
-        unitText += "INPUTS " + str(inputNumbers) + "\n"
-
-        massFlowVariableName = _helpers.getInputMfrName(self, self.modelPipe)
-
-        portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
-
-        if len(portItemsWithParent) == 2:
-            temperatureVariableName = _chelpers.getTemperatureVariableName(
-                portItemsWithParent[0][1], portItemsWithParent[0][0], _mfn.PortItemType.STANDARD
-            )
-            unitText += temperatureVariableName + "\n"
-            unitText += massFlowVariableName + "\n"
-            unitText += tempRoomVar + "\n"
-
-            temperatureVariableName = _chelpers.getTemperatureVariableName(
-                portItemsWithParent[1][1], portItemsWithParent[1][0], _mfn.PortItemType.STANDARD
-            )
-            unitText += temperatureVariableName + "\n"
-
-        else:
-            lines += (
-                "Error: NO VALUE\n" * 3
-                + "at connection with parents "
-                + str(self.fromPort.parent)
-                + str(self.toPort.parent)
-                + "\n"
-            )
-
-        unitText += "***Initial values\n"
-        unitText += initialValueS + "\n\n"
-
-        unitText += "EQUATIONS " + str(equationNr) + "\n"
-        temperatureVariableName = _temps.getTemperatureVariableName(self, self.modelPipe)
-        unitText += f"{temperatureVariableName} = [{unitNumber},{equationConstant1}]\n"
-
-        heatLossVariableName = _cnames.getHeatLossVariableName(self, _mfn.PortItemType.STANDARD)
-        unitText += f"{heatLossVariableName} = [{unitNumber},3]/3600 ! kW\n"
-
-        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.modelPipe)
         inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
-        unitText += f"{canonicalMfrName} = {inputMfrName}\n\n"
+        portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
+        inputTemperatureVariableName = _chelpers.getTemperatureVariableName(
+            portItemsWithParent[0][1], portItemsWithParent[0][0], _mfn.PortItemType.STANDARD
+        )
+        revInputTemperatureVariableName = _chelpers.getTemperatureVariableName(
+            portItemsWithParent[1][1], portItemsWithParent[1][0], _mfn.PortItemType.STANDARD
+        )
 
-        unitNumber += 1
+        outputTemperatureName = _temps.getTemperatureVariableName(self, self.modelPipe)
+        convectedHeatFluxName = self.getConvectedHeatFluxVariableName()
+        dissipatedHeatFluxName = self.getDissipatedHeatFluxVariableName()
+        internalHeatName = self.getInternalHeatVariableName()
+        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.modelPipe)
 
-        return unitText, unitNumber
+        unitText = f"""\
+UNIT {unitNumber} TYPE 931
+! {self.displayName}
+PARAMETERS 6
+{diameterInM} ! diameter [m]
+{lengthInM} ! length [m]
+{uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)] {uValueInSIUnitsComment}
+{densityVar} ! density [kg/m^3]
+{specHeatVar} ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
+INPUTS 4
+{inputTemperatureVariableName} ! input flow temperature [deg C]
+{inputMfrName} ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+{revInputTemperatureVariableName} ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+{outputTemperatureName} = [{unitNumber},1] ! Output flow temperature [deg C]
+{dissipatedHeatFluxName} = [{unitNumber},3]/3600 ! Dissipated heat [kW]
+{convectedHeatFluxName} = [{unitNumber},4]/3600 ! Convected heat [kW]
+{internalHeatName} = [{unitNumber},5] ! Accumulated internal energy since start of simulation [kJ]
+{canonicalMfrName} = {inputMfrName}
+
+"""
+
+        nextUnitNumber = unitNumber + 1
+
+        return unitText, nextUnitNumber
+
+    def getConvectedHeatFluxVariableName(self) -> str:
+        return f"P{self.displayName}Conv_kW"
+
+    def getDissipatedHeatFluxVariableName(self) -> str:
+        return f"P{self.displayName}_kW"
+
+    def getInternalHeatVariableName(self) -> str:
+        return f"P{self.displayName}Int_kJ"
 
     def _getFromAndToPortsAndParentBlockItems(
         self,
