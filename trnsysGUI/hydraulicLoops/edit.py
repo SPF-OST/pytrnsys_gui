@@ -73,17 +73,9 @@ def _applyModel(guiHydraulicLoop: _gmodel.HydraulicLoop, hydraulicLoop: _model.H
 
 
 def _applyConnectionModels(guiHydraulicLoop: _gmodel.HydraulicLoop) -> None:
-    loopName = guiHydraulicLoop.name
-    useLoopWideDefaults = guiHydraulicLoop.useLoopWideDefaults
-
     for modelConnection in guiHydraulicLoop.connections:
         connection = modelConnection.connection
 
-        if useLoopWideDefaults:
-            connection.lengthInM = _values.Variable(_names.getDefaultLengthName(loopName))
-            connection.diameterInCm = _values.Variable(_names.getDefaultDiameterName(loopName))
-            connection.uValueInWPerM2K = _values.Variable(_names.getDefaultUValueName(loopName))
-        else:
-            connection.lengthInM = modelConnection.lengthInM
-            connection.diameterInCm = modelConnection.diameterInCm
-            connection.uValueInWPerM2K = modelConnection.uValueInWPerM2K
+        connection.lengthInM = modelConnection.lengthInM
+        connection.diameterInCm = modelConnection.diameterInCm
+        connection.uValueInWPerM2K = modelConnection.uValueInWPerM2K
