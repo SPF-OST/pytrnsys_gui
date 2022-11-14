@@ -461,15 +461,8 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.pauseVis()
 
     def closeEvent(self, a0):
-        for t in self.parent.centralWidget.trnsysObj:
-            if isinstance(t, _spc.SinglePipeConnection):
-                t.firstS.labelMass.setVisible(False)
-
         self.pauseVis()
-        self.parent.centralWidget.updateConnGrads()
-        self.parent.massFlowEnabled = False
-
-        super(MassFlowVisualizer, self).closeEvent(a0)
+        super().closeEvent(a0)
 
     def keyPressEvent(self, e):
         if e.key() == _qtc.Qt.Key_Up:
