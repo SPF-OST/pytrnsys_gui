@@ -60,6 +60,7 @@ from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.scene import Scene
@@ -516,6 +517,28 @@ class Editor(QWidget):
             SinglePipeTotals = _cnames.EnergyBalanceTotals.SinglePipe
             DoublePipeTotals = _cnames.EnergyBalanceTotals.DoublePipe
 
+            singlePipes = [o for o in self.trnsysObj if isinstance(o, SinglePipeConnection)]
+            singlePipeEnergyBalanceEquations = ""
+            if singlePipes:
+                singlePipeEnergyBalanceEquations = f"""\
+EQUATIONS 3
+*** single pipes
+qSysIn_{SinglePipeTotals.CONVECTED} = {SinglePipeTotals.CONVECTED}
+qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
+qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
+
+"""
+            doublePipes = [o for o in self.trnsysObj if isinstance(o, DoublePipeConnection)]
+            doublePipesEnergyBalanceEquations = ""
+            if doublePipes:
+                doublePipesEnergyBalanceEquations = """\
+EQUATIONS 4
+*** double pipes
+qSysIn_{DoublePipeTotals.CONVECTED} = {DoublePipeTotals.CONVECTED}
+qSysOut_{DoublePipeTotals.DISSIPATION_TO_FAR_FIELD} = {DoublePipeTotals.DISSIPATION_TO_FAR_FIELD}
+qSysOut_{DoublePipeTotals.PIPE_INTERNAL_CHANGE} = {DoublePipeTotals.PIPE_INTERNAL_CHANGE}
+qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNAL_CHANGE}
+"""
             energyBalanceEquations = f"""\
 *************************************
 ** BEGIN hydraulic.ddck
@@ -527,17 +550,8 @@ class Editor(QWidget):
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 
 *************************************
-EQUATIONS 7
-*** single pipes
-qSysIn_{SinglePipeTotals.CONVECTED} = {SinglePipeTotals.CONVECTED}
-qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
-qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
-
-*** double pipes
-qSysIn_{DoublePipeTotals.CONVECTED} = {DoublePipeTotals.CONVECTED}
-qSysOut_{DoublePipeTotals.DISSIPATION_TO_FAR_FIELD} = {DoublePipeTotals.DISSIPATION_TO_FAR_FIELD}
-qSysOut_{DoublePipeTotals.PIPE_INTERNAL_CHANGE} = {DoublePipeTotals.PIPE_INTERNAL_CHANGE}
-qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNAL_CHANGE}
+{singlePipeEnergyBalanceEquations}
+{doublePipesEnergyBalanceEquations}
 
 """
 
