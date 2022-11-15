@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import typing as _tp
 
-import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
