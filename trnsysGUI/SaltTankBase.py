@@ -110,7 +110,6 @@ class SaltTankBase(BlockItem, _ip.HasInternalPiping):
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.deleteConns()
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
         self.parent.scene().removeItem(self)

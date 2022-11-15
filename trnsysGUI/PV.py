@@ -77,7 +77,6 @@ class PV(BlockItem):
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.deleteConns()
         # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
