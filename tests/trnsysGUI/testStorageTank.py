@@ -53,6 +53,7 @@ class TestStorageTank:
 
     @staticmethod
     def _deserializeStorageTank(storageTankLegacyJson, diagramViewMock):
+        legacySerializedStorageTank = _json.loads(storageTankLegacyJson)
         storageTank = _st.StorageTank(
             trnsysType="StorageTank",
             parent=diagramViewMock,
@@ -61,7 +62,6 @@ class TestStorageTank:
         diagramViewMock.scene().addItem(storageTank)
 
         blocks = []
-        legacySerializedStorageTank = _json.loads(storageTankLegacyJson)
         storageTank.decode(legacySerializedStorageTank, blocks)
 
         return storageTank

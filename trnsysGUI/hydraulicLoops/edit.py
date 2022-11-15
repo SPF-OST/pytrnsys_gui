@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import trnsysGUI.connection.values as _values
+
 from . import _loopWideDefaults as _lwd
 from . import common as _common
 from . import model as _model
-from . import names as _names
 from ._dialogs.edit import dialog as _gui, model as _gmodel
 
 

@@ -47,7 +47,7 @@ class InternalPiping:
 
         if not nodes:
             raise ValueError(
-                f"Could not find a with a port of type {portItemType} associated with graphical port item."
+                f"Could not find a port of type {portItemType} associated with graphical port item."
             )
 
         if len(nodes) > 1:

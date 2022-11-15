@@ -56,8 +56,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         self.heatExchangers: _tp.List[HeatExchanger] = []
 
-        self.blackBoxEquations = []
-
         self.nTes = self.parent.parent().idGen.getStoragenTes()
         self.storageType = self.parent.parent().idGen.getStorageType()
 

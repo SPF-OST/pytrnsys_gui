@@ -7,10 +7,8 @@ import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
-
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
@@ -18,6 +16,7 @@ import trnsysGUI.internalPiping
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+
 from . import _helpers as _chelpers
 from . import _massFlowLabels as _mfl
 

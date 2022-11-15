@@ -5,11 +5,6 @@ from __future__ import annotations
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
-import trnsysGUI.directPortPair as _dpp
-import trnsysGUI.hydraulicLoops.model as _hlm
-import trnsysGUI.hydraulicLoops.split as _hls
-import trnsysGUI.modifyRelativeHeightsDialog as _mhd
-import trnsysGUI.storageTank.side as _sd
 from PyQt5.QtWidgets import (
     QLabel,
     QLineEdit,
@@ -26,6 +21,12 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QListWidgetItem,
 )
+
+import trnsysGUI.directPortPair as _dpp
+import trnsysGUI.hydraulicLoops.split as _hls
+import trnsysGUI.modifyRelativeHeightsDialog as _mhd
+import trnsysGUI.storageTank.side as _sd
+
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.storageTank.widget as _st
