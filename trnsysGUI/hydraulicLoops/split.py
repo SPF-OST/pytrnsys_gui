@@ -32,7 +32,7 @@ def split(
     connection: _spc.SinglePipeConnection,  # type: ignore[name-defined]
     hydraulicLoops: _model.HydraulicLoops,
     fluids: _tp.Sequence[_model.Fluid],
-    splitLoopsSummary: _tp.Optional[_common.SplitLoopsSummary],
+    splitLoopsSummary: _tp.Optional[_common.SplitLoopsSummary] = None,
 ) -> _common.Cancellable[_tp.Optional[SplitSummary]]:
     splitter = _Splitter(hydraulicLoops, fluids)
 

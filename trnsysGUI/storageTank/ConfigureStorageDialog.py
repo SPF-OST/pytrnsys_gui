@@ -5,6 +5,11 @@ from __future__ import annotations
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
+import trnsysGUI.directPortPair as _dpp
+import trnsysGUI.hydraulicLoops.model as _hlm
+import trnsysGUI.hydraulicLoops.split as _hls
+import trnsysGUI.modifyRelativeHeightsDialog as _mhd
+import trnsysGUI.storageTank.side as _sd
 from PyQt5.QtWidgets import (
     QLabel,
     QLineEdit,
@@ -21,10 +26,6 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QListWidgetItem,
 )
-
-import trnsysGUI.directPortPair as _dpp
-import trnsysGUI.modifyRelativeHeightsDialog as _mhd
-import trnsysGUI.storageTank.side as _sd
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.storageTank.widget as _st
@@ -223,9 +224,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
 
     @staticmethod
     def _getHeatExchangerListItemText(h):  # pylint: disable = invalid-name
-        return (
-            f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
-        )
+        return f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
 
     def _loadDirectPortPairs(self):
         self._leftDirectPortPairsItemListWidget.clear()
@@ -272,30 +271,28 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         try:
             _inputPercentageHeight = float(self.offsetLeI.text())
         except ValueError:
-            self._editor.logger.warning('HX input height is not a number.')
+            self._editor.logger.warning("HX input height is not a number.")
             return
 
         try:
             _outputPercentageHeight = float(self.offsetLeO.text())
         except ValueError:
-            self._editor.logger.warning('HX output height is not a number.')
+            self._editor.logger.warning("HX output height is not a number.")
             return
 
         if self.minOffsetDistance() and self.offsetsInRange():
             if self.rButton.isChecked():
-                self._editor.logger.debug('Adding HX on righthand side.')
+                self._editor.logger.debug("Adding HX on righthand side.")
                 self._addHxR()
             elif self.lButton.isChecked():
-                self._editor.logger.debug('Adding HX on lefthand side.')
+                self._editor.logger.debug("Adding HX on lefthand side.")
                 self._addHxL()
             else:
-                self._editor.logger.warning('No side selected for heat exchanger.')
+                self._editor.logger.warning("No side selected for heat exchanger.")
                 return
         else:
             msgb = QMessageBox()
-            msgb.setText(
-                f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)"
-            )
+            msgb.setText(f"At least {self.minimumPortDistance}% of difference needed and valid range (0, 100)")
             msgb.exec_()
 
     def minOffsetDistance(self):
@@ -330,20 +327,23 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         try:
             _inputPortPercentageHeight = float(self.manPortLeI.text())
         except ValueError:
-            self._editor.logger.warning('Input port height is not a number.')
+            self._editor.logger.warning("Input port height is not a number.")
             return
 
         try:
             _outputPortPercentageHeight = float(self.manPortLeO.text())
         except ValueError:
-            self._editor.logger.warning('Output port height is not a number.')
+            self._editor.logger.warning("Output port height is not a number.")
             return
 
-        if max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100 or min(_inputPortPercentageHeight,
-                                                                                      _outputPortPercentageHeight) <= 0:
+        if (
+            max(_inputPortPercentageHeight, _outputPortPercentageHeight) >= 100
+            or min(_inputPortPercentageHeight, _outputPortPercentageHeight) <= 0
+        ):
             messageBox = QMessageBox()
             messageBox.setText(
-                'Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %).')
+                "Ports need to be on the tank, please make sure the port heights are within (0 %, 100 %)."
+            )
             messageBox.exec_()
             return
 
@@ -354,7 +354,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         elif self.manrButton.isChecked():
             _pairSide = _sd.Side.RIGHT
         else:
-            self._editor.logger.warning('No side selected for port pair.')
+            self._editor.logger.warning("No side selected for port pair.")
             return
 
         self.storage.addDirectPortPair(
@@ -375,24 +375,14 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
 
     def _removeSelectedPortPairs(self, directPortPairsListWidget):
         for selectedItem in directPortPairsListWidget.selectedItems():
-            selectedDirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
+            selectedDirectPortPair: _dpp.DirectPortPair = selectedItem.data(_qtc.Qt.UserRole)
+
+            self._removePorts(selectedDirectPortPair.fromPort, selectedDirectPortPair.toPort)
 
             self.storage.directPortPairs.remove(selectedDirectPortPair)
 
             row = directPortPairsListWidget.row(selectedItem)
             directPortPairsListWidget.takeItem(row)
-
-            while len(selectedDirectPortPair.fromPort.connectionList) > 0:
-                selectedDirectPortPair.fromPort.connectionList[0].deleteConn()
-
-            while len(selectedDirectPortPair.toPort.connectionList) > 0:
-                selectedDirectPortPair.toPort.connectionList[0].deleteConn()
-
-            self.storage.inputs.remove(selectedDirectPortPair.fromPort)
-            self.storage.outputs.remove(selectedDirectPortPair.toPort)
-
-            self.storage.parent.scene().removeItem(selectedDirectPortPair.fromPort)
-            self.storage.parent.scene().removeItem(selectedDirectPortPair.toPort)
 
     def removeHxL(self):
         self._removeSelectedHeatExchangers(self.leftHeatExchangersItemListWidget)
@@ -402,25 +392,29 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
 
     def _removeSelectedHeatExchangers(self, heatExchangersItemListWidget):
         for selectedItem in heatExchangersItemListWidget.selectedItems():
-            heatExchanger = selectedItem.data(_qtc.Qt.UserRole)
+            heatExchanger: _st.HeatExchanger = selectedItem.data(_qtc.Qt.UserRole)
+
+            self._removePorts(heatExchanger.port1, heatExchanger.port2)
 
             self.storage.heatExchangers.remove(heatExchanger)
+            self.storage.parent.scene().removeItem(heatExchanger)
 
             row = heatExchangersItemListWidget.row(selectedItem)
             heatExchangersItemListWidget.takeItem(row)
 
-            while len(heatExchanger.port1.connectionList) > 0:
-                heatExchanger.port1.connectionList[0].deleteConn()
+    def _removePorts(self, fromPort, toPort):
+        self._removeConnectionIfAny(fromPort)
+        self._removeConnectionIfAny(toPort)
+        self.storage.inputs.remove(fromPort)
+        self.storage.outputs.remove(toPort)
+        self.storage.parent.scene().removeItem(fromPort)
+        self.storage.parent.scene().removeItem(toPort)
 
-            while len(heatExchanger.port2.connectionList) > 0:
-                heatExchanger.port2.connectionList[0].deleteConn()
-
-            self.storage.inputs.remove(heatExchanger.port1)
-            self.storage.outputs.remove(heatExchanger.port2)
-
-            self.storage.parent.scene().removeItem(heatExchanger.port1)
-            self.storage.parent.scene().removeItem(heatExchanger.port2)
-            self.storage.parent.scene().removeItem(heatExchanger)
+    def _removeConnectionIfAny(self, port):
+        if port.isConnected():
+            connection = port.getConnection()
+            _hls.split(connection, self._editor.hydraulicLoops, self._editor.fluids)
+            connection.deleteConn()
 
     def modifyHx(self):
         """
@@ -493,7 +487,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         selectedItem.setText(newText)
 
     def _getFirstSelectedDirectPortPairListWidgetItem(
-            self,
+        self,
     ) -> _tp.Optional[QListWidgetItem]:
         leftSelectedItems = self._leftDirectPortPairsItemListWidget.selectedItems()
         if leftSelectedItems:
