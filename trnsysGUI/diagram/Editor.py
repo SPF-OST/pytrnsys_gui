@@ -281,7 +281,7 @@ class Editor(QWidget):
         self.connectionList = []
         self.trnsysObj = []
         self.graphicalObj = []
-        self.fluids = _hlm.Fluids([])
+        self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
 
         self.copyGroupList = QGraphicsItemGroup()
@@ -817,7 +817,9 @@ class Editor(QWidget):
 
         self._decodeHydraulicLoops(blocklist)
 
-    def _decodeHydraulicLoops(self, blocklist):
+        self._setHydraulicLoopsOnStorageTanks()
+
+    def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
         if "hydraulicLoops" not in blocklist:
             hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
@@ -828,6 +830,15 @@ class Editor(QWidget):
             )
 
         self.hydraulicLoops = hydraulicLoops
+
+    def _setHydraulicLoopsOnStorageTanks(self) -> None:
+        for trnsysObject in self.trnsysObj:
+            if not isinstance(trnsysObject, StorageTank):
+                continue
+
+            storageTank = trnsysObject
+
+            storageTank.setHydraulicLoops(self.hydraulicLoops)
 
     def exportSvg(self):
         """

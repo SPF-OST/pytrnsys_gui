@@ -100,7 +100,7 @@ class TestEditor:
         storageTanks = [o for o in editor.trnsysObj if isinstance(o, _stw.StorageTank)]  # pylint: disable=no-member
 
         for storageTank in storageTanks:
-            storageTank.exportDck(editor.hydraulicLoops)
+            storageTank.exportDck()
 
         storageTankNames = [t.displayName for t in storageTanks]
 
