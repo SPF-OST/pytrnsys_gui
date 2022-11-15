@@ -752,11 +752,16 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         """
         self.hydraulicLoops.clear()
 
-        while len(self.trnsysObj) > 0:
-            self.logger.info("In deleting...")
-            self.trnsysObj[0].deleteBlock()
+        while self.trnsysObj:
+            trnsysObject = self.trnsysObj[0]
+            if isinstance(trnsysObject, BlockItem):
+                trnsysObject.deleteBlock()
+            elif isinstance(trnsysObject, ConnectionBase):
+                trnsysObject.deleteConn()
+            else:
+                raise AssertionError(f"Don't know how to delete {trnsysObject}.")
 
-        while len(self.graphicalObj) > 0:
+        while self.graphicalObj:
             self.graphicalObj[0].deleteBlock()
 
     # Encoding / decoding
