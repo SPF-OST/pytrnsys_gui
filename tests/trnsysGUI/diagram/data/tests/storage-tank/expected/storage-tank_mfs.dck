@@ -187,141 +187,168 @@ Lloop2Cp = FwaterCp
 
 
 UNIT 451 TYPE 931
-!Tes-Col
+! Tes-Col
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop1Rho
-Lloop1Cp
-20
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
 INPUTS 4
-TTesDpL50_10H
-MTes-Col_A
-TRoomStore
-TColH
+TTesDpL50_10H ! input flow temperature [deg C]
+MTes-Col_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TColH ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
-EQUATIONS 3
-TTes-Col = [451,1]
-PTes-Col_kW = [451,3]/3600 ! kW
+EQUATIONS 5
+TTes-Col = [451,1] ! Output flow temperature [deg C]
+PTes-Col_kW = [451,3]/3600 ! Dissipated heat [kW]
+PTes-ColConv_kW = [451,4]/3600 ! Convected heat [kW]
+PTes-ColInt_kJ = [451,5] ! Accumulated internal energy since start of simulation [kJ]
 MTes-Col = MTes-Col_A
 
 UNIT 452 TYPE 931
-!PiTes_HP
+! PiTes_HP
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop2Rho
-Lloop2Cp
-20
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
 INPUTS 4
-TTesInHxH
-MPiTes_HP_A
-TRoomStore
-THPH
+TTesInHxH ! input flow temperature [deg C]
+MPiTes_HP_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+THPH ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
-EQUATIONS 3
-TPiTes_HP = [452,1]
-PPiTes_HP_kW = [452,3]/3600 ! kW
+EQUATIONS 5
+TPiTes_HP = [452,1] ! Output flow temperature [deg C]
+PPiTes_HP_kW = [452,3]/3600 ! Dissipated heat [kW]
+PPiTes_HPConv_kW = [452,4]/3600 ! Convected heat [kW]
+PPiTes_HPInt_kJ = [452,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTes_HP = MPiTes_HP_A
 
 UNIT 453 TYPE 931
-!PiTes_Pump109
+! PiTes_Pump109
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop2Rho
-Lloop2Cp
-20
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
 INPUTS 4
-TTesInHxH
-MPiTes_Pump109_A
-TRoomStore
-TPump109
+TTesInHxH ! input flow temperature [deg C]
+MPiTes_Pump109_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TPump109 ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
-EQUATIONS 3
-TPiTes_Pump109 = [453,1]
-PPiTes_Pump109_kW = [453,3]/3600 ! kW
+EQUATIONS 5
+TPiTes_Pump109 = [453,1] ! Output flow temperature [deg C]
+PPiTes_Pump109_kW = [453,3]/3600 ! Dissipated heat [kW]
+PPiTes_Pump109Conv_kW = [453,4]/3600 ! Convected heat [kW]
+PPiTes_Pump109Int_kJ = [453,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTes_Pump109 = MPiTes_Pump109_A
 
 UNIT 454 TYPE 931
-!PiPump109_HP
+! PiPump109_HP
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop2Rho
-Lloop2Cp
-20
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
 INPUTS 4
-TPump109
-MPiPump109_HP_A
-TRoomStore
-THPH
+TPump109 ! input flow temperature [deg C]
+MPiPump109_HP_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+THPH ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
-EQUATIONS 3
-TPiPump109_HP = [454,1]
-PPiPump109_HP_kW = [454,3]/3600 ! kW
+EQUATIONS 5
+TPiPump109_HP = [454,1] ! Output flow temperature [deg C]
+PPiPump109_HP_kW = [454,3]/3600 ! Dissipated heat [kW]
+PPiPump109_HPConv_kW = [454,4]/3600 ! Convected heat [kW]
+PPiPump109_HPInt_kJ = [454,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPump109_HP = MPiPump109_HP_A
 
 UNIT 455 TYPE 931
-!PiCol_Pump114
+! PiCol_Pump114
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop1Rho
-Lloop1Cp
-20
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
 INPUTS 4
-TColH
-MPiCol_Pump114_A
-TRoomStore
-TPump114
+TColH ! input flow temperature [deg C]
+MPiCol_Pump114_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TPump114 ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
-EQUATIONS 3
-TPiCol_Pump114 = [455,1]
-PPiCol_Pump114_kW = [455,3]/3600 ! kW
+EQUATIONS 5
+TPiCol_Pump114 = [455,1] ! Output flow temperature [deg C]
+PPiCol_Pump114_kW = [455,3]/3600 ! Dissipated heat [kW]
+PPiCol_Pump114Conv_kW = [455,4]/3600 ! Convected heat [kW]
+PPiCol_Pump114Int_kJ = [455,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiCol_Pump114 = MPiCol_Pump114_A
 
 UNIT 456 TYPE 931
-!PiPump114_Tes
+! PiPump114_Tes
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
-2.99988 ! U-value [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
-Lloop1Rho
-Lloop1Cp
-20
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
 INPUTS 4
-TPump114
-MPiPump114_Tes_A
-TRoomStore
-TTesDpL50_10H
+TPump114 ! input flow temperature [deg C]
+MPiPump114_Tes_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TTesDpL50_10H ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
-EQUATIONS 3
-TPiPump114_Tes = [456,1]
-PPiPump114_Tes_kW = [456,3]/3600 ! kW
+EQUATIONS 5
+TPiPump114_Tes = [456,1] ! Output flow temperature [deg C]
+PPiPump114_Tes_kW = [456,3]/3600 ! Dissipated heat [kW]
+PPiPump114_TesConv_kW = [456,4]/3600 ! Convected heat [kW]
+PPiPump114_TesInt_kJ = [456,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPump114_Tes = MPiPump114_Tes_A
 
-*** Pipe losses
+*** Single pipe losses
 EQUATIONS 1
-PipeLossTot=PTes-Col_kW+PPiTes_HP_kW+PPiTes_Pump109_kW+PPiPump109_HP_kW+PPiCol_Pump114_kW+PPiPump114_Tes_kW
+spPipeEnIntTot = PTes-ColInt_kJ+PPiTes_HPInt_kJ+PPiTes_Pump109Int_kJ+PPiPump109_HPInt_kJ+PPiCol_Pump114Int_kJ+PPiPump114_TesInt_kJ
 
+UNIT 100 TYPE 150
+PARAMETERS 3
+1 ! Number of inputs
+1 ! Number of time steps
+0 ! Initial value
+INPUTS 1
+spPipeEnIntTot
+**
+0
+
+EQUATIONS 4
+spPipeConvectedTot = PTes-ColConv_kW+PPiTes_HPConv_kW+PPiTes_Pump109Conv_kW+PPiPump109_HPConv_kW+PPiCol_Pump114Conv_kW+PPiPump114_TesConv_kW
+PipeLossTot = PTes-Col_kW+PPiTes_HP_kW+PPiTes_Pump109_kW+PPiPump109_HP_kW+PPiCol_Pump114_kW+PPiPump114_Tes_kW
+spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
+spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
 ASSIGN storage-tank_Mfr.prt 457
 
 UNIT 457 TYPE 25! User defined Printer
