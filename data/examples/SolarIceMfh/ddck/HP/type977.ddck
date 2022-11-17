@@ -23,7 +23,7 @@ MfrEvapIn = ABS(@mfr(EvapIn, MfrPuHpEvap))
 THpCondIn = @temp(CondIn, TPiHpCondIn)      
 MfrCondIn = ABS(@mfr(CondIn, MfrPiHpCondIn))
 CpEvap = @cp(EvapIn,cpWat) 
-CpCond = @cp(COndIn,cpWat)
+CpCond = @cp(CondIn,cpWat)
 
 ***********************************
 ** outputs to hydraulic solver

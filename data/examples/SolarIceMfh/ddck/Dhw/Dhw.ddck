@@ -79,8 +79,8 @@ zOutDp3_Tes1=0.95
 CONSTANTS 4
 zInhx1_Tes1=0.30
 zOuthx1_Tes1=0.05
-Cphx1_Tes1=cpbri     !
-Rhohx1_Tes1=rhobri    !
+Cphx1_Tes1=LsolarLoopCp
+Rhohx1_Tes1=LsolarLoopRho
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
@@ -150,7 +150,7 @@ nCvMin_Tes1=20      ! 8: -, maximum relative plug height
 maxTDiff_Tes1=0.015 ! 9: K, maximum temperature difference between plugs
 readMode_Tes1=0     ! 10: 1: from table, 0: Tini and CapTot
 Tref_Tes1=273.15    ! 11: oC, reference temperature
-Tmax_Tes1=90.       ! 6: oC, initial temperature
+Tmax_Tes1=100.       ! 6: oC, initial temperature
 CONSTANTS 10
 Ufoam_Tes1= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) 
 Ubot_Tes1 = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)

@@ -347,7 +347,7 @@
                         },
                         "outputPort": {
                             "id": 1978,
-                            "relativeHeight": 0.12
+                            "relativeHeight": 0.05
                         },
                         "side": "left",
                         "trnsysId": 1620
@@ -2924,20 +2924,20 @@
             "id": 4971,
             "labelPos": [
                 -708.0,
-                -396.0
+                -376.0
             ],
             "lengthInM": {
                 "name": "solarLoopLen"
             },
             "massFlowLabelPos": [
                 -708.0,
-                -396.0
+                -376.0
             ],
             "name": "PiOutHxTes",
             "segmentsCorners": [
                 [
                     -728.5,
-                    -396.0
+                    -376.0
                 ],
                 [
                     -728.5,
@@ -3025,10 +3025,10 @@
             }
         },
         "IDs": {
-            "GlobalId": 4980,
+            "GlobalId": 4981,
             "__idDct__": true,
-            "globalConnID": 1161,
-            "trnsysID": 1638
+            "globalConnID": 1162,
+            "trnsysID": 1639
         },
         "Strings": {
             "DiagramName": "SolTherm2050_6_SolarIceMfh.json",

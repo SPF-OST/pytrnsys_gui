@@ -17,20 +17,20 @@
 ** inputs from hydraulic solver
 ***********************************
 EQUATIONS 6
-TSourceIn = @temp(In1, TPiHXCoolBriIn)
-MfrSourceIn = ABS(@mfr(In1, MfrPiHXCoolBriIn))
-TLoadIn = @temp(In2, TPiHXCoolWatIn)
-MfrLoadIn = ABS(@mfr(In2, MfrPiHxCoolWatIn))
-cpSource = @cp(In1,CPBRI)
-cpLoad = @cp(In2,CPWAT)
+TSourceIn = @temp(Side1In, TPiHXCoolBriIn)
+MfrSourceIn = ABS(@mfr(Side1In, MfrPiHXCoolBriIn))
+TLoadIn = @temp(Side2In, TPiHXCoolWatIn)
+MfrLoadIn = ABS(@mfr(Side2In, MfrPiHxCoolWatIn))
+cpSource = @cp(Side1In,CPBRI)
+cpLoad = @cp(Side2In,CPWAT)
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
-EQUATIONS 2
+EQUATIONS 4
 TsourceOut = [500,1]		!Source-side outlet temperature	oC
 TLoadOut = [500,3]			!Load side outlet temperature	oC
-@temp(Out1) = TsourceOut	!Source-side outlet temperature	oC - Link to GUI
-@temp(Out2) = TLoadOut		!Load side outlet temperature	oC - Link to GUI
+@temp(Side1Out) = TsourceOut	!Source-side outlet temperature	oC - Link to GUI
+@temp(Side2Out) = TLoadOut		!Load side outlet temperature	oC - Link to GUI
 
 ******************************************************************************************
 ** outputs to energy balance in kWh and ABSOLUTE value

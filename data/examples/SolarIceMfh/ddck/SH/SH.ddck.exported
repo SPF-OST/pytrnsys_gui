@@ -33,9 +33,8 @@ Thx1In_Tes2 = TPiInHxTesSh
 Mfrhx1_Tes2 = MSHSolarTesHx2279_A
 Thx1InRev_Tes2 = TPiOutHxTesSh
 CONSTANTS 2
-zAux1_Tes2=0.5
-qAux1_Tes2_nom_kW=sizeHpUsed
-
+zAux1_Tes2=0.00
+qAux1_Tes2=0.00
 
 *************************************
 **** Outputs to hydraulic solver ****
@@ -60,8 +59,8 @@ zOutDp1_Tes2=0.05
 CONSTANTS 4
 zInhx1_Tes2=0.30
 zOuthx1_Tes2=0.12
-Cphx1_Tes2=cpbri
-Rhohx1_Tes2=rhobri
+Cphx1_Tes2=LsolarLoopCp
+Rhohx1_Tes2=LsolarLoopRho
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
@@ -70,14 +69,14 @@ CONSTANTS 1
 nHxUsed_Tes2=1 
 *********Constant values of HX=1***********
 CONSTANTS 15
-dInHx1_Tes2=0.031 ! m only if modHx1=1
-dOutHx1_Tes2=0.0333 ! m only if modHx1=1
-LHx1_Tes2=6.625*Vol_Tes2/(2*PI*0.0333) ! m only if modHx1=1
-LamHx1_Tes2=30 ! W/mK only if modHx1=1
-brineConcHx1_Tes2=33 ! [0-100] only if modHx1=1
-VHx1_Tes2=-0.014 
+dInHx1_Tes2=0.05 ! m only if modHx1=1
+dOutHx1_Tes2=0.06 ! m only if modHx1=1
+LHx1_Tes2=20 ! m only if modHx1=1
+LamHx1_Tes2=50 ! W/mK only if modHx1=1
+brineConcHx1_Tes2=30 ! [0-100] only if modHx1=1
+VHx1_Tes2=0. 
 nCvHx1_Tes2=20 
-modHx1_Tes2=0 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)
+modHx1_Tes2=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)
 nNuHx1_Tes2=0.5 !  only if modHx1=1
 cNuHx1_Tes2=0.25 !  only if modHx1=1
 dUaMfrHx1_Tes2=0.375 ! only if modHx1=0
@@ -114,18 +113,18 @@ zSenAvgTop4_Tes2 = 0.75
 zSenAvgBot5_Tes2 = 0.85
 zSenAvgTop5_Tes2 = 0.95
 CONSTANTS 12
-Vol_Tes2=MAX(0.15*MfrHpCondNom/1000,0.15*MfrBuiRdNom/1000)          ! 1: m3, volume of store
+Vol_Tes2=1          ! 1: m3, volume of store
 RhoWat_Tes2=RhoWat  ! 2: kg/m3, density of storage media
 CpWat_Tes2=CpWat    ! 3: kJ/kgK, specific heat of storage media
 lamZ_Tes2=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES
-Heigh_Tes2=2.       ! 5: m, storage height
+Heigh_Tes2=1.       ! 5: m, storage height
 Tini_Tes2=60.       ! 6: oC, initial temperature
 nCvMax_Tes2=400     ! 7: -, minimum relative plug height
 nCvMin_Tes2=20      ! 8: -, maximum relative plug height
 maxTDiff_Tes2=0.015 ! 9: K, maximum temperature difference between plugs
 readMode_Tes2=0     ! 10: 1: from table, 0: Tini and CapTot
 Tref_Tes2=273.15    ! 11: oC, reference temperature
-Tmax_Tes2=90.       ! 6: oC, initial temperature
+Tmax_Tes2=100.       ! 6: oC, initial temperature
 CONSTANTS 10
 Ufoam_Tes2= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) 
 Ubot_Tes2 = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
