@@ -1,0 +1,61 @@
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 8
+*** Pump outlet temperatures
+TPuSH = TPiSHOutMix
+TtapWater = TPiDhwDemand
+TPuCool = TPiPuCoolIn
+TPuHpCond = TPiHpInPu
+TPuCol = TPiColPuIn
+TPuHpEvap = TPiHpEvapOut
+TPuDHW = TPiHxDhwOut
+TPuCirc = TPiPuCircIn
+
+EQUATIONS 14
+*** Massflowrates
+MfrPuSH = 500
+MfrsupplyWater = 1000
+xFracDivHp = 1.0
+MfrPuCool = 500
+xFracDivSHCool = 0.0
+xFracMixHxTes = 1.0
+MfrPuHpCond = 500
+xFracDivSolarDhwSh = 1.0
+xFracDivDhw = 0.0
+xFracDivDhwOut = 0.0
+MfrPuCol = 500
+MfrPuHpEvap = 500
+MfrPuDHW = 500
+MfrPuCirc = 500
+
+CONSTANTS 2
+T_set_DivSH=50
+T_set_DivHpEvap=50
+
+UNIT 441 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiDivSHCool
+TPiSHInMix
+MPiRadOut
+T_set_DivSH
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivSH
+EQUATIONS 1
+xFracDivSH =  1.-[441,5] 
+
+UNIT 442 TYPE 811 ! Passive Divider for heating 
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiIceToHp
+TPiHpEvapMix
+MPiHpEvapIn
+T_set_DivHpEvap
+*** INITIAL INPUT VALUES
+35.0 21.0 800.0 T_set_DivHpEvap
+EQUATIONS 1
+xFracDivHpEvap =  1.-[442,5] 
+
