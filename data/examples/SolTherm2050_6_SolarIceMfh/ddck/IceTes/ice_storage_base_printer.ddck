@@ -1,0 +1,87 @@
+*******************************
+**BEGIN ice_storage_base_printer.ddck
+*******************************
+    
+*****************************************
+** Contact person : D. Carbonell   
+** Creation date  : 23.04.2018  
+** Last changes   : 30.04.20, MB 
+*****************************************		
+***********************************			
+** printer that compines values from different parts of the solar ice system			
+***********************************		
+
+EQUATIONS 7
+QPcmFromCol = sumQhxkW*(ProCs)  
+QColToPcm   = QColToPcmNormalOp+QDefColToPcm    
+QPcmToHp    = sumQhxkW*(ProHp+ProPar)       
+QPcmSerial  = sumQhxkW*(ProSeries)             
+QPcmSerialToHp    = qCoolPcm*(ProSeries)     
+QPcmFromColSerial = qHeatPcm*(ProSeries)   !QColSerialToPcm = qHeatPcm*(ProSeries2+Proseries12)     
+QColSerialToPcm   = qHeatPcm*(ProSeries)   
+
+EQUATIONS 12    ! Converted values for outputs
+
+QColToPcmNormalOp = Pcoll_KW*(ProCs)     !  Col (at source level so at col level)
+QDefColToPcm      = Pcoll_KW*(ProDfCol)     !  Col (at source level so at col level)
+QColSerial        = Pcoll_KW*(ProSeries)     !  Col (at source level so at col level)
+QColToTes         = Pcoll_KW*NOT(xFracMixHxTes)*pumpColOn!(ProWs+ProPar)(ProWs+ProPar)     
+QColToDHW		  = Pcoll_KW*NOT(xFracMixHxTes)*(1-xFracDivSolarDHWSH)*pumpColOn!(ProWs+ProPar)*(1-xFracDivSolarDHWSH)
+QColToSH		  = Pcoll_KW*NOT(xFracMixHxTes)*xFracDivSolarDHWSH*pumpColOn!(ProWs+ProPar)* xFracDivSolarDHWSH
+ratioColSerial    = MAX(MIN(Pcoll_KW/(qCoolPcm+Pcoll_KW+1e-30),1.0),0.0)     ! Error QhxPcm instead of QCoolPcm 
+QColToHp          = PColl_KW*ratioColSerial*(ProSeries)     
+**** all this is to be improved
+QColSerialToHp    = (Pcoll_KW-qHeatPcm)*(ProSeries)     
+************ Heat pump************    
+**QEvapHpFromPcm       = PauxEvap_KW*(ProHp+proPar)
+QPriToPcm = qHeatPcm*NOT(CoolingOnRc)
+QPriFromPcm = qCoolPcm*NOT(CoolingOnRc)
+PSCfromPCM_kW = sumQHxkW*CoolingOnRc
+
+*******************************
+** Monthly printers
+*******************************
+
+CONSTANTS 1
+unitPrintPcm2=229
+
+ASSIGN    temp\PCM_SOLAR_MO.Prt      unitPrintPcm2
+    
+UNIT 230 Type 46     ! Printegrator Monthly Values for Heat Pump
+PARAMETERS 6     
+unitPrintPcm2     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 17
+Time MassIce QPcmFromCol    QPcmToHp     
+QPcmSerial    QPcmFromColSerial        QColToPcm  QDefColToPcm  qColToHp    
+QColSerial  QColToTes QColSerialToHp  QPcmSerialToHp  QColSerialToPcm  QPriToPcm  QPriFromPcm  PSCfromPCM_kW          
+*******     
+Time MassIce QPcmFromCol    QPcmToHp     
+QPcmSerial    QPcmFromColSerial        QColToPcm  QDefColToPcm  qColToHp    
+QColSerial  QColToTes QColSerialToHp  QPcmSerialToHp  QColSerialToPcm  QPriToPcm  QPriFromPcm  PSCfromPCM_kW  
+
+
+CONSTANTS 1
+unitPcmBalanceHour=220
+
+ASSIGN temp\PCMBalance.hr   unitPcmBalanceHour     
+
+UNIT 220 Type 46      !Changed automatically
+PARAMETERS 6    
+unitPcmBalanceHour   ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 7
+Time  sumQHxkW  sumQAcumkW  sumQLosskW  sumQMeltkW  sumQIcekW  MassIce 
+**
+Time  sumQHxkW  sumQAcumkW  sumQLosskW  sumQMeltkW  sumQIcekW  MassIce 
+*******************************
+**END IceStorage-861-Generic_Printer.ddck
+*******************************
