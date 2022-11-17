@@ -38,7 +38,6 @@ class MasterControl(BlockItem):
         Overridden method to also delete folder
         """
         print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.deleteConns()
         # print("self.parent.parent" + str(self.parent.parent()))
         self.parent.parent().trnsysObj.remove(self)
         print("deleting block " + str(self) + self.displayName)

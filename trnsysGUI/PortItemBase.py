@@ -276,6 +276,9 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
 
         return self.parent
 
+    def isConnected(self) -> bool:
+        return bool(self.connectionList)
+
     def getConnectionOrNone(self) -> _tp.Optional[_cb.ConnectionBase]:
         if not self.connectionList:
             return None
@@ -287,9 +290,10 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         return connection
 
     def getConnection(self) -> _cb.ConnectionBase:
-        connection = self.getConnectionOrNone()
+        assert self.isConnected()
 
-        assert connection
+        connection = self.getConnectionOrNone()
+        assert connection  # for mypy
 
         return connection
 

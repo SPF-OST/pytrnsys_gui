@@ -31,7 +31,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
         self.labelVisState = False
-        self.massFlowEnabled = False
         self.calledByVisualizeMf = False
         self.currentFile = "Untitled"
 
@@ -407,7 +406,6 @@ class MainWindow(QMainWindow):
             return
 
         MassFlowVisualizer(self, mfrFile, tempFile)
-        self.massFlowEnabled = True
 
     def visualizeMf(self):
         qmb = QMessageBox()
@@ -421,7 +419,6 @@ class MainWindow(QMainWindow):
         self.calledByVisualizeMf = True
         if os.path.isfile(mfrFile) and os.path.isfile(tempFile):
             MassFlowVisualizer(self, mfrFile, tempFile)
-            self.massFlowEnabled = True
         else:
             self.logger.info("No mfrFile or tempFile found!")
 

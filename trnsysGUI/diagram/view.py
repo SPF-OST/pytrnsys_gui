@@ -82,6 +82,7 @@ class View(QGraphicsView):
             self.logger.debug("name is " + componentType)
             if componentType == "StorageTank":
                 blockItem = StorageTank(componentType, self, displayNamePrefix="Tes")
+                blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
                 self.parent().showConfigStorageDlg(blockItem)
             elif componentType == "TeePiece":
                 blockItem = TeePiece(componentType, self, displayNamePrefix="Tee")

@@ -42,18 +42,19 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
-    def __init__(self, trnsysType, parent, **kwargs):
+    def __init__(self, trnsysType, parent, **kwargs) -> None:
         super().__init__(trnsysType, parent, **kwargs)
 
         self.parent = parent
+
+        self._hydraulicLoops: _tp.Optional[_hlm.HydraulicLoops] = None
+
         self._idGenerator: _id.IdGenerator = self.parent.parent().idGen
         self.dckFilePath = ""
 
         self.directPortPairs: _tp.List[DirectPortPair] = []
 
         self.heatExchangers: _tp.List[HeatExchanger] = []
-
-        self.blackBoxEquations = []
 
         self.nTes = self.parent.parent().idGen.getStoragenTes()
         self.storageType = self.parent.parent().idGen.getStorageType()
@@ -62,6 +63,9 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         self.path = None
         self.addTree()
+
+    def setHydraulicLoops(self, hydraulicLoops: _hlm.HydraulicLoops) -> None:
+        self._hydraulicLoops = hydraulicLoops
 
     def getDisplayName(self) -> str:
         return self.displayName
@@ -400,16 +404,15 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
 
-    def exportDck(self, hydraulicLoops: _hlm.HydraulicLoops) -> None:  # pylint: disable=too-many-locals,too-many-statements
-
+    def exportDck(self) -> None:  # pylint: disable=too-many-locals,too-many-statements
         if not self._areAllPortsConnected():
             msgb = QMessageBox()
             msgb.setText("Please connect all ports before exporting!")
             msgb.exec_()
             return
-        noError = self._debugConn()
+        success = self._debugConn()
 
-        if not noError:
+        if not success:
             qmb = QMessageBox()
             qmb.setText("Ignore connection errors and continue with export?")
             qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
@@ -437,7 +440,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         directPairsPorts = self._getDirectPairPortsForExport()
 
-        heatExchangerPorts = self._getHeatExchangerPortsForExport(hydraulicLoops)
+        heatExchangerPorts = self._getHeatExchangerPortsForExport()
 
         auxiliaryPorts = self._getAuxiliaryPortForExport(inputs)
 
@@ -476,15 +479,15 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             directPairsPorts.append(directPairsPort)
         return directPairsPorts
 
-    def _getHeatExchangerPortsForExport(self, hydraulicLoops: _hlm.HydraulicLoops):
+    def _getHeatExchangerPortsForExport(self):
         heatExchangerPorts = []
         for heatExchanger in self.heatExchangers:
-            heatExchangerPort = self._getHeatExchangerPortForExport(heatExchanger, hydraulicLoops)
+            heatExchangerPort = self._getHeatExchangerPortForExport(heatExchanger)
 
             heatExchangerPorts.append(heatExchangerPort)
         return heatExchangerPorts
 
-    def _getHeatExchangerPortForExport(self, heatExchanger, hydraulicLoops):  # pylint: disable=too-many-locals
+    def _getHeatExchangerPortForExport(self, heatExchanger):  # pylint: disable=too-many-locals
         heatExchangerName = heatExchanger.displayName
 
         incomingConnection = heatExchanger.port1.getConnection()
@@ -493,17 +496,14 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
 
         outgoingConnection = heatExchanger.port2.getConnection()
-        reverseInputTemperatureName = _cnames.getTemperatureVariableName(
-            outgoingConnection, _mfn.PortItemType.STANDARD
-
-        )
+        reverseInputTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, _mfn.PortItemType.STANDARD)
 
         inputPos = heatExchanger.relativeInputHeight
         outputPos = heatExchanger.relativeOutputHeight
 
         outputTemperatureName = _temps.getInternalTemperatureVariableName(self, modelPipe)
 
-        loop = hydraulicLoops.getLoopForExistingConnection(incomingConnection)
+        loop = self._hydraulicLoops.getLoopForExistingConnection(incomingConnection)
         loopName = loop.name.value
 
         heatExchangerPort = {
@@ -601,7 +601,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.deleteConns()
         self.parent.parent().trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
         self.parent.scene().removeItem(self)

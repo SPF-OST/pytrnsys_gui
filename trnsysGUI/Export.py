@@ -118,8 +118,8 @@ dpCpFl = 4.19 ! Specific heat of fluid, kJ/kg.K
 dpViscFl = 3.078  ! Viscosity of fluid in kg/m.hr
 
 ****** Initial conditions ******
-dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in �C
-dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in �C
+dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in degrees celsius
+dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in degrees celsius
 
 ****** Soil's thermal properties ******
 dpLamdaSl = 8.64  ! Thermal conductivity of soil in kJ/hr.m.K
@@ -136,8 +136,8 @@ dpNrSlCirc = 4  ! Number of circumferential soil nodes
 """
         massFlowSolverConstantsBlock = """\
 CONSTANTS 3
-TambAvg = 7.96 ! Average surface temperature in °C
-dTambAmpl = 13.32 ! Amplitude of surface temperature in °C
+TambAvg = 7.96 ! Average surface temperature in degrees celsius
+dTambAmpl = 13.32 ! Amplitude of surface temperature in n degrees celsius
 ddTcwOffset = 36 ! Days of minimum surface temperature
 """
         if exportTo == "ddck":
@@ -382,29 +382,100 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
         return f
 
-    def exportPrintPipeLosses(self):
-        f = ""
-        lossText = ""
-        rightCounter = 0
+    def exportSinglePipeEnergyBalanceVariables(self):
+        singlePipes = [ip for ip in self._hasInternalPipings if isinstance(ip, _spc.SinglePipeConnection)]
 
-        for t in self._hasInternalPipings:
-            if isinstance(t, _spc.SinglePipeConnection):
-                if rightCounter != 0:
-                    lossText += "+"
-                lossText += _cnames.getHeatLossVariableName(t, _mfn.PortItemType.STANDARD)
-                rightCounter += 1
-            if isinstance(t, _dpc.DoublePipeConnection):
-                if rightCounter != 0:
-                    lossText += "+"
-                lossText += _cnames.getHeatLossVariableName(t, _mfn.PortItemType.COLD) + "+"
-                lossText += _cnames.getHeatLossVariableName(t, _mfn.PortItemType.HOT)
-                rightCounter += 1
+        if not singlePipes:
+            return ""
 
-        if rightCounter == 0:
-            lossText += "0"
+        convectedFluxes = [sp.getConvectedHeatFluxVariableName() for sp in singlePipes]
+        summedConvectedFluxes = "+".join(convectedFluxes)
 
-        f += "*** Pipe losses\nEQUATIONS 1\nPipeLossTot=" + lossText + "\n\n"
-        return f
+        dissipatedFluxes = [sp.getDissipatedHeatFluxVariableName() for sp in singlePipes]
+        summedDissipatedFluxes = "+".join(dissipatedFluxes)
+
+        internalEnergies = [sp.getInternalHeatVariableName() for sp in singlePipes]
+        summedInternalEnergies = "+".join(internalEnergies)
+
+        Totals = _cnames.EnergyBalanceTotals.SinglePipe
+        equation = f"""\
+*** Single pipe losses
+EQUATIONS 1
+spPipeEnIntTot = {summedInternalEnergies}
+
+UNIT 100 TYPE 150
+PARAMETERS 3
+1 ! Number of inputs
+1 ! Number of time steps
+0 ! Initial value
+INPUTS 1
+spPipeEnIntTot
+**
+0
+
+EQUATIONS 4
+{Totals.CONVECTED} = {summedConvectedFluxes}
+{Totals.DISSIPATED} = {summedDissipatedFluxes}
+{Totals.PIPE_INTERNAL_CHANGE} = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
+{Totals.IMBALANCE} = {Totals.CONVECTED} - {Totals.DISSIPATED} - {Totals.PIPE_INTERNAL_CHANGE}
+"""
+        return equation
+
+    def exportDoublePipeEnergyBalanceVariables(self):
+        doublePipes = [ip for ip in self._hasInternalPipings if isinstance(ip, _dpc.DoublePipeConnection)]
+
+        if not doublePipes:
+            return ""
+
+        dissipatedHeatFluxesToFarField = []
+        convectedHeatFluxes = []
+        pipeInternalEnergyChanges = []
+        soilInternalEnergyChanges = []
+        for doublePipe in doublePipes:
+            coldConvectedHeatFlux = doublePipe.getEnergyBalanceVariableName(
+                _dpc.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.COLD
+            )
+            hotConvectedHeatFlux = doublePipe.getEnergyBalanceVariableName(
+                _dpc.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.HOT
+            )
+            convectedHeatFluxes.extend([coldConvectedHeatFlux, hotConvectedHeatFlux])
+
+            dissipatedHeatFluxToFarField = doublePipe.getEnergyBalanceVariableName(
+                _dpc.EnergyBalanceVariables.SOIL_TO_FAR_FIELD
+            )
+            dissipatedHeatFluxesToFarField.append(dissipatedHeatFluxToFarField)
+
+            coldPipeInternalEnergyChange = doublePipe.getEnergyBalanceVariableName(
+                _dpc.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.COLD
+            )
+            hotPipeInternalEnergyChange = doublePipe.getEnergyBalanceVariableName(
+                _dpc.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.HOT
+            )
+            pipeInternalEnergyChanges.extend([coldPipeInternalEnergyChange, hotPipeInternalEnergyChange])
+
+            soilInternalEnergyChange = doublePipe.getEnergyBalanceVariableName(
+                _dpc.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE
+            )
+            soilInternalEnergyChanges.append(soilInternalEnergyChange)
+
+        summedConvectedHeatFluxes = " + ".join(convectedHeatFluxes)
+        summedDissipationToFarField = " + ".join(dissipatedHeatFluxesToFarField)
+        summedPipeInternalEnergyChanges = " + ".join(pipeInternalEnergyChanges)
+        summedSoilInternalEnergyChanges = " + ".join(soilInternalEnergyChanges)
+
+        Totals = _cnames.EnergyBalanceTotals.DoublePipe
+
+        equations = f"""\
+*** Double pipe energy balance
+EQUATIONS 5
+{Totals.CONVECTED} = {summedConvectedHeatFluxes}
+{Totals.DISSIPATION_TO_FAR_FIELD} = {summedDissipationToFarField}
+{Totals.PIPE_INTERNAL_CHANGE} = {summedPipeInternalEnergyChanges}
+{Totals.SOIL_INTERNAL_CHANGE} = {summedSoilInternalEnergyChanges}
+{Totals.IMBALANCE} = {Totals.CONVECTED} - {Totals.DISSIPATION_TO_FAR_FIELD}  - {Totals.PIPE_INTERNAL_CHANGE} - {Totals.SOIL_INTERNAL_CHANGE}
+"""
+
+        return equations
 
     def exportMassFlowPrinter(self, unitnr, descLen):
         typenr = 25
@@ -461,7 +532,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
                 inputVariableName = _mnames.getInputVariableName(hasInternalPiping, hasInternalPiping.modelDiverter)
                 allVariableNames.append(inputVariableName)
 
-        variableNameOctets = [allVariableNames[s: s + 8] for s in range(0, len(allVariableNames), 8)]
+        variableNameOctets = [allVariableNames[s : s + 8] for s in range(0, len(allVariableNames), 8)]
 
         formattedInputVariables = "\n".join(" ".join(o) for o in variableNameOctets) + "\n"
 

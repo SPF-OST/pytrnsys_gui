@@ -76,9 +76,8 @@ class Scene(_qtw.QGraphicsScene):
                 selectedObject.deleteBlockCom()
 
     def mousePressEvent(self, event):
-        if not self._editor.parent().massFlowEnabled:
-            for connection in self._editor.connectionList:
-                connection.deselectConnection()
+        for connection in self._editor.connectionList:
+            connection.deselectConnection()
 
         for trnsysObject in self._editor.trnsysObj:
             if isinstance(trnsysObject, BlockItem):

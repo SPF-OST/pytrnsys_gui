@@ -2,13 +2,13 @@
 # type: ignore
 
 import json
-import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
 import shutil
 import typing as _tp
 
+import math as _math
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF, QEvent
 from PyQt5.QtGui import QColor, QPainter
@@ -35,6 +35,7 @@ from PyQt5.QtWidgets import (
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
+import trnsysGUI.connection.names as _cnames
 import trnsysGUI.diagram.Encoder as _enc
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
@@ -59,6 +60,7 @@ from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.connection.connectionBase import ConnectionBase
 from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
 from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
+from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
 from trnsysGUI.diagram.scene import Scene
@@ -281,7 +283,7 @@ class Editor(QWidget):
         self.connectionList = []
         self.trnsysObj = []
         self.graphicalObj = []
-        self.fluids = _hlm.Fluids([])
+        self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
 
         self.copyGroupList = QGraphicsItemGroup()
@@ -512,17 +514,48 @@ class Editor(QWidget):
                     fullExportText += line
             header.close()
         elif exportTo == "ddck":
-            fullExportText += "*************************************\n"
-            fullExportText += "** BEGIN hydraulic.ddck\n"
-            fullExportText += "*************************************\n\n"
-            fullExportText += "*************************************\n"
-            fullExportText += "** Outputs to energy balance in kWh\n"
-            fullExportText += (
-                "** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name\n"
-            )
-            fullExportText += "*************************************\n"
-            fullExportText += "EQUATIONS 1\n"
-            fullExportText += "qSysOut_PipeLoss = PipeLossTot\n"
+            SinglePipeTotals = _cnames.EnergyBalanceTotals.SinglePipe
+            DoublePipeTotals = _cnames.EnergyBalanceTotals.DoublePipe
+
+            singlePipes = [o for o in self.trnsysObj if isinstance(o, SinglePipeConnection)]
+            singlePipeEnergyBalanceEquations = ""
+            if singlePipes:
+                singlePipeEnergyBalanceEquations = f"""\
+EQUATIONS 3
+*** single pipes
+qSysIn_{SinglePipeTotals.CONVECTED} = {SinglePipeTotals.CONVECTED}
+qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
+qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
+
+"""
+            doublePipes = [o for o in self.trnsysObj if isinstance(o, DoublePipeConnection)]
+            doublePipesEnergyBalanceEquations = ""
+            if doublePipes:
+                doublePipesEnergyBalanceEquations = """\
+EQUATIONS 4
+*** double pipes
+qSysIn_{DoublePipeTotals.CONVECTED} = {DoublePipeTotals.CONVECTED}
+qSysOut_{DoublePipeTotals.DISSIPATION_TO_FAR_FIELD} = {DoublePipeTotals.DISSIPATION_TO_FAR_FIELD}
+qSysOut_{DoublePipeTotals.PIPE_INTERNAL_CHANGE} = {DoublePipeTotals.PIPE_INTERNAL_CHANGE}
+qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNAL_CHANGE}
+"""
+            energyBalanceEquations = f"""\
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+
+*************************************
+{singlePipeEnergyBalanceEquations}
+{doublePipesEnergyBalanceEquations}
+
+"""
+
+            fullExportText += energyBalanceEquations
 
         simulationUnit = 450
         simulationType = 9351
@@ -549,7 +582,8 @@ class Editor(QWidget):
         fullExportText += exporter.exportFluids() + "\n"
         fullExportText += exporter.exportHydraulicLoops() + "\n"
         fullExportText += exporter.exportPipeAndTeeTypesForTemp(simulationUnit + 1)  # DC-ERROR
-        fullExportText += exporter.exportPrintPipeLosses()
+        fullExportText += exporter.exportSinglePipeEnergyBalanceVariables()
+        fullExportText += exporter.exportDoublePipeEnergyBalanceVariables()
 
         fullExportText += exporter.exportMassFlowPrinter(self.printerUnitnr, 15)
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)
@@ -571,7 +605,7 @@ class Editor(QWidget):
             hydraulicFolder = os.path.split(exportPath)[0]
             if not (os.path.isdir(hydraulicFolder)):
                 os.makedirs(hydraulicFolder)
-            f = open(exportPath, "w", encoding="UTF-8")
+            f = open(exportPath, "w")
             f.truncate(0)
             f.write(fullExportText)
             f.close()
@@ -718,11 +752,16 @@ class Editor(QWidget):
         """
         self.hydraulicLoops.clear()
 
-        while len(self.trnsysObj) > 0:
-            self.logger.info("In deleting...")
-            self.trnsysObj[0].deleteBlock()
+        while self.trnsysObj:
+            trnsysObject = self.trnsysObj[0]
+            if isinstance(trnsysObject, BlockItem):
+                trnsysObject.deleteBlock()
+            elif isinstance(trnsysObject, ConnectionBase):
+                trnsysObject.deleteConn()
+            else:
+                raise AssertionError(f"Don't know how to delete {trnsysObject}.")
 
-        while len(self.graphicalObj) > 0:
+        while self.graphicalObj:
             self.graphicalObj[0].deleteBlock()
 
     # Encoding / decoding
@@ -817,7 +856,9 @@ class Editor(QWidget):
 
         self._decodeHydraulicLoops(blocklist)
 
-    def _decodeHydraulicLoops(self, blocklist):
+        self._setHydraulicLoopsOnStorageTanks()
+
+    def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
         if "hydraulicLoops" not in blocklist:
             hydraulicLoops = _hlmig.createLoops(singlePipeConnections, self.fluids.WATER)
@@ -828,6 +869,15 @@ class Editor(QWidget):
             )
 
         self.hydraulicLoops = hydraulicLoops
+
+    def _setHydraulicLoopsOnStorageTanks(self) -> None:
+        for trnsysObject in self.trnsysObj:
+            if not isinstance(trnsysObject, StorageTank):
+                continue
+
+            storageTank = trnsysObject
+
+            storageTank.setHydraulicLoops(self.hydraulicLoops)
 
     def exportSvg(self):
         """

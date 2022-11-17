@@ -374,17 +374,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def printRotation(self):
         self.logger.debug("Rotation is " + str(self.rotationN))
 
-    # Deletion related
-    def deleteConns(self):
-
-        for p in self.inputs:
-            while len(p.connectionList) > 0:
-                p.connectionList[0].deleteConn()
-
-        for p in self.outputs:
-            while len(p.connectionList) > 0:
-                p.connectionList[0].deleteConn()
-
     def deleteBlock(self):
         self.parent.parent().trnsysObj.remove(self)
         self.parent.scene().removeItem(self)

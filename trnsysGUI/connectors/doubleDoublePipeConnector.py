@@ -3,15 +3,12 @@ from __future__ import annotations
 import typing as _tp
 
 import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
+import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
-from trnsysGUI import connectorsAndPipesExportHelpers as _helpers
-from trnsysGUI.massFlowSolver import networkModel as _mfn
-
-if _tp.TYPE_CHECKING:
-    import trnsysGUI.connection.doublePipeConnection as _dpc
 
 
 class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
@@ -73,14 +70,14 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         return internalPiping
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        fromConnection = self.inputs[0].getConnection()
-        toConnection = self.outputs[0].getConnection()
+        inputPort = self.inputs[0]
+        outputPort = self.outputs[0]
 
-        assert isinstance(fromConnection, _dpc.DoublePipeConnection)
-        assert isinstance(toConnection, _dpc.DoublePipeConnection)
+        assert isinstance(inputPort, _dppi.DoublePipePortItem)
+        assert isinstance(outputPort, _dppi.DoublePipePortItem)
 
-        hotEquation = self._getEquation(self._hotPipe, fromConnection, toConnection)
-        coldEquation = self._getEquation(self._coldPipe, toConnection, fromConnection)
+        hotEquation = self._getEquation(self._hotPipe, inputPort, outputPort)
+        coldEquation = self._getEquation(self._coldPipe, outputPort, inputPort)
 
         equations = f"""\
 EQUATIONS 2
@@ -92,21 +89,24 @@ EQUATIONS 2
     def _getEquation(
         self,
         pipe: _mfn.Pipe,
-        posFlowInputConnection: _dpc.DoublePipeConnection,
-        negFlowInputConnection: _dpc.DoublePipeConnection,
+        fromPort: _dppi.DoublePipePortItem,
+        toPort: _dppi.DoublePipePortItem
     ) -> str:
         outputTemp = _temps.getTemperatureVariableName(self, self._hotPipe)
+        fromConnection = fromPort.getConnection()
+        toConnection = toPort.getConnection()
+
         mfr = _helpers.getInputMfrName(self, pipe)
 
-        posFlowInputConnectionNode = posFlowInputConnection.getInternalPiping().getNode(
-            self.inputs[0], pipe.fromPort.type
+        posFlowInputConnectionNode = fromConnection.getInternalPiping().getNode(
+            fromPort, pipe.fromPort.type
         )
-        posFlowInputTemp = _temps.getTemperatureVariableName(posFlowInputConnection, posFlowInputConnectionNode)
+        posFlowInputTemp = _temps.getTemperatureVariableName(fromConnection, posFlowInputConnectionNode)
 
-        negFlowInputConnectionNode = negFlowInputConnection.getInternalPiping().getNode(
-            self.outputs[0], pipe.toPort.type
+        negFlowInputConnectionNode = toConnection.getInternalPiping().getNode(
+            toPort, pipe.toPort.type
         )
-        negFlowInputTemp = _temps.getTemperatureVariableName(negFlowInputConnection, negFlowInputConnectionNode)
+        negFlowInputTemp = _temps.getTemperatureVariableName(toConnection, negFlowInputConnectionNode)
 
         hotEquation = _helpers.getEquation(outputTemp, mfr, posFlowInputTemp, negFlowInputTemp)
         return hotEquation

@@ -85,6 +85,8 @@ class _Merger:
     @staticmethod
     def _addConnection(connection, loop):
         loop.addConnection(connection)
+        if loop.useLoopWideDefaults:
+            _lwd.resetConnectionPropertiesToLoopWideDefaults([connection], loop.name.value)
 
     def _createLoop(self, connection: _spc.SinglePipeConnection) -> None:  # type: ignore[name-defined]
         name = self._hydraulicLoops.generateName()
@@ -92,6 +94,7 @@ class _Merger:
 
         useLoopWideDefaults = True
         loop = _model.HydraulicLoop(name, self._defaultFluid, useLoopWideDefaults, connections)
+        _lwd.resetConnectionPropertiesToLoopWideDefaults([connection], loop.name.value)
 
         self._hydraulicLoops.addLoop(loop)
 

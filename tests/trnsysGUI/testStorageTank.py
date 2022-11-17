@@ -54,9 +54,10 @@ class TestStorageTank:
     @staticmethod
     def _deserializeStorageTank(storageTankLegacyJson, diagramViewMock):
         legacySerializedStorageTank = _json.loads(storageTankLegacyJson)
-
         storageTank = _st.StorageTank(
-            trnsysType="StorageTank", displayNamePrefix=legacySerializedStorageTank["BlockName"], parent=diagramViewMock
+            trnsysType="StorageTank",
+            parent=diagramViewMock,
+            displayNamePrefix=legacySerializedStorageTank["BlockName"],
         )  # pylint: disable=no-member
         diagramViewMock.scene().addItem(storageTank)
 
@@ -80,7 +81,9 @@ class TestStorageTank:
         hydraulicLoops = _hlm.HydraulicLoops([])
         self._setupExternalConnectionMocks(storageTank, hydraulicLoops)
 
-        storageTank.exportDck(hydraulicLoops)
+        storageTank.setHydraulicLoops(hydraulicLoops)
+
+        storageTank.exportDck()
 
         actualDdckPath = self.ACTUAL_DIR_PATH / "ddck" / "StorageTank7701" / "TesDhw.ddck"
         actualDdckContent = actualDdckPath.read_text()

@@ -191,6 +191,10 @@ class Fluids:
         self.fluids = sorted(fluidList, key=lambda f: f.name)
 
     @staticmethod
+    def createDefault() -> "Fluids":
+        return Fluids([])
+
+    @staticmethod
     def createFromJson(sequence: _tp.Sequence[_tp.Dict]) -> "Fluids":
         fluids = [_ser.Fluid.from_dict(o) for o in sequence]
         return Fluids(fluids)
