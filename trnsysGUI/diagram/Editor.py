@@ -531,7 +531,7 @@ qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNA
             doublePipes = [o for o in self.trnsysObj if isinstance(o, DoublePipeConnection)]
             doublePipesEnergyBalanceEquations = ""
             if doublePipes:
-                doublePipesEnergyBalanceEquations = """\
+                doublePipesEnergyBalanceEquations = f"""\
 EQUATIONS 4
 *** double pipes
 qSysIn_{DoublePipeTotals.CONVECTED} = {DoublePipeTotals.CONVECTED}
