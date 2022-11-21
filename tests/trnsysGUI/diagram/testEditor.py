@@ -298,6 +298,6 @@ class _Helper:
             _su.rmtree(self.actualProjectFolderPath)
 
         pytrnsysGuiDir = _pl.Path(__file__).parents[3]
-        exampleFolderPath = pytrnsysGuiDir / "data" / "examples" / self._project.projectName
+        exampleFolderPath = pytrnsysGuiDir / "data" / "examplesToBeCompleted" / self._project.projectName
 
         _su.copytree(exampleFolderPath, self.actualProjectFolderPath)
