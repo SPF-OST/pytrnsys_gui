@@ -41,8 +41,8 @@ class SaltTankBase(BlockItem, _ip.HasInternalPiping):
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
 
-        sink = _mfn.Sink(inputPort)
-        source = _mfn.Source(outputPort)
+        sink = _mfn.Sink(inputPort, "In")
+        source = _mfn.Source(outputPort, "Out")
 
         return _ip.InternalPiping([sink, source], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
