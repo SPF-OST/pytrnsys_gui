@@ -2,9 +2,9 @@ name: Static checks and unit tests
 
 on:
   push:
-    branches: [ v10.0 ]
+    branches: [ v0.10 ]
   pull_request:
-    branches: [ v10.0 ]
+    branches: [ v0.10 ]
 
 jobs:
   build-srspf01:
