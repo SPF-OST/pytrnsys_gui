@@ -1,0 +1,4 @@
+-r release-3rd-party.in
+
+pytrnsys-gui==0.10.0
+pytrnsys==0.7.1
