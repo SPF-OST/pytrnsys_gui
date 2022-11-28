@@ -76,18 +76,18 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         assert isinstance(inputPort, _dppi.DoublePipePortItem)
         assert isinstance(outputPort, _dppi.DoublePipePortItem)
 
-        hotEquation = self._getEquation(self._hotPipe, inputPort, outputPort)
-        coldEquation = self._getEquation(self._coldPipe, outputPort, inputPort)
+        hotUnit = self._getIfThenElseUnit(startingUnit, self._hotPipe, inputPort, outputPort)
+        coldUnit = self._getIfThenElseUnit(startingUnit + 1, self._coldPipe, outputPort, inputPort)
 
-        equations = f"""\
-EQUATIONS 2
-{coldEquation}
-{hotEquation}
+        unitText = f"""\
+{hotUnit}
+{coldUnit}
 """
-        return equations, startingUnit
+        return unitText, startingUnit + 2
 
-    def _getEquation(
+    def _getIfThenElseUnit(
         self,
+        unitNumber: int,
         pipe: _mfn.Pipe,
         fromPort: _dppi.DoublePipePortItem,
         toPort: _dppi.DoublePipePortItem
@@ -98,15 +98,9 @@ EQUATIONS 2
 
         mfr = _helpers.getInputMfrName(self, pipe)
 
-        posFlowInputConnectionNode = fromConnection.getInternalPiping().getNode(
-            fromPort, pipe.fromPort.type
-        )
-        posFlowInputTemp = _temps.getTemperatureVariableName(fromConnection, posFlowInputConnectionNode)
+        posFlowInputTemp = _helpers.getTemperatureVariableName(fromConnection, fromPort, pipe.fromPort.type)
 
-        negFlowInputConnectionNode = toConnection.getInternalPiping().getNode(
-            toPort, pipe.toPort.type
-        )
-        negFlowInputTemp = _temps.getTemperatureVariableName(toConnection, negFlowInputConnectionNode)
+        negFlowInputTemp = _helpers.getTemperatureVariableName(toConnection, toPort, pipe.toPort.type)
 
-        hotEquation = _helpers.getEquation(outputTemp, mfr, posFlowInputTemp, negFlowInputTemp)
-        return hotEquation
+        unitText = _helpers.getIfThenElseUnit(unitNumber, outputTemp, mfr, posFlowInputTemp, negFlowInputTemp)
+        return unitText

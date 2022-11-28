@@ -88,6 +88,49 @@ class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
 
 
 @_dc.dataclass
+class ConnectionModelVersion2(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    connectionId: int
+    name: str
+    id: int  # pylint: disable=invalid-name
+    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
+    labelPos: _tp.Tuple[float, float]
+    massFlowLabelPos: _tp.Tuple[float, float]
+    fromPortId: int
+    toPortId: int
+    trnsysId: int
+    diameterInCm: _values.Value
+    uValueInWPerM2K: _values.Value
+    lengthInM: _values.Value
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return ConnectionModelVersion1
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModelVersion2":
+        assert isinstance(superseded, ConnectionModelVersion1)
+
+        return ConnectionModelVersion2(
+            superseded.connectionId,
+            superseded.name,
+            superseded.id,
+            superseded.segmentsCorners,
+            superseded.labelPos,
+            superseded.massFlowLabelPos,
+            superseded.fromPortId,
+            superseded.toPortId,
+            superseded.trnsysId,
+            superseded.diameterInCm,
+            superseded.uValueInWPerM2K,
+            superseded.lengthInM,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("f03faf46-4d0e-4407-a604-90925d83d43a")
+
+
+@_dc.dataclass
 class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
@@ -101,6 +144,7 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
     diameterInCm: _values.Value
     uValueInWPerM2K: _values.Value
     lengthInM: _values.Value
+    shallCreateTrnsysUnit: bool
 
     @classmethod
     def from_dict(
@@ -125,11 +169,11 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return ConnectionModelVersion1
+        return ConnectionModelVersion2
 
     @classmethod
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "ConnectionModel":
-        assert isinstance(superseded, ConnectionModelVersion1)
+        assert isinstance(superseded, ConnectionModelVersion2)
 
         return ConnectionModel(
             superseded.connectionId,
@@ -144,8 +188,9 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
             superseded.diameterInCm,
             superseded.uValueInWPerM2K,
             superseded.lengthInM,
+            shallCreateTrnsysUnit=True,
         )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("f03faf46-4d0e-4407-a604-90925d83d43a")
+        return _uuid.UUID("6092f751-ee2a-4e91-8dad-79960685b7d5")

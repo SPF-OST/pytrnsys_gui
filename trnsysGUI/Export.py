@@ -383,18 +383,22 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
         return f
 
     def exportSinglePipeEnergyBalanceVariables(self):
-        singlePipes = [ip for ip in self._hasInternalPipings if isinstance(ip, _spc.SinglePipeConnection)]
+        singlePipesWithTrnsysUnits = [
+            ip
+            for ip in self._hasInternalPipings
+            if isinstance(ip, _spc.SinglePipeConnection) and ip.shallCreateTrnsysUnit
+        ]
 
-        if not singlePipes:
+        if not singlePipesWithTrnsysUnits:
             return ""
 
-        convectedFluxes = [sp.getConvectedHeatFluxVariableName() for sp in singlePipes]
+        convectedFluxes = [sp.getConvectedHeatFluxVariableName() for sp in singlePipesWithTrnsysUnits]
         summedConvectedFluxes = "+".join(convectedFluxes)
 
-        dissipatedFluxes = [sp.getDissipatedHeatFluxVariableName() for sp in singlePipes]
+        dissipatedFluxes = [sp.getDissipatedHeatFluxVariableName() for sp in singlePipesWithTrnsysUnits]
         summedDissipatedFluxes = "+".join(dissipatedFluxes)
 
-        internalEnergies = [sp.getInternalHeatVariableName() for sp in singlePipes]
+        internalEnergies = [sp.getInternalHeatVariableName() for sp in singlePipesWithTrnsysUnits]
         summedInternalEnergies = "+".join(internalEnergies)
 
         Totals = _cnames.EnergyBalanceTotals.SinglePipe

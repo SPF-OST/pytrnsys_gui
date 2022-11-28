@@ -1,12 +1,13 @@
 __all__ = ["HydraulicLoopDialog"]
 
+import abc as _abc
 import dataclasses as _dc
-import itertools as _it
 import typing as _tp
+import itertools as _it
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
-from PyQt5 import QtWidgets as _qtw
+import PyQt5.QtWidgets as _qtw
 
 try:
     from . import _UI_dialog_generated as _uigen
@@ -113,6 +114,16 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             uValueText = self.bulkUValueLineEdit.text()
             uValueInWPerM2K = float(uValueText) if uValueText else None
 
+            shallCreateUnitText = self.bulkGeneratUnitComboBox.currentText()
+            if not shallCreateUnitText:
+                shallCreateUnit = None
+            elif shallCreateUnitText == "Yes":
+                shallCreateUnit = True
+            elif shallCreateUnitText == "No":
+                shallCreateUnit = False
+            else:
+                raise AssertionError("Expecting 'Yes' or 'No' for 'shall generate unit' combobox.")
+
             for connection in self._hydraulicLoop.connections:
                 if individualPipeLengthInM is not None:
                     connection.lengthInM = individualPipeLengthInM
@@ -122,6 +133,9 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
 
                 if uValueInWPerM2K is not None:
                     connection.uValueInWPerM2K = uValueInWPerM2K
+
+                if shallCreateUnit is not None:
+                    connection.shallCreateTrnsysUnit = shallCreateUnit
 
             self._reloadConnections()
 
@@ -234,15 +248,58 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         raise AssertionError(f"Unknown dialog code {dialogCode}.")
 
 
-_PropertyValue = _tp.Union[str, float]
+_PropertyValue = _tp.Union[str, float, bool]
 
 
 @_dc.dataclass
-class _Property:
+class _Property(_abc.ABC):
     header: str
     getter: _tp.Callable[[_gmodel.Connection], _PropertyValue]
     setter: _tp.Optional[_tp.Callable[[_gmodel.Connection, _PropertyValue], None]] = None
     shallHighlightOutliers: bool = True
+
+    @property
+    @_abc.abstractmethod
+    def mayBeEditable(self) -> bool:
+        raise NotImplementedError()
+
+    @property
+    @_abc.abstractmethod
+    def mayBeUserCheckable(self) -> bool:
+        raise NotImplementedError()
+
+    @property
+    @_abc.abstractmethod
+    def mayBeDisplayable(self) -> bool:
+        raise NotImplementedError()
+
+
+class _TextProperty(_Property):
+    @property
+    def mayBeDisplayable(self) -> bool:
+        return True
+
+    @property
+    def mayBeEditable(self) -> bool:
+        return True
+
+    @property
+    def mayBeUserCheckable(self) -> bool:
+        return False
+
+
+class _BoolProperty(_Property):
+    @property
+    def mayBeDisplayable(self) -> bool:
+        return False
+
+    @property
+    def mayBeEditable(self) -> bool:
+        return False
+
+    @property
+    def mayBeUserCheckable(self) -> bool:
+        return True
 
 
 def _parsePositiveFloat(text: str) -> float:
@@ -266,13 +323,18 @@ def _setConnectionLength(connection: _gmodel.Connection, lengthInMText: _tp.Any)
     connection.lengthInM = _parsePositiveFloat(lengthInMText)
 
 
+def _setConnectionShallCreateTrnsysUnit(connection: _gmodel.Connection, shallCreateTrnsysUnit: _tp.Any) -> None:
+    connection.shallCreateTrnsysUnit = shallCreateTrnsysUnit
+
+
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     c: _gmodel.Connection
     _PROPERTIES = [
-        _Property("Name", lambda c: c.name, shallHighlightOutliers=False),
-        _Property("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
-        _Property("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),
-        _Property("Length [m]", lambda c: c.lengthInM, _setConnectionLength),
+        _BoolProperty("Unit?", lambda c: c.shallCreateTrnsysUnit, _setConnectionShallCreateTrnsysUnit),
+        _TextProperty("Name", lambda c: c.name, shallHighlightOutliers=False),
+        _TextProperty("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
+        _TextProperty("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),
+        _TextProperty("Length [m]", lambda c: c.lengthInM, _setConnectionLength),
     ]
 
     def __init__(self, connections: _tp.Sequence[_gmodel.Connection]):
@@ -306,7 +368,21 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         connection, prop = self._getConnectionAndProperty(modelIndex)
 
         if role == _qtc.Qt.DisplayRole:
+            if prop.mayBeUserCheckable:
+                return None
+
             data = prop.getter(connection)  # type: ignore[misc,call-arg]
+
+            return data
+
+        if role == _qtc.Qt.CheckStateRole:
+            if not prop.mayBeUserCheckable:
+                return None
+
+            data = prop.getter(connection)  # type: ignore[misc,call-arg]
+
+            data = _qtc.Qt.Checked if data else _qtc.Qt.Unchecked
+
             return data
 
         if prop.shallHighlightOutliers and role in [_qtc.Qt.FontRole, _qtc.Qt.ForegroundRole]:
@@ -343,8 +419,11 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
         return mostUsedValueWithCount["value"]
 
     def setData(self, index: _qtc.QModelIndex, value: _tp.Any, role: int = _qtc.Qt.EditRole) -> bool:
-        if role != _qtc.Qt.EditRole:
+        if role not in [_qtc.Qt.EditRole, _qtc.Qt.CheckStateRole]:
             return False
+
+        if role == _qtc.Qt.CheckStateRole:
+            value = (value == _qtc.Qt.Checked)
 
         connection, prop = self._getConnectionAndProperty(index)
 
@@ -369,14 +448,20 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     def flags(self, index: _qtc.QModelIndex) -> _qtc.Qt.ItemFlags:
         parentFlags = super().flags(index)
 
-        if not self._isEditable(index.column()):
+        prop = self._PROPERTIES[index.column()]
+
+        hasSetter = bool(prop.setter)
+        if not hasSetter:
             return parentFlags
 
-        return parentFlags | _qtc.Qt.ItemIsEditable  # type: ignore[operator,return-value]
+        flags = parentFlags
+        if prop.mayBeEditable:
+            flags |= _qtc.Qt.ItemIsEditable
 
-    def _isEditable(self, columnIndex: int) -> bool:
-        prop = self._PROPERTIES[columnIndex]
-        return bool(prop.setter)
+        if prop.mayBeUserCheckable:
+            flags |= _qtc.Qt.ItemIsUserCheckable
+
+        return flags
 
     def index(self, row: int, column: int, parent: _tp.Optional[_qtc.QModelIndex] = None) -> _qtc.QModelIndex:
         assert parent

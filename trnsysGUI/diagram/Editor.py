@@ -517,13 +517,14 @@ class Editor(QWidget):
             SinglePipeTotals = _cnames.EnergyBalanceTotals.SinglePipe
             DoublePipeTotals = _cnames.EnergyBalanceTotals.DoublePipe
 
-            singlePipes = [o for o in self.trnsysObj if isinstance(o, SinglePipeConnection)]
+            singlePipesWithTrnsysUnits = [
+                o for o in self.trnsysObj if isinstance(o, SinglePipeConnection) and o.shallCreateTrnsysUnit
+            ]
             singlePipeEnergyBalanceEquations = ""
-            if singlePipes:
+            if singlePipesWithTrnsysUnits:
                 singlePipeEnergyBalanceEquations = f"""\
-EQUATIONS 3
+EQUATIONS 2
 *** single pipes
-qSysIn_{SinglePipeTotals.CONVECTED} = {SinglePipeTotals.CONVECTED}
 qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
 qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
 
@@ -532,9 +533,8 @@ qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNA
             doublePipesEnergyBalanceEquations = ""
             if doublePipes:
                 doublePipesEnergyBalanceEquations = f"""\
-EQUATIONS 4
+EQUATIONS 3
 *** double pipes
-qSysIn_{DoublePipeTotals.CONVECTED} = {DoublePipeTotals.CONVECTED}
 qSysOut_{DoublePipeTotals.DISSIPATION_TO_FAR_FIELD} = {DoublePipeTotals.DISSIPATION_TO_FAR_FIELD}
 qSysOut_{DoublePipeTotals.PIPE_INTERNAL_CHANGE} = {DoublePipeTotals.PIPE_INTERNAL_CHANGE}
 qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNAL_CHANGE}

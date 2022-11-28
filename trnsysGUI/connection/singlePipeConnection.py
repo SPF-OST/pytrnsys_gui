@@ -18,7 +18,6 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.singlePipeSegmentItem as _spsi
 import trnsysGUI.temperatures as _temps
-from . import _helpers as _chelpers
 from . import _massFlowLabels as _mfl
 
 if _tp.TYPE_CHECKING:
@@ -39,6 +38,8 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
         self.uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+
+        self.shallCreateTrnsysUnit = True
 
         self._updateModels(self.displayName)
 
@@ -110,6 +111,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.diameterInCm,
             self.uValueInWPerM2K,
             self.lengthInM,
+            self.shallCreateTrnsysUnit,
         )
 
         dictName = "Connection-"
@@ -133,16 +135,90 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.uValueInWPerM2K = model.uValueInWPerM2K
         self.lengthInM = model.lengthInM
 
+        self.shallCreateTrnsysUnit = model.shallCreateTrnsysUnit
+
     def getInternalPiping(self) -> _pi.InternalPiping:
         return _pi.InternalPiping(
             [self.modelPipe], {self.modelPipe.fromPort: self.fromPort, self.modelPipe.toPort: self.toPort}
         )
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals, too-many-statements
+        inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
+        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.modelPipe)
+
+        portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
+
+        inputTemperatureVariableName = _helpers.getTemperatureVariableName(
+            portItemsWithParent[0][1], portItemsWithParent[0][0], _mfn.PortItemType.STANDARD
+        )
+        revInputTemperatureVariableName = _helpers.getTemperatureVariableName(
+            portItemsWithParent[1][1], portItemsWithParent[1][0], _mfn.PortItemType.STANDARD
+        )
+
+        outputTemperatureName = _temps.getTemperatureVariableName(self, self.modelPipe)
+
         unitNumber = startingUnit
 
-        loop = self._editor.hydraulicLoops.getLoopForExistingConnection(self)
+        if not self.shallCreateTrnsysUnit:
+            unitText = self._getPassThroughPipeDefinition(
+                startingUnit,
+                inputMfrName,
+                canonicalMfrName,
+                inputTemperatureVariableName,
+                revInputTemperatureVariableName,
+                outputTemperatureName,
+            )
+            return unitText, unitNumber + 1
 
+        unitText = self._getTrnsysUnitDefinition(
+            unitNumber,
+            inputMfrName,
+            canonicalMfrName,
+            inputTemperatureVariableName,
+            revInputTemperatureVariableName,
+            outputTemperatureName,
+        )
+
+        nextUnitNumber = unitNumber + 1
+
+        return unitText, nextUnitNumber
+
+    def _getPassThroughPipeDefinition(
+        self,
+        unitNumber,
+        inputMfrName,
+        canonicalMfrName,
+        inputTemperatureVariableName,
+        revInputTemperatureVariableName,
+        outputTemperatureName,
+    ):
+        outputTemperatureUnit = _helpers.getIfThenElseUnit(
+            unitNumber,
+            outputTemperatureName,
+            canonicalMfrName,
+            inputTemperatureVariableName,
+            revInputTemperatureVariableName,
+        )
+
+        unitText = f"""\
+! {self.displayName}
+EQUATIONS 1
+{canonicalMfrName} = {inputMfrName}
+{outputTemperatureUnit}
+
+"""
+        return unitText
+
+    def _getTrnsysUnitDefinition(  # pylint: disable=too-many-locals
+        self,
+        unitNumber,
+        inputMfrName,
+        canonicalMfrName,
+        inputTemperatureVariableName,
+        revInputTemperatureVariableName,
+        outputTemperatureName,
+    ):
+        loop = self._editor.hydraulicLoops.getLoopForExistingConnection(self)
         densityVar = _names.getDensityName(loop.name.value)
         specHeatVar = _names.getHeatCapacityName(loop.name.value)
         lengthInM = _getConvertedValueOrName(self.lengthInM)
@@ -151,22 +227,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         uValueInSIUnitsComment = (
             f" (= {self.uValueInWPerM2K} W/(m^2*K))" if isinstance(self.uValueInWPerM2K, float) else ""
         )
-
-        inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
-        portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
-        inputTemperatureVariableName = _chelpers.getTemperatureVariableName(
-            portItemsWithParent[0][1], portItemsWithParent[0][0], _mfn.PortItemType.STANDARD
-        )
-        revInputTemperatureVariableName = _chelpers.getTemperatureVariableName(
-            portItemsWithParent[1][1], portItemsWithParent[1][0], _mfn.PortItemType.STANDARD
-        )
-
-        outputTemperatureName = _temps.getTemperatureVariableName(self, self.modelPipe)
         convectedHeatFluxName = self.getConvectedHeatFluxVariableName()
         dissipatedHeatFluxName = self.getDissipatedHeatFluxVariableName()
         internalHeatName = self.getInternalHeatVariableName()
-        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.modelPipe)
-
         unitText = f"""\
 UNIT {unitNumber} TYPE 931
 ! {self.displayName}
@@ -193,10 +256,7 @@ EQUATIONS 5
 {canonicalMfrName} = {inputMfrName}
 
 """
-
-        nextUnitNumber = unitNumber + 1
-
-        return unitText, nextUnitNumber
+        return unitText
 
     def getConvectedHeatFluxVariableName(self) -> str:
         return f"P{self.displayName}Conv_kW"

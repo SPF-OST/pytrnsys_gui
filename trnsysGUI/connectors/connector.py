@@ -79,18 +79,14 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
         mfrName = _helpers.getInputMfrName(self, self._modelPipe)
 
         fromConnection = self.inputs[0].getConnection()
-        fromConnectionNode = fromConnection.getInternalPiping().getNode(self.inputs[0], _mfn.PortItemType.STANDARD)
-
         toConnection = self.outputs[0].getConnection()
-        toConnectionNode = toConnection.getInternalPiping().getNode(self.outputs[0], _mfn.PortItemType.STANDARD)
 
-        posFlowTempName = _temps.getTemperatureVariableName(fromConnection, fromConnectionNode)
-        negFlowTempName = _temps.getTemperatureVariableName(toConnection, toConnectionNode)
+        posFlowTempName = _helpers.getTemperatureVariableName(fromConnection, self.inputs[0], _mfn.PortItemType.STANDARD)
+        negFlowTempName = _helpers.getTemperatureVariableName(toConnection, self.outputs[0], _mfn.PortItemType.STANDARD)
 
-        equation = f"{tempName} = GE({mfrName}, 0)*{posFlowTempName} + LT({mfrName}, 0)*{negFlowTempName}"
+        unitNumber = startingUnit
+        unitText = _helpers.getIfThenElseUnit(unitNumber, tempName, mfrName, posFlowTempName, negFlowTempName)
 
-        equations = f"""\
-EQUATIONS 1
-{equation}
-"""
-        return equations, startingUnit
+        nextUnitNumber = unitNumber + 1
+
+        return unitText, nextUnitNumber

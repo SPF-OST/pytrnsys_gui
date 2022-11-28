@@ -7,17 +7,16 @@ import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
+
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
-import trnsysGUI.internalPiping
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
-
-from . import _helpers as _chelpers
 from . import _massFlowLabels as _mfl
 
 
@@ -125,7 +124,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
 
-    def getInternalPiping(self) -> trnsysGUI.internalPiping.InternalPiping:
+    def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
             self.coldModelPipe.fromPort: self.toPort,
             self.coldModelPipe.toPort: self.fromPort,
@@ -137,9 +136,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         }
 
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
-        return trnsysGUI.internalPiping.InternalPiping(
-            [self.coldModelPipe, self.hotModelPipe], modelPortItemsToGraphicalPortItem
-        )
+        return _ip.InternalPiping([self.coldModelPipe, self.hotModelPipe], modelPortItemsToGraphicalPortItem)
 
     def exportPipeAndTeeTypesForTemp(
         self, startingUnit: int
@@ -207,18 +204,18 @@ dpRadNdDist                             ! Radial distance of node 10, m
         return headerAndParameters
 
     def _getInputs(self) -> str:
-        coldTemperatureName = _chelpers.getTemperatureVariableName(
+        coldTemperatureName = _helpers.getTemperatureVariableName(
             self.toPort.parent, self.toPort, _mfn.PortItemType.COLD
         )
         coldMfrName = _helpers.getInputMfrName(self, self.coldModelPipe)
-        coldRevTemperatureName = _chelpers.getTemperatureVariableName(
+        coldRevTemperatureName = _helpers.getTemperatureVariableName(
             self.fromPort.parent, self.fromPort, _mfn.PortItemType.COLD
         )
-        hotTemperatureName = _chelpers.getTemperatureVariableName(
+        hotTemperatureName = _helpers.getTemperatureVariableName(
             self.fromPort.parent, self.fromPort, _mfn.PortItemType.HOT
         )
         hotMfrName = _helpers.getInputMfrName(self, self.hotModelPipe)
-        hotRevTemperatureName = _chelpers.getTemperatureVariableName(
+        hotRevTemperatureName = _helpers.getTemperatureVariableName(
             self.toPort.parent, self.toPort, _mfn.PortItemType.HOT
         )
         inputs = f"""\
@@ -264,7 +261,11 @@ EQUATIONS {4 + len(energyBalanceVariables)}
     def _getEnergyBalanceVariables(self) -> _tp.Sequence[_EnergyBalanceVariable]:
         return [
             self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.COLD, 7, "Convected heat [kW]"
+                EnergyBalanceVariables.CONVECTED,
+                _mfn.PortItemType.COLD,
+                7,
+                "Convected heat [kW]",
+                conversionFactor="-1*1/3600",
             ),
             self._getEnergyBalanceVariable(
                 EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
@@ -279,7 +280,11 @@ EQUATIONS {4 + len(energyBalanceVariables)}
                 "Dissipated heat to casing (aka gravel) [kW]",
             ),
             self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.HOT, 8, "Convected heat [kW]"
+                EnergyBalanceVariables.CONVECTED,
+                _mfn.PortItemType.HOT,
+                8,
+                "Convected heat [kW]",
+                conversionFactor="-1*1/3600",
             ),
             self._getEnergyBalanceVariable(
                 EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
@@ -366,7 +371,9 @@ Hot: {formattedHotMassFlowAndTemperature}
 
 
 class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
-    def __init__(self, doublePipeConnection: DoublePipeConnection, parentCommand: _qtw.QUndoCommand = None) -> None:
+    def __init__(
+        self, doublePipeConnection: DoublePipeConnection, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None
+    ) -> None:
         super().__init__("Delete double pipe connection", parentCommand)
         self._connection = doublePipeConnection
         self._fromPort = self._connection.fromPort
