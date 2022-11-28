@@ -12,7 +12,7 @@ import trnsysGUI.singlePipePortItem as _spi
 
 def getReachableConnections(
     port: _spi.SinglePipePortItem,
-    ignoreConnections: _tp.Set[_spc.SinglePipeConnection] = None,
+    ignoreConnections: _tp.Optional[_tp.Set[_spc.SinglePipeConnection]] = None,
 ) -> _tp.Set[_spc.SinglePipeConnection]:
     assert len(port.connectionList) <= 1
 

@@ -346,11 +346,11 @@ class MainWindow(QMainWindow):
             _err.showErrorMessageBox(errorMessage)
             return
         processApp = ProcessMain()
-        executionFailed, errorStatement = processApp.processAction(self.logger, self.centralWidget.projectFolder)
+        result = processApp.processAction(self.logger, self.centralWidget.projectFolder)
 
-        if executionFailed:
-            errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
-            _err.showErrorMessageBox(errorMessage)
+        if _res.isError(result):
+            error = _res.error(result)
+            _err.showErrorMessageBox(error.message)
 
         return
 

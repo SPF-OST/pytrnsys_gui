@@ -42,6 +42,7 @@ def _createGuiConnections(hydraulicLoop):
                 _values.DEFAULT_DIAMETER_IN_CM,
                 _values.DEFAULT_U_VALUE_IN_W_PER_M2_K,
                 _values.DEFAULT_LENGTH_IN_M,
+                _values.DEFAULT_SHALL_CREATE_TRNSYS_UNIT,
                 c,
             )
             for c in hydraulicLoop.connections
@@ -50,7 +51,7 @@ def _createGuiConnections(hydraulicLoop):
         return guiConnections
 
     guiConnections = [
-        _gmodel.Connection(c.displayName, c.diameterInCm, c.uValueInWPerM2K, c.lengthInM, c)
+        _gmodel.Connection(c.displayName, c.diameterInCm, c.uValueInWPerM2K, c.lengthInM, c.shallCreateTrnsysUnit, c)
         for c in hydraulicLoop.connections
     ]
 
@@ -79,3 +80,4 @@ def _applyConnectionModels(guiHydraulicLoop: _gmodel.HydraulicLoop) -> None:
         connection.lengthInM = modelConnection.lengthInM
         connection.diameterInCm = modelConnection.diameterInCm
         connection.uValueInWPerM2K = modelConnection.uValueInWPerM2K
+        connection.shallCreateTrnsysUnit = modelConnection.shallCreateTrnsysUnit

@@ -78,53 +78,59 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         coldOutputSingleConnection = self.inputs[1].getConnection()
         assert isinstance(coldOutputSingleConnection, _spc.SinglePipeConnection)
 
-        coldEquation = self._getColdPipeEquation(doubleConnection, coldOutputSingleConnection)
+        coldUnit = self._getColdPipeIfThenElseUnit(startingUnit, doubleConnection, coldOutputSingleConnection)
 
-        hotEquation = self._getHotPipeEquation(hotInputSingleConnection, doubleConnection)
+        hotUnit = self._getHotPipeIfThenElseUnit(startingUnit + 1, hotInputSingleConnection, doubleConnection)
 
-        equations = f"""\
-EQUATIONS 2
-{coldEquation}
-{hotEquation}
+        unitText = f"""\
+{coldUnit}
+{hotUnit}
 """
-        return equations, startingUnit
+        return unitText, startingUnit + 2
 
-    def _getColdPipeEquation(
-        self, doubleConnection: _dpc.DoublePipeConnection, coldOutputSingleConnection: _spc.SinglePipeConnection
+    def _getColdPipeIfThenElseUnit(
+        self,
+        unitNumber: int,
+        doubleConnection: _dpc.DoublePipeConnection,
+        coldOutputSingleConnection: _spc.SinglePipeConnection,
     ) -> str:
         coldOutputTemp = _temps.getTemperatureVariableName(self, self._coldPipe)
 
         coldMfr = _helpers.getInputMfrName(self, self._coldPipe)
 
-        doubleConnectionColdNode = doubleConnection.getInternalPiping().getNode(self.outputs[0], _mfn.PortItemType.COLD)
-        posFlowColdInputTemp = _temps.getTemperatureVariableName(doubleConnection, doubleConnectionColdNode)
-
-        couldOutputSingleConnectionOutputModelPort = coldOutputSingleConnection.getInternalPiping().getNode(
-            self.inputs[1], _mfn.PortItemType.STANDARD
-        )
-        negFlowColdInputTemp = _temps.getTemperatureVariableName(
-            coldOutputSingleConnection, couldOutputSingleConnectionOutputModelPort
+        posFlowColdInputTemp = _helpers.getTemperatureVariableName(
+            doubleConnection, self.outputs[0], _mfn.PortItemType.COLD
         )
 
-        coldEquation = _helpers.getEquation(coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp)
+        negFlowColdInputTemp = _helpers.getTemperatureVariableName(
+            coldOutputSingleConnection, self.inputs[1], _mfn.PortItemType.STANDARD
+        )
+
+        coldEquation = _helpers.getIfThenElseUnit(
+            unitNumber, coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp
+        )
 
         return coldEquation
 
-    def _getHotPipeEquation(
-        self, hotInputSingleConnection: _spc.SinglePipeConnection, doubleConnection: _dpc.DoublePipeConnection
+    def _getHotPipeIfThenElseUnit(
+        self,
+        unitNumber: int,
+        hotInputSingleConnection: _spc.SinglePipeConnection,
+        doubleConnection: _dpc.DoublePipeConnection,
     ) -> str:
         hotOutputTemp = _temps.getTemperatureVariableName(self, self._hotPipe)
 
         hotMfr = _helpers.getInputMfrName(self, self._hotPipe)
 
-        hotInputSingleConnectionNode = hotInputSingleConnection.getInternalPiping().getNode(
-            self.inputs[0], _mfn.PortItemType.STANDARD
+        posFlowHotInputTemp = _helpers.getTemperatureVariableName(
+            hotInputSingleConnection, self.inputs[0], _mfn.PortItemType.STANDARD
         )
-        posFlowHotInputTemp = _temps.getTemperatureVariableName(hotInputSingleConnection, hotInputSingleConnectionNode)
 
-        doubleConnectionHotNode = doubleConnection.getInternalPiping().getNode(self.outputs[0], _mfn.PortItemType.HOT)
-        negFlowHotInputTemp = _temps.getTemperatureVariableName(doubleConnection, doubleConnectionHotNode)
-
-        hotEquation = _helpers.getEquation(hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp)
+        negFlowHotInputTemp = _helpers.getTemperatureVariableName(
+            doubleConnection, self.outputs[0], _mfn.PortItemType.HOT
+        )
+        hotEquation = _helpers.getIfThenElseUnit(
+            unitNumber, hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp
+        )
 
         return hotEquation
