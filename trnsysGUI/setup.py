@@ -42,7 +42,8 @@ class _VersionedPackage:
 
 
 def setup() -> _res.Result[None]:
-    isDeveloperInstall = pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local.endswith("dev")
+    localVersionPart = pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local
+    isDeveloperInstall = localVersionPart and localVersionPart.endswith("dev")
     if isDeveloperInstall:
         result = _checkRequirements()
         if _res.isError(result):
