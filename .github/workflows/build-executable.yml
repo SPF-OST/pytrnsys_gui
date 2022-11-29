@@ -19,7 +19,7 @@ jobs:
         run: cd release
       - name: Create virtual environment
         run: |
-          rmdir /s /q venv
+          Remove-Item -Recurse -ErrorAction Ignore venv
           py -3.9 -m venv venv
       - name: Install dependencies
         run: |
@@ -27,7 +27,7 @@ jobs:
           venv\Scripts\python -m pip install wheel
           venv\Scripts\pip install -r requirements\release.txt
       - name: Delete old build artifacts
-        run: rmdir /s /q dist build
+        run: Remove-Item -Recurse -ErrorAction dist build
       - name: Build executable
         run: |
           venv\Scripts\pyinstaller pytrnsys-gui.spec
