@@ -20,6 +20,8 @@ jobs:
       - name: Create virtual environment
         run: |
           Remove-Item -Recurse -ErrorAction Ignore venv
+          whereis py
+          py -0
           py -3.11 -m venv venv
       - name: Install dependencies
         run: |
