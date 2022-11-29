@@ -35,7 +35,7 @@ jobs:
     needs: [publish-to-pypi]
     steps:
       - name: Add GitHub workspace as safe directory
-        run: git config --global --add safe.directory ${{env.GITHUB_WORKSPACE}}
+        run: git config --global --add safe.directory ${{github.workspace}}
       - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -60,5 +60,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: pytrnsys-gui-${{env.GITHUB_REF_NAME}}
+          name: pytrnsys-gui-${{github.ref_name}}
           path: dist\pytrnsys-gui
