@@ -34,11 +34,6 @@ jobs:
     runs-on: [etzel]
     needs: [publish-to-pypi]
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.9'
       - name: Change to `release` directory
         run: cd release
       - name: Create virtual environment
