@@ -22,7 +22,7 @@ jobs:
         run: |
           venv\Scripts\python -m pip install --upgrade pip
           venv\Scripts\python -m pip install wheel
-          venv\Scripts\pip install -r requirements\release.txt
+          venv\Scripts\pip install -r ..\requirements\release.txt
       - name: Delete old build artifacts
         run: Remove-Item -Recurse -ErrorAction dist build
       - name: Build executable
