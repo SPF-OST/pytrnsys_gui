@@ -11,18 +11,13 @@ on:
 jobs:
   build-executable:
     runs-on: [self-hosted, etzel]
+    defaults:
+      run:
+        working-directory: release
     steps:
-      - name: Add GitHub workspace as safe directory
-        run: git config --global --add safe.directory ${{github.workspace}}
       - uses: actions/checkout@v3
-      - name: Change to `release` directory
-        run: cd release
       - name: Create virtual environment
-        run: |
-          Remove-Item -Recurse -ErrorAction Ignore venv
-          Write-Output (Get-Command py).Path
-          py -0
-          py -3.11 -m venv venv
+        run: py -3.11 -m venv venv
       - name: Install dependencies
         run: |
           venv\Scripts\python -m pip install --upgrade pip
@@ -31,8 +26,7 @@ jobs:
       - name: Delete old build artifacts
         run: Remove-Item -Recurse -ErrorAction dist build
       - name: Build executable
-        run: |
-          venv\Scripts\pyinstaller pytrnsys-gui.spec
+        run: venv\Scripts\pyinstaller pytrnsys-gui.spec
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
