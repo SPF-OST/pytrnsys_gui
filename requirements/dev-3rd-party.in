@@ -5,6 +5,8 @@ twine
 pip-compile-multi
 black
 
+pre-commit
+
 pyinstaller
 
 sphinx
