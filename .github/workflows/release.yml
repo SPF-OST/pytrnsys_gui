@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.9'
     - name: Install dependencies
@@ -34,6 +34,11 @@ jobs:
     runs-on: [etzel]
     needs: [publish-to-pypi]
     steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
       - name: Change to `release` directory
         run: cd release
       - name: Create virtual environment
@@ -51,7 +56,7 @@ jobs:
         run: |
           venv\Scripts\pyinstaller pytrnsys-gui.spec
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: pytrnsys-gui-${{env.GITHUB_REF_NAME}}
           path: dist\pytrnsys-gui
