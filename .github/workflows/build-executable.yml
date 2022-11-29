@@ -1,17 +1,16 @@
 name: Release
 
 on:
-  - workflow_run:
+  workflow_run:
       workflows: ["Publish to PyPI"]
       branches: [v0.10]
       types:
         - completed
-  - workflow_dispatch
+  workflow_dispatch:
 
 jobs:
   build-executable:
-    runs-on: [etzel]
-    needs: [publish-to-pypi]
+    runs-on: [self-hosted, etzel]
     steps:
       - name: Add GitHub workspace as safe directory
         run: git config --global --add safe.directory ${{github.workspace}}
