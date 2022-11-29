@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  workflow_run:
+      workflows: ["Publish to PyPI"]
+      branches: [v0.10]
+      types:
+        - completed
+  workflow_dispatch:
+
+jobs:
+  build-executable:
+    runs-on: [self-hosted, etzel]
+    steps:
+      - name: Add GitHub workspace as safe directory
+        run: git config --global --add safe.directory ${{github.workspace}}
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Change to `release` directory
+        run: cd release
+      - name: Create virtual environment
+        run: |
+          rmdir /s /q venv
+          py -3.9 -m venv venv
+      - name: Install dependencies
+        run: |
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel
+          venv\Scripts\pip install -r requirements\release.txt
+      - name: Delete old build artifacts
+        run: rmdir /s /q dist build
+      - name: Build executable
+        run: |
+          venv\Scripts\pyinstaller pytrnsys-gui.spec
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytrnsys-gui-${{github.ref_name}}
+          path: dist\pytrnsys-gui
