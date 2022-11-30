@@ -27,7 +27,7 @@ jobs:
           release\venv\Scripts\pip install -r requirements\release.txt
         working-directory: .
       - name: Delete old build artifacts
-        run: Remove-Item -Recurse -ErrorAction Ignore dist build
+        run: Remove-Item -Recurse -ErrorAction Ignore dist, build
       - name: Build executable
         run: venv\Scripts\pyinstaller pytrnsys-gui.spec
       - name: Upload artifacts
