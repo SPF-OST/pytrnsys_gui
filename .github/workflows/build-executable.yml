@@ -16,6 +16,8 @@ jobs:
         working-directory: release
     steps:
       - uses: actions/checkout@v3
+      - name: Delete old virtual environment
+        run: Remove-Item -Recurse -ErrorAction Ignore venv
       - name: Create virtual environment
         run: py -3.10 -m venv venv
       - name: Install dependencies
@@ -25,7 +27,7 @@ jobs:
           release\venv\Scripts\pip install -r requirements\release.txt
         working-directory: .
       - name: Delete old build artifacts
-        run: Remove-Item -Recurse -ErrorAction dist build
+        run: Remove-Item -Recurse -ErrorAction Ignore dist build
       - name: Build executable
         run: venv\Scripts\pyinstaller pytrnsys-gui.spec
       - name: Upload artifacts
