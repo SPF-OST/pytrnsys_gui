@@ -15,8 +15,6 @@ jobs:
       run:
         working-directory: release
     steps:
-      - name: Enable long paths
-        run: git config core.longpaths true
       - uses: actions/checkout@v3
       - name: Create virtual environment
         run: py -3.11 -m venv venv
