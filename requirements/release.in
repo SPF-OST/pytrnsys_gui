@@ -1,4 +1,6 @@
 -r release-3rd-party.in
 
-pytrnsys-gui==0.10.1
 pytrnsys==0.7.1
+-e file:.
+
+pyinstaller
