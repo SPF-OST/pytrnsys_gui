@@ -1,4 +1,4 @@
-name: Release
+name: Build executable
 
 on:
   workflow_run:
