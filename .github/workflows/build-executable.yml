@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}
-          path: release\dist\pytrnsys-gui
+          path: release\dist\pytrnsys-gui.exe
