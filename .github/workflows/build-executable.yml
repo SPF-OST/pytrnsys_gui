@@ -39,6 +39,8 @@ jobs:
       - name: Determine short SHA
         id: sha
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
+      - name: Rename executable
+        run: Rename-Item -Path dist\pytrnsys-gui.exe -NewName dist\pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}.exe
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
