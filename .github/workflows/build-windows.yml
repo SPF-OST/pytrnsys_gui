@@ -47,6 +47,8 @@ jobs:
       run:
         working-directory: release
     steps:
+      - name: Support longpaths
+        run: git config --system core.longpaths true
       - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
