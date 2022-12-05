@@ -43,9 +43,6 @@ jobs:
   build-executable:
     needs: [test]
     runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: release
     steps:
       - name: Support longpaths
         run: git config --system core.longpaths true
@@ -59,20 +56,19 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install wheel
           pip install -r requirements\release.txt
-        working-directory: .
       - name: Generate UI code from Qt Creator Studio .ui files
         run: |
           python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-        working-directory: .
       - name: Delete old build artifacts
         run: Remove-Item -Recurse -ErrorAction Ignore dist, build
       - name: Build executable
         run: pyinstaller pytrnsys-gui.spec
+        working-directory: release
       - name: Determine short SHA
         id: sha
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
       - name: Rename executable
-        run: Rename-Item -Path dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}.exe
+        run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}.exe
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
