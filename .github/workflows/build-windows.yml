@@ -7,10 +7,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  test:
     runs-on: windows-latest
-
     steps:
     - name: Support longpaths
       run: git config --system core.longpaths true
@@ -41,3 +39,40 @@ jobs:
         path: test-results
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
+
+  build-executable:
+    needs: [test]
+    runs-on: [ self-hosted, etzel ]
+    defaults:
+      run:
+        working-directory: release
+    steps:
+      - uses: actions/checkout@v3
+      - name: Delete old virtual environment
+        run: Remove-Item -Recurse -ErrorAction Ignore venv
+      - name: Create virtual environment
+        run: py -3.10 -m venv venv
+      - name: Install dependencies
+        run: |
+          release\venv\Scripts\python -m pip install --upgrade pip
+          release\venv\Scripts\python -m pip install wheel
+          release\venv\Scripts\pip install -r requirements\release.txt
+        working-directory: .
+      - name: Generate UI code from Qt Creator Studio .ui files
+        run: |
+          release\venv\Scripts\activate
+          python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
+        working-directory: .
+      - name: Delete old build artifacts
+        run: Remove-Item -Recurse -ErrorAction Ignore dist, build
+      - name: Build executable
+        run: venv\Scripts\pyinstaller pytrnsys-gui.spec
+      - name: Determine short SHA
+        id: sha
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}
+          path: release\dist\pytrnsys-gui.exe
+
