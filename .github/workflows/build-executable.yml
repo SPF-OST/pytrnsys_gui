@@ -27,8 +27,6 @@ jobs:
       - name: Generate UI code from Qt Creator Studio .ui files
         run: |
           python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-      - name: Delete old build artifacts
-        run: Remove-Item -Recurse -ErrorAction Ignore dist, build
       - name: Build executable
         run: pyinstaller pytrnsys-gui.spec
         working-directory: release
