@@ -21,7 +21,9 @@ class ResizerItem(QGraphicsEllipseItem):
 
     def itemChange(self, change, value):
         if change == self.ItemPositionChange:
-            self.parent.setItemSize(self.pos().x(), self.pos().y())
+            xInt = round(self.pos().x())
+            yInt = round(self.pos().y())
+            self.parent.setItemSize(xInt, yInt)
             self.parent.updateImage()
             return QPointF(value.x(), value.x())
 
