@@ -42,39 +42,36 @@ jobs:
 
   build-executable:
     needs: [test]
-    runs-on: [ self-hosted, etzel ]
-    defaults:
-      run:
-        working-directory: release
+    runs-on: windows-latest
     steps:
+      - name: Support longpaths
+        run: git config --system core.longpaths true
       - uses: actions/checkout@v3
-      - name: Delete old virtual environment
-        run: Remove-Item -Recurse -ErrorAction Ignore venv
-      - name: Create virtual environment
-        run: py -3.10 -m venv venv
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
       - name: Install dependencies
         run: |
-          release\venv\Scripts\python -m pip install --upgrade pip
-          release\venv\Scripts\python -m pip install wheel
-          release\venv\Scripts\pip install -r requirements\release.txt
-        working-directory: .
+          python -m pip install --upgrade pip
+          python -m pip install wheel
+          pip install -r requirements\release.txt
       - name: Generate UI code from Qt Creator Studio .ui files
         run: |
-          release\venv\Scripts\activate
           python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-        working-directory: .
-      - name: Delete old build artifacts
-        run: Remove-Item -Recurse -ErrorAction Ignore dist, build
       - name: Build executable
-        run: venv\Scripts\pyinstaller pytrnsys-gui.spec
-      - name: Determine short SHA
-        id: sha
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
+        run: pyinstaller pytrnsys-gui.spec
+        working-directory: release
+      - name: Determine output path components
+        id: vars
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
+          $ref_name="${{github.ref_name}}".replace("/","-")
+          echo "ref_name=$ref_name" >> $env:GITHUB_OUTPUT
       - name: Rename executable
-        run: Rename-Item -Path dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}.exe
+        run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}
-          path: release\dist\pytrnsys-gui.exe
-
+          name: pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}
+          path: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
