@@ -64,14 +64,16 @@ jobs:
       - name: Build executable
         run: pyinstaller pytrnsys-gui.spec
         working-directory: release
-      - name: Determine short SHA
-        id: sha
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
+      - name: Determine output path components
+        id: vars
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
+          echo "ref_name=${{github.ref_name}}.replace('/','-')" >> $env:GITHUB_OUTPUT
       - name: Rename executable
-        run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}.exe
+        run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}
-          path: release\dist\pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}.exe
+          name: pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}
+          path: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
 
