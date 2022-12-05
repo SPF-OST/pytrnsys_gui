@@ -59,8 +59,6 @@ jobs:
       - name: Generate UI code from Qt Creator Studio .ui files
         run: |
           python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-      - name: Delete old build artifacts
-        run: Remove-Item -Recurse -ErrorAction Ignore dist, build
       - name: Build executable
         run: pyinstaller pytrnsys-gui.spec
         working-directory: release
@@ -68,7 +66,8 @@ jobs:
         id: vars
         run: |
           echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
-          echo "ref_name=${{github.ref_name}}.replace('/','-')" >> $env:GITHUB_OUTPUT
+          $ref_name="${{github.ref_name}}".replace("/","-")
+          echo "ref_name=$ref_name" >> $env:GITHUB_OUTPUT
       - name: Rename executable
         run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
       - name: Upload artifacts
@@ -76,4 +75,3 @@ jobs:
         with:
           name: pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}
           path: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
-
