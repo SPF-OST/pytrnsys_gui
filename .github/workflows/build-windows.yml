@@ -42,31 +42,30 @@ jobs:
 
   build-executable:
     needs: [test]
-    runs-on: [ self-hosted, etzel ]
+    runs-on: windows-latest
     defaults:
       run:
         working-directory: release
     steps:
       - uses: actions/checkout@v3
-      - name: Delete old virtual environment
-        run: Remove-Item -Recurse -ErrorAction Ignore venv
-      - name: Create virtual environment
-        run: py -3.10 -m venv venv
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
       - name: Install dependencies
         run: |
-          release\venv\Scripts\python -m pip install --upgrade pip
-          release\venv\Scripts\python -m pip install wheel
-          release\venv\Scripts\pip install -r requirements\release.txt
+          python -m pip install --upgrade pip
+          python -m pip install wheel
+          pip install -r requirements\release.txt
         working-directory: .
       - name: Generate UI code from Qt Creator Studio .ui files
         run: |
-          release\venv\Scripts\activate
           python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
         working-directory: .
       - name: Delete old build artifacts
         run: Remove-Item -Recurse -ErrorAction Ignore dist, build
       - name: Build executable
-        run: venv\Scripts\pyinstaller pytrnsys-gui.spec
+        run: pyinstaller pytrnsys-gui.spec
       - name: Determine short SHA
         id: sha
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
@@ -76,5 +75,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}
-          path: release\dist\pytrnsys-gui.exe
+          path: release\dist\pytrnsys-gui-${{github.ref_name}}-${{steps.sha.outputs.sha_short}}.exe
 
