@@ -27,7 +27,9 @@ jobs:
           release\venv\Scripts\pip install -r requirements\release.txt
         working-directory: .
       - name: Generate UI code from Qt Creator Studio .ui files
-        run: release\venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
+        run: |
+          release\venv\Scripts\activate
+          python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
         working-directory: .
       - name: Delete old build artifacts
         run: Remove-Item -Recurse -ErrorAction Ignore dist, build
