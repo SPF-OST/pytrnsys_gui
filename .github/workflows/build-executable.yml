@@ -35,8 +35,9 @@ jobs:
           echo "ref_name=$ref_name" >> $env:GITHUB_OUTPUT
       - name: Rename executable
         run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
-          name: pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}
-          path: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          title: Release ${{steps.vars.outputs.ref_name}} (${{steps.vars.outputs.sha_short}})
+          prerelease: false
+          files: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
