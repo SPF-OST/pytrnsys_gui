@@ -72,7 +72,7 @@ jobs:
         id: fn
         run: |
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
-          $(pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
+          $(venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
           $ref_name="${{github.ref_name}}".replace("/","-")
           echo "file_name=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}.exe" >> $env:GITHUB_OUTPUT
       - name: Rename executable
