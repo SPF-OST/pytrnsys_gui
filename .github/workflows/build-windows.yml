@@ -70,10 +70,19 @@ jobs:
           echo "ref_name=$ref_name" >> $env:GITHUB_OUTPUT
       - name: Rename executable
         run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
-      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
+      - name: Release artifacts
+        if: ${{github.event_name == 'push'}}
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build (${{steps.vars.outputs.ref_name}} / ${{steps.vars.outputs.sha_short}})"
-          files: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
+          # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
+          files: release/dist/pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
+      - name: Upload artifacts
+        if: ${{github.event_name == 'pull_request'}}
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}
+          path: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
