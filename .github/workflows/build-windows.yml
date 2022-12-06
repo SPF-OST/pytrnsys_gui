@@ -76,4 +76,4 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build (${{steps.vars.outputs.ref_name}} / ${{steps.vars.outputs.sha_short}})"
-          files: pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
+          files: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
