@@ -77,6 +77,7 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build (${{steps.vars.outputs.ref_name}} / ${{steps.vars.outputs.sha_short}})"
+          # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: release/dist/pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
       - name: Upload artifacts
         if: ${{github.event.name}} == "pull_request"
