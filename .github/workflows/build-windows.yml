@@ -88,8 +88,8 @@ jobs:
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: |
             release/dist/${{steps.fn.outputs.file_name}}
-            venv\pytrnsys_gui_data
-            venv\pytrnsys_data
+            venv/pytrnsys_gui_data
+            venv/pytrnsys_data
       - name: Upload artifacts
         if: ${{github.event_name == 'pull_request'}}
         uses: actions/upload-artifact@v3
