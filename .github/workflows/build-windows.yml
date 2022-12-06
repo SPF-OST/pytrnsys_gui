@@ -84,7 +84,7 @@ jobs:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
           automatic_release_tag: "latest"
           prerelease: true
-          title: "Development Build (${{steps.vars.outputs.ref_name}} / ${{steps.vars.outputs.sha_short}})"
+          title: "Development Build"
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: |
             release/dist/${{steps.fn.outputs.file_name}}
