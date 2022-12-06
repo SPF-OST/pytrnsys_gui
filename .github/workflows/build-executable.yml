@@ -16,37 +16,38 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+      - name: Set up venv
+        run: |
+          python -m venv venv
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install wheel
-          pip install -r requirements\release.txt
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel
+          venv\Scripts\pip install -r requirements\release.txt
       - name: Generate UI code from Qt Creator Studio .ui files
         run: |
+          venv\Scripts\activate
           python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
       - name: Build executable
-        run: pyinstaller pytrnsys-gui.spec
+        run: ..\venv\Scripts\pyinstaller pytrnsys-gui.spec
         working-directory: release
-      - name: Determine output path components
-        id: vars
+      - name: Compute file name
+        id: fn
         run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $env:GITHUB_OUTPUT
+          $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
+          $(venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
           $ref_name="${{github.ref_name}}".replace("/","-")
-          echo "ref_name=$ref_name" >> $env:GITHUB_OUTPUT
+          echo "file_name=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}.exe" >> $env:GITHUB_OUTPUT
       - name: Rename executable
-        run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        if: ${{github.event_name == 'push'}}
+        run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName ${{steps.fn.outputs.file_name}}
+      - name: Release artifacts
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
-          automatic_release_tag: "latest"
-          prerelease: true
+          prerelease: false
           title: "Development Build (${{steps.vars.outputs.ref_name}} / ${{steps.vars.outputs.sha_short}})"
-          # ATTENTION `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
-          files: release/dist/pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
-      - name: Upload artifacts
-        if: ${{github.event_name == 'pull_request'}}
-        uses: actions/upload-artifact@v3
-        with:
-          name: pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}
-          path: release\dist\pytrnsys-gui-${{steps.vars.outputs.ref_name}}-${{steps.vars.outputs.sha_short}}.exe
+          # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
+          files: |
+            release/dist/${{steps.fn.outputs.file_name}}
+            venv/pytrnsys_gui_data
+            venv/pytrnsys_data
