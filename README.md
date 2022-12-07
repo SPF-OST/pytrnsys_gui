@@ -11,13 +11,13 @@ You can find the documentation under https://pytrnsys.readthedocs.io/
 
 ## Installation
 
-In the following all commands should be run from the `pytrnsys_gui` directory. The command should be run in a 
-"Windows Command Prompt" for Windows environment. The commands should be very similar should you wish to install on
-Linux.
+You'll need `TRNSYS` (at least version 17, preferably version 18, 32 bit)  installed on your machine.
 
 ### Binary installation / User installation
 
-#### Latest stable release
+#### Installation
+
+##### Latest stable release
 
 This version is recommended for **non-SPF users** and/or everyone interested in the most recent stable release
 possibly missing the latest features.
@@ -29,7 +29,7 @@ the latest Release Build:
 
 (Note that the version will vary as newer versions are being published)
 
-#### Bleeding-edge version
+##### Bleeding-edge version
 
 This version is recommended for **SPF users** and/or everyone wanting to get the latest and greatest but not minding the fact
 that this version is less stable (i.e. can contain more bugs/errors) than the latest stable release.
@@ -38,6 +38,16 @@ Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and download 
 the `bleeding-edge` Development Build:
 
 ![Bleeding Edge Release](doc/bleeding-edge.png)
+
+#### Post-installation
+
+Copy `pytrnsys` custom TRNSYS types in the form of compiled DLLs from
+
+    pytrnsys_data\data\ddcks\dlls
+    
+to the respective folder of your TRNSYS installation:
+
+    ...\UserLib\ReleaseDLLs
 
 
 ### Installation from source / Developer installation
@@ -63,8 +73,8 @@ the `bleeding-edge` Development Build:
 
 #### Getting started
 
-All the following commands should be run from the `pytrnsys_gui` directory. The commands
-specified are for a Windows environment. They are very similar for Linux.
+All the following commands should be run from the `pytrnsys_gui` directory. The command should be run in a 
+"Windows Command Prompt" (cmd).
 
 1. Create a virtual environment:
     ```commandline
@@ -94,7 +104,9 @@ specified are for a Windows environment. They are very similar for Linux.
     python GUI.py
     ```
 
-Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+Several custom TRNSYS types in the form of compiled DLLs are delivered with `pytrnsys`.
+
+You'll have to manually copy the files from
 
     pytrnsys\data\ddcks\dlls
     
