@@ -1,12 +1,13 @@
 import logging as _log
 import pathlib as _pl
+import sys as _sys
 
 import PyQt5.QtWidgets as _qtw
-import sys as _sys
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI.arguments as _args
+import trnsysGUI.errors as _err
 import trnsysGUI.setup as _setup
 
 
@@ -63,6 +64,7 @@ _OLD_EXCEPTHOOK = None
 
 
 def _registerExceptionHook(logger: _log.Logger) -> None:
+    global _OLD_EXCEPTHOOK  # pylint: disable=global-statement
     _OLD_EXCEPTHOOK = _sys.excepthook
 
     def exceptionHook(exceptionType, value, traceback):
