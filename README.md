@@ -27,7 +27,7 @@ the latest Release Build:
 
 ![Latest Versioned Release](doc/release.png)
 
-(Note the version will vary as newer versions are being published)
+(Note that the version will vary as newer versions are being published)
 
 #### Bleeding-edge version
 
