@@ -37,10 +37,18 @@ def _getDataFilePairs():
     return dataFilePairs
 
 
+_MASTER_VERSION_TEMPLATE = "0.0.0+master.{sha}"
+
 setuptools.setup(
     name="pytrnsys-gui",
     author="Institute for Solar Technology (SPF), OST Rapperswil",
-    setuptools_git_versioning={"enabled": True},
+    setuptools_git_versioning={
+        "enabled": True,
+        "template": _MASTER_VERSION_TEMPLATE,
+        "dev_template": _MASTER_VERSION_TEMPLATE,
+        "dirty_template": f"{_MASTER_VERSION_TEMPLATE}.dirty"
+
+    },
     author_email="martin.neugebauer@ost.ch",
     description="A GUI for Trnsys",
     long_description=long_description,

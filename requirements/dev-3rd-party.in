@@ -1,5 +1,7 @@
 -r test-3rd-party.in
 
+setuptools-git-versioning
+
 twine
 
 pip-compile-multi
