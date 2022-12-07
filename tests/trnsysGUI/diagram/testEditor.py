@@ -118,7 +118,7 @@ class TestEditor:
 
         request.addfinalizer(quitApplication)
 
-        logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
+        logger = _ulog.get_or_create_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
 
         helper = _Helper(testProject)
         helper.setup()
@@ -156,7 +156,7 @@ class TestEditor:
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
         project = _prj.LoadProject(projectJsonFilePath)
-        logger = _ulog.setup_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
+        logger = _ulog.get_or_create_custom_logger("root", "DEBUG")  # type: ignore[attr-defined]
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
 
         self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.centralWidget)
