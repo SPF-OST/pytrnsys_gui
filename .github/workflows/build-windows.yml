@@ -74,7 +74,7 @@ jobs:
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
           $(venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
           $ref_name="${{github.ref_name}}".replace("/","-")
-          echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}.exe" >> $env:GITHUB_OUTPUT
+          echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
       - name: Create zip file
         if: ${{github.event_name == 'push'}}
         run: Compress-Archive -Path data, venv\pytrnsys_data, release\dist\pytrnsys-gui.exe -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
