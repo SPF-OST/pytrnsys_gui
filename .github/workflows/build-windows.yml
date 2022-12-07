@@ -79,7 +79,7 @@ jobs:
         if: ${{github.event_name == 'push'}}
         run: Compress-Archive -Path data, venv\pytrnsys_data, release\dist\pytrnsys-gui.exe -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
       - name: Release artifacts
-        if: ${{github.event_name == 'push'}}
+        if: ${{github.event_name == 'push' or (github.event_name == 'repository_dispatch' and github.event.event_type == 'run-tests-and-build-executable')}}
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
