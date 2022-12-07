@@ -74,9 +74,10 @@ jobs:
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
           $(venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
           $ref_name="${{github.ref_name}}".replace("/","-")
-          echo "file_name=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}.exe" >> $env:GITHUB_OUTPUT
-      - name: Rename executable
-        run: Rename-Item -Path release\dist\pytrnsys-gui.exe -NewName ${{steps.fn.outputs.file_name}}
+          echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}.exe" >> $env:GITHUB_OUTPUT
+      - name: Create zip file
+        if: ${{github.event_name == 'push'}}
+        run: Compress-Archive -Path data, venv\pytrnsys_data, release\dist\pytrnsys-gui.exe -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
       - name: Release artifacts
         if: ${{github.event_name == 'push'}}
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -86,16 +87,13 @@ jobs:
           prerelease: true
           title: "Development Build"
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
-          files: |
-            release/dist/${{steps.fn.outputs.file_name}}
-            venv/pytrnsys_gui_data
-            venv/pytrnsys_data
+          files: ${{steps.fn.outputs.file_name_base}}.zip
       - name: Upload artifacts
         if: ${{github.event_name == 'pull_request'}}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{steps.fn.outputs.file_name}}
+          name: ${{steps.fn.outputs.file_name_base}}
           path: |
-            release\dist\${{steps.fn.outputs.file_name}}
-            venv\pytrnsys_gui_data
+            data
             venv\pytrnsys_data
+            release\dist\pytrnsys-gui.exe
