@@ -63,6 +63,10 @@ def _getLogFilePath():
 def _registerExceptionHook(logger: _log.Logger) -> None:
     def exceptionHook(exceptionType, value, traceback):
         logger.critical("Uncaught exception", exc_info=(exceptionType, value, traceback))
+
+        for handler in logger.handlers:
+            handler.flush()
+
         _sys.exit(-1)
 
     _sys.excepthook = exceptionHook
