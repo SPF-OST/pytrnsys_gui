@@ -60,16 +60,10 @@ def _getLogFilePath():
     return _pl.Path("pytrnsys-gui.log")
 
 
-_OLD_EXCEPTHOOK = None
-
-
 def _registerExceptionHook(logger: _log.Logger) -> None:
-    global _OLD_EXCEPTHOOK  # pylint: disable=global-statement
-    _OLD_EXCEPTHOOK = _sys.excepthook
-
     def exceptionHook(exceptionType, value, traceback):
         logger.critical("Uncaught exception", exc_info=(exceptionType, value, traceback))
-        _OLD_EXCEPTHOOK(exceptionType, value, traceback)
+        _sys.exit(-1)
 
     _sys.excepthook = exceptionHook
 
