@@ -40,7 +40,7 @@ def _getDataFilePairs():
 setuptools.setup(
     name="pytrnsys-gui",
     author="Institute for Solar Technology (SPF), OST Rapperswil",
-    version_config=True,
+    setuptools_git_versioning={"enabled": True},
     author_email="martin.neugebauer@ost.ch",
     description="A GUI for Trnsys",
     long_description=long_description,
