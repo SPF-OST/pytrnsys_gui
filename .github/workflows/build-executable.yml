@@ -34,8 +34,8 @@ jobs:
       - name: Compute file name
         id: fn
         run: |
-          $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
-          $(venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
+          $pytrnsys_gui_sha=(git rev-parse --short HEAD)
+          $pytrnsys_sha=(venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split()[-1].Trim()
           $ref_name="${{github.ref_name}}".replace("/","-")
           echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
       - name: Create zip file
