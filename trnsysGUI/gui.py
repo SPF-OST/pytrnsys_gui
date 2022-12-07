@@ -54,8 +54,8 @@ def main():
 def _getLogFilePath():
     isRunAsPyinstallerExe = getattr(_sys, 'frozen', False) and hasattr(_sys, '_MEIPASS')
     if isRunAsPyinstallerExe:
-        pyinstallerLogFilePath = _pl.Path(_sys.executable) / "pytrnsys-gui.log"
-        return pyinstallerLogFilePath
+        containingDir = _pl.Path(_sys.executable).parent
+        return containingDir / "pytrnsys-gui.log"
 
     return _pl.Path("pytrnsys-gui.log")
 
