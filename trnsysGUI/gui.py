@@ -15,7 +15,7 @@ def main():
     arguments = _args.getArgsOrExit()
 
     logFilePath = _getLogFilePath()
-    logger = _ulog.get_or_create_custom_logger("root", arguments.logLevel, logFilePath)
+    logger = _ulog.getOrCreateCustomLogger("root", arguments.logLevel, logFilePath)
 
     _registerExceptionHook(logger)
 
