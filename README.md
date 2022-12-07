@@ -22,7 +22,8 @@ Linux.
 This version is recommended for **non-SPF users** and/or everyone interested in the most stable release possibly missing
 the latest features.
 
-Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and download the latest Release Build:
+Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and download the `.zip` file included in
+the latest Release Build:
 
 [Latest Versioned Release](doc/release.png)
 
@@ -33,7 +34,8 @@ Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and download 
 This version is recommended for **SPF users** and/or everyone wanting to get the latest and greatest but not minding the fact
 that this version is less stable (i.e. can contain more bugs/errors) than the latest stable release.
 
-Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and downloaded the `bleeding-edge` Development Build:
+Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and download the `.zip` file included in
+the `bleeding-edge` Development Build:
 
 [Bleeding Edge Release](doc/bleeding-edge.png)
 
