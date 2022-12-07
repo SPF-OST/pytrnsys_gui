@@ -49,6 +49,11 @@ to the respective folder of your TRNSYS installation:
 
     ...\UserLib\ReleaseDLLs
 
+#### Troubleshooting
+`pytrnsys-gui.exe` writes logging messages into the `pytrnsys-gui.log` file located in the same directory
+as the `.exe` file. The `.log` file might give you some hints as to what happened if something doesn't
+work or if `pytrnsys-gui.exe` has crashed.
+
 
 ### Installation from source / Developer installation
 
