@@ -45,6 +45,6 @@ jobs:
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
           prerelease: false
-          title: "Release build"
+          title: "Release Build"
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
