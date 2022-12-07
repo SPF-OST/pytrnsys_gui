@@ -17,72 +17,25 @@ Linux.
 
 ### Binary installation / User installation
 
-#### Prerequisites
+#### Latest stable release
 
-##### Required
+This version is recommended for **non-SPF users** and/or everyone interested in the most stable release possibly missing
+the latest features.
 
-1. [Python 3.9](https://www.python.org/downloads/)
+Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and download the latest Release Build:
 
-#### Getting started
+[Latest Versioned Release](doc/release.png)
 
-1. Open a command prompt (e.g., by hitting the Windows-key, then typing "cmd" 
-   into the search box and hitting enter). The following commands should be entered
-   into the command prompt just opened.
+(Note the version will vary as newer versions are being published)
 
-1. Navigate to the directory which should contain the `pytrnsys-gui` directory:
-    ```commandline
-    cd [your-directory]
-    ```
-   Replace `[your-directory]` (including the brackets []) with your directory of choice: if your
-directory is called `foo` then `pytrnsys-gui` will be installed to `foo\pytrnsys-gui`.
-   
-1. Create a virtual environment:
-    ```commandline
-    py -3.9 -m venv pytrnsys-gui
-    ```
-1. Activate it:
-    ```commandline
-    pytrnsys-gui\Scripts\activate
-    ```
-1. Install the `wheel` package:
-    ```commandline
-    pip install wheel
-    ```
-         
-1. Install `pytrnsys-gui` and its requirements:
-    ```commandline
-    pip install -r pip install -r https://raw.githubusercontent.com/SPF-OST/pytrnsys_gui/v0.10.1-reqs/requirements/release.txt
-    ```
-   
-You can now close the command prompt opened in the first step.
+#### Bleeding-edge version
 
-Several original types are delivered with pytrnsys. For those you'll manually need to copy the dll-files from:
+This version is recommended for **SPF users** and/or everyone wanting to get the latest and greatest but not minding the fact
+that this version is less stable (i.e. can contain more bugs/errors) than the latest stable release.
 
-    pytrnsys-gui\pytrnsys_data\ddcks\dlls
-    
-to the respective folder of your TRNSYS installation:
+Go to [Releases](https://github.com/SPF-OST/pytrnsys_gui/releases) and downloaded the `bleeding-edge` Development Build:
 
-    ...\UserLib\ReleaseDLLs
-
-The `pytrnsys-gui` can now be started by double-clicking on the 
-`pytrnsys-gui\Scripts\pytrnsys-gui.exe` file. Example projects can be found in the
-`pytrnsys-gui\pytrnsys_gui_data\examples` directory.
-
-
-#### Upgrading from one patch version to the next within the same minor version
-There is a shortcut for upgrading from one patch version to the next within the same minor version, e.g., from
-1.2.11 to 1.2.12:
-
-1. Activate your virtual environment:
-    ```commandline
-    pytrnsys-gui\Scripts\activate
-
-1. Issue the following command:
-    ```commandline
-    pip install --upgrade pytrnsys-gui
-   
-This method might not be 100% reliable. If you're experiencing problems, we recommend installing your preferred
-version from scratch as described above.
+[Bleeding Edge Release](doc/bleeding-edge.png)
 
 
 ### Installation from source / Developer installation
