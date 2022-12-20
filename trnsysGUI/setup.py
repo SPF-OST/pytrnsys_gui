@@ -24,7 +24,7 @@ class _VersionedPackage:
     def create(cls, serializedVersionedPackage: str) -> "_VersionedPackage":
         match = cls._VERSIONED_PACKAGE_REGEX.match(serializedVersionedPackage)
         if not match:
-            raise ValueError(f"Not a package version specification: {serializedVersionedPackage}")
+            raise ValueError(f'Not a package version specification: "{serializedVersionedPackage}"')
 
         name = match.group(1)
         version = match.group(2)
@@ -59,7 +59,10 @@ def _checkRequirements() -> _res.Result[None]:
 
     requiredVersions = _getRequiredVersions(release3rdPartyTxtFilePath)
 
-    installedVersions = _getInstalledNonEditableVersions()
+    result = _getInstalledNonEditableVersions()
+    if _res.isError(result):
+        return result
+    installedVersions = _res.value(result)
 
     missingVersions = requiredVersions - installedVersions
     if missingVersions:
@@ -90,7 +93,7 @@ followed by
     return None
 
 
-def _getInstalledNonEditableVersions() -> _tp.Set[_VersionedPackage]:
+def _getInstalledNonEditableVersions() -> _res.Result[_tp.Set[_VersionedPackage]]:
     completedPipFreezeProcess = _sp.run("pip freeze --no-color".split(), capture_output=True, text=True, check=True)
     serializedInstalledVersions = completedPipFreezeProcess.stdout.split("\n")
     serializedNonEditableInstalledVersions = [
@@ -98,7 +101,20 @@ def _getInstalledNonEditableVersions() -> _tp.Set[_VersionedPackage]:
         for v in serializedInstalledVersions
         if v.strip() and not v.startswith("-e")
     ]
-    installedVersions = {_VersionedPackage.create(v) for v in serializedNonEditableInstalledVersions}
+    try:
+        installedVersions = {_VersionedPackage.create(v) for v in serializedNonEditableInstalledVersions}
+    except ValueError as valueError:
+        errorMessage = f"""\
+Could not parse `pip` freeze output:
+
+    {valueError}
+
+Please try updating `pip` from within your virtual environment like so:
+
+    (venv) C:\\...\\pytrnsys_gui> python -m pip install --upgrade pip    
+"""
+        return _res.Error(errorMessage)
+
     return installedVersions
 
 
