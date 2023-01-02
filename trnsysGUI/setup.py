@@ -61,7 +61,7 @@ def _checkRequirements() -> _res.Result[None]:
 
     result = _getInstalledNonEditableVersions()
     if _res.isError(result):
-        return result
+        return _res.error(result)
     installedVersions = _res.value(result)
 
     missingVersions = requiredVersions - installedVersions
