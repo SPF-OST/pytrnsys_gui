@@ -28,15 +28,15 @@ _DATA_DIR = _pl.Path(__file__).parent / "data"
 class _Project:
     projectName: str
     testCasesDirName: str
-    shallCopyFolderFromExamples: bool
+    exampleDirNameToCopyFrom: _tp.Optional[str] = None
 
     @staticmethod
     def createForTestProject(projectName: str) -> "_Project":
-        return _Project(projectName, "tests", False)
+        return _Project(projectName, "tests")
 
     @staticmethod
-    def createForExampleProject(projectName: str) -> "_Project":
-        return _Project(projectName, "examples", True)
+    def createForExampleProject(projectName: str, exampleDirNameToCopyFrom: str = "examples") -> "_Project":
+        return _Project(projectName, "examples", exampleDirNameToCopyFrom)
 
     @property
     def testId(self) -> str:
@@ -44,7 +44,8 @@ class _Project:
 
 
 def getProjects() -> _tp.Iterable[_Project]:
-    yield _Project.createForExampleProject("TRIHP_dualSource")
+    yield _Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
+    yield _Project.createForExampleProject("icegrid")
 
     yield from getTestProjects()
 
@@ -248,7 +249,7 @@ class _Helper:
         self._expectedProjectFolderPath = testCasesFolderPath / self._project.projectName / "expected"
 
     def setup(self):
-        if self._project.shallCopyFolderFromExamples:
+        if self._project.exampleDirNameToCopyFrom:
             self._copyExampleToTestInputFolder()
 
         self._removeGeneratedFiles()
@@ -298,6 +299,6 @@ class _Helper:
             _su.rmtree(self.actualProjectFolderPath)
 
         pytrnsysGuiDir = _pl.Path(__file__).parents[3]
-        exampleFolderPath = pytrnsysGuiDir / "data" / "examplesToBeCompleted" / self._project.projectName
+        exampleFolderPath = pytrnsysGuiDir / "data" / self._project.exampleDirNameToCopyFrom / self._project.projectName
 
         _su.copytree(exampleFolderPath, self.actualProjectFolderPath)

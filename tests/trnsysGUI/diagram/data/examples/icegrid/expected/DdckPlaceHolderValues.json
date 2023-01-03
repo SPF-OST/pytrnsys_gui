@@ -1,0 +1,123 @@
+{
+    "QSnkA": {
+        "In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MQSnkA_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TSCnrA_QSnkA"
+        },
+        "Out": {
+            "@temp": "TQSnkA"
+        }
+    },
+    "QSnkB": {
+        "In": {
+            "@cp": "Lloop3Cp",
+            "@mfr": "MQSnkB_A",
+            "@rho": "Lloop3Rho",
+            "@temp": "TSCnrB_QSnkB"
+        },
+        "Out": {
+            "@temp": "TQSnkB"
+        }
+    },
+    "QSnkC": {
+        "In": {
+            "@cp": "Lloop4Cp",
+            "@mfr": "MQSnkC_A",
+            "@rho": "Lloop4Rho",
+            "@temp": "TSCnrC_QSnkC"
+        },
+        "Out": {
+            "@temp": "TQSnkC"
+        }
+    },
+    "QSnkD": {
+        "In": {
+            "@cp": "Lloop5Cp",
+            "@mfr": "MQSnkD_A",
+            "@rho": "Lloop5Rho",
+            "@temp": "TSCnrD_QSnkD"
+        },
+        "Out": {
+            "@temp": "TQSnkD"
+        }
+    },
+    "QSnkE": {
+        "In": {
+            "@cp": "Lloop6Cp",
+            "@mfr": "MQSnkE_A",
+            "@rho": "Lloop6Rho",
+            "@temp": "TSCnrE_QSnkE"
+        },
+        "Out": {
+            "@temp": "TQSnkE"
+        }
+    },
+    "QSnkF": {
+        "In": {
+            "@cp": "Lloop7Cp",
+            "@mfr": "MQSnkF_A",
+            "@rho": "Lloop7Rho",
+            "@temp": "TSCnrF_QSnkF"
+        },
+        "Out": {
+            "@temp": "TQSnkF"
+        }
+    },
+    "QSnkG": {
+        "In": {
+            "@cp": "Lloop8Cp",
+            "@mfr": "MQSnkG_A",
+            "@rho": "Lloop8Rho",
+            "@temp": "TSCnrG_QSnkG"
+        },
+        "Out": {
+            "@temp": "TQSnkG"
+        }
+    },
+    "QSnkH": {
+        "In": {
+            "@cp": "Lloop9Cp",
+            "@mfr": "MQSnkH_A",
+            "@rho": "Lloop9Rho",
+            "@temp": "TSCnrH_QSnkH"
+        },
+        "Out": {
+            "@temp": "TQSnkH"
+        }
+    },
+    "QSnkI": {
+        "In": {
+            "@cp": "Lloop10Cp",
+            "@mfr": "MQSnkI_A",
+            "@rho": "Lloop10Rho",
+            "@temp": "TSCnrI_QSnkI"
+        },
+        "Out": {
+            "@temp": "TQSnkI"
+        }
+    },
+    "QSnkJ": {
+        "In": {
+            "@cp": "Lloop11Cp",
+            "@mfr": "MQSnkJ_A",
+            "@rho": "Lloop11Rho",
+            "@temp": "TSCnrJ_QSnkJ"
+        },
+        "Out": {
+            "@temp": "TQSnkJ"
+        }
+    },
+    "QSrc1": {
+        "In": {
+            "@cp": "Lloop1Cp",
+            "@mfr": "MQSrc1_A",
+            "@rho": "Lloop1Rho",
+            "@temp": "TSCnr1_QSrc1"
+        },
+        "Out": {
+            "@temp": "TQSrc1"
+        }
+    }
+}
