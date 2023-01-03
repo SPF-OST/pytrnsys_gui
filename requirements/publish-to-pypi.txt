@@ -7,7 +7,7 @@
 #
 bleach==5.0.1
     # via readme-renderer
-certifi==2022.6.15
+certifi==2022.12.7
     # via requests
 charset-normalizer==2.1.0
     # via requests
@@ -59,7 +59,7 @@ urllib3==1.26.9
     #   twine
 webencodings==0.5.1
     # via bleach
-wheel==0.37.1
+wheel==0.38.4
     # via -r requirements\publish-to-pypi.in
 zipp==3.8.0
     # via importlib-metadata
