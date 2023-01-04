@@ -39,7 +39,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
 
-        self.shallCreateTrnsysUnit = True
+        self.shallBeSimulated = True
 
         self._updateModels(self.displayName)
 
@@ -111,7 +111,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.diameterInCm,
             self.uValueInWPerM2K,
             self.lengthInM,
-            self.shallCreateTrnsysUnit,
+            self.shallBeSimulated,
         )
 
         dictName = "Connection-"
@@ -135,7 +135,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.uValueInWPerM2K = model.uValueInWPerM2K
         self.lengthInM = model.lengthInM
 
-        self.shallCreateTrnsysUnit = model.shallCreateTrnsysUnit
+        self.shallBeSimulated = model.shallBeSimulated
 
     def getInternalPiping(self) -> _pi.InternalPiping:
         return _pi.InternalPiping(
@@ -159,8 +159,8 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         unitNumber = startingUnit
 
-        if not self.shallCreateTrnsysUnit:
-            unitText = self._getPassThroughPipeDefinition(
+        if not self.shallBeSimulated:
+            unitText = self._getPassThroughPipeUnitText(
                 startingUnit,
                 inputMfrName,
                 canonicalMfrName,
@@ -170,7 +170,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             )
             return unitText, unitNumber + 1
 
-        unitText = self._getTrnsysUnitDefinition(
+        unitText = self._getSimulatedPipeUnitText(
             unitNumber,
             inputMfrName,
             canonicalMfrName,
@@ -183,7 +183,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         return unitText, nextUnitNumber
 
-    def _getPassThroughPipeDefinition(
+    def _getPassThroughPipeUnitText(
         self,
         unitNumber,
         inputMfrName,
@@ -209,7 +209,7 @@ EQUATIONS 1
 """
         return unitText
 
-    def _getTrnsysUnitDefinition(  # pylint: disable=too-many-locals
+    def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals
         self,
         unitNumber,
         inputMfrName,

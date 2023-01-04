@@ -17,7 +17,7 @@ class Connection:
     diameterInCm: float
     uValueInWPerM2K: float
     lengthInM: float
-    shallCreateTrnsysUnit: bool
+    shallBeSimulated: bool
     connection: _spc.SinglePipeConnection
 
 

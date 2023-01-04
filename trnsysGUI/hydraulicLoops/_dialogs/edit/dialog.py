@@ -114,15 +114,15 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
             uValueText = self.bulkUValueLineEdit.text()
             uValueInWPerM2K = float(uValueText) if uValueText else None
 
-            shallCreateUnitText = self.bulkGeneratUnitComboBox.currentText()
-            if not shallCreateUnitText:
-                shallCreateUnit = None
-            elif shallCreateUnitText == "Yes":
-                shallCreateUnit = True
-            elif shallCreateUnitText == "No":
-                shallCreateUnit = False
+            shallBeSimulatedText = self.bulkShallBeSimulatedComboBox.currentText()
+            if not shallBeSimulatedText:
+                shallBeSimulated = None
+            elif shallBeSimulatedText == "Yes":
+                shallBeSimulated = True
+            elif shallBeSimulatedText == "No":
+                shallBeSimulated = False
             else:
-                raise AssertionError("Expecting 'Yes' or 'No' for 'shall generate unit' combobox.")
+                raise AssertionError("Expecting 'Yes' or 'No' for 'Simulate pipe?' combobox.")
 
             for connection in self._hydraulicLoop.connections:
                 if individualPipeLengthInM is not None:
@@ -134,8 +134,8 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
                 if uValueInWPerM2K is not None:
                     connection.uValueInWPerM2K = uValueInWPerM2K
 
-                if shallCreateUnit is not None:
-                    connection.shallCreateTrnsysUnit = shallCreateUnit
+                if shallBeSimulated is not None:
+                    connection.shallBeSimulated = shallBeSimulated
 
             self._reloadConnections()
 
@@ -323,14 +323,14 @@ def _setConnectionLength(connection: _gmodel.Connection, lengthInMText: _tp.Any)
     connection.lengthInM = _parsePositiveFloat(lengthInMText)
 
 
-def _setConnectionShallCreateTrnsysUnit(connection: _gmodel.Connection, shallCreateTrnsysUnit: _tp.Any) -> None:
-    connection.shallCreateTrnsysUnit = shallCreateTrnsysUnit
+def _setshallBeSimulated(connection: _gmodel.Connection, shallBeSimulated: _tp.Any) -> None:
+    connection.shallBeSimulated = shallBeSimulated
 
 
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     c: _gmodel.Connection
     _PROPERTIES = [
-        _BoolProperty("Simulate?", lambda c: c.shallCreateTrnsysUnit, _setConnectionShallCreateTrnsysUnit),
+        _BoolProperty("Simulate?", lambda c: c.shallBeSimulated, _setshallBeSimulated),
         _TextProperty("Name", lambda c: c.name, shallHighlightOutliers=False),
         _TextProperty("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
         _TextProperty("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),

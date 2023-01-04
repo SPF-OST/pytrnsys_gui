@@ -517,11 +517,11 @@ class Editor(QWidget):
             SinglePipeTotals = _cnames.EnergyBalanceTotals.SinglePipe
             DoublePipeTotals = _cnames.EnergyBalanceTotals.DoublePipe
 
-            singlePipesWithTrnsysUnits = [
-                o for o in self.trnsysObj if isinstance(o, SinglePipeConnection) and o.shallCreateTrnsysUnit
+            simulatedSinglePipes = [
+                o for o in self.trnsysObj if isinstance(o, SinglePipeConnection) and o.shallBeSimulated
             ]
             singlePipeEnergyBalanceEquations = ""
-            if singlePipesWithTrnsysUnits:
+            if simulatedSinglePipes:
                 singlePipeEnergyBalanceEquations = f"""\
 EQUATIONS 2
 *** single pipes
