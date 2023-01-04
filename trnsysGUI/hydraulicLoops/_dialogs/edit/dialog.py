@@ -330,7 +330,7 @@ def _setConnectionShallCreateTrnsysUnit(connection: _gmodel.Connection, shallCre
 class _ConnectionsUiModel(_qtc.QAbstractItemModel):
     c: _gmodel.Connection
     _PROPERTIES = [
-        _BoolProperty("Unit?", lambda c: c.shallCreateTrnsysUnit, _setConnectionShallCreateTrnsysUnit),
+        _BoolProperty("Simulate?", lambda c: c.shallCreateTrnsysUnit, _setConnectionShallCreateTrnsysUnit),
         _TextProperty("Name", lambda c: c.name, shallHighlightOutliers=False),
         _TextProperty("Diameter [cm]", lambda c: c.diameterInCm, _setConnectionDiameter),
         _TextProperty("U value [W/(m^2 K)]", lambda c: c.uValueInWPerM2K, _setConnectionUValue),

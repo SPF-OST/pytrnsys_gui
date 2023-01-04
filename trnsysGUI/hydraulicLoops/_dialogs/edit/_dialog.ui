@@ -394,7 +394,7 @@
              <item row="3" column="0">
               <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>Generate TRNSYS unit</string>
+                <string>Simulate pipe?</string>
                </property>
               </widget>
              </item>
@@ -440,7 +440,7 @@
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Yes - create a TRNSYS unit to simulate the behaviour of the pipe&lt;/p&gt;&lt;p&gt;No - represent the pipe using a simple equation assuming no heat loss&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Yes - simulate the behaviour of the pipe&lt;/p&gt;&lt;p&gt;No - create a dummy pipe assuming no heat loss&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">image: url(:/tango-icons/status/tango-icon-theme-0.8.90/scalable/status/dialog-information.svg);</string>
