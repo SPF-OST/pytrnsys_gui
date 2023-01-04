@@ -104,6 +104,7 @@ def main():
 
         cmd = [
             "pytest",
+            "-v",
             "--cov=trnsysGUI",
             f"--cov-report=html:{testResultsDirPath / 'coverage'}",
             "--cov-report=term",
