@@ -4,6 +4,10 @@
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QMessageBox
 
 
+def NameContainsUnacceptableCharacters(name):
+    return not name.isalnum()
+
+
 class segmentDlg(QDialog):
     def __init__(self, seg, parent=None):
         super(segmentDlg, self).__init__(parent)
@@ -57,3 +61,4 @@ class segmentDlg(QDialog):
             if str(t.displayName).lower() == n.lower():
                 return True
         return False
+
