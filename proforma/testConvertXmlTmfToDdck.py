@@ -28,5 +28,10 @@ def testDecodeXmlTmf() -> None:
 def testConvertXmlTmfStringToDdck() -> None:
     xmlFilePath = _CONTAINING_DIR_PATH / "Type71.xmltmf"
     xmlFileContent = xmlFilePath.read_text(encoding="utf8")
-    ddckContent = _tmf.convertXmlTmfStringToDdck(xmlFileContent)
-    print(ddckContent)
+
+    actualDdckContent = _tmf.convertXmlTmfStringToDdck(xmlFileContent)
+
+    expectedDdckFilePath = _CONTAINING_DIR_PATH / "Type71.ddck"
+    expectedDdckContent = expectedDdckFilePath.read_text(encoding="utf8")
+
+    assert actualDdckContent == expectedDdckContent
