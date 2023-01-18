@@ -100,7 +100,7 @@ All the following commands should be run from the `pytrnsys_gui` directory. The 
    ```
 5. Tag the editable install of `pytrnsys-gui`
    ```commandline
-   setup.py egg_info -b dev
+   python setup.py egg_info -b dev
    ```
    (By adding this tag we make sure that the Qt Creator .ui files are re-generated each time the GUI is started.)
 6. Now you can run `pytrnsys-gui`!
