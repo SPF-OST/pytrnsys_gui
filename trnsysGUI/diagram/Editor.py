@@ -89,15 +89,15 @@ class Editor(QWidget):
     A diagram editor has a QGraphicsLineItem (connLineItem) which is set Visible only when a connection is being created
 
     Function of BlockItems:
-    Items can be added to the library by adding them to the model of the library broswer view.
+    Items can be added to the library by adding them to the model of the library browser view.
     Then they can be dragged and dropped into the diagram view.
 
     Function of trnsysExport:
     When exporting the trnsys file, exportData() is called.
 
     Function of save and load:
-    A diagram can be saved to a json file by calling encodeDiagram and can then be loaded by calling decodeDiagram wiht
-    appropiate filenames.
+    A diagram can be saved to a json file by calling encodeDiagram and can then be loaded by calling decodeDiagram with
+    appropriate filenames.
 
     Attributes
     ----------
