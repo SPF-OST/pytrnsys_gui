@@ -1,0 +1,9 @@
+pip-compile-multi
+pip-tools
+
+pytest
+black
+mypy
+pylint
+
+-r requirements.in
