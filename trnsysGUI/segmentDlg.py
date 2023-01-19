@@ -4,8 +4,19 @@
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QMessageBox
 
 
-def NameContainsUnacceptableCharacters(name):
-    return not name.isalnum()
+class respondToUnacceptableNaming:
+    def __init__(self, name):
+        self.name = name
+        self.unAcceptableName = self.nameContainsUnacceptableCharacters(name)
+        self.response = self.responseToUnacceptableName()
+
+    def nameContainsUnacceptableCharacters(self, name):
+        return not name.isalnum()
+
+    def responseToUnacceptableName(self):
+        if self.unAcceptableName is True:
+            return "Found unacceptable characters (this includes spaces at the start and the end)\n" \
+                   "Please use only letters and numbers."
 
 
 class segmentDlg(QDialog):
@@ -39,19 +50,24 @@ class segmentDlg(QDialog):
         newName = self.le.text()
         if newName.lower() == str(self.seg.connection.displayName).lower():
             self.close()
+        elif self.nameContainsUnacceptableCharacters(newName):
+            response = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
+                       "Please use only letters and numbers."
+            self.respondInMessageBoxWith(response)
         elif newName != "" and not self.nameExists(newName):
             self.seg.connection.setDisplayName(newName)
             for segment in self.seg.connection.segments:
                 segment.setToolTip(newName)
             self.close()
         elif newName == "":
-            msgb = QMessageBox()
-            msgb.setText("Please Enter a name!")
-            msgb.exec()
+            self.respondInMessageBoxWith("Please Enter a name!")
         elif self.nameExists(newName):
-            msgb = QMessageBox()
-            msgb.setText("Name already exist!")
-            msgb.exec()
+            self.respondInMessageBoxWith("Name already exist!")
+
+    def respondInMessageBoxWith(self, response):
+        msgb = QMessageBox()
+        msgb.setText(response)
+        msgb.exec()
 
     def cancel(self):
         self.close()
@@ -61,4 +77,7 @@ class segmentDlg(QDialog):
             if str(t.displayName).lower() == n.lower():
                 return True
         return False
+
+    def nameContainsUnacceptableCharacters(self, name):
+        return not name.isalnum()
 
