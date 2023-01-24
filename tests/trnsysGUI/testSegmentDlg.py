@@ -1,39 +1,60 @@
+import dataclasses as _dc
+from typing import Optional as _op
+
 import pytest as _pt
+
 import trnsysGUI.segmentDlg as _sd
 
-unacceptableNames = [" name with spaces ", "name%with^strange$characters+", "1337", "1337_2556", ""]
-acceptableNames = ["nameisnoncapitalwithonlyletters", "NameIsCamelCaseWithOnlyLetters",
+_existingNames = ["SCnrA_QSnkA", "SCnrB_QSnkB", "SCnrC_QSnkC", "SCnrD_QSnkD"]
+_unacceptableNames = [" name with spaces ", "name%with^strange$characters+", "1337", "1337_2556", ""]
+_acceptableNames = ["nameisnoncapitalwithonlyletters", "NameIsCamelCaseWithOnlyLetters",
                    "name1contains2numbers3without4capital5letters", "name1contains2numbers3with4CAPITAL5LETTERS",
                    "_name_with_underscores_"]
+_booleans = [False] * 5
+_booleans[2] = True
+_response1 = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
+                            "Please use only letters, numbers, and underscores."
+_responsesUnacceptableNames = [_response1] * 4
+_responsesUnacceptableNames.append('Please Enter a name!')
+
+
+@_dc.dataclass
+class _TestCase:
+    name: str
+    isValid: bool
+    doesExist: bool
+    response: _op[str]
+    isdigit: bool
+
+
+_TEST_CASES = [
+    _TestCase(name="TDTeeA_DTeeB", isValid=True, doesExist=False, response=None, isdigit=False),
+
+]
+
+_casesResponse = [(_unacceptableNames[i], _responsesUnacceptableNames[i]) for i in range(len(_unacceptableNames))]
+_casesOnlyNumbers = [(_unacceptableNames[i], _booleans[i]) for i in range(len(_unacceptableNames))]
 
 
 class TestCheckPipeName:
-    # todo: apply these tests to the class segmentDlg
-    @_pt.mark.parametrize("userInput", unacceptableNames)
+    @_pt.mark.parametrize("userInput", _unacceptableNames)
     def testNameContainsUnacceptableCharacters(self, userInput):
-        responseClass = _sd.CheckPipeName(userInput)
+        response = _sd.CheckPipeName(userInput, _existingNames).nameContainsUnacceptableCharacters()
 
-        assert responseClass.unacceptableName is True
+        assert response is True
 
-    @_pt.mark.parametrize("userInput", acceptableNames)
+    @_pt.mark.parametrize("userInput", _acceptableNames)
     def testNameContainsOnlyAcceptableCharacters(self, userInput):
-        responseClass = _sd.CheckPipeName(userInput)
+        response = _sd.CheckPipeName(userInput, _existingNames).nameContainsUnacceptableCharacters()
 
-        assert responseClass.unacceptableName is False
+        assert response is False
 
-    @_pt.mark.parametrize("userInput", unacceptableNames)
-    def testResponseToUnacceptableName(self, userInput):
-        expectedResponse = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
-                            "Please use only letters, numbers, and underscores."
-        responseClass = _sd.CheckPipeName(userInput)
-        assert responseClass.response == expectedResponse
+    @_pt.mark.parametrize("userInput, expectedResponse", _casesResponse)
+    def testResponseToUnacceptableName(self, userInput, expectedResponse):
+        errorMessage = _sd.CheckPipeName(userInput, _existingNames).errorMessage
+        assert errorMessage == expectedResponse
 
-    @_pt.mark.parametrize("userInput, booleans", [
-        (unacceptableNames[0], False),
-        (unacceptableNames[1], False),
-        (unacceptableNames[2], True),
-        (unacceptableNames[3], False),
-    ])
+    @_pt.mark.parametrize("userInput, booleans", _casesOnlyNumbers)
     def testOnlyNumbers(self, userInput, booleans):
-        response = _sd.CheckPipeName(userInput).containsOnlyNumbers(userInput)
+        response = _sd.CheckPipeName(userInput, _existingNames).containsOnlyNumbers(userInput)
         assert response is booleans

@@ -5,21 +5,21 @@ from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLa
 
 
 class CheckPipeName:
-    def __init__(self, name):
+    def __init__(self, name, existingNames):
+        self.response = None
         self.name = name
-        self.onlyWords = self.removeUnderscores(name)
-        self.unacceptableName = self.nameContainsUnacceptableCharacters()
-        self.response = self.responseToUnacceptableName()
+        self.existingNames = existingNames
+        self.nameWithoutUnderscores = self.removeUnderscores()
+        self.errorMessage = self.checkValidity()
 
     def nameContainsUnacceptableCharacters(self):
-        if self.containsOnlyNumbers(self.onlyWords):
+        if self.containsOnlyNumbers(self.nameWithoutUnderscores):
             return True
-        return not self.containsOnlyLettersAndNumbers(self.onlyWords)
+        return not self.containsOnlyLettersAndNumbers(self.nameWithoutUnderscores)
 
-    @staticmethod
-    def removeUnderscores(name):
-        wordsOnly = "".join(list(filter(None, name.split('_'))))
-        return wordsOnly
+    def removeUnderscores(self):
+        nameWithoutUnderscores = "".join(list(filter(None, self.name.split('_'))))
+        return nameWithoutUnderscores
 
     @staticmethod
     def containsOnlyLettersAndNumbers(string1):
@@ -29,10 +29,26 @@ class CheckPipeName:
     def containsOnlyNumbers(string1):
         return string1.isdigit()
 
-    def responseToUnacceptableName(self):
-        if self.unacceptableName:
-            return "Found unacceptable characters (this includes spaces at the start and the end)\n" \
-                   "Please use only letters, numbers, and underscores."
+    @staticmethod
+    def nameExists(n, existingNames):
+        for name in existingNames:
+            if name.lower() == n.lower():
+                return True
+        return False
+
+    def checkValidity(self):
+        newName = self.name
+        if newName == "":
+            errorMessage = "Please Enter a name!"
+            return errorMessage
+        elif self.nameContainsUnacceptableCharacters():
+            errorMessage = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
+                           "Please use only letters, numbers, and underscores."
+            return errorMessage
+        elif self.nameExists(newName, self.existingNames):
+            errorMessage = "Name already exist!"
+            return errorMessage
+        return None
 
 
 # todo: make upper case
@@ -41,7 +57,6 @@ class segmentDlg(QDialog):
         super(segmentDlg, self).__init__(parent)
         self.seg = seg
         nameLabel = QLabel("Name:")
-        objectLabel = QLabel("Object:" + str(self.seg))
         self.le = QLineEdit(self.seg.connection.displayName)
 
         self.okButton = QPushButton("OK")
@@ -65,32 +80,21 @@ class segmentDlg(QDialog):
 
     def acceptedEdit(self):
         newName = self.le.text()
-        isValidNewName, response = self.checkName(newName)
-        if not isValidNewName:
-            self.respondInMessageBoxWith(response)
+        # todo: use result class
+        existingNames = self.getExistingNames()
+        errorMessage = CheckPipeName(newName, existingNames).errorMessage
+        if self.nameKept(newName):
+            self.close()
+        elif errorMessage:
+            self.respondInMessageBoxWith(errorMessage)
         else:
-            if self.nameKept(newName):
-                self.close()
-            elif not self.nameExists(newName):
-                self.seg.connection.setDisplayName(newName)
-                for segment in self.seg.connection.segments:
-                    segment.setToolTip(newName)
-                self.close()
+            self.applyNameChange(newName)
+            self.close()
 
-    def checkName(self, newName):
-        if newName == "":
-            response = "Please Enter a name!"
-            self.respondInMessageBoxWith(response)
-            return False, response
-        elif self.nameContainsUnacceptableCharacters(newName):
-            response = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
-                       "Please use only letters, numbers, and underscores."
-            return False, response
-        elif self.nameExists(newName):
-            response = "Name already exist!"
-            self.respondInMessageBoxWith(response)
-            return False, response
-        return True, None
+    def applyNameChange(self, newName):
+        self.seg.connection.setDisplayName(newName)
+        for segment in self.seg.connection.segments:
+            segment.setToolTip(newName)
 
     def nameKept(self, name):
         return name.lower() == str(self.seg.connection.displayName).lower()
@@ -104,12 +108,13 @@ class segmentDlg(QDialog):
     def cancel(self):
         self.close()
 
-    def nameExists(self, n):
-        for t in self.parent().trnsysObj:
-            if str(t.displayName).lower() == n.lower():
+    @staticmethod
+    def nameExists(n, existingNames):
+        for name in existingNames:
+            if name.lower() == n.lower():
                 return True
         return False
 
-    @staticmethod
-    def nameContainsUnacceptableCharacters(name):
-        return CheckPipeName(name).unacceptableName
+    def getExistingNames(self):
+        existingNames = [str(t.displayName) for t in self.parent().trnsysObj]
+        return existingNames
