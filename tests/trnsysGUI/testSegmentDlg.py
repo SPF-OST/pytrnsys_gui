@@ -1,6 +1,3 @@
-import dataclasses as _dc
-from typing import Optional as _op
-
 import pytest as _pt
 
 import trnsysGUI.segmentDlg as _sd
@@ -16,22 +13,6 @@ _response1 = "Found unacceptable characters (this includes spaces at the start a
                             "Please use only letters, numbers, and underscores."
 _responsesUnacceptableNames = [_response1] * 4
 _responsesUnacceptableNames.append('Please Enter a name!')
-
-
-@_dc.dataclass
-class _TestCase:
-    name: str
-    isValid: bool
-    doesExist: bool
-    response: _op[str]
-    isdigit: bool
-
-
-_TEST_CASES = [
-    _TestCase(name="TDTeeA_DTeeB", isValid=True, doesExist=False, response=None, isdigit=False),
-
-]
-
 _casesResponse = [(_unacceptableNames[i], _responsesUnacceptableNames[i]) for i in range(len(_unacceptableNames))]
 _casesOnlyNumbers = [(_unacceptableNames[i], _booleans[i]) for i in range(len(_unacceptableNames))]
 
