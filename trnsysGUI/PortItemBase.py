@@ -236,9 +236,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
 
         self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
 
-        internalPiping = self.parent.getInternalPiping()
-        portItems = internalPiping.getModelPortItems(self)
-        formattedPortItems = [f"{p.name} ({p.direction.value})" for p in portItems]
+        formattedPortItems = self._getFormattedPortItems()
         jointFormattedPortItems = "\n".join(formattedPortItems)
         self.parent.parent.parent().listV.addItem(f"Names: {jointFormattedPortItems}")
 
@@ -247,6 +245,22 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         self.parent.parent.parent().listV.addItem("Connections:")
         for connection in self.connectionList:
             self.parent.parent.parent().listV.addItem(connection.displayName)
+
+    def _getFormattedPortItems(self) -> _tp.Sequence[str]:
+        internalPiping: _ip.InternalPiping = self.parent.getInternalPiping()
+
+        portItems = internalPiping.getModelPortItems(self)
+
+        formattedPortItems = []
+        for portItem in portItems:
+            node = internalPiping.getNode(self, portItem.type)
+            nodeNameOrEmpty = node.name or ""
+
+            formattedPortItem = f"{nodeNameOrEmpty}{portItem.name} ({portItem.direction.value})"
+
+            formattedPortItems.append(formattedPortItem)
+
+        return formattedPortItems
 
     def _debugClear(self):
         self.parent.parent.parent().listV.clear()
