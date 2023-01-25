@@ -60,21 +60,39 @@ def _getPlaceholdersForPort(
     modelPortItem: _mfn.PortItem,
 ) -> _tp.Dict[str, str]:
     if modelPortItem.direction == _mfn.PortItemDirection.OUTPUT:
-        placeholdersForPort = {"@temp": _temps.getInternalTemperatureVariableName(component, node)}
-    elif modelPortItem.direction == _mfn.PortItemDirection.INPUT:
-        graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[modelPortItem]
-        inputConnection = graphicalPortItem.getConnection()
+        outputTemperatureVariableName = _temps.getInternalTemperatureVariableName(component, node)
+        reverseInputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(internalPiping, modelPortItem)
 
-        inputTemperatureVariableName = _cnames.getTemperatureVariableName(inputConnection, modelPortItem.type)
+        placeholdersForPort = _createOutputPlaceholdersDict(
+            outputTemperatureVariableName, reverseInputTemperatureVariableName
+        )
+
+        return placeholdersForPort
+
+    if modelPortItem.direction == _mfn.PortItemDirection.INPUT:
+        inputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(internalPiping, modelPortItem)
         inputMfrVariableName = _mnames.getMassFlowVariableName(component, node, modelPortItem)
 
+        inputConnection = _getConnectionAt(internalPiping, modelPortItem)
         loop = _getLoop(hydraulicLoops, inputConnection)
 
         placeholdersForPort = _createInputPlaceholdersDict(inputMfrVariableName, inputTemperatureVariableName, loop)
-    else:
-        raise AssertionError(f"Unknown {_mfn.PortItemDirection.__name__}: {modelPortItem.direction}")
 
-    return placeholdersForPort
+        return placeholdersForPort
+
+    raise AssertionError(f"Unknown {_mfn.PortItemDirection.__name__}: {modelPortItem.direction}")
+
+
+def _getTemperatureOfPipeConnectedAt(internalPiping: _ip.InternalPiping, modelPortItem: _mfn.PortItem) -> str:
+    inputConnection = _getConnectionAt(internalPiping, modelPortItem)
+    inputTemperatureVariableName = _cnames.getTemperatureVariableName(inputConnection, modelPortItem.type)
+    return inputTemperatureVariableName
+
+
+def _getConnectionAt(internalPiping: _ip.InternalPiping, modelPortItem: _mfn.PortItem) -> _cb.ConnectionBase:
+    graphicalPortItem = internalPiping.modelPortItemsToGraphicalPortItem[modelPortItem]
+    connection = graphicalPortItem.getConnection()
+    return connection
 
 
 def _createInputPlaceholdersDict(
@@ -94,6 +112,11 @@ def _createInputPlaceholdersDict(
         "@cp": _lnames.getHeatCapacityName(loopName),
         "@rho": _lnames.getDensityName(loopName),
     }
+
+
+def _createOutputPlaceholdersDict(outputTemperatureVariableName, reverseInputTemperatureVariableName):
+    placeholdersForPort = {"@temp": outputTemperatureVariableName, "@revtemp": reverseInputTemperatureVariableName}
+    return placeholdersForPort
 
 
 def _getLoop(

@@ -7,6 +7,7 @@
             "@temp": "THx-Col"
         },
         "Out": {
+            "@revtemp": "TPiPump93_Col",
             "@temp": "TCol"
         }
     },
@@ -18,6 +19,7 @@
             "@temp": "TPiPump93_ExHx"
         },
         "Side1Out": {
+            "@revtemp": "THx-Col",
             "@temp": "TExHxSide1"
         },
         "Side2In": {
@@ -27,6 +29,7 @@
             "@temp": "TPiPump88_ExHx"
         },
         "Side2Out": {
+            "@revtemp": "TPiExHx_Tes",
             "@temp": "TExHxSide2"
         }
     }
