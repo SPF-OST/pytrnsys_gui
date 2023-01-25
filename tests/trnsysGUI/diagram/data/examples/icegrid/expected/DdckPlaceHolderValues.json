@@ -7,6 +7,7 @@
             "@temp": "TSCnrA_QSnkA"
         },
         "Out": {
+            "@revtemp": "TQSnkA_SCnrA",
             "@temp": "TQSnkA"
         }
     },
@@ -18,6 +19,7 @@
             "@temp": "TSCnrB_QSnkB"
         },
         "Out": {
+            "@revtemp": "TQSnkB_SCnrB",
             "@temp": "TQSnkB"
         }
     },
@@ -29,6 +31,7 @@
             "@temp": "TSCnrC_QSnkC"
         },
         "Out": {
+            "@revtemp": "TQSnkC_SCnrC",
             "@temp": "TQSnkC"
         }
     },
@@ -40,6 +43,7 @@
             "@temp": "TSCnrD_QSnkD"
         },
         "Out": {
+            "@revtemp": "TQSnkD_SCnrD",
             "@temp": "TQSnkD"
         }
     },
@@ -51,6 +55,7 @@
             "@temp": "TSCnrE_QSnkE"
         },
         "Out": {
+            "@revtemp": "TQSnkE_SCnrE",
             "@temp": "TQSnkE"
         }
     },
@@ -62,6 +67,7 @@
             "@temp": "TSCnrF_QSnkF"
         },
         "Out": {
+            "@revtemp": "TQSnkF_SCnrF",
             "@temp": "TQSnkF"
         }
     },
@@ -73,6 +79,7 @@
             "@temp": "TSCnrG_QSnkG"
         },
         "Out": {
+            "@revtemp": "TQSnkG_SCnrG",
             "@temp": "TQSnkG"
         }
     },
@@ -84,6 +91,7 @@
             "@temp": "TSCnrH_QSnkH"
         },
         "Out": {
+            "@revtemp": "TQSnkH_SCnrH",
             "@temp": "TQSnkH"
         }
     },
@@ -95,6 +103,7 @@
             "@temp": "TSCnrI_QSnkI"
         },
         "Out": {
+            "@revtemp": "TQSnkI_SCnrI",
             "@temp": "TQSnkI"
         }
     },
@@ -106,6 +115,7 @@
             "@temp": "TSCnrJ_QSnkJ"
         },
         "Out": {
+            "@revtemp": "TQSnkJ_SCnrJ",
             "@temp": "TQSnkJ"
         }
     },
@@ -117,6 +127,7 @@
             "@temp": "TSCnr1_QSrc1"
         },
         "Out": {
+            "@revtemp": "TQSrc1_SCnr1",
             "@temp": "TQSrc1"
         }
     }

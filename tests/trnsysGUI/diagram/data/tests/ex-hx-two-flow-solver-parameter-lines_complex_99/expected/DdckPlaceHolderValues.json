@@ -7,6 +7,7 @@
             "@temp": "TPiFlFloor1"
         },
         "Out": {
+            "@revtemp": "TPiRtFloor1",
             "@temp": "TFloor1"
         }
     },
@@ -18,6 +19,7 @@
             "@temp": "TPiFlFloor2"
         },
         "Out": {
+            "@revtemp": "TPiRtFloor2",
             "@temp": "TFloor2"
         }
     },
@@ -29,6 +31,7 @@
             "@temp": "TPiFlFloor3"
         },
         "Out": {
+            "@revtemp": "TPiRtFloor3",
             "@temp": "TFloor3"
         }
     },
@@ -40,6 +43,7 @@
             "@temp": "TPiFlFloor4"
         },
         "Out": {
+            "@revtemp": "TPiRtFloor4",
             "@temp": "TFloor4"
         }
     },
@@ -51,6 +55,7 @@
             "@temp": "TPiFlFloor5"
         },
         "Out": {
+            "@revtemp": "TPiRtFloor5",
             "@temp": "TFloor5"
         }
     },
@@ -62,6 +67,7 @@
             "@temp": "TPiFlFloor6"
         },
         "Out": {
+            "@revtemp": "TPiFloor6Rt",
             "@temp": "TFloor6"
         }
     },
@@ -73,6 +79,7 @@
             "@temp": "TPiTeeAuxHxRt_HP"
         },
         "CondOut": {
+            "@revtemp": "TPiHP_PuAux",
             "@temp": "THPCond"
         },
         "EvapIn": {
@@ -82,6 +89,7 @@
             "@temp": "TPiHpEvapIn"
         },
         "EvapOut": {
+            "@revtemp": "TPiHpEvapOut",
             "@temp": "THPEvap"
         }
     },
@@ -93,6 +101,7 @@
             "@temp": "TPiHxDhwPriFl"
         },
         "Side1Out": {
+            "@revtemp": "TPiHxDhwPriRt",
             "@temp": "THxDHWSide1"
         },
         "Side2In": {
@@ -102,6 +111,7 @@
             "@temp": "TPiPuHxDhw2HxDHW"
         },
         "Side2Out": {
+            "@revtemp": "TPiHxDHW_Dhw",
             "@temp": "THxDHWSide2"
         }
     },
