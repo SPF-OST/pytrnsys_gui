@@ -3,28 +3,15 @@
 
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QMessageBox
 
-
-class respondToUnacceptableNaming:
-    def __init__(self, name):
-        self.name = name
-        self.unAcceptableName = self.nameContainsUnacceptableCharacters(name)
-        self.response = self.responseToUnacceptableName()
-
-    def nameContainsUnacceptableCharacters(self, name):
-        return not name.isalnum()
-
-    def responseToUnacceptableName(self):
-        if self.unAcceptableName is True:
-            return "Found unacceptable characters (this includes spaces at the start and the end)\n" \
-                   "Please use only letters and numbers."
+import trnsysGUI.componentAndPipeNameValidator as _cpn
 
 
+# todo: make upper case
 class segmentDlg(QDialog):
     def __init__(self, seg, parent=None):
         super(segmentDlg, self).__init__(parent)
         self.seg = seg
         nameLabel = QLabel("Name:")
-        objectLabel = QLabel("Object:" + str(self.seg))
         self.le = QLineEdit(self.seg.connection.displayName)
 
         self.okButton = QPushButton("OK")
@@ -48,23 +35,31 @@ class segmentDlg(QDialog):
 
     def acceptedEdit(self):
         newName = self.le.text()
-        if newName.lower() == str(self.seg.connection.displayName).lower():
+        # todo: use result class
+        if self.isOldName(newName):
             self.close()
-        elif self.nameContainsUnacceptableCharacters(newName):
-            response = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
-                       "Please use only letters and numbers."
-            self.respondInMessageBoxWith(response)
-        elif newName != "" and not self.nameExists(newName):
-            self.seg.connection.setDisplayName(newName)
-            for segment in self.seg.connection.segments:
-                segment.setToolTip(newName)
-            self.close()
-        elif newName == "":
-            self.respondInMessageBoxWith("Please Enter a name!")
-        elif self.nameExists(newName):
-            self.respondInMessageBoxWith("Name already exist!")
+            return
 
-    def respondInMessageBoxWith(self, response):
+        existingNames = self.getExistingNames()
+        nameValidator = _cpn.ComponentAndPipeNameValidator(existingNames)
+        errorMessage = nameValidator.validateName(newName)
+        if errorMessage:
+            self.respondInMessageBoxWith(errorMessage)
+            return
+
+        self.applyNameChange(newName)
+        self.close()
+
+    def applyNameChange(self, newName):
+        self.seg.connection.setDisplayName(newName)
+        for segment in self.seg.connection.segments:
+            segment.setToolTip(newName)
+
+    def isOldName(self, name):
+        return name.lower() == str(self.seg.connection.displayName).lower()
+
+    @staticmethod
+    def respondInMessageBoxWith(response):
         msgb = QMessageBox()
         msgb.setText(response)
         msgb.exec()
@@ -72,12 +67,6 @@ class segmentDlg(QDialog):
     def cancel(self):
         self.close()
 
-    def nameExists(self, n):
-        for t in self.parent().trnsysObj:
-            if str(t.displayName).lower() == n.lower():
-                return True
-        return False
-
-    def nameContainsUnacceptableCharacters(self, name):
-        return not name.isalnum()
-
+    def getExistingNames(self):
+        existingNames = [str(t.displayName) for t in self.parent().trnsysObj]
+        return existingNames
