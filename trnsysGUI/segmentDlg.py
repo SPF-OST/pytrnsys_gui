@@ -3,7 +3,7 @@
 
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QMessageBox
 
-import trnsysGUI.checkPipeName as _cpn
+import trnsysGUI.componentAndPipeNameValidator as _cpn
 
 
 # todo: make upper case
@@ -36,22 +36,26 @@ class segmentDlg(QDialog):
     def acceptedEdit(self):
         newName = self.le.text()
         # todo: use result class
+        if self.isOldName(newName):
+            self.close()
+            return
+
         existingNames = self.getExistingNames()
-        errorMessage = _cpn.CheckPipeName(newName, existingNames).errorMessage
-        if self.nameKept(newName):
-            self.close()
-        elif errorMessage:
+        nameValidator = _cpn.ComponentAndPipeNameValidator(existingNames)
+        errorMessage = nameValidator.validateName(newName)
+        if errorMessage:
             self.respondInMessageBoxWith(errorMessage)
-        else:
-            self.applyNameChange(newName)
-            self.close()
+            return
+
+        self.applyNameChange(newName)
+        self.close()
 
     def applyNameChange(self, newName):
         self.seg.connection.setDisplayName(newName)
         for segment in self.seg.connection.segments:
             segment.setToolTip(newName)
 
-    def nameKept(self, name):
+    def isOldName(self, name):
         return name.lower() == str(self.seg.connection.displayName).lower()
 
     @staticmethod
@@ -62,13 +66,6 @@ class segmentDlg(QDialog):
 
     def cancel(self):
         self.close()
-
-    @staticmethod
-    def nameExists(n, existingNames):
-        for name in existingNames:
-            if name.lower() == n.lower():
-                return True
-        return False
 
     def getExistingNames(self):
         existingNames = [str(t.displayName) for t in self.parent().trnsysObj]
