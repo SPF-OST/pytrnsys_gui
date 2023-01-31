@@ -20,7 +20,7 @@ class ProcessMain:
         try:
             processTool.readConfig(pathConfig, configFile)
         except Exception as e:
-            return _res.Error(f"An error occurred reading the file {configFile} at {pathConfig}: {repr(e)}")
+            return _res.Error(f"An error occurred reading the file {configFile} at {pathConfig}: {e}")
         except:
             return _res.Error(f"An undefined error occurred reading the file {configFile} at {pathConfig}.")
 
@@ -29,6 +29,6 @@ class ProcessMain:
             logger.info("Successfully executed ProcessParallelTrnsys with %s", fullPath)
             return None
         except Exception as e:
-            return _res.Error(f"An error occurred processing the file {configFile} at {pathConfig}: {repr(e)}")
+            return _res.Error(f"An error occurred processing the file {configFile} at {pathConfig}: {e}")
         except:
             return _res.Error(f"An undefined error occurred processing the file {configFile} at {pathConfig}.")
