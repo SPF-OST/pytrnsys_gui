@@ -7,6 +7,7 @@
             "@temp": "TPiFCUIn"
         },
         "Out": {
+            "@revtemp": "TPiFCUOut",
             "@temp": "TFCU"
         }
     },
@@ -18,6 +19,7 @@
             "@temp": "TPiHxCoolBriOut"
         },
         "Out": {
+            "@revtemp": "TPiGhxOut",
             "@temp": "TGhx"
         }
     },
@@ -29,6 +31,7 @@
             "@temp": "TPiHpCondIn"
         },
         "Cond1Out": {
+            "@revtemp": "TPiHpCondOut",
             "@temp": "THPCond1"
         },
         "Cond2In": {
@@ -38,6 +41,7 @@
             "@temp": "TPiHpDesIn"
         },
         "Cond2Out": {
+            "@revtemp": "TPiHpDesOut",
             "@temp": "THPCond2"
         },
         "EvapIn": {
@@ -47,6 +51,7 @@
             "@temp": "TPiGhxToHP"
         },
         "EvapOut": {
+            "@revtemp": "TPiHPEvapOut",
             "@temp": "THPEvap"
         }
     },
@@ -58,6 +63,7 @@
             "@temp": "TPiHpToHxCool"
         },
         "Side1Out": {
+            "@revtemp": "TPiHxCoolBriOut",
             "@temp": "THxCoolSide1"
         },
         "Side2In": {
@@ -67,6 +73,7 @@
             "@temp": "TPiHxCoolWatIn"
         },
         "Side2Out": {
+            "@revtemp": "TConn1455",
             "@temp": "THxCoolSide2"
         }
     },
@@ -78,6 +85,7 @@
             "@temp": "TPiDhwToHxDhw"
         },
         "Side1Out": {
+            "@revtemp": "TPiHxDhwOut",
             "@temp": "THxDHWSide1"
         },
         "Side2In": {
@@ -87,6 +95,7 @@
             "@temp": "TPiSupplyToHxDhw"
         },
         "Side2Out": {
+            "@revtemp": "TPiDhwSecOut",
             "@temp": "THxDHWSide2"
         }
     },
@@ -98,6 +107,7 @@
             "@temp": "TPiRadIn"
         },
         "Out": {
+            "@revtemp": "TPiRadOut",
             "@temp": "TRadiatorSH"
         }
     },
