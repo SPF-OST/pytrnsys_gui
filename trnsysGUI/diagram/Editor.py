@@ -297,7 +297,7 @@ class Editor(QWidget):
         control.kernel_manager = kernel_manager
         control.kernel_client = kernel_client
         control.exit_requested.connect(stop)
-        control.execute(f"!cd {projectFolder}")
+        control.execute(f"%cd {projectFolder}")
 
         diagramAndConsoleVerticalLayout = QVBoxLayout(self)
         diagramAndConsoleVerticalLayout.addWidget(self.diagramView)
