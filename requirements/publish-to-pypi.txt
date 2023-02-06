@@ -17,7 +17,7 @@ docutils==0.18.1
     # via readme-renderer
 idna==3.3
     # via requests
-importlib-metadata==4.12.0
+importlib-metadata==6.0.0
     # via
     #   keyring
     #   twine
@@ -25,7 +25,7 @@ keyring==23.6.0
     # via twine
 pkginfo==1.8.3
     # via twine
-pygments==2.12.0
+pygments==2.14.0
     # via
     #   readme-renderer
     #   rich
@@ -61,5 +61,5 @@ webencodings==0.5.1
     # via bleach
 wheel==0.38.4
     # via -r requirements\publish-to-pypi.in
-zipp==3.8.0
+zipp==3.12.1
     # via importlib-metadata

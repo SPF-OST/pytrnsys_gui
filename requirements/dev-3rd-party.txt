@@ -47,11 +47,6 @@ idna==3.3
     # via requests
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==4.12.0
-    # via
-    #   keyring
-    #   sphinx
-    #   twine
 keyring==23.6.0
     # via twine
 nodeenv==1.7.0
@@ -70,11 +65,6 @@ pkginfo==1.8.3
     # via twine
 pre-commit==2.20.0
     # via -r requirements\dev-3rd-party.in
-pygments==2.12.0
-    # via
-    #   readme-renderer
-    #   rich
-    #   sphinx
 pyinstaller==5.6.2
     # via -r requirements\dev-3rd-party.in
 pyinstaller-hooks-contrib==2022.13
@@ -130,8 +120,6 @@ virtualenv==20.17.0
     # via pre-commit
 webencodings==0.5.1
     # via bleach
-zipp==3.8.0
-    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

@@ -9,6 +9,10 @@ import shutil
 import typing as _tp
 
 import math as _math
+import qtconsole.inprocess as _gtcip
+import qtconsole.rich_jupyter_widget as _qtcjw
+import sys as _sys
+import tornado as _tornado
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF, QEvent
 from PyQt5.QtGui import QColor, QPainter
@@ -274,7 +278,33 @@ class Editor(QWidget):
             self.createWeatherAndControlDirs(self.projectFolder)
 
         self.horizontalLayout.addLayout(self.vertL)
-        self.horizontalLayout.addWidget(self.diagramView)
+
+        kernel_manager = _gtcip.QtInProcessKernelManager()
+        kernel_manager.start_kernel()
+        kernel = kernel_manager.kernel
+        kernel.gui = "qt"
+
+        self._init_asyncio_patch()
+
+        kernel_client = kernel_manager.client()
+        kernel_client.start_channels()
+
+        def stop():
+            kernel_client.stop_channels()
+            kernel_manager.shutdown_kernel()
+
+        control = _qtcjw.RichJupyterWidget()
+        control.kernel_manager = kernel_manager
+        control.kernel_client = kernel_client
+        control.exit_requested.connect(stop)
+        control.execute(f"!cd {projectFolder}")
+
+        diagramAndConsoleVerticalLayout = QVBoxLayout(self)
+        diagramAndConsoleVerticalLayout.addWidget(self.diagramView)
+        diagramAndConsoleVerticalLayout.addWidget(control)
+
+        self.horizontalLayout.addLayout(diagramAndConsoleVerticalLayout)
+
         self.horizontalLayout.addLayout(self.fileBrowserLayout)
         self.horizontalLayout.setStretchFactor(self.diagramView, 5)
         self.horizontalLayout.setStretchFactor(self.libraryBrowserView, 1)
@@ -328,6 +358,36 @@ class Editor(QWidget):
             self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
         elif loadValue == "json":
             self._decodeDiagram(jsonPath, loadValue=loadValue)
+
+    @staticmethod
+    def _init_asyncio_patch():
+        """set default asyncio policy to be compatible with tornado
+        Tornado 6 (at least) is not compatible with the default
+        asyncio implementation on Windows
+        Pick the older SelectorEventLoopPolicy on Windows
+        if the known-incompatible default policy is in use.
+        do this as early as possible to make it a low priority and overrideable
+        ref: https://github.com/tornadoweb/tornado/issues/2608
+        FIXME: if/when tornado supports the defaults in asyncio,
+               remove and bump tornado requirement for py38
+        """
+        if (
+                _sys.platform.startswith("win")
+                and _sys.version_info >= (3, 8)
+                and _tornado.version_info < (6, 1)
+        ):
+            import asyncio
+
+            try:
+                from asyncio import WindowsProactorEventLoopPolicy, WindowsSelectorEventLoopPolicy
+            except ImportError:
+                pass
+                # not affected
+            else:
+                if type(asyncio.get_event_loop_policy()) is WindowsProactorEventLoopPolicy:
+                    # WindowsProactorEventLoopPolicy is not compatible with tornado 6
+                    # fallback to the pre-3.8 default of Selector
+                    asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
     # Debug function
     def dumpInformation(self):
