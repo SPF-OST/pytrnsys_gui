@@ -10,10 +10,6 @@ astroid==2.11.6
     # via pylint
 atomicwrites==1.4.0
     # via pytest
-colorama==0.4.5
-    # via
-    #   pylint
-    #   pytest
 coverage[toml]==6.4.1
     # via pytest-cov
 dill==0.3.5.1
@@ -30,8 +26,6 @@ mypy==0.991
     # via -r requirements\test-3rd-party.in
 mypy-extensions==0.4.3
     # via mypy
-platformdirs==2.5.2
-    # via pylint
 pluggy==1.0.0
     # via pytest
 py==1.11.0
