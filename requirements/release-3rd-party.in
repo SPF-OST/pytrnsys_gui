@@ -9,3 +9,4 @@ dataclasses_jsonschema
 lark
 appdirs
 Jinja2
+qtconsole
