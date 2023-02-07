@@ -8,6 +8,8 @@ import subprocess as _sp
 import sys
 
 _VENV_BIN_DIR_PATH = _pl.Path(sys.executable).parent
+_PYUIC5_FILE_PATH = _VENV_BIN_DIR_PATH / "pyuic5"
+_PYRCC5_FILE_PATH = _VENV_BIN_DIR_PATH / "pyrcc5"
 
 
 def main():
@@ -23,6 +25,8 @@ def main():
 
 
 def _generatePythonCodeFromUiFiles():
+    print(f"Using pyuic5 executable from {_PYUIC5_FILE_PATH}.")
+
     currentDirPath = _pl.Path()
 
     uiFilePaths = currentDirPath.rglob("*.ui")
@@ -31,13 +35,15 @@ def _generatePythonCodeFromUiFiles():
 
         print(f"Generating {generatedFilePath} from {uiFilePath}...", end="")
 
-        cmd = [_VENV_BIN_DIR_PATH / "pyuic5", "-o", generatedFilePath, uiFilePath]
+        cmd = [_PYUIC5_FILE_PATH, "-o", generatedFilePath, uiFilePath]
         _sp.run(cmd, check=True)
 
         print("done.")
 
 
 def _generatePythonCodeFromQrcFiles():
+    print(f"Using pyrcc5 executable from {_PYRCC5_FILE_PATH}.")
+
     currentDirPath = _pl.Path()
 
     qrcFilePaths = currentDirPath.rglob("*.qrc")
@@ -46,7 +52,7 @@ def _generatePythonCodeFromQrcFiles():
 
         print(f"Generating {generatedFilePath} from {qrcFilePath}...", end="")
 
-        cmd = [_VENV_BIN_DIR_PATH / "pyrcc5", "-o", generatedFilePath, qrcFilePath]
+        cmd = [_PYRCC5_FILE_PATH, "-o", generatedFilePath, qrcFilePath]
         _sp.run(cmd, check=True)
 
         print("done.")
