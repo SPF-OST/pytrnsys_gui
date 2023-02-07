@@ -27,13 +27,13 @@ jobs:
     - name: Generate UI code from Qt Creator Studio .ui files
       run: python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
     - name: Static type checking with mypy
-      run: python dev-tools/runStaticChecksAndUnitTests.py --type
+      run: python dev-tools/devTools.py --type
     - name: Lint with pylint
-      run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
+      run: python dev-tools/devTools.py --lint --keep-results
     - name: Generate class and package diagrams
-      run: python dev-tools/runStaticChecksAndUnitTests.py --diagram=dot --keep-results
+      run: python dev-tools/devTools.py --diagram=dot --keep-results
     - name: Test with pytest
-      run: python dev-tools/runStaticChecksAndUnitTests.py --unit="not linux_ci" --keep-results
+      run: python dev-tools/devTools.py --unit="not linux_ci" --keep-results
     - name: Post coverage report to Coveralls
       uses: coverallsapp/github-action@master
       with:
@@ -59,7 +59,7 @@ jobs:
         with:
           python-version: '3.9'
       - name: Build executable
-        run: python dev-tools/runStaticChecksAndUnitTests.py -x
+        run: python dev-tools/devTools.py -x
       - name: Compute file name
         id: fn
         run: |
