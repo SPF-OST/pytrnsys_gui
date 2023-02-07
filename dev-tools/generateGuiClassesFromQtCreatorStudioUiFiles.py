@@ -3,8 +3,11 @@
 # Run from top-level directory
 
 import pathlib as _pl
-import shutil as _su
 import subprocess as _sp
+
+import sys
+
+_VENV_BIN_DIR_PATH = _pl.Path(sys.executable).parent
 
 
 def main():
@@ -20,10 +23,6 @@ def main():
 
 
 def _generatePythonCodeFromUiFiles():
-    pyuicExecutableFilePath = _su.which("pyuic5")
-
-    print(f"Using `pyuic5' executable at {pyuicExecutableFilePath}")
-
     currentDirPath = _pl.Path()
 
     uiFilePaths = currentDirPath.rglob("*.ui")
@@ -32,17 +31,13 @@ def _generatePythonCodeFromUiFiles():
 
         print(f"Generating {generatedFilePath} from {uiFilePath}...", end="")
 
-        cmd = [pyuicExecutableFilePath, "-o", generatedFilePath, uiFilePath]
+        cmd = [_VENV_BIN_DIR_PATH / "pyuic5", "-o", generatedFilePath, uiFilePath]
         _sp.run(cmd, check=True)
 
         print("done.")
 
 
 def _generatePythonCodeFromQrcFiles():
-    pyrccExecutableFilePath = _su.which("pyrcc5")
-
-    print(f"Using `pyrcc5' executable at {pyrccExecutableFilePath}")
-
     currentDirPath = _pl.Path()
 
     qrcFilePaths = currentDirPath.rglob("*.qrc")
@@ -51,7 +46,7 @@ def _generatePythonCodeFromQrcFiles():
 
         print(f"Generating {generatedFilePath} from {qrcFilePath}...", end="")
 
-        cmd = [pyrccExecutableFilePath, "-o", generatedFilePath, qrcFilePath]
+        cmd = [_VENV_BIN_DIR_PATH / "pyrcc5", "-o", generatedFilePath, qrcFilePath]
         _sp.run(cmd, check=True)
 
         print("done.")
