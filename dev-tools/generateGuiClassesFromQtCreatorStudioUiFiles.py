@@ -4,12 +4,13 @@
 
 import pathlib as _pl
 import subprocess as _sp
+import sysconfig as _sysconfig
 
-import sys
+import sys as _sys
 
-_VENV_BIN_DIR_PATH = _pl.Path(sys.executable).parent
-_PYUIC5_FILE_PATH = _VENV_BIN_DIR_PATH / "pyuic5"
-_PYRCC5_FILE_PATH = _VENV_BIN_DIR_PATH / "pyrcc5"
+_SCRIPTS_DIR = _pl.Path(_sysconfig.get_path("scripts"))
+_PYUIC5_FILE_PATH = _SCRIPTS_DIR / "pyuic5"
+_PYRCC5_FILE_PATH = _SCRIPTS_DIR / "pyrcc5"
 
 
 def main():
