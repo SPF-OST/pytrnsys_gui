@@ -6,8 +6,6 @@ import pathlib as _pl
 import subprocess as _sp
 import sysconfig as _sysconfig
 
-import sys as _sys
-
 _SCRIPTS_DIR = _pl.Path(_sysconfig.get_path("scripts"))
 _PYUIC5_FILE_PATH = _SCRIPTS_DIR / "pyuic5"
 _PYRCC5_FILE_PATH = _SCRIPTS_DIR / "pyrcc5"
