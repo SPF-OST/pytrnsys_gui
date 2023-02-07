@@ -9,7 +9,7 @@ on:
 jobs:
   build-srspf01:
 
-    runs-on: srspf01
+    runs-on: [self-hosted, srspf01]
 
     steps:
     - uses: actions/checkout@v3
@@ -25,13 +25,13 @@ jobs:
     - name: Generate UI code from Qt Creator Studio .ui files
       run: python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
     - name: Static type checking with mypy
-      run: python dev-tools/runStaticChecksAndUnitTests.py --type
+      run: python dev-tools/devTools.py --type
     - name: Lint with pylint
-      run: python dev-tools/runStaticChecksAndUnitTests.py --lint --keep-results
+      run: python dev-tools/devTools.py --lint --keep-results
     - name: Generate class and package diagrams
-      run: python dev-tools/runStaticChecksAndUnitTests.py --diagram=dot --keep-results
+      run: python dev-tools/devTools.py --diagram=dot --keep-results
     - name: Test with pytest
-      run: python dev-tools/runStaticChecksAndUnitTests.py --unit "linux or linux_ci" --keep-results
+      run: python dev-tools/devTools.py --unit "linux or linux_ci" --keep-results
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v3
       with:
