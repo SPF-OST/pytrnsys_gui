@@ -38,7 +38,6 @@ import trnsysGUI as _tgui
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
-import trnsysGUI.diagram.sizes as _sizes
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
@@ -76,6 +75,7 @@ from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
+from . import _sizes
 
 
 class Editor(QWidget):
