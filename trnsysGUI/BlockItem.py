@@ -109,7 +109,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
     # Setter functions
     def setParent(self, p):
-        self.parent = p
+        self.editor = p
 
         if self not in self.editor.trnsysObj:
             self.editor.trnsysObj.append(self)

@@ -803,7 +803,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         for j in blocklist["Blocks"]:
             for k in j:
                 if isinstance(k, BlockItem):
-                    k.setParent(self.diagramView)
+                    k.setParent(self)
                     k.changeSize()
                     self.diagramScene.addItem(k)
                     blockFolderNames.append(k.displayName)

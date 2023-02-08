@@ -16,10 +16,10 @@ def setRelativeSizes(
 
 
 def _getSizeComponent(size: _qtc.QSize, splitterOrientation: _qtc.Qt.Orientation) -> int:
-    if splitterOrientation == _qtc.Qt.Orientation.Vertical:
+    if splitterOrientation == _qtc.Qt.Orientation.Vertical:  # pylint: disable=no-member
         return size.width()
 
-    if splitterOrientation == _qtc.Qt.Orientation.Horizontal:
+    if splitterOrientation == _qtc.Qt.Orientation.Horizontal:  # pylint: disable=no-member
         return size.height()
 
     raise ValueError(f"Unknown orientation: {splitterOrientation}")
