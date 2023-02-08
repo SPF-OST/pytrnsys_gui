@@ -6,10 +6,10 @@ import trnsysGUI.internalPiping as _ip
 
 
 class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
-        self.logger = parent.logger
+        self.logger = editor.logger
 
         self.h = 120
         self.w = 120
@@ -20,7 +20,7 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
-        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
+        self.childIds.append(self.editor.idGen.getTrnsysID())
 
         self.changeSize()
 

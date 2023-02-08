@@ -14,8 +14,8 @@ import trnsysGUI.images as _img
 
 
 class PV(BlockItem):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super(PV, self).__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super(PV, self).__init__(trnsysType, editor, **kwargs)
         factor = 0.97
         self.w = 100
         self.h = 100
@@ -48,12 +48,12 @@ class PV(BlockItem):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        self.logger.debug(self.parent.parent())
+        self.logger.debug(self.editor)
         pathName = self.displayName
-        if self.parent.parent().projectPath == "":
-            self.path = self.parent.parent().projectFolder
+        if self.editor.projectPath == "":
+            self.path = self.editor.projectFolder
         else:
-            self.path = self.parent.parent().projectPath
+            self.path = self.editor.projectPath
         self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
@@ -70,19 +70,17 @@ class PV(BlockItem):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
-        self.parent.parent().splitter.addWidget(self.tree)
+        self.editor.splitter.addWidget(self.tree)
 
     def deleteBlock(self):
         """
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        # self.logger.debug("self.parent.parent" + str(self.parent.parent()))
-        self.parent.parent().trnsysObj.remove(self)
+        self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        # self.logger.debug("self.scene is" + str(self.parent.scene()))
-        self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
+        self.editor.diagramView.scene().removeItem(self)
+        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:

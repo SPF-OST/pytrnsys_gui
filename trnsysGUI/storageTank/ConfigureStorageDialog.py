@@ -525,7 +525,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
             qmb.setDefaultButton(QMessageBox.Ok)
             qmb.exec()
             return
-        if self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
+        if self._editor.nameExists(newName) or self._editor.nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()

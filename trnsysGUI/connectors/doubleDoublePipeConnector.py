@@ -12,8 +12,8 @@ import trnsysGUI.temperatures as _temps
 
 
 class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.inputs.append(_dppi.DoublePipePortItem("i", 0, self))
         self.outputs.append(_dppi.DoublePipePortItem("o", 2, self))

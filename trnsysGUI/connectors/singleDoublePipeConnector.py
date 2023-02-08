@@ -13,8 +13,8 @@ from trnsysGUI.massFlowSolver import networkModel as _mfn
 
 
 class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))

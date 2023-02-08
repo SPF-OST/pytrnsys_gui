@@ -8,13 +8,9 @@ import pkgutil as _pu
 import shutil
 import typing as _tp
 
+import PyQt5.QtCore as _qtc
 import math as _math
-import qtconsole.inprocess as _gtcip
-import qtconsole.rich_jupyter_widget as _qtcjw
-import sys as _sys
-import tornado as _tornado
 from PyQt5 import QtGui
-from PyQt5.QtCore import QSize, Qt, QLineF, QFileInfo, QDir, QPointF, QEvent
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtSvg import QSvgGenerator
@@ -40,7 +36,9 @@ import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
 import trnsysGUI.connection.names as _cnames
+import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
+import trnsysGUI.diagram.sizes as _sizes
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
@@ -125,9 +123,9 @@ class Editor(QWidget):
     snapSize : int
         Size of align grid
 
-    horizontalLayout : :obj:`QHBoxLayout`
+    mainSplitter : :obj:`QHBoxLayout`
     Contains the diagram editor and the layout containing the library browser view and the listview
-    vertL : :obj:`QVBoxLayout`
+    _componentsAndContextInfoSplitter : :obj:`QVBoxLayout`
     Cointains the library browser view and the listWidget
 
     moveDirectPorts: bool
@@ -176,14 +174,6 @@ class Editor(QWidget):
 
         self.trnsysPath = _pl.Path(r"C:\Trnsys18\Exe\TRNExe.exe")
 
-        self.horizontalLayout = QHBoxLayout(self)
-        self.libraryBrowserView = QListView(self)
-        self.libraryModel = LibraryModel(self)
-
-        self.libraryBrowserView.setGridSize(QSize(65, 65))
-        self.libraryBrowserView.setResizeMode(QListView.Adjust)
-        self.libraryModel.setColumnCount(0)
-
         componentNamesWithIcon = [
             ("Connector", _img.CONNECTOR_SVG.icon()),
             ("TeePiece", _img.TEE_PIECE_SVG.icon()),
@@ -226,23 +216,28 @@ class Editor(QWidget):
 
         libItems = [QtGui.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
 
+        libraryModel = LibraryModel(self)
+        libraryModel.setColumnCount(0)
         for i in libItems:
-            self.libraryModel.appendRow(i)
+            libraryModel.appendRow(i)
 
-        self.libraryBrowserView.setModel(self.libraryModel)
-        self.libraryBrowserView.setViewMode(self.libraryBrowserView.IconMode)
-        self.libraryBrowserView.setDragDropMode(self.libraryBrowserView.DragOnly)
+        libraryBrowserView = QListView(self)
+        libraryBrowserView.setGridSize(_qtc.QSize(65, 65))
+        libraryBrowserView.setResizeMode(QListView.Adjust)
+        libraryBrowserView.setModel(libraryModel)
+        libraryBrowserView.setViewMode(libraryBrowserView.IconMode)
+        libraryBrowserView.setDragDropMode(libraryBrowserView.DragOnly)
 
         self.diagramScene = Scene(self)
         self.diagramView = View(self.diagramScene, self)
 
         # For list view
-        self.vertL = QVBoxLayout()
-        self.vertL.addWidget(self.libraryBrowserView)
-        self.vertL.setStretchFactor(self.libraryBrowserView, 2)
-        self.listV = QListWidget()
-        self.vertL.addWidget(self.listV)
-        self.vertL.setStretchFactor(self.listV, 1)
+        libraryBrowserAndContextInfoSplitter = QSplitter(_qtc.Qt.Orientation.Vertical, parent=self)
+        self.contextInfoList = QListWidget()
+
+        libraryBrowserAndContextInfoSplitter.addWidget(libraryBrowserView)
+        libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
+        _sizes.setRelativeSizes(libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1])
 
         # for file browser
         self.projectPath = ""
@@ -262,7 +257,7 @@ class Editor(QWidget):
         self.scroll = QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.splitter = QSplitter(
-            Qt.Vertical,
+            _qtc.Qt.Vertical,
         )
         self.splitter.setChildrenCollapsible(False)
         self.scroll.setWidget(self.splitter)
@@ -277,37 +272,21 @@ class Editor(QWidget):
             self.createHydraulicDir(self.projectFolder)
             self.createWeatherAndControlDirs(self.projectFolder)
 
-        self.horizontalLayout.addLayout(self.vertL)
+        consoleWidget = _con.createConsole(_pl.Path(self.projectPath))
+        diagramAndConsoleSplitter = QSplitter(_qtc.Qt.Orientation.Vertical, parent=self)
+        diagramAndConsoleSplitter.addWidget(self.diagramView)
+        diagramAndConsoleSplitter.addWidget(consoleWidget)
 
-        kernel_manager = _gtcip.QtInProcessKernelManager()
-        kernel_manager.start_kernel()
-        kernel = kernel_manager.kernel
-        kernel.gui = "qt"
+        fileBrowserWidget = QWidget(parent=self)
+        fileBrowserWidget.setLayout(self.fileBrowserLayout)
 
-        self._init_asyncio_patch()
-
-        kernel_client = kernel_manager.client()
-        kernel_client.start_channels()
-
-        def stop():
-            kernel_client.stop_channels()
-            kernel_manager.shutdown_kernel()
-
-        control = _qtcjw.RichJupyterWidget()
-        control.kernel_manager = kernel_manager
-        control.kernel_client = kernel_client
-        control.exit_requested.connect(stop)
-        control.execute(f"%cd {projectFolder}")
-
-        diagramAndConsoleVerticalLayout = QVBoxLayout(self)
-        diagramAndConsoleVerticalLayout.addWidget(self.diagramView)
-        diagramAndConsoleVerticalLayout.addWidget(control)
-
-        self.horizontalLayout.addLayout(diagramAndConsoleVerticalLayout)
-
-        self.horizontalLayout.addLayout(self.fileBrowserLayout)
-        self.horizontalLayout.setStretchFactor(self.diagramView, 5)
-        self.horizontalLayout.setStretchFactor(self.libraryBrowserView, 1)
+        mainSplitter = QSplitter(_qtc.Qt.Orientation.Horizontal, parent=self)
+        mainSplitter.addWidget(libraryBrowserAndContextInfoSplitter)
+        mainSplitter.addWidget(diagramAndConsoleSplitter)
+        mainSplitter.addWidget(fileBrowserWidget)
+        _sizes.setRelativeSizes(
+            mainSplitter, [libraryBrowserAndContextInfoSplitter, diagramAndConsoleSplitter, fileBrowserWidget], [1, 5, 1]
+        )
 
         self._currentlyDraggedConnectionFromPort = None
         self.connectionList = []
@@ -325,7 +304,7 @@ class Editor(QWidget):
         colorsc = "red"
         linePx = 4
         if colorsc == "red":
-            connLinecolor = QColor(Qt.red)
+            connLinecolor = QColor(_qtc.Qt.red)
         elif colorsc == "blueish":
             connLinecolor = QColor(3, 124, 193)  # Blue
         elif colorsc == "darkgray":
@@ -334,21 +313,21 @@ class Editor(QWidget):
             connLinecolor = QColor(196, 196, 196)  # Gray
 
         # Only for displaying on-going creation of connection
-        self.connLine = QLineF()
+        self.connLine = _qtc.QLineF()
         self.connLineItem = QGraphicsLineItem(self.connLine)
         self.connLineItem.setPen(QtGui.QPen(connLinecolor, linePx))
         self.connLineItem.setVisible(False)
         self.diagramScene.addItem(self.connLineItem)
 
         # For line that shows quickly up when using the align mode
-        self.alignYLine = QLineF()
+        self.alignYLine = _qtc.QLineF()
         self.alignYLineItem = QGraphicsLineItem(self.alignYLine)
         self.alignYLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
         self.alignYLineItem.setVisible(False)
         self.diagramScene.addItem(self.alignYLineItem)
 
         # For line that shows quickly up when using align mode
-        self.alignXLine = QLineF()
+        self.alignXLine = _qtc.QLineF()
         self.alignXLineItem = QGraphicsLineItem(self.alignXLine)
         self.alignXLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
         self.alignXLineItem.setVisible(False)
@@ -358,36 +337,6 @@ class Editor(QWidget):
             self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
         elif loadValue == "json":
             self._decodeDiagram(jsonPath, loadValue=loadValue)
-
-    @staticmethod
-    def _init_asyncio_patch():
-        """set default asyncio policy to be compatible with tornado
-        Tornado 6 (at least) is not compatible with the default
-        asyncio implementation on Windows
-        Pick the older SelectorEventLoopPolicy on Windows
-        if the known-incompatible default policy is in use.
-        do this as early as possible to make it a low priority and overrideable
-        ref: https://github.com/tornadoweb/tornado/issues/2608
-        FIXME: if/when tornado supports the defaults in asyncio,
-               remove and bump tornado requirement for py38
-        """
-        if (
-                _sys.platform.startswith("win")
-                and _sys.version_info >= (3, 8)
-                and _tornado.version_info < (6, 1)
-        ):
-            import asyncio
-
-            try:
-                from asyncio import WindowsProactorEventLoopPolicy, WindowsSelectorEventLoopPolicy
-            except ImportError:
-                pass
-                # not affected
-            else:
-                if type(asyncio.get_event_loop_policy()) is WindowsProactorEventLoopPolicy:
-                    # WindowsProactorEventLoopPolicy is not compatible with tornado 6
-                    # fallback to the pre-3.8 default of Selector
-                    asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
     # Debug function
     def dumpInformation(self):
@@ -474,18 +423,18 @@ class Editor(QWidget):
         if distance <= 3.5:
             hitPortItem.enlargePortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.ashColorR)
-            self.listV.clear()
+            self.contextInfoList.clear()
             hitPortItem.debugprint()
         else:
             hitPortItem.resetPortSize()
             hitPortItem.innerCircle.setBrush(hitPortItem.visibleColor)
-            self.listV.clear()
+            self.contextInfoList.clear()
             fromPort.debugprint()
 
         fromPort.enlargePortSize()
         fromPort.innerCircle.setBrush(hitPortItem.visibleColor)
 
-    def _getHitPortItemOrNone(self, event: QEvent) -> _tp.Optional[PortItemBase]:
+    def _getHitPortItemOrNone(self, event: _qtc.QEvent) -> _tp.Optional[PortItemBase]:
         fromPort = self._currentlyDraggedConnectionFromPort
         mousePosition = event.scenePos()
 
@@ -523,7 +472,9 @@ class Editor(QWidget):
             if toPort != fromPort:
                 self._createConnection(fromPort, toPort)
 
-    def _getRelevantHitPortItems(self, mousePosition: QPointF, fromPort: PortItemBase) -> _tp.Sequence[PortItemBase]:
+    def _getRelevantHitPortItems(
+        self, mousePosition: _qtc.QPointF, fromPort: PortItemBase
+    ) -> _tp.Sequence[PortItemBase]:
         hitItems = self.diagramScene.items(mousePosition)
         relevantPortItems = [
             i for i in hitItems if isinstance(i, PortItemBase) and type(i) == type(fromPort) and not i.connectionList
@@ -948,7 +899,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         """
         generator = QSvgGenerator()
         generator.setResolution(300)
-        generator.setSize(QSize(self.diagramScene.width(), self.diagramScene.height()))
+        generator.setSize(_qtc.QSize(self.diagramScene.width(), self.diagramScene.height()))
         # generator.setViewBox(QRect(0, 0, 800, 800))
         generator.setViewBox(self.diagramScene.sceneRect())
         generator.setFileName("VectorGraphicsExport.svg")
@@ -1170,7 +1121,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         # painter.setBrush(Qt.red)
         painter.setBrush(QColor(252, 136, 98))
         painter.drawEllipse(36, 2, 15, 15)
-        painter.setBrush(Qt.yellow)
+        painter.setBrush(_qtc.Qt.yellow)
         painter.drawEllipse(20, 20, 20, 20)
         painter.end()
 
@@ -1216,7 +1167,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         """
         fn, _ = QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
         if fn != "":
-            if QFileInfo(fn).suffix() == "":
+            if _qtc.QFileInfo(fn).suffix() == "":
                 fn += ".pdf"
             printer = QPrinter(QPrinter.HighResolution)
             printer.setOrientation(QPrinter.Landscape)
@@ -1230,8 +1181,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def openProject(self):
         self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
         if self.projectPath != "":
-            test = self.parent()
-
             self.parent().newDia()
             self.PPL.setText(self.projectPath)
             loadPath = os.path.join(self.projectPath, "ddck")
@@ -1289,7 +1238,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         self.model = MyQFileSystemModel()
         self.model.setRootPath(loadPath)
         self.model.setName("Config File")
-        self.model.setFilter(QDir.Files)
+        self.model.setFilter(_qtc.QDir.Files)
         self.tree = MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(loadPath))

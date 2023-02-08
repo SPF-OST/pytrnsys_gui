@@ -17,8 +17,8 @@ _DEFAULT_MASS_FLOW_RATE = 500
 
 
 class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-instance-attributes
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
         self.w = 40
         self.h = 40
 

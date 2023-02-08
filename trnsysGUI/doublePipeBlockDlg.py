@@ -17,10 +17,11 @@ import trnsysGUI.BlockItem as _bi
 
 
 class DoublePipeBlockDlg(QDialog):
-    def __init__(self, block: _bi.BlockItem, parent=None):
-        super(DoublePipeBlockDlg, self).__init__(parent)
+    def __init__(self, block: _bi.BlockItem, editor):
+        super(DoublePipeBlockDlg, self).__init__(editor)
         nameLabel = QLabel("Name:")
-        self.logger = parent.logger
+        self._editor = editor
+        self.logger = editor.logger
         self.block = block
         self.le = QLineEdit(self.block.label.toPlainText())
         self.setWindowIcon(QIcon(block.pixmap()))
@@ -58,7 +59,7 @@ class DoublePipeBlockDlg(QDialog):
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
+        elif self._editor.nameExists(newName) or self._editor.nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()
