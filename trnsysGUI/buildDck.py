@@ -143,7 +143,7 @@ class buildDck:
 
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
-        It also loads the readed lines into self.lines
+        It also loads the read lines into self.lines
         """
         tool = readConfig.ReadConfigTrnsys()
 
