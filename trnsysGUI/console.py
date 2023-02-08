@@ -48,7 +48,7 @@ def _initAsyncIOPatch() -> None:
     if _sys.platform.startswith("win") and _sys.version_info >= (3, 8) and _tornado.version_info < (6, 1):
 
         try:
-            from asyncio import (  # pylint: disable=import-outside-toplevel
+            from asyncio import (  # type: ignore[attr-defined]  # pylint: disable=import-outside-toplevel
                 WindowsProactorEventLoopPolicy,
                 WindowsSelectorEventLoopPolicy,
             )
