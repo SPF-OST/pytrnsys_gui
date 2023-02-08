@@ -92,7 +92,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         fromPort: _dppi.DoublePipePortItem,
         toPort: _dppi.DoublePipePortItem
     ) -> str:
-        outputTemp = _temps.getTemperatureVariableName(self, self._hotPipe)
+        outputTemp = _temps.getTemperatureVariableName(self, pipe)
         fromConnection = fromPort.getConnection()
         toConnection = toPort.getConnection()
 
