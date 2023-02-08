@@ -24,23 +24,23 @@ class Scene(_qtw.QGraphicsScene):
         self._previouslyHitItems = []
 
     def mouseMoveEvent(self, mouseEvent):
-        self.parent().sceneMouseMoveEvent(mouseEvent)
+        self._editor.sceneMouseMoveEvent(mouseEvent)
         super().mouseMoveEvent(mouseEvent)
 
     def mouseReleaseEvent(self, mouseEvent):
-        self.parent().sceneMouseReleaseEvent(mouseEvent)
+        self._editor.sceneMouseReleaseEvent(mouseEvent)
         super().mouseReleaseEvent(mouseEvent)
-        self.parent().moveDirectPorts = False
+        self._editor.moveDirectPorts = False
 
     def drawBackground(self, painter, rect):
         # Overwrite drawBackground if snapGrid is True
-        if self.parent().snapGrid:
+        if self._editor.snapGrid:
             pen = QPen()
             pen.setWidth(2)
             pen.setCosmetic(True)
             painter.setPen(pen)
 
-            gridSize = self.parent().snapSize
+            gridSize = self._editor.snapSize
 
             left = int(rect.left()) - (int(rect.left()) % gridSize)
             top = int(rect.top()) - (int(rect.top()) % gridSize)
@@ -56,11 +56,11 @@ class Scene(_qtw.QGraphicsScene):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_L:
-            self.parent().moveDirectPorts = not self.parent().moveDirectPorts
+            self._editor.moveDirectPorts = not self._editor.moveDirectPorts
             return
 
         if event.key() == Qt.Key_Delete:
-            trnsysObjects = self.parent().trnsysObj
+            trnsysObjects = self._editor.trnsysObj
             selectedObjects = [o for o in trnsysObjects if o.isSelected]
 
             if not selectedObjects:
@@ -86,7 +86,7 @@ class Scene(_qtw.QGraphicsScene):
                 for heatExchanger in trnsysObject.heatExchangers:
                     heatExchanger.unhighlightHx()
 
-        self.parent().alignYLineItem.setVisible(False)
+        self._editor.alignYLineItem.setVisible(False)
 
         if self._previouslyHitItems is not None:
             for item in self._previouslyHitItems:

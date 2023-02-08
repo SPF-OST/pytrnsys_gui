@@ -20,11 +20,12 @@ import trnsysGUI.TVentil as _vnt
 
 
 class TVentilDlg(QDialog):
-    def __init__(self, ventil: _vnt.TVentil, parent=None):
-        super(TVentilDlg, self).__init__(parent)
+    def __init__(self, ventil: _vnt.TVentil, editor):
+        super(TVentilDlg, self).__init__(editor)
+        self._editor = editor
         nameLabel = QLabel("Name:")
 
-        self.logger = parent.logger
+        self.logger = editor.logger
 
         self.block = ventil
         self.valvePosition = self.block.positionForMassFlowSolver
@@ -122,7 +123,7 @@ class TVentilDlg(QDialog):
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
+        elif self._editor.nameExists(newName) or self._editor.nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()

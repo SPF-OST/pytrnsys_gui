@@ -8,8 +8,8 @@ import trnsysGUI.internalPiping as _ip
 
 
 class Crystalizer(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.w = 120
         self.h = 40

@@ -16,8 +16,8 @@ import trnsysGUI.internalPiping as _ip
 
 
 class ParabolicTroughField(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.w = 160
         self.h = 240
@@ -76,10 +76,10 @@ class ParabolicTroughField(BlockItem, _ip.HasInternalPiping):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        if self.parent.parent().projectPath == "":
-            self.path = self.parent.parent().projectFolder
+        if self.editor.projectPath == "":
+            self.path = self.editor.projectFolder
         else:
-            self.path = self.parent.parent().projectPath
+            self.path = self.editor.projectPath
 
         pathName = self.displayName
         self.path = os.path.join(self.path, "ddck")
@@ -98,17 +98,17 @@ class ParabolicTroughField(BlockItem, _ip.HasInternalPiping):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
-        self.parent.parent().splitter.addWidget(self.tree)
+        self.editor.splitter.addWidget(self.tree)
 
     def deleteBlock(self):
         """
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.parent.parent().trnsysObj.remove(self)
+        self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
+        self.editor.diagramView.scene().removeItem(self)
+        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         try:
             shutil.rmtree(self.path)
         except:

@@ -24,27 +24,27 @@ class HeatExchanger(QGraphicsItemGroup):
             relativeOutputHeight,
             storageTankWidth,
             storageTankHeight,
-            parent,
+            storageTank,
             name
     ):
-        super().__init__(parent)
-        self.parent = parent
-        self.logger = parent.logger
+        super().__init__(storageTank)
+        self.storageTank = storageTank
+        self.logger = storageTank.logger
 
         self._lines = []
         self.w = width
 
         self.sSide = sideNr
-        self.id = self.parent.parent.parent().idGen.getID()
+        self.id = self.storageTank.editor.idGen.getID()
         self.trnsysId = trnsysId
 
-        self.parent.heatExchangers.append(self)
+        self.storageTank.heatExchangers.append(self)
         self.setZValue(100)
-        self.port1 = _cspi.createSinglePipePortItem("i", self.sSide, self.parent)
-        self.port2 = _cspi.createSinglePipePortItem("o", self.sSide, self.parent)
+        self.port1 = _cspi.createSinglePipePortItem("i", self.sSide, self.storageTank)
+        self.port2 = _cspi.createSinglePipePortItem("o", self.sSide, self.storageTank)
 
-        self.parent.inputs.append(self.port1)
-        self.parent.outputs.append(self.port2)
+        self.storageTank.inputs.append(self.port1)
+        self.storageTank.outputs.append(self.port2)
 
         self._setRelativeHeightsAndTankSize(
             storageTankWidth,
@@ -82,7 +82,7 @@ class HeatExchanger(QGraphicsItemGroup):
         self.id = newId
 
     def setParent(self, parent):
-        self.parent = parent
+        self.storageTank = parent
 
         if parent.name == "StorageTank":
             self.logger.debug("p is a StorageTank")
@@ -105,7 +105,7 @@ class HeatExchanger(QGraphicsItemGroup):
         self.logger.debug("pressed")
 
     def renameHx(self):
-        self.scene().parent().showHxDlg(self)
+        self.storageTank.editor.showHxDlg(self)
 
     def rename(self, newName):
         self.displayName = newName
@@ -195,7 +195,7 @@ class HeatExchanger(QGraphicsItemGroup):
 
     def _clearDrawing(self):
         for line in self._lines:
-            self.parent.parent.parent().diagramScene.removeItem(line)
+            self.storageTank.editor.diagramScene.removeItem(line)
 
         self._lines = []
 

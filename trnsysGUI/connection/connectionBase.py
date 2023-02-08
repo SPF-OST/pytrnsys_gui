@@ -810,8 +810,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                     self.parent.diagramScene.removeItem(item)
             if isinstance(item, QGraphicsTextItem):
                 if isinstance(item.parent, _pib.PortItemBase):
-                    self.logger.debug("it has " + str(item.parent()))
-                    self.logger.debug("Deleting it")
                     self.parent.diagramScene.removeItem(item)
 
         for seg in self.segments:
@@ -957,11 +955,11 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     # Debug
     def inspectConn(self):
-        self.parent.listV.clear()
-        self.parent.listV.addItem("Display name: " + self.displayName)
-        self.parent.listV.addItem("Parent: " + str(self.parent))
-        self.parent.listV.addItem("fromPort: " + str(self.fromPort) + str(self.fromPort.id))
-        self.parent.listV.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
+        self.parent.contextInfoList.clear()
+        self.parent.contextInfoList.addItem("Display name: " + self.displayName)
+        self.parent.contextInfoList.addItem("Parent: " + str(self.parent))
+        self.parent.contextInfoList.addItem("fromPort: " + str(self.fromPort) + str(self.fromPort.id))
+        self.parent.contextInfoList.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
 
     def printConn(self):
         self.logger.debug("------------------------------------")

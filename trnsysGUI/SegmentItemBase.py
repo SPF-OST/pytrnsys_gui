@@ -648,7 +648,7 @@ class SegmentItemBase(QGraphicsItemGroup):
             self.secondLine.setVisible(True)
 
     def renameConn(self):
-        self.scene().parent().showSegmentDlg(self)
+        self.connection.parent.parent().showSegmentDlg(self)
 
     def printItemsAt(self):
         self.logger.debug("Items at startnode are %s", str(self.scene().items(self.line().p1())))

@@ -11,15 +11,15 @@ import trnsysGUI.internalPiping as _ip
 
 
 class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.w = 40
         self.h = 20
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
-        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
+        self.childIds.append(self.editor.idGen.getTrnsysID())
 
     def getDisplayName(self) -> str:
         return self.displayName
