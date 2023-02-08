@@ -19,8 +19,9 @@ import trnsysGUI.pump as _pmp
 
 
 class PumpDlg(QDialog):
-    def __init__(self, pump: _pmp.Pump, parent=None):
-        super(PumpDlg, self).__init__(parent)
+    def __init__(self, pump: _pmp.Pump, editor):
+        super(PumpDlg, self).__init__(editor)
+        self._editor = editor
         nameLabel = QLabel("Name:")
         self.block = pump
         self.le = QLineEdit(self.block.label.toPlainText())
@@ -93,7 +94,7 @@ class PumpDlg(QDialog):
             msgb = QMessageBox()
             msgb.setText("Please Enter a name!")
             msgb.exec()
-        elif self.parent().nameExists(newName) or self.parent().nameExistsInDdckFolder(newName):
+        elif self._editor.nameExists(newName) or self._editor.nameExistsInDdckFolder(newName):
             msgb = QMessageBox()
             msgb.setText("Name already exist!")
             msgb.exec()

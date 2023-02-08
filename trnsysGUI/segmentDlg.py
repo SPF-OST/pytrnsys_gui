@@ -8,7 +8,7 @@ import trnsysGUI.componentAndPipeNameValidator as _cpn
 
 # todo: make upper case
 class segmentDlg(QDialog):
-    def __init__(self, seg, parent=None):
+    def __init__(self, seg, parent):
         super(segmentDlg, self).__init__(parent)
         self.seg = seg
         nameLabel = QLabel("Name:")

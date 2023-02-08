@@ -20,8 +20,8 @@ import trnsysGUI.temperatures as _temps
 
 
 class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.h = 40
         self.w = 40

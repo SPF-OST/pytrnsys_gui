@@ -56,7 +56,7 @@ class TestStorageTank:
         legacySerializedStorageTank = _json.loads(storageTankLegacyJson)
         storageTank = _st.StorageTank(
             trnsysType="StorageTank",
-            parent=diagramViewMock,
+            editor=diagramViewMock,
             displayNamePrefix=legacySerializedStorageTank["BlockName"],
         )  # pylint: disable=no-member
         diagramViewMock.scene().addItem(storageTank)
