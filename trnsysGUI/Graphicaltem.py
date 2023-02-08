@@ -4,7 +4,7 @@
 import pathlib as _pl
 
 from PyQt5 import QtCore
-from PyQt5.QtGui import QCursor, QPixmap
+from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QMenu, QFileDialog
 
 import trnsysGUI.imageAccessor as _ia
@@ -15,7 +15,7 @@ from trnsysGUI.ResizerItem import ResizerItem
 class GraphicalItem(QGraphicsPixmapItem):
     def __init__(self, editor, **_):
 
-        super(GraphicalItem, self).__init__(None)
+        super().__init__(None)
         self.w = 100
         self.h = 100
         self._editor = editor
@@ -94,20 +94,16 @@ class GraphicalItem(QGraphicsPixmapItem):
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         self.setPos(float(i["BlockPosition"][0] + offset_x), float(i["BlockPosition"][1] + offset_y))
 
-        # self.updateFlipStateH(i["FlippedH"])
-        # self.updateFlipStateV(i["FlippedV"])
-        # self.rotateBlockToN(i["RotationN"])
-
         resBlockList.append(self)
 
     def setParent(self, parent):
-        self.parent = parent
+        self._editor = parent
         if self not in self._editor.graphicalObj:
             self._editor.graphicalObj.append(self)
 
     def deleteBlock(self):
         self._editor.graphicalObj.remove(self)
-        self.parent.scene().removeItem(self)
+        self._editor.diagramView.scene().removeItem(self)
         del self
 
     def mousePressEvent(self, event):

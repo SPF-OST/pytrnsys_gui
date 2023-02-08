@@ -45,19 +45,20 @@ def _initAsyncIOPatch() -> None:
     FIXME: if/when tornado supports the defaults in asyncio,
            remove and bump tornado requirement for py38
     """
-    if (
-            _sys.platform.startswith("win")
-            and _sys.version_info >= (3, 8)
-            and _tornado.version_info < (6, 1)
-    ):
+    if _sys.platform.startswith("win") and _sys.version_info >= (3, 8) and _tornado.version_info < (6, 1):
 
         try:
-            from _aio import WindowsProactorEventLoopPolicy, WindowsSelectorEventLoopPolicy
+            from asyncio import (  # pylint: disable=import-outside-toplevel
+                WindowsProactorEventLoopPolicy,
+                WindowsSelectorEventLoopPolicy,
+            )
         except ImportError:
             pass
             # not affected
         else:
-            if type(_aio.get_event_loop_policy()) is WindowsProactorEventLoopPolicy:
+            if (
+                type(_aio.get_event_loop_policy()) is WindowsProactorEventLoopPolicy  # pylint: disable=unidiomatic-typecheck
+            ):
                 # WindowsProactorEventLoopPolicy is not compatible with tornado 6
                 # fallback to the pre-3.8 default of Selector
                 _aio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
