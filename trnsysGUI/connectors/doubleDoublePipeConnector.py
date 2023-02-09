@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os as _os
 import typing as _tp
 
 import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
