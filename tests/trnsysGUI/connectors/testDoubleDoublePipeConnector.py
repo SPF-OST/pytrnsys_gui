@@ -157,3 +157,4 @@ class TestDoubleDoublePipeConnector:
         mainWindow.showMinimized()
 
         return diagramViewMock, [application, mainWindow, editorMock, graphicsScene]
+        
