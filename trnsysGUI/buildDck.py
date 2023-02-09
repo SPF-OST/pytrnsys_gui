@@ -59,7 +59,10 @@ class buildDck:
         it reads the Deck list and writes a deck file. Afterwards it checks that the deck looks fine
 
         """
-        self._readConfig(self.pathConfig, "run.config")
+        readConfigResult = self._readConfig(self.pathConfig, "run.config")
+        if _res.isError(readConfigResult):
+            return _res.error(readConfigResult)
+
         self._getConfig()
 
         self.nameBase = self.inputs["nameRef"]
@@ -139,7 +142,7 @@ class buildDck:
 
             self.variablesOutput = variations
 
-    def _readConfig(self, path, name, parseFileCreated=False):
+    def _readConfig(self, path, name, parseFileCreated=False) -> _res.Result[None]:
 
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
@@ -148,18 +151,22 @@ class buildDck:
         tool = readConfig.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated, controlDataType=False)
-        # stop propagting to root logger
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
         if "pathToConnectionInfo" in self.inputs:
             self._ddckPlaceHolderValuesJsonPath = self.inputs["pathToConnectionInfo"]
-        if self.inputs["addResultsFolder"] == False:
-            pass
-        else:
-            self.path = os.path.join(self.path, self.inputs["addResultsFolder"])
 
-            if not os.path.isdir(self.path):
+        resultsFolder = self.inputs.get("addResultsFolder")
+        if not resultsFolder:
+            return
+
+        self.path = os.path.join(self.path, resultsFolder)
+
+        if not os.path.isdir(self.path):
+            try:
                 os.mkdir(self.path)
+            except FileNotFoundError:
+                return _res.Error(f"The path could not be found: {self.path}")
 
     def _getConfig(self):
         """
