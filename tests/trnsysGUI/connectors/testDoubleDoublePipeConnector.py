@@ -115,6 +115,7 @@ class TestDoubleDoublePipeConnector:
 
     @staticmethod
     def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectPath):
+        # todo: provide this class as a TestHelper class. see TestStorageTank
         application = _widgets.QApplication([])
 
         mainWindow = _widgets.QMainWindow()
