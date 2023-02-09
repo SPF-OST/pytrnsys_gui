@@ -84,10 +84,7 @@ class WTap(BlockItem, _ip.HasInternalPiping):
         """
         self.logger.debug(self.editor)
         pathName = self.displayName
-        if self.editor.projectPath == "":
-            self.path = self.editor.projectFolder
-        else:
-            self.path = self.editor.projectPath
+        self.path = self.editor.projectFolder
         self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
