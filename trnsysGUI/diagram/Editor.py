@@ -2,6 +2,7 @@
 # type: ignore
 
 import json
+import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
@@ -9,31 +10,15 @@ import shutil
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
-import math as _math
-from PyQt5 import QtGui
-from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtPrintSupport import QPrinter
-from PyQt5.QtSvg import QSvgGenerator
-from PyQt5.QtWidgets import (
-    QWidget,
-    QHBoxLayout,
-    QListView,
-    QVBoxLayout,
-    QListWidget,
-    QLabel,
-    QLineEdit,
-    QScrollArea,
-    QSplitter,
-    QGraphicsItemGroup,
-    QGraphicsLineItem,
-    QMessageBox,
-    QFileDialog,
-    QTreeView,
-    QPushButton,
-)
+import PyQt5.QtGui as _qtg
+import PyQt5.QtPrintSupport as _qtp
+import PyQt5.QtSvg as _qtsvg
+import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
+import pytrnsys.utils.log as _ulog
+
 import trnsysGUI as _tgui
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
@@ -75,74 +60,11 @@ from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
+from . import _loggingCallback as _lgcb
 from . import _sizes
 
 
-class Editor(QWidget):
-    """
-    This class is the central widget of the MainWindow.
-    It contains the items library, diagram graphics scene and graphics view, and the inspector widget
-
-    Function of Connections:
-    Logically:
-    A Connection is composed of a fromPort and a toPort, which gives the direction of the pipe.
-    Ports are attached to Blocks.
-    Visually:
-    A diagram editor has a QGraphicsLineItem (connLineItem) which is set Visible only when a connection is being created
-
-    Function of BlockItems:
-    Items can be added to the library by adding them to the model of the library browser view.
-    Then they can be dragged and dropped into the diagram view.
-
-    Function of trnsysExport:
-    When exporting the trnsys file, exportData() is called.
-
-    Function of save and load:
-    A diagram can be saved to a json file by calling encodeDiagram and can then be loaded by calling decodeDiagram with
-    appropriate filenames.
-
-    Attributes
-    ----------
-    projectFolder : str
-        Path to the folder of the project
-    diagramName : str
-        Name used for saving the diagram
-    saveAsPath : :obj:`Path`
-        Default saving location is trnsysGUI/diagrams, path only set if "save as" used
-    idGen : :obj:`IdGenerator`
-        Is used to distribute ids (id, trnsysId(for trnsysExport), etc)
-    alignMode : bool
-        Enables mode in which a dragged block is aligned to y or x value of another one
-        Toggled in the MainWindow class in toggleAlignMode()
-
-    editorMode : int
-        Mode 0: Pipes are PolySun-like
-        Mode 1: Pipes have only 90deg angles, visio-like
-    snapGrid : bool
-        Enable/Disable align grid
-    snapSize : int
-        Size of align grid
-
-    mainSplitter : :obj:`QHBoxLayout`
-    Contains the diagram editor and the layout containing the library browser view and the listview
-    _componentsAndContextInfoSplitter : :obj:`QVBoxLayout`
-    Cointains the library browser view and the listWidget
-
-    moveDirectPorts: bool
-        Enables/Disables moving direct ports of storagetank (doesn't work with HxPorts yet)
-    diagramScene : :obj:`QGraphicsScene`
-        Contains the "logical" part of the diagram
-    diagramView : :obj:`QGraphicsView`
-        Contains the visualization of the diagramScene
-    _currentlyDraggedConnectionFromPort : :obj:`PortItem`
-    connectionList : :obj:`List` of :obj:`Connection`
-    trnsysObj : :obj:`List` of :obj:`BlockItem` and :obj:`Connection`
-    graphicalObj : :obj:`List` of :obj:`GraphicalItem`
-    connLine : :obj:`QLineF`
-    connLineItem = :obj:`QGraphicsLineItem`
-
-    """
-
+class Editor(_qtw.QWidget):
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
         super().__init__(parent)
 
@@ -173,6 +95,134 @@ class Editor(QWidget):
         self.snapSize = 20
 
         self.trnsysPath = _pl.Path(r"C:\Trnsys18\Exe\TRNExe.exe")
+
+        self.diagramScene = Scene(self)
+        self.diagramView = View(self.diagramScene, self)
+
+        # for file browser
+        self.fileList = []
+
+        if loadValue == "new" or loadValue == "json":
+            self.createProjectFolder()
+
+        self.fileBrowserLayout = _qtw.QVBoxLayout()
+        self.pathLayout = _qtw.QHBoxLayout()
+        self.projectPathLabel = _qtw.QLabel("Project Path:")
+        self.PPL = _qtw.QLineEdit(self.projectFolder)
+        self.PPL.setDisabled(True)
+
+        self.pathLayout.addWidget(self.projectPathLabel)
+        self.pathLayout.addWidget(self.PPL)
+        self.scroll = _qtw.QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.splitter = _qtw.QSplitter(
+            _qtc.Qt.Vertical,
+        )
+        self.splitter.setChildrenCollapsible(False)
+        self.scroll.setWidget(self.splitter)
+        self.scroll.setFixedWidth(350)
+        self.fileBrowserLayout.addLayout(self.pathLayout)
+        self.fileBrowserLayout.addWidget(self.scroll)
+        self.createDdckTree(self.projectFolder)
+
+        if loadValue == "new" or loadValue == "json":
+            self.createConfigBrowser(self.projectFolder)
+            self.copyGenericFolder(self.projectFolder)
+            self.createHydraulicDir(self.projectFolder)
+            self.createWeatherAndControlDirs(self.projectFolder)
+
+        self._setupWidgetHierarchy()
+
+        self._currentlyDraggedConnectionFromPort = None
+        self.connectionList = []
+        self.trnsysObj = []
+        self.graphicalObj = []
+        self.fluids = _hlm.Fluids.createDefault()
+        self.hydraulicLoops = _hlm.HydraulicLoops([])
+
+        self.copyGroupList = _qtw.QGraphicsItemGroup()
+        self.selectionGroupList = _qtw.QGraphicsItemGroup()
+
+        self.printerUnitnr = 0
+
+        # Different colors for connLineColor
+        colorsc = "red"
+        linePx = 4
+        if colorsc == "red":
+            connLinecolor = _qtg.QColor(_qtc.Qt.red)
+        elif colorsc == "blueish":
+            connLinecolor = _qtg.QColor(3, 124, 193)  # Blue
+        elif colorsc == "darkgray":
+            connLinecolor = _qtg.QColor(140, 140, 140)  # Gray
+        else:
+            connLinecolor = _qtg.QColor(196, 196, 196)  # Gray
+
+        # Only for displaying on-going creation of connection
+        self.connLine = _qtc.QLineF()
+        self.connLineItem = _qtw.QGraphicsLineItem(self.connLine)
+        self.connLineItem.setPen(_qtg.QPen(connLinecolor, linePx))
+        self.connLineItem.setVisible(False)
+        self.diagramScene.addItem(self.connLineItem)
+
+        # For line that shows quickly up when using the align mode
+        self.alignYLine = _qtc.QLineF()
+        self.alignYLineItem = _qtw.QGraphicsLineItem(self.alignYLine)
+        self.alignYLineItem.setPen(_qtg.QPen(_qtg.QColor(196, 249, 252), 2))
+        self.alignYLineItem.setVisible(False)
+        self.diagramScene.addItem(self.alignYLineItem)
+
+        # For line that shows quickly up when using align mode
+        self.alignXLine = _qtc.QLineF()
+        self.alignXLineItem = _qtw.QGraphicsLineItem(self.alignXLine)
+        self.alignXLineItem.setPen(_qtg.QPen(_qtg.QColor(196, 249, 252), 2))
+        self.alignXLineItem.setVisible(False)
+        self.diagramScene.addItem(self.alignXLineItem)
+
+        if loadValue == "load" or loadValue == "copy":
+            self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
+        elif loadValue == "json":
+            self._decodeDiagram(jsonPath, loadValue=loadValue)
+
+    def _setupWidgetHierarchy(self):
+        libraryBrowserView = self._createLibraryBrowserView()
+        self.contextInfoList = _qtw.QListWidget()
+
+        libraryBrowserAndContextInfoSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
+        libraryBrowserAndContextInfoSplitter.addWidget(libraryBrowserView)
+        libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
+        _sizes.setRelativeSizes(libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1])
+
+        consoleWidget = _con.createConsoleWidget(_pl.Path(self.projectFolder))
+
+        loggingTextEdit = _qtw.QPlainTextEdit()
+        loggingTextEdit.setReadOnly(True)
+
+        def loggingCallback(logMessage: str) -> None:
+            loggingTextEdit.appendPlainText(logMessage)
+
+        _lgcb.configureLoggingCallback(self.logger, loggingCallback, _ulog.FORMAT)
+
+        logAndConsoleTabs = _qtw.QTabWidget()
+        logAndConsoleTabs.addTab(loggingTextEdit, "Logging")
+        logAndConsoleTabs.addTab(consoleWidget, "IPython console")
+
+        diagramAndTabsSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
+        diagramAndTabsSplitter.addWidget(self.diagramView)
+        diagramAndTabsSplitter.addWidget(logAndConsoleTabs)
+
+        fileBrowserWidget = _qtw.QWidget()
+        fileBrowserWidget.setLayout(self.fileBrowserLayout)
+
+        mainSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Horizontal, parent=self)
+        mainSplitter.addWidget(libraryBrowserAndContextInfoSplitter)
+        mainSplitter.addWidget(diagramAndTabsSplitter)
+        mainSplitter.addWidget(fileBrowserWidget)
+        _sizes.setRelativeSizes(
+            mainSplitter, [libraryBrowserAndContextInfoSplitter, diagramAndTabsSplitter, fileBrowserWidget], [1, 5, 1]
+        )
+
+    @staticmethod
+    def _createLibraryBrowserView():
 
         componentNamesWithIcon = [
             ("Connector", _img.CONNECTOR_SVG.icon()),
@@ -214,129 +264,20 @@ class Editor(QWidget):
             ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
         ]
 
-        libItems = [QtGui.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
+        libItems = [_qtg.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
 
-        libraryModel = LibraryModel(self)
+        libraryModel = LibraryModel()
         libraryModel.setColumnCount(0)
         for i in libItems:
             libraryModel.appendRow(i)
 
-        libraryBrowserView = QListView(self)
+        libraryBrowserView = _qtw.QListView()
         libraryBrowserView.setGridSize(_qtc.QSize(65, 65))
-        libraryBrowserView.setResizeMode(QListView.Adjust)
+        libraryBrowserView.setResizeMode(_qtw.QListView.Adjust)
         libraryBrowserView.setModel(libraryModel)
         libraryBrowserView.setViewMode(libraryBrowserView.IconMode)
         libraryBrowserView.setDragDropMode(libraryBrowserView.DragOnly)
-
-        self.diagramScene = Scene(self)
-        self.diagramView = View(self.diagramScene, self)
-
-        # For list view
-        libraryBrowserAndContextInfoSplitter = QSplitter(_qtc.Qt.Orientation.Vertical, parent=self)
-        self.contextInfoList = QListWidget()
-
-        libraryBrowserAndContextInfoSplitter.addWidget(libraryBrowserView)
-        libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
-        _sizes.setRelativeSizes(libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1])
-
-        # for file browser
-        self.projectPath = ""
-        self.fileList = []
-
-        if loadValue == "new" or loadValue == "json":
-            self.createProjectFolder()
-
-        self.fileBrowserLayout = QVBoxLayout()
-        self.pathLayout = QHBoxLayout()
-        self.projectPathLabel = QLabel("Project Path:")
-        self.PPL = QLineEdit(self.projectFolder)
-        self.PPL.setDisabled(True)
-
-        self.pathLayout.addWidget(self.projectPathLabel)
-        self.pathLayout.addWidget(self.PPL)
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.splitter = QSplitter(
-            _qtc.Qt.Vertical,
-        )
-        self.splitter.setChildrenCollapsible(False)
-        self.scroll.setWidget(self.splitter)
-        self.scroll.setFixedWidth(350)
-        self.fileBrowserLayout.addLayout(self.pathLayout)
-        self.fileBrowserLayout.addWidget(self.scroll)
-        self.createDdckTree(self.projectFolder)
-
-        if loadValue == "new" or loadValue == "json":
-            self.createConfigBrowser(self.projectFolder)
-            self.copyGenericFolder(self.projectFolder)
-            self.createHydraulicDir(self.projectFolder)
-            self.createWeatherAndControlDirs(self.projectFolder)
-
-        consoleWidget = _con.createConsole(_pl.Path(self.projectPath))
-        diagramAndConsoleSplitter = QSplitter(_qtc.Qt.Orientation.Vertical, parent=self)
-        diagramAndConsoleSplitter.addWidget(self.diagramView)
-        diagramAndConsoleSplitter.addWidget(consoleWidget)
-
-        fileBrowserWidget = QWidget(parent=self)
-        fileBrowserWidget.setLayout(self.fileBrowserLayout)
-
-        mainSplitter = QSplitter(_qtc.Qt.Orientation.Horizontal, parent=self)
-        mainSplitter.addWidget(libraryBrowserAndContextInfoSplitter)
-        mainSplitter.addWidget(diagramAndConsoleSplitter)
-        mainSplitter.addWidget(fileBrowserWidget)
-        _sizes.setRelativeSizes(
-            mainSplitter, [libraryBrowserAndContextInfoSplitter, diagramAndConsoleSplitter, fileBrowserWidget], [1, 5, 1]
-        )
-
-        self._currentlyDraggedConnectionFromPort = None
-        self.connectionList = []
-        self.trnsysObj = []
-        self.graphicalObj = []
-        self.fluids = _hlm.Fluids.createDefault()
-        self.hydraulicLoops = _hlm.HydraulicLoops([])
-
-        self.copyGroupList = QGraphicsItemGroup()
-        self.selectionGroupList = QGraphicsItemGroup()
-
-        self.printerUnitnr = 0
-
-        # Different colors for connLineColor
-        colorsc = "red"
-        linePx = 4
-        if colorsc == "red":
-            connLinecolor = QColor(_qtc.Qt.red)
-        elif colorsc == "blueish":
-            connLinecolor = QColor(3, 124, 193)  # Blue
-        elif colorsc == "darkgray":
-            connLinecolor = QColor(140, 140, 140)  # Gray
-        else:
-            connLinecolor = QColor(196, 196, 196)  # Gray
-
-        # Only for displaying on-going creation of connection
-        self.connLine = _qtc.QLineF()
-        self.connLineItem = QGraphicsLineItem(self.connLine)
-        self.connLineItem.setPen(QtGui.QPen(connLinecolor, linePx))
-        self.connLineItem.setVisible(False)
-        self.diagramScene.addItem(self.connLineItem)
-
-        # For line that shows quickly up when using the align mode
-        self.alignYLine = _qtc.QLineF()
-        self.alignYLineItem = QGraphicsLineItem(self.alignYLine)
-        self.alignYLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
-        self.alignYLineItem.setVisible(False)
-        self.diagramScene.addItem(self.alignYLineItem)
-
-        # For line that shows quickly up when using align mode
-        self.alignXLine = _qtc.QLineF()
-        self.alignXLineItem = QGraphicsLineItem(self.alignXLine)
-        self.alignXLineItem.setPen(QtGui.QPen(QColor(196, 249, 252), 2))
-        self.alignXLineItem.setVisible(False)
-        self.diagramScene.addItem(self.alignXLineItem)
-
-        if loadValue == "load" or loadValue == "copy":
-            self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
-        elif loadValue == "json":
-            self._decodeDiagram(jsonPath, loadValue=loadValue)
+        return libraryBrowserView
 
     # Debug function
     def dumpInformation(self):
@@ -372,7 +313,7 @@ class Editor(QWidget):
                 and isinstance(endPort.parent, StorageTank)
                 and startPort.parent != endPort.parent
             ):
-                msgSTank = QMessageBox(self)
+                msgSTank = _qtw.QMessageBox(self)
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
                 msgSTank.exec_()
 
@@ -489,10 +430,10 @@ class Editor(QWidget):
         assert exportTo in ["ddck", "mfs"]
 
         if not self._isHydraulicConnected():
-            messageBox = QMessageBox()
+            messageBox = _qtw.QMessageBox()
             messageBox.setWindowTitle("Hydraulic not connected")
             messageBox.setText("You need to connect all port items before you can export the hydraulics.")
-            messageBox.setStandardButtons(QMessageBox.Ok)
+            messageBox.setStandardButtons(_qtw.QMessageBox.Ok)
             messageBox.exec()
             return
 
@@ -664,13 +605,13 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         if not _pl.Path(folderPath).exists():
             return False
 
-        qmb = QMessageBox(self)
+        qmb = _qtw.QMessageBox(self)
         qmb.setText(f"Warning: {folderPath} already exists. Do you want to overwrite it or cancel?")
-        qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-        qmb.setDefaultButton(QMessageBox.Cancel)
+        qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+        qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
         ret = qmb.exec()
 
-        if ret == QMessageBox.Cancel:
+        if ret == _qtw.QMessageBox.Cancel:
             self.canceled = True
             self.logger.info("Canceling")
             return True
@@ -690,15 +631,15 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         hydCtrlPath = os.path.join(ddckFolder, "control", "hydraulic_control.ddck")
         if _pl.Path(hydCtrlPath).exists():
-            qmb = QMessageBox(self)
+            qmb = _qtw.QMessageBox(self)
             qmb.setText(
                 "Warning: "
                 + "The file hydraulic_control.ddck already exists in the control folder. Do you want to overwrite it or cancel?"
             )
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
+            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
             ret = qmb.exec()
-            if ret == QMessageBox.Save:
+            if ret == _qtw.QMessageBox.Save:
                 self.canceled = False
                 self.logger.info("Overwriting")
             else:
@@ -843,7 +784,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
                 additionalFolders.append(folder)
 
         if len(additionalFolders) > 0:
-            warnBox = QMessageBox()
+            warnBox = _qtw.QMessageBox()
             warnBox.setWindowTitle("Additional ddck-folders")
 
             if len(additionalFolders) == 1:
@@ -855,8 +796,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
                 text += "\n\t" + folder
 
             warnBox.setText(text)
-            warnBox.setStandardButtons(QMessageBox.Ok)
-            warnBox.setDefaultButton(QMessageBox.Ok)
+            warnBox.setStandardButtons(_qtw.QMessageBox.Ok)
+            warnBox.setDefaultButton(_qtw.QMessageBox.Ok)
             warnBox.exec()
 
         for t in self.trnsysObj:
@@ -897,16 +838,16 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         -------
 
         """
-        generator = QSvgGenerator()
+        generator = _qtsvg.QSvgGenerator()
         generator.setResolution(300)
         generator.setSize(_qtc.QSize(self.diagramScene.width(), self.diagramScene.height()))
         # generator.setViewBox(QRect(0, 0, 800, 800))
         generator.setViewBox(self.diagramScene.sceneRect())
         generator.setFileName("VectorGraphicsExport.svg")
 
-        painter = QPainter()
+        painter = _qtg.QPainter()
         painter.begin(generator)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(_qtg.QPainter.Antialiasing)
         self.diagramScene.render(painter)
         painter.end()
 
@@ -917,23 +858,23 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         jsonFilePath = _pl.Path(self.projectFolder) / "DdckPlaceHolderValues.json"
 
         if jsonFilePath.is_dir():
-            qmb = QMessageBox(self)
+            qmb = _qtw.QMessageBox(self)
             qmb.setText(
                 f"A folder already exits at f{jsonFilePath}. Chose a different location or delete the folder first."
             )
-            qmb.setStandardButtons(QMessageBox.Ok)
+            qmb.setStandardButtons(_qtw.QMessageBox.Ok)
             qmb.exec()
 
             return None
 
         if jsonFilePath.is_file():
-            qmb = QMessageBox(self)
+            qmb = _qtw.QMessageBox(self)
             qmb.setText("The file already exists. Do you want to overwrite it or cancel?")
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
+            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
             ret = qmb.exec()
 
-            if ret != QMessageBox.Save:
+            if ret != _qtw.QMessageBox.Save:
                 return None
 
         result = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
@@ -941,11 +882,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             return _res.error(result)
 
         if shallShowMessageOnSuccess:
-            msgb = QMessageBox()
+            msgb = _qtw.QMessageBox()
             msgb.setWindowTitle("Saved successfully")
             msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
-            msgb.setStandardButtons(QMessageBox.Ok)
-            msgb.setDefaultButton(QMessageBox.Ok)
+            msgb.setStandardButtons(_qtw.QMessageBox.Ok)
+            msgb.setDefaultButton(_qtw.QMessageBox.Ok)
             msgb.exec()
 
         return None
@@ -975,13 +916,13 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         diagramPath = os.path.join(self.projectFolder, self.diagramName)
 
         if os.path.isfile(diagramPath) and showWarning:
-            qmb = QMessageBox(self)
+            qmb = _qtw.QMessageBox(self)
             qmb.setText("Warning: " + "This diagram name exists already. Do you want to overwrite or cancel?")
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
+            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
             ret = qmb.exec()
 
-            if ret != QMessageBox.Save:
+            if ret != _qtw.QMessageBox.Save:
                 self.logger.info("Canceling")
                 return
 
@@ -990,15 +931,12 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         self.encodeDiagram(diagramPath)
         if showWarning:
-            msgb = QMessageBox()
+            msgb = _qtw.QMessageBox()
             msgb.setWindowTitle("Saved successfully")
             msgb.setText("Saved diagram at " + diagramPath)
-            msgb.setStandardButtons(QMessageBox.Ok)
-            msgb.setDefaultButton(QMessageBox.Ok)
+            msgb.setStandardButtons(_qtw.QMessageBox.Ok)
+            msgb.setDefaultButton(_qtw.QMessageBox.Ok)
             msgb.exec()
-
-    def saveToProject(self):
-        projectPath = self.projectPath
 
     def renameDiagram(self, newName):
         """
@@ -1015,7 +953,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         if self.saveAsPath.name != "":
             # print("Path name is " + self.saveAsPath.name)
             if newName + ".json" in self.saveAsPath.glob("*"):
-                QMessageBox(
+                _qtw.QMessageBox(
                     self, "Warning", "This diagram name exists already in the directory." " Please rename this diagram"
                 )
             else:
@@ -1116,10 +1054,10 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     # Unused
     def create_icon(self, map_icon):
         map_icon.fill()
-        painter = QPainter(map_icon)
-        painter.fillRect(10, 10, 40, 40, QColor(88, 233, 252))
+        painter = _qtg.QPainter(map_icon)
+        painter.fillRect(10, 10, 40, 40, _qtg.QColor(88, 233, 252))
         # painter.setBrush(Qt.red)
-        painter.setBrush(QColor(252, 136, 98))
+        painter.setBrush(_qtg.QColor(252, 136, 98))
         painter.drawEllipse(36, 2, 15, 15)
         painter.setBrush(_qtc.Qt.yellow)
         painter.drawEllipse(20, 20, 20, 20)
@@ -1165,45 +1103,28 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         fn = user input directory
         ---------------------------------------------
         """
-        fn, _ = QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
+        fn, _ = _qtw.QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
         if fn != "":
             if _qtc.QFileInfo(fn).suffix() == "":
                 fn += ".pdf"
-            printer = QPrinter(QPrinter.HighResolution)
-            printer.setOrientation(QPrinter.Landscape)
-            printer.setOutputFormat(QPrinter.PdfFormat)
+            printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
+            printer.setOrientation(_qtp.QPrinter.Landscape)
+            printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
             printer.setOutputFileName(fn)
-            painter = QPainter(printer)
+            painter = _qtg.QPainter(printer)
             self.diagramScene.render(painter)
             painter.end()
             self.logger.info("File exported to %s" % fn)
 
-    def openProject(self):
-        self.projectPath = str(QFileDialog.getExistingDirectory(self, "Select Project Path"))
-        if self.projectPath != "":
-            self.parent().newDia()
-            self.PPL.setText(self.projectPath)
-            loadPath = os.path.join(self.projectPath, "ddck")
-
-            self.createConfigBrowser(self.projectPath)
-            self.copyGenericFolder(self.projectPath)
-            self.createHydraulicDir(self.projectPath)
-            self.createWeatherAndControlDirs(self.projectPath)
-            self.createDdckTree(loadPath)
-            # todo : open diagram
-            # todo : add files into list
-
     def createDdckTree(self, loadPath):
-        treeToRemove = self.findChild(QTreeView, "ddck")
+        treeToRemove = self.findChild(_qtw.QTreeView, "ddck")
         try:
-            # treeToRemove.hide()
             treeToRemove.deleteLater()
         except AttributeError:
             self.logger.debug("Widget doesnt exist!")
         else:
             self.logger.debug("Deleted widget")
-        if self.projectPath == "":
-            loadPath = os.path.join(loadPath, "ddck")
+        loadPath = os.path.join(loadPath, "ddck")
         if not os.path.exists(loadPath):
             os.makedirs(loadPath)
         self.model = MyQFileSystemModel()
@@ -1218,7 +1139,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         self.splitter.insertWidget(0, self.tree)
 
     def createConfigBrowser(self, loadPath):
-        self.layoutToRemove = self.findChild(QHBoxLayout, "Config_Layout")
+        self.layoutToRemove = self.findChild(_qtw.QHBoxLayout, "Config_Layout")
         try:
             # treeToRemove.hide()
             self.layoutToRemove.deleteLater()
@@ -1231,8 +1152,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         runConfigPath = _pl.Path(loadPath) / "run.config"
         runConfigPath.write_bytes(runConfigData)
 
-        self.HBox = QHBoxLayout()
-        self.refreshButton = QPushButton(self)
+        self.HBox = _qtw.QHBoxLayout()
+        self.refreshButton = _qtw.QPushButton(self)
         self.refreshButton.setIcon(_img.ROTATE_TO_RIGHT_PNG.icon())
         self.refreshButton.clicked.connect(self.refreshConfig)
         self.model = MyQFileSystemModel()
@@ -1255,14 +1176,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             os.makedirs(self.projectFolder)
 
     def refreshConfig(self):
-        # configPath = os.path.dirname(__file__)
-        # configPath = os.path.join(configPath, 'project')
-        # configPath = os.path.join(configPath, self.date_time)
-        # emptyConfig = os.path.join(configPath, 'run.config')
-        if self.projectPath == "":
-            localPath = self.projectFolder
-        else:
-            localPath = self.projectPath
+        localPath = self.projectFolder
 
         self.configToEdit = os.path.join(localPath, "run.config")
         os.remove(self.configToEdit)
