@@ -1,4 +1,4 @@
-__all__ = ["createConsole"]
+__all__ = ["createConsoleWidget"]
 
 import asyncio as _aio
 import pathlib as _pl
@@ -10,7 +10,7 @@ import qtconsole.rich_jupyter_widget as _qtcjw
 import tornado as _tornado
 
 
-def createConsole(projectFolderToStartIPythonIn: _pl.Path) -> _qtw.QWidget:
+def createConsoleWidget(projectFolderToStartIPythonIn: _pl.Path) -> _qtw.QWidget:
     kernelManager = _gtcip.QtInProcessKernelManager()
     kernelManager.start_kernel()
     kernel = kernelManager.kernel
