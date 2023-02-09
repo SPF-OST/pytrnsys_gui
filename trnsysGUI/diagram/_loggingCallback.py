@@ -4,11 +4,11 @@ import logging as _log
 import typing as _tp
 
 
-def configureLoggingCallback(logger: _log.Logger, callback: "_Callback", format: _tp.Optional[str] = None) -> None:
+def configureLoggingCallback(logger: _log.Logger, callback: "_Callback", formatString: _tp.Optional[str] = None) -> None:
     callbackLogHandler = _CallbackLogHandler(callback)
 
-    if format:
-        formatter = _log.Formatter(fmt=format)
+    if formatString:
+        formatter = _log.Formatter(fmt=formatString)
         callbackLogHandler.setFormatter(formatter)
 
     logger.addHandler(callbackLogHandler)
