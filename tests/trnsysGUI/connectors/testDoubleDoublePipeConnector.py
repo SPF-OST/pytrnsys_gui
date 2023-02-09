@@ -14,34 +14,16 @@ import trnsysGUI.connection.doublePipeConnection as _dpc
 # a more helpful stack trace using the cgitb module.
 _cgitb.enable(format="text")
 
-UNIT_TEXT = 'UNIT 5 TYPE 222\n' \
-           'INPUTS 3\n' \
-           'MDPCnr7701Hot_A Thx1ExtFromPortConnHot Tdpp1ExtToPortConnHot\n' \
-           '***\n' \
-           '0 20 20\n' \
-           '\n' \
-           'EQUATIONS 1\n' \
-           'TDPCnr7701Hot = [5,1]\n' \
-           '\n' \
-           '\n' \
-           'UNIT 6 TYPE 222\n' \
-           'INPUTS 3\n' \
-           'MDPCnr7701Cold_A Tdpp1ExtToPortConnCold Thx1ExtFromPortConnCold\n' \
-           '***\n0 20 20\n' \
-           '\n' \
-           'EQUATIONS 1\n' \
-           'TDPCnr7701Cold = [6,1]\n' \
-           '\n' \
-           '\n'
 
-UNIT_TEXT_WRONG = 'UNIT 5 TYPE 222\n' \
+def getUnitText(version1, version2):
+    unit_text = 'UNIT 5 TYPE 222\n' \
            'INPUTS 3\n' \
            'MDPCnr7701Hot_A Thx1ExtFromPortConnHot Tdpp1ExtToPortConnHot\n' \
            '***\n' \
            '0 20 20\n' \
            '\n' \
            'EQUATIONS 1\n' \
-           'TDPCnr7701Hot = [5,1]\n' \
+           f'TDPCnr7701{version1} = [5,1]\n' \
            '\n' \
            '\n' \
            'UNIT 6 TYPE 222\n' \
@@ -50,9 +32,10 @@ UNIT_TEXT_WRONG = 'UNIT 5 TYPE 222\n' \
            '***\n0 20 20\n' \
            '\n' \
            'EQUATIONS 1\n' \
-           'TDPCnr7701Hot = [6,1]\n' \
+           f'TDPCnr7701{version2} = [6,1]\n' \
            '\n' \
            '\n'
+    return unit_text
 
 
 class _StrictMock:
@@ -81,7 +64,51 @@ class TestDoubleDoublePipeConnector:
         ddpConnector.outputs[0].connectionList.append(externalToPortConnection)
         text, newTemp = ddpConnector.exportPipeAndTeeTypesForTemp(5)
         assert newTemp == 7
-        assert text == UNIT_TEXT
+        assert text == getUnitText('Hot', 'Cold')
+
+    def test_connection_does_not_write_both_HOT_entries(self, tmp_path):
+        logger = _log.getLogger("root")
+        (
+            diagramViewMock,
+            objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
+        ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
+
+        ddpConnector = _ddpc.DoubleDoublePipeConnector(
+            trnsysType="DPCnr",
+            parent=diagramViewMock,
+            displayNamePrefix="DPCnr",
+        )  # pylint: disable=no-member
+        diagramViewMock.scene().addItem(ddpConnector)
+
+        externalFromPortConnection = self._createConnectionMock(f"hx1ExtFromPortConn", toPort=ddpConnector.inputs[0])
+        ddpConnector.inputs[0].connectionList.append(externalFromPortConnection)
+        externalToPortConnection = self._createConnectionMock(f"dpp1ExtToPortConn", fromPort=ddpConnector.outputs[0])
+        ddpConnector.outputs[0].connectionList.append(externalToPortConnection)
+        text, newTemp = ddpConnector.exportPipeAndTeeTypesForTemp(5)
+        assert newTemp == 7
+        assert text != getUnitText('Hot', 'Hot')
+
+    def test_connection_does_not_write_both_COLD_entries(self, tmp_path):
+        logger = _log.getLogger("root")
+        (
+            diagramViewMock,
+            objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
+        ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
+
+        ddpConnector = _ddpc.DoubleDoublePipeConnector(
+            trnsysType="DPCnr",
+            parent=diagramViewMock,
+            displayNamePrefix="DPCnr",
+        )  # pylint: disable=no-member
+        diagramViewMock.scene().addItem(ddpConnector)
+
+        externalFromPortConnection = self._createConnectionMock(f"hx1ExtFromPortConn", toPort=ddpConnector.inputs[0])
+        ddpConnector.inputs[0].connectionList.append(externalFromPortConnection)
+        externalToPortConnection = self._createConnectionMock(f"dpp1ExtToPortConn", fromPort=ddpConnector.outputs[0])
+        ddpConnector.outputs[0].connectionList.append(externalToPortConnection)
+        text, newTemp = ddpConnector.exportPipeAndTeeTypesForTemp(5)
+        assert newTemp == 7
+        assert text != getUnitText('Cold', 'Cold')
 
     @staticmethod
     def _createConnectionMock(
