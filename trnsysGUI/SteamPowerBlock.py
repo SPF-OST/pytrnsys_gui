@@ -77,10 +77,7 @@ class SteamPowerBlock(BlockItem, _ip.HasInternalPiping):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        if self.editor.projectPath == "":
-            self.path = self.editor.projectFolder
-        else:
-            self.path = self.editor.projectPath
+        self.path = self.editor.projectFolder
 
         pathName = self.displayName
         self.path = os.path.join(self.path, "ddck")

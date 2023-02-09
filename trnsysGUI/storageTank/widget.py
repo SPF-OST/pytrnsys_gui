@@ -576,10 +576,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         A file explorer for that item is added to the right of the main window by calling this method
         """
         pathName = self.displayName
-        if self.editor.projectPath == "":
-            self.path = self.editor.projectFolder
-        else:
-            self.path = self.editor.projectPath
+        self.path = self.editor.projectFolder
         self.path = _os.path.join(self.path, "ddck")
         self.path = _os.path.join(self.path, pathName)
         if not _os.path.exists(self.path):

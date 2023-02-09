@@ -160,7 +160,7 @@ class TestStorageTank:
         return _tp.cast(_spc.SinglePipeConnection, mock)
 
     @staticmethod
-    def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectPath):
+    def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectFolder):
         application = _widgets.QApplication([])
 
         mainWindow = _widgets.QMainWindow()
@@ -169,7 +169,7 @@ class TestStorageTank:
         editorMock.connectionList = []
         editorMock.logger = logger
         editorMock.trnsysObj = []
-        editorMock.projectPath = str(projectPath)
+        editorMock.projectFolder = str(projectFolder)
         editorMock.splitter = _mock.Mock(name="splitter")
         editorMock.idGen = _mock.Mock(
             name="idGen",
