@@ -4,8 +4,6 @@
 import os
 import shutil
 
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QTreeView
 
 from trnsysGUI.BlockItem import BlockItem
@@ -13,7 +11,7 @@ from trnsysGUI.BlockItem import BlockItem
 
 class MasterControl(BlockItem):
     def __init__(self, trnsysType, editor, **kwargs):
-        super(MasterControl, self).__init__(trnsysType, editor, **kwargs)
+        super().__init__(trnsysType, editor, **kwargs)
         factor = 0.667  # 0.63 for png
         self.w = 100
         self.h = 100
@@ -23,12 +21,7 @@ class MasterControl(BlockItem):
         self.createControlDir()
 
     def createControlDir(self):
-        if self.editor.projectPath == "":
-            projectPath = self.editor.projectFolder
-        else:
-            projectPath = self.editor.projectPath
-
-        self.editor.controlDirectory = os.path.join(projectPath, "ddck")
+        self.editor.controlDirectory = os.path.join(self.editor.projectFolder, "ddck")
         self.editor.controlDirectory = os.path.join(self.editor.controlDirectory, "Master_Control")
         if not os.path.exists(self.editor.controlDirectory):
             os.makedirs(self.editor.controlDirectory)

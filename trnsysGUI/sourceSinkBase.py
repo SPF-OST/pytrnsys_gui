@@ -30,7 +30,7 @@ class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
         self._updateDdckFilePath()
 
     def _updateDdckFilePath(self):
-        ddckFilePath = _pl.Path(self.editor.projectPath) / "ddck" / f"{self.displayName}.ddck"
+        ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
         self.path = str(ddckFilePath)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
