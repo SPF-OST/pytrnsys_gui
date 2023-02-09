@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os as _os
 import typing as _tp
 
 import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
@@ -79,10 +80,8 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         hotUnit = self._getIfThenElseUnit(startingUnit, self._hotPipe, inputPort, outputPort)
         coldUnit = self._getIfThenElseUnit(startingUnit + 1, self._coldPipe, outputPort, inputPort)
 
-        unitText = f"""\
-{hotUnit}
-{coldUnit}
-"""
+        unitText = f"{hotUnit}\n{coldUnit}\n"
+
         return unitText, startingUnit + 2
 
     def _getIfThenElseUnit(
