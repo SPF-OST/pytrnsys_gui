@@ -2,7 +2,6 @@
 # type: ignore
 
 import json
-import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
@@ -12,13 +11,12 @@ import typing as _tp
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
-import PyQt5.QtSvg as _qtsvg
 import PyQt5.QtWidgets as _qtw
+import math as _math
 
 import pytrnsys.trnsys_util.deckUtils as _du
-import pytrnsys.utils.result as _res
 import pytrnsys.utils.log as _ulog
-
+import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
@@ -209,17 +207,21 @@ class Editor(_qtw.QWidget):
         diagramAndTabsSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
         diagramAndTabsSplitter.addWidget(self.diagramView)
         diagramAndTabsSplitter.addWidget(logAndConsoleTabs)
+        _sizes.setRelativeSizes(diagramAndTabsSplitter, [self.diagramView, logAndConsoleTabs], [3, 1])
 
         fileBrowserWidget = _qtw.QWidget()
         fileBrowserWidget.setLayout(self.fileBrowserLayout)
 
-        mainSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Horizontal, parent=self)
+        mainSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Horizontal)
         mainSplitter.addWidget(libraryBrowserAndContextInfoSplitter)
         mainSplitter.addWidget(diagramAndTabsSplitter)
         mainSplitter.addWidget(fileBrowserWidget)
         _sizes.setRelativeSizes(
             mainSplitter, [libraryBrowserAndContextInfoSplitter, diagramAndTabsSplitter, fileBrowserWidget], [1, 5, 1]
         )
+
+        topLevelLayout = _qtw.QGridLayout(self)
+        topLevelLayout.addWidget(mainSplitter)
 
     @staticmethod
     def _createLibraryBrowserView():
@@ -830,26 +832,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             storageTank = trnsysObject
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
-
-    def exportSvg(self):
-        """
-        For exporting a svg file (text is still too large)
-        Returns
-        -------
-
-        """
-        generator = _qtsvg.QSvgGenerator()
-        generator.setResolution(300)
-        generator.setSize(_qtc.QSize(self.diagramScene.width(), self.diagramScene.height()))
-        # generator.setViewBox(QRect(0, 0, 800, 800))
-        generator.setViewBox(self.diagramScene.sceneRect())
-        generator.setFileName("VectorGraphicsExport.svg")
-
-        painter = _qtg.QPainter()
-        painter.begin(generator)
-        painter.setRenderHint(_qtg.QPainter.Antialiasing)
-        self.diagramScene.render(painter)
-        painter.end()
 
     def exportDdckPlaceHolderValuesJsonFile(self, shallShowMessageOnSuccess: bool = True) -> _res.Result[None]:
         if not self._isHydraulicConnected():
