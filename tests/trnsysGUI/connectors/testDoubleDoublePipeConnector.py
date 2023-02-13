@@ -15,71 +15,65 @@ import trnsysGUI.connection.doublePipeConnection as _dpc
 _cgitb.enable(format="text")
 
 
-def getUnitText(version1, version2):
-    # todo: check \n against OS issues
-    unit_text = 'UNIT 5 TYPE 222\n' \
-           'INPUTS 3\n' \
-           'MDPCnr7701Hot_A Thx1ExtFromPortConnHot Tdpp1ExtToPortConnHot\n' \
-           '***\n' \
-           '0 20 20\n' \
-           '\n' \
-           'EQUATIONS 1\n' \
-           f'TDPCnr7701{version1} = [5,1]\n' \
-           '\n' \
-           '\n' \
-           'UNIT 6 TYPE 222\n' \
-           'INPUTS 3\n' \
-           'MDPCnr7701Cold_A Tdpp1ExtToPortConnCold Thx1ExtFromPortConnCold\n' \
-           '***\n0 20 20\n' \
-           '\n' \
-           'EQUATIONS 1\n' \
-           f'TDPCnr7701{version2} = [6,1]\n' \
-           '\n' \
-           '\n'
-    return unit_text
-
-
 class _StrictMock:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
 
 class TestDoubleDoublePipeConnector:
-    def test_connection_writes_both_HOT_and_COLD_entries(self, tmp_path):
-        ddpConnector = self._prepDPPConnector(tmp_path)
-        text, newTemp = ddpConnector.exportPipeAndTeeTypesForTemp(5)
-        assert newTemp == 7
-        assert text == getUnitText('Hot', 'Cold')
+    def test(self, tmp_path):  # pylint: disable=invalid-name
+        connector = self._createConnector(tmp_path)
 
-    def test_connection_does_not_write_both_HOT_entries(self, tmp_path):
-        ddpConnector = self._prepDPPConnector(tmp_path)
-        text, newTemp = ddpConnector.exportPipeAndTeeTypesForTemp(5)
-        assert newTemp == 7
-        assert text != getUnitText('Hot', 'Hot')
+        unitNumber = 1
+        text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(unitNumber)
 
-    def test_connection_does_not_write_both_COLD_entries(self, tmp_path):
-        ddpConnector = self._prepDPPConnector(tmp_path)
-        text, newTemp = ddpConnector.exportPipeAndTeeTypesForTemp(5)
-        assert newTemp == 7
-        assert text != getUnitText('Cold', 'Cold')
+        assert nextUnitNumber == unitNumber + 2
+        assert text == """\
+UNIT 1 TYPE 222
+INPUTS 3
+MDPCnrHot_A TinputConnectionHot ToutputConnectionHot
+***
+0 20 20
 
-    def _prepDPPConnector(self, tmp_path):
+EQUATIONS 1
+TDPCnrHot = [1,1]
+
+
+UNIT 2 TYPE 222
+INPUTS 3
+MDPCnrCold_A ToutputConnectionCold TinputConnectionCold
+***
+0 20 20
+
+EQUATIONS 1
+TDPCnrCold = [2,1]
+
+"""
+
+    @classmethod
+    def _createConnector(cls, tmp_path):  # pylint: disable=invalid-name:
         logger = _log.getLogger("root")
+
         (
             diagramViewMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
-        ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
-        ddpConnector = _ddpc.DoubleDoublePipeConnector(
+        ) = cls._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
+
+        connector = _ddpc.DoubleDoublePipeConnector(
             trnsysType="DPCnr",
             parent=diagramViewMock,
-            displayNamePrefix="DPCnr",
-        )  # pylint: disable=no-member
-        diagramViewMock.scene().addItem(ddpConnector)
-        externalFromPortConnection = self._createConnectionMock(f"hx1ExtFromPortConn", toPort=ddpConnector.inputs[0])
-        ddpConnector.inputs[0].connectionList.append(externalFromPortConnection)
-        externalToPortConnection = self._createConnectionMock(f"dpp1ExtToPortConn", fromPort=ddpConnector.outputs[0])
-        ddpConnector.outputs[0].connectionList.append(externalToPortConnection)
-        return ddpConnector
+            displayName="DPCnr",
+        )
+
+        diagramViewMock.scene().addItem(connector)
+
+        externalFromPortConnection = cls._createConnectionMock("inputConnection", toPort=connector.inputs[0])
+        connector.inputs[0].connectionList.append(externalFromPortConnection)
+
+        externalToPortConnection = cls._createConnectionMock("outputConnection", fromPort=connector.outputs[0])
+        connector.outputs[0].connectionList.append(externalToPortConnection)
+
+        return connector
 
     @staticmethod
     def _createConnectionMock(
@@ -96,7 +90,9 @@ class TestDoubleDoublePipeConnector:
         def getInternalPiping() -> _ip.InternalPiping:
             coldModelPortItemsToGraphicalPortItem = {coldModelPipe.fromPort: toPort, coldModelPipe.toPort: fromPort}
             hotModelPortItemsToGraphicalPortItem = {hotModelPipe.fromPort: fromPort, hotModelPipe.toPort: toPort}
-            modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
+            modelPortItemsToGraphicalPortItem = (
+                coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
+            )
             return _ip.InternalPiping([coldModelPipe, hotModelPipe], modelPortItemsToGraphicalPortItem)
 
         mock = _StrictMock(
@@ -115,7 +111,7 @@ class TestDoubleDoublePipeConnector:
 
     @staticmethod
     def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectPath):
-        # todo: provide this class as a TestHelper class. see TestStorageTank
+        # todo: provide this class as a TestHelper class. see TestStorageTank  # pylint: disable=fixme
         application = _widgets.QApplication([])
 
         mainWindow = _widgets.QMainWindow()
@@ -131,9 +127,6 @@ class TestDoubleDoublePipeConnector:
             spec_set=[
                 "getID",
                 "getTrnsysID",
-                "getStoragenTes",
-                "getStorageType",
-                "getConnID",
             ],
         )
         editorMock.moveDirectPorts = True
@@ -143,9 +136,6 @@ class TestDoubleDoublePipeConnector:
 
         editorMock.idGen.getID = lambda: 7701
         editorMock.idGen.getTrnsysID = lambda: 7702
-        editorMock.idGen.getStoragenTes = lambda: 7703
-        editorMock.idGen.getStorageType = lambda: 7704
-        editorMock.idGen.getConnID = lambda: 7705
 
         graphicsScene = _widgets.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
@@ -157,4 +147,3 @@ class TestDoubleDoublePipeConnector:
         mainWindow.showMinimized()
 
         return diagramViewMock, [application, mainWindow, editorMock, graphicsScene]
-        

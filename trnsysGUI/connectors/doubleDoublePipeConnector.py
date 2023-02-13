@@ -79,7 +79,9 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         hotUnit = self._getIfThenElseUnit(startingUnit, self._hotPipe, inputPort, outputPort)
         coldUnit = self._getIfThenElseUnit(startingUnit + 1, self._coldPipe, outputPort, inputPort)
 
-        unitText = f"{hotUnit}\n{coldUnit}\n"
+        unitText = f"""\
+{hotUnit}
+{coldUnit}"""
 
         return unitText, startingUnit + 2
 
