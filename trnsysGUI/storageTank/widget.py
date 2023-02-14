@@ -600,7 +600,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.parent.scene().removeItem(self)
+        self.editor.diagramScene.removeItem(self)
         widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         _sh.rmtree(self.path)
         try:

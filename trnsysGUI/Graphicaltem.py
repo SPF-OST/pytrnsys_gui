@@ -103,7 +103,7 @@ class GraphicalItem(QGraphicsPixmapItem):
 
     def deleteBlock(self):
         self._editor.graphicalObj.remove(self)
-        self._editor.diagramView.scene().removeItem(self)
+        self._editor.diagramScene.removeItem(self)
         del self
 
     def mousePressEvent(self, event):

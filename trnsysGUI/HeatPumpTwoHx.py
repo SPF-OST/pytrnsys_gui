@@ -221,7 +221,7 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.editor.diagramView.scene().removeItem(self)
+        self.editor.diagramScene.removeItem(self)
         widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
