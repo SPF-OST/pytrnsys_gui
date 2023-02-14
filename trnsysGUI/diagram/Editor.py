@@ -15,7 +15,6 @@ import PyQt5.QtWidgets as _qtw
 import math as _math
 
 import pytrnsys.trnsys_util.deckUtils as _du
-import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
 import trnsysGUI.connection.names as _cnames
@@ -58,7 +57,6 @@ from trnsysGUI.segmentDlg import segmentDlg
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
-from . import _loggingCallback as _lgcb
 from . import _sizes
 
 
@@ -129,6 +127,9 @@ class Editor(_qtw.QWidget):
             self.createHydraulicDir(self.projectFolder)
             self.createWeatherAndControlDirs(self.projectFolder)
 
+        self.loggingTextEdit = _qtw.QPlainTextEdit()
+        self.loggingTextEdit.setReadOnly(True)
+
         self._setupWidgetHierarchy()
 
         self._currentlyDraggedConnectionFromPort = None
@@ -192,16 +193,8 @@ class Editor(_qtw.QWidget):
 
         consoleWidget = _con.createConsoleWidget(_pl.Path(self.projectFolder))
 
-        loggingTextEdit = _qtw.QPlainTextEdit()
-        loggingTextEdit.setReadOnly(True)
-
-        def loggingCallback(logMessage: str) -> None:
-            loggingTextEdit.appendPlainText(logMessage)
-
-        _lgcb.configureLoggingCallback(self.logger, loggingCallback, _ulog.FORMAT)
-
         logAndConsoleTabs = _qtw.QTabWidget()
-        logAndConsoleTabs.addTab(loggingTextEdit, "Logging")
+        logAndConsoleTabs.addTab(self.loggingTextEdit, "Logging")
         logAndConsoleTabs.addTab(consoleWidget, "IPython console")
 
         diagramAndTabsSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
@@ -1022,7 +1015,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         c = hxDlg(hx, self)
 
     def showSegmentDlg(self, seg):
-        c = segmentDlg(seg, self)
+        segmentDlg(seg, self)
 
     def showTVentilDlg(self, bl):
         c = TVentilDlg(bl, self)
