@@ -398,7 +398,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
             self._removePorts(heatExchanger.port1, heatExchanger.port2)
 
             self.storage.heatExchangers.remove(heatExchanger)
-            self.storage.parent.scene().removeItem(heatExchanger)
+            self.storage.editor.diagramScene.removeItem(heatExchanger)
 
             row = heatExchangersItemListWidget.row(selectedItem)
             heatExchangersItemListWidget.takeItem(row)
@@ -408,8 +408,8 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         self._removeConnectionIfAny(toPort)
         self.storage.inputs.remove(fromPort)
         self.storage.outputs.remove(toPort)
-        self.storage.parent.scene().removeItem(fromPort)
-        self.storage.parent.scene().removeItem(toPort)
+        self.storage.editor.diagramScene.removeItem(fromPort)
+        self.storage.editor.diagramScene.removeItem(toPort)
 
     def _removeConnectionIfAny(self, port):
         if port.isConnected():

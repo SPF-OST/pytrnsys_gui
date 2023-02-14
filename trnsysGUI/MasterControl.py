@@ -33,7 +33,7 @@ class MasterControl(BlockItem):
         print("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
         self.editor.trnsysObj.remove(self)
         print("deleting block " + str(self) + self.displayName)
-        self.editor.diagramView.scene().removeItem(self)
+        self.editor.diagramScene.removeItem(self)
         widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         self.editor.controlExists -= 1
         if self.editor.controlExists == 0:

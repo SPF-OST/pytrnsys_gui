@@ -375,7 +375,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
     def deleteBlock(self):
         self.editor.trnsysObj.remove(self)
-        self.editor.diagramView.scene().removeItem(self)
+        self.editor.diagramScene.removeItem(self)
         widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         if widgetToRemove:
             widgetToRemove.hide()
