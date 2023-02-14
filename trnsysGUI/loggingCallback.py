@@ -14,14 +14,26 @@ def configureLoggingCallback(logger: _log.Logger, callback: "_Callback", formatS
     logger.addHandler(callbackLogHandler)
 
 
+def removeLoggingCallback(logger: _log.Logger, callback: "_Callback"):
+    for handler in list(logger.handlers):
+        if not isinstance(handler, _CallbackLogHandler):
+            continue
+
+        if handler.callback != callback:
+            continue
+
+        logger.removeHandler(handler)
+        break
+
+
 _Callback = _tp.Callable[[str], None]
 
 
 class _CallbackLogHandler(_log.Handler):
     def __init__(self, callback: _Callback):
         super().__init__()
-        self._callback = callback
+        self.callback = callback
 
     def emit(self, record: _log.LogRecord) -> None:
         message = self.format(record)
-        self._callback(message)
+        self.callback(message)
