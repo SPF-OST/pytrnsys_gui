@@ -247,7 +247,7 @@ class MainWindow(_qtw.QMainWindow):
             return
         createProject = _ccl.value(createProjectMaybeCancelled)
 
-        _lgcb.removeLoggingCallback(self._loggingCallback)
+        _lgcb.removeLoggingCallback(self.logger, self._loggingCallback)
 
         self.centralWidget = self._createDiagramEditor(createProject)
         self.setCentralWidget(self.centralWidget)
@@ -276,7 +276,7 @@ class MainWindow(_qtw.QMainWindow):
 
         loadProject = _prj.LoadProject(newJsonFilePath)
 
-        _lgcb.removeLoggingCallback(self._loggingCallback)
+        _lgcb.removeLoggingCallback(self.logger, self._loggingCallback)
 
         self.centralWidget = self._createDiagramEditor(loadProject)
         self.setCentralWidget(self.centralWidget)
@@ -451,7 +451,7 @@ class MainWindow(_qtw.QMainWindow):
             return
         project = _ccl.value(maybeCancelled)
 
-        _lgcb.removeLoggingCallback(self._loggingCallback)
+        _lgcb.removeLoggingCallback(self.logger, self._loggingCallback)
 
         self.centralWidget = self._createDiagramEditor(project)
         self.setCentralWidget(self.centralWidget)
