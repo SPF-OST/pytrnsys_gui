@@ -1,5 +1,7 @@
 # Graphical user interface for pytrnsys
 
+[![Coverage Status](https://coveralls.io/repos/github/SPF-OST/pytrnsys_gui/badge.svg?branch=master)](https://coveralls.io/github/SPF-OST/pytrnsys_gui?branch=master)
+
 ## Overview
 
 A short presentation (15 min) of pytrnsys and its features can be found in the following 
