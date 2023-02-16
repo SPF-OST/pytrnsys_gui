@@ -34,6 +34,11 @@ jobs:
       run: python dev-tools/devTools.py --diagram=dot --keep-results
     - name: Test with pytest
       run: python dev-tools/devTools.py --unit="not linux_ci" --keep-results
+    - name: Post coverage report to Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: test-results/coverage.lcov
     - name: Upload test results and coverage reports
       uses: actions/upload-artifact@v3
       with:
