@@ -106,8 +106,8 @@ def main():
             "pytest",
             "-v",
             "--cov=trnsysGUI",
-            f"--cov-report=html:{testResultsDirPath / 'coverage.lcov'}",
-            f"--cov-report=lcov:{testResultsDirPath / 'coverage-html'}",
+            f"--cov-report=html:{testResultsDirPath / 'coverage-html'}",
+            f"--cov-report=lcov:{testResultsDirPath / 'coverage.lcov'}",
             "--cov-report=term",
             f"--html={testResultsDirPath / 'report' / 'report.html'}",
         ]
