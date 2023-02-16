@@ -63,5 +63,4 @@ class Encoder(json.JSONEncoder):
 
             return res
         else:
-            logger.debug("This is a strange object in Encoder" + type(obj))
-            # return super().default(obj)
+            logger.debug("Strange object in %s: %s", Encoder.__name__, type(obj))
