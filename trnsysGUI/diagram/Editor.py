@@ -20,6 +20,7 @@ import trnsysGUI as _tgui
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
+import trnsysGUI.errors as _err
 import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
@@ -380,7 +381,8 @@ class Editor(_qtw.QWidget):
 
         numberOfHitPortsItems = len(relevantPortItems)
         if numberOfHitPortsItems > 1:
-            raise NotImplementedError("Can't deal with overlapping port items.")
+            self._showOverlappingPortItemsNotSupportedErrorMessage()
+            return None
 
         hitPortItem = relevantPortItems[0]
 
@@ -400,13 +402,22 @@ class Editor(_qtw.QWidget):
         numberOfHitPortsItems = len(relevantPortItems)
 
         if numberOfHitPortsItems > 1:
-            raise NotImplementedError("Can't deal with overlapping port items.")
+            self._showOverlappingPortItemsNotSupportedErrorMessage()
+            return
 
         if numberOfHitPortsItems == 1:
             toPort = relevantPortItems[0]
 
             if toPort != fromPort:
                 self._createConnection(fromPort, toPort)
+
+    @staticmethod
+    def _showOverlappingPortItemsNotSupportedErrorMessage():
+        errorMessage = """\
+Overlapping port items are not supported. Please move the containing components so that the port items
+don't overlap if you want to connect them.
+"""
+        _err.showErrorMessageBox(errorMessage, title="Not implemented")
 
     def _getRelevantHitPortItems(
         self, mousePosition: _qtc.QPointF, fromPort: PortItemBase
