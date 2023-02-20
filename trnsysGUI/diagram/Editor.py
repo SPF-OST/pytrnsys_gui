@@ -347,7 +347,6 @@ class Editor(_qtw.QWidget):
         self.connLineItem.setVisible(True)
 
         hitPortItem = self._getHitPortItemOrNone(event)
-
         if not hitPortItem:
             return
 
@@ -371,10 +370,29 @@ class Editor(_qtw.QWidget):
         fromPort.enlargePortSize()
         fromPort.innerCircle.setBrush(hitPortItem.visibleColor)
 
+    def sceneMouseReleaseEvent(self, event):
+        if not self._currentlyDraggedConnectionFromPort:
+            return
+        fromPort = self._currentlyDraggedConnectionFromPort
+
+        self._currentlyDraggedConnectionFromPort = None
+        self.connLineItem.setVisible(False)
+
+        toPort = self._getHitPortItemOrNone(event)
+        if not toPort:
+            return
+
+        if fromPort == toPort:
+            return
+
+        self._createConnection(fromPort, toPort)
+
     def _getHitPortItemOrNone(self, event: _qtc.QEvent) -> _tp.Optional[PortItemBase]:
         fromPort = self._currentlyDraggedConnectionFromPort
-        mousePosition = event.scenePos()
+        if not fromPort:
+            return None
 
+        mousePosition = event.scenePos()
         relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
         if not relevantPortItems:
             return None
@@ -387,29 +405,6 @@ class Editor(_qtw.QWidget):
         hitPortItem = relevantPortItems[0]
 
         return hitPortItem
-
-    def sceneMouseReleaseEvent(self, event):
-        if not self._currentlyDraggedConnectionFromPort:
-            return
-        fromPort = self._currentlyDraggedConnectionFromPort
-
-        self._currentlyDraggedConnectionFromPort = None
-        self.connLineItem.setVisible(False)
-
-        mousePosition = event.scenePos()
-        relevantPortItems = self._getRelevantHitPortItems(mousePosition, fromPort)
-
-        numberOfHitPortsItems = len(relevantPortItems)
-
-        if numberOfHitPortsItems > 1:
-            self._showOverlappingPortItemsNotSupportedErrorMessage()
-            return
-
-        if numberOfHitPortsItems == 1:
-            toPort = relevantPortItems[0]
-
-            if toPort != fromPort:
-                self._createConnection(fromPort, toPort)
 
     @staticmethod
     def _showOverlappingPortItemsNotSupportedErrorMessage():
