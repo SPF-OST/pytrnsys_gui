@@ -80,8 +80,6 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         if change == self.ItemScenePositionHasChanged and self.parent.editor.editorMode == 0:
             self.logger.debug("editor mode = 0")
             for conn in self.connectionList:
-                conn.positionLabel()
-
                 if conn.fromPort is self:
                     e = conn.segments[0]  # pylint: disable = invalid-name
                     e.setLine(self.scenePos().x(), self.scenePos().y(), e.line().p2().x(), e.line().p2().y())
@@ -95,9 +93,6 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
 
         if change == self.ItemScenePositionHasChanged and self.parent.editor.editorMode == 1:
             for conn in self.connectionList:
-                # Update position of connection label
-                conn.positionLabel()
-
                 if conn.fromPort is self:
                     if (self.createdAtSide not in (1, 3)) or not conn.segments[0].isVertical():
                         if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
