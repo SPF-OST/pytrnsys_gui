@@ -1,5 +1,6 @@
 import pytest as _pt
 
+import pytrnsys.utils.result as _res
 import trnsysGUI.componentAndPipeNameValidator as _cpn
 
 _EXISTING_NAMES = ["SCnrA_QSnkA", "SCnrB_QSnkB", "SCnrC_QSnkC", "SCnrD_QSnkD"]
@@ -14,6 +15,8 @@ _INVALID_CHARACTER_ERROR_MESSAGE = (
     "Found unacceptable characters (this includes spaces at the start and the end)\n"
     "Please use only letters, numbers, and underscores."
 )
+_NAME_ALREADY_EXISTS_ERROR_MESSAGE = "Name already exist (note: names are case insensitive)."
+
 _NAMES_AND_ERROR_MESSAGES = [
     (" name with spaces ", _INVALID_CHARACTER_ERROR_MESSAGE),
     ("name%with^strange$characters+", _INVALID_CHARACTER_ERROR_MESSAGE),
@@ -26,31 +29,27 @@ _NAMES_AND_ERROR_MESSAGES = [
         _INVALID_CHARACTER_ERROR_MESSAGE,
     ),
     ("", "Please enter a name."),
-    ("SCnrA_QSnkA", "Name already exist (note: names are case insensitive)."),
-    ("SCnra_QSnkA", "Name already exist (note: names are case insensitive).")
+    ("SCnrA_QSnkA", _NAME_ALREADY_EXISTS_ERROR_MESSAGE),
+    ("SCnra_QSnkA", _NAME_ALREADY_EXISTS_ERROR_MESSAGE),
 ]
 
 _INVALID_NAMES = [n for n, _ in _NAMES_AND_ERROR_MESSAGES]
 
 
 class TestComponentAndPipeNameValidator:
-    @_pt.mark.parametrize("newName", _INVALID_NAMES)
-    def testValidateNameInvalidNames(self, newName):
+    @_pt.mark.parametrize(["newName", "expectedErrorMessage"], _NAMES_AND_ERROR_MESSAGES)
+    def testValidateNameInvalidNames(self, newName, expectedErrorMessage):
         validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES)
-        errorMessage = validator.validateName(newName)
+        result = validator.validateName(newName)
 
-        assert errorMessage
+        assert _res.isError(result)
+
+        errorMessage = _res.error(result).message
+        assert errorMessage == expectedErrorMessage
 
     @_pt.mark.parametrize("newName", _VALID_NAMES)
     def testValidateNameValidNames(self, newName):
         validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES)
-        errorMessage = validator.validateName(newName)
+        result = validator.validateName(newName)
 
-        assert not errorMessage
-
-    @_pt.mark.parametrize("newName, expectedErrorMessage", _NAMES_AND_ERROR_MESSAGES)
-    def testResponseToUnacceptableName(self, newName, expectedErrorMessage):
-        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES)
-        errorMessage = validator.validateName(newName)
-
-        assert errorMessage == expectedErrorMessage
+        assert not _res.isError(result)
