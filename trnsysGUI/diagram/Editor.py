@@ -408,10 +408,8 @@ class Editor(_qtw.QWidget):
 
     @staticmethod
     def _showOverlappingPortItemsNotSupportedErrorMessage():
-        errorMessage = """\
-Overlapping port items are not supported. Please move the containing components so that the port items
-don't overlap if you want to connect them.
-"""
+        errorMessage = "Overlapping port items are not supported. Please move the containing components so that the " \
+                       "port items don't overlap if you want to connect them."
         _err.showErrorMessageBox(errorMessage, title="Not implemented")
 
     def _getRelevantHitPortItems(
