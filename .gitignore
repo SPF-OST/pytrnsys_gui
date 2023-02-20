@@ -33,3 +33,6 @@ docs/trnsysGUI.uml
 /.tgitconfig
 
 pytrnsys-gui.log
+
+/release/pyinstaller-venv/
+/proforma/venv/
