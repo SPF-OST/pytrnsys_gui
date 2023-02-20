@@ -113,7 +113,7 @@ def main():
             r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
             r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
             r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller-exclude.in",
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
             r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
         ]
 
