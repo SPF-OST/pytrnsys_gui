@@ -1,4 +1,4 @@
-import typing as _tp
+import pytrnsys.utils.result as _res
 
 
 class ComponentAndPipeNameValidator:
@@ -6,32 +6,32 @@ class ComponentAndPipeNameValidator:
     def __init__(self, existingNames):
         self._existingNamesInLowerCase = [n.lower() for n in existingNames]
 
-    def validateName(self, newName: str) -> _tp.Optional[str]:
+    def validateName(self, newName: str) -> _res.Result[None]:
         if newName == "":
-            return "Please enter a name."
+            return _res.Error("Please enter a name.")
 
-        if self._nameContainsUnacceptableCharacters(newName):
+        if self._doesNameContainUnacceptableCharacters(newName):
             errorMessage = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
                            "Please use only letters, numbers, and underscores."
-            return errorMessage
+            return _res.Error(errorMessage)
 
-        if self._nameExists(newName):
-            return "Name already exist (note: names are case insensitive)."
+        if self._doesNameExist(newName):
+            return _res.Error("Name already exist (note: names are case insensitive).")
 
         return None
 
-    def _nameExists(self, newName: str) -> bool:
+    def _doesNameExist(self, newName: str) -> bool:
         newNameInLowerCase = newName.lower()
         doesNameExist = newNameInLowerCase in self._existingNamesInLowerCase
         return doesNameExist
 
-    def _nameContainsUnacceptableCharacters(self, name: str) -> bool:
+    def _doesNameContainUnacceptableCharacters(self, name: str) -> bool:
         nameWithoutUnderscores = self._removeUnderscores(name)
 
-        if self._containsOnlyNumbers(nameWithoutUnderscores):
+        if self._doesContainOnlyNumbers(nameWithoutUnderscores):
             return True
 
-        return not self._containsOnlyLettersAndNumbers(nameWithoutUnderscores)
+        return not self._doesContainOnlyLettersAndNumbers(nameWithoutUnderscores)
 
     @staticmethod
     def _removeUnderscores(name: str) -> str:
@@ -39,9 +39,9 @@ class ComponentAndPipeNameValidator:
         return nameWithoutUnderscores
 
     @staticmethod
-    def _containsOnlyLettersAndNumbers(string: str) -> bool:
+    def _doesContainOnlyLettersAndNumbers(string: str) -> bool:
         return string.isalnum()
 
     @staticmethod
-    def _containsOnlyNumbers(string: str) -> bool:
+    def _doesContainOnlyNumbers(string: str) -> bool:
         return string.isdigit()
