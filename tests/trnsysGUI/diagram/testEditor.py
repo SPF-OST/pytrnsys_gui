@@ -160,7 +160,7 @@ class TestEditor:
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
 
-        self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.centralWidget)
+        self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
 
         massFlowRatesPrintFileName = f"{testProject.projectName}_Mfr.prt"
         helper.ensureCSVsAreEqual(massFlowRatesPrintFileName)
@@ -178,7 +178,7 @@ class TestEditor:
         temperaturesPrintFilePath: _pl.Path,
         mainWindow: _mw.MainWindow,  # type: ignore[name-defined]
     ):
-        blockItemsAndConnections = mainWindow.centralWidget.trnsysObj
+        blockItemsAndConnections = mainWindow.editor.trnsysObj
         singlePipeConnections = [o for o in blockItemsAndConnections if isinstance(o, _spc.SinglePipeConnection)]
         valves = [o for o in blockItemsAndConnections if isinstance(o, _tv.TVentil)]
 

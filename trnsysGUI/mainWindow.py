@@ -36,8 +36,10 @@ class MainWindow(_qtw.QMainWindow):
         self.jsonPath = None
         self.logger = logger
 
-        self.centralWidget = self._createDiagramEditor(project)
-        self.setCentralWidget(self.centralWidget)
+        self.editor = self._createDiagramEditor(project)
+        self.setCentralWidget(self.editor)
+
+        _lgcb.configureLoggingCallback(self.logger, self._loggingCallback, _ulog.FORMAT)
 
         self.labelVisState = False
         self.calledByVisualizeMf = False
@@ -215,7 +217,7 @@ class MainWindow(_qtw.QMainWindow):
 
         # Status bar
         self.sb = self.statusBar()
-        self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
+        self.sb.showMessage("Mode is " + str(self.editor.editorMode))
 
         # QUndo framework
         self.undoStack = _qtw.QUndoStack(self)
@@ -247,14 +249,12 @@ class MainWindow(_qtw.QMainWindow):
             return
         createProject = _ccl.value(createProjectMaybeCancelled)
 
-        _lgcb.removeLoggingCallback(self.logger, self._loggingCallback)
-
-        self.centralWidget = self._createDiagramEditor(createProject)
-        self.setCentralWidget(self.centralWidget)
+        self.editor = self._createDiagramEditor(createProject)
+        self.setCentralWidget(self.editor)
 
     def saveDia(self):
         self.logger.info("Saving diagram")
-        self.centralWidget.save()
+        self.editor.save()
 
     def copyToNew(self):
         currentProjectFolderPath = _pl.Path(self.projectFolder)
@@ -276,11 +276,8 @@ class MainWindow(_qtw.QMainWindow):
 
         loadProject = _prj.LoadProject(newJsonFilePath)
 
-        _lgcb.removeLoggingCallback(self.logger, self._loggingCallback)
-
-        self.centralWidget = self._createDiagramEditor(loadProject)
-        self.setCentralWidget(self.centralWidget)
-        self.centralWidget.save(showWarning=False)
+        self.editor = self._createDiagramEditor(loadProject)
+        self.editor.save(showWarning=False)
 
     @staticmethod
     def _copyContents(oldProjectFolderPath, newProjectFolderPath):
@@ -309,7 +306,7 @@ class MainWindow(_qtw.QMainWindow):
     def updateRun(self):
         self.logger.info("Updating run.config")
         configPath = os.path.join(self.projectFolder, "run.config")
-        runConfig = configFile(configPath, self.centralWidget)
+        runConfig = configFile(configPath, self.editor)
         runConfig.updateConfig()
 
     def runSimulation(self):
@@ -322,7 +319,7 @@ class MainWindow(_qtw.QMainWindow):
 
         #   Check ddcks of storage tanks
         storageWithoutFile = []
-        for object in self.centralWidget.trnsysObj:
+        for object in self.editor.trnsysObj:
             if isinstance(object, StorageTank):
                 storageTankFile = os.path.join(object.displayName, object.displayName + ".ddck")
                 storageTankPath = os.path.join(ddckPath, storageTankFile)
@@ -344,7 +341,7 @@ class MainWindow(_qtw.QMainWindow):
 
         #   Start simulation
         runApp = RunMain()
-        executionFailed, errorStatement = runApp.runAction(self.logger, self.centralWidget.projectFolder)
+        executionFailed, errorStatement = runApp.runAction(self.logger, self.editor.projectFolder)
 
         if executionFailed:
             errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
@@ -359,7 +356,7 @@ class MainWindow(_qtw.QMainWindow):
             _err.showErrorMessageBox(errorMessage)
             return
         processApp = ProcessMain()
-        result = processApp.processAction(self.logger, self.centralWidget.projectFolder)
+        result = processApp.processAction(self.logger, self.editor.projectFolder)
 
         if _res.isError(result):
             error = _res.error(result)
@@ -368,14 +365,14 @@ class MainWindow(_qtw.QMainWindow):
         return
 
     def exportDdckPlaceHolderValuesJson(self):
-        result = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
+        result = self.editor.exportDdckPlaceHolderValuesJsonFile()
         if _res.isError(result):
             errorMessage = f"The json file could not be generated: {result.message}"
             _err.showErrorMessageBox(errorMessage)
 
     def renameDia(self):
         self.logger.info("Renaming diagram...")
-        self.centralWidget.showDiagramDlg()
+        self.editor.showDiagramDlg()
 
     def deleteDia(self):
         qmb = _qtw.QMessageBox()
@@ -385,26 +382,26 @@ class MainWindow(_qtw.QMainWindow):
         ret = qmb.exec()
         if ret == _qtw.QMessageBox.Yes:
             self.logger.info("Deleting diagram")
-            self.centralWidget.delBlocks()
+            self.editor.delBlocks()
         else:
             self.logger.info("Canceling")
             return
 
     def tidyUp(self):
         self.logger.info("Tidying up...")
-        self.centralWidget.cleanUpConnections()
+        self.editor.cleanUpConnections()
 
     def setZoomIn(self):
         self.logger.info("Setting zoom in")
-        self.centralWidget.diagramView.scale(1.2, 1.2)
+        self.editor.diagramView.scale(1.2, 1.2)
 
     def setZoomOut(self):
         self.logger.info("Setting zoom out")
-        self.centralWidget.diagramView.scale(0.8, 0.8)
+        self.editor.diagramView.scale(0.8, 0.8)
 
     def setZoom0(self):
         self.logger.info("Setting zoom 0")
-        self.centralWidget.diagramView.resetTransform()
+        self.editor.diagramView.resetTransform()
 
     def runAndVisMf(self):
         self.calledByVisualizeMf = True
@@ -451,23 +448,24 @@ class MainWindow(_qtw.QMainWindow):
             return
         project = _ccl.value(maybeCancelled)
 
-        _lgcb.removeLoggingCallback(self.logger, self._loggingCallback)
+        self.editor = self._createDiagramEditor(project)
+        self.setCentralWidget(self.editor)
 
-        self.centralWidget = self._createDiagramEditor(project)
-        self.setCentralWidget(self.centralWidget)
+        if isinstance(self.editor, _prj.MigrateProject):
+            self.editor.save()
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
-        self.centralWidget.setConnLabelVis(self.labelVisState)
+        self.editor.setConnLabelVis(self.labelVisState)
 
     def exportHydraulicsDdck(self):
-        self.centralWidget.exportHydraulics(exportTo="ddck")
+        self.editor.exportHydraulics(exportTo="ddck")
 
     def exportHydraulicControl(self):
-        self.centralWidget.exportHydraulicControl()
+        self.editor.exportHydraulicControl()
 
     def exportDck(self):
-        jsonResult = self.centralWidget.exportDdckPlaceHolderValuesJsonFile()
+        jsonResult = self.editor.exportDdckPlaceHolderValuesJsonFile()
         if _res.isError(jsonResult):
             errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
             _err.showErrorMessageBox(errorMessage)
@@ -482,34 +480,34 @@ class MainWindow(_qtw.QMainWindow):
 
     def toggleEditorMode(self):
         self.logger.info("Toggling editor mode")
-        self.centralWidget.editorMode = (self.centralWidget.editorMode + 1) % 2
-        self.sb.showMessage("Mode is " + str(self.centralWidget.editorMode))
+        self.editor.editorMode = (self.editor.editorMode + 1) % 2
+        self.sb.showMessage("Mode is " + str(self.editor.editorMode))
 
     def toggleAlignMode(self):
         self.logger.info("Toggling alignMode")
-        self.centralWidget.alignMode = not self.centralWidget.alignMode
+        self.editor.alignMode = not self.editor.alignMode
 
     def toggleSnap(self):
-        self.centralWidget.snapGrid = not self.centralWidget.snapGrid
-        self.centralWidget.diagramScene.update()
+        self.editor.snapGrid = not self.editor.snapGrid
+        self.editor.diagramScene.update()
 
     def runMassflowSolver(self):
         self.logger.info("Running massflow solver...")
 
-        exportPath = self.centralWidget.exportHydraulics(exportTo="mfs")
+        exportPath = self.editor.exportHydraulics(exportTo="mfs")
         if not exportPath:
             return None
 
         self.exportedTo = exportPath
         self.logger.info(exportPath)
 
-        if not self.centralWidget.trnsysPath.is_file():
+        if not self.editor.trnsysPath.is_file():
             errorMessage = "TRNExe.exe not found! Consider correcting the path in the settings."
             _err.showErrorMessageBox(errorMessage)
             return None
 
         try:
-            subprocess.run([str(self.centralWidget.trnsysPath), exportPath, "/H"], check=True)
+            subprocess.run([str(self.editor.trnsysPath), exportPath, "/H"], check=True)
             mfrFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_Mfr.prt")
             tempFile = os.path.join(self.projectFolder, self.projectFolder.split("\\")[-1] + "_T.prt")
             self.calledByVisualizeMf = False
@@ -522,7 +520,7 @@ class MainWindow(_qtw.QMainWindow):
             return None
 
     def movePorts(self):
-        self.centralWidget.moveDirectPorts = True
+        self.editor.moveDirectPorts = True
 
     def mouseMoveEvent(self, e):
         pass
@@ -531,7 +529,7 @@ class MainWindow(_qtw.QMainWindow):
         os.system('start "" https://pytrnsys.readthedocs.io')
 
     def exportPDF(self):
-        self.centralWidget.printPDF()
+        self.editor.printPDF()
 
     def closeEvent(self, e):
         qmb = _qtw.QMessageBox()
@@ -544,7 +542,7 @@ class MainWindow(_qtw.QMainWindow):
         elif ret == _qtw.QMessageBox.Close:
             e.accept()
         elif ret == _qtw.QMessageBox.Save:
-            self.centralWidget.save()
+            self.editor.save()
             e.accept
 
     def ensureSettingsExist(self):
@@ -560,16 +558,16 @@ class MainWindow(_qtw.QMainWindow):
 
     def loadTrnsysPath(self):
         settings = _settings.Settings.load()
-        self.centralWidget.trnsysPath = _pl.Path(settings.trnsysBinaryPath)
+        self.editor.trnsysPath = _pl.Path(settings.trnsysBinaryPath)
 
     def debugConns(self):
         """
         Check each block items for error connections.
         Returns warning message if blockitem contains two input connections or two output connections
         """
-        self.logger.info("trnsysObjs:", self.centralWidget.trnsysObj)
+        self.logger.info("trnsysObjs:", self.editor.trnsysObj)
         self.noErrorConns = True
-        for o in self.centralWidget.trnsysObj:
+        for o in self.editor.trnsysObj:
             self.logger.info(o)
             if isinstance(o, BlockItem) and len(o.outputs) == 1 and len(o.inputs) == 1:
                 self.logger.info("Checking block connections", o.displayName)
@@ -599,38 +597,35 @@ class MainWindow(_qtw.QMainWindow):
     def _createDiagramEditor(self, project: _prj.Project) -> _de.Editor:
         if isinstance(project, _prj.LoadProject):
             self.projectFolder = str(project.jsonFilePath.parent)
-            editor = _de.Editor(
+            return _de.Editor(
                 self,
                 str(project.jsonFilePath.parent),
                 jsonPath=None,
                 loadValue="load",
                 logger=self.logger,
             )
-        elif isinstance(project, _prj.MigrateProject):
+
+        if isinstance(project, _prj.MigrateProject):
             self.projectFolder = str(project.newProjectFolderPath)
-            editor = _de.Editor(
+            return _de.Editor(
                 self,
                 str(project.newProjectFolderPath),
                 str(project.oldJsonFilePath),
                 loadValue="json",
                 logger=self.logger,
             )
-            editor.save()
-        elif isinstance(project, _prj.CreateProject):
+
+        if isinstance(project, _prj.CreateProject):
             self.projectFolder = str(project.jsonFilePath.parent)
-            editor = _de.Editor(
+            return _de.Editor(
                 self,
                 self.projectFolder,
                 jsonPath=str(project.jsonFilePath),
                 loadValue="new",
                 logger=self.logger,
             )
-        else:
-            raise AssertionError(f"Unknown `project' type: {type(project)}")
 
-        _lgcb.configureLoggingCallback(self.logger, self._loggingCallback, _ulog.FORMAT)
-
-        return editor
+        raise AssertionError(f"Unknown `project' type: {type(project)}")
 
     def _loggingCallback(self, logMessage: str) -> None:
-        self.centralWidget.loggingTextEdit.appendPlainText(logMessage)
+        self.editor.loggingTextEdit.appendPlainText(logMessage)

@@ -14,18 +14,6 @@ def configureLoggingCallback(logger: _log.Logger, callback: "_Callback", formatS
     logger.addHandler(callbackLogHandler)
 
 
-def removeLoggingCallback(logger: _log.Logger, callback: "_Callback"):
-    for handler in list(logger.handlers):
-        if not isinstance(handler, _CallbackLogHandler):
-            continue
-
-        if handler.callback != callback:
-            continue
-
-        logger.removeHandler(handler)
-        break
-
-
 _Callback = _tp.Callable[[str], None]
 
 

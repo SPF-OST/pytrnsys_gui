@@ -73,7 +73,6 @@ class DoublePipeBlockDlg(QDialog):
     # unused
     def loadFile(self):
         self.logger.debug("Opening diagram")
-        # self.centralWidget.delBlocks()
         fileName = QFileDialog.getOpenFileName(self, "Open diagram", filter="*.ddck")[0]
         if fileName != "":
             if len(self.block.propertyFile) < 2:
