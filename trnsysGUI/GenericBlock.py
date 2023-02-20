@@ -18,8 +18,8 @@ from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class GenericBlock(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super(GenericBlock, self).__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super(GenericBlock, self).__init__(trnsysType, editor, **kwargs)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
@@ -76,7 +76,7 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         return res
 
     def addPortDlg(self):
-        self.parent.parent().showGenericPortPairDlg(self)
+        self.editor.showGenericPortPairDlg(self)
 
     def addPort(self, io, relH):
         self.logger.debug(io)
@@ -98,7 +98,7 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         self._imageAccessor = _img.ImageAccessor.createForFile(_pl.Path(name))
 
     def pickImage(self):
-        return _pl.Path(QFileDialog.getOpenFileName(self.parent.parent(), filter="*.png *.svg")[0])
+        return _pl.Path(QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -198,7 +198,7 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         self.inputs.append(_cspi.createSinglePipePortItem("i", side, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", side, self))
         # Allocate id
-        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
+        self.childIds.append(self.editor.idGen.getTrnsysID())
 
         portNb = [0, 0, 0, 0]
         for i in self.inputs:
@@ -292,12 +292,9 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         When a blockitem is added to the main window.
         A file explorer for that item is added to the right of the main window by calling this method
         """
-        self.logger.debug(self.parent.parent())
+        self.logger.debug(self.editor)
         pathName = self.displayName
-        if self.parent.parent().projectPath == "":
-            self.path = self.parent.parent().projectFolder
-        else:
-            self.path = self.parent.parent().projectPath
+        self.path = self.editor.projectFolder
 
         self.path = os.path.join(self.path, "ddck")
         self.path = os.path.join(self.path, pathName)
@@ -315,17 +312,17 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
-        self.parent.parent().splitter.addWidget(self.tree)
+        self.editor.splitter.addWidget(self.tree)
 
     def deleteBlock(self):
         """
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.parent.parent().trnsysObj.remove(self)
+        self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
+        self.editor.diagramScene.removeItem(self)
+        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         shutil.rmtree(self.path)
         self.deleteLoadedFile()
         try:

@@ -17,8 +17,8 @@ from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr
 
 
 class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.w = 60
         self.h = 40
@@ -31,7 +31,7 @@ class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
-        self.childIds.append(self.parent.parent().idGen.getTrnsysID())
+        self.childIds.append(self.editor.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
 

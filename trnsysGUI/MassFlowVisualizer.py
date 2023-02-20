@@ -132,7 +132,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         py = parent.geometry().y()
         dw = self.width()
         dh = self.height()
-        self.move(parent.centralWidget.diagramView.geometry().topLeft())
+        self.move(parent.editor.diagramView.geometry().topLeft())
         self.show()
 
     def togglePause(self):
@@ -144,7 +144,7 @@ class MassFlowVisualizer(_qtw.QDialog):
     def cancel(self):
         self.pauseVis()
         self.close()
-        self.parent.centralWidget.updateConnGrads()
+        self.parent.editor.updateConnGrads()
 
     # comment out
     def showMassBtn(self):
@@ -155,7 +155,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         """
         self.showMass = not self.showMass
 
-        for t in self.parent.centralWidget.trnsysObj:
+        for t in self.parent.editor.trnsysObj:
             if isinstance(t, _cb.ConnectionBase):
                 if self.showMass:
                     t.firstS.labelMass.setVisible(True)
@@ -191,7 +191,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         if self.loadedFile:
             i = 0
-            for t in self.parent.centralWidget.trnsysObj:
+            for t in self.parent.editor.trnsysObj:
                 if isinstance(t, _spc.SinglePipeConnection):
                     mfrVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.modelPipe)
                     temperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.STANDARD)

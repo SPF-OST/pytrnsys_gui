@@ -37,29 +37,28 @@ class TestStorageTank:
 
         logger = _log.getLogger("root")
         (
-            diagramViewMock,
+            editorMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
 
         legacyJson = self.LEGACY_JSON_PATH.read_text()
-        storageTank = self._deserializeStorageTank(legacyJson, diagramViewMock)
+        storageTank = self._deserializeStorageTank(legacyJson, editorMock)
 
         serializedStorageTank = storageTank.encode()[1]
         actualStorageTankJson = _json.dumps(serializedStorageTank, indent=4, sort_keys=True)
 
         assert actualStorageTankJson == expectedStorageTankJson
 
-        self._deserializeStorageTank(actualStorageTankJson, diagramViewMock)
+        self._deserializeStorageTank(actualStorageTankJson, editorMock)
 
     @staticmethod
-    def _deserializeStorageTank(storageTankLegacyJson, diagramViewMock):
+    def _deserializeStorageTank(storageTankLegacyJson, editorMock):
         legacySerializedStorageTank = _json.loads(storageTankLegacyJson)
         storageTank = _st.StorageTank(
             trnsysType="StorageTank",
-            parent=diagramViewMock,
+            editor=editorMock,
             displayNamePrefix=legacySerializedStorageTank["BlockName"],
         )  # pylint: disable=no-member
-        diagramViewMock.scene().addItem(storageTank)
 
         blocks = []
         storageTank.decode(legacySerializedStorageTank, blocks)
@@ -71,12 +70,12 @@ class TestStorageTank:
 
         logger = _log.getLogger("root")
         (
-            diagramViewMock,
+            editorMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, self.ACTUAL_DIR_PATH)
 
         legacyJson = self.LEGACY_JSON_PATH.read_text()
-        storageTank = self._deserializeStorageTank(legacyJson, diagramViewMock)
+        storageTank = self._deserializeStorageTank(legacyJson, editorMock)
 
         hydraulicLoops = _hlm.HydraulicLoops([])
         self._setupExternalConnectionMocks(storageTank, hydraulicLoops)
@@ -161,7 +160,7 @@ class TestStorageTank:
         return _tp.cast(_spc.SinglePipeConnection, mock)
 
     @staticmethod
-    def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectPath):
+    def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectFolder):
         application = _widgets.QApplication([])
 
         mainWindow = _widgets.QMainWindow()
@@ -170,7 +169,7 @@ class TestStorageTank:
         editorMock.connectionList = []
         editorMock.logger = logger
         editorMock.trnsysObj = []
-        editorMock.projectPath = str(projectPath)
+        editorMock.projectFolder = str(projectFolder)
         editorMock.splitter = _mock.Mock(name="splitter")
         editorMock.idGen = _mock.Mock(
             name="idGen",
@@ -196,10 +195,7 @@ class TestStorageTank:
         graphicsScene = _widgets.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
 
-        diagramViewMock = _widgets.QGraphicsView(graphicsScene, parent=editorMock)
-        diagramViewMock.logger = logger
-
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()
 
-        return diagramViewMock, [application, mainWindow, editorMock, graphicsScene]
+        return editorMock, [application, mainWindow, graphicsScene]

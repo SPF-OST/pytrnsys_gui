@@ -10,8 +10,8 @@ import trnsysGUI.temperatures as _temps
 
 
 class Connector(_bi.BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.sizeFactor = 0.5
         self.w = 40

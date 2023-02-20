@@ -55,17 +55,15 @@ TDPCnrCold = [2,1]
         logger = _log.getLogger("root")
 
         (
-            diagramViewMock,
+            editorMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
-        ) = cls._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
+        ) = cls._createEditorMockAndOtherObjectsToKeepAlive(logger, tmp_path)
 
         connector = _ddpc.DoubleDoublePipeConnector(
+            editor=editorMock,
             trnsysType="DPCnr",
-            parent=diagramViewMock,
             displayName="DPCnr",
         )
-
-        diagramViewMock.scene().addItem(connector)
 
         externalFromPortConnection = cls._createConnectionMock("inputConnection", toPort=connector.inputs[0])
         connector.inputs[0].connectionList.append(externalFromPortConnection)
@@ -110,7 +108,7 @@ TDPCnrCold = [2,1]
         return _tp.cast(_dpc.DoublePipeConnection, mock)
 
     @staticmethod
-    def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectPath):
+    def _createEditorMockAndOtherObjectsToKeepAlive(logger, projectPath):
         # todo: provide this class as a TestHelper class. see TestStorageTank  # pylint: disable=fixme
         application = _widgets.QApplication([])
 
@@ -140,10 +138,7 @@ TDPCnrCold = [2,1]
         graphicsScene = _widgets.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
 
-        diagramViewMock = _widgets.QGraphicsView(graphicsScene, parent=editorMock)
-        diagramViewMock.logger = logger
-
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()
 
-        return diagramViewMock, [application, mainWindow, editorMock, graphicsScene]
+        return editorMock, [application, mainWindow, graphicsScene]

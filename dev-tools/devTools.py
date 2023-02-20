@@ -3,11 +3,13 @@
 # Run from top-level directory
 
 import argparse as ap
+import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
 import sys
 import time
+import venv
 
 
 def main():
@@ -67,6 +69,14 @@ def main():
         action="store_true",
         dest="shallRunAll",
     )
+    parser.add_argument(
+        "-x",
+        "--executable",
+        help="Create executable using pyinstaller",
+        action="store_true",
+        dest="shallCreateExecutable",
+    )
+
     arguments = parser.parse_args()
 
     testResultsDirPath = pl.Path("test-results")
@@ -89,16 +99,44 @@ def main():
         cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
         sp.run(cmd.split(), check=True)
 
-    if (
-        arguments.shallRunAll
-        or arguments.pytestMarkersExpression is not None
-        or not (
-            arguments.shallPerformStaticChecks
-            or arguments.mypyArguments is not None
-            or arguments.lintArguments is not None
-            or arguments.diagramsFormat
-        )
-    ):
+    if arguments.shallRunAll or arguments.shallCreateExecutable:
+        releaseDirPath = pl.Path("release").resolve(strict=True)
+
+        sh.rmtree(releaseDirPath / "build", ignore_errors=True)
+        sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
+        sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
+
+        venvDirPath = releaseDirPath / "pyinstaller-venv"
+        venv.create(venvDirPath, with_pip=True)
+
+        commands = [
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
+            r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
+        ]
+
+        for cmd in commands:
+            print(cmd)
+            sp.run(cmd.split(), check=True)
+
+        os.chdir("release")
+
+        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
+        print(cmd)
+        sp.run(cmd.split(), check=True)
+
+        os.chdir("..")
+
+    wasCalledWithoutArguments = (
+        not arguments.shallPerformStaticChecks
+        and arguments.mypyArguments is None
+        and arguments.lintArguments is None
+        and arguments.diagramsFormat is None
+        and not arguments.shallCreateExecutable
+    )
+    if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
         markersExpression = arguments.pytestMarkersExpression or "not ci and not linux"
         additionalArgs = ["-m", markersExpression]
 

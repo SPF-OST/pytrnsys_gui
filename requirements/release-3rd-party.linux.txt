@@ -6,7 +6,7 @@
 #    pip-compile-multi
 #
 appdirs==1.4.4
-    # via -r requirements\release-3rd-party.in
+    # via -r requirements/release-3rd-party.in
 asttokens==2.2.1
     # via stack-data
 attrs==21.4.0
@@ -14,15 +14,13 @@ attrs==21.4.0
 backcall==0.2.0
     # via ipython
 bokeh==2.4.3
-    # via -r requirements\release-3rd-party.in
-colorama==0.4.6
-    # via ipython
+    # via -r requirements/release-3rd-party.in
 comm==0.1.2
     # via ipykernel
 cycler==0.11.0
     # via matplotlib
 dataclasses-jsonschema==2.14.1
-    # via -r requirements\release-3rd-party.in
+    # via -r requirements/release-3rd-party.in
 debugpy==1.6.6
     # via ipykernel
 decorator==5.1.1
@@ -43,7 +41,7 @@ jedi==0.18.2
     # via ipython
 jinja2==3.1.2
     # via
-    #   -r requirements\release-3rd-party.in
+    #   -r requirements/release-3rd-party.in
     #   bokeh
 jsonschema==4.6.1
     # via dataclasses-jsonschema
@@ -59,12 +57,12 @@ jupyter-core==5.2.0
 kiwisolver==1.4.3
     # via matplotlib
 lark==1.1.2
-    # via -r requirements\release-3rd-party.in
+    # via -r requirements/release-3rd-party.in
 markupsafe==2.1.1
     # via jinja2
 matplotlib==3.5.2
     # via
-    #   -r requirements\release-3rd-party.in
+    #   -r requirements/release-3rd-party.in
     #   seaborn
 matplotlib-inline==0.1.6
     # via
@@ -74,7 +72,7 @@ nest-asyncio==1.5.6
     # via ipykernel
 numpy==1.23.0
     # via
-    #   -r requirements\release-3rd-party.in
+    #   -r requirements/release-3rd-party.in
     #   bokeh
     #   matplotlib
     #   pandas
@@ -88,10 +86,12 @@ packaging==21.3
     #   qtpy
 pandas==1.4.3
     # via
-    #   -r requirements\release-3rd-party.in
+    #   -r requirements/release-3rd-party.in
     #   seaborn
 parso==0.8.3
     # via jedi
+pexpect==4.8.0
+    # via ipython
 pickleshare==0.7.5
     # via ipython
 pillow==9.3.0
@@ -104,6 +104,8 @@ prompt-toolkit==3.0.36
     # via ipython
 psutil==5.9.4
     # via ipykernel
+ptyprocess==0.7.0
+    # via pexpect
 pure-eval==0.2.2
     # via stack-data
 pygments==2.14.0
@@ -115,7 +117,7 @@ pyparsing==3.0.9
     #   matplotlib
     #   packaging
 pyqt5==5.15.7
-    # via -r requirements\release-3rd-party.in
+    # via -r requirements/release-3rd-party.in
 pyqt5-qt5==5.15.2
     # via pyqt5
 pyqt5-sip==12.11.0
@@ -130,8 +132,6 @@ python-dateutil==2.8.2
     #   pandas
 pytz==2022.1
     # via pandas
-pywin32==305
-    # via jupyter-core
 pyyaml==6.0
     # via bokeh
 pyzmq==25.0.0
@@ -140,15 +140,15 @@ pyzmq==25.0.0
     #   jupyter-client
     #   qtconsole
 qtconsole==5.4.0
-    # via -r requirements\release-3rd-party.in
+    # via -r requirements/release-3rd-party.in
 qtpy==2.3.0
     # via qtconsole
 scipy==1.8.1
     # via
-    #   -r requirements\release-3rd-party.in
+    #   -r requirements/release-3rd-party.in
     #   seaborn
 seaborn==0.11.2
-    # via -r requirements\release-3rd-party.in
+    # via -r requirements/release-3rd-party.in
 six==1.16.0
     # via python-dateutil
 stack-data==0.6.2

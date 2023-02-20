@@ -9,8 +9,8 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, parent, **kwargs):
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs):
+        super().__init__(trnsysType, editor, **kwargs)
 
         self.w = 60
         self.h = 60
@@ -30,7 +30,7 @@ class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
         self._updateDdckFilePath()
 
     def _updateDdckFilePath(self):
-        ddckFilePath = _pl.Path(self.parent.parent().projectPath) / "ddck" / f"{self.displayName}.ddck"
+        ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
         self.path = str(ddckFilePath)
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:

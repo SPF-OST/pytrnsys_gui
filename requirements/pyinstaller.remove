@@ -1,0 +1,5 @@
+# pyinstaller cannot deal with `debugpy`, but it's not really needed, so let's just not install it
+# See here https://github.com/pyinstaller/pyinstaller/issues/5363 and here
+# https://github.com/microsoft/debugpy/issues/490
+
+debugpy

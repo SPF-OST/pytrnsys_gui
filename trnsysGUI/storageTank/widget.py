@@ -42,22 +42,22 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
-    def __init__(self, trnsysType, parent, **kwargs) -> None:
-        super().__init__(trnsysType, parent, **kwargs)
+    def __init__(self, trnsysType, editor, **kwargs) -> None:
+        super().__init__(trnsysType, editor, **kwargs)
 
-        self.parent = parent
+        self.parent = editor
 
         self._hydraulicLoops: _tp.Optional[_hlm.HydraulicLoops] = None
 
-        self._idGenerator: _id.IdGenerator = self.parent.parent().idGen
         self.dckFilePath = ""
 
         self.directPortPairs: _tp.List[DirectPortPair] = []
 
         self.heatExchangers: _tp.List[HeatExchanger] = []
 
-        self.nTes = self.parent.parent().idGen.getStoragenTes()
-        self.storageType = self.parent.parent().idGen.getStorageType()
+        idGenerator: _id.IdGenerator = self.editor.idGen
+        self.nTes = idGenerator.getStoragenTes()
+        self.storageType =idGenerator.getStorageType()
 
         self.changeSize()
 
@@ -92,11 +92,11 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         self.logger.debug("Setting parent of Storage Tank (and its hx)")
         self.parent = p
 
-        if self not in self.parent.parent().trnsysObj:
-            self.parent.parent().trnsysObj.append(self)
+        if self not in self.editor.trnsysObj:
+            self.editor.trnsysObj.append(self)
 
         for heatExchanger in self.heatExchangers:
-            heatExchanger.parent = self
+            heatExchanger.storageTank = self
 
     def addDirectPortPair(  # pylint: disable=too-many-arguments
         self,
@@ -152,7 +152,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             relativeOutputHeight=relativeOutputHeight,
             storageTankWidth=self.w,
             storageTankHeight=self.h,
-            parent=self,
+            storageTank=self,
             name=name,
         )
         return heatExchanger
@@ -382,7 +382,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         menu.exec(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
-        ConfigureStorageDialog(self, self.scene().parent())
+        ConfigureStorageDialog(self, self.editor)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         heatExchangerNodes = [hx.modelPipe for hx in self.heatExchangers]
@@ -576,10 +576,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         A file explorer for that item is added to the right of the main window by calling this method
         """
         pathName = self.displayName
-        if self.parent.parent().projectPath == "":
-            self.path = self.parent.parent().projectFolder
-        else:
-            self.path = self.parent.parent().projectPath
+        self.path = self.editor.projectFolder
         self.path = _os.path.join(self.path, "ddck")
         self.path = _os.path.join(self.path, pathName)
         if not _os.path.exists(self.path):
@@ -594,17 +591,17 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         self.tree.setObjectName(f"{self.displayName}Tree")
         self.tree.setMinimumHeight(200)
         self.tree.setSortingEnabled(True)
-        self.parent.parent().splitter.addWidget(self.tree)
+        self.editor.splitter.addWidget(self.tree)
 
     def deleteBlock(self):
         """
         Overridden method to also delete folder
         """
         self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.parent.parent().trnsysObj.remove(self)
+        self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
+        self.editor.diagramScene.removeItem(self)
+        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         _sh.rmtree(self.path)
         try:
             widgetToRemove.hide()

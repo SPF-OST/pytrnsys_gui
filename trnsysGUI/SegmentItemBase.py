@@ -303,9 +303,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         pass
 
     def mouseReleaseEvent(self, e):
-        # Should be same as below
-        # self.scene().removeItem(self)
-
         if e.button() == 1:
             self.keyPr = 0
 
@@ -648,7 +645,7 @@ class SegmentItemBase(QGraphicsItemGroup):
             self.secondLine.setVisible(True)
 
     def renameConn(self):
-        self.scene().parent().showSegmentDlg(self)
+        self.connection.parent.showSegmentDlg(self)
 
     def printItemsAt(self):
         self.logger.debug("Items at startnode are %s", str(self.scene().items(self.line().p1())))

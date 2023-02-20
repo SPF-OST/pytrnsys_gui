@@ -92,11 +92,10 @@ class MyQTreeView(QTreeView):
                     self.logger.debug("Canceling")
                     return
             shutil.copy(fileName, filePath)
-            # self.item.parent().centralWidget.fileList.append(filePath)
             try:
                 fileList = self.item.parent.parent().fileList
             except AttributeError:
-                fileList = self.item.parent().centralWidget.fileList
+                fileList = self.item.parent().editor.fileList
             fileList.append(loadPath)
             try:
                 self.item.loadedFiles.append(loadPath)

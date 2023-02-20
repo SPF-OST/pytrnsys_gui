@@ -25,15 +25,15 @@ FILEPATH = "res/Config.txt"
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
-    def __init__(self, trnsysType, parent, displayNamePrefix=None, displayName=None, **kwargs):
+    def __init__(self, trnsysType, editor, displayNamePrefix=None, displayName=None, **kwargs):
         super().__init__(None)
 
-        self.logger = parent.logger
+        self.logger = editor.logger
 
         self.w = 120
         self.h = 120
-        self.parent = parent
-        self.id = self.parent.parent().idGen.getID()
+        self.editor = editor
+        self.id = self.editor.idGen.getID()
         self.propertyFile = []
 
         if displayNamePrefix:
@@ -44,7 +44,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
             raise Exception('No display name defined.')
 
         if "loadedBlock" not in kwargs:
-            self.parent.parent().trnsysObj.append(self)
+            self.editor.trnsysObj.append(self)
 
         self.inputs: _tp.Sequence[_pib.PortItemBase] = []
         self.outputs: _tp.Sequence[_pib.PortItemBase] = []
@@ -53,7 +53,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         # Export related:
         self.name = trnsysType
-        self.trnsysId = self.parent.parent().idGen.getTrnsysID()
+        self.trnsysId = self.editor.idGen.getTrnsysID()
 
         # Transform related
         self.flippedV = False
@@ -90,7 +90,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         currentMethodName = f"{currentClassName}.{BlockItem._getImageAccessor.__name__}"
 
         message = (
-            f"{currentMethodName} has been called. However, this method should not be called directly but must\n"
+            f"{currentMethodName} has been called. However, this method should not be called directly but must be\n"
             f"implemented in a child class. This means that a) someone instantiated `{currentClassName}` directly\n"
             f"or b) a child class of it doesn't implement `{currentMethodName}`. Either way that's an\n"
             f"unrecoverable error and therefore the program will be terminated now. Please do get in touch with\n"
@@ -109,11 +109,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
     # Setter functions
     def setParent(self, p):
-        self.parent = p
+        self.editor = p
 
-        if self not in self.parent.parent().trnsysObj:
-            self.parent.parent().trnsysObj.append(self)
-            # self.logger.debug("trnsysObj are " + str(self.parent.parent().trnsysObj))
+        if self not in self.editor.trnsysObj:
+            self.editor.trnsysObj.append(self)
 
     def setId(self, newId):
         self.id = newId
@@ -158,15 +157,15 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
     def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
         if hasattr(self, "isTempering"):
-            self.parent.parent().showTVentilDlg(self)
+            self.editor.showTVentilDlg(self)
         elif self.name == "Pump":
-            self.parent.parent().showPumpDlg(self)
+            self.editor.showPumpDlg(self)
         elif self.name in ("TeePiece", "WTap_main"):
-            self.parent.parent().showBlockDlg(self)
+            self.editor.showBlockDlg(self)
         elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
-            self.parent.parent().showDoublePipeBlockDlg(self)
+            self.editor.showDoublePipeBlockDlg(self)
         else:
-            self.parent.parent().showBlockDlg(self)
+            self.editor.showBlockDlg(self)
             if len(self.propertyFile) > 0:
                 for files in self.propertyFile:
                     os.startfile(files, "open")
@@ -180,7 +179,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                 self.logger.debug("Block was dragged")
                 self.logger.debug("Old pos is" + str(self.oldPos))
                 command = MoveCommand(self, self.oldPos, "Move BlockItem")
-                self.parent.parent().parent().undoStack.push(command)
+                self.editor.parent().undoStack.push(command)
                 self.oldPos = self.scenePos()
 
         super().mouseReleaseEvent(event)
@@ -375,14 +374,14 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.logger.debug("Rotation is " + str(self.rotationN))
 
     def deleteBlock(self):
-        self.parent.parent().trnsysObj.remove(self)
-        self.parent.scene().removeItem(self)
-        widgetToRemove = self.parent.parent().findChild(QTreeView, self.displayName + "Tree")
+        self.editor.trnsysObj.remove(self)
+        self.editor.diagramScene.removeItem(self)
+        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
         if widgetToRemove:
             widgetToRemove.hide()
 
     def deleteBlockCom(self):
-        self.parent.deleteBlockCom(self)
+        self.editor.diagramView.deleteBlockCom(self)
 
     def getConnections(self):
         """
@@ -468,30 +467,30 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         # Snap grid excludes alignment
 
         if change == self.ItemPositionChange:
-            if self.parent.parent().snapGrid:
-                snapSize = self.parent.parent().snapSize
+            if self.editor.snapGrid:
+                snapSize = self.editor.snapSize
                 self.logger.debug("itemchange")
                 self.logger.debug(type(value))
                 value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
                 return value
-            if self.parent.parent().alignMode:
+            if self.editor.alignMode:
                 if self.hasElementsInYBand():
                     return self.alignBlock(value)
             return value
         return super().itemChange(change, value)
 
     def alignBlock(self, value):
-        for t in self.parent.parent().trnsysObj:
+        for t in self.editor.trnsysObj:
             if isinstance(t, BlockItem) and t is not self:
                 if self.elementInYBand(t):
                     value = QPointF(self.pos().x(), t.pos().y())
-                    self.parent.parent().alignYLineItem.setLine(
+                    self.editor.alignYLineItem.setLine(
                         self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
                     )
 
-                    self.parent.parent().alignYLineItem.setVisible(True)
+                    self.editor.alignYLineItem.setVisible(True)
 
-                    qtm = QTimer(self.parent.parent())
+                    qtm = QTimer(self.editor)
                     qtm.timeout.connect(self.timerfunc)
                     qtm.setSingleShot(True)
                     qtm.start(1000)
@@ -503,18 +502,18 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                         QtCore.Qt.NoButton,
                         QtCore.Qt.NoModifier,
                     )
-                    self.parent.mouseReleaseEvent(e)
-                    self.parent.parent().alignMode = False
+                    self.editor.diagramView.mouseReleaseEvent(e)
+                    self.editor.alignMode = False
 
                 if self.elementInXBand(t):
                     value = QPointF(t.pos().x(), self.pos().y())
-                    self.parent.parent().alignXLineItem.setLine(
+                    self.editor.alignXLineItem.setLine(
                         t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
                     )
 
-                    self.parent.parent().alignXLineItem.setVisible(True)
+                    self.editor.alignXLineItem.setVisible(True)
 
-                    qtm = QTimer(self.parent.parent())
+                    qtm = QTimer(self.editor)
                     qtm.timeout.connect(self.timerfunc2)
                     qtm.setSingleShot(True)
                     qtm.start(1000)
@@ -526,19 +525,19 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                         QtCore.Qt.NoButton,
                         QtCore.Qt.NoModifier,
                     )
-                    self.parent.mouseReleaseEvent(e)
-                    self.parent.parent().alignMode = False
+                    self.editor.diagramView.mouseReleaseEvent(e)
+                    self.editor.alignMode = False
 
         return value
 
     def timerfunc(self):
-        self.parent.parent().alignYLineItem.setVisible(False)
+        self.editor.alignYLineItem.setVisible(False)
 
     def timerfunc2(self):
-        self.parent.parent().alignXLineItem.setVisible(False)
+        self.editor.alignXLineItem.setVisible(False)
 
     def hasElementsInYBand(self):
-        for t in self.parent.parent().trnsysObj:
+        for t in self.editor.trnsysObj:
             if isinstance(t, BlockItem):
                 if self.elementInYBand(t):
                     return True
@@ -546,7 +545,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         return False
 
     def hasElementsInXBand(self):
-        for t in self.parent.parent().trnsysObj:
+        for t in self.editor.trnsysObj:
             if isinstance(t, BlockItem):
                 if self.elementInXBand(t):
                     return True
@@ -562,7 +561,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
 
     def elementInY(self):
-        for t in self.parent.parent().trnsysObj:
+        for t in self.editor.trnsysObj:
             if isinstance(t, BlockItem):
                 if self.scenePos().y == t.scenePos().y():
                     return True
@@ -663,7 +662,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def deleteLoadedFile(self):
         for items in self.loadedFiles:
             try:
-                self.parent.parent().fileList.remove(str(items))
+                self.editor.fileList.remove(str(items))
             except ValueError:
                 self.logger.debug("File already deleted from file list.")
-                self.logger.debug("filelist:", self.parent.parent().fileList)
+                self.logger.debug("filelist:", self.editor.fileList)

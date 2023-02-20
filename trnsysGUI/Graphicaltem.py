@@ -4,7 +4,7 @@
 import pathlib as _pl
 
 from PyQt5 import QtCore
-from PyQt5.QtGui import QCursor, QPixmap
+from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QMenu, QFileDialog
 
 import trnsysGUI.imageAccessor as _ia
@@ -13,14 +13,14 @@ from trnsysGUI.ResizerItem import ResizerItem
 
 
 class GraphicalItem(QGraphicsPixmapItem):
-    def __init__(self, parent, **_):
+    def __init__(self, editor, **_):
 
-        super(GraphicalItem, self).__init__(None)
+        super().__init__(None)
         self.w = 100
         self.h = 100
-        self.parent = parent
+        self._editor = editor
         self.resizeMode = False
-        self.id = self.parent.parent().idGen.getID()
+        self.id = self._editor.idGen.getID()
 
         self.flippedH = False
         self.flippedV = False
@@ -34,7 +34,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         self.setFlag(self.ItemSendsScenePositionChanges, True)
         self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
-        self.parent.parent().graphicalObj.append(self)
+        self._editor.graphicalObj.append(self)
 
     def setItemSize(self, w, h):
         self.w, self.h = w, h
@@ -51,7 +51,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         menu.exec_(event.screenPos())
 
     def loadAction(self):
-        fileName = QFileDialog.getOpenFileName(self.parent.parent(), "Load image", filter="*.png *.svg")[0]
+        fileName = QFileDialog.getOpenFileName(self._editor, "Load image", filter="*.png *.svg")[0]
         if fileName[-3:] == "png" or fileName[-3:] == "svg":
             self.setImageSource(fileName)
             self.updateImage()
@@ -94,21 +94,16 @@ class GraphicalItem(QGraphicsPixmapItem):
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         self.setPos(float(i["BlockPosition"][0] + offset_x), float(i["BlockPosition"][1] + offset_y))
 
-        # self.updateFlipStateH(i["FlippedH"])
-        # self.updateFlipStateV(i["FlippedV"])
-        # self.rotateBlockToN(i["RotationN"])
-
         resBlockList.append(self)
 
     def setParent(self, parent):
-        self.parent = parent
-        if self not in self.parent.parent().graphicalObj:
-            self.parent.parent().graphicalObj.append(self)
+        self._editor = parent
+        if self not in self._editor.graphicalObj:
+            self._editor.graphicalObj.append(self)
 
     def deleteBlock(self):
-        # self.parent.parent().trnsysObj.remove(self)
-        self.parent.parent().graphicalObj.remove(self)
-        self.parent.scene().removeItem(self)
+        self._editor.graphicalObj.remove(self)
+        self._editor.diagramScene.removeItem(self)
         del self
 
     def mousePressEvent(self, event):

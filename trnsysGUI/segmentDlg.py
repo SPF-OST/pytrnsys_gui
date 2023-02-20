@@ -1,27 +1,29 @@
 # pylint: skip-file
 # type: ignore
 
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QGridLayout, QDialog, QMessageBox
+import PyQt5.QtWidgets as _qtw
 
+import pytrnsys.utils.result as _res
 import trnsysGUI.componentAndPipeNameValidator as _cpn
+import trnsysGUI.errors as _err
 
 
 # todo: make upper case
-class segmentDlg(QDialog):
-    def __init__(self, seg, parent=None):
+class segmentDlg(_qtw.QDialog):
+    def __init__(self, seg, parent):
         super(segmentDlg, self).__init__(parent)
         self.seg = seg
-        nameLabel = QLabel("Name:")
-        self.le = QLineEdit(self.seg.connection.displayName)
+        nameLabel = _qtw.QLabel("Name:")
+        self.le = _qtw.QLineEdit(self.seg.connection.displayName)
 
-        self.okButton = QPushButton("OK")
-        self.cancelButton = QPushButton("Cancel")
+        self.okButton = _qtw.QPushButton("OK")
+        self.cancelButton = _qtw.QPushButton("Cancel")
 
-        buttonLayout = QHBoxLayout()
+        buttonLayout = _qtw.QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.okButton)
         buttonLayout.addWidget(self.cancelButton)
-        layout = QGridLayout()
+        layout = _qtw.QGridLayout()
         layout.addWidget(nameLabel, 0, 0)
         layout.addWidget(self.le, 0, 1)
         layout.addLayout(buttonLayout, 1, 0, 2, 0)
@@ -42,9 +44,10 @@ class segmentDlg(QDialog):
 
         existingNames = self.getExistingNames()
         nameValidator = _cpn.ComponentAndPipeNameValidator(existingNames)
-        errorMessage = nameValidator.validateName(newName)
-        if errorMessage:
-            self.respondInMessageBoxWith(errorMessage)
+        result = nameValidator.validateName(newName)
+        if _res.isError(result):
+            errorMessage = _res.error(result)
+            _err.showErrorMessageBox(errorMessage)
             return
 
         self.applyNameChange(newName)
@@ -57,12 +60,6 @@ class segmentDlg(QDialog):
 
     def isOldName(self, name):
         return name.lower() == str(self.seg.connection.displayName).lower()
-
-    @staticmethod
-    def respondInMessageBoxWith(response):
-        msgb = QMessageBox()
-        msgb.setText(response)
-        msgb.exec()
 
     def cancel(self):
         self.close()

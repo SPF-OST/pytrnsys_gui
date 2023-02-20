@@ -26,7 +26,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         self.createdAtSide = side
         self.posCallbacks = []
         self.connectionList: list[_cb.ConnectionBase] = []
-        self.id = self.parent.parent.parent().idGen.getID()  # pylint: disable = invalid-name
+        self.id = self.parent.editor.idGen.getID()  # pylint: disable = invalid-name
 
         self.color = "white"
         self.ashColorR = QColor(239, 57, 75)
@@ -66,7 +66,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         # pylint: disable = fixme, too-many-branches, too-many-statements, too-many-nested-blocks
         # TODO : here to merge segments when moving blockitems
         if (
-            self.parent.parent.parent().moveDirectPorts
+            self.parent.editor.moveDirectPorts
             and hasattr(self.parent, "heatExchangers")
             and change == self.ItemPositionChange
         ):
@@ -77,7 +77,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
 
                 return QPointF(self.savePos.x(), value.y())
 
-        if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 0:
+        if change == self.ItemScenePositionHasChanged and self.parent.editor.editorMode == 0:
             self.logger.debug("editor mode = 0")
             for conn in self.connectionList:
                 conn.positionLabel()
@@ -93,7 +93,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                 for s in conn.segments:  # pylint: disable = invalid-name
                     s.updateGrad()
 
-        if change == self.ItemScenePositionHasChanged and self.parent.parent.parent().editorMode == 1:
+        if change == self.ItemScenePositionHasChanged and self.parent.editor.editorMode == 1:
             for conn in self.connectionList:
                 # Update position of connection label
                 conn.positionLabel()
@@ -187,7 +187,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         return super().itemChange(change, value)
 
     def mousePressEvent(self, event):  # pylint: disable = unused-argument
-        if self.parent.parent.parent().moveDirectPorts and hasattr(self.parent, "heatExchangers"):
+        if self.parent.editor.moveDirectPorts and hasattr(self.parent, "heatExchangers"):
             self.setFlag(self.ItemIsMovable)
             self.savePos = self.pos()
             return
@@ -196,7 +196,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
             return
 
         self.setFlag(self.ItemIsMovable, False)
-        self.scene().parent().startConnection(self)
+        self.parent.editor.startConnection(self)
 
     def hoverEnterEvent(self, event):  # pylint: disable = unused-argument
         self.logger.debug(self.parent)
@@ -234,17 +234,17 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
 
     def debugprint(self):
 
-        self.parent.parent.parent().listV.addItem("ID: " + str(self.id))
+        self.parent.editor.contextInfoList.addItem("ID: " + str(self.id))
 
         formattedPortItems = self._getFormattedPortItems()
         jointFormattedPortItems = "\n".join(formattedPortItems)
-        self.parent.parent.parent().listV.addItem(f"Names: {jointFormattedPortItems}")
+        self.parent.editor.contextInfoList.addItem(f"Names: {jointFormattedPortItems}")
 
-        self.parent.parent.parent().listV.addItem("Block: " + self.parent.displayName)
+        self.parent.editor.contextInfoList.addItem("Block: " + self.parent.displayName)
 
-        self.parent.parent.parent().listV.addItem("Connections:")
+        self.parent.editor.contextInfoList.addItem("Connections:")
         for connection in self.connectionList:
-            self.parent.parent.parent().listV.addItem(connection.displayName)
+            self.parent.editor.contextInfoList.addItem(connection.displayName)
 
     def _getFormattedPortItems(self) -> _tp.Sequence[str]:
         internalPiping: _ip.InternalPiping = self.parent.getInternalPiping()
@@ -263,7 +263,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         return formattedPortItems
 
     def _debugClear(self):
-        self.parent.parent.parent().listV.clear()
+        self.parent.editor.contextInfoList.clear()
 
     def hideCorners(self, connection):
         cor = connection.getCorners()[0]
