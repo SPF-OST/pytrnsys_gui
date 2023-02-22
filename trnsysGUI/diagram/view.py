@@ -221,7 +221,8 @@ class View(_qtw.QGraphicsView):
                       "GroundSourceHx": {"blockItem": GroundSourceHx, "displayNamePrefix": "Gshx"},
                       "ExternalHx": {"blockItem": ExternalHx, "displayNamePrefix": "Hx"},
                       "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "displayNamePrefix": "IceS"},
-                      "GraphicalItem": {"blockItem": GraphicalItem, "displayNamePrefix": None},  # this will likely cause issues
+                      "GraphicalItem": {"blockItem": GraphicalItem, "displayNamePrefix": None},
+                      # this will likely cause issues
                       "MasterControl": {"blockItem": MasterControl, "displayNamePrefix": None},
                       "Control": {"blockItem": Control, "displayNamePrefix": None},
                       "Sink": {"blockItem": Sink, "displayNamePrefix": "QSnk"},
@@ -249,10 +250,7 @@ class View(_qtw.QGraphicsView):
             blockItem = parts.blockItem(componentType, editor, displayNamePrefix=parts.displayNamePrefix)
         return blockItem
 
-
-
-
-def _dropEventRedone(self, event):  # pylint: disable=too-many-branches,too-many-statements
+    def _dropEventRedone(self, event):  # pylint: disable=too-many-branches,too-many-statements
         """Here, the dropped icons create BlockItems/GraphicalItems"""
         if event.mimeData().hasFormat("component/name"):
             componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
@@ -262,6 +260,7 @@ def _dropEventRedone(self, event):  # pylint: disable=too-many-branches,too-many
                 blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
                 self._editor.showConfigStorageDlg(blockItem)
             elif componentType == "GenericBlock":
+                self._editor.showGenericPortPairDlg(blockItem)
 
             snapSize = self._editor.snapSize
             if self._editor.snapGrid:
