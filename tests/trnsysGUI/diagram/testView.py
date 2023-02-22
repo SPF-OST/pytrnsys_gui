@@ -55,50 +55,55 @@ from trnsysGUI.water import Water
 _cgitb.enable(format="text")
 
 _BLOCKITEMCASESWITHPROJECTPATH = [
-                   ("TeePiece", TeePiece),
-                   ("DPTee", DoublePipeTeePiece),
-                   ("SPCnr", SingleDoublePipeConnector),
-                   ("DPCnr", DoubleDoublePipeConnector),
-                   ("TVentil", TVentil),
-                   ("Pump", Pump),
-                   ("Connector", Connector),
-                   ("GraphicalItem", GraphicalItem),
-                   ("Crystalizer", Crystalizer),
-                   ("WTap_main", WTap_main),
-                   ]
+    ("TeePiece", TeePiece),
+    ("DPTee", DoublePipeTeePiece),
+    ("SPCnr", SingleDoublePipeConnector),
+    ("DPCnr", DoubleDoublePipeConnector),
+    ("TVentil", TVentil),
+    ("Pump", Pump),
+    ("Connector", Connector),
+    ("GraphicalItem", GraphicalItem),
+    ("Crystalizer", Crystalizer),
+    ("WTap_main", WTap_main),
+]
 
 _BLOCKITEMCASESWITHPROJECTFOLDER = [
-                   ("Collector", Collector),
-                   ("HP", HeatPump),
-                   ("IceStorage", IceStorage),
-                   ("PitStorage", PitStorage),
-                   ("Radiator", Radiator),
-                   ("WTap", WTap),
-                   ("GenericBlock", GenericBlock),
-                   ("HPTwoHx", HeatPumpTwoHx),
-                   ("HPDoubleDual", HPDoubleDual),
-                   ("HPDual", HPDual),
-                   ("Boiler", Boiler),
-                   ("AirSourceHP", AirSourceHP),
-                   ("PV", PV),
-                   ("GroundSourceHx", GroundSourceHx),
-                   ("ExternalHx", ExternalHx),
-                   ("IceStorageTwoHx", IceStorageTwoHx),
-                   ("Sink", Sink),
-                   ("Source", Source),
-                   ("SourceSink", SourceSink),
-                   ("Geotherm", Geotherm),
-                   ("Water", Water),
-                   ("powerBlock", SteamPowerBlock),
-                   ("CSP_PT", ParabolicTroughField),
-                   ("CSP_CR", CentralReceiver),
-                   ("coldSaltTank", SaltTankCold),
-                   ("hotSaltTank", SaltTankHot),
-                   ]
-                   # ("StorageTank", StorageTank),
-                   # ("MasterControl", MasterControl),
-                   # ("Control", Control),
+    ("Collector", Collector),
+    ("HP", HeatPump),
+    ("IceStorage", IceStorage),
+    ("PitStorage", PitStorage),
+    ("Radiator", Radiator),
+    ("WTap", WTap),
+    ("GenericBlock", GenericBlock),
+    ("HPTwoHx", HeatPumpTwoHx),
+    ("HPDoubleDual", HPDoubleDual),
+    ("HPDual", HPDual),
+    ("Boiler", Boiler),
+    ("AirSourceHP", AirSourceHP),
+    ("PV", PV),
+    ("GroundSourceHx", GroundSourceHx),
+    ("ExternalHx", ExternalHx),
+    ("IceStorageTwoHx", IceStorageTwoHx),
+    ("Sink", Sink),
+    ("Source", Source),
+    ("SourceSink", SourceSink),
+    ("Geotherm", Geotherm),
+    ("Water", Water),
+    ("powerBlock", SteamPowerBlock),
+    ("CSP_PT", ParabolicTroughField),
+    ("CSP_CR", CentralReceiver),
+    ("coldSaltTank", SaltTankCold),
+    ("hotSaltTank", SaltTankHot),
+]
 
+# todo: the following cases likely expose a bug in the code
+_BLOCKITEMCASESWITHDISPLAYNAME = [
+    ("MasterControl", MasterControl),
+    ("Control", Control),
+]
+
+
+# ("StorageTank", StorageTank),
 
 class TestView:
     # def setup(self):
@@ -121,8 +126,25 @@ class TestView:
         assert isinstance(blockItem, blockItemType)
 
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER)
-    def testGetBlockItemWithoutProjectFolder(self, componentType, blockItemType, tmp_path,
-                                             request: _pt.FixtureRequest) -> None:
+    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, tmp_path,
+                                          request: _pt.FixtureRequest) -> None:
+        logger = _log.getLogger("root")
+        (
+            editorMock,
+            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
+        ) = self._createEditorMock(logger, tmp_path)
+
+        def quitApplication():
+            application.quit()
+
+        request.addfinalizer(quitApplication)
+
+        blockItem = _v._getBlockItem(componentType, editorMock)
+        assert isinstance(blockItem, blockItemType)
+
+    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHDISPLAYNAME)
+    def testGetBlockItemSpecial(self, componentType, blockItemType, tmp_path,
+                                request: _pt.FixtureRequest) -> None:
         logger = _log.getLogger("root")
         (
             editorMock,
