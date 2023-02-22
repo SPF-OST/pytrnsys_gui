@@ -346,7 +346,7 @@ class Editor(_qtw.QWidget):
         self.connLineItem.setLine(self.connLine)
         self.connLineItem.setVisible(True)
 
-        hitPortItem = self._getHitPortItemOrNone(event)
+        hitPortItem = self._getToPortItemAtOrNone(fromPort, event)
         if not hitPortItem:
             return
 
@@ -371,14 +371,13 @@ class Editor(_qtw.QWidget):
         fromPort.innerCircle.setBrush(hitPortItem.visibleColor)
 
     def sceneMouseReleaseEvent(self, event):
-        if not self._currentlyDraggedConnectionFromPort:
-            return
         fromPort = self._currentlyDraggedConnectionFromPort
 
         self._currentlyDraggedConnectionFromPort = None
         self.connLineItem.setVisible(False)
 
-        toPort = self._getHitPortItemOrNone(event)
+        toPort = self._getToPortItemAtOrNone(fromPort, event)
+
         if not toPort:
             return
 
@@ -387,8 +386,9 @@ class Editor(_qtw.QWidget):
 
         self._createConnection(fromPort, toPort)
 
-    def _getHitPortItemOrNone(self, event: _qtc.QEvent) -> _tp.Optional[PortItemBase]:
-        fromPort = self._currentlyDraggedConnectionFromPort
+    def _getToPortItemAtOrNone(
+        self, fromPort: _tp.Optional[PortItemBase], event: _qtc.QEvent
+    ) -> _tp.Optional[PortItemBase]:
         if not fromPort:
             return None
 
@@ -408,8 +408,10 @@ class Editor(_qtw.QWidget):
 
     @staticmethod
     def _showOverlappingPortItemsNotSupportedErrorMessage():
-        errorMessage = "Overlapping port items are not supported. Please move the containing components so that the " \
-                       "port items don't overlap if you want to connect them."
+        errorMessage = (
+            "Overlapping port items are not supported. Please move the containing components so that the "
+            "port items don't overlap if you want to connect them."
+        )
         _err.showErrorMessageBox(errorMessage, title="Not implemented")
 
     def _getRelevantHitPortItems(
