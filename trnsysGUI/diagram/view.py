@@ -222,7 +222,7 @@ class View(_qtw.QGraphicsView):
                       "ExternalHx": {"blockItem": ExternalHx, "displayNamePrefix": "Hx"},
                       "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "displayNamePrefix": "IceS"},
                       "GraphicalItem": {"blockItem": GraphicalItem, "displayNamePrefix": None},
-                      # this will likely cause issues
+                      # None entries will likely cause issues
                       "MasterControl": {"blockItem": MasterControl, "displayNamePrefix": None},
                       "Control": {"blockItem": Control, "displayNamePrefix": None},
                       "Sink": {"blockItem": Sink, "displayNamePrefix": "QSnk"},
