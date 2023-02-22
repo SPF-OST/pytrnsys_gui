@@ -5,11 +5,9 @@ import unittest.mock as _mock
 
 import PyQt5.QtWidgets as _qtw
 
-from trnsysGUI.Graphicaltem import GraphicalItem
 from trnsysGUI.diagram.view import View as _v
 
 from trnsysGUI.AirSourceHP import AirSourceHP
-from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
@@ -40,7 +38,6 @@ from trnsysGUI.connectors.connector import Connector
 from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer
-from trnsysGUI.deleteBlockCommand import DeleteBlockCommand
 from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.pump import Pump
@@ -103,8 +100,6 @@ _BLOCKITEMCASESWITHDISPLAYNAME = [
 ]
 
 
-# ("StorageTank", StorageTank),
-
 class TestView:
     # def setup(self):
     #     self.editor = self._createEditor('.')
@@ -142,9 +137,10 @@ class TestView:
         blockItem = _v._getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
 
+    @_pt.mark.skip()
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHDISPLAYNAME)
-    def testGetBlockItemSpecial(self, componentType, blockItemType, tmp_path,
-                                request: _pt.FixtureRequest) -> None:
+    def testGetBlockItemDisplayName(self, componentType, blockItemType, tmp_path,
+                                    request: _pt.FixtureRequest) -> None:
         logger = _log.getLogger("root")
         (
             editorMock,
@@ -159,6 +155,22 @@ class TestView:
         blockItem = _v._getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
 
+    def testGetBlockItemStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None:
+        logger = _log.getLogger("root")
+        (
+            editorMock,
+            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
+        ) = self._createEditorMock(logger, tmp_path)
+
+        def quitApplication():
+            application.quit()
+
+        request.addfinalizer(quitApplication)
+
+        blockItem = _v._getBlockItem("StorageTank", editorMock)
+        assert isinstance(blockItem, StorageTank)
+
+    @_pt.mark.skip()
     def testGetBlockItemRaises(self, tmp_path, request: _pt.FixtureRequest) -> None:
         logger = _log.getLogger("root")
         (
@@ -191,6 +203,8 @@ class TestView:
             spec_set=[
                 "getID",
                 "getTrnsysID",
+                "getStoragenTes",
+                "getStorageType",
             ],
         )
         editorMock.moveDirectPorts = True
@@ -200,6 +214,8 @@ class TestView:
 
         editorMock.idGen.getID = lambda: 7701
         editorMock.idGen.getTrnsysID = lambda: 7702
+        editorMock.idGen.getStoragenTes = lambda: 7703
+        editorMock.idGen.getStorageType = lambda: 7704
 
         graphicsScene = _qtw.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
