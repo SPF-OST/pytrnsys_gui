@@ -3,7 +3,7 @@ import logging as _log
 import unittest.mock as _mock
 import typing as _tp
 
-from PyQt5 import QtWidgets as _widgets
+from PyQt5 import QtWidgets as _qtw
 
 import trnsysGUI.connectors.doubleDoublePipeConnector as _ddpc
 import trnsysGUI.massFlowSolver.networkModel as _mfn
@@ -110,11 +110,11 @@ TDPCnrCold = [2,1]
     @staticmethod
     def _createEditorMockAndOtherObjectsToKeepAlive(logger, projectPath):
         # todo: provide this class as a TestHelper class. see TestStorageTank  # pylint: disable=fixme
-        application = _widgets.QApplication([])
+        application = _qtw.QApplication([])
 
-        mainWindow = _widgets.QMainWindow()
+        mainWindow = _qtw.QMainWindow()
 
-        editorMock = _widgets.QWidget(parent=mainWindow)
+        editorMock = _qtw.QWidget(parent=mainWindow)
         editorMock.connectionList = []
         editorMock.logger = logger
         editorMock.trnsysObj = []
@@ -135,7 +135,7 @@ TDPCnrCold = [2,1]
         editorMock.idGen.getID = lambda: 7701
         editorMock.idGen.getTrnsysID = lambda: 7702
 
-        graphicsScene = _widgets.QGraphicsScene(parent=editorMock)
+        graphicsScene = _qtw.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
 
         mainWindow.setCentralWidget(editorMock)
