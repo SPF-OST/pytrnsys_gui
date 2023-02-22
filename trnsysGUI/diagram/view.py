@@ -193,3 +193,86 @@ class View(_qtw.QGraphicsView):
     def deleteBlockCom(self, blockItem):
         command = DeleteBlockCommand(blockItem, self._editor)
         self._editor.parent().undoStack.push(command)
+
+    @staticmethod
+    def _getBlockItem(componentType, editor):
+        blockItems = {"StorageTank": {"blockItem": StorageTank, "displayNamePrefix": "Tes"},
+                      "TeePiece": {"blockItem": TeePiece, "displayNamePrefix": "Tee"},
+                      "DPTee": {"blockItem": DoublePipeTeePiece, "displayNamePrefix": "DTee"},
+                      "SPCnr": {"blockItem": SingleDoublePipeConnector, "displayNamePrefix": "SCnr"},
+                      "DPCnr": {"blockItem": DoubleDoublePipeConnector, "displayNamePrefix": "DCnr"},
+                      "TVentil": {"blockItem": TVentil, "displayNamePrefix": "Val"},
+                      "Pump": {"blockItem": Pump, "displayNamePrefix": "Pump"},
+                      "Collector": {"blockItem": Collector, "displayNamePrefix": "Coll"},
+                      "HP": {"blockItem": HeatPump, "displayNamePrefix": "HP"},
+                      "IceStorage": {"blockItem": IceStorage, "displayNamePrefix": "IceS"},
+                      "PitStorage": {"blockItem": PitStorage, "displayNamePrefix": "PitS"},
+                      "Radiator": {"blockItem": Radiator, "displayNamePrefix": "Rad"},
+                      "WTap": {"blockItem": WTap, "displayNamePrefix": "WtTp"},
+                      "WTap_main": {"blockItem": WTap_main, "displayNamePrefix": "WtSp"},
+                      "Connector": {"blockItem": Connector, "displayNamePrefix": "Conn"},
+                      "GenericBlock": {"blockItem": GenericBlock, "displayNamePrefix": "GBlk"},
+                      "HPTwoHx": {"blockItem": HeatPumpTwoHx, "displayNamePrefix": "HP"},
+                      "HPDoubleDual": {"blockItem": HPDoubleDual, "displayNamePrefix": "HPDD"},
+                      "HPDual": {"blockItem": HPDual, "displayNamePrefix": "HPDS"},
+                      "Boiler": {"blockItem": Boiler, "displayNamePrefix": "Bolr"},
+                      "AirSourceHP": {"blockItem": AirSourceHP, "displayNamePrefix": "Ashp"},
+                      "PV": {"blockItem": PV, "displayNamePrefix": "PV"},
+                      "GroundSourceHx": {"blockItem": GroundSourceHx, "displayNamePrefix": "Gshx"},
+                      "ExternalHx": {"blockItem": ExternalHx, "displayNamePrefix": "Hx"},
+                      "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "displayNamePrefix": "IceS"},
+                      "GraphicalItem": {"blockItem": GraphicalItem, "displayNamePrefix": None},  # this will likely cause issues
+                      "MasterControl": {"blockItem": MasterControl, "displayNamePrefix": None},
+                      "Control": {"blockItem": Control, "displayNamePrefix": None},
+                      "Sink": {"blockItem": Sink, "displayNamePrefix": "QSnk"},
+                      "Source": {"blockItem": Source, "displayNamePrefix": "QSrc"},
+                      "SourceSink": {"blockItem": SourceSink, "displayNamePrefix": "QExc"},
+                      "Geotherm": {"blockItem": Geotherm, "displayNamePrefix": "GeoT"},
+                      "Water": {"blockItem": Water, "displayNamePrefix": "QWat"},
+                      "Crystalizer": {"blockItem": Crystalizer, "displayNamePrefix": "Cryt"},
+                      "powerBlock": {"blockItem": SteamPowerBlock, "displayNamePrefix": "StPB"},
+                      "CSP_PT": {"blockItem": ParabolicTroughField, "displayNamePrefix": "PT"},
+                      "CSP_CR": {"blockItem": CentralReceiver, "displayNamePrefix": "CR"},
+                      "coldSaltTank": {"blockItem": SaltTankCold, "displayNamePrefix": "ClSt"},
+                      "hotSaltTank": {"blockItem": SaltTankHot, "displayNamePrefix": "HtSt"},
+                      "Blk": {"blockItem": BlockItem, "displayNamePrefix": "Blk"},
+                      }
+        if componentType not in blockItems:
+            parts = blockItems["Blk"]
+        else:
+            parts = blockItems[componentType]
+        if isinstance(parts.blockItem, GraphicalItem):  # may not be needed
+            blockItem = parts.blockItem(editor)
+        elif isinstance(parts.blockItem, MasterControl) or isinstance(parts.blockItem, Control):
+            blockItem = parts.blockItem(componentType, editor)
+        else:
+            blockItem = parts.blockItem(componentType, editor, displayNamePrefix=parts.displayNamePrefix)
+        return blockItem
+
+
+
+
+def _dropEventRedone(self, event):  # pylint: disable=too-many-branches,too-many-statements
+        """Here, the dropped icons create BlockItems/GraphicalItems"""
+        if event.mimeData().hasFormat("component/name"):
+            componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
+            self.logger.debug("name is " + componentType)
+            blockItem = self._getBlockItem(componentType)
+            if componentType == "StorageTank":
+                blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
+                self._editor.showConfigStorageDlg(blockItem)
+            elif componentType == "GenericBlock":
+
+            snapSize = self._editor.snapSize
+            if self._editor.snapGrid:
+                position = _qtc.QPoint(
+                    event.pos().x() - event.pos().x() % snapSize, event.pos().y() - event.pos().y() % snapSize
+                )
+                scenePosition = self.mapToScene(position)
+            else:
+                scenePosition = self.mapToScene(event.pos())
+
+            blockItem.setPos(scenePosition)
+            self.scene().addItem(blockItem)
+
+            blockItem.oldPos = blockItem.scenePos()
