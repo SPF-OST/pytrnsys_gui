@@ -242,12 +242,14 @@ class View(_qtw.QGraphicsView):
             parts = blockItems["Blk"]
         else:
             parts = blockItems[componentType]
-        if isinstance(parts.blockItem, GraphicalItem):  # may not be needed
-            blockItem = parts.blockItem(editor)
-        elif isinstance(parts.blockItem, MasterControl) or isinstance(parts.blockItem, Control):
-            blockItem = parts.blockItem(componentType, editor)
+
+        if parts["blockItem"] == GraphicalItem:  # may not be needed
+            blockItem = parts["blockItem"](editor)
+        elif (parts["blockItem"] == MasterControl) or (parts["blockItem"] == Control):
+            blockItem = parts["blockItem"](componentType, editor)
         else:
-            blockItem = parts.blockItem(componentType, editor, displayNamePrefix=parts.displayNamePrefix)
+            blockItem = parts["blockItem"](componentType, editor, displayNamePrefix=parts["displayNamePrefix"])
+
         return blockItem
 
     def _dropEventRedone(self, event):  # pylint: disable=too-many-branches,too-many-statements
