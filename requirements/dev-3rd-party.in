@@ -12,3 +12,5 @@ pre-commit
 pyinstaller
 
 sphinx
+
+reloadium
