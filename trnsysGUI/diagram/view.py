@@ -52,6 +52,7 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
+# todo: change to DragAndDrop
 class View(_qtw.QGraphicsView):
     """
     Displays the items from the Scene. Here, the drag and drop from the library to the View is implemented.
@@ -195,7 +196,14 @@ class View(_qtw.QGraphicsView):
         self._editor.parent().undoStack.push(command)
 
     @staticmethod
-    def _getBlockItem(componentType, editor):
+    def _getBlockItem(componentType, editor, displayName=None, loadedBlock=None):
+        # todo: provide this to Decoder as well
+        """ returns an "blockItem" instance of a specific diagram component
+
+        componentType: name of the component, e.g., "StorageTank"
+
+        """
+
         blockItems = {"StorageTank": {"blockItem": StorageTank, "displayNamePrefix": "Tes"},
                       "TeePiece": {"blockItem": TeePiece, "displayNamePrefix": "Tee"},
                       "DPTee": {"blockItem": DoublePipeTeePiece, "displayNamePrefix": "DTee"},
@@ -236,17 +244,17 @@ class View(_qtw.QGraphicsView):
                       "CSP_CR": {"blockItem": CentralReceiver, "displayNamePrefix": "CR"},
                       "coldSaltTank": {"blockItem": SaltTankCold, "displayNamePrefix": "ClSt"},
                       "hotSaltTank": {"blockItem": SaltTankHot, "displayNamePrefix": "HtSt"},
-                      "Blk": {"blockItem": BlockItem, "displayNamePrefix": "Blk"},
                       }
         if componentType not in blockItems:
-            parts = blockItems["Blk"]
+            raise AssertionError(f"Unknown kind of block item: {componentType}")
         else:
             parts = blockItems[componentType]
 
         if parts["blockItem"] == GraphicalItem:  # may not be needed
             blockItem = parts["blockItem"](editor)
         elif (parts["blockItem"] == MasterControl) or (parts["blockItem"] == Control):
-            blockItem = parts["blockItem"](componentType, editor)
+            # todo: ask if these need updating, or are never used.
+            blockItem = parts["blockItem"](componentType, editor) # currently broken, needs a displayName or prefix
         else:
             blockItem = parts["blockItem"](componentType, editor, displayNamePrefix=parts["displayNamePrefix"])
 
