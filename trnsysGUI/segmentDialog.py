@@ -17,21 +17,21 @@ class SegmentDialog(_qtw.QDialog):
         nameLabel = _qtw.QLabel("Name:")
         self._lineEdit = _qtw.QLineEdit(self._connection.displayName)
 
-        self.okButton = _qtw.QPushButton("OK")
-        self.cancelButton = _qtw.QPushButton("Cancel")
+        okButton = _qtw.QPushButton("OK")
+        cancelButton = _qtw.QPushButton("Cancel")
 
         buttonLayout = _qtw.QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(self.okButton)
-        buttonLayout.addWidget(self.cancelButton)
+        buttonLayout.addWidget(okButton)
+        buttonLayout.addWidget(cancelButton)
         layout = _qtw.QGridLayout()
         layout.addWidget(nameLabel, 0, 0)
         layout.addWidget(self._lineEdit, 0, 1)
         layout.addLayout(buttonLayout, 1, 0, 2, 0)
         self.setLayout(layout)
 
-        self.okButton.clicked.connect(self._acceptedEdit)
-        self.cancelButton.clicked.connect(self._cancel)
+        okButton.clicked.connect(self._acceptedEdit)
+        cancelButton.clicked.connect(self._cancel)
         self.setWindowTitle("Change connection name")
 
     def _acceptedEdit(self) -> None:
