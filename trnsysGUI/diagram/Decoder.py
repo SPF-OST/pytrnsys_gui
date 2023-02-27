@@ -114,9 +114,13 @@ class Decoder(json.JSONDecoder):
                     elif i["BlockName"] == "HP":
                         bl = HeatPump(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
                     elif i["BlockName"] == "IceStorage":
-                        bl = IceStorage(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
+                        bl = IceStorage(
+                            i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
                     elif i["BlockName"] == "PitStorage":
-                        bl = PitStorage(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
+                        bl = PitStorage(
+                            i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
                     elif i["BlockName"] == "Radiator":
                         bl = Radiator(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
                     elif i["BlockName"] == "coldSaltTank":
@@ -172,7 +176,9 @@ class Decoder(json.JSONDecoder):
                     elif i["BlockName"] == "HPDual":
                         bl = HPDual(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
                     elif i["BlockName"] == "ExternalHx":
-                        bl = ExternalHx(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
+                        bl = ExternalHx(
+                            i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
                     elif i["BlockName"] == "IceStorageTwoHx":
                         bl = IceStorageTwoHx(
                             i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
@@ -209,7 +215,9 @@ class Decoder(json.JSONDecoder):
                     elif i["BlockName"] == "Source":
                         bl = Source(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
                     elif i["BlockName"] == "SourceSink":
-                        bl = SourceSink(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
+                        bl = SourceSink(
+                            i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
+                        )
                     elif i["BlockName"] == "Geotherm":
                         bl = Geotherm(i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True)
                     elif i["BlockName"] == "Water":

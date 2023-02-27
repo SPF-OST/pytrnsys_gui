@@ -623,7 +623,9 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         resBlockList.append(self)
 
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):  # pylint: disable=unused-argument
+    def decodePaste(
+        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
+    ):  # pylint: disable=unused-argument
         self.setPos(
             float(i["BlockPosition"][0] + offset_x),
             float(i["BlockPosition"][1] + offset_y),

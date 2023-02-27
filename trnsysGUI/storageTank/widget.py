@@ -119,7 +119,9 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             inputPort.id = portIds.inputId
             outputPort.id = portIds.outputId
 
-        directPortPair = DirectPortPair(trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side)
+        directPortPair = DirectPortPair(
+            trnsysId, inputPort, outputPort, relativeInputHeight, relativeOutputHeight, side
+        )
 
         self.directPortPairs.append(directPortPair)
 
@@ -303,7 +305,11 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         name = heatExchangerModel.name + nameSuffix
 
         heatExchanger = self.addHeatExchanger(
-            name, portPair.trnsysId, portPair.side, portPair.inputPort.relativeHeight, portPair.outputPort.relativeHeight
+            name,
+            portPair.trnsysId,
+            portPair.side,
+            portPair.inputPort.relativeHeight,
+            portPair.outputPort.relativeHeight,
         )
 
         if shallSetNamesAndIDs:

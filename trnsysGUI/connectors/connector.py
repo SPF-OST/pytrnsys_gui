@@ -81,7 +81,9 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
         fromConnection = self.inputs[0].getConnection()
         toConnection = self.outputs[0].getConnection()
 
-        posFlowTempName = _helpers.getTemperatureVariableName(fromConnection, self.inputs[0], _mfn.PortItemType.STANDARD)
+        posFlowTempName = _helpers.getTemperatureVariableName(
+            fromConnection, self.inputs[0], _mfn.PortItemType.STANDARD
+        )
         negFlowTempName = _helpers.getTemperatureVariableName(toConnection, self.outputs[0], _mfn.PortItemType.STANDARD)
 
         unitNumber = startingUnit

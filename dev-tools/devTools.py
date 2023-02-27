@@ -96,7 +96,7 @@ def main():
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting is not None:
-        cmd = "black -l 121 --check trnsysGUI tests dev-tools"
+        cmd = "black -l 120 --check trnsysGUI tests dev-tools"
 
         sp.run(cmd.split(), check=True)
 

@@ -410,7 +410,9 @@ class Type1924_TesPlugFlow:
 
     def getHeighAvgSensorParValues(self, nTes):
 
-        lines = self.sLine + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+        lines = (
+            self.sLine + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+        )
 
         line = "CONSTANTS 10\n"
         lines = lines + line
