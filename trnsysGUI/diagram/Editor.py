@@ -54,7 +54,7 @@ from trnsysGUI.doublePipeBlockDlg import DoublePipeBlockDlg
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.hxDlg import hxDlg
 from trnsysGUI.idGenerator import IdGenerator
-from trnsysGUI.segmentDlg import segmentDlg
+from trnsysGUI.segmentDialog import SegmentDialog
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
@@ -1021,7 +1021,9 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         c = hxDlg(hx, self)
 
     def showSegmentDlg(self, seg):
-        segmentDlg(seg, self)
+        existingNames = [o.displayName for o in self.trnsysObj]
+        segmentDialog = SegmentDialog(seg.connection, existingNames)
+        segmentDialog.exec()
 
     def showTVentilDlg(self, bl):
         c = TVentilDlg(bl, self)
