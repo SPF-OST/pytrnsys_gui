@@ -35,7 +35,9 @@ class InternalPiping:
         return modelPortItems[0]
 
     def getModelPortItems(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Sequence[_mfn.PortItem]:
-        modelPortItems = [mpi for mpi, gpi in self.modelPortItemsToGraphicalPortItem.items() if gpi == graphicalPortItem]
+        modelPortItems = [
+            mpi for mpi, gpi in self.modelPortItemsToGraphicalPortItem.items() if gpi == graphicalPortItem
+        ]
         return modelPortItems
 
     def getNode(

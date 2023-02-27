@@ -780,7 +780,9 @@ class ConnectionBase(_ip.HasInternalPiping):
                             f = 10  # pylint: disable = invalid-name
                             distFactor = max(f * 1 / angleBetween, f)
 
-                            normVecp2p1 = QPointF(distFactor / normVec * vecp2p1.x(), distFactor / normVec * vecp2p1.y())
+                            normVecp2p1 = QPointF(
+                                distFactor / normVec * vecp2p1.x(), distFactor / normVec * vecp2p1.y()
+                            )
 
                             newPos1 = collisionPos - normVecp2p1
                             newPos2 = collisionPos + normVecp2p1

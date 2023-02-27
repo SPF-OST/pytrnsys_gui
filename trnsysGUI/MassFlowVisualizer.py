@@ -196,7 +196,10 @@ class MassFlowVisualizer(_qtw.QDialog):
                     mfrVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.modelPipe)
                     temperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.STANDARD)
 
-                    if mfrVariableName in self.massFlowData.columns and temperatureVariableName in self.tempMassFlowData:
+                    if (
+                        mfrVariableName in self.massFlowData.columns
+                        and temperatureVariableName in self.tempMassFlowData
+                    ):
                         massFlow = self._getMassFlow(mfrVariableName, timeStep)
                         temperature = self._getTemperature(temperatureVariableName, timeStep)
 

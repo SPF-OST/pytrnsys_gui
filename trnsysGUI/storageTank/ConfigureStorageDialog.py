@@ -225,7 +225,9 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
 
     @staticmethod
     def _getHeatExchangerListItemText(h):  # pylint: disable = invalid-name
-        return f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
+        return (
+            f"{h.displayName}, y_offset = {int(h.relativeInputHeight * 100)}% to {int(h.relativeOutputHeight * 100)}%"
+        )
 
     def _loadDirectPortPairs(self):
         self._leftDirectPortPairsItemListWidget.clear()
