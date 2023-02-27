@@ -47,7 +47,7 @@ class segmentDlg(_qtw.QDialog):
         result = nameValidator.validateName(newName)
         if _res.isError(result):
             errorMessage = _res.error(result)
-            _err.showErrorMessageBox(errorMessage)
+            _err.showErrorMessageBox(errorMessage.message)
             return
 
         self.applyNameChange(newName)
