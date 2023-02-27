@@ -16,16 +16,16 @@ class HeatExchanger(QGraphicsItemGroup):
     PORT_ITEM_PROTRUSION_SIZE_IN_PIXELS = 8
 
     def __init__(
-            self,
-            trnsysId,
-            sideNr,
-            width,
-            relativeInputHeight,
-            relativeOutputHeight,
-            storageTankWidth,
-            storageTankHeight,
-            storageTank,
-            name
+        self,
+        trnsysId,
+        sideNr,
+        width,
+        relativeInputHeight,
+        relativeOutputHeight,
+        storageTankWidth,
+        storageTankHeight,
+        storageTank,
+        name,
     ):
         super().__init__(storageTank)
         self.storageTank = storageTank
@@ -88,9 +88,7 @@ class HeatExchanger(QGraphicsItemGroup):
             self.logger.debug("p is a StorageTank")
             self.setParentItem(parent)
         else:
-            self.logger.debug(
-                "A non-Storage-Tank block is trying to set parent of heatExchanger"
-            )
+            self.logger.debug("A non-Storage-Tank block is trying to set parent of heatExchanger")
 
     def contextMenuEvent(self, event):
         menu = QMenu()
@@ -200,11 +198,11 @@ class HeatExchanger(QGraphicsItemGroup):
         self._lines = []
 
     def _setRelativeHeightsAndTankSize(
-            self,
-            storageTankWidth,
-            storageTankHeight,
-            relativeInputHeight,
-            relativeOutputHeight,
+        self,
+        storageTankWidth,
+        storageTankHeight,
+        relativeInputHeight,
+        relativeOutputHeight,
     ):
         self._storageTankWidth = storageTankWidth
         self._storageTankHeight = storageTankHeight

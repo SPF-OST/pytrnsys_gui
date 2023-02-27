@@ -353,7 +353,9 @@ class SegmentItemBase(QGraphicsItemGroup):
                     self.logger.debug("Second corner is not none")
                     # if PortItem
                     if hasattr(self.endNode.parent, "fromPort"):
-                        segbef = self.connection.segments[self.connection.getNodePos(self.secondCorner.node.prevN().parent)]
+                        segbef = self.connection.segments[
+                            self.connection.getNodePos(self.secondCorner.node.prevN().parent)
+                        ]
 
                         segbef.setLine(
                             segbef.line().p1().x(),
@@ -380,7 +382,9 @@ class SegmentItemBase(QGraphicsItemGroup):
                     # if PortItem
                     elif hasattr(self.startNode.parent, "fromPort"):
 
-                        segafter = self.connection.segments[self.connection.getNodePos(self.thirdCorner.node.nextN().parent)]
+                        segafter = self.connection.segments[
+                            self.connection.getNodePos(self.thirdCorner.node.nextN().parent)
+                        ]
 
                         segafter.setLine(
                             segafter.line().p1().x(),
@@ -418,7 +422,6 @@ class SegmentItemBase(QGraphicsItemGroup):
             self.disrAfterNode = self.startNode
             self.start = self.startNode.prevN().prevN()
 
-
             segments = self.connection.segments
             for s in segments:
                 if s.startNode is self.start:
@@ -433,7 +436,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         if (hasattr(self.endNode.parent, "fromPort")) and (self.endNode.nextN() is not None):
             self.disrBeforeNode = self.endNode
             self.end = self.endNode.nextN().nextN()
-
 
             segments = self.connection.segments
             for s in segments:
@@ -477,7 +479,6 @@ class SegmentItemBase(QGraphicsItemGroup):
 
                 self.secondCorner = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
                 self.thirdCorner = CornerItem(
-
                     -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
                 )
 
@@ -511,7 +512,6 @@ class SegmentItemBase(QGraphicsItemGroup):
 
                 self.secondCorner = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
                 self.thirdCorner = CornerItem(
-
                     -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
                 )
 
@@ -540,7 +540,6 @@ class SegmentItemBase(QGraphicsItemGroup):
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
         raise NotImplementedError()
-
 
     def isVertical(self):
         return self.line().p1().x() == self.line().p2().x()

@@ -86,7 +86,6 @@ class buildDck:
             return
         self.overwriteForcedByUser = deck.overwriteForcedByUser
 
-
         result = deck.checkTrnsysDeck(deck.nameDeck, check=self.inputs["checkDeck"])
         if _res.isError(result):
             return _res.error(result)

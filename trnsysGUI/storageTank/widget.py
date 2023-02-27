@@ -57,7 +57,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         idGenerator: _id.IdGenerator = self.editor.idGen
         self.nTes = idGenerator.getStoragenTes()
-        self.storageType =idGenerator.getStorageType()
+        self.storageType = idGenerator.getStorageType()
 
         self.changeSize()
 

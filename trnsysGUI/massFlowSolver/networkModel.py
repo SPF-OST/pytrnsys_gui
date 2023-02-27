@@ -143,7 +143,7 @@ class Pump(TwoNeighboursBase):
 class ThreeNeighboursBase(Node, _abc.ABC):
     def __init__(
         self, inputPort: PortItem, output1Port: PortItem, output2Port: PortItem, name: _tp.Optional[str] = None
-) -> None:
+    ) -> None:
         super().__init__(name)
         self.input = inputPort
         self.output1 = output1Port

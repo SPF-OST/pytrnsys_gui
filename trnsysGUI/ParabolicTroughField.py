@@ -57,8 +57,8 @@ class ParabolicTroughField(BlockItem, _ip.HasInternalPiping):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[4*delta, h]]
-        self.origOutputsPos = [[4*delta, 0]]
+        self.origInputsPos = [[4 * delta, h]]
+        self.origOutputsPos = [[4 * delta, 0]]
 
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])

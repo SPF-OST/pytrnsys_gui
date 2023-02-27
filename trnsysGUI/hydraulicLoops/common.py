@@ -47,8 +47,8 @@ Cancellable = _tp.Union[_tp.Literal["cancelled"], T]
 
 
 def setConnectionsSelected(
-        connections: _tp.Iterable[_spc.SinglePipeConnection],  # type: ignore[name-defined]
-        isSelected: bool) -> None:
+    connections: _tp.Iterable[_spc.SinglePipeConnection], isSelected: bool  # type: ignore[name-defined]
+) -> None:
     for connection in connections:
         if isSelected:
             connection.selectConnection()

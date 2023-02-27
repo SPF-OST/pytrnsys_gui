@@ -2,9 +2,7 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-def getMassFlowVariableName(
-    hasInternalPiping: _ip.HasInternalPiping, node: _mfn.Node, portItem: _mfn.PortItem
-) -> str:
+def getMassFlowVariableName(hasInternalPiping: _ip.HasInternalPiping, node: _mfn.Node, portItem: _mfn.PortItem) -> str:
     if portItem not in node.getPortItems():
         raise ValueError("`portItem` not one of `node`'s port items.")
 
@@ -17,9 +15,7 @@ def getMassFlowVariableName(
     return f"M{displayName}{nodeNameOrEmpty}_{postfix}"
 
 
-def getCanonicalMassFlowVariableName(
-    hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe
-) -> str:
+def getCanonicalMassFlowVariableName(hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe) -> str:
     pipeNameOrEmpty = pipe.name or ""
     return f"M{hasInternalPiping.getDisplayName()}{pipeNameOrEmpty}"
 
