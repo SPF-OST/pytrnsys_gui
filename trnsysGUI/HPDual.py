@@ -170,10 +170,10 @@ class HPDual(BlockItem, _ip.HasInternalPiping):
     def getSubBlockOffset(self, c):
         for i in range(3):
             if (
-                    self.inputs[i] == c.toPort
-                    or self.inputs[i] == c.fromPort
-                    or self.outputs[i] == c.toPort
-                    or self.outputs[i] == c.fromPort
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
             ):
                 return i
 

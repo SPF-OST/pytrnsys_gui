@@ -86,7 +86,5 @@ class ModifyRelativeHeightsDialog(_qwt.QDialog):
     @staticmethod
     def _showFormattingError(portName: str) -> None:
         messageBox = _qwt.QMessageBox()
-        messageBox.setText(
-            f"Value for '{portName}' must be an integer between 1 and 99 inclusive."
-        )
+        messageBox.setText(f"Value for '{portName}' must be an integer between 1 and 99 inclusive.")
         messageBox.exec()

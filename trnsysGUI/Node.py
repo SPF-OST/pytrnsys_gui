@@ -1,6 +1,7 @@
 # pylint: skip-file
 # type: ignore
 
+
 class Node(object):
     def __init__(self, parent=None, prevNode=None, nextNode=None):
         """

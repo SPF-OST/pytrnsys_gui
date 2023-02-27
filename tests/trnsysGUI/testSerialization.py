@@ -39,9 +39,7 @@ class PersonVersion1(_ser.UpgradableJsonSchemaMixin):
 
         lastName = ""
         heightInCm = round(superseded.heightInM * 100)
-        return PersonVersion1(
-            superseded.firstName, lastName, superseded.age, heightInCm
-        )
+        return PersonVersion1(superseded.firstName, lastName, superseded.age, heightInCm)
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
@@ -140,9 +138,7 @@ class TestSerialization:
         person0 = PersonVersion0(firstName="Damian", age=32, heightInM=1.73)
         assert person0.to_dict() == self.SERIALIZED_P0
 
-        person1 = PersonVersion1(
-            firstName="Damian", lastName="Birchler", age=32, heightInCm=173
-        )
+        person1 = PersonVersion1(firstName="Damian", lastName="Birchler", age=32, heightInCm=173)
         assert person1.to_dict() == self.SERIALIZED_P1
 
         person = Person(title="Mr.", lastName="Birchler", ageInYears=32, heightInCm=173)
@@ -233,9 +229,7 @@ class TestSerialization:
                             "ageInYears: int, "
                             "heightInCm: int)",
                             "properties": {
-                                "__version__": {
-                                    "const": "1774d088-3917-4c29-a76a-0a4514ef6cf5"
-                                },
+                                "__version__": {"const": "1774d088-3917-4c29-a76a-0a4514ef6cf5"},
                                 "ageInYears": {"type": "integer"},
                                 "heightInCm": {"type": "integer"},
                                 "lastName": {"type": "string"},
@@ -254,13 +248,9 @@ class TestSerialization:
                     ]
                 },
                 "PersonVersion0": {
-                    "description": "PersonVersion0(firstName: "
-                    "str, age: int, heightInM: "
-                    "float)",
+                    "description": "PersonVersion0(firstName: " "str, age: int, heightInM: " "float)",
                     "properties": {
-                        "__version__": {
-                            "const": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b"
-                        },
+                        "__version__": {"const": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b"},
                         "age": {"type": "integer"},
                         "firstName": {"type": "string"},
                         "heightInM": {"type": "number"},
@@ -277,9 +267,7 @@ class TestSerialization:
                             "heightInCm: "
                             "int)",
                             "properties": {
-                                "__version__": {
-                                    "const": "70d5694f-032c-4ca8-b13c-c020b05f2179"
-                                },
+                                "__version__": {"const": "70d5694f-032c-4ca8-b13c-c020b05f2179"},
                                 "age": {"type": "integer"},
                                 "firstName": {"type": "string"},
                                 "heightInCm": {"type": "integer"},
@@ -308,10 +296,7 @@ class TestSerialization:
         }
         team = Team.from_json(json)
 
-        expectedMembers = [
-            Person.from_dict(d)
-            for d in [self.SERIALIZED_P0, self.SERIALIZED_P1, self.SERIALIZED_P]
-        ]
+        expectedMembers = [Person.from_dict(d) for d in [self.SERIALIZED_P0, self.SERIALIZED_P1, self.SERIALIZED_P]]
 
         assert team.members == expectedMembers
 

@@ -41,20 +41,20 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-man
 
     @classmethod
     def from_dict(
-            cls,
-            data: _dcj.JsonDict,  # pylint: disable=duplicate-code
-            validate=True,
-            validate_enums: bool = True,
+        cls,
+        data: _dcj.JsonDict,  # pylint: disable=duplicate-code
+        validate=True,
+        validate_enums: bool = True,
     ) -> "BlockItemModel":
         del data[".__BlockDict__"]
         blockItemModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(BlockItemModel, blockItemModel)
 
     def to_dict(
-            self,
-            omit_none: bool = True,
-            validate: bool = False,
-            validate_enums: bool = True,  # pylint: disable=duplicate-code
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True

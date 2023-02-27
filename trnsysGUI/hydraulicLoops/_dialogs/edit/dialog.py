@@ -220,7 +220,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         )
         messageBox.setStandardButtons(messageBox.Yes | messageBox.No)
         pressedButton = messageBox.exec()
-        shallContinue = (pressedButton == messageBox.Yes)
+        shallContinue = pressedButton == messageBox.Yes
         return shallContinue
 
     def _setUseLoopWideDefaults(self, isSet: bool) -> None:
@@ -423,7 +423,7 @@ class _ConnectionsUiModel(_qtc.QAbstractItemModel):
             return False
 
         if role == _qtc.Qt.CheckStateRole:
-            value = (value == _qtc.Qt.Checked)
+            value = value == _qtc.Qt.Checked
 
         connection, prop = self._getConnectionAndProperty(index)
 

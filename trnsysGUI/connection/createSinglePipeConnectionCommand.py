@@ -18,10 +18,10 @@ if _tp.TYPE_CHECKING:
 
 class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
     def __init__(
-            self,
-            fromPort: _spi.SinglePipePortItem,
-            toPort: _spi.SinglePipePortItem,
-            editor: _ed.Editor,  # type: ignore[name-defined]
+        self,
+        fromPort: _spi.SinglePipePortItem,
+        toPort: _spi.SinglePipePortItem,
+        editor: _ed.Editor,  # type: ignore[name-defined]
     ):
         super().__init__("Create single pipe connection")
         self._fromPort = fromPort

@@ -20,15 +20,13 @@ class GlobalNetwork:
 
 
 def getGlobalNetwork(hasInternalPipings: _tp.Sequence[_ip.HasInternalPiping]) -> GlobalNetwork:
-    allNodesWithParent, modelsToGraphicalPortItem = (
-        _getAllNodesWithParentAndModelsToGraphicalPortItem(hasInternalPipings)
+    allNodesWithParent, modelsToGraphicalPortItem = _getAllNodesWithParentAndModelsToGraphicalPortItem(
+        hasInternalPipings
     )
 
     allNodes = [nwp.node for nwp in allNodesWithParent]
 
-    modelPortItemsToNode = {
-        mpi: n for n in allNodes for mpi in n.getPortItems()
-    }
+    modelPortItemsToNode = {mpi: n for n in allNodes for mpi in n.getPortItems()}
 
     graphicalPortItemsToModels = _getGraphicalPortItemsToModels(modelsToGraphicalPortItem)
 
@@ -78,9 +76,7 @@ def _getInternalPortItemToExternalNode(
             graphicalPortItem = modelsToGraphicalPortItem[portItem]
             candidates = graphicalPortItemsToModels[graphicalPortItem]
 
-            externalPortItem = _com.getSingle(
-                c for c in candidates if c != portItem and c.canOverlapWith(portItem)
-            )
+            externalPortItem = _com.getSingle(c for c in candidates if c != portItem and c.canOverlapWith(portItem))
 
             externalNode = modelPortItemsToNode[externalPortItem]
 

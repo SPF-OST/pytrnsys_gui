@@ -58,9 +58,7 @@ class _CreateNewOrOpenExisting(_enum.Enum):
     OPEN_EXISTING = _enum.auto()
 
 
-def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _ccl.MaybeCancelled[
-    _CreateNewOrOpenExisting
-]:
+def _askUserWhetherToCreateNewProjectOrOpenExisting() -> _ccl.MaybeCancelled[_CreateNewOrOpenExisting]:
     messageBox = _qtw.QMessageBox()
     messageBox.setWindowTitle("Start a new or open an existing project")
     messageBox.setText("Do you want to start a new project or open an existing one?")
@@ -143,9 +141,7 @@ def _isEmptyDirectory(path: _pl.Path) -> bool:
 
 
 def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[_tp.Union[LoadProject, MigrateProject]]:
-    projectFolderPathString, _ = _qtw.QFileDialog.getOpenFileName(
-        caption="Open diagram", filter="*.json"
-    )
+    projectFolderPathString, _ = _qtw.QFileDialog.getOpenFileName(caption="Open diagram", filter="*.json")
     if not projectFolderPathString:
         return _ccl.CANCELLED
     jsonFilePath = _pl.Path(projectFolderPathString)
@@ -169,9 +165,7 @@ def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[_tp.Union[LoadProject, Migr
         if result == _qtw.QMessageBox.Cancel:
             return _ccl.CANCELLED
 
-        maybeCancelled = getExistingEmptyDirectory(
-            startingDirectoryPath=projectFolderPath.parent
-        )
+        maybeCancelled = getExistingEmptyDirectory(startingDirectoryPath=projectFolderPath.parent)
         if _ccl.isCancelled(maybeCancelled):
             return _ccl.CANCELLED
         newProjectFolderPath = _ccl.value(maybeCancelled)
