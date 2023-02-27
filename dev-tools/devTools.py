@@ -17,72 +17,7 @@ _SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
 
 
 def main():
-    parser = ap.ArgumentParser()
-
-    parser.add_argument(
-        "-k",
-        "--keep-results",
-        help="Don't clean test results",
-        action="store_true",
-        dest="shallKeepResults",
-    )
-    parser.add_argument(
-        "-s",
-        "--static-checks",
-        help="Perform linting and type checking",
-        action="store_true",
-        dest="shallPerformStaticChecks",
-    )
-    parser.add_argument(
-        "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
-    )
-    parser.add_argument("-b", "--black", help="Check formatting", action="store_true", dest="shallCheckFormatting")
-    parser.add_argument(
-        "-t",
-        "--type",
-        help="Perform type checking",
-        type=str,
-        default=None,
-        const="",
-        nargs="?",
-        dest="mypyArguments",
-    )
-    parser.add_argument(
-        "-u",
-        "--unit",
-        help="Perform unit tests",
-        type=str,
-        default=None,
-        const="",
-        nargs="?",
-        dest="pytestMarkersExpression",
-    )
-    parser.add_argument(
-        "-d",
-        "--diagram",
-        help="Create package and class diagrams",
-        nargs="?",
-        default=None,
-        const="pdf",
-        choices=["pdf", "dot"],
-        dest="diagramsFormat",
-    )
-    parser.add_argument(
-        "-a",
-        "--all",
-        help="Perform all checks",
-        action="store_true",
-        dest="shallRunAll",
-    )
-    parser.add_argument(
-        "-x",
-        "--executable",
-        help="Create executable using pyinstaller",
-        action="store_true",
-        dest="shallCreateExecutable",
-    )
-
-    arguments = parser.parse_args()
+    arguments = _parseArguments()
 
     testResultsDirPath = pl.Path("test-results")
 
@@ -163,6 +98,75 @@ def main():
         args = [*cmd, *additionalArgs, "tests"]
 
         sp.run(args, check=True)
+
+
+def _parseArguments() -> ap.Namespace:
+    parser = ap.ArgumentParser()
+
+    parser.add_argument(
+        "-k",
+        "--keep-results",
+        help="Don't clean test results",
+        action="store_true",
+        dest="shallKeepResults",
+    )
+    parser.add_argument(
+        "-s",
+        "--static-checks",
+        help="Perform linting and type checking",
+        action="store_true",
+        dest="shallPerformStaticChecks",
+    )
+    parser.add_argument(
+        "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
+    )
+    parser.add_argument("-b", "--black", help="Check formatting", action="store_true", dest="shallCheckFormatting")
+    parser.add_argument(
+        "-t",
+        "--type",
+        help="Perform type checking",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="mypyArguments",
+    )
+    parser.add_argument(
+        "-u",
+        "--unit",
+        help="Perform unit tests",
+        type=str,
+        default=None,
+        const="",
+        nargs="?",
+        dest="pytestMarkersExpression",
+    )
+    parser.add_argument(
+        "-d",
+        "--diagram",
+        help="Create package and class diagrams",
+        nargs="?",
+        default=None,
+        const="pdf",
+        choices=["pdf", "dot"],
+        dest="diagramsFormat",
+    )
+    parser.add_argument(
+        "-a",
+        "--all",
+        help="Perform all checks",
+        action="store_true",
+        dest="shallRunAll",
+    )
+    parser.add_argument(
+        "-x",
+        "--executable",
+        help="Create executable using pyinstaller",
+        action="store_true",
+        dest="shallCreateExecutable",
+    )
+    arguments = parser.parse_args()
+    return arguments
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:

@@ -63,8 +63,8 @@ class _Splitter:
             return None
 
         isConnectionRedundant = (
-            fromConnections == otherConnections
-            or toConnections == otherConnections  # pylint: disable=consider-using-in
+            fromConnections == otherConnections  # pylint: disable=consider-using-in
+            or toConnections == otherConnections
         )
         if isConnectionRedundant:
             assert (not fromConnections or fromConnections == otherConnections) and (
