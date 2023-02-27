@@ -36,6 +36,7 @@ def main():
     parser.add_argument(
         "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
     )
+    parser.add_argument("-b", "--black", help="Check formatting", action="store_true", dest="shallCheckFormatting")
     parser.add_argument(
         "-t",
         "--type",
@@ -97,6 +98,11 @@ def main():
         additionalArgs = arguments.lintArguments or ""
 
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
+
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting is not None:
+        cmd = "black -l 121 --check trnsysGUI tests dev-tools"
+
+        sp.run(cmd.split(), check=True)
 
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
