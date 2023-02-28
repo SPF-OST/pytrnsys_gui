@@ -656,6 +656,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
 
+    # defined in BlockItem and in HasInternalPiping???
     def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
 

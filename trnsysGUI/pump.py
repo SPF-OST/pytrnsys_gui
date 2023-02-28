@@ -33,6 +33,8 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
 
         self.changeSize()
 
+    # =============================
+    # implements hasInternalPiping
     def getDisplayName(self) -> str:
         return self.displayName
 
@@ -42,6 +44,19 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
     def shallRenameOutputTemperaturesInHydraulicFile(self):
         return False
 
+    # does this need to be here?
+    def getInternalPiping(self) -> _ip.InternalPiping:
+        modelPortItemsToGraphicalPortItem = {
+            self._modelPump.fromPort: self.inputs[0],
+            self._modelPump.toPort: self.outputs[0],
+        }
+        return _ip.InternalPiping([self._modelPump], modelPortItemsToGraphicalPortItem)
+
+    # implements hasInternalPiping
+    # =============================
+
+    # =============================
+    # implements blockItem
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PUMP_SVG
 
@@ -71,27 +86,6 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
 
         return width, height
-
-    def exportPumpOutlets(self):
-        temperatureVariableName = _temps.getTemperatureVariableName(self, self._modelPump)
-        inputConnection = self.inputs[0].getConnection()
-        inputConnectionNode = inputConnection.getInternalPiping().getNode(self.inputs[0], _mfn.PortItemType.STANDARD)
-        inputTemperatureVariable = _temps.getTemperatureVariableName(inputConnection, inputConnectionNode)
-        equation = f"{temperatureVariableName} = {inputTemperatureVariable}\n"
-        equationNr = 1
-        return equation, equationNr
-
-    def exportMassFlows(self):
-        equationNr = 1
-        massFlowLine = f"Mfr{self.displayName} = {self.massFlowRateInKgPerH}\n"
-        return massFlowLine, equationNr
-
-    def getInternalPiping(self) -> _ip.InternalPiping:
-        modelPortItemsToGraphicalPortItem = {
-            self._modelPump.fromPort: self.inputs[0],
-            self._modelPump.toPort: self.outputs[0],
-        }
-        return _ip.InternalPiping([self._modelPump], modelPortItemsToGraphicalPortItem)
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         inputPortIds = [p.id for p in self.inputs]
@@ -133,6 +127,22 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
 
         resBlockList.append(self)
 
+    def exportPumpOutlets(self):
+        temperatureVariableName = _temps.getTemperatureVariableName(self, self._modelPump)
+        inputConnection = self.inputs[0].getConnection()
+        inputConnectionNode = inputConnection.getInternalPiping().getNode(self.inputs[0], _mfn.PortItemType.STANDARD)
+        inputTemperatureVariable = _temps.getTemperatureVariableName(inputConnection, inputConnectionNode)
+        equation = f"{temperatureVariableName} = {inputTemperatureVariable}\n"
+        equationNr = 1
+        return equation, equationNr
+
+    def exportMassFlows(self):
+        equationNr = 1
+        massFlowLine = f"Mfr{self.displayName} = {self.massFlowRateInKgPerH}\n"
+        return massFlowLine, equationNr
+    # implements blockItem
+    # =============================
+
 
 @_dc.dataclass
 class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
@@ -151,19 +161,19 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
 
     @classmethod
     def from_dict(
-        cls,  # pylint: disable = duplicate-code 2
-        data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
-        validate=True,
-        validate_enums: bool = True,
+            cls,  # pylint: disable = duplicate-code 2
+            data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
+            validate=True,
+            validate_enums: bool = True,
     ) -> "PumpModel":
         pumpModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(PumpModel, pumpModel)
 
     def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code 2
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,  # pylint: disable=duplicate-code 2
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
