@@ -61,6 +61,7 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
 
     # =============================
     # implements blockItem
+    # todo: turn this into a setter in the parent setImage(_img.PUMP_SVG), which gives image to _getImageAccessor
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PUMP_SVG
 

@@ -36,12 +36,10 @@ FILEPATH = "res/Config.txt"
 # - TeePiece
 # - SingleDoublePipeConnector
 # - DoubleDoublePipeConnector
-# - Pump
 # - TVentil
-# - PitStorage
+# - Pump
 # - WTap_main
 # - Connector
-# - Boiler
 # - Crystalizer
 # -
 # -
@@ -53,8 +51,10 @@ FILEPATH = "res/Config.txt"
 # - Collector <- addTree and deleteBlock
 # - HeatPump <- addTree and deleteBlock
 # - IceStorage <- addTree and deleteBlock
+# - PitStorage <- addTree and deleteBlock
 # - Radiator <- addTree and deleteBlock
 # - WTap <- addTree and deleteBlock
+# - Boiler <- addTree and deleteBlock
 # - AirSourceHP <- addTree and deleteBlock
 # - PV <- addTree and deleteBlock
 # - GroundSourceHx <- addTree and deleteBlock
