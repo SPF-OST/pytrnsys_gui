@@ -32,6 +32,47 @@ FILEPATH = "res/Config.txt"
         # setParent may help copying between GUI versions, or allow us to open two diagrams simultaneously.
         #
 
+# children of BlockItem which only pass on editor to this Class:
+# - TeePiece
+# - SingleDoublePipeConnector
+# - DoubleDoublePipeConnector
+# - Pump
+# - TVentil
+# - PitStorage
+# - WTap_main
+# - Connector
+# - Boiler
+# - Crystalizer
+# -
+# -
+# -
+
+# children of BlockItem which use editor themselves:
+# - DoublePipeTeePiece <- only for childrenIds
+# - SourceSinkBase [Source, Sink, SourceSink, Geotherm, Water] <- only for _updateDdckFilePath
+# - Collector <- addTree and deleteBlock
+# - HeatPump <- addTree and deleteBlock
+# - IceStorage <- addTree and deleteBlock
+# - Radiator <- addTree and deleteBlock
+# - WTap <- addTree and deleteBlock
+# - AirSourceHP <- addTree and deleteBlock
+# - PV <- addTree and deleteBlock
+# - GroundSourceHx <- addTree and deleteBlock
+# - ExternalHx <- addTree and deleteBlock
+# - IceStorageTwoHx <- addTree and deleteBlock
+# - Control <- addTree and deleteBlock
+# - SteamPowerBlock <- addTree and deleteBlock
+# - ParabolicTroughField <- addTree and deleteBlock
+# - CentralReceiver <- addTree and deleteBlock
+# - SaltTankBase [SaltTankCold, SaltTankHot] <- addTree and deleteBlock
+# - HeatPumpTwoHx <- addTree, deleteBlock, childrenIds
+# - HPDoubleDual <- addTree, deleteBlock, childrenIds
+# - HPDual <- addTree, deleteBlock, childrenIds
+# - StorageTank <- addTree, deleteBlock, mouseDoubleClickEvent
+# - GenericBlock <- addTree, deleteBlock, addPortDlg, pickImage, addPortPair,
+# - GraphicalItem <- loadAction, setParent, deleteBlock
+# - MasterControl <- createControlDir, deleteBlock
+
 # todo: can we put all logging into (intermediate) parent?
 
 

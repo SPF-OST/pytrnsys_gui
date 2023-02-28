@@ -35,16 +35,20 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
 
     # =============================
     # implements hasInternalPiping
+    # todo: this first one does not make sense. Why is this not the default of BlockItem?
     def getDisplayName(self) -> str:
         return self.displayName
 
+    # todo: use a setter in the parent instead: self.setHasDdckPlaceHolders(False) and have this in the parent
     def hasDdckPlaceHolders(self) -> bool:
         return False
 
+    # todo: use a setter in the parent instead: self.setHasDdckPlaceHolders(False) and have this in the parent
     def shallRenameOutputTemperaturesInHydraulicFile(self):
         return False
 
     # Would this fit better elsewhere?
+    # todo: this is inherited from both parents???
     def getInternalPiping(self) -> _ip.InternalPiping:
         modelPortItemsToGraphicalPortItem = {
             self._modelPump.fromPort: self.inputs[0],

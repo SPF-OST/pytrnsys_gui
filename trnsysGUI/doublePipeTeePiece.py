@@ -29,6 +29,7 @@ class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
 
         self.changeSize()
 
+        # todo: why are the children of this teePiece provided with ids here?
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.editor.idGen.getTrnsysID())
