@@ -19,12 +19,28 @@ from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
 from trnsysGUI.blockItemModel import BlockItemModel
 
 FILEPATH = "res/Config.txt"
+    # def __init__
+        # self.logger = editor.logger   <- just needs logger, not editor
+        # self.editor = editor
+        #     self.editor.trnsysObj.append(self)    <- is exactly the behavior we could use after instantiating.
+        # self.id = self.editor.idGen.getID()       <- could be done when adding to trnsysObj list
+        # self.trnsysId = self.editor.idGen.getTrnsysID()   <- could be done when adding to trnsysObj list
+
+        # self.id mainly matters for displayName. could be done upon adding to editor
+        # self.trnsysId is not used here, except for encoding, thus wouldn't be needed before adding to editor
+        #
+        # setParent may help copying between GUI versions, or allow us to open two diagrams simultaneously.
+        #
+
+# todo: can we put all logging into (intermediate) parent?
 
 
 # pylint: disable = fixme
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
+    # ===============================
+    # Needs Editor
     def __init__(self, trnsysType, editor, displayNamePrefix=None, displayName=None, **kwargs):
         super().__init__(None)
 
@@ -82,6 +98,178 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.origOutputsPos = None
         self.origInputsPos = None
 
+    def setParent(self, p):
+        self.editor = p
+
+        if self not in self.editor.trnsysObj:
+            self.editor.trnsysObj.append(self)
+
+    # todo: move this outside of the block item, and provide the instance to such methods.
+    def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
+        if hasattr(self, "isTempering"):
+            self.editor.showTVentilDlg(self)
+        elif self.name == "Pump":
+            self.editor.showPumpDlg(self)
+        elif self.name in ("TeePiece", "WTap_main"):
+            self.editor.showBlockDlg(self)
+        elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
+            self.editor.showDoublePipeBlockDlg(self)
+        else:
+            self.editor.showBlockDlg(self)
+            if len(self.propertyFile) > 0:
+                for files in self.propertyFile:
+                    os.startfile(files, "open")
+
+    # todo: move this outside of the block item, and provide the instance to such methods.
+    def mouseReleaseEvent(self, event):
+        # self.logger.debug("Released mouse over block")
+        if self.oldPos is None:
+            self.logger.debug("For Undo Framework: oldPos is None")
+        else:
+            if self.scenePos() != self.oldPos:
+                self.logger.debug("Block was dragged")
+                self.logger.debug("Old pos is" + str(self.oldPos))
+                command = MoveCommand(self, self.oldPos, "Move BlockItem")
+                self.editor.parent().undoStack.push(command)
+                self.oldPos = self.scenePos()
+
+        super().mouseReleaseEvent(event)
+
+    # todo: move this outside of the block item, and provide the instance to such methods.
+    def deleteBlock(self):
+        self.editor.trnsysObj.remove(self)
+        self.editor.diagramScene.removeItem(self)
+        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
+        if widgetToRemove:
+            widgetToRemove.hide()
+
+    # todo: move this outside of the block item, and provide the instance to such methods.
+    def deleteBlockCom(self):
+        self.editor.diagramView.deleteBlockCom(self)
+
+    # todo: move this outside of the block item, and provide the instance to such methods.
+    def itemChange(self, change, value):  # method that requires some information about the specific item
+        # Snap grid excludes alignment
+
+        if change == self.ItemPositionChange:
+            if self.editor.snapGrid:
+                snapSize = self.editor.snapSize
+                self.logger.debug("itemchange")
+                self.logger.debug(type(value))
+                value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
+                return value
+            if self.editor.alignMode:
+                if self.hasElementsInYBand():
+                    return self.alignBlock(value)
+            return value
+        return super().itemChange(change, value)
+
+    # todo: move this outside of the block item, and provide the instance to such methods.
+    def alignBlock(self, value):
+        for t in self.editor.trnsysObj:
+            if isinstance(t, BlockItem) and t is not self:
+                if self.elementInYBand(t):
+                    value = QPointF(self.pos().x(), t.pos().y())
+                    self.editor.alignYLineItem.setLine(
+                        self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
+                    )
+
+                    self.editor.alignYLineItem.setVisible(True)
+
+                    qtm = QTimer(self.editor)
+                    qtm.timeout.connect(self.timerfunc)
+                    qtm.setSingleShot(True)
+                    qtm.start(1000)
+
+                    e = QMouseEvent(
+                        QEvent.MouseButtonRelease,
+                        self.pos(),
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoModifier,
+                    )
+                    self.editor.diagramView.mouseReleaseEvent(e)
+                    self.editor.alignMode = False
+
+                if self.elementInXBand(t):
+                    value = QPointF(t.pos().x(), self.pos().y())
+                    self.editor.alignXLineItem.setLine(
+                        t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
+                    )
+
+                    self.editor.alignXLineItem.setVisible(True)
+
+                    qtm = QTimer(self.editor)
+                    qtm.timeout.connect(self.timerfunc2)
+                    qtm.setSingleShot(True)
+                    qtm.start(1000)
+
+                    e = QMouseEvent(
+                        QEvent.MouseButtonRelease,
+                        self.pos(),
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoButton,
+                        QtCore.Qt.NoModifier,
+                    )
+                    self.editor.diagramView.mouseReleaseEvent(e)
+                    self.editor.alignMode = False
+
+        return value
+
+    # todo: this name does not provide meaningful information: seems to be about disabling horizontal alignment line
+    def timerfunc(self):
+        self.editor.alignYLineItem.setVisible(False)
+
+    # todo: this name does not provide meaningful information: seems to be about disabling vertical alignment line
+    def timerfunc2(self):
+        self.editor.alignXLineItem.setVisible(False)
+
+    # todo: overlapWithOtherTrnsysObj??? combine x and y
+    def hasElementsInYBand(self):
+        for t in self.editor.trnsysObj:
+            if isinstance(t, BlockItem):
+                if self.elementInYBand(t):
+                    return True
+
+        return False
+
+    # todo: overlapWithOtherTrnsysObj??? combine x and y
+    def hasElementsInXBand(self):
+        for t in self.editor.trnsysObj:
+            if isinstance(t, BlockItem):
+                if self.elementInXBand(t):
+                    return True
+
+        return False
+
+    def elementInY(self):
+        for t in self.editor.trnsysObj:
+            if isinstance(t, BlockItem):
+                if self.scenePos().y == t.scenePos().y():
+                    return True
+        return False
+
+    # AlignMode related
+    def elementInYBand(self, t):
+        eps = 50
+        return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
+
+    def elementInXBand(self, t):
+        eps = 50
+        return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
+
+    # todo: is this ddck specific? loadedFiles does not exist in this Class, cannot find it in parents
+    def deleteLoadedFile(self):
+        for items in self.loadedFiles:
+            try:
+                self.editor.fileList.remove(str(items))
+            except ValueError:
+                self.logger.debug("File already deleted from file list.")
+                self.logger.debug("filelist:", self.editor.fileList)
+
+    # needs Editor
+    # ===============================
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if isinstance(self, BlockItem):
             raise AssertionError("`BlockItem' cannot be instantiated directly.")
@@ -108,11 +296,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         pass
 
     # Setter functions
-    def setParent(self, p):
-        self.editor = p
-
-        if self not in self.editor.trnsysObj:
-            self.editor.trnsysObj.append(self)
 
     def setId(self, newId):
         self.id = newId
@@ -154,35 +337,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def launchNotepadFile(self):
         self.logger.debug("Launching notpad")
         os.system("start notepad++ " + FILEPATH)
-
-    def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
-        if hasattr(self, "isTempering"):
-            self.editor.showTVentilDlg(self)
-        elif self.name == "Pump":
-            self.editor.showPumpDlg(self)
-        elif self.name in ("TeePiece", "WTap_main"):
-            self.editor.showBlockDlg(self)
-        elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
-            self.editor.showDoublePipeBlockDlg(self)
-        else:
-            self.editor.showBlockDlg(self)
-            if len(self.propertyFile) > 0:
-                for files in self.propertyFile:
-                    os.startfile(files, "open")
-
-    def mouseReleaseEvent(self, event):
-        # self.logger.debug("Released mouse over block")
-        if self.oldPos is None:
-            self.logger.debug("For Undo Framework: oldPos is None")
-        else:
-            if self.scenePos() != self.oldPos:
-                self.logger.debug("Block was dragged")
-                self.logger.debug("Old pos is" + str(self.oldPos))
-                command = MoveCommand(self, self.oldPos, "Move BlockItem")
-                self.editor.parent().undoStack.push(command)
-                self.oldPos = self.scenePos()
-
-        super().mouseReleaseEvent(event)
 
     # Transform related
     def changeSize(self):
@@ -373,16 +527,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def printRotation(self):
         self.logger.debug("Rotation is " + str(self.rotationN))
 
-    def deleteBlock(self):
-        self.editor.trnsysObj.remove(self)
-        self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        if widgetToRemove:
-            widgetToRemove.hide()
-
-    def deleteBlockCom(self):
-        self.editor.diagramView.deleteBlockCom(self)
-
     def getConnections(self):
         """
         Get the connections from inputs and outputs of this block.
@@ -461,111 +605,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
             self.logger.debug("No resizer")
         else:
             del self.resizer
-
-    # AlignMode related
-    def itemChange(self, change, value):
-        # Snap grid excludes alignment
-
-        if change == self.ItemPositionChange:
-            if self.editor.snapGrid:
-                snapSize = self.editor.snapSize
-                self.logger.debug("itemchange")
-                self.logger.debug(type(value))
-                value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
-                return value
-            if self.editor.alignMode:
-                if self.hasElementsInYBand():
-                    return self.alignBlock(value)
-            return value
-        return super().itemChange(change, value)
-
-    def alignBlock(self, value):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem) and t is not self:
-                if self.elementInYBand(t):
-                    value = QPointF(self.pos().x(), t.pos().y())
-                    self.editor.alignYLineItem.setLine(
-                        self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
-                    )
-
-                    self.editor.alignYLineItem.setVisible(True)
-
-                    qtm = QTimer(self.editor)
-                    qtm.timeout.connect(self.timerfunc)
-                    qtm.setSingleShot(True)
-                    qtm.start(1000)
-
-                    e = QMouseEvent(
-                        QEvent.MouseButtonRelease,
-                        self.pos(),
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoModifier,
-                    )
-                    self.editor.diagramView.mouseReleaseEvent(e)
-                    self.editor.alignMode = False
-
-                if self.elementInXBand(t):
-                    value = QPointF(t.pos().x(), self.pos().y())
-                    self.editor.alignXLineItem.setLine(
-                        t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
-                    )
-
-                    self.editor.alignXLineItem.setVisible(True)
-
-                    qtm = QTimer(self.editor)
-                    qtm.timeout.connect(self.timerfunc2)
-                    qtm.setSingleShot(True)
-                    qtm.start(1000)
-
-                    e = QMouseEvent(
-                        QEvent.MouseButtonRelease,
-                        self.pos(),
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoModifier,
-                    )
-                    self.editor.diagramView.mouseReleaseEvent(e)
-                    self.editor.alignMode = False
-
-        return value
-
-    def timerfunc(self):
-        self.editor.alignYLineItem.setVisible(False)
-
-    def timerfunc2(self):
-        self.editor.alignXLineItem.setVisible(False)
-
-    def hasElementsInYBand(self):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem):
-                if self.elementInYBand(t):
-                    return True
-
-        return False
-
-    def hasElementsInXBand(self):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem):
-                if self.elementInXBand(t):
-                    return True
-
-        return False
-
-    def elementInYBand(self, t):
-        eps = 50
-        return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
-
-    def elementInXBand(self, t):
-        eps = 50
-        return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
-
-    def elementInY(self):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem):
-                if self.scenePos().y == t.scenePos().y():
-                    return True
-        return False
 
     def encode(self):
         portListInputs = []
@@ -660,10 +699,4 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
 
-    def deleteLoadedFile(self):
-        for items in self.loadedFiles:
-            try:
-                self.editor.fileList.remove(str(items))
-            except ValueError:
-                self.logger.debug("File already deleted from file list.")
-                self.logger.debug("filelist:", self.editor.fileList)
+
