@@ -44,7 +44,7 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
     def shallRenameOutputTemperaturesInHydraulicFile(self):
         return False
 
-    # does this need to be here?
+    # Would this fit better elsewhere?
     def getInternalPiping(self) -> _ip.InternalPiping:
         modelPortItemsToGraphicalPortItem = {
             self._modelPump.fromPort: self.inputs[0],
@@ -159,26 +159,8 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
 
     massFlowRateInKgPerH: float
 
-    @classmethod
-    def from_dict(
-            cls,  # pylint: disable = duplicate-code 2
-            data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
-            validate=True,
-            validate_enums: bool = True,
-    ) -> "PumpModel":
-        pumpModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(PumpModel, pumpModel)
-
-    def to_dict(
-            self,
-            omit_none: bool = True,
-            validate: bool = False,
-            validate_enums: bool = True,  # pylint: disable=duplicate-code 2
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__BlockDict__"] = True
-        return data
-
+    # =====================================
+    # implements UpgradableJsonSchemaMixin
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
         return _bim.BlockItemModel
@@ -200,7 +182,33 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
             superseded.rotationN,
             _DEFAULT_MASS_FLOW_RATE,
         )
+    # implements UpgradableJsonSchemaMixin
+    # =====================================
+
+    # =====================================
+    # implements UpgradableJsonSchemaMixinVersion0
+    @classmethod
+    def from_dict(  # this duplicates the parent, what is actually needed?
+            cls,  # pylint: disable = duplicate-code 2
+            data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
+            validate=True,
+            validate_enums: bool = True,
+    ) -> "PumpModel":
+        pumpModel = super().from_dict(data, validate, validate_enums)
+        return _tp.cast(PumpModel, pumpModel)
+
+    def to_dict(
+            self,
+            omit_none: bool = True,
+            validate: bool = False,
+            validate_enums: bool = True,  # pylint: disable=duplicate-code 2
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums)
+        data[".__BlockDict__"] = True
+        return data
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("9552365f-ef11-4fac-ba35-644e94b54088")
+    # implements UpgradableJsonSchemaMixinVersion0
+    # =====================================
