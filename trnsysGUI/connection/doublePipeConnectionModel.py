@@ -27,7 +27,7 @@ class DoublePipeConnectionModelVersion0(  # pylint: disable=too-many-instance-at
 
 
 @_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name

@@ -123,6 +123,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
 
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
+        self.lengthInM
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {

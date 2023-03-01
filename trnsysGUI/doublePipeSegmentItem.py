@@ -2,17 +2,18 @@ import typing as _tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QLineF
-from PyQt5.QtWidgets import QGraphicsLineItem
+from PyQt5.QtWidgets import QGraphicsLineItem, QMenu
 
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
-    from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]  #  pylint: disable=unused-import
+    from trnsysGUI.connection.connectionBase import \
+        ConnectionBase  # type: ignore[attr-defined]  #  pylint: disable=unused-import
 
 
 class DoublePipeSegmentItem(SegmentItemBase):
-    def __init__(self, startNode, endNode, parent: "ConnectionBase"):
+    def __init__(self, startNode, endNode, parent: "DoublePipeConnection"):
         super().__init__(startNode, endNode, parent)
 
         self.blueLine = QGraphicsLineItem(self)
@@ -20,6 +21,16 @@ class DoublePipeSegmentItem(SegmentItemBase):
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
         return DoublePipeSegmentItem(startNode, endNode, self.connection)
+
+    # def _getContextMenu(self) -> QMenu:
+    #     menu = super()._getContextMenu()
+    #
+    #     action = menu.addAction("Provide length")
+    #     action.triggered.connect(self.connection.lengthInM = float(self.LineEdit.text())
+    #         def setLength(self):
+    #     self.block)
+    #
+    #     return menu
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
