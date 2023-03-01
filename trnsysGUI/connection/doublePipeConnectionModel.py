@@ -8,8 +8,8 @@ from pytrnsys.utils import serialization as _ser
 
 
 @_dc.dataclass
-class DoublePipeConnectionModelVersion0(
-    _ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
+class DoublePipeConnectionModelVersion0(  # pylint: disable=too-many-instance-attributes
+                                _ser.UpgradableJsonSchemaMixinVersion0):
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -38,10 +38,29 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pyli
     fromPortId: int
     toPortId: int
     trnsysId: int
+    lengthInM: float
 
-    # @classmethod
-    # def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-    #     return DoublePipeConnectionModelVersion0
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return DoublePipeConnectionModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeConnectionModel":
+        assert isinstance(superseded, DoublePipeConnectionModelVersion0)
+
+        return DoublePipeConnectionModel(
+                superseded.connectionId,
+                superseded.name,
+                superseded.id,
+                superseded.childIds,
+                superseded.segmentsCorners,
+                superseded.labelPos,
+                superseded.massFlowLabelPos,
+                superseded.fromPortId,
+                superseded.toPortId,
+                superseded.trnsysId,
+                lengthInM=2.0
+        )
 
     @classmethod
     def from_dict(

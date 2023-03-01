@@ -45,6 +45,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
+        self.lengthInM = 2.0
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -102,6 +103,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
             self.fromPort.id,
             self.toPort.id,
             self.trnsysId,
+            self.lengthInM
         )
 
         dictName = "Connection-"
