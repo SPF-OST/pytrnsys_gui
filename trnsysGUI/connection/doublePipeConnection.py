@@ -384,5 +384,3 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def redo(self):
         self._connection.deleteConn()
         self._connection = None
-
-
