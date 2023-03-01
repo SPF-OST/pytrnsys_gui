@@ -3,12 +3,10 @@ from __future__ import annotations
 import dataclasses as _dc
 import enum as _enum
 import typing as _tp
-import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
-import dataclasses_jsonschema as _dcj
+from trnsysGUI.connection.doublePipeConnectionModel import DoublePipeConnectionModel
 
-import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
@@ -388,40 +386,3 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
         self._connection = None
 
 
-@_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
-    connectionId: int
-    name: str
-    id: int  # pylint: disable=invalid-name
-    childIds: _tp.List[int]
-    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
-    labelPos: _tp.Tuple[float, float]
-    massFlowLabelPos: _tp.Tuple[float, float]
-    fromPortId: int
-    toPortId: int
-    trnsysId: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "DoublePipeConnectionModel":
-        data.pop(".__ConnectionDict__")
-        doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__ConnectionDict__"] = True
-        return data
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("0810c9ea-85df-4431-bb40-3190c25c9161")
