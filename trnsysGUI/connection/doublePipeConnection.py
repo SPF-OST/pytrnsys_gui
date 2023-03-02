@@ -49,7 +49,6 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         self._updateModels(self.displayName)
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
-        self.lengthContainer = _dpcldlg.LengthContainer(self.lengthInM)
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -331,12 +330,6 @@ Hot: {formattedHotMassFlowAndTemperature}
 """
         for segment in self.segments:
             segment.labelMass.setPlainText(labelText)
-
-    def editLength(self):
-        _dpcldlg.doublePipeConnectionLengthDialog(self.lengthContainer)
-
-    def setLength(self):
-        self.lengthInM = self.lengthContainer.lengthInM
 
 
 class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):

@@ -4,11 +4,11 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QLineF
 from PyQt5.QtWidgets import QGraphicsLineItem, QMenu
 
-from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
+import trnsysGUI.connection.values as _values
 import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcldlg
+from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
-from trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog import LengthContainer
 
 if _tp.TYPE_CHECKING:
     from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
@@ -22,13 +22,12 @@ class DoublePipeSegmentItem(SegmentItemBase):
         self._doublePipeConnection = parent
         self.blueLine = QGraphicsLineItem(self)
         self.redLine = QGraphicsLineItem(self)
-        self.lengthContainer = None
+        self.lengthContainer = _dpcldlg.LengthContainer(_values.DEFAULT_LENGTH_IN_M)
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
         return DoublePipeSegmentItem(startNode, endNode, self.connection)
 
     def _getContextMenu(self) -> QMenu:
-        self.lengthContainer = self._doublePipeConnection.lengthContainer
         menu = super()._getContextMenu()
         action = menu.addAction("Provide length")
         action.triggered.connect(self.editLength)
