@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing as tp
+import typing as _tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QPointF
@@ -11,7 +11,7 @@ from trnsysGUI.CornerItem import CornerItem  # type: ignore[attr-defined]
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
-if tp.TYPE_CHECKING:
+if _tp.TYPE_CHECKING:
     from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection  # type: ignore[attr-defined]  # pylint: disable=unused-import
 
 

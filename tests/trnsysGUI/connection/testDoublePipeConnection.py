@@ -1,1 +1,1 @@
-import trnsysGUI.connection.doublePipeConnection as _dpc
+# import trnsysGUI.connection.doublePipeConnection as _dpc

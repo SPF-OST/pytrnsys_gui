@@ -39,7 +39,7 @@ class EnergyBalanceVariables(_enum.Enum):
     SOIL_INTERNAL_CHANGE = "SlInt"
 
 
-class DoublePipeConnection(_cb.ConnectionBase):
+class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
     def __init__(self, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem, parent):
         super().__init__(fromPort, toPort, parent)
 
@@ -49,7 +49,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
 
         self._updateModels(self.displayName)
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
-        self.lengthContainer = LengthContainer(self.lengthInM)
+        self.lengthContainer = _dpcldlg.LengthContainer(self.lengthInM)
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -355,8 +355,3 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def redo(self):
         self._connection.deleteConn()
         self._connection = None
-
-
-class LengthContainer:
-    def __init__(self, lengthInM):
-        self.lengthInM = lengthInM
