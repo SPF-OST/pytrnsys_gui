@@ -8,6 +8,7 @@ import PyQt5.QtWidgets as _qtw
 from trnsysGUI.connection.doublePipeConnectionModel import DoublePipeConnectionModel
 
 import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
@@ -45,7 +46,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
-        self.lengthInM = 2.0
+        self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -123,7 +124,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
 
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
-        self.lengthInM
+        self.lengthInM = model.lengthInM
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
@@ -154,12 +155,13 @@ class DoublePipeConnection(_cb.ConnectionBase):
         return unitText, nextUnitNumber
 
     def _getHeaderAndParameters(self, unitNumber: int) -> str:
+        lengthInM = _values.getConvertedValueOrName(self.lengthInM)
         headerAndParameters = f"""\
 UNIT {unitNumber} TYPE 9511
 ! {self.displayName}
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+{lengthInM}                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)

@@ -221,9 +221,9 @@ EQUATIONS 1
         loop = self._editor.hydraulicLoops.getLoopForExistingConnection(self)
         densityVar = _names.getDensityName(loop.name.value)
         specHeatVar = _names.getHeatCapacityName(loop.name.value)
-        lengthInM = _getConvertedValueOrName(self.lengthInM)
-        diameterInM = _getConvertedValueOrName(self.diameterInCm, 1 / 100)
-        uValueInkJPerHourM2K = _getConvertedValueOrName(self.uValueInWPerM2K, 60 * 60 / 1000)
+        lengthInM = _values.getConvertedValueOrName(self.lengthInM)
+        diameterInM = _values.getConvertedValueOrName(self.diameterInCm, 1 / 100)
+        uValueInkJPerHourM2K = _values.getConvertedValueOrName(self.uValueInWPerM2K, 60 * 60 / 1000)
         uValueInSIUnitsComment = (
             f" (= {self.uValueInWPerM2K} W/(m^2*K))" if isinstance(self.uValueInWPerM2K, float) else ""
         )
@@ -284,12 +284,3 @@ EQUATIONS 5
         label = _mfl.getFormattedMassFlowAndTemperature(massFlow, temperature)
         for segment in self.segments:
             segment.labelMass.setPlainText(label)
-
-
-def _getConvertedValueOrName(valueOrName: _values.Value, conversionFactor=1.0) -> _tp.Union[float, str]:
-    if isinstance(valueOrName, _values.Variable):
-        return valueOrName.name
-
-    value = valueOrName
-
-    return value * conversionFactor

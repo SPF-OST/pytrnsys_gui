@@ -1066,7 +1066,7 @@ UNIT 493 TYPE 9511
 ! DTeeB_DTeeC
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1145,7 +1145,7 @@ UNIT 494 TYPE 9511
 ! DTeeC_DTeeD
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1224,7 +1224,7 @@ UNIT 495 TYPE 9511
 ! DTeeD_DTeeE
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1303,7 +1303,7 @@ UNIT 496 TYPE 9511
 ! DTeeE_DTeeF
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1382,7 +1382,7 @@ UNIT 497 TYPE 9511
 ! DTeeF_DTeeG
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1461,7 +1461,7 @@ UNIT 498 TYPE 9511
 ! DTeeG_DTeeH
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1540,7 +1540,7 @@ UNIT 499 TYPE 9511
 ! DTeeH_DTeeI
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1619,7 +1619,7 @@ UNIT 500 TYPE 9511
 ! DTeeI_DTeeJ
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1698,7 +1698,7 @@ UNIT 501 TYPE 9511
 ! DTeeB_SCnrB
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1777,7 +1777,7 @@ UNIT 502 TYPE 9511
 ! DTeeC_SCnrC
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1856,7 +1856,7 @@ UNIT 503 TYPE 9511
 ! DTeeD_SCnrD
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1935,7 +1935,7 @@ UNIT 504 TYPE 9511
 ! DTeeE_SCnrE
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2014,7 +2014,7 @@ UNIT 505 TYPE 9511
 ! DTeeF_SCnrF
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2093,7 +2093,7 @@ UNIT 506 TYPE 9511
 ! DTeeG_SCnrG
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2172,7 +2172,7 @@ UNIT 507 TYPE 9511
 ! DTeeH_SCnrH
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2251,7 +2251,7 @@ UNIT 508 TYPE 9511
 ! DTeeI_SCnrI
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2330,7 +2330,7 @@ UNIT 509 TYPE 9511
 ! DTeeJ_SCnrJ
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2737,7 +2737,7 @@ UNIT 534 TYPE 9511
 ! DTeeJ_SCnrZ
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2830,7 +2830,7 @@ UNIT 536 TYPE 9511
 ! DTeeA_DTeeB
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2909,7 +2909,7 @@ UNIT 537 TYPE 9511
 ! DTeeA_SCnrA
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -2988,7 +2988,7 @@ UNIT 538 TYPE 9511
 ! SCnr1_DTeeA
 PARAMETERS 36
 ****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)

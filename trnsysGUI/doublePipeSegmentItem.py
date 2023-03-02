@@ -2,7 +2,7 @@ import typing as _tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QLineF
-from PyQt5.QtWidgets import QGraphicsLineItem, QMenu
+from PyQt5.QtWidgets import QGraphicsLineItem  #, QMenu
 
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
@@ -13,7 +13,7 @@ if _tp.TYPE_CHECKING:
 
 
 class DoublePipeSegmentItem(SegmentItemBase):
-    def __init__(self, startNode, endNode, parent: "DoublePipeConnection"):
+    def __init__(self, startNode, endNode, parent: "ConnectionBase"):
         super().__init__(startNode, endNode, parent)
 
         self.blueLine = QGraphicsLineItem(self)

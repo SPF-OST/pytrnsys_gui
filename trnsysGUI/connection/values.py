@@ -15,3 +15,12 @@ DEFAULT_DIAMETER_IN_CM = 2.0
 DEFAULT_LENGTH_IN_M = 2.0
 DEFAULT_U_VALUE_IN_W_PER_M2_K = 0.8333
 DEFAULT_SHALL_CREATE_TRNSYS_UNIT = True
+
+
+def getConvertedValueOrName(valueOrName: Value, conversionFactor=1.0) -> _tp.Union[float, str]:
+    if isinstance(valueOrName, Variable):
+        return valueOrName.name
+
+    value = valueOrName
+
+    return value * conversionFactor
