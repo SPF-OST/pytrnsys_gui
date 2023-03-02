@@ -2,11 +2,11 @@ import typing as _tp
 
 import trnsysGUI.connection.values as _values
 
-# if _tp.TYPE_CHECKING:
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+if _tp.TYPE_CHECKING:
+    from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 
 
-def getDoublePipeConnectionHeaderAndParameters(connection: DoublePipeConnection, unitNumber: int) -> str:
+def getDoublePipeConnectionHeaderAndParameters(connection: "DoublePipeConnection", unitNumber: int) -> str:
     lengthInM = _values.getConvertedValueOrName(connection.lengthInM)
     headerAndParameters = f"""\
 UNIT {unitNumber} TYPE 9511
