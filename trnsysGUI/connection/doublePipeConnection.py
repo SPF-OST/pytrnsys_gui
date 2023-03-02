@@ -6,6 +6,7 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 from trnsysGUI.connection.doublePipeConnectionModel import DoublePipeConnectionModel
+import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcldlg
 
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.values as _values
@@ -48,6 +49,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
 
         self._updateModels(self.displayName)
         self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+        self.lengthContainer = LengthContainer(self.lengthInM)
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -330,6 +332,12 @@ Hot: {formattedHotMassFlowAndTemperature}
         for segment in self.segments:
             segment.labelMass.setPlainText(labelText)
 
+    def editLength(self):
+        _dpcldlg.doublePipeConnectionLengthDialog(self.lengthContainer)
+
+    def setLength(self):
+        self.lengthInM = self.lengthContainer.lengthInM
+
 
 class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def __init__(
@@ -347,3 +355,8 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def redo(self):
         self._connection.deleteConn()
         self._connection = None
+
+
+class LengthContainer:
+    def __init__(self, lengthInM):
+        self.lengthInM = lengthInM
