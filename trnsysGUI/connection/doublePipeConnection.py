@@ -10,6 +10,7 @@ from trnsysGUI.connection.doublePipeConnectionModel import DoublePipeConnectionM
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.ddckFields.getHeaderAndParametersGenerator as _ghp
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping as _ip
@@ -17,7 +18,6 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 from . import _massFlowLabels as _mfl
-import trnsysGUI.ddckFields.getHeaderAndParametersGenerator as _ghp
 
 
 @_dc.dataclass

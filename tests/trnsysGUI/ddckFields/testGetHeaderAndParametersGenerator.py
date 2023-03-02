@@ -1,5 +1,4 @@
 import pytest as _pt
-import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.ddckFields.getHeaderAndParametersGenerator as _ghp
 import trnsysGUI.ddckFields.headerAndParameters.getDoublePipeConnectionHeaderAndParameters as _gdpchp
 import tests.trnsysGUI.ddckFields.headerAndParameters.doublePipeConnectionHeaderAndParameters as _dpchp
