@@ -1,3 +1,3 @@
 {
-    "files": ["resources/resources.qrc","hydraulicLoops/_dialogs/merge/_dialog.ui","hydraulicLoops/_dialogs/edit/_dialog.ui","hydraulicLoops/_dialogs/split/_dialog.ui"]
+    "files": ["resources/resources.qrc","dialogs/connectionDialogs/doublePipeConnectionLengthDialog.py","hydraulicLoops/_dialogs/split/_dialog.ui","hydraulicLoops/_dialogs/edit/_dialog.ui","hydraulicLoops/_dialogs/merge/_dialog.ui","dialogs/connectionDialogs/doublepipeconnectionlengthdialogbox.h","dialogs/connectionDialogs/doublepipeconnectionlengthdialogbox.cpp","dialogs/connectionDialogs/doublepipeconnectionlengthdialogbox.ui"]
 }
