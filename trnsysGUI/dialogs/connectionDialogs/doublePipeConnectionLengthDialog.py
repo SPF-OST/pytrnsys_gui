@@ -61,6 +61,3 @@ def _parsePositiveFloat(text: str) -> float:
 class LengthContainer:
     def __init__(self, lengthInM: float):
         self.lengthInM = lengthInM
-
-    def setLengthOfDoublePipeConnection(self, connection:"DoublePipeConnection"):
-        connection.lengthInM = self.lengthInM

@@ -32,15 +32,12 @@ class DoublePipeSegmentItem(SegmentItemBase):
         menu = super()._getContextMenu()
         action = menu.addAction("Provide length")
         action.triggered.connect(self.editLength)
-        self.lengthContainer.setLengthOfDoublePipeConnection(self._doublePipeConnection)
+        self._doublePipeConnection.lengthInM = self.lengthContainer.lengthInM
 
         return menu
 
     def editLength(self):
         _dpcldlg.doublePipeConnectionLengthDialog(self.lengthContainer)
-
-    def setLength(self):
-        self._doublePipeConnection.setLength()
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
