@@ -60,6 +60,33 @@ from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 from . import _sizes
 
+# Current Responsibilities of the editor (likely incomplete), includes minute detail for each!!!:
+# - generate Ids, trnsysIds
+# - hold the view and the scene
+# - deal with snapgrid and align mode
+# - deal with the layout, blockItem library, fileBrowser (including checking for files)
+# - providing the location of each individual image file
+# - resizing the layout components
+# - draggingFromPort
+# - keeping track of several lists: connectionList, trnsysObj, graphicalObj, fluids, hydraulicLoops, copyGroupList, selectionGroupList
+# - displaying the pipe segment when dragging from a port
+# - creating a new project and creating the diagram from a loaded project
+# - setting up the folder and folder structure for a new project with all the default files
+# - normal logging and additional debug logging
+# - dealing with mouseEvents
+# - errorHandling for overlapping diagram features
+# - exporting hydraulics and hydraulic control
+# - checking hydraulics and massflow contributors
+# - encoding and decoding the diagram to and from json files
+# - encoding and decoding hydraulic loops to and from json files
+# - deleting blockItems
+# - deal with ddck placeholdervalues (encode and decode)
+# - saving and loading projects
+# - getting individual dialogs
+# - dealing with ports of a specific blockItem type
+# - saving the PDF
+# -
+
 
 class Editor(_qtw.QWidget):
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
