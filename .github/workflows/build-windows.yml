@@ -54,6 +54,8 @@ jobs:
     needs: [test]
     runs-on: windows-latest
     steps:
+      - name: Support longpaths
+        run: git config core.longpaths true
       - uses: actions/checkout@v3
       - name: Build executable
         run: py -3.9 dev-tools/devTools.py -x
