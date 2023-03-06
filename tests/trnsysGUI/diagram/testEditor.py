@@ -139,6 +139,7 @@ class TestEditor:
         convertedProject = _prj.LoadProject(convertedJsonFilePath)
         _mw.MainWindow(logger, convertedProject)  # type: ignore[attr-defined]
 
+    @_pt.mark.needs_trnsys
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testMassFlowSolver(self, testProject: _Project, request: _pt.FixtureRequest) -> None:
         helper = _Helper(testProject)
