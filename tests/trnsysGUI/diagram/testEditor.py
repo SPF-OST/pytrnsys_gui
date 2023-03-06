@@ -4,12 +4,12 @@ import os as _os
 import pathlib as _pl
 import shutil as _su
 import subprocess as _sp
+import time as _time
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 import pytest as _pt
-import time as _time
 
 import pytrnsys.utils.log as _ulog
 import trnsysGUI.MassFlowVisualizer as _mfv
