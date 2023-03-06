@@ -28,6 +28,7 @@ class DoublePipeSegmentItem(SegmentItemBase):
         return DoublePipeSegmentItem(startNode, endNode, self.connection)
 
     def _getContextMenu(self) -> QMenu:
+        self.lengthContainer.lengthInM = self._doublePipeConnection.lengthInM
         menu = super()._getContextMenu()
         action = menu.addAction("Provide length")
         action.triggered.connect(self.editLength)
