@@ -15,17 +15,13 @@ jobs:
       - name: Support longpaths
         run: git config core.longpaths true
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
       - name: Remove old venv
         run: |
           if (Test-Path -LiteralPath venv) {
             Remove-Item -LiteralPath venv -Recurse
           }
       - name: Create virtual environment
-        run: python -m venv venv
+        run: py -3.9 -m venv venv
       - name: Install dependencies
         run: |
           venv\Scripts\python -m pip install --upgrade pip
@@ -61,12 +57,8 @@ jobs:
       - name: Support longpaths
         run: git config core.longpaths true
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
       - name: Build executable
-        run: python dev-tools/devTools.py -x
+        run: py -3.9 dev-tools/devTools.py -x
       - name: Compute file name
         id: fn
         run: |
