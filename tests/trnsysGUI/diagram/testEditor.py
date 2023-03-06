@@ -4,15 +4,14 @@ import os as _os
 import pathlib as _pl
 import shutil as _su
 import subprocess as _sp
-import sys as _sys
 import time as _time
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 import pytest as _pt
-import pytrnsys.utils.log as _ulog
 
+import pytrnsys.utils.log as _ulog
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -140,7 +139,7 @@ class TestEditor:
         convertedProject = _prj.LoadProject(convertedJsonFilePath)
         _mw.MainWindow(logger, convertedProject)  # type: ignore[attr-defined]
 
-    @_pt.mark.linux_ci
+    @_pt.mark.needs_trnsys
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testMassFlowSolver(self, testProject: _Project, request: _pt.FixtureRequest) -> None:
         helper = _Helper(testProject)
@@ -202,18 +201,17 @@ class TestEditor:
     def _exportMassFlowSolverDeckAndRunTrnsys(self, editor: _de.Editor):  # type: ignore[name-defined]
         exportedFilePath = self._exportHydraulic(editor, _format="mfs")
 
-        trnsysExePath = _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnExe.exe")
+        trnExePath = self._getTrnExePath()
 
-        runningOnWindows = _sys.platform.startswith("win32")
-        if runningOnWindows:
-            _sp.run([str(trnsysExePath), str(exportedFilePath), "/H"], check=True)
-            return
+        _sp.run([str(trnExePath), str(exportedFilePath), "/H"], check=True)
 
-        # Running on Linux using Wine
-        zDrivePath = _pl.PureWindowsPath("Z:")
-        exportedFileWindowswPath = zDrivePath / exportedFilePath
+    @staticmethod
+    def _getTrnExePath():
+        isRunDuringCi = (_os.environ.get("CI") == "true")
+        if isRunDuringCi:
+            return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
 
-        _sp.run(["wine", str(trnsysExePath), str(exportedFileWindowswPath), "/H"], check=True)
+        return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
 
     @classmethod
     def _exportHydraulic(cls, editor: _de.Editor, *, _format) -> str:  # type: ignore[name-defined]

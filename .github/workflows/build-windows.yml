@@ -10,56 +10,51 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: [self-hosted, etzel]
     steps:
-    - name: Support longpaths
-      run: git config --system core.longpaths true
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install wheel
-        pip install -r requirements/test.txt
-    - name: Generate UI code from Qt Creator Studio .ui files
-      run: python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
-    - name: Static type checking with mypy
-      run: python dev-tools/devTools.py --type
-    - name: Lint with pylint
-      run: python dev-tools/devTools.py --lint --keep-results
-    - name: Generate class and package diagrams
-      run: python dev-tools/devTools.py --diagram=dot --keep-results
-    - name: Test with pytest
-      run: python dev-tools/devTools.py --unit="not linux_ci" --keep-results
-    - name: Post coverage report to Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: test-results/coverage.lcov
-    - name: Upload test results and coverage reports
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results-and-coverage-report-windows
-        path: test-results
-      # Use always() to always run this step to publish test results when there are test failures
-      if: ${{ always() }}
+      - uses: actions/checkout@v3
+      - name: Remove old venv
+        run: |
+          if (Test-Path -LiteralPath venv) {
+            Remove-Item -LiteralPath venv -Recurse
+          }
+      - name: Create virtual environment
+        run: py -3.9 -m venv venv
+      - name: Install dependencies
+        run: |
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel
+          venv\Scripts\python -m pip install -r requirements/test.txt
+      - name: Generate UI code from Qt Creator Studio .ui files
+        run: venv\Scripts\python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
+      - name: Static type checking with mypy
+        run: venv\Scripts\python dev-tools/devTools.py --type
+      - name: Lint with pylint
+        run: venv\Scripts\python dev-tools/devTools.py --lint --keep-results
+      - name: Generate class and package diagrams
+        run: venv\Scripts\python dev-tools/devTools.py --diagram=dot --keep-results
+      - name: Test with pytest
+        run: venv\Scripts\python dev-tools/devTools.py --keep-results
+      - name: Post coverage report to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: test-results/coverage.lcov
+      - name: Upload test results and coverage reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-and-coverage-report-windows
+          path: test-results
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
 
   build-executable:
     needs: [test]
-    runs-on: windows-latest
+    runs-on: [self-hosted, etzel]
     steps:
-      - name: Support longpaths
-        run: git config --system core.longpaths true
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
       - name: Build executable
-        run: python dev-tools/devTools.py -x
+        run: py -3.9 dev-tools/devTools.py -x
       - name: Compute file name
         id: fn
         run: |
