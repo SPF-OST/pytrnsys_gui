@@ -7,9 +7,13 @@ import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
+import sysconfig as _sysconfig
+import venv
+
 import sys
 import time
-import venv
+
+_SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
 
 
 def main():
@@ -84,19 +88,19 @@ def main():
     _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = "mypy --show-error-codes trnsysGUI tests dev-tools"
+        cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes trnsysGUI tests dev-tools"
         additionalArgs = arguments.mypyArguments or ""
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
-        cmd = "pylint trnsysGUI tests dev-tools"
+        cmd = f"{_SCRIPTS_DIR / 'pylint'} trnsysGUI tests dev-tools"
         additionalArgs = arguments.lintArguments or ""
 
         sp.run([*cmd.split(), *additionalArgs.split()], check=True)
 
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"pyreverse -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
+        cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
         sp.run(cmd.split(), check=True)
 
     if arguments.shallRunAll or arguments.shallCreateExecutable:
@@ -141,7 +145,7 @@ def main():
         additionalArgs = ["-m", markersExpression]
 
         cmd = [
-            "pytest",
+            _SCRIPTS_DIR / "pytest",
             "-v",
             "--cov=trnsysGUI",
             f"--cov-report=html:{testResultsDirPath / 'coverage-html'}",
