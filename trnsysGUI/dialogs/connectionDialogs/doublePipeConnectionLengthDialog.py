@@ -7,6 +7,11 @@ if _tp.TYPE_CHECKING:
     pass
 
 
+class LengthContainer:
+    def __init__(self, lengthInM: float):
+        self.lengthInM = lengthInM
+
+
 class doublePipeConnectionLengthDialog(_qtw.QDialog):
     def __init__(self, container: "LengthContainer"):
         super(doublePipeConnectionLengthDialog, self).__init__()
@@ -56,8 +61,3 @@ def _parsePositiveFloat(text: str) -> float:
         raise ValueError("Value must be positive.")
 
     return value
-
-
-class LengthContainer:
-    def __init__(self, lengthInM: float):
-        self.lengthInM = lengthInM
