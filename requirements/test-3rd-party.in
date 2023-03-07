@@ -10,3 +10,4 @@ mypy
 pylint
 
 PyQT5-stubs
+pytest-qt
