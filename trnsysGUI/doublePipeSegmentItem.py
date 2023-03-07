@@ -1,4 +1,5 @@
 import typing as _tp
+import copy as _cp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QLineF
@@ -25,19 +26,19 @@ class DoublePipeSegmentItem(SegmentItemBase):
         self.lengthContainer = _dpcldlg.LengthContainer(_values.DEFAULT_LENGTH_IN_M)
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
-        return DoublePipeSegmentItem(startNode, endNode, self.connection)
+        return DoublePipeSegmentItem(startNode, endNode, self._doublePipeConnection)
 
     def _getContextMenu(self) -> QMenu:
-        self.lengthContainer.lengthInM = self._doublePipeConnection.lengthInM
         menu = super()._getContextMenu()
         action = menu.addAction("Provide length")
         action.triggered.connect(self.editLength)
-        self._doublePipeConnection.lengthInM = self.lengthContainer.lengthInM
 
         return menu
 
     def editLength(self):
+        self.lengthContainer.lengthInM = self._doublePipeConnection.lengthInM
         _dpcldlg.doublePipeConnectionLengthDialog(self.lengthContainer)
+        self._doublePipeConnection.lengthInM = self.lengthContainer.lengthInM
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
