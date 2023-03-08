@@ -213,14 +213,7 @@ class Decoder(json.JSONDecoder):
                         bl = GenericBlock(
                             i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
                         )
-                    elif i["BlockName"] == "MasterControl":
-                        bl = MasterControl(
-                            i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
-                        )
-                    elif i["BlockName"] == "Control":
-                        bl = Control(
-                            i["BlockName"], self.editor, displayName=i["BlockDisplayName"], loadedBlock=True
-                        )
+
                     # --- new encoding]
 
                     elif i["BlockName"] == "GraphicalItem":
