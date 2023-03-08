@@ -1,7 +1,6 @@
 
 
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
 from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
@@ -40,8 +39,8 @@ from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.water import Water
 
 
-def getBlockItem(componentType, editor, displayName=None, loadedBlock=None):
-    # todo: provide this to Decoder as well
+def getBlockItem(componentType, editor): #, displayName=None, loadedBlock=None):
+    # todo: provide this to Decoder as well # type: ignore[fixme]
     """ returns an "blockItem" instance of a specific diagram component
         componentType: name of the component, e.g., "StorageTank"
         """
@@ -86,8 +85,8 @@ def getBlockItem(componentType, editor, displayName=None, loadedBlock=None):
                   }
     if componentType not in blockItems:
         raise AssertionError(f"Unknown kind of block item: {componentType}")
-    else:
-        parts = blockItems[componentType]
+
+    parts = blockItems[componentType]
 
     if parts["blockItem"] == GraphicalItem:  # may not be needed
         item = parts["blockItem"](editor)

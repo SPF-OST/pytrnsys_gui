@@ -1,20 +1,19 @@
 import cgitb as _cgitb
 import logging as _log
-import pytest as _pt
 import unittest.mock as _mock
+import pytest as _pt
 
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.diagram.getBlockItem as _gbi
-from trnsysGUI.diagram.view import View as _v
 
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
 from trnsysGUI.ExternalHx import ExternalHx
-from trnsysGUI.GenericBlock import GenericBlock
-from trnsysGUI.Graphicaltem import GraphicalItem
+from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
+from trnsysGUI.Graphicaltem import GraphicalItem  # type: ignore[attr-defined]
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.HPDoubleDual import HPDoubleDual
 from trnsysGUI.HPDual import HPDual
@@ -93,7 +92,7 @@ _BLOCKITEMCASESWITHPROJECTFOLDER = [
 ]
 
 
-class TestView:
+class TestGetBlockItem:
 
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH)
     def testGetBlockItem(self, componentType, blockItemType, tmp_path, request: _pt.FixtureRequest) -> None:
@@ -143,20 +142,9 @@ class TestView:
         blockItem = _gbi.getBlockItem("StorageTank", editorMock)
         assert isinstance(blockItem, StorageTank)
 
-    @_pt.mark.skip
-    def testGetBlockItemRaises(self, tmp_path, request: _pt.FixtureRequest) -> None:
-        logger = _log.getLogger("root")
-        (
-            editorMock,
-            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
-        ) = self._createEditorMock(logger, tmp_path)
-
-        def quitApplication():
-            application.quit()
-
-        with _pt.raises(AssertionError) as e:
-            _gbi.getBlockItem("Blk", editorMock)
-        request.addfinalizer(quitApplication)
+    def testGetBlockItemRaises(self) -> None:
+        with _pt.raises(AssertionError):
+            _gbi.getBlockItem("Blk", 0)
 
     @staticmethod
     def _createEditorMock(logger, projectPath):

@@ -41,7 +41,7 @@ class View(_qtw.QGraphicsView):
         if event.mimeData().hasFormat("component/name"):
             componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
             self.logger.debug("name is " + componentType)
-            blockItem = getBlockItem(componentType)
+            blockItem = getBlockItem(componentType, self._editor)
             if componentType == "StorageTank":
                 blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
                 self._editor.showConfigStorageDlg(blockItem)
@@ -77,6 +77,3 @@ class View(_qtw.QGraphicsView):
     def deleteBlockCom(self, blockItem):
         command = DeleteBlockCommand(blockItem, self._editor)
         self._editor.parent().undoStack.push(command)
-
-
-
