@@ -23,7 +23,6 @@ class DoublePipeSegmentItem(SegmentItemBase):
         self._doublePipeConnection = parent
         self.blueLine = QGraphicsLineItem(self)
         self.redLine = QGraphicsLineItem(self)
-        self.lengthContainer = _dpcldlg.LengthContainer(_values.DEFAULT_LENGTH_IN_M)
 
     def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
         return DoublePipeSegmentItem(startNode, endNode, self._doublePipeConnection)
@@ -36,9 +35,9 @@ class DoublePipeSegmentItem(SegmentItemBase):
         return menu
 
     def editLength(self):
-        self.lengthContainer.lengthInM = self._doublePipeConnection.lengthInM
-        _dpcldlg.doublePipeConnectionLengthDialog(self.lengthContainer)
-        self._doublePipeConnection.lengthInM = self.lengthContainer.lengthInM
+        lengthContainer = _dpcldlg.LengthContainer(self._doublePipeConnection.lengthInM)
+        _dpcldlg.doublePipeConnectionLengthDialog(lengthContainer).exec()
+        self._doublePipeConnection.lengthInM = lengthContainer.lengthInM
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))

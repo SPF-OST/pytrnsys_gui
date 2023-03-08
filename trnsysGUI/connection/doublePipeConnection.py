@@ -6,7 +6,6 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 from trnsysGUI.connection.doublePipeConnectionModel import DoublePipeConnectionModel
-import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcldlg
 
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.values as _values

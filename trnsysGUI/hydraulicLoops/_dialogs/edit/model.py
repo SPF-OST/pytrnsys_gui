@@ -13,6 +13,7 @@ if _tp.TYPE_CHECKING:
 
 @_dc.dataclass
 class Connection:
+    # todo: apply to container
     name: str
     diameterInCm: float
     uValueInWPerM2K: float

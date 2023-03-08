@@ -8,6 +8,7 @@ if _tp.TYPE_CHECKING:
 
 
 class LengthContainer:
+    # todo: change to *pipe*
     def __init__(self, lengthInM: float):
         self.lengthInM = lengthInM
 
@@ -24,7 +25,6 @@ class doublePipeConnectionLengthDialog(_qtw.QDialog):
         self.okButton.clicked.connect(self.acceptedEdit)
         self.cancelButton.clicked.connect(self.cancel)
         self.setWindowTitle("Properties")
-        self.exec()
 
     def _getLayout(self):
         buttonLayout = _qtw.QGridLayout(self)
@@ -45,6 +45,7 @@ class doublePipeConnectionLengthDialog(_qtw.QDialog):
 
     @staticmethod
     def showError():
+        # todo: send to errorMessageBox
         messageBox = _qtw.QMessageBox()
         messageBox.setWindowTitle("Almost there")
         messageBox.setText("Value must be positive.")
