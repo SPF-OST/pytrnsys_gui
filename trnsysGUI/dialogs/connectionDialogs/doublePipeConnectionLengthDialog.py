@@ -6,13 +6,13 @@ import trnsysGUI.errors as _er
 
 
 @_dc.dataclass
-class dPConnection:
+class DPConnection:
     lengthInM: float
 
 
-class doublePipeConnectionLengthDialog(_qtw.QDialog):
-    def __init__(self, connection: "dPConnection"):
-        super(doublePipeConnectionLengthDialog, self).__init__()
+class DoublePipeConnectionLengthDialog(_qtw.QDialog):
+    def __init__(self, connection: "DPConnection"):
+        super(DoublePipeConnectionLengthDialog, self).__init__()
         self.lengthContainer = connection
         self.nameLabel = _qtw.QLabel("Length (m):")
         self.lineEdit = _qtw.QLineEdit(str(connection.lengthInM))

@@ -18,10 +18,6 @@ class TestGetHeaderAndParameters:
         textBlockGenerator = _ghp.getHeaderAndParametersGenerator("DoublePipeConnection")
         assert textBlockGenerator == _gdpchp.getDoublePipeConnectionHeaderAndParameters
 
-    def testGetDoublePipeConnectionVersion(self):
-        textBlockGenerator = _ghp.getHeaderAndParametersGenerator("DoublePipeConnection")
-        assert textBlockGenerator == _gdpchp.getDoublePipeConnectionHeaderAndParameters
-
     def testDoublePipeConnectionText(self):
         textBlockGenerator = _ghp.getHeaderAndParametersGenerator("DoublePipeConnection")
         connection = _StrictMock(lengthInM=2.0,

@@ -1,5 +1,4 @@
 import unittest.mock as _m
-import pytest as _pt
 
 from PyQt5 import QtCore
 
@@ -8,8 +7,8 @@ import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _
 
 class TestDoublePipeConnectionLengthDialog:  # pylint: disable = attribute-defined-outside-init
     def setup(self):
-        self.dPConnection = _dpcdlg.dPConnection(5)
-        self.widget = _dpcdlg.doublePipeConnectionLengthDialog(self.dPConnection)
+        self.dPConnection = _dpcdlg.DPConnection(5)
+        self.widget = _dpcdlg.DoublePipeConnectionLengthDialog(self.dPConnection)
 
     def _testHelper(self, bot, value, button="okButton"):
         bot.addWidget(self.widget)
