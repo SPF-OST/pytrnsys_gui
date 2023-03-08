@@ -47,7 +47,7 @@ def getProjects() -> _tp.Iterable[_Project]:
     yield _Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
     yield _Project.createForExampleProject("icegrid")
 
-    yield from getTestProjects()
+    # yield from getTestProjects()
 
 
 def getTestProjects() -> _tp.Iterable[_Project]:

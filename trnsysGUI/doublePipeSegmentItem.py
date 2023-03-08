@@ -1,11 +1,9 @@
 import typing as _tp
-import copy as _cp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QLineF
 from PyQt5.QtWidgets import QGraphicsLineItem, QMenu
 
-import trnsysGUI.connection.values as _values
 import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcldlg
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
@@ -35,9 +33,9 @@ class DoublePipeSegmentItem(SegmentItemBase):
         return menu
 
     def editLength(self):
-        lengthContainer = _dpcldlg.LengthContainer(self._doublePipeConnection.lengthInM)
-        _dpcldlg.doublePipeConnectionLengthDialog(lengthContainer).exec()
-        self._doublePipeConnection.lengthInM = lengthContainer.lengthInM
+        connection = _dpcldlg.dPConnection(self._doublePipeConnection.lengthInM)
+        _dpcldlg.doublePipeConnectionLengthDialog(connection).exec()
+        self._doublePipeConnection.lengthInM = connection.lengthInM
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))

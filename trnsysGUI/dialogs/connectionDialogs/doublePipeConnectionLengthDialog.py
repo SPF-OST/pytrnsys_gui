@@ -1,24 +1,21 @@
-
-import typing as _tp
+import dataclasses as _dc
 
 import PyQt5.QtWidgets as _qtw
 
-if _tp.TYPE_CHECKING:
-    pass
+import trnsysGUI.errors as _er
 
 
-class LengthContainer:
-    # todo: change to *pipe*
-    def __init__(self, lengthInM: float):
-        self.lengthInM = lengthInM
+@_dc.dataclass
+class dPConnection:
+    lengthInM: float
 
 
 class doublePipeConnectionLengthDialog(_qtw.QDialog):
-    def __init__(self, container: "LengthContainer"):
+    def __init__(self, connection: "dPConnection"):
         super(doublePipeConnectionLengthDialog, self).__init__()
-        self.lengthContainer = container
+        self.lengthContainer = connection
         self.nameLabel = _qtw.QLabel("Length (m):")
-        self.lineEdit = _qtw.QLineEdit(str(container.lengthInM))
+        self.lineEdit = _qtw.QLineEdit(str(connection.lengthInM))
         self.okButton = _qtw.QPushButton("OK")
         self.cancelButton = _qtw.QPushButton("Cancel")
         self.setLayout(self._getLayout())
@@ -41,15 +38,7 @@ class doublePipeConnectionLengthDialog(_qtw.QDialog):
             self.lengthContainer.lengthInM = lengthInM
             self.close()
         except ValueError:
-            self.showError()
-
-    @staticmethod
-    def showError():
-        # todo: send to errorMessageBox
-        messageBox = _qtw.QMessageBox()
-        messageBox.setWindowTitle("Almost there")
-        messageBox.setText("Value must be positive.")
-        messageBox.exec()
+            _er.showErrorMessageBox(errorMessage="Value must be positive.", title="Almost there")
 
     def cancel(self):
         self.close()
