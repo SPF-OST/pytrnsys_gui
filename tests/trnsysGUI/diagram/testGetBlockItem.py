@@ -12,7 +12,7 @@ from trnsysGUI.diagram.blockItems.Boiler import Boiler
 from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
 from trnsysGUI.ExternalHx import ExternalHx
-from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
+from trnsysGUI.diagram.blockItems.GenericBlock import GenericBlock  # type: ignore[attr-defined]
 from trnsysGUI.Graphicaltem import GraphicalItem  # type: ignore[attr-defined]
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.HPDoubleDual import HPDoubleDual

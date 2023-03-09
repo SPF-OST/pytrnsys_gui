@@ -296,7 +296,7 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         pathName = self.displayName
         self.path = self.editor.projectFolder
 
-        self.path = os.path.join(self.path, "ddck")
+        self.path = os.path.join(self.path, "../../ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)
