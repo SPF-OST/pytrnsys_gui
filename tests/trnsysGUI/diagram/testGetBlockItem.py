@@ -8,7 +8,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.diagram.getBlockItem as _gbi
 
 from trnsysGUI.AirSourceHP import AirSourceHP
-from trnsysGUI.Boiler import Boiler
+from trnsysGUI.diagram.blockItems.Boiler import Boiler
 from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
 from trnsysGUI.ExternalHx import ExternalHx

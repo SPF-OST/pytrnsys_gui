@@ -1,7 +1,7 @@
 
 
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
-from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
+from trnsysGUI.diagram.blockItems.Boiler import Boiler  # type: ignore[attr-defined]
 from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
 from trnsysGUI.ExternalHx import ExternalHx  # type: ignore[attr-defined]
