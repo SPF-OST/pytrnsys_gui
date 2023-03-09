@@ -95,7 +95,8 @@ _BLOCKITEMCASESWITHPROJECTFOLDER = [
 class TestGetBlockItem:
 
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH)
-    def testGetBlockItem(self, componentType, blockItemType, tmp_path, request: _pt.FixtureRequest) -> None:
+    def testGetBlockItem(self, componentType, blockItemType, tmp_path, # pylint: disable=invalid-name
+                         request: _pt.FixtureRequest) -> None:
         logger = _log.getLogger("root")
         (
             editorMock,
@@ -111,7 +112,7 @@ class TestGetBlockItem:
         assert isinstance(blockItem, blockItemType)
 
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER)
-    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, tmp_path,
+    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, tmp_path, # pylint: disable=invalid-name
                                           request: _pt.FixtureRequest) -> None:
         logger = _log.getLogger("root")
         (
@@ -127,7 +128,7 @@ class TestGetBlockItem:
         blockItem = _gbi.getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
 
-    def testGetBlockItemStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None:
+    def testGetBlockItemStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None: # pylint: disable=invalid-name
         logger = _log.getLogger("root")
         (
             editorMock,

@@ -40,7 +40,7 @@ from trnsysGUI.water import Water
 
 
 def getBlockItem(componentType, editor): #, displayName=None, loadedBlock=None):
-    # todo: provide this to Decoder as well # type: ignore[fixme]
+    # todo: provide this to Decoder as well # pylint: disable=fixme
     """ returns an "blockItem" instance of a specific diagram component
         componentType: name of the component, e.g., "StorageTank"
         """
