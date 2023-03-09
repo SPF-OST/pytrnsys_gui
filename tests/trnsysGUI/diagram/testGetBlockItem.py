@@ -50,17 +50,18 @@ from trnsysGUI.water import Water
 _cgitb.enable(format="text")
 
 _BLOCKITEMCASESWITHPROJECTPATH = [
-    ("TeePiece", TeePiece),
-    ("DPTee", DoublePipeTeePiece),
-    ("SPCnr", SingleDoublePipeConnector),
-    ("DPCnr", DoubleDoublePipeConnector),
-    ("TVentil", TVentil),
-    ("Pump", Pump),
-    ("Connector", Connector),
-    ("GraphicalItem", GraphicalItem),
-    ("Crystalizer", Crystalizer),
-    ("WTap_main", WTap_main),
+    ("TeePiece", TeePiece, "Tee7701"),
+    ("DPTee", DoublePipeTeePiece, "DTee7701"),
+    ("SPCnr", SingleDoublePipeConnector, "SCnr7701"),
+    ("DPCnr", DoubleDoublePipeConnector, "DCnr7701"),
+    ("TVentil", TVentil, "Val7701"),
+    ("Pump", Pump, "Pump7701"),
+    ("Connector", Connector, "Conn7701"),
+    ("Crystalizer", Crystalizer, "Cryt7701"),
+    ("WTap_main", WTap_main, "WtSp7701"),
 ]
+
+res, _ = zip(_BLOCKITEMCASESWITHPROJECTPATH)
 
 _BLOCKITEMCASESWITHPROJECTFOLDER = [
     ("Collector", Collector),
@@ -94,58 +95,77 @@ _BLOCKITEMCASESWITHPROJECTFOLDER = [
 
 class TestGetBlockItem:
 
-    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH)
-    def testGetBlockItem(self, componentType, blockItemType, tmp_path, # pylint: disable=invalid-name
+    @_pt.mark.parametrize("componentType, blockItemType, displayName", _BLOCKITEMCASESWITHPROJECTPATH)
+    def testGetBlockItem(self, componentType, blockItemType, displayName, tmp_path,  # pylint: disable=invalid-name
                          request: _pt.FixtureRequest) -> None:
-        logger = _log.getLogger("root")
-        (
-            editorMock,
-            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
-        ) = self._createEditorMock(logger, tmp_path)
-
-        def quitApplication():
-            application.quit()
-
-        request.addfinalizer(quitApplication)
-
+        editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
+        assert blockItem.displayName == displayName
 
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER)
-    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, tmp_path, # pylint: disable=invalid-name
+    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, tmp_path,  # pylint: disable=invalid-name
                                           request: _pt.FixtureRequest) -> None:
-        logger = _log.getLogger("root")
-        (
-            editorMock,
-            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
-        ) = self._createEditorMock(logger, tmp_path)
-
-        def quitApplication():
-            application.quit()
-
-        request.addfinalizer(quitApplication)
-
+        editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
 
-    def testGetBlockItemStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None: # pylint: disable=invalid-name
-        logger = _log.getLogger("root")
-        (
-            editorMock,
-            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
-        ) = self._createEditorMock(logger, tmp_path)
-
-        def quitApplication():
-            application.quit()
-
-        request.addfinalizer(quitApplication)
-
+    def testGetBlockItemStorageTank(self, tmp_path,
+                                    request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+        editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("StorageTank", editorMock)
         assert isinstance(blockItem, StorageTank)
+        assert blockItem.displayName == "Tes7701"
+
+    def testGetGraphicalItem(self, tmp_path,
+                             request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+        editorMock = self._testHelper(tmp_path, request)
+        blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
+        assert isinstance(blockItem, GraphicalItem)
 
     def testGetBlockItemRaises(self) -> None:
         with _pt.raises(AssertionError):
             _gbi.getBlockItem("Blk", 0)
+
+    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH[:][0:2])
+    def testGetLoaded(self, componentType, blockItemType, tmp_path,
+                      request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+        editorMock = self._testHelper(tmp_path, request)
+        blockItem = _gbi.getBlockItem(componentType, editorMock, displayName=componentType, loadedBlock=True)
+        assert isinstance(blockItem, blockItemType)
+        assert blockItem.displayName == componentType
+
+    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER)
+    def testGetLoadedWithProjectFolder(self, componentType, blockItemType, tmp_path,
+                      request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+        editorMock = self._testHelper(tmp_path, request)
+        blockItem = _gbi.getBlockItem(componentType, editorMock, displayName=componentType, loadedBlock=True)
+        assert isinstance(blockItem, blockItemType)
+        assert blockItem.displayName == componentType
+
+    def testGetLoadedStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+        editorMock = self._testHelper(tmp_path, request)
+        blockItem = _gbi.getBlockItem("StorageTank", editorMock, displayName="StorageTank", loadedBlock=True)
+        assert isinstance(blockItem, StorageTank)
+        assert blockItem.displayName == "StorageTank"
+
+    def testGetLoadedGraphicalItem(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+        editorMock = self._testHelper(tmp_path, request)
+        blockItem = _gbi.getBlockItem("GraphicalItem", editorMock, loadedGI=True)
+        assert isinstance(blockItem, GraphicalItem)
+
+    def _testHelper(self, tmp_path, request):
+        logger = _log.getLogger("root")
+        (
+            editorMock,
+            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
+        ) = self._createEditorMock(logger, tmp_path)
+
+        def quitApplication():
+            application.quit()
+
+        request.addfinalizer(quitApplication)
+        return editorMock
 
     @staticmethod
     def _createEditorMock(logger, projectPath):

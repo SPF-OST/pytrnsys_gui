@@ -39,7 +39,7 @@ from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.water import Water
 
 
-def getBlockItem(componentType, editor): #, displayName=None, loadedBlock=None):
+def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, loadedGI=False):
     # todo: provide this to Decoder as well # pylint: disable=fixme
     """ returns an "blockItem" instance of a specific diagram component
         componentType: name of the component, e.g., "StorageTank"
@@ -87,10 +87,13 @@ def getBlockItem(componentType, editor): #, displayName=None, loadedBlock=None):
         raise AssertionError(f"Unknown kind of block item: {componentType}")
 
     parts = blockItems[componentType]
+    if displayName:
+        parts["displayNamePrefix"] = None
 
     if parts["blockItem"] == GraphicalItem:  # may not be needed
-        item = parts["blockItem"](editor)
+        item = parts["blockItem"](editor, loadedGI=loadedGI)
     else:
-        item = parts["blockItem"](componentType, editor, displayNamePrefix=parts["displayNamePrefix"])
+        item = parts["blockItem"](componentType, editor, displayNamePrefix=parts["displayNamePrefix"],
+                                  displayName=displayName, loadedBlock=loadedBlock)
 
     return item
