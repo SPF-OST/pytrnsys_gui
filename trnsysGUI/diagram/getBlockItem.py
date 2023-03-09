@@ -53,6 +53,7 @@ def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, load
                   "TVentil": {"blockItem": TVentil, "displayNamePrefix": "Val"},
                   "Pump": {"blockItem": Pump, "displayNamePrefix": "Pump"},
                   "Collector": {"blockItem": Collector, "displayNamePrefix": "Coll"},
+                  "Kollektor": {"blockItem": Collector, "displayNamePrefix": "Coll"},
                   "HP": {"blockItem": HeatPump, "displayNamePrefix": "HP"},
                   "IceStorage": {"blockItem": IceStorage, "displayNamePrefix": "IceS"},
                   "PitStorage": {"blockItem": PitStorage, "displayNamePrefix": "PitS"},

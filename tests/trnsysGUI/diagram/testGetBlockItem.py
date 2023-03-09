@@ -61,10 +61,11 @@ _BLOCKITEMCASESWITHPROJECTPATH = [
     ("WTap_main", WTap_main, "WtSp7701"),
 ]
 
-res, _ = zip(_BLOCKITEMCASESWITHPROJECTPATH)
+_BLOCKITEMCASESWITHPROJECTPATH_WITHOUT_NAME = [(x, y) for x, y, z in _BLOCKITEMCASESWITHPROJECTPATH]
 
 _BLOCKITEMCASESWITHPROJECTFOLDER = [
     ("Collector", Collector),
+    ("Kollektor", Collector),
     ("HP", HeatPump),
     ("IceStorage", IceStorage),
     ("PitStorage", PitStorage),
@@ -127,7 +128,7 @@ class TestGetBlockItem:
         with _pt.raises(AssertionError):
             _gbi.getBlockItem("Blk", 0)
 
-    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH[:][0:2])
+    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH_WITHOUT_NAME)
     def testGetLoaded(self, componentType, blockItemType, tmp_path,
                       request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
         editorMock = self._testHelper(tmp_path, request)
