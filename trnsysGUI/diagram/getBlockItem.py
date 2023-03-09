@@ -6,7 +6,7 @@ from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defin
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
 from trnsysGUI.ExternalHx import ExternalHx  # type: ignore[attr-defined]
 from trnsysGUI.diagram.blockItems.GenericBlock import GenericBlock  # type: ignore[attr-defined]
-from trnsysGUI.Graphicaltem import GraphicalItem  # type: ignore[attr-defined]
+from trnsysGUI.diagram.blockItems.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
 from trnsysGUI.GroundSourceHx import GroundSourceHx  # type: ignore[attr-defined]
 from trnsysGUI.HPDoubleDual import HPDoubleDual  # type: ignore[attr-defined]
 from trnsysGUI.HPDual import HPDual  # type: ignore[attr-defined]

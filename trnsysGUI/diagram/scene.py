@@ -3,7 +3,7 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QPen
 
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.Graphicaltem import GraphicalItem  # type: ignore[attr-defined]
+from trnsysGUI.diagram.blockItems.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
 from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]
 from trnsysGUI.storageTank.widget import StorageTank

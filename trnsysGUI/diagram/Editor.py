@@ -33,7 +33,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
-from trnsysGUI.Graphicaltem import GraphicalItem
+from trnsysGUI.diagram.blockItems.GraphicalItem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
