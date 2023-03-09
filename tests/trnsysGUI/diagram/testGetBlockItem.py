@@ -111,15 +111,15 @@ class TestGetBlockItem:
         blockItem = _gbi.getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
 
-    def testGetBlockItemStorageTank(self, tmp_path,
-                                    request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+    def testGetBlockItemStorageTank(self, tmp_path,  # pylint: disable=invalid-name
+                                    request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("StorageTank", editorMock)
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "Tes7701"
 
-    def testGetGraphicalItem(self, tmp_path,
-                             request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+    def testGetGraphicalItem(self, tmp_path, # pylint: disable=invalid-name
+                             request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
         assert isinstance(blockItem, GraphicalItem)
@@ -129,16 +129,16 @@ class TestGetBlockItem:
             _gbi.getBlockItem("Blk", 0)
 
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH_WITHOUT_NAME)
-    def testGetLoaded(self, componentType, blockItemType, tmp_path,
-                      request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+    def testGetLoaded(self, componentType, blockItemType, tmp_path,  # pylint: disable=invalid-name
+                      request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentType, editorMock, displayName=componentType, loadedBlock=True)
         assert isinstance(blockItem, blockItemType)
         assert blockItem.displayName == componentType
 
     @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER)
-    def testGetLoadedWithProjectFolder(self, componentType, blockItemType, tmp_path,
-                      request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+    def testGetLoadedWithProjectFolder(self, componentType, blockItemType, tmp_path,  # pylint: disable=invalid-name
+                                       request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentType, editorMock, displayName=componentType, loadedBlock=True)
         assert isinstance(blockItem, blockItemType)
@@ -155,7 +155,7 @@ class TestGetBlockItem:
         blockItem = _gbi.getBlockItem("GraphicalItem", editorMock, loadedGI=True)
         assert isinstance(blockItem, GraphicalItem)
 
-    def _testHelper(self, tmp_path, request):
+    def _testHelper(self, tmp_path, request):  # pylint: disable=invalid-name
         logger = _log.getLogger("root")
         (
             editorMock,

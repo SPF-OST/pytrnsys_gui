@@ -39,9 +39,9 @@ from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.water import Water
 
 
-def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, loadedGI=False):
-    # todo: provide this to Decoder as well # pylint: disable=fixme
-    """ returns an "blockItem" instance of a specific diagram component
+def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, loadedGI=None):
+    # todo: remove editor and provide actual needed arguments. # pylint: disable=fixme
+    """ returns a "blockItem" instance of a specific diagram component
         componentType: name of the component, e.g., "StorageTank"
         """
 
@@ -88,13 +88,16 @@ def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, load
         raise AssertionError(f"Unknown kind of block item: {componentType}")
 
     parts = blockItems[componentType]
-    if displayName:
-        parts["displayNamePrefix"] = None
 
-    if parts["blockItem"] == GraphicalItem:  # may not be needed
+    if parts["blockItem"] == GraphicalItem and loadedGI:
         item = parts["blockItem"](editor, loadedGI=loadedGI)
+    elif parts["blockItem"] == GraphicalItem:
+        item = parts["blockItem"](editor)
+    elif loadedBlock:
+        # Providing "loadedBlock=False currently causes GUI to crash
+        # upon deleting blocks after dragging them on the diagram.
+        item = parts["blockItem"](componentType, editor, displayName=displayName, loadedBlock=loadedBlock)
     else:
-        item = parts["blockItem"](componentType, editor, displayNamePrefix=parts["displayNamePrefix"],
-                                  displayName=displayName, loadedBlock=loadedBlock)
+        item = parts["blockItem"](componentType, editor, displayNamePrefix=parts["displayNamePrefix"])
 
     return item
