@@ -84,6 +84,7 @@ def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, load
                   "coldSaltTank": {"blockItem": SaltTankCold, "displayNamePrefix": "ClSt"},
                   "hotSaltTank": {"blockItem": SaltTankHot, "displayNamePrefix": "HtSt"},
                   }
+
     if componentType not in blockItems:
         raise AssertionError(f"Unknown kind of block item: {componentType}")
 

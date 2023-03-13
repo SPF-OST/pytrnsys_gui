@@ -61,12 +61,16 @@ class Decoder(json.JSONDecoder):
                 # no way of accessing the diagramView)
 
                 elif ".__BlockDict__" in i:
+                    componentType = i["BlockName"]
                     self.logger.debug("Found a block ")
 
-                    if i["BlockName"] == "GraphicalItem":
+                    if componentType == "GraphicalItem":
                         bl = _gbi.getBlockItem("GraphicalItem", self.editor, loadedGI=True)
+                    elif componentType == "Control" or componentType == "MasterControl":
+                        self.logger.warning(f"BlockItem: '{componentType}' is no longer supported in the GUI.")
+                        continue
                     else:
-                        bl = _gbi.getBlockItem(i["BlockName"], self.editor, displayName=i["BlockDisplayName"],
+                        bl = _gbi.getBlockItem(componentType, self.editor, displayName=i["BlockDisplayName"],
                                                loadedBlock=True)
 
                     bl.decode(i, resBlockList)
