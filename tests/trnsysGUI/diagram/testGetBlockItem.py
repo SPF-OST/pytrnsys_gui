@@ -61,37 +61,39 @@ _BLOCKITEMCASESWITHPROJECTPATH = [
     ("WTap_main", WTap_main, "WtSp7701"),
 ]
 
-_BLOCKITEMCASESWITHPROJECTPATH_WITHOUT_NAME = [(x, y) for x, y, z in _BLOCKITEMCASESWITHPROJECTPATH]
+_BLOCKITEMCASESWITHPROJECTPATH_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCKITEMCASESWITHPROJECTPATH]
 
 _BLOCKITEMCASESWITHPROJECTFOLDER = [
-    ("Collector", Collector),
-    ("Kollektor", Collector),
-    ("HP", HeatPump),
-    ("IceStorage", IceStorage),
-    ("PitStorage", PitStorage),
-    ("Radiator", Radiator),
-    ("WTap", WTap),
-    ("GenericBlock", GenericBlock),
-    ("HPTwoHx", HeatPumpTwoHx),
-    ("HPDoubleDual", HPDoubleDual),
-    ("HPDual", HPDual),
-    ("Boiler", Boiler),
-    ("AirSourceHP", AirSourceHP),
-    ("PV", PV),
-    ("GroundSourceHx", GroundSourceHx),
-    ("ExternalHx", ExternalHx),
-    ("IceStorageTwoHx", IceStorageTwoHx),
-    ("Sink", Sink),
-    ("Source", Source),
-    ("SourceSink", SourceSink),
-    ("Geotherm", Geotherm),
-    ("Water", Water),
-    ("powerBlock", SteamPowerBlock),
-    ("CSP_PT", ParabolicTroughField),
-    ("CSP_CR", CentralReceiver),
-    ("coldSaltTank", SaltTankCold),
-    ("hotSaltTank", SaltTankHot),
+    ("Collector", Collector, "Coll7701"),
+    ("Kollektor", Collector, "Coll7701"),
+    ("HP", HeatPump, "HP7701"),
+    ("IceStorage", IceStorage, "IceS7701"),
+    ("PitStorage", PitStorage, "PitS7701"),
+    ("Radiator", Radiator, "Rad7701"),
+    ("WTap", WTap, "WtTp7701"),
+    ("GenericBlock", GenericBlock, "GBlk7701"),
+    ("HPTwoHx", HeatPumpTwoHx, "HP7701"),  # Todo: duplicate name?   # pylint: disable=fixme
+    ("HPDoubleDual", HPDoubleDual, "HPDD7701"),
+    ("HPDual", HPDual, "HPDS7701"),
+    ("Boiler", Boiler, "Bolr7701"),
+    ("AirSourceHP", AirSourceHP, "Ashp7701"),
+    ("PV", PV, "PV7701"),
+    ("GroundSourceHx", GroundSourceHx, "Gshx7701"),
+    ("ExternalHx", ExternalHx, "Hx7701"),
+    ("IceStorageTwoHx", IceStorageTwoHx, "IceS7701"),  # Todo: duplicate name?   # pylint: disable=fixme
+    ("Sink", Sink, "QSnk7701"),
+    ("Source", Source, "QSrc7701"),
+    ("SourceSink", SourceSink, "QExc7701"),
+    ("Geotherm", Geotherm, "GeoT7701"),
+    ("Water", Water, "QWat7701"),
+    ("powerBlock", SteamPowerBlock, "StPB7701"),
+    ("CSP_PT", ParabolicTroughField, "PT7701"),
+    ("CSP_CR", CentralReceiver, "CR7701"),
+    ("coldSaltTank", SaltTankCold, "ClSt7701"),
+    ("hotSaltTank", SaltTankHot, "HtSt7701"),
 ]
+
+_BLOCKITEMCASESWITHPROJECTFOLDER_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCKITEMCASESWITHPROJECTPATH]
 
 
 class TestGetBlockItem:
@@ -104,12 +106,14 @@ class TestGetBlockItem:
         assert isinstance(blockItem, blockItemType)
         assert blockItem.displayName == displayName
 
-    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER)
-    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, tmp_path,  # pylint: disable=invalid-name
+    @_pt.mark.parametrize("componentType, blockItemType, displayName", _BLOCKITEMCASESWITHPROJECTFOLDER)
+    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, displayName,
+                                          tmp_path,  # pylint: disable=invalid-name
                                           request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
+        assert blockItem.displayName == displayName
 
     def testGetBlockItemStorageTank(self, tmp_path,  # pylint: disable=invalid-name
                                     request: _pt.FixtureRequest) -> None:
@@ -136,7 +140,7 @@ class TestGetBlockItem:
         assert isinstance(blockItem, blockItemType)
         assert blockItem.displayName == componentType
 
-    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER)
+    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER_WITHOUT_NAME)
     def testGetLoadedWithProjectFolder(self, componentType, blockItemType, tmp_path,  # pylint: disable=invalid-name
                                        request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
