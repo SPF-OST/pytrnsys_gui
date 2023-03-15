@@ -132,11 +132,6 @@ class TestGetBlockItem:
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "StorageTank"
 
-    def testGetLoadedGraphicalItem(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
-        editorMock = self._testHelper(tmp_path, request)
-        blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
-        assert isinstance(blockItem, GraphicalItem)
-
     def _testHelper(self, tmp_path, request):  # pylint: disable=invalid-name
         logger = _log.getLogger("root")
         (

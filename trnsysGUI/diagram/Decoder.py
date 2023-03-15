@@ -65,7 +65,7 @@ class Decoder(json.JSONDecoder):
                     self.logger.debug("Found a block ")
 
                     if componentType == "GraphicalItem":
-                        bl = _gbi.getBlockItem("GraphicalItem", self.editor, loadedGI=True)
+                        bl = _gbi.getBlockItem("GraphicalItem", self.editor)
                     elif componentType == "Control" or componentType == "MasterControl":
                         self.logger.warning(f"BlockItem: '{componentType}' is no longer supported in the GUI.")
                         continue

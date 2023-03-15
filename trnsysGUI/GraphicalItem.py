@@ -91,8 +91,8 @@ class GraphicalItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.setPos(float(i["BlockPosition"][0] + offset_x), float(i["BlockPosition"][1] + offset_y))
+    def decodePaste(self, i, offsetX, offsetY, resConnList, resBlockList, **kwargs):
+        self.setPos(float(i["BlockPosition"][0] + offsetX), float(i["BlockPosition"][1] + offsetY))
 
         resBlockList.append(self)
 
