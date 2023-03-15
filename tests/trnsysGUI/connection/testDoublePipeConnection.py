@@ -22,7 +22,7 @@ class TestDoublePipeConnection:
 
         request.addfinalizer(quitApplication)
 
-    @_pt.mark.skip()
+    @_pt.mark.skip("Incomplete tdd style reverse engineering of required mocks")
     def testInitialization(self, request: _pt.FixtureRequest):  # pylint: disable=unused-argument
         logger = _log.getLogger("root")
         (
@@ -35,7 +35,7 @@ class TestDoublePipeConnection:
         dpSegItem = _m.Mock(spec=_dpsi.DoublePipeSegmentItem)
         with _m.patch("trnsysGUI.connection.doublePipeConnection.DoublePipeConnection._createSegmentItem") as creator:
             creator.return_value = dpSegItem
-            connection = _dpc.DoublePipeConnection(fromPort, toPort, editorMock)  # pylint: disable=unused-variable
+            _dpc.DoublePipeConnection(fromPort, toPort, editorMock)
 
     @staticmethod
     def _getPortMock(name):
