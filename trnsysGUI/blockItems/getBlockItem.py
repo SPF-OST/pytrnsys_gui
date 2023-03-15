@@ -1,12 +1,12 @@
 
 
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
-from trnsysGUI.diagram.blockItems.Boiler import Boiler  # type: ignore[attr-defined]
+from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
 from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
 from trnsysGUI.ExternalHx import ExternalHx  # type: ignore[attr-defined]
-from trnsysGUI.diagram.blockItems.GenericBlock import GenericBlock  # type: ignore[attr-defined]
-from trnsysGUI.diagram.blockItems.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
+from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
+from trnsysGUI.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
 from trnsysGUI.GroundSourceHx import GroundSourceHx  # type: ignore[attr-defined]
 from trnsysGUI.HPDoubleDual import HPDoubleDual  # type: ignore[attr-defined]
 from trnsysGUI.HPDual import HPDual  # type: ignore[attr-defined]
@@ -39,8 +39,7 @@ from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.water import Water
 
 
-def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, loadedGI=None):
-    # todo: remove editor and provide actual needed arguments. # pylint: disable=fixme
+def getBlockItem(componentType, editor, displayName=None, loadedBlock=None):
     """ returns a "blockItem" instance of a specific diagram component
         componentType: name of the component, e.g., "StorageTank"
         """
@@ -89,16 +88,15 @@ def getBlockItem(componentType, editor, displayName=None, loadedBlock=None, load
         raise AssertionError(f"Unknown kind of block item: {componentType}")
 
     parts = blockItems[componentType]
+    itemType = parts["blockItem"]
 
-    if parts["blockItem"] == GraphicalItem and loadedGI:
-        item = parts["blockItem"](editor, loadedGI=loadedGI)
-    elif parts["blockItem"] == GraphicalItem:
-        item = parts["blockItem"](editor)
+    if itemType == GraphicalItem:
+        item = GraphicalItem(editor)
     elif loadedBlock:
         # Providing "loadedBlock=False currently causes GUI to crash
         # upon deleting blocks after dragging them on the diagram.
-        item = parts["blockItem"](componentType, editor, displayName=displayName, loadedBlock=loadedBlock)
+        item = itemType(componentType, editor, displayName=displayName, loadedBlock=loadedBlock)
     else:
-        item = parts["blockItem"](componentType, editor, displayNamePrefix=parts["displayNamePrefix"])
+        item = itemType(componentType, editor, displayNamePrefix=parts["displayNamePrefix"])
 
     return item

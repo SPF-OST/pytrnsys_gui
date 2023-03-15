@@ -7,7 +7,7 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 from trnsysGUI.deleteBlockCommand import DeleteBlockCommand
-from trnsysGUI.diagram.getBlockItem import getBlockItem
+from trnsysGUI.blockItems.getBlockItem import getBlockItem
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed

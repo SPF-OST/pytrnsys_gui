@@ -5,15 +5,15 @@ import pytest as _pt
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.diagram.getBlockItem as _gbi
+import trnsysGUI.blockItems.getBlockItem as _gbi
 
 from trnsysGUI.AirSourceHP import AirSourceHP
-from trnsysGUI.diagram.blockItems.Boiler import Boiler
+from trnsysGUI.Boiler import Boiler
 from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
 from trnsysGUI.ExternalHx import ExternalHx
-from trnsysGUI.diagram.blockItems.GenericBlock import GenericBlock  # type: ignore[attr-defined]
-from trnsysGUI.diagram.blockItems.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
+from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
+from trnsysGUI.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.HPDoubleDual import HPDoubleDual
 from trnsysGUI.HPDual import HPDual
@@ -49,7 +49,7 @@ from trnsysGUI.water import Water
 # a more helpful stack trace using the cgitb module.
 _cgitb.enable(format="text")
 
-_BLOCKITEMCASESWITHPROJECTPATH = [
+_BLOCK_ITEM_CASES = [
     ("TeePiece", TeePiece, "Tee7701"),
     ("DPTee", DoublePipeTeePiece, "DTee7701"),
     ("SPCnr", SingleDoublePipeConnector, "SCnr7701"),
@@ -59,11 +59,6 @@ _BLOCKITEMCASESWITHPROJECTPATH = [
     ("Connector", Connector, "Conn7701"),
     ("Crystalizer", Crystalizer, "Cryt7701"),
     ("WTap_main", WTap_main, "WtSp7701"),
-]
-
-_BLOCKITEMCASESWITHPROJECTPATH_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCKITEMCASESWITHPROJECTPATH]
-
-_BLOCKITEMCASESWITHPROJECTFOLDER = [
     ("Collector", Collector, "Coll7701"),
     ("Kollektor", Collector, "Coll7701"),
     ("HP", HeatPump, "HP7701"),
@@ -72,7 +67,7 @@ _BLOCKITEMCASESWITHPROJECTFOLDER = [
     ("Radiator", Radiator, "Rad7701"),
     ("WTap", WTap, "WtTp7701"),
     ("GenericBlock", GenericBlock, "GBlk7701"),
-    ("HPTwoHx", HeatPumpTwoHx, "HP7701"),  # Todo: duplicate name?   # pylint: disable=fixme
+    ("HPTwoHx", HeatPumpTwoHx, "HP7701"),
     ("HPDoubleDual", HPDoubleDual, "HPDD7701"),
     ("HPDual", HPDual, "HPDS7701"),
     ("Boiler", Boiler, "Bolr7701"),
@@ -80,7 +75,7 @@ _BLOCKITEMCASESWITHPROJECTFOLDER = [
     ("PV", PV, "PV7701"),
     ("GroundSourceHx", GroundSourceHx, "Gshx7701"),
     ("ExternalHx", ExternalHx, "Hx7701"),
-    ("IceStorageTwoHx", IceStorageTwoHx, "IceS7701"),  # Todo: duplicate name?   # pylint: disable=fixme
+    ("IceStorageTwoHx", IceStorageTwoHx, "IceS7701"),
     ("Sink", Sink, "QSnk7701"),
     ("Source", Source, "QSrc7701"),
     ("SourceSink", SourceSink, "QExc7701"),
@@ -93,23 +88,14 @@ _BLOCKITEMCASESWITHPROJECTFOLDER = [
     ("hotSaltTank", SaltTankHot, "HtSt7701"),
 ]
 
-_BLOCKITEMCASESWITHPROJECTFOLDER_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCKITEMCASESWITHPROJECTPATH]
+_BLOCK_ITEM_CASES_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCK_ITEM_CASES]
 
 
 class TestGetBlockItem:
 
-    @_pt.mark.parametrize("componentType, blockItemType, displayName", _BLOCKITEMCASESWITHPROJECTPATH)
+    @_pt.mark.parametrize("componentType, blockItemType, displayName", _BLOCK_ITEM_CASES)
     def testGetBlockItem(self, componentType, blockItemType, displayName, tmp_path,  # pylint: disable=invalid-name
                          request: _pt.FixtureRequest) -> None:
-        editorMock = self._testHelper(tmp_path, request)
-        blockItem = _gbi.getBlockItem(componentType, editorMock)
-        assert isinstance(blockItem, blockItemType)
-        assert blockItem.displayName == displayName
-
-    @_pt.mark.parametrize("componentType, blockItemType, displayName", _BLOCKITEMCASESWITHPROJECTFOLDER)
-    def testGetBlockItemWithProjectFolder(self, componentType, blockItemType, displayName,
-                                          tmp_path,  # pylint: disable=invalid-name
-                                          request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentType, editorMock)
         assert isinstance(blockItem, blockItemType)
@@ -122,7 +108,7 @@ class TestGetBlockItem:
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "Tes7701"
 
-    def testGetGraphicalItem(self, tmp_path, # pylint: disable=invalid-name
+    def testGetGraphicalItem(self, tmp_path,  # pylint: disable=invalid-name
                              request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
@@ -132,17 +118,9 @@ class TestGetBlockItem:
         with _pt.raises(AssertionError):
             _gbi.getBlockItem("Blk", 0)
 
-    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTPATH_WITHOUT_NAME)
+    @_pt.mark.parametrize("componentType, blockItemType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
     def testGetLoaded(self, componentType, blockItemType, tmp_path,  # pylint: disable=invalid-name
                       request: _pt.FixtureRequest) -> None:
-        editorMock = self._testHelper(tmp_path, request)
-        blockItem = _gbi.getBlockItem(componentType, editorMock, displayName=componentType, loadedBlock=True)
-        assert isinstance(blockItem, blockItemType)
-        assert blockItem.displayName == componentType
-
-    @_pt.mark.parametrize("componentType, blockItemType", _BLOCKITEMCASESWITHPROJECTFOLDER_WITHOUT_NAME)
-    def testGetLoadedWithProjectFolder(self, componentType, blockItemType, tmp_path,  # pylint: disable=invalid-name
-                                       request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentType, editorMock, displayName=componentType, loadedBlock=True)
         assert isinstance(blockItem, blockItemType)
@@ -156,14 +134,14 @@ class TestGetBlockItem:
 
     def testGetLoadedGraphicalItem(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
         editorMock = self._testHelper(tmp_path, request)
-        blockItem = _gbi.getBlockItem("GraphicalItem", editorMock, loadedGI=True)
+        blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
         assert isinstance(blockItem, GraphicalItem)
 
     def _testHelper(self, tmp_path, request):  # pylint: disable=invalid-name
         logger = _log.getLogger("root")
         (
             editorMock,
-            [application, mainWindow, graphicsScene],  # pylint: disable=unused-variable
+            [application, _, _],
         ) = self._createEditorMock(logger, tmp_path)
 
         def quitApplication():
@@ -173,7 +151,7 @@ class TestGetBlockItem:
         return editorMock
 
     @staticmethod
-    def _createEditorMock(logger, projectPath):
+    def _createEditorMock(logger, projectFolder):
         application = _qtw.QApplication([])
 
         mainWindow = _qtw.QMainWindow()
@@ -182,8 +160,7 @@ class TestGetBlockItem:
         editorMock.connectionList = []
         editorMock.logger = logger
         editorMock.trnsysObj = []
-        editorMock.projectPath = str(projectPath)
-        editorMock.projectFolder = str(projectPath)
+        editorMock.projectFolder = str(projectFolder)
         editorMock.splitter = _mock.Mock(name="splitter")
         editorMock.idGen = _mock.Mock(
             name="idGen",

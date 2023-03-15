@@ -4,7 +4,7 @@
 import json
 import typing as tp
 
-import trnsysGUI.diagram.getBlockItem as _gbi
+import trnsysGUI.blockItems.getBlockItem as _gbi
 
 from trnsysGUI.doublePipePortItem import DoublePipePortItem
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
