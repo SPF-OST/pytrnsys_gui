@@ -7,7 +7,7 @@ import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.blockItems.getBlockItem as _gbi
 
-from trnsysGUI.AirSourceHP import AirSourceHP  # NOSONAR
+from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
