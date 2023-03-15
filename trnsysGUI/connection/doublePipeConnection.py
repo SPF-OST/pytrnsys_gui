@@ -47,7 +47,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
-        self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+        self.lengthInM: _values.Value = _values.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
