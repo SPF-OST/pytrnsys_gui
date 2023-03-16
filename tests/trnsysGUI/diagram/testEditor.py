@@ -4,15 +4,14 @@ import os as _os
 import pathlib as _pl
 import shutil as _su
 import subprocess as _sp
-import sys as _sys
-import time as _time
 import typing as _tp
 
-import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 import pytest as _pt
-import pytrnsys.utils.log as _ulog
+import sys as _sys
+import time as _time
 
+import pytrnsys.utils.log as _ulog
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -63,23 +62,15 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 class TestEditor:
     @_pt.mark.parametrize("project", TEST_CASES)
-    def testStorageAndHydraulicExports(  # pylint: disable=too-many-locals
-        self, project: _Project, request: _pt.FixtureRequest
-    ) -> None:
+    def testStorageAndHydraulicExports(self, project: _Project, qtbot) -> None:  # pylint: disable=too-many-locals
         helper = _Helper(project)
         helper.setup()
-
-        # The following line is required otherwise QT will crash
-        application = _qtw.QApplication([])
-
-        def quitApplication():
-            application.quit()
-
-        request.addfinalizer(quitApplication)
 
         projectFolderPath = helper.actualProjectFolderPath
 
         editor = self._createEditor(projectFolderPath)
+        qtbot.addWidget(editor)
+
         editor.exportHydraulics(exportTo="mfs")
         mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
         helper.ensureFilesAreEqual(mfsDdckRelativePath)
@@ -108,17 +99,7 @@ class TestEditor:
         return storageTankNames
 
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testSaveAndReloadProject(  # pylint: disable=too-many-locals
-        self, testProject: _Project, request: _pt.FixtureRequest
-    ) -> None:
-        # The following line is required otherwise QT will crash
-        application = _qtw.QApplication([])
-
-        def quitApplication():
-            application.quit()
-
-        request.addfinalizer(quitApplication)
-
+    def testSaveAndReloadProject(self, testProject: _Project, qtbot) -> None:  # pylint: disable=too-many-locals
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
 
         helper = _Helper(testProject)
@@ -127,6 +108,7 @@ class TestEditor:
         jsonFilePath = helper.actualProjectFolderPath / f"{helper.actualProjectFolderPath.name}.json"
         project = _prj.LoadProject(jsonFilePath)
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
+        qtbot.addWidget(mainWindow)
 
         convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
         while convertedProjectFolderPath.exists():
@@ -142,23 +124,17 @@ class TestEditor:
 
     @_pt.mark.linux_ci
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testMassFlowSolver(self, testProject: _Project, request: _pt.FixtureRequest) -> None:
+    def testMassFlowSolver(self, testProject: _Project, qtbot) -> None:
         helper = _Helper(testProject)
         helper.setup()
-
-        # The following line is required otherwise QT will crash
-        application = _qtw.QApplication([])
-
-        def quitApplication():
-            application.quit()
-
-        request.addfinalizer(quitApplication)
 
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
         project = _prj.LoadProject(projectJsonFilePath)
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
+
+        qtbot.addWidget(mainWindow)
 
         self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
 
