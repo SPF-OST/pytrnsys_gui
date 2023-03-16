@@ -12,22 +12,12 @@ import trnsysGUI.internalPiping as _ip
 
 
 class TestDoublePipeConnection:
-
-    @staticmethod
-    def _applicationHandling(request):
-        application = _widgets.QApplication([])
-
-        def quitApplication():
-            application.quit()
-
-        request.addfinalizer(quitApplication)
-
     @_pt.mark.skip("Incomplete tdd style reverse engineering of required mocks")
-    def testInitialization(self, request: _pt.FixtureRequest):  # pylint: disable=unused-argument
+    def testInitialization(self, qtbot):  # pylint: disable=unused-argument
         logger = _log.getLogger("root")
         (
             editorMock,
-            [application, _, _]  # pylint: disable=unused-variable
+            objectsToKeepAlive  # pylint: disable=unused-variable
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, ".")
         fromPort = self._getPortMock("fromPort1")
         toPort = self._getPortMock("toPort1")
@@ -53,8 +43,6 @@ class TestDoublePipeConnection:
 
     @staticmethod
     def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectFolder):
-        application = _widgets.QApplication([])
-
         mainWindow = _widgets.QStackedWidget()
 
         editorMock = _widgets.QWidget(parent=mainWindow)
@@ -87,7 +75,7 @@ class TestDoublePipeConnection:
         graphicsScene = _widgets.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = _m.Mock(name="diagramScene")
 
-        def addItem(dummyArgument):  # pylint: disable=unused-argument
+        def addItem(_):  # pylint: disable=unused-argument
             pass
 
         editorMock.diagramScene.addItem = addItem
@@ -98,4 +86,4 @@ class TestDoublePipeConnection:
         editorMock.diagramScene.items = items
         mainWindow.showMinimized()
 
-        return editorMock, [application, mainWindow, graphicsScene]
+        return editorMock, [mainWindow, graphicsScene]
