@@ -28,12 +28,12 @@ class TestDoublePipeConnectionLengthDialog:  # pylint: disable = attribute-defin
         assert self.dPConnection.lengthInM == 5
 
     def testDialogRaises(self, qtbot):
-        with _m.patch('trnsysGUI.errors.showErrorMessageBox') as box:
+        with _m.patch("trnsysGUI.errors.showErrorMessageBox") as box:
             self._testHelper(qtbot, "-7")
             box.assert_called_with(errorMessage="Value must be positive.", title="Almost there")
 
     def testDialogInputAfterRaises(self, qtbot):
-        with _m.patch('trnsysGUI.errors.showErrorMessageBox'):
+        with _m.patch("trnsysGUI.errors.showErrorMessageBox"):
             self._testHelper(qtbot, "-7")
             self._clearAndWriteAndPressButton(qtbot, "9")
             assert self.dPConnection.lengthInM == 9
