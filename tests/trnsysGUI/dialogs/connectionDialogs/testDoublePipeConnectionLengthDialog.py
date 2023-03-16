@@ -1,8 +1,6 @@
 import unittest.mock as _m
-import pytest as _pt
 
 from PyQt5 import QtCore
-from PyQt5 import QtWidgets as _widgets
 
 import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcdlg
 
@@ -21,40 +19,24 @@ class TestDoublePipeConnectionLengthDialog:  # pylint: disable = attribute-defin
         bot.keyClicks(self.widget.lineEdit, value)
         bot.mouseClick(getattr(self.widget, button), QtCore.Qt.LeftButton)
 
-    def testDialogLineEdit(self, qtbot, request: _pt.FixtureRequest):
-        application = _widgets.QApplication([])
-        # qtbot.
-        qtbot.addWidget(application)
-        # qtbot(application)
-
-        def quitApplication():
-            application.quit()
-
+    def testDialogLineEdit(self, qtbot):
         self._testHelper(qtbot, "7")
         assert self.dPConnection.lengthInM == 7
-        request.addfinalizer(quitApplication)
 
     def testDialogCancel(self, qtbot):
         self._testHelper(qtbot, "7", button="cancelButton")
         assert self.dPConnection.lengthInM == 5
 
-    def testDialogRaises(self, qtbot, request: _pt.FixtureRequest):
-        application = _widgets.QApplication([])
+    def testDialogRaises(self, qtbot):
+        with _m.patch('trnsysGUI.errors.showErrorMessageBox') as box:
+            self._testHelper(qtbot, "-7")
+            box.assert_called_with(errorMessage="Value must be positive.", title="Almost there")
 
-        def quitApplication():
-            application.quit()
-        request.addfinalizer(quitApplication)
+    def testDialogInputAfterRaises(self, qtbot):
+        with _m.patch('trnsysGUI.errors.showErrorMessageBox'):
+            self._testHelper(qtbot, "-7")
+            self._clearAndWriteAndPressButton(qtbot, "9")
+            assert self.dPConnection.lengthInM == 9
 
-        with qtbot.capture_exceptions() as exceptions:
-            with _m.patch('trnsysGUI.errors.showErrorMessageBox') as box:
-                self._testHelper(qtbot, "-7")
-                box.assert_called_with(errorMessage="Value must be positive.", title="Almost there")
-
-    # def testDialogInputAfterRaises(self, qtbot):
-    #     with _m.patch('trnsysGUI.errors.showErrorMessageBox'):
-    #         self._testHelper(qtbot, "-7")
-    #         self._clearAndWriteAndPressButton(qtbot, "9")
-    #         assert self.dPConnection.lengthInM == 9
-    #
-    # def teardown(self):
-    #     self.widget.close()
+    def teardown(self):
+        self.widget.close()
