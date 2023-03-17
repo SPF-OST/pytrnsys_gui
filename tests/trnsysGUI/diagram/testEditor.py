@@ -100,11 +100,18 @@ class TestEditor:
         return storageTankNames
 
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testSaveAndReloadProject(self, testProject: _Project, qtbot) -> None:  # pylint: disable=too-many-locals
+    def testSaveAndReloadProject(
+        self, testProject: _Project, qtbot, monkeypatch
+    ) -> None:  # pylint: disable=too-many-locals
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
 
         helper = _Helper(testProject)
         helper.setup()
+
+        monkeypatch.setattr(
+            _mw.MainWindow,  # type: ignore[attr-defined]
+            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
+            _patchedCloseEvent)
 
         jsonFilePath = helper.actualProjectFolderPath / f"{helper.actualProjectFolderPath.name}.json"
         project = _prj.LoadProject(jsonFilePath)
@@ -125,9 +132,14 @@ class TestEditor:
 
     @_pt.mark.needs_trnsys
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testMassFlowSolver(self, testProject: _Project, qtbot) -> None:
+    def testMassFlowSolver(self, testProject: _Project, qtbot, monkeypatch) -> None:
         helper = _Helper(testProject)
         helper.setup()
+
+        monkeypatch.setattr(
+            _mw.MainWindow,  # type: ignore[attr-defined]
+            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
+            _patchedCloseEvent)
 
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
@@ -185,7 +197,7 @@ class TestEditor:
 
     @staticmethod
     def _getTrnExePath():
-        isRunDuringCi = (_os.environ.get("CI") == "true")
+        isRunDuringCi = _os.environ.get("CI") == "true"
         if isRunDuringCi:
             return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
 
@@ -207,6 +219,10 @@ class TestEditor:
             logger=logger,
         )
         return editor
+
+
+def _patchedCloseEvent(_, closeEvent):
+    return closeEvent.accept()
 
 
 class _Helper:
