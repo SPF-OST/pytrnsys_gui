@@ -1,5 +1,8 @@
+from __future__ import annotations
 
+import typing as _tp
 
+from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
 from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
 from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
@@ -39,64 +42,69 @@ from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.water import Water
 
 
-def getBlockItem(componentType, editor, displayName=None, loadedBlock=None):
-    """ returns a "blockItem" instance of a specific diagram component
-        componentType: name of the component, e.g., "StorageTank"
-        """
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.diagram.Editor as _ed
 
-    blockItems = {"StorageTank": {"blockItem": StorageTank, "displayNamePrefix": "Tes"},
-                  "TeePiece": {"blockItem": TeePiece, "displayNamePrefix": "Tee"},
-                  "DPTee": {"blockItem": DoublePipeTeePiece, "displayNamePrefix": "DTee"},
-                  "SPCnr": {"blockItem": SingleDoublePipeConnector, "displayNamePrefix": "SCnr"},
-                  "DPCnr": {"blockItem": DoubleDoublePipeConnector, "displayNamePrefix": "DCnr"},
-                  "TVentil": {"blockItem": TVentil, "displayNamePrefix": "Val"},
-                  "Pump": {"blockItem": Pump, "displayNamePrefix": "Pump"},
-                  "Collector": {"blockItem": Collector, "displayNamePrefix": "Coll"},
-                  "Kollektor": {"blockItem": Collector, "displayNamePrefix": "Coll"},
-                  "HP": {"blockItem": HeatPump, "displayNamePrefix": "HP"},
-                  "IceStorage": {"blockItem": IceStorage, "displayNamePrefix": "IceS"},
-                  "PitStorage": {"blockItem": PitStorage, "displayNamePrefix": "PitS"},
-                  "Radiator": {"blockItem": Radiator, "displayNamePrefix": "Rad"},
-                  "WTap": {"blockItem": WTap, "displayNamePrefix": "WtTp"},
-                  "WTap_main": {"blockItem": WTap_main, "displayNamePrefix": "WtSp"},
-                  "Connector": {"blockItem": Connector, "displayNamePrefix": "Conn"},
-                  "GenericBlock": {"blockItem": GenericBlock, "displayNamePrefix": "GBlk"},
-                  "HPTwoHx": {"blockItem": HeatPumpTwoHx, "displayNamePrefix": "HP"},
-                  "HPDoubleDual": {"blockItem": HPDoubleDual, "displayNamePrefix": "HPDD"},
-                  "HPDual": {"blockItem": HPDual, "displayNamePrefix": "HPDS"},
-                  "Boiler": {"blockItem": Boiler, "displayNamePrefix": "Bolr"},
-                  "AirSourceHP": {"blockItem": AirSourceHP, "displayNamePrefix": "Ashp"},
-                  "PV": {"blockItem": PV, "displayNamePrefix": "PV"},
-                  "GroundSourceHx": {"blockItem": GroundSourceHx, "displayNamePrefix": "Gshx"},
-                  "ExternalHx": {"blockItem": ExternalHx, "displayNamePrefix": "Hx"},
-                  "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "displayNamePrefix": "IceS"},
-                  "GraphicalItem": {"blockItem": GraphicalItem, "displayNamePrefix": None},
-                  "Sink": {"blockItem": Sink, "displayNamePrefix": "QSnk"},
-                  "Source": {"blockItem": Source, "displayNamePrefix": "QSrc"},
-                  "SourceSink": {"blockItem": SourceSink, "displayNamePrefix": "QExc"},
-                  "Geotherm": {"blockItem": Geotherm, "displayNamePrefix": "GeoT"},
-                  "Water": {"blockItem": Water, "displayNamePrefix": "QWat"},
-                  "Crystalizer": {"blockItem": Crystalizer, "displayNamePrefix": "Cryt"},
-                  "powerBlock": {"blockItem": SteamPowerBlock, "displayNamePrefix": "StPB"},
-                  "CSP_PT": {"blockItem": ParabolicTroughField, "displayNamePrefix": "PT"},
-                  "CSP_CR": {"blockItem": CentralReceiver, "displayNamePrefix": "CR"},
-                  "coldSaltTank": {"blockItem": SaltTankCold, "displayNamePrefix": "ClSt"},
-                  "hotSaltTank": {"blockItem": SaltTankHot, "displayNamePrefix": "HtSt"},
-                  }
 
-    if componentType not in blockItems:
-        raise AssertionError(f"Unknown kind of block item: {componentType}")
+def getBlockItem(
+    componentTypeName: str, editor: _ed.Editor, displayName: _tp.Optional[str] = None
+) -> _tp.Union[BlockItem, GraphicalItem]:
+    """
+    returns a "blockItem" instance of a specific diagram component
+    componentType: name of the component, e.g., "StorageTank"
+    """
 
-    parts = blockItems[componentType]
-    itemType = parts["blockItem"]
+    blockItems = {
+        "StorageTank": {"blockItem": StorageTank, "displayNamePrefix": "Tes"},
+        "TeePiece": {"blockItem": TeePiece, "displayNamePrefix": "Tee"},
+        "DPTee": {"blockItem": DoublePipeTeePiece, "displayNamePrefix": "DTee"},
+        "SPCnr": {"blockItem": SingleDoublePipeConnector, "displayNamePrefix": "SCnr"},
+        "DPCnr": {"blockItem": DoubleDoublePipeConnector, "displayNamePrefix": "DCnr"},
+        "TVentil": {"blockItem": TVentil, "displayNamePrefix": "Val"},
+        "Pump": {"blockItem": Pump, "displayNamePrefix": "Pump"},
+        "Collector": {"blockItem": Collector, "displayNamePrefix": "Coll"},
+        "Kollektor": {"blockItem": Collector, "displayNamePrefix": "Coll"},
+        "HP": {"blockItem": HeatPump, "displayNamePrefix": "HP"},
+        "IceStorage": {"blockItem": IceStorage, "displayNamePrefix": "IceS"},
+        "PitStorage": {"blockItem": PitStorage, "displayNamePrefix": "PitS"},
+        "Radiator": {"blockItem": Radiator, "displayNamePrefix": "Rad"},
+        "WTap": {"blockItem": WTap, "displayNamePrefix": "WtTp"},
+        "WTap_main": {"blockItem": WTap_main, "displayNamePrefix": "WtSp"},
+        "Connector": {"blockItem": Connector, "displayNamePrefix": "Conn"},
+        "GenericBlock": {"blockItem": GenericBlock, "displayNamePrefix": "GBlk"},
+        "HPTwoHx": {"blockItem": HeatPumpTwoHx, "displayNamePrefix": "HP"},
+        "HPDoubleDual": {"blockItem": HPDoubleDual, "displayNamePrefix": "HPDD"},
+        "HPDual": {"blockItem": HPDual, "displayNamePrefix": "HPDS"},
+        "Boiler": {"blockItem": Boiler, "displayNamePrefix": "Bolr"},
+        "AirSourceHP": {"blockItem": AirSourceHP, "displayNamePrefix": "Ashp"},
+        "PV": {"blockItem": PV, "displayNamePrefix": "PV"},
+        "GroundSourceHx": {"blockItem": GroundSourceHx, "displayNamePrefix": "Gshx"},
+        "ExternalHx": {"blockItem": ExternalHx, "displayNamePrefix": "Hx"},
+        "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "displayNamePrefix": "IceS"},
+        "Sink": {"blockItem": Sink, "displayNamePrefix": "QSnk"},
+        "Source": {"blockItem": Source, "displayNamePrefix": "QSrc"},
+        "SourceSink": {"blockItem": SourceSink, "displayNamePrefix": "QExc"},
+        "Geotherm": {"blockItem": Geotherm, "displayNamePrefix": "GeoT"},
+        "Water": {"blockItem": Water, "displayNamePrefix": "QWat"},
+        "Crystalizer": {"blockItem": Crystalizer, "displayNamePrefix": "Cryt"},
+        "powerBlock": {"blockItem": SteamPowerBlock, "displayNamePrefix": "StPB"},
+        "CSP_PT": {"blockItem": ParabolicTroughField, "displayNamePrefix": "PT"},
+        "CSP_CR": {"blockItem": CentralReceiver, "displayNamePrefix": "CR"},
+        "coldSaltTank": {"blockItem": SaltTankCold, "displayNamePrefix": "ClSt"},
+        "hotSaltTank": {"blockItem": SaltTankHot, "displayNamePrefix": "HtSt"},
+    }
 
-    if itemType == GraphicalItem:
-        item = GraphicalItem(editor)
-    elif loadedBlock:
-        # Providing "loadedBlock=False currently causes GUI to crash
-        # upon deleting blocks after dragging them on the diagram.
-        item = itemType(componentType, editor, displayName=displayName, loadedBlock=loadedBlock)
-    else:
-        item = itemType(componentType, editor, displayNamePrefix=parts["displayNamePrefix"])
+    if componentTypeName == "GraphicalItem":
+        return GraphicalItem(editor)
 
-    return item
+    if componentTypeName not in blockItems:
+        raise AssertionError(f"Unknown kind of block item: `{componentTypeName}`.")
+
+    parts = blockItems[componentTypeName]
+    clazz = parts["blockItem"]
+    prefix = parts["displayNamePrefix"]
+
+    if displayName:
+        return clazz(componentTypeName, editor, displayName=displayName, loadedBlock=True)
+
+    return clazz(componentTypeName, editor, displayNamePrefix=prefix)

@@ -70,8 +70,7 @@ class Decoder(json.JSONDecoder):
                         self.logger.warning(f"BlockItem: '{componentType}' is no longer supported in the GUI.")
                         continue
                     else:
-                        bl = _gbi.getBlockItem(componentType, self.editor, displayName=i["BlockDisplayName"],
-                                               loadedBlock=True)
+                        bl = _gbi.getBlockItem(componentType, self.editor, displayName=i["BlockDisplayName"])
 
                     bl.decode(i, resBlockList)
 
