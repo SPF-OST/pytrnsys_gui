@@ -4,12 +4,15 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
-from pytrnsys.utils import serialization as _ser
+import pytrnsys.utils.serialization as _ser
+
+import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 
 
 @_dc.dataclass
 class DoublePipeConnectionModelVersion0(  # pylint: disable=too-many-instance-attributes
-                                _ser.UpgradableJsonSchemaMixinVersion0):
+    _ser.UpgradableJsonSchemaMixinVersion0
+):
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -49,35 +52,35 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
         assert isinstance(superseded, DoublePipeConnectionModelVersion0)
 
         return DoublePipeConnectionModel(
-                superseded.connectionId,
-                superseded.name,
-                superseded.id,
-                superseded.childIds,
-                superseded.segmentsCorners,
-                superseded.labelPos,
-                superseded.massFlowLabelPos,
-                superseded.fromPortId,
-                superseded.toPortId,
-                superseded.trnsysId,
-                lengthInM=2.0
+            superseded.connectionId,
+            superseded.name,
+            superseded.id,
+            superseded.childIds,
+            superseded.segmentsCorners,
+            superseded.labelPos,
+            superseded.massFlowLabelPos,
+            superseded.fromPortId,
+            superseded.toPortId,
+            superseded.trnsysId,
+            _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M,
         )
 
     @classmethod
     def from_dict(
-            cls,
-            data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
-            validate=True,
-            validate_enums: bool = True,
+        cls,
+        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
+        validate=True,
+        validate_enums: bool = True,
     ) -> "DoublePipeConnectionModel":
         data.pop(".__ConnectionDict__")
         doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
 
     def to_dict(
-            self,
-            omit_none: bool = True,
-            validate: bool = False,
-            validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
+        self,
+        omit_none: bool = True,
+        validate: bool = False,
+        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__ConnectionDict__"] = True
@@ -85,4 +88,4 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('bdb5f03b-75bb-4c2f-a658-0de489c5b017')
+        return _uuid.UUID("bdb5f03b-75bb-4c2f-a658-0de489c5b017")

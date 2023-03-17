@@ -9,6 +9,7 @@ import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
 import trnsysGUI.connection.singlePipeConnectionModel as _model
+import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.hydraulicLoops.names as _names
@@ -35,9 +36,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         self._editor = parent
 
-        self.diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
-        self.uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
-        self.lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+        self.diameterInCm: _values.Value = _defaults.DEFAULT_DIAMETER_IN_CM
+        self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
+        self.lengthInM: _values.Value = _defaults.DEFAULT_LENGTH_IN_M
 
         self.shallBeSimulated = True
 

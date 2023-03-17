@@ -8,6 +8,7 @@ import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnectionModel as _model
+import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.ddckFields.headerAndParameters.doublePipeConnection as _hp
@@ -48,7 +49,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
-        self.lengthInM: _values.Value = _values.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
+        self.lengthInM: _values.Value = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
