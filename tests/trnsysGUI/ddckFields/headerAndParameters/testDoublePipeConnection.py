@@ -1,19 +1,12 @@
-import typing as _tp
-
-import trnsysGUI.connection.values as _values
-
-if _tp.TYPE_CHECKING:
-    from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+import trnsysGUI.ddckFields.headerAndParameters.doublePipeConnection as _dpchp
 
 
-def getDoublePipeConnectionHeaderAndParameters(connection: "DoublePipeConnection", unitNumber: int) -> str:
-    lengthInM = _values.getConvertedValueOrName(connection.lengthInM)
-    headerAndParameters = f"""\
-UNIT {unitNumber} TYPE 9511
-! {connection.displayName}
+_EXPECTED_HEADER_AND_PARAMETERS = """\
+UNIT 12 TYPE 9511
+! Con35
 PARAMETERS 36
 ****** pipe and soil properties ******
-{lengthInM}                                ! Length of buried pipe, m
+2.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -56,4 +49,15 @@ dpRadNdDist                             ! Radial distance of node 9, m
 dpRadNdDist                             ! Radial distance of node 10, m
 
 """
-    return headerAndParameters
+
+
+class _StrictMock:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+
+class TestGetHeaderAndParameters:
+    def testDoublePipeConnectionText(self):
+        connection = _StrictMock(lengthInM=2.0, displayName="Con35")
+        actualHeaderAndParameters = _dpchp.getHeaderAndParameters(connection, 12)
+        assert actualHeaderAndParameters == _EXPECTED_HEADER_AND_PARAMETERS
