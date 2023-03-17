@@ -98,7 +98,7 @@ def getBlockItem(
         return GraphicalItem(editor)
 
     if componentTypeName not in blockItems:
-        raise AssertionError(f"Unknown kind of block item: `{componentTypeName}`.")
+        raise ValueError(f"Unknown kind of block item: `{componentTypeName}`.")
 
     parts = blockItems[componentTypeName]
     clazz = parts["blockItem"]

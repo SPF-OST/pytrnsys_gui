@@ -122,7 +122,7 @@ class TestGetBlockItem:
     def testGetNewUnknownBlockItemRaises(self, tmp_path, request: _pt.FixtureRequest) -> None:
         editorMock = self._testHelper(tmp_path, request)
 
-        with _pt.raises(AssertionError):
+        with _pt.raises(ValueError):
             _gbi.getBlockItem("Blk", editorMock)
 
     @_pt.mark.parametrize("componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
