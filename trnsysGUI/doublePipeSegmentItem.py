@@ -33,7 +33,7 @@ class DoublePipeSegmentItem(SegmentItemBase):
         return menu
 
     def editLength(self):
-        connection = _dpcldlg.DPConnection(self._doublePipeConnection.lengthInM)
+        connection = _dpcldlg.ConnectionModel(self._doublePipeConnection.lengthInM)
         _dpcldlg.DoublePipeConnectionLengthDialog(connection).exec()
         self._doublePipeConnection.lengthInM = connection.lengthInM
 
