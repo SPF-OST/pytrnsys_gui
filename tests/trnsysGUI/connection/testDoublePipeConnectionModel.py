@@ -40,7 +40,7 @@ _JSON_VERSION_1 = {
     "fromPortId": 17,
     "id": 1,
     "labelPos": [1.1, 1.1],
-    "lengthInM": 2.0,
+    "lengthInM": 579.404,
     "massFlowLabelPos": [1.1, 0],
     "name": "dpc5",
     "segmentsCorners": [[0, 0], [0, 1], [1, 0], [1, 1]],
@@ -72,7 +72,7 @@ _MODEL1 = _dpcm.DoublePipeConnectionModel(
     fromPortId=17,
     toPortId=18,
     trnsysId=500,
-    lengthInM=2.0,
+    lengthInM=579.404,
 )
 
 
