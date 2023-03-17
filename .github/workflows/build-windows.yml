@@ -2,9 +2,11 @@ name: Static checks and unit tests
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - '*'
   repository_dispatch:
     type: run-tests-and-build-executable
 
