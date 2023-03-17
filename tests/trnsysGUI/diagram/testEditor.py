@@ -4,7 +4,6 @@ import os as _os
 import pathlib as _pl
 import shutil as _su
 import subprocess as _sp
-import sys as _sys
 import time as _time
 import typing as _tp
 
