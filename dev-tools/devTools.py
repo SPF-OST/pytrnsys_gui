@@ -7,6 +7,7 @@ import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
+import typing as tp
 import sysconfig as _sysconfig
 import venv
 
@@ -17,6 +18,95 @@ _SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
 
 
 def main():
+    arguments = _parseArguments()
+
+    testResultsDirPath = pl.Path("test-results")
+
+    _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
+
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
+        cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes trnsysGUI tests dev-tools"
+        additionalArgs = arguments.mypyArguments or ""
+        _printAndRun([*cmd.split(), *additionalArgs.split()])
+
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
+        cmd = f"{_SCRIPTS_DIR / 'pylint'} trnsysGUI tests dev-tools"
+        additionalArgs = arguments.lintArguments or ""
+
+        _printAndRun([*cmd.split(), *additionalArgs.split()])
+
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting is not None:
+        cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 --check trnsysGUI tests dev-tools"
+
+        _printAndRun(cmd.split())
+
+    if arguments.shallRunAll or arguments.diagramsFormat:
+        diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+        cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
+        _printAndRun(cmd.split())
+
+    if arguments.shallRunAll or arguments.shallCreateExecutable:
+        releaseDirPath = pl.Path("release").resolve(strict=True)
+
+        sh.rmtree(releaseDirPath / "build", ignore_errors=True)
+        sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
+        sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
+
+        venvDirPath = releaseDirPath / "pyinstaller-venv"
+        venv.create(venvDirPath, with_pip=True)
+
+        commands = [
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
+            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
+            r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
+        ]
+
+        for cmd in commands:
+            _printAndRun(cmd.split())
+
+        os.chdir("release")
+
+        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
+        _printAndRun(cmd.split())
+
+        os.chdir("..")
+
+    wasCalledWithoutArguments = (
+        not arguments.shallPerformStaticChecks
+        and arguments.mypyArguments is None
+        and arguments.lintArguments is None
+        and arguments.diagramsFormat is None
+        and not arguments.shallCreateExecutable
+    )
+    if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
+        markersExpression = arguments.pytestMarkersExpression or "not ci and not linux"
+        additionalArgs = ["-m", markersExpression]
+
+        cmd = [
+            _SCRIPTS_DIR / "pytest",
+            "-v",
+            "--cov=trnsysGUI",
+            f"--cov-report=html:{testResultsDirPath / 'coverage-html'}",
+            f"--cov-report=lcov:{testResultsDirPath / 'coverage.lcov'}",
+            "--cov-report=term",
+            f"--html={testResultsDirPath / 'report' / 'report.html'}",
+        ]
+
+        args = [*cmd, *additionalArgs, "tests"]
+
+        _printAndRun(args)
+
+
+def _printAndRun(args: tp.Sequence[str]) -> None:
+    formattedArgs = " ".join(str(arg) for arg in args)
+    print(f"Running '{formattedArgs}'...")
+    sp.run(args, check=True)
+    print("...DONE.")
+
+
+def _parseArguments() -> ap.Namespace:
     parser = ap.ArgumentParser()
 
     parser.add_argument(
@@ -36,6 +126,7 @@ def main():
     parser.add_argument(
         "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
     )
+    parser.add_argument("-b", "--black", help="Check formatting", action="store_true", dest="shallCheckFormatting")
     parser.add_argument(
         "-t",
         "--type",
@@ -80,83 +171,8 @@ def main():
         action="store_true",
         dest="shallCreateExecutable",
     )
-
     arguments = parser.parse_args()
-
-    testResultsDirPath = pl.Path("test-results")
-
-    _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
-
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes trnsysGUI tests dev-tools"
-        additionalArgs = arguments.mypyArguments or ""
-        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
-
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'pylint'} trnsysGUI tests dev-tools"
-        additionalArgs = arguments.lintArguments or ""
-
-        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
-
-    if arguments.shallRunAll or arguments.diagramsFormat:
-        diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
-        sp.run(cmd.split(), check=True)
-
-    if arguments.shallRunAll or arguments.shallCreateExecutable:
-        releaseDirPath = pl.Path("release").resolve(strict=True)
-
-        sh.rmtree(releaseDirPath / "build", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
-
-        venvDirPath = releaseDirPath / "pyinstaller-venv"
-        venv.create(venvDirPath, with_pip=True)
-
-        commands = [
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
-            r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
-        ]
-
-        for cmd in commands:
-            print(cmd)
-            sp.run(cmd.split(), check=True)
-
-        os.chdir("release")
-
-        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
-        print(cmd)
-        sp.run(cmd.split(), check=True)
-
-        os.chdir("..")
-
-    wasCalledWithoutArguments = (
-        not arguments.shallPerformStaticChecks
-        and arguments.mypyArguments is None
-        and arguments.lintArguments is None
-        and arguments.diagramsFormat is None
-        and not arguments.shallCreateExecutable
-    )
-    if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
-        markersExpression = arguments.pytestMarkersExpression or "not ci and not linux"
-        additionalArgs = ["-m", markersExpression]
-
-        cmd = [
-            _SCRIPTS_DIR / "pytest",
-            "-v",
-            "--cov=trnsysGUI",
-            f"--cov-report=html:{testResultsDirPath / 'coverage-html'}",
-            f"--cov-report=lcov:{testResultsDirPath / 'coverage.lcov'}",
-            "--cov-report=term",
-            f"--html={testResultsDirPath / 'report' / 'report.html'}",
-        ]
-
-        args = [*cmd, *additionalArgs, "tests"]
-
-        sp.run(args, check=True)
+    return arguments
 
 
 def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: bool) -> None:

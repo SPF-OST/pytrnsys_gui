@@ -190,7 +190,9 @@ class Editor(_qtw.QWidget):
         libraryBrowserAndContextInfoSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
         libraryBrowserAndContextInfoSplitter.addWidget(libraryBrowserView)
         libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
-        _sizes.setRelativeSizes(libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1])
+        _sizes.setRelativeSizes(
+            libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1]
+        )
 
         self._consoleWidget = _con.QtConsoleWidget()
 

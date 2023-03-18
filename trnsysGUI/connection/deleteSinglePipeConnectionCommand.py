@@ -13,12 +13,12 @@ import trnsysGUI.hydraulicLoops.split as _hlsplit  # pylint: disable=cyclic-impo
 
 class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=too-many-instance-attributes
     def __init__(
-            self,
-            connection: _spc.SinglePipeConnection,
-            hydraulicLoops: _hlmodel.HydraulicLoops,
-            fluids: _tp.Sequence[_hlmodel.Fluid],
-            defaultFluid: _hlmodel.Fluid,
-            parentCommand: _tp.Optional[_qtw.QUndoCommand]
+        self,
+        connection: _spc.SinglePipeConnection,
+        hydraulicLoops: _hlmodel.HydraulicLoops,
+        fluids: _tp.Sequence[_hlmodel.Fluid],
+        defaultFluid: _hlmodel.Fluid,
+        parentCommand: _tp.Optional[_qtw.QUndoCommand],
     ):
         super().__init__("Delete single pipe connection", parentCommand)
         self._connection: _tp.Optional[_spc.SinglePipeConnection] = connection

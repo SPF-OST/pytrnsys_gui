@@ -97,9 +97,7 @@ def _getInstalledNonEditableVersions() -> _res.Result[_tp.Set[_VersionedPackage]
     completedPipFreezeProcess = _sp.run("pip freeze --no-color".split(), capture_output=True, text=True, check=True)
     serializedInstalledVersions = completedPipFreezeProcess.stdout.split("\n")
     serializedNonEditableInstalledVersions = [
-        v
-        for v in serializedInstalledVersions
-        if v.strip() and not v.startswith("-e")
+        v for v in serializedInstalledVersions if v.strip() and not v.startswith("-e")
     ]
     try:
         installedVersions = {_VersionedPackage.create(v) for v in serializedNonEditableInstalledVersions}

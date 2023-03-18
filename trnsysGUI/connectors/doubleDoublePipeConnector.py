@@ -63,9 +63,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
 
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
 
-        internalPiping = _ip.InternalPiping(
-            [self._coldPipe, self._hotPipe], modelPortItemsToGraphicalPortItem
-        )
+        internalPiping = _ip.InternalPiping([self._coldPipe, self._hotPipe], modelPortItemsToGraphicalPortItem)
 
         return internalPiping
 
@@ -86,11 +84,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         return unitText, startingUnit + 2
 
     def _getIfThenElseUnit(
-        self,
-        unitNumber: int,
-        pipe: _mfn.Pipe,
-        fromPort: _dppi.DoublePipePortItem,
-        toPort: _dppi.DoublePipePortItem
+        self, unitNumber: int, pipe: _mfn.Pipe, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem
     ) -> str:
         outputTemp = _temps.getTemperatureVariableName(self, pipe)
         fromConnection = fromPort.getConnection()

@@ -212,29 +212,13 @@ class MassFlowVisualizer(_qtw.QDialog):
                             t.setColor(thickValue, mfr="max")
                         elif round(abs(temperature)) == self.minValue:
                             t.setColor(thickValue, mfr="min")
-                        elif (
-                            self.minValue
-                            < round(abs(temperature))
-                            <= self.lowerQuarter
-                        ):
+                        elif self.minValue < round(abs(temperature)) <= self.lowerQuarter:
                             t.setColor(thickValue, mfr="minTo25")
-                        elif (
-                            self.lowerQuarter
-                            < round(abs(temperature))
-                            <= self.medianValue
-                        ):
+                        elif self.lowerQuarter < round(abs(temperature)) <= self.medianValue:
                             t.setColor(thickValue, mfr="25To50")
-                        elif (
-                            self.medianValue
-                            < round(abs(temperature))
-                            <= self.upperQuarter
-                        ):
+                        elif self.medianValue < round(abs(temperature)) <= self.upperQuarter:
                             t.setColor(thickValue, mfr="50To75")
-                        elif (
-                            self.upperQuarter
-                            < round(abs(temperature))
-                            < self.maxValue
-                        ):
+                        elif self.upperQuarter < round(abs(temperature)) < self.maxValue:
                             t.setColor(thickValue, mfr="75ToMax")
                         else:
                             t.setColor(thickValue, mfr="test")

@@ -62,7 +62,7 @@ class SaltTankBase(BlockItem, _ip.HasInternalPiping):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[w-delta, 0]]
+        self.origInputsPos = [[w - delta, 0]]
         self.origOutputsPos = [[delta, 0]]
 
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])

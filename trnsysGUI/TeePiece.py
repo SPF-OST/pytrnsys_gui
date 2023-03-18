@@ -124,7 +124,7 @@ class TeePiece(_bi.BlockItem, _ip.HasInternalPiping):
         temperatureVariableNames = [
             _cnames.getTemperatureVariableName(self.inputs[0].getConnection(), _mfn.PortItemType.STANDARD),
             _cnames.getTemperatureVariableName(self.outputs[0].getConnection(), _mfn.PortItemType.STANDARD),
-            _cnames.getTemperatureVariableName(self.outputs[1].getConnection(), _mfn.PortItemType.STANDARD)
+            _cnames.getTemperatureVariableName(self.outputs[1].getConnection(), _mfn.PortItemType.STANDARD),
         ]
 
         unitText += "\n".join(temperatureVariableNames) + "\n"

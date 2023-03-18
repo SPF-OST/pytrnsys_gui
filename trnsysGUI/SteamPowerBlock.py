@@ -58,8 +58,8 @@ class SteamPowerBlock(BlockItem, _ip.HasInternalPiping):
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
-        self.origInputsPos = [[0, h-4*delta]]
-        self.origOutputsPos = [[0, h-2*delta]]
+        self.origInputsPos = [[0, h - 4 * delta]]
+        self.origOutputsPos = [[0, h - 2 * delta]]
 
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])

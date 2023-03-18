@@ -410,7 +410,9 @@ class Type1924_TesPlugFlow:
 
     def getHeighAvgSensorParValues(self, nTes):
 
-        lines = self.sLine + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+        lines = (
+            self.sLine + "** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user \n" + self.sLine
+        )
 
         line = "CONSTANTS 10\n"
         lines = lines + line
@@ -628,16 +630,22 @@ class Type1924_TesPlugFlow:
         line = "EQUATIONS 5\n"
         lines = lines + line
 
-        line = "Qv_Tes%d     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QLoss_Tes%d  = [%d,177] ! Heat Losses of the Tes [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QAcum_Tes%d  = [%d,178] ! Sensible accumulated heat [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QPorts_Tes%d = [%d,179] ! Heat Input by direct ports [kW]\n"%(nTes,nUnit)
-        lines=lines+line
-        line = "QImb_Tes%d   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n"%(nTes,nUnit)
-        lines=lines+line
+        line = "Qv_Tes%d     = [%d,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]\n" % (
+            nTes,
+            nUnit,
+        )
+        lines = lines + line
+        line = "QLoss_Tes%d  = [%d,177] ! Heat Losses of the Tes [kW]\n" % (nTes, nUnit)
+        lines = lines + line
+        line = "QAcum_Tes%d  = [%d,178] ! Sensible accumulated heat [kW]\n" % (nTes, nUnit)
+        lines = lines + line
+        line = "QPorts_Tes%d = [%d,179] ! Heat Input by direct ports [kW]\n" % (nTes, nUnit)
+        lines = lines + line
+        line = "QImb_Tes%d   = [%d,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort\n" % (
+            nTes,
+            nUnit,
+        )
+        lines = lines + line
 
         return lines
 
@@ -670,7 +678,7 @@ class Type1924_TesPlugFlow:
 
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
-        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d "%(nTes,nTes,nTes,nTes,nTes)
+        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d " % (nTes, nTes, nTes, nTes, nTes)
         lines = lines + line
         for i in range(inputs["nPorts"]):
             line = "Qdp%d_Tes%d " % (i + 1, nTes)

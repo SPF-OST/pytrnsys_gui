@@ -126,7 +126,9 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                             cor.setPos(self.scenePos().x(), cor.pos().y())
 
                             seg = conn.segments[0]  # first segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(
+                                self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y()
+                            )
 
                 elif conn.toPort is self:
                     if (conn.fromPort.createdAtSide not in (1, 3)) or not conn.segments[0].isVertical():
@@ -163,14 +165,18 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                             self.logger.debug("Inside 2nd")
 
                             seg = conn.segments[-1]  # last segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(
+                                self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y()
+                            )
                         elif len(conn.getCorners()) == 2 and len(conn.segments) > 0:
                             cor = conn.getCorners()[-1]
                             cor.setPos(self.scenePos().x(), cor.pos().y())
                             self.logger.debug("Inside 3rd")
 
                             seg = conn.segments[-1]  # last segment
-                            seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
+                            seg.setLine(
+                                self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y()
+                            )
 
                 else:
                     self.logger.debug("Error: In Mode 1, moving a portItem, portItem is neither from nor toPort")

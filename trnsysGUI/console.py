@@ -72,7 +72,8 @@ def _initAsyncIOPatch() -> None:
             # not affected
         else:
             if (
-                type(_aio.get_event_loop_policy()) is WindowsProactorEventLoopPolicy  # pylint: disable=unidiomatic-typecheck
+                type(_aio.get_event_loop_policy())  # pylint: disable=unidiomatic-typecheck
+                is WindowsProactorEventLoopPolicy
             ):
                 # WindowsProactorEventLoopPolicy is not compatible with tornado 6
                 # fallback to the pre-3.8 default of Selector
