@@ -41,14 +41,24 @@ def main():
         return
     project = _ccl.value(maybeCancelled)
 
-    form = _mw.MainWindow(logger, project)
-    form.showMaximized()
-    form.show()
-    form.ensureSettingsExist()
-    form.loadTrnsysPath()
+    mainWindow = _mw.MainWindow(logger, project)
+    mainWindow.start()
 
-    tracer = trc.createTracer(arguments.shallTrace)
-    tracer.run(app.exec)
+    def _shutdownMainWindowIfRunning() -> None:
+        if mainWindow.isRunning():
+            mainWindow.shutdown()
+
+    app.aboutToQuit.connect(_shutdownMainWindowIfRunning)
+
+    try:
+        mainWindow.showMaximized()
+        mainWindow.ensureSettingsExist()
+        mainWindow.loadTrnsysPath()
+
+        tracer = trc.createTracer(arguments.shallTrace)
+        tracer.run(app.exec)
+    finally:
+        _shutdownMainWindowIfRunning()
 
 
 def _getLogFilePath():
