@@ -33,7 +33,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
-from trnsysGUI.Graphicaltem import GraphicalItem
+from trnsysGUI.GraphicalItem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
@@ -1203,18 +1203,18 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         assert data, f"{resourcePath} package resource not found"
         return data
 
-    def createHydraulicDir(self, projectPath):
+    def createHydraulicDir(self, projectFolder):
 
-        self.hydraulicFolder = os.path.join(projectPath, "ddck")
+        self.hydraulicFolder = os.path.join(projectFolder, "ddck")
         self.hydraulicFolder = os.path.join(self.hydraulicFolder, "hydraulic")
 
         if not os.path.exists(self.hydraulicFolder):
             self.logger.info("Creating " + self.hydraulicFolder)
             os.makedirs(self.hydraulicFolder)
 
-    def createWeatherAndControlDirs(self, projectPath):
+    def createWeatherAndControlDirs(self, projectFolder):
 
-        ddckFolder = os.path.join(projectPath, "ddck")
+        ddckFolder = os.path.join(projectFolder, "ddck")
         weatherFolder = os.path.join(ddckFolder, "weather")
         controlFolder = os.path.join(ddckFolder, "control")
 

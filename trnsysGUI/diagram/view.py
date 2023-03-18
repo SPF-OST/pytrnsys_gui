@@ -6,47 +6,8 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
-from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
-from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
-from trnsysGUI.Control import Control  # type: ignore[attr-defined]
-from trnsysGUI.ExternalHx import ExternalHx  # type: ignore[attr-defined]
-from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
-from trnsysGUI.Graphicaltem import GraphicalItem  # type: ignore[attr-defined]
-from trnsysGUI.GroundSourceHx import GroundSourceHx  # type: ignore[attr-defined]
-from trnsysGUI.HPDoubleDual import HPDoubleDual  # type: ignore[attr-defined]
-from trnsysGUI.HPDual import HPDual  # type: ignore[attr-defined]
-from trnsysGUI.HeatPump import HeatPump  # type: ignore[attr-defined]
-from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx  # type: ignore[attr-defined]
-from trnsysGUI.IceStorage import IceStorage  # type: ignore[attr-defined]
-from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx  # type: ignore[attr-defined]
-from trnsysGUI.MasterControl import MasterControl  # type: ignore[attr-defined]
-from trnsysGUI.PV import PV  # type: ignore[attr-defined]
-from trnsysGUI.ParabolicTroughField import ParabolicTroughField  # type: ignore[attr-defined]
-from trnsysGUI.PitStorage import PitStorage  # type: ignore[attr-defined]
-from trnsysGUI.Radiator import Radiator  # type: ignore[attr-defined]
-from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
-from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
-from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
-from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
-from trnsysGUI.TeePiece import TeePiece  # type: ignore[attr-defined]
-from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
-from trnsysGUI.WTap_main import WTap_main  # type: ignore[attr-defined]
-from trnsysGUI.connectors.connector import Connector  # type: ignore[attr-defined]
-from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
-from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.deleteBlockCommand import DeleteBlockCommand
-from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
-from trnsysGUI.geotherm import Geotherm
-from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
-from trnsysGUI.sink import Sink
-from trnsysGUI.source import Source
-from trnsysGUI.sourceSink import SourceSink
-from trnsysGUI.storageTank.widget import StorageTank
-from trnsysGUI.water import Water
+from trnsysGUI.blockItems.getBlockItem import getBlockItem
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -80,89 +41,12 @@ class View(_qtw.QGraphicsView):
         if event.mimeData().hasFormat("component/name"):
             componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
             self.logger.debug("name is " + componentType)
+            blockItem = getBlockItem(componentType, self._editor)
             if componentType == "StorageTank":
-                blockItem = StorageTank(componentType, self._editor, displayNamePrefix="Tes")
                 blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
                 self._editor.showConfigStorageDlg(blockItem)
-            elif componentType == "TeePiece":
-                blockItem = TeePiece(componentType, self._editor, displayNamePrefix="Tee")
-            elif componentType == "DPTee":
-                blockItem = DoublePipeTeePiece(componentType, self._editor, displayNamePrefix="DTee")
-            elif componentType == "SPCnr":
-                blockItem = SingleDoublePipeConnector(componentType, self._editor, displayNamePrefix="SCnr")
-            elif componentType == "DPCnr":
-                blockItem = DoubleDoublePipeConnector(componentType, self._editor, displayNamePrefix="DCnr")
-            elif componentType == "TVentil":
-                blockItem = TVentil(componentType, self._editor, displayNamePrefix="Val")
-            elif componentType == "Pump":
-                blockItem = Pump(componentType, self._editor, displayNamePrefix="Pump")
-            elif componentType == "Collector":
-                blockItem = Collector(componentType, self._editor, displayNamePrefix="Coll")
-            elif componentType == "HP":
-                blockItem = HeatPump(componentType, self._editor, displayNamePrefix="HP")
-            elif componentType == "IceStorage":
-                blockItem = IceStorage(componentType, self._editor, displayNamePrefix="IceS")
-            elif componentType == "PitStorage":
-                blockItem = PitStorage(componentType, self._editor, displayNamePrefix="PitS")
-            elif componentType == "Radiator":
-                blockItem = Radiator(componentType, self._editor, displayNamePrefix="Rad")
-            elif componentType == "WTap":
-                blockItem = WTap(componentType, self._editor, displayNamePrefix="WtTp")
-            elif componentType == "WTap_main":
-                blockItem = WTap_main(componentType, self._editor, displayNamePrefix="WtSp")
-            elif componentType == "Connector":
-                blockItem = Connector(componentType, self._editor, displayNamePrefix="Conn")
             elif componentType == "GenericBlock":
-                blockItem = GenericBlock(componentType, self._editor, displayNamePrefix="GBlk")
                 self._editor.showGenericPortPairDlg(blockItem)
-            elif componentType == "HPTwoHx":
-                blockItem = HeatPumpTwoHx(componentType, self._editor, displayNamePrefix="HP")
-            elif componentType == "HPDoubleDual":
-                blockItem = HPDoubleDual(componentType, self._editor, displayNamePrefix="HPDD")
-            elif componentType == "HPDual":
-                blockItem = HPDual(componentType, self._editor, displayNamePrefix="HPDS")
-            elif componentType == "Boiler":
-                blockItem = Boiler(componentType, self._editor, displayNamePrefix="Bolr")
-            elif componentType == "AirSourceHP":
-                blockItem = AirSourceHP(componentType, self._editor, displayNamePrefix="Ashp")
-            elif componentType == "PV":
-                blockItem = PV(componentType, self._editor, displayNamePrefix="PV")
-            elif componentType == "GroundSourceHx":
-                blockItem = GroundSourceHx(componentType, self._editor, displayNamePrefix="Gshx")
-            elif componentType == "ExternalHx":
-                blockItem = ExternalHx(componentType, self._editor, displayNamePrefix="Hx")
-            elif componentType == "IceStorageTwoHx":
-                blockItem = IceStorageTwoHx(componentType, self._editor, displayNamePrefix="IceS")
-            elif componentType == "GraphicalItem":
-                blockItem = GraphicalItem(self._editor)
-            elif componentType == "MasterControl":
-                blockItem = MasterControl(componentType, self._editor)
-            elif componentType == "Control":
-                blockItem = Control(componentType, self._editor)
-            elif componentType == "Sink":
-                blockItem = Sink(componentType, self._editor, displayNamePrefix="QSnk")
-            elif componentType == "Source":
-                blockItem = Source(componentType, self._editor, displayNamePrefix="QSrc")
-            elif componentType == "SourceSink":
-                blockItem = SourceSink(componentType, self._editor, displayNamePrefix="QExc")
-            elif componentType == "Geotherm":
-                blockItem = Geotherm(componentType, self._editor, displayNamePrefix="GeoT")
-            elif componentType == "Water":
-                blockItem = Water(componentType, self._editor, displayNamePrefix="QWat")
-            elif componentType == "Crystalizer":
-                blockItem = Crystalizer(componentType, self._editor, displayNamePrefix="Cryt")
-            elif componentType == "powerBlock":
-                blockItem = SteamPowerBlock(componentType, self._editor, displayNamePrefix="StPB")
-            elif componentType == "CSP_PT":
-                blockItem = ParabolicTroughField(componentType, self._editor, displayNamePrefix="PT")
-            elif componentType == "CSP_CR":
-                blockItem = CentralReceiver(componentType, self._editor, displayNamePrefix="CR")
-            elif componentType == "coldSaltTank":
-                blockItem = SaltTankCold(componentType, self._editor, displayNamePrefix="ClSt")
-            elif componentType == "hotSaltTank":
-                blockItem = SaltTankHot(componentType, self._editor, displayNamePrefix="HtSt")
-            else:
-                blockItem = BlockItem(componentType, self._editor, displayNamePrefix="Blk")
 
             snapSize = self._editor.snapSize
             if self._editor.snapGrid:
