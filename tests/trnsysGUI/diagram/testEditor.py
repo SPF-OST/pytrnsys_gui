@@ -110,7 +110,8 @@ class TestEditor:
         monkeypatch.setattr(
             _mw.MainWindow,  # type: ignore[attr-defined]
             _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            _patchedCloseEvent)
+            _patchedCloseEvent,
+        )
 
         jsonFilePath = helper.actualProjectFolderPath / f"{helper.actualProjectFolderPath.name}.json"
         project = _prj.LoadProject(jsonFilePath)
@@ -138,7 +139,8 @@ class TestEditor:
         monkeypatch.setattr(
             _mw.MainWindow,  # type: ignore[attr-defined]
             _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            _patchedCloseEvent)
+            _patchedCloseEvent,
+        )
 
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
