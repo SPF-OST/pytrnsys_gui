@@ -12,7 +12,6 @@ import trnsysGUI.internalPiping as _ip
 
 
 class TestDoublePipeConnection:
-
     @staticmethod
     def _applicationHandling(request):
         application = _widgets.QApplication([])
@@ -27,7 +26,7 @@ class TestDoublePipeConnection:
         logger = _log.getLogger("root")
         (
             editorMock,
-            [application, _, _]  # pylint: disable=unused-variable
+            [application, _, _],  # pylint: disable=unused-variable
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, ".")
         fromPort = self._getPortMock("fromPort1")
         toPort = self._getPortMock("toPort1")

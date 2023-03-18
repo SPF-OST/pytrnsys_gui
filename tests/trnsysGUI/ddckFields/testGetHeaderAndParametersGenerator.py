@@ -20,7 +20,6 @@ class TestGetHeaderAndParameters:
 
     def testDoublePipeConnectionText(self):
         textBlockGenerator = _ghp.getHeaderAndParametersGenerator("DoublePipeConnection")
-        connection = _StrictMock(lengthInM=2.0,
-                                 displayName="Con35")
+        connection = _StrictMock(lengthInM=2.0, displayName="Con35")
         text = textBlockGenerator(connection, 12)
         assert text == _dpchp.HEADER_AND_PARAMETERS

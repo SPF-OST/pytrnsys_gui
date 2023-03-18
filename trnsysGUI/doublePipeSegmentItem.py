@@ -11,6 +11,7 @@ from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defin
 
 if _tp.TYPE_CHECKING:
     from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+
     # type: ignore[attr-defined]  #  pylint: disable=unused-import
 
 

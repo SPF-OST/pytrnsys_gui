@@ -105,7 +105,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.fromPort.id,
             self.toPort.id,
             self.trnsysId,
-            self.lengthInM
+            self.lengthInM,
         )
 
         dictName = "Connection-"

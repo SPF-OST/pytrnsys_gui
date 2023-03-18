@@ -91,9 +91,9 @@ class SegmentItemBase(QGraphicsItemGroup):
         return calcDist(self.line().p1(), self.line().p2())
 
     def interpolate(
-            self,
-            partLen2,
-            totLenConn,
+        self,
+        partLen2,
+        totLenConn,
     ):
         # c1_r = 0
         # c1_b = 255
@@ -335,14 +335,14 @@ class SegmentItemBase(QGraphicsItemGroup):
                             self.logger.debug("no next or prev segments")
                         else:
                             if nextHorizSeg.isHorizontal() and int(self.endNode.parent.pos().y() - 10) <= int(
-                                    nextHorizSeg.line().p2().y()
+                                nextHorizSeg.line().p2().y()
                             ) <= int(self.endNode.parent.pos().y() + 10):
                                 self.deleteNextHorizSeg(False, nextHorizSeg)
                                 self.logger.debug("next horizontal")
                                 return
 
                             if prevHorizSeg.isHorizontal() and int(self.startNode.parent.pos().y() - 10) <= int(
-                                    prevHorizSeg.line().p2().y()
+                                prevHorizSeg.line().p2().y()
                             ) <= int(self.startNode.parent.pos().y() + 10):
                                 self.deletePrevHorizSeg(False, prevHorizSeg)
                                 self.logger.debug("previous horizontal")

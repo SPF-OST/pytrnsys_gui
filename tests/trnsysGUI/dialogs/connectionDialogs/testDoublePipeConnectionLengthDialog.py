@@ -50,14 +50,14 @@ class TestDoublePipeConnectionLengthDialog:  # pylint: disable = attribute-defin
         self._applicationHandling(request)
         self._initializeDialog()
 
-        with _m.patch('trnsysGUI.errors.showErrorMessageBox') as box:
+        with _m.patch("trnsysGUI.errors.showErrorMessageBox") as box:
             self._testHelper("-7")
             box.assert_called_with(errorMessage="Value must be positive.", title="Almost there")
 
     def testDialogInputAfterRaises(self, request: _pt.FixtureRequest):
         self._applicationHandling(request)
         self._initializeDialog()
-        with _m.patch('trnsysGUI.errors.showErrorMessageBox'):
+        with _m.patch("trnsysGUI.errors.showErrorMessageBox"):
             self._testHelper("-7")
             self._clearAndWriteAndPressButton("9")
             assert self.dPConnection.lengthInM == 9
