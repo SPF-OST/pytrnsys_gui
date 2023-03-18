@@ -15,9 +15,7 @@ class InternalPiping:
     modelPortItemsToGraphicalPortItem: _tp.Mapping[_mfn.PortItem, _pi.PortItemBase]  # type: ignore[name-defined]
 
     def __post_init__(self):
-        if not all(
-            mpi in self.modelPortItemsToGraphicalPortItem for n in self.nodes for mpi in n.getPortItems()
-        ):
+        if not all(mpi in self.modelPortItemsToGraphicalPortItem for n in self.nodes for mpi in n.getPortItems()):
             raise ValueError("Error a port item of a node was not contained in `modelPortItemsToGraphicalPortItem`.")
 
     def getModelPortItem(
@@ -37,7 +35,9 @@ class InternalPiping:
         return modelPortItems[0]
 
     def getModelPortItems(self, graphicalPortItem: _pi.PortItemBase) -> _tp.Sequence[_mfn.PortItem]:
-        modelPortItems = [mpi for mpi, gpi in self.modelPortItemsToGraphicalPortItem.items() if gpi == graphicalPortItem]
+        modelPortItems = [
+            mpi for mpi, gpi in self.modelPortItemsToGraphicalPortItem.items() if gpi == graphicalPortItem
+        ]
         return modelPortItems
 
     def getNode(
@@ -46,9 +46,7 @@ class InternalPiping:
         nodes = [n for n, t in self._getNodesAndPortItemType(graphicalPortItem) if t == portItemType]
 
         if not nodes:
-            raise ValueError(
-                f"Could not find a port of type {portItemType} associated with graphical port item."
-            )
+            raise ValueError(f"Could not find a port of type {portItemType} associated with graphical port item.")
 
         if len(nodes) > 1:
             raise AssertionError(

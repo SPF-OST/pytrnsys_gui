@@ -132,7 +132,7 @@ class PitStorage(BlockItemFourPorts):
             side1Input: self.inputs[0],
             side1Output: self.outputs[0],
             side2Input: self.inputs[1],
-            side2Output: self.outputs[1]
+            side2Output: self.outputs[1],
         }
 
         return _ip.InternalPiping([side1Pipe, side2Pipe], modelPortItemsToGraphicalPortItem)

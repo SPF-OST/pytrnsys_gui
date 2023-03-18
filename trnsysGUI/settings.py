@@ -15,7 +15,7 @@ import pytrnsys.utils.serialization as _ser
 class SettingsVersion0(_ser.UpgradableJsonSchemaMixinVersion0):
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('f7a2c37c-ce82-4a4a-9869-80f00083275b')
+        return _uuid.UUID("f7a2c37c-ce82-4a4a-9869-80f00083275b")
 
     trnsysBinaryDirPath: str
 
@@ -77,4 +77,4 @@ class Settings(_ser.UpgradableJsonSchemaMixin):
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID('e5ea1fbd-1be9-4415-b3e9-7f3a2a11d216')
+        return _uuid.UUID("e5ea1fbd-1be9-4415-b3e9-7f3a2a11d216")

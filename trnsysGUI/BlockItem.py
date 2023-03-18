@@ -41,7 +41,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         elif displayName:
             self.displayName = displayName
         else:
-            raise Exception('No display name defined.')
+            raise Exception("No display name defined.")
 
         if "loadedBlock" not in kwargs:
             self.editor.trnsysObj.append(self)
@@ -227,12 +227,14 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         else:
             for i, inputPort in enumerate(self.inputs):
-                inputPort.setPos(self.origInputsPos[i][0],  # pylint: disable = unsubscriptable-object
-                                 inputPort.pos().y())
+                inputPort.setPos(
+                    self.origInputsPos[i][0], inputPort.pos().y()  # pylint: disable = unsubscriptable-object
+                )
 
             for i, outputPort in enumerate(self.outputs):
-                outputPort.setPos(self.origOutputsPos[i][0],  # pylint: disable = unsubscriptable-object
-                                  outputPort.pos().y())
+                outputPort.setPos(
+                    self.origOutputsPos[i][0], outputPort.pos().y()  # pylint: disable = unsubscriptable-object
+                )
 
     def updateFlipStateV(self, state):
         self.flippedV = bool(state)
@@ -259,12 +261,14 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         else:
             for i, inputPort in enumerate(self.inputs):
-                inputPort.setPos(inputPort.pos().x(),
-                                 self.origInputsPos[i][1])  # pylint: disable = unsubscriptable-object
+                inputPort.setPos(
+                    inputPort.pos().x(), self.origInputsPos[i][1]
+                )  # pylint: disable = unsubscriptable-object
 
             for i, outputPort in enumerate(self.outputs):
-                outputPort.setPos(outputPort.pos().x(),
-                                  self.origOutputsPos[i][1])  # pylint: disable = unsubscriptable-object
+                outputPort.setPos(
+                    outputPort.pos().x(), self.origOutputsPos[i][1]
+                )  # pylint: disable = unsubscriptable-object
 
     def updateSidesFlippedH(self):
         if self.rotationN % 2 == 0:
@@ -619,8 +623,9 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         resBlockList.append(self)
 
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList,
-                    **kwargs):  # pylint: disable=unused-argument
+    def decodePaste(
+        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs  # /NOSONAR
+    ):  # pylint: disable=unused-argument
         self.setPos(
             float(i["BlockPosition"][0] + offset_x),
             float(i["BlockPosition"][1] + offset_y),

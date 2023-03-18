@@ -5,7 +5,6 @@ setuptools-git-versioning
 twine
 
 pip-compile-multi
-black
 
 pre-commit
 

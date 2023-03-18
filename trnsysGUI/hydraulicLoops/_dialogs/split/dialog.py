@@ -25,7 +25,7 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         occupiedNames: _tp.Set[str],
         fluids: _tp.Sequence[_model.Fluid],
         setLoop1Selected: _tp.Callable[[bool], None],
-        setLoop2Selected: _tp.Callable[[bool], None]
+        setLoop2Selected: _tp.Callable[[bool], None],
     ) -> _common.Cancellable[_common.SplitLoopsSummary]:
         dialog = SplitLoopDialog(loop, occupiedNames, fluids, setLoop1Selected, setLoop2Selected)
         dialog.exec()
@@ -37,7 +37,7 @@ class SplitLoopDialog(_qtw.QDialog, _uigen.Ui_splitHydraulicLoopDialog):
         occupiedNames: _tp.Set[str],
         fluids: _tp.Sequence[_model.Fluid],
         setLoop1Selected: _tp.Callable[[bool], None],
-        setLoop2Selected: _tp.Callable[[bool], None]
+        setLoop2Selected: _tp.Callable[[bool], None],
     ) -> None:
         super().__init__()
         self.setupUi(self)

@@ -353,7 +353,8 @@ class SegmentItemBase(QGraphicsItemGroup):
                     # if PortItem
                     if hasattr(self.endNode.parent, "fromPort"):
                         segbef = self.connection.segments[
-                            self.connection.getNodePos(self.secondCorner.node.prevN().parent)]
+                            self.connection.getNodePos(self.secondCorner.node.prevN().parent)
+                        ]
 
                         segbef.setLine(
                             segbef.line().p1().x(),
@@ -381,7 +382,8 @@ class SegmentItemBase(QGraphicsItemGroup):
                     elif hasattr(self.startNode.parent, "fromPort"):
 
                         segafter = self.connection.segments[
-                            self.connection.getNodePos(self.thirdCorner.node.nextN().parent)]
+                            self.connection.getNodePos(self.thirdCorner.node.nextN().parent)
+                        ]
 
                         segafter.setLine(
                             segafter.line().p1().x(),
@@ -476,7 +478,6 @@ class SegmentItemBase(QGraphicsItemGroup):
 
                 self.secondCorner = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
                 self.thirdCorner = CornerItem(
-
                     -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
                 )
 
@@ -510,7 +511,6 @@ class SegmentItemBase(QGraphicsItemGroup):
 
                 self.secondCorner = CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
                 self.thirdCorner = CornerItem(
-
                     -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
                 )
 

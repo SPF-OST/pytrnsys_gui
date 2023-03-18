@@ -2,7 +2,6 @@ import pytrnsys.utils.result as _res
 
 
 class ComponentAndPipeNameValidator:
-
     def __init__(self, existingNames):
         self._existingNamesInLowerCase = [n.lower() for n in existingNames]
 
@@ -11,8 +10,10 @@ class ComponentAndPipeNameValidator:
             return _res.Error("Please enter a name.")
 
         if self._doesNameContainUnacceptableCharacters(newName):
-            errorMessage = "Found unacceptable characters (this includes spaces at the start and the end)\n" \
-                           "Please use only letters, numbers, and underscores."
+            errorMessage = (
+                "Found unacceptable characters (this includes spaces at the start and the end)\n"
+                "Please use only letters, numbers, and underscores."
+            )
             return _res.Error(errorMessage)
 
         if self._doesNameExist(newName):

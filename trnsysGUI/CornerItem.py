@@ -54,15 +54,23 @@ class CornerItem(QGraphicsEllipseItem):
 
             if type(nextNode.parent) is CornerItem:
                 if segmentAfter.line() is not None:
-                    segmentAfter.setLine(self.scenePos().x(), self.scenePos().y(), segmentAfter.line().p2().x(),
-                                     segmentAfter.line().p2().y())
+                    segmentAfter.setLine(
+                        self.scenePos().x(),
+                        self.scenePos().y(),
+                        segmentAfter.line().p2().x(),
+                        segmentAfter.line().p2().y(),
+                    )
                 else:
                     self.logger.debug("segmentAfter.line() is None")
 
             if type(previousNode.parent) is CornerItem:
                 if segmentBefore.line() is not None:
-                    segmentBefore.setLine(segmentBefore.line().p1().x(), segmentBefore.line().p1().y(),
-                                          self.scenePos().x(), self.scenePos().y())
+                    segmentBefore.setLine(
+                        segmentBefore.line().p1().x(),
+                        segmentBefore.line().p1().y(),
+                        self.scenePos().x(),
+                        self.scenePos().y(),
+                    )
                 else:
                     self.logger.debug("segmentBefore.line() is None")
 
@@ -70,22 +78,29 @@ class CornerItem(QGraphicsEllipseItem):
                 if nextNode.nextN() is None and self.node.lastNode() is nextNode:
                     self.logger.debug("nextNode is at 'toPort'")
                     lastSegment = self.parent.segments[-1]
-                    lastSegment.setLine(self.scenePos().x(), self.scenePos().y(), nextNode.parent.toPort.scenePos().x(),
-                                        nextNode.parent.toPort.scenePos().y())
+                    lastSegment.setLine(
+                        self.scenePos().x(),
+                        self.scenePos().y(),
+                        nextNode.parent.toPort.scenePos().x(),
+                        nextNode.parent.toPort.scenePos().y(),
+                    )
 
             if hasattr(previousNode.parent, "fromPort"):
                 if previousNode.prevN() is None and self.node.firstNode() is previousNode:
                     self.logger.debug("previousNode is at 'fromPort'")
                     firstSegment = self.parent.segments[0]
-                    firstSegment.setLine(previousNode.parent.fromPort.scenePos().x(),
-                                         previousNode.parent.fromPort.scenePos().y(), self.scenePos().x(),
-                                         self.scenePos().y())
+                    firstSegment.setLine(
+                        previousNode.parent.fromPort.scenePos().x(),
+                        previousNode.parent.fromPort.scenePos().y(),
+                        self.scenePos().x(),
+                        self.scenePos().y(),
+                    )
 
             for segment in self.parent.segments:
                 try:
                     segment.updateGrad()
                 except:
-                    self.logger.warning('Could not update color gradient of pipe.')
+                    self.logger.warning("Could not update color gradient of pipe.")
 
             for callback in self.posCallbacks:
                 callback(value)
