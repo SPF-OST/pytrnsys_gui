@@ -63,7 +63,8 @@ class _Splitter:
             return None
 
         isConnectionRedundant = (
-            fromConnections == otherConnections or toConnections == otherConnections  # pylint: disable=consider-using-in
+            fromConnections == otherConnections  # pylint: disable=consider-using-in
+            or toConnections == otherConnections
         )
         if isConnectionRedundant:
             assert (not fromConnections or fromConnections == otherConnections) and (
@@ -113,9 +114,7 @@ class _Splitter:
             fromLoopName, splitLoopsSummary.fromLoop.fluid, useLoopWideDefaults, [*fromConnections]
         )
 
-        toLoop = _model.HydraulicLoop(
-            toLoopName, splitLoopsSummary.toLoop.fluid, useLoopWideDefaults, [*toConnections]
-        )
+        toLoop = _model.HydraulicLoop(toLoopName, splitLoopsSummary.toLoop.fluid, useLoopWideDefaults, [*toConnections])
 
         self._hydraulicLoops.addLoop(fromLoop)
         self._hydraulicLoops.addLoop(toLoop)

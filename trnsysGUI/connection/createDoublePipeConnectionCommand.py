@@ -13,10 +13,10 @@ if _tp.TYPE_CHECKING:
 
 class CreateDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def __init__(
-            self,
-            fromPort: _dpi.DoublePipePortItem,
-            toPort: _dpi.DoublePipePortItem,
-            editor: _ed.Editor,  # type: ignore[name-defined]
+        self,
+        fromPort: _dpi.DoublePipePortItem,
+        toPort: _dpi.DoublePipePortItem,
+        editor: _ed.Editor,  # type: ignore[name-defined]
     ) -> None:
         super().__init__("Create double pipe connection")
         self._fromPort = fromPort

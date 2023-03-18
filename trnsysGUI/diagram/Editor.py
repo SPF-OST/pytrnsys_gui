@@ -33,7 +33,7 @@ from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
 from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
-from trnsysGUI.Graphicaltem import GraphicalItem
+from trnsysGUI.GraphicalItem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
@@ -190,13 +190,15 @@ class Editor(_qtw.QWidget):
         libraryBrowserAndContextInfoSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
         libraryBrowserAndContextInfoSplitter.addWidget(libraryBrowserView)
         libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
-        _sizes.setRelativeSizes(libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1])
+        _sizes.setRelativeSizes(
+            libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1]
+        )
 
-        consoleWidget = _con.createConsoleWidget(_pl.Path(self.projectFolder))
+        self._consoleWidget = _con.QtConsoleWidget()
 
         logAndConsoleTabs = _qtw.QTabWidget()
         logAndConsoleTabs.addTab(self.loggingTextEdit, "Logging")
-        logAndConsoleTabs.addTab(consoleWidget, "IPython console")
+        logAndConsoleTabs.addTab(self._consoleWidget, "IPython console")
 
         diagramAndTabsSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
         diagramAndTabsSplitter.addWidget(self.diagramView)
@@ -274,6 +276,16 @@ class Editor(_qtw.QWidget):
         libraryBrowserView.setViewMode(libraryBrowserView.IconMode)
         libraryBrowserView.setDragDropMode(libraryBrowserView.DragOnly)
         return libraryBrowserView
+
+    def isRunning(self):
+        return self._consoleWidget.isRunning()
+
+    def start(self) -> None:
+        projectFolderPath = self.projectFolder
+        self._consoleWidget.startInFolder(_pl.Path(projectFolderPath))
+
+    def shutdown(self) -> None:
+        self._consoleWidget.shutdown()
 
     # Debug function
     def dumpInformation(self):
@@ -834,7 +846,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
     def exportDdckPlaceHolderValuesJsonFile(self, shallShowMessageOnSuccess: bool = True) -> _res.Result[None]:
         if not self._isHydraulicConnected():
-            return _res.Error(f"You need to connect all port items before you can export the hydraulics.")
+            return _res.Error("You need to connect all port items before you can export the hydraulics.")
 
         jsonFilePath = _pl.Path(self.projectFolder) / "DdckPlaceHolderValues.json"
 
@@ -1203,18 +1215,18 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         assert data, f"{resourcePath} package resource not found"
         return data
 
-    def createHydraulicDir(self, projectPath):
+    def createHydraulicDir(self, projectFolder):
 
-        self.hydraulicFolder = os.path.join(projectPath, "ddck")
+        self.hydraulicFolder = os.path.join(projectFolder, "ddck")
         self.hydraulicFolder = os.path.join(self.hydraulicFolder, "hydraulic")
 
         if not os.path.exists(self.hydraulicFolder):
             self.logger.info("Creating " + self.hydraulicFolder)
             os.makedirs(self.hydraulicFolder)
 
-    def createWeatherAndControlDirs(self, projectPath):
+    def createWeatherAndControlDirs(self, projectFolder):
 
-        ddckFolder = os.path.join(projectPath, "ddck")
+        ddckFolder = os.path.join(projectFolder, "ddck")
         weatherFolder = os.path.join(ddckFolder, "weather")
         controlFolder = os.path.join(ddckFolder, "control")
 

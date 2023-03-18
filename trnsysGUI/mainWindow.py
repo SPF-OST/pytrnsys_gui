@@ -36,8 +36,7 @@ class MainWindow(_qtw.QMainWindow):
         self.jsonPath = None
         self.logger = logger
 
-        self.editor = self._createDiagramEditor(project)
-        self.setCentralWidget(self.editor)
+        self._resetEditor(project)
 
         _lgcb.configureLoggingCallback(self.logger, self._loggingCallback, _ulog.FORMAT)
 
@@ -230,6 +229,15 @@ class MainWindow(_qtw.QMainWindow):
         self.editMenu.addAction(undoAction)
         self.editMenu.addAction(redoAction)
 
+    def isRunning(self):
+        return self.editor.isRunning()
+
+    def start(self) -> None:
+        self.editor.start()
+
+    def shutdown(self) -> None:
+        self.editor.shutdown()
+
     def newDia(self):
         messageBox = _qtw.QMessageBox()
         messageBox.setText(
@@ -249,8 +257,7 @@ class MainWindow(_qtw.QMainWindow):
             return
         createProject = _ccl.value(createProjectMaybeCancelled)
 
-        self.editor = self._createDiagramEditor(createProject)
-        self.setCentralWidget(self.editor)
+        self._resetEditor(createProject)
 
     def saveDia(self):
         self.logger.info("Saving diagram")
@@ -276,7 +283,8 @@ class MainWindow(_qtw.QMainWindow):
 
         loadProject = _prj.LoadProject(newJsonFilePath)
 
-        self.editor = self._createDiagramEditor(loadProject)
+        self._resetEditor(loadProject)
+
         self.editor.save(showWarning=False)
 
     @staticmethod
@@ -448,11 +456,14 @@ class MainWindow(_qtw.QMainWindow):
             return
         project = _ccl.value(maybeCancelled)
 
-        self.editor = self._createDiagramEditor(project)
-        self.setCentralWidget(self.editor)
+        self._resetEditor(project)
 
         if isinstance(self.editor, _prj.MigrateProject):
             self.editor.save()
+
+    def _resetEditor(self, project):
+        self.editor = self._createDiagramEditor(project)
+        self.setCentralWidget(self.editor)
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState

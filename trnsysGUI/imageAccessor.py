@@ -117,11 +117,11 @@ class ImageAccessor:
     @staticmethod
     def _createDataLoaderFromResourcePath(resourcePath: str, logger: _log.Logger) -> _DataLoaderBase:
         if resourcePath.startswith(_PackageResourceDataLoader.PATH_PREFIX):
-            path = resourcePath[len(_PackageResourceDataLoader.PATH_PREFIX):]
+            path = resourcePath[len(_PackageResourceDataLoader.PATH_PREFIX) :]
             return _PackageResourceDataLoader(path, logger)
 
         if resourcePath.startswith(_FileDataLoader.PATH_PREFIX):
-            path = resourcePath[len(_FileDataLoader.PATH_PREFIX):]
+            path = resourcePath[len(_FileDataLoader.PATH_PREFIX) :]
             return _FileDataLoader(_pl.Path(path), logger)
 
         logger.warning("Found legacy resource path %s: assuming it's a package resource.", resourcePath)

@@ -384,9 +384,7 @@ PARAMETERS {len(serializedNodes) * 4 + 1}
 
     def exportSinglePipeEnergyBalanceVariables(self):
         simulatedSinglePipes = [
-            ip
-            for ip in self._hasInternalPipings
-            if isinstance(ip, _spc.SinglePipeConnection) and ip.shallBeSimulated
+            ip for ip in self._hasInternalPipings if isinstance(ip, _spc.SinglePipeConnection) and ip.shallBeSimulated
         ]
 
         if not simulatedSinglePipes:

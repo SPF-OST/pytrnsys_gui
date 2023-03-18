@@ -172,7 +172,7 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
             condenser1Input: self.inputs[1],
             condenser1Output: self.outputs[1],
             condenser2Input: self.inputs[2],
-            condenser2Output: self.outputs[2]
+            condenser2Output: self.outputs[2],
         }
         nodes = [evaporatorPipe, condenser1Pipe, condenser2Pipe]
 
@@ -181,10 +181,10 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
     def getSubBlockOffset(self, c):
         for i in range(3):
             if (
-                    self.inputs[i] == c.toPort
-                    or self.inputs[i] == c.fromPort
-                    or self.outputs[i] == c.toPort
-                    or self.outputs[i] == c.fromPort
+                self.inputs[i] == c.toPort
+                or self.inputs[i] == c.fromPort
+                or self.outputs[i] == c.toPort
+                or self.outputs[i] == c.fromPort
             ):
                 return i
 

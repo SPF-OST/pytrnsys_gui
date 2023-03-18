@@ -52,9 +52,9 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
         def onApply() -> None:
             nameValue = self.nameComboBox.currentText()
             isUserDefined = (
-                    self._loop1.name.isUserDefined
-                    or self._loop2.name.isUserDefined
-                    or nameValue not in [self._loop1.name and self._loop2.name]
+                self._loop1.name.isUserDefined
+                or self._loop2.name.isUserDefined
+                or nameValue not in [self._loop1.name and self._loop2.name]
             )
             name = _model.UserDefinedName(nameValue) if isUserDefined else _model.AutomaticallyGeneratedName(nameValue)
 
@@ -140,7 +140,6 @@ class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
         loop2: _model.HydraulicLoop,
         occupiedNames: _tp.Set[str],
         fluids: _tp.Sequence[_model.Fluid],
-
     ) -> _common.Cancellable[_common.MergedLoopSummary]:
         dialog = MergeLoopsDialog(loop1, loop2, occupiedNames, fluids)
         dialog.exec()

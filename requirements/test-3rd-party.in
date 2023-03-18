@@ -8,6 +8,7 @@ pytest-html
 pytest-xvfb
 mypy
 pylint
+black==22.6.0
 
 PyQT5-stubs
 pytest-qt
