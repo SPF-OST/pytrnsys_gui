@@ -17,36 +17,35 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-met
         self.kernel_manager: _tp.Optional[_qtcip.QtInProcessKernelManager] = None
         self.kernel_client: _tp.Optional[_qtcc.KernelClient] = None
 
-    def isStarted(self):
+    def isRunning(self):
         return self.kernel_manager and self.kernel_client
 
     def startInFolder(self, dirPathToStartIPythonIn: _pl.Path) -> None:
-        if self.isStarted():
+        if self.isRunning():
             raise RuntimeError("Console has already been started.")
 
         self.kernel_manager = _qtcip.QtInProcessKernelManager()
         self.kernel_manager.start_kernel()
-        kernel = self.kernel_manager.kernel
-        kernel.gui = "qt"
+        self.kernel_manager.kernel.gui = "qt"
 
         _initAsyncIOPatch()
 
         self.kernel_client = self.kernel_manager.client()
         self.kernel_client.start_channels()
 
-        widget = _qtcjw.RichJupyterWidget()
-        widget.kernel_manager = self.kernel_manager
-        widget.kernel_client = self.kernel_client
-        widget.execute(f"%cd {dirPathToStartIPythonIn}")
+        self.execute(f"%cd {dirPathToStartIPythonIn}")
 
     def shutdown(self) -> None:
-        if not self.isStarted():
+        if not self.isRunning():
             raise RuntimeError("Cannot shut down console which hasn't been started.")
 
         assert self.kernel_client and self.kernel_manager
 
         self.kernel_client.stop_channels()
         self.kernel_manager.shutdown_kernel()
+
+        self.kernel_client = None
+        self.kernel_manager = None
 
 
 def _initAsyncIOPatch() -> None:
