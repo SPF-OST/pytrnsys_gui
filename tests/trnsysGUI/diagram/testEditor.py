@@ -207,7 +207,7 @@ class TestEditor:
 
     @staticmethod
     def _getTrnExePath():
-        isRunDuringCi = (_os.environ.get("CI") == "true")
+        isRunDuringCi = _os.environ.get("CI") == "true"
         if isRunDuringCi:
             return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
 
