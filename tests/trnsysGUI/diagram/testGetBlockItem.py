@@ -106,9 +106,7 @@ class TestGetBlockItem:
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
-    def testGetNewStorageTank(
-        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name
-    ) -> None:
+    def testGetNewStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("StorageTank", editorMock)
         assert isinstance(blockItem, StorageTank)
@@ -119,7 +117,9 @@ class TestGetBlockItem:
         blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
         assert isinstance(blockItem, GraphicalItem)
 
-    def testGetNewUnknownBlockItemRaises(self, tmp_path, request: _pt.FixtureRequest) -> None:
+    def testGetNewUnknownBlockItemRaises(
+        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name
+    ) -> None:
         editorMock = self._testHelper(tmp_path, request)
 
         with _pt.raises(ValueError):

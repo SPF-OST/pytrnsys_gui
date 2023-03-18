@@ -47,7 +47,9 @@ if _tp.TYPE_CHECKING:
 
 
 def getBlockItem(
-    componentTypeName: str, editor: _ed.Editor, displayName: _tp.Optional[str] = None
+    componentTypeName: str,
+    editor: _ed.Editor,  # type: ignore[name-defined]
+    displayName: _tp.Optional[str] = None
 ) -> _tp.Union[BlockItem, GraphicalItem]:
     """
     returns a "blockItem" instance of a specific diagram component
