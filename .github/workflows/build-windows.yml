@@ -34,7 +34,7 @@ jobs:
       - name: Lint with pylint
         run: venv\Scripts\python dev-tools/devTools.py --lint --keep-results
       - name: Syntax checking with black
-        run: python dev-tools/devTools.py --black --keep-results
+        run: venv\Scripts\python dev-tools/devTools.py --black --keep-results
       - name: Generate class and package diagrams
         run: venv\Scripts\python dev-tools/devTools.py --diagram=dot --keep-results
       - name: Test with pytest
