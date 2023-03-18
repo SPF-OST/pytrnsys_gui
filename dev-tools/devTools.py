@@ -100,7 +100,7 @@ def main():
 
 
 def _printAndRun(args: tp.Sequence[str]) -> None:
-    formattedArgs = " ".join(args)
+    formattedArgs = " ".join(str(arg) for arg in args)
     print(f"Running '{formattedArgs}'...")
     sp.run(args, check=True)
     print("...DONE.")
