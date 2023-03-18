@@ -98,7 +98,7 @@ class TestGetBlockItem:
         componentTypeName,
         componentType,
         displayName,
-        tmp_path,  # pylint: disable=invalid-name
+        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
         request: _pt.FixtureRequest,
     ) -> None:
         editorMock = self._testHelper(tmp_path, request)
@@ -106,19 +106,23 @@ class TestGetBlockItem:
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
-    def testGetNewStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+    def testGetNewStorageTank(
+        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
+    ) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("StorageTank", editorMock)
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "Tes7701"
 
-    def testGetNewGraphicalItem(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+    def testGetNewGraphicalItem(
+        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
+    ) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
         assert isinstance(blockItem, GraphicalItem)
 
     def testGetNewUnknownBlockItemRaises(
-        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name
+        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, request)
 
@@ -127,20 +131,26 @@ class TestGetBlockItem:
 
     @_pt.mark.parametrize("componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
     def testGetLoadedBlockItem(
-        self, componentTypeName, componentType, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name
+        self,
+        componentTypeName,
+        componentType,
+        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
+        request: _pt.FixtureRequest,
     ) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem(componentTypeName, editorMock, displayName=componentTypeName)
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == componentTypeName
 
-    def testGetLoadedStorageTank(self, tmp_path, request: _pt.FixtureRequest) -> None:  # pylint: disable=invalid-name
+    def testGetLoadedStorageTank(
+        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
+    ) -> None:
         editorMock = self._testHelper(tmp_path, request)
         blockItem = _gbi.getBlockItem("StorageTank", editorMock, displayName="StorageTank")
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "StorageTank"
 
-    def _testHelper(self, tmp_path, request):  # pylint: disable=invalid-name
+    def _testHelper(self, tmp_path, request):  # pylint: disable=invalid-name  # /NOSONAR
         logger = _log.getLogger("root")
         (
             editorMock,

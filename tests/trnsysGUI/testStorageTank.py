@@ -31,7 +31,7 @@ class TestStorageTank:
     EXPECTED_DIR_PATH = DATA_DIR_PATH / "expected"
     LEGACY_JSON_PATH = DATA_DIR_PATH / "storageTankOldestFormat.json"
 
-    def testDeserializeJsonFromLegacyFormatAndSerialize(self, tmp_path):  # pylint: disable=invalid-name
+    def testDeserializeJsonFromLegacyFormatAndSerialize(self, tmp_path):  # pylint: disable=invalid-name  # /NOSONAR
         expectedPath = self.EXPECTED_DIR_PATH / "storageTankNewestFormat.json"
         expectedStorageTankJson = expectedPath.read_text()
 

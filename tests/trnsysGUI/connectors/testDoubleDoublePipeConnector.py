@@ -21,7 +21,7 @@ class _StrictMock:
 
 
 class TestDoubleDoublePipeConnector:
-    def test(self, tmp_path):  # pylint: disable=invalid-name
+    def test(self, tmp_path):  # pylint: disable=invalid-name  # /NOSONAR
         connector = self._createConnector(tmp_path)
 
         unitNumber = 1
@@ -54,7 +54,7 @@ TDPCnrCold = [2,1]
         )
 
     @classmethod
-    def _createConnector(cls, tmp_path):  # pylint: disable=invalid-name:
+    def _createConnector(cls, tmp_path):  # pylint: disable=invalid-name  # /NOSONAR
         logger = _log.getLogger("root")
 
         (
