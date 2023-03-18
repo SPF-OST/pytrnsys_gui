@@ -834,7 +834,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
     def exportDdckPlaceHolderValuesJsonFile(self, shallShowMessageOnSuccess: bool = True) -> _res.Result[None]:
         if not self._isHydraulicConnected():
-            return _res.Error(f"You need to connect all port items before you can export the hydraulics.")
+            return _res.Error("You need to connect all port items before you can export the hydraulics.")
 
         jsonFilePath = _pl.Path(self.projectFolder) / "DdckPlaceHolderValues.json"
 
