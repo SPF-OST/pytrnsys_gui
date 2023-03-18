@@ -43,6 +43,8 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):
         if not self.isStarted():
             raise RuntimeError("Cannot shut down console which hasn't been started.")
 
+        assert self.kernel_client and self.kernel_manager
+
         self.kernel_client.stop_channels()
         self.kernel_manager.shutdown_kernel()
 
