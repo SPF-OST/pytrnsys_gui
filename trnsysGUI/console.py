@@ -1,37 +1,50 @@
-__all__ = ["createConsoleWidget"]
+__all__ = ["QtConsoleWidget"]
 
 import asyncio as _aio
 import pathlib as _pl
 import sys as _sys
+import typing as _tp
 
-import PyQt5.QtWidgets as _qtw
-import qtconsole.inprocess as _gtcip
+import qtconsole.inprocess as _qtcip
 import qtconsole.rich_jupyter_widget as _qtcjw
+import qtconsole.client as _qtcc
 import tornado as _tornado
 
 
-def createConsoleWidget(projectFolderToStartIPythonIn: _pl.Path) -> _qtw.QWidget:
-    kernelManager = _gtcip.QtInProcessKernelManager()
-    kernelManager.start_kernel()
-    kernel = kernelManager.kernel
-    kernel.gui = "qt"
+class QtConsoleWidget(_qtcjw.RichJupyterWidget):
+    def __init__(self):
+        super().__init__()
+        self.kernel_manager: _tp.Optional[_qtcip.QtInProcessKernelManager] = None
+        self.kernel_client: _tp.Optional[_qtcc.KernelClient] = None
 
-    _initAsyncIOPatch()
+    def isStarted(self):
+        return self.kernel_manager and self.kernel_client
 
-    kernelClient = kernelManager.client()
-    kernelClient.start_channels()
+    def startInFolder(self, dirPathToStartIPythonIn: _pl.Path) -> None:
+        if self.isStarted():
+            raise RuntimeError("Console has already been started.")
 
-    def stop():
-        kernelClient.stop_channels()
-        kernelManager.shutdown_kernel()
+        self.kernel_manager = _qtcip.QtInProcessKernelManager()
+        self.kernel_manager.start_kernel()
+        kernel = self.kernel_manager.kernel
+        kernel.gui = "qt"
 
-    widget = _qtcjw.RichJupyterWidget()
-    widget.kernel_manager = kernelManager
-    widget.kernel_client = kernelClient
-    widget.exit_requested.connect(stop)
-    widget.execute(f"%cd {projectFolderToStartIPythonIn}")
+        _initAsyncIOPatch()
 
-    return widget
+        self.kernel_client = self.kernel_manager.client()
+        self.kernel_client.start_channels()
+
+        widget = _qtcjw.RichJupyterWidget()
+        widget.kernel_manager = self.kernel_manager
+        widget.kernel_client = self.kernel_client
+        widget.execute(f"%cd {dirPathToStartIPythonIn}")
+
+    def shutdown(self) -> None:
+        if not self.isStarted():
+            raise RuntimeError("Cannot shut down console which hasn't been started.")
+
+        self.kernel_client.stop_channels()
+        self.kernel_manager.shutdown_kernel()
 
 
 def _initAsyncIOPatch() -> None:

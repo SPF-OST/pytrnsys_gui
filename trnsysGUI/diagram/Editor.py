@@ -192,11 +192,11 @@ class Editor(_qtw.QWidget):
         libraryBrowserAndContextInfoSplitter.addWidget(self.contextInfoList)
         _sizes.setRelativeSizes(libraryBrowserAndContextInfoSplitter, [libraryBrowserView, self.contextInfoList], [3, 1])
 
-        consoleWidget = _con.createConsoleWidget(_pl.Path(self.projectFolder))
+        self._consoleWidget = _con.QtConsoleWidget()
 
         logAndConsoleTabs = _qtw.QTabWidget()
         logAndConsoleTabs.addTab(self.loggingTextEdit, "Logging")
-        logAndConsoleTabs.addTab(consoleWidget, "IPython console")
+        logAndConsoleTabs.addTab(self._consoleWidget, "IPython console")
 
         diagramAndTabsSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Vertical)
         diagramAndTabsSplitter.addWidget(self.diagramView)
@@ -274,6 +274,16 @@ class Editor(_qtw.QWidget):
         libraryBrowserView.setViewMode(libraryBrowserView.IconMode)
         libraryBrowserView.setDragDropMode(libraryBrowserView.DragOnly)
         return libraryBrowserView
+
+    def isRunning(self):
+        return self._consoleWidget.isRunning()
+
+    def start(self) -> None:
+        projectFolderPath = self.projectFolder
+        self._consoleWidget.startInFolder(_pl.Path(projectFolderPath))
+
+    def shutdown(self) -> None:
+        self._consoleWidget.shutdown()
 
     # Debug function
     def dumpInformation(self):
