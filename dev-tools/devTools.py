@@ -137,7 +137,7 @@ def _maybeRunPylint(arguments):
 
 
 def _maybeRunBlack(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting is not None:
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting:
         cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 --check trnsysGUI tests dev-tools"
 
         _printAndRun(cmd.split())
@@ -190,7 +190,7 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         and not arguments.shallCreateExecutable
     )
     if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
-        markersExpression = arguments.pytestMarkersExpression or "not ci and not linux"
+        markersExpression = arguments.pytestMarkersExpression or "not ci"
         additionalArgs = ["-m", markersExpression]
 
         cmd = [
