@@ -7,6 +7,7 @@ import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
+import typing as tp
 import sysconfig as _sysconfig
 import venv
 
@@ -26,23 +27,23 @@ def main():
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
         cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes trnsysGUI tests dev-tools"
         additionalArgs = arguments.mypyArguments or ""
-        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
+        _printAndRun([*cmd.split(), *additionalArgs.split()])
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
         cmd = f"{_SCRIPTS_DIR / 'pylint'} trnsysGUI tests dev-tools"
         additionalArgs = arguments.lintArguments or ""
 
-        sp.run([*cmd.split(), *additionalArgs.split()], check=True)
+        _printAndRun([*cmd.split(), *additionalArgs.split()])
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting is not None:
         cmd = "black -l 120 --check trnsysGUI tests dev-tools"
 
-        sp.run(cmd.split(), check=True)
+        _printAndRun(cmd.split())
 
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
         cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
-        sp.run(cmd.split(), check=True)
+        _printAndRun(cmd.split())
 
     if arguments.shallRunAll or arguments.shallCreateExecutable:
         releaseDirPath = pl.Path("release").resolve(strict=True)
@@ -63,14 +64,12 @@ def main():
         ]
 
         for cmd in commands:
-            print(cmd)
-            sp.run(cmd.split(), check=True)
+            _printAndRun(cmd.split())
 
         os.chdir("release")
 
         cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
-        print(cmd)
-        sp.run(cmd.split(), check=True)
+        _printAndRun(cmd.split())
 
         os.chdir("..")
 
@@ -97,7 +96,14 @@ def main():
 
         args = [*cmd, *additionalArgs, "tests"]
 
-        sp.run(args, check=True)
+        _printAndRun(args)
+
+
+def _printAndRun(args: tp.Sequence[str]) -> None:
+    formattedArgs = " ".join(args)
+    print(f"Running '{formattedArgs}'...")
+    sp.run(args, check=True)
+    print("...DONE.")
 
 
 def _parseArguments() -> ap.Namespace:
