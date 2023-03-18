@@ -36,7 +36,7 @@ def main():
         _printAndRun([*cmd.split(), *additionalArgs.split()])
 
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting is not None:
-        cmd = "black -l 120 --check trnsysGUI tests dev-tools"
+        cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 --check trnsysGUI tests dev-tools"
 
         _printAndRun(cmd.split())
 
