@@ -248,7 +248,7 @@ class TestSerialization:
                     ]
                 },
                 "PersonVersion0": {
-                    "description": "PersonVersion0(firstName: " "str, age: int, heightInM: " "float)",
+                    "description": "PersonVersion0(firstName: str, age: int, heightInM: float)",
                     "properties": {
                         "__version__": {"const": "ff2ba3c8-4fef-4a64-a026-11212ab35d6b"},
                         "age": {"type": "integer"},

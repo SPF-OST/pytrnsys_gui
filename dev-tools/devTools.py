@@ -20,31 +20,49 @@ _SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
 def main():
     arguments = _parseArguments()
 
-    testResultsDirPath = pl.Path("test-results")
+    _maybeRunMypy(arguments)
 
-    _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
+    _maybeRunPylint(arguments)
 
+    _maybeRunBlack(arguments)
+
+    _maybeCreateDiagrams(arguments)
+
+    _maybeCreateExecutable(arguments)
+
+    _maybeRunPytest(arguments)
+
+
+def _maybeRunMypy(arguments):
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
         cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes trnsysGUI tests dev-tools"
         additionalArgs = arguments.mypyArguments or ""
         _printAndRun([*cmd.split(), *additionalArgs.split()])
 
+
+def _maybeRunPylint(arguments):
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
         cmd = f"{_SCRIPTS_DIR / 'pylint'} trnsysGUI tests dev-tools"
         additionalArgs = arguments.lintArguments or ""
 
         _printAndRun([*cmd.split(), *additionalArgs.split()])
 
+
+def _maybeRunBlack(arguments):
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting is not None:
         cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 --check trnsysGUI tests dev-tools"
 
         _printAndRun(cmd.split())
 
+
+def _maybeCreateDiagrams(arguments):
     if arguments.shallRunAll or arguments.diagramsFormat:
         diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
         cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
         _printAndRun(cmd.split())
 
+
+def _maybeCreateExecutable(arguments):
     if arguments.shallRunAll or arguments.shallCreateExecutable:
         releaseDirPath = pl.Path("release").resolve(strict=True)
 
@@ -73,6 +91,10 @@ def main():
 
         os.chdir("..")
 
+
+def _maybeRunPytest(arguments):
+    testResultsDirPath = pl.Path("test-results")
+    _prepareTestResultsDirectory(testResultsDirPath, arguments.shallKeepResults)
     wasCalledWithoutArguments = (
         not arguments.shallPerformStaticChecks
         and arguments.mypyArguments is None
