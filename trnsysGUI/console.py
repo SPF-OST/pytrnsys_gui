@@ -14,8 +14,10 @@ import tornado as _tornado
 class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-method,too-many-ancestors
     def __init__(self):
         super().__init__()
-        self.kernel_manager: _tp.Optional[_qtcip.QtInProcessKernelManager] = None
-        self.kernel_client: _tp.Optional[_qtcc.KernelClient] = None
+        self.kernel_manager: _tp.Optional[  # pylint: disable=invalid-name # /NOSONAR
+            _qtcip.QtInProcessKernelManager
+        ] = None
+        self.kernel_client: _tp.Optional[_qtcc.KernelClient] = None  # pylint: disable=invalid-name # /NOSONAR
 
     def isRunning(self):
         return self.kernel_manager and self.kernel_client
