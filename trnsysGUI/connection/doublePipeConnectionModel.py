@@ -4,7 +4,9 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
-from pytrnsys.utils import serialization as _ser
+import pytrnsys.utils.serialization as _ser
+
+import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 
 
 @_dc.dataclass
@@ -60,7 +62,7 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
             superseded.fromPortId,
             superseded.toPortId,
             superseded.trnsysId,
-            lengthInM=2.0,
+            _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M,
         )
 
     @classmethod
@@ -68,7 +70,7 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
         cls,
         data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
         validate=True,
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # /NOSONAR
     ) -> "DoublePipeConnectionModel":
         data.pop(".__ConnectionDict__")
         doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
@@ -76,9 +78,9 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
 
     def to_dict(
         self,
-        omit_none: bool = True,
+        omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
+        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1 # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__ConnectionDict__"] = True

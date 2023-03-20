@@ -6,15 +6,15 @@ import trnsysGUI.errors as _er
 
 
 @_dc.dataclass
-class DPConnection:
+class ConnectionModel:
     lengthInM: float
 
 
 class DoublePipeConnectionLengthDialog(_qtw.QDialog):
-    def __init__(self, connection: "DPConnection"):
-        super(DoublePipeConnectionLengthDialog, self).__init__()
-        self.lengthContainer = connection
-        self.nameLabel = _qtw.QLabel("Length (m):")
+    def __init__(self, connection: "ConnectionModel"):
+        super().__init__()
+        self.model = connection
+        self.nameLabel = _qtw.QLabel("Length [m]:")
         self.lineEdit = _qtw.QLineEdit(str(connection.lengthInM))
         self.okButton = _qtw.QPushButton("OK")
         self.cancelButton = _qtw.QPushButton("Cancel")
@@ -35,7 +35,7 @@ class DoublePipeConnectionLengthDialog(_qtw.QDialog):
         text = self.lineEdit.text()
         try:
             lengthInM = _parsePositiveFloat(text)
-            self.lengthContainer.lengthInM = lengthInM
+            self.model.lengthInM = lengthInM
             self.close()
         except ValueError:
             _er.showErrorMessageBox(errorMessage="Value must be positive.", title="Almost there")

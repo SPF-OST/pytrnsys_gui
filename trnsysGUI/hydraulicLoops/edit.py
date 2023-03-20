@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import trnsysGUI.connection.values as _values
+import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 
 from . import _loopWideDefaults as _lwd
 from . import common as _common
@@ -39,10 +39,10 @@ def _createGuiConnections(hydraulicLoop):
         guiConnections = [
             _gmodel.Connection(
                 c.displayName,
-                _values.DEFAULT_DIAMETER_IN_CM,
-                _values.DEFAULT_U_VALUE_IN_W_PER_M2_K,
-                _values.DEFAULT_LENGTH_IN_M,
-                _values.DEFAULT_SHALL_CREATE_TRNSYS_UNIT,
+                _defaults.DEFAULT_DIAMETER_IN_CM,
+                _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K,
+                _defaults.DEFAULT_LENGTH_IN_M,
+                _defaults.DEFAULT_SHALL_CREATE_TRNSYS_UNIT,
                 c,
             )
             for c in hydraulicLoop.connections

@@ -1,25 +1,18 @@
 import cgitb as _cgitb
 import logging as _log
 import unittest.mock as _mock
-import pytest as _pt
 
 import PyQt5.QtWidgets as _qtw
+import pytest as _pt
 
 import trnsysGUI.blockItems.getBlockItem as _gbi
-
 from trnsysGUI.AirSourceHP import AirSourceHP
 from trnsysGUI.Boiler import Boiler
 from trnsysGUI.CentralReceiver import CentralReceiver
 from trnsysGUI.Collector import Collector
-from trnsysGUI.connectors.connector import Connector
-from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
-from trnsysGUI.crystalizer import Crystalizer
-from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.ExternalHx import ExternalHx
 from trnsysGUI.GenericBlock import GenericBlock  # type: ignore[attr-defined]
 from trnsysGUI.GraphicalItem import GraphicalItem  # type: ignore[attr-defined]
-from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.GroundSourceHx import GroundSourceHx
 from trnsysGUI.HPDoubleDual import HPDoubleDual
 from trnsysGUI.HPDual import HPDual
@@ -27,23 +20,29 @@ from trnsysGUI.HeatPump import HeatPump
 from trnsysGUI.HeatPumpTwoHx import HeatPumpTwoHx
 from trnsysGUI.IceStorage import IceStorage
 from trnsysGUI.IceStorageTwoHx import IceStorageTwoHx
+from trnsysGUI.PV import PV
 from trnsysGUI.ParabolicTroughField import ParabolicTroughField
 from trnsysGUI.PitStorage import PitStorage
-from trnsysGUI.pump import Pump
-from trnsysGUI.PV import PV
 from trnsysGUI.Radiator import Radiator
 from trnsysGUI.SaltTankCold import SaltTankCold
 from trnsysGUI.SaltTankHot import SaltTankHot
+from trnsysGUI.SteamPowerBlock import SteamPowerBlock
+from trnsysGUI.TVentil import TVentil
+from trnsysGUI.TeePiece import TeePiece
+from trnsysGUI.WTap import WTap
+from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.connectors.connector import Connector
+from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.crystalizer import Crystalizer
+from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
+from trnsysGUI.geotherm import Geotherm
+from trnsysGUI.pump import Pump
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink
-from trnsysGUI.SteamPowerBlock import SteamPowerBlock
 from trnsysGUI.storageTank.widget import StorageTank
-from trnsysGUI.TVentil import TVentil
-from trnsysGUI.TeePiece import TeePiece
 from trnsysGUI.water import Water
-from trnsysGUI.WTap import WTap
-from trnsysGUI.WTap_main import WTap_main
 
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
@@ -94,79 +93,58 @@ _BLOCK_ITEM_CASES_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCK_ITEM_CASES]
 class TestGetBlockItem:
     @_pt.mark.parametrize("componentTypeName, componentType, displayName", _BLOCK_ITEM_CASES)
     def testGetNewBlockItem(
-        self,
-        componentTypeName,
-        componentType,
-        displayName,
-        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
-        request: _pt.FixtureRequest,
+        self, componentTypeName, componentType, displayName, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
-        editorMock = self._testHelper(tmp_path, request)
+        editorMock = self._testHelper(tmp_path, qtbot)
         blockItem = _gbi.getBlockItem(componentTypeName, editorMock)
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
-    def testGetNewStorageTank(
-        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
-    ) -> None:
-        editorMock = self._testHelper(tmp_path, request)
+    def testGetNewStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+        editorMock = self._testHelper(tmp_path, qtbot)
         blockItem = _gbi.getBlockItem("StorageTank", editorMock)
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "Tes7701"
 
-    def testGetNewGraphicalItem(
-        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
-    ) -> None:
-        editorMock = self._testHelper(tmp_path, request)
+    def testGetNewGraphicalItem(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+        editorMock = self._testHelper(tmp_path, qtbot)
         blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
         assert isinstance(blockItem, GraphicalItem)
 
-    def testGetNewUnknownBlockItemRaises(
-        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
-    ) -> None:
-        editorMock = self._testHelper(tmp_path, request)
+    def testGetNewUnknownBlockItemRaises(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+        editorMock = self._testHelper(tmp_path, qtbot)
 
         with _pt.raises(ValueError):
             _gbi.getBlockItem("Blk", editorMock)
 
     @_pt.mark.parametrize("componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
     def testGetLoadedBlockItem(
-        self,
-        componentTypeName,
-        componentType,
-        tmp_path,  # pylint: disable=invalid-name  # /NOSONAR
-        request: _pt.FixtureRequest,
+        self, componentTypeName, componentType, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
-        editorMock = self._testHelper(tmp_path, request)
+        editorMock = self._testHelper(tmp_path, qtbot)
         blockItem = _gbi.getBlockItem(componentTypeName, editorMock, displayName=componentTypeName)
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == componentTypeName
 
-    def testGetLoadedStorageTank(
-        self, tmp_path, request: _pt.FixtureRequest  # pylint: disable=invalid-name  # /NOSONAR
-    ) -> None:
-        editorMock = self._testHelper(tmp_path, request)
+    def testGetLoadedStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
+        editorMock = self._testHelper(tmp_path, qtbot)
         blockItem = _gbi.getBlockItem("StorageTank", editorMock, displayName="StorageTank")
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "StorageTank"
 
-    def _testHelper(self, tmp_path, request):  # pylint: disable=invalid-name  # /NOSONAR
+    def _testHelper(self, tmp_path, bot):  # pylint: disable=invalid-name  # /NOSONAR
         logger = _log.getLogger("root")
         (
             editorMock,
-            [application, _, _],
+            [mainWindow, _],
         ) = self._createEditorMock(logger, tmp_path)
 
-        def quitApplication():
-            application.quit()
+        bot.addWidget(mainWindow)
 
-        request.addfinalizer(quitApplication)
         return editorMock
 
     @staticmethod
     def _createEditorMock(logger, projectFolder):
-        application = _qtw.QApplication([])
-
         mainWindow = _qtw.QMainWindow()
 
         editorMock = _qtw.QWidget(parent=mainWindow)
@@ -201,4 +179,4 @@ class TestGetBlockItem:
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()
 
-        return editorMock, [application, mainWindow, graphicsScene]
+        return editorMock, [mainWindow, graphicsScene]

@@ -6,6 +6,7 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 
+import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
 
 
@@ -41,9 +42,9 @@ class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
     fromPortId: int
     toPortId: int
     trnsysId: int
-    diameterInCm: _values.Value = _values.DEFAULT_DIAMETER_IN_CM
-    uValueInWPerM2K: _values.Value = _values.DEFAULT_U_VALUE_IN_W_PER_M2_K
-    lengthInM: _values.Value = _values.DEFAULT_LENGTH_IN_M
+    diameterInCm: _values.Value = _defaults.DEFAULT_DIAMETER_IN_CM
+    uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
+    lengthInM: _values.Value = _defaults.DEFAULT_LENGTH_IN_M
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
@@ -77,9 +78,9 @@ class ConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
             superseded.PortFromID,
             superseded.PortToID,
             superseded.trnsysID,
-            _values.DEFAULT_DIAMETER_IN_CM,
-            _values.DEFAULT_U_VALUE_IN_W_PER_M2_K,
-            _values.DEFAULT_LENGTH_IN_M,
+            _defaults.DEFAULT_DIAMETER_IN_CM,
+            _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K,
+            _defaults.DEFAULT_LENGTH_IN_M,
         )
 
     @classmethod

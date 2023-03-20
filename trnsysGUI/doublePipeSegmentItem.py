@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing as _tp
 
 from PyQt5 import QtGui, QtCore
@@ -8,7 +10,6 @@ import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
-
 if _tp.TYPE_CHECKING:
     from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 
@@ -16,25 +17,28 @@ if _tp.TYPE_CHECKING:
 
 
 class DoublePipeSegmentItem(SegmentItemBase):
-    def __init__(self, startNode, endNode, parent: "DoublePipeConnection"):
+    def __init__(self, startNode, endNode, parent: DoublePipeConnection):
         super().__init__(startNode, endNode, parent)
 
-        self._doublePipeConnection = parent
         self.blueLine = QGraphicsLineItem(self)
         self.redLine = QGraphicsLineItem(self)
 
-    def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
+    @property
+    def _doublePipeConnection(self) -> DoublePipeConnection:
+        return self.connection
+
+    def _createSegment(self, startNode, endNode) -> SegmentItemBase:
         return DoublePipeSegmentItem(startNode, endNode, self._doublePipeConnection)
 
     def _getContextMenu(self) -> QMenu:
         menu = super()._getContextMenu()
-        action = menu.addAction("Provide length")
-        action.triggered.connect(self.editLength)
+        action = menu.addAction("Edit length")
+        action.triggered.connect(self._editLength)
 
         return menu
 
-    def editLength(self):
-        connection = _dpcldlg.DPConnection(self._doublePipeConnection.lengthInM)
+    def _editLength(self):
+        connection = _dpcldlg.ConnectionModel(self._doublePipeConnection.lengthInM)
         _dpcldlg.DoublePipeConnectionLengthDialog(connection).exec()
         self._doublePipeConnection.lengthInM = connection.lengthInM
 

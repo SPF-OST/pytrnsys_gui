@@ -5,18 +5,20 @@ import enum as _enum
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
-from trnsysGUI.connection.doublePipeConnectionModel import DoublePipeConnectionModel
 
 import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.doublePipeConnectionModel as _model
+import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
-import trnsysGUI.ddckFields.getHeaderAndParametersGenerator as _ghp
+import trnsysGUI.ddckFields.headerAndParameters.doublePipeConnection as _hp
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+
 from . import _massFlowLabels as _mfl
 
 
@@ -47,7 +49,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
-        self.lengthInM: _values.Value = _values.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
+        self.lengthInM: _values.Value = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -94,7 +96,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             cornerTupel = (corner.pos().x(), corner.pos().y())
             corners.append(cornerTupel)
 
-        doublePipeConnectionModel = DoublePipeConnectionModel(
+        doublePipeConnectionModel = _model.DoublePipeConnectionModel(
             self.connId,
             self.displayName,
             self.id,
@@ -112,7 +114,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return dictName, doublePipeConnectionModel.to_dict()
 
     def decode(self, i):
-        model = DoublePipeConnectionModel.from_dict(i)
+        model = _model.DoublePipeConnectionModel.from_dict(i)
 
         self.id = model.id
         self.connId = model.connectionId
@@ -156,12 +158,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return unitText, nextUnitNumber
 
     def _getHeaderAndParameters(self, unitNumber: int) -> str:
-        # this could be turned into a setter.
-        # setTextBlockGenerator(_ghp.getHeaderAndParametersGenerator("DoublePipeConnection"))
-        # _getHeaderAndParameters would then be part of a parent
-        textBlockGenerator = _ghp.getHeaderAndParametersGenerator("DoublePipeConnection")
-        headerAndParameters = textBlockGenerator(self, unitNumber)
-
+        headerAndParameters = _hp.getHeaderAndParameters(self, unitNumber)
         return headerAndParameters
 
     def _getInputs(self) -> str:

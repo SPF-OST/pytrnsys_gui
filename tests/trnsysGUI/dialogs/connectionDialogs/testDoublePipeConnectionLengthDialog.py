@@ -1,63 +1,46 @@
 import unittest.mock as _m
-import pytest as _pt
 
-from PyQt5 import QtCore, QtTest
-from PyQt5 import QtWidgets as _widgets
+import PyQt5.QtCore as _qtc
 
 import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcdlg
+import trnsysGUI.errors as _errors
+
+
+_SHOW_ERROR_FUNCTION_NAME = f"{_errors.__name__}.{_errors.showErrorMessageBox.__name__}"
 
 
 class TestDoublePipeConnectionLengthDialog:  # pylint: disable = attribute-defined-outside-init
     def setup(self):
-        self.widget = None
-        self.dPConnection = None
+        self.connectionModel = _dpcdlg.ConnectionModel(5)
+        self.dialog = _dpcdlg.DoublePipeConnectionLengthDialog(self.connectionModel)
 
-    def _initializeDialog(self):
-        self.dPConnection = _dpcdlg.DPConnection(5)
-        self.widget = _dpcdlg.DoublePipeConnectionLengthDialog(self.dPConnection)
+    def _testHelper(self, bot, value, button="okButton"):
+        bot.addWidget(self.dialog)
+        self._clearAndWriteAndPressButton(bot, value, button)
 
-    @staticmethod
-    def _applicationHandling(request):
-        application = _widgets.QApplication([])
+    def _clearAndWriteAndPressButton(self, bot, value, button="okButton"):
+        self.dialog.lineEdit.clear()
+        bot.keyClicks(self.dialog.lineEdit, value)
+        bot.mouseClick(getattr(self.dialog, button), _qtc.Qt.LeftButton)
 
-        def quitApplication():
-            application.quit()
+    def testDialogLineEdit(self, qtbot):
+        self._testHelper(qtbot, "7")
+        assert self.connectionModel.lengthInM == 7
 
-        request.addfinalizer(quitApplication)
+    def testDialogCancel(self, qtbot):
+        self._testHelper(qtbot, "7", button="cancelButton")
+        assert self.connectionModel.lengthInM == 5
 
-    def _testHelper(self, value, button="okButton"):
-        # bot.addWidget(self.widget)
-        self._clearAndWriteAndPressButton(value, button)
-
-    def _clearAndWriteAndPressButton(self, value, button="okButton"):
-        self.widget.lineEdit.clear()
-        QtTest.QTest.keyClicks(self.widget.lineEdit, value)
-        QtTest.QTest.mouseClick(getattr(self.widget, button), QtCore.Qt.LeftButton)
-
-    def testDialogLineEdit(self, request: _pt.FixtureRequest):
-        self._applicationHandling(request)
-        self._initializeDialog()
-        self._testHelper("7")
-        assert self.dPConnection.lengthInM == 7
-
-    def testDialogCancel(self, request: _pt.FixtureRequest):
-        self._applicationHandling(request)
-        self._initializeDialog()
-        self._testHelper("7", button="cancelButton")
-        assert self.dPConnection.lengthInM == 5
-
-    def testDialogRaises(self, request: _pt.FixtureRequest):
-        self._applicationHandling(request)
-        self._initializeDialog()
-
-        with _m.patch("trnsysGUI.errors.showErrorMessageBox") as box:
-            self._testHelper("-7")
+    def testDialogRaises(self, qtbot):
+        with _m.patch(_SHOW_ERROR_FUNCTION_NAME) as box:
+            self._testHelper(qtbot, "-7")
             box.assert_called_with(errorMessage="Value must be positive.", title="Almost there")
 
-    def testDialogInputAfterRaises(self, request: _pt.FixtureRequest):
-        self._applicationHandling(request)
-        self._initializeDialog()
-        with _m.patch("trnsysGUI.errors.showErrorMessageBox"):
-            self._testHelper("-7")
-            self._clearAndWriteAndPressButton("9")
-            assert self.dPConnection.lengthInM == 9
+    def testDialogInputAfterRaises(self, qtbot):
+        with _m.patch(_SHOW_ERROR_FUNCTION_NAME):
+            self._testHelper(qtbot, "-7")
+            self._clearAndWriteAndPressButton(qtbot, "9")
+            assert self.connectionModel.lengthInM == 9
+
+    def teardown(self):
+        self.dialog.close()
