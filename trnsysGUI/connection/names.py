@@ -5,7 +5,11 @@ import trnsysGUI.temperatures as _temps
 
 def getTemperatureVariableName(connection: _cb.ConnectionBase, portItemType: _mfn.PortItemType) -> str:
     modelPipe = connection.getModelPipe(portItemType)
-    variableName = _temps.getTemperatureVariableName(connection, modelPipe)
+    variableName = _temps.getTemperatureVariableName(
+        connection.shallRenameOutputTemperaturesInHydraulicFile(),
+        componentDisplayName=connection.displayName,
+        nodeName=modelPipe.name,
+    )
     return variableName
 
 

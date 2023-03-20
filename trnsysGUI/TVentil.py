@@ -268,7 +268,9 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
             unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
             unitText += "EQUATIONS 1\n"
-            temperatureVariableName = _temps.getInternalTemperatureVariableName(self, self.modelDiverter)
+            temperatureVariableName = _temps.getInternalTemperatureVariableName(
+                componentDisplayName=self.displayName, nodeName=self.modelDiverter.name
+            )
             unitText += f"{temperatureVariableName}= [{unitNumber},{equationConstant}]\n"
 
             unitNumber += 1

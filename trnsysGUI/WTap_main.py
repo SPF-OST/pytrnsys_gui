@@ -72,7 +72,11 @@ class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
         return _ip.InternalPiping([self._modelSource], {self._modelSource.portItem: self.outputs[0]})
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        temperatureVariable = _temps.getTemperatureVariableName(self, self._modelSource)
+        temperatureVariable = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=self.displayName,
+            nodeName=self._modelSource.name,
+        )
         equations = f"""\
 ! {self.displayName}
 EQUATIONS 2
