@@ -133,7 +133,9 @@ class TeePiece(_bi.BlockItem, _ip.HasInternalPiping):
         unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
 
         unitText += "EQUATIONS 1\n"
-        temperatureVariableName = _temps.getInternalTemperatureVariableName(self, self._modelTeePiece)
+        temperatureVariableName = _temps.getInternalTemperatureVariableName(
+            componentDisplayName=self.displayName, nodeName=self._modelTeePiece.name
+        )
         unitText += f"{temperatureVariableName}= [{unitNumber},{equationConstant}]\n"
 
         unitNumber += 1
@@ -144,7 +146,11 @@ class TeePiece(_bi.BlockItem, _ip.HasInternalPiping):
     def _getTemperatureVariableName(self, portItem: _pib.PortItemBase) -> str:
         connection = portItem.connectionList[0]
         node = connection.getInternalPiping().getNode(portItem, _mfn.PortItemType.STANDARD)
-        temperatureVariableName = _temps.getTemperatureVariableName(connection, node)
+        temperatureVariableName = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=connection.displayName,
+            nodeName=node.name,
+        )
         return temperatureVariableName
 
     def decode(self, i, resBlockList):

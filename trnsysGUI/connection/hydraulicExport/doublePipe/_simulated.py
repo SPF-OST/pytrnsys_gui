@@ -1,12 +1,20 @@
-import typing as _tp
+import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _dpc
 
-import trnsysGUI.connection.values as _values
+from trnsysGUI.connection import values as _values
 
-if _tp.TYPE_CHECKING:
-    from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+from . import _getEnergyBalanceVariables as _vars
 
 
-def getHeaderAndParameters(connection: "DoublePipeConnection", unitNumber: int) -> str:
+def exportSimulatedConnection(doublePipeConnection, unitNumber):
+    headerAndParameters = _getHeaderAndParameters(doublePipeConnection, unitNumber)
+    inputs = _getInputs(doublePipeConnection)
+    equations = _getEquations(doublePipeConnection, unitNumber)
+    unitText = headerAndParameters + inputs + equations
+    nextUnitNumber = unitNumber + 1
+    return unitText, nextUnitNumber
+
+
+def _getHeaderAndParameters(connection: _dpc.DoublePipeConnection, unitNumber: int) -> str:
     lengthInM = _values.getConvertedValueOrName(connection.lengthInM)
     headerAndParameters = f"""\
 UNIT {unitNumber} TYPE 9511
@@ -57,3 +65,62 @@ dpRadNdDist                             ! Radial distance of node 10, m
 
 """
     return headerAndParameters
+
+
+def _getInputs(connectionNames: _dpc.DoublePipeConnection) -> str:
+    coldPipe = connectionNames.coldPipe
+    hotPipe = connectionNames.hotPipe
+
+    inputs = f"""\
+INPUTS 6
+{coldPipe.inputPort.inputTemperatureVariableName} ! Inlet fluid temperature - cold pipe, deg C
+{coldPipe.inputPort.massFlowRateVariableName} ! Inlet fluid flow rate - cold pipe, kg/h
+{coldPipe.outputPort.inputTemperatureVariableName} ! ! Other side of pipe - cold pipe, deg C
+{hotPipe.inputPort.inputTemperatureVariableName} ! Inlet fluid temperature - hot pipe, deg C
+{hotPipe.inputPort.massFlowRateVariableName} ! Inlet fluid flow rate - hot pipe, kg/h
+{hotPipe.outputPort.inputTemperatureVariableName} ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+"""
+    return inputs
+
+
+def _getEquations(
+    doublePipeConnection: _dpc.DoublePipeConnection,
+    unitNumber: int,
+) -> str:
+    energyBalanceVariables = _vars.getEnergyBalanceVariables(
+        doublePipeConnection.displayName,
+        coldPipeName=doublePipeConnection.coldPipe.name,
+        hotPipeName=doublePipeConnection.hotPipe.name,
+    )
+
+    formattedEnergyBalanceVariables = "\n".join(
+        f"{v.name} = [{unitNumber},{v.outputNumber}]*{v.conversionFactor} ! {v.comment}" for v in energyBalanceVariables
+    )
+    coldPipe = doublePipeConnection.coldPipe
+    coldOutputTemperature = doublePipeConnection.getOutputTemperatureVariableName(coldPipe)
+    coldCanonicalMassFlowRate = doublePipeConnection.getCanonicalMassFlowRateVariableName(coldPipe)
+
+    hotPipe = doublePipeConnection.hotPipe
+    hotOutputTemperature = doublePipeConnection.getOutputTemperatureVariableName(hotPipe)
+    hotCanonicalMassFlow = doublePipeConnection.getCanonicalMassFlowRateVariableName(hotPipe)
+
+    equations = f"""\
+EQUATIONS {4 + len(energyBalanceVariables)}
+{coldOutputTemperature} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
+{coldCanonicalMassFlowRate} = {coldPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+
+{hotOutputTemperature} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
+{hotCanonicalMassFlow} = {hotPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+
+{formattedEnergyBalanceVariables}
+
+"""
+    return equations

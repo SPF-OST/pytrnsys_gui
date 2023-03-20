@@ -1,3 +1,5 @@
+import typing as _tp
+
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
@@ -15,9 +17,9 @@ def getMassFlowVariableName(hasInternalPiping: _ip.HasInternalPiping, node: _mfn
     return f"M{displayName}{nodeNameOrEmpty}_{postfix}"
 
 
-def getCanonicalMassFlowVariableName(hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe) -> str:
-    pipeNameOrEmpty = pipe.name or ""
-    return f"M{hasInternalPiping.getDisplayName()}{pipeNameOrEmpty}"
+def getCanonicalMassFlowVariableName(*, componentDisplayName: str, pipeName: _tp.Optional[str]) -> str:
+    pipeNameOrEmpty = pipeName or ""
+    return f"M{componentDisplayName}{pipeNameOrEmpty}"
 
 
 def _getPostfix(node: _mfn.Node, portItem: _mfn.PortItem) -> str:

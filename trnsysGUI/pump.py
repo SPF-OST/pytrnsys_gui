@@ -73,10 +73,18 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
         return width, height
 
     def exportPumpOutlets(self):
-        temperatureVariableName = _temps.getTemperatureVariableName(self, self._modelPump)
+        temperatureVariableName = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=self.displayName,
+            nodeName=self._modelPump.name,
+        )
         inputConnection = self.inputs[0].getConnection()
         inputConnectionNode = inputConnection.getInternalPiping().getNode(self.inputs[0], _mfn.PortItemType.STANDARD)
-        inputTemperatureVariable = _temps.getTemperatureVariableName(inputConnection, inputConnectionNode)
+        inputTemperatureVariable = _temps.getTemperatureVariableName(
+            inputConnection.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=inputConnection.getDisplayName(),
+            nodeName=inputConnectionNode.name,
+        )
         equation = f"{temperatureVariableName} = {inputTemperatureVariable}\n"
         equationNr = 1
         return equation, equationNr

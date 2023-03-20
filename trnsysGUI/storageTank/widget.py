@@ -471,7 +471,9 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             inputPos = directPortPair.relativeInputHeight
             outputPos = directPortPair.relativeOutputHeight
 
-            outputTemperatureName = _temps.getInternalTemperatureVariableName(self, modelPipe)
+            outputTemperatureName = _temps.getInternalTemperatureVariableName(
+                componentDisplayName=self.displayName, nodeName=modelPipe.name
+            )
 
             directPairsPort = {
                 "T": inputTemperatureName,
@@ -507,7 +509,9 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         inputPos = heatExchanger.relativeInputHeight
         outputPos = heatExchanger.relativeOutputHeight
 
-        outputTemperatureName = _temps.getInternalTemperatureVariableName(self, modelPipe)
+        outputTemperatureName = _temps.getInternalTemperatureVariableName(
+            componentDisplayName=self.displayName, nodeName=modelPipe.name
+        )
 
         loop = self._hydraulicLoops.getLoopForExistingConnection(incomingConnection)
         loopName = loop.name.value

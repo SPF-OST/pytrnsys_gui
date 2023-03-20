@@ -21,8 +21,8 @@ class _StrictMock:
 
 
 class TestDoubleDoublePipeConnector:
-    def test(self, tmp_path):  # pylint: disable=invalid-name  # /NOSONAR
-        connector = self._createConnector(tmp_path)
+    def test(self, tmp_path, qtbot):  # pylint: disable=invalid-name  # /NOSONAR
+        connector = self._createConnector(tmp_path, qtbot)
 
         unitNumber = 1
         text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(unitNumber)
@@ -31,36 +31,38 @@ class TestDoubleDoublePipeConnector:
         assert (
             text
             == """\
+! BEGIN DPCnr
+! hot pipe
 UNIT 1 TYPE 222
 INPUTS 3
 MDPCnrHot_A TinputConnectionHot ToutputConnectionHot
 ***
 0 20 20
-
 EQUATIONS 1
 TDPCnrHot = [1,1]
 
-
+! cold pipe
 UNIT 2 TYPE 222
 INPUTS 3
 MDPCnrCold_A ToutputConnectionCold TinputConnectionCold
 ***
 0 20 20
-
 EQUATIONS 1
 TDPCnrCold = [2,1]
+! END DPCnr
+
 
 """
         )
 
     @classmethod
-    def _createConnector(cls, tmp_path):  # pylint: disable=invalid-name  # /NOSONAR
+    def _createConnector(cls, tmp_path, bot):  # pylint: disable=invalid-name  # /NOSONAR
         logger = _log.getLogger("root")
 
         (
             editorMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
-        ) = cls._createEditorMockAndOtherObjectsToKeepAlive(logger, tmp_path)
+        ) = cls._createEditorMockAndOtherObjectsToKeepAlive(logger, tmp_path, bot)
 
         connector = _ddpc.DoubleDoublePipeConnector(
             editor=editorMock,
@@ -111,11 +113,11 @@ TDPCnrCold = [2,1]
         return _tp.cast(_dpc.DoublePipeConnection, mock)
 
     @staticmethod
-    def _createEditorMockAndOtherObjectsToKeepAlive(logger, projectPath):
+    def _createEditorMockAndOtherObjectsToKeepAlive(logger, projectPath, bot):
         # todo: provide this class as a TestHelper class. see TestStorageTank  # pylint: disable=fixme
-        application = _widgets.QApplication([])
-
         mainWindow = _widgets.QMainWindow()
+
+        bot.addWidget(mainWindow)
 
         editorMock = _widgets.QWidget(parent=mainWindow)
         editorMock.connectionList = []
@@ -144,4 +146,4 @@ TDPCnrCold = [2,1]
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()
 
-        return editorMock, [application, mainWindow, graphicsScene]
+        return editorMock, [mainWindow, graphicsScene]

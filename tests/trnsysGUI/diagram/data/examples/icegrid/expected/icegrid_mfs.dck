@@ -646,24 +646,25 @@ Lloop12Rho = FwaterRho
 Lloop12Cp = FwaterCp
 
 
+! BEGIN SCnr1
+! cold pipe
 UNIT 451 TYPE 222
 INPUTS 3
 MSCnr1Cold_A TSCnr1_DTeeACold TSCnr1_QSrc1
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnr1Cold = [451,1]
 
-
+! hot pipe
 UNIT 452 TYPE 222
 INPUTS 3
 MSCnr1Hot_A TQSrc1_SCnr1 TSCnr1_DTeeAHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnr1Hot = [452,1]
+! END SCnr1
 
 
 UNIT 453 TYPE 929
@@ -696,204 +697,214 @@ TDTeeA_SCnrAHot
 EQUATIONS 1
 TDTeeAHot= [454,1]
 
+! BEGIN SCnrA
+! cold pipe
 UNIT 455 TYPE 222
 INPUTS 3
 MSCnrACold_A TDTeeA_SCnrACold TQSnkA_SCnrA
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrACold = [455,1]
 
-
+! hot pipe
 UNIT 456 TYPE 222
 INPUTS 3
 MSCnrAHot_A TSCnrA_QSnkA TDTeeA_SCnrAHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrAHot = [456,1]
+! END SCnrA
 
 
+! BEGIN SCnrB
+! cold pipe
 UNIT 457 TYPE 222
 INPUTS 3
 MSCnrBCold_A TDTeeB_SCnrBCold TQSnkB_SCnrB
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrBCold = [457,1]
 
-
+! hot pipe
 UNIT 458 TYPE 222
 INPUTS 3
 MSCnrBHot_A TSCnrB_QSnkB TDTeeB_SCnrBHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrBHot = [458,1]
+! END SCnrB
 
 
+! BEGIN SCnrC
+! cold pipe
 UNIT 459 TYPE 222
 INPUTS 3
 MSCnrCCold_A TDTeeC_SCnrCCold TQSnkC_SCnrC
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrCCold = [459,1]
 
-
+! hot pipe
 UNIT 460 TYPE 222
 INPUTS 3
 MSCnrCHot_A TSCnrC_QSnkC TDTeeC_SCnrCHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrCHot = [460,1]
+! END SCnrC
 
 
+! BEGIN SCnrD
+! cold pipe
 UNIT 461 TYPE 222
 INPUTS 3
 MSCnrDCold_A TDTeeD_SCnrDCold TQSnkD_SCnrD
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrDCold = [461,1]
 
-
+! hot pipe
 UNIT 462 TYPE 222
 INPUTS 3
 MSCnrDHot_A TSCnrD_QSnkD TDTeeD_SCnrDHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrDHot = [462,1]
+! END SCnrD
 
 
+! BEGIN SCnrE
+! cold pipe
 UNIT 463 TYPE 222
 INPUTS 3
 MSCnrECold_A TDTeeE_SCnrECold TQSnkE_SCnrE
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrECold = [463,1]
 
-
+! hot pipe
 UNIT 464 TYPE 222
 INPUTS 3
 MSCnrEHot_A TSCnrE_QSnkE TDTeeE_SCnrEHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrEHot = [464,1]
+! END SCnrE
 
 
+! BEGIN SCnrF
+! cold pipe
 UNIT 465 TYPE 222
 INPUTS 3
 MSCnrFCold_A TDTeeF_SCnrFCold TQSnkF_SCnrF
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrFCold = [465,1]
 
-
+! hot pipe
 UNIT 466 TYPE 222
 INPUTS 3
 MSCnrFHot_A TSCnrF_QSnkF TDTeeF_SCnrFHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrFHot = [466,1]
+! END SCnrF
 
 
+! BEGIN SCnrG
+! cold pipe
 UNIT 467 TYPE 222
 INPUTS 3
 MSCnrGCold_A TDTeeG_SCnrGCold TQSnkG_SCnrG
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrGCold = [467,1]
 
-
+! hot pipe
 UNIT 468 TYPE 222
 INPUTS 3
 MSCnrGHot_A TSCnrG_QSnkG TDTeeG_SCnrGHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrGHot = [468,1]
+! END SCnrG
 
 
+! BEGIN SCnrH
+! cold pipe
 UNIT 469 TYPE 222
 INPUTS 3
 MSCnrHCold_A TDTeeH_SCnrHCold TQSnkH_SCnrH
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrHCold = [469,1]
 
-
+! hot pipe
 UNIT 470 TYPE 222
 INPUTS 3
 MSCnrHHot_A TSCnrH_QSnkH TDTeeH_SCnrHHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrHHot = [470,1]
+! END SCnrH
 
 
+! BEGIN SCnrI
+! cold pipe
 UNIT 471 TYPE 222
 INPUTS 3
 MSCnrICold_A TDTeeI_SCnrICold TQSnkI_SCnrI
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrICold = [471,1]
 
-
+! hot pipe
 UNIT 472 TYPE 222
 INPUTS 3
 MSCnrIHot_A TSCnrI_QSnkI TDTeeI_SCnrIHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrIHot = [472,1]
+! END SCnrI
 
 
+! BEGIN SCnrJ
+! cold pipe
 UNIT 473 TYPE 222
 INPUTS 3
 MSCnrJCold_A TDTeeJ_SCnrJCold TQSnkJ_SCnrJ
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrJCold = [473,1]
 
-
+! hot pipe
 UNIT 474 TYPE 222
 INPUTS 3
 MSCnrJHot_A TSCnrJ_QSnkJ TDTeeJ_SCnrJHot
 ***
 0 20 20
-
 EQUATIONS 1
 TSCnrJHot = [474,1]
+! END SCnrJ
 
 
 UNIT 475 TYPE 929
@@ -1798,1046 +1809,477 @@ DTeeI_DTeeJGrSl = [500,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
 DTeeI_DTeeJSlFf = [500,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
 DTeeI_DTeeJSlInt = [500,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
 
-UNIT 501 TYPE 9511
-! DTeeB_SCnrB
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
+! BEGIN DTeeB_SCnrB
+! cold pipe
+UNIT 501 TYPE 222
+INPUTS 3
+MDTeeB_SCnrBCold_A TSCnrBCold TDTeeBCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeB_SCnrBCold = [501,1]
+MDTeeB_SCnrBCold = MDTeeB_SCnrBCold_A
 
-INPUTS 6
-TSCnrBCold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeB_SCnrBCold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeBCold ! ! Other side of pipe - cold pipe, deg C
-TDTeeBHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeB_SCnrBHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrBHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
+! hot pipe
+UNIT 502 TYPE 222
+INPUTS 3
+MDTeeB_SCnrBHot_A TDTeeBHot TSCnrBHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeB_SCnrBHot = [502,1]
+MDTeeB_SCnrBHot = MDTeeB_SCnrBHot_A
+! END DTeeB_SCnrB
 
-EQUATIONS 14
-TDTeeB_SCnrBCold = [501,1]  ! Outlet fluid temperature, deg C
-MDTeeB_SCnrBCold = MDTeeB_SCnrBCold_A  ! Outlet mass flow rate, kg/h
 
-TDTeeB_SCnrBHot = [501,3]  ! Outlet fluid temperature, deg C
-MDTeeB_SCnrBHot = MDTeeB_SCnrBHot_A  ! Outlet mass flow rate, kg/h
+! BEGIN DTeeC_SCnrC
+! cold pipe
+UNIT 503 TYPE 222
+INPUTS 3
+MDTeeC_SCnrCCold_A TSCnrCCold TDTeeCCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeC_SCnrCCold = [503,1]
+MDTeeC_SCnrCCold = MDTeeC_SCnrCCold_A
 
-DTeeB_SCnrBColdConv = [501,7]*-1*1/3600 ! Convected heat [kW]
-DTeeB_SCnrBColdInt = [501,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeB_SCnrBColdDiss = [501,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeB_SCnrBHotConv = [501,8]*-1*1/3600 ! Convected heat [kW]
-DTeeB_SCnrBHotInt = [501,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeB_SCnrBHotDiss = [501,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeB_SCnrBExch = [501,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeB_SCnrBGrSl = [501,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeB_SCnrBSlFf = [501,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeB_SCnrBSlInt = [501,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
+! hot pipe
+UNIT 504 TYPE 222
+INPUTS 3
+MDTeeC_SCnrCHot_A TDTeeCHot TSCnrCHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeC_SCnrCHot = [504,1]
+MDTeeC_SCnrCHot = MDTeeC_SCnrCHot_A
+! END DTeeC_SCnrC
 
-UNIT 502 TYPE 9511
-! DTeeC_SCnrC
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
 
-INPUTS 6
-TSCnrCCold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeC_SCnrCCold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeCCold ! ! Other side of pipe - cold pipe, deg C
-TDTeeCHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeC_SCnrCHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrCHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
+! BEGIN DTeeD_SCnrD
+! cold pipe
+UNIT 505 TYPE 222
+INPUTS 3
+MDTeeD_SCnrDCold_A TSCnrDCold TDTeeDCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeD_SCnrDCold = [505,1]
+MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A
 
-EQUATIONS 14
-TDTeeC_SCnrCCold = [502,1]  ! Outlet fluid temperature, deg C
-MDTeeC_SCnrCCold = MDTeeC_SCnrCCold_A  ! Outlet mass flow rate, kg/h
+! hot pipe
+UNIT 506 TYPE 222
+INPUTS 3
+MDTeeD_SCnrDHot_A TDTeeDHot TSCnrDHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeD_SCnrDHot = [506,1]
+MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
+! END DTeeD_SCnrD
 
-TDTeeC_SCnrCHot = [502,3]  ! Outlet fluid temperature, deg C
-MDTeeC_SCnrCHot = MDTeeC_SCnrCHot_A  ! Outlet mass flow rate, kg/h
 
-DTeeC_SCnrCColdConv = [502,7]*-1*1/3600 ! Convected heat [kW]
-DTeeC_SCnrCColdInt = [502,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeC_SCnrCColdDiss = [502,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeC_SCnrCHotConv = [502,8]*-1*1/3600 ! Convected heat [kW]
-DTeeC_SCnrCHotInt = [502,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeC_SCnrCHotDiss = [502,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeC_SCnrCExch = [502,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeC_SCnrCGrSl = [502,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeC_SCnrCSlFf = [502,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeC_SCnrCSlInt = [502,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
+! BEGIN DTeeE_SCnrE
+! cold pipe
+UNIT 507 TYPE 222
+INPUTS 3
+MDTeeE_SCnrECold_A TSCnrECold TDTeeECold
+***
+0 20 20
+EQUATIONS 2
+TDTeeE_SCnrECold = [507,1]
+MDTeeE_SCnrECold = MDTeeE_SCnrECold_A
 
-UNIT 503 TYPE 9511
-! DTeeD_SCnrD
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
+! hot pipe
+UNIT 508 TYPE 222
+INPUTS 3
+MDTeeE_SCnrEHot_A TDTeeEHot TSCnrEHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeE_SCnrEHot = [508,1]
+MDTeeE_SCnrEHot = MDTeeE_SCnrEHot_A
+! END DTeeE_SCnrE
 
-INPUTS 6
-TSCnrDCold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeD_SCnrDCold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeDCold ! ! Other side of pipe - cold pipe, deg C
-TDTeeDHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeD_SCnrDHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrDHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
 
-EQUATIONS 14
-TDTeeD_SCnrDCold = [503,1]  ! Outlet fluid temperature, deg C
-MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A  ! Outlet mass flow rate, kg/h
+! BEGIN DTeeF_SCnrF
+! cold pipe
+UNIT 509 TYPE 222
+INPUTS 3
+MDTeeF_SCnrFCold_A TSCnrFCold TDTeeFCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeF_SCnrFCold = [509,1]
+MDTeeF_SCnrFCold = MDTeeF_SCnrFCold_A
 
-TDTeeD_SCnrDHot = [503,3]  ! Outlet fluid temperature, deg C
-MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeD_SCnrDColdConv = [503,7]*-1*1/3600 ! Convected heat [kW]
-DTeeD_SCnrDColdInt = [503,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeD_SCnrDColdDiss = [503,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeD_SCnrDHotConv = [503,8]*-1*1/3600 ! Convected heat [kW]
-DTeeD_SCnrDHotInt = [503,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeD_SCnrDHotDiss = [503,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeD_SCnrDExch = [503,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeD_SCnrDGrSl = [503,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeD_SCnrDSlFf = [503,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeD_SCnrDSlInt = [503,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
-UNIT 504 TYPE 9511
-! DTeeE_SCnrE
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
-
-INPUTS 6
-TSCnrECold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeE_SCnrECold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeECold ! ! Other side of pipe - cold pipe, deg C
-TDTeeEHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeE_SCnrEHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrEHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
-
-EQUATIONS 14
-TDTeeE_SCnrECold = [504,1]  ! Outlet fluid temperature, deg C
-MDTeeE_SCnrECold = MDTeeE_SCnrECold_A  ! Outlet mass flow rate, kg/h
-
-TDTeeE_SCnrEHot = [504,3]  ! Outlet fluid temperature, deg C
-MDTeeE_SCnrEHot = MDTeeE_SCnrEHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeE_SCnrEColdConv = [504,7]*-1*1/3600 ! Convected heat [kW]
-DTeeE_SCnrEColdInt = [504,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeE_SCnrEColdDiss = [504,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeE_SCnrEHotConv = [504,8]*-1*1/3600 ! Convected heat [kW]
-DTeeE_SCnrEHotInt = [504,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeE_SCnrEHotDiss = [504,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeE_SCnrEExch = [504,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeE_SCnrEGrSl = [504,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeE_SCnrESlFf = [504,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeE_SCnrESlInt = [504,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
-UNIT 505 TYPE 9511
-! DTeeF_SCnrF
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
-
-INPUTS 6
-TSCnrFCold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeF_SCnrFCold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeFCold ! ! Other side of pipe - cold pipe, deg C
-TDTeeFHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeF_SCnrFHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrFHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
-
-EQUATIONS 14
-TDTeeF_SCnrFCold = [505,1]  ! Outlet fluid temperature, deg C
-MDTeeF_SCnrFCold = MDTeeF_SCnrFCold_A  ! Outlet mass flow rate, kg/h
-
-TDTeeF_SCnrFHot = [505,3]  ! Outlet fluid temperature, deg C
-MDTeeF_SCnrFHot = MDTeeF_SCnrFHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeF_SCnrFColdConv = [505,7]*-1*1/3600 ! Convected heat [kW]
-DTeeF_SCnrFColdInt = [505,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeF_SCnrFColdDiss = [505,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeF_SCnrFHotConv = [505,8]*-1*1/3600 ! Convected heat [kW]
-DTeeF_SCnrFHotInt = [505,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeF_SCnrFHotDiss = [505,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeF_SCnrFExch = [505,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeF_SCnrFGrSl = [505,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeF_SCnrFSlFf = [505,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeF_SCnrFSlInt = [505,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
-UNIT 506 TYPE 9511
-! DTeeG_SCnrG
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
-
-INPUTS 6
-TSCnrGCold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeG_SCnrGCold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeGCold ! ! Other side of pipe - cold pipe, deg C
-TDTeeGHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeG_SCnrGHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrGHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
-
-EQUATIONS 14
-TDTeeG_SCnrGCold = [506,1]  ! Outlet fluid temperature, deg C
-MDTeeG_SCnrGCold = MDTeeG_SCnrGCold_A  ! Outlet mass flow rate, kg/h
-
-TDTeeG_SCnrGHot = [506,3]  ! Outlet fluid temperature, deg C
-MDTeeG_SCnrGHot = MDTeeG_SCnrGHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeG_SCnrGColdConv = [506,7]*-1*1/3600 ! Convected heat [kW]
-DTeeG_SCnrGColdInt = [506,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeG_SCnrGColdDiss = [506,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeG_SCnrGHotConv = [506,8]*-1*1/3600 ! Convected heat [kW]
-DTeeG_SCnrGHotInt = [506,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeG_SCnrGHotDiss = [506,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeG_SCnrGExch = [506,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeG_SCnrGGrSl = [506,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeG_SCnrGSlFf = [506,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeG_SCnrGSlInt = [506,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
-UNIT 507 TYPE 9511
-! DTeeH_SCnrH
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
-
-INPUTS 6
-TSCnrHCold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeH_SCnrHCold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeHCold ! ! Other side of pipe - cold pipe, deg C
-TDTeeHHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeH_SCnrHHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrHHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
-
-EQUATIONS 14
-TDTeeH_SCnrHCold = [507,1]  ! Outlet fluid temperature, deg C
-MDTeeH_SCnrHCold = MDTeeH_SCnrHCold_A  ! Outlet mass flow rate, kg/h
-
-TDTeeH_SCnrHHot = [507,3]  ! Outlet fluid temperature, deg C
-MDTeeH_SCnrHHot = MDTeeH_SCnrHHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeH_SCnrHColdConv = [507,7]*-1*1/3600 ! Convected heat [kW]
-DTeeH_SCnrHColdInt = [507,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeH_SCnrHColdDiss = [507,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeH_SCnrHHotConv = [507,8]*-1*1/3600 ! Convected heat [kW]
-DTeeH_SCnrHHotInt = [507,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeH_SCnrHHotDiss = [507,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeH_SCnrHExch = [507,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeH_SCnrHGrSl = [507,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeH_SCnrHSlFf = [507,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeH_SCnrHSlInt = [507,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
-UNIT 508 TYPE 9511
-! DTeeI_SCnrI
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
-
-INPUTS 6
-TSCnrICold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeI_SCnrICold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeICold ! ! Other side of pipe - cold pipe, deg C
-TDTeeIHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeI_SCnrIHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrIHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
-
-EQUATIONS 14
-TDTeeI_SCnrICold = [508,1]  ! Outlet fluid temperature, deg C
-MDTeeI_SCnrICold = MDTeeI_SCnrICold_A  ! Outlet mass flow rate, kg/h
-
-TDTeeI_SCnrIHot = [508,3]  ! Outlet fluid temperature, deg C
-MDTeeI_SCnrIHot = MDTeeI_SCnrIHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeI_SCnrIColdConv = [508,7]*-1*1/3600 ! Convected heat [kW]
-DTeeI_SCnrIColdInt = [508,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeI_SCnrIColdDiss = [508,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeI_SCnrIHotConv = [508,8]*-1*1/3600 ! Convected heat [kW]
-DTeeI_SCnrIHotInt = [508,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeI_SCnrIHotDiss = [508,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeI_SCnrIExch = [508,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeI_SCnrIGrSl = [508,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeI_SCnrISlFf = [508,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeI_SCnrISlInt = [508,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
-UNIT 509 TYPE 9511
-! DTeeJ_SCnrJ
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
-
-INPUTS 6
-TSCnrJCold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeJ_SCnrJCold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeJCold ! ! Other side of pipe - cold pipe, deg C
-TDTeeJHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeJ_SCnrJHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrJHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
-
-EQUATIONS 14
-TDTeeJ_SCnrJCold = [509,1]  ! Outlet fluid temperature, deg C
-MDTeeJ_SCnrJCold = MDTeeJ_SCnrJCold_A  ! Outlet mass flow rate, kg/h
-
-TDTeeJ_SCnrJHot = [509,3]  ! Outlet fluid temperature, deg C
-MDTeeJ_SCnrJHot = MDTeeJ_SCnrJHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeJ_SCnrJColdConv = [509,7]*-1*1/3600 ! Convected heat [kW]
-DTeeJ_SCnrJColdInt = [509,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeJ_SCnrJColdDiss = [509,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeJ_SCnrJHotConv = [509,8]*-1*1/3600 ! Convected heat [kW]
-DTeeJ_SCnrJHotInt = [509,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeJ_SCnrJHotDiss = [509,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeJ_SCnrJExch = [509,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeJ_SCnrJGrSl = [509,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeJ_SCnrJSlFf = [509,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeJ_SCnrJSlInt = [509,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
+! hot pipe
 UNIT 510 TYPE 222
+INPUTS 3
+MDTeeF_SCnrFHot_A TDTeeFHot TSCnrFHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeF_SCnrFHot = [510,1]
+MDTeeF_SCnrFHot = MDTeeF_SCnrFHot_A
+! END DTeeF_SCnrF
+
+
+! BEGIN DTeeG_SCnrG
+! cold pipe
+UNIT 511 TYPE 222
+INPUTS 3
+MDTeeG_SCnrGCold_A TSCnrGCold TDTeeGCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeG_SCnrGCold = [511,1]
+MDTeeG_SCnrGCold = MDTeeG_SCnrGCold_A
+
+! hot pipe
+UNIT 512 TYPE 222
+INPUTS 3
+MDTeeG_SCnrGHot_A TDTeeGHot TSCnrGHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeG_SCnrGHot = [512,1]
+MDTeeG_SCnrGHot = MDTeeG_SCnrGHot_A
+! END DTeeG_SCnrG
+
+
+! BEGIN DTeeH_SCnrH
+! cold pipe
+UNIT 513 TYPE 222
+INPUTS 3
+MDTeeH_SCnrHCold_A TSCnrHCold TDTeeHCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeH_SCnrHCold = [513,1]
+MDTeeH_SCnrHCold = MDTeeH_SCnrHCold_A
+
+! hot pipe
+UNIT 514 TYPE 222
+INPUTS 3
+MDTeeH_SCnrHHot_A TDTeeHHot TSCnrHHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeH_SCnrHHot = [514,1]
+MDTeeH_SCnrHHot = MDTeeH_SCnrHHot_A
+! END DTeeH_SCnrH
+
+
+! BEGIN DTeeI_SCnrI
+! cold pipe
+UNIT 515 TYPE 222
+INPUTS 3
+MDTeeI_SCnrICold_A TSCnrICold TDTeeICold
+***
+0 20 20
+EQUATIONS 2
+TDTeeI_SCnrICold = [515,1]
+MDTeeI_SCnrICold = MDTeeI_SCnrICold_A
+
+! hot pipe
+UNIT 516 TYPE 222
+INPUTS 3
+MDTeeI_SCnrIHot_A TDTeeIHot TSCnrIHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeI_SCnrIHot = [516,1]
+MDTeeI_SCnrIHot = MDTeeI_SCnrIHot_A
+! END DTeeI_SCnrI
+
+
+! BEGIN DTeeJ_SCnrJ
+! cold pipe
+UNIT 517 TYPE 222
+INPUTS 3
+MDTeeJ_SCnrJCold_A TSCnrJCold TDTeeJCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeJ_SCnrJCold = [517,1]
+MDTeeJ_SCnrJCold = MDTeeJ_SCnrJCold_A
+
+! hot pipe
+UNIT 518 TYPE 222
+INPUTS 3
+MDTeeJ_SCnrJHot_A TDTeeJHot TSCnrJHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeJ_SCnrJHot = [518,1]
+MDTeeJ_SCnrJHot = MDTeeJ_SCnrJHot_A
+! END DTeeJ_SCnrJ
+
+
+! BEGIN SCnr99
+! cold pipe
+UNIT 519 TYPE 222
 INPUTS 3
 MSCnr99Cold_A TDTeeJ_SCnrZCold TSCnrZ_SCnrZ
 ***
 0 20 20
-
 EQUATIONS 1
-TSCnr99Cold = [510,1]
+TSCnr99Cold = [519,1]
 
-
-UNIT 511 TYPE 222
+! hot pipe
+UNIT 520 TYPE 222
 INPUTS 3
 MSCnr99Hot_A TSCnrZ_SCnrZ TDTeeJ_SCnrZHot
 ***
 0 20 20
-
 EQUATIONS 1
-TSCnr99Hot = [511,1]
+TSCnr99Hot = [520,1]
+! END SCnr99
+
 
 
 ! SCnr1_QSrc1
-EQUATIONS 1
-MSCnr1_QSrc1 = MSCnr1_QSrc1_A
-UNIT 512 TYPE 222
+UNIT 521 TYPE 222
 INPUTS 3
-MSCnr1_QSrc1 TSCnr1Cold TQSrc1H
+MSCnr1_QSrc1_A TSCnr1Cold TQSrc1H
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnr1_QSrc1 = [512,1]
-
+EQUATIONS 2
+TSCnr1_QSrc1 = [521,1]
+MSCnr1_QSrc1 = MSCnr1_QSrc1_A
 
 
 ! QSrc1_SCnr1
-EQUATIONS 1
-MQSrc1_SCnr1 = MQSrc1_SCnr1_A
-UNIT 513 TYPE 222
+UNIT 522 TYPE 222
 INPUTS 3
-MQSrc1_SCnr1 TQSrc1H TSCnr1Hot
+MQSrc1_SCnr1_A TQSrc1H TSCnr1Hot
 ***
 0 20 20
-
-EQUATIONS 1
-TQSrc1_SCnr1 = [513,1]
-
+EQUATIONS 2
+TQSrc1_SCnr1 = [522,1]
+MQSrc1_SCnr1 = MQSrc1_SCnr1_A
 
 
 ! SCnrA_QSnkA
-EQUATIONS 1
-MSCnrA_QSnkA = MSCnrA_QSnkA_A
-UNIT 514 TYPE 222
+UNIT 523 TYPE 222
 INPUTS 3
-MSCnrA_QSnkA TSCnrAHot TQSnkAH
+MSCnrA_QSnkA_A TSCnrAHot TQSnkAH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrA_QSnkA = [514,1]
-
+EQUATIONS 2
+TSCnrA_QSnkA = [523,1]
+MSCnrA_QSnkA = MSCnrA_QSnkA_A
 
 
 ! QSnkA_SCnrA
-EQUATIONS 1
-MQSnkA_SCnrA = MQSnkA_SCnrA_A
-UNIT 515 TYPE 222
+UNIT 524 TYPE 222
 INPUTS 3
-MQSnkA_SCnrA TQSnkAH TSCnrACold
+MQSnkA_SCnrA_A TQSnkAH TSCnrACold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkA_SCnrA = [515,1]
-
+EQUATIONS 2
+TQSnkA_SCnrA = [524,1]
+MQSnkA_SCnrA = MQSnkA_SCnrA_A
 
 
 ! SCnrB_QSnkB
-EQUATIONS 1
-MSCnrB_QSnkB = MSCnrB_QSnkB_A
-UNIT 516 TYPE 222
+UNIT 525 TYPE 222
 INPUTS 3
-MSCnrB_QSnkB TSCnrBHot TQSnkBH
+MSCnrB_QSnkB_A TSCnrBHot TQSnkBH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrB_QSnkB = [516,1]
-
+EQUATIONS 2
+TSCnrB_QSnkB = [525,1]
+MSCnrB_QSnkB = MSCnrB_QSnkB_A
 
 
 ! QSnkB_SCnrB
-EQUATIONS 1
-MQSnkB_SCnrB = MQSnkB_SCnrB_A
-UNIT 517 TYPE 222
+UNIT 526 TYPE 222
 INPUTS 3
-MQSnkB_SCnrB TQSnkBH TSCnrBCold
+MQSnkB_SCnrB_A TQSnkBH TSCnrBCold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkB_SCnrB = [517,1]
-
+EQUATIONS 2
+TQSnkB_SCnrB = [526,1]
+MQSnkB_SCnrB = MQSnkB_SCnrB_A
 
 
 ! SCnrC_QSnkC
-EQUATIONS 1
-MSCnrC_QSnkC = MSCnrC_QSnkC_A
-UNIT 518 TYPE 222
+UNIT 527 TYPE 222
 INPUTS 3
-MSCnrC_QSnkC TSCnrCHot TQSnkCH
+MSCnrC_QSnkC_A TSCnrCHot TQSnkCH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrC_QSnkC = [518,1]
-
+EQUATIONS 2
+TSCnrC_QSnkC = [527,1]
+MSCnrC_QSnkC = MSCnrC_QSnkC_A
 
 
 ! QSnkC_SCnrC
-EQUATIONS 1
-MQSnkC_SCnrC = MQSnkC_SCnrC_A
-UNIT 519 TYPE 222
+UNIT 528 TYPE 222
 INPUTS 3
-MQSnkC_SCnrC TQSnkCH TSCnrCCold
+MQSnkC_SCnrC_A TQSnkCH TSCnrCCold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkC_SCnrC = [519,1]
-
+EQUATIONS 2
+TQSnkC_SCnrC = [528,1]
+MQSnkC_SCnrC = MQSnkC_SCnrC_A
 
 
 ! SCnrD_QSnkD
-EQUATIONS 1
-MSCnrD_QSnkD = MSCnrD_QSnkD_A
-UNIT 520 TYPE 222
+UNIT 529 TYPE 222
 INPUTS 3
-MSCnrD_QSnkD TSCnrDHot TQSnkDH
+MSCnrD_QSnkD_A TSCnrDHot TQSnkDH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrD_QSnkD = [520,1]
-
+EQUATIONS 2
+TSCnrD_QSnkD = [529,1]
+MSCnrD_QSnkD = MSCnrD_QSnkD_A
 
 
 ! QSnkD_SCnrD
-EQUATIONS 1
-MQSnkD_SCnrD = MQSnkD_SCnrD_A
-UNIT 521 TYPE 222
+UNIT 530 TYPE 222
 INPUTS 3
-MQSnkD_SCnrD TQSnkDH TSCnrDCold
+MQSnkD_SCnrD_A TQSnkDH TSCnrDCold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkD_SCnrD = [521,1]
-
+EQUATIONS 2
+TQSnkD_SCnrD = [530,1]
+MQSnkD_SCnrD = MQSnkD_SCnrD_A
 
 
 ! SCnrE_QSnkE
-EQUATIONS 1
-MSCnrE_QSnkE = MSCnrE_QSnkE_A
-UNIT 522 TYPE 222
+UNIT 531 TYPE 222
 INPUTS 3
-MSCnrE_QSnkE TSCnrEHot TQSnkEH
+MSCnrE_QSnkE_A TSCnrEHot TQSnkEH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrE_QSnkE = [522,1]
-
+EQUATIONS 2
+TSCnrE_QSnkE = [531,1]
+MSCnrE_QSnkE = MSCnrE_QSnkE_A
 
 
 ! QSnkE_SCnrE
-EQUATIONS 1
-MQSnkE_SCnrE = MQSnkE_SCnrE_A
-UNIT 523 TYPE 222
+UNIT 532 TYPE 222
 INPUTS 3
-MQSnkE_SCnrE TQSnkEH TSCnrECold
+MQSnkE_SCnrE_A TQSnkEH TSCnrECold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkE_SCnrE = [523,1]
-
+EQUATIONS 2
+TQSnkE_SCnrE = [532,1]
+MQSnkE_SCnrE = MQSnkE_SCnrE_A
 
 
 ! SCnrF_QSnkF
-EQUATIONS 1
-MSCnrF_QSnkF = MSCnrF_QSnkF_A
-UNIT 524 TYPE 222
+UNIT 533 TYPE 222
 INPUTS 3
-MSCnrF_QSnkF TSCnrFHot TQSnkFH
+MSCnrF_QSnkF_A TSCnrFHot TQSnkFH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrF_QSnkF = [524,1]
-
+EQUATIONS 2
+TSCnrF_QSnkF = [533,1]
+MSCnrF_QSnkF = MSCnrF_QSnkF_A
 
 
 ! QSnkF_SCnrF
-EQUATIONS 1
-MQSnkF_SCnrF = MQSnkF_SCnrF_A
-UNIT 525 TYPE 222
+UNIT 534 TYPE 222
 INPUTS 3
-MQSnkF_SCnrF TQSnkFH TSCnrFCold
+MQSnkF_SCnrF_A TQSnkFH TSCnrFCold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkF_SCnrF = [525,1]
-
+EQUATIONS 2
+TQSnkF_SCnrF = [534,1]
+MQSnkF_SCnrF = MQSnkF_SCnrF_A
 
 
 ! SCnrG_QSnkG
-EQUATIONS 1
-MSCnrG_QSnkG = MSCnrG_QSnkG_A
-UNIT 526 TYPE 222
+UNIT 535 TYPE 222
 INPUTS 3
-MSCnrG_QSnkG TSCnrGHot TQSnkGH
+MSCnrG_QSnkG_A TSCnrGHot TQSnkGH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrG_QSnkG = [526,1]
-
+EQUATIONS 2
+TSCnrG_QSnkG = [535,1]
+MSCnrG_QSnkG = MSCnrG_QSnkG_A
 
 
 ! QSnkG_SCnrG
-EQUATIONS 1
-MQSnkG_SCnrG = MQSnkG_SCnrG_A
-UNIT 527 TYPE 222
+UNIT 536 TYPE 222
 INPUTS 3
-MQSnkG_SCnrG TQSnkGH TSCnrGCold
+MQSnkG_SCnrG_A TQSnkGH TSCnrGCold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkG_SCnrG = [527,1]
-
+EQUATIONS 2
+TQSnkG_SCnrG = [536,1]
+MQSnkG_SCnrG = MQSnkG_SCnrG_A
 
 
 ! SCnrH_QSnkH
-EQUATIONS 1
-MSCnrH_QSnkH = MSCnrH_QSnkH_A
-UNIT 528 TYPE 222
+UNIT 537 TYPE 222
 INPUTS 3
-MSCnrH_QSnkH TSCnrHHot TQSnkHH
+MSCnrH_QSnkH_A TSCnrHHot TQSnkHH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrH_QSnkH = [528,1]
-
+EQUATIONS 2
+TSCnrH_QSnkH = [537,1]
+MSCnrH_QSnkH = MSCnrH_QSnkH_A
 
 
 ! QSnkH_SCnrH
-EQUATIONS 1
-MQSnkH_SCnrH = MQSnkH_SCnrH_A
-UNIT 529 TYPE 222
+UNIT 538 TYPE 222
 INPUTS 3
-MQSnkH_SCnrH TQSnkHH TSCnrHCold
+MQSnkH_SCnrH_A TQSnkHH TSCnrHCold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkH_SCnrH = [529,1]
-
+EQUATIONS 2
+TQSnkH_SCnrH = [538,1]
+MQSnkH_SCnrH = MQSnkH_SCnrH_A
 
 
 ! SCnrI_QSnkI
-EQUATIONS 1
-MSCnrI_QSnkI = MSCnrI_QSnkI_A
-UNIT 530 TYPE 222
+UNIT 539 TYPE 222
 INPUTS 3
-MSCnrI_QSnkI TSCnrIHot TQSnkIH
+MSCnrI_QSnkI_A TSCnrIHot TQSnkIH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrI_QSnkI = [530,1]
-
+EQUATIONS 2
+TSCnrI_QSnkI = [539,1]
+MSCnrI_QSnkI = MSCnrI_QSnkI_A
 
 
 ! QSnkI_SCnrI
-EQUATIONS 1
-MQSnkI_SCnrI = MQSnkI_SCnrI_A
-UNIT 531 TYPE 222
+UNIT 540 TYPE 222
 INPUTS 3
-MQSnkI_SCnrI TQSnkIH TSCnrICold
+MQSnkI_SCnrI_A TQSnkIH TSCnrICold
 ***
 0 20 20
-
-EQUATIONS 1
-TQSnkI_SCnrI = [531,1]
-
+EQUATIONS 2
+TQSnkI_SCnrI = [540,1]
+MQSnkI_SCnrI = MQSnkI_SCnrI_A
 
 
 ! SCnrJ_QSnkJ
-EQUATIONS 1
-MSCnrJ_QSnkJ = MSCnrJ_QSnkJ_A
-UNIT 532 TYPE 222
+UNIT 541 TYPE 222
 INPUTS 3
-MSCnrJ_QSnkJ TSCnrJHot TQSnkJH
+MSCnrJ_QSnkJ_A TSCnrJHot TQSnkJH
 ***
 0 20 20
-
-EQUATIONS 1
-TSCnrJ_QSnkJ = [532,1]
-
+EQUATIONS 2
+TSCnrJ_QSnkJ = [541,1]
+MSCnrJ_QSnkJ = MSCnrJ_QSnkJ_A
 
 
 ! QSnkJ_SCnrJ
-EQUATIONS 1
-MQSnkJ_SCnrJ = MQSnkJ_SCnrJ_A
-UNIT 533 TYPE 222
+UNIT 542 TYPE 222
 INPUTS 3
-MQSnkJ_SCnrJ TQSnkJH TSCnrJCold
+MQSnkJ_SCnrJ_A TQSnkJH TSCnrJCold
 ***
 0 20 20
+EQUATIONS 2
+TQSnkJ_SCnrJ = [542,1]
+MQSnkJ_SCnrJ = MQSnkJ_SCnrJ_A
 
-EQUATIONS 1
-TQSnkJ_SCnrJ = [533,1]
-
-
-
-UNIT 534 TYPE 9511
+UNIT 543 TYPE 9511
 ! DTeeJ_SCnrZ
 PARAMETERS 36
 ****** pipe and soil properties ******
@@ -2899,38 +2341,35 @@ dpTIniHot
 dpTIniHot
 
 EQUATIONS 14
-TDTeeJ_SCnrZCold = [534,1]  ! Outlet fluid temperature, deg C
+TDTeeJ_SCnrZCold = [543,1]  ! Outlet fluid temperature, deg C
 MDTeeJ_SCnrZCold = MDTeeJ_SCnrZCold_A  ! Outlet mass flow rate, kg/h
 
-TDTeeJ_SCnrZHot = [534,3]  ! Outlet fluid temperature, deg C
+TDTeeJ_SCnrZHot = [543,3]  ! Outlet fluid temperature, deg C
 MDTeeJ_SCnrZHot = MDTeeJ_SCnrZHot_A  ! Outlet mass flow rate, kg/h
 
-DTeeJ_SCnrZColdConv = [534,7]*-1*1/3600 ! Convected heat [kW]
-DTeeJ_SCnrZColdInt = [534,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeJ_SCnrZColdDiss = [534,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeJ_SCnrZHotConv = [534,8]*-1*1/3600 ! Convected heat [kW]
-DTeeJ_SCnrZHotInt = [534,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeJ_SCnrZHotDiss = [534,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeJ_SCnrZExch = [534,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeJ_SCnrZGrSl = [534,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeJ_SCnrZSlFf = [534,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeJ_SCnrZSlInt = [534,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
+DTeeJ_SCnrZColdConv = [543,7]*-1*1/3600 ! Convected heat [kW]
+DTeeJ_SCnrZColdInt = [543,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
+DTeeJ_SCnrZColdDiss = [543,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
+DTeeJ_SCnrZHotConv = [543,8]*-1*1/3600 ! Convected heat [kW]
+DTeeJ_SCnrZHotInt = [543,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
+DTeeJ_SCnrZHotDiss = [543,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
+DTeeJ_SCnrZExch = [543,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
+DTeeJ_SCnrZGrSl = [543,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
+DTeeJ_SCnrZSlFf = [543,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
+DTeeJ_SCnrZSlInt = [543,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
+
 
 ! SCnrZ_SCnrZ
-EQUATIONS 1
-MSCnrZ_SCnrZ = MSCnrZ_SCnrZ_A
-UNIT 535 TYPE 222
+UNIT 544 TYPE 222
 INPUTS 3
-MSCnrZ_SCnrZ TSCnr99Hot TSCnr99Cold
+MSCnrZ_SCnrZ_A TSCnr99Hot TSCnr99Cold
 ***
 0 20 20
+EQUATIONS 2
+TSCnrZ_SCnrZ = [544,1]
+MSCnrZ_SCnrZ = MSCnrZ_SCnrZ_A
 
-EQUATIONS 1
-TSCnrZ_SCnrZ = [535,1]
-
-
-
-UNIT 536 TYPE 9511
+UNIT 545 TYPE 9511
 ! DTeeA_DTeeB
 PARAMETERS 36
 ****** pipe and soil properties ******
@@ -2992,103 +2431,47 @@ dpTIniHot
 dpTIniHot
 
 EQUATIONS 14
-TDTeeA_DTeeBCold = [536,1]  ! Outlet fluid temperature, deg C
+TDTeeA_DTeeBCold = [545,1]  ! Outlet fluid temperature, deg C
 MDTeeA_DTeeBCold = MDTeeA_DTeeBCold_A  ! Outlet mass flow rate, kg/h
 
-TDTeeA_DTeeBHot = [536,3]  ! Outlet fluid temperature, deg C
+TDTeeA_DTeeBHot = [545,3]  ! Outlet fluid temperature, deg C
 MDTeeA_DTeeBHot = MDTeeA_DTeeBHot_A  ! Outlet mass flow rate, kg/h
 
-DTeeA_DTeeBColdConv = [536,7]*-1*1/3600 ! Convected heat [kW]
-DTeeA_DTeeBColdInt = [536,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeA_DTeeBColdDiss = [536,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeA_DTeeBHotConv = [536,8]*-1*1/3600 ! Convected heat [kW]
-DTeeA_DTeeBHotInt = [536,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeA_DTeeBHotDiss = [536,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeA_DTeeBExch = [536,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeA_DTeeBGrSl = [536,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeA_DTeeBSlFf = [536,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeA_DTeeBSlInt = [536,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
+DTeeA_DTeeBColdConv = [545,7]*-1*1/3600 ! Convected heat [kW]
+DTeeA_DTeeBColdInt = [545,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
+DTeeA_DTeeBColdDiss = [545,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
+DTeeA_DTeeBHotConv = [545,8]*-1*1/3600 ! Convected heat [kW]
+DTeeA_DTeeBHotInt = [545,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
+DTeeA_DTeeBHotDiss = [545,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
+DTeeA_DTeeBExch = [545,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
+DTeeA_DTeeBGrSl = [545,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
+DTeeA_DTeeBSlFf = [545,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
+DTeeA_DTeeBSlInt = [545,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
 
-UNIT 537 TYPE 9511
-! DTeeA_SCnrA
-PARAMETERS 36
-****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
+! BEGIN DTeeA_SCnrA
+! cold pipe
+UNIT 546 TYPE 222
+INPUTS 3
+MDTeeA_SCnrACold_A TSCnrACold TDTeeACold
+***
+0 20 20
+EQUATIONS 2
+TDTeeA_SCnrACold = [546,1]
+MDTeeA_SCnrACold = MDTeeA_SCnrACold_A
 
-INPUTS 6
-TSCnrACold ! Inlet fluid temperature - cold pipe, deg C
-MDTeeA_SCnrACold_A ! Inlet fluid flow rate - cold pipe, kg/h
-TDTeeACold ! ! Other side of pipe - cold pipe, deg C
-TDTeeAHot ! Inlet fluid temperature - hot pipe, deg C
-MDTeeA_SCnrAHot_A ! Inlet fluid flow rate - hot pipe, kg/h
-TSCnrAHot ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
+! hot pipe
+UNIT 547 TYPE 222
+INPUTS 3
+MDTeeA_SCnrAHot_A TDTeeAHot TSCnrAHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeA_SCnrAHot = [547,1]
+MDTeeA_SCnrAHot = MDTeeA_SCnrAHot_A
+! END DTeeA_SCnrA
 
-EQUATIONS 14
-TDTeeA_SCnrACold = [537,1]  ! Outlet fluid temperature, deg C
-MDTeeA_SCnrACold = MDTeeA_SCnrACold_A  ! Outlet mass flow rate, kg/h
 
-TDTeeA_SCnrAHot = [537,3]  ! Outlet fluid temperature, deg C
-MDTeeA_SCnrAHot = MDTeeA_SCnrAHot_A  ! Outlet mass flow rate, kg/h
-
-DTeeA_SCnrAColdConv = [537,7]*-1*1/3600 ! Convected heat [kW]
-DTeeA_SCnrAColdInt = [537,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeA_SCnrAColdDiss = [537,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeA_SCnrAHotConv = [537,8]*-1*1/3600 ! Convected heat [kW]
-DTeeA_SCnrAHotInt = [537,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-DTeeA_SCnrAHotDiss = [537,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-DTeeA_SCnrAExch = [537,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-DTeeA_SCnrAGrSl = [537,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-DTeeA_SCnrASlFf = [537,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-DTeeA_SCnrASlInt = [537,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
-
-UNIT 538 TYPE 9511
+UNIT 548 TYPE 9511
 ! SCnr1_DTeeA
 PARAMETERS 36
 ****** pipe and soil properties ******
@@ -3150,38 +2533,38 @@ dpTIniHot
 dpTIniHot
 
 EQUATIONS 14
-TSCnr1_DTeeACold = [538,1]  ! Outlet fluid temperature, deg C
+TSCnr1_DTeeACold = [548,1]  ! Outlet fluid temperature, deg C
 MSCnr1_DTeeACold = MSCnr1_DTeeACold_A  ! Outlet mass flow rate, kg/h
 
-TSCnr1_DTeeAHot = [538,3]  ! Outlet fluid temperature, deg C
+TSCnr1_DTeeAHot = [548,3]  ! Outlet fluid temperature, deg C
 MSCnr1_DTeeAHot = MSCnr1_DTeeAHot_A  ! Outlet mass flow rate, kg/h
 
-SCnr1_DTeeAColdConv = [538,7]*-1*1/3600 ! Convected heat [kW]
-SCnr1_DTeeAColdInt = [538,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-SCnr1_DTeeAColdDiss = [538,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-SCnr1_DTeeAHotConv = [538,8]*-1*1/3600 ! Convected heat [kW]
-SCnr1_DTeeAHotInt = [538,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
-SCnr1_DTeeAHotDiss = [538,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
-SCnr1_DTeeAExch = [538,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
-SCnr1_DTeeAGrSl = [538,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
-SCnr1_DTeeASlFf = [538,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
-SCnr1_DTeeASlInt = [538,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
+SCnr1_DTeeAColdConv = [548,7]*-1*1/3600 ! Convected heat [kW]
+SCnr1_DTeeAColdInt = [548,9]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
+SCnr1_DTeeAColdDiss = [548,11]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
+SCnr1_DTeeAHotConv = [548,8]*-1*1/3600 ! Convected heat [kW]
+SCnr1_DTeeAHotInt = [548,10]*1/3600 ! Change in fluid's internal heat content compared to previous time step [kW]
+SCnr1_DTeeAHotDiss = [548,12]*1/3600 ! Dissipated heat to casing (aka gravel) [kW]
+SCnr1_DTeeAExch = [548,13]*1/3600 ! Dissipated heat from cold pipe to hot pipe [kW]
+SCnr1_DTeeAGrSl = [548,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
+SCnr1_DTeeASlFf = [548,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
+SCnr1_DTeeASlInt = [548,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
 
 *** Double pipe energy balance
 EQUATIONS 5
-dpPipeConvectedTot = DTeeB_DTeeCColdConv + DTeeB_DTeeCHotConv + DTeeC_DTeeDColdConv + DTeeC_DTeeDHotConv + DTeeD_DTeeEColdConv + DTeeD_DTeeEHotConv + DTeeE_DTeeFColdConv + DTeeE_DTeeFHotConv + DTeeF_DTeeGColdConv + DTeeF_DTeeGHotConv + DTeeG_DTeeHColdConv + DTeeG_DTeeHHotConv + DTeeH_DTeeIColdConv + DTeeH_DTeeIHotConv + DTeeI_DTeeJColdConv + DTeeI_DTeeJHotConv + DTeeB_SCnrBColdConv + DTeeB_SCnrBHotConv + DTeeC_SCnrCColdConv + DTeeC_SCnrCHotConv + DTeeD_SCnrDColdConv + DTeeD_SCnrDHotConv + DTeeE_SCnrEColdConv + DTeeE_SCnrEHotConv + DTeeF_SCnrFColdConv + DTeeF_SCnrFHotConv + DTeeG_SCnrGColdConv + DTeeG_SCnrGHotConv + DTeeH_SCnrHColdConv + DTeeH_SCnrHHotConv + DTeeI_SCnrIColdConv + DTeeI_SCnrIHotConv + DTeeJ_SCnrJColdConv + DTeeJ_SCnrJHotConv + DTeeJ_SCnrZColdConv + DTeeJ_SCnrZHotConv + DTeeA_DTeeBColdConv + DTeeA_DTeeBHotConv + DTeeA_SCnrAColdConv + DTeeA_SCnrAHotConv + SCnr1_DTeeAColdConv + SCnr1_DTeeAHotConv
-dpToFFieldTot = DTeeB_DTeeCSlFf + DTeeC_DTeeDSlFf + DTeeD_DTeeESlFf + DTeeE_DTeeFSlFf + DTeeF_DTeeGSlFf + DTeeG_DTeeHSlFf + DTeeH_DTeeISlFf + DTeeI_DTeeJSlFf + DTeeB_SCnrBSlFf + DTeeC_SCnrCSlFf + DTeeD_SCnrDSlFf + DTeeE_SCnrESlFf + DTeeF_SCnrFSlFf + DTeeG_SCnrGSlFf + DTeeH_SCnrHSlFf + DTeeI_SCnrISlFf + DTeeJ_SCnrJSlFf + DTeeJ_SCnrZSlFf + DTeeA_DTeeBSlFf + DTeeA_SCnrASlFf + SCnr1_DTeeASlFf
-dpPipeIntTot = DTeeB_DTeeCColdInt + DTeeB_DTeeCHotInt + DTeeC_DTeeDColdInt + DTeeC_DTeeDHotInt + DTeeD_DTeeEColdInt + DTeeD_DTeeEHotInt + DTeeE_DTeeFColdInt + DTeeE_DTeeFHotInt + DTeeF_DTeeGColdInt + DTeeF_DTeeGHotInt + DTeeG_DTeeHColdInt + DTeeG_DTeeHHotInt + DTeeH_DTeeIColdInt + DTeeH_DTeeIHotInt + DTeeI_DTeeJColdInt + DTeeI_DTeeJHotInt + DTeeB_SCnrBColdInt + DTeeB_SCnrBHotInt + DTeeC_SCnrCColdInt + DTeeC_SCnrCHotInt + DTeeD_SCnrDColdInt + DTeeD_SCnrDHotInt + DTeeE_SCnrEColdInt + DTeeE_SCnrEHotInt + DTeeF_SCnrFColdInt + DTeeF_SCnrFHotInt + DTeeG_SCnrGColdInt + DTeeG_SCnrGHotInt + DTeeH_SCnrHColdInt + DTeeH_SCnrHHotInt + DTeeI_SCnrIColdInt + DTeeI_SCnrIHotInt + DTeeJ_SCnrJColdInt + DTeeJ_SCnrJHotInt + DTeeJ_SCnrZColdInt + DTeeJ_SCnrZHotInt + DTeeA_DTeeBColdInt + DTeeA_DTeeBHotInt + DTeeA_SCnrAColdInt + DTeeA_SCnrAHotInt + SCnr1_DTeeAColdInt + SCnr1_DTeeAHotInt
-dpSoilIntTot = DTeeB_DTeeCSlInt + DTeeC_DTeeDSlInt + DTeeD_DTeeESlInt + DTeeE_DTeeFSlInt + DTeeF_DTeeGSlInt + DTeeG_DTeeHSlInt + DTeeH_DTeeISlInt + DTeeI_DTeeJSlInt + DTeeB_SCnrBSlInt + DTeeC_SCnrCSlInt + DTeeD_SCnrDSlInt + DTeeE_SCnrESlInt + DTeeF_SCnrFSlInt + DTeeG_SCnrGSlInt + DTeeH_SCnrHSlInt + DTeeI_SCnrISlInt + DTeeJ_SCnrJSlInt + DTeeJ_SCnrZSlInt + DTeeA_DTeeBSlInt + DTeeA_SCnrASlInt + SCnr1_DTeeASlInt
+dpPipeConvectedTot = DTeeB_DTeeCColdConv + DTeeB_DTeeCHotConv + DTeeC_DTeeDColdConv + DTeeC_DTeeDHotConv + DTeeD_DTeeEColdConv + DTeeD_DTeeEHotConv + DTeeE_DTeeFColdConv + DTeeE_DTeeFHotConv + DTeeF_DTeeGColdConv + DTeeF_DTeeGHotConv + DTeeG_DTeeHColdConv + DTeeG_DTeeHHotConv + DTeeH_DTeeIColdConv + DTeeH_DTeeIHotConv + DTeeI_DTeeJColdConv + DTeeI_DTeeJHotConv + DTeeJ_SCnrZColdConv + DTeeJ_SCnrZHotConv + DTeeA_DTeeBColdConv + DTeeA_DTeeBHotConv + SCnr1_DTeeAColdConv + SCnr1_DTeeAHotConv
+dpToFFieldTot = DTeeB_DTeeCSlFf + DTeeC_DTeeDSlFf + DTeeD_DTeeESlFf + DTeeE_DTeeFSlFf + DTeeF_DTeeGSlFf + DTeeG_DTeeHSlFf + DTeeH_DTeeISlFf + DTeeI_DTeeJSlFf + DTeeJ_SCnrZSlFf + DTeeA_DTeeBSlFf + SCnr1_DTeeASlFf
+dpPipeIntTot = DTeeB_DTeeCColdInt + DTeeB_DTeeCHotInt + DTeeC_DTeeDColdInt + DTeeC_DTeeDHotInt + DTeeD_DTeeEColdInt + DTeeD_DTeeEHotInt + DTeeE_DTeeFColdInt + DTeeE_DTeeFHotInt + DTeeF_DTeeGColdInt + DTeeF_DTeeGHotInt + DTeeG_DTeeHColdInt + DTeeG_DTeeHHotInt + DTeeH_DTeeIColdInt + DTeeH_DTeeIHotInt + DTeeI_DTeeJColdInt + DTeeI_DTeeJHotInt + DTeeJ_SCnrZColdInt + DTeeJ_SCnrZHotInt + DTeeA_DTeeBColdInt + DTeeA_DTeeBHotInt + SCnr1_DTeeAColdInt + SCnr1_DTeeAHotInt
+dpSoilIntTot = DTeeB_DTeeCSlInt + DTeeC_DTeeDSlInt + DTeeD_DTeeESlInt + DTeeE_DTeeFSlInt + DTeeF_DTeeGSlInt + DTeeG_DTeeHSlInt + DTeeH_DTeeISlInt + DTeeI_DTeeJSlInt + DTeeJ_SCnrZSlInt + DTeeA_DTeeBSlInt + SCnr1_DTeeASlInt
 dpImbalance = dpPipeConvectedTot - dpToFFieldTot  - dpPipeIntTot - dpSoilIntTot
-ASSIGN icegrid_Mfr.prt 539
+ASSIGN icegrid_Mfr.prt 549
 
-UNIT 539 TYPE 25! User defined Printer
+UNIT 549 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-539! 4 Logical unit
+549! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -3212,14 +2595,14 @@ MDTeeJ_SCnrZCold MDTeeJ_SCnrZHot MSCnrZ_SCnrZ MDTeeA_DTeeBCold MDTeeA_DTeeBHot M
 MSCnr1_DTeeAHot
 
 
-ASSIGN icegrid_T.prt 540
+ASSIGN icegrid_T.prt 550
 
-UNIT 540 TYPE 25! User defined Printer
+UNIT 550 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-540! 4 Logical unit
+550! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
