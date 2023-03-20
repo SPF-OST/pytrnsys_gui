@@ -58,6 +58,6 @@ class _StrictMock:
 
 class TestGetHeaderAndParameters:
     def testDoublePipeConnectionText(self):
-        connection = _StrictMock(lengthInM=2.0, displayName="Con35")
+        connection = _StrictMock(displayName="Con35", lengthInM=2.0)
         actualHeaderAndParameters = _dpchp.getHeaderAndParameters(connection, 12)
         assert actualHeaderAndParameters == _EXPECTED_HEADER_AND_PARAMETERS

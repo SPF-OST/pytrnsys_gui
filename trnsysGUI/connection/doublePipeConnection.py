@@ -50,6 +50,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         self._updateModels(self.displayName)
         self.lengthInM: _values.Value = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
+        self.shallBeSimulated: bool = _defaults.DEFAULT_SHALL_BE_SIMULATED
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -108,6 +109,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.toPort.id,
             self.trnsysId,
             self.lengthInM,
+            self.shallBeSimulated,
         )
 
         dictName = "Connection-"
@@ -128,6 +130,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
         self.lengthInM = model.lengthInM
+        self.shallBeSimulated = model.shallBeSimulated
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
