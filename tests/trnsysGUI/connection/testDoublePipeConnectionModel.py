@@ -138,7 +138,7 @@ class _DeserializationTestCase:
     needsUpgrading: bool = False
 
     @property
-    def id(self) -> str:
+    def name(self) -> str:
         className = type(self.model).__name__
         upgrading = "upgrading" if self.needsUpgrading else "not-upgrading"
         return f"{className}/{upgrading}"
@@ -159,7 +159,7 @@ class _SuperseedsTestCase:
     currentVersionModel: _ser.UpgradableJsonSchemaMixin
 
     @property
-    def id(self) -> str:
+    def name(self) -> str:
         previousClazzName = type(self.previousVersionModel).__name__
         currentClazzName = type(self.currentVersionModel).__name__
         return f"{previousClazzName}->{currentClazzName}"
@@ -177,23 +177,21 @@ class TestDoublePipeConnectionModel:
         data = model.to_dict()
         assert data == json
 
-    @_pt.mark.parametrize("deserializationTestCase", [_pt.param(c, id=c.id) for c in _DESERIALIZATION_TEST_CASES])
+    @_pt.mark.parametrize("deserializationTestCase", [_pt.param(c, id=c.name) for c in _DESERIALIZATION_TEST_CASES])
     def testDeserialize(self, deserializationTestCase: _DeserializationTestCase):
         clazz = type(deserializationTestCase.model)
         deserializedModel = clazz.from_dict(deserializationTestCase.json)
         assert deserializedModel == deserializationTestCase.model
 
-    @_pt.mark.parametrize("superseedsTestCase", [_pt.param(c, id=c.id) for c in _SUPERSEEDS_TEST_CASES])
+    @_pt.mark.parametrize("superseedsTestCase", [_pt.param(c, id=c.name) for c in _SUPERSEEDS_TEST_CASES])
     def testGetSupersededClass(self, superseedsTestCase: _SuperseedsTestCase):
         superseedingClass = type(superseedsTestCase.currentVersionModel)
         superseededClass = type(superseedsTestCase.previousVersionModel)
         assert superseedingClass.getSupersededClass() == superseededClass
 
-    @_pt.mark.parametrize("superseedsTestCase", [_pt.param(c, id=c.id) for c in _SUPERSEEDS_TEST_CASES])
+    @_pt.mark.parametrize("superseedsTestCase", [_pt.param(c, id=c.name) for c in _SUPERSEEDS_TEST_CASES])
     def testUpgrade(self, superseedsTestCase: _SuperseedsTestCase):
         superseedingClass = type(superseedsTestCase.currentVersionModel)
 
         upgradedModel = superseedingClass.upgrade(superseedsTestCase.previousVersionModel)
-        assert (
-                upgradedModel == superseedsTestCase.currentVersionModel
-        )
+        assert upgradedModel == superseedsTestCase.currentVersionModel
