@@ -133,50 +133,36 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         menu.exec_(event.screenPos())
 
     def encode(self):
-        if self.isVisible():
-            self.logger.debug("Encoding a Generic Block")
+        _, dct = super().encode()
 
-            portListInputs = []
-            portListOutputs = []
+        dct["PortPairsNb"] = [self.getPairNb(i) for i in range(4)]
+        dct["Imagesource"] = self._imageAccessor.getResourcePath()
 
-            for p in self.inputs:
-                portListInputs.append(p.id)
-            for p in self.outputs:
-                portListOutputs.append(p.id)
-
-            dct = {}
-            dct[".__BlockDict__"] = True
-            dct["BlockName"] = self.name
-            dct["BlockDisplayName"] = self.displayName
-            dct["BlockPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
-            dct["trnsysID"] = self.trnsysId
-            dct["PortsIDIn"] = portListInputs
-            dct["PortsIDOut"] = portListOutputs
-            dct["FlippedH"] = self.flippedH
-            dct["FlippedV"] = self.flippedV
-            dct["RotationN"] = self.rotationN
-            dct["Imagesource"] = self._imageAccessor.getResourcePath()
-            dct["PortPairsNb"] = [self.getPairNb(i) for i in range(4)]
-
-            dictName = "Block-"
-            return dictName, dct
+        dictName = "Block-"
+        return dictName, dct
 
     def decode(self, i, resBlockList):
-        assert len(self.inputs) == len(self.outputs)
-        numberOfPortPairs = len(self.inputs)
-        for portPairIndex in range(numberOfPortPairs):
-            self.removePortPair(portPairIndex)
+        self._removePortPairs()
 
         numberOfPortPairsBySide = i["PortPairsNb"]
+        self._addPortPairs(numberOfPortPairsBySide)
+
+        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
+        self.setImage()
+
+        super().decode(i, resBlockList)
+
+    def _addPortPairs(self, numberOfPortPairsBySide):
         for side in range(3):
             numberOfPortPairsToAdd = numberOfPortPairsBySide[side]
             for _ in range(numberOfPortPairsToAdd):
                 self.addPortPair(side)
 
-        super(GenericBlock, self).decode(i, resBlockList)
-        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
-        self.setImage()
+    def _removePortPairs(self):
+        assert len(self.inputs) == len(self.outputs)
+        numberOfPortPairs = len(self.inputs)
+        for portPairIndex in range(numberOfPortPairs):
+            self.removePortPair(portPairIndex)
 
     def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
         correcter = 0
