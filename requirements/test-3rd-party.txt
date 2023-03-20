@@ -57,6 +57,8 @@ pytest-metadata==2.0.1
     # via pytest-html
 pytest-xvfb==2.0.0
     # via -r requirements\test-3rd-party.in
+pytest-qt==4.2.0
+    # via -r requirements\test-3rd-party.in
 pyvirtualdisplay==3.0
     # via pytest-xvfb
 tomli==2.0.1

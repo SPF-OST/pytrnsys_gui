@@ -3,20 +3,22 @@ from __future__ import annotations
 import dataclasses as _dc
 import enum as _enum
 import typing as _tp
-import uuid as _uuid
 
 import PyQt5.QtWidgets as _qtw
-import dataclasses_jsonschema as _dcj
 
-import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.doublePipeConnectionModel as _model
+import trnsysGUI.connection.doublePipeDefaultValues as _defaults
+import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.ddckFields.headerAndParameters.doublePipeConnection as _hp
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+
 from . import _massFlowLabels as _mfl
 
 
@@ -38,7 +40,7 @@ class EnergyBalanceVariables(_enum.Enum):
     SOIL_INTERNAL_CHANGE = "SlInt"
 
 
-class DoublePipeConnection(_cb.ConnectionBase):
+class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
     def __init__(self, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem, parent):
         super().__init__(fromPort, toPort, parent)
 
@@ -47,6 +49,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
+        self.lengthInM: _values.Value = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -93,7 +96,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
             cornerTupel = (corner.pos().x(), corner.pos().y())
             corners.append(cornerTupel)
 
-        doublePipeConnectionModel = DoublePipeConnectionModel(
+        doublePipeConnectionModel = _model.DoublePipeConnectionModel(
             self.connId,
             self.displayName,
             self.id,
@@ -104,13 +107,14 @@ class DoublePipeConnection(_cb.ConnectionBase):
             self.fromPort.id,
             self.toPort.id,
             self.trnsysId,
+            self.lengthInM,
         )
 
         dictName = "Connection-"
         return dictName, doublePipeConnectionModel.to_dict()
 
     def decode(self, i):
-        model = DoublePipeConnectionModel.from_dict(i)
+        model = _model.DoublePipeConnectionModel.from_dict(i)
 
         self.id = model.id
         self.connId = model.connectionId
@@ -123,6 +127,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
 
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
+        self.lengthInM = model.lengthInM
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
@@ -153,54 +158,7 @@ class DoublePipeConnection(_cb.ConnectionBase):
         return unitText, nextUnitNumber
 
     def _getHeaderAndParameters(self, unitNumber: int) -> str:
-        headerAndParameters = f"""\
-UNIT {unitNumber} TYPE 9511
-! {self.displayName}
-PARAMETERS 36
-****** pipe and soil properties ******
-dpLength                                ! Length of buried pipe, m
-dpDiamIn                                ! Inner diameter of pipes, m
-dpDiamOut                               ! Outer diameter of pipes, m
-dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
-dpDepth                                 ! Buried pipe depth, m
-dpDiamCase                              ! Diameter of casing material, m
-dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
-dpDistPtoP                              ! Center-to-center pipe spacing, m
-dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
-dpGapThick                              ! Gap thickness, m
-****** fluid properties ******
-dpRhoFlu                                ! Density of fluid, kg/m^3
-dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
-dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
-dpViscFl                                ! Viscosity of fluid, kg/(m*h)
-****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
-****** thermal properties soil ******
-dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
-dpRhoSl                                 ! Density of soil, kg/m^3
-dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
-****** general temperature dependency (dependent on weather data) ******
-TambAvg                                 ! Average surface temperature, deg C
-dTambAmpl                               ! Amplitude of surface temperature, deg C
-ddTcwOffset                             ! Days of minimum surface temperature
-****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
-dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
-dpRadNdDist                             ! Radial distance of node 1, m
-dpRadNdDist                             ! Radial distance of node 2, m
-dpRadNdDist                             ! Radial distance of node 3, m
-dpRadNdDist                             ! Radial distance of node 4, m
-dpRadNdDist                             ! Radial distance of node 5, m
-dpRadNdDist                             ! Radial distance of node 6, m
-dpRadNdDist                             ! Radial distance of node 7, m
-dpRadNdDist                             ! Radial distance of node 8, m
-dpRadNdDist                             ! Radial distance of node 9, m
-dpRadNdDist                             ! Radial distance of node 10, m
-
-"""
+        headerAndParameters = _hp.getHeaderAndParameters(self, unitNumber)
         return headerAndParameters
 
     def _getInputs(self) -> str:
@@ -386,42 +344,3 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def redo(self):
         self._connection.deleteConn()
         self._connection = None
-
-
-@_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
-    connectionId: int
-    name: str
-    id: int  # pylint: disable=invalid-name
-    childIds: _tp.List[int]
-    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
-    labelPos: _tp.Tuple[float, float]
-    massFlowLabelPos: _tp.Tuple[float, float]
-    fromPortId: int
-    toPortId: int
-    trnsysId: int
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "DoublePipeConnectionModel":
-        data.pop(".__ConnectionDict__")
-        doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code # 1
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__ConnectionDict__"] = True
-        return data
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("0810c9ea-85df-4431-bb40-3190c25c9161")

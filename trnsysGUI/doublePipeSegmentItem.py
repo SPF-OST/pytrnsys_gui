@@ -1,25 +1,46 @@
+from __future__ import annotations
+
 import typing as _tp
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QLineF
-from PyQt5.QtWidgets import QGraphicsLineItem
+from PyQt5.QtWidgets import QGraphicsLineItem, QMenu
 
+import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcldlg
 from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
-    from trnsysGUI.connection.connectionBase import ConnectionBase  # type: ignore[attr-defined]  #  pylint: disable=unused-import
+    from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
+
+    # type: ignore[attr-defined]  #  pylint: disable=unused-import
 
 
 class DoublePipeSegmentItem(SegmentItemBase):
-    def __init__(self, startNode, endNode, parent: "ConnectionBase"):
+    def __init__(self, startNode, endNode, parent: DoublePipeConnection):
         super().__init__(startNode, endNode, parent)
 
         self.blueLine = QGraphicsLineItem(self)
         self.redLine = QGraphicsLineItem(self)
 
-    def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
-        return DoublePipeSegmentItem(startNode, endNode, self.connection)
+    @property
+    def _doublePipeConnection(self) -> DoublePipeConnection:
+        return self.connection
+
+    def _createSegment(self, startNode, endNode) -> SegmentItemBase:
+        return DoublePipeSegmentItem(startNode, endNode, self._doublePipeConnection)
+
+    def _getContextMenu(self) -> QMenu:
+        menu = super()._getContextMenu()
+        action = menu.addAction("Edit length")
+        action.triggered.connect(self._editLength)
+
+        return menu
+
+    def _editLength(self):
+        connection = _dpcldlg.ConnectionModel(self._doublePipeConnection.lengthInM)
+        _dpcldlg.DoublePipeConnectionLengthDialog(connection).exec()
+        self._doublePipeConnection.lengthInM = connection.lengthInM
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))

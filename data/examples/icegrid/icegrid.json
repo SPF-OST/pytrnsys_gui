@@ -806,7 +806,7 @@
         },
         "Connection-347": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 265,
                 266
@@ -818,6 +818,7 @@
                 -200.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -270.5295138888889,
                 59.791666666666686
@@ -838,7 +839,7 @@
         },
         "Connection-348": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 267,
                 268
@@ -850,6 +851,7 @@
                 -60.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -110.18446180555554,
                 123.53949652777777
@@ -870,7 +872,7 @@
         },
         "Connection-349": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 269,
                 270
@@ -882,6 +884,7 @@
                 80.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 20.32118055555557,
                 61.14800347222223
@@ -902,7 +905,7 @@
         },
         "Connection-350": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 271,
                 272
@@ -914,6 +917,7 @@
                 220.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 220.0,
                 190.0
@@ -934,7 +938,7 @@
         },
         "Connection-351": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 273,
                 274
@@ -946,6 +950,7 @@
                 360.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 360.0,
                 190.0
@@ -966,7 +971,7 @@
         },
         "Connection-352": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 275,
                 276
@@ -978,6 +983,7 @@
                 500.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 500.0,
                 190.0
@@ -998,7 +1004,7 @@
         },
         "Connection-353": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 277,
                 278
@@ -1010,6 +1016,7 @@
                 640.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 591.1718749999999,
                 109.97612847222223
@@ -1030,7 +1037,7 @@
         },
         "Connection-354": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 279,
                 280
@@ -1042,6 +1049,7 @@
                 780.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 721.6775173611111,
                 43.51562500000003
@@ -1062,7 +1070,7 @@
         },
         "Connection-355": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 281,
                 282
@@ -1074,6 +1082,7 @@
                 -230.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -308.667534722222,
                 443.7955729166668
@@ -1090,7 +1099,7 @@
         },
         "Connection-356": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 283,
                 284
@@ -1102,6 +1111,7 @@
                 -90.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -90.0,
                 220.0
@@ -1118,7 +1128,7 @@
         },
         "Connection-357": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 285,
                 286
@@ -1130,6 +1140,7 @@
                 50.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -23.2421875,
                 453.28993055555554
@@ -1146,7 +1157,7 @@
         },
         "Connection-358": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 287,
                 288
@@ -1158,6 +1169,7 @@
                 190.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 123.53949652777783,
                 512.9687499999999
@@ -1174,7 +1186,7 @@
         },
         "Connection-359": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 289,
                 290
@@ -1186,6 +1198,7 @@
                 330.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 244.55078124999994,
                 446.5082465277777
@@ -1202,7 +1215,7 @@
         },
         "Connection-360": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 291,
                 292
@@ -1214,6 +1227,7 @@
                 470.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 470.0,
                 220.0
@@ -1230,7 +1244,7 @@
         },
         "Connection-361": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 293,
                 294
@@ -1242,6 +1256,7 @@
                 610.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 523.1944444444445,
                 451.93359375
@@ -1258,7 +1273,7 @@
         },
         "Connection-362": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 295,
                 296
@@ -1270,6 +1285,7 @@
                 750.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 671.3324652777777,
                 504.83072916666663
@@ -1286,7 +1302,7 @@
         },
         "Connection-363": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 297,
                 298
@@ -1298,6 +1314,7 @@
                 890.0,
                 220.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 825.2070312500001,
                 444.5633680555555
@@ -1930,7 +1947,7 @@
         },
         "Connection-462": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 374,
                 375
@@ -1942,6 +1959,7 @@
                 920.0,
                 190.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 883.37890625,
                 101.83810763888891
@@ -1994,7 +2012,7 @@
         },
         "Connection-489": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 401,
                 402
@@ -2006,6 +2024,7 @@
                 -343.7126736111112,
                 190.35633680555551
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -404.7478298611111,
                 123.89583333333336
@@ -2026,7 +2045,7 @@
         },
         "Connection-490": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 403,
                 404
@@ -2038,6 +2057,7 @@
                 -373.7126736111112,
                 220.35633680555551
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -373.7126736111112,
                 220.35633680555551
@@ -2054,7 +2074,7 @@
         },
         "Connection-493": {
             ".__ConnectionDict__": true,
-            "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
+            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
             "childIds": [
                 407,
                 408
@@ -2066,6 +2086,7 @@
                 -470.0,
                 98.0
             ],
+            "lengthInM": 2.0,
             "massFlowLabelPos": [
                 -470.0,
                 98.0

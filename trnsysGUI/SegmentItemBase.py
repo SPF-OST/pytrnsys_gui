@@ -193,7 +193,6 @@ class SegmentItemBase(QGraphicsItemGroup):
                     if not self.endNode.parent.isVisible():
                         self.endNode.parent.setVisible(True)
                     if self.isVertical():
-
                         self.logger.debug("Segment is vertical: %s", self.connection.segments.index(self))
                         self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
                         self.startNode.parent.setPos(newPos.x(), self.startNode.parent.scenePos().y())
@@ -552,7 +551,6 @@ class SegmentItemBase(QGraphicsItemGroup):
         p2 = self.line().p2()
 
         if len(self.scene().items(newPos)) == 0:
-
             self.firstChild.setLine(p1.x(), p1.y(), newPos.x(), newPos.y())
             self.secondChild.setLine(newPos.x(), newPos.y(), p2.x(), p2.y())
 
