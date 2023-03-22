@@ -211,13 +211,31 @@ class Editor(_qtw.QWidget):
         mainSplitter = _qtw.QSplitter(_qtc.Qt.Orientation.Horizontal)
         mainSplitter.addWidget(libraryBrowserAndContextInfoSplitter)
         mainSplitter.addWidget(diagramAndTabsSplitter)
-        mainSplitter.addWidget(fileBrowserWidget)
+
+        fileSystemTreeView = self._getFileSystemTreeView()
+        mainSplitter.addWidget(fileSystemTreeView)
+
         _sizes.setRelativeSizes(
             mainSplitter, [libraryBrowserAndContextInfoSplitter, diagramAndTabsSplitter, fileBrowserWidget], [1, 5, 1]
         )
 
         topLevelLayout = _qtw.QGridLayout(self)
         topLevelLayout.addWidget(mainSplitter)
+
+    def _getFileSystemTreeView(self):
+        treeView = _qtw.QTreeView()
+
+        fileSystemModel = _qtw.QFileSystemModel()
+        fileSystemModel.setRootPath(self.projectFolder)
+
+        self._configureFileSystemTreeView(treeView, fileSystemModel)
+
+        return treeView
+
+    def _configureFileSystemTreeView(self, treeView, fileSystemModel):
+        rootIndex = fileSystemModel.index(self.projectFolder)
+        treeView.setModel(fileSystemModel)
+        treeView.setRootIndex(rootIndex)
 
     @staticmethod
     def _createLibraryBrowserView():
@@ -317,9 +335,9 @@ class Editor(_qtw.QWidget):
     def _createConnection(self, startPort, endPort) -> None:
         if startPort is not endPort:
             if (
-                isinstance(startPort.parent, StorageTank)
-                and isinstance(endPort.parent, StorageTank)
-                and startPort.parent != endPort.parent
+                    isinstance(startPort.parent, StorageTank)
+                    and isinstance(endPort.parent, StorageTank)
+                    and startPort.parent != endPort.parent
             ):
                 msgSTank = _qtw.QMessageBox(self)
                 msgSTank.setText("Storage Tank to Storage Tank connection is not working atm!")
@@ -399,7 +417,7 @@ class Editor(_qtw.QWidget):
         self._createConnection(fromPort, toPort)
 
     def _getToPortItemAtOrNone(
-        self, fromPort: _tp.Optional[PortItemBase], event: _qtc.QEvent
+            self, fromPort: _tp.Optional[PortItemBase], event: _qtc.QEvent
     ) -> _tp.Optional[PortItemBase]:
         if not fromPort:
             return None
@@ -427,7 +445,7 @@ class Editor(_qtw.QWidget):
         _err.showErrorMessageBox(errorMessage, title="Not implemented")
 
     def _getRelevantHitPortItems(
-        self, mousePosition: _qtc.QPointF, fromPort: PortItemBase
+            self, mousePosition: _qtc.QPointF, fromPort: PortItemBase
     ) -> _tp.Sequence[PortItemBase]:
         hitItems = self.diagramScene.items(mousePosition)
         relevantPortItems = [
@@ -951,7 +969,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
                 )
             else:
                 self.saveAsPath = _pl.Path(
-                    self.saveAsPath.stem[0 : self.saveAsPath.name.index(self.diagramName)] + newName
+                    self.saveAsPath.stem[0: self.saveAsPath.name.index(self.diagramName)] + newName
                 )
 
         self.diagramName = newName
