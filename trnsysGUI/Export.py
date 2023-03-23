@@ -10,7 +10,7 @@ import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.connection.values as _values
+import trnsysGUI.connection.singlePipeDefaultValues as _spdValues
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.hydraulicLoops.names as _lnames
 import trnsysGUI.internalPiping as _ip
@@ -666,7 +666,7 @@ EQUATIONS {{nEquations}}
 
         nEquations = sum(6 if l.useLoopWideDefaults else 2 for l in loops)
 
-        return self._render(template, loops=loops, nEquations=nEquations, names=_lnames, values=_values)
+        return self._render(template, loops=loops, nEquations=nEquations, names=_lnames, values=_spdValues)
 
     @staticmethod
     def _render(template: str, /, **kwargs):
