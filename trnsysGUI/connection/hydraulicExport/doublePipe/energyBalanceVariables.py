@@ -13,14 +13,20 @@ class EnergyBalanceVariable:
     comment: str
 
 
+@_dc.dataclass
+class _EnergyBalanceVariablesValue:
+    suffix: str
+    isPerSinglePipe: bool
+
+
 class EnergyBalanceVariables(_enum.Enum):
-    PIPE_TO_GRAVEL = "Diss"
-    CONVECTED = "Conv"
-    PIPE_INTERNAL_CHANGE = "Int"
-    COLD_TO_HOT = "Exch"
-    GRAVEL_TO_SOIL = "GrSl"
-    SOIL_TO_FAR_FIELD = "SlFf"
-    SOIL_INTERNAL_CHANGE = "SlInt"
+    PIPE_TO_GRAVEL = _EnergyBalanceVariablesValue("Diss", True)
+    CONVECTED = _EnergyBalanceVariablesValue("Conv", True)
+    PIPE_INTERNAL_CHANGE = _EnergyBalanceVariablesValue("Int", True)
+    COLD_TO_HOT = _EnergyBalanceVariablesValue("Exch", False)
+    GRAVEL_TO_SOIL = _EnergyBalanceVariablesValue("GrSl", False)
+    SOIL_TO_FAR_FIELD = _EnergyBalanceVariablesValue("SlFf", False)
+    SOIL_INTERNAL_CHANGE = _EnergyBalanceVariablesValue("SlInt", False)
 
 
 @_dc.dataclass
@@ -35,11 +41,21 @@ class VariableNameGenerator:
         variable: EnergyBalanceVariables,
         portItemType: _tp.Optional[_mfn.PortItemType] = None,
     ) -> str:
-        prefix = self._getEnergyBalanceVariablePrefix(portItemType)
-        variableName = f"{prefix}{variable.value}"
+        variableValue = variable.value
+        prefix = self._getEnergyBalanceVariablePrefix(variable, portItemType)
+        variableName = f"{prefix}{variableValue.suffix}"
         return variableName
 
-    def _getEnergyBalanceVariablePrefix(self, portItemType: _tp.Optional[_mfn.PortItemType]):
+    def _getEnergyBalanceVariablePrefix(
+        self, variable: EnergyBalanceVariables, portItemType: _tp.Optional[_mfn.PortItemType]
+    ) -> str:
+        isPerSinglePipe = variable.value.isPerSinglePipe
+        if not isPerSinglePipe and portItemType:
+            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per double pipe.")
+
+        if isPerSinglePipe and not portItemType:
+            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per single pipe.")
+
         if not portItemType:
             return self.doublePipeDisplayName
 
