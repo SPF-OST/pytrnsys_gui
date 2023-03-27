@@ -56,7 +56,16 @@ def _parseArguments() -> ap.Namespace:
     parser.add_argument(
         "-l", "--lint", help="Perform linting", type=str, default=None, const="", nargs="?", dest="lintArguments"
     )
-    parser.add_argument("-b", "--black", help="Check formatting", action="store_true", dest="shallCheckFormatting")
+    parser.add_argument(
+        "-b",
+        "--black",
+        help="Check formatting",
+        type=str,
+        default=None,
+        const="--check",
+        nargs="?",
+        dest="blackArguments",
+    )
     parser.add_argument(
         "-t",
         "--type",
@@ -137,10 +146,11 @@ def _maybeRunPylint(arguments):
 
 
 def _maybeRunBlack(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.shallCheckFormatting:
-        cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 --check trnsysGUI tests dev-tools"
+    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None:
+        cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 trnsysGUI tests dev-tools"
+        additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
 
-        _printAndRun(cmd.split())
+        _printAndRun([*cmd.split(), *additionalArgs.split()])
 
 
 def _maybeCreateDiagrams(arguments):
@@ -185,7 +195,7 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         not arguments.shallPerformStaticChecks
         and arguments.mypyArguments is None
         and arguments.lintArguments is None
-        and not arguments.shallCheckFormatting
+        and arguments.blackArguments is None
         and arguments.diagramsFormat is None
         and not arguments.shallCreateExecutable
     )
