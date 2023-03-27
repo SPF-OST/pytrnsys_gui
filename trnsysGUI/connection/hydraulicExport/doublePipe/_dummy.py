@@ -43,7 +43,7 @@ def _getIfThenElseUnitText(
         pipe.inputPort.massFlowRateVariableName,
         pipe.inputPort.inputTemperatureVariableName,
         pipe.outputPort.inputTemperatureVariableName,
-        canonicalMassFlowRateVariableName,
+        canonicalMassFlowRate=canonicalMassFlowRateVariableName,
         extraNewlines="",
     )
 

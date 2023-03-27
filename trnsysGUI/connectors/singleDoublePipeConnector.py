@@ -118,12 +118,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         )
 
         coldEquation = _helpers.getIfThenElseUnit(
-            unitNumber,
-            coldOutputTemp,
-            coldMfr,
-            posFlowColdInputTemp,
-            negFlowColdInputTemp,
-            extraNewlines="",
+            unitNumber, coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp, extraNewlines=""
         )
 
         return coldEquation
@@ -150,12 +145,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             doubleConnection, self.outputs[0], _mfn.PortItemType.HOT
         )
         hotEquation = _helpers.getIfThenElseUnit(
-            unitNumber,
-            hotOutputTemp,
-            hotMfr,
-            posFlowHotInputTemp,
-            negFlowHotInputTemp,
-            extraNewlines="",
+            unitNumber, hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp, extraNewlines=""
         )
 
         return hotEquation

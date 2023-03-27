@@ -128,10 +128,10 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     ) -> _tp.Tuple[str, int]:  # pylint: disable=too-many-locals,too-many-statements
         unitNumber = startingUnit
 
-        exportModel = self.getHydraulicExportConnectionModel()
+        exportModel = self._getHydraulicExportConnectionModel()
         return _he.export(exportModel, unitNumber)
 
-    def getHydraulicExportConnectionModel(self) -> _hedpc.DoublePipeConnection:
+    def _getHydraulicExportConnectionModel(self) -> _hedpc.DoublePipeConnection:
         coldInputTemperature = _helpers.getTemperatureVariableName(
             self.toPort.parent, self.toPort, _mfn.PortItemType.COLD
         )

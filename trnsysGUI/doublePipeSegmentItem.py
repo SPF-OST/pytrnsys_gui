@@ -33,11 +33,11 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
     def _getContextMenu(self) -> _qtw.QMenu:
         menu = super()._getContextMenu()
         action = menu.addAction("Edit properties...")
-        action.triggered.connect(self._editLength)
+        action.triggered.connect(self._editProperties)
 
         return menu
 
-    def _editLength(self):
+    def _editProperties(self):
         connection = _dpcldlg.ConnectionModel(
             self._doublePipeConnection.displayName,
             self._doublePipeConnection.lengthInM,

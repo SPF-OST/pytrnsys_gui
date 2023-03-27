@@ -41,15 +41,16 @@ EQUATIONS {{2 if canonicalMassFlowRate else 1}}
 )
 
 
-def getIfThenElseUnit(  # pylint: disable=too-many-arguments
+def getIfThenElseUnit(
     unitNumber: int,
     outputTemp: str,
     massFlowRate: str,
     posFlowInputTemp: str,
     negFlowInputTemp: str,
+    *,
     canonicalMassFlowRate: _tp.Optional[str] = None,
     componentName: _tp.Optional[str] = None,
-    extraNewlines: str = "\n\n",
+    extraNewlines: str = "\n\n"
 ) -> str:
     unitText = _IF_THEN_ELSE_UNIT_TEMPLATE.render(
         unitNumber=unitNumber,

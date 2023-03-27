@@ -205,8 +205,8 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             inputMfrName,
             inputTemperatureVariableName,
             revInputTemperatureVariableName,
-            canonicalMfrName,
-            self.displayName,
+            canonicalMassFlowRate=canonicalMfrName,
+            componentName=self.displayName,
         )
 
         return unitText

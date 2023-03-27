@@ -1,7 +1,5 @@
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _dpc
 
-from trnsysGUI.connection import values as _values
-
 from . import _getEnergyBalanceVariables as _vars
 
 
@@ -15,13 +13,12 @@ def exportSimulatedConnection(doublePipeConnection, unitNumber):
 
 
 def _getHeaderAndParameters(connection: _dpc.DoublePipeConnection, unitNumber: int) -> str:
-    lengthInM = _values.getConvertedValueOrName(connection.lengthInM)
     headerAndParameters = f"""\
 UNIT {unitNumber} TYPE 9511
 ! {connection.displayName}
 PARAMETERS 36
 ****** pipe and soil properties ******
-{lengthInM}                                ! Length of buried pipe, m
+{connection.lengthInM}                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
