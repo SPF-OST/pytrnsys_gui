@@ -47,7 +47,7 @@ class TestEnergyBalanceVariables:
                 except ValueError:
                     pass
 
-        def getNameResultName(nameResult_: _NameResult) -> str:
-            return nameResult_.name
+        def getNameResultName(result: _NameResult) -> str:
+            return result.name
 
         return sorted(nameResults, key=getNameResultName)
