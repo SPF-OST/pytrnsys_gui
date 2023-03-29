@@ -32,17 +32,17 @@ _TEST_CASES = [
     _TestCase(
         _ebv.EnergyBalanceVariables.CONVECTED,
         None,
-        _res.Error("Energy balance variable `CONVECTED` is not defined per double pipe."),
+        _res.Error("Energy balance variable `CONVECTED` is defined per single pipe."),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.PIPE_TO_GRAVEL,
         None,
-        _res.Error("Energy balance variable `PIPE_TO_GRAVEL` is not defined per double pipe."),
+        _res.Error("Energy balance variable `PIPE_TO_GRAVEL` is defined per single pipe."),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
         None,
-        _res.Error("Energy balance variable `PIPE_INTERNAL_CHANGE` is not defined per double pipe."),
+        _res.Error("Energy balance variable `PIPE_INTERNAL_CHANGE` is defined per single pipe."),
     ),
     _TestCase(_ebv.EnergyBalanceVariables.COLD_TO_HOT, None, "DTeeI_SCnrIExch"),
     _TestCase(
