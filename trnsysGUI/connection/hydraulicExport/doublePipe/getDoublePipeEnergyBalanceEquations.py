@@ -15,11 +15,15 @@ def getDoublePipeEnergyBalanceEquations(hasInternalPipings: _tp.Sequence[_ip.Has
     if not simulatedDoublePipes:
         return ""
 
+    equations = _createEquations(simulatedDoublePipes)
+    return equations
+
+
+def _createEquations(simulatedDoublePipes):
     dissipatedHeatFluxesToFarField = []
     convectedHeatFluxes = []
     pipeInternalEnergyChanges = []
     soilInternalEnergyChanges = []
-
     for doublePipe in simulatedDoublePipes:
         energyBalanceVariableNameGenerator = _dpebv.VariableNameGenerator(
             doublePipe.displayName,
@@ -27,39 +31,18 @@ def getDoublePipeEnergyBalanceEquations(hasInternalPipings: _tp.Sequence[_ip.Has
             hotPipeName=doublePipe.hotModelPipe.name,
         )
 
-        coldConvectedHeatFlux = energyBalanceVariableNameGenerator.getName(
-            _dpebv.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.COLD
+        _getEquationTerms(
+            convectedHeatFluxes,
+            dissipatedHeatFluxesToFarField,
+            energyBalanceVariableNameGenerator,
+            pipeInternalEnergyChanges,
+            soilInternalEnergyChanges,
         )
-        hotConvectedHeatFlux = energyBalanceVariableNameGenerator.getName(
-            _dpebv.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.HOT
-        )
-        convectedHeatFluxes.extend([coldConvectedHeatFlux, hotConvectedHeatFlux])
-
-        dissipatedHeatFluxToFarField = energyBalanceVariableNameGenerator.getName(
-            _dpebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD
-        )
-        dissipatedHeatFluxesToFarField.append(dissipatedHeatFluxToFarField)
-
-        coldPipeInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
-            _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.COLD
-        )
-        hotPipeInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
-            _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.HOT
-        )
-        pipeInternalEnergyChanges.extend([coldPipeInternalEnergyChange, hotPipeInternalEnergyChange])
-
-        soilInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
-            _dpebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE
-        )
-        soilInternalEnergyChanges.append(soilInternalEnergyChange)
-
     summedConvectedHeatFluxes = " + ".join(convectedHeatFluxes)
     summedDissipationToFarField = " + ".join(dissipatedHeatFluxesToFarField)
     summedPipeInternalEnergyChanges = " + ".join(pipeInternalEnergyChanges)
     summedSoilInternalEnergyChanges = " + ".join(soilInternalEnergyChanges)
-
     Totals = _cnames.EnergyBalanceTotals.DoublePipe
-
     equations = f"""\
 *** Double pipe energy balance
 EQUATIONS 5
@@ -70,3 +53,34 @@ EQUATIONS 5
 {Totals.IMBALANCE} = {Totals.CONVECTED} - {Totals.DISSIPATION_TO_FAR_FIELD}  - {Totals.PIPE_INTERNAL_CHANGE} - {Totals.SOIL_INTERNAL_CHANGE}
 """
     return equations
+
+
+def _getEquationTerms(
+    convectedHeatFluxes,
+    dissipatedHeatFluxesToFarField,
+    energyBalanceVariableNameGenerator,
+    pipeInternalEnergyChanges,
+    soilInternalEnergyChanges,
+):
+    coldConvectedHeatFlux = energyBalanceVariableNameGenerator.getName(
+        _dpebv.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.COLD
+    )
+    hotConvectedHeatFlux = energyBalanceVariableNameGenerator.getName(
+        _dpebv.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.HOT
+    )
+    convectedHeatFluxes.extend([coldConvectedHeatFlux, hotConvectedHeatFlux])
+    dissipatedHeatFluxToFarField = energyBalanceVariableNameGenerator.getName(
+        _dpebv.EnergyBalanceVariables.SOIL_TO_FAR_FIELD
+    )
+    dissipatedHeatFluxesToFarField.append(dissipatedHeatFluxToFarField)
+    coldPipeInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
+        _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.COLD
+    )
+    hotPipeInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
+        _dpebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.HOT
+    )
+    pipeInternalEnergyChanges.extend([coldPipeInternalEnergyChange, hotPipeInternalEnergyChange])
+    soilInternalEnergyChange = energyBalanceVariableNameGenerator.getName(
+        _dpebv.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE
+    )
+    soilInternalEnergyChanges.append(soilInternalEnergyChange)
