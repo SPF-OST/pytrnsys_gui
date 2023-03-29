@@ -20,17 +20,7 @@ class _StrictMock:
         self.__dict__.update(kwargs)
 
 
-class TestDoubleDoublePipeConnector:
-    def test(self, tmp_path, qtbot):  # pylint: disable=invalid-name  # /NOSONAR
-        connector = self._createConnector(tmp_path, qtbot)
-
-        unitNumber = 1
-        text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(unitNumber)
-
-        assert nextUnitNumber == unitNumber + 2
-        assert (
-            text
-            == """\
+_EXPECTED_TEXT = """\
 ! BEGIN DPCnr
 ! hot pipe
 UNIT 1 TYPE 222
@@ -53,7 +43,17 @@ TDPCnrCold = [2,1]
 
 
 """
-        )
+
+
+class TestDoubleDoublePipeConnector:
+    def test(self, tmp_path, qtbot):  # pylint: disable=invalid-name  # /NOSONAR
+        connector = self._createConnector(tmp_path, qtbot)
+
+        unitNumber = 1
+        text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(unitNumber)
+
+        assert nextUnitNumber == unitNumber + 2
+        assert text == _EXPECTED_TEXT
 
     @classmethod
     def _createConnector(cls, tmp_path, bot):  # pylint: disable=invalid-name  # /NOSONAR
