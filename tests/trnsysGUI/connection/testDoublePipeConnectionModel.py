@@ -21,38 +21,14 @@ _JSON_VERSION_0 = {
     "trnsysId": 500,
 }
 
-_JSON_VERSION_1 = {
-    ".__ConnectionDict__": True,
-    "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
-    "childIds": [2, 3, 4],
-    "connectionId": 1,
-    "fromPortId": 17,
-    "id": 1,
-    "labelPos": [1.1, 1.1],
-    "lengthInM": 2.0,
-    "massFlowLabelPos": [1.1, 0],
-    "name": "dpc5",
-    "segmentsCorners": [[0, 0], [0, 1], [1, 0], [1, 1]],
-    "toPortId": 18,
-    "trnsysId": 500,
-}
+_JSON_VERSION_1 = _JSON_VERSION_0.copy()
+_JSON_VERSION_1["__version__"] = "bdb5f03b-75bb-4c2f-a658-0de489c5b017"
+_JSON_VERSION_1["lengthInM"] = 2.0
 
-_JSON = {
-    ".__ConnectionDict__": True,
-    "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
-    "childIds": [2, 3, 4],
-    "connectionId": 1,
-    "fromPortId": 17,
-    "id": 1,
-    "labelPos": [1.1, 1.1],
-    "lengthInM": 2.0,
-    "massFlowLabelPos": [1.1, 0],
-    "name": "dpc5",
-    "segmentsCorners": [[0, 0], [0, 1], [1, 0], [1, 1]],
-    "shallBeSimulated": False,
-    "toPortId": 18,
-    "trnsysId": 500,
-}
+_JSON_VERSION_2 = _JSON_VERSION_1.copy()
+_JSON_VERSION_2["__version__"] = "62a1383d-5a0b-4886-9951-31ffd732637d"
+_JSON_VERSION_2["shallBeSimulated"] = False
+
 
 _DESERIALIZED_MODEL_VERSION_0 = _dpcm.DoublePipeConnectionModelVersion0(
     connectionId=1,
@@ -127,7 +103,7 @@ _DESERIALIZED_MODEL = _dpcm.DoublePipeConnectionModel(
 
 
 _SERIALIZATION_CASES = [
-    (_DESERIALIZED_MODEL, _JSON),
+    (_DESERIALIZED_MODEL, _JSON_VERSION_2),
 ]
 
 
@@ -149,7 +125,7 @@ _DESERIALIZATION_TEST_CASES = [
     _DeserializationTestCase(_JSON_VERSION_0, _UPGRADED_MODEL_VERSION_1, needsUpgrading=True),
     _DeserializationTestCase(_JSON_VERSION_1, _DESERIALIZED_MODEL_VERSION_1),
     _DeserializationTestCase(_JSON_VERSION_1, _UPGRADED_MODEL, needsUpgrading=True),
-    _DeserializationTestCase(_JSON, _DESERIALIZED_MODEL),
+    _DeserializationTestCase(_JSON_VERSION_2, _DESERIALIZED_MODEL),
 ]
 
 
