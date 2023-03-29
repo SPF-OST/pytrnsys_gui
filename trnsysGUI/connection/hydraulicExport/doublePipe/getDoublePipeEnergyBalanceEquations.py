@@ -1,16 +1,21 @@
+import dataclasses as _dc
 import typing as _tp
 
 import trnsysGUI.connection.names as _cnames
-import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.hydraulicExport.doublePipe.energyBalanceVariables as _dpebv
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-def getDoublePipeEnergyBalanceEquations(hasInternalPipings: _tp.Sequence[_ip.HasInternalPiping]):
-    simulatedDoublePipes = [
-        ip for ip in hasInternalPipings if isinstance(ip, _dpc.DoublePipeConnection) and ip.shallBeSimulated
-    ]
+@_dc.dataclass()
+class DoublePipe:
+    displayName: str
+    coldPipeName: str
+    hotPipeName: str
+    shallBeSimulated: bool
+
+
+def getDoublePipeEnergyBalanceEquations(doublePipes: _tp.Sequence[DoublePipe]):
+    simulatedDoublePipes = [ip for ip in doublePipes if ip.shallBeSimulated]
 
     if not simulatedDoublePipes:
         return ""
@@ -19,6 +24,7 @@ def getDoublePipeEnergyBalanceEquations(hasInternalPipings: _tp.Sequence[_ip.Has
     return equations
 
 
+# todo: write a test
 def _createEquations(simulatedDoublePipes):
     dissipatedHeatFluxesToFarField = []
     convectedHeatFluxes = []

@@ -425,7 +425,14 @@ EQUATIONS 4
         return equation
 
     def exportDoublePipeEnergyBalanceVariables(self):
-        equations = _gdpebe.getDoublePipeEnergyBalanceEquations(self._hasInternalPipings)
+
+        doublePipes = [
+            _gdpebe.DoublePipe(ip.displayName, ip.coldModelPipe.name, ip.hotModelPipe.name, ip.shallBeSimulated)
+            for ip in self._hasInternalPipings
+            if isinstance(ip, _dpc.DoublePipeConnection)
+        ]
+
+        equations = _gdpebe.getDoublePipeEnergyBalanceEquations(doublePipes)
 
         return equations
 
