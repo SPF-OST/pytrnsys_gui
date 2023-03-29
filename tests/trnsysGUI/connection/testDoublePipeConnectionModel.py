@@ -6,6 +6,30 @@ import pytest as _pt
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.connection.doublePipeConnectionModel as _dpcm
 
+
+@_dc.dataclass
+class _DeserializationTestCase:
+    json: _dcj.JsonDict
+    model: _ser.UpgradableJsonSchemaMixinVersion0
+    needsUpgrading: bool = False
+
+    def name(self) -> str:
+        className = type(self.model).__name__
+        upgrading = "upgrading" if self.needsUpgrading else "not-upgrading"
+        return f"{className}/{upgrading}"
+
+
+@_dc.dataclass
+class _SuperseedsTestCase:
+    previousVersionModel: _ser.UpgradableJsonSchemaMixinVersion0
+    currentVersionModel: _ser.UpgradableJsonSchemaMixin
+
+    def name(self) -> str:
+        previousClazzName = type(self.previousVersionModel).__name__
+        currentClazzName = type(self.currentVersionModel).__name__
+        return f"{previousClazzName}->{currentClazzName}"
+
+
 _JSON_VERSION_0 = {
     ".__ConnectionDict__": True,
     "__version__": "0810c9ea-85df-4431-bb40-3190c25c9161",
@@ -107,19 +131,6 @@ _SERIALIZATION_CASES = [
 ]
 
 
-@_dc.dataclass
-class _DeserializationTestCase:
-    json: _dcj.JsonDict
-    model: _ser.UpgradableJsonSchemaMixinVersion0
-    needsUpgrading: bool = False
-
-    @property
-    def name(self) -> str:
-        className = type(self.model).__name__
-        upgrading = "upgrading" if self.needsUpgrading else "not-upgrading"
-        return f"{className}/{upgrading}"
-
-
 _DESERIALIZATION_TEST_CASES = [
     _DeserializationTestCase(_JSON_VERSION_0, _DESERIALIZED_MODEL_VERSION_0),
     _DeserializationTestCase(_JSON_VERSION_0, _UPGRADED_MODEL_VERSION_1, needsUpgrading=True),
@@ -127,18 +138,6 @@ _DESERIALIZATION_TEST_CASES = [
     _DeserializationTestCase(_JSON_VERSION_1, _UPGRADED_MODEL, needsUpgrading=True),
     _DeserializationTestCase(_JSON_VERSION_2, _DESERIALIZED_MODEL),
 ]
-
-
-@_dc.dataclass
-class _SuperseedsTestCase:
-    previousVersionModel: _ser.UpgradableJsonSchemaMixinVersion0
-    currentVersionModel: _ser.UpgradableJsonSchemaMixin
-
-    @property
-    def name(self) -> str:
-        previousClazzName = type(self.previousVersionModel).__name__
-        currentClazzName = type(self.currentVersionModel).__name__
-        return f"{previousClazzName}->{currentClazzName}"
 
 
 _SUPERSEEDS_TEST_CASES = [
@@ -153,19 +152,19 @@ class TestDoublePipeConnectionModel:
         data = model.to_dict()
         assert data == json
 
-    @_pt.mark.parametrize("deserializationTestCase", [_pt.param(c, id=c.name) for c in _DESERIALIZATION_TEST_CASES])
+    @_pt.mark.parametrize("deserializationTestCase", _DESERIALIZATION_TEST_CASES, ids=_DeserializationTestCase.name)
     def testDeserialize(self, deserializationTestCase: _DeserializationTestCase):
         clazz = type(deserializationTestCase.model)
         deserializedModel = clazz.from_dict(deserializationTestCase.json)
         assert deserializedModel == deserializationTestCase.model
 
-    @_pt.mark.parametrize("superseedsTestCase", [_pt.param(c, id=c.name) for c in _SUPERSEEDS_TEST_CASES])
+    @_pt.mark.parametrize("superseedsTestCase", _SUPERSEEDS_TEST_CASES, ids=_SuperseedsTestCase.name)
     def testGetSupersededClass(self, superseedsTestCase: _SuperseedsTestCase):
         superseedingClass = type(superseedsTestCase.currentVersionModel)
         superseededClass = type(superseedsTestCase.previousVersionModel)
         assert superseedingClass.getSupersededClass() == superseededClass
 
-    @_pt.mark.parametrize("superseedsTestCase", [_pt.param(c, id=c.name) for c in _SUPERSEEDS_TEST_CASES])
+    @_pt.mark.parametrize("superseedsTestCase", _SUPERSEEDS_TEST_CASES, ids=_SuperseedsTestCase.name)
     def testUpgrade(self, superseedsTestCase: _SuperseedsTestCase):
         superseedingClass = type(superseedsTestCase.currentVersionModel)
 
