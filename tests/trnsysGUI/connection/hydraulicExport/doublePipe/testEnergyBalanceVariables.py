@@ -32,17 +32,17 @@ _TEST_CASES = [
     _TestCase(
         _ebv.EnergyBalanceVariables.CONVECTED,
         None,
-        _res.Error("Energy balance variable `CONVECTED` is not defined per double pipe."),
+        _res.Error("Energy balance variable `CONVECTED` is defined per single pipe."),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.PIPE_TO_GRAVEL,
         None,
-        _res.Error("Energy balance variable `PIPE_TO_GRAVEL` is not defined per double pipe."),
+        _res.Error("Energy balance variable `PIPE_TO_GRAVEL` is defined per single pipe."),
     ),
     _TestCase(
         _ebv.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
         None,
-        _res.Error("Energy balance variable `PIPE_INTERNAL_CHANGE` is not defined per double pipe."),
+        _res.Error("Energy balance variable `PIPE_INTERNAL_CHANGE` is defined per single pipe."),
     ),
     _TestCase(_ebv.EnergyBalanceVariables.COLD_TO_HOT, None, "DTeeI_SCnrIExch"),
     _TestCase(
@@ -91,27 +91,30 @@ _TEST_CASES = [
 ]
 
 
+_PASSING_TEST_CASES = [tc for tc in _TEST_CASES if not _res.isError(tc.name)]
+
+_FAILING_TEST_CASES = [tc for tc in _TEST_CASES if _res.isError(tc.name)]
+
+
 def _getVariableName(variable: _ebv.EnergyBalanceVariables) -> str:
     return variable.name
 
 
 class TestEnergyBalanceVariables:
-    @_pt.mark.parametrize("testCase", _TEST_CASES, ids=_TestCase.testId)
+    @_pt.mark.parametrize("testCase", _PASSING_TEST_CASES, ids=_TestCase.testId)
     def testVariableNameGenerator(self, testCase: _TestCase) -> None:
         generator = _ebv.VariableNameGenerator("DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot")
+        name = generator.getName(testCase.variable, testCase.portItemType)
 
-        name = None
-        actualErrorMessage = None
-        try:
-            name = generator.getName(testCase.variable, testCase.portItemType)
-        except ValueError as valueError:
-            actualErrorMessage = str(valueError)
+        assert name == testCase.name
 
-        if _res.isError(testCase.name):
-            expectedErrorMessage = _res.error(testCase.name).message
-            assert expectedErrorMessage == actualErrorMessage
-        else:
-            assert name == testCase.name
+    @_pt.mark.parametrize("testCase", _FAILING_TEST_CASES, ids=_TestCase.testId)
+    def testVariableNameGeneratorInvalidArguments(self, testCase: _TestCase) -> None:
+        generator = _ebv.VariableNameGenerator("DTeeI_SCnrI", coldPipeName="Cold", hotPipeName="Hot")
+
+        expectedErrorMessageRegexPattern = _res.error(testCase.name).message
+        with _pt.raises(ValueError, match=expectedErrorMessageRegexPattern):
+            generator.getName(testCase.variable, testCase.portItemType)
 
     @_pt.mark.parametrize("variable", _ebv.EnergyBalanceVariables, ids=_getVariableName)
     def testPortItemTypeStandardRaises(self, variable: _ebv.EnergyBalanceVariables) -> None:
@@ -128,17 +131,18 @@ class TestEnergyBalanceVariables:
         expectedPortItemTypes = {_mfn.PortItemType.COLD, _mfn.PortItemType.HOT, None}
         expectedPortItemTypesByVariable = {v: expectedPortItemTypes for v in _ebv.EnergyBalanceVariables}
 
-        portItemTypesByVariable = self._getPortItemTypesByVariable()
+        portItemTypesByVariable = self._getPortItemTypesByVariableFromTestCases()
 
         assert portItemTypesByVariable == expectedPortItemTypesByVariable
 
     @staticmethod
-    def _getPortItemTypesByVariable() -> _cabc.Mapping[
+    def _getPortItemTypesByVariableFromTestCases() -> _cabc.Mapping[
         _ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]
     ]:
         portItemTypesByVariable = dict[_ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]]()
         for testCase in _TEST_CASES:
-            portItemTypes = portItemTypesByVariable.get(testCase.variable, set())
+            defaultReturnIfNotFound = set[_tp.Optional[_mfn.PortItemType]]()
+            portItemTypes = portItemTypesByVariable.get(testCase.variable, defaultReturnIfNotFound)
             portItemTypes.add(testCase.portItemType)
             portItemTypesByVariable[testCase.variable] = portItemTypes
 

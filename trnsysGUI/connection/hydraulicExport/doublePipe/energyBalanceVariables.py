@@ -62,7 +62,7 @@ class VariableNameGenerator:
             raise ValueError(f"Energy balance variable `{variable.name}` is not defined per single pipe.")
 
         if isPerSinglePipe and not portItemType:
-            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per double pipe.")
+            raise ValueError(f"Energy balance variable `{variable.name}` is defined per single pipe.")
 
         if not portItemType:
             return self.doublePipeDisplayName
