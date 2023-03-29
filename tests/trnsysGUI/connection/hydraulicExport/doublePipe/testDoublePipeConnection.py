@@ -153,6 +153,5 @@ class TestDoublePipeConnection:
             _DUMMY_DOUBLE_PIPE_CONNECTION,
             503,
         )
-        print(actualUnitText)
         assert actualUnitText == _EXPECTED_DUMMY_UNIT_TEXT
         assert nextUnitNumber == 505
