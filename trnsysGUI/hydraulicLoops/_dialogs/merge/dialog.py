@@ -1,21 +1,16 @@
 import typing as _tp
 
-import PyQt5.QtWidgets as _qtw
-import PyQt5.QtGui as _qtg
 import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+import PyQt5.QtWidgets as _qtw
 
+import trnsysGUI.dialogs as _dlgs
 from trnsysGUI.hydraulicLoops import common as _common
-
-try:
-    from . import _UI_dialog_generated as _uigen
-except ImportError as importError:
-    raise AssertionError(  # pylint: disable=duplicate-code  # 2
-        "Could not find the generated Python code for a .ui or .qrc file. Please run the "
-        "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
-        "`pytrnsys_gui` directory."
-    ) from importError
-
 from trnsysGUI.hydraulicLoops import model as _model
+
+_dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
+
+from . import _UI_dialog_generated as _uigen  # type: ignore[import]  # pylint: disable=wrong-import-position
 
 
 class MergeLoopsDialog(_qtw.QDialog, _uigen.Ui_mergeLoopsDialog):
