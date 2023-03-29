@@ -8,10 +8,10 @@ import trnsysGUI.errors as _error
 try:
     from . import _UI_doublePipe_generated as _gen
 except ImportError as importError:
-    uiFileMissingErrorText = "Could not find the generated Python code for a .ui or .qrc file. Please run the " \
-                             "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your " \
-                             "`pytrnsys_gui` directory."
-    raise AssertionError(uiFileMissingErrorText) from importError
+    UI_File_Missing = "Could not find the generated Python code for a .ui or .qrc file. Please run the " \
+                      "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your " \
+                      "`pytrnsys_gui` directory."
+    raise AssertionError(UI_File_Missing) from importError
 
 
 @_dc.dataclass
