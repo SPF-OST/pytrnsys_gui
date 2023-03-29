@@ -4,7 +4,14 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.errors as _error
-from . import _UI_doublePipe_generated as _gen
+
+try:
+    from . import _UI_doublePipe_generated as _gen
+except ImportError as importError:
+    uiFileMissingErrorText = "Could not find the generated Python code for a .ui or .qrc file. Please run the " \
+                             "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your " \
+                             "`pytrnsys_gui` directory."
+    raise AssertionError(uiFileMissingErrorText) from importError
 
 
 @_dc.dataclass
