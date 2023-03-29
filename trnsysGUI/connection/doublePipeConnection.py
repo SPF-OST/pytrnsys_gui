@@ -148,6 +148,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.toPort.parent, self.toPort, _mfn.PortItemType.HOT
         )
 
+        # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
         assert self.coldModelPipe.name and self.hotModelPipe.name
 
         connectionModel = _hedpc.DoublePipeConnection(
