@@ -49,16 +49,23 @@ class VariableNameGenerator:
     def _getEnergyBalanceVariablePrefix(
         self, variable: EnergyBalanceVariables, portItemType: _tp.Optional[_mfn.PortItemType]
     ) -> str:
+        if portItemType not in [_mfn.PortItemType.COLD, _mfn.PortItemType.HOT, None]:
+            errorMessage = (
+                f"Energy balance variables are only defined for "
+                f"`{_mfn.PortItemType.COLD.name}` or `{_mfn.PortItemType.HOT.name}` "  # pylint: disable=no-member
+                f"port item types or `None`."
+            )
+            raise ValueError(errorMessage)
+
         isPerSinglePipe = variable.value.isPerSinglePipe
         if not isPerSinglePipe and portItemType:
-            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per double pipe.")
+            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per single pipe.")
 
         if isPerSinglePipe and not portItemType:
-            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per single pipe.")
+            raise ValueError(f"Energy balance variable `{variable.name}` is not defined per double pipe.")
 
         if not portItemType:
             return self.doublePipeDisplayName
 
-        assert portItemType in [_mfn.PortItemType.COLD, _mfn.PortItemType.HOT]
         pipeName = self.coldPipeName if portItemType == _mfn.PortItemType.COLD else self.hotPipeName
         return f"{self.doublePipeDisplayName}{pipeName}"
