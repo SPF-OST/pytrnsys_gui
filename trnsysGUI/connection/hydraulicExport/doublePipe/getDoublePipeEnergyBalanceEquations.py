@@ -42,15 +42,15 @@ def _createEquations(simulatedDoublePipes):
     summedDissipationToFarField = " + ".join(dissipatedHeatFluxesToFarField)
     summedPipeInternalEnergyChanges = " + ".join(pipeInternalEnergyChanges)
     summedSoilInternalEnergyChanges = " + ".join(soilInternalEnergyChanges)
-    Totals = _cnames.EnergyBalanceTotals.DoublePipe
+    totals = _cnames.EnergyBalanceTotals.DoublePipe
     equations = f"""\
 *** Double pipe energy balance
 EQUATIONS 5
-{Totals.CONVECTED} = {summedConvectedHeatFluxes}
-{Totals.DISSIPATION_TO_FAR_FIELD} = {summedDissipationToFarField}
-{Totals.PIPE_INTERNAL_CHANGE} = {summedPipeInternalEnergyChanges}
-{Totals.SOIL_INTERNAL_CHANGE} = {summedSoilInternalEnergyChanges}
-{Totals.IMBALANCE} = {Totals.CONVECTED} - {Totals.DISSIPATION_TO_FAR_FIELD}  - {Totals.PIPE_INTERNAL_CHANGE} - {Totals.SOIL_INTERNAL_CHANGE}
+{totals.CONVECTED} = {summedConvectedHeatFluxes}
+{totals.DISSIPATION_TO_FAR_FIELD} = {summedDissipationToFarField}
+{totals.PIPE_INTERNAL_CHANGE} = {summedPipeInternalEnergyChanges}
+{totals.SOIL_INTERNAL_CHANGE} = {summedSoilInternalEnergyChanges}
+{totals.IMBALANCE} = {totals.CONVECTED} - {totals.DISSIPATION_TO_FAR_FIELD}  - {totals.PIPE_INTERNAL_CHANGE} - {totals.SOIL_INTERNAL_CHANGE}
 """
     return equations
 
