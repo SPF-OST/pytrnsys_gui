@@ -24,7 +24,6 @@ def getDoublePipeEnergyBalanceEquations(doublePipes: _tp.Sequence[DoublePipe]):
     return equations
 
 
-# todo: write a test
 def _createEquations(simulatedDoublePipes):
     dissipatedHeatFluxesToFarField = []
     convectedHeatFluxes = []
@@ -33,8 +32,8 @@ def _createEquations(simulatedDoublePipes):
     for doublePipe in simulatedDoublePipes:
         energyBalanceVariableNameGenerator = _dpebv.VariableNameGenerator(
             doublePipe.displayName,
-            coldPipeName=doublePipe.coldModelPipe.name,
-            hotPipeName=doublePipe.hotModelPipe.name,
+            coldPipeName=doublePipe.coldPipeName,
+            hotPipeName=doublePipe.hotPipeName,
         )
 
         _getEquationTerms(
