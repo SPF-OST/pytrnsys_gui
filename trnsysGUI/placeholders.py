@@ -60,7 +60,9 @@ def _getPlaceholdersForPort(
     modelPortItem: _mfn.PortItem,
 ) -> _tp.Dict[str, str]:
     if modelPortItem.direction == _mfn.PortItemDirection.OUTPUT:
-        outputTemperatureVariableName = _temps.getInternalTemperatureVariableName(component, node)
+        outputTemperatureVariableName = _temps.getInternalTemperatureVariableName(
+            componentDisplayName=component.getDisplayName(), nodeName=node.name
+        )
         reverseInputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(internalPiping, modelPortItem)
 
         placeholdersForPort = _createOutputPlaceholdersDict(

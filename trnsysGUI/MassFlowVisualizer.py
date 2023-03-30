@@ -193,7 +193,9 @@ class MassFlowVisualizer(_qtw.QDialog):
             i = 0
             for t in self.parent.editor.trnsysObj:
                 if isinstance(t, _spc.SinglePipeConnection):
-                    mfrVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.modelPipe)
+                    mfrVariableName = _mnames.getCanonicalMassFlowVariableName(
+                        componentDisplayName=t.getDisplayName(), pipeName=t.modelPipe.name
+                    )
                     temperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.STANDARD)
 
                     if (
@@ -224,10 +226,14 @@ class MassFlowVisualizer(_qtw.QDialog):
                             t.setColor(thickValue, mfr="test")
                         i += 1
                 if isinstance(t, _dpc.DoublePipeConnection):
-                    coldMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.coldModelPipe)
+                    coldMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(
+                        componentDisplayName=t.displayName, pipeName=t.coldModelPipe.name
+                    )
                     coldTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.COLD)
 
-                    hotMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(t, t.hotModelPipe)
+                    hotMassFlowVariableName = _mnames.getCanonicalMassFlowVariableName(
+                        componentDisplayName=t.displayName, pipeName=t.hotModelPipe.name
+                    )
                     hotTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.HOT)
 
                     coldMassFlow = self._getMassFlow(coldMassFlowVariableName, timeStep)

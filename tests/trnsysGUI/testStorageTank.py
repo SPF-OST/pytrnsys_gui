@@ -31,7 +31,9 @@ class TestStorageTank:
     EXPECTED_DIR_PATH = DATA_DIR_PATH / "expected"
     LEGACY_JSON_PATH = DATA_DIR_PATH / "storageTankOldestFormat.json"
 
-    def testDeserializeJsonFromLegacyFormatAndSerialize(self, tmp_path):  # pylint: disable=invalid-name  # /NOSONAR
+    def testDeserializeJsonFromLegacyFormatAndSerialize(
+        self, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
+    ):
         expectedPath = self.EXPECTED_DIR_PATH / "storageTankNewestFormat.json"
         expectedStorageTankJson = expectedPath.read_text()
 
@@ -39,7 +41,7 @@ class TestStorageTank:
         (
             editorMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
-        ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path)
+        ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, tmp_path, qtbot)
 
         legacyJson = self.LEGACY_JSON_PATH.read_text()
         storageTank = self._deserializeStorageTank(legacyJson, editorMock)
@@ -65,14 +67,14 @@ class TestStorageTank:
 
         return storageTank
 
-    def testExportDdck(self):  # pylint: disable=invalid-name
+    def testExportDdck(self, qtbot):  # pylint: disable=invalid-name
         self._deleteAndRecreateEmptyActualDir()
 
         logger = _log.getLogger("root")
         (
             editorMock,
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
-        ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, self.ACTUAL_DIR_PATH)
+        ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, self.ACTUAL_DIR_PATH, qtbot)
 
         legacyJson = self.LEGACY_JSON_PATH.read_text()
         storageTank = self._deserializeStorageTank(legacyJson, editorMock)
@@ -160,10 +162,10 @@ class TestStorageTank:
         return _tp.cast(_spc.SinglePipeConnection, mock)
 
     @staticmethod
-    def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectFolder):
-        application = _widgets.QApplication([])
-
+    def _createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, projectFolder, bot):
         mainWindow = _widgets.QMainWindow()
+
+        bot.addWidget(mainWindow)
 
         editorMock = _widgets.QWidget(parent=mainWindow)
         editorMock.connectionList = []
@@ -198,4 +200,4 @@ class TestStorageTank:
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()
 
-        return editorMock, [application, mainWindow, graphicsScene]
+        return editorMock, [mainWindow, graphicsScene]

@@ -30,7 +30,7 @@ class DoublePipeConnectionModelVersion0(  # pylint: disable=too-many-instance-at
 
 
 @_dc.dataclass
-class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class DoublePipeConnectionModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     connectionId: int
     name: str
     id: int  # pylint: disable=invalid-name
@@ -48,8 +48,50 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
         return DoublePipeConnectionModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeConnectionModel":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeConnectionModelVersion1":
         assert isinstance(superseded, DoublePipeConnectionModelVersion0)
+
+        return DoublePipeConnectionModelVersion1(
+            superseded.connectionId,
+            superseded.name,
+            superseded.id,
+            superseded.childIds,
+            superseded.segmentsCorners,
+            superseded.labelPos,
+            superseded.massFlowLabelPos,
+            superseded.fromPortId,
+            superseded.toPortId,
+            superseded.trnsysId,
+            _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("bdb5f03b-75bb-4c2f-a658-0de489c5b017")
+
+
+@_dc.dataclass
+class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+    connectionId: int
+    name: str
+    id: int  # pylint: disable=invalid-name
+    childIds: _tp.List[int]
+    segmentsCorners: _tp.List[_tp.Tuple[float, float]]
+    labelPos: _tp.Tuple[float, float]
+    massFlowLabelPos: _tp.Tuple[float, float]
+    fromPortId: int
+    toPortId: int
+    trnsysId: int
+    lengthInM: float
+    shallBeSimulated: bool
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return DoublePipeConnectionModelVersion1
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeConnectionModel":
+        assert isinstance(superseded, DoublePipeConnectionModelVersion1)
 
         return DoublePipeConnectionModel(
             superseded.connectionId,
@@ -62,7 +104,8 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
             superseded.fromPortId,
             superseded.toPortId,
             superseded.trnsysId,
-            _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M,
+            superseded.lengthInM,
+            _defaults.DEFAULT_SHALL_BE_SIMULATED,
         )
 
     @classmethod
@@ -88,4 +131,4 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("bdb5f03b-75bb-4c2f-a658-0de489c5b017")
+        return _uuid.UUID("62a1383d-5a0b-4886-9951-31ffd732637d")

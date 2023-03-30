@@ -83,8 +83,15 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         hotUnit = self._getHotPipeIfThenElseUnit(startingUnit + 1, hotInputSingleConnection, doubleConnection)
 
         unitText = f"""\
+! BEGIN {self.displayName}
+! cold pipe
 {coldUnit}
+
+! hot pipe
 {hotUnit}
+! END {self.displayName}
+
+
 """
         return unitText, startingUnit + 2
 
@@ -94,7 +101,11 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         doubleConnection: _dpc.DoublePipeConnection,
         coldOutputSingleConnection: _spc.SinglePipeConnection,
     ) -> str:
-        coldOutputTemp = _temps.getTemperatureVariableName(self, self._coldPipe)
+        coldOutputTemp = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=self.displayName,
+            nodeName=self._coldPipe.name,
+        )
 
         coldMfr = _helpers.getInputMfrName(self, self._coldPipe)
 
@@ -107,7 +118,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         )
 
         coldEquation = _helpers.getIfThenElseUnit(
-            unitNumber, coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp
+            unitNumber, coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp, extraNewlines=""
         )
 
         return coldEquation
@@ -118,7 +129,11 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         hotInputSingleConnection: _spc.SinglePipeConnection,
         doubleConnection: _dpc.DoublePipeConnection,
     ) -> str:
-        hotOutputTemp = _temps.getTemperatureVariableName(self, self._hotPipe)
+        hotOutputTemp = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=self.displayName,
+            nodeName=self._hotPipe.name,
+        )
 
         hotMfr = _helpers.getInputMfrName(self, self._hotPipe)
 
@@ -130,7 +145,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             doubleConnection, self.outputs[0], _mfn.PortItemType.HOT
         )
         hotEquation = _helpers.getIfThenElseUnit(
-            unitNumber, hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp
+            unitNumber, hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp, extraNewlines=""
         )
 
         return hotEquation

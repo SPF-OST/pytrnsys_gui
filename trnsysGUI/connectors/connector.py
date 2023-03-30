@@ -75,7 +75,11 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
         return width, height
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        tempName = _temps.getTemperatureVariableName(self, self._modelPipe)
+        tempName = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=self.displayName,
+            nodeName=self._modelPipe.name,
+        )
         mfrName = _helpers.getInputMfrName(self, self._modelPipe)
 
         fromConnection = self.inputs[0].getConnection()
@@ -87,7 +91,9 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
         negFlowTempName = _helpers.getTemperatureVariableName(toConnection, self.outputs[0], _mfn.PortItemType.STANDARD)
 
         unitNumber = startingUnit
-        unitText = _helpers.getIfThenElseUnit(unitNumber, tempName, mfrName, posFlowTempName, negFlowTempName)
+        unitText = _helpers.getIfThenElseUnit(
+            unitNumber, tempName, mfrName, posFlowTempName, negFlowTempName, componentName=self.displayName
+        )
 
         nextUnitNumber = unitNumber + 1
 

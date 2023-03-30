@@ -806,7 +806,7 @@
         },
         "Connection-347": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 265,
                 266
@@ -834,12 +834,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 314,
             "trnsysId": 265
         },
         "Connection-348": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 267,
                 268
@@ -867,12 +868,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 318,
             "trnsysId": 267
         },
         "Connection-349": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 269,
                 270
@@ -900,12 +902,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 322,
             "trnsysId": 269
         },
         "Connection-350": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 271,
                 272
@@ -933,12 +936,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 326,
             "trnsysId": 271
         },
         "Connection-351": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 273,
                 274
@@ -966,12 +970,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 330,
             "trnsysId": 273
         },
         "Connection-352": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 275,
                 276
@@ -999,12 +1004,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 334,
             "trnsysId": 275
         },
         "Connection-353": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 277,
                 278
@@ -1032,12 +1038,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 338,
             "trnsysId": 277
         },
         "Connection-354": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 279,
                 280
@@ -1065,12 +1072,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 342,
             "trnsysId": 279
         },
         "Connection-355": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 281,
                 282
@@ -1094,12 +1102,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 270,
             "trnsysId": 281
         },
         "Connection-356": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 283,
                 284
@@ -1123,12 +1132,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 274,
             "trnsysId": 283
         },
         "Connection-357": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 285,
                 286
@@ -1152,12 +1162,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 278,
             "trnsysId": 285
         },
         "Connection-358": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 287,
                 288
@@ -1181,12 +1192,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 282,
             "trnsysId": 287
         },
         "Connection-359": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 289,
                 290
@@ -1210,12 +1222,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 286,
             "trnsysId": 289
         },
         "Connection-360": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 291,
                 292
@@ -1239,12 +1252,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 290,
             "trnsysId": 291
         },
         "Connection-361": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 293,
                 294
@@ -1268,12 +1282,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 294,
             "trnsysId": 293
         },
         "Connection-362": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 295,
                 296
@@ -1297,12 +1312,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 298,
             "trnsysId": 295
         },
         "Connection-363": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 297,
                 298
@@ -1326,12 +1342,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 302,
             "trnsysId": 297
         },
         "Connection-428": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 178,
             "diameterInCm": 30.0,
             "fromPortId": 82,
@@ -1352,14 +1369,14 @@
                     20.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 389,
             "trnsysId": 339,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-429": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 179,
             "diameterInCm": 30.0,
             "fromPortId": 390,
@@ -1380,14 +1397,14 @@
                     58.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 81,
             "trnsysId": 340,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-432": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 182,
             "diameterInCm": 30.0,
             "fromPortId": 214,
@@ -1408,14 +1425,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 392,
             "trnsysId": 343,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-433": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 183,
             "diameterInCm": 30.0,
             "fromPortId": 393,
@@ -1436,14 +1453,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 215,
             "trnsysId": 344,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-434": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 184,
             "diameterInCm": 30.0,
             "fromPortId": 268,
@@ -1464,14 +1481,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 395,
             "trnsysId": 345,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-435": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 185,
             "diameterInCm": 30.0,
             "fromPortId": 396,
@@ -1492,14 +1509,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 269,
             "trnsysId": 346,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-437": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 187,
             "diameterInCm": 30.0,
             "fromPortId": 272,
@@ -1520,14 +1537,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 407,
             "trnsysId": 348,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-438": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 188,
             "diameterInCm": 30.0,
             "fromPortId": 408,
@@ -1548,14 +1565,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 273,
             "trnsysId": 349,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-439": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 189,
             "diameterInCm": 30.0,
             "fromPortId": 276,
@@ -1576,14 +1593,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 410,
             "trnsysId": 350,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-440": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 190,
             "diameterInCm": 30.0,
             "fromPortId": 411,
@@ -1604,14 +1621,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 277,
             "trnsysId": 351,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-441": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 191,
             "diameterInCm": 30.0,
             "fromPortId": 280,
@@ -1632,14 +1649,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 416,
             "trnsysId": 352,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-442": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 192,
             "diameterInCm": 30.0,
             "fromPortId": 417,
@@ -1660,14 +1677,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 281,
             "trnsysId": 353,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-443": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 193,
             "diameterInCm": 30.0,
             "fromPortId": 284,
@@ -1688,14 +1705,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 419,
             "trnsysId": 354,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-444": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 194,
             "diameterInCm": 30.0,
             "fromPortId": 420,
@@ -1716,14 +1733,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 285,
             "trnsysId": 355,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-445": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 195,
             "diameterInCm": 30.0,
             "fromPortId": 288,
@@ -1744,14 +1761,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 413,
             "trnsysId": 356,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-446": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 196,
             "diameterInCm": 30.0,
             "fromPortId": 414,
@@ -1772,14 +1789,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 289,
             "trnsysId": 357,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-447": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 197,
             "diameterInCm": 30.0,
             "fromPortId": 292,
@@ -1800,14 +1817,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 404,
             "trnsysId": 358,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-448": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 198,
             "diameterInCm": 30.0,
             "fromPortId": 405,
@@ -1828,14 +1845,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 293,
             "trnsysId": 359,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-449": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 199,
             "diameterInCm": 30.0,
             "fromPortId": 296,
@@ -1856,14 +1873,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 398,
             "trnsysId": 360,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-450": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 200,
             "diameterInCm": 30.0,
             "fromPortId": 399,
@@ -1884,14 +1901,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 297,
             "trnsysId": 361,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-451": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 201,
             "diameterInCm": 30.0,
             "fromPortId": 300,
@@ -1912,14 +1929,14 @@
                     360.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 401,
             "trnsysId": 362,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-452": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 202,
             "diameterInCm": 30.0,
             "fromPortId": 402,
@@ -1940,14 +1957,14 @@
                     320.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 301,
             "trnsysId": 363,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-462": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 374,
                 375
@@ -1975,12 +1992,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 387,
             "trnsysId": 374
         },
         "Connection-470": {
             ".__ConnectionDict__": true,
-            "__version__": "6092f751-ee2a-4e91-8dad-79960685b7d5",
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 217,
             "diameterInCm": 30.0,
             "fromPortId": 385,
@@ -2005,14 +2023,14 @@
                     200.0
                 ]
             ],
-            "shallCreateTrnsysUnit": false,
+            "shallBeSimulated": false,
             "toPortId": 386,
             "trnsysId": 381,
             "uValueInWPerM2K": 0.8333
         },
         "Connection-489": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 401,
                 402
@@ -2040,12 +2058,13 @@
                     190.0
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 310,
             "trnsysId": 401
         },
         "Connection-490": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 403,
                 404
@@ -2069,12 +2088,13 @@
                     280.0
                 ]
             ],
+            "shallBeSimulated": false,
             "toPortId": 216,
             "trnsysId": 403
         },
         "Connection-493": {
             ".__ConnectionDict__": true,
-            "__version__": "bdb5f03b-75bb-4c2f-a658-0de489c5b017",
+            "__version__": "62a1383d-5a0b-4886-9951-31ffd732637d",
             "childIds": [
                 407,
                 408
@@ -2098,18 +2118,19 @@
                     190.35633680555551
                 ]
             ],
+            "shallBeSimulated": true,
             "toPortId": 100,
             "trnsysId": 407
         },
         "IDs": {
-            "GlobalId": 521,
+            "GlobalId": 527,
             "__idDct__": true,
-            "globalConnID": 259,
-            "trnsysID": 430
+            "globalConnID": 265,
+            "trnsysID": 436
         },
         "Strings": {
             "DiagramName": "icegrid.json",
-            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\icegrid\\simulation\\icegrid",
+            "ProjectFolder": "C:\\Users\\damian.birchler\\src\\pytrnsys\\wd1\\pytrnsys_gui\\data\\examples\\icegrid",
             "__nameDct__": true
         }
     },

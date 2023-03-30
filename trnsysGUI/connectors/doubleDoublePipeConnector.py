@@ -78,15 +78,27 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         coldUnit = self._getIfThenElseUnit(startingUnit + 1, self._coldPipe, outputPort, inputPort)
 
         unitText = f"""\
+! BEGIN {self.displayName}
+! hot pipe
 {hotUnit}
-{coldUnit}"""
+
+! cold pipe
+{coldUnit}
+! END {self.displayName}
+
+
+"""
 
         return unitText, startingUnit + 2
 
     def _getIfThenElseUnit(
         self, unitNumber: int, pipe: _mfn.Pipe, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem
     ) -> str:
-        outputTemp = _temps.getTemperatureVariableName(self, pipe)
+        outputTemp = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=self.displayName,
+            nodeName=pipe.name,
+        )
         fromConnection = fromPort.getConnection()
         toConnection = toPort.getConnection()
 
@@ -96,5 +108,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
 
         negFlowInputTemp = _helpers.getTemperatureVariableName(toConnection, toPort, pipe.toPort.type)
 
-        unitText = _helpers.getIfThenElseUnit(unitNumber, outputTemp, mfr, posFlowInputTemp, negFlowInputTemp)
+        unitText = _helpers.getIfThenElseUnit(
+            unitNumber, outputTemp, mfr, posFlowInputTemp, negFlowInputTemp, extraNewlines=""
+        )
         return unitText

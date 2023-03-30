@@ -145,7 +145,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals, too-many-statements
         inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
-        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(self, self.modelPipe)
+        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(
+            componentDisplayName=self.displayName, pipeName=self.modelPipe.name
+        )
 
         portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
 
@@ -156,7 +158,11 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             portItemsWithParent[1][1], portItemsWithParent[1][0], _mfn.PortItemType.STANDARD
         )
 
-        outputTemperatureName = _temps.getTemperatureVariableName(self, self.modelPipe)
+        outputTemperatureName = _temps.getTemperatureVariableName(
+            self.shallRenameOutputTemperaturesInHydraulicFile(),
+            componentDisplayName=self.displayName,
+            nodeName=self.modelPipe.name,
+        )
 
         unitNumber = startingUnit
 
@@ -193,21 +199,16 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         revInputTemperatureVariableName,
         outputTemperatureName,
     ):
-        outputTemperatureUnit = _helpers.getIfThenElseUnit(
+        unitText = _helpers.getIfThenElseUnit(
             unitNumber,
             outputTemperatureName,
-            canonicalMfrName,
+            inputMfrName,
             inputTemperatureVariableName,
             revInputTemperatureVariableName,
+            canonicalMassFlowRate=canonicalMfrName,
+            componentName=self.displayName,
         )
 
-        unitText = f"""\
-! {self.displayName}
-EQUATIONS 1
-{canonicalMfrName} = {inputMfrName}
-{outputTemperatureUnit}
-
-"""
         return unitText
 
     def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals

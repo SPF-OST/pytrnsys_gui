@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import dataclasses as _dc
-import enum as _enum
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
@@ -9,35 +7,14 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnectionModel as _model
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
-import trnsysGUI.connection.values as _values
+import trnsysGUI.connection.hydraulicExport.doublePipe as _he
+import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _hedpc
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
-import trnsysGUI.ddckFields.headerAndParameters.doublePipeConnection as _hp
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.temperatures as _temps
-
 from . import _massFlowLabels as _mfl
-
-
-@_dc.dataclass
-class _EnergyBalanceVariable:
-    name: str
-    outputNumber: int
-    conversionFactor: str
-    comment: str
-
-
-class EnergyBalanceVariables(_enum.Enum):
-    PIPE_TO_GRAVEL = "Diss"
-    CONVECTED = "Conv"
-    PIPE_INTERNAL_CHANGE = "Int"
-    COLD_TO_HOT = "Exch"
-    GRAVEL_TO_SOIL = "GrSl"
-    SOIL_TO_FAR_FIELD = "SlFf"
-    SOIL_INTERNAL_CHANGE = "SlInt"
 
 
 class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
@@ -49,7 +26,8 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
-        self.lengthInM: _values.Value = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
+        self.lengthInM: float = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
+        self.shallBeSimulated: bool = _defaults.DEFAULT_SHALL_BE_SIMULATED
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -108,6 +86,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.toPort.id,
             self.trnsysId,
             self.lengthInM,
+            self.shallBeSimulated,
         )
 
         dictName = "Connection-"
@@ -128,6 +107,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
         self.lengthInM = model.lengthInM
+        self.shallBeSimulated = model.shallBeSimulated
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
@@ -148,163 +128,45 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     ) -> _tp.Tuple[str, int]:  # pylint: disable=too-many-locals,too-many-statements
         unitNumber = startingUnit
 
-        headerAndParameters = self._getHeaderAndParameters(unitNumber)
-        inputs = self._getInputs()
-        equations = self._getEquations(unitNumber)
+        exportModel = self._getHydraulicExportConnectionModel()
+        return _he.export(exportModel, unitNumber)
 
-        unitText = headerAndParameters + inputs + equations
-        nextUnitNumber = unitNumber + 1
-
-        return unitText, nextUnitNumber
-
-    def _getHeaderAndParameters(self, unitNumber: int) -> str:
-        headerAndParameters = _hp.getHeaderAndParameters(self, unitNumber)
-        return headerAndParameters
-
-    def _getInputs(self) -> str:
-        coldTemperatureName = _helpers.getTemperatureVariableName(
+    def _getHydraulicExportConnectionModel(self) -> _hedpc.DoublePipeConnection:
+        coldInputTemperature = _helpers.getTemperatureVariableName(
             self.toPort.parent, self.toPort, _mfn.PortItemType.COLD
         )
-        coldMfrName = _helpers.getInputMfrName(self, self.coldModelPipe)
-        coldRevTemperatureName = _helpers.getTemperatureVariableName(
+        coldMassFlowRate = _helpers.getInputMfrName(self, self.coldModelPipe)
+        coldRevInputTemperature = _helpers.getTemperatureVariableName(
             self.fromPort.parent, self.fromPort, _mfn.PortItemType.COLD
         )
-        hotTemperatureName = _helpers.getTemperatureVariableName(
+
+        hotInputTemperature = _helpers.getTemperatureVariableName(
             self.fromPort.parent, self.fromPort, _mfn.PortItemType.HOT
         )
-        hotMfrName = _helpers.getInputMfrName(self, self.hotModelPipe)
-        hotRevTemperatureName = _helpers.getTemperatureVariableName(
+        hotMassFlowRate = _helpers.getInputMfrName(self, self.hotModelPipe)
+        hotRevInputTemperature = _helpers.getTemperatureVariableName(
             self.toPort.parent, self.toPort, _mfn.PortItemType.HOT
         )
-        inputs = f"""\
-INPUTS 6
-{coldTemperatureName} ! Inlet fluid temperature - cold pipe, deg C
-{coldMfrName} ! Inlet fluid flow rate - cold pipe, kg/h
-{coldRevTemperatureName} ! ! Other side of pipe - cold pipe, deg C
-{hotTemperatureName} ! Inlet fluid temperature - hot pipe, deg C
-{hotMfrName} ! Inlet fluid flow rate - hot pipe, kg/h
-{hotRevTemperatureName} ! ! Other side of pipe - hot pipe, deg C
-*** initial values
-dpTIniCold
-0
-dpTIniCold
-dpTIniHot
-0
-dpTIniHot
 
-"""
-        return inputs
+        # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
+        assert self.coldModelPipe.name and self.hotModelPipe.name
 
-    def _getEquations(self, unitNumber: int) -> str:
-        energyBalanceVariables = self._getEnergyBalanceVariables()
-        formattedEnergyBalanceVariables = "\n".join(
-            f"{v.name} = [{unitNumber},{v.outputNumber}]*{v.conversionFactor} ! {v.comment}"
-            for v in energyBalanceVariables
+        connectionModel = _hedpc.DoublePipeConnection(
+            self.displayName,
+            self.lengthInM,
+            self.shallBeSimulated,
+            coldPipe=_hedpc.SinglePipe(
+                self.coldModelPipe.name,
+                _hedpc.InputPort(coldInputTemperature, coldMassFlowRate),
+                _hedpc.OutputPort(coldRevInputTemperature),
+            ),
+            hotPipe=_hedpc.SinglePipe(
+                self.hotModelPipe.name,
+                _hedpc.InputPort(hotInputTemperature, hotMassFlowRate),
+                _hedpc.OutputPort(hotRevInputTemperature),
+            ),
         )
-        coldMfrName = _helpers.getInputMfrName(self, self.coldModelPipe)
-        hotMfrName = _helpers.getInputMfrName(self, self.hotModelPipe)
-        equations = f"""\
-EQUATIONS {4 + len(energyBalanceVariables)}
-{_temps.getTemperatureVariableName(self, self.coldModelPipe)} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
-{_mnames.getCanonicalMassFlowVariableName(self, self.coldModelPipe)} = {coldMfrName}  ! Outlet mass flow rate, kg/h
-
-{_temps.getTemperatureVariableName(self, self.hotModelPipe)} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
-{_mnames.getCanonicalMassFlowVariableName(self, self.hotModelPipe)} = {hotMfrName}  ! Outlet mass flow rate, kg/h
-
-{formattedEnergyBalanceVariables}
-
-"""
-        return equations
-
-    def _getEnergyBalanceVariables(self) -> _tp.Sequence[_EnergyBalanceVariable]:
-        return [
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.CONVECTED,
-                _mfn.PortItemType.COLD,
-                7,
-                "Convected heat [kW]",
-                conversionFactor="-1*1/3600",
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
-                _mfn.PortItemType.COLD,
-                9,
-                "Change in fluid's internal heat content compared to previous time step [kW]",
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.PIPE_TO_GRAVEL,
-                _mfn.PortItemType.COLD,
-                11,
-                "Dissipated heat to casing (aka gravel) [kW]",
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.CONVECTED,
-                _mfn.PortItemType.HOT,
-                8,
-                "Convected heat [kW]",
-                conversionFactor="-1*1/3600",
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.PIPE_INTERNAL_CHANGE,
-                _mfn.PortItemType.HOT,
-                10,
-                "Change in fluid's internal heat content compared to previous time step [kW]",
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.PIPE_TO_GRAVEL,
-                _mfn.PortItemType.HOT,
-                12,
-                "Dissipated heat to casing (aka gravel) [kW]",
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.COLD_TO_HOT, None, 13, "Dissipated heat from cold pipe to hot pipe [kW]"
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.GRAVEL_TO_SOIL, None, 14, "Dissipated heat from gravel to soil [kW]"
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.SOIL_TO_FAR_FIELD, None, 15, 'Dissipated heat from soil to "far field" [kW]'
-            ),
-            self._getEnergyBalanceVariable(
-                EnergyBalanceVariables.SOIL_INTERNAL_CHANGE,
-                None,
-                16,
-                "Change in soil's internal heat content compared to previous time step [kW]",
-            ),
-        ]
-
-    def _getEnergyBalanceVariable(
-        self,
-        variable: EnergyBalanceVariables,
-        portItemType: _tp.Optional[_mfn.PortItemType],
-        outputNumber: int,
-        comment: str,
-        conversionFactor: str = "1/3600",
-    ) -> _EnergyBalanceVariable:
-        variableName = self.getEnergyBalanceVariableName(variable, portItemType)
-        return _EnergyBalanceVariable(variableName, outputNumber, conversionFactor, comment)
-
-    def getEnergyBalanceVariableName(
-        self,
-        variable: EnergyBalanceVariables,
-        portItemType: _tp.Optional[_mfn.PortItemType] = None,
-    ) -> str:
-        prefix = self._getEnergyBalanceVariablePrefix(portItemType)
-        variableName = f"{prefix}{variable.value}"
-        return variableName
-
-    def _getEnergyBalanceVariablePrefix(self, portItemType: _tp.Optional[_mfn.PortItemType]):
-        if not portItemType:
-            return self.displayName
-
-        assert portItemType in [_mfn.PortItemType.COLD, _mfn.PortItemType.HOT]
-        pipeName = self.coldModelPipe.name if portItemType == _mfn.PortItemType.COLD else self.hotModelPipe.name
-        return f"{self.displayName}{pipeName}"
-
-    @staticmethod
-    def _addComment(firstColumn, comment):
-        spacing = 40
-        return str(firstColumn).ljust(spacing) + comment + "\n"
+        return connectionModel
 
     def _updateModels(self, newDisplayName: str):
         coldFromPort: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)

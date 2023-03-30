@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import typing as _tp
 
-from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import QLineF
-from PyQt5.QtWidgets import QGraphicsLineItem, QMenu
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.dialogs.connectionDialogs.doublePipeConnectionLengthDialog as _dpcldlg
-from trnsysGUI.SegmentItemBase import SegmentItemBase  # type: ignore[attr-defined]
+import trnsysGUI.SegmentItemBase as _sib
+import trnsysGUI.dialogs.connections.doublePipe as _dpcldlg
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
@@ -16,35 +16,46 @@ if _tp.TYPE_CHECKING:
     # type: ignore[attr-defined]  #  pylint: disable=unused-import
 
 
-class DoublePipeSegmentItem(SegmentItemBase):
+class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
     def __init__(self, startNode, endNode, parent: DoublePipeConnection):
         super().__init__(startNode, endNode, parent)
 
-        self.blueLine = QGraphicsLineItem(self)
-        self.redLine = QGraphicsLineItem(self)
+        self.blueLine = _qtw.QGraphicsLineItem(self)
+        self.redLine = _qtw.QGraphicsLineItem(self)
 
     @property
     def _doublePipeConnection(self) -> DoublePipeConnection:
         return self.connection
 
-    def _createSegment(self, startNode, endNode) -> SegmentItemBase:
+    def _createSegment(self, startNode, endNode) -> _sib.SegmentItemBase:  # type: ignore[name-defined]
         return DoublePipeSegmentItem(startNode, endNode, self._doublePipeConnection)
 
-    def _getContextMenu(self) -> QMenu:
+    def _getContextMenu(self) -> _qtw.QMenu:
         menu = super()._getContextMenu()
-        action = menu.addAction("Edit length")
-        action.triggered.connect(self._editLength)
+        action = menu.addAction("Edit properties...")
+        action.triggered.connect(self._editProperties)
 
         return menu
 
-    def _editLength(self):
-        connection = _dpcldlg.ConnectionModel(self._doublePipeConnection.lengthInM)
-        _dpcldlg.DoublePipeConnectionLengthDialog(connection).exec()
+    def _editProperties(self):
+        connection = _dpcldlg.ConnectionModel(
+            self._doublePipeConnection.displayName,
+            self._doublePipeConnection.lengthInM,
+            self._doublePipeConnection.shallBeSimulated,
+        )
+
+        dialog = _dpcldlg.DoublePipeConnectionPropertiesDialog(connection)
+        dialogCode = dialog.exec()
+
+        if dialogCode != _qtw.QDialog.Accepted:
+            return
+
         self._doublePipeConnection.lengthInM = connection.lengthInM
+        self._doublePipeConnection.shallBeSimulated = connection.shallBeSimulated
 
     def _setLineImpl(self, x1, y1, x2, y2):
-        self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
-        self.redLine.setPen(QtGui.QPen(QtCore.Qt.red, 3))
+        self.blueLine.setPen(_qtg.QPen(_qtc.Qt.blue, 3))
+        self.redLine.setPen(_qtg.QPen(_qtc.Qt.red, 3))
         offset = 3
 
         if abs(y1 - y2) < 1:
@@ -59,11 +70,11 @@ class DoublePipeSegmentItem(SegmentItemBase):
             # This is probably an artifact of back when connections didn't have to
             # be straight. Once, these artifacts have been removed, we should throw here.
             pass
-        self.linePoints = QLineF(x1, y1, x2, y2)
+        self.linePoints = _qtc.QLineF(x1, y1, x2, y2)
 
     def updateGrad(self):
-        self.blueLine.setPen(QtGui.QPen(QtCore.Qt.blue, 3))
-        self.redLine.setPen(QtGui.QPen(QtCore.Qt.red, 3))
+        self.blueLine.setPen(_qtg.QPen(_qtc.Qt.blue, 3))
+        self.redLine.setPen(_qtg.QPen(_qtc.Qt.red, 3))
 
     def setSelect(self, isSelected: bool) -> None:
         if isSelected:

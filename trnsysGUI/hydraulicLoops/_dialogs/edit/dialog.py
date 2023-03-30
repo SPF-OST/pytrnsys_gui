@@ -2,26 +2,20 @@ __all__ = ["HydraulicLoopDialog"]
 
 import abc as _abc
 import dataclasses as _dc
-import typing as _tp
 import itertools as _it
+import typing as _tp
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-try:
-    from . import _UI_dialog_generated as _uigen
-    import trnsysGUI.resources.QRC_resources_generated as _
-except ImportError as importError:
-    raise AssertionError(  # pylint: disable=duplicate-code  # 1
-        "Could not find the generated Python code for a .ui or .qrc file. Please run the "
-        "`dev-tools\\generateGuiClassesFromQtCreatorStudioUiFiles.py' script from your "
-        "`pytrnsys_gui` directory."
-    ) from importError
-
+import trnsysGUI.dialogs as _dlgs
 import trnsysGUI.hydraulicLoops.model as _model
-
 from . import model as _gmodel
+
+_dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
+
+from . import _UI_dialog_generated as _uigen  # type: ignore[import]  # pylint: disable=wrong-import-position
 
 
 class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):

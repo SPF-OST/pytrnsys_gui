@@ -20,6 +20,7 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.temperatures.hydraulic as _thyd
+import trnsysGUI.connection.hydraulicExport.doublePipe.getDoublePipeEnergyBalanceEquations as _gdpebe
 
 _UNUSED_INDEX = 0
 
@@ -424,58 +425,14 @@ EQUATIONS 4
         return equation
 
     def exportDoublePipeEnergyBalanceVariables(self):
-        doublePipes = [ip for ip in self._hasInternalPipings if isinstance(ip, _dpc.DoublePipeConnection)]
 
-        if not doublePipes:
-            return ""
+        doublePipes = [
+            _gdpebe.DoublePipe(ip.displayName, ip.coldModelPipe.name, ip.hotModelPipe.name, ip.shallBeSimulated)
+            for ip in self._hasInternalPipings
+            if isinstance(ip, _dpc.DoublePipeConnection)
+        ]
 
-        dissipatedHeatFluxesToFarField = []
-        convectedHeatFluxes = []
-        pipeInternalEnergyChanges = []
-        soilInternalEnergyChanges = []
-        for doublePipe in doublePipes:
-            coldConvectedHeatFlux = doublePipe.getEnergyBalanceVariableName(
-                _dpc.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.COLD
-            )
-            hotConvectedHeatFlux = doublePipe.getEnergyBalanceVariableName(
-                _dpc.EnergyBalanceVariables.CONVECTED, _mfn.PortItemType.HOT
-            )
-            convectedHeatFluxes.extend([coldConvectedHeatFlux, hotConvectedHeatFlux])
-
-            dissipatedHeatFluxToFarField = doublePipe.getEnergyBalanceVariableName(
-                _dpc.EnergyBalanceVariables.SOIL_TO_FAR_FIELD
-            )
-            dissipatedHeatFluxesToFarField.append(dissipatedHeatFluxToFarField)
-
-            coldPipeInternalEnergyChange = doublePipe.getEnergyBalanceVariableName(
-                _dpc.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.COLD
-            )
-            hotPipeInternalEnergyChange = doublePipe.getEnergyBalanceVariableName(
-                _dpc.EnergyBalanceVariables.PIPE_INTERNAL_CHANGE, _mfn.PortItemType.HOT
-            )
-            pipeInternalEnergyChanges.extend([coldPipeInternalEnergyChange, hotPipeInternalEnergyChange])
-
-            soilInternalEnergyChange = doublePipe.getEnergyBalanceVariableName(
-                _dpc.EnergyBalanceVariables.SOIL_INTERNAL_CHANGE
-            )
-            soilInternalEnergyChanges.append(soilInternalEnergyChange)
-
-        summedConvectedHeatFluxes = " + ".join(convectedHeatFluxes)
-        summedDissipationToFarField = " + ".join(dissipatedHeatFluxesToFarField)
-        summedPipeInternalEnergyChanges = " + ".join(pipeInternalEnergyChanges)
-        summedSoilInternalEnergyChanges = " + ".join(soilInternalEnergyChanges)
-
-        Totals = _cnames.EnergyBalanceTotals.DoublePipe
-
-        equations = f"""\
-*** Double pipe energy balance
-EQUATIONS 5
-{Totals.CONVECTED} = {summedConvectedHeatFluxes}
-{Totals.DISSIPATION_TO_FAR_FIELD} = {summedDissipationToFarField}
-{Totals.PIPE_INTERNAL_CHANGE} = {summedPipeInternalEnergyChanges}
-{Totals.SOIL_INTERNAL_CHANGE} = {summedSoilInternalEnergyChanges}
-{Totals.IMBALANCE} = {Totals.CONVECTED} - {Totals.DISSIPATION_TO_FAR_FIELD}  - {Totals.PIPE_INTERNAL_CHANGE} - {Totals.SOIL_INTERNAL_CHANGE}
-"""
+        equations = _gdpebe.getDoublePipeEnergyBalanceEquations(doublePipes)
 
         return equations
 
@@ -519,15 +476,17 @@ EQUATIONS 5
         for hasInternalPiping in self._hasInternalPipings:
             if isinstance(hasInternalPiping, _spc.SinglePipeConnection):
                 mfrVariableName = _mnames.getCanonicalMassFlowVariableName(
-                    hasInternalPiping, hasInternalPiping.modelPipe
+                    componentDisplayName=hasInternalPiping.getDisplayName(), pipeName=hasInternalPiping.modelPipe.name
                 )
                 allVariableNames.append(mfrVariableName)
             elif isinstance(hasInternalPiping, _dpc.DoublePipeConnection):
                 coldMfrVariableName = _mnames.getCanonicalMassFlowVariableName(
-                    hasInternalPiping, hasInternalPiping.coldModelPipe
+                    componentDisplayName=hasInternalPiping.getDisplayName(),
+                    pipeName=hasInternalPiping.coldModelPipe.name,
                 )
                 hotMfrVariableName = _mnames.getCanonicalMassFlowVariableName(
-                    hasInternalPiping, hasInternalPiping.hotModelPipe
+                    componentDisplayName=hasInternalPiping.getDisplayName(),
+                    pipeName=hasInternalPiping.hotModelPipe.name,
                 )
                 allVariableNames.extend([coldMfrVariableName, hotMfrVariableName])
             elif isinstance(hasInternalPiping, _tventil.TVentil):
@@ -591,7 +550,8 @@ INPUTS {len(allVariableNames)}
 
             internalPiping = hasInternalPiping.getInternalPiping()
             nodes = internalPiping.nodes
-            temperatureVariableNames = [_temps.getTemperatureVariableName(hasInternalPiping, n) for n in nodes]
+
+            temperatureVariableNames = self._getOutputTemperatureVariableNames(hasInternalPiping, nodes)
 
             allVariableNames.extend(temperatureVariableNames)
 
@@ -607,6 +567,18 @@ INPUTS {len(allVariableNames)}
 
 """
         return f
+
+    @staticmethod
+    def _getOutputTemperatureVariableNames(hasInternalPiping, nodes):
+        temperatureVariableNames = []
+        for n in nodes:
+            temperatureVariableName = _temps.getTemperatureVariableName(
+                hasInternalPiping.shallRenameOutputTemperaturesInHydraulicFile(),
+                componentDisplayName=hasInternalPiping.getDisplayName(),
+                nodeName=n.name,
+            )
+            temperatureVariableNames.append(temperatureVariableName)
+        return temperatureVariableNames
 
     def exportFluids(self) -> str:
         def getValueOrVariableName(
