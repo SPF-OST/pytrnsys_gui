@@ -21,8 +21,8 @@ def assertThatGeneratedUIModuleAndResourcesExist(packageName: str, *, moduleName
 
 
 def assertThatLocalGeneratedUIModuleAndResourcesExist(
-    callingModuleName: str, *, moduleName: str = DEFAULT_MODULE_NAME
+    absoluteModuleName: str, *, moduleName: str = DEFAULT_MODULE_NAME
 ) -> None:
     """This functions assumes that the module to import is next to the calling module in the file hierarchy."""
-    packageName = ".".join(callingModuleName.split(".")[:-1])
+    packageName = ".".join(absoluteModuleName.split(".")[:-1])
     assertThatGeneratedUIModuleAndResourcesExist(packageName, moduleName=moduleName)
