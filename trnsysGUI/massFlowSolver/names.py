@@ -4,6 +4,12 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
+# These constants are defined in `head.ddck`
+ABSOLUTE_TOLERANCE_NAME = "mfrSolverAbsTol"
+RELATIVE_TOLERANCE_NAME = "mfrSolverRelTol"
+TOLERANCE_SWITCHING_THRESHOLD_NAME = "mfrTolSwitchThreshold"
+
+
 def getMassFlowVariableName(hasInternalPiping: _ip.HasInternalPiping, node: _mfn.Node, portItem: _mfn.PortItem) -> str:
     if portItem not in node.getPortItems():
         raise ValueError("`portItem` not one of `node`'s port items.")
