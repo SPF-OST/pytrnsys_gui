@@ -523,7 +523,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += energyBalanceEquations
 
         simulationUnit = 450
-        simulationType = 9351
+        simulationType = 9352
         descConnLength = 15
 
         exporter = self._createExporter()

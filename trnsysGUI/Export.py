@@ -231,9 +231,14 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
 
         jointLines = "\n".join(lines)
 
+        nToleranceParameters = 3
+
         resultText = f"""\
 UNIT {simulationUnit} TYPE {simulationType}
-PARAMETERS {len(serializedNodes) * 4 + 1}
+PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
+{_mnames.ABSOLUTE_TOLERANCE_NAME}
+{_mnames.RELATIVE_TOLERANCE_NAME}
+{_mnames.TOLERANCE_SWITCHING_THRESHOLD_NAME}
 {len(serializedNodes)}
 {jointLines}
 """
