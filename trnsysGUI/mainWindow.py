@@ -33,6 +33,8 @@ class MainWindow(_qtw.QMainWindow):
     def __init__(self, logger, project: _prj.Project, parent=None):
         super().__init__(parent)
 
+        self.editor = None
+
         self.jsonPath = None
         self.logger = logger
 
@@ -458,12 +460,17 @@ class MainWindow(_qtw.QMainWindow):
 
         self._resetEditor(project)
 
-        if isinstance(self.editor, _prj.MigrateProject):
+        if isinstance(project, _prj.MigrateProject):
             self.editor.save()
 
     def _resetEditor(self, project):
+        wasRunning = self.editor and self.editor.isRunning()
+
         self.editor = self._createDiagramEditor(project)
         self.setCentralWidget(self.editor)
+
+        if wasRunning:
+            self.editor.start()
 
     def toggleConnLabels(self):
         self.labelVisState = not self.labelVisState
