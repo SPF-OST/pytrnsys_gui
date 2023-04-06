@@ -60,6 +60,16 @@ OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
 EQSOLVER solver_equation           ! EQUATION SOLVER statement
 TIME_REPORT time_report
 
+
+**************************************
+*** MASS FLOW SOLVER CONSTANTS  ******
+**************************************
+
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
+
 ************************************** 
 ***User defined printer settings******
 **************************************
@@ -117,8 +127,11 @@ EQUATIONS 2
 TPump88 = TPiTes_Pump88
 TPump93 = TPiPump93_Col
 
-UNIT 450 TYPE 9351
-PARAMETERS 49
+UNIT 450 TYPE 9352
+PARAMETERS 52
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 12
 6 8 0 0        !1 : TesDpL50_10
 11 5 0 0       !2 : ExHxSide1

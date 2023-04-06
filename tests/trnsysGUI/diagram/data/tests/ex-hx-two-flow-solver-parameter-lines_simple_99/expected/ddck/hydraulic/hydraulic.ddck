@@ -24,8 +24,11 @@ TExHxSide1H=TExHxSide1
 TExHxSide2H=TExHxSide2
 TColH=TCol
 
-UNIT 450 TYPE 9351
-PARAMETERS 49
+UNIT 450 TYPE 9352
+PARAMETERS 52
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 12
 6 8 0 0        !1 : TesDpL50_10
 11 5 0 0       !2 : ExHxSide1

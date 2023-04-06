@@ -24,8 +24,11 @@ TTesDpL50_10H=TTesDpL50_10
 TColH=TCol
 THPH=THP
 
-UNIT 450 TYPE 9351
-PARAMETERS 49
+UNIT 450 TYPE 9352
+PARAMETERS 52
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 12
 6 8 0 0        !1 : TesInHx
 12 5 0 0       !2 : TesDpL50_10

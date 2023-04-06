@@ -61,6 +61,16 @@ OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
 EQSOLVER solver_equation           ! EQUATION SOLVER statement
 TIME_REPORT time_report
 
+
+**************************************
+*** MASS FLOW SOLVER CONSTANTS  ******
+**************************************
+
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
+
 ************************************** 
 ***User defined printer settings******
 **************************************
@@ -172,8 +182,11 @@ CONSTANTS 3
 TambAvg = 7.96 ! Average surface temperature in degrees celsius
 dTambAmpl = 13.32 ! Amplitude of surface temperature in n degrees celsius
 ddTcwOffset = 36 ! Days of minimum surface temperature
-UNIT 450 TYPE 9351
-PARAMETERS 481
+UNIT 450 TYPE 9352
+PARAMETERS 484
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 120
 119 90 0 0     !1 : SCnr1Cold
 91 120 0 0     !2 : SCnr1Hot
