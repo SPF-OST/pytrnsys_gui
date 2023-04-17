@@ -376,8 +376,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         data = list(_it.chain.from_iterable(data))  # nested list combined into one list
         cleanedData = [x for x in data if str(x) != "nan"]  # remove nan from list
         cleanedData = [round(abs(num)) for num in cleanedData]  # get absolute value and round off
-        nonZeroData = [x for x in cleanedData if x > 1]  # a work around to remove the 1 values from the data frame
-        noDuplicateData = list(dict.fromkeys(nonZeroData))
+        noDuplicateData = list(dict.fromkeys(cleanedData))
 
         self.medianValueMfr = _np.percentile(noDuplicateData, 50)  # median value / 50th percentile
         self.lowerQuarterMfr = _np.percentile(noDuplicateData, 25)  # 25th percentile
