@@ -1,5 +1,4 @@
 import dataclasses as _dc
-import logging as _log
 import os as _os
 import pathlib as _pl
 import shutil as _su
@@ -7,11 +6,13 @@ import subprocess as _sp
 import time as _time
 import typing as _tp
 
+import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 import pytest as _pt
 
 
 import pytrnsys.utils.log as _ulog
+
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -61,31 +62,35 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 
 class TestEditor:
-    @_pt.mark.parametrize("project", TEST_CASES)
-    def testStorageAndHydraulicExports(self, project: _Project, qtbot) -> None:  # pylint: disable=too-many-locals
-        helper = _Helper(project)
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testExports(self, testProject: _Project, qtbot, monkeypatch) -> None:
+        helper = _Helper(testProject)
         helper.setup()
 
-        projectFolderPath = helper.actualProjectFolderPath
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        editor = mainWindow.editor
 
-        editor = self._createEditor(projectFolderPath)
-        qtbot.addWidget(editor)
+        monkeypatch.chdir(helper.actualProjectFolderPath)
 
+        self._exportAndTestMassFlowSolverDeckFile(editor, testProject, helper)
+
+        self.exportAndTestStorageDdckFiles(editor, helper)
+
+        self._exportAndTestHydraulicDdckFile(editor, helper)
+
+        self._exportAndTestPlaceholdersJsonAndDeckFile(mainWindow, testProject, helper, monkeypatch)
+
+    @staticmethod
+    def _exportAndTestMassFlowSolverDeckFile(editor, testProject, helper):
         editor.exportHydraulics(exportTo="mfs")
-        mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
+        mfsDdckRelativePath = f"{testProject.projectName}_mfs.dck"
         helper.ensureFilesAreEqual(mfsDdckRelativePath)
 
+    def exportAndTestStorageDdckFiles(self, editor, helper):
         storageTankNames = self._exportStorageTanksAndGetNames(editor)
         for storageTankName in storageTankNames:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath)
-
-        editor.exportHydraulics(exportTo="ddck")
-        hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
-        helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
-
-        editor.exportDdckPlaceHolderValuesJsonFile(shallShowMessageOnSuccess=False)
-        helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
 
     @classmethod
     def _exportStorageTanksAndGetNames(cls, editor: _de.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
@@ -98,6 +103,27 @@ class TestEditor:
 
         return storageTankNames
 
+    @staticmethod
+    def _exportAndTestHydraulicDdckFile(editor, helper):
+        editor.exportHydraulics(exportTo="ddck")
+        hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
+        helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
+
+    @staticmethod
+    def _exportAndTestPlaceholdersJsonAndDeckFile(mainWindow, testProject, helper, monkeypatch):
+        def dummyInformation(*_, **__):
+            return _qtw.QMessageBox.Ok
+
+        monkeypatch.setattr(
+            _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
+        )
+
+        mainWindow.exportDck()
+        helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
+
+        deckFileName = f"{testProject.projectName}.dck"
+        helper.ensureFilesAreEqual(deckFileName)
+
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testSaveAndReloadProject(
         self, testProject: _Project, qtbot, monkeypatch
@@ -107,16 +133,7 @@ class TestEditor:
         helper = _Helper(testProject)
         helper.setup()
 
-        monkeypatch.setattr(
-            _mw.MainWindow,  # type: ignore[attr-defined]
-            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            _patchedCloseEvent,
-        )
-
-        jsonFilePath = helper.actualProjectFolderPath / f"{helper.actualProjectFolderPath.name}.json"
-        project = _prj.LoadProject(jsonFilePath)
-        mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
-        qtbot.addWidget(mainWindow)
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
 
         convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
         while convertedProjectFolderPath.exists():
@@ -136,19 +153,7 @@ class TestEditor:
         helper = _Helper(testProject)
         helper.setup()
 
-        monkeypatch.setattr(
-            _mw.MainWindow,  # type: ignore[attr-defined]
-            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            _patchedCloseEvent,
-        )
-
-        projectFolderPath = helper.actualProjectFolderPath
-        projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
-        project = _prj.LoadProject(projectJsonFilePath)
-        logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
-        mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
-
-        qtbot.addWidget(mainWindow)
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
 
         self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
 
@@ -161,6 +166,26 @@ class TestEditor:
         massFlowRatesPrintFilePath = helper.actualProjectFolderPath / massFlowRatesPrintFileName
         temperaturesPrintFilePath = helper.actualProjectFolderPath / temperaturesPintFileName
         self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow)
+
+    @staticmethod
+    def _createMainWindow(helper, qtbot, monkeypatch):
+        monkeypatch.setattr(
+            _mw.MainWindow,  # type: ignore[attr-defined]
+            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
+            _patchedCloseEvent,
+        )
+
+        projectFolderPath = helper.actualProjectFolderPath
+        projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
+        project = _prj.LoadProject(projectJsonFilePath)
+
+        logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
+
+        mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
+
+        qtbot.addWidget(mainWindow)
+
+        return mainWindow
 
     @staticmethod
     def _assertMassFlowVisualizerLoadsData(
@@ -209,18 +234,6 @@ class TestEditor:
         exportedFilePath = editor.exportHydraulics(exportTo=_format)
         return exportedFilePath
 
-    @staticmethod
-    def _createEditor(projectFolderPath):
-        logger = _log.Logger("root")
-        editor = _de.Editor(
-            parent=None,
-            projectFolder=str(projectFolderPath),
-            jsonPath=None,
-            loadValue="load",
-            logger=logger,
-        )
-        return editor
-
 
 def _patchedCloseEvent(_, closeEvent):
     return closeEvent.accept()
@@ -249,7 +262,7 @@ class _Helper:
 
     def _removeGeneratedFiles(self):
         for child in self.actualProjectFolderPath.iterdir():
-            if child.name in ("ddck", f"{self._project.projectName}.json"):
+            if child.name in ("ddck", f"{self._project.projectName}.json", "run.config"):
                 continue
 
             if child.is_dir():

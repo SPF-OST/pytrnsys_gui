@@ -844,7 +844,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
 
-    def exportDdckPlaceHolderValuesJsonFile(self, shallShowMessageOnSuccess: bool = True) -> _res.Result[None]:
+    def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
         if not self._isHydraulicConnected():
             return _res.Error("You need to connect all port items before you can export the hydraulics.")
 
@@ -874,13 +874,12 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         if _res.isError(result):
             return _res.error(result)
 
-        if shallShowMessageOnSuccess:
-            msgb = _qtw.QMessageBox()
-            msgb.setWindowTitle("Saved successfully")
-            msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
-            msgb.setStandardButtons(_qtw.QMessageBox.Ok)
-            msgb.setDefaultButton(_qtw.QMessageBox.Ok)
-            msgb.exec()
+        _qtw.QMessageBox.information(
+            self,
+            "Saved successfully",
+            f"Saved place holder values JSON file at {jsonFilePath}.",
+            buttons=_qtw.QMessageBox.Ok,
+        )
 
         return None
 

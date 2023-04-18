@@ -1,0 +1,721 @@
+**********************************************************************
+** head.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\generic 
+**********************************************************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+    
+*****************************************
+** Contact person: Dani Carbonell        
+** Date: 30.09.2016
+*****************************************
+
+***************************************************************************
+** Description: 
+** Basic TRNSYS variables including fluid properties
+***************************************************************************
+
+VERSION 17    
+
+************************************** 
+***Simulation time              ******
+**************************************
+
+EQUATIONS 4
+year = 1 ! select year to be run of weather files that contain data for more than one year
+START = 0 ! 8760*(year-1)
+STOP =  18*12*30*24 ! 8760*year
+dtSim = 1 ! time step in hours
+
+************************************** 
+***TRNSYS SIMULATION  constants ******
+**************************************
+
+CONSTANTS 13
+nIteTrnsys = 30      ! TRNSYS Limit of iterations
+nWarnTrnsys = 12000  ! TRNSYS Limit of warnings
+nCallTraceTrnys = 31 ! TRNSYS limit of calls to a component before it will be traced
+FrInte_Tol = 0.003   ! TRNSYS solver tolerances      
+FrConv_Tol = 0.0005  ! TRNSYS solver tolerances    
+nan_check_bool = 1   ! TRNSYS nan check boolean
+time_report = 1      ! TRNSYS time report
+solver_equation = 0  ! TRNSYS EQUATION SOLVER statement
+debug_statement = 0  ! TRNSYS Overwrite DEBUG statement
+solver_statement = 0 ! TRNSYS Solver statement
+min_relax_factor = 1 ! TRNSYS Minimum relaxation factor
+max_relac_factor = 1 ! TRNSYS Maximum relaxation factor 
+solver_integration = 1    ! TRNSYS numerical integration solver method
+
+
+************************************** 
+***TRNSYS SIMULATION SET-UP     ******
+**************************************
+
+SIMULATION START STOP dtSim     
+TOLERANCES    FrInte_Tol  FrConv_Tol     
+LIMITS nIteTrnsys nWarnTrnsys nCallTraceTrnys ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ solver_integration                        ! TRNSYS numerical integration solver method
+WIDTH 132                                     ! TRNSYS output file width, number of characters
+LIST                                          ! NOLIST statement
+
+SOLVER solver_statement min_relax_factor max_relac_factor      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK nan_check_bool  ! Nan DEBUG statement
+OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
+EQSOLVER solver_equation           ! EQUATION SOLVER statement
+TIME_REPORT time_report
+
+
+**************************************
+*** MASS FLOW SOLVER CONSTANTS  ******
+**************************************
+
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
+
+************************************** 
+***User defined printer settings******
+**************************************
+ 
+CONSTANTS 3    
+ 
+tStrtUser = START     ! START start time of user defined printer
+tEndUser  = STOP      ! END time of user defined printer
+dtPrUser  = dtSim     ! timestep of user defined printer
+
+************************************** 
+***Generic Constants            ******
+**************************************
+
+CONSTANTS 6 
+versionDeck = 1 !can be changed from config file to adapt processes and so on
+PI   = 3.1415926     
+Zero = 0
+Nix  = 0
+notused  = 0
+NPlotsPerSim = 18
+
+************************************** 
+***Constant fluid properties    ******
+**************************************
+
+CONSTANTS 7 
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 �C Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/m�]; Value for an average pipe temperature with 55 �C Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 �C
+RHOWAT = 998.0   ! density of Water  [kg/m�] at20 �C
+LAMWAT = 0.58    ! heat conductivity W/(mK) 
+CPWAT_SI = CPWAT*1000 ! J/(kgK)    
+CPBRI_SI = CPBRI*1000 ! J/(kgK)    
+
+*******************************
+**END Head.dck
+*******************************
+**********************************************************************
+** hydraulic_control.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\control 
+**********************************************************************
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+*************************************
+**BEGIN hydraulic_control.ddck
+*************************************
+EQUATIONS 10
+*** Massflowrates
+MfrQSnkA = QSnkAM
+MfrQSnkB = QSnkBM
+MfrQSnkI = QSnkIM
+MfrQSnkJ = QSnkJM
+MfrQSnkH = QSnkHM
+MfrQSnkC = QSnkCM
+MfrQSnkD = QSnkDM
+MfrQSnkG = QSnkGM
+MfrQSnkE = QSnkEM
+MfrQSnkF = QSnkFM
+
+EQUATIONS 2
+PSnk = QSnkAP + QSnkBP + QSnkCP + QSnkDP + QSnkEP + QSnkFP + QSnkGP + QSnkHP + QSnkIP + QSnkJP
+qSysOut_Snk = PSnk
+
+EQUATIONS 3
+dT = QSrc1TOut - QSrc1TIn
+MfrQSrc1 = QSnkAM + QSnkBM + QSnkCM + QSnkDM + QSnkEM + QSnkFM + QSnkGM + QSnkHM + QSnkIM + QSnkJM
+QSrc1P = MfrQSrc1*CPWAT*dT/3600
+
+EQUATIONS 3
+TambAvg = 10
+DTAmbAmpl = 15
+ddTcwOffset = 0
+
+EQUATIONS 1
+TRoomStore = 10
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkA 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkAdT = 3			! K
+
+EQUATIONS 1
+QSnkAP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkATIn = TSCnrA_QSnkA
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkATOut = QSnkATin - QSnkAdT
+TQSnkA = QSnkATOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkAM = QSnkAP / ((CPWAT/3600)*QSnkAdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkB 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkBdT = 3			! K
+
+EQUATIONS 1
+QSnkBP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkBTIn = TSCnrB_QSnkB
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkBTOut = QSnkBTin - QSnkBdT
+TQSnkB = QSnkBTOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkBM = QSnkBP / ((CPWAT/3600)*QSnkBdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkC 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkCdT = 3			! K
+
+EQUATIONS 1
+QSnkCP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkCTIn = TSCnrC_QSnkC
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkCTOut = QSnkCTin - QSnkCdT
+TQSnkC = QSnkCTOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkCM = QSnkCP / ((CPWAT/3600)*QSnkCdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkD 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkDdT = 3			! K
+
+EQUATIONS 1
+QSnkDP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkDTIn = TSCnrD_QSnkD
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkDTOut = QSnkDTin - QSnkDdT
+TQSnkD = QSnkDTOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkDM = QSnkDP / ((CPWAT/3600)*QSnkDdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkE 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkEdT = 3			! K
+
+EQUATIONS 1
+QSnkEP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkETIn = TSCnrE_QSnkE
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkETOut = QSnkETin - QSnkEdT
+TQSnkE = QSnkETOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkEM = QSnkEP / ((CPWAT/3600)*QSnkEdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkF 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkFdT = 3			! K
+
+EQUATIONS 1
+QSnkFP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkFTIn = TSCnrF_QSnkF
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkFTOut = QSnkFTin - QSnkFdT
+TQSnkF = QSnkFTOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkFM = QSnkFP / ((CPWAT/3600)*QSnkFdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkG 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkGdT = 3			! K
+
+EQUATIONS 1
+QSnkGP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkGTIn = TSCnrG_QSnkG
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkGTOut = QSnkGTin - QSnkGdT
+TQSnkG = QSnkGTOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkGM = QSnkGP / ((CPWAT/3600)*QSnkGdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkH 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkHdT = 3			! K
+
+EQUATIONS 1
+QSnkHP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkHTIn = TSCnrH_QSnkH
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkHTOut = QSnkHTin - QSnkHdT
+TQSnkH = QSnkHTOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkHM = QSnkHP / ((CPWAT/3600)*QSnkHdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkI 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkIdT = 3			! K
+
+EQUATIONS 1
+QSnkIP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkITIn = TSCnrI_QSnkI
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkITOut = QSnkITin - QSnkIdT
+TQSnkI = QSnkITOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkIM = QSnkIP / ((CPWAT/3600)*QSnkIdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkJ 
+**********************************************************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+*******************************
+**BEGIN sink.ddck
+*******************************
+
+***********************************
+** Parameters
+***********************************
+EQUATIONS 1
+QSnkJdT = 3			! K
+
+EQUATIONS 1
+QSnkJP = 150 !Power of sink
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature warm pipe to sink: 	 TIn
+EQUATIONS 1
+QSnkJTIn = TSCnrJ_QSnkJ
+
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSnkJTOut = QSnkJTin - QSnkJdT
+TQSnkJ = QSnkJTOut
+
+***********************************
+** outputs to hydraulic control
+***********************************
+EQUATIONS 1
+QSnkJM = QSnkJP / ((CPWAT/3600)*QSnkJdT)	!kg/h
+
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+**********************************************************************
+** QSrc.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSrc1 
+**********************************************************************
+*******************************
+**BEGIN source.ddck
+*******************************
+*******************************
+**BEGIN source.ddck
+*******************************
+
+
+***********************************
+** inputs from hydraulic solver
+***********************************
+** Temperature cold pipe to source: 	 TIn
+EQUATIONS 1
+QSrc1TIn = TSCnr1_QSrc1
+
+***********************************
+** outputs
+***********************************
+EQUATIONS 2
+QSrc1TOut = 15
+TQSrc1 = QSrc1TOut
+
+******************************************************************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+******************************************************************************************
+EQUATIONS 1
+qSysIn_Src = QSrc1P
+
+******************************************************************************************
+** Hourly printer
+******************************************************************************************
+ASSIGN temp\TRL_Stunden.Prt 654
+
+UNIT 10 Type 46 !Changed automatically
+PARAMETERS 7
+654 !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+1 !4 1: hourly integration
+2  !5 number of outputs to avoid integration
+1 2 !6 output number to avoid integration
+INPUTS 2
+TIME QSrc1TIn
+*******************************
+TIME TInQSrc1**********************************************************************
+** end.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\generic 
+**********************************************************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+    
+*****************************************
+** Contact person: Dani Carbonell        
+** Date: 30.09.2016
+*****************************************
+
+END
+***************************************************************
+**BEGIN Monthly Energy Balance printer automatically generated from DDck files
+***************************************************************
+EQUATIONS 1
+qImb =  - qSysOut_Snk + qSysIn_Src
+CONSTANTS 1
+unitPrintEBal=11
+ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal
+UNIT 11 Type 46
+PARAMETERS 6
+unitPrintEBal !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+-1 !4 -1: monthly integration
+1  !5 number of outputs to avoid integration
+1  !6 output number to avoid integration
+INPUTS 4
+TIME qSysOut_Snk qSysIn_Src qImb
+*******************************
+TIME qSysOut_Snk qSysIn_Src qImb
+***************************************************************
+**BEGIN Hourly Energy Balance printer automatically generated from DDck files
+***************************************************************
+CONSTANTS 1
+unitPrintEBal_h=12
+ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h
+UNIT 12 Type 46
+PARAMETERS 6
+unitPrintEBal_h !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+1 !4 1: hourly integration
+1  !5 number of outputs to avoid integration
+1  !6 output number to avoid integration
+INPUTS 4
+TIME qSysOut_Snk qSysIn_Src qImb
+*******************************
+TIME qSysOut_Snk qSysIn_Src qImb
+
+*******************************
+**END End.ddck
+*******************************

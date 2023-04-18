@@ -40,8 +40,6 @@ class MainWindow(_qtw.QMainWindow):
 
         self._resetEditor(project)
 
-        _lgcb.configureLoggingCallback(self.logger, self._loggingCallback, _ulog.FORMAT)
-
         self.labelVisState = False
         self.calledByVisualizeMf = False
         self.currentFile = "Untitled"
@@ -235,9 +233,11 @@ class MainWindow(_qtw.QMainWindow):
         return self.editor.isRunning()
 
     def start(self) -> None:
+        _lgcb.configureLoggingCallback(self.logger, self._loggingCallback, _ulog.FORMAT)
         self.editor.start()
 
     def shutdown(self) -> None:
+        _lgcb.removeLoggingCallback(self.logger, self._loggingCallback)
         self.editor.shutdown()
 
     def newDia(self):
@@ -561,7 +561,7 @@ class MainWindow(_qtw.QMainWindow):
             e.accept()
         elif ret == _qtw.QMessageBox.Save:
             self.editor.save()
-            e.accept
+            e.accept()
 
     def ensureSettingsExist(self):
         settings = _settings.Settings.tryLoadOrNone()

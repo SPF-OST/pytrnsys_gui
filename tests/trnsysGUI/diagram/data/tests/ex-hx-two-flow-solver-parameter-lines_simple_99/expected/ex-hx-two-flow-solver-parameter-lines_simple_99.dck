@@ -1,0 +1,771 @@
+**********************************************************************
+** head.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_simple_99\ex-hx-two-flow-solver-parameter-lines_simple_99\ddck\generic 
+**********************************************************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+    
+*****************************************
+** Contact person: Dani Carbonell        
+** Date: 30.09.2016
+*****************************************
+
+***************************************************************************
+** Description: 
+** Basic TRNSYS variables including fluid properties
+***************************************************************************
+
+VERSION 17    
+
+************************************** 
+***Simulation time              ******
+**************************************
+
+CONSTANTS 3
+START = 0     
+STOP = 8760     
+dtSim = 1/30.  ! time step in hours
+
+************************************** 
+***TRNSYS SIMULATION  constants ******
+**************************************
+
+CONSTANTS 13
+nIteTrnsys = 30      ! TRNSYS Limit of iterations
+nWarnTrnsys = 12000  ! TRNSYS Limit of warnings
+nCallTraceTrnys = 31 ! TRNSYS limit of calls to a component before it will be traced
+FrInte_Tol = 0.003   ! TRNSYS solver tolerances      
+FrConv_Tol = 0.0005  ! TRNSYS solver tolerances    
+nan_check_bool = 1   ! TRNSYS nan check boolean
+time_report = 1      ! TRNSYS time report
+solver_equation = 0  ! TRNSYS EQUATION SOLVER statement
+debug_statement = 0  ! TRNSYS Overwrite DEBUG statement
+solver_statement = 0 ! TRNSYS Solver statement
+min_relax_factor = 1 ! TRNSYS Minimum relaxation factor
+max_relac_factor = 1 ! TRNSYS Maximum relaxation factor 
+solver_integration = 1    ! TRNSYS numerical integration solver method
+
+
+************************************** 
+***TRNSYS SIMULATION SET-UP     ******
+**************************************
+
+SIMULATION START STOP dtSim     
+TOLERANCES    FrInte_Tol  FrConv_Tol     
+LIMITS nIteTrnsys nWarnTrnsys nCallTraceTrnys ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ solver_integration                        ! TRNSYS numerical integration solver method
+WIDTH 132                                     ! TRNSYS output file width, number of characters
+LIST                                          ! NOLIST statement
+
+SOLVER solver_statement min_relax_factor max_relac_factor      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK nan_check_bool  ! Nan DEBUG statement
+OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
+EQSOLVER solver_equation           ! EQUATION SOLVER statement
+TIME_REPORT time_report
+
+
+**************************************
+*** MASS FLOW SOLVER CONSTANTS  ******
+**************************************
+
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
+
+************************************** 
+***User defined printer settings******
+**************************************
+ 
+CONSTANTS 3    
+ 
+tStrtUser = START     ! START start time of user defined printer
+tEndUser  = STOP      ! END time of user defined printer
+dtPrUser  = dtSim     ! timestep of user defined printer
+
+************************************** 
+***Generic Constants            ******
+**************************************
+
+CONSTANTS 6 
+versionDeck = 1 !can be changed from config file to adapt processes and so on
+PI   = 3.1415926     
+Zero = 0
+Nix  = 0
+notused  = 0
+NPlotsPerSim = 18
+
+************************************** 
+***Constant fluid properties    ******
+**************************************
+
+CONSTANTS 7 
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 °C
+RHOWAT = 998.0   ! density of Water  [kg/m³] at20 °C
+LAMWAT = 0.58    ! heat conductivity W/(mK) 
+CPWAT_SI = CPWAT*1000 ! J/(kgK)    
+CPBRI_SI = CPBRI*1000 ! J/(kgK)    
+
+*******************************
+**END Head.dck
+*******************************
+**********************************************************************
+** hydraulic.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_simple_99\ex-hx-two-flow-solver-parameter-lines_simple_99\ddck\hydraulic 
+**********************************************************************
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+
+*************************************
+EQUATIONS 2
+*** single pipes
+qSysOut_PipeLoss = PipeLossTot
+qSysOut_spPipeIntTot = spPipeIntTot
+
+
+
+
+
+EQUATIONS 4
+*** Black box component temperatures
+TTesDpL50_10H=TTesDpL50_10
+TExHxSide1H=TExHxSide1
+TExHxSide2H=TExHxSide2
+TColH=TCol
+
+UNIT 11 TYPE 9352 !Changed automatically
+PARAMETERS 52
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
+12
+6 8 0 0        !1 : TesDpL50_10
+11 5 0 0       !2 : ExHxSide1
+9 6 0 0        !3 : ExHxSide2
+5 12 0 0       !4 : Col
+2 4 0 0        !5 : Hx_Col
+3 1 0 0        !6 : PiExHx_Tes
+8 9 0 1        !7 : Pump88
+1 7 0 0        !8 : PiTes_Pump88
+7 3 0 0        !9 : PiPump88_ExHx
+12 11 0 1      !10 : Pump93
+10 2 0 0       !11 : PiPump93_ExHx
+10 4 0 0       !12 : PiPump93_Col
+INPUTS 12! for Type 9351
+0,0 0,0 0,0 0,0 0,0 0,0 MfrPump88 0,0 0,0 MfrPump93 
+0,0 0,0 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 
+
+EQUATIONS 24	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MTesDpL50_10_A=[11,1] !Changed automatically
+MTesDpL50_10_B=[11,2] !Changed automatically
+MExHxSide1_A=[11,4] !Changed automatically
+MExHxSide1_B=[11,5] !Changed automatically
+MExHxSide2_A=[11,7] !Changed automatically
+MExHxSide2_B=[11,8] !Changed automatically
+MCol_A=[11,10] !Changed automatically
+MCol_B=[11,11] !Changed automatically
+MHx_Col_A=[11,13] !Changed automatically
+MHx_Col_B=[11,14] !Changed automatically
+MPiExHx_Tes_A=[11,16] !Changed automatically
+MPiExHx_Tes_B=[11,17] !Changed automatically
+MPump88_A=[11,19] !Changed automatically
+MPump88_B=[11,20] !Changed automatically
+MPiTes_Pump88_A=[11,22] !Changed automatically
+MPiTes_Pump88_B=[11,23] !Changed automatically
+MPiPump88_ExHx_A=[11,25] !Changed automatically
+MPiPump88_ExHx_B=[11,26] !Changed automatically
+MPump93_A=[11,28] !Changed automatically
+MPump93_B=[11,29] !Changed automatically
+MPiPump93_ExHx_A=[11,31] !Changed automatically
+MPiPump93_ExHx_B=[11,32] !Changed automatically
+MPiPump93_Col_A=[11,34] !Changed automatically
+MPiPump93_Col_B=[11,35] !Changed automatically
+
+
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 4
+** loop2
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+
+** loop1
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+
+
+UNIT 12 TYPE 931 !Changed automatically
+! Hx_Col
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
+INPUTS 4
+TExHxSide1H ! input flow temperature [deg C]
+MHx_Col_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TColH ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+THx_Col = [12,1]  !Changed automatically
+PHx_Col_kW = [12,3]/3600  !Changed automatically
+PHx_ColConv_kW = [12,4]/3600  !Changed automatically
+PHx_ColInt_kJ = [12,5]  !Changed automatically
+MHx_Col = MHx_Col_A
+
+UNIT 13 TYPE 931 !Changed automatically
+! PiExHx_Tes
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
+INPUTS 4
+TExHxSide2H ! input flow temperature [deg C]
+MPiExHx_Tes_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TTesDpL50_10H ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiExHx_Tes = [13,1]  !Changed automatically
+PPiExHx_Tes_kW = [13,3]/3600  !Changed automatically
+PPiExHx_TesConv_kW = [13,4]/3600  !Changed automatically
+PPiExHx_TesInt_kJ = [13,5]  !Changed automatically
+MPiExHx_Tes = MPiExHx_Tes_A
+
+UNIT 14 TYPE 931 !Changed automatically
+! PiTes_Pump88
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
+INPUTS 4
+TTesDpL50_10H ! input flow temperature [deg C]
+MPiTes_Pump88_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TPump88 ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiTes_Pump88 = [14,1]  !Changed automatically
+PPiTes_Pump88_kW = [14,3]/3600  !Changed automatically
+PPiTes_Pump88Conv_kW = [14,4]/3600  !Changed automatically
+PPiTes_Pump88Int_kJ = [14,5]  !Changed automatically
+MPiTes_Pump88 = MPiTes_Pump88_A
+
+UNIT 15 TYPE 931 !Changed automatically
+! PiPump88_ExHx
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
+INPUTS 4
+TPump88 ! input flow temperature [deg C]
+MPiPump88_ExHx_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TExHxSide2H ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiPump88_ExHx = [15,1]  !Changed automatically
+PPiPump88_ExHx_kW = [15,3]/3600  !Changed automatically
+PPiPump88_ExHxConv_kW = [15,4]/3600  !Changed automatically
+PPiPump88_ExHxInt_kJ = [15,5]  !Changed automatically
+MPiPump88_ExHx = MPiPump88_ExHx_A
+
+UNIT 16 TYPE 931 !Changed automatically
+! PiPump93_ExHx
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
+INPUTS 4
+TPump93 ! input flow temperature [deg C]
+MPiPump93_ExHx_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TExHxSide1H ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiPump93_ExHx = [16,1]  !Changed automatically
+PPiPump93_ExHx_kW = [16,3]/3600  !Changed automatically
+PPiPump93_ExHxConv_kW = [16,4]/3600  !Changed automatically
+PPiPump93_ExHxInt_kJ = [16,5]  !Changed automatically
+MPiPump93_ExHx = MPiPump93_ExHx_A
+
+UNIT 17 TYPE 931 !Changed automatically
+! PiPump93_Col
+PARAMETERS 6
+0.02 ! diameter [m]
+2.0 ! length [m]
+2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+20 ! Initial fluid temperature [deg C]
+INPUTS 4
+TPump93 ! input flow temperature [deg C]
+MPiPump93_Col_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TColH ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiPump93_Col = [17,1]  !Changed automatically
+PPiPump93_Col_kW = [17,3]/3600  !Changed automatically
+PPiPump93_ColConv_kW = [17,4]/3600  !Changed automatically
+PPiPump93_ColInt_kJ = [17,5]  !Changed automatically
+MPiPump93_Col = MPiPump93_Col_A
+
+*** Single pipe losses
+EQUATIONS 1
+spPipeEnIntTot = PHx_ColInt_kJ+PPiExHx_TesInt_kJ+PPiTes_Pump88Int_kJ+PPiPump88_ExHxInt_kJ+PPiPump93_ExHxInt_kJ+PPiPump93_ColInt_kJ
+
+UNIT 10 TYPE 150 !Changed automatically
+PARAMETERS 3
+1 ! Number of inputs
+1 ! Number of time steps
+0 ! Initial value
+INPUTS 1
+spPipeEnIntTot
+**
+0
+
+EQUATIONS 4
+spPipeConvectedTot = PHx_ColConv_kW+PPiExHx_TesConv_kW+PPiTes_Pump88Conv_kW+PPiPump88_ExHxConv_kW+PPiPump93_ExHxConv_kW+PPiPump93_ColConv_kW
+PipeLossTot = PHx_Col_kW+PPiExHx_Tes_kW+PPiTes_Pump88_kW+PPiPump88_ExHx_kW+PPiPump93_ExHx_kW+PPiPump93_Col_kW
+spPipeIntTot = (spPipeEnIntTot - [10,1]) / dtSim / 3600  !Changed automatically
+spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 457
+
+UNIT 18 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+457! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 6
+MHx_Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
+
+***
+MHx_Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
+
+
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_T.prt 458
+
+UNIT 19 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+458! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 6
+THx_Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
+
+***
+THx_Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
+
+
+**********************************************************************
+** Tes.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_simple_99\ex-hx-two-flow-solver-parameter-lines_simple_99\ddck\Tes 
+**********************************************************************
+*************************************
+**BEGIN Tes.ddck
+*************************************
+*************************************
+**BEGIN Tes.ddck
+*************************************
+
+*************************************
+** Plug-Flow Model exported from TRNSYS GUI
+*************************************
+
+*************************************
+** To be checked: 
+** check cp and rho values for the circuits 
+** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
+*************************************
+
+*************************************
+** outputs to energy balance in kWh
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+*************************************
+EQUATIONS 3
+qSysOut_TesLoss = QLoss_Tes1
+qSysOut_TesAcum = QAcum_Tes1
+elSysIn_Q_TesAux = qHeatSource_Tes1
+
+*************************************
+*** Inputs from hydraulic solver ****
+*************************************
+EQUATIONS 3
+Tdp1In_Tes1 = TPiExHx_Tes
+Mfrdp1_Tes1 = MTesDpL50_10_A
+Tdp1InRev_Tes1 = TPiTes_Pump88
+CONSTANTS 2
+zAux1_Tes1=0.00
+qAux1_Tes1=0.00
+
+*************************************
+**** Outputs to hydraulic solver ****
+*************************************
+EQUATIONS 1
+*** direct port outputs
+TTesDpL50_10=[20,1] !Changed automatically
+
+*************************************
+****** Parameters of Type1924 *******
+*************************************
+CONSTANTS 3
+TRoomStore=15 ! 
+VStoreRef = 0.763
+ratioTes1 = Vol_Tes1 / VStoreRef
+*********Connecting values of DIRECT PORT=1***********
+CONSTANTS 2
+zInDp1_Tes1=0.50
+zOutDp1_Tes1=0.10
+*********Constant of DIRECT PORT=1***********
+CONSTANTS 1
+Dp1Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
+********** HEAT EXCHANGER CONSTANTS*******
+CONSTANTS 1
+nHxUsed_Tes1=0 
+*************************************
+** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
+*************************************
+CONSTANTS 10
+zSen1_Tes1=0.05
+zSen2_Tes1=0.15
+zSen3_Tes1=0.25
+zSen4_Tes1=0.35
+zSen5_Tes1=0.45
+zSen6_Tes1=0.55
+zSen7_Tes1=0.65
+zSen8_Tes1=0.75
+zSen9_Tes1=0.85
+zSen10_Tes1=0.95
+*************************************
+** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
+*************************************
+CONSTANTS 10
+zSenAvgBot1_Tes1 = 0.05
+zSenAvgTop1_Tes1 = 0.15
+zSenAvgBot2_Tes1 = 0.25
+zSenAvgTop2_Tes1 = 0.35
+zSenAvgBot3_Tes1 = 0.45
+zSenAvgTop3_Tes1 = 0.55
+zSenAvgBot4_Tes1 = 0.65
+zSenAvgTop4_Tes1 = 0.75
+zSenAvgBot5_Tes1 = 0.85
+zSenAvgTop5_Tes1 = 0.95
+CONSTANTS 12
+Vol_Tes1=1          ! 1: m3, volume of store
+RhoWat_Tes1=RhoWat  ! 2: kg/m3, density of storage media
+CpWat_Tes1=CpWat    ! 3: kJ/kgK, specific heat of storage media
+lamZ_Tes1=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES
+Heigh_Tes1=1.       ! 5: m, storage height
+Tini_Tes1=60.       ! 6: oC, initial temperature
+nCvMax_Tes1=400     ! 7: -, minimum relative plug height
+nCvMin_Tes1=20      ! 8: -, maximum relative plug height
+maxTDiff_Tes1=0.015 ! 9: K, maximum temperature difference between plugs
+readMode_Tes1=0     ! 10: 1: from table, 0: Tini and CapTot
+Tref_Tes1=273.15    ! 11: oC, reference temperature
+Tmax_Tes1=100.       ! 6: oC, initial temperature
+CONSTANTS 10
+Ufoam_Tes1= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) 
+Ubot_Tes1 = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
+Atop_Tes1 = Vol_Tes1/Heigh_Tes1 ! m2
+Diameter_Tes1 = (4*ATop_Tes1/PI)^0.5 ! m 
+ALat_Tes1 = Heigh_Tes1*PI*Diameter_Tes1 ! m2
+UaBot_Tes1= Ubot_Tes1*ATop_Tes1 !  W/k 
+Uaz1_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+Uaz2_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+Uaz3_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+UaTop_Tes1 = Ufoam_Tes1*ATop_Tes1 !  W/k
+************* MOVING PLATE *******************
+CONSTANTS 4
+MoInsPlate_Tes1=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
+zInsPlate_Tes1=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
+TinsPlate_Tes1=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
+UAinsPlate_Tes1=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
+*************************************
+********** TYPE DEFINITION **********
+*************************************
+UNIT 20 TYPE 1924      !Changed automatically
+PARAMETERS 219 
+Vol_Tes1     ! 1: m3, volume of store
+RhoWat_Tes1  ! 2: kg/m3, density of storage media
+CpWat_Tes1   ! 3: kJ/kgK, specific heat of storage media
+lamZ_Tes1    ! 4: W/mK, effective vertical thermal conductivity of TES
+Heigh_Tes1   ! 5: m, storage height
+TIni_Tes1   ! 6: oC, initial temperature
+nCvMax_Tes1  ! 7: -, minimum relative plug height
+nCvMin_Tes1  ! 8: -, maximum relative plug height
+maxTDiff_Tes1  ! 9: K, maximum temperature difference between plugs
+readMode_Tes1  ! 10: 1: from table, 0: Tini and CapTot
+Tref_Tes1     ! 11: oC, reference temperature
+UaBot_Tes1 ! W/k 
+Uaz1_Tes1  ! W/k
+Uaz2_Tes1  ! W/k
+Uaz3_Tes1  ! W/k
+UaTop_Tes1 ! W/k
+tMax_Tes1
+0	0	0 ! 17-20 unsused parameters
+zInDp1_Tes1 zOutDp1_Tes1 zero Dp1Strat_Tes1 ! 21 - 25: zIn, zOut, cp, strat
+-1 -1 zero zero ! 26 - 30: zIn, zOut, cp, strat
+-1 -1 zero zero ! 31 - 35: zIn, zOut, cp, strat
+-1 -1 zero zero ! 36 - 40: zIn, zOut, cp, strat
+-1 -1 zero zero ! 41 - 45: zIn, zOut, cp, strat
+-1 -1 zero zero ! 46 - 50: zIn, zOut, cp, strat
+-1 -1 zero zero ! 51 - 55: zIn, zOut, cp, strat
+-1 -1 zero zero ! 56 - 60: zIn, zOut, cp, strat
+-1 -1 zero zero ! 61 - 65: zIn, zOut, cp, strat
+-1 -1 zero zero ! 66 - 70: zIn, zOut, cp, strat
+zSen1_Tes1 zSen2_Tes1 zSen3_Tes1 zSen4_Tes1 zSen5_Tes1 zSen6_Tes1 zSen7_Tes1 zSen8_Tes1 zSen9_Tes1 zSen10_Tes1 ! 61-71 : relative storage temperature sensor heights 
+zSenAvgBot1_Tes1 zSenAvgTop1_Tes1 ! 71-72 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot2_Tes1 zSenAvgTop2_Tes1 ! 73-74 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot3_Tes1 zSenAvgTop3_Tes1 ! 75-76 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot4_Tes1 zSenAvgTop4_Tes1 ! 77-78 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot5_Tes1 zSenAvgTop5_Tes1 ! 79-80 : relative position of lower and upper edge temeprature sensors
+MoInsPlate_Tes1 ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
+zInsPlate_Tes1  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
+TinsPlate_Tes1  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
+UAinsPlate_Tes1 ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
+nHxUsed_Tes1     ! 85: number Of used Hx
+** Parameters for heat Exchanger number 1
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 1
+** Parameters for heat Exchanger number 2
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 2
+** Parameters for heat Exchanger number 3
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 3
+** Parameters for heat Exchanger number 4
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 4
+** Parameters for heat Exchanger number 5
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 5
+** Parameters for heat Exchanger number 6
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 6
+** 20 height position for any heat source, e.g. electrical backup or heat pump condenser. Any position can be due to a different heat source
+zAux1_Tes1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
+INPUTS 69
+************10 DIRECT PORTS INPUTS***************
+Tdp1In_Tes1 Mfrdp1_Tes1 Tdp1InRev_Tes1
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+****************
+TroomStore
+***************** 6 HX INPUTS ******************
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+***************** 20 HEAT SOURCE INPUTS ******************
+qAux1_Tes1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
+****************** INTIAL INPUTS***********************
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero 
+*****************OUTPUTS****************
+EQUATIONS 1
+Qdp1_Tes1=[20,31]  !Changed automatically
+EQUATIONS 21
+TAvg_Tes1 = [20,180]  !Changed automatically
+***Temperatures at 10 equallay distributed height 
+T1_Tes1 =[20,21]  !Changed automatically
+T2_Tes1 =[20,22]  !Changed automatically
+T3_Tes1 =[20,23]  !Changed automatically
+T4_Tes1 =[20,24]  !Changed automatically
+T5_Tes1 =[20,25]  !Changed automatically
+T6_Tes1 =[20,26]  !Changed automatically
+T7_Tes1 =[20,27]  !Changed automatically
+T8_Tes1 =[20,28]  !Changed automatically
+T9_Tes1 =[20,29]  !Changed automatically
+T10_Tes1 =[20,30]  !Changed automatically
+***Temperatures at 10 sensors user defined height
+Tsen1_Tes1 =[20,71]  !Changed automatically
+Tsen2_Tes1 =[20,72]  !Changed automatically
+Tsen3_Tes1 =[20,73]  !Changed automatically
+Tsen4_Tes1 =[20,74]  !Changed automatically
+Tsen5_Tes1 =[20,75]  !Changed automatically
+Tsen6_Tes1 =[20,76]  !Changed automatically
+Tsen7_Tes1 =[20,77]  !Changed automatically
+Tsen8_Tes1 =[20,78]  !Changed automatically
+Tsen9_Tes1 =[20,79]  !Changed automatically
+Tsen10_Tes1 =[20,80]  !Changed automatically
+EQUATIONS 1
+qHeatSource_Tes1 = [20,181]  !Changed automatically
+EQUATIONS 5
+Qv_Tes1     = [20,176]  !Changed automatically
+QLoss_Tes1  = [20,177]  !Changed automatically
+QAcum_Tes1  = [20,178]  !Changed automatically
+QPorts_Tes1 = [20,179]  !Changed automatically
+QImb_Tes1   = [20,64]   !Changed automatically
+CONSTANTS 1 
+unitPrinter_Tes1 = 23
+ ASSIGN temp\TES1_MO.Prt unitPrinter_Tes1
+UNIT 21 TYPE 46 !Changed automatically
+PARAMETERS 5
+unitPrinter_Tes1 ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0  ! 5: Number of inputs to avoid integration
+INPUTS 7
+Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 qHeatSource_Tes1 
+zero zero zero zero zero zero zero 
+*************************************
+********** Online Plotter ***********
+*************************************
+
+UNIT 22 TYPE 65      !Changed automatically
+PARAMETERS 12   
+10     ! 1 Nb. of left-axis variables 
+0     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum 
+100     ! 4 Left axis maximum -
+0     ! 5 Right axis minimum 
+100     ! 6 Right axis maximum 
+nPlotsPerSim     ! 7 Number of plots per simulation 
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing 
+-1     ! 10 Logical unit for output file 
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 10     
+T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+LABELS  3         
+Temperatures  
+MassFlows  
+Tes1
+
+
+**********************************************************************
+** end.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_simple_99\ex-hx-two-flow-solver-parameter-lines_simple_99\ddck\generic 
+**********************************************************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+    
+*****************************************
+** Contact person: Dani Carbonell        
+** Date: 30.09.2016
+*****************************************
+
+END
+***************************************************************
+**BEGIN Monthly Energy Balance printer automatically generated from DDck files
+***************************************************************
+EQUATIONS 1
+qImb =  - qSysOut_PipeLoss - qSysOut_spPipeIntTot - qSysOut_TesLoss - qSysOut_TesAcum + elSysIn_Q_TesAux
+CONSTANTS 1
+unitPrintEBal=24
+ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal
+UNIT 24 Type 46
+PARAMETERS 6
+unitPrintEBal !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+-1 !4 -1: monthly integration
+1  !5 number of outputs to avoid integration
+1  !6 output number to avoid integration
+INPUTS 7
+TIME qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_TesLoss qSysOut_TesAcum elSysIn_Q_TesAux qImb
+*******************************
+TIME qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_TesLoss qSysOut_TesAcum elSysIn_Q_TesAux qImb
+***************************************************************
+**BEGIN Hourly Energy Balance printer automatically generated from DDck files
+***************************************************************
+CONSTANTS 1
+unitPrintEBal_h=25
+ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h
+UNIT 25 Type 46
+PARAMETERS 6
+unitPrintEBal_h !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+1 !4 1: hourly integration
+1  !5 number of outputs to avoid integration
+1  !6 output number to avoid integration
+INPUTS 7
+TIME qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_TesLoss qSysOut_TesAcum elSysIn_Q_TesAux qImb
+*******************************
+TIME qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_TesLoss qSysOut_TesAcum elSysIn_Q_TesAux qImb
+
+*******************************
+**END End.ddck
+*******************************
