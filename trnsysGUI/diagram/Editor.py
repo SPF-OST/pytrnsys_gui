@@ -851,23 +851,23 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         jsonFilePath = _pl.Path(self.projectFolder) / "DdckPlaceHolderValues.json"
 
         if jsonFilePath.is_dir():
-            qmb = _qtw.QMessageBox(self)
-            qmb.setText(
-                f"A folder already exits at f{jsonFilePath}. Chose a different location or delete the folder first."
+            _qtw.QMessageBox.information(
+                self,
+                "Folder already exists",
+                f"A folder already exits at f{jsonFilePath}. Chose a different location or delete the folder first.",
             )
-            qmb.setStandardButtons(_qtw.QMessageBox.Ok)
-            qmb.exec()
-
             return None
 
         if jsonFilePath.is_file():
-            qmb = _qtw.QMessageBox(self)
-            qmb.setText("The file already exists. Do you want to overwrite it or cancel?")
-            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
-            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
-            ret = qmb.exec()
+            pressedButton = _qtw.QMessageBox.question(
+                self,
+                "Overwrite file?",
+                f"The file {jsonFilePath} already exists. Do you want to overwrite it or cancel?",
+                buttons=(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel),
+                defaultButton=_qtw.QMessageBox.Cancel,
+            )
 
-            if ret != _qtw.QMessageBox.Save:
+            if pressedButton != _qtw.QMessageBox.Save:
                 return None
 
         result = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
