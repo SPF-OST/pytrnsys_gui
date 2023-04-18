@@ -154,6 +154,2546 @@ ddTcwOffset = 0
 EQUATIONS 1
 TRoomStore = 10
 **********************************************************************
+** hydraulic.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\hydraulic 
+**********************************************************************
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+
+*************************************
+
+EQUATIONS 3
+*** double pipes
+qSysOut_dpToFFieldTot = dpToFFieldTot
+qSysOut_dpPipeIntTot = dpPipeIntTot
+qSysOut_dpSoilIntTot = dpSoilIntTot
+
+
+
+EQUATIONS 11
+*** Black box component temperatures
+TQSrc1H=TQSrc1
+TQSnkAH=TQSnkA
+TQSnkBH=TQSnkB
+TQSnkIH=TQSnkI
+TQSnkJH=TQSnkJ
+TQSnkHH=TQSnkH
+TQSnkCH=TQSnkC
+TQSnkDH=TQSnkD
+TQSnkGH=TQSnkG
+TQSnkEH=TQSnkE
+TQSnkFH=TQSnkF
+
+*** Default global PARAMETERS for TYPES 9511 ***
+CONSTANTS 25
+
+****** Pipe and soil properties ******
+dpLength = 579.404 ! Length of buried pipe in m
+dpDiamIn = 0.4028 ! Inner diameter of pipes in m
+dpDiamOut = 0.429 ! Outer diameter of pipes in m
+dpLambda = 175 ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth = 1.8 ! Buried pipe depth in m
+dpDiamCase = 2 ! Diameter of casing material in m
+dpLambdaFill = 7  ! Thermal conductivity of fill insulation in kJ/hr.m.K
+dpDistPtoP = 0.55  ! Center-to-center pipe spacing in m
+dpLambdaGap = 1.44  ! Thermal conductivity of gap material in kJ/hr.m.K (gravel)
+dpGapThick = 0  ! Gap thickness in m
+
+****** Fluid properties ******
+dpRhoFlu = 1000.0 ! Density of fluid, kg/m^3
+dpLambdaFl = LamWat*3.6  ! Thermal conductivity of fluid in kJ/hr.m.K
+dpCpFl = 4.19 ! Specific heat of fluid, kJ/kg.K
+dpViscFl = 3.078  ! Viscosity of fluid in kg/m.hr
+
+****** Initial conditions ******
+dpTIniHot = 15  ! Initial fluid temperature - pipe 1 in degrees celsius
+dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in degrees celsius
+
+****** Soil's thermal properties ******
+dpLamdaSl = 8.64  ! Thermal conductivity of soil in kJ/hr.m.K
+dpRhoSl = 1800  ! Density of soil in kg/m^3
+dpCpSl = 1.0  ! Specific heat of soil in kJ/kg.K
+
+****** Definition of nodes ******
+dpNrFlNds = 60  ! Number of fluid nodes
+dpNrSlRad = 10  ! Number of radial soil nodes
+dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
+dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
+dpNrSlAx = 20  ! Number of axial soil nodes
+dpNrSlCirc = 4  ! Number of circumferential soil nodes
+UNIT 10 TYPE 9352 !Changed automatically
+PARAMETERS 484
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
+120
+119 90 0 0     !1 : SCnr1Cold
+91 120 0 0     !2 : SCnr1Hot
+115 119 117 2  !3 : DTeeACold
+116 120 118 2  !4 : DTeeAHot
+117 93 0 0     !5 : SCnrACold
+92 118 0 0     !6 : SCnrAHot
+59 95 0 0      !7 : SCnrBCold
+94 60 0 0      !8 : SCnrBHot
+61 97 0 0      !9 : SCnrCCold
+96 62 0 0      !10 : SCnrCHot
+63 99 0 0      !11 : SCnrDCold
+98 64 0 0      !12 : SCnrDHot
+65 101 0 0     !13 : SCnrECold
+100 66 0 0     !14 : SCnrEHot
+67 103 0 0     !15 : SCnrFCold
+102 68 0 0     !16 : SCnrFHot
+69 105 0 0     !17 : SCnrGCold
+104 70 0 0     !18 : SCnrGHot
+71 107 0 0     !19 : SCnrHCold
+106 72 0 0     !20 : SCnrHHot
+73 109 0 0     !21 : SCnrICold
+108 74 0 0     !22 : SCnrIHot
+75 111 0 0     !23 : SCnrJCold
+110 76 0 0     !24 : SCnrJHot
+43 115 59 2    !25 : DTeeBCold
+44 116 60 2    !26 : DTeeBHot
+45 43 61 2     !27 : DTeeCCold
+46 44 62 2     !28 : DTeeCHot
+47 45 63 2     !29 : DTeeDCold
+48 46 64 2     !30 : DTeeDHot
+49 47 65 2     !31 : DTeeECold
+50 48 66 2     !32 : DTeeEHot
+51 49 67 2     !33 : DTeeFCold
+52 50 68 2     !34 : DTeeFHot
+53 51 69 2     !35 : DTeeGCold
+54 52 70 2     !36 : DTeeGHot
+55 53 71 2     !37 : DTeeHCold
+56 54 72 2     !38 : DTeeHHot
+57 55 73 2     !39 : DTeeICold
+58 56 74 2     !40 : DTeeIHot
+112 57 75 2    !41 : DTeeJCold
+113 58 76 2    !42 : DTeeJHot
+27 25 0 0      !43 : DTeeB_DTeeCCold
+26 28 0 0      !44 : DTeeB_DTeeCHot
+29 27 0 0      !45 : DTeeC_DTeeDCold
+28 30 0 0      !46 : DTeeC_DTeeDHot
+31 29 0 0      !47 : DTeeD_DTeeECold
+30 32 0 0      !48 : DTeeD_DTeeEHot
+33 31 0 0      !49 : DTeeE_DTeeFCold
+32 34 0 0      !50 : DTeeE_DTeeFHot
+35 33 0 0      !51 : DTeeF_DTeeGCold
+34 36 0 0      !52 : DTeeF_DTeeGHot
+37 35 0 0      !53 : DTeeG_DTeeHCold
+36 38 0 0      !54 : DTeeG_DTeeHHot
+39 37 0 0      !55 : DTeeH_DTeeICold
+38 40 0 0      !56 : DTeeH_DTeeIHot
+41 39 0 0      !57 : DTeeI_DTeeJCold
+40 42 0 0      !58 : DTeeI_DTeeJHot
+7 25 0 0       !59 : DTeeB_SCnrBCold
+26 8 0 0       !60 : DTeeB_SCnrBHot
+9 27 0 0       !61 : DTeeC_SCnrCCold
+28 10 0 0      !62 : DTeeC_SCnrCHot
+11 29 0 0      !63 : DTeeD_SCnrDCold
+30 12 0 0      !64 : DTeeD_SCnrDHot
+13 31 0 0      !65 : DTeeE_SCnrECold
+32 14 0 0      !66 : DTeeE_SCnrEHot
+15 33 0 0      !67 : DTeeF_SCnrFCold
+34 16 0 0      !68 : DTeeF_SCnrFHot
+17 35 0 0      !69 : DTeeG_SCnrGCold
+36 18 0 0      !70 : DTeeG_SCnrGHot
+19 37 0 0      !71 : DTeeH_SCnrHCold
+38 20 0 0      !72 : DTeeH_SCnrHHot
+21 39 0 0      !73 : DTeeI_SCnrICold
+40 22 0 0      !74 : DTeeI_SCnrIHot
+23 41 0 0      !75 : DTeeJ_SCnrJCold
+42 24 0 0      !76 : DTeeJ_SCnrJHot
+112 114 0 0    !77 : SCnr99Cold
+114 113 0 0    !78 : SCnr99Hot
+90 91 0 1      !79 : QSrc1
+92 93 0 1      !80 : QSnkA
+94 95 0 1      !81 : QSnkB
+108 109 0 1    !82 : QSnkI
+110 111 0 1    !83 : QSnkJ
+106 107 0 1    !84 : QSnkH
+96 97 0 1      !85 : QSnkC
+98 99 0 1      !86 : QSnkD
+104 105 0 1    !87 : QSnkG
+100 101 0 1    !88 : QSnkE
+102 103 0 1    !89 : QSnkF
+1 79 0 0       !90 : SCnr1_QSrc1
+79 2 0 0       !91 : QSrc1_SCnr1
+6 80 0 0       !92 : SCnrA_QSnkA
+80 5 0 0       !93 : QSnkA_SCnrA
+8 81 0 0       !94 : SCnrB_QSnkB
+81 7 0 0       !95 : QSnkB_SCnrB
+10 85 0 0      !96 : SCnrC_QSnkC
+85 9 0 0       !97 : QSnkC_SCnrC
+12 86 0 0      !98 : SCnrD_QSnkD
+86 11 0 0      !99 : QSnkD_SCnrD
+14 88 0 0      !100 : SCnrE_QSnkE
+88 13 0 0      !101 : QSnkE_SCnrE
+16 89 0 0      !102 : SCnrF_QSnkF
+89 15 0 0      !103 : QSnkF_SCnrF
+18 87 0 0      !104 : SCnrG_QSnkG
+87 17 0 0      !105 : QSnkG_SCnrG
+20 84 0 0      !106 : SCnrH_QSnkH
+84 19 0 0      !107 : QSnkH_SCnrH
+22 82 0 0      !108 : SCnrI_QSnkI
+82 21 0 0      !109 : QSnkI_SCnrI
+24 83 0 0      !110 : SCnrJ_QSnkJ
+83 23 0 0      !111 : QSnkJ_SCnrJ
+77 41 0 0      !112 : DTeeJ_SCnrZCold
+42 78 0 0      !113 : DTeeJ_SCnrZHot
+78 77 0 0      !114 : SCnrZ_SCnrZ
+25 3 0 0       !115 : DTeeA_DTeeBCold
+4 26 0 0       !116 : DTeeA_DTeeBHot
+5 3 0 0        !117 : DTeeA_SCnrACold
+4 6 0 0        !118 : DTeeA_SCnrAHot
+3 1 0 0        !119 : SCnr1_DTeeACold
+2 4 0 0        !120 : SCnr1_DTeeAHot
+INPUTS 120! for Type 9351
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 MfrQSrc1 MfrQSnkA 
+MfrQSnkB MfrQSnkI MfrQSnkJ MfrQSnkH MfrQSnkC MfrQSnkD MfrQSnkG MfrQSnkE MfrQSnkF 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+
+
+EQUATIONS 260	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MSCnr1Cold_A=[10,1] !Changed automatically
+MSCnr1Cold_B=[10,2] !Changed automatically
+MSCnr1Hot_A=[10,4] !Changed automatically
+MSCnr1Hot_B=[10,5] !Changed automatically
+MDTeeACold_A=[10,7] !Changed automatically
+MDTeeACold_B=[10,8] !Changed automatically
+MDTeeACold_C=[10,9] !Changed automatically
+MDTeeAHot_A=[10,10] !Changed automatically
+MDTeeAHot_B=[10,11] !Changed automatically
+MDTeeAHot_C=[10,12] !Changed automatically
+MSCnrACold_A=[10,13] !Changed automatically
+MSCnrACold_B=[10,14] !Changed automatically
+MSCnrAHot_A=[10,16] !Changed automatically
+MSCnrAHot_B=[10,17] !Changed automatically
+MSCnrBCold_A=[10,19] !Changed automatically
+MSCnrBCold_B=[10,20] !Changed automatically
+MSCnrBHot_A=[10,22] !Changed automatically
+MSCnrBHot_B=[10,23] !Changed automatically
+MSCnrCCold_A=[10,25] !Changed automatically
+MSCnrCCold_B=[10,26] !Changed automatically
+MSCnrCHot_A=[10,28] !Changed automatically
+MSCnrCHot_B=[10,29] !Changed automatically
+MSCnrDCold_A=[10,31] !Changed automatically
+MSCnrDCold_B=[10,32] !Changed automatically
+MSCnrDHot_A=[10,34] !Changed automatically
+MSCnrDHot_B=[10,35] !Changed automatically
+MSCnrECold_A=[10,37] !Changed automatically
+MSCnrECold_B=[10,38] !Changed automatically
+MSCnrEHot_A=[10,40] !Changed automatically
+MSCnrEHot_B=[10,41] !Changed automatically
+MSCnrFCold_A=[10,43] !Changed automatically
+MSCnrFCold_B=[10,44] !Changed automatically
+MSCnrFHot_A=[10,46] !Changed automatically
+MSCnrFHot_B=[10,47] !Changed automatically
+MSCnrGCold_A=[10,49] !Changed automatically
+MSCnrGCold_B=[10,50] !Changed automatically
+MSCnrGHot_A=[10,52] !Changed automatically
+MSCnrGHot_B=[10,53] !Changed automatically
+MSCnrHCold_A=[10,55] !Changed automatically
+MSCnrHCold_B=[10,56] !Changed automatically
+MSCnrHHot_A=[10,58] !Changed automatically
+MSCnrHHot_B=[10,59] !Changed automatically
+MSCnrICold_A=[10,61] !Changed automatically
+MSCnrICold_B=[10,62] !Changed automatically
+MSCnrIHot_A=[10,64] !Changed automatically
+MSCnrIHot_B=[10,65] !Changed automatically
+MSCnrJCold_A=[10,67] !Changed automatically
+MSCnrJCold_B=[10,68] !Changed automatically
+MSCnrJHot_A=[10,70] !Changed automatically
+MSCnrJHot_B=[10,71] !Changed automatically
+MDTeeBCold_A=[10,73] !Changed automatically
+MDTeeBCold_B=[10,74] !Changed automatically
+MDTeeBCold_C=[10,75] !Changed automatically
+MDTeeBHot_A=[10,76] !Changed automatically
+MDTeeBHot_B=[10,77] !Changed automatically
+MDTeeBHot_C=[10,78] !Changed automatically
+MDTeeCCold_A=[10,79] !Changed automatically
+MDTeeCCold_B=[10,80] !Changed automatically
+MDTeeCCold_C=[10,81] !Changed automatically
+MDTeeCHot_A=[10,82] !Changed automatically
+MDTeeCHot_B=[10,83] !Changed automatically
+MDTeeCHot_C=[10,84] !Changed automatically
+MDTeeDCold_A=[10,85] !Changed automatically
+MDTeeDCold_B=[10,86] !Changed automatically
+MDTeeDCold_C=[10,87] !Changed automatically
+MDTeeDHot_A=[10,88] !Changed automatically
+MDTeeDHot_B=[10,89] !Changed automatically
+MDTeeDHot_C=[10,90] !Changed automatically
+MDTeeECold_A=[10,91] !Changed automatically
+MDTeeECold_B=[10,92] !Changed automatically
+MDTeeECold_C=[10,93] !Changed automatically
+MDTeeEHot_A=[10,94] !Changed automatically
+MDTeeEHot_B=[10,95] !Changed automatically
+MDTeeEHot_C=[10,96] !Changed automatically
+MDTeeFCold_A=[10,97] !Changed automatically
+MDTeeFCold_B=[10,98] !Changed automatically
+MDTeeFCold_C=[10,99] !Changed automatically
+MDTeeFHot_A=[10,100] !Changed automatically
+MDTeeFHot_B=[10,101] !Changed automatically
+MDTeeFHot_C=[10,102] !Changed automatically
+MDTeeGCold_A=[10,103] !Changed automatically
+MDTeeGCold_B=[10,104] !Changed automatically
+MDTeeGCold_C=[10,105] !Changed automatically
+MDTeeGHot_A=[10,106] !Changed automatically
+MDTeeGHot_B=[10,107] !Changed automatically
+MDTeeGHot_C=[10,108] !Changed automatically
+MDTeeHCold_A=[10,109] !Changed automatically
+MDTeeHCold_B=[10,110] !Changed automatically
+MDTeeHCold_C=[10,111] !Changed automatically
+MDTeeHHot_A=[10,112] !Changed automatically
+MDTeeHHot_B=[10,113] !Changed automatically
+MDTeeHHot_C=[10,114] !Changed automatically
+MDTeeICold_A=[10,115] !Changed automatically
+MDTeeICold_B=[10,116] !Changed automatically
+MDTeeICold_C=[10,117] !Changed automatically
+MDTeeIHot_A=[10,118] !Changed automatically
+MDTeeIHot_B=[10,119] !Changed automatically
+MDTeeIHot_C=[10,120] !Changed automatically
+MDTeeJCold_A=[10,121] !Changed automatically
+MDTeeJCold_B=[10,122] !Changed automatically
+MDTeeJCold_C=[10,123] !Changed automatically
+MDTeeJHot_A=[10,124] !Changed automatically
+MDTeeJHot_B=[10,125] !Changed automatically
+MDTeeJHot_C=[10,126] !Changed automatically
+MDTeeB_DTeeCCold_A=[10,127] !Changed automatically
+MDTeeB_DTeeCCold_B=[10,128] !Changed automatically
+MDTeeB_DTeeCHot_A=[10,130] !Changed automatically
+MDTeeB_DTeeCHot_B=[10,131] !Changed automatically
+MDTeeC_DTeeDCold_A=[10,133] !Changed automatically
+MDTeeC_DTeeDCold_B=[10,134] !Changed automatically
+MDTeeC_DTeeDHot_A=[10,136] !Changed automatically
+MDTeeC_DTeeDHot_B=[10,137] !Changed automatically
+MDTeeD_DTeeECold_A=[10,139] !Changed automatically
+MDTeeD_DTeeECold_B=[10,140] !Changed automatically
+MDTeeD_DTeeEHot_A=[10,142] !Changed automatically
+MDTeeD_DTeeEHot_B=[10,143] !Changed automatically
+MDTeeE_DTeeFCold_A=[10,145] !Changed automatically
+MDTeeE_DTeeFCold_B=[10,146] !Changed automatically
+MDTeeE_DTeeFHot_A=[10,148] !Changed automatically
+MDTeeE_DTeeFHot_B=[10,149] !Changed automatically
+MDTeeF_DTeeGCold_A=[10,151] !Changed automatically
+MDTeeF_DTeeGCold_B=[10,152] !Changed automatically
+MDTeeF_DTeeGHot_A=[10,154] !Changed automatically
+MDTeeF_DTeeGHot_B=[10,155] !Changed automatically
+MDTeeG_DTeeHCold_A=[10,157] !Changed automatically
+MDTeeG_DTeeHCold_B=[10,158] !Changed automatically
+MDTeeG_DTeeHHot_A=[10,160] !Changed automatically
+MDTeeG_DTeeHHot_B=[10,161] !Changed automatically
+MDTeeH_DTeeICold_A=[10,163] !Changed automatically
+MDTeeH_DTeeICold_B=[10,164] !Changed automatically
+MDTeeH_DTeeIHot_A=[10,166] !Changed automatically
+MDTeeH_DTeeIHot_B=[10,167] !Changed automatically
+MDTeeI_DTeeJCold_A=[10,169] !Changed automatically
+MDTeeI_DTeeJCold_B=[10,170] !Changed automatically
+MDTeeI_DTeeJHot_A=[10,172] !Changed automatically
+MDTeeI_DTeeJHot_B=[10,173] !Changed automatically
+MDTeeB_SCnrBCold_A=[10,175] !Changed automatically
+MDTeeB_SCnrBCold_B=[10,176] !Changed automatically
+MDTeeB_SCnrBHot_A=[10,178] !Changed automatically
+MDTeeB_SCnrBHot_B=[10,179] !Changed automatically
+MDTeeC_SCnrCCold_A=[10,181] !Changed automatically
+MDTeeC_SCnrCCold_B=[10,182] !Changed automatically
+MDTeeC_SCnrCHot_A=[10,184] !Changed automatically
+MDTeeC_SCnrCHot_B=[10,185] !Changed automatically
+MDTeeD_SCnrDCold_A=[10,187] !Changed automatically
+MDTeeD_SCnrDCold_B=[10,188] !Changed automatically
+MDTeeD_SCnrDHot_A=[10,190] !Changed automatically
+MDTeeD_SCnrDHot_B=[10,191] !Changed automatically
+MDTeeE_SCnrECold_A=[10,193] !Changed automatically
+MDTeeE_SCnrECold_B=[10,194] !Changed automatically
+MDTeeE_SCnrEHot_A=[10,196] !Changed automatically
+MDTeeE_SCnrEHot_B=[10,197] !Changed automatically
+MDTeeF_SCnrFCold_A=[10,199] !Changed automatically
+MDTeeF_SCnrFCold_B=[10,200] !Changed automatically
+MDTeeF_SCnrFHot_A=[10,202] !Changed automatically
+MDTeeF_SCnrFHot_B=[10,203] !Changed automatically
+MDTeeG_SCnrGCold_A=[10,205] !Changed automatically
+MDTeeG_SCnrGCold_B=[10,206] !Changed automatically
+MDTeeG_SCnrGHot_A=[10,208] !Changed automatically
+MDTeeG_SCnrGHot_B=[10,209] !Changed automatically
+MDTeeH_SCnrHCold_A=[10,211] !Changed automatically
+MDTeeH_SCnrHCold_B=[10,212] !Changed automatically
+MDTeeH_SCnrHHot_A=[10,214] !Changed automatically
+MDTeeH_SCnrHHot_B=[10,215] !Changed automatically
+MDTeeI_SCnrICold_A=[10,217] !Changed automatically
+MDTeeI_SCnrICold_B=[10,218] !Changed automatically
+MDTeeI_SCnrIHot_A=[10,220] !Changed automatically
+MDTeeI_SCnrIHot_B=[10,221] !Changed automatically
+MDTeeJ_SCnrJCold_A=[10,223] !Changed automatically
+MDTeeJ_SCnrJCold_B=[10,224] !Changed automatically
+MDTeeJ_SCnrJHot_A=[10,226] !Changed automatically
+MDTeeJ_SCnrJHot_B=[10,227] !Changed automatically
+MSCnr99Cold_A=[10,229] !Changed automatically
+MSCnr99Cold_B=[10,230] !Changed automatically
+MSCnr99Hot_A=[10,232] !Changed automatically
+MSCnr99Hot_B=[10,233] !Changed automatically
+MQSrc1_A=[10,235] !Changed automatically
+MQSrc1_B=[10,236] !Changed automatically
+MQSnkA_A=[10,238] !Changed automatically
+MQSnkA_B=[10,239] !Changed automatically
+MQSnkB_A=[10,241] !Changed automatically
+MQSnkB_B=[10,242] !Changed automatically
+MQSnkI_A=[10,244] !Changed automatically
+MQSnkI_B=[10,245] !Changed automatically
+MQSnkJ_A=[10,247] !Changed automatically
+MQSnkJ_B=[10,248] !Changed automatically
+MQSnkH_A=[10,250] !Changed automatically
+MQSnkH_B=[10,251] !Changed automatically
+MQSnkC_A=[10,253] !Changed automatically
+MQSnkC_B=[10,254] !Changed automatically
+MQSnkD_A=[10,256] !Changed automatically
+MQSnkD_B=[10,257] !Changed automatically
+MQSnkG_A=[10,259] !Changed automatically
+MQSnkG_B=[10,260] !Changed automatically
+MQSnkE_A=[10,262] !Changed automatically
+MQSnkE_B=[10,263] !Changed automatically
+MQSnkF_A=[10,265] !Changed automatically
+MQSnkF_B=[10,266] !Changed automatically
+MSCnr1_QSrc1_A=[10,268] !Changed automatically
+MSCnr1_QSrc1_B=[10,269] !Changed automatically
+MQSrc1_SCnr1_A=[10,271] !Changed automatically
+MQSrc1_SCnr1_B=[10,272] !Changed automatically
+MSCnrA_QSnkA_A=[10,274] !Changed automatically
+MSCnrA_QSnkA_B=[10,275] !Changed automatically
+MQSnkA_SCnrA_A=[10,277] !Changed automatically
+MQSnkA_SCnrA_B=[10,278] !Changed automatically
+MSCnrB_QSnkB_A=[10,280] !Changed automatically
+MSCnrB_QSnkB_B=[10,281] !Changed automatically
+MQSnkB_SCnrB_A=[10,283] !Changed automatically
+MQSnkB_SCnrB_B=[10,284] !Changed automatically
+MSCnrC_QSnkC_A=[10,286] !Changed automatically
+MSCnrC_QSnkC_B=[10,287] !Changed automatically
+MQSnkC_SCnrC_A=[10,289] !Changed automatically
+MQSnkC_SCnrC_B=[10,290] !Changed automatically
+MSCnrD_QSnkD_A=[10,292] !Changed automatically
+MSCnrD_QSnkD_B=[10,293] !Changed automatically
+MQSnkD_SCnrD_A=[10,295] !Changed automatically
+MQSnkD_SCnrD_B=[10,296] !Changed automatically
+MSCnrE_QSnkE_A=[10,298] !Changed automatically
+MSCnrE_QSnkE_B=[10,299] !Changed automatically
+MQSnkE_SCnrE_A=[10,301] !Changed automatically
+MQSnkE_SCnrE_B=[10,302] !Changed automatically
+MSCnrF_QSnkF_A=[10,304] !Changed automatically
+MSCnrF_QSnkF_B=[10,305] !Changed automatically
+MQSnkF_SCnrF_A=[10,307] !Changed automatically
+MQSnkF_SCnrF_B=[10,308] !Changed automatically
+MSCnrG_QSnkG_A=[10,310] !Changed automatically
+MSCnrG_QSnkG_B=[10,311] !Changed automatically
+MQSnkG_SCnrG_A=[10,313] !Changed automatically
+MQSnkG_SCnrG_B=[10,314] !Changed automatically
+MSCnrH_QSnkH_A=[10,316] !Changed automatically
+MSCnrH_QSnkH_B=[10,317] !Changed automatically
+MQSnkH_SCnrH_A=[10,319] !Changed automatically
+MQSnkH_SCnrH_B=[10,320] !Changed automatically
+MSCnrI_QSnkI_A=[10,322] !Changed automatically
+MSCnrI_QSnkI_B=[10,323] !Changed automatically
+MQSnkI_SCnrI_A=[10,325] !Changed automatically
+MQSnkI_SCnrI_B=[10,326] !Changed automatically
+MSCnrJ_QSnkJ_A=[10,328] !Changed automatically
+MSCnrJ_QSnkJ_B=[10,329] !Changed automatically
+MQSnkJ_SCnrJ_A=[10,331] !Changed automatically
+MQSnkJ_SCnrJ_B=[10,332] !Changed automatically
+MDTeeJ_SCnrZCold_A=[10,334] !Changed automatically
+MDTeeJ_SCnrZCold_B=[10,335] !Changed automatically
+MDTeeJ_SCnrZHot_A=[10,337] !Changed automatically
+MDTeeJ_SCnrZHot_B=[10,338] !Changed automatically
+MSCnrZ_SCnrZ_A=[10,340] !Changed automatically
+MSCnrZ_SCnrZ_B=[10,341] !Changed automatically
+MDTeeA_DTeeBCold_A=[10,343] !Changed automatically
+MDTeeA_DTeeBCold_B=[10,344] !Changed automatically
+MDTeeA_DTeeBHot_A=[10,346] !Changed automatically
+MDTeeA_DTeeBHot_B=[10,347] !Changed automatically
+MDTeeA_SCnrACold_A=[10,349] !Changed automatically
+MDTeeA_SCnrACold_B=[10,350] !Changed automatically
+MDTeeA_SCnrAHot_A=[10,352] !Changed automatically
+MDTeeA_SCnrAHot_B=[10,353] !Changed automatically
+MSCnr1_DTeeACold_A=[10,355] !Changed automatically
+MSCnr1_DTeeACold_B=[10,356] !Changed automatically
+MSCnr1_DTeeAHot_A=[10,358] !Changed automatically
+MSCnr1_DTeeAHot_B=[10,359] !Changed automatically
+
+
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 24
+** loop1
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+
+** loop2
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+
+** loop3
+Lloop3Rho = FwaterRho
+Lloop3Cp = FwaterCp
+
+** loop4
+Lloop4Rho = FwaterRho
+Lloop4Cp = FwaterCp
+
+** loop5
+Lloop5Rho = FwaterRho
+Lloop5Cp = FwaterCp
+
+** loop6
+Lloop6Rho = FwaterRho
+Lloop6Cp = FwaterCp
+
+** loop7
+Lloop7Rho = FwaterRho
+Lloop7Cp = FwaterCp
+
+** loop8
+Lloop8Rho = FwaterRho
+Lloop8Cp = FwaterCp
+
+** loop9
+Lloop9Rho = FwaterRho
+Lloop9Cp = FwaterCp
+
+** loop10
+Lloop10Rho = FwaterRho
+Lloop10Cp = FwaterCp
+
+** loop11
+Lloop11Rho = FwaterRho
+Lloop11Cp = FwaterCp
+
+** loop12
+Lloop12Rho = FwaterRho
+Lloop12Cp = FwaterCp
+
+
+! BEGIN SCnr1
+! cold pipe
+UNIT 11 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnr1Cold_A TSCnr1_DTeeACold TSCnr1_QSrc1
+***
+0 20 20
+EQUATIONS 1
+TSCnr1Cold = [11,1] !Changed automatically
+
+! hot pipe
+UNIT 12 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnr1Hot_A TQSrc1_SCnr1 TSCnr1_DTeeAHot
+***
+0 20 20
+EQUATIONS 1
+TSCnr1Hot = [12,1] !Changed automatically
+! END SCnr1
+
+
+UNIT 13 TYPE 929 !Changed automatically
+!DTeeACold
+PARAMETERS 0
+INPUTS 6
+MDTeeACold_A
+MDTeeACold_B
+MDTeeACold_C
+TDTeeA_DTeeBCold
+TSCnr1_DTeeACold
+TDTeeA_SCnrACold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeACold= [13,1] !Changed automatically
+
+UNIT 14 TYPE 929 !Changed automatically
+!DTeeAHot
+PARAMETERS 0
+INPUTS 6
+MDTeeAHot_A
+MDTeeAHot_B
+MDTeeAHot_C
+TDTeeA_DTeeBHot
+TSCnr1_DTeeAHot
+TDTeeA_SCnrAHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeAHot= [14,1] !Changed automatically
+
+! BEGIN SCnrA
+! cold pipe
+UNIT 15 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrACold_A TDTeeA_SCnrACold TQSnkA_SCnrA
+***
+0 20 20
+EQUATIONS 1
+TSCnrACold = [15,1] !Changed automatically
+
+! hot pipe
+UNIT 16 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrAHot_A TSCnrA_QSnkA TDTeeA_SCnrAHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrAHot = [16,1] !Changed automatically
+! END SCnrA
+
+
+! BEGIN SCnrB
+! cold pipe
+UNIT 17 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrBCold_A TDTeeB_SCnrBCold TQSnkB_SCnrB
+***
+0 20 20
+EQUATIONS 1
+TSCnrBCold = [17,1] !Changed automatically
+
+! hot pipe
+UNIT 18 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrBHot_A TSCnrB_QSnkB TDTeeB_SCnrBHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrBHot = [18,1] !Changed automatically
+! END SCnrB
+
+
+! BEGIN SCnrC
+! cold pipe
+UNIT 19 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrCCold_A TDTeeC_SCnrCCold TQSnkC_SCnrC
+***
+0 20 20
+EQUATIONS 1
+TSCnrCCold = [19,1] !Changed automatically
+
+! hot pipe
+UNIT 20 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrCHot_A TSCnrC_QSnkC TDTeeC_SCnrCHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrCHot = [20,1] !Changed automatically
+! END SCnrC
+
+
+! BEGIN SCnrD
+! cold pipe
+UNIT 21 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrDCold_A TDTeeD_SCnrDCold TQSnkD_SCnrD
+***
+0 20 20
+EQUATIONS 1
+TSCnrDCold = [21,1] !Changed automatically
+
+! hot pipe
+UNIT 22 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrDHot_A TSCnrD_QSnkD TDTeeD_SCnrDHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrDHot = [22,1] !Changed automatically
+! END SCnrD
+
+
+! BEGIN SCnrE
+! cold pipe
+UNIT 23 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrECold_A TDTeeE_SCnrECold TQSnkE_SCnrE
+***
+0 20 20
+EQUATIONS 1
+TSCnrECold = [23,1] !Changed automatically
+
+! hot pipe
+UNIT 24 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrEHot_A TSCnrE_QSnkE TDTeeE_SCnrEHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrEHot = [24,1] !Changed automatically
+! END SCnrE
+
+
+! BEGIN SCnrF
+! cold pipe
+UNIT 25 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrFCold_A TDTeeF_SCnrFCold TQSnkF_SCnrF
+***
+0 20 20
+EQUATIONS 1
+TSCnrFCold = [25,1] !Changed automatically
+
+! hot pipe
+UNIT 26 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrFHot_A TSCnrF_QSnkF TDTeeF_SCnrFHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrFHot = [26,1] !Changed automatically
+! END SCnrF
+
+
+! BEGIN SCnrG
+! cold pipe
+UNIT 27 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrGCold_A TDTeeG_SCnrGCold TQSnkG_SCnrG
+***
+0 20 20
+EQUATIONS 1
+TSCnrGCold = [27,1] !Changed automatically
+
+! hot pipe
+UNIT 28 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrGHot_A TSCnrG_QSnkG TDTeeG_SCnrGHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrGHot = [28,1] !Changed automatically
+! END SCnrG
+
+
+! BEGIN SCnrH
+! cold pipe
+UNIT 29 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrHCold_A TDTeeH_SCnrHCold TQSnkH_SCnrH
+***
+0 20 20
+EQUATIONS 1
+TSCnrHCold = [29,1] !Changed automatically
+
+! hot pipe
+UNIT 30 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrHHot_A TSCnrH_QSnkH TDTeeH_SCnrHHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrHHot = [30,1] !Changed automatically
+! END SCnrH
+
+
+! BEGIN SCnrI
+! cold pipe
+UNIT 31 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrICold_A TDTeeI_SCnrICold TQSnkI_SCnrI
+***
+0 20 20
+EQUATIONS 1
+TSCnrICold = [31,1] !Changed automatically
+
+! hot pipe
+UNIT 32 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrIHot_A TSCnrI_QSnkI TDTeeI_SCnrIHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrIHot = [32,1] !Changed automatically
+! END SCnrI
+
+
+! BEGIN SCnrJ
+! cold pipe
+UNIT 33 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrJCold_A TDTeeJ_SCnrJCold TQSnkJ_SCnrJ
+***
+0 20 20
+EQUATIONS 1
+TSCnrJCold = [33,1] !Changed automatically
+
+! hot pipe
+UNIT 34 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrJHot_A TSCnrJ_QSnkJ TDTeeJ_SCnrJHot
+***
+0 20 20
+EQUATIONS 1
+TSCnrJHot = [34,1] !Changed automatically
+! END SCnrJ
+
+
+UNIT 35 TYPE 929 !Changed automatically
+!DTeeBCold
+PARAMETERS 0
+INPUTS 6
+MDTeeBCold_A
+MDTeeBCold_B
+MDTeeBCold_C
+TDTeeB_DTeeCCold
+TDTeeA_DTeeBCold
+TDTeeB_SCnrBCold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeBCold= [35,1] !Changed automatically
+
+UNIT 36 TYPE 929 !Changed automatically
+!DTeeBHot
+PARAMETERS 0
+INPUTS 6
+MDTeeBHot_A
+MDTeeBHot_B
+MDTeeBHot_C
+TDTeeB_DTeeCHot
+TDTeeA_DTeeBHot
+TDTeeB_SCnrBHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeBHot= [36,1] !Changed automatically
+
+UNIT 37 TYPE 929 !Changed automatically
+!DTeeCCold
+PARAMETERS 0
+INPUTS 6
+MDTeeCCold_A
+MDTeeCCold_B
+MDTeeCCold_C
+TDTeeC_DTeeDCold
+TDTeeB_DTeeCCold
+TDTeeC_SCnrCCold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeCCold= [37,1] !Changed automatically
+
+UNIT 38 TYPE 929 !Changed automatically
+!DTeeCHot
+PARAMETERS 0
+INPUTS 6
+MDTeeCHot_A
+MDTeeCHot_B
+MDTeeCHot_C
+TDTeeC_DTeeDHot
+TDTeeB_DTeeCHot
+TDTeeC_SCnrCHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeCHot= [38,1] !Changed automatically
+
+UNIT 39 TYPE 929 !Changed automatically
+!DTeeDCold
+PARAMETERS 0
+INPUTS 6
+MDTeeDCold_A
+MDTeeDCold_B
+MDTeeDCold_C
+TDTeeD_DTeeECold
+TDTeeC_DTeeDCold
+TDTeeD_SCnrDCold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeDCold= [39,1] !Changed automatically
+
+UNIT 40 TYPE 929 !Changed automatically
+!DTeeDHot
+PARAMETERS 0
+INPUTS 6
+MDTeeDHot_A
+MDTeeDHot_B
+MDTeeDHot_C
+TDTeeD_DTeeEHot
+TDTeeC_DTeeDHot
+TDTeeD_SCnrDHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeDHot= [40,1] !Changed automatically
+
+UNIT 41 TYPE 929 !Changed automatically
+!DTeeECold
+PARAMETERS 0
+INPUTS 6
+MDTeeECold_A
+MDTeeECold_B
+MDTeeECold_C
+TDTeeE_DTeeFCold
+TDTeeD_DTeeECold
+TDTeeE_SCnrECold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeECold= [41,1] !Changed automatically
+
+UNIT 42 TYPE 929 !Changed automatically
+!DTeeEHot
+PARAMETERS 0
+INPUTS 6
+MDTeeEHot_A
+MDTeeEHot_B
+MDTeeEHot_C
+TDTeeE_DTeeFHot
+TDTeeD_DTeeEHot
+TDTeeE_SCnrEHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeEHot= [42,1] !Changed automatically
+
+UNIT 43 TYPE 929 !Changed automatically
+!DTeeFCold
+PARAMETERS 0
+INPUTS 6
+MDTeeFCold_A
+MDTeeFCold_B
+MDTeeFCold_C
+TDTeeF_DTeeGCold
+TDTeeE_DTeeFCold
+TDTeeF_SCnrFCold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeFCold= [43,1] !Changed automatically
+
+UNIT 44 TYPE 929 !Changed automatically
+!DTeeFHot
+PARAMETERS 0
+INPUTS 6
+MDTeeFHot_A
+MDTeeFHot_B
+MDTeeFHot_C
+TDTeeF_DTeeGHot
+TDTeeE_DTeeFHot
+TDTeeF_SCnrFHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeFHot= [44,1] !Changed automatically
+
+UNIT 45 TYPE 929 !Changed automatically
+!DTeeGCold
+PARAMETERS 0
+INPUTS 6
+MDTeeGCold_A
+MDTeeGCold_B
+MDTeeGCold_C
+TDTeeG_DTeeHCold
+TDTeeF_DTeeGCold
+TDTeeG_SCnrGCold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeGCold= [45,1] !Changed automatically
+
+UNIT 46 TYPE 929 !Changed automatically
+!DTeeGHot
+PARAMETERS 0
+INPUTS 6
+MDTeeGHot_A
+MDTeeGHot_B
+MDTeeGHot_C
+TDTeeG_DTeeHHot
+TDTeeF_DTeeGHot
+TDTeeG_SCnrGHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeGHot= [46,1] !Changed automatically
+
+UNIT 47 TYPE 929 !Changed automatically
+!DTeeHCold
+PARAMETERS 0
+INPUTS 6
+MDTeeHCold_A
+MDTeeHCold_B
+MDTeeHCold_C
+TDTeeH_DTeeICold
+TDTeeG_DTeeHCold
+TDTeeH_SCnrHCold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeHCold= [47,1] !Changed automatically
+
+UNIT 48 TYPE 929 !Changed automatically
+!DTeeHHot
+PARAMETERS 0
+INPUTS 6
+MDTeeHHot_A
+MDTeeHHot_B
+MDTeeHHot_C
+TDTeeH_DTeeIHot
+TDTeeG_DTeeHHot
+TDTeeH_SCnrHHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeHHot= [48,1] !Changed automatically
+
+UNIT 49 TYPE 929 !Changed automatically
+!DTeeICold
+PARAMETERS 0
+INPUTS 6
+MDTeeICold_A
+MDTeeICold_B
+MDTeeICold_C
+TDTeeI_DTeeJCold
+TDTeeH_DTeeICold
+TDTeeI_SCnrICold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeICold= [49,1] !Changed automatically
+
+UNIT 50 TYPE 929 !Changed automatically
+!DTeeIHot
+PARAMETERS 0
+INPUTS 6
+MDTeeIHot_A
+MDTeeIHot_B
+MDTeeIHot_C
+TDTeeI_DTeeJHot
+TDTeeH_DTeeIHot
+TDTeeI_SCnrIHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeIHot= [50,1] !Changed automatically
+
+UNIT 51 TYPE 929 !Changed automatically
+!DTeeJCold
+PARAMETERS 0
+INPUTS 6
+MDTeeJCold_A
+MDTeeJCold_B
+MDTeeJCold_C
+TDTeeJ_SCnrZCold
+TDTeeI_DTeeJCold
+TDTeeJ_SCnrJCold
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeJCold= [51,1] !Changed automatically
+
+UNIT 52 TYPE 929 !Changed automatically
+!DTeeJHot
+PARAMETERS 0
+INPUTS 6
+MDTeeJHot_A
+MDTeeJHot_B
+MDTeeJHot_C
+TDTeeJ_SCnrZHot
+TDTeeI_DTeeJHot
+TDTeeJ_SCnrJHot
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TDTeeJHot= [52,1] !Changed automatically
+
+UNIT 53 TYPE 9511 !Changed automatically
+! DTeeB_DTeeC
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeCCold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeB_DTeeCCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeBCold ! ! Other side of pipe - cold pipe, deg C
+TDTeeBHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeB_DTeeCHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeCHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeB_DTeeCCold = [53,1]   !Changed automatically
+MDTeeB_DTeeCCold = MDTeeB_DTeeCCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeB_DTeeCHot = [53,3]   !Changed automatically
+MDTeeB_DTeeCHot = MDTeeB_DTeeCHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeB_DTeeCColdConv = [53,7]*-1*1/3600  !Changed automatically
+DTeeB_DTeeCColdInt = [53,9]*1/3600  !Changed automatically
+DTeeB_DTeeCColdDiss = [53,11]*1/3600  !Changed automatically
+DTeeB_DTeeCHotConv = [53,8]*-1*1/3600  !Changed automatically
+DTeeB_DTeeCHotInt = [53,10]*1/3600  !Changed automatically
+DTeeB_DTeeCHotDiss = [53,12]*1/3600  !Changed automatically
+DTeeB_DTeeCExch = [53,13]*1/3600  !Changed automatically
+DTeeB_DTeeCGrSl = [53,14]*1/3600  !Changed automatically
+DTeeB_DTeeCSlFf = [53,15]*1/3600  !Changed automatically
+DTeeB_DTeeCSlInt = [53,16]*1/3600  !Changed automatically
+
+UNIT 54 TYPE 9511 !Changed automatically
+! DTeeC_DTeeD
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeDCold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeC_DTeeDCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeCCold ! ! Other side of pipe - cold pipe, deg C
+TDTeeCHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeC_DTeeDHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeDHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeC_DTeeDCold = [54,1]   !Changed automatically
+MDTeeC_DTeeDCold = MDTeeC_DTeeDCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeC_DTeeDHot = [54,3]   !Changed automatically
+MDTeeC_DTeeDHot = MDTeeC_DTeeDHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeC_DTeeDColdConv = [54,7]*-1*1/3600  !Changed automatically
+DTeeC_DTeeDColdInt = [54,9]*1/3600  !Changed automatically
+DTeeC_DTeeDColdDiss = [54,11]*1/3600  !Changed automatically
+DTeeC_DTeeDHotConv = [54,8]*-1*1/3600  !Changed automatically
+DTeeC_DTeeDHotInt = [54,10]*1/3600  !Changed automatically
+DTeeC_DTeeDHotDiss = [54,12]*1/3600  !Changed automatically
+DTeeC_DTeeDExch = [54,13]*1/3600  !Changed automatically
+DTeeC_DTeeDGrSl = [54,14]*1/3600  !Changed automatically
+DTeeC_DTeeDSlFf = [54,15]*1/3600  !Changed automatically
+DTeeC_DTeeDSlInt = [54,16]*1/3600  !Changed automatically
+
+UNIT 55 TYPE 9511 !Changed automatically
+! DTeeD_DTeeE
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeECold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeD_DTeeECold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeDCold ! ! Other side of pipe - cold pipe, deg C
+TDTeeDHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeD_DTeeEHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeEHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeD_DTeeECold = [55,1]   !Changed automatically
+MDTeeD_DTeeECold = MDTeeD_DTeeECold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeD_DTeeEHot = [55,3]   !Changed automatically
+MDTeeD_DTeeEHot = MDTeeD_DTeeEHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeD_DTeeEColdConv = [55,7]*-1*1/3600  !Changed automatically
+DTeeD_DTeeEColdInt = [55,9]*1/3600  !Changed automatically
+DTeeD_DTeeEColdDiss = [55,11]*1/3600  !Changed automatically
+DTeeD_DTeeEHotConv = [55,8]*-1*1/3600  !Changed automatically
+DTeeD_DTeeEHotInt = [55,10]*1/3600  !Changed automatically
+DTeeD_DTeeEHotDiss = [55,12]*1/3600  !Changed automatically
+DTeeD_DTeeEExch = [55,13]*1/3600  !Changed automatically
+DTeeD_DTeeEGrSl = [55,14]*1/3600  !Changed automatically
+DTeeD_DTeeESlFf = [55,15]*1/3600  !Changed automatically
+DTeeD_DTeeESlInt = [55,16]*1/3600  !Changed automatically
+
+UNIT 56 TYPE 9511 !Changed automatically
+! DTeeE_DTeeF
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeFCold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeE_DTeeFCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeECold ! ! Other side of pipe - cold pipe, deg C
+TDTeeEHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeE_DTeeFHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeFHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeE_DTeeFCold = [56,1]   !Changed automatically
+MDTeeE_DTeeFCold = MDTeeE_DTeeFCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeE_DTeeFHot = [56,3]   !Changed automatically
+MDTeeE_DTeeFHot = MDTeeE_DTeeFHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeE_DTeeFColdConv = [56,7]*-1*1/3600  !Changed automatically
+DTeeE_DTeeFColdInt = [56,9]*1/3600  !Changed automatically
+DTeeE_DTeeFColdDiss = [56,11]*1/3600  !Changed automatically
+DTeeE_DTeeFHotConv = [56,8]*-1*1/3600  !Changed automatically
+DTeeE_DTeeFHotInt = [56,10]*1/3600  !Changed automatically
+DTeeE_DTeeFHotDiss = [56,12]*1/3600  !Changed automatically
+DTeeE_DTeeFExch = [56,13]*1/3600  !Changed automatically
+DTeeE_DTeeFGrSl = [56,14]*1/3600  !Changed automatically
+DTeeE_DTeeFSlFf = [56,15]*1/3600  !Changed automatically
+DTeeE_DTeeFSlInt = [56,16]*1/3600  !Changed automatically
+
+UNIT 57 TYPE 9511 !Changed automatically
+! DTeeF_DTeeG
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeGCold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeF_DTeeGCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeFCold ! ! Other side of pipe - cold pipe, deg C
+TDTeeFHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeF_DTeeGHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeGHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeF_DTeeGCold = [57,1]   !Changed automatically
+MDTeeF_DTeeGCold = MDTeeF_DTeeGCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeF_DTeeGHot = [57,3]   !Changed automatically
+MDTeeF_DTeeGHot = MDTeeF_DTeeGHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeF_DTeeGColdConv = [57,7]*-1*1/3600  !Changed automatically
+DTeeF_DTeeGColdInt = [57,9]*1/3600  !Changed automatically
+DTeeF_DTeeGColdDiss = [57,11]*1/3600  !Changed automatically
+DTeeF_DTeeGHotConv = [57,8]*-1*1/3600  !Changed automatically
+DTeeF_DTeeGHotInt = [57,10]*1/3600  !Changed automatically
+DTeeF_DTeeGHotDiss = [57,12]*1/3600  !Changed automatically
+DTeeF_DTeeGExch = [57,13]*1/3600  !Changed automatically
+DTeeF_DTeeGGrSl = [57,14]*1/3600  !Changed automatically
+DTeeF_DTeeGSlFf = [57,15]*1/3600  !Changed automatically
+DTeeF_DTeeGSlInt = [57,16]*1/3600  !Changed automatically
+
+UNIT 58 TYPE 9511 !Changed automatically
+! DTeeG_DTeeH
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeHCold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeG_DTeeHCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeGCold ! ! Other side of pipe - cold pipe, deg C
+TDTeeGHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeG_DTeeHHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeHHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeG_DTeeHCold = [58,1]   !Changed automatically
+MDTeeG_DTeeHCold = MDTeeG_DTeeHCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeG_DTeeHHot = [58,3]   !Changed automatically
+MDTeeG_DTeeHHot = MDTeeG_DTeeHHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeG_DTeeHColdConv = [58,7]*-1*1/3600  !Changed automatically
+DTeeG_DTeeHColdInt = [58,9]*1/3600  !Changed automatically
+DTeeG_DTeeHColdDiss = [58,11]*1/3600  !Changed automatically
+DTeeG_DTeeHHotConv = [58,8]*-1*1/3600  !Changed automatically
+DTeeG_DTeeHHotInt = [58,10]*1/3600  !Changed automatically
+DTeeG_DTeeHHotDiss = [58,12]*1/3600  !Changed automatically
+DTeeG_DTeeHExch = [58,13]*1/3600  !Changed automatically
+DTeeG_DTeeHGrSl = [58,14]*1/3600  !Changed automatically
+DTeeG_DTeeHSlFf = [58,15]*1/3600  !Changed automatically
+DTeeG_DTeeHSlInt = [58,16]*1/3600  !Changed automatically
+
+UNIT 59 TYPE 9511 !Changed automatically
+! DTeeH_DTeeI
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeICold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeH_DTeeICold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeHCold ! ! Other side of pipe - cold pipe, deg C
+TDTeeHHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeH_DTeeIHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeIHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeH_DTeeICold = [59,1]   !Changed automatically
+MDTeeH_DTeeICold = MDTeeH_DTeeICold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeH_DTeeIHot = [59,3]   !Changed automatically
+MDTeeH_DTeeIHot = MDTeeH_DTeeIHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeH_DTeeIColdConv = [59,7]*-1*1/3600  !Changed automatically
+DTeeH_DTeeIColdInt = [59,9]*1/3600  !Changed automatically
+DTeeH_DTeeIColdDiss = [59,11]*1/3600  !Changed automatically
+DTeeH_DTeeIHotConv = [59,8]*-1*1/3600  !Changed automatically
+DTeeH_DTeeIHotInt = [59,10]*1/3600  !Changed automatically
+DTeeH_DTeeIHotDiss = [59,12]*1/3600  !Changed automatically
+DTeeH_DTeeIExch = [59,13]*1/3600  !Changed automatically
+DTeeH_DTeeIGrSl = [59,14]*1/3600  !Changed automatically
+DTeeH_DTeeISlFf = [59,15]*1/3600  !Changed automatically
+DTeeH_DTeeISlInt = [59,16]*1/3600  !Changed automatically
+
+UNIT 60 TYPE 9511 !Changed automatically
+! DTeeI_DTeeJ
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeJCold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeI_DTeeJCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeICold ! ! Other side of pipe - cold pipe, deg C
+TDTeeIHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeI_DTeeJHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeJHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeI_DTeeJCold = [60,1]   !Changed automatically
+MDTeeI_DTeeJCold = MDTeeI_DTeeJCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeI_DTeeJHot = [60,3]   !Changed automatically
+MDTeeI_DTeeJHot = MDTeeI_DTeeJHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeI_DTeeJColdConv = [60,7]*-1*1/3600  !Changed automatically
+DTeeI_DTeeJColdInt = [60,9]*1/3600  !Changed automatically
+DTeeI_DTeeJColdDiss = [60,11]*1/3600  !Changed automatically
+DTeeI_DTeeJHotConv = [60,8]*-1*1/3600  !Changed automatically
+DTeeI_DTeeJHotInt = [60,10]*1/3600  !Changed automatically
+DTeeI_DTeeJHotDiss = [60,12]*1/3600  !Changed automatically
+DTeeI_DTeeJExch = [60,13]*1/3600  !Changed automatically
+DTeeI_DTeeJGrSl = [60,14]*1/3600  !Changed automatically
+DTeeI_DTeeJSlFf = [60,15]*1/3600  !Changed automatically
+DTeeI_DTeeJSlInt = [60,16]*1/3600  !Changed automatically
+
+! BEGIN DTeeB_SCnrB
+! cold pipe
+UNIT 61 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeB_SCnrBCold_A TSCnrBCold TDTeeBCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeB_SCnrBCold = [61,1] !Changed automatically
+MDTeeB_SCnrBCold = MDTeeB_SCnrBCold_A
+
+! hot pipe
+UNIT 62 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeB_SCnrBHot_A TDTeeBHot TSCnrBHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeB_SCnrBHot = [62,1] !Changed automatically
+MDTeeB_SCnrBHot = MDTeeB_SCnrBHot_A
+! END DTeeB_SCnrB
+
+
+! BEGIN DTeeC_SCnrC
+! cold pipe
+UNIT 63 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeC_SCnrCCold_A TSCnrCCold TDTeeCCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeC_SCnrCCold = [63,1] !Changed automatically
+MDTeeC_SCnrCCold = MDTeeC_SCnrCCold_A
+
+! hot pipe
+UNIT 64 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeC_SCnrCHot_A TDTeeCHot TSCnrCHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeC_SCnrCHot = [64,1] !Changed automatically
+MDTeeC_SCnrCHot = MDTeeC_SCnrCHot_A
+! END DTeeC_SCnrC
+
+
+! BEGIN DTeeD_SCnrD
+! cold pipe
+UNIT 65 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeD_SCnrDCold_A TSCnrDCold TDTeeDCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeD_SCnrDCold = [65,1] !Changed automatically
+MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A
+
+! hot pipe
+UNIT 66 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeD_SCnrDHot_A TDTeeDHot TSCnrDHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeD_SCnrDHot = [66,1] !Changed automatically
+MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
+! END DTeeD_SCnrD
+
+
+! BEGIN DTeeE_SCnrE
+! cold pipe
+UNIT 67 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeE_SCnrECold_A TSCnrECold TDTeeECold
+***
+0 20 20
+EQUATIONS 2
+TDTeeE_SCnrECold = [67,1] !Changed automatically
+MDTeeE_SCnrECold = MDTeeE_SCnrECold_A
+
+! hot pipe
+UNIT 68 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeE_SCnrEHot_A TDTeeEHot TSCnrEHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeE_SCnrEHot = [68,1] !Changed automatically
+MDTeeE_SCnrEHot = MDTeeE_SCnrEHot_A
+! END DTeeE_SCnrE
+
+
+! BEGIN DTeeF_SCnrF
+! cold pipe
+UNIT 69 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeF_SCnrFCold_A TSCnrFCold TDTeeFCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeF_SCnrFCold = [69,1] !Changed automatically
+MDTeeF_SCnrFCold = MDTeeF_SCnrFCold_A
+
+! hot pipe
+UNIT 70 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeF_SCnrFHot_A TDTeeFHot TSCnrFHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeF_SCnrFHot = [70,1] !Changed automatically
+MDTeeF_SCnrFHot = MDTeeF_SCnrFHot_A
+! END DTeeF_SCnrF
+
+
+! BEGIN DTeeG_SCnrG
+! cold pipe
+UNIT 71 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeG_SCnrGCold_A TSCnrGCold TDTeeGCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeG_SCnrGCold = [71,1] !Changed automatically
+MDTeeG_SCnrGCold = MDTeeG_SCnrGCold_A
+
+! hot pipe
+UNIT 72 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeG_SCnrGHot_A TDTeeGHot TSCnrGHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeG_SCnrGHot = [72,1] !Changed automatically
+MDTeeG_SCnrGHot = MDTeeG_SCnrGHot_A
+! END DTeeG_SCnrG
+
+
+! BEGIN DTeeH_SCnrH
+! cold pipe
+UNIT 73 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeH_SCnrHCold_A TSCnrHCold TDTeeHCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeH_SCnrHCold = [73,1] !Changed automatically
+MDTeeH_SCnrHCold = MDTeeH_SCnrHCold_A
+
+! hot pipe
+UNIT 74 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeH_SCnrHHot_A TDTeeHHot TSCnrHHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeH_SCnrHHot = [74,1] !Changed automatically
+MDTeeH_SCnrHHot = MDTeeH_SCnrHHot_A
+! END DTeeH_SCnrH
+
+
+! BEGIN DTeeI_SCnrI
+! cold pipe
+UNIT 75 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeI_SCnrICold_A TSCnrICold TDTeeICold
+***
+0 20 20
+EQUATIONS 2
+TDTeeI_SCnrICold = [75,1] !Changed automatically
+MDTeeI_SCnrICold = MDTeeI_SCnrICold_A
+
+! hot pipe
+UNIT 76 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeI_SCnrIHot_A TDTeeIHot TSCnrIHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeI_SCnrIHot = [76,1] !Changed automatically
+MDTeeI_SCnrIHot = MDTeeI_SCnrIHot_A
+! END DTeeI_SCnrI
+
+
+! BEGIN DTeeJ_SCnrJ
+! cold pipe
+UNIT 77 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeJ_SCnrJCold_A TSCnrJCold TDTeeJCold
+***
+0 20 20
+EQUATIONS 2
+TDTeeJ_SCnrJCold = [77,1] !Changed automatically
+MDTeeJ_SCnrJCold = MDTeeJ_SCnrJCold_A
+
+! hot pipe
+UNIT 78 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeJ_SCnrJHot_A TDTeeJHot TSCnrJHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeJ_SCnrJHot = [78,1] !Changed automatically
+MDTeeJ_SCnrJHot = MDTeeJ_SCnrJHot_A
+! END DTeeJ_SCnrJ
+
+
+! BEGIN SCnr99
+! cold pipe
+UNIT 79 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnr99Cold_A TDTeeJ_SCnrZCold TSCnrZ_SCnrZ
+***
+0 20 20
+EQUATIONS 1
+TSCnr99Cold = [79,1] !Changed automatically
+
+! hot pipe
+UNIT 80 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnr99Hot_A TSCnrZ_SCnrZ TDTeeJ_SCnrZHot
+***
+0 20 20
+EQUATIONS 1
+TSCnr99Hot = [80,1] !Changed automatically
+! END SCnr99
+
+
+
+! SCnr1_QSrc1
+UNIT 81 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnr1_QSrc1_A TSCnr1Cold TQSrc1H
+***
+0 20 20
+EQUATIONS 2
+TSCnr1_QSrc1 = [81,1] !Changed automatically
+MSCnr1_QSrc1 = MSCnr1_QSrc1_A
+
+
+! QSrc1_SCnr1
+UNIT 82 TYPE 222 !Changed automatically
+INPUTS 3
+MQSrc1_SCnr1_A TQSrc1H TSCnr1Hot
+***
+0 20 20
+EQUATIONS 2
+TQSrc1_SCnr1 = [82,1] !Changed automatically
+MQSrc1_SCnr1 = MQSrc1_SCnr1_A
+
+
+! SCnrA_QSnkA
+UNIT 83 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrA_QSnkA_A TSCnrAHot TQSnkAH
+***
+0 20 20
+EQUATIONS 2
+TSCnrA_QSnkA = [83,1] !Changed automatically
+MSCnrA_QSnkA = MSCnrA_QSnkA_A
+
+
+! QSnkA_SCnrA
+UNIT 84 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkA_SCnrA_A TQSnkAH TSCnrACold
+***
+0 20 20
+EQUATIONS 2
+TQSnkA_SCnrA = [84,1] !Changed automatically
+MQSnkA_SCnrA = MQSnkA_SCnrA_A
+
+
+! SCnrB_QSnkB
+UNIT 85 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrB_QSnkB_A TSCnrBHot TQSnkBH
+***
+0 20 20
+EQUATIONS 2
+TSCnrB_QSnkB = [85,1] !Changed automatically
+MSCnrB_QSnkB = MSCnrB_QSnkB_A
+
+
+! QSnkB_SCnrB
+UNIT 86 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkB_SCnrB_A TQSnkBH TSCnrBCold
+***
+0 20 20
+EQUATIONS 2
+TQSnkB_SCnrB = [86,1] !Changed automatically
+MQSnkB_SCnrB = MQSnkB_SCnrB_A
+
+
+! SCnrC_QSnkC
+UNIT 87 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrC_QSnkC_A TSCnrCHot TQSnkCH
+***
+0 20 20
+EQUATIONS 2
+TSCnrC_QSnkC = [87,1] !Changed automatically
+MSCnrC_QSnkC = MSCnrC_QSnkC_A
+
+
+! QSnkC_SCnrC
+UNIT 88 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkC_SCnrC_A TQSnkCH TSCnrCCold
+***
+0 20 20
+EQUATIONS 2
+TQSnkC_SCnrC = [88,1] !Changed automatically
+MQSnkC_SCnrC = MQSnkC_SCnrC_A
+
+
+! SCnrD_QSnkD
+UNIT 89 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrD_QSnkD_A TSCnrDHot TQSnkDH
+***
+0 20 20
+EQUATIONS 2
+TSCnrD_QSnkD = [89,1] !Changed automatically
+MSCnrD_QSnkD = MSCnrD_QSnkD_A
+
+
+! QSnkD_SCnrD
+UNIT 90 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkD_SCnrD_A TQSnkDH TSCnrDCold
+***
+0 20 20
+EQUATIONS 2
+TQSnkD_SCnrD = [90,1] !Changed automatically
+MQSnkD_SCnrD = MQSnkD_SCnrD_A
+
+
+! SCnrE_QSnkE
+UNIT 91 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrE_QSnkE_A TSCnrEHot TQSnkEH
+***
+0 20 20
+EQUATIONS 2
+TSCnrE_QSnkE = [91,1] !Changed automatically
+MSCnrE_QSnkE = MSCnrE_QSnkE_A
+
+
+! QSnkE_SCnrE
+UNIT 92 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkE_SCnrE_A TQSnkEH TSCnrECold
+***
+0 20 20
+EQUATIONS 2
+TQSnkE_SCnrE = [92,1] !Changed automatically
+MQSnkE_SCnrE = MQSnkE_SCnrE_A
+
+
+! SCnrF_QSnkF
+UNIT 93 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrF_QSnkF_A TSCnrFHot TQSnkFH
+***
+0 20 20
+EQUATIONS 2
+TSCnrF_QSnkF = [93,1] !Changed automatically
+MSCnrF_QSnkF = MSCnrF_QSnkF_A
+
+
+! QSnkF_SCnrF
+UNIT 94 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkF_SCnrF_A TQSnkFH TSCnrFCold
+***
+0 20 20
+EQUATIONS 2
+TQSnkF_SCnrF = [94,1] !Changed automatically
+MQSnkF_SCnrF = MQSnkF_SCnrF_A
+
+
+! SCnrG_QSnkG
+UNIT 95 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrG_QSnkG_A TSCnrGHot TQSnkGH
+***
+0 20 20
+EQUATIONS 2
+TSCnrG_QSnkG = [95,1] !Changed automatically
+MSCnrG_QSnkG = MSCnrG_QSnkG_A
+
+
+! QSnkG_SCnrG
+UNIT 96 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkG_SCnrG_A TQSnkGH TSCnrGCold
+***
+0 20 20
+EQUATIONS 2
+TQSnkG_SCnrG = [96,1] !Changed automatically
+MQSnkG_SCnrG = MQSnkG_SCnrG_A
+
+
+! SCnrH_QSnkH
+UNIT 97 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrH_QSnkH_A TSCnrHHot TQSnkHH
+***
+0 20 20
+EQUATIONS 2
+TSCnrH_QSnkH = [97,1] !Changed automatically
+MSCnrH_QSnkH = MSCnrH_QSnkH_A
+
+
+! QSnkH_SCnrH
+UNIT 98 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkH_SCnrH_A TQSnkHH TSCnrHCold
+***
+0 20 20
+EQUATIONS 2
+TQSnkH_SCnrH = [98,1] !Changed automatically
+MQSnkH_SCnrH = MQSnkH_SCnrH_A
+
+
+! SCnrI_QSnkI
+UNIT 99 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrI_QSnkI_A TSCnrIHot TQSnkIH
+***
+0 20 20
+EQUATIONS 2
+TSCnrI_QSnkI = [99,1] !Changed automatically
+MSCnrI_QSnkI = MSCnrI_QSnkI_A
+
+
+! QSnkI_SCnrI
+UNIT 100 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkI_SCnrI_A TQSnkIH TSCnrICold
+***
+0 20 20
+EQUATIONS 2
+TQSnkI_SCnrI = [100,1] !Changed automatically
+MQSnkI_SCnrI = MQSnkI_SCnrI_A
+
+
+! SCnrJ_QSnkJ
+UNIT 101 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrJ_QSnkJ_A TSCnrJHot TQSnkJH
+***
+0 20 20
+EQUATIONS 2
+TSCnrJ_QSnkJ = [101,1] !Changed automatically
+MSCnrJ_QSnkJ = MSCnrJ_QSnkJ_A
+
+
+! QSnkJ_SCnrJ
+UNIT 102 TYPE 222 !Changed automatically
+INPUTS 3
+MQSnkJ_SCnrJ_A TQSnkJH TSCnrJCold
+***
+0 20 20
+EQUATIONS 2
+TQSnkJ_SCnrJ = [102,1] !Changed automatically
+MQSnkJ_SCnrJ = MQSnkJ_SCnrJ_A
+
+UNIT 103 TYPE 9511 !Changed automatically
+! DTeeJ_SCnrZ
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TSCnr99Cold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeJ_SCnrZCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeJCold ! ! Other side of pipe - cold pipe, deg C
+TDTeeJHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeJ_SCnrZHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TSCnr99Hot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeJ_SCnrZCold = [103,1]   !Changed automatically
+MDTeeJ_SCnrZCold = MDTeeJ_SCnrZCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeJ_SCnrZHot = [103,3]   !Changed automatically
+MDTeeJ_SCnrZHot = MDTeeJ_SCnrZHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeJ_SCnrZColdConv = [103,7]*-1*1/3600  !Changed automatically
+DTeeJ_SCnrZColdInt = [103,9]*1/3600  !Changed automatically
+DTeeJ_SCnrZColdDiss = [103,11]*1/3600  !Changed automatically
+DTeeJ_SCnrZHotConv = [103,8]*-1*1/3600  !Changed automatically
+DTeeJ_SCnrZHotInt = [103,10]*1/3600  !Changed automatically
+DTeeJ_SCnrZHotDiss = [103,12]*1/3600  !Changed automatically
+DTeeJ_SCnrZExch = [103,13]*1/3600  !Changed automatically
+DTeeJ_SCnrZGrSl = [103,14]*1/3600  !Changed automatically
+DTeeJ_SCnrZSlFf = [103,15]*1/3600  !Changed automatically
+DTeeJ_SCnrZSlInt = [103,16]*1/3600  !Changed automatically
+
+
+! SCnrZ_SCnrZ
+UNIT 104 TYPE 222 !Changed automatically
+INPUTS 3
+MSCnrZ_SCnrZ_A TSCnr99Hot TSCnr99Cold
+***
+0 20 20
+EQUATIONS 2
+TSCnrZ_SCnrZ = [104,1] !Changed automatically
+MSCnrZ_SCnrZ = MSCnrZ_SCnrZ_A
+
+UNIT 105 TYPE 9511 !Changed automatically
+! DTeeA_DTeeB
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeBCold ! Inlet fluid temperature - cold pipe, deg C
+MDTeeA_DTeeBCold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TDTeeACold ! ! Other side of pipe - cold pipe, deg C
+TDTeeAHot ! Inlet fluid temperature - hot pipe, deg C
+MDTeeA_DTeeBHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeBHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TDTeeA_DTeeBCold = [105,1]   !Changed automatically
+MDTeeA_DTeeBCold = MDTeeA_DTeeBCold_A  ! Outlet mass flow rate, kg/h
+
+TDTeeA_DTeeBHot = [105,3]   !Changed automatically
+MDTeeA_DTeeBHot = MDTeeA_DTeeBHot_A  ! Outlet mass flow rate, kg/h
+
+DTeeA_DTeeBColdConv = [105,7]*-1*1/3600  !Changed automatically
+DTeeA_DTeeBColdInt = [105,9]*1/3600  !Changed automatically
+DTeeA_DTeeBColdDiss = [105,11]*1/3600  !Changed automatically
+DTeeA_DTeeBHotConv = [105,8]*-1*1/3600  !Changed automatically
+DTeeA_DTeeBHotInt = [105,10]*1/3600  !Changed automatically
+DTeeA_DTeeBHotDiss = [105,12]*1/3600  !Changed automatically
+DTeeA_DTeeBExch = [105,13]*1/3600  !Changed automatically
+DTeeA_DTeeBGrSl = [105,14]*1/3600  !Changed automatically
+DTeeA_DTeeBSlFf = [105,15]*1/3600  !Changed automatically
+DTeeA_DTeeBSlInt = [105,16]*1/3600  !Changed automatically
+
+! BEGIN DTeeA_SCnrA
+! cold pipe
+UNIT 106 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeA_SCnrACold_A TSCnrACold TDTeeACold
+***
+0 20 20
+EQUATIONS 2
+TDTeeA_SCnrACold = [106,1] !Changed automatically
+MDTeeA_SCnrACold = MDTeeA_SCnrACold_A
+
+! hot pipe
+UNIT 107 TYPE 222 !Changed automatically
+INPUTS 3
+MDTeeA_SCnrAHot_A TDTeeAHot TSCnrAHot
+***
+0 20 20
+EQUATIONS 2
+TDTeeA_SCnrAHot = [107,1] !Changed automatically
+MDTeeA_SCnrAHot = MDTeeA_SCnrAHot_A
+! END DTeeA_SCnrA
+
+
+UNIT 108 TYPE 9511 !Changed automatically
+! SCnr1_DTeeA
+PARAMETERS 36
+****** pipe and soil properties ******
+2.0                                ! Length of buried pipe, m
+dpDiamIn                                ! Inner diameter of pipes, m
+dpDiamOut                               ! Outer diameter of pipes, m
+dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
+dpDepth                                 ! Buried pipe depth, m
+dpDiamCase                              ! Diameter of casing material, m
+dpLambdaFill                            ! Thermal conductivity of fill insulation, kJ/(h*m*K)
+dpDistPtoP                              ! Center-to-center pipe spacing, m
+dpLambdaGap                             ! Thermal conductivity of gap material, kJ/(h*m*K)
+dpGapThick                              ! Gap thickness, m
+****** fluid properties ******
+dpRhoFlu                                ! Density of fluid, kg/m^3
+dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m*K)
+dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
+dpViscFl                                ! Viscosity of fluid, kg/(m*h)
+****** initial conditions ******
+dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
+dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+****** thermal properties soil ******
+dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
+dpRhoSl                                 ! Density of soil, kg/m^3
+dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
+****** general temperature dependency (dependent on weather data) ******
+TambAvg                                 ! Average surface temperature, deg C
+dTambAmpl                               ! Amplitude of surface temperature, deg C
+ddTcwOffset                             ! Days of minimum surface temperature
+****** definition of nodes ******
+dpNrFlNds                               ! Number of fluid nodes
+dpNrSlRad                               ! Number of radial soil nodes
+dpNrSlAx                                ! Number of axial soil nodes
+dpNrSlCirc                              ! Number of circumferential soil nodes
+dpRadNdDist                             ! Radial distance of node 1, m
+dpRadNdDist                             ! Radial distance of node 2, m
+dpRadNdDist                             ! Radial distance of node 3, m
+dpRadNdDist                             ! Radial distance of node 4, m
+dpRadNdDist                             ! Radial distance of node 5, m
+dpRadNdDist                             ! Radial distance of node 6, m
+dpRadNdDist                             ! Radial distance of node 7, m
+dpRadNdDist                             ! Radial distance of node 8, m
+dpRadNdDist                             ! Radial distance of node 9, m
+dpRadNdDist                             ! Radial distance of node 10, m
+
+INPUTS 6
+TDTeeACold ! Inlet fluid temperature - cold pipe, deg C
+MSCnr1_DTeeACold_A ! Inlet fluid flow rate - cold pipe, kg/h
+TSCnr1Cold ! ! Other side of pipe - cold pipe, deg C
+TSCnr1Hot ! Inlet fluid temperature - hot pipe, deg C
+MSCnr1_DTeeAHot_A ! Inlet fluid flow rate - hot pipe, kg/h
+TDTeeAHot ! ! Other side of pipe - hot pipe, deg C
+*** initial values
+dpTIniCold
+0
+dpTIniCold
+dpTIniHot
+0
+dpTIniHot
+
+EQUATIONS 14
+TSCnr1_DTeeACold = [108,1]   !Changed automatically
+MSCnr1_DTeeACold = MSCnr1_DTeeACold_A  ! Outlet mass flow rate, kg/h
+
+TSCnr1_DTeeAHot = [108,3]   !Changed automatically
+MSCnr1_DTeeAHot = MSCnr1_DTeeAHot_A  ! Outlet mass flow rate, kg/h
+
+SCnr1_DTeeAColdConv = [108,7]*-1*1/3600  !Changed automatically
+SCnr1_DTeeAColdInt = [108,9]*1/3600  !Changed automatically
+SCnr1_DTeeAColdDiss = [108,11]*1/3600  !Changed automatically
+SCnr1_DTeeAHotConv = [108,8]*-1*1/3600  !Changed automatically
+SCnr1_DTeeAHotInt = [108,10]*1/3600  !Changed automatically
+SCnr1_DTeeAHotDiss = [108,12]*1/3600  !Changed automatically
+SCnr1_DTeeAExch = [108,13]*1/3600  !Changed automatically
+SCnr1_DTeeAGrSl = [108,14]*1/3600  !Changed automatically
+SCnr1_DTeeASlFf = [108,15]*1/3600  !Changed automatically
+SCnr1_DTeeASlInt = [108,16]*1/3600  !Changed automatically
+
+*** Double pipe energy balance
+EQUATIONS 5
+dpPipeConvectedTot = DTeeB_DTeeCColdConv + DTeeB_DTeeCHotConv + DTeeC_DTeeDColdConv + DTeeC_DTeeDHotConv + DTeeD_DTeeEColdConv + DTeeD_DTeeEHotConv + DTeeE_DTeeFColdConv + DTeeE_DTeeFHotConv + DTeeF_DTeeGColdConv + DTeeF_DTeeGHotConv + DTeeG_DTeeHColdConv + DTeeG_DTeeHHotConv + DTeeH_DTeeIColdConv + DTeeH_DTeeIHotConv + DTeeI_DTeeJColdConv + DTeeI_DTeeJHotConv + DTeeJ_SCnrZColdConv + DTeeJ_SCnrZHotConv + DTeeA_DTeeBColdConv + DTeeA_DTeeBHotConv + SCnr1_DTeeAColdConv + SCnr1_DTeeAHotConv
+dpToFFieldTot = DTeeB_DTeeCSlFf + DTeeC_DTeeDSlFf + DTeeD_DTeeESlFf + DTeeE_DTeeFSlFf + DTeeF_DTeeGSlFf + DTeeG_DTeeHSlFf + DTeeH_DTeeISlFf + DTeeI_DTeeJSlFf + DTeeJ_SCnrZSlFf + DTeeA_DTeeBSlFf + SCnr1_DTeeASlFf
+dpPipeIntTot = DTeeB_DTeeCColdInt + DTeeB_DTeeCHotInt + DTeeC_DTeeDColdInt + DTeeC_DTeeDHotInt + DTeeD_DTeeEColdInt + DTeeD_DTeeEHotInt + DTeeE_DTeeFColdInt + DTeeE_DTeeFHotInt + DTeeF_DTeeGColdInt + DTeeF_DTeeGHotInt + DTeeG_DTeeHColdInt + DTeeG_DTeeHHotInt + DTeeH_DTeeIColdInt + DTeeH_DTeeIHotInt + DTeeI_DTeeJColdInt + DTeeI_DTeeJHotInt + DTeeJ_SCnrZColdInt + DTeeJ_SCnrZHotInt + DTeeA_DTeeBColdInt + DTeeA_DTeeBHotInt + SCnr1_DTeeAColdInt + SCnr1_DTeeAHotInt
+dpSoilIntTot = DTeeB_DTeeCSlInt + DTeeC_DTeeDSlInt + DTeeD_DTeeESlInt + DTeeE_DTeeFSlInt + DTeeF_DTeeGSlInt + DTeeG_DTeeHSlInt + DTeeH_DTeeISlInt + DTeeI_DTeeJSlInt + DTeeJ_SCnrZSlInt + DTeeA_DTeeBSlInt + SCnr1_DTeeASlInt
+dpImbalance = dpPipeConvectedTot - dpToFFieldTot  - dpPipeIntTot - dpSoilIntTot
+ASSIGN icegrid_Mfr.prt 549
+
+UNIT 109 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+549! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 65
+MDTeeB_DTeeCCold MDTeeB_DTeeCHot MDTeeC_DTeeDCold MDTeeC_DTeeDHot MDTeeD_DTeeECold MDTeeD_DTeeEHot MDTeeE_DTeeFCold MDTeeE_DTeeFHot
+MDTeeF_DTeeGCold MDTeeF_DTeeGHot MDTeeG_DTeeHCold MDTeeG_DTeeHHot MDTeeH_DTeeICold MDTeeH_DTeeIHot MDTeeI_DTeeJCold MDTeeI_DTeeJHot
+MDTeeB_SCnrBCold MDTeeB_SCnrBHot MDTeeC_SCnrCCold MDTeeC_SCnrCHot MDTeeD_SCnrDCold MDTeeD_SCnrDHot MDTeeE_SCnrECold MDTeeE_SCnrEHot
+MDTeeF_SCnrFCold MDTeeF_SCnrFHot MDTeeG_SCnrGCold MDTeeG_SCnrGHot MDTeeH_SCnrHCold MDTeeH_SCnrHHot MDTeeI_SCnrICold MDTeeI_SCnrIHot
+MDTeeJ_SCnrJCold MDTeeJ_SCnrJHot MSCnr1_QSrc1 MQSrc1_SCnr1 MSCnrA_QSnkA MQSnkA_SCnrA MSCnrB_QSnkB MQSnkB_SCnrB
+MSCnrC_QSnkC MQSnkC_SCnrC MSCnrD_QSnkD MQSnkD_SCnrD MSCnrE_QSnkE MQSnkE_SCnrE MSCnrF_QSnkF MQSnkF_SCnrF
+MSCnrG_QSnkG MQSnkG_SCnrG MSCnrH_QSnkH MQSnkH_SCnrH MSCnrI_QSnkI MQSnkI_SCnrI MSCnrJ_QSnkJ MQSnkJ_SCnrJ
+MDTeeJ_SCnrZCold MDTeeJ_SCnrZHot MSCnrZ_SCnrZ MDTeeA_DTeeBCold MDTeeA_DTeeBHot MDTeeA_SCnrACold MDTeeA_SCnrAHot MSCnr1_DTeeACold
+MSCnr1_DTeeAHot
+
+***
+MDTeeB_DTeeCCold MDTeeB_DTeeCHot MDTeeC_DTeeDCold MDTeeC_DTeeDHot MDTeeD_DTeeECold MDTeeD_DTeeEHot MDTeeE_DTeeFCold MDTeeE_DTeeFHot
+MDTeeF_DTeeGCold MDTeeF_DTeeGHot MDTeeG_DTeeHCold MDTeeG_DTeeHHot MDTeeH_DTeeICold MDTeeH_DTeeIHot MDTeeI_DTeeJCold MDTeeI_DTeeJHot
+MDTeeB_SCnrBCold MDTeeB_SCnrBHot MDTeeC_SCnrCCold MDTeeC_SCnrCHot MDTeeD_SCnrDCold MDTeeD_SCnrDHot MDTeeE_SCnrECold MDTeeE_SCnrEHot
+MDTeeF_SCnrFCold MDTeeF_SCnrFHot MDTeeG_SCnrGCold MDTeeG_SCnrGHot MDTeeH_SCnrHCold MDTeeH_SCnrHHot MDTeeI_SCnrICold MDTeeI_SCnrIHot
+MDTeeJ_SCnrJCold MDTeeJ_SCnrJHot MSCnr1_QSrc1 MQSrc1_SCnr1 MSCnrA_QSnkA MQSnkA_SCnrA MSCnrB_QSnkB MQSnkB_SCnrB
+MSCnrC_QSnkC MQSnkC_SCnrC MSCnrD_QSnkD MQSnkD_SCnrD MSCnrE_QSnkE MQSnkE_SCnrE MSCnrF_QSnkF MQSnkF_SCnrF
+MSCnrG_QSnkG MQSnkG_SCnrG MSCnrH_QSnkH MQSnkH_SCnrH MSCnrI_QSnkI MQSnkI_SCnrI MSCnrJ_QSnkJ MQSnkJ_SCnrJ
+MDTeeJ_SCnrZCold MDTeeJ_SCnrZHot MSCnrZ_SCnrZ MDTeeA_DTeeBCold MDTeeA_DTeeBHot MDTeeA_SCnrACold MDTeeA_SCnrAHot MSCnr1_DTeeACold
+MSCnr1_DTeeAHot
+
+
+ASSIGN icegrid_T.prt 550
+
+UNIT 110 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+550! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 65
+TDTeeB_DTeeCCold TDTeeB_DTeeCHot TDTeeC_DTeeDCold TDTeeC_DTeeDHot TDTeeD_DTeeECold TDTeeD_DTeeEHot TDTeeE_DTeeFCold TDTeeE_DTeeFHot
+TDTeeF_DTeeGCold TDTeeF_DTeeGHot TDTeeG_DTeeHCold TDTeeG_DTeeHHot TDTeeH_DTeeICold TDTeeH_DTeeIHot TDTeeI_DTeeJCold TDTeeI_DTeeJHot
+TDTeeB_SCnrBCold TDTeeB_SCnrBHot TDTeeC_SCnrCCold TDTeeC_SCnrCHot TDTeeD_SCnrDCold TDTeeD_SCnrDHot TDTeeE_SCnrECold TDTeeE_SCnrEHot
+TDTeeF_SCnrFCold TDTeeF_SCnrFHot TDTeeG_SCnrGCold TDTeeG_SCnrGHot TDTeeH_SCnrHCold TDTeeH_SCnrHHot TDTeeI_SCnrICold TDTeeI_SCnrIHot
+TDTeeJ_SCnrJCold TDTeeJ_SCnrJHot TSCnr1_QSrc1 TQSrc1_SCnr1 TSCnrA_QSnkA TQSnkA_SCnrA TSCnrB_QSnkB TQSnkB_SCnrB
+TSCnrC_QSnkC TQSnkC_SCnrC TSCnrD_QSnkD TQSnkD_SCnrD TSCnrE_QSnkE TQSnkE_SCnrE TSCnrF_QSnkF TQSnkF_SCnrF
+TSCnrG_QSnkG TQSnkG_SCnrG TSCnrH_QSnkH TQSnkH_SCnrH TSCnrI_QSnkI TQSnkI_SCnrI TSCnrJ_QSnkJ TQSnkJ_SCnrJ
+TDTeeJ_SCnrZCold TDTeeJ_SCnrZHot TSCnrZ_SCnrZ TDTeeA_DTeeBCold TDTeeA_DTeeBHot TDTeeA_SCnrACold TDTeeA_SCnrAHot TSCnr1_DTeeACold
+TSCnr1_DTeeAHot
+
+***
+TDTeeB_DTeeCCold TDTeeB_DTeeCHot TDTeeC_DTeeDCold TDTeeC_DTeeDHot TDTeeD_DTeeECold TDTeeD_DTeeEHot TDTeeE_DTeeFCold TDTeeE_DTeeFHot
+TDTeeF_DTeeGCold TDTeeF_DTeeGHot TDTeeG_DTeeHCold TDTeeG_DTeeHHot TDTeeH_DTeeICold TDTeeH_DTeeIHot TDTeeI_DTeeJCold TDTeeI_DTeeJHot
+TDTeeB_SCnrBCold TDTeeB_SCnrBHot TDTeeC_SCnrCCold TDTeeC_SCnrCHot TDTeeD_SCnrDCold TDTeeD_SCnrDHot TDTeeE_SCnrECold TDTeeE_SCnrEHot
+TDTeeF_SCnrFCold TDTeeF_SCnrFHot TDTeeG_SCnrGCold TDTeeG_SCnrGHot TDTeeH_SCnrHCold TDTeeH_SCnrHHot TDTeeI_SCnrICold TDTeeI_SCnrIHot
+TDTeeJ_SCnrJCold TDTeeJ_SCnrJHot TSCnr1_QSrc1 TQSrc1_SCnr1 TSCnrA_QSnkA TQSnkA_SCnrA TSCnrB_QSnkB TQSnkB_SCnrB
+TSCnrC_QSnkC TQSnkC_SCnrC TSCnrD_QSnkD TQSnkD_SCnrD TSCnrE_QSnkE TQSnkE_SCnrE TSCnrF_QSnkF TQSnkF_SCnrF
+TSCnrG_QSnkG TQSnkG_SCnrG TSCnrH_QSnkH TQSnkH_SCnrH TSCnrI_QSnkI TQSnkI_SCnrI TSCnrJ_QSnkJ TQSnkJ_SCnrJ
+TDTeeJ_SCnrZCold TDTeeJ_SCnrZHot TSCnrZ_SCnrZ TDTeeA_DTeeBCold TDTeeA_DTeeBHot TDTeeA_SCnrACold TDTeeA_SCnrAHot TSCnr1_DTeeACold
+TSCnr1_DTeeAHot
+
+
+**********************************************************************
 ** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkA 
 **********************************************************************
 *******************************
@@ -650,7 +3190,7 @@ qSysIn_Src = QSrc1P
 ******************************************************************************************
 ASSIGN temp\TRL_Stunden.Prt 654
 
-UNIT 10 Type 46 !Changed automatically
+UNIT 111 Type 46 !Changed automatically
 PARAMETERS 7
 654 !1: Logical unit number
 -1 !2: for monthly summaries
@@ -681,11 +3221,11 @@ END
 **BEGIN Monthly Energy Balance printer automatically generated from DDck files
 ***************************************************************
 EQUATIONS 1
-qImb =  - qSysOut_Snk + qSysIn_Src
+qImb =  - qSysOut_Snk - qSysOut_dpToFFieldTot - qSysOut_dpPipeIntTot - qSysOut_dpSoilIntTot + qSysIn_Src
 CONSTANTS 1
-unitPrintEBal=11
+unitPrintEBal=112
 ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal
-UNIT 11 Type 46
+UNIT 112 Type 46
 PARAMETERS 6
 unitPrintEBal !1: Logical unit number
 -1 !2: for monthly summaries
@@ -693,17 +3233,17 @@ unitPrintEBal !1: Logical unit number
 -1 !4 -1: monthly integration
 1  !5 number of outputs to avoid integration
 1  !6 output number to avoid integration
-INPUTS 4
-TIME qSysOut_Snk qSysIn_Src qImb
+INPUTS 7
+TIME qSysOut_Snk qSysOut_dpToFFieldTot qSysOut_dpPipeIntTot qSysOut_dpSoilIntTot qSysIn_Src qImb
 *******************************
-TIME qSysOut_Snk qSysIn_Src qImb
+TIME qSysOut_Snk qSysOut_dpToFFieldTot qSysOut_dpPipeIntTot qSysOut_dpSoilIntTot qSysIn_Src qImb
 ***************************************************************
 **BEGIN Hourly Energy Balance printer automatically generated from DDck files
 ***************************************************************
 CONSTANTS 1
-unitPrintEBal_h=12
+unitPrintEBal_h=113
 ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h
-UNIT 12 Type 46
+UNIT 113 Type 46
 PARAMETERS 6
 unitPrintEBal_h !1: Logical unit number
 -1 !2: for monthly summaries
@@ -711,10 +3251,10 @@ unitPrintEBal_h !1: Logical unit number
 1 !4 1: hourly integration
 1  !5 number of outputs to avoid integration
 1  !6 output number to avoid integration
-INPUTS 4
-TIME qSysOut_Snk qSysIn_Src qImb
+INPUTS 7
+TIME qSysOut_Snk qSysOut_dpToFFieldTot qSysOut_dpPipeIntTot qSysOut_dpSoilIntTot qSysIn_Src qImb
 *******************************
-TIME qSysOut_Snk qSysIn_Src qImb
+TIME qSysOut_Snk qSysOut_dpToFFieldTot qSysOut_dpPipeIntTot qSysOut_dpSoilIntTot qSysIn_Src qImb
 
 *******************************
 **END End.ddck
