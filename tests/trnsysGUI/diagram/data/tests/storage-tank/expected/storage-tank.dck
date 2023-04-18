@@ -1,5 +1,5 @@
 **********************************************************************
-** head.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\generic 
+** head.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN Head.ddck
@@ -58,7 +58,7 @@ LAMWAT = 0.58    ! heat conductivity W/(mK)
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
 **********************************************************************
-** hydraulic.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\hydraulic 
+** hydraulic.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\hydraulic 
 **********************************************************************
 *************************************
 ** BEGIN hydraulic.ddck
@@ -297,7 +297,7 @@ INPUTS 6
 TTes_Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
 TTes_Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
 **********************************************************************
-** Tes.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\Tes 
+** Tes.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\Tes 
 **********************************************************************
 *************************************
 **BEGIN Tes.ddck
@@ -547,7 +547,7 @@ Temperatures
 MassFlows  
 Tes1
 **********************************************************************
-** end.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\generic 
+** end.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\storage-tank\storage-tank\ddck\generic 
 **********************************************************************
 ***************************************************************
 **BEGIN Monthly Energy Balance printer automatically generated from DDck files

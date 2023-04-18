@@ -1,5 +1,5 @@
 **********************************************************************
-** head.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** head.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN Head.ddck
@@ -58,7 +58,7 @@ LAMWAT = 0.58    ! heat conductivity W/(mK)
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
 **********************************************************************
-** Control-TriHpDesuperheater.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\control 
+** Control-TriHpDesuperheater.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\control 
 **********************************************************************
 ****************************
 **Control Dual Source system
@@ -139,7 +139,7 @@ TPuHpDhwCond = TPiPuHpDhwIn
 TPuDhw = TPiHxDhwOut
 TPuCirc = TPiPuCircIn
 **********************************************************************
-** type888.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\control 
+** type888.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\control 
 **********************************************************************
 *******************************
 **BEGIN Control-868-minimal.ddck 
@@ -244,7 +244,7 @@ Temperatures
 Boolean     
 Control    
 **********************************************************************
-** basic_battery.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** basic_battery.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN battery.ddck
@@ -360,7 +360,7 @@ Pel
 SoC
 Battery     
 **********************************************************************
-** fronius_symo_inverter.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** fronius_symo_inverter.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN fronius_symo_inverter.dck
@@ -371,9 +371,9 @@ unitReadInvPv = 22
 PvMaxPInv = 12500
 PvMaxVInv = 1000
 PvMinVInv = 200
-ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic\140911_FRONIUS_SYMO_Inverter.dat" unitReadInvPv 
+ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic\140911_FRONIUS_SYMO_Inverter.dat" unitReadInvPv 
 **********************************************************************
-** PrinterMonthlyElectric.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** PrinterMonthlyElectric.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN MonthlyPrinter.dck
@@ -393,7 +393,7 @@ INPUTS 9
 Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
 Time  ElHpTot_kW  PelPuHpBri_kW  PelPuSh_kW    PelContr_kW  ElHpComp_kW  PelPuHpSH_kW  qAuxStoreDHW_KW qAuxStoreSH_KW                   
 **********************************************************************
-** PrinterQvsT-GSHP-Desuperheater.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** PrinterQvsT-GSHP-Desuperheater.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN UserPrinter.dck
@@ -419,7 +419,7 @@ Pdhw_kW TPiDHWDemand TLoadDHWHXOut TLoadDHWHXIn PPiCircLoss_kW   TGHXout Qghx_kW
 QHpEvap_kW  ThpEvapIn  QHpCond_kW  THpCondOut QHpDes_kW  THpDesOut  PRdIn_kW  TRdFl  TRdRt     
 Pdhw_kW TPiDHWDemand TLoadDHWHXOut TLoadDHWHXIn PPiCircLoss_kW   TGHXout Qghx_kW
 **********************************************************************
-** sunskin_roof_module_eternit.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** sunskin_roof_module_eternit.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 ******************************
 **BEGIN sunskin_roof_module_eternit.ddck
@@ -445,7 +445,7 @@ PvTambNoct = 293.15 ! Ambient temperature at NOCT
 PvInsNoct = 800 ! Insolation at NOCT
 powerRating = 190 ! rated power at STC (Wp), according to datasheet, PvURefMpp*PvIRefMpp=190.53, slightly larger
 **********************************************************************
-** type194.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** type194.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN pv.dck
@@ -568,7 +568,7 @@ Pel
 Vel
 PV     
 **********************************************************************
-** ghx_2x2_5m.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\Ghx 
+** ghx_2x2_5m.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\Ghx 
 **********************************************************************
 ******************************
 **BEGIN ghx_2x2_5m.ddck
@@ -580,9 +580,9 @@ calcRand = 2 ! 1: old Randaussen approach of EWS. If nBorehole>1 the MfrGHX/Nbor
 lghxProbes = 300
 CONSTANTS 1
 unitGhxGfunc = 31
- ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\Ghx\g_functions\2x2_5m.txt" unitGhxGfunc 
+ ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\Ghx\g_functions\2x2_5m.txt" unitGhxGfunc 
 **********************************************************************
-** type951.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\Ghx 
+** type951.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\Ghx 
 **********************************************************************
 *******************************
 **BEGIN type951.ddck
@@ -763,7 +763,7 @@ Temperatures
 MassFlow 
 GHX    
 **********************************************************************
-** ProDomo13-R410A.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HP 
+** ProDomo13-R410A.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HP 
 **********************************************************************
 *********************************************
 ** BEGIN WWHp-ProDomo13 from CADENA SA
@@ -792,7 +792,7 @@ TMinEvapTin = -8
 TMinEvapTout = TMinEvapTin - 3
 cpEvap = cpBri
 **********************************************************************
-** type977.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HP 
+** type977.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HP 
 **********************************************************************
 *******************************
 **BEGIN BW-HeatPump.dck
@@ -965,7 +965,7 @@ Temperatures
 massFlow_and_Heat_transf     
 HPDHW    
 **********************************************************************
-** const_eff_hx.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HxCool 
+** const_eff_hx.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HxCool 
 **********************************************************************
 *******************************
 **BEGIN Const_eff_HX.ddck
@@ -997,7 +997,7 @@ MrfLoad = [43,4]		 !Changed automatically
 HTR_HX = [43,5]		 !Changed automatically
 OHTC_HX = [43,6]		 !Changed automatically
 **********************************************************************
-** const_eff_hx_dhw_contr.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HxDHW 
+** const_eff_hx_dhw_contr.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\HxDHW 
 **********************************************************************
 *******************************
 **BEGIN Const_eff_HX.ddck
@@ -1063,7 +1063,7 @@ HTR_HXDHWHX = [46,10]		 !Changed automatically
 fractionOfBypass = [45,9]		 !Changed automatically
 QHXDHW_kW = HTR_HXDHWHX/3600
 **********************************************************************
-** hydraulic.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\hydraulic 
+** hydraulic.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\hydraulic 
 **********************************************************************
 *************************************
 ** BEGIN hydraulic.ddck
@@ -2659,7 +2659,7 @@ TPiPuDhwOut TPiTesDhwOut TPiTesShOut TPiTeeMixSHIn TPiSHOutMix TPiTesShIn TPiRad
 TPiTesDhwCond TPiHpToTesDhwOut TPiCondToDes TPiPuGhxOut TPiHPEvapOut TPiDivCooltoHp TPiHpEvapMix TPiHPEvapIn
 TPiDhwSecOut TPiHxDhwSecIn TPiHxCoolWatIn TConn1455 TPiHpDesOut TPiHpDesIn TPiHpCondOut TPiHpCondIn
 **********************************************************************
-** type1792.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\RadiatorSH 
+** type1792.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\RadiatorSH 
 **********************************************************************
 **************************************
 **BEGIN type1792.ddck 
@@ -2902,7 +2902,7 @@ Temperatures
 Power     
 RadFloor
 **********************************************************************
-** dhw_mfh.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater 
+** dhw_mfh.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater 
 **********************************************************************
 *******************************
 **BEGIN dhw_mfh.ddck 
@@ -2918,7 +2918,7 @@ EQUATIONS 1
 MfrDHWset = dtDhwCorrect*MfrDHWreal
 CONSTANTS 1
 unitReadDhw = 129
- ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater\DhwForMFH6appartments_2min_tset55.dat" unitReadDhw 
+ ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater\DhwForMFH6appartments_2min_tset55.dat" unitReadDhw 
 CONSTANTS 2
 scaleDHW = 1
 dtDHWdata = 1/30.     ! timestep of DHW data-file
@@ -3005,7 +3005,7 @@ massFlow
 Temperatures     
 DHW-Hyd
 **********************************************************************
-** elDemand.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater 
+** elDemand.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater 
 **********************************************************************
 *******************************
 **BEGIN elDemand.ddck 
@@ -3016,7 +3016,7 @@ EQUATIONS 1
 PelHH_kW = frPelHH*PelHhDr_kW    !kW, um Faktor fr korrigierter HH-Strom
 CONSTANTS 1
 unitReadEl_3 = 133
- ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater\20191107_MFH_30_electricity_profile_2min.txt" unitReadEl_3 
+ ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater\20191107_MFH_30_electricity_profile_2min.txt" unitReadEl_3 
 UNIT 132 TYPE 9     !Changed automatically
 PARAMETERS 10
 6    !-, 1, Mode
@@ -3030,7 +3030,7 @@ EQUATIONS 2    !, Output of PVT HH el. Data reader
 PelHhDr_kW = [132,1]  !Changed automatically
 frPelHH = 1.0    !-, Korrekturfaktor für HH-Strom
 **********************************************************************
-** mfb30.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater 
+** mfb30.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\tapWater 
 **********************************************************************
 *******************************
 **BEGIN mfb30.ddck
@@ -3073,7 +3073,7 @@ AsolS = 172.53*scaleBuilding
 AsolE = 43.81*scaleBuilding
 AsolW = 26.32*scaleBuilding
 **********************************************************************
-** TesDhw.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\TesDhw 
+** TesDhw.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\TesDhw 
 **********************************************************************
 *************************************
 **BEGIN TesDhw.ddck
@@ -3316,7 +3316,7 @@ Temperatures
 MassFlows  
 Tes1
 **********************************************************************
-** TesSh.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\TesSh 
+** TesSh.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\TesSh 
 **********************************************************************
 *************************************
 **BEGIN TesSh.ddck
@@ -3546,7 +3546,7 @@ Temperatures
 MassFlows  
 Tes2
 **********************************************************************
-** CitySMA_dryN.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
+** CitySMA_dryN.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
 **********************************************************************
 *******************************
 **BEGIN City.dck
@@ -3564,11 +3564,11 @@ formatWeatherData = 1! 1 = user format, 2 = Standard weather file in the TMY2 fo
 unitWeatherData = 142
  unitWeatherData2 = 143
  unitWeatherData3 = 144
- ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99" unitWeatherData 
-ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99" unitWeatherData2 
-ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99" unitWeatherData3 
+ ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99" unitWeatherData 
+ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99" unitWeatherData2 
+ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\SMA_dryN_hourly.99" unitWeatherData3 
 **********************************************************************
-** internal_gains.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
+** internal_gains.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
 **********************************************************************
 *******************************
 **BEGIN internal_gains.ddck 
@@ -3587,7 +3587,7 @@ CONSTANTS 1
 factorCircToSh = 0.5 !How much of circulation losses go to SH
 CONSTANTS 1
 unitReadIntGain = 146
- ASSIGN "C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\int_gains_mfb_2019.txt" unitReadIntGain 
+ ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather\int_gains_mfb_2019.txt" unitReadIntGain 
 UNIT 145 TYPE 9      !Changed automatically
 PARAMETERS 22     
 5     ! 1 Mode
@@ -3606,7 +3606,7 @@ PbuiGainPers_KW = scaleBuiSize*[145,3]/1000*PGainPer      !Changed automatically
 PBuiGainEq_KW = scaleBuiSize*[145,2]/1000*PGainEquip      !Changed automatically
 PBuiGainCircLoss_KW = CircLoss*factorCircToSh    ! relative air mass flow rate for the SFH, -
 **********************************************************************
-** type5998.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
+** type5998.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
 **********************************************************************
 **************************************
 **BEGIN type5998.ddck 
@@ -3832,7 +3832,7 @@ INPUTS 4
 Time Tamb Tamb24  Troom  
 Time Tamb Tamb24  Troom 
 **********************************************************************
-** weather_data_base.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
+** weather_data_base.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\weather 
 **********************************************************************
 *******************************
 **BEGIN WeatherData.dck
@@ -4019,7 +4019,7 @@ INPUTS 6
 Time Tamb one IT_H_KW IB_H_kW IT_surfUser_1_Wm2
 Time Tamb hoursInMonth IT_H_KW IB_H_kW IT_surfUser_1_Wm2
 **********************************************************************
-** end.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
+** end.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\TRIHP_dualSource\TRIHP_dualSource\ddck\generic 
 **********************************************************************
 ***************************************************************
 **BEGIN Monthly Energy Balance printer automatically generated from DDck files

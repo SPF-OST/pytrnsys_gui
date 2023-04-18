@@ -128,7 +128,7 @@ class TestEditor:
     @staticmethod
     def _getHardCodedPathPrefixesForReplacingInExpectedDeck():
         hardCodedPathPrefixInExpectedDeck = (
-            r"C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram"
+            r"C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram"
         )
 
         hardCodedPathPrefixInActualDeck = str(_pl.Path(__file__).parent)

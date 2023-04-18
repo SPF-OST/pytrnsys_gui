@@ -1,5 +1,5 @@
 **********************************************************************
-** head.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\generic 
+** head.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\generic 
 **********************************************************************
 *******************************
 **BEGIN Head.ddck
@@ -59,7 +59,7 @@ LAMWAT = 0.58    ! heat conductivity W/(mK)
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
 **********************************************************************
-** hydraulic_control.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\control 
+** hydraulic_control.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\control 
 **********************************************************************
 *************************************
 **BEGIN hydraulic_control.ddck
@@ -89,7 +89,7 @@ ddTcwOffset = 0
 EQUATIONS 1
 TRoomStore = 10
 **********************************************************************
-** hydraulic.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\hydraulic 
+** hydraulic.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\hydraulic 
 **********************************************************************
 *************************************
 ** BEGIN hydraulic.ddck
@@ -2060,7 +2060,7 @@ TSCnrG_QSnkG TQSnkG_SCnrG TSCnrH_QSnkH TQSnkH_SCnrH TSCnrI_QSnkI TQSnkI_SCnrI TS
 TDTeeJ_SCnrZCold TDTeeJ_SCnrZHot TSCnrZ_SCnrZ TDTeeA_DTeeBCold TDTeeA_DTeeBHot TDTeeA_SCnrACold TDTeeA_SCnrAHot TSCnr1_DTeeACold
 TSCnr1_DTeeAHot
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkA 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkA 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2077,7 +2077,7 @@ TQSnkA = QSnkATOut
 EQUATIONS 1
 QSnkAM = QSnkAP / ((CPWAT/3600)*QSnkAdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkB 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkB 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2094,7 +2094,7 @@ TQSnkB = QSnkBTOut
 EQUATIONS 1
 QSnkBM = QSnkBP / ((CPWAT/3600)*QSnkBdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkC 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkC 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2111,7 +2111,7 @@ TQSnkC = QSnkCTOut
 EQUATIONS 1
 QSnkCM = QSnkCP / ((CPWAT/3600)*QSnkCdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkD 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkD 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2128,7 +2128,7 @@ TQSnkD = QSnkDTOut
 EQUATIONS 1
 QSnkDM = QSnkDP / ((CPWAT/3600)*QSnkDdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkE 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkE 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2145,7 +2145,7 @@ TQSnkE = QSnkETOut
 EQUATIONS 1
 QSnkEM = QSnkEP / ((CPWAT/3600)*QSnkEdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkF 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkF 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2162,7 +2162,7 @@ TQSnkF = QSnkFTOut
 EQUATIONS 1
 QSnkFM = QSnkFP / ((CPWAT/3600)*QSnkFdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkG 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkG 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2179,7 +2179,7 @@ TQSnkG = QSnkGTOut
 EQUATIONS 1
 QSnkGM = QSnkGP / ((CPWAT/3600)*QSnkGdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkH 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkH 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2196,7 +2196,7 @@ TQSnkH = QSnkHTOut
 EQUATIONS 1
 QSnkHM = QSnkHP / ((CPWAT/3600)*QSnkHdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkI 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkI 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2213,7 +2213,7 @@ TQSnkI = QSnkITOut
 EQUATIONS 1
 QSnkIM = QSnkIP / ((CPWAT/3600)*QSnkIdT)	!kg/h
 **********************************************************************
-** QSnk.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkJ 
+** QSnk.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSnkJ 
 **********************************************************************
 *******************************
 **BEGIN sink.ddck
@@ -2230,7 +2230,7 @@ TQSnkJ = QSnkJTOut
 EQUATIONS 1
 QSnkJM = QSnkJP / ((CPWAT/3600)*QSnkJdT)	!kg/h
 **********************************************************************
-** QSrc.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSrc1 
+** QSrc.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\QSrc1 
 **********************************************************************
 *******************************
 **BEGIN source.ddck
@@ -2255,7 +2255,7 @@ INPUTS 2
 TIME QSrc1TIn
 TIME TInQSrc1
 **********************************************************************
-** end.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\generic 
+** end.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\icegrid\icegrid\ddck\generic 
 **********************************************************************
 ***************************************************************
 **BEGIN Monthly Energy Balance printer automatically generated from DDck files
