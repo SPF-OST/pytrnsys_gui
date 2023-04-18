@@ -63,7 +63,7 @@ TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 class TestEditor:
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testExports(self, testProject: _Project, qtbot, monkeypatch) -> None:
+    def testExportDeck(self, testProject: _Project, qtbot, monkeypatch) -> None:
         helper = _Helper(testProject)
         helper.setup()
 
@@ -72,19 +72,11 @@ class TestEditor:
 
         monkeypatch.chdir(helper.actualProjectFolderPath)
 
-        self._exportAndTestMassFlowSolverDeckFile(editor, testProject, helper)
-
         self.exportAndTestStorageDdckFiles(editor, helper)
 
         self._exportAndTestHydraulicDdckFile(editor, helper)
 
         self._exportAndTestPlaceholdersJsonAndDeckFile(mainWindow, testProject, helper, monkeypatch)
-
-    @staticmethod
-    def _exportAndTestMassFlowSolverDeckFile(editor, testProject, helper):
-        editor.exportHydraulics(exportTo="mfs")
-        mfsDdckRelativePath = f"{testProject.projectName}_mfs.dck"
-        helper.ensureFilesAreEqual(mfsDdckRelativePath)
 
     def exportAndTestStorageDdckFiles(self, editor, helper):
         storageTankNames = self._exportStorageTanksAndGetNames(editor)
@@ -167,6 +159,9 @@ class TestEditor:
         mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
 
         self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
+
+        massFlowSolverDeckFileName = f"{testProject.projectName}_mfs.dck"
+        helper.ensureFilesAreEqual(massFlowSolverDeckFileName)
 
         massFlowRatesPrintFileName = f"{testProject.projectName}_Mfr.prt"
         helper.ensureCSVsAreEqual(massFlowRatesPrintFileName)
