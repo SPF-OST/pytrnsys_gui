@@ -4,35 +4,11 @@
 *******************************
 **BEGIN Head.ddck
 *******************************
-*******************************
-**BEGIN Head.ddck
-*******************************
-    
-*****************************************
-** Contact person: Dani Carbonell        
-** Date: 30.09.2016
-*****************************************
-
-***************************************************************************
-** Description: 
-** Basic TRNSYS variables including fluid properties
-***************************************************************************
-
 VERSION 17    
-
-************************************** 
-***Simulation time              ******
-**************************************
-
 CONSTANTS 3
 START = 0     
 STOP = 8760     
 dtSim = 1/30.  ! time step in hours
-
-************************************** 
-***TRNSYS SIMULATION  constants ******
-**************************************
-
 CONSTANTS 13
 nIteTrnsys = 30      ! TRNSYS Limit of iterations
 nWarnTrnsys = 12000  ! TRNSYS Limit of warnings
@@ -47,49 +23,25 @@ solver_statement = 0 ! TRNSYS Solver statement
 min_relax_factor = 1 ! TRNSYS Minimum relaxation factor
 max_relac_factor = 1 ! TRNSYS Maximum relaxation factor 
 solver_integration = 1    ! TRNSYS numerical integration solver method
-
-
-************************************** 
-***TRNSYS SIMULATION SET-UP     ******
-**************************************
-
 SIMULATION START STOP dtSim     
 TOLERANCES    FrInte_Tol  FrConv_Tol     
 LIMITS nIteTrnsys nWarnTrnsys nCallTraceTrnys ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
 DFQ solver_integration                        ! TRNSYS numerical integration solver method
 WIDTH 132                                     ! TRNSYS output file width, number of characters
 LIST                                          ! NOLIST statement
-
 SOLVER solver_statement min_relax_factor max_relac_factor      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
 NAN_CHECK nan_check_bool  ! Nan DEBUG statement
 OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
 EQSOLVER solver_equation           ! EQUATION SOLVER statement
 TIME_REPORT time_report
-
-
-**************************************
-*** MASS FLOW SOLVER CONSTANTS  ******
-**************************************
-
 CONSTANTS 3
 mfrSolverAbsTol = 1e-8
 mfrSolverRelTol = 1e-8
 mfrTolSwitchThreshold = 1e2
-
-************************************** 
-***User defined printer settings******
-**************************************
- 
 CONSTANTS 3    
- 
 tStrtUser = START     ! START start time of user defined printer
 tEndUser  = STOP      ! END time of user defined printer
 dtPrUser  = dtSim     ! timestep of user defined printer
-
-************************************** 
-***Generic Constants            ******
-**************************************
-
 CONSTANTS 6 
 versionDeck = 1 !can be changed from config file to adapt processes and so on
 PI   = 3.1415926     
@@ -97,11 +49,6 @@ Zero = 0
 Nix  = 0
 notused  = 0
 NPlotsPerSim = 18
-
-************************************** 
-***Constant fluid properties    ******
-**************************************
-
 CONSTANTS 7 
 CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 degC Tyfocor LS
 RHOBRI = 1016.0  ! density Glycol [kg/m3]; Value for an average pipe temperature with 55 degC Tyfocor L
@@ -110,37 +57,16 @@ RHOWAT = 998.0   ! density of Water  [kg/m3] at20 degC
 LAMWAT = 0.58    ! heat conductivity W/(mK) 
 CPWAT_SI = CPWAT*1000 ! J/(kgK)    
 CPBRI_SI = CPBRI*1000 ! J/(kgK)    
-
-*******************************
-**END Head.dck
-*******************************
 **********************************************************************
 ** hydraulic.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_complex_99\ex-hx-two-flow-solver-parameter-lines_complex_99\ddck\hydraulic 
 **********************************************************************
 *************************************
 ** BEGIN hydraulic.ddck
 *************************************
-*************************************
-** BEGIN hydraulic.ddck
-*************************************
-
-*************************************
-** Outputs to energy balance in kWh
-
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
-
-*************************************
 EQUATIONS 2
-*** single pipes
 qSysOut_PipeLoss = PipeLossTot
 qSysOut_spPipeIntTot = spPipeIntTot
-
-
-
-
-
 EQUATIONS 14
-*** Black box component temperatures
 TFloor1H=TFloor1
 TTesShDpL90_2H=TTesShDpL90_2
 TTesDhwDpL50_1H=TTesDhwDpL50_1
@@ -155,7 +81,6 @@ TFloor3H=TFloor3
 TFloor4H=TFloor4
 TFloor5H=TFloor5
 TFloor6H=TFloor6
-
 UNIT 11 TYPE 9352 !Changed automatically
 PARAMETERS 396
 mfrSolverAbsTol
@@ -271,7 +196,6 @@ MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 MfrPuOverflowSh 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 
-*** Initial Inputs
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
@@ -282,7 +206,6 @@ MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 0 0 
 0 0 0 0 0 0 0 0 
-
 EQUATIONS 212	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
 MPuAux_A=[11,1] !Changed automatically
 MPuAux_B=[11,2] !Changed automatically
@@ -496,38 +419,21 @@ MPiHP_PuAux_A=[11,289] !Changed automatically
 MPiHP_PuAux_B=[11,290] !Changed automatically
 MPiTeeAuxHxRt_HP_A=[11,292] !Changed automatically
 MPiTeeAuxHxRt_HP_B=[11,293] !Changed automatically
-
-
-** Fluids:
 EQUATIONS 4
-** brine
 FbrineRho = RHOBRI ! [kg/m^3]
 FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
-** water
 FwaterRho = RHOWAT ! [kg/m^3]
 FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
-
-** Hydraulic loops
 EQUATIONS 8
-** loop1
 Lloop1Rho = FwaterRho
 Lloop1Cp = FwaterCp
-
-** loop2
 Lloop2Rho = FwaterRho
 Lloop2Cp = FwaterCp
-
-** loop3
 Lloop3Rho = FwaterRho
 Lloop3Cp = FwaterCp
-
-** loop4
 Lloop4Rho = FwaterRho
 Lloop4Cp = FwaterCp
-
-
 UNIT 12 TYPE 929 !Changed automatically
-!DivAux
 PARAMETERS 0
 INPUTS 6
 MDivAux_A
@@ -536,13 +442,10 @@ MDivAux_C
 TPiAuxToDiv
 TPiAuxtoTeeShFl
 TPiHxDhwPriFl
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TDivAux= [12,1] !Changed automatically
-
 UNIT 13 TYPE 929 !Changed automatically
-!TeeAuxHxRt
 PARAMETERS 0
 INPUTS 6
 MTeeAuxHxRt_A
@@ -551,18 +454,13 @@ MTeeAuxHxRt_C
 TPiTeeAuxHxRt_HP
 TPiTeeHxDhwRt
 TPiHxDhwPriRt
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeAuxHxRt= [13,1] !Changed automatically
-
-! supplyWater
 EQUATIONS 2
 Tcw = 1
 TsupplyWater = Tcw
-
 UNIT 14 TYPE 929 !Changed automatically
-!TeeCircOut
 PARAMETERS 0
 INPUTS 6
 MTeeCircOut_A
@@ -571,13 +469,10 @@ MTeeCircOut_C
 TPiDhwCirctoTap
 TPiDhwtoTCirc
 TPiDhwCircRtPu
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeCircOut= [14,1] !Changed automatically
-
 UNIT 15 TYPE 931 !Changed automatically
-! PiDhwCircRtPu
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -590,18 +485,14 @@ TTeeCircOut ! input flow temperature [deg C]
 MPiDhwCircRtPu_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuCirc ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiDhwCircRtPu = [15,1]  !Changed automatically
 PPiDhwCircRtPu_kW = [15,3]/3600  !Changed automatically
 PPiDhwCircRtPuConv_kW = [15,4]/3600  !Changed automatically
 PPiDhwCircRtPuInt_kJ = [15,5]  !Changed automatically
 MPiDhwCircRtPu = MPiDhwCircRtPu_A
-
 UNIT 16 TYPE 931 !Changed automatically
-! PiDhwCirctoTap
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -614,18 +505,14 @@ TTeeCircOut ! input flow temperature [deg C]
 MPiDhwCirctoTap_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TtapWater ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiDhwCirctoTap = [16,1]  !Changed automatically
 PPiDhwCirctoTap_kW = [16,3]/3600  !Changed automatically
 PPiDhwCirctoTapConv_kW = [16,4]/3600  !Changed automatically
 PPiDhwCirctoTapInt_kJ = [16,5]  !Changed automatically
 MPiDhwCirctoTap = MPiDhwCirctoTap_A
-
 UNIT 17 TYPE 931 !Changed automatically
-! PiAuxToDiv
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -638,18 +525,14 @@ TPuAux ! input flow temperature [deg C]
 MPiAuxToDiv_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TDivAux ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiAuxToDiv = [17,1]  !Changed automatically
 PPiAuxToDiv_kW = [17,3]/3600  !Changed automatically
 PPiAuxToDivConv_kW = [17,4]/3600  !Changed automatically
 PPiAuxToDivInt_kJ = [17,5]  !Changed automatically
 MPiAuxToDiv = MPiAuxToDiv_A
-
 UNIT 18 TYPE 931 !Changed automatically
-! PiHpEvapIn
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -662,18 +545,14 @@ TPuAuxEvap ! input flow temperature [deg C]
 MPiHpEvapIn_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 THPEvapH ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiHpEvapIn = [18,1]  !Changed automatically
 PPiHpEvapIn_kW = [18,3]/3600  !Changed automatically
 PPiHpEvapInConv_kW = [18,4]/3600  !Changed automatically
 PPiHpEvapInInt_kJ = [18,5]  !Changed automatically
 MPiHpEvapIn = MPiHpEvapIn_A
-
 UNIT 19 TYPE 929 !Changed automatically
-!TeeShRt1
 PARAMETERS 0
 INPUTS 6
 MTeeShRt1_A
@@ -682,13 +561,10 @@ MTeeShRt1_C
 TPiTeeShRtTes
 TPiShRt2to1
 TPiRtFloor1
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShRt1= [19,1] !Changed automatically
-
 UNIT 20 TYPE 931 !Changed automatically
-! PiFlFloor1
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -701,18 +577,14 @@ TPuSh1 ! input flow temperature [deg C]
 MPiFlFloor1_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TFloor1H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiFlFloor1 = [20,1]  !Changed automatically
 PPiFlFloor1_kW = [20,3]/3600  !Changed automatically
 PPiFlFloor1Conv_kW = [20,4]/3600  !Changed automatically
 PPiFlFloor1Int_kJ = [20,5]  !Changed automatically
 MPiFlFloor1 = MPiFlFloor1_A
-
 UNIT 21 TYPE 929 !Changed automatically
-!TeeShOut1
 PARAMETERS 0
 INPUTS 6
 MTeeShOut1_A
@@ -721,13 +593,10 @@ MTeeShOut1_C
 TPiTeeShFlTes
 TPiShFl1to2
 TPiShFltoPu1
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShOut1= [21,1] !Changed automatically
-
 UNIT 22 TYPE 931 !Changed automatically
-! PiFlFloor2
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -740,18 +609,14 @@ TPuSh2 ! input flow temperature [deg C]
 MPiFlFloor2_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TFloor2H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiFlFloor2 = [22,1]  !Changed automatically
 PPiFlFloor2_kW = [22,3]/3600  !Changed automatically
 PPiFlFloor2Conv_kW = [22,4]/3600  !Changed automatically
 PPiFlFloor2Int_kJ = [22,5]  !Changed automatically
 MPiFlFloor2 = MPiFlFloor2_A
-
 UNIT 23 TYPE 931 !Changed automatically
-! PiFlFloor3
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -764,18 +629,14 @@ TPuSh3 ! input flow temperature [deg C]
 MPiFlFloor3_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TFloor3H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiFlFloor3 = [23,1]  !Changed automatically
 PPiFlFloor3_kW = [23,3]/3600  !Changed automatically
 PPiFlFloor3Conv_kW = [23,4]/3600  !Changed automatically
 PPiFlFloor3Int_kJ = [23,5]  !Changed automatically
 MPiFlFloor3 = MPiFlFloor3_A
-
 UNIT 24 TYPE 931 !Changed automatically
-! PiFlFloor4
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -788,18 +649,14 @@ TPuSh4 ! input flow temperature [deg C]
 MPiFlFloor4_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TFloor4H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiFlFloor4 = [24,1]  !Changed automatically
 PPiFlFloor4_kW = [24,3]/3600  !Changed automatically
 PPiFlFloor4Conv_kW = [24,4]/3600  !Changed automatically
 PPiFlFloor4Int_kJ = [24,5]  !Changed automatically
 MPiFlFloor4 = MPiFlFloor4_A
-
 UNIT 25 TYPE 931 !Changed automatically
-! PiFlFloor5
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -812,18 +669,14 @@ TPuSh5 ! input flow temperature [deg C]
 MPiFlFloor5_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TFloor5H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiFlFloor5 = [25,1]  !Changed automatically
 PPiFlFloor5_kW = [25,3]/3600  !Changed automatically
 PPiFlFloor5Conv_kW = [25,4]/3600  !Changed automatically
 PPiFlFloor5Int_kJ = [25,5]  !Changed automatically
 MPiFlFloor5 = MPiFlFloor5_A
-
 UNIT 26 TYPE 931 !Changed automatically
-! PiFlFloor6
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -836,18 +689,14 @@ TPUSh6 ! input flow temperature [deg C]
 MPiFlFloor6_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TFloor6H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiFlFloor6 = [26,1]  !Changed automatically
 PPiFlFloor6_kW = [26,3]/3600  !Changed automatically
 PPiFlFloor6Conv_kW = [26,4]/3600  !Changed automatically
 PPiFlFloor6Int_kJ = [26,5]  !Changed automatically
 MPiFlFloor6 = MPiFlFloor6_A
-
 UNIT 27 TYPE 929 !Changed automatically
-!TeeShRt5
 PARAMETERS 0
 INPUTS 6
 MTeeShRt5_A
@@ -856,13 +705,10 @@ MTeeShRt5_C
 TPiShRt5to4
 TPiPuOvRt6to5
 TPiRtFloor5
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShRt5= [27,1] !Changed automatically
-
 UNIT 28 TYPE 929 !Changed automatically
-!TeeShRt4
 PARAMETERS 0
 INPUTS 6
 MTeeShRt4_A
@@ -871,13 +717,10 @@ MTeeShRt4_C
 TPiShRt4to3
 TPiShRt5to4
 TPiRtFloor4
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShRt4= [28,1] !Changed automatically
-
 UNIT 29 TYPE 929 !Changed automatically
-!TeeShRt3
 PARAMETERS 0
 INPUTS 6
 MTeeShRt3_A
@@ -886,13 +729,10 @@ MTeeShRt3_C
 TPiShRt3to2
 TPiShRt4to3
 TPiRtFloor3
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShRt3= [29,1] !Changed automatically
-
 UNIT 30 TYPE 929 !Changed automatically
-!TeeShRt2
 PARAMETERS 0
 INPUTS 6
 MTeeShRt2_A
@@ -901,13 +741,10 @@ MTeeShRt2_C
 TPiShRt2to1
 TPiShRt3to2
 TPiRtFloor2
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShRt2= [30,1] !Changed automatically
-
 UNIT 31 TYPE 931 !Changed automatically
-! PiRtFloor5
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -920,18 +757,14 @@ TFloor5H ! input flow temperature [deg C]
 MPiRtFloor5_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt5 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiRtFloor5 = [31,1]  !Changed automatically
 PPiRtFloor5_kW = [31,3]/3600  !Changed automatically
 PPiRtFloor5Conv_kW = [31,4]/3600  !Changed automatically
 PPiRtFloor5Int_kJ = [31,5]  !Changed automatically
 MPiRtFloor5 = MPiRtFloor5_A
-
 UNIT 32 TYPE 931 !Changed automatically
-! PiShRt5to4
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -944,18 +777,14 @@ TTeeShRt5 ! input flow temperature [deg C]
 MPiShRt5to4_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt4 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShRt5to4 = [32,1]  !Changed automatically
 PPiShRt5to4_kW = [32,3]/3600  !Changed automatically
 PPiShRt5to4Conv_kW = [32,4]/3600  !Changed automatically
 PPiShRt5to4Int_kJ = [32,5]  !Changed automatically
 MPiShRt5to4 = MPiShRt5to4_A
-
 UNIT 33 TYPE 931 !Changed automatically
-! PiRtFloor4
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -968,18 +797,14 @@ TFloor4H ! input flow temperature [deg C]
 MPiRtFloor4_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt4 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiRtFloor4 = [33,1]  !Changed automatically
 PPiRtFloor4_kW = [33,3]/3600  !Changed automatically
 PPiRtFloor4Conv_kW = [33,4]/3600  !Changed automatically
 PPiRtFloor4Int_kJ = [33,5]  !Changed automatically
 MPiRtFloor4 = MPiRtFloor4_A
-
 UNIT 34 TYPE 931 !Changed automatically
-! PiRtFloor3
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -992,18 +817,14 @@ TFloor3H ! input flow temperature [deg C]
 MPiRtFloor3_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt3 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiRtFloor3 = [34,1]  !Changed automatically
 PPiRtFloor3_kW = [34,3]/3600  !Changed automatically
 PPiRtFloor3Conv_kW = [34,4]/3600  !Changed automatically
 PPiRtFloor3Int_kJ = [34,5]  !Changed automatically
 MPiRtFloor3 = MPiRtFloor3_A
-
 UNIT 35 TYPE 931 !Changed automatically
-! PiRtFloor2
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1016,18 +837,14 @@ TFloor2H ! input flow temperature [deg C]
 MPiRtFloor2_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt2 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiRtFloor2 = [35,1]  !Changed automatically
 PPiRtFloor2_kW = [35,3]/3600  !Changed automatically
 PPiRtFloor2Conv_kW = [35,4]/3600  !Changed automatically
 PPiRtFloor2Int_kJ = [35,5]  !Changed automatically
 MPiRtFloor2 = MPiRtFloor2_A
-
 UNIT 36 TYPE 931 !Changed automatically
-! PiShRt4to3
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1040,18 +857,14 @@ TTeeShRt4 ! input flow temperature [deg C]
 MPiShRt4to3_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt3 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShRt4to3 = [36,1]  !Changed automatically
 PPiShRt4to3_kW = [36,3]/3600  !Changed automatically
 PPiShRt4to3Conv_kW = [36,4]/3600  !Changed automatically
 PPiShRt4to3Int_kJ = [36,5]  !Changed automatically
 MPiShRt4to3 = MPiShRt4to3_A
-
 UNIT 37 TYPE 931 !Changed automatically
-! PiShRt3to2
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1064,18 +877,14 @@ TTeeShRt3 ! input flow temperature [deg C]
 MPiShRt3to2_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt2 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShRt3to2 = [37,1]  !Changed automatically
 PPiShRt3to2_kW = [37,3]/3600  !Changed automatically
 PPiShRt3to2Conv_kW = [37,4]/3600  !Changed automatically
 PPiShRt3to2Int_kJ = [37,5]  !Changed automatically
 MPiShRt3to2 = MPiShRt3to2_A
-
 UNIT 38 TYPE 931 !Changed automatically
-! PiShRt2to1
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1088,18 +897,14 @@ TTeeShRt2 ! input flow temperature [deg C]
 MPiShRt2to1_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt1 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShRt2to1 = [38,1]  !Changed automatically
 PPiShRt2to1_kW = [38,3]/3600  !Changed automatically
 PPiShRt2to1Conv_kW = [38,4]/3600  !Changed automatically
 PPiShRt2to1Int_kJ = [38,5]  !Changed automatically
 MPiShRt2to1 = MPiShRt2to1_A
-
 UNIT 39 TYPE 931 !Changed automatically
-! PiRtFloor1
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1112,18 +917,14 @@ TFloor1H ! input flow temperature [deg C]
 MPiRtFloor1_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt1 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiRtFloor1 = [39,1]  !Changed automatically
 PPiRtFloor1_kW = [39,3]/3600  !Changed automatically
 PPiRtFloor1Conv_kW = [39,4]/3600  !Changed automatically
 PPiRtFloor1Int_kJ = [39,5]  !Changed automatically
 MPiRtFloor1 = MPiRtFloor1_A
-
 UNIT 40 TYPE 931 !Changed automatically
-! PiShFltoPu1
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1136,18 +937,14 @@ TTeeShOut1 ! input flow temperature [deg C]
 MPiShFltoPu1_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuSh1 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFltoPu1 = [40,1]  !Changed automatically
 PPiShFltoPu1_kW = [40,3]/3600  !Changed automatically
 PPiShFltoPu1Conv_kW = [40,4]/3600  !Changed automatically
 PPiShFltoPu1Int_kJ = [40,5]  !Changed automatically
 MPiShFltoPu1 = MPiShFltoPu1_A
-
 UNIT 41 TYPE 929 !Changed automatically
-!TeeShOut2
 PARAMETERS 0
 INPUTS 6
 MTeeShOut2_A
@@ -1156,13 +953,10 @@ MTeeShOut2_C
 TPiShFl1to2
 TPiShFl2to3
 TPiShFlToPu2
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShOut2= [41,1] !Changed automatically
-
 UNIT 42 TYPE 929 !Changed automatically
-!TeeShOut3
 PARAMETERS 0
 INPUTS 6
 MTeeShOut3_A
@@ -1171,13 +965,10 @@ MTeeShOut3_C
 TPiShFl2to3
 TPiShFl3to4
 TPiShFlToPu3
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShOut3= [42,1] !Changed automatically
-
 UNIT 43 TYPE 929 !Changed automatically
-!TeeShOut4
 PARAMETERS 0
 INPUTS 6
 MTeeShOut4_A
@@ -1186,13 +977,10 @@ MTeeShOut4_C
 TPiShFl3to4
 TPiShFl4to5
 TPiShFlToPu4
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShOut4= [43,1] !Changed automatically
-
 UNIT 44 TYPE 929 !Changed automatically
-!TeeShOut5
 PARAMETERS 0
 INPUTS 6
 MTeeShOut5_A
@@ -1201,13 +989,10 @@ MTeeShOut5_C
 TPiShFl4to5
 TPiShFl5to6
 TPiShFlToPu5
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShOut5= [44,1] !Changed automatically
-
 UNIT 45 TYPE 931 !Changed automatically
-! PiShFl1to2
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1220,18 +1005,14 @@ TTeeShOut1 ! input flow temperature [deg C]
 MPiShFl1to2_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShOut2 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFl1to2 = [45,1]  !Changed automatically
 PPiShFl1to2_kW = [45,3]/3600  !Changed automatically
 PPiShFl1to2Conv_kW = [45,4]/3600  !Changed automatically
 PPiShFl1to2Int_kJ = [45,5]  !Changed automatically
 MPiShFl1to2 = MPiShFl1to2_A
-
 UNIT 46 TYPE 931 !Changed automatically
-! PiShFlToPu2
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1244,18 +1025,14 @@ TTeeShOut2 ! input flow temperature [deg C]
 MPiShFlToPu2_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuSh2 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFlToPu2 = [46,1]  !Changed automatically
 PPiShFlToPu2_kW = [46,3]/3600  !Changed automatically
 PPiShFlToPu2Conv_kW = [46,4]/3600  !Changed automatically
 PPiShFlToPu2Int_kJ = [46,5]  !Changed automatically
 MPiShFlToPu2 = MPiShFlToPu2_A
-
 UNIT 47 TYPE 931 !Changed automatically
-! PiShFl2to3
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1268,18 +1045,14 @@ TTeeShOut2 ! input flow temperature [deg C]
 MPiShFl2to3_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShOut3 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFl2to3 = [47,1]  !Changed automatically
 PPiShFl2to3_kW = [47,3]/3600  !Changed automatically
 PPiShFl2to3Conv_kW = [47,4]/3600  !Changed automatically
 PPiShFl2to3Int_kJ = [47,5]  !Changed automatically
 MPiShFl2to3 = MPiShFl2to3_A
-
 UNIT 48 TYPE 931 !Changed automatically
-! PiShFlToPu3
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1292,18 +1065,14 @@ TTeeShOut3 ! input flow temperature [deg C]
 MPiShFlToPu3_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuSh3 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFlToPu3 = [48,1]  !Changed automatically
 PPiShFlToPu3_kW = [48,3]/3600  !Changed automatically
 PPiShFlToPu3Conv_kW = [48,4]/3600  !Changed automatically
 PPiShFlToPu3Int_kJ = [48,5]  !Changed automatically
 MPiShFlToPu3 = MPiShFlToPu3_A
-
 UNIT 49 TYPE 931 !Changed automatically
-! PiShFl3to4
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1316,18 +1085,14 @@ TTeeShOut3 ! input flow temperature [deg C]
 MPiShFl3to4_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShOut4 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFl3to4 = [49,1]  !Changed automatically
 PPiShFl3to4_kW = [49,3]/3600  !Changed automatically
 PPiShFl3to4Conv_kW = [49,4]/3600  !Changed automatically
 PPiShFl3to4Int_kJ = [49,5]  !Changed automatically
 MPiShFl3to4 = MPiShFl3to4_A
-
 UNIT 50 TYPE 931 !Changed automatically
-! PiShFlToPu4
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1340,18 +1105,14 @@ TTeeShOut4 ! input flow temperature [deg C]
 MPiShFlToPu4_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuSh4 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFlToPu4 = [50,1]  !Changed automatically
 PPiShFlToPu4_kW = [50,3]/3600  !Changed automatically
 PPiShFlToPu4Conv_kW = [50,4]/3600  !Changed automatically
 PPiShFlToPu4Int_kJ = [50,5]  !Changed automatically
 MPiShFlToPu4 = MPiShFlToPu4_A
-
 UNIT 51 TYPE 931 !Changed automatically
-! PiShFl4to5
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1364,18 +1125,14 @@ TTeeShOut4 ! input flow temperature [deg C]
 MPiShFl4to5_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShOut5 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFl4to5 = [51,1]  !Changed automatically
 PPiShFl4to5_kW = [51,3]/3600  !Changed automatically
 PPiShFl4to5Conv_kW = [51,4]/3600  !Changed automatically
 PPiShFl4to5Int_kJ = [51,5]  !Changed automatically
 MPiShFl4to5 = MPiShFl4to5_A
-
 UNIT 52 TYPE 931 !Changed automatically
-! PiShFlToPu5
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1388,18 +1145,14 @@ TTeeShOut5 ! input flow temperature [deg C]
 MPiShFlToPu5_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuSh5 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFlToPu5 = [52,1]  !Changed automatically
 PPiShFlToPu5_kW = [52,3]/3600  !Changed automatically
 PPiShFlToPu5Conv_kW = [52,4]/3600  !Changed automatically
 PPiShFlToPu5Int_kJ = [52,5]  !Changed automatically
 MPiShFlToPu5 = MPiShFlToPu5_A
-
 UNIT 53 TYPE 931 !Changed automatically
-! PiHpEvapOut
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1412,18 +1165,14 @@ THPEvapH ! input flow temperature [deg C]
 MPiHpEvapOut_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuAuxEvap ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiHpEvapOut = [53,1]  !Changed automatically
 PPiHpEvapOut_kW = [53,3]/3600  !Changed automatically
 PPiHpEvapOutConv_kW = [53,4]/3600  !Changed automatically
 PPiHpEvapOutInt_kJ = [53,5]  !Changed automatically
 MPiHpEvapOut = MPiHpEvapOut_A
-
 UNIT 54 TYPE 931 !Changed automatically
-! PiHxDhwPriFl
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1436,18 +1185,14 @@ TDivAux ! input flow temperature [deg C]
 MPiHxDhwPriFl_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 THxDHWSide1H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiHxDhwPriFl = [54,1]  !Changed automatically
 PPiHxDhwPriFl_kW = [54,3]/3600  !Changed automatically
 PPiHxDhwPriFlConv_kW = [54,4]/3600  !Changed automatically
 PPiHxDhwPriFlInt_kJ = [54,5]  !Changed automatically
 MPiHxDhwPriFl = MPiHxDhwPriFl_A
-
 UNIT 55 TYPE 931 !Changed automatically
-! PiHxDhwPriRt
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1460,18 +1205,14 @@ THxDHWSide1H ! input flow temperature [deg C]
 MPiHxDhwPriRt_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeAuxHxRt ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiHxDhwPriRt = [55,1]  !Changed automatically
 PPiHxDhwPriRt_kW = [55,3]/3600  !Changed automatically
 PPiHxDhwPriRtConv_kW = [55,4]/3600  !Changed automatically
 PPiHxDhwPriRtInt_kJ = [55,5]  !Changed automatically
 MPiHxDhwPriRt = MPiHxDhwPriRt_A
-
 UNIT 56 TYPE 931 !Changed automatically
-! PiTesDhwtoPuHx
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1484,18 +1225,14 @@ TTesDhwDpL50_1H ! input flow temperature [deg C]
 MPiTesDhwtoPuHx_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuHxDhwSec ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiTesDhwtoPuHx = [56,1]  !Changed automatically
 PPiTesDhwtoPuHx_kW = [56,3]/3600  !Changed automatically
 PPiTesDhwtoPuHxConv_kW = [56,4]/3600  !Changed automatically
 PPiTesDhwtoPuHxInt_kJ = [56,5]  !Changed automatically
 MPiTesDhwtoPuHx = MPiTesDhwtoPuHx_A
-
 UNIT 57 TYPE 929 !Changed automatically
-!TeeAuxShFl
 PARAMETERS 0
 INPUTS 6
 MTeeAuxShFl_A
@@ -1504,13 +1241,10 @@ MTeeAuxShFl_C
 TPiAuxtoTeeShFl
 TPiShPriFl
 TPiTeeShFlTes
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeAuxShFl= [57,1] !Changed automatically
-
 UNIT 58 TYPE 931 !Changed automatically
-! PiAuxtoTeeShFl
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1523,18 +1257,14 @@ TDivAux ! input flow temperature [deg C]
 MPiAuxtoTeeShFl_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeAuxShFl ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiAuxtoTeeShFl = [58,1]  !Changed automatically
 PPiAuxtoTeeShFl_kW = [58,3]/3600  !Changed automatically
 PPiAuxtoTeeShFlConv_kW = [58,4]/3600  !Changed automatically
 PPiAuxtoTeeShFlInt_kJ = [58,5]  !Changed automatically
 MPiAuxtoTeeShFl = MPiAuxtoTeeShFl_A
-
 UNIT 59 TYPE 931 !Changed automatically
-! PiShPriFl
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1547,18 +1277,14 @@ TTeeAuxShFl ! input flow temperature [deg C]
 MPiShPriFl_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTesShDpL90_2H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShPriFl = [59,1]  !Changed automatically
 PPiShPriFl_kW = [59,3]/3600  !Changed automatically
 PPiShPriFlConv_kW = [59,4]/3600  !Changed automatically
 PPiShPriFlInt_kJ = [59,5]  !Changed automatically
 MPiShPriFl = MPiShPriFl_A
-
 UNIT 60 TYPE 931 !Changed automatically
-! PiTeeShFlTes
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1571,18 +1297,14 @@ TTeeAuxShFl ! input flow temperature [deg C]
 MPiTeeShFlTes_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShOut1 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiTeeShFlTes = [60,1]  !Changed automatically
 PPiTeeShFlTes_kW = [60,3]/3600  !Changed automatically
 PPiTeeShFlTesConv_kW = [60,4]/3600  !Changed automatically
 PPiTeeShFlTesInt_kJ = [60,5]  !Changed automatically
 MPiTeeShFlTes = MPiTeeShFlTes_A
-
 UNIT 61 TYPE 929 !Changed automatically
-!TeeAuxShRt
 PARAMETERS 0
 INPUTS 6
 MTeeAuxShRt_A
@@ -1591,13 +1313,10 @@ MTeeAuxShRt_C
 TPiTeeHxDhwRt
 TPiTeeShRtTes
 TPiShPriRt
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeAuxShRt= [61,1] !Changed automatically
-
 UNIT 62 TYPE 931 !Changed automatically
-! PiShPriRt
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1610,18 +1329,14 @@ TTesShDpL90_2H ! input flow temperature [deg C]
 MPiShPriRt_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeAuxShRt ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShPriRt = [62,1]  !Changed automatically
 PPiShPriRt_kW = [62,3]/3600  !Changed automatically
 PPiShPriRtConv_kW = [62,4]/3600  !Changed automatically
 PPiShPriRtInt_kJ = [62,5]  !Changed automatically
 MPiShPriRt = MPiShPriRt_A
-
 UNIT 63 TYPE 931 !Changed automatically
-! PiTeeHxDhwRt
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1634,18 +1349,14 @@ TTeeAuxShRt ! input flow temperature [deg C]
 MPiTeeHxDhwRt_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeAuxHxRt ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiTeeHxDhwRt = [63,1]  !Changed automatically
 PPiTeeHxDhwRt_kW = [63,3]/3600  !Changed automatically
 PPiTeeHxDhwRtConv_kW = [63,4]/3600  !Changed automatically
 PPiTeeHxDhwRtInt_kJ = [63,5]  !Changed automatically
 MPiTeeHxDhwRt = MPiTeeHxDhwRt_A
-
 UNIT 64 TYPE 931 !Changed automatically
-! PiTeeShRtTes
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1658,18 +1369,14 @@ TTeeShRt1 ! input flow temperature [deg C]
 MPiTeeShRtTes_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeAuxShRt ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiTeeShRtTes = [64,1]  !Changed automatically
 PPiTeeShRtTes_kW = [64,3]/3600  !Changed automatically
 PPiTeeShRtTesConv_kW = [64,4]/3600  !Changed automatically
 PPiTeeShRtTesInt_kJ = [64,5]  !Changed automatically
 MPiTeeShRtTes = MPiTeeShRtTes_A
-
 UNIT 65 TYPE 931 !Changed automatically
-! PiPuDhwCircOut
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1682,18 +1389,14 @@ TPuCirc ! input flow temperature [deg C]
 MPiPuDhwCircOut_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTesDhwDpR50_99H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiPuDhwCircOut = [65,1]  !Changed automatically
 PPiPuDhwCircOut_kW = [65,3]/3600  !Changed automatically
 PPiPuDhwCircOutConv_kW = [65,4]/3600  !Changed automatically
 PPiPuDhwCircOutInt_kJ = [65,5]  !Changed automatically
 MPiPuDhwCircOut = MPiPuDhwCircOut_A
-
 UNIT 66 TYPE 929 !Changed automatically
-!TeeShOut6
 PARAMETERS 0
 INPUTS 6
 MTeeShOut6_A
@@ -1702,13 +1405,10 @@ MTeeShOut6_C
 TPiPuOvFl
 TPiShFl5to6
 TPiShFlToPu6
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShOut6= [66,1] !Changed automatically
-
 UNIT 67 TYPE 931 !Changed automatically
-! PiShFl5to6
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1721,18 +1421,14 @@ TTeeShOut5 ! input flow temperature [deg C]
 MPiShFl5to6_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShOut6 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFl5to6 = [67,1]  !Changed automatically
 PPiShFl5to6_kW = [67,3]/3600  !Changed automatically
 PPiShFl5to6Conv_kW = [67,4]/3600  !Changed automatically
 PPiShFl5to6Int_kJ = [67,5]  !Changed automatically
 MPiShFl5to6 = MPiShFl5to6_A
-
 UNIT 68 TYPE 931 !Changed automatically
-! PiShFlToPu6
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1745,18 +1441,14 @@ TTeeShOut6 ! input flow temperature [deg C]
 MPiShFlToPu6_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPUSh6 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiShFlToPu6 = [68,1]  !Changed automatically
 PPiShFlToPu6_kW = [68,3]/3600  !Changed automatically
 PPiShFlToPu6Conv_kW = [68,4]/3600  !Changed automatically
 PPiShFlToPu6Int_kJ = [68,5]  !Changed automatically
 MPiShFlToPu6 = MPiShFlToPu6_A
-
 UNIT 69 TYPE 931 !Changed automatically
-! PiPuOvFl
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1769,18 +1461,14 @@ TTeeShOut6 ! input flow temperature [deg C]
 MPiPuOvFl_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuOverflowSh ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiPuOvFl = [69,1]  !Changed automatically
 PPiPuOvFl_kW = [69,3]/3600  !Changed automatically
 PPiPuOvFlConv_kW = [69,4]/3600  !Changed automatically
 PPiPuOvFlInt_kJ = [69,5]  !Changed automatically
 MPiPuOvFl = MPiPuOvFl_A
-
 UNIT 70 TYPE 929 !Changed automatically
-!TeeShRt6
 PARAMETERS 0
 INPUTS 6
 MTeeShRt6_A
@@ -1789,13 +1477,10 @@ MTeeShRt6_C
 TPiPuOvRt6to5
 TPiPuOvRt
 TPiFloor6Rt
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeShRt6= [70,1] !Changed automatically
-
 UNIT 71 TYPE 931 !Changed automatically
-! PiFloor6Rt
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1808,18 +1493,14 @@ TFloor6H ! input flow temperature [deg C]
 MPiFloor6Rt_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt6 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiFloor6Rt = [71,1]  !Changed automatically
 PPiFloor6Rt_kW = [71,3]/3600  !Changed automatically
 PPiFloor6RtConv_kW = [71,4]/3600  !Changed automatically
 PPiFloor6RtInt_kJ = [71,5]  !Changed automatically
 MPiFloor6Rt = MPiFloor6Rt_A
-
 UNIT 72 TYPE 931 !Changed automatically
-! PiPuOvRt6to5
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1832,18 +1513,14 @@ TTeeShRt6 ! input flow temperature [deg C]
 MPiPuOvRt6to5_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt5 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiPuOvRt6to5 = [72,1]  !Changed automatically
 PPiPuOvRt6to5_kW = [72,3]/3600  !Changed automatically
 PPiPuOvRt6to5Conv_kW = [72,4]/3600  !Changed automatically
 PPiPuOvRt6to5Int_kJ = [72,5]  !Changed automatically
 MPiPuOvRt6to5 = MPiPuOvRt6to5_A
-
 UNIT 73 TYPE 929 !Changed automatically
-!TeeDhwOut
 PARAMETERS 0
 INPUTS 6
 MTeeDhwOut_A
@@ -1852,13 +1529,10 @@ MTeeDhwOut_C
 TPiTesDhwTapOut
 TPiDhwCircTesOut
 TPiDhwtoTCirc
-***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
 TTeeDhwOut= [73,1] !Changed automatically
-
 UNIT 74 TYPE 931 !Changed automatically
-! PiDhwtoTCirc
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1871,18 +1545,14 @@ TTeeDhwOut ! input flow temperature [deg C]
 MPiDhwtoTCirc_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeCircOut ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiDhwtoTCirc = [74,1]  !Changed automatically
 PPiDhwtoTCirc_kW = [74,3]/3600  !Changed automatically
 PPiDhwtoTCircConv_kW = [74,4]/3600  !Changed automatically
 PPiDhwtoTCircInt_kJ = [74,5]  !Changed automatically
 MPiDhwtoTCirc = MPiDhwtoTCirc_A
-
 UNIT 75 TYPE 931 !Changed automatically
-! PiTesDhwTapOut
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1895,18 +1565,14 @@ TTesDhwDpR1_97H ! input flow temperature [deg C]
 MPiTesDhwTapOut_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeDhwOut ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiTesDhwTapOut = [75,1]  !Changed automatically
 PPiTesDhwTapOut_kW = [75,3]/3600  !Changed automatically
 PPiTesDhwTapOutConv_kW = [75,4]/3600  !Changed automatically
 PPiTesDhwTapOutInt_kJ = [75,5]  !Changed automatically
 MPiTesDhwTapOut = MPiTesDhwTapOut_A
-
 UNIT 76 TYPE 931 !Changed automatically
-! PiDhwCircTesOut
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1919,18 +1585,14 @@ TTesDhwDpR50_99H ! input flow temperature [deg C]
 MPiDhwCircTesOut_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeDhwOut ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiDhwCircTesOut = [76,1]  !Changed automatically
 PPiDhwCircTesOut_kW = [76,3]/3600  !Changed automatically
 PPiDhwCircTesOutConv_kW = [76,4]/3600  !Changed automatically
 PPiDhwCircTesOutInt_kJ = [76,5]  !Changed automatically
 MPiDhwCircTesOut = MPiDhwCircTesOut_A
-
 UNIT 77 TYPE 931 !Changed automatically
-! PiPuOvRt
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1943,18 +1605,14 @@ TPuOverflowSh ! input flow temperature [deg C]
 MPiPuOvRt_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTeeShRt6 ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiPuOvRt = [77,1]  !Changed automatically
 PPiPuOvRt_kW = [77,3]/3600  !Changed automatically
 PPiPuOvRtConv_kW = [77,4]/3600  !Changed automatically
 PPiPuOvRtInt_kJ = [77,5]  !Changed automatically
 MPiPuOvRt = MPiPuOvRt_A
-
 UNIT 78 TYPE 931 !Changed automatically
-! PiDhwMains
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1967,18 +1625,14 @@ TsupplyWater ! input flow temperature [deg C]
 MPiDhwMains_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTesDhwDpR1_97H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiDhwMains = [78,1]  !Changed automatically
 PPiDhwMains_kW = [78,3]/3600  !Changed automatically
 PPiDhwMainsConv_kW = [78,4]/3600  !Changed automatically
 PPiDhwMainsInt_kJ = [78,5]  !Changed automatically
 MPiDhwMains = MPiDhwMains_A
-
 UNIT 79 TYPE 931 !Changed automatically
-! PiPuHxDhw2HxDHW
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -1991,18 +1645,14 @@ TPuHxDhwSec ! input flow temperature [deg C]
 MPiPuHxDhw2HxDHW_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 THxDHWSide2H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiPuHxDhw2HxDHW = [79,1]  !Changed automatically
 PPiPuHxDhw2HxDHW_kW = [79,3]/3600  !Changed automatically
 PPiPuHxDhw2HxDHWConv_kW = [79,4]/3600  !Changed automatically
 PPiPuHxDhw2HxDHWInt_kJ = [79,5]  !Changed automatically
 MPiPuHxDhw2HxDHW = MPiPuHxDhw2HxDHW_A
-
 UNIT 80 TYPE 931 !Changed automatically
-! PiHxDHW_Dhw
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -2015,18 +1665,14 @@ THxDHWSide2H ! input flow temperature [deg C]
 MPiHxDHW_Dhw_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TTesDhwDpL50_1H ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiHxDHW_Dhw = [80,1]  !Changed automatically
 PPiHxDHW_Dhw_kW = [80,3]/3600  !Changed automatically
 PPiHxDHW_DhwConv_kW = [80,4]/3600  !Changed automatically
 PPiHxDHW_DhwInt_kJ = [80,5]  !Changed automatically
 MPiHxDHW_Dhw = MPiHxDHW_Dhw_A
-
 UNIT 81 TYPE 931 !Changed automatically
-! PiHP_PuAux
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -2039,18 +1685,14 @@ THPCondH ! input flow temperature [deg C]
 MPiHP_PuAux_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TPuAux ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiHP_PuAux = [81,1]  !Changed automatically
 PPiHP_PuAux_kW = [81,3]/3600  !Changed automatically
 PPiHP_PuAuxConv_kW = [81,4]/3600  !Changed automatically
 PPiHP_PuAuxInt_kJ = [81,5]  !Changed automatically
 MPiHP_PuAux = MPiHP_PuAux_A
-
 UNIT 82 TYPE 931 !Changed automatically
-! PiTeeAuxHxRt_HP
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -2063,20 +1705,15 @@ TTeeAuxHxRt ! input flow temperature [deg C]
 MPiTeeAuxHxRt_HP_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 THPCondH ! reverse flow input temperature [deg C]
-***Initial values
 20 0.0 20 20
-
 EQUATIONS 5
 TPiTeeAuxHxRt_HP = [82,1]  !Changed automatically
 PPiTeeAuxHxRt_HP_kW = [82,3]/3600  !Changed automatically
 PPiTeeAuxHxRt_HPConv_kW = [82,4]/3600  !Changed automatically
 PPiTeeAuxHxRt_HPInt_kJ = [82,5]  !Changed automatically
 MPiTeeAuxHxRt_HP = MPiTeeAuxHxRt_HP_A
-
-*** Single pipe losses
 EQUATIONS 1
 spPipeEnIntTot = PPiDhwCircRtPuInt_kJ+PPiDhwCirctoTapInt_kJ+PPiAuxToDivInt_kJ+PPiHpEvapInInt_kJ+PPiFlFloor1Int_kJ+PPiFlFloor2Int_kJ+PPiFlFloor3Int_kJ+PPiFlFloor4Int_kJ+PPiFlFloor5Int_kJ+PPiFlFloor6Int_kJ+PPiRtFloor5Int_kJ+PPiShRt5to4Int_kJ+PPiRtFloor4Int_kJ+PPiRtFloor3Int_kJ+PPiRtFloor2Int_kJ+PPiShRt4to3Int_kJ+PPiShRt3to2Int_kJ+PPiShRt2to1Int_kJ+PPiRtFloor1Int_kJ+PPiShFltoPu1Int_kJ+PPiShFl1to2Int_kJ+PPiShFlToPu2Int_kJ+PPiShFl2to3Int_kJ+PPiShFlToPu3Int_kJ+PPiShFl3to4Int_kJ+PPiShFlToPu4Int_kJ+PPiShFl4to5Int_kJ+PPiShFlToPu5Int_kJ+PPiHpEvapOutInt_kJ+PPiHxDhwPriFlInt_kJ+PPiHxDhwPriRtInt_kJ+PPiTesDhwtoPuHxInt_kJ+PPiAuxtoTeeShFlInt_kJ+PPiShPriFlInt_kJ+PPiTeeShFlTesInt_kJ+PPiShPriRtInt_kJ+PPiTeeHxDhwRtInt_kJ+PPiTeeShRtTesInt_kJ+PPiPuDhwCircOutInt_kJ+PPiShFl5to6Int_kJ+PPiShFlToPu6Int_kJ+PPiPuOvFlInt_kJ+PPiFloor6RtInt_kJ+PPiPuOvRt6to5Int_kJ+PPiDhwtoTCircInt_kJ+PPiTesDhwTapOutInt_kJ+PPiDhwCircTesOutInt_kJ+PPiPuOvRtInt_kJ+PPiDhwMainsInt_kJ+PPiPuHxDhw2HxDHWInt_kJ+PPiHxDHW_DhwInt_kJ+PPiHP_PuAuxInt_kJ+PPiTeeAuxHxRt_HPInt_kJ
-
 UNIT 10 TYPE 150 !Changed automatically
 PARAMETERS 3
 1 ! Number of inputs
@@ -2084,16 +1721,13 @@ PARAMETERS 3
 0 ! Initial value
 INPUTS 1
 spPipeEnIntTot
-**
 0
-
 EQUATIONS 4
 spPipeConvectedTot = PPiDhwCircRtPuConv_kW+PPiDhwCirctoTapConv_kW+PPiAuxToDivConv_kW+PPiHpEvapInConv_kW+PPiFlFloor1Conv_kW+PPiFlFloor2Conv_kW+PPiFlFloor3Conv_kW+PPiFlFloor4Conv_kW+PPiFlFloor5Conv_kW+PPiFlFloor6Conv_kW+PPiRtFloor5Conv_kW+PPiShRt5to4Conv_kW+PPiRtFloor4Conv_kW+PPiRtFloor3Conv_kW+PPiRtFloor2Conv_kW+PPiShRt4to3Conv_kW+PPiShRt3to2Conv_kW+PPiShRt2to1Conv_kW+PPiRtFloor1Conv_kW+PPiShFltoPu1Conv_kW+PPiShFl1to2Conv_kW+PPiShFlToPu2Conv_kW+PPiShFl2to3Conv_kW+PPiShFlToPu3Conv_kW+PPiShFl3to4Conv_kW+PPiShFlToPu4Conv_kW+PPiShFl4to5Conv_kW+PPiShFlToPu5Conv_kW+PPiHpEvapOutConv_kW+PPiHxDhwPriFlConv_kW+PPiHxDhwPriRtConv_kW+PPiTesDhwtoPuHxConv_kW+PPiAuxtoTeeShFlConv_kW+PPiShPriFlConv_kW+PPiTeeShFlTesConv_kW+PPiShPriRtConv_kW+PPiTeeHxDhwRtConv_kW+PPiTeeShRtTesConv_kW+PPiPuDhwCircOutConv_kW+PPiShFl5to6Conv_kW+PPiShFlToPu6Conv_kW+PPiPuOvFlConv_kW+PPiFloor6RtConv_kW+PPiPuOvRt6to5Conv_kW+PPiDhwtoTCircConv_kW+PPiTesDhwTapOutConv_kW+PPiDhwCircTesOutConv_kW+PPiPuOvRtConv_kW+PPiDhwMainsConv_kW+PPiPuHxDhw2HxDHWConv_kW+PPiHxDHW_DhwConv_kW+PPiHP_PuAuxConv_kW+PPiTeeAuxHxRt_HPConv_kW
 PipeLossTot = PPiDhwCircRtPu_kW+PPiDhwCirctoTap_kW+PPiAuxToDiv_kW+PPiHpEvapIn_kW+PPiFlFloor1_kW+PPiFlFloor2_kW+PPiFlFloor3_kW+PPiFlFloor4_kW+PPiFlFloor5_kW+PPiFlFloor6_kW+PPiRtFloor5_kW+PPiShRt5to4_kW+PPiRtFloor4_kW+PPiRtFloor3_kW+PPiRtFloor2_kW+PPiShRt4to3_kW+PPiShRt3to2_kW+PPiShRt2to1_kW+PPiRtFloor1_kW+PPiShFltoPu1_kW+PPiShFl1to2_kW+PPiShFlToPu2_kW+PPiShFl2to3_kW+PPiShFlToPu3_kW+PPiShFl3to4_kW+PPiShFlToPu4_kW+PPiShFl4to5_kW+PPiShFlToPu5_kW+PPiHpEvapOut_kW+PPiHxDhwPriFl_kW+PPiHxDhwPriRt_kW+PPiTesDhwtoPuHx_kW+PPiAuxtoTeeShFl_kW+PPiShPriFl_kW+PPiTeeShFlTes_kW+PPiShPriRt_kW+PPiTeeHxDhwRt_kW+PPiTeeShRtTes_kW+PPiPuDhwCircOut_kW+PPiShFl5to6_kW+PPiShFlToPu6_kW+PPiPuOvFl_kW+PPiFloor6Rt_kW+PPiPuOvRt6to5_kW+PPiDhwtoTCirc_kW+PPiTesDhwTapOut_kW+PPiDhwCircTesOut_kW+PPiPuOvRt_kW+PPiDhwMains_kW+PPiPuHxDhw2HxDHW_kW+PPiHxDHW_Dhw_kW+PPiHP_PuAux_kW+PPiTeeAuxHxRt_HP_kW
 spPipeIntTot = (spPipeEnIntTot - [10,1]) / dtSim / 3600  !Changed automatically
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
 ASSIGN ex-hx-two-flow-solver-parameter-lines_complex_99_Mfr.prt 522
-
 UNIT 83 TYPE 25 !Changed automatically
 PARAMETERS 10
 dtSim! 1 Printing interval
@@ -2106,7 +1740,6 @@ STOP! 3 Stop time
 -1! 8 Print header
 0! 9 Delimiter
 1! 10 Print labels
-
 INPUTS 54
 xFracDivAux MPiDhwCircRtPu MPiDhwCirctoTap MPiAuxToDiv MPiHpEvapIn MPiFlFloor1 MPiFlFloor2 MPiFlFloor3
 MPiFlFloor4 MPiFlFloor5 MPiFlFloor6 MPiRtFloor5 MPiShRt5to4 MPiRtFloor4 MPiRtFloor3 MPiRtFloor2
@@ -2115,8 +1748,6 @@ MPiShFlToPu3 MPiShFl3to4 MPiShFlToPu4 MPiShFl4to5 MPiShFlToPu5 MPiHpEvapOut MPiH
 MPiTesDhwtoPuHx MPiAuxtoTeeShFl MPiShPriFl MPiTeeShFlTes MPiShPriRt MPiTeeHxDhwRt MPiTeeShRtTes MPiPuDhwCircOut
 MPiShFl5to6 MPiShFlToPu6 MPiPuOvFl MPiFloor6Rt MPiPuOvRt6to5 MPiDhwtoTCirc MPiTesDhwTapOut MPiDhwCircTesOut
 MPiPuOvRt MPiDhwMains MPiPuHxDhw2HxDHW MPiHxDHW_Dhw MPiHP_PuAux MPiTeeAuxHxRt_HP
-
-***
 xFracDivAux MPiDhwCircRtPu MPiDhwCirctoTap MPiAuxToDiv MPiHpEvapIn MPiFlFloor1 MPiFlFloor2 MPiFlFloor3
 MPiFlFloor4 MPiFlFloor5 MPiFlFloor6 MPiRtFloor5 MPiShRt5to4 MPiRtFloor4 MPiRtFloor3 MPiRtFloor2
 MPiShRt4to3 MPiShRt3to2 MPiShRt2to1 MPiRtFloor1 MPiShFltoPu1 MPiShFl1to2 MPiShFlToPu2 MPiShFl2to3
@@ -2124,10 +1755,7 @@ MPiShFlToPu3 MPiShFl3to4 MPiShFlToPu4 MPiShFl4to5 MPiShFlToPu5 MPiHpEvapOut MPiH
 MPiTesDhwtoPuHx MPiAuxtoTeeShFl MPiShPriFl MPiTeeShFlTes MPiShPriRt MPiTeeHxDhwRt MPiTeeShRtTes MPiPuDhwCircOut
 MPiShFl5to6 MPiShFlToPu6 MPiPuOvFl MPiFloor6Rt MPiPuOvRt6to5 MPiDhwtoTCirc MPiTesDhwTapOut MPiDhwCircTesOut
 MPiPuOvRt MPiDhwMains MPiPuHxDhw2HxDHW MPiHxDHW_Dhw MPiHP_PuAux MPiTeeAuxHxRt_HP
-
-
 ASSIGN ex-hx-two-flow-solver-parameter-lines_complex_99_T.prt 523
-
 UNIT 84 TYPE 25 !Changed automatically
 PARAMETERS 10
 dtSim! 1 Printing interval
@@ -2140,7 +1768,6 @@ STOP! 3 Stop time
 -1! 8 Print header
 0! 9 Delimiter
 1! 10 Print labels
-
 INPUTS 53
 TPiDhwCircRtPu TPiDhwCirctoTap TPiAuxToDiv TPiHpEvapIn TPiFlFloor1 TPiFlFloor2 TPiFlFloor3 TPiFlFloor4
 TPiFlFloor5 TPiFlFloor6 TPiRtFloor5 TPiShRt5to4 TPiRtFloor4 TPiRtFloor3 TPiRtFloor2 TPiShRt4to3
@@ -2149,8 +1776,6 @@ TPiShFl3to4 TPiShFlToPu4 TPiShFl4to5 TPiShFlToPu5 TPiHpEvapOut TPiHxDhwPriFl TPi
 TPiAuxtoTeeShFl TPiShPriFl TPiTeeShFlTes TPiShPriRt TPiTeeHxDhwRt TPiTeeShRtTes TPiPuDhwCircOut TPiShFl5to6
 TPiShFlToPu6 TPiPuOvFl TPiFloor6Rt TPiPuOvRt6to5 TPiDhwtoTCirc TPiTesDhwTapOut TPiDhwCircTesOut TPiPuOvRt
 TPiDhwMains TPiPuHxDhw2HxDHW TPiHxDHW_Dhw TPiHP_PuAux TPiTeeAuxHxRt_HP
-
-***
 TPiDhwCircRtPu TPiDhwCirctoTap TPiAuxToDiv TPiHpEvapIn TPiFlFloor1 TPiFlFloor2 TPiFlFloor3 TPiFlFloor4
 TPiFlFloor5 TPiFlFloor6 TPiRtFloor5 TPiShRt5to4 TPiRtFloor4 TPiRtFloor3 TPiRtFloor2 TPiShRt4to3
 TPiShRt3to2 TPiShRt2to1 TPiRtFloor1 TPiShFltoPu1 TPiShFl1to2 TPiShFlToPu2 TPiShFl2to3 TPiShFlToPu3
@@ -2158,40 +1783,16 @@ TPiShFl3to4 TPiShFlToPu4 TPiShFl4to5 TPiShFlToPu5 TPiHpEvapOut TPiHxDhwPriFl TPi
 TPiAuxtoTeeShFl TPiShPriFl TPiTeeShFlTes TPiShPriRt TPiTeeHxDhwRt TPiTeeShRtTes TPiPuDhwCircOut TPiShFl5to6
 TPiShFlToPu6 TPiPuOvFl TPiFloor6Rt TPiPuOvRt6to5 TPiDhwtoTCirc TPiTesDhwTapOut TPiDhwCircTesOut TPiPuOvRt
 TPiDhwMains TPiPuHxDhw2HxDHW TPiHxDHW_Dhw TPiHP_PuAux TPiTeeAuxHxRt_HP
-
-
 **********************************************************************
 ** TesDhw.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_complex_99\ex-hx-two-flow-solver-parameter-lines_complex_99\ddck\TesDhw 
 **********************************************************************
 *************************************
 **BEGIN TesDhw.ddck
 *************************************
-*************************************
-**BEGIN TesDhw.ddck
-*************************************
-
-*************************************
-** Plug-Flow Model exported from TRNSYS GUI
-*************************************
-
-*************************************
-** To be checked: 
-** check cp and rho values for the circuits 
-** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
-*************************************
-
-*************************************
-** outputs to energy balance in kWh
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
-*************************************
 EQUATIONS 3
 qSysOut_TesDhwLoss = QLoss_Tes2
 qSysOut_TesDhwAcum = QAcum_Tes2
 elSysIn_Q_TesDhwAux = qHeatSource_Tes2
-
-*************************************
-*** Inputs from hydraulic solver ****
-*************************************
 EQUATIONS 3
 Tdp1In_Tes2 = TPiHxDHW_Dhw
 Mfrdp1_Tes2 = MTesDhwDpL50_1_A
@@ -2207,48 +1808,29 @@ Tdp3InRev_Tes2 = TPiDhwCircTesOut
 CONSTANTS 2
 zAux1_Tes2=0.00
 qAux1_Tes2=0.00
-
-*************************************
-**** Outputs to hydraulic solver ****
-*************************************
 EQUATIONS 3
-*** direct port outputs
 TTesDhwDpL50_1=[85,1] !Changed automatically
 TTesDhwDpR1_97=[85,3] !Changed automatically
 TTesDhwDpR50_99=[85,5] !Changed automatically
-
-*************************************
-****** Parameters of Type1924 *******
-*************************************
 CONSTANTS 1
 ratioTes2 = Vol_Tes2 / VStoreRef
-*********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
 zInDp1_Tes2=0.50
 zOutDp1_Tes2=0.01
-*********Connecting values of DIRECT PORT=2***********
 CONSTANTS 2
 zInDp2_Tes2=0.01
 zOutDp2_Tes2=0.97
-*********Connecting values of DIRECT PORT=3***********
 CONSTANTS 2
 zInDp3_Tes2=0.50
 zOutDp3_Tes2=0.99
-*********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
-*********Constant of DIRECT PORT=2***********
 CONSTANTS 1
 Dp2Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
-*********Constant of DIRECT PORT=3***********
 CONSTANTS 1
 Dp3Strat_Tes2=0 ! 0: no forced stratification ; 1: force to stratify
-********** HEAT EXCHANGER CONSTANTS*******
 CONSTANTS 1
 nHxUsed_Tes2=0 
-*************************************
-** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
-*************************************
 CONSTANTS 10
 zSen1_Tes2=0.05
 zSen2_Tes2=0.15
@@ -2260,9 +1842,6 @@ zSen7_Tes2=0.65
 zSen8_Tes2=0.75
 zSen9_Tes2=0.85
 zSen10_Tes2=0.95
-*************************************
-** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
-*************************************
 CONSTANTS 10
 zSenAvgBot1_Tes2 = 0.05
 zSenAvgTop1_Tes2 = 0.15
@@ -2298,15 +1877,11 @@ Uaz1_Tes2 = Ufoam_Tes2*ALat_Tes2/3 !  W/k
 Uaz2_Tes2 = Ufoam_Tes2*ALat_Tes2/3 !  W/k
 Uaz3_Tes2 = Ufoam_Tes2*ALat_Tes2/3 !  W/k
 UaTop_Tes2 = Ufoam_Tes2*ATop_Tes2 !  W/k
-************* MOVING PLATE *******************
 CONSTANTS 4
 MoInsPlate_Tes2=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
 zInsPlate_Tes2=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
 TinsPlate_Tes2=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
 UAinsPlate_Tes2=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
-*************************************
-********** TYPE DEFINITION **********
-*************************************
 UNIT 85 TYPE 1925      !Changed automatically
 PARAMETERS 219 
 Vol_Tes2     ! 1: m3, volume of store
@@ -2348,22 +1923,14 @@ zInsPlate_Tes2  ! 82: 0-1, relative position of fixed height insulation plate in
 TinsPlate_Tes2  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
 UAinsPlate_Tes2 ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
 nHxUsed_Tes2     ! 85: number Of used Hx
-** Parameters for heat Exchanger number 1
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 1
-** Parameters for heat Exchanger number 2
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 2
-** Parameters for heat Exchanger number 3
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 3
-** Parameters for heat Exchanger number 4
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 4
-** Parameters for heat Exchanger number 5
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 5
-** Parameters for heat Exchanger number 6
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 6
-** 20 height position for any heat source, e.g. electrical backup or heat pump condenser. Any position can be due to a different heat source
 zAux1_Tes2 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
 INPUTS 69
-************10 DIRECT PORTS INPUTS***************
 Tdp1In_Tes2 Mfrdp1_Tes2 Tdp1InRev_Tes2
 Tdp2In_Tes2 Mfrdp2_Tes2 Tdp2InRev_Tes2
 Tdp3In_Tes2 Mfrdp3_Tes2 Tdp3InRev_Tes2
@@ -2374,18 +1941,14 @@ zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
-****************
 TroomStore
-***************** 6 HX INPUTS ******************
 zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
-***************** 20 HEAT SOURCE INPUTS ******************
 qAux1_Tes2 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
-****************** INTIAL INPUTS***********************
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero zero 
@@ -2393,14 +1956,12 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
-*****************OUTPUTS****************
 EQUATIONS 3
 Qdp1_Tes2=[85,31]  !Changed automatically
 Qdp2_Tes2=[85,32]  !Changed automatically
 Qdp3_Tes2=[85,33]  !Changed automatically
 EQUATIONS 21
 TAvg_Tes2 = [85,180]  !Changed automatically
-***Temperatures at 10 equallay distributed height 
 T1_Tes2 =[85,21]  !Changed automatically
 T2_Tes2 =[85,22]  !Changed automatically
 T3_Tes2 =[85,23]  !Changed automatically
@@ -2411,7 +1972,6 @@ T7_Tes2 =[85,27]  !Changed automatically
 T8_Tes2 =[85,28]  !Changed automatically
 T9_Tes2 =[85,29]  !Changed automatically
 T10_Tes2 =[85,30]  !Changed automatically
-***Temperatures at 10 sensors user defined height
 Tsen1_Tes2 =[85,71]  !Changed automatically
 Tsen2_Tes2 =[85,72]  !Changed automatically
 Tsen3_Tes2 =[85,73]  !Changed automatically
@@ -2443,10 +2003,6 @@ unitPrinter_Tes2 ! 1: Logical unit number, -
 INPUTS 9
 Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 Qdp3_Tes2 qHeatSource_Tes2 
 zero zero zero zero zero zero zero zero zero 
-*************************************
-********** Online Plotter ***********
-*************************************
-
 UNIT 87 TYPE 65      !Changed automatically
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 
@@ -2468,40 +2024,16 @@ LABELS  3
 Temperatures  
 MassFlows  
 Tes2
-
-
 **********************************************************************
 ** TesSh.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_complex_99\ex-hx-two-flow-solver-parameter-lines_complex_99\ddck\TesSh 
 **********************************************************************
 *************************************
 **BEGIN TesSh.ddck
 *************************************
-*************************************
-**BEGIN TesSh.ddck
-*************************************
-
-*************************************
-** Plug-Flow Model exported from TRNSYS GUI
-*************************************
-
-*************************************
-** To be checked: 
-** check cp and rho values for the circuits 
-** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
-*************************************
-
-*************************************
-** outputs to energy balance in kWh
-** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
-*************************************
 EQUATIONS 3
 qSysOut_TesShLoss = QLoss_Tes1
 qSysOut_TesShAcum = QAcum_Tes1
 elSysIn_Q_TesShAux = qHeatSource_Tes1
-
-*************************************
-*** Inputs from hydraulic solver ****
-*************************************
 EQUATIONS 3
 Tdp1In_Tes1 = TPiShPriFl
 Mfrdp1_Tes1 = MTesShDpL90_2_A
@@ -2509,34 +2041,19 @@ Tdp1InRev_Tes1 = TPiShPriRt
 CONSTANTS 2
 zAux1_Tes1=0.00
 qAux1_Tes1=0.00
-
-*************************************
-**** Outputs to hydraulic solver ****
-*************************************
 EQUATIONS 1
-*** direct port outputs
 TTesShDpL90_2=[89,1] !Changed automatically
-
-*************************************
-****** Parameters of Type1924 *******
-*************************************
 CONSTANTS 3
 TRoomStore=15 ! 
 VStoreRef = 0.763
 ratioTes1 = Vol_Tes1 / VStoreRef
-*********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
 zInDp1_Tes1=0.90
 zOutDp1_Tes1=0.02
-*********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
-********** HEAT EXCHANGER CONSTANTS*******
 CONSTANTS 1
 nHxUsed_Tes1=0 
-*************************************
-** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
-*************************************
 CONSTANTS 10
 zSen1_Tes1=0.05
 zSen2_Tes1=0.15
@@ -2548,9 +2065,6 @@ zSen7_Tes1=0.65
 zSen8_Tes1=0.75
 zSen9_Tes1=0.85
 zSen10_Tes1=0.95
-*************************************
-** USER DEFINED AVERAGED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
-*************************************
 CONSTANTS 10
 zSenAvgBot1_Tes1 = 0.05
 zSenAvgTop1_Tes1 = 0.15
@@ -2586,15 +2100,11 @@ Uaz1_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
 Uaz2_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
 Uaz3_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
 UaTop_Tes1 = Ufoam_Tes1*ATop_Tes1 !  W/k
-************* MOVING PLATE *******************
 CONSTANTS 4
 MoInsPlate_Tes1=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
 zInsPlate_Tes1=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
 TinsPlate_Tes1=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
 UAinsPlate_Tes1=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
-*************************************
-********** TYPE DEFINITION **********
-*************************************
 UNIT 89 TYPE 1924      !Changed automatically
 PARAMETERS 219 
 Vol_Tes1     ! 1: m3, volume of store
@@ -2636,22 +2146,14 @@ zInsPlate_Tes1  ! 82: 0-1, relative position of fixed height insulation plate in
 TinsPlate_Tes1  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
 UAinsPlate_Tes1 ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
 nHxUsed_Tes1     ! 85: number Of used Hx
-** Parameters for heat Exchanger number 1
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 1
-** Parameters for heat Exchanger number 2
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 2
-** Parameters for heat Exchanger number 3
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 3
-** Parameters for heat Exchanger number 4
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 4
-** Parameters for heat Exchanger number 5
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 5
-** Parameters for heat Exchanger number 6
 -1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 6
-** 20 height position for any heat source, e.g. electrical backup or heat pump condenser. Any position can be due to a different heat source
 zAux1_Tes1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
 INPUTS 69
-************10 DIRECT PORTS INPUTS***************
 Tdp1In_Tes1 Mfrdp1_Tes1 Tdp1InRev_Tes1
 zero zero zero
 zero zero zero
@@ -2662,18 +2164,14 @@ zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
-****************
 TroomStore
-***************** 6 HX INPUTS ******************
 zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
 zero zero zero
-***************** 20 HEAT SOURCE INPUTS ******************
 qAux1_Tes1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
-****************** INTIAL INPUTS***********************
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero zero 
@@ -2681,12 +2179,10 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
-*****************OUTPUTS****************
 EQUATIONS 1
 Qdp1_Tes1=[89,31]  !Changed automatically
 EQUATIONS 21
 TAvg_Tes1 = [89,180]  !Changed automatically
-***Temperatures at 10 equallay distributed height 
 T1_Tes1 =[89,21]  !Changed automatically
 T2_Tes1 =[89,22]  !Changed automatically
 T3_Tes1 =[89,23]  !Changed automatically
@@ -2697,7 +2193,6 @@ T7_Tes1 =[89,27]  !Changed automatically
 T8_Tes1 =[89,28]  !Changed automatically
 T9_Tes1 =[89,29]  !Changed automatically
 T10_Tes1 =[89,30]  !Changed automatically
-***Temperatures at 10 sensors user defined height
 Tsen1_Tes1 =[89,71]  !Changed automatically
 Tsen2_Tes1 =[89,72]  !Changed automatically
 Tsen3_Tes1 =[89,73]  !Changed automatically
@@ -2729,10 +2224,6 @@ unitPrinter_Tes1 ! 1: Logical unit number, -
 INPUTS 7
 Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 qHeatSource_Tes1 
 zero zero zero zero zero zero zero 
-*************************************
-********** Online Plotter ***********
-*************************************
-
 UNIT 91 TYPE 65      !Changed automatically
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 
@@ -2754,24 +2245,9 @@ LABELS  3
 Temperatures  
 MassFlows  
 Tes1
-
-
 **********************************************************************
 ** end.ddck from C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram\data\tests\ex-hx-two-flow-solver-parameter-lines_complex_99\ex-hx-two-flow-solver-parameter-lines_complex_99\ddck\generic 
 **********************************************************************
-*******************************
-**BEGIN Head.ddck
-*******************************
-*******************************
-**BEGIN Head.ddck
-*******************************
-    
-*****************************************
-** Contact person: Dani Carbonell        
-** Date: 30.09.2016
-*****************************************
-
-END
 ***************************************************************
 **BEGIN Monthly Energy Balance printer automatically generated from DDck files
 ***************************************************************
@@ -2810,7 +2286,7 @@ INPUTS 10
 TIME qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_TesDhwLoss qSysOut_TesDhwAcum elSysIn_Q_TesDhwAux qSysOut_TesShLoss qSysOut_TesShAcum elSysIn_Q_TesShAux qImb
 *******************************
 TIME qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_TesDhwLoss qSysOut_TesDhwAcum elSysIn_Q_TesDhwAux qSysOut_TesShLoss qSysOut_TesShAcum elSysIn_Q_TesShAux qImb
-
 *******************************
-**END End.ddck
+**BEGIN Head.ddck
 *******************************
+END
