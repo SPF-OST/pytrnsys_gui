@@ -109,8 +109,7 @@ class TestEditor:
         hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
         helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
 
-    @staticmethod
-    def _exportAndTestPlaceholdersJsonAndDeckFile(mainWindow, testProject, helper, monkeypatch):
+    def _exportAndTestPlaceholdersJsonAndDeckFile(self, mainWindow, testProject, helper, monkeypatch):
         def dummyInformation(*_, **__):
             return _qtw.QMessageBox.Ok
 
@@ -122,7 +121,21 @@ class TestEditor:
         helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
 
         deckFileName = f"{testProject.projectName}.dck"
-        helper.ensureFilesAreEqual(deckFileName)
+
+        pathPrefixes = self._getHardCodedPathPrefixesForReplacingInExpectedDeck()
+        helper.ensureFilesAreEqual(deckFileName, replaceInExpected=pathPrefixes)
+
+    @staticmethod
+    def _getHardCodedPathPrefixesForReplacingInExpectedDeck():
+        hardCodedPathPrefixInExpectedDeck = (
+            r"C:\Users\damian.birchler\src\pytrnsys\wd1\pytrnsys_gui\tests\trnsysGUI\diagram"
+        )
+
+        hardCodedPathPrefixInActualDeck = str(_pl.Path(__file__).parent)
+
+        pathPrefixes = (hardCodedPathPrefixInExpectedDeck, hardCodedPathPrefixInActualDeck)
+
+        return pathPrefixes
 
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testSaveAndReloadProject(
@@ -270,10 +283,17 @@ class _Helper:
             else:
                 child.unlink()
 
-    def ensureFilesAreEqual(self, fileRelativePathAsString: str) -> None:
+    def ensureFilesAreEqual(
+        self, fileRelativePathAsString: str, replaceInExpected: _tp.Optional[_tp.Tuple[str, str]] = None
+    ) -> None:
         actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
+
         actualContent = actualFilePath.read_text()
+
         expectedContent = expectedFilePath.read_text(encoding="windows-1252")
+        if replaceInExpected:
+            old, new = replaceInExpected
+            expectedContent = expectedContent.replace(old, new)
 
         assert actualContent == expectedContent
 
