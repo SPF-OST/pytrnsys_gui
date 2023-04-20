@@ -42,8 +42,8 @@ def _getUntrackedPathsRelativeToRepoRoot(projectFolderPathUnderVersionControl: _
     for statusAndUntrackedPath in statusesAndUntrackedPath:
         status, untrackedPathAsString = statusAndUntrackedPath.split()
 
-        modifiedStatus = "??"
-        if status != modifiedStatus:
+        untrackedStatus = "??"
+        if status != untrackedStatus:
             continue
 
         untrackedPath = _pl.Path(untrackedPathAsString)
