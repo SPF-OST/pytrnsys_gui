@@ -184,10 +184,10 @@ class TestEditor:
         helper.ensureFilesAreEqual(massFlowSolverDeckFileName)
 
         massFlowRatesPrintFileName = f"{testProject.projectName}_Mfr.prt"
-        helper.ensureCSVsAreEqual(massFlowRatesPrintFileName)
+        helper.ensureDataFramesAreEqual(massFlowRatesPrintFileName)
 
         temperaturesPintFileName = f"{testProject.projectName}_T.prt"
-        helper.ensureCSVsAreEqual(temperaturesPintFileName)
+        helper.ensureDataFramesAreEqual(temperaturesPintFileName)
 
         massFlowRatesPrintFilePath = helper.actualProjectFolderPath / massFlowRatesPrintFileName
         temperaturesPrintFilePath = helper.actualProjectFolderPath / temperaturesPintFileName
