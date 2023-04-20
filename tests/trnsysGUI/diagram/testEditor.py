@@ -1,5 +1,3 @@
-import dataclasses as _dc
-import logging as _log
 import os as _os
 import pathlib as _pl
 import shutil as _su
@@ -7,11 +5,12 @@ import subprocess as _sp
 import time as _time
 import typing as _tp
 
-import pandas as _pd
+import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
 
 import pytrnsys.utils.log as _ulog
+
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -20,72 +19,79 @@ import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
 
-_DATA_DIR = _pl.Path(__file__).parent / "data"
+from . import _testHelper as _th
 
 
-@_dc.dataclass
-class _Project:
-    projectName: str
-    testCasesDirName: str
-    exampleDirNameToCopyFrom: _tp.Optional[str] = None
-
-    @staticmethod
-    def createForTestProject(projectName: str) -> "_Project":
-        return _Project(projectName, "tests")
-
-    @staticmethod
-    def createForExampleProject(projectName: str, exampleDirNameToCopyFrom: str = "examples") -> "_Project":
-        return _Project(projectName, "examples", exampleDirNameToCopyFrom)
-
-    @property
-    def testId(self) -> str:
-        return f"{self.testCasesDirName}/{self.projectName}"
-
-
-def getProjects() -> _tp.Iterable[_Project]:
-    yield _Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
-    yield _Project.createForExampleProject("icegrid")
+def getProjects() -> _tp.Iterable[_th.Project]:
+    yield _th.Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
+    yield _th.Project.createForExampleProject("icegrid")
 
     yield from getTestProjects()
 
 
-def getTestProjects() -> _tp.Iterable[_Project]:
-    testProjectTestCasesDir = _DATA_DIR / "tests"
+def getTestProjects() -> _tp.Iterable[_th.Project]:
+    testProjectTestCasesDir = _th.DATA_DIR / "tests"
     testProjectTestCaseDirPaths = [tc for tc in testProjectTestCasesDir.iterdir() if tc.name != "README.txt"]
     for testProjectTestCaseDirPath in testProjectTestCaseDirPaths:
         projectName = testProjectTestCaseDirPath.name
-        yield _Project.createForTestProject(projectName)
+        yield _th.Project.createForTestProject(projectName)
 
 
 TEST_CASES = [_pt.param(p, id=p.testId) for p in getProjects()]
 
 
 class TestEditor:
-    @_pt.mark.parametrize("project", TEST_CASES)
-    def testStorageAndHydraulicExports(self, project: _Project, qtbot) -> None:  # pylint: disable=too-many-locals
-        helper = _Helper(project)
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testExportStorages(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        helper = _th.Helper(testProject)
         helper.setup()
 
-        projectFolderPath = helper.actualProjectFolderPath
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        editor = mainWindow.editor
 
-        editor = self._createEditor(projectFolderPath)
-        qtbot.addWidget(editor)
+        self._exportAndTestStorageDdckFiles(editor, helper)
 
-        editor.exportHydraulics(exportTo="mfs")
-        mfsDdckRelativePath = f"{project.projectName}_mfs.dck"
-        helper.ensureFilesAreEqual(mfsDdckRelativePath)
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testExportHydraulic(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        helper = _th.Helper(testProject)
+        helper.setup()
 
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        editor = mainWindow.editor
+
+        self._exportAndTestHydraulicDdckFile(editor, helper)
+
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testExportPlaceholders(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        helper = _th.Helper(testProject)
+        helper.setup()
+
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        editor = mainWindow.editor
+
+        self._exportAndTestDdckPlaceholdersJsonFile(editor, helper, monkeypatch)
+
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testExportDeck(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        helper = _th.Helper(testProject)
+        helper.setup()
+
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        editor = mainWindow.editor
+
+        monkeypatch.chdir(helper.actualProjectFolderPath)
+
+        self._exportAndTestStorageDdckFiles(editor, helper)
+
+        self._exportAndTestHydraulicDdckFile(editor, helper)
+
+        self._exportAndTestDeckFile(mainWindow, testProject, helper, monkeypatch)
+
+    def _exportAndTestStorageDdckFiles(self, editor, helper):
         storageTankNames = self._exportStorageTanksAndGetNames(editor)
         for storageTankName in storageTankNames:
             ddckFileRelativePath = f"ddck/{storageTankName}/{storageTankName}.ddck"
             helper.ensureFilesAreEqual(ddckFileRelativePath)
-
-        editor.exportHydraulics(exportTo="ddck")
-        hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
-        helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
-
-        editor.exportDdckPlaceHolderValuesJsonFile(shallShowMessageOnSuccess=False)
-        helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
 
     @classmethod
     def _exportStorageTanksAndGetNames(cls, editor: _de.Editor) -> _tp.Sequence[str]:  # type: ignore[name-defined]
@@ -98,25 +104,59 @@ class TestEditor:
 
         return storageTankNames
 
+    @staticmethod
+    def _exportAndTestHydraulicDdckFile(editor, helper):
+        editor.exportHydraulics(exportTo="ddck")
+        hydraulicDdckRelativePath = "ddck/hydraulic/hydraulic.ddck"
+        helper.ensureFilesAreEqual(hydraulicDdckRelativePath)
+
+    @staticmethod
+    def _exportAndTestDdckPlaceholdersJsonFile(editor, helper, monkeypatch):
+        def dummyInformation(*_, **__):
+            return _qtw.QMessageBox.Ok
+
+        monkeypatch.setattr(
+            _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
+        )
+
+        editor.exportDdckPlaceHolderValuesJsonFile()
+        helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
+
+    def _exportAndTestDeckFile(self, mainWindow, testProject, helper, monkeypatch):
+        def dummyInformation(*_, **__):
+            return _qtw.QMessageBox.Ok
+
+        monkeypatch.setattr(
+            _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
+        )
+
+        mainWindow.exportDck()
+
+        deckFileName = f"{testProject.projectName}.dck"
+
+        pathPrefixes = self._getHardCodedPathPrefixesForReplacingInExpectedDeck()
+        helper.ensureFilesAreEqual(deckFileName, replaceInExpected=pathPrefixes)
+
+    @staticmethod
+    def _getHardCodedPathPrefixesForReplacingInExpectedDeck():
+        hardCodedPathPrefixInExpectedDeck = r"C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram"
+
+        hardCodedPathPrefixInActualDeck = str(_pl.Path(__file__).parent)
+
+        pathPrefixes = (hardCodedPathPrefixInExpectedDeck, hardCodedPathPrefixInActualDeck)
+
+        return pathPrefixes
+
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testSaveAndReloadProject(
-        self, testProject: _Project, qtbot, monkeypatch
+        self, testProject: _th.Project, qtbot, monkeypatch
     ) -> None:  # pylint: disable=too-many-locals
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
 
-        helper = _Helper(testProject)
+        helper = _th.Helper(testProject)
         helper.setup()
 
-        monkeypatch.setattr(
-            _mw.MainWindow,  # type: ignore[attr-defined]
-            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            _patchedCloseEvent,
-        )
-
-        jsonFilePath = helper.actualProjectFolderPath / f"{helper.actualProjectFolderPath.name}.json"
-        project = _prj.LoadProject(jsonFilePath)
-        mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
-        qtbot.addWidget(mainWindow)
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
 
         convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
         while convertedProjectFolderPath.exists():
@@ -132,35 +172,49 @@ class TestEditor:
 
     @_pt.mark.needs_trnsys
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testMassFlowSolver(self, testProject: _Project, qtbot, monkeypatch) -> None:
-        helper = _Helper(testProject)
+    def testMassFlowSolver(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        helper = _th.Helper(testProject)
         helper.setup()
+
+        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+
+        self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
+
+        massFlowSolverDeckFileName = f"{testProject.projectName}_mfs.dck"
+        helper.ensureFilesAreEqual(massFlowSolverDeckFileName)
+
+        massFlowRatesPrintFileName = f"{testProject.projectName}_Mfr.prt"
+        helper.ensureDataFramesAreEqual(massFlowRatesPrintFileName)
+
+        temperaturesPintFileName = f"{testProject.projectName}_T.prt"
+        helper.ensureDataFramesAreEqual(temperaturesPintFileName)
+
+        massFlowRatesPrintFilePath = helper.actualProjectFolderPath / massFlowRatesPrintFileName
+        temperaturesPrintFilePath = helper.actualProjectFolderPath / temperaturesPintFileName
+        self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow)
+
+    @staticmethod
+    def _createMainWindow(helper, qtbot, monkeypatch):
+        def patchedCloseEvent(_, closeEvent):
+            return closeEvent.accept()
 
         monkeypatch.setattr(
             _mw.MainWindow,  # type: ignore[attr-defined]
             _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            _patchedCloseEvent,
+            patchedCloseEvent,
         )
 
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
         project = _prj.LoadProject(projectJsonFilePath)
+
         logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
+
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
 
         qtbot.addWidget(mainWindow)
 
-        self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
-
-        massFlowRatesPrintFileName = f"{testProject.projectName}_Mfr.prt"
-        helper.ensureCSVsAreEqual(massFlowRatesPrintFileName)
-
-        temperaturesPintFileName = f"{testProject.projectName}_T.prt"
-        helper.ensureCSVsAreEqual(temperaturesPintFileName)
-
-        massFlowRatesPrintFilePath = helper.actualProjectFolderPath / massFlowRatesPrintFileName
-        temperaturesPrintFilePath = helper.actualProjectFolderPath / temperaturesPintFileName
-        self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow)
+        return mainWindow
 
     @staticmethod
     def _assertMassFlowVisualizerLoadsData(
@@ -208,90 +262,3 @@ class TestEditor:
     def _exportHydraulic(cls, editor: _de.Editor, *, _format) -> str:  # type: ignore[name-defined]
         exportedFilePath = editor.exportHydraulics(exportTo=_format)
         return exportedFilePath
-
-    @staticmethod
-    def _createEditor(projectFolderPath):
-        logger = _log.Logger("root")
-        editor = _de.Editor(
-            parent=None,
-            projectFolder=str(projectFolderPath),
-            jsonPath=None,
-            loadValue="load",
-            logger=logger,
-        )
-        return editor
-
-
-def _patchedCloseEvent(_, closeEvent):
-    return closeEvent.accept()
-
-
-class _Helper:
-    def __init__(
-        self,
-        project: _Project,
-    ):
-        self._project = project
-
-        testCasesFolderPath = _DATA_DIR / self._project.testCasesDirName
-
-        # project name is used twice because the project file must always be contained in a folder
-        # of the same name
-        self.actualProjectFolderPath = testCasesFolderPath / self._project.projectName / self._project.projectName
-
-        self._expectedProjectFolderPath = testCasesFolderPath / self._project.projectName / "expected"
-
-    def setup(self):
-        if self._project.exampleDirNameToCopyFrom:
-            self._copyExampleToTestInputFolder()
-
-        self._removeGeneratedFiles()
-
-    def _removeGeneratedFiles(self):
-        for child in self.actualProjectFolderPath.iterdir():
-            if child.name in ("ddck", f"{self._project.projectName}.json"):
-                continue
-
-            if child.is_dir():
-                _su.rmtree(child)
-            else:
-                child.unlink()
-
-    def ensureFilesAreEqual(self, fileRelativePathAsString: str) -> None:
-        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
-        actualContent = actualFilePath.read_text()
-        expectedContent = expectedFilePath.read_text(encoding="windows-1252")
-
-        assert actualContent == expectedContent
-
-    def _getActualAndExpectedFilePath(self, fileRelativePathAsString):
-        fileRelativePath = _pl.Path(fileRelativePathAsString)
-        actualFilePath = self.actualProjectFolderPath / fileRelativePath
-        expectedFilePath = self._expectedProjectFolderPath / fileRelativePath
-        return actualFilePath, expectedFilePath
-
-    def ensureCSVsAreEqual(self, fileRelativePathAsString: str, absoluteTolerance: float = 1e-10) -> None:
-        actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
-
-        actualDf: _pd.DataFrame = _pd.read_csv(actualFilePath, delim_whitespace=True)
-        expectedDf: _pd.DataFrame = _pd.read_csv(expectedFilePath, delim_whitespace=True)
-
-        assert actualDf.shape == expectedDf.shape
-
-        actualColumns = "\n".join(sorted(actualDf.columns))  # pylint: disable=no-member
-        expectedColumns = "\n".join(sorted(expectedDf.columns))  # pylint: disable=no-member
-
-        assert actualColumns == expectedColumns
-
-        maxAbsoluteDifference = (actualDf - expectedDf).max().max()
-
-        assert maxAbsoluteDifference <= absoluteTolerance
-
-    def _copyExampleToTestInputFolder(self):
-        if self.actualProjectFolderPath.exists():
-            _su.rmtree(self.actualProjectFolderPath)
-
-        pytrnsysGuiDir = _pl.Path(__file__).parents[3]
-        exampleFolderPath = pytrnsysGuiDir / "data" / self._project.exampleDirNameToCopyFrom / self._project.projectName
-
-        _su.copytree(exampleFolderPath, self.actualProjectFolderPath)

@@ -24,14 +24,17 @@ TTesDpL50_10H=TTesDpL50_10
 TColH=TCol
 THPH=THP
 
-UNIT 450 TYPE 9351
-PARAMETERS 49
+UNIT 450 TYPE 9352
+PARAMETERS 52
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 12
 6 8 0 0        !1 : TesInHx
 12 5 0 0       !2 : TesDpL50_10
 5 11 0 0       !3 : Col
 9 6 0 0        !4 : HP
-2 3 0 0        !5 : Tes-Col
+2 3 0 0        !5 : Tes_Col
 1 4 0 0        !6 : PiTes_HP
 8 9 0 1        !7 : Pump109
 1 7 0 0        !8 : PiTes_Pump109
@@ -55,8 +58,8 @@ MCol_A=[450,7]
 MCol_B=[450,8]
 MHP_A=[450,10]
 MHP_B=[450,11]
-MTes-Col_A=[450,13]
-MTes-Col_B=[450,14]
+MTes_Col_A=[450,13]
+MTes_Col_B=[450,14]
 MPiTes_HP_A=[450,16]
 MPiTes_HP_B=[450,17]
 MPump109_A=[450,19]
@@ -94,7 +97,7 @@ Lloop2Cp = FwaterCp
 
 
 UNIT 451 TYPE 931
-! Tes-Col
+! Tes_Col
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -104,18 +107,18 @@ Lloop1Cp ! specific heat [kJ/(kg*K)]
 20 ! Initial fluid temperature [deg C]
 INPUTS 4
 TTesDpL50_10H ! input flow temperature [deg C]
-MTes-Col_A ! input mass flow [kg/h]
+MTes_Col_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TColH ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 5
-TTes-Col = [451,1] ! Output flow temperature [deg C]
-PTes-Col_kW = [451,3]/3600 ! Dissipated heat [kW]
-PTes-ColConv_kW = [451,4]/3600 ! Convected heat [kW]
-PTes-ColInt_kJ = [451,5] ! Accumulated internal energy since start of simulation [kJ]
-MTes-Col = MTes-Col_A
+TTes_Col = [451,1] ! Output flow temperature [deg C]
+PTes_Col_kW = [451,3]/3600 ! Dissipated heat [kW]
+PTes_ColConv_kW = [451,4]/3600 ! Convected heat [kW]
+PTes_ColInt_kJ = [451,5] ! Accumulated internal energy since start of simulation [kJ]
+MTes_Col = MTes_Col_A
 
 UNIT 452 TYPE 931
 ! PiTes_HP
@@ -239,7 +242,7 @@ MPiPump114_Tes = MPiPump114_Tes_A
 
 *** Single pipe losses
 EQUATIONS 1
-spPipeEnIntTot = PTes-ColInt_kJ+PPiTes_HPInt_kJ+PPiTes_Pump109Int_kJ+PPiPump109_HPInt_kJ+PPiCol_Pump114Int_kJ+PPiPump114_TesInt_kJ
+spPipeEnIntTot = PTes_ColInt_kJ+PPiTes_HPInt_kJ+PPiTes_Pump109Int_kJ+PPiPump109_HPInt_kJ+PPiCol_Pump114Int_kJ+PPiPump114_TesInt_kJ
 
 UNIT 100 TYPE 150
 PARAMETERS 3
@@ -252,8 +255,8 @@ spPipeEnIntTot
 0
 
 EQUATIONS 4
-spPipeConvectedTot = PTes-ColConv_kW+PPiTes_HPConv_kW+PPiTes_Pump109Conv_kW+PPiPump109_HPConv_kW+PPiCol_Pump114Conv_kW+PPiPump114_TesConv_kW
-PipeLossTot = PTes-Col_kW+PPiTes_HP_kW+PPiTes_Pump109_kW+PPiPump109_HP_kW+PPiCol_Pump114_kW+PPiPump114_Tes_kW
+spPipeConvectedTot = PTes_ColConv_kW+PPiTes_HPConv_kW+PPiTes_Pump109Conv_kW+PPiPump109_HPConv_kW+PPiCol_Pump114Conv_kW+PPiPump114_TesConv_kW
+PipeLossTot = PTes_Col_kW+PPiTes_HP_kW+PPiTes_Pump109_kW+PPiPump109_HP_kW+PPiCol_Pump114_kW+PPiPump114_Tes_kW
 spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
 ASSIGN storage-tank_Mfr.prt 457
@@ -272,10 +275,10 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 6
-MTes-Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
+MTes_Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
 
 ***
-MTes-Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
+MTes_Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
 
 
 ASSIGN storage-tank_T.prt 458
@@ -294,9 +297,9 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 6
-TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
+TTes_Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
 
 ***
-TTes-Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
+TTes_Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
 
 

@@ -60,6 +60,16 @@ OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
 EQSOLVER solver_equation           ! EQUATION SOLVER statement
 TIME_REPORT time_report
 
+
+**************************************
+*** MASS FLOW SOLVER CONSTANTS  ******
+**************************************
+
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
+
 ************************************** 
 ***User defined printer settings******
 **************************************
@@ -117,14 +127,17 @@ EQUATIONS 2
 TPump88 = TPiTes_Pump88
 TPump93 = TPiPump93_Col
 
-UNIT 450 TYPE 9351
-PARAMETERS 49
+UNIT 450 TYPE 9352
+PARAMETERS 52
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 12
 6 8 0 0        !1 : TesDpL50_10
 11 5 0 0       !2 : ExHxSide1
 9 6 0 0        !3 : ExHxSide2
 5 12 0 0       !4 : Col
-2 4 0 0        !5 : Hx-Col
+2 4 0 0        !5 : Hx_Col
 3 1 0 0        !6 : PiExHx_Tes
 8 9 0 1        !7 : Pump88
 1 7 0 0        !8 : PiTes_Pump88
@@ -148,8 +161,8 @@ MExHxSide2_A=[450,7]
 MExHxSide2_B=[450,8]
 MCol_A=[450,10]
 MCol_B=[450,11]
-MHx-Col_A=[450,13]
-MHx-Col_B=[450,14]
+MHx_Col_A=[450,13]
+MHx_Col_B=[450,14]
 MPiExHx_Tes_A=[450,16]
 MPiExHx_Tes_B=[450,17]
 MPump88_A=[450,19]
@@ -187,7 +200,7 @@ Lloop1Cp = FwaterCp
 
 
 UNIT 451 TYPE 931
-! Hx-Col
+! Hx_Col
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -197,18 +210,18 @@ Lloop2Cp ! specific heat [kJ/(kg*K)]
 20 ! Initial fluid temperature [deg C]
 INPUTS 4
 TExHxSide1H ! input flow temperature [deg C]
-MHx-Col_A ! input mass flow [kg/h]
+MHx_Col_A ! input mass flow [kg/h]
 TRoomStore ! ambient temperature [deg C]
 TColH ! reverse flow input temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
 EQUATIONS 5
-THx-Col = [451,1] ! Output flow temperature [deg C]
-PHx-Col_kW = [451,3]/3600 ! Dissipated heat [kW]
-PHx-ColConv_kW = [451,4]/3600 ! Convected heat [kW]
-PHx-ColInt_kJ = [451,5] ! Accumulated internal energy since start of simulation [kJ]
-MHx-Col = MHx-Col_A
+THx_Col = [451,1] ! Output flow temperature [deg C]
+PHx_Col_kW = [451,3]/3600 ! Dissipated heat [kW]
+PHx_ColConv_kW = [451,4]/3600 ! Convected heat [kW]
+PHx_ColInt_kJ = [451,5] ! Accumulated internal energy since start of simulation [kJ]
+MHx_Col = MHx_Col_A
 
 UNIT 452 TYPE 931
 ! PiExHx_Tes
@@ -332,7 +345,7 @@ MPiPump93_Col = MPiPump93_Col_A
 
 *** Single pipe losses
 EQUATIONS 1
-spPipeEnIntTot = PHx-ColInt_kJ+PPiExHx_TesInt_kJ+PPiTes_Pump88Int_kJ+PPiPump88_ExHxInt_kJ+PPiPump93_ExHxInt_kJ+PPiPump93_ColInt_kJ
+spPipeEnIntTot = PHx_ColInt_kJ+PPiExHx_TesInt_kJ+PPiTes_Pump88Int_kJ+PPiPump88_ExHxInt_kJ+PPiPump93_ExHxInt_kJ+PPiPump93_ColInt_kJ
 
 UNIT 100 TYPE 150
 PARAMETERS 3
@@ -345,8 +358,8 @@ spPipeEnIntTot
 0
 
 EQUATIONS 4
-spPipeConvectedTot = PHx-ColConv_kW+PPiExHx_TesConv_kW+PPiTes_Pump88Conv_kW+PPiPump88_ExHxConv_kW+PPiPump93_ExHxConv_kW+PPiPump93_ColConv_kW
-PipeLossTot = PHx-Col_kW+PPiExHx_Tes_kW+PPiTes_Pump88_kW+PPiPump88_ExHx_kW+PPiPump93_ExHx_kW+PPiPump93_Col_kW
+spPipeConvectedTot = PHx_ColConv_kW+PPiExHx_TesConv_kW+PPiTes_Pump88Conv_kW+PPiPump88_ExHxConv_kW+PPiPump93_ExHxConv_kW+PPiPump93_ColConv_kW
+PipeLossTot = PHx_Col_kW+PPiExHx_Tes_kW+PPiTes_Pump88_kW+PPiPump88_ExHx_kW+PPiPump93_ExHx_kW+PPiPump93_Col_kW
 spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
 ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 457
@@ -365,10 +378,10 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 6
-MHx-Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
+MHx_Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
 
 ***
-MHx-Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
+MHx_Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
 
 
 ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_T.prt 458
@@ -387,10 +400,10 @@ STOP! 3 Stop time
 1! 10 Print labels
 
 INPUTS 6
-THx-Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
+THx_Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
 
 ***
-THx-Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
+THx_Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
 
 
 CONSTANTS 1

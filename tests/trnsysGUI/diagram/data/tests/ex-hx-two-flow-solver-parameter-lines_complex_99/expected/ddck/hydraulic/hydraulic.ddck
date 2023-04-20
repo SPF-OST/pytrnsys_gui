@@ -34,8 +34,11 @@ TFloor4H=TFloor4
 TFloor5H=TFloor5
 TFloor6H=TFloor6
 
-UNIT 450 TYPE 9351
-PARAMETERS 393
+UNIT 450 TYPE 9352
+PARAMETERS 396
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 98
 97 20 0 1      !1 : PuAux
 26 53 0 0      !2 : Floor1

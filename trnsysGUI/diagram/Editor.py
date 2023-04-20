@@ -523,7 +523,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += energyBalanceEquations
 
         simulationUnit = 450
-        simulationType = 9351
+        simulationType = 9352
         descConnLength = 15
 
         exporter = self._createExporter()
@@ -844,43 +844,42 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
 
-    def exportDdckPlaceHolderValuesJsonFile(self, shallShowMessageOnSuccess: bool = True) -> _res.Result[None]:
+    def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
         if not self._isHydraulicConnected():
             return _res.Error("You need to connect all port items before you can export the hydraulics.")
 
         jsonFilePath = _pl.Path(self.projectFolder) / "DdckPlaceHolderValues.json"
 
         if jsonFilePath.is_dir():
-            qmb = _qtw.QMessageBox(self)
-            qmb.setText(
-                f"A folder already exits at f{jsonFilePath}. Chose a different location or delete the folder first."
+            _qtw.QMessageBox.information(
+                self,
+                "Folder already exists",
+                f"A folder already exits at f{jsonFilePath}. Chose a different location or delete the folder first.",
             )
-            qmb.setStandardButtons(_qtw.QMessageBox.Ok)
-            qmb.exec()
-
             return None
 
         if jsonFilePath.is_file():
-            qmb = _qtw.QMessageBox(self)
-            qmb.setText("The file already exists. Do you want to overwrite it or cancel?")
-            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
-            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
-            ret = qmb.exec()
+            pressedButton = _qtw.QMessageBox.question(
+                self,
+                "Overwrite file?",
+                f"The file {jsonFilePath} already exists. Do you want to overwrite it or cancel?",
+                buttons=(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel),
+                defaultButton=_qtw.QMessageBox.Cancel,
+            )
 
-            if ret != _qtw.QMessageBox.Save:
+            if pressedButton != _qtw.QMessageBox.Save:
                 return None
 
         result = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
         if _res.isError(result):
             return _res.error(result)
 
-        if shallShowMessageOnSuccess:
-            msgb = _qtw.QMessageBox()
-            msgb.setWindowTitle("Saved successfully")
-            msgb.setText(f"Saved place holder values JSON file at {jsonFilePath}.")
-            msgb.setStandardButtons(_qtw.QMessageBox.Ok)
-            msgb.setDefaultButton(_qtw.QMessageBox.Ok)
-            msgb.exec()
+        _qtw.QMessageBox.information(
+            self,
+            "Saved successfully",
+            f"Saved place holder values JSON file at {jsonFilePath}.",
+            buttons=_qtw.QMessageBox.Ok,
+        )
 
         return None
 

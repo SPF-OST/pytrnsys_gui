@@ -34,8 +34,11 @@ THPEvapH=THPEvap
 THPCond1H=THPCond1
 THPCond2H=THPCond2
 
-UNIT 450 TYPE 9351
-PARAMETERS 353
+UNIT 450 TYPE 9352
+PARAMETERS 356
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 88
 41 71 0 0      !1 : RadiatorSH
 69 41 0 1      !2 : PuSH

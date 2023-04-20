@@ -4,7 +4,7 @@
             "@cp": "Lloop2Cp",
             "@mfr": "MCol_A",
             "@rho": "Lloop2Rho",
-            "@temp": "THx-Col"
+            "@temp": "THx_Col"
         },
         "Out": {
             "@revtemp": "TPiPump93_Col",
@@ -19,7 +19,7 @@
             "@temp": "TPiPump93_ExHx"
         },
         "Side1Out": {
-            "@revtemp": "THx-Col",
+            "@revtemp": "THx_Col",
             "@temp": "TExHxSide1"
         },
         "Side2In": {

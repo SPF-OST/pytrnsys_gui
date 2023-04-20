@@ -4,7 +4,7 @@
             "@cp": "Lloop1Cp",
             "@mfr": "MCol_A",
             "@rho": "Lloop1Rho",
-            "@temp": "TTes-Col"
+            "@temp": "TTes_Col"
         },
         "Out": {
             "@revtemp": "TPiCol_Pump114",

@@ -68,8 +68,11 @@ dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
 dpNrSlAx = 20  ! Number of axial soil nodes
 dpNrSlCirc = 4  ! Number of circumferential soil nodes
-UNIT 450 TYPE 9351
-PARAMETERS 481
+UNIT 450 TYPE 9352
+PARAMETERS 484
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
 120
 119 90 0 0     !1 : SCnr1Cold
 91 120 0 0     !2 : SCnr1Hot
