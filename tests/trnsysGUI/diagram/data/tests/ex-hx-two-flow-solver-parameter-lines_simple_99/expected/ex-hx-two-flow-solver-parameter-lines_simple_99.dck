@@ -251,11 +251,9 @@ PPiPump93_ColInt_kJ = [17,5]  !Changed automatically
 MPiPump93_Col = MPiPump93_Col_A
 EQUATIONS 1
 spPipeEnIntTot = PHx_ColInt_kJ+PPiExHx_TesInt_kJ+PPiTes_Pump88Int_kJ+PPiPump88_ExHxInt_kJ+PPiPump93_ExHxInt_kJ+PPiPump93_ColInt_kJ
-UNIT 10 TYPE 150 !Changed automatically
-PARAMETERS 3
+UNIT 10 TYPE 993 !Changed automatically
+PARAMETERS 1
 1 ! Number of inputs
-1 ! Number of time steps
-0 ! Initial value
 INPUTS 1
 spPipeEnIntTot
 0

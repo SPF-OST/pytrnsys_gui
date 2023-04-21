@@ -411,11 +411,9 @@ PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
 EQUATIONS 1
 spPipeEnIntTot = {summedInternalEnergies}
 
-UNIT 100 TYPE 150
-PARAMETERS 3
+UNIT 100 TYPE 993
+PARAMETERS 1
 1 ! Number of inputs
-1 ! Number of time steps
-0 ! Initial value
 INPUTS 1
 spPipeEnIntTot
 **

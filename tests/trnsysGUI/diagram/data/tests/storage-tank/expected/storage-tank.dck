@@ -251,11 +251,9 @@ PPiPump114_TesInt_kJ = [17,5]  !Changed automatically
 MPiPump114_Tes = MPiPump114_Tes_A
 EQUATIONS 1
 spPipeEnIntTot = PTes_ColInt_kJ+PPiTes_HPInt_kJ+PPiTes_Pump109Int_kJ+PPiPump109_HPInt_kJ+PPiCol_Pump114Int_kJ+PPiPump114_TesInt_kJ
-UNIT 10 TYPE 150 !Changed automatically
-PARAMETERS 3
+UNIT 10 TYPE 993 !Changed automatically
+PARAMETERS 1
 1 ! Number of inputs
-1 ! Number of time steps
-0 ! Initial value
 INPUTS 1
 spPipeEnIntTot
 0
