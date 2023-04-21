@@ -1714,11 +1714,9 @@ PPiTeeAuxHxRt_HPInt_kJ = [82,5]  !Changed automatically
 MPiTeeAuxHxRt_HP = MPiTeeAuxHxRt_HP_A
 EQUATIONS 1
 spPipeEnIntTot = PPiDhwCircRtPuInt_kJ+PPiDhwCirctoTapInt_kJ+PPiAuxToDivInt_kJ+PPiHpEvapInInt_kJ+PPiFlFloor1Int_kJ+PPiFlFloor2Int_kJ+PPiFlFloor3Int_kJ+PPiFlFloor4Int_kJ+PPiFlFloor5Int_kJ+PPiFlFloor6Int_kJ+PPiRtFloor5Int_kJ+PPiShRt5to4Int_kJ+PPiRtFloor4Int_kJ+PPiRtFloor3Int_kJ+PPiRtFloor2Int_kJ+PPiShRt4to3Int_kJ+PPiShRt3to2Int_kJ+PPiShRt2to1Int_kJ+PPiRtFloor1Int_kJ+PPiShFltoPu1Int_kJ+PPiShFl1to2Int_kJ+PPiShFlToPu2Int_kJ+PPiShFl2to3Int_kJ+PPiShFlToPu3Int_kJ+PPiShFl3to4Int_kJ+PPiShFlToPu4Int_kJ+PPiShFl4to5Int_kJ+PPiShFlToPu5Int_kJ+PPiHpEvapOutInt_kJ+PPiHxDhwPriFlInt_kJ+PPiHxDhwPriRtInt_kJ+PPiTesDhwtoPuHxInt_kJ+PPiAuxtoTeeShFlInt_kJ+PPiShPriFlInt_kJ+PPiTeeShFlTesInt_kJ+PPiShPriRtInt_kJ+PPiTeeHxDhwRtInt_kJ+PPiTeeShRtTesInt_kJ+PPiPuDhwCircOutInt_kJ+PPiShFl5to6Int_kJ+PPiShFlToPu6Int_kJ+PPiPuOvFlInt_kJ+PPiFloor6RtInt_kJ+PPiPuOvRt6to5Int_kJ+PPiDhwtoTCircInt_kJ+PPiTesDhwTapOutInt_kJ+PPiDhwCircTesOutInt_kJ+PPiPuOvRtInt_kJ+PPiDhwMainsInt_kJ+PPiPuHxDhw2HxDHWInt_kJ+PPiHxDHW_DhwInt_kJ+PPiHP_PuAuxInt_kJ+PPiTeeAuxHxRt_HPInt_kJ
-UNIT 10 TYPE 150 !Changed automatically
-PARAMETERS 3
+UNIT 10 TYPE 993 !Changed automatically
+PARAMETERS 1
 1 ! Number of inputs
-1 ! Number of time steps
-0 ! Initial value
 INPUTS 1
 spPipeEnIntTot
 0
