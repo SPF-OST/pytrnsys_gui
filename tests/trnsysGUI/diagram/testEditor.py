@@ -262,3 +262,26 @@ class TestEditor:
     def _exportHydraulic(cls, editor: _de.Editor, *, _format) -> str:  # type: ignore[name-defined]
         exportedFilePath = editor.exportHydraulics(exportTo=_format)
         return exportedFilePath
+
+    @_pt.mark.tool
+    @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testToolUpdateExpectedFiles(self, testProject: _th.Project) -> None:
+        """Make `Helper.ensureFilesAreEqual` always return True, then run `testExportDeck` followed by this test.
+        Repeat the same for testMassFlowSolver. Finally, don't forget to check the modifications
+        to the expected files before committing and undo the changes to `Helper`! ;)"""
+        helper = _th.Helper(testProject)
+
+        _su.copytree(helper.actualProjectFolderPath, helper.expectedProjectFolderPath, dirs_exist_ok=True)
+
+        self._resetHardCodedPathsInDeckFile(testProject, helper)
+
+    def _resetHardCodedPathsInDeckFile(self, project: _th.Project, helper: _th.Helper) -> None:
+        deckFilePath = helper.expectedProjectFolderPath / f"{project.projectName}.dck"
+        (
+            hardcodedPathInExpectedDeck,
+            hardCodedPathInActualDeck,
+        ) = self._getHardCodedPathPrefixesForReplacingInExpectedDeck()
+        deckFileContent = deckFilePath.read_text(encoding="windows-1252")
+        updatedDeckFileContent = deckFileContent.replace(hardCodedPathInActualDeck, hardcodedPathInExpectedDeck)
+        deckFilePath.write_text(updatedDeckFileContent, encoding="windows-1252")

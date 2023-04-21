@@ -42,7 +42,7 @@ class Helper:
         # of the same name
         self.actualProjectFolderPath = testCasesFolderPath / project.projectName / project.projectName
 
-        self._expectedProjectFolderPath = testCasesFolderPath / project.projectName / "expected"
+        self.expectedProjectFolderPath = testCasesFolderPath / project.projectName / "expected"
 
     @staticmethod
     def _getProjectFolderPathInExamplesDir(project: Project) -> _tp.Optional[_pl.Path]:
@@ -97,7 +97,7 @@ class Helper:
     def _getActualAndExpectedFilePath(self, fileRelativePathAsString: str) -> _tp.Tuple[_pl.Path, _pl.Path]:
         fileRelativePath = _pl.Path(fileRelativePathAsString)
         actualFilePath = self.actualProjectFolderPath / fileRelativePath
-        expectedFilePath = self._expectedProjectFolderPath / fileRelativePath
+        expectedFilePath = self.expectedProjectFolderPath / fileRelativePath
         return actualFilePath, expectedFilePath
 
     def ensureDataFramesAreEqual(self, fileRelativePathAsString: str) -> None:
