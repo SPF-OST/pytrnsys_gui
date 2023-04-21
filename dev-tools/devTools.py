@@ -200,8 +200,8 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         and not arguments.shallCreateExecutable
     )
     if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
-        markersExpression = arguments.pytestMarkersExpression or "not ci"
-        additionalArgs = ["-m", markersExpression]
+        markerExpressions = _getMarkerExpressions(arguments.pytestMarkersExpression)
+        additionalArgs = ["-m", markerExpressions]
 
         cmd = [
             _SCRIPTS_DIR / "pytest",
@@ -216,6 +216,16 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         args = [*cmd, *additionalArgs, "tests"]
 
         _printAndRun(args)
+
+
+def _getMarkerExpressions(userSuppliedMarkerExpressions: str) -> str:
+    hardCodedMarkerExpressions = "not tool"
+    markerExpressions = (
+        f"({hardCodedMarkerExpressions}) and ({userSuppliedMarkerExpressions})"
+        if userSuppliedMarkerExpressions
+        else hardCodedMarkerExpressions
+    )
+    return markerExpressions
 
 
 def _printAndRun(args: tp.Sequence[str]) -> None:
