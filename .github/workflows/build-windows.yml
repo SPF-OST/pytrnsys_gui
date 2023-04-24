@@ -57,6 +57,10 @@ jobs:
     runs-on: [self-hosted, etzel]
     steps:
       - uses: actions/checkout@v3
+      - name: Report github.event_name and event_type
+        run: |
+          echo "Event name: ${{github.event_name}}"
+          echo "Event type: ${{github.event.event_type}}"
       - name: Build executable
         run: py -3.9 dev-tools/devTools.py -x
       - name: Compute file name
