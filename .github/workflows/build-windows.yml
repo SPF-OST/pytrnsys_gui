@@ -60,7 +60,8 @@ jobs:
       - name: Report github.event_name and event_type
         run: |
           echo "Event name: ${{github.event_name}}"
-          echo "Event type: ${{github.event.event_type}}"
+          echo "Event type (via client payload): ${{github.event.client_payload.type}}"
+          echo "Event type (via event_type): ${{github.event.event_type}}
       - name: Build executable
         run: py -3.9 dev-tools/devTools.py -x
       - name: Compute file name
@@ -74,7 +75,7 @@ jobs:
         if: ${{github.event_name == 'push'}}
         run: Compress-Archive -Path data, release\pyinstaller-venv\pytrnsys_data, release\dist\pytrnsys-gui.exe -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
       - name: Release artifacts
-        if: ${{github.event_name == 'push' || (github.event_name == 'repository_dispatch' && github.event.event_type == 'run-tests-and-build-executable')}}
+        if: ${{github.event_name == 'push' || (github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable')}}
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
