@@ -72,7 +72,7 @@ jobs:
           $ref_name="${{github.ref_name}}".replace("/","-")
           echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
       - name: Create zip file
-        if: ${{github.event_name == 'push'}}
+        if: ${{github.event_name == 'push' || (github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable')}}
         run: Compress-Archive -Path data, release\pyinstaller-venv\pytrnsys_data, release\dist\pytrnsys-gui.exe -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
       - name: Release artifacts
         if: ${{github.event_name == 'push' || (github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable')}}
