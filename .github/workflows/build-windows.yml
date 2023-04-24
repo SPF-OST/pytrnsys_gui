@@ -61,7 +61,7 @@ jobs:
         run: |
           echo "Event name: ${{github.event_name}}"
           echo "Event type (via client payload): ${{github.event.client_payload.type}}"
-          echo "Event type (via event_type): ${{github.event.event_type}}
+          echo "Event type (via event_type): ${{github.event.event_type}}"
       - name: Build executable
         run: py -3.9 dev-tools/devTools.py -x
       - name: Compute file name
