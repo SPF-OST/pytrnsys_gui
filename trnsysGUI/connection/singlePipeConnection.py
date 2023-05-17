@@ -32,15 +32,13 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         toPort: _sppi.SinglePipePortItem,
         parent: _ed.Editor,  # type: ignore[name-defined]
     ):
-        super().__init__(fromPort, toPort, parent)
+        shallBeSimulated = True
+        super().__init__(fromPort, toPort, shallBeSimulated, _defaults.DEFAULT_LENGTH_IN_M, parent)
 
         self._editor = parent
 
         self.diameterInCm: _values.Value = _defaults.DEFAULT_DIAMETER_IN_CM
         self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
-        self.lengthInM: _values.Value = _defaults.DEFAULT_LENGTH_IN_M
-
-        self.shallBeSimulated = True
 
         self._updateModels(self.displayName)
 

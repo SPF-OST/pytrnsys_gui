@@ -19,15 +19,15 @@ from . import _massFlowLabels as _mfl
 
 class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
     def __init__(self, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem, parent):
-        super().__init__(fromPort, toPort, parent)
+        super().__init__(
+            fromPort, toPort, _defaults.DEFAULT_SHALL_BE_SIMULATED, _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M, parent
+        )
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
-        self.lengthInM: float = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
-        self.shallBeSimulated: bool = _defaults.DEFAULT_SHALL_BE_SIMULATED
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
