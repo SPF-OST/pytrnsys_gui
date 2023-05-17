@@ -496,11 +496,6 @@ class MainWindow(_qtw.QMainWindow):
             errorMessage = f"The deck file could not be generated: {result.message}"
             _err.showErrorMessageBox(errorMessage)
 
-    def toggleEditorMode(self):
-        self.logger.info("Toggling editor mode")
-        self.editor.editorMode = (self.editor.editorMode + 1) % 2
-        self.sb.showMessage("Mode is " + str(self.editor.editorMode))
-
     def toggleAlignMode(self):
         self.logger.info("Toggling alignMode")
         self.editor.alignMode = not self.editor.alignMode

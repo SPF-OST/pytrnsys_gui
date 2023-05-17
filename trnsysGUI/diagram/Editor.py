@@ -976,9 +976,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def setAlignMode(self, b):
         self.alignMode = True
 
-    def setEditorMode(self, b):
-        self.editorMode = b
-
     def setMoveDirectPorts(self, b):
         """
         Sets the bool moveDirectPorts. When mouse released in diagramScene, moveDirectPorts is set to False again
