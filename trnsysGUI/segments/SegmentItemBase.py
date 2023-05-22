@@ -377,8 +377,6 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
                 else:
                     self.logger.debug("Second corner is none")
-            else:
-                pass
 
     def initInMode0(self):
         if (hasattr(self.startNode.parent, "fromPort")) and (self.startNode.prevN() is not None):
