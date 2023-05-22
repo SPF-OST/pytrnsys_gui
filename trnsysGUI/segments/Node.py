@@ -49,12 +49,3 @@ class Node(object):
         while res.nextN() is not None:
             res = res.nextN()
         return res
-
-    def countNodes(self):
-        res = 1
-        n = self.firstNode(self)
-        while res.nextN() is not None:
-            res += 1
-            n = n.nextN()
-        print("This connection has " + str(res) + "nodes")
-        return res
