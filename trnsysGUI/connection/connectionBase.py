@@ -138,8 +138,6 @@ class ConnectionBase(_ip.HasInternalPiping):
         pass
 
     def setColor(self, value, **kwargs):
-        col = _qtg.QColor(0, 0, 0)
-
         if "mfr" in kwargs:
             if kwargs["mfr"] == "NegMfr":
                 col = _qtg.QColor(0, 0, 255)
@@ -564,12 +562,12 @@ class ConnectionBase(_ip.HasInternalPiping):
 
                 offsetPoint = pos1.y() - 15.666
 
-                help_point_1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                help_point_2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
 
-                seg1.setLine(pos1, help_point_1)
-                seg2.setLine(help_point_1, help_point_2)
-                seg3.setLine(help_point_2, pos2)
+                seg1.setLine(pos1, helperPoint1)
+                seg2.setLine(helperPoint1, helperPoint2)
+                seg3.setLine(helperPoint2, pos2)
 
                 self.printConnNodes()
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
@@ -580,8 +578,8 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.fromPort.setZValue(100)
                 self.toPort.setZValue(100)
 
-                corner1.setPos(help_point_1)
-                corner2.setPos(help_point_2)
+                corner1.setPos(helperPoint1)
+                corner2.setPos(helperPoint2)
                 self.firstS = self.getFirstSeg()
 
         elif self.fromPort.side == 3:
@@ -643,12 +641,12 @@ class ConnectionBase(_ip.HasInternalPiping):
 
                 offsetPoint = pos1.y() + 15.666
 
-                help_point_1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                help_point_2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
 
-                seg1.setLine(pos1, help_point_1)
-                seg2.setLine(help_point_1, help_point_2)
-                seg3.setLine(help_point_2, pos2)
+                seg1.setLine(pos1, helperPoint1)
+                seg2.setLine(helperPoint1, helperPoint2)
+                seg3.setLine(helperPoint2, pos2)
 
                 self.printConnNodes()
 
@@ -661,8 +659,8 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.toPort.setZValue(100)
                 self.logger.debug("Here in niceconn")
 
-                corner1.setPos(help_point_1)
-                corner2.setPos(help_point_2)
+                corner1.setPos(helperPoint1)
+                corner2.setPos(helperPoint2)
                 self.firstS = self.getFirstSeg()
 
         else:
@@ -710,11 +708,11 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             self.logger.debug("Here in niceconn")
 
-            help_point_1 = _qtc.QPointF(midx, pos1.y())  # pylint: disable = invalid-name
-            help_point_2 = _qtc.QPointF(midx, pos2.y())  # pylint: disable = invalid-name
+            helperPoint1 = _qtc.QPointF(midx, pos1.y())  # pylint: disable = invalid-name
+            helperPoint2 = _qtc.QPointF(midx, pos2.y())  # pylint: disable = invalid-name
 
-            corner1.setPos(help_point_1)
-            corner2.setPos(help_point_2)
+            corner1.setPos(helperPoint1)
+            corner2.setPos(helperPoint2)
             self.firstS = self.getFirstSeg()
 
             self.logger.debug("Conn has now " + str(self.firstS))

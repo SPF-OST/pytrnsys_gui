@@ -38,13 +38,6 @@ class Node(object):
         self.parent = parent
 
     def firstNode(self):
-        # Recursion
-        # if self.prevNode is not None:
-        #     return self.prevNode.beginNode()
-        # else:
-        #     return self
-
-        # Should do the same:
         res = self
         while res.prevNode is not None:
             res = res.prevNode
@@ -52,17 +45,9 @@ class Node(object):
         return res
 
     def lastNode(self):
-        # Recursion
-        # if self.nextNode is not None:
-        #     return self.nextnode.lastNode()
-        # else:
-        #     return self
-
-        # Should do the same:
         res = self
         while res.nextN() is not None:
             res = res.nextN()
-            # print("In traversal... at node " + str(self) + " has parent " + str(self.parent))
         return res
 
     def countNodes(self):

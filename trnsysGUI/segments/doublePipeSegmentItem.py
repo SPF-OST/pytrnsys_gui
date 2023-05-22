@@ -104,4 +104,5 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         self.redLine.setPen(selectPen)
 
     def setColorAndWidthAccordingToMassflow(self, color, width):
+        # No need to do anything here
         pass

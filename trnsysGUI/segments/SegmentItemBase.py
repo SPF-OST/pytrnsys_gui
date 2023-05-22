@@ -123,8 +123,6 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
             if s.endNode is self.startNode:
                 prevSeg = s
 
-        # Todo: Add support for disr segments
-
         # if the startNode parent is a connection:
         if not hasattr(self.startNode.parent, "fromPort"):
             self.connection.segments.insert(self.connection.segments.index(prevSeg) + 1, self)
@@ -197,9 +195,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
                 self.logger.debug("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
     def deleteNextHorizSeg(self, b, nextS):
-        if b:
-            pass
-        else:
+        if not b:
             nodeTodelete1 = self.endNode
             nodeTodelete2 = self.endNode.nextN()
             self.endNode = nextS.endNode
@@ -230,9 +226,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
             )
 
     def deletePrevHorizSeg(self, b, prevS):
-        if b:
-            pass
-        else:
+        if not b:
             nodeTodelete1 = self.startNode
             nodeTodelete2 = self.startNode.prevN()
             self.startNode = prevS.startNode
@@ -270,9 +264,6 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         self.connection.segments.remove(self)
         self.connection.parent.diagramScene.removeItem(self.startNode.parent)
         self.connection.parent.diagramScene.removeItem(self.endNode.parent)
-
-    def splitSegment(self):
-        pass
 
     def mouseReleaseEvent(self, e):
         if e.button() == 1:
