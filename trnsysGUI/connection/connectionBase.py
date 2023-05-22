@@ -10,9 +10,9 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.CornerItem as _ci
-import trnsysGUI.Node as _node
+import trnsysGUI.segments.Node as _node
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.SegmentItemBase as _sib
+import trnsysGUI.segments.SegmentItemBase as _sib
 import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
@@ -890,7 +890,7 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def updateSegGrads(self):
         for s in self.segments:  # pylint: disable = invalid-name
-            s.updateGrad()
+            s.resetLinePens()
 
     # Invert connection
     def invertConnection(self):
@@ -920,7 +920,7 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             s.setLine(s.line().p2().x(), s.line().p2().y(), s.line().p1().x(), s.line().p1().y())
 
-            s.updateGrad()
+            s.resetLinePens()
 
     def invertNodes(self):
         element = self.startNode
@@ -940,18 +940,18 @@ class ConnectionBase(_ip.HasInternalPiping):
         element.setPrev(nextNode)
 
     def selectConnection(self):
-        for segment in self.segments:
-            segment.setSelect(True)
-
         self.isSelected = True
+
+        for segment in self.segments:
+            segment.resetLinePens()
 
         self.setLabelsSelected(True)
 
     def deselectConnection(self):
-        for segment in self.segments:
-            segment.updateGrad()
-
         self.isSelected = False
+
+        for segment in self.segments:
+            segment.resetLinePens()
 
         self.setLabelsSelected(False)
 

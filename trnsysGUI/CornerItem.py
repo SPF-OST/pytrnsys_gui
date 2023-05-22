@@ -5,7 +5,7 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import QBrush
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
-from trnsysGUI.Node import Node
+from trnsysGUI.segments.Node import Node
 
 
 class CornerItem(QGraphicsEllipseItem):
@@ -98,7 +98,7 @@ class CornerItem(QGraphicsEllipseItem):
 
             for segment in self.parent.segments:
                 try:
-                    segment.updateGrad()
+                    segment.resetLinePens()
                 except:
                     self.logger.warning("Could not update color gradient of pipe.")
 

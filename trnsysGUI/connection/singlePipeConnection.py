@@ -17,7 +17,7 @@ import trnsysGUI.internalPiping as _pi
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
-import trnsysGUI.singlePipeSegmentItem as _spsi
+import trnsysGUI.segments.singlePipeSegmentItem as _spsi
 import trnsysGUI.temperatures as _temps
 from . import _massFlowLabels as _mfl
 
@@ -124,9 +124,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.trnsysId = model.trnsysId
         self.setDisplayName(model.name)
 
-        if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
-
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
 
@@ -135,6 +132,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.lengthInM = model.lengthInM
 
         self.shallBeSimulated = model.shallBeSimulated
+
+        if len(model.segmentsCorners) > 0:
+            self.loadSegments(model.segmentsCorners)
 
     def getInternalPiping(self) -> _pi.InternalPiping:
         return _pi.InternalPiping(

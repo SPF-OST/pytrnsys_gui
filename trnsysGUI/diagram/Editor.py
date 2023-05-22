@@ -1240,6 +1240,13 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
 
+        self._updateGradients(hydraulicLoop)
+
+    @staticmethod
+    def _updateGradients(hydraulicLoop: _hlm.HydraulicLoop) -> None:
+        for connection in hydraulicLoop.connections:
+            connection.updateSegGrads()
+
     def _getDdckDirNames(self) -> _tp.Sequence[str]:
         ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
 

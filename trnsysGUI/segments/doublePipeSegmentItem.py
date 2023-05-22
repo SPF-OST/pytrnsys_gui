@@ -6,25 +6,27 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.SegmentItemBase as _sib
+import trnsysGUI.segments.SegmentItemBase as _sib
 import trnsysGUI.dialogs.connections.doublePipe as _dpcldlg
+
+from . import _common
+
+_LINE_PEN_WIDTH = 3
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
-    from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
-
-    # type: ignore[attr-defined]  #  pylint: disable=unused-import
+    import trnsysGUI.connection.doublePipeConnection as _dpc
 
 
 class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
-    def __init__(self, startNode, endNode, parent: DoublePipeConnection):
+    def __init__(self, startNode, endNode, parent: _dpc.DoublePipeConnection):
         super().__init__(startNode, endNode, parent)
 
         self.blueLine = _qtw.QGraphicsLineItem(self)
         self.redLine = _qtw.QGraphicsLineItem(self)
 
     @property
-    def _doublePipeConnection(self) -> DoublePipeConnection:
+    def _doublePipeConnection(self) -> _dpc.DoublePipeConnection:
         return self.connection
 
     def _createSegment(self, startNode, endNode) -> _sib.SegmentItemBase:  # type: ignore[name-defined]
@@ -53,9 +55,11 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         self._doublePipeConnection.lengthInM = connection.lengthInM
         self._doublePipeConnection.shallBeSimulated = connection.shallBeSimulated
 
+        self._doublePipeConnection.updateSegGrads()
+
     def _setLineImpl(self, x1, y1, x2, y2):
-        self.blueLine.setPen(_qtg.QPen(_qtc.Qt.blue, 3))
-        self.redLine.setPen(_qtg.QPen(_qtc.Qt.red, 3))
+        self.resetLinePens()
+
         offset = 3
 
         if abs(y1 - y2) < 1:
@@ -68,21 +72,36 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
             # Initially, connections go directly between its two ports: only
             # afterwards are they broken up into horizontal and vertical segments.
             # This is probably an artifact of back when connections didn't have to
-            # be straight. Once, these artifacts have been removed, we should throw here.
+            # be straight. Once these artifacts have been removed, we should throw here.
             pass
         self.linePoints = _qtc.QLineF(x1, y1, x2, y2)
 
-    def updateGrad(self):
-        self.blueLine.setPen(_qtg.QPen(_qtc.Qt.blue, 3))
-        self.redLine.setPen(_qtg.QPen(_qtc.Qt.red, 3))
+    def _setStandardLinePens(self) -> None:
+        bluePen = self._createPen(_qtc.Qt.blue)
+        self.blueLine.setPen(bluePen)
+        redPen = self._createPen(_qtc.Qt.red)
+        self.redLine.setPen(redPen)
 
-    def setSelect(self, isSelected: bool) -> None:
-        if isSelected:
-            selectPen = self._createSelectPen()
-            self.blueLine.setPen(selectPen)
-            self.redLine.setPen(selectPen)
-        else:
-            self.updateGrad()
+    def _createPen(self, globalColor: _qtc.Qt.GlobalColor) -> _qtg.QPen:
+        if self._doublePipeConnection.shallBeSimulated:
+            return _qtg.QPen(globalColor, _LINE_PEN_WIDTH)
+
+        color = self._getTransparentColor(globalColor, _common.NOT_SIMULATED_COLOR_ALPHA)
+        pen = _qtg.QPen(color, _LINE_PEN_WIDTH)
+        pen.setStyle(_qtc.Qt.DashLine)
+
+        return pen
+
+    @staticmethod
+    def _getTransparentColor(globalColor: _qtc.Qt.GlobalColor, alpha: int) -> _qtg.QColor:
+        color = _qtg.QColor(globalColor)
+        color.setAlpha(alpha)
+        return color
+
+    def _setSelectedLinePen(self):
+        selectPen = self._createSelectPen()
+        self.blueLine.setPen(selectPen)
+        self.redLine.setPen(selectPen)
 
     def setColorAndWidthAccordingToMassflow(self, color, width):
         pass

@@ -89,7 +89,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                     e.setLine(e.line().p1().x(), e.line().p1().y(), self.scenePos().x(), self.scenePos().y())
 
                 for s in conn.segments:  # pylint: disable = invalid-name
-                    s.updateGrad()
+                    s.resetLinePens()
 
         if change == self.ItemScenePositionHasChanged and self.parent.editor.editorMode == 1:
             for conn in self.connectionList:

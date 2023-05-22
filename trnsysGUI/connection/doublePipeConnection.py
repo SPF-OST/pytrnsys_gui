@@ -11,7 +11,7 @@ import trnsysGUI.connection.hydraulicExport.doublePipe as _he
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _hedpc
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
-import trnsysGUI.doublePipeSegmentItem as _dpsi
+import trnsysGUI.segments.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from . import _massFlowLabels as _mfl
@@ -101,13 +101,13 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds = model.childIds
         self.setDisplayName(model.name)
 
-        if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
-
         self.setLabelPos(model.labelPos)
         self.setMassLabelPos(model.massFlowLabelPos)
         self.lengthInM = model.lengthInM
         self.shallBeSimulated = model.shallBeSimulated
+
+        if len(model.segmentsCorners) > 0:
+            self.loadSegments(model.segmentsCorners)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
@@ -150,6 +150,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
         assert self.coldModelPipe.name and self.hotModelPipe.name
+        assert isinstance(self.lengthInM, float)
 
         connectionModel = _hedpc.DoublePipeConnection(
             self.displayName,
