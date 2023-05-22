@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing as _tp
 
+import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import math as _math
@@ -666,10 +667,13 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
     def _setSelectedLinePen(self):
         raise NotImplementedError()
 
-    @staticmethod
-    def _createSelectPen() -> _qtg.QPen:
+    def _createSelectPen(self) -> _qtg.QPen:
         color = _qtg.QColor(125, 242, 189)
         width = 4
 
         selectPen = _qtg.QPen(color, width)
+
+        if not self.connection.shallBeSimulated:
+            selectPen.setStyle(_qtc.Qt.DashLine)
+
         return selectPen
