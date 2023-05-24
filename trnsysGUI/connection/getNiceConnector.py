@@ -7,7 +7,8 @@ from trnsysGUI import CornerItem as _ci
 
 def getNiceConnector(name):
     connectors = {"NiceConn 2 to 2": niceConnectorBoth2,
-                  "NiceConn 0 to 0": niceConnectorBoth0}
+                  "NiceConn 0 to 0": niceConnectorBoth0,
+                  "Ports are directed to each other": niceConnectorOther}
 
     if name in connectors:
         return connectors[name]
@@ -24,12 +25,11 @@ class niceConnectorBase(metaclass=ABCMeta):
         self.fromSide = None
         self.toSide = None
         self.logStatement = None
-
-    def _resetConnectionWithValues(self):
-        self.connection.fromPort.createdAtSide = self.fromSide
-        self.connection.toPort.createdAtSide = self.toSide
-        self.connection.logger.debug(self.logStatement)
-        self.connection.clearConn()
+        self.operation = None
+        self.printConnNodes = False
+        self.toPort = self.connection.toPort
+        self.fromPort = self.connection.fromPort
+        self.setFirstSeg = False
 
     def createNiceConn(self):
         self._resetConnectionWithValues()
@@ -43,42 +43,30 @@ class niceConnectorBase(metaclass=ABCMeta):
 
         self._addGraphicsItems(segs + corners)
 
-        points = self._getPoints()
+        points = self._getPoints(self.operation)
 
         self._setSegLines(segs, points)
+        if self.printConnNodes:
+            self.connection.printConnNodes()
 
         self._setCornerFlags(corners)
 
         self._setCornerZvalues(corners, 100)
+        if self.nrOfCorners == 2:
+            self._setCornerZvalues([self.toPort, self.fromPort], 100)
 
+        self.connection.logger.debug("Here in niceconn")
         self._setCornerPositions(corners, points)
 
-    @abstractmethod
-    def _getPoints(self):
-        raise NotImplementedError()
+        if self.setFirstSeg:
+            self.connection.firstS = self.connection.getFirstSeg()
+            self.connection.logger.debug("Conn has now " + str(self.connection.firstS))
 
-    def _addGraphicsItems(self, gItems):
-        for gItem in gItems:
-            self.connection.parent.diagramScene.addItem(gItem)
-
-    def _connectStartAndEndNodes(self, toStart, toEnd):
-        self.startNode.setNext(toStart.node)
-        self.endNode.setPrev(toEnd.node)
-
-    def _connectWithSegments(self, corners):
-        # todo: deal with _createSegmentItem being protected
-        segs = [self.connection._createSegmentItem(self.startNode, corners[0].node)]
-        for i in range(len(corners) - 1):
-            segs.append(self.connection._createSegmentItem(corners[i].node, corners[i + 1].node))
-
-        segs.append(self.connection._createSegmentItem(corners[-1].node, self.endNode))
-        return segs
-
-    @staticmethod
-    def _setNextConnectionCorner(corners):
-        for i in range(len(corners) - 1):
-            corners[i].node.setNext(corners[i + 1].node)
-        return corners
+    def _resetConnectionWithValues(self):
+        self.connection.fromPort.createdAtSide = self.fromSide
+        self.connection.toPort.createdAtSide = self.toSide
+        self.connection.logger.debug(self.logStatement)
+        self.connection.clearConn()
 
     def _getConnectionCorners(self, nrOfCorners):
         rad = self.rad
@@ -92,6 +80,57 @@ class niceConnectorBase(metaclass=ABCMeta):
 
         corners.append(_ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, cornerCur.node, self.endNode, self.connection))
         return corners
+
+    @staticmethod
+    def _setNextConnectionCorner(corners):
+        for i in range(len(corners) - 1):
+            corners[i].node.setNext(corners[i + 1].node)
+        return corners
+
+    def _connectWithSegments(self, corners):
+        # todo: deal with _createSegmentItem being protected
+        segs = [self.connection._createSegmentItem(self.startNode, corners[0].node)]
+        for i in range(len(corners) - 1):
+            segs.append(self.connection._createSegmentItem(corners[i].node, corners[i + 1].node))
+
+        segs.append(self.connection._createSegmentItem(corners[-1].node, self.endNode))
+        return segs
+
+    def _connectStartAndEndNodes(self, toStart, toEnd):
+        self.startNode.setNext(toStart.node)
+        self.endNode.setPrev(toEnd.node)
+
+    def _addGraphicsItems(self, gItems):
+        for gItem in gItems:
+            self.connection.parent.diagramScene.addItem(gItem)
+
+    def _getPoints(self, operation):
+        posStart = self.connection.fromPort.scenePos()
+        posEnd = self.connection.toPort.scenePos()
+        points = [posStart]
+
+        baseLineHeight = max(posStart.y(), posEnd.y()) + 100.6
+
+        if operation == "add":
+            point1 = _qtc.QPointF(posStart.x() + self.portOffset, posStart.y())
+        elif operation == "subtract":
+            point1 = _qtc.QPointF(posStart.x() - self.portOffset, posStart.y())
+        else:
+            raise NotImplementedError()
+
+        points.append(point1)
+        points.append(_qtc.QPointF(point1.x(), baseLineHeight))
+
+        if operation == "add":
+            point3 = _qtc.QPointF(posEnd.x() + self.portOffset, baseLineHeight)
+        elif operation == "subtract":
+            point3 = _qtc.QPointF(posEnd.x() - self.portOffset, baseLineHeight)
+        else:
+            raise NotImplementedError()
+
+        points.append(point3)
+        points.append(_qtc.QPointF(point3.x(), posEnd.y()))
+        return points
 
     @staticmethod
     def _setSegLines(segs, points):
@@ -124,21 +163,7 @@ class niceConnectorBoth2(niceConnectorBase):
         self.fromSide = 2
         self.toSide = 2
         self.logStatement = "NiceConn 2 to 2"
-
-    def _getPoints(self):
-        posStart = self.connection.fromPort.scenePos()
-        posEnd = self.connection.toPort.scenePos()
-        points = [posStart]
-
-        baseLineHeight = max(posStart.y(), posEnd.y()) + 100.6
-
-        point1 = _qtc.QPointF(posStart.x() + self.portOffset, posStart.y())
-        points.append(point1)
-        points.append(_qtc.QPointF(point1.x(), baseLineHeight))
-        point3 = _qtc.QPointF(posEnd.x() + self.portOffset, baseLineHeight)
-        points.append(point3)
-        points.append(_qtc.QPointF(point3.x(), posEnd.y()))
-        return points
+        self.operation = "add"
 
 
 class niceConnectorBoth0(niceConnectorBase):
@@ -148,18 +173,38 @@ class niceConnectorBoth0(niceConnectorBase):
         self.fromSide = 0
         self.toSide = 0
         self.logStatement = "NiceConn 0 to 0"
+        self.operation = "subtract"
 
-    def _getPoints(self):
+
+class niceConnectorOther(niceConnectorBase):
+    def __init__(self, connection, rad):
+        super().__init__(connection, rad)
+        self.nrOfCorners = 2
+        self.fromSide = self.connection.fromPort.side
+        self.toSide = self.connection.toPort.side
+        self.logStatement = "Ports are directed to each other"
+        self.operation = "subtract"
+        self.printConnNodes = True
+        self.toPort = self.connection.toPort
+        self.fromPort = self.connection.fromPort
+        self.setFirstSeg = True
+
+    def _getPoints(self, operation):
         posStart = self.connection.fromPort.scenePos()
         posEnd = self.connection.toPort.scenePos()
+
         points = [posStart]
 
-        baseLineHeight = max(posStart.y(), posEnd.y()) + 100.6
+        midx = self.getMiddleCoordinate(posStart, posEnd)
 
-        point1 = _qtc.QPointF(posStart.x() - self.portOffset, posStart.y())
-        points.append(point1)
-        points.append(_qtc.QPointF(point1.x(), baseLineHeight))
-        point3 = _qtc.QPointF(posEnd.x() - self.portOffset, baseLineHeight)
-        points.append(point3)
-        points.append(_qtc.QPointF(point3.x(), posEnd.y()))
+        points.append(_qtc.QPointF(midx, posStart.y()))
+        points.append(_qtc.QPointF(midx, posEnd.y()))
+        points.append(posEnd)
+
         return points
+
+    def getMiddleCoordinate(self, pos1, pos2):
+        midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
+        return midx
+
+

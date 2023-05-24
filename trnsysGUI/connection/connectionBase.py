@@ -377,6 +377,8 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
             connectorName = "NiceConn 0 to 0"
+            connector = _gnc.getNiceConnector(connectorName)
+            connector(self, rad).createNiceConn()
 
 
         elif self.fromPort.side == 1:
@@ -543,58 +545,9 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.firstS = self.getFirstSeg()
 
         else:
-            pos1 = self.fromPort.scenePos()
-            pos2 = self.toPort.scenePos()
-
-            self.fromPort.createdAtSide = self.fromPort.side
-            self.toPort.createdAtSide = self.toPort.side
-            self.logger.debug("Ports are directed to each other")
-            self.clearConn()
-
-            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
-
-            corner1.node.setNext(corner2.node)
-
-            seg1 = self._createSegmentItem(self.startNode, corner1.node)
-            seg2 = self._createSegmentItem(corner1.node, corner2.node)
-            seg3 = self._createSegmentItem(corner2.node, self.endNode)
-
-            self.startNode.setNext(corner1.node)
-            self.endNode.setPrev(corner2.node)
-
-            self.parent.diagramScene.addItem(seg1)
-            self.parent.diagramScene.addItem(seg2)
-            self.parent.diagramScene.addItem(seg3)
-
-            self.parent.diagramScene.addItem(corner1)
-            self.parent.diagramScene.addItem(corner2)
-
-            midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
-
-            seg1.setLine(pos1.x(), pos1.y(), midx, pos1.y())
-            seg2.setLine(midx, pos1.y(), midx, pos2.y())
-            seg3.setLine(midx, pos2.y(), pos2.x(), pos2.y())
-            self.printConnNodes()
-
-            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
-
-            corner1.setZValue(100)
-            corner2.setZValue(100)
-            self.toPort.setZValue(100)
-            self.fromPort.setZValue(100)
-
-            self.logger.debug("Here in niceconn")
-
-            helperPoint1 = _qtc.QPointF(midx, pos1.y())  # pylint: disable = invalid-name
-            helperPoint2 = _qtc.QPointF(midx, pos2.y())  # pylint: disable = invalid-name
-
-            corner1.setPos(helperPoint1)
-            corner2.setPos(helperPoint2)
-            self.firstS = self.getFirstSeg()
-
-            self.logger.debug("Conn has now " + str(self.firstS))
+            connectorName = "Ports are directed to each other"
+            connector = _gnc.getNiceConnector(connectorName)
+            connector(self, rad).createNiceConn()
 
     # Unused
     def buildBridges(self):  # pylint: disable = too-many-locals, too-many-statements
