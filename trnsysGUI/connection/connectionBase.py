@@ -370,184 +370,41 @@ class ConnectionBase(_ip.HasInternalPiping):
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
             connectorName = "NiceConn 2 to 2"
 
-            # the if statements would provide the connectorNames.
-            # afterwards, the following code would be run for all cases.
-            connector = _gnc.getNiceConnector(connectorName)
-            connector(self, rad).createNiceConn()
-
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
             connectorName = "NiceConn 0 to 0"
-            connector = _gnc.getNiceConnector(connectorName)
-            connector(self, rad).createNiceConn()
-
 
         elif self.fromPort.side == 1:
-            self.fromPort.createdAtSide = 1
             # pylint: disable = fixme
             # todo :  when rotated, it cause a problem because side gets changed
-
-            self.logger.debug("NiceConn from 1")
-            portOffset = 30
-            self.clearConn()
 
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
             if pos2.y() <= pos1.y():
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
-
-                seg1 = self._createSegmentItem(self.startNode, corner1.node)
-                seg2 = self._createSegmentItem(corner1.node, self.endNode)
-
-                self.startNode.setNext(corner1.node)
-                self.endNode.setPrev(corner1.node)
-
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(corner1)
-
-                # position of the connecting node
-                p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
-
-                seg1.setLine(pos1, p1)
-                seg2.setLine(p1, pos2)
-
-                corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-                corner1.setZValue(100)
-                self.fromPort.setZValue(100)
-                self.toPort.setZValue(100)
-
-                corner1.setPos(p1)
-                self.firstS = self.getFirstSeg()
-
+                connectorName = "To port ABOVE from port 1"
             else:
-                self.logger.debug("To port below from port")
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-                corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
-
-                corner1.node.setNext(corner2.node)
-
-                seg1 = self._createSegmentItem(self.startNode, corner1.node)
-                seg2 = self._createSegmentItem(corner1.node, corner2.node)
-                seg3 = self._createSegmentItem(corner2.node, self.endNode)
-
-                self.startNode.setNext(corner1.node)
-                self.endNode.setPrev(corner2.node)
-
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(seg3)
-
-                self.parent.diagramScene.addItem(corner1)
-                self.parent.diagramScene.addItem(corner2)
-
-                offsetPoint = pos1.y() - 15.666
-
-                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
-
-                seg1.setLine(pos1, helperPoint1)
-                seg2.setLine(helperPoint1, helperPoint2)
-                seg3.setLine(helperPoint2, pos2)
-
-                self.printConnNodes()
-                corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-                corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
-
-                corner1.setZValue(100)
-                corner2.setZValue(100)
-                self.fromPort.setZValue(100)
-                self.toPort.setZValue(100)
-
-                corner1.setPos(helperPoint1)
-                corner2.setPos(helperPoint2)
-                self.firstS = self.getFirstSeg()
+                connectorName = "To port BELOW from port 1"  # this was wrong before
 
         elif self.fromPort.side == 3:
-            self.fromPort.createdAtSide = 3
-
-            self.logger.debug("NiceConn from 1")
-            portOffset = 30
-            self.clearConn()
 
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
             if pos2.y() >= pos1.y():
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, self.endNode, self)
-
-                seg1 = self._createSegmentItem(self.startNode, corner1.node)
-                seg2 = self._createSegmentItem(corner1.node, self.endNode)
-
-                self.startNode.setNext(corner1.node)
-                self.endNode.setPrev(corner1.node)
-
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(corner1)
-
-                # position of the connecting node
-                p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
-
-                seg1.setLine(pos1, p1)
-                seg2.setLine(p1, pos2)
-
-                corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-                corner1.setZValue(100)
-                self.fromPort.setZValue(100)
-                self.toPort.setZValue(100)
-
-                corner1.setPos(p1)
-                self.firstS = self.getFirstSeg()
+                connectorName = "To port BELOW from port 3"  # this was wrong before
+                connector = _gnc.getNiceConnector(connectorName)
+                connector(self, rad, fromSide=3, logStatement=connectorName).createNiceConn()
             else:
-                self.logger.debug("To port above from port")
-                corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-                corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
-
-                corner1.node.setNext(corner2.node)
-
-                seg1 = self._createSegmentItem(self.startNode, corner1.node)
-                seg2 = self._createSegmentItem(corner1.node, corner2.node)
-                seg3 = self._createSegmentItem(corner2.node, self.endNode)
-
-                self.startNode.setNext(corner1.node)
-                self.endNode.setPrev(corner2.node)
-
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(seg3)
-
-                self.parent.diagramScene.addItem(corner1)
-                self.parent.diagramScene.addItem(corner2)
-
-                offsetPoint = pos1.y() + 15.666
-
-                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
-
-                seg1.setLine(pos1, helperPoint1)
-                seg2.setLine(helperPoint1, helperPoint2)
-                seg3.setLine(helperPoint2, pos2)
-
-                self.printConnNodes()
-
-                corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-                corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
-
-                corner1.setZValue(100)
-                corner2.setZValue(100)
-                self.fromPort.setZValue(100)
-                self.toPort.setZValue(100)
-                self.logger.debug("Here in niceconn")
-
-                corner1.setPos(helperPoint1)
-                corner2.setPos(helperPoint2)
-                self.firstS = self.getFirstSeg()
+                connectorName = "To port ABOVE from port 3"  # this was wrong before
+                connector = _gnc.getNiceConnector(connectorName)
+                connector(self, rad, fromSide=3, logStatement=connectorName).createNiceConn()
+            return
 
         else:
             connectorName = "Ports are directed to each other"
-            connector = _gnc.getNiceConnector(connectorName)
-            connector(self, rad).createNiceConn()
+
+        connector = _gnc.getNiceConnector(connectorName)
+        connector(self, rad).createNiceConn()
 
     # Unused
     def buildBridges(self):  # pylint: disable = too-many-locals, too-many-statements
@@ -892,5 +749,3 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
-
-
