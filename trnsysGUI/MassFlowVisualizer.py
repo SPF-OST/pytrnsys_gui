@@ -256,11 +256,11 @@ class MassFlowVisualizer(_qtw.QDialog):
             return
 
     def _getMassFlow(self, mfrVariableName: str, timeStep: int) -> float:
-        mass = self.massFlowData[mfrVariableName[:25]].iloc[timeStep]
+        mass = self.massFlowData[mfrVariableName].iloc[timeStep]
         return mass
 
     def _getTemperature(self, temperatureVariableName: str, timeStep: int) -> float:
-        return self.tempMassFlowData[temperatureVariableName[:25]].iloc[timeStep]
+        return self.tempMassFlowData[temperatureVariableName].iloc[timeStep]
 
     def pauseVis(self):
         self.paused = True
