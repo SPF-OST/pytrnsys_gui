@@ -9,7 +9,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.segments.SegmentItemBase as _sib
 import trnsysGUI.dialogs.connections.doublePipe as _dpcldlg
 
-from . import _common
+from trnsysGUI.segments import _common
 
 _LINE_PEN_WIDTH = 3
 
@@ -76,7 +76,7 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
             pass
         self.linePoints = _qtc.QLineF(x1, y1, x2, y2)
 
-    def _setStandardLinePens(self) -> None:
+    def _setStandardLinesPens(self) -> None:
         bluePen = self._createPen(_qtc.Qt.blue)
         self.blueLine.setPen(bluePen)
         redPen = self._createPen(_qtc.Qt.red)
@@ -98,8 +98,8 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         color.setAlpha(alpha)
         return color
 
-    def _setSelectedLinePen(self):
-        selectPen = self._createSelectPen()
+    def _setSelectedLinesPen(self):
+        selectPen = self._createSelectedLinesPen()
         self.blueLine.setPen(selectPen)
         self.redLine.setPen(selectPen)
 

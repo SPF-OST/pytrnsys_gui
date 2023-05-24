@@ -67,7 +67,7 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         gradient.setColorAt(1, _qtc.Qt.black)
         return gradient
 
-    def _setStandardLinePens(self) -> None:
+    def _setStandardLinesPens(self) -> None:
         gradient = self._createUpdatedGradient()
         self._updateLine(gradient)
 
@@ -95,20 +95,6 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         gradient.setColorAt(0, self._interpolate(partLen1, totLenConn))
         gradient.setColorAt(1, self._interpolate(partLen2, totLenConn))
         return gradient
-
-    def _updateLine(self, gradient: _qtg.QGradient) -> None:
-        pen = self._createPen(gradient)
-        self.singleLine.setPen(pen)
-
-    def _createPen(self, gradient: _qtg.QGradient) -> _qtg.QPen:
-        brush = _qtg.QBrush(gradient)
-        pen = _qtg.QPen(brush, _LINE_PEN_WIDTH)
-
-        if self._singlePipeConnection.shallBeSimulated:
-            return pen
-
-        pen.setStyle(_qtc.Qt.DashLine)
-        return pen
 
     def _interpolate(
         self,
@@ -138,8 +124,22 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
                 alpha,
             )
 
-    def _setSelectedLinePen(self):
-        selectPen = self._createSelectPen()
+    def _updateLine(self, gradient: _qtg.QGradient) -> None:
+        pen = self._createPen(gradient)
+        self.singleLine.setPen(pen)
+
+    def _createPen(self, gradient: _qtg.QGradient) -> _qtg.QPen:
+        brush = _qtg.QBrush(gradient)
+        pen = _qtg.QPen(brush, _LINE_PEN_WIDTH)
+
+        if self._singlePipeConnection.shallBeSimulated:
+            return pen
+
+        pen.setStyle(_qtc.Qt.DashLine)
+        return pen
+
+    def _setSelectedLinesPen(self):
+        selectPen = self._createSelectedLinesPen()
         self.singleLine.setPen(selectPen)
 
     def setColorAndWidthAccordingToMassflow(self, color, width):

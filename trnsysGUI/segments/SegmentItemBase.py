@@ -657,17 +657,17 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
     def resetLinePens(self) -> None:
         if self.connection.isSelected:
-            self._setSelectedLinePen()
+            self._setSelectedLinesPen()
         else:
-            self._setStandardLinePens()
+            self._setStandardLinesPens()
 
-    def _setStandardLinePens(self):
+    def _setStandardLinesPens(self):
         raise NotImplementedError()
 
-    def _setSelectedLinePen(self):
+    def _setSelectedLinesPen(self):
         raise NotImplementedError()
 
-    def _createSelectPen(self) -> _qtg.QPen:
+    def _createSelectedLinesPen(self) -> _qtg.QPen:
         color = _qtg.QColor(125, 242, 189)
         width = 4
 
