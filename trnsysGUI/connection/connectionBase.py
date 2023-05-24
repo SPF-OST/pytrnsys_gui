@@ -28,12 +28,12 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
 class ConnectionBase(_ip.HasInternalPiping):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(
-        self,
-        fromPort: _pib.PortItemBase,
-        toPort: _pib.PortItemBase,
-        shallBeSimulated: bool,
-        lengthInMeters: _values.Value,
-        parent,
+            self,
+            fromPort: _pib.PortItemBase,
+            toPort: _pib.PortItemBase,
+            shallBeSimulated: bool,
+            lengthInMeters: _values.Value,
+            parent,
     ):
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
@@ -367,71 +367,12 @@ class ConnectionBase(_ip.HasInternalPiping):
         )
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
-            self.fromPort.createdAtSide = 2
-            self.toPort.createdAtSide = 2
-            self.logger.debug("NiceConn 2 to 2")
-            portOffset = 30
-            self.clearConn()
+            connectorName = "NiceConn 2 to 2"
 
-            corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
-            corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
-            corner3 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner2.node, None, self)
-            corner4 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner3.node, self.endNode, self)
-
-            corner1.node.setNext(corner2.node)
-            corner2.node.setNext(corner3.node)
-            corner3.node.setNext(corner4.node)
-
-            seg1 = self._createSegmentItem(self.startNode, corner1.node)
-            seg2 = self._createSegmentItem(corner1.node, corner2.node)
-            seg3 = self._createSegmentItem(corner2.node, corner3.node)
-            seg4 = self._createSegmentItem(corner3.node, corner4.node)
-            seg5 = self._createSegmentItem(corner4.node, self.endNode)
-
-            self.startNode.setNext(corner1.node)
-            self.endNode.setPrev(corner4.node)
-
-            self.parent.diagramScene.addItem(seg1)
-            self.parent.diagramScene.addItem(seg2)
-            self.parent.diagramScene.addItem(seg3)
-            self.parent.diagramScene.addItem(seg4)
-            self.parent.diagramScene.addItem(seg5)
-
-            self.parent.diagramScene.addItem(corner1)
-            self.parent.diagramScene.addItem(corner2)
-            self.parent.diagramScene.addItem(corner3)
-            self.parent.diagramScene.addItem(corner4)
-
-            pos1 = self.fromPort.scenePos()
-            pos2 = self.toPort.scenePos()
-
-            baseLineHeight = max(pos1.y(), pos2.y()) + 100.6
-
-            p1 = _qtc.QPointF(pos1.x() + portOffset, pos1.y())  # pylint: disable = invalid-name
-            p2 = _qtc.QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
-            p3 = _qtc.QPointF(pos2.x() + portOffset, baseLineHeight)  # pylint: disable = invalid-name
-            p4 = _qtc.QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
-
-            seg1.setLine(pos1, p1)
-            seg2.setLine(p1, p2)
-            seg3.setLine(p2, p3)
-            seg4.setLine(p3, p4)
-            seg5.setLine(p4, pos2)
-
-            corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
-            corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
-            corner3.setFlag(corner3.ItemSendsScenePositionChanges, True)
-            corner4.setFlag(corner4.ItemSendsScenePositionChanges, True)
-
-            corner1.setZValue(100)
-            corner2.setZValue(100)
-            corner3.setZValue(100)
-            corner4.setZValue(100)
-
-            corner1.setPos(p1)
-            corner2.setPos(p2)
-            corner3.setPos(p3)
-            corner4.setPos(p4)
+            # the if statements would provide the connectorNames.
+            # afterwards, the following code would be run for all cases.
+            connector = getNiceConnector(connectorName)
+            connector(self, rad).createNiceConn()
 
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
             self.fromPort.createdAtSide = 0
@@ -1060,3 +1001,119 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
+
+
+def getNiceConnector(name):
+    connectors = {"both sides == 2": niceConnectorBoth2}
+
+    if name in connectors:
+        return connectors[name]
+
+
+class niceConnectorBoth2:
+    def __init__(self, connection, rad):
+        self.connection = connection
+        self.rad = rad
+        self.portOffset = 30
+        self.startNode = self.connection.startNode
+        self.endNode = self.connection.endNode
+        self.nrOfCorners = 4
+
+    def createNiceConn(self):
+        self.connection.fromPort.createdAtSide = 2
+        self.connection.toPort.createdAtSide = 2
+        self.connection.logger.debug("NiceConn 2 to 2")
+        self.connection.clearConn()
+
+        corners = self._getConnectionCorners(self.nrOfCorners)
+        corners = self._setNextConnectionCorner(corners)
+
+        segs = self._connectWithSegments(corners)
+
+        self._connectStartAndEndNodes(corners[0], corners[-1])
+
+        self._addGraphicsItems(segs + corners)
+
+        points = self._getPoints()
+
+        self._setSegLines(segs, points)
+
+        self._setCornerFlags(corners)
+
+        self._setCornerZvalues(corners, 100)
+
+        self._setCornerPositions(corners, points)
+
+    def _getPoints(self):
+        posStart = self.connection.fromPort.scenePos()
+        posEnd = self.connection.toPort.scenePos()
+        points = [posStart]
+
+        baseLineHeight = max(posStart.y(), posEnd.y()) + 100.6
+
+        point1 = _qtc.QPointF(posStart.x() + self.portOffset, posStart.y())
+        points.append(point1)
+        points.append(_qtc.QPointF(point1.x(), baseLineHeight))
+        point3 = _qtc.QPointF(posEnd.x() + self.portOffset, baseLineHeight)
+        points.append(point3)
+        points.append(_qtc.QPointF(point3.x(), posEnd.y()))
+        return points
+
+    def _addGraphicsItems(self, gItems):
+        for gItem in gItems:
+            self.connection.parent.diagramScene.addItem(gItem)
+
+    def _connectStartAndEndNodes(self, toStart, toEnd):
+        self.startNode.setNext(toStart.node)
+        self.endNode.setPrev(toEnd.node)
+
+    def _connectWithSegments(self, corners):
+        # todo: deal with _createSegmentItem being protected
+        segs = [self.connection._createSegmentItem(self.startNode, corners[0].node)]
+        for i in range(len(corners) - 1):
+            segs.append(self.connection._createSegmentItem(corners[i].node, corners[i + 1].node))
+
+        segs.append(self.connection._createSegmentItem(corners[-1].node, self.endNode))
+        return segs
+
+    @staticmethod
+    def _setNextConnectionCorner(corners):
+        for i in range(len(corners) - 1):
+            corners[i].node.setNext(corners[i + 1].node)
+        return corners
+
+    def _getConnectionCorners(self, nrOfCorners):
+        rad = self.rad
+
+        cornerCur = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
+        corners = [cornerCur]
+        for i in range(nrOfCorners):
+            corner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, cornerCur.node, None, self.connection)
+            corners.append([corner])
+            cornerCur = corner
+
+        corners.append(_ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, cornerCur.node, self.endNode, self.connection))
+        return corners
+
+    @staticmethod
+    def _setSegLines(segs, points):
+        assert len(segs) + 1 == len(points)
+
+        for i, seg in enumerate(segs):
+            seg.setLine(points[i], points[i + 1])
+
+    @staticmethod
+    def _setCornerFlags(corners):
+        for corner in corners:
+            corner.setFlag(corner.ItemSendsScenePositionChanges, True)
+
+    @staticmethod
+    def _setCornerZvalues(corners, value):
+        for corner in corners:
+            corner.setZValue(value)
+
+    @staticmethod
+    def _setCornerPositions(corners, points):
+        assert len(corners) + 2 == len(points)
+        for i, corner in enumerate(corners):
+            corner.setPos(points[i + 1])
