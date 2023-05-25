@@ -69,8 +69,8 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         self.initNew(parent)
 
-    @_abc.abstractmethod
     @property
+    @_abc.abstractmethod
     def _segmentItemFactory(self) -> _sif.SegmentItemFactoryBase:
         raise NotImplementedError()
 
@@ -373,12 +373,12 @@ class ConnectionBase(_ip.HasInternalPiping):
         )
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
-            connectorName = "NiceConn 2 to 2"
-            connector = _gnc.NiceConnectorBothTwo(self, rad)
+            logStatement = "NiceConn 2 to 2"
+            connector = _gnc.NiceConnectorBothTwo(self, self._segmentItemFactory, rad)
 
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
-            connectorName = "NiceConn 0 to 0"
-            connector = _gnc.NiceConnectorBothZero(self, rad)
+            logStatement = "NiceConn 0 to 0"
+            connector = _gnc.NiceConnectorBothZero(self, self._segmentItemFactory, rad)
 
         elif self.fromPort.side == 1:
             # pylint: disable = fixme
@@ -389,10 +389,10 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             if pos2.y() <= pos1.y():
                 logStatement = "To port ABOVE from port 1"
-                connector = _gnc.NiceConnectorFromAbove(self, rad)
+                connector = _gnc.NiceConnectorFromAbove(self, self._segmentItemFactory, rad)
             else:
                 logStatement = "To port BELOW from port 1"
-                connector = _gnc.NiceConnectorFromBelow(self, rad)
+                connector = _gnc.NiceConnectorFromBelow(self, self._segmentItemFactory, rad)
 
         elif self.fromPort.side == 3:
 
@@ -401,14 +401,18 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             if pos2.y() >= pos1.y():
                 logStatement = "To port BELOW from port 3"
-                connector = _gnc.NiceConnectorFromAbove(self, rad, fromSide=3, logStatement=logStatement)
+                connector = _gnc.NiceConnectorFromAbove(
+                    self, self._segmentItemFactory, rad, fromSide=3, logStatement=logStatement
+                )
             else:
-                connectorName = "To port ABOVE from port 3"
-                connector = _gnc.NiceConnectorFromBelow(self, rad, fromSide=3, logStatement=logStatement, operation="add")
+                logStatement = "To port ABOVE from port 3"
+                connector = _gnc.NiceConnectorFromBelow(
+                    self, self._segmentItemFactory, rad, fromSide=3, logStatement=logStatement, operation="add"
+                )
 
         else:
-            connectorName = "Ports are directed to each other"
-            connector = _gnc.NiceConnectorOther(self, rad)
+            logStatement = "Ports are directed to each other"
+            connector = _gnc.NiceConnectorOther(self, self._segmentItemFactory, rad)
 
         connector.createNiceConn()
 

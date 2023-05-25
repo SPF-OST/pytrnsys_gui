@@ -1,4 +1,3 @@
-
 from PyQt5 import QtCore as _qtc
 
 from trnsysGUI import CornerItem as _ci
@@ -161,8 +160,8 @@ class NiceConnectorBase:
 
 
 class NiceConnectorBothTwo(NiceConnectorBase):
-    def __init__(self, connection, rad):
-        super().__init__(connection, rad)
+    def __init__(self, connection, segmentItemFactory, rad):
+        super().__init__(connection, segmentItemFactory, rad)
         self.nrOfCorners = 4
         self.fromSide = 2
         self.toSide = 2
@@ -171,8 +170,8 @@ class NiceConnectorBothTwo(NiceConnectorBase):
 
 
 class NiceConnectorBothZero(NiceConnectorBase):
-    def __init__(self, connection, rad):
-        super().__init__(connection, rad)
+    def __init__(self, connection, segmentItemFactory, rad):
+        super().__init__(connection, segmentItemFactory, rad)
         self.nrOfCorners = 4
         self.fromSide = 0
         self.toSide = 0
@@ -181,8 +180,8 @@ class NiceConnectorBothZero(NiceConnectorBase):
 
 
 class NiceConnectorOther(NiceConnectorBase):
-    def __init__(self, connection, rad):
-        super().__init__(connection, rad)
+    def __init__(self, connection, segmentItemFactory, rad):
+        super().__init__(connection, segmentItemFactory, rad)
         self.nrOfCorners = 2
         self.fromSide = self.connection.fromPort.side
         self.toSide = self.connection.toPort.side
@@ -210,8 +209,8 @@ class NiceConnectorOther(NiceConnectorBase):
 
 
 class NiceConnectorFromAbove(NiceConnectorBase):
-    def __init__(self, connection, rad, fromSide=1, logStatement="To port ABOVE from port 1"):
-        super().__init__(connection, rad)
+    def __init__(self, connection, segmentItemFactory, rad, fromSide=1, logStatement="To port ABOVE from port 1"):
+        super().__init__(connection, segmentItemFactory, rad)
         self.nrOfCorners = 1
         self.fromSide = fromSide
         self.logStatement = logStatement
@@ -243,8 +242,16 @@ class NiceConnectorFromAbove(NiceConnectorBase):
 
 
 class NiceConnectorFromBelow(NiceConnectorBase):
-    def __init__(self, connection, rad, fromSide=1, logStatement="To port BELOW from port 1", operation="subtract"):
-        super().__init__(connection, rad)
+    def __init__(
+        self,
+        connection,
+        segmentItemFactory,
+        rad,
+        fromSide=1,
+        logStatement="To port BELOW from port 1",
+        operation="subtract",
+    ):
+        super().__init__(connection, segmentItemFactory, rad)
         self.nrOfCorners = 2
         self.fromSide = fromSide
         self.logStatement = logStatement

@@ -18,6 +18,8 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.temperatures as _temps
+import trnsysGUI.segments.segmentItemFactoryBase as _sif
+import trnsysGUI.segments.singlePipeSegmentItemFactory as _spsif
 
 from . import _massFlowLabels as _mfl
 
@@ -41,6 +43,10 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
 
         self._updateModels(self.displayName)
+
+    @property
+    def _segmentItemFactory(self) -> _sif.SegmentItemFactoryBase:
+        return _spsif.SinglePipeSegmentItemFactory(self)
 
     @property
     def fromPort(self) -> _sppi.SinglePipePortItem:
