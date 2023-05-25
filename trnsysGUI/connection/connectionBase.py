@@ -5,14 +5,15 @@ from __future__ import annotations
 import math as _math
 import typing as _tp
 
-from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QGraphicsTextItem, QUndoCommand
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.CornerItem as _ci
-import trnsysGUI.Node as _node
+import trnsysGUI.segments.Node as _node
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.SegmentItemBase as _sib
+import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
@@ -26,13 +27,24 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
 
 class ConnectionBase(_ip.HasInternalPiping):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes
-    def __init__(self, fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, parent):
+    def __init__(
+        self,
+        fromPort: _pib.PortItemBase,
+        toPort: _pib.PortItemBase,
+        shallBeSimulated: bool,
+        lengthInMeters: _values.Value,
+        parent,
+    ):
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
         self.logger = parent.logger
 
         self._fromPort = fromPort
         self._toPort = toPort
+
+        self.shallBeSimulated = shallBeSimulated
+        self.lengthInM = lengthInMeters
+
         self.displayName = ""
 
         self.parent = parent
@@ -109,7 +121,7 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     @staticmethod
     def _toPoint(tup):
-        pos = QPointF(tup[0], tup[1])
+        pos = _qtc.QPointF(tup[0], tup[1])
         return pos
 
     def setStartPort(self, newStartPort):
@@ -126,27 +138,25 @@ class ConnectionBase(_ip.HasInternalPiping):
         pass
 
     def setColor(self, value, **kwargs):
-        col = QColor(0, 0, 0)
-
         if "mfr" in kwargs:
             if kwargs["mfr"] == "NegMfr":
-                col = QColor(0, 0, 255)
+                col = _qtg.QColor(0, 0, 255)
             elif kwargs["mfr"] == "ZeroMfr":
-                col = QColor(142, 142, 142)  # Gray
+                col = _qtg.QColor(142, 142, 142)  # Gray
             elif kwargs["mfr"] == "min":
-                col = QColor(0, 0, 204)  # deep blue
+                col = _qtg.QColor(0, 0, 204)  # deep blue
             elif kwargs["mfr"] == "max":
-                col = QColor(153, 0, 0)  # deep red
+                col = _qtg.QColor(153, 0, 0)  # deep red
             elif kwargs["mfr"] == "minTo25":
-                col = QColor(0, 128, 255)  # blue
+                col = _qtg.QColor(0, 128, 255)  # blue
             elif kwargs["mfr"] == "25To50":
-                col = QColor(102, 255, 255)  # light blue
+                col = _qtg.QColor(102, 255, 255)  # light blue
             elif kwargs["mfr"] == "50To75":
-                col = QColor(255, 153, 153)  # light red
+                col = _qtg.QColor(255, 153, 153)  # light red
             elif kwargs["mfr"] == "75ToMax":
-                col = QColor(255, 51, 51)  # red
+                col = _qtg.QColor(255, 51, 51)  # red
             else:
-                col = QColor(255, 0, 0)
+                col = _qtg.QColor(255, 0, 0)
 
             for s in self.segments:  # pylint: disable = invalid-name
                 self.logger.debug("Value: " + str(value))
@@ -157,10 +167,10 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     # Getters
     def getStartPoint(self):
-        return QPointF(self.fromPort.scenePos())
+        return _qtc.QPointF(self.fromPort.scenePos())
 
     def getEndPoint(self):
-        return QPointF(self.toPort.scenePos())
+        return _qtc.QPointF(self.toPort.scenePos())
 
     def getNodePos(self, searchCorner):
 
@@ -397,10 +407,10 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             baseLineHeight = max(pos1.y(), pos2.y()) + 100.6
 
-            p1 = QPointF(pos1.x() + portOffset, pos1.y())  # pylint: disable = invalid-name
-            p2 = QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
-            p3 = QPointF(pos2.x() + portOffset, baseLineHeight)  # pylint: disable = invalid-name
-            p4 = QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
+            p1 = _qtc.QPointF(pos1.x() + portOffset, pos1.y())  # pylint: disable = invalid-name
+            p2 = _qtc.QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
+            p3 = _qtc.QPointF(pos2.x() + portOffset, baseLineHeight)  # pylint: disable = invalid-name
+            p4 = _qtc.QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
 
             seg1.setLine(pos1, p1)
             seg2.setLine(p1, p2)
@@ -464,10 +474,10 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             baseLineHeight = max(pos1.y(), pos2.y()) + 100.6
 
-            p1 = QPointF(pos1.x() - portOffset, pos1.y())  # pylint: disable = invalid-name
-            p2 = QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
-            p3 = QPointF(pos2.x() - portOffset, baseLineHeight)  # pylint: disable = invalid-name
-            p4 = QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
+            p1 = _qtc.QPointF(pos1.x() - portOffset, pos1.y())  # pylint: disable = invalid-name
+            p2 = _qtc.QPointF(p1.x(), baseLineHeight)  # pylint: disable = invalid-name
+            p3 = _qtc.QPointF(pos2.x() - portOffset, baseLineHeight)  # pylint: disable = invalid-name
+            p4 = _qtc.QPointF(p3.x(), pos2.y())  # pylint: disable = invalid-name
 
             seg1.setLine(pos1, p1)
             seg2.setLine(p1, p2)
@@ -516,7 +526,7 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.parent.diagramScene.addItem(corner1)
 
                 # position of the connecting node
-                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
+                p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, p1)
                 seg2.setLine(p1, pos2)
@@ -552,12 +562,12 @@ class ConnectionBase(_ip.HasInternalPiping):
 
                 offsetPoint = pos1.y() - 15.666
 
-                help_point_1 = QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                help_point_2 = QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
 
-                seg1.setLine(pos1, help_point_1)
-                seg2.setLine(help_point_1, help_point_2)
-                seg3.setLine(help_point_2, pos2)
+                seg1.setLine(pos1, helperPoint1)
+                seg2.setLine(helperPoint1, helperPoint2)
+                seg3.setLine(helperPoint2, pos2)
 
                 self.printConnNodes()
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
@@ -568,8 +578,8 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.fromPort.setZValue(100)
                 self.toPort.setZValue(100)
 
-                corner1.setPos(help_point_1)
-                corner2.setPos(help_point_2)
+                corner1.setPos(helperPoint1)
+                corner2.setPos(helperPoint2)
                 self.firstS = self.getFirstSeg()
 
         elif self.fromPort.side == 3:
@@ -596,7 +606,7 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.parent.diagramScene.addItem(corner1)
 
                 # position of the connecting node
-                p1 = QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
+                p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
 
                 seg1.setLine(pos1, p1)
                 seg2.setLine(p1, pos2)
@@ -631,12 +641,12 @@ class ConnectionBase(_ip.HasInternalPiping):
 
                 offsetPoint = pos1.y() + 15.666
 
-                help_point_1 = QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
-                help_point_2 = QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
+                helperPoint2 = _qtc.QPointF(pos2.x(), offsetPoint)  # pylint: disable = invalid-name
 
-                seg1.setLine(pos1, help_point_1)
-                seg2.setLine(help_point_1, help_point_2)
-                seg3.setLine(help_point_2, pos2)
+                seg1.setLine(pos1, helperPoint1)
+                seg2.setLine(helperPoint1, helperPoint2)
+                seg3.setLine(helperPoint2, pos2)
 
                 self.printConnNodes()
 
@@ -649,8 +659,8 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.toPort.setZValue(100)
                 self.logger.debug("Here in niceconn")
 
-                corner1.setPos(help_point_1)
-                corner2.setPos(help_point_2)
+                corner1.setPos(helperPoint1)
+                corner2.setPos(helperPoint2)
                 self.firstS = self.getFirstSeg()
 
         else:
@@ -698,11 +708,11 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             self.logger.debug("Here in niceconn")
 
-            help_point_1 = QPointF(midx, pos1.y())  # pylint: disable = invalid-name
-            help_point_2 = QPointF(midx, pos2.y())  # pylint: disable = invalid-name
+            helperPoint1 = _qtc.QPointF(midx, pos1.y())  # pylint: disable = invalid-name
+            helperPoint2 = _qtc.QPointF(midx, pos2.y())  # pylint: disable = invalid-name
 
-            corner1.setPos(help_point_1)
-            corner2.setPos(help_point_2)
+            corner1.setPos(helperPoint1)
+            corner2.setPos(helperPoint2)
             self.firstS = self.getFirstSeg()
 
             self.logger.debug("Conn has now " + str(self.firstS))
@@ -764,7 +774,7 @@ class ConnectionBase(_ip.HasInternalPiping):
                             m1 = (qp2.y() - qp1.y()) / (qp2.x() - qp1.x())  # pylint: disable = invalid-name
                             m2 = (qp2_.y() - qp1_.y()) / (qp2_.x() - qp1_.x())  # pylint: disable = invalid-name
 
-                            collisionPos = QPointF((n1 - n2) / (m2 - m1), m1 * (n1 - n2) / (m2 - m1) + n1)
+                            collisionPos = _qtc.QPointF((n1 - n2) / (m2 - m1), m1 * (n1 - n2) / (m2 - m1) + n1)
 
                             vecp2p1 = qp2 - qp1  # pylint: disable = invalid-name
                             vecp2p1_ = qp2_ - qp1_  # pylint: disable = invalid-name
@@ -780,7 +790,7 @@ class ConnectionBase(_ip.HasInternalPiping):
                             f = 10  # pylint: disable = invalid-name
                             distFactor = max(f * 1 / angleBetween, f)
 
-                            normVecp2p1 = QPointF(
+                            normVecp2p1 = _qtc.QPointF(
                                 distFactor / normVec * vecp2p1.x(), distFactor / normVec * vecp2p1.y()
                             )
 
@@ -809,7 +819,7 @@ class ConnectionBase(_ip.HasInternalPiping):
             if isinstance(item, _sib.SegmentItemBase):
                 if item.startNode.lastNode() is self.endNode or item.startNode.firstNode() is self.startNode:
                     self.parent.diagramScene.removeItem(item)
-            if isinstance(item, QGraphicsTextItem):
+            if isinstance(item, _qtw.QGraphicsTextItem):
                 if isinstance(item.parent, _pib.PortItemBase):
                     self.parent.diagramScene.removeItem(item)
 
@@ -851,7 +861,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         deleteConnectionCommand = self.createDeleteUndoCommand()
         self.parent.parent().undoStack.push(deleteConnectionCommand)
 
-    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[QUndoCommand] = None) -> QUndoCommand:
+    def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
         raise NotImplementedError()
 
     # Gradient related
@@ -878,7 +888,7 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def updateSegGrads(self):
         for s in self.segments:  # pylint: disable = invalid-name
-            s.updateGrad()
+            s.resetLinePens()
 
     # Invert connection
     def invertConnection(self):
@@ -908,7 +918,7 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             s.setLine(s.line().p2().x(), s.line().p2().y(), s.line().p1().x(), s.line().p1().y())
 
-            s.updateGrad()
+            s.resetLinePens()
 
     def invertNodes(self):
         element = self.startNode
@@ -928,18 +938,18 @@ class ConnectionBase(_ip.HasInternalPiping):
         element.setPrev(nextNode)
 
     def selectConnection(self):
-        for segment in self.segments:
-            segment.setSelect(True)
-
         self.isSelected = True
+
+        for segment in self.segments:
+            segment.resetLinePens()
 
         self.setLabelsSelected(True)
 
     def deselectConnection(self):
-        for segment in self.segments:
-            segment.updateGrad()
-
         self.isSelected = False
+
+        for segment in self.segments:
+            segment.resetLinePens()
 
         self.setLabelsSelected(False)
 
@@ -949,7 +959,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         self._setBold(self.firstS.labelMass, isSelected)
 
     @staticmethod
-    def _setBold(label: QGraphicsTextItem, isBold: bool) -> None:
+    def _setBold(label: _qtw.QGraphicsTextItem, isBold: bool) -> None:
         originalFontCopy = label.font()
         originalFontCopy.setBold(isBold)
         label.setFont(originalFontCopy)
