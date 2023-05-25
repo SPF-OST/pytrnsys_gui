@@ -195,8 +195,8 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
             else:
                 self.logger.debug("Unrecognized editorMode in segmentItem mouseMoveEvent")
 
-    def deleteNextHorizSeg(self, b, nextS):
-        if not b:
+    def deleteNextHorizSeg(self, keepSeg, nextS):
+        if not keepSeg:
             nodeTodelete1 = self.endNode
             nodeTodelete2 = self.endNode.nextN()
             self.endNode = nextS.endNode
@@ -226,8 +226,8 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
                 self.startNode.parent.scenePos().y(),
             )
 
-    def deletePrevHorizSeg(self, b, prevS):
-        if not b:
+    def deletePrevHorizSeg(self, keepPrevSeg, prevS):
+        if not keepPrevSeg:
             nodeTodelete1 = self.startNode
             nodeTodelete2 = self.startNode.prevN()
             self.startNode = prevS.startNode
