@@ -29,7 +29,6 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         self._updateModels(self.displayName)
 
-
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
         assert isinstance(self._fromPort, _dppi.DoublePipePortItem)
