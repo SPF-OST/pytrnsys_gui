@@ -18,7 +18,7 @@ import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.segments.Node as _node
-import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.segments.segmentItemFactoryBase as _sif
 
 
