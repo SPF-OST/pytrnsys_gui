@@ -18,6 +18,7 @@ import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.connection.getNiceConnector as _gnc
+import trnsysGUI.segments.segmentItemCreator as _sic
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -66,6 +67,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.startPos = None
 
         self.initNew(parent)
+        self.connectionType = "None"  # Needs to be implemented in child classes
 
     def getDisplayName(self) -> str:
         return self.displayName
@@ -91,7 +93,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         raise NotImplementedError()
 
     def _createSegmentItem(self, startNode, endNode):
-        raise NotImplementedError()
+        return _sic.createSegmentItem(startNode, endNode, self, self.connectionType)
 
     def isVisible(self):
         res = True

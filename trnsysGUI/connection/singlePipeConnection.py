@@ -16,10 +16,8 @@ import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.internalPiping as _pi
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.segments.segmentItemCreator
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.temperatures as _temps
-import trnsysGUI.segments.SegmentItemBase as _sib
 
 from . import _massFlowLabels as _mfl
 
@@ -43,6 +41,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
 
         self._updateModels(self.displayName)
+        self.connectionType = "SinglePipeConnection"
 
     @property
     def fromPort(self) -> _sppi.SinglePipePortItem:
@@ -61,9 +60,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             )
 
         return self.modelPipe
-
-    def _createSegmentItem(self, startNode, endNode):
-        return trnsysGUI.segments.segmentItemCreator.createSegmentItem(startNode, endNode, self)
 
     def _updateModels(self, newDisplayName: str) -> None:
         fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
