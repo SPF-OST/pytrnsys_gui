@@ -41,7 +41,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
 
         self._updateModels(self.displayName)
-        self.connectionType = "SinglePipeConnection"
 
     @property
     def fromPort(self) -> _sppi.SinglePipePortItem:
@@ -69,6 +68,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def getRadius(self):
         rad = 2
         return rad
+
+    def getConnectionType(self):
+        return "SinglePipeConnection"
 
     def editHydraulicLoop(self) -> None:
         self._editor.editHydraulicLoop(self)
