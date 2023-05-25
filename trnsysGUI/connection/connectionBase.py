@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import abc as _abc
 import math as _math
 import typing as _tp
 
@@ -10,15 +11,15 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.CornerItem as _ci
-import trnsysGUI.segments.Node as _node
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.connection.getNiceConnector as _gnc
 import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.connection.getNiceConnector as _gnc
-import trnsysGUI.segments.segmentItemCreator as _sic
+import trnsysGUI.segments.Node as _node
+import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.segments.segmentItemFactoryBase as _sif
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -68,6 +69,11 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         self.initNew(parent)
 
+    @_abc.abstractmethod
+    @property
+    def _segmentItemFactory(self) -> _sif.SegmentItemFactoryBase:
+        raise NotImplementedError()
+
     def getDisplayName(self) -> str:
         return self.displayName
 
@@ -90,17 +96,6 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def _updateModels(self, newDisplayName: str) -> None:
         raise NotImplementedError()
-
-    def _createSegmentItem(self, startNode, endNode):
-        connectionType = self.getConnectionType()
-        return _sic.createSegmentItem(startNode, endNode, self, connectionType)
-
-    def getConnectionType(self):
-        raise NotImplementedError()
-
-    @property
-    def connectionType(self):
-        return self.getConnectionType()
 
     def isVisible(self):
         res = True
@@ -241,7 +236,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
+        self.firstS = self._segmentItemFactory.create(self.startNode, self.endNode)
 
         self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
@@ -258,7 +253,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.startNode.setNext(self.endNode)
         self.endNode.setPrev(self.startNode)
 
-        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
+        self.firstS = self._segmentItemFactory.create(self.startNode, self.endNode)
 
         self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
 
@@ -288,13 +283,14 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             cor.node.nextNode.setPrev(cor.node)
             cor.node.prevNode.setNext(cor.node)
-            self._createSegmentItem(tempNode, cor.node)
+            self._segmentItemFactory.create(tempNode, cor.node)
 
             tempNode = cor.node
 
             self.printConn()
 
-        self._createSegmentItem(tempNode, tempNode.nextN())
+        node = tempNode.nextN()
+        self._segmentItemFactory.create(tempNode, node)
 
         self.printConn()
 
@@ -378,9 +374,11 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
             connectorName = "NiceConn 2 to 2"
+            connector = _gnc.NiceConnectorBothTwo(self, rad)
 
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
             connectorName = "NiceConn 0 to 0"
+            connector = _gnc.NiceConnectorBothZero(self, rad)
 
         elif self.fromPort.side == 1:
             # pylint: disable = fixme
@@ -390,9 +388,11 @@ class ConnectionBase(_ip.HasInternalPiping):
             pos2 = self.toPort.scenePos()
 
             if pos2.y() <= pos1.y():
-                connectorName = "To port ABOVE from port 1"
+                logStatement = "To port ABOVE from port 1"
+                connector = _gnc.NiceConnectorFromAbove(self, rad)
             else:
-                connectorName = "To port BELOW from port 1"  # this was wrong before
+                logStatement = "To port BELOW from port 1"
+                connector = _gnc.NiceConnectorFromBelow(self, rad)
 
         elif self.fromPort.side == 3:
 
@@ -400,20 +400,17 @@ class ConnectionBase(_ip.HasInternalPiping):
             pos2 = self.toPort.scenePos()
 
             if pos2.y() >= pos1.y():
-                connectorName = "To port BELOW from port 3"  # this was wrong before
-                connector = _gnc.getNiceConnector(connectorName)
-                connector(self, rad, fromSide=3, logStatement=connectorName).createNiceConn()
+                logStatement = "To port BELOW from port 3"
+                connector = _gnc.NiceConnectorFromAbove(self, rad, fromSide=3, logStatement=logStatement)
             else:
-                connectorName = "To port ABOVE from port 3"  # this was wrong before
-                connector = _gnc.getNiceConnector(connectorName)
-                connector(self, rad, fromSide=3, logStatement=connectorName, operation="add").createNiceConn()
-            return
+                connectorName = "To port ABOVE from port 3"
+                connector = _gnc.NiceConnectorFromBelow(self, rad, fromSide=3, logStatement=logStatement, operation="add")
 
         else:
             connectorName = "Ports are directed to each other"
+            connector = _gnc.NiceConnectorOther(self, rad)
 
-        connector = _gnc.getNiceConnector(connectorName)
-        connector(self, rad).createNiceConn()
+        connector.createNiceConn()
 
     # Unused
     def buildBridges(self):  # pylint: disable = too-many-locals, too-many-statements
@@ -450,8 +447,8 @@ class ConnectionBase(_ip.HasInternalPiping):
                             s.startNode.setNext(node1)
                             s.endNode.setPrev(node2)
 
-                            s.firstChild = self._createSegmentItem(s.startNode, node1)
-                            s.secondChild = self._createSegmentItem(node2, s.endNode)
+                            s.firstChild = self._segmentItemFactory.create(s.startNode, node1)
+                            s.secondChild = self._segmentItemFactory.create(node2, s.endNode)
 
                             s.hasBridge = True
                             c.hasBridge = True

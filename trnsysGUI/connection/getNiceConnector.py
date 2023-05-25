@@ -1,30 +1,14 @@
+
 from PyQt5 import QtCore as _qtc
 
-import trnsysGUI.segments.segmentItemCreator as _sic
 from trnsysGUI import CornerItem as _ci
-
-
-def getNiceConnector(name):
-    connectors = {
-        "NiceConn 2 to 2": NiceConnectorBothTwo,
-        "NiceConn 0 to 0": NiceConnectorBothZero,
-        "To port ABOVE from port 1": NiceConnectorFromAbove,
-        "To port BELOW from port 1": NiceConnectorFromBelow,
-        "To port BELOW from port 3": NiceConnectorFromAbove,
-        "To port ABOVE from port 3": NiceConnectorFromBelow,
-        "Ports are directed to each other": NiceConnectorOther,
-    }
-
-    if name in connectors:
-        return connectors[name]
-
-    raise NotImplementedError()
 
 
 class NiceConnectorBase:
     # pylint: disable = too-many-instance-attributes
-    def __init__(self, connection, rad):
+    def __init__(self, connection, segmentItemFactory, rad):
         self.connection = connection
+        self.segmentItemFactory = segmentItemFactory
         self.rad = rad
         self.nrOfCorners = None
         self.fromSide = None
@@ -100,13 +84,12 @@ class NiceConnectorBase:
 
     def _connectWithSegments(self, corners):
         endNode, startNode = self._getStartAndEndNode()
-        connectionType = self.connection.getConnectionType()
 
-        segs = [_sic.createSegmentItem(startNode, corners[0].node, self.connection, connectionType)]
+        segs = [self.segmentItemFactory.create(startNode, corners[0].node)]
         for i in range(len(corners) - 1):
-            segs.append(_sic.createSegmentItem(corners[i].node, corners[i + 1].node, self.connection, connectionType))
+            segs.append(self.segmentItemFactory.create(corners[i].node, corners[i + 1].node))
 
-        segs.append(_sic.createSegmentItem(corners[-1].node, endNode, self.connection, connectionType))
+        segs.append(self.segmentItemFactory.create(corners[-1].node, endNode))
         return segs
 
     def _connectStartAndEndNodes(self, toStart, toEnd):

@@ -69,9 +69,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         rad = 2
         return rad
 
-    def getConnectionType(self):
-        return "SinglePipeConnection"
-
     def editHydraulicLoop(self) -> None:
         self._editor.editHydraulicLoop(self)
 
