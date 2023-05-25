@@ -67,7 +67,6 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.startPos = None
 
         self.initNew(parent)
-        # self.connectionType = "None"  # Needs to be implemented in child classes
 
     def getDisplayName(self) -> str:
         return self.displayName
