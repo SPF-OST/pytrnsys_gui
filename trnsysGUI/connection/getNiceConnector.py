@@ -100,12 +100,13 @@ class NiceConnectorBase:
 
     def _connectWithSegments(self, corners):
         endNode, startNode = self._getStartAndEndNode()
+        connectionType = self.connection.connectionType
 
-        segs = [_sic.createSegmentItem(startNode, corners[0].node, self.connection)]
+        segs = [_sic.createSegmentItem(startNode, corners[0].node, self.connection, connectionType)]
         for i in range(len(corners) - 1):
-            segs.append(_sic.createSegmentItem(corners[i].node, corners[i + 1].node, self.connection))
+            segs.append(_sic.createSegmentItem(corners[i].node, corners[i + 1].node, self.connection, connectionType))
 
-        segs.append(_sic.createSegmentItem(corners[-1].node, endNode, self.connection))
+        segs.append(_sic.createSegmentItem(corners[-1].node, endNode, self.connection, connectionType))
         return segs
 
     def _connectStartAndEndNodes(self, toStart, toEnd):

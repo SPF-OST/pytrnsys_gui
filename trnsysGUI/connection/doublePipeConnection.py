@@ -13,8 +13,6 @@ import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.segments.SegmentItemBase as _sib
-import trnsysGUI.segments.segmentItemCreator
 
 from . import _massFlowLabels as _mfl
 
@@ -30,6 +28,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
+        self.connectionType = "DoublePipeConnection"
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -49,9 +48,6 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             return self.hotModelPipe
 
         raise ValueError(f"Don't have a model pipe of type {portItemType}.")
-
-    def _createSegmentItem(self, startNode, endNode):
-        return trnsysGUI.segments.segmentItemCreator.createSegmentItem(startNode, endNode, self)
 
     def getRadius(self):
         rad = 4
