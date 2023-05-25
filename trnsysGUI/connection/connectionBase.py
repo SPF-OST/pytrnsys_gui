@@ -67,7 +67,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.startPos = None
 
         self.initNew(parent)
-        self.connectionType = "None"  # Needs to be implemented in child classes
+        # self.connectionType = "None"  # Needs to be implemented in child classes
 
     def getDisplayName(self) -> str:
         return self.displayName
@@ -93,7 +93,15 @@ class ConnectionBase(_ip.HasInternalPiping):
         raise NotImplementedError()
 
     def _createSegmentItem(self, startNode, endNode):
-        return _sic.createSegmentItem(startNode, endNode, self, self.connectionType)
+        connectionType = self.getConnectionType()
+        return _sic.createSegmentItem(startNode, endNode, self, connectionType)
+
+    def getConnectionType(self):
+        raise NotImplementedError()
+
+    @property
+    def connectionType(self):
+        return self.getConnectionType()
 
     def isVisible(self):
         res = True
@@ -399,7 +407,7 @@ class ConnectionBase(_ip.HasInternalPiping):
             else:
                 connectorName = "To port ABOVE from port 3"  # this was wrong before
                 connector = _gnc.getNiceConnector(connectorName)
-                connector(self, rad, fromSide=3, logStatement=connectorName).createNiceConn()
+                connector(self, rad, fromSide=3, logStatement=connectorName, operation="add").createNiceConn()
             return
 
         else:

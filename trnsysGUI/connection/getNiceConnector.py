@@ -79,9 +79,9 @@ class NiceConnectorBase:
 
         cornerCur = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, startNode, None, self.connection)
         corners = [cornerCur]
-        for _ in range(nrOfCorners):
+        for _ in range(nrOfCorners - 2):
             corner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, cornerCur.node, None, self.connection)
-            corners.append([corner])
+            corners.append(corner)
             cornerCur = corner
 
         corners.append(_ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, cornerCur.node, endNode, self.connection))
@@ -100,7 +100,7 @@ class NiceConnectorBase:
 
     def _connectWithSegments(self, corners):
         endNode, startNode = self._getStartAndEndNode()
-        connectionType = self.connection.connectionType
+        connectionType = self.connection.getConnectionType()
 
         segs = [_sic.createSegmentItem(startNode, corners[0].node, self.connection, connectionType)]
         for i in range(len(corners) - 1):
@@ -144,6 +144,8 @@ class NiceConnectorBase:
 
         points.append(point3)
         points.append(_qtc.QPointF(point3.x(), posEnd.y()))
+        points.append(posEnd)
+
         return points
 
     def _getStartAndEndPositions(self):
@@ -258,7 +260,7 @@ class NiceConnectorFromAbove(NiceConnectorBase):
 
 
 class NiceConnectorFromBelow(NiceConnectorBase):
-    def __init__(self, connection, rad, fromSide=1, logStatement="To port BELOW from port 1"):
+    def __init__(self, connection, rad, fromSide=1, logStatement="To port BELOW from port 1", operation="subtract"):
         super().__init__(connection, rad)
         self.nrOfCorners = 2
         self.fromSide = fromSide
@@ -266,6 +268,7 @@ class NiceConnectorFromBelow(NiceConnectorBase):
         self.createBothPorts = False
         self.setFirstSeg = True
         self.printConnNodes = True
+        self.operation = operation
 
     def _getPoints(self, operation):
         posEnd, posStart = self._getStartAndEndPositions()

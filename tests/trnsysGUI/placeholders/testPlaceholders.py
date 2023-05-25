@@ -1,4 +1,4 @@
-import logging as _log
+git cleimport logging as _log
 import pathlib as _pl
 
 import pytrnsys.utils.result as _res

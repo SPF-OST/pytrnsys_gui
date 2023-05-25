@@ -28,7 +28,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
-        self.connectionType = "DoublePipeConnection"
+
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -48,6 +48,9 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             return self.hotModelPipe
 
         raise ValueError(f"Don't have a model pipe of type {portItemType}.")
+
+    def getConnectionType(self):
+        return "DoublePipeConnection"
 
     def getRadius(self):
         rad = 4
