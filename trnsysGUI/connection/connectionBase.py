@@ -29,12 +29,12 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
 class ConnectionBase(_ip.HasInternalPiping):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(
-            self,
-            fromPort: _pib.PortItemBase,
-            toPort: _pib.PortItemBase,
-            shallBeSimulated: bool,
-            lengthInMeters: _values.Value,
-            parent,
+        self,
+        fromPort: _pib.PortItemBase,
+        toPort: _pib.PortItemBase,
+        shallBeSimulated: bool,
+        lengthInMeters: _values.Value,
+        parent,
     ):
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
