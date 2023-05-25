@@ -113,6 +113,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         raise NotImplementedError()
 
     def insertInParentSegments(self):
+        # todo: this is the responsibility of the connectionManipulators not of the segments.
         """
         This function inserts the segment in correct order to the segment list of the connection.
         Returns

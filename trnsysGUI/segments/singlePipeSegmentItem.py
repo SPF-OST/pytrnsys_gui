@@ -12,13 +12,65 @@ import trnsysGUI.segments.SegmentItemBase as _sib
 
 from . import _common
 
-
 _LINE_PEN_WIDTH = 4
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.singlePipeConnection as _spc
 
+
+# GUI functionality
+# The segments seem to be the visual element that gets clicked on.
+# - When clicking, the ?entire connection? needs to light up.
+# - dialog pops up to allow adjustments (name, hydraulicLoop, etc.)
+# - moving of segments, with dynamic readjustment of whole connection
+# - other mouseEvent behavior
+
+
+# A connecting segment has the following properties:
+#   - startNode, endNode, the connection it belongs to
+#   - whether or not it is simulated
+#   - Should it matter what segments it is next to?
+#   - pipe information is a connection property.
+#   - therefore, connecting segments, should not need to exist separate from visual segments.
+
+# A visual segment has the following properties:
+#   - startNode, endNode, the connection it belongs to
+#   - whether or not it is simulated
+#   - a corresponding connecting segment?
+#   - diagram location (given by start and endNode location?)
+#   - QGraphicsLineItem:
+#       - line color and gradient
+#       - line style: full or dashed
+#
+
+# On visual segments, the following operations can be done:
+#   - creation (segment shouldn't do this itself in my opinion)
+#   - deletion
+#   - moving
+#   - draw corresponding line
+#   - line color and gradient adjustments
+#   - change line style
+#   - changes involving the line colors, gradient, and style should be done elsewhere.
+#     Only the QGraphicsLineItem needs to be updated.
+
+# In my opinion, the functionality related to the connection should be done by the connection and not be
+# part of the visual segment's responsibilities.
+# This may include the inclusion and removal of other segments as the current segment is being dragged.
+# Perhaps this should be done by another object entirely, however.
+
+# ConnectionManipulator(currentSegment, connection).moveSegment()
+# ConnectionManipulator(currentSegment, connection).removeAdjacentSegmentsAndConnectToNextNeighbor()
+# ConnectionManipulator(currentSegment, connection).changeProperty(shallBeSimulated, False)
+# ConnectionManipulator(currentSegment, connection).showMassFlow()
+
+# Not sure what is involved in "editHydraulicLoop
+
+# lineManipulator = SingleLineManipulator(currentSegment)
+# lineManipulator.initGrad()
+#   - pen = doStuff()
+#   - return pen
+# self.singleLine.setPen(pen)
 
 class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
     def __init__(self, startNode, endNode, parent: _spc.SinglePipeConnection):
@@ -97,9 +149,9 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         return gradient
 
     def _interpolate(
-        self,
-        segmentLength: int,
-        connectionLength: int,
+            self,
+            segmentLength: int,
+            connectionLength: int,
     ) -> _qtg.QColor:
         alpha = 255 if self._singlePipeConnection.shallBeSimulated else _common.NOT_SIMULATED_COLOR_ALPHA
 
