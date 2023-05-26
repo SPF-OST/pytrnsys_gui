@@ -25,14 +25,14 @@ from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
-from trnsysGUI.TeePiece import TeePiece  # type: ignore[attr-defined]
+from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
 from trnsysGUI.WTap_main import WTap_main  # type: ignore[attr-defined]
 from trnsysGUI.connectors.connector import Connector  # type: ignore[attr-defined]
 from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer
-from trnsysGUI.doublePipeTeePiece import DoublePipeTeePiece
+from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
 from trnsysGUI.sink import Sink
