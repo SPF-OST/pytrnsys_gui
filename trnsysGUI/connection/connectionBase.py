@@ -373,11 +373,9 @@ class ConnectionBase(_ip.HasInternalPiping):
         )
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
-            logStatement = "NiceConn 2 to 2"
             connector = _gnc.NiceConnectorBothTwo(self, self._segmentItemFactory, rad)
 
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
-            logStatement = "NiceConn 0 to 0"
             connector = _gnc.NiceConnectorBothZero(self, self._segmentItemFactory, rad)
 
         elif self.fromPort.side == 1:
@@ -388,10 +386,8 @@ class ConnectionBase(_ip.HasInternalPiping):
             pos2 = self.toPort.scenePos()
 
             if pos2.y() <= pos1.y():
-                logStatement = "To port ABOVE from port 1"
                 connector = _gnc.NiceConnectorFromAbove(self, self._segmentItemFactory, rad)
             else:
-                logStatement = "To port BELOW from port 1"
                 connector = _gnc.NiceConnectorFromBelow(self, self._segmentItemFactory, rad)
 
         elif self.fromPort.side == 3:
@@ -411,7 +407,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                 )
 
         else:
-            logStatement = "Ports are directed to each other"
             connector = _gnc.NiceConnectorOther(self, self._segmentItemFactory, rad)
 
         connector.createNiceConn()
