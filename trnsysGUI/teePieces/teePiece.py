@@ -112,6 +112,10 @@ class TeePiece(_tpb.TeePieceBase):
 
         resBlockList.append(self)
 
+    @property
+    def _portOffset(self):
+        return 20
+
 
 @_dc.dataclass
 class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes

@@ -171,6 +171,10 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
         return unitText, unitNumber + 2
 
+    @property
+    def _portOffset(self):
+        return 30
+
 
 @_dc.dataclass
 class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes

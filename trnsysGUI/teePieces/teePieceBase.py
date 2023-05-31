@@ -38,21 +38,24 @@ class TeePieceBase(_bi.BlockItem, _ip.HasInternalPiping):
         raise NotImplementedError()
 
     def changeSize(self):
-        width, _ = self._getCappedWithAndHeight()
         self._positionLabel()
 
-        self.origInputsPos = [[0, 30]]
-        self.origOutputsPos = [[width, 30], [30, 0]]
+        width, _ = self._getCappedWithAndHeight()
+
+        self.origInputsPos = [[0, self._portOffset]]
+        self.origOutputsPos = [[width, self._portOffset], [self._portOffset, 0]]
 
         self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
         self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
         self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
 
-        # pylint: disable=duplicate-code  # 1
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        # pylint: disable=duplicate-code  # 1
         self.outputs[1].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
+
+    @property
+    def _portOffset(self) -> int:
+        raise NotImplementedError()
