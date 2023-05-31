@@ -21,6 +21,7 @@ class _StrictMockWithMethods(StrictMockBase):
         self.toPort = toPort
 
     def clearConn(self):
+        # This method currently does not need to do anything in the tests.
         pass
 
 
@@ -34,16 +35,8 @@ class FakePort(StrictMockBase):
         return _qtc.QPointF(self.xPos, self.yPos)
 
 
-def createSimpleDoublePipeConnectionMock(
-    displayName: str, fromPort=StrictMockBase(), toPort=StrictMockBase()
-) -> _dpc.DoublePipeConnection:
-    coldInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-    coldOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
-    coldModelPipe = _mfn.Pipe(coldInput, coldOutput, "Cold")
-
-    hotInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-    hotOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
-    hotModelPipe = _mfn.Pipe(hotInput, hotOutput, "Hot")
+def createSimpleDoublePipeConnectionMock(displayName: str, fromPort=None, toPort=None) -> _dpc.DoublePipeConnection:
+    coldModelPipe, hotModelPipe = getHotAndColdPipes()
 
     def getInternalPiping() -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {coldModelPipe.fromPort: toPort, coldModelPipe.toPort: fromPort}
@@ -66,15 +59,7 @@ def createSimpleDoublePipeConnectionMock(
     return _tp.cast(_dpc.DoublePipeConnection, mock)
 
 
-def createFullDoublePipeConnectionMock(
-    displayName: str, fromPort=FakePort(), toPort=FakePort()
-) -> _dpc.DoublePipeConnection:
-
-    fromPort.xPos = 0
-    fromPort.yPos = 0
-    toPort.xPos = 10
-    toPort.yPos = 10
-
+def getHotAndColdPipes():
     coldInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
     coldOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
     coldModelPipe = _mfn.Pipe(coldInput, coldOutput, "Cold")
@@ -83,11 +68,22 @@ def createFullDoublePipeConnectionMock(
     hotOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
     hotModelPipe = _mfn.Pipe(hotInput, hotOutput, "Hot")
 
-    def getInternalPiping() -> _ip.InternalPiping:
-        coldModelPortItemsToGraphicalPortItem = {coldModelPipe.fromPort: toPort, coldModelPipe.toPort: fromPort}
-        hotModelPortItemsToGraphicalPortItem = {hotModelPipe.fromPort: fromPort, hotModelPipe.toPort: toPort}
-        modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
-        return _ip.InternalPiping([coldModelPipe, hotModelPipe], modelPortItemsToGraphicalPortItem)
+    return coldModelPipe, hotModelPipe
+
+
+def createFullDoublePipeConnectionMock(displayName: str, fromPort=None, toPort=None) -> _dpc.DoublePipeConnection:
+    if not fromPort:
+        fromPort = FakePort()
+
+    if not toPort:
+        toPort = FakePort()
+
+    fromPort.xPos = 0
+    fromPort.yPos = 0
+    toPort.xPos = 10
+    toPort.yPos = 10
+
+    coldModelPipe, hotModelPipe = getHotAndColdPipes()
 
     mock = _StrictMockWithMethods(
         startNode=_node.Node(),  # type: ignore[attr-defined]
@@ -100,7 +96,6 @@ def createFullDoublePipeConnectionMock(
         toPort=toPort,
         _hotPipe=hotModelPipe,
         _coldPipe=coldModelPipe,
-        getInternalPiping=getInternalPiping,
         hasDdckPlaceHolders=lambda: False,
         shallRenameOutputTemperaturesInHydraulicFile=lambda: False,
     )

@@ -14,9 +14,12 @@ class FakeSegmentItem(_fc.StrictMockBase):
         self.startNode = startNode
         self.endNode = endNode
         self.connection = connection
+        self.lineStart = None
+        self.lineEnd = None
 
     def setLine(self, point1, point2):
-        pass
+        self.lineStart = point1
+        self.lineEnd = point2
 
 
 class FakeSegmentItemFactory:
