@@ -80,8 +80,8 @@ def createFullDoublePipeConnectionMock(displayName: str, fromPort=None, toPort=N
 
     fromPort.xPos = 0
     fromPort.yPos = 0
-    toPort.xPos = 10
-    toPort.yPos = 10
+    toPort.xPos = 100
+    toPort.yPos = 100
 
     coldModelPipe, hotModelPipe = getHotAndColdPipes()
 

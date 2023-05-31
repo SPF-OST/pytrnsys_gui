@@ -30,6 +30,21 @@ class FakeSegmentItemFactory:
         return FakeSegmentItem(startNode, endNode, self._connection)
 
 
+def getLineCoords(segments):
+    xStartCoords = []
+    yStartCoords = []
+    xEndCoords = []
+    yEndCoords = []
+
+    for seg in segments:
+        xStartCoords.append(seg.lineStart.x())
+        yStartCoords.append(seg.lineStart.y())
+        xEndCoords.append(seg.lineEnd.x())
+        yEndCoords.append(seg.lineEnd.y())
+
+    return xStartCoords, yStartCoords, xEndCoords, yEndCoords
+
+
 class TestCleanConnector:
     def testDPconnectionUsingBothTwoConnector(self):
         # requirements
@@ -56,6 +71,15 @@ class TestCleanConnector:
                 assert isinstance(item, FakeSegmentItem)
             else:
                 assert isinstance(item, _ci.CornerItem)
+
+        print(" ")
+        print(newGraphicalItems[0].lineStart.x())
+        xStartCoords, yStartCoords, xEndCoords, yEndCoords = getLineCoords(newGraphicalItems[0:5])
+
+        assert xStartCoords == [0.0, 30.0, 30.0, 130.0, 130.0]
+        assert yStartCoords == [0.0, 0.0, 200.6, 200.6, 100.0]
+        assert xEndCoords == [30.0, 30.0, 130.0, 130.0, 100.0]
+        assert yEndCoords == [0.0, 200.6, 200.6, 100.0, 100.0]
 
 
 # things to test
