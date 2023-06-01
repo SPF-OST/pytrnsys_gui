@@ -135,16 +135,16 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many
         cls,
         data: _dcj.JsonDict,
         validate=True,
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # /NOSONAR
     ) -> "TeePieceModel":
         teePieceModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(TeePieceModel, teePieceModel)
 
     def to_dict(
         self,
-        omit_none: bool = True,
+        omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,  # pylint: disable=duplicate-code  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)
         data[".__BlockDict__"] = True
