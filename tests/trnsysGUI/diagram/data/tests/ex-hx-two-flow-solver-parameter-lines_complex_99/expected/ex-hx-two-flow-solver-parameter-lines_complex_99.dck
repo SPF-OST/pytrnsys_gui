@@ -446,7 +446,6 @@ TPiHxDhwPriFl
 EQUATIONS 1
 TDivAux= [12,1] !Changed automatically
 UNIT 13 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeAuxHxRt_A
 MTeeAuxHxRt_B
@@ -454,14 +453,18 @@ MTeeAuxHxRt_C
 TPiTeeAuxHxRt_HP
 TPiTeeHxDhwRt
 TPiHxDhwPriRt
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeAuxHxRt= [13,1] !Changed automatically
+TTeeAuxHxRt = [13,1] !Changed automatically
 EQUATIONS 2
 Tcw = 1
 TsupplyWater = Tcw
 UNIT 14 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeCircOut_A
 MTeeCircOut_B
@@ -469,9 +472,14 @@ MTeeCircOut_C
 TPiDhwCirctoTap
 TPiDhwtoTCirc
 TPiDhwCircRtPu
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeCircOut= [14,1] !Changed automatically
+TTeeCircOut = [14,1] !Changed automatically
 UNIT 15 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -553,7 +561,6 @@ PPiHpEvapInConv_kW = [18,4]/3600  !Changed automatically
 PPiHpEvapInInt_kJ = [18,5]  !Changed automatically
 MPiHpEvapIn = MPiHpEvapIn_A
 UNIT 19 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShRt1_A
 MTeeShRt1_B
@@ -561,9 +568,14 @@ MTeeShRt1_C
 TPiTeeShRtTes
 TPiShRt2to1
 TPiRtFloor1
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt1= [19,1] !Changed automatically
+TTeeShRt1 = [19,1] !Changed automatically
 UNIT 20 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -585,7 +597,6 @@ PPiFlFloor1Conv_kW = [20,4]/3600  !Changed automatically
 PPiFlFloor1Int_kJ = [20,5]  !Changed automatically
 MPiFlFloor1 = MPiFlFloor1_A
 UNIT 21 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShOut1_A
 MTeeShOut1_B
@@ -593,9 +604,14 @@ MTeeShOut1_C
 TPiTeeShFlTes
 TPiShFl1to2
 TPiShFltoPu1
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut1= [21,1] !Changed automatically
+TTeeShOut1 = [21,1] !Changed automatically
 UNIT 22 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -697,7 +713,6 @@ PPiFlFloor6Conv_kW = [26,4]/3600  !Changed automatically
 PPiFlFloor6Int_kJ = [26,5]  !Changed automatically
 MPiFlFloor6 = MPiFlFloor6_A
 UNIT 27 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShRt5_A
 MTeeShRt5_B
@@ -705,11 +720,15 @@ MTeeShRt5_C
 TPiShRt5to4
 TPiPuOvRt6to5
 TPiRtFloor5
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt5= [27,1] !Changed automatically
+TTeeShRt5 = [27,1] !Changed automatically
 UNIT 28 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShRt4_A
 MTeeShRt4_B
@@ -717,11 +736,15 @@ MTeeShRt4_C
 TPiShRt4to3
 TPiShRt5to4
 TPiRtFloor4
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt4= [28,1] !Changed automatically
+TTeeShRt4 = [28,1] !Changed automatically
 UNIT 29 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShRt3_A
 MTeeShRt3_B
@@ -729,11 +752,15 @@ MTeeShRt3_C
 TPiShRt3to2
 TPiShRt4to3
 TPiRtFloor3
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt3= [29,1] !Changed automatically
+TTeeShRt3 = [29,1] !Changed automatically
 UNIT 30 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShRt2_A
 MTeeShRt2_B
@@ -741,9 +768,14 @@ MTeeShRt2_C
 TPiShRt2to1
 TPiShRt3to2
 TPiRtFloor2
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt2= [30,1] !Changed automatically
+TTeeShRt2 = [30,1] !Changed automatically
 UNIT 31 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -945,7 +977,6 @@ PPiShFltoPu1Conv_kW = [40,4]/3600  !Changed automatically
 PPiShFltoPu1Int_kJ = [40,5]  !Changed automatically
 MPiShFltoPu1 = MPiShFltoPu1_A
 UNIT 41 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShOut2_A
 MTeeShOut2_B
@@ -953,11 +984,15 @@ MTeeShOut2_C
 TPiShFl1to2
 TPiShFl2to3
 TPiShFlToPu2
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut2= [41,1] !Changed automatically
+TTeeShOut2 = [41,1] !Changed automatically
 UNIT 42 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShOut3_A
 MTeeShOut3_B
@@ -965,11 +1000,15 @@ MTeeShOut3_C
 TPiShFl2to3
 TPiShFl3to4
 TPiShFlToPu3
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut3= [42,1] !Changed automatically
+TTeeShOut3 = [42,1] !Changed automatically
 UNIT 43 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShOut4_A
 MTeeShOut4_B
@@ -977,11 +1016,15 @@ MTeeShOut4_C
 TPiShFl3to4
 TPiShFl4to5
 TPiShFlToPu4
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut4= [43,1] !Changed automatically
+TTeeShOut4 = [43,1] !Changed automatically
 UNIT 44 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShOut5_A
 MTeeShOut5_B
@@ -989,9 +1032,14 @@ MTeeShOut5_C
 TPiShFl4to5
 TPiShFl5to6
 TPiShFlToPu5
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut5= [44,1] !Changed automatically
+TTeeShOut5 = [44,1] !Changed automatically
 UNIT 45 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1233,7 +1281,6 @@ PPiTesDhwtoPuHxConv_kW = [56,4]/3600  !Changed automatically
 PPiTesDhwtoPuHxInt_kJ = [56,5]  !Changed automatically
 MPiTesDhwtoPuHx = MPiTesDhwtoPuHx_A
 UNIT 57 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeAuxShFl_A
 MTeeAuxShFl_B
@@ -1241,9 +1288,14 @@ MTeeAuxShFl_C
 TPiAuxtoTeeShFl
 TPiShPriFl
 TPiTeeShFlTes
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeAuxShFl= [57,1] !Changed automatically
+TTeeAuxShFl = [57,1] !Changed automatically
 UNIT 58 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1305,7 +1357,6 @@ PPiTeeShFlTesConv_kW = [60,4]/3600  !Changed automatically
 PPiTeeShFlTesInt_kJ = [60,5]  !Changed automatically
 MPiTeeShFlTes = MPiTeeShFlTes_A
 UNIT 61 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeAuxShRt_A
 MTeeAuxShRt_B
@@ -1313,9 +1364,14 @@ MTeeAuxShRt_C
 TPiTeeHxDhwRt
 TPiTeeShRtTes
 TPiShPriRt
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeAuxShRt= [61,1] !Changed automatically
+TTeeAuxShRt = [61,1] !Changed automatically
 UNIT 62 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1397,7 +1453,6 @@ PPiPuDhwCircOutConv_kW = [65,4]/3600  !Changed automatically
 PPiPuDhwCircOutInt_kJ = [65,5]  !Changed automatically
 MPiPuDhwCircOut = MPiPuDhwCircOut_A
 UNIT 66 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShOut6_A
 MTeeShOut6_B
@@ -1405,9 +1460,14 @@ MTeeShOut6_C
 TPiPuOvFl
 TPiShFl5to6
 TPiShFlToPu6
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut6= [66,1] !Changed automatically
+TTeeShOut6 = [66,1] !Changed automatically
 UNIT 67 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1469,7 +1529,6 @@ PPiPuOvFlConv_kW = [69,4]/3600  !Changed automatically
 PPiPuOvFlInt_kJ = [69,5]  !Changed automatically
 MPiPuOvFl = MPiPuOvFl_A
 UNIT 70 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeShRt6_A
 MTeeShRt6_B
@@ -1477,9 +1536,14 @@ MTeeShRt6_C
 TPiPuOvRt6to5
 TPiPuOvRt
 TPiFloor6Rt
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt6= [70,1] !Changed automatically
+TTeeShRt6 = [70,1] !Changed automatically
 UNIT 71 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1521,7 +1585,6 @@ PPiPuOvRt6to5Conv_kW = [72,4]/3600  !Changed automatically
 PPiPuOvRt6to5Int_kJ = [72,5]  !Changed automatically
 MPiPuOvRt6to5 = MPiPuOvRt6to5_A
 UNIT 73 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeDhwOut_A
 MTeeDhwOut_B
@@ -1529,9 +1592,14 @@ MTeeDhwOut_C
 TPiTesDhwTapOut
 TPiDhwCircTesOut
 TPiDhwtoTCirc
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeDhwOut= [73,1] !Changed automatically
+TTeeDhwOut = [73,1] !Changed automatically
 UNIT 74 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
