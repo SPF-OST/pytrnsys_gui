@@ -127,6 +127,10 @@ EQUATIONS 2
 TPump88 = TPiTes_Pump88
 TPump93 = TPiPump93_Col
 
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 52
 mfrSolverAbsTol
@@ -207,7 +211,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TExHxSide1H ! input flow temperature [deg C]
 MHx_Col_A ! input mass flow [kg/h]
@@ -231,7 +235,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TExHxSide2H ! input flow temperature [deg C]
 MPiExHx_Tes_A ! input mass flow [kg/h]
@@ -255,7 +259,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTesDpL50_10H ! input flow temperature [deg C]
 MPiTes_Pump88_A ! input mass flow [kg/h]
@@ -279,7 +283,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPump88 ! input flow temperature [deg C]
 MPiPump88_ExHx_A ! input mass flow [kg/h]
@@ -303,7 +307,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPump93 ! input flow temperature [deg C]
 MPiPump93_ExHx_A ! input mass flow [kg/h]
@@ -327,7 +331,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPump93 ! input flow temperature [deg C]
 MPiPump93_Col_A ! input mass flow [kg/h]

@@ -249,9 +249,9 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
 
             portItems = self.modelDiverter.getPortItems()
             massFlowVariableNames = [
-                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[0]),
-                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[1]),
-                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[2]),
+                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[0]),
+                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[1]),
+                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[2]),
             ]
 
             unitText += "\n".join(massFlowVariableNames) + "\n"

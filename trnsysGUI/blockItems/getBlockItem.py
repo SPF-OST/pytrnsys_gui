@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typing as _tp
 
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
+from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
 from trnsysGUI.CentralReceiver import CentralReceiver  # type: ignore[attr-defined]
 from trnsysGUI.Collector import Collector  # type: ignore[attr-defined]
@@ -25,22 +25,21 @@ from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
-from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
 from trnsysGUI.WTap_main import WTap_main  # type: ignore[attr-defined]
-from trnsysGUI.connectors.connector import Connector  # type: ignore[attr-defined]
-from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.connection.connectors.connector import Connector  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer
-from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.pump import Pump  # type: ignore[attr-defined]
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink
 from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
+from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
-
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed

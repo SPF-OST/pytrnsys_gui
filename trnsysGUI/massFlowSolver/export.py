@@ -39,12 +39,13 @@ def _getOutputLines(
 ) -> _tp.Sequence[str]:
     internalPiping = hasInternalPiping.getInternalPiping()
     nodes = internalPiping.nodes
+    displayName = hasInternalPiping.getDisplayName()
 
     lines = []
     for nodeIndex, node in enumerate(nodes):
         portItems = node.getPortItems()
         for variableIndex, portItem in enumerate(portItems):
-            outputVariable = _mnames.getMassFlowVariableName(hasInternalPiping, node, portItem)
+            outputVariable = _mnames.getMassFlowVariableName(displayName, node, portItem)
             index = equationNumber + nodeIndex * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE + variableIndex
             line = f"{outputVariable}=[{simulationUnit},{index}]"
             lines.append(line)

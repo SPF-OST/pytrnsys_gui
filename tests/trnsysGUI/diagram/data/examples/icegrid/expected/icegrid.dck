@@ -110,6 +110,8 @@ TQSnkDH=TQSnkD
 TQSnkGH=TQSnkG
 TQSnkEH=TQSnkE
 TQSnkFH=TQSnkF
+CONSTANTS 1
+spTIni = 20
 CONSTANTS 25
 dpLength = 579.404 ! Length of buried pipe in m
 dpDiamIn = 0.4028 ! Inner diameter of pipes in m
@@ -581,13 +583,13 @@ Lloop12Cp = FwaterCp
 UNIT 11 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnr1Cold_A TSCnr1_DTeeACold TSCnr1_QSrc1
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnr1Cold = [11,1] !Changed automatically
 UNIT 12 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnr1Hot_A TQSrc1_SCnr1 TSCnr1_DTeeAHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnr1Hot = [12,1] !Changed automatically
 UNIT 13 TYPE 929 !Changed automatically
@@ -625,121 +627,121 @@ TDTeeAHot = [14,1] !Changed automatically
 UNIT 15 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrACold_A TDTeeA_SCnrACold TQSnkA_SCnrA
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrACold = [15,1] !Changed automatically
 UNIT 16 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrAHot_A TSCnrA_QSnkA TDTeeA_SCnrAHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrAHot = [16,1] !Changed automatically
 UNIT 17 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrBCold_A TDTeeB_SCnrBCold TQSnkB_SCnrB
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrBCold = [17,1] !Changed automatically
 UNIT 18 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrBHot_A TSCnrB_QSnkB TDTeeB_SCnrBHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrBHot = [18,1] !Changed automatically
 UNIT 19 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrCCold_A TDTeeC_SCnrCCold TQSnkC_SCnrC
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrCCold = [19,1] !Changed automatically
 UNIT 20 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrCHot_A TSCnrC_QSnkC TDTeeC_SCnrCHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrCHot = [20,1] !Changed automatically
 UNIT 21 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrDCold_A TDTeeD_SCnrDCold TQSnkD_SCnrD
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrDCold = [21,1] !Changed automatically
 UNIT 22 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrDHot_A TSCnrD_QSnkD TDTeeD_SCnrDHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrDHot = [22,1] !Changed automatically
 UNIT 23 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrECold_A TDTeeE_SCnrECold TQSnkE_SCnrE
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrECold = [23,1] !Changed automatically
 UNIT 24 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrEHot_A TSCnrE_QSnkE TDTeeE_SCnrEHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrEHot = [24,1] !Changed automatically
 UNIT 25 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrFCold_A TDTeeF_SCnrFCold TQSnkF_SCnrF
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrFCold = [25,1] !Changed automatically
 UNIT 26 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrFHot_A TSCnrF_QSnkF TDTeeF_SCnrFHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrFHot = [26,1] !Changed automatically
 UNIT 27 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrGCold_A TDTeeG_SCnrGCold TQSnkG_SCnrG
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrGCold = [27,1] !Changed automatically
 UNIT 28 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrGHot_A TSCnrG_QSnkG TDTeeG_SCnrGHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrGHot = [28,1] !Changed automatically
 UNIT 29 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrHCold_A TDTeeH_SCnrHCold TQSnkH_SCnrH
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrHCold = [29,1] !Changed automatically
 UNIT 30 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrHHot_A TSCnrH_QSnkH TDTeeH_SCnrHHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrHHot = [30,1] !Changed automatically
 UNIT 31 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrICold_A TDTeeI_SCnrICold TQSnkI_SCnrI
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrICold = [31,1] !Changed automatically
 UNIT 32 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrIHot_A TSCnrI_QSnkI TDTeeI_SCnrIHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrIHot = [32,1] !Changed automatically
 UNIT 33 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrJCold_A TDTeeJ_SCnrJCold TQSnkJ_SCnrJ
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnrJCold = [33,1] !Changed automatically
 UNIT 34 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrJHot_A TSCnrJ_QSnkJ TDTeeJ_SCnrJHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnrJHot = [34,1] !Changed automatically
 UNIT 35 TYPE 929 !Changed automatically
@@ -1561,292 +1563,292 @@ DTeeI_DTeeJSlInt = [60,16]*1/3600  !Changed automatically
 UNIT 61 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeB_SCnrBCold_A TSCnrBCold TDTeeBCold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeB_SCnrBCold = [61,1] !Changed automatically
 MDTeeB_SCnrBCold = MDTeeB_SCnrBCold_A
 UNIT 62 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeB_SCnrBHot_A TDTeeBHot TSCnrBHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeB_SCnrBHot = [62,1] !Changed automatically
 MDTeeB_SCnrBHot = MDTeeB_SCnrBHot_A
 UNIT 63 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeC_SCnrCCold_A TSCnrCCold TDTeeCCold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeC_SCnrCCold = [63,1] !Changed automatically
 MDTeeC_SCnrCCold = MDTeeC_SCnrCCold_A
 UNIT 64 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeC_SCnrCHot_A TDTeeCHot TSCnrCHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeC_SCnrCHot = [64,1] !Changed automatically
 MDTeeC_SCnrCHot = MDTeeC_SCnrCHot_A
 UNIT 65 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeD_SCnrDCold_A TSCnrDCold TDTeeDCold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeD_SCnrDCold = [65,1] !Changed automatically
 MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A
 UNIT 66 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeD_SCnrDHot_A TDTeeDHot TSCnrDHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeD_SCnrDHot = [66,1] !Changed automatically
 MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
 UNIT 67 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeE_SCnrECold_A TSCnrECold TDTeeECold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeE_SCnrECold = [67,1] !Changed automatically
 MDTeeE_SCnrECold = MDTeeE_SCnrECold_A
 UNIT 68 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeE_SCnrEHot_A TDTeeEHot TSCnrEHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeE_SCnrEHot = [68,1] !Changed automatically
 MDTeeE_SCnrEHot = MDTeeE_SCnrEHot_A
 UNIT 69 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeF_SCnrFCold_A TSCnrFCold TDTeeFCold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeF_SCnrFCold = [69,1] !Changed automatically
 MDTeeF_SCnrFCold = MDTeeF_SCnrFCold_A
 UNIT 70 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeF_SCnrFHot_A TDTeeFHot TSCnrFHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeF_SCnrFHot = [70,1] !Changed automatically
 MDTeeF_SCnrFHot = MDTeeF_SCnrFHot_A
 UNIT 71 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeG_SCnrGCold_A TSCnrGCold TDTeeGCold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeG_SCnrGCold = [71,1] !Changed automatically
 MDTeeG_SCnrGCold = MDTeeG_SCnrGCold_A
 UNIT 72 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeG_SCnrGHot_A TDTeeGHot TSCnrGHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeG_SCnrGHot = [72,1] !Changed automatically
 MDTeeG_SCnrGHot = MDTeeG_SCnrGHot_A
 UNIT 73 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeH_SCnrHCold_A TSCnrHCold TDTeeHCold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeH_SCnrHCold = [73,1] !Changed automatically
 MDTeeH_SCnrHCold = MDTeeH_SCnrHCold_A
 UNIT 74 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeH_SCnrHHot_A TDTeeHHot TSCnrHHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeH_SCnrHHot = [74,1] !Changed automatically
 MDTeeH_SCnrHHot = MDTeeH_SCnrHHot_A
 UNIT 75 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeI_SCnrICold_A TSCnrICold TDTeeICold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeI_SCnrICold = [75,1] !Changed automatically
 MDTeeI_SCnrICold = MDTeeI_SCnrICold_A
 UNIT 76 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeI_SCnrIHot_A TDTeeIHot TSCnrIHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeI_SCnrIHot = [76,1] !Changed automatically
 MDTeeI_SCnrIHot = MDTeeI_SCnrIHot_A
 UNIT 77 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeJ_SCnrJCold_A TSCnrJCold TDTeeJCold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeJ_SCnrJCold = [77,1] !Changed automatically
 MDTeeJ_SCnrJCold = MDTeeJ_SCnrJCold_A
 UNIT 78 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeJ_SCnrJHot_A TDTeeJHot TSCnrJHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeJ_SCnrJHot = [78,1] !Changed automatically
 MDTeeJ_SCnrJHot = MDTeeJ_SCnrJHot_A
 UNIT 79 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnr99Cold_A TDTeeJ_SCnrZCold TSCnrZ_SCnrZ
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
 TSCnr99Cold = [79,1] !Changed automatically
 UNIT 80 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnr99Hot_A TSCnrZ_SCnrZ TDTeeJ_SCnrZHot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 1
 TSCnr99Hot = [80,1] !Changed automatically
 UNIT 81 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnr1_QSrc1_A TSCnr1Cold TQSrc1H
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnr1_QSrc1 = [81,1] !Changed automatically
 MSCnr1_QSrc1 = MSCnr1_QSrc1_A
 UNIT 82 TYPE 222 !Changed automatically
 INPUTS 3
 MQSrc1_SCnr1_A TQSrc1H TSCnr1Hot
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSrc1_SCnr1 = [82,1] !Changed automatically
 MQSrc1_SCnr1 = MQSrc1_SCnr1_A
 UNIT 83 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrA_QSnkA_A TSCnrAHot TQSnkAH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrA_QSnkA = [83,1] !Changed automatically
 MSCnrA_QSnkA = MSCnrA_QSnkA_A
 UNIT 84 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkA_SCnrA_A TQSnkAH TSCnrACold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkA_SCnrA = [84,1] !Changed automatically
 MQSnkA_SCnrA = MQSnkA_SCnrA_A
 UNIT 85 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrB_QSnkB_A TSCnrBHot TQSnkBH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrB_QSnkB = [85,1] !Changed automatically
 MSCnrB_QSnkB = MSCnrB_QSnkB_A
 UNIT 86 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkB_SCnrB_A TQSnkBH TSCnrBCold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkB_SCnrB = [86,1] !Changed automatically
 MQSnkB_SCnrB = MQSnkB_SCnrB_A
 UNIT 87 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrC_QSnkC_A TSCnrCHot TQSnkCH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrC_QSnkC = [87,1] !Changed automatically
 MSCnrC_QSnkC = MSCnrC_QSnkC_A
 UNIT 88 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkC_SCnrC_A TQSnkCH TSCnrCCold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkC_SCnrC = [88,1] !Changed automatically
 MQSnkC_SCnrC = MQSnkC_SCnrC_A
 UNIT 89 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrD_QSnkD_A TSCnrDHot TQSnkDH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrD_QSnkD = [89,1] !Changed automatically
 MSCnrD_QSnkD = MSCnrD_QSnkD_A
 UNIT 90 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkD_SCnrD_A TQSnkDH TSCnrDCold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkD_SCnrD = [90,1] !Changed automatically
 MQSnkD_SCnrD = MQSnkD_SCnrD_A
 UNIT 91 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrE_QSnkE_A TSCnrEHot TQSnkEH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrE_QSnkE = [91,1] !Changed automatically
 MSCnrE_QSnkE = MSCnrE_QSnkE_A
 UNIT 92 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkE_SCnrE_A TQSnkEH TSCnrECold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkE_SCnrE = [92,1] !Changed automatically
 MQSnkE_SCnrE = MQSnkE_SCnrE_A
 UNIT 93 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrF_QSnkF_A TSCnrFHot TQSnkFH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrF_QSnkF = [93,1] !Changed automatically
 MSCnrF_QSnkF = MSCnrF_QSnkF_A
 UNIT 94 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkF_SCnrF_A TQSnkFH TSCnrFCold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkF_SCnrF = [94,1] !Changed automatically
 MQSnkF_SCnrF = MQSnkF_SCnrF_A
 UNIT 95 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrG_QSnkG_A TSCnrGHot TQSnkGH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrG_QSnkG = [95,1] !Changed automatically
 MSCnrG_QSnkG = MSCnrG_QSnkG_A
 UNIT 96 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkG_SCnrG_A TQSnkGH TSCnrGCold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkG_SCnrG = [96,1] !Changed automatically
 MQSnkG_SCnrG = MQSnkG_SCnrG_A
 UNIT 97 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrH_QSnkH_A TSCnrHHot TQSnkHH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrH_QSnkH = [97,1] !Changed automatically
 MSCnrH_QSnkH = MSCnrH_QSnkH_A
 UNIT 98 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkH_SCnrH_A TQSnkHH TSCnrHCold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkH_SCnrH = [98,1] !Changed automatically
 MQSnkH_SCnrH = MQSnkH_SCnrH_A
 UNIT 99 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrI_QSnkI_A TSCnrIHot TQSnkIH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrI_QSnkI = [99,1] !Changed automatically
 MSCnrI_QSnkI = MSCnrI_QSnkI_A
 UNIT 100 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkI_SCnrI_A TQSnkIH TSCnrICold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkI_SCnrI = [100,1] !Changed automatically
 MQSnkI_SCnrI = MQSnkI_SCnrI_A
 UNIT 101 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrJ_QSnkJ_A TSCnrJHot TQSnkJH
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrJ_QSnkJ = [101,1] !Changed automatically
 MSCnrJ_QSnkJ = MSCnrJ_QSnkJ_A
 UNIT 102 TYPE 222 !Changed automatically
 INPUTS 3
 MQSnkJ_SCnrJ_A TQSnkJH TSCnrJCold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TQSnkJ_SCnrJ = [102,1] !Changed automatically
 MQSnkJ_SCnrJ = MQSnkJ_SCnrJ_A
@@ -1919,7 +1921,7 @@ DTeeJ_SCnrZSlInt = [103,16]*1/3600  !Changed automatically
 UNIT 104 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrZ_SCnrZ_A TSCnr99Hot TSCnr99Cold
-0 20 20
+0 spTIni spTIni
 EQUATIONS 2
 TSCnrZ_SCnrZ = [104,1] !Changed automatically
 MSCnrZ_SCnrZ = MSCnrZ_SCnrZ_A
@@ -1992,14 +1994,14 @@ DTeeA_DTeeBSlInt = [105,16]*1/3600  !Changed automatically
 UNIT 106 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeA_SCnrACold_A TSCnrACold TDTeeACold
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeA_SCnrACold = [106,1] !Changed automatically
 MDTeeA_SCnrACold = MDTeeA_SCnrACold_A
 UNIT 107 TYPE 222 !Changed automatically
 INPUTS 3
 MDTeeA_SCnrAHot_A TDTeeAHot TSCnrAHot
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeA_SCnrAHot = [107,1] !Changed automatically
 MDTeeA_SCnrAHot = MDTeeA_SCnrAHot_A

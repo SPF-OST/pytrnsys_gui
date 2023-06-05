@@ -8,9 +8,7 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
-
 import pytrnsys.utils.log as _ulog
-
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -18,7 +16,6 @@ import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
-
 from . import _testHelper as _th
 
 
@@ -72,8 +69,8 @@ class TestEditor:
         self._exportAndTestDdckPlaceholdersJsonFile(editor, helper, monkeypatch)
 
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testExportDeck(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
-        helper = _th.Helper(testProject)
+    def testExportDeck(self, testProject: _th.Project, qtbot, monkeypatch, shallComparisonsAlwaysSucceed=False) -> None:
+        helper = _th.Helper(testProject, shallComparisonsAlwaysSucceed)
         helper.setup()
 
         mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
@@ -172,8 +169,10 @@ class TestEditor:
 
     @_pt.mark.needs_trnsys
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testMassFlowSolver(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
-        helper = _th.Helper(testProject)
+    def testMassFlowSolver(
+        self, testProject: _th.Project, qtbot, monkeypatch, shallComparisonsAlwaysSucceed=False
+    ) -> None:
+        helper = _th.Helper(testProject, shallComparisonsAlwaysSucceed)
         helper.setup()
 
         mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
@@ -266,16 +265,24 @@ class TestEditor:
     @_pt.mark.tool
     @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testToolUpdateExpectedFiles(self, testProject: _th.Project) -> None:
-        """Make `Helper.ensureFilesAreEqual` always return True, then run a test that generates
-        actual files that you'd with which you'd like to update the expected files. Then run this
-        test tool. Repeat the same for each tests for which you want to update the expected files.
-        Finally, don't forget to check the modifications to the expected files before committing
-        and undo the changes to `Helper`! ;)"""
+    def testToolUpdateExportDeckExpectedFiles(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        shallComparisonsAlwaysSucceed = True
+        self.testExportDeck(testProject, qtbot, monkeypatch, shallComparisonsAlwaysSucceed)
+
+        self._updateExpectedFiles(testProject)
+
+    @_pt.mark.tool
+    @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testToolUpdateMassFlowSolverExpectedFiles(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        shallComparisonsAlwaysSucceed = True
+        self.testMassFlowSolver(testProject, qtbot, monkeypatch, shallComparisonsAlwaysSucceed)
+
+        self._updateExpectedFiles(testProject)
+
+    def _updateExpectedFiles(self, testProject):
         helper = _th.Helper(testProject)
-
         _su.copytree(helper.actualProjectFolderPath, helper.expectedProjectFolderPath, dirs_exist_ok=True)
-
         self._resetHardCodedPathsInDeckFile(testProject, helper)
 
     def _resetHardCodedPathsInDeckFile(self, project: _th.Project, helper: _th.Helper) -> None:

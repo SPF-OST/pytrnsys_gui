@@ -5,22 +5,28 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.createHydraulicModelPipes as _chmp
 import trnsysGUI.connection.doublePipeConnectionModel as _model
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
+import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.connection.hydraulicExport.doublePipe as _he
+import trnsysGUI.connection.hydraulicExport.doublePipe.createExportDoublePipeConnection as _cec
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _hedpc
-import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
-import trnsysGUI.segments.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.segments.doublePipeSegmentItem as _dpsi
 from . import _massFlowLabels as _mfl
 
 
 class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
     def __init__(self, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem, parent):
         super().__init__(
-            fromPort, toPort, _defaults.DEFAULT_SHALL_BE_SIMULATED, _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M, parent
+            fromPort,
+            toPort,
+            _defaults.DEFAULT_SHALL_BE_SIMULATED,
+            _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M,
+            parent,
         )
 
         self.childIds = []
@@ -123,60 +129,29 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
         return _ip.InternalPiping([self.coldModelPipe, self.hotModelPipe], modelPortItemsToGraphicalPortItem)
 
-    def exportPipeAndTeeTypesForTemp(
-        self, startingUnit: int
-    ) -> _tp.Tuple[str, int]:  # pylint: disable=too-many-locals,too-many-statements
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         unitNumber = startingUnit
 
         exportModel = self._getHydraulicExportConnectionModel()
         return _he.export(exportModel, unitNumber)
 
-    def _getHydraulicExportConnectionModel(self) -> _hedpc.DoublePipeConnection:
-        coldInputTemperature = _helpers.getTemperatureVariableName(
-            self.toPort.parent, self.toPort, _mfn.PortItemType.COLD
-        )
-        coldMassFlowRate = _helpers.getInputMfrName(self, self.coldModelPipe)
-        coldRevInputTemperature = _helpers.getTemperatureVariableName(
-            self.fromPort.parent, self.fromPort, _mfn.PortItemType.COLD
-        )
-
-        hotInputTemperature = _helpers.getTemperatureVariableName(
-            self.fromPort.parent, self.fromPort, _mfn.PortItemType.HOT
-        )
-        hotMassFlowRate = _helpers.getInputMfrName(self, self.hotModelPipe)
-        hotRevInputTemperature = _helpers.getTemperatureVariableName(
-            self.toPort.parent, self.toPort, _mfn.PortItemType.HOT
+    def _getHydraulicExportConnectionModel(self) -> _hedpc.ExportDoublePipeConnection:
+        hydraulicConnection = _cec.HydraulicDoublePipeConnection(
+            self.displayName,
+            _hecom.getAdjacentBlockItem(self.fromPort),
+            _hecom.getAdjacentBlockItem(self.toPort),
+            self.coldModelPipe,
+            self.hotModelPipe,
         )
 
-        # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
-        assert self.coldModelPipe.name and self.hotModelPipe.name
         assert isinstance(self.lengthInM, float)
 
-        connectionModel = _hedpc.DoublePipeConnection(
-            self.displayName,
-            self.lengthInM,
-            self.shallBeSimulated,
-            coldPipe=_hedpc.SinglePipe(
-                self.coldModelPipe.name,
-                _hedpc.InputPort(coldInputTemperature, coldMassFlowRate),
-                _hedpc.OutputPort(coldRevInputTemperature),
-            ),
-            hotPipe=_hedpc.SinglePipe(
-                self.hotModelPipe.name,
-                _hedpc.InputPort(hotInputTemperature, hotMassFlowRate),
-                _hedpc.OutputPort(hotRevInputTemperature),
-            ),
-        )
-        return connectionModel
+        exportConnection = _cec.createExportConnection(hydraulicConnection, self.lengthInM, self.shallBeSimulated)
+
+        return exportConnection
 
     def _updateModels(self, newDisplayName: str):
-        coldFromPort: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-        coldToPort: _mfn.PortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
-        self.coldModelPipe = _mfn.Pipe(coldFromPort, coldToPort, name="Cold")
-
-        hotFromPort: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-        hotToPort: _mfn.PortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
-        self.hotModelPipe = _mfn.Pipe(hotFromPort, hotToPort, name="Hot")
+        self.coldModelPipe, self.hotModelPipe = _chmp.createColdAndHotModelPipes()
 
     def setMassFlowAndTemperature(
         self, coldMassFlow: float, coldTemperature: float, hotMassFlow: float, hotTemperature: float

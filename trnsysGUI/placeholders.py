@@ -59,9 +59,11 @@ def _getPlaceholdersForPort(
     node: _mfn.Node,
     modelPortItem: _mfn.PortItem,
 ) -> _tp.Dict[str, str]:
+    displayName = component.getDisplayName()
+
     if modelPortItem.direction == _mfn.PortItemDirection.OUTPUT:
         outputTemperatureVariableName = _temps.getInternalTemperatureVariableName(
-            componentDisplayName=component.getDisplayName(), nodeName=node.name
+            componentDisplayName=displayName, nodeName=node.name
         )
         reverseInputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(internalPiping, modelPortItem)
 
@@ -73,7 +75,7 @@ def _getPlaceholdersForPort(
 
     if modelPortItem.direction == _mfn.PortItemDirection.INPUT:
         inputTemperatureVariableName = _getTemperatureOfPipeConnectedAt(internalPiping, modelPortItem)
-        inputMfrVariableName = _mnames.getMassFlowVariableName(component, node, modelPortItem)
+        inputMfrVariableName = _mnames.getMassFlowVariableName(displayName, node, modelPortItem)
 
         inputConnection = _getConnectionAt(internalPiping, modelPortItem)
         loop = _getLoop(hydraulicLoops, inputConnection)

@@ -2,14 +2,15 @@ import typing as _tp
 
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
-import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
+import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.temperatures as _temps
-from trnsysGUI.massFlowSolver import networkModel as _mfn
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.globalNames as _gnames
 
 
 class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
@@ -107,7 +108,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             nodeName=self._coldPipe.name,
         )
 
-        coldMfr = _helpers.getInputMfrName(self, self._coldPipe)
+        coldMfr = _helpers.getInputMfrName(self.displayName, self._coldPipe)
 
         posFlowColdInputTemp = _helpers.getTemperatureVariableName(
             doubleConnection, self.outputs[0], _mfn.PortItemType.COLD
@@ -118,7 +119,13 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         )
 
         coldEquation = _helpers.getIfThenElseUnit(
-            unitNumber, coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp, extraNewlines=""
+            unitNumber,
+            coldOutputTemp,
+            _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE,
+            coldMfr,
+            posFlowColdInputTemp,
+            negFlowColdInputTemp,
+            extraNewlines="",
         )
 
         return coldEquation
@@ -135,7 +142,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             nodeName=self._hotPipe.name,
         )
 
-        hotMfr = _helpers.getInputMfrName(self, self._hotPipe)
+        hotMfr = _helpers.getInputMfrName(self.displayName, self._hotPipe)
 
         posFlowHotInputTemp = _helpers.getTemperatureVariableName(
             hotInputSingleConnection, self.inputs[0], _mfn.PortItemType.STANDARD
@@ -145,7 +152,13 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             doubleConnection, self.outputs[0], _mfn.PortItemType.HOT
         )
         hotEquation = _helpers.getIfThenElseUnit(
-            unitNumber, hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp, extraNewlines=""
+            unitNumber,
+            hotOutputTemp,
+            _gnames.SinglePipes.INITIAL_TEMPERATURE,
+            hotMfr,
+            posFlowHotInputTemp,
+            negFlowHotInputTemp,
+            extraNewlines="",
         )
 
         return hotEquation

@@ -8,7 +8,7 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
+import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.globalNames as _gnames
 import trnsysGUI.images as _img

@@ -151,7 +151,7 @@ def _createPort(
     initialTemperature: _tp.Union[str, float],
 ) -> _Port:
 
-    massFlowName = _mnames.getMassFlowVariableName(teePiece, massFlowNetworkNode, modelPortItem)
+    massFlowName = _mnames.getMassFlowVariableName(teePiece.displayName, massFlowNetworkNode, modelPortItem)
     temperatureName = _cnames.getTemperatureVariableName(connection, portItemType)
     port = _Port(_Variable(massFlowName, 0), _Variable(temperatureName, initialTemperature))
     return port

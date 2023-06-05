@@ -33,6 +33,7 @@ class Helper:
     def __init__(
         self,
         project: Project,
+        shallComparisonsAlwaysSucceed: bool = False,
     ):
         self._projectFolderPathInExamplesDir = self._getProjectFolderPathInExamplesDir(project)
 
@@ -43,6 +44,8 @@ class Helper:
         self.actualProjectFolderPath = testCasesFolderPath / project.projectName / project.projectName
 
         self.expectedProjectFolderPath = testCasesFolderPath / project.projectName / "expected"
+
+        self._shallComparisonsAlwaysSucceed = shallComparisonsAlwaysSucceed
 
     @staticmethod
     def _getProjectFolderPathInExamplesDir(project: Project) -> _tp.Optional[_pl.Path]:
@@ -83,6 +86,9 @@ class Helper:
     def ensureFilesAreEqual(
         self, fileRelativePathAsString: str, replaceInExpected: _tp.Optional[_tp.Tuple[str, str]] = None
     ) -> None:
+        if self._shallComparisonsAlwaysSucceed:
+            return
+
         actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
 
         actualContent = actualFilePath.read_text()
@@ -90,6 +96,10 @@ class Helper:
         expectedContent = expectedFilePath.read_text(encoding="windows-1252")
         if replaceInExpected:
             old, new = replaceInExpected
+
+            if old not in expectedContent:
+                raise ValueError(f"Could not find string '{old}' in file '{expectedFilePath}'.")
+
             expectedContent = expectedContent.replace(old, new)
 
         assert actualContent == expectedContent
@@ -101,6 +111,9 @@ class Helper:
         return actualFilePath, expectedFilePath
 
     def ensureDataFramesAreEqual(self, fileRelativePathAsString: str) -> None:
+        if self._shallComparisonsAlwaysSucceed:
+            return
+
         actualFilePath, expectedFilePath = self._getActualAndExpectedFilePath(fileRelativePathAsString)
 
         actualDf: _pd.DataFrame = _pd.read_csv(actualFilePath, delim_whitespace=True)

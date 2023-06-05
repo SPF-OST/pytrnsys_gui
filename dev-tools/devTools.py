@@ -7,8 +7,8 @@ import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import typing as tp
 import sysconfig as _sysconfig
+import typing as tp
 import venv
 
 import sys
@@ -132,9 +132,19 @@ def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: 
 
 def _maybeRunMypy(arguments):
     if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes trnsysGUI tests dev-tools"
+        cmd = [
+            _SCRIPTS_DIR / "mypy",
+            "--show-error-codes",
+            "--exclude",
+            # Don't include python scripts which are copied into test
+            # data directories (from, e.g., `examples`) during tests
+            "^tests/(.+/)?data/.*",
+        ]
+
         additionalArgs = arguments.mypyArguments or ""
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+        args = [*cmd, *additionalArgs, "trnsysGUI", "tests", "dev-tools"]
+
+        _printAndRun(args)
 
 
 def _maybeRunPylint(arguments):
