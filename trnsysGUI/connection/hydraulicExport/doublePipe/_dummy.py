@@ -1,7 +1,6 @@
 import typing as _tp
 
 import trnsysGUI.connectorsAndPipesExportHelpers as _helper
-
 from . import doublePipeConnection as _dpc
 
 
@@ -37,9 +36,13 @@ def _getIfThenElseUnitText(
     unitNumber: int,
 ) -> str:
     canonicalMassFlowRateVariableName = doublePipeConnection.getCanonicalMassFlowRateVariableName(pipe)
+    outputTemperatureVariableName = doublePipeConnection.getOutputTemperatureVariableName(pipe)
+    initialOutputTemperatureVariableName = doublePipeConnection.getInitialOutputTemperatureVariableName(pipe)
+
     unitText = _helper.getIfThenElseUnit(
         unitNumber,
-        doublePipeConnection.getOutputTemperatureVariableName(pipe),
+        outputTemperatureVariableName,
+        initialOutputTemperatureVariableName,
         pipe.inputPort.massFlowRateVariableName,
         pipe.inputPort.inputTemperatureVariableName,
         pipe.outputPort.inputTemperatureVariableName,

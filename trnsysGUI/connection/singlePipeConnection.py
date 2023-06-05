@@ -16,13 +16,16 @@ import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.internalPiping as _pi
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.segments.singlePipeSegmentItem as _spsi
+import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.temperatures as _temps
 from . import _massFlowLabels as _mfl
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
+
+
+_INITIAL_FLUID_TEMPERATURE = 20
 
 
 class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
@@ -200,6 +203,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitText = _helpers.getIfThenElseUnit(
             unitNumber,
             outputTemperatureName,
+            _INITIAL_FLUID_TEMPERATURE
             inputMfrName,
             inputTemperatureVariableName,
             revInputTemperatureVariableName,
@@ -239,7 +243,7 @@ PARAMETERS 6
 {uValueInkJPerHourM2K} ! U-value [kJ/(h*m^2*K)] {uValueInSIUnitsComment}
 {densityVar} ! density [kg/m^3]
 {specHeatVar} ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+{_INITIAL_FLUID_TEMPERATURE} ! Initial fluid temperature [deg C]
 INPUTS 4
 {inputTemperatureVariableName} ! input flow temperature [deg C]
 {inputMfrName} ! input mass flow [kg/h]

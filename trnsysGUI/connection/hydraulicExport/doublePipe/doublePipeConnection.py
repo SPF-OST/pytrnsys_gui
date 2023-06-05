@@ -1,6 +1,7 @@
 import abc as _abc
 import dataclasses as _dc
 
+import trnsysGUI.globalNames as _gnames
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.temperatures as _temps
 
@@ -39,6 +40,15 @@ class DoublePipeConnection:
         return _temps.getTemperatureVariableName(
             shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=pipe.name
         )
+
+    def getInitialOutputTemperatureVariableName(self, pipe: SinglePipe) -> str:
+        if pipe is self.coldPipe:
+            return _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE
+
+        if pipe is self.hotPipe:
+            return _gnames.DoublePipes.INITIAL_HOT_TEMPERATURE
+
+        raise ValueError("`pipe` single pipe does not belong to this double pipe")
 
     def getCanonicalMassFlowRateVariableName(self, pipe: SinglePipe) -> str:
         return _mnames.getCanonicalMassFlowVariableName(componentDisplayName=self.displayName, pipeName=pipe.name)
