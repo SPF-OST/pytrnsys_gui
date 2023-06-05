@@ -189,13 +189,13 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self._positionLabel()
 
     def _positionLabel(self):
-        width, height = self._getCappedWithAndHeight()
+        width, _ = self._getCappedWidthAndHeight()
         rect = self.label.boundingRect()
         labelWidth = rect.width()
-        labelPosX = (height - labelWidth) / 2
+        labelPosX = (width - labelWidth) / 2
         self.label.setPos(labelPosX, width)
 
-    def _getCappedWithAndHeight(self):
+    def _getCappedWidthAndHeight(self):
         width = self.w
         height = self.h
         height = max(height, 20)

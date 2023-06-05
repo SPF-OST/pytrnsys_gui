@@ -591,7 +591,6 @@ MSCnr1Hot_A TQSrc1_SCnr1 TSCnr1_DTeeAHot
 EQUATIONS 1
 TSCnr1Hot = [12,1] !Changed automatically
 UNIT 13 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeACold_A
 MDTeeACold_B
@@ -599,11 +598,15 @@ MDTeeACold_C
 TDTeeA_DTeeBCold
 TSCnr1_DTeeACold
 TDTeeA_SCnrACold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeACold= [13,1] !Changed automatically
+TDTeeACold = [13,1] !Changed automatically
 UNIT 14 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeAHot_A
 MDTeeAHot_B
@@ -611,9 +614,14 @@ MDTeeAHot_C
 TDTeeA_DTeeBHot
 TSCnr1_DTeeAHot
 TDTeeA_SCnrAHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeAHot= [14,1] !Changed automatically
+TDTeeAHot = [14,1] !Changed automatically
 UNIT 15 TYPE 222 !Changed automatically
 INPUTS 3
 MSCnrACold_A TDTeeA_SCnrACold TQSnkA_SCnrA
@@ -735,7 +743,6 @@ MSCnrJHot_A TSCnrJ_QSnkJ TDTeeJ_SCnrJHot
 EQUATIONS 1
 TSCnrJHot = [34,1] !Changed automatically
 UNIT 35 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeBCold_A
 MDTeeBCold_B
@@ -743,11 +750,15 @@ MDTeeBCold_C
 TDTeeB_DTeeCCold
 TDTeeA_DTeeBCold
 TDTeeB_SCnrBCold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeBCold= [35,1] !Changed automatically
+TDTeeBCold = [35,1] !Changed automatically
 UNIT 36 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeBHot_A
 MDTeeBHot_B
@@ -755,11 +766,15 @@ MDTeeBHot_C
 TDTeeB_DTeeCHot
 TDTeeA_DTeeBHot
 TDTeeB_SCnrBHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeBHot= [36,1] !Changed automatically
+TDTeeBHot = [36,1] !Changed automatically
 UNIT 37 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeCCold_A
 MDTeeCCold_B
@@ -767,11 +782,15 @@ MDTeeCCold_C
 TDTeeC_DTeeDCold
 TDTeeB_DTeeCCold
 TDTeeC_SCnrCCold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeCCold= [37,1] !Changed automatically
+TDTeeCCold = [37,1] !Changed automatically
 UNIT 38 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeCHot_A
 MDTeeCHot_B
@@ -779,11 +798,15 @@ MDTeeCHot_C
 TDTeeC_DTeeDHot
 TDTeeB_DTeeCHot
 TDTeeC_SCnrCHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeCHot= [38,1] !Changed automatically
+TDTeeCHot = [38,1] !Changed automatically
 UNIT 39 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeDCold_A
 MDTeeDCold_B
@@ -791,11 +814,15 @@ MDTeeDCold_C
 TDTeeD_DTeeECold
 TDTeeC_DTeeDCold
 TDTeeD_SCnrDCold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeDCold= [39,1] !Changed automatically
+TDTeeDCold = [39,1] !Changed automatically
 UNIT 40 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeDHot_A
 MDTeeDHot_B
@@ -803,11 +830,15 @@ MDTeeDHot_C
 TDTeeD_DTeeEHot
 TDTeeC_DTeeDHot
 TDTeeD_SCnrDHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeDHot= [40,1] !Changed automatically
+TDTeeDHot = [40,1] !Changed automatically
 UNIT 41 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeECold_A
 MDTeeECold_B
@@ -815,11 +846,15 @@ MDTeeECold_C
 TDTeeE_DTeeFCold
 TDTeeD_DTeeECold
 TDTeeE_SCnrECold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeECold= [41,1] !Changed automatically
+TDTeeECold = [41,1] !Changed automatically
 UNIT 42 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeEHot_A
 MDTeeEHot_B
@@ -827,11 +862,15 @@ MDTeeEHot_C
 TDTeeE_DTeeFHot
 TDTeeD_DTeeEHot
 TDTeeE_SCnrEHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeEHot= [42,1] !Changed automatically
+TDTeeEHot = [42,1] !Changed automatically
 UNIT 43 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeFCold_A
 MDTeeFCold_B
@@ -839,11 +878,15 @@ MDTeeFCold_C
 TDTeeF_DTeeGCold
 TDTeeE_DTeeFCold
 TDTeeF_SCnrFCold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeFCold= [43,1] !Changed automatically
+TDTeeFCold = [43,1] !Changed automatically
 UNIT 44 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeFHot_A
 MDTeeFHot_B
@@ -851,11 +894,15 @@ MDTeeFHot_C
 TDTeeF_DTeeGHot
 TDTeeE_DTeeFHot
 TDTeeF_SCnrFHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeFHot= [44,1] !Changed automatically
+TDTeeFHot = [44,1] !Changed automatically
 UNIT 45 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeGCold_A
 MDTeeGCold_B
@@ -863,11 +910,15 @@ MDTeeGCold_C
 TDTeeG_DTeeHCold
 TDTeeF_DTeeGCold
 TDTeeG_SCnrGCold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeGCold= [45,1] !Changed automatically
+TDTeeGCold = [45,1] !Changed automatically
 UNIT 46 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeGHot_A
 MDTeeGHot_B
@@ -875,11 +926,15 @@ MDTeeGHot_C
 TDTeeG_DTeeHHot
 TDTeeF_DTeeGHot
 TDTeeG_SCnrGHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeGHot= [46,1] !Changed automatically
+TDTeeGHot = [46,1] !Changed automatically
 UNIT 47 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeHCold_A
 MDTeeHCold_B
@@ -887,11 +942,15 @@ MDTeeHCold_C
 TDTeeH_DTeeICold
 TDTeeG_DTeeHCold
 TDTeeH_SCnrHCold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeHCold= [47,1] !Changed automatically
+TDTeeHCold = [47,1] !Changed automatically
 UNIT 48 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeHHot_A
 MDTeeHHot_B
@@ -899,11 +958,15 @@ MDTeeHHot_C
 TDTeeH_DTeeIHot
 TDTeeG_DTeeHHot
 TDTeeH_SCnrHHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeHHot= [48,1] !Changed automatically
+TDTeeHHot = [48,1] !Changed automatically
 UNIT 49 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeICold_A
 MDTeeICold_B
@@ -911,11 +974,15 @@ MDTeeICold_C
 TDTeeI_DTeeJCold
 TDTeeH_DTeeICold
 TDTeeI_SCnrICold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeICold= [49,1] !Changed automatically
+TDTeeICold = [49,1] !Changed automatically
 UNIT 50 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeIHot_A
 MDTeeIHot_B
@@ -923,11 +990,15 @@ MDTeeIHot_C
 TDTeeI_DTeeJHot
 TDTeeH_DTeeIHot
 TDTeeI_SCnrIHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeIHot= [50,1] !Changed automatically
+TDTeeIHot = [50,1] !Changed automatically
 UNIT 51 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeJCold_A
 MDTeeJCold_B
@@ -935,11 +1006,15 @@ MDTeeJCold_C
 TDTeeJ_SCnrZCold
 TDTeeI_DTeeJCold
 TDTeeJ_SCnrJCold
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeJCold= [51,1] !Changed automatically
+TDTeeJCold = [51,1] !Changed automatically
 UNIT 52 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MDTeeJHot_A
 MDTeeJHot_B
@@ -947,9 +1022,14 @@ MDTeeJHot_C
 TDTeeJ_SCnrZHot
 TDTeeI_DTeeJHot
 TDTeeJ_SCnrJHot
-0 0 0 20 20 20 
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeJHot= [52,1] !Changed automatically
+TDTeeJHot = [52,1] !Changed automatically
 UNIT 53 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
