@@ -40,7 +40,7 @@ class TeePieceBase(_bi.BlockItem, _ip.HasInternalPiping):
     def changeSize(self):
         self._positionLabel()
 
-        width, _ = self._getCappedWithAndHeight()
+        width, _ = self._getCappedWidthAndHeight()
 
         self.origInputsPos = [[0, self._portOffset]]
         self.origOutputsPos = [[width, self._portOffset], [self._portOffset, 0]]

@@ -3,10 +3,12 @@ import typing as _tp
 
 import jinja2 as _jinja
 
-from trnsysGUI import temperatures as _temps
-from trnsysGUI.connection import names as _cnames
+import trnsysGUI.temperatures as _temps
+import trnsysGUI.connection.names as _cnames
+import trnsysGUI.connection.connectionBase as _cb
 from trnsysGUI.massFlowSolver import networkModel as _mfn, names as _mnames
 from trnsysGUI.teePieces import teePieceBase as _tpb
+
 
 _TEE_PIECE_UNIT_TEMPLATE = _jinja.Template(
     """\
@@ -75,16 +77,19 @@ def _renderTeePieceUnit(
 def getTeePieceUnit(
     unitNumber: int,
     teePiece: _tpb.TeePieceBase,
-    node: _mfn.TeePiece,
+    massFlowNetworkNode: _mfn.TeePiece,
     portItemType: _mfn.PortItemType,
     initialTemperature: _tp.Union[str, float],
     componentName: _tp.Optional[str] = None,
     extraNewlines: str = "",
-):
-    inputPort, orthogonalOutputPort, straightOutputPort = _createPorts(teePiece, node, portItemType, initialTemperature)
+) -> str:
+
+    inputPort, orthogonalOutputPort, straightOutputPort = _createPorts(
+        teePiece, massFlowNetworkNode, portItemType, initialTemperature
+    )
 
     outputTemperature = _temps.getInternalTemperatureVariableName(
-        componentDisplayName=teePiece.displayName, nodeName=node.name
+        componentDisplayName=teePiece.displayName, nodeName=massFlowNetworkNode.name
     )
 
     unitText = _renderTeePieceUnit(
@@ -100,18 +105,53 @@ def getTeePieceUnit(
     return unitText
 
 
-def _createPorts(teePiece, node, portItemType, initialTemperature):
-    inputMassFlow = _mnames.getMassFlowVariableName(teePiece, node, node.input)
-    inputTemperature = _cnames.getTemperatureVariableName(teePiece.inputs[0].getConnection(), portItemType)
-    inputPort = _Port(_Variable(inputMassFlow, 0), _Variable(inputTemperature, initialTemperature))
-    straightOutMassFlow = _mnames.getMassFlowVariableName(teePiece, node, node.output1)
-    straightOutputTemperature = _cnames.getTemperatureVariableName(teePiece.outputs[0].getConnection(), portItemType)
-    straightOutputPort = _Port(
-        _Variable(straightOutMassFlow, 0), _Variable(straightOutputTemperature, initialTemperature)
+def _createPorts(
+    teePiece: _tpb.TeePieceBase,
+    massFlowNetworkNode: _mfn.TeePiece,
+    portItemType: _mfn.PortItemType,
+    initialTemperature: _tp.Union[str, float],
+) -> _tp.Tuple[_Port, _Port, _Port]:
+
+    inputPort = _createPort(
+        teePiece.inputs[0].getConnection(),
+        massFlowNetworkNode.input,
+        teePiece,
+        massFlowNetworkNode,
+        portItemType,
+        initialTemperature,
     )
-    orthogonalOutMassFlow = _mnames.getMassFlowVariableName(teePiece, node, node.output2)
-    orthogonalOutputTemperature = _cnames.getTemperatureVariableName(teePiece.outputs[1].getConnection(), portItemType)
-    orthogonalOutputPort = _Port(
-        _Variable(orthogonalOutMassFlow, 0), _Variable(orthogonalOutputTemperature, initialTemperature)
+
+    straightOutputPort = _createPort(
+        teePiece.outputs[0].getConnection(),
+        massFlowNetworkNode.output1,
+        teePiece,
+        massFlowNetworkNode,
+        portItemType,
+        initialTemperature,
     )
+
+    orthogonalOutputPort = _createPort(
+        teePiece.outputs[1].getConnection(),
+        massFlowNetworkNode.output2,
+        teePiece,
+        massFlowNetworkNode,
+        portItemType,
+        initialTemperature,
+    )
+
     return inputPort, orthogonalOutputPort, straightOutputPort
+
+
+def _createPort(
+    connection: _cb.ConnectionBase,
+    modelPortItem: _mfn.PortItem,
+    teePiece: _tpb.TeePieceBase,
+    massFlowNetworkNode: _mfn.TeePiece,
+    portItemType: _mfn.PortItemType,
+    initialTemperature: _tp.Union[str, float],
+) -> _Port:
+
+    massFlowName = _mnames.getMassFlowVariableName(teePiece, massFlowNetworkNode, modelPortItem)
+    temperatureName = _cnames.getTemperatureVariableName(connection, portItemType)
+    port = _Port(_Variable(massFlowName, 0), _Variable(temperatureName, initialTemperature))
+    return port
