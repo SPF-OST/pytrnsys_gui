@@ -46,7 +46,7 @@ class NiceConnectorBase:
         self._setCornerPositions(corners, points)
 
         if self.setFirstSeg:
-            self.connection.firstS = self.connection.getFirstSeg()
+            self.connection.firstS = segs[0]
             self.connection.logger.debug("Conn has now " + str(self.connection.firstS))
 
     def _resetConnectionWithValues(self):

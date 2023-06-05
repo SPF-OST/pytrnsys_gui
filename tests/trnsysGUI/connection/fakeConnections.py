@@ -30,9 +30,15 @@ class FakePort(StrictMockBase):
         super().__init__(**kwargs)
         self.xPos = 0
         self.yPos = 0
+        self.side = 7
+        self.zValue = -9999
 
     def scenePos(self):
         return _qtc.QPointF(self.xPos, self.yPos)
+
+    def setZValue(self, value):
+        # Used as a spy
+        self.zValue = value
 
 
 def createSimpleDoublePipeConnectionMock(displayName: str, fromPort=None, toPort=None) -> _dpc.DoublePipeConnection:
@@ -85,6 +91,9 @@ def createFullDoublePipeConnectionMock(displayName: str, fromPort=None, toPort=N
 
     coldModelPipe, hotModelPipe = getHotAndColdPipes()
 
+    def printConnNodes():
+        pass
+
     mock = _StrictMockWithMethods(
         startNode=_node.Node(),  # type: ignore[attr-defined]
         endNode=_node.Node(),  # type: ignore[attr-defined]
@@ -98,6 +107,7 @@ def createFullDoublePipeConnectionMock(displayName: str, fromPort=None, toPort=N
         _coldPipe=coldModelPipe,
         hasDdckPlaceHolders=lambda: False,
         shallRenameOutputTemperaturesInHydraulicFile=lambda: False,
+        printConnNodes=printConnNodes,
     )
 
     return _tp.cast(_dpc.DoublePipeConnection, mock)
