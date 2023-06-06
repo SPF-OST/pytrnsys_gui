@@ -1,23 +1,30 @@
+from __future__ import annotations
+
+import dataclasses as _dc
+import typing as _tp
 from PyQt5 import QtCore as _qtc
 
 from trnsysGUI import CornerItem as _ci
-import trnsysGUI.connection.connectionBase as _cb
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.connection.connectionBase as _cb
+    import trnsysGUI.segments.segmentItemFactoryBase as _sifb
 
 
+@_dc.dataclass
 class NiceConnectorBase:
     # pylint: disable = too-many-instance-attributes
-    def __init__(self, connection: _cb.ConnectionBase, segmentItemFactory, rad):
-        self.connection = connection
-        self.segmentItemFactory = segmentItemFactory
-        self.rad = rad
-        self.nrOfCorners = None
-        self.fromSide = None
-        self.toSide = None
-        self.logStatement = None
-        self.operation = None
-        self.printConnNodes = False
-        self.setFirstSeg = False
-        self.createBothPorts = True
+    connection: _cb.ConnectionBase
+    segmentItemFactory: _sifb.SegmentItemFactoryBase
+    rad: float
+    nrOfCorners: _tp.Optional[int] = None
+    fromSide: _tp.Optional[int] = None
+    toSide: _tp.Optional[int] = None
+    logStatement: _tp.Optional[str] = None
+    operation: _tp.Optional[str] = None
+    printConnNodes: bool = False
+    setFirstSeg: bool = False
+    createBothPorts: bool = True
 
     def createNiceConn(self):
         self._resetConnectionWithValues()

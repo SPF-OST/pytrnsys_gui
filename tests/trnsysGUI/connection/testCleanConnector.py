@@ -33,7 +33,7 @@ class FakeSegmentItemFactory:
 class TestCleanConnector:
     def testDPconnectionUsingBothTwoConnector(self):
         self._RunNiceConnWithTests(
-            ConnectorType=_gnc.NiceConnectorBothTwo,
+            connectorType=_gnc.NiceConnectorBothTwo,
             patchString="NiceConnectorBothTwo",
             addItemCount=1,
             fromPortSide=2,
@@ -49,7 +49,7 @@ class TestCleanConnector:
     def testDPconnectionUsingBothZeroConnector(self):
         self._RunNiceConnWithTests(
             patchString="NiceConnectorBothZero",
-            ConnectorType=_gnc.NiceConnectorBothZero,
+            connectorType=_gnc.NiceConnectorBothZero,
             addItemCount=1,
             fromPortSide=0,
             toPortSide=0,
@@ -63,7 +63,7 @@ class TestCleanConnector:
 
     def testDPconnectionUsingOtherConnector(self):
         self._RunNiceConnWithTests(
-            ConnectorType=_gnc.NiceConnectorOther,
+            connectorType=_gnc.NiceConnectorOther,
             patchString="NiceConnectorOther",
             addItemCount=1,
             fromPortSide=7,
@@ -78,7 +78,7 @@ class TestCleanConnector:
 
     def testDPconnectionUsingFromAboveConnector(self):
         self._RunNiceConnWithTests(
-            ConnectorType=_gnc.NiceConnectorFromAbove,
+            connectorType=_gnc.NiceConnectorFromAbove,
             patchString="NiceConnectorFromAbove",
             addItemCount=1,
             fromPortSide=1,
@@ -93,7 +93,7 @@ class TestCleanConnector:
 
     def testDPconnectionUsingFromAboveConnectorWithOtherPortSide(self):
         self._RunNiceConnWithTests(
-            ConnectorType=_gnc.NiceConnectorFromAbove,
+            connectorType=_gnc.NiceConnectorFromAbove,
             patchString="NiceConnectorFromAbove",
             addItemCount=1,
             fromPortSide=3,
@@ -108,7 +108,7 @@ class TestCleanConnector:
 
     def testDPconnectionUsingFromBelowConnector(self):
         self._RunNiceConnWithTests(
-            ConnectorType=_gnc.NiceConnectorFromBelow,
+            connectorType=_gnc.NiceConnectorFromBelow,
             patchString="NiceConnectorFromBelow",
             addItemCount=1,
             fromPortSide=1,
@@ -123,7 +123,7 @@ class TestCleanConnector:
 
     def testDPconnectionUsingFromBelowConnectorWithOtherPortSide(self):
         self._RunNiceConnWithTests(
-            ConnectorType=_gnc.NiceConnectorFromBelow,
+            connectorType=_gnc.NiceConnectorFromBelow,
             patchString="NiceConnectorFromBelow",
             operation="add",
             addItemCount=1,
@@ -137,9 +137,9 @@ class TestCleanConnector:
             yEndCoordsExpected=[15.666, 15.666, 100.0],
         )
 
-    def _RunNiceConnWithTests(
+    def _RunNiceConnWithTests(  # pylint: disable = too-many-arguments, too-many-locals
         self,
-        ConnectorType,
+        connectorType,
         addItemCount,
         fromPortSide,
         nSegsExpected,
@@ -155,7 +155,7 @@ class TestCleanConnector:
 
         dpConnection, rad, segmentItemFactory = self._getSetup()
         mockMethod = self._runNiceConn(
-            ConnectorType, dpConnection, patchString, rad, segmentItemFactory, fromPortSide, operation
+            connectorType, dpConnection, patchString, rad, segmentItemFactory, fromPortSide, operation
         )
 
         assert dpConnection.fromPort.createdAtSide == fromPortSide
@@ -183,18 +183,18 @@ class TestCleanConnector:
 
     @staticmethod
     def _runNiceConn(
-        ConnectorType, dpConnection, patchString, rad, segmentItemFactory, fromPortSide=None, operation="subtract"
+        connectorType, dpConnection, patchString, rad, segmentItemFactory, fromPortSide=None, operation="subtract"
     ):
         fullPatchString = "trnsysGUI.connection.getNiceConnector." + patchString + "._addGraphicsItems"
         with _m.patch(fullPatchString, return_value=None) as mockMethod:
             if patchString == "NiceConnectorFromAbove":
-                ConnectorType(dpConnection, segmentItemFactory, rad, fromSide=fromPortSide).createNiceConn()
+                connectorType(dpConnection, segmentItemFactory, rad, fromSide=fromPortSide).createNiceConn()
             elif patchString == "NiceConnectorFromBelow":
-                ConnectorType(
+                connectorType(
                     dpConnection, segmentItemFactory, rad, fromSide=fromPortSide, operation=operation
                 ).createNiceConn()
             else:
-                ConnectorType(dpConnection, segmentItemFactory, rad).createNiceConn()
+                connectorType(dpConnection, segmentItemFactory, rad).createNiceConn()
         return mockMethod
 
     @staticmethod
