@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc as _abc
 
-import trnsysGUI.segments.Node as _node
+import trnsysGUI.segments.node as _node
 import trnsysGUI.segments.segmentItemBase as _sib
 
 

@@ -18,7 +18,7 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.doublePipeConnection as _dpc
 
 
-class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
+class DoublePipeSegmentItem(_sib.SegmentItemBase):
     def __init__(self, startNode, endNode, parent: _dpc.DoublePipeConnection):
         super().__init__(startNode, endNode, parent)
 
@@ -27,7 +27,8 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
 
     @property
     def _doublePipeConnection(self) -> _dpc.DoublePipeConnection:
-        return self.connection
+        # cannot use asserts here, because of circular import
+        return _tp.cast("_dpc.DoublePipeConnection", self.connection)
 
     def _createSegment(self, startNode, endNode) -> _sib.SegmentItemBase:  # type: ignore[name-defined]
         return DoublePipeSegmentItem(startNode, endNode, self._doublePipeConnection)

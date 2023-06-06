@@ -4,11 +4,16 @@ import dataclasses as _dc
 import typing as _tp
 from PyQt5 import QtCore as _qtc
 
-from trnsysGUI import CornerItem as _ci
+from trnsysGUI import cornerItem as _ci
 
 if _tp.TYPE_CHECKING:
+    import PyQt5.QtWidgets as _qtw
+
+    from trnsysGUI import PortItemBase as _pib
     import trnsysGUI.connection.connectionBase as _cb
     import trnsysGUI.segments.segmentItemFactoryBase as _sifb
+    import trnsysGUI.segments.node as _node
+    import trnsysGUI.segments.segmentItemBase as _sib
 
 
 @_dc.dataclass
@@ -16,17 +21,20 @@ class NiceConnectorBase:
     # pylint: disable = too-many-instance-attributes
     connection: _cb.ConnectionBase
     segmentItemFactory: _sifb.SegmentItemFactoryBase
-    rad: float
-    nrOfCorners: _tp.Optional[int] = None
-    fromSide: _tp.Optional[int] = None
-    toSide: _tp.Optional[int] = None
-    logStatement: _tp.Optional[str] = None
-    operation: _tp.Optional[str] = None
-    printConnNodes: bool = False
-    setFirstSeg: bool = False
-    createBothPorts: bool = True
+    rad: int
 
-    def createNiceConn(self):
+    nrOfCorners: int = _dc.field(init=False)
+
+    def __post_init__(self):
+        self.fromSide: _tp.Optional[int] = None
+        self.toSide: _tp.Optional[int] = None
+        self.logStatement: _tp.Optional[str] = None
+        self.operation: str = ""
+        self.printConnNodes: bool = False
+        self.setFirstSeg: bool = False
+        self.createBothPorts: bool = True
+
+    def createNiceConn(self) -> None:
         self._resetConnectionWithValues()
 
         corners = self._getConnectionCorners(self.nrOfCorners)
@@ -36,7 +44,8 @@ class NiceConnectorBase:
 
         self._connectStartAndEndNodes(corners[0], corners[-1])
 
-        self._addGraphicsItems(segs + corners)
+        graphicItems = [*segs, *corners]
+        self._addGraphicsItems(graphicItems)
 
         points = self._getPoints(self.operation)
 
@@ -57,14 +66,14 @@ class NiceConnectorBase:
             self.connection.firstS = segs[0]
             self.connection.logger.debug("Conn has now " + str(self.connection.firstS))
 
-    def _resetConnectionWithValues(self):
+    def _resetConnectionWithValues(self) -> None:
         self.connection.fromPort.createdAtSide = self.fromSide
         if self.createBothPorts:
             self.connection.toPort.createdAtSide = self.toSide
         self.connection.logger.debug(self.logStatement)
         self.connection.clearConn()
 
-    def _getConnectionCorners(self, nrOfCorners):
+    def _getConnectionCorners(self, nrOfCorners: int) -> list[_ci.CornerItem]:
         rad = self.rad
         endNode, startNode = self._getStartAndEndNode()
 
@@ -78,18 +87,18 @@ class NiceConnectorBase:
         corners.append(_ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, cornerCur.node, endNode, self.connection))
         return corners
 
-    def _getStartAndEndNode(self):
+    def _getStartAndEndNode(self) -> _tp.Tuple[_node.Node, _node.Node]:
         startNode = self.connection.startNode
         endNode = self.connection.endNode
         return endNode, startNode
 
     @staticmethod
-    def _setNextConnectionCorner(corners):
+    def _setNextConnectionCorner(corners: list[_ci.CornerItem]) -> list[_ci.CornerItem]:
         for i in range(len(corners) - 1):
             corners[i].node.setNext(corners[i + 1].node)
         return corners
 
-    def _connectWithSegments(self, corners):
+    def _connectWithSegments(self, corners: _tp.Sequence[_ci.CornerItem]) -> list[_sib.SegmentItemBase]:
         endNode, startNode = self._getStartAndEndNode()
 
         segs = [self.segmentItemFactory.create(startNode, corners[0].node)]
@@ -99,16 +108,16 @@ class NiceConnectorBase:
         segs.append(self.segmentItemFactory.create(corners[-1].node, endNode))
         return segs
 
-    def _connectStartAndEndNodes(self, toStart, toEnd):
+    def _connectStartAndEndNodes(self, toStart: _ci.CornerItem, toEnd: _ci.CornerItem) -> None:
         endNode, startNode = self._getStartAndEndNode()
         startNode.setNext(toStart.node)
         endNode.setPrev(toEnd.node)
 
-    def _addGraphicsItems(self, gItems):
+    def _addGraphicsItems(self, gItems: _tp.Sequence[_qtw.QGraphicsItem]) -> None:
         for gItem in gItems:
             self.connection.parent.diagramScene.addItem(gItem)
 
-    def _getPoints(self, operation):
+    def _getPoints(self, operation: str) -> list[_qtc.QPointF]:
         posEnd, posStart = self._getStartAndEndPositions()
         points = [posStart]
 
@@ -138,30 +147,30 @@ class NiceConnectorBase:
 
         return points
 
-    def _getStartAndEndPositions(self):
+    def _getStartAndEndPositions(self) -> _tp.Tuple[_qtc.QPointF, _qtc.QPointF]:
         posStart = self.connection.fromPort.scenePos()
         posEnd = self.connection.toPort.scenePos()
         return posEnd, posStart
 
     @staticmethod
-    def _setSegLines(segs, points):
+    def _setSegLines(segs: _tp.Sequence[_sib.SegmentItemBase], points: _tp.Sequence[_qtc.QPointF]) -> None:
         assert len(segs) + 1 == len(points)
 
         for i, seg in enumerate(segs):
             seg.setLine(points[i], points[i + 1])
 
     @staticmethod
-    def _setCornerFlags(corners):
+    def _setCornerFlags(corners: _tp.Sequence[_ci.CornerItem]):
         for corner in corners:
             corner.setFlag(corner.ItemSendsScenePositionChanges, True)
 
     @staticmethod
-    def _setCornerZvalues(corners, value):
+    def _setCornerZvalues(corners: _tp.Sequence[_tp.Union[_pib.PortItemBase, _ci.CornerItem]], value: float):
         for corner in corners:
             corner.setZValue(value)
 
     @staticmethod
-    def _setCornerPositions(corners, points):
+    def _setCornerPositions(corners: _tp.Sequence[_ci.CornerItem], points):
         assert len(corners) + 2 == len(points)
         for i, corner in enumerate(corners):
             corner.setPos(points[i + 1])
@@ -216,27 +225,30 @@ class NiceConnectorOther(NiceConnectorBase):
         return midx
 
 
+@_dc.dataclass
 class NiceConnectorFromAbove(NiceConnectorBase):
-    def __init__(self, connection, segmentItemFactory, rad, fromSide=1, logStatement="To port ABOVE from port 1"):
-        super().__init__(connection, segmentItemFactory, rad)
+    fromSide: int = 1
+    logStatement: str = "To port ABOVE from port 1"
+
+    def __post_init__(self) -> None:
         self.nrOfCorners = 1
-        self.fromSide = fromSide
-        self.logStatement = logStatement
         self.createBothPorts = False
         self.setFirstSeg = True
-        if fromSide == 1:
+        self.printConnNodes: bool = False
+
+        if self.fromSide == 1:
             self.operation = "subtract"
-        elif fromSide == 3:
+        elif self.fromSide == 3:
             self.operation = "add"
 
-    def _getConnectionCorners(self, nrOfCorners):
+    def _getConnectionCorners(self, nrOfCorners: int) -> list[_ci.CornerItem]:
         rad = self.rad
         endNode, startNode = self._getStartAndEndNode()
         corners = [_ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, startNode, endNode, self.connection)]
 
         return corners
 
-    def _getPoints(self, operation):
+    def _getPoints(self, operation: str) -> list[_qtc.QPointF]:
         posEnd, posStart = self._getStartAndEndPositions()
 
         points = [posStart]
@@ -251,26 +263,19 @@ class NiceConnectorFromAbove(NiceConnectorBase):
         return points
 
 
+@_dc.dataclass
 class NiceConnectorFromBelow(NiceConnectorBase):
-    def __init__(
-        self,
-        connection,
-        segmentItemFactory,
-        rad,
-        fromSide=1,
-        logStatement="To port BELOW from port 1",
-        operation="subtract",
-    ):
-        super().__init__(connection, segmentItemFactory, rad)
+    fromSide: int = 1
+    logStatement: str = "To port BELOW from port 1"
+    operation: str = "subtract"
+
+    def __post_init__(self) -> None:
         self.nrOfCorners = 2
-        self.fromSide = fromSide
-        self.logStatement = logStatement
         self.createBothPorts = False
         self.setFirstSeg = True
         self.printConnNodes = True
-        self.operation = operation
 
-    def _getPoints(self, operation):
+    def _getPoints(self, operation: str) -> list[_qtc.QPointF]:
         posEnd, posStart = self._getStartAndEndPositions()
 
         points = [posStart]

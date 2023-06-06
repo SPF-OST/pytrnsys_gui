@@ -1,15 +1,12 @@
-# pylint: skip-file
-# type: ignore
-
 from PyQt5 import QtCore
 from PyQt5.QtGui import QBrush
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
-from trnsysGUI.segments.Node import Node
+from trnsysGUI.segments.node import Node
 
 
 class CornerItem(QGraphicsEllipseItem):
-    def __init__(self, x, y, r1, r2, prevNode, nextNode, parent=None):
+    def __init__(self, x, y, r1, r2, prevNode, nextNode, parent=None):  # pylint: disable=too-many-arguments
         """
         CornerItems represent corners for each Connection.
         When a segmentItem is dragged, it will also move the corners, which will trigger the CornerItem
@@ -30,7 +27,7 @@ class CornerItem(QGraphicsEllipseItem):
         nextNode
         parent
         """
-        super(CornerItem, self).__init__(x, y, r1, r2, None)
+        super().__init__(x, y, r1, r2, None)
 
         self.logger = parent.logger
 
@@ -41,7 +38,7 @@ class CornerItem(QGraphicsEllipseItem):
 
         self.posCallbacks = []
 
-    def itemChange(self, change, value):
+    def itemChange(self, change, value):  # pylint: disable=too-many-branches
         if change == self.ItemScenePositionHasChanged:
 
             nextNode = self.node.nextN()
@@ -52,7 +49,7 @@ class CornerItem(QGraphicsEllipseItem):
             segmentBefore = self.parent.segments[nodePosInConnection]
             segmentAfter = self.parent.segments[nodePosInConnection + 1]
 
-            if type(nextNode.parent) is CornerItem:
+            if isinstance(nextNode.parent, CornerItem):
                 if segmentAfter.line() is not None:
                     segmentAfter.setLine(
                         self.scenePos().x(),
@@ -63,7 +60,7 @@ class CornerItem(QGraphicsEllipseItem):
                 else:
                     self.logger.debug("segmentAfter.line() is None")
 
-            if type(previousNode.parent) is CornerItem:
+            if isinstance(previousNode.parent, CornerItem):
                 if segmentBefore.line() is not None:
                     segmentBefore.setLine(
                         segmentBefore.line().p1().x(),
@@ -99,11 +96,11 @@ class CornerItem(QGraphicsEllipseItem):
             for segment in self.parent.segments:
                 try:
                     segment.resetLinePens()
-                except:
+                except:  # pylint: disable=bare-except
                     self.logger.warning("Could not update color gradient of pipe.")
 
             for callback in self.posCallbacks:
                 callback(value)
             return value
 
-        return super(CornerItem, self).itemChange(change, value)
+        return super().itemChange(change, value)

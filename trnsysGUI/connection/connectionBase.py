@@ -10,14 +10,14 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.CornerItem as _ci
+import trnsysGUI.cornerItem as _ci
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.getNiceConnector as _gnc
 import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.segments.Node as _node
+import trnsysGUI.segments.node as _node
 import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.segments.segmentItemFactoryBase as _sif
 

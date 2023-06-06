@@ -7,7 +7,7 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 from PyQt5.QtGui import QColor
 
-import trnsysGUI.CornerItem as _ci
+import trnsysGUI.cornerItem as _ci
 import trnsysGUI.segments.segmentItemBase as _sib
 
 from . import _common

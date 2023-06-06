@@ -5,7 +5,7 @@ from PyQt5 import QtCore as _qtc
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.segments.Node as _node
+import trnsysGUI.segments.node as _node
 import trnsysGUI.connection.singlePipeConnection as _spc
 
 

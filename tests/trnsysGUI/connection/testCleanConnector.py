@@ -1,7 +1,7 @@
 import unittest.mock as _m
 
 import trnsysGUI.connection.getNiceConnector as _gnc
-from trnsysGUI import CornerItem as _ci
+from trnsysGUI import cornerItem as _ci
 
 from . import fakeConnections as _fc
 

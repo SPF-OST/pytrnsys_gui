@@ -1,5 +1,5 @@
 # pylint: skip-file
-# type: ignore
+
 from __future__ import annotations
 
 import typing as _tp
@@ -9,7 +9,7 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import math as _math
 
-import trnsysGUI.CornerItem as _ci
+import trnsysGUI.cornerItem as _ci
 import trnsysGUI.HorizSegmentMoveCommand as _smvc
 
 # This is needed to avoid a circular import but still be able to type check

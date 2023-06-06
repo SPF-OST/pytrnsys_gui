@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing as _tp
 
-import trnsysGUI.segments.Node as _node
+import trnsysGUI.segments.node as _node
 import trnsysGUI.segments.singlePipeSegmentItem as _spsi
 import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.segments.segmentItemFactoryBase as _sif
