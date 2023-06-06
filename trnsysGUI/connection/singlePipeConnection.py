@@ -11,7 +11,8 @@ import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
 import trnsysGUI.connection.singlePipeConnectionModel as _model
 import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
-import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.globalNames as _gnames
 import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.internalPiping as _pi
 import trnsysGUI.massFlowSolver.names as _mnames
@@ -203,7 +204,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitText = _helpers.getIfThenElseUnit(
             unitNumber,
             outputTemperatureName,
-            _INITIAL_FLUID_TEMPERATURE
+            _gnames.SinglePipes.INITIAL_TEMPERATURE,
             inputMfrName,
             inputTemperatureVariableName,
             revInputTemperatureVariableName,

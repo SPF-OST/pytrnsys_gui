@@ -2,12 +2,12 @@ import typing as _tp
 
 import jinja2 as _jinja
 
-import trnsysGUI.massFlowSolver.names as _mnames
-import globalNames as _gnames
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.temperatures as _temps
+import trnsysGUI.globalNames as _gnames
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.temperatures as _temps
 
 
 def getTemperatureVariableName(
@@ -81,5 +81,5 @@ def getIfThenElseUnit(
     return unitText
 
 
-def getInputMfrName(hasInternalPiping: _ip.HasInternalPiping, pipe: _mfn.Pipe) -> str:
-    return _mnames.getMassFlowVariableName(hasInternalPiping, pipe, pipe.fromPort)
+def getInputMfrName(displayName: str, pipe: _mfn.Pipe) -> str:
+    return _mnames.getMassFlowVariableName(displayName, pipe, pipe.fromPort)

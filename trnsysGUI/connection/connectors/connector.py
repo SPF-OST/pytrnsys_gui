@@ -1,12 +1,13 @@
 import typing as _tp
 
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+import trnsysGUI.globalNames as _gnames
 
 
 class Connector(_bi.BlockItem, _ip.HasInternalPiping):
@@ -80,7 +81,7 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
             componentDisplayName=self.displayName,
             nodeName=self._modelPipe.name,
         )
-        mfrName = _helpers.getInputMfrName(self, self._modelPipe)
+        mfrName = _helpers.getInputMfrName(self.displayName, self._modelPipe)
 
         fromConnection = self.inputs[0].getConnection()
         toConnection = self.outputs[0].getConnection()
@@ -92,7 +93,13 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
 
         unitNumber = startingUnit
         unitText = _helpers.getIfThenElseUnit(
-            unitNumber, tempName, mfrName, posFlowTempName, negFlowTempName, componentName=self.displayName
+            unitNumber,
+            tempName,
+            _gnames.SinglePipes.INITIAL_TEMPERATURE,
+            mfrName,
+            posFlowTempName,
+            negFlowTempName,
+            componentName=self.displayName,
         )
 
         nextUnitNumber = unitNumber + 1

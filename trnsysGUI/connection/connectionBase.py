@@ -35,6 +35,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         lengthInMeters: _values.Value,
         parent,
     ):
+        super().__init__()
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
         self.logger = parent.logger

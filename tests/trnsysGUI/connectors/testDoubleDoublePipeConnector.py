@@ -5,7 +5,7 @@ import typing as _tp
 
 from PyQt5 import QtWidgets as _widgets
 
-import trnsysGUI.connectors.doubleDoublePipeConnector as _ddpc
+import trnsysGUI.connection.connectors.doubleDoublePipeConnector as _ddpc
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.connection.doublePipeConnection as _dpc

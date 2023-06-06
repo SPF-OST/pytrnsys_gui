@@ -2,8 +2,8 @@ import typing as _tp
 
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
-import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
+import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.images as _img
@@ -107,7 +107,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             nodeName=self._coldPipe.name,
         )
 
-        coldMfr = _helpers.getInputMfrName(self, self._coldPipe)
+        coldMfr = _helpers.getInputMfrName(self.displayName, self._coldPipe)
 
         posFlowColdInputTemp = _helpers.getTemperatureVariableName(
             doubleConnection, self.outputs[0], _mfn.PortItemType.COLD
@@ -135,7 +135,7 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             nodeName=self._hotPipe.name,
         )
 
-        hotMfr = _helpers.getInputMfrName(self, self._hotPipe)
+        hotMfr = _helpers.getInputMfrName(self.displayName, self._hotPipe)
 
         posFlowHotInputTemp = _helpers.getTemperatureVariableName(
             hotInputSingleConnection, self.inputs[0], _mfn.PortItemType.STANDARD

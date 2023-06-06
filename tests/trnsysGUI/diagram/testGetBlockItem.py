@@ -28,20 +28,20 @@ from trnsysGUI.SaltTankCold import SaltTankCold
 from trnsysGUI.SaltTankHot import SaltTankHot
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.WTap import WTap
 from trnsysGUI.WTap_main import WTap_main
-from trnsysGUI.connectors.connector import Connector
-from trnsysGUI.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
-from trnsysGUI.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
+from trnsysGUI.connection.connectors.connector import Connector
+from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
+from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer
-from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.pump import Pump
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink
 from trnsysGUI.storageTank.widget import StorageTank
+from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
+from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
 
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get

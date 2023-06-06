@@ -29,10 +29,8 @@ class SinglePipe:
 
 
 @_dc.dataclass
-class DoublePipeConnection:
+class HydraulicDoublePipeConnection:
     displayName: str
-    lengthInM: float
-    shallBeSimulated: bool
     coldPipe: SinglePipe
     hotPipe: SinglePipe
 
@@ -52,3 +50,10 @@ class DoublePipeConnection:
 
     def getCanonicalMassFlowRateVariableName(self, pipe: SinglePipe) -> str:
         return _mnames.getCanonicalMassFlowVariableName(componentDisplayName=self.displayName, pipeName=pipe.name)
+
+
+@_dc.dataclass
+class DoublePipeConnection:
+    hydraulicConnection: HydraulicDoublePipeConnection
+    lengthInM: float
+    shallBeSimulated: bool

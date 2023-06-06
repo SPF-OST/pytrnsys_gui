@@ -2,19 +2,21 @@ import trnsysGUI.connection.hydraulicExport.doublePipe as _he
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _model
 
 _SIMULATED_DOUBLE_PIPE_CONNECTION = _model.DoublePipeConnection(
-    displayName="DTeeD_SCnrD",
+    _model.HydraulicDoublePipeConnection(
+        displayName="DTeeD_SCnrD",
+        coldPipe=_model.SinglePipe(
+            name="Cold",
+            inputPort=_model.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
+            outputPort=_model.OutputPort("TDTeeDCold"),
+        ),
+        hotPipe=_model.SinglePipe(
+            name="Hot",
+            inputPort=_model.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
+            outputPort=_model.OutputPort("TSCnrDHot"),
+        ),
+    ),
     lengthInM=400.0,
     shallBeSimulated=True,
-    coldPipe=_model.SinglePipe(
-        name="Cold",
-        inputPort=_model.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
-        outputPort=_model.OutputPort("TDTeeDCold"),
-    ),
-    hotPipe=_model.SinglePipe(
-        name="Hot",
-        inputPort=_model.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
-        outputPort=_model.OutputPort("TSCnrDHot"),
-    ),
 )
 
 _EXPECTED_SIMULATED_UNIT_TEXT = """\
@@ -100,19 +102,21 @@ DTeeD_SCnrDSlInt = [503,16]*1/3600 ! Change in soil's internal heat content comp
 """
 
 _DUMMY_DOUBLE_PIPE_CONNECTION = _model.DoublePipeConnection(
-    displayName="DTeeD_SCnrD",
+    _model.HydraulicDoublePipeConnection(
+        displayName="DTeeD_SCnrD",
+        coldPipe=_model.SinglePipe(
+            name="Cold",
+            inputPort=_model.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
+            outputPort=_model.OutputPort("TDTeeDCold"),
+        ),
+        hotPipe=_model.SinglePipe(
+            name="Hot",
+            inputPort=_model.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
+            outputPort=_model.OutputPort("TSCnrDHot"),
+        ),
+    ),
     lengthInM=400.0,
     shallBeSimulated=False,
-    coldPipe=_model.SinglePipe(
-        name="Cold",
-        inputPort=_model.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
-        outputPort=_model.OutputPort("TDTeeDCold"),
-    ),
-    hotPipe=_model.SinglePipe(
-        name="Hot",
-        inputPort=_model.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
-        outputPort=_model.OutputPort("TSCnrDHot"),
-    ),
 )
 
 _EXPECTED_DUMMY_UNIT_TEXT = """\
