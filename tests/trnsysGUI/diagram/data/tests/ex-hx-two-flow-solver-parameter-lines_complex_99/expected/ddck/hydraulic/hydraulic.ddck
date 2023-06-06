@@ -419,9 +419,8 @@ TPiHxDhwPriFl
 EQUATIONS 1
 TDivAux= [451,1]
 
+! TeeAuxHxRt
 UNIT 452 TYPE 929
-!TeeAuxHxRt
-PARAMETERS 0
 INPUTS 6
 MTeeAuxHxRt_A
 MTeeAuxHxRt_B
@@ -429,19 +428,23 @@ MTeeAuxHxRt_C
 TPiTeeAuxHxRt_HP
 TPiTeeHxDhwRt
 TPiHxDhwPriRt
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeAuxHxRt= [452,1]
+TTeeAuxHxRt = [452,1]
 
 ! supplyWater
 EQUATIONS 2
 Tcw = 1
 TsupplyWater = Tcw
 
+! TeeCircOut
 UNIT 453 TYPE 929
-!TeeCircOut
-PARAMETERS 0
 INPUTS 6
 MTeeCircOut_A
 MTeeCircOut_B
@@ -449,10 +452,15 @@ MTeeCircOut_C
 TPiDhwCirctoTap
 TPiDhwtoTCirc
 TPiDhwCircRtPu
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeCircOut= [453,1]
+TTeeCircOut = [453,1]
 
 UNIT 454 TYPE 931
 ! PiDhwCircRtPu
@@ -550,9 +558,8 @@ PPiHpEvapInConv_kW = [457,4]/3600 ! Convected heat [kW]
 PPiHpEvapInInt_kJ = [457,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpEvapIn = MPiHpEvapIn_A
 
+! TeeShRt1
 UNIT 458 TYPE 929
-!TeeShRt1
-PARAMETERS 0
 INPUTS 6
 MTeeShRt1_A
 MTeeShRt1_B
@@ -560,10 +567,15 @@ MTeeShRt1_C
 TPiTeeShRtTes
 TPiShRt2to1
 TPiRtFloor1
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt1= [458,1]
+TTeeShRt1 = [458,1]
 
 UNIT 459 TYPE 931
 ! PiFlFloor1
@@ -589,9 +601,8 @@ PPiFlFloor1Conv_kW = [459,4]/3600 ! Convected heat [kW]
 PPiFlFloor1Int_kJ = [459,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiFlFloor1 = MPiFlFloor1_A
 
+! TeeShOut1
 UNIT 460 TYPE 929
-!TeeShOut1
-PARAMETERS 0
 INPUTS 6
 MTeeShOut1_A
 MTeeShOut1_B
@@ -599,10 +610,15 @@ MTeeShOut1_C
 TPiTeeShFlTes
 TPiShFl1to2
 TPiShFltoPu1
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut1= [460,1]
+TTeeShOut1 = [460,1]
 
 UNIT 461 TYPE 931
 ! PiFlFloor2
@@ -724,9 +740,8 @@ PPiFlFloor6Conv_kW = [465,4]/3600 ! Convected heat [kW]
 PPiFlFloor6Int_kJ = [465,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiFlFloor6 = MPiFlFloor6_A
 
+! TeeShRt5
 UNIT 466 TYPE 929
-!TeeShRt5
-PARAMETERS 0
 INPUTS 6
 MTeeShRt5_A
 MTeeShRt5_B
@@ -734,14 +749,18 @@ MTeeShRt5_C
 TPiShRt5to4
 TPiPuOvRt6to5
 TPiRtFloor5
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt5= [466,1]
+TTeeShRt5 = [466,1]
 
+! TeeShRt4
 UNIT 467 TYPE 929
-!TeeShRt4
-PARAMETERS 0
 INPUTS 6
 MTeeShRt4_A
 MTeeShRt4_B
@@ -749,14 +768,18 @@ MTeeShRt4_C
 TPiShRt4to3
 TPiShRt5to4
 TPiRtFloor4
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt4= [467,1]
+TTeeShRt4 = [467,1]
 
+! TeeShRt3
 UNIT 468 TYPE 929
-!TeeShRt3
-PARAMETERS 0
 INPUTS 6
 MTeeShRt3_A
 MTeeShRt3_B
@@ -764,14 +787,18 @@ MTeeShRt3_C
 TPiShRt3to2
 TPiShRt4to3
 TPiRtFloor3
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt3= [468,1]
+TTeeShRt3 = [468,1]
 
+! TeeShRt2
 UNIT 469 TYPE 929
-!TeeShRt2
-PARAMETERS 0
 INPUTS 6
 MTeeShRt2_A
 MTeeShRt2_B
@@ -779,10 +806,15 @@ MTeeShRt2_C
 TPiShRt2to1
 TPiShRt3to2
 TPiRtFloor2
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt2= [469,1]
+TTeeShRt2 = [469,1]
 
 UNIT 470 TYPE 931
 ! PiRtFloor5
@@ -1024,9 +1056,8 @@ PPiShFltoPu1Conv_kW = [479,4]/3600 ! Convected heat [kW]
 PPiShFltoPu1Int_kJ = [479,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiShFltoPu1 = MPiShFltoPu1_A
 
+! TeeShOut2
 UNIT 480 TYPE 929
-!TeeShOut2
-PARAMETERS 0
 INPUTS 6
 MTeeShOut2_A
 MTeeShOut2_B
@@ -1034,14 +1065,18 @@ MTeeShOut2_C
 TPiShFl1to2
 TPiShFl2to3
 TPiShFlToPu2
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut2= [480,1]
+TTeeShOut2 = [480,1]
 
+! TeeShOut3
 UNIT 481 TYPE 929
-!TeeShOut3
-PARAMETERS 0
 INPUTS 6
 MTeeShOut3_A
 MTeeShOut3_B
@@ -1049,14 +1084,18 @@ MTeeShOut3_C
 TPiShFl2to3
 TPiShFl3to4
 TPiShFlToPu3
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut3= [481,1]
+TTeeShOut3 = [481,1]
 
+! TeeShOut4
 UNIT 482 TYPE 929
-!TeeShOut4
-PARAMETERS 0
 INPUTS 6
 MTeeShOut4_A
 MTeeShOut4_B
@@ -1064,14 +1103,18 @@ MTeeShOut4_C
 TPiShFl3to4
 TPiShFl4to5
 TPiShFlToPu4
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut4= [482,1]
+TTeeShOut4 = [482,1]
 
+! TeeShOut5
 UNIT 483 TYPE 929
-!TeeShOut5
-PARAMETERS 0
 INPUTS 6
 MTeeShOut5_A
 MTeeShOut5_B
@@ -1079,10 +1122,15 @@ MTeeShOut5_C
 TPiShFl4to5
 TPiShFl5to6
 TPiShFlToPu5
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut5= [483,1]
+TTeeShOut5 = [483,1]
 
 UNIT 484 TYPE 931
 ! PiShFl1to2
@@ -1372,9 +1420,8 @@ PPiTesDhwtoPuHxConv_kW = [495,4]/3600 ! Convected heat [kW]
 PPiTesDhwtoPuHxInt_kJ = [495,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTesDhwtoPuHx = MPiTesDhwtoPuHx_A
 
+! TeeAuxShFl
 UNIT 496 TYPE 929
-!TeeAuxShFl
-PARAMETERS 0
 INPUTS 6
 MTeeAuxShFl_A
 MTeeAuxShFl_B
@@ -1382,10 +1429,15 @@ MTeeAuxShFl_C
 TPiAuxtoTeeShFl
 TPiShPriFl
 TPiTeeShFlTes
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeAuxShFl= [496,1]
+TTeeAuxShFl = [496,1]
 
 UNIT 497 TYPE 931
 ! PiAuxtoTeeShFl
@@ -1459,9 +1511,8 @@ PPiTeeShFlTesConv_kW = [499,4]/3600 ! Convected heat [kW]
 PPiTeeShFlTesInt_kJ = [499,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTeeShFlTes = MPiTeeShFlTes_A
 
+! TeeAuxShRt
 UNIT 500 TYPE 929
-!TeeAuxShRt
-PARAMETERS 0
 INPUTS 6
 MTeeAuxShRt_A
 MTeeAuxShRt_B
@@ -1469,10 +1520,15 @@ MTeeAuxShRt_C
 TPiTeeHxDhwRt
 TPiTeeShRtTes
 TPiShPriRt
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeAuxShRt= [500,1]
+TTeeAuxShRt = [500,1]
 
 UNIT 501 TYPE 931
 ! PiShPriRt
@@ -1570,9 +1626,8 @@ PPiPuDhwCircOutConv_kW = [504,4]/3600 ! Convected heat [kW]
 PPiPuDhwCircOutInt_kJ = [504,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuDhwCircOut = MPiPuDhwCircOut_A
 
+! TeeShOut6
 UNIT 505 TYPE 929
-!TeeShOut6
-PARAMETERS 0
 INPUTS 6
 MTeeShOut6_A
 MTeeShOut6_B
@@ -1580,10 +1635,15 @@ MTeeShOut6_C
 TPiPuOvFl
 TPiShFl5to6
 TPiShFlToPu6
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShOut6= [505,1]
+TTeeShOut6 = [505,1]
 
 UNIT 506 TYPE 931
 ! PiShFl5to6
@@ -1657,9 +1717,8 @@ PPiPuOvFlConv_kW = [508,4]/3600 ! Convected heat [kW]
 PPiPuOvFlInt_kJ = [508,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuOvFl = MPiPuOvFl_A
 
+! TeeShRt6
 UNIT 509 TYPE 929
-!TeeShRt6
-PARAMETERS 0
 INPUTS 6
 MTeeShRt6_A
 MTeeShRt6_B
@@ -1667,10 +1726,15 @@ MTeeShRt6_C
 TPiPuOvRt6to5
 TPiPuOvRt
 TPiFloor6Rt
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeShRt6= [509,1]
+TTeeShRt6 = [509,1]
 
 UNIT 510 TYPE 931
 ! PiFloor6Rt
@@ -1720,9 +1784,8 @@ PPiPuOvRt6to5Conv_kW = [511,4]/3600 ! Convected heat [kW]
 PPiPuOvRt6to5Int_kJ = [511,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuOvRt6to5 = MPiPuOvRt6to5_A
 
+! TeeDhwOut
 UNIT 512 TYPE 929
-!TeeDhwOut
-PARAMETERS 0
 INPUTS 6
 MTeeDhwOut_A
 MTeeDhwOut_B
@@ -1730,10 +1793,15 @@ MTeeDhwOut_C
 TPiTesDhwTapOut
 TPiDhwCircTesOut
 TPiDhwtoTCirc
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeDhwOut= [512,1]
+TTeeDhwOut = [512,1]
 
 UNIT 513 TYPE 931
 ! PiDhwtoTCirc

@@ -566,9 +566,10 @@ TSCnr1Hot = [452,1]
 ! END SCnr1
 
 
+! DTeeA
+! cold side
+! DTeeACold
 UNIT 453 TYPE 929
-!DTeeACold
-PARAMETERS 0
 INPUTS 6
 MDTeeACold_A
 MDTeeACold_B
@@ -576,14 +577,18 @@ MDTeeACold_C
 TDTeeA_DTeeBCold
 TSCnr1_DTeeACold
 TDTeeA_SCnrACold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeACold= [453,1]
-
+TDTeeACold = [453,1]
+! hot side
+! DTeeAHot
 UNIT 454 TYPE 929
-!DTeeAHot
-PARAMETERS 0
 INPUTS 6
 MDTeeAHot_A
 MDTeeAHot_B
@@ -591,10 +596,16 @@ MDTeeAHot_C
 TDTeeA_DTeeBHot
 TSCnr1_DTeeAHot
 TDTeeA_SCnrAHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeAHot= [454,1]
+TDTeeAHot = [454,1]
+
 
 ! BEGIN SCnrA
 ! cold pipe
@@ -806,9 +817,10 @@ TSCnrJHot = [474,1]
 ! END SCnrJ
 
 
+! DTeeB
+! cold side
+! DTeeBCold
 UNIT 475 TYPE 929
-!DTeeBCold
-PARAMETERS 0
 INPUTS 6
 MDTeeBCold_A
 MDTeeBCold_B
@@ -816,14 +828,18 @@ MDTeeBCold_C
 TDTeeB_DTeeCCold
 TDTeeA_DTeeBCold
 TDTeeB_SCnrBCold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeBCold= [475,1]
-
+TDTeeBCold = [475,1]
+! hot side
+! DTeeBHot
 UNIT 476 TYPE 929
-!DTeeBHot
-PARAMETERS 0
 INPUTS 6
 MDTeeBHot_A
 MDTeeBHot_B
@@ -831,14 +847,21 @@ MDTeeBHot_C
 TDTeeB_DTeeCHot
 TDTeeA_DTeeBHot
 TDTeeB_SCnrBHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeBHot= [476,1]
+TDTeeBHot = [476,1]
 
+
+! DTeeC
+! cold side
+! DTeeCCold
 UNIT 477 TYPE 929
-!DTeeCCold
-PARAMETERS 0
 INPUTS 6
 MDTeeCCold_A
 MDTeeCCold_B
@@ -846,14 +869,18 @@ MDTeeCCold_C
 TDTeeC_DTeeDCold
 TDTeeB_DTeeCCold
 TDTeeC_SCnrCCold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeCCold= [477,1]
-
+TDTeeCCold = [477,1]
+! hot side
+! DTeeCHot
 UNIT 478 TYPE 929
-!DTeeCHot
-PARAMETERS 0
 INPUTS 6
 MDTeeCHot_A
 MDTeeCHot_B
@@ -861,14 +888,21 @@ MDTeeCHot_C
 TDTeeC_DTeeDHot
 TDTeeB_DTeeCHot
 TDTeeC_SCnrCHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeCHot= [478,1]
+TDTeeCHot = [478,1]
 
+
+! DTeeD
+! cold side
+! DTeeDCold
 UNIT 479 TYPE 929
-!DTeeDCold
-PARAMETERS 0
 INPUTS 6
 MDTeeDCold_A
 MDTeeDCold_B
@@ -876,14 +910,18 @@ MDTeeDCold_C
 TDTeeD_DTeeECold
 TDTeeC_DTeeDCold
 TDTeeD_SCnrDCold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeDCold= [479,1]
-
+TDTeeDCold = [479,1]
+! hot side
+! DTeeDHot
 UNIT 480 TYPE 929
-!DTeeDHot
-PARAMETERS 0
 INPUTS 6
 MDTeeDHot_A
 MDTeeDHot_B
@@ -891,14 +929,21 @@ MDTeeDHot_C
 TDTeeD_DTeeEHot
 TDTeeC_DTeeDHot
 TDTeeD_SCnrDHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeDHot= [480,1]
+TDTeeDHot = [480,1]
 
+
+! DTeeE
+! cold side
+! DTeeECold
 UNIT 481 TYPE 929
-!DTeeECold
-PARAMETERS 0
 INPUTS 6
 MDTeeECold_A
 MDTeeECold_B
@@ -906,14 +951,18 @@ MDTeeECold_C
 TDTeeE_DTeeFCold
 TDTeeD_DTeeECold
 TDTeeE_SCnrECold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeECold= [481,1]
-
+TDTeeECold = [481,1]
+! hot side
+! DTeeEHot
 UNIT 482 TYPE 929
-!DTeeEHot
-PARAMETERS 0
 INPUTS 6
 MDTeeEHot_A
 MDTeeEHot_B
@@ -921,14 +970,21 @@ MDTeeEHot_C
 TDTeeE_DTeeFHot
 TDTeeD_DTeeEHot
 TDTeeE_SCnrEHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeEHot= [482,1]
+TDTeeEHot = [482,1]
 
+
+! DTeeF
+! cold side
+! DTeeFCold
 UNIT 483 TYPE 929
-!DTeeFCold
-PARAMETERS 0
 INPUTS 6
 MDTeeFCold_A
 MDTeeFCold_B
@@ -936,14 +992,18 @@ MDTeeFCold_C
 TDTeeF_DTeeGCold
 TDTeeE_DTeeFCold
 TDTeeF_SCnrFCold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeFCold= [483,1]
-
+TDTeeFCold = [483,1]
+! hot side
+! DTeeFHot
 UNIT 484 TYPE 929
-!DTeeFHot
-PARAMETERS 0
 INPUTS 6
 MDTeeFHot_A
 MDTeeFHot_B
@@ -951,14 +1011,21 @@ MDTeeFHot_C
 TDTeeF_DTeeGHot
 TDTeeE_DTeeFHot
 TDTeeF_SCnrFHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeFHot= [484,1]
+TDTeeFHot = [484,1]
 
+
+! DTeeG
+! cold side
+! DTeeGCold
 UNIT 485 TYPE 929
-!DTeeGCold
-PARAMETERS 0
 INPUTS 6
 MDTeeGCold_A
 MDTeeGCold_B
@@ -966,14 +1033,18 @@ MDTeeGCold_C
 TDTeeG_DTeeHCold
 TDTeeF_DTeeGCold
 TDTeeG_SCnrGCold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeGCold= [485,1]
-
+TDTeeGCold = [485,1]
+! hot side
+! DTeeGHot
 UNIT 486 TYPE 929
-!DTeeGHot
-PARAMETERS 0
 INPUTS 6
 MDTeeGHot_A
 MDTeeGHot_B
@@ -981,14 +1052,21 @@ MDTeeGHot_C
 TDTeeG_DTeeHHot
 TDTeeF_DTeeGHot
 TDTeeG_SCnrGHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeGHot= [486,1]
+TDTeeGHot = [486,1]
 
+
+! DTeeH
+! cold side
+! DTeeHCold
 UNIT 487 TYPE 929
-!DTeeHCold
-PARAMETERS 0
 INPUTS 6
 MDTeeHCold_A
 MDTeeHCold_B
@@ -996,14 +1074,18 @@ MDTeeHCold_C
 TDTeeH_DTeeICold
 TDTeeG_DTeeHCold
 TDTeeH_SCnrHCold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeHCold= [487,1]
-
+TDTeeHCold = [487,1]
+! hot side
+! DTeeHHot
 UNIT 488 TYPE 929
-!DTeeHHot
-PARAMETERS 0
 INPUTS 6
 MDTeeHHot_A
 MDTeeHHot_B
@@ -1011,14 +1093,21 @@ MDTeeHHot_C
 TDTeeH_DTeeIHot
 TDTeeG_DTeeHHot
 TDTeeH_SCnrHHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeHHot= [488,1]
+TDTeeHHot = [488,1]
 
+
+! DTeeI
+! cold side
+! DTeeICold
 UNIT 489 TYPE 929
-!DTeeICold
-PARAMETERS 0
 INPUTS 6
 MDTeeICold_A
 MDTeeICold_B
@@ -1026,14 +1115,18 @@ MDTeeICold_C
 TDTeeI_DTeeJCold
 TDTeeH_DTeeICold
 TDTeeI_SCnrICold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeICold= [489,1]
-
+TDTeeICold = [489,1]
+! hot side
+! DTeeIHot
 UNIT 490 TYPE 929
-!DTeeIHot
-PARAMETERS 0
 INPUTS 6
 MDTeeIHot_A
 MDTeeIHot_B
@@ -1041,14 +1134,21 @@ MDTeeIHot_C
 TDTeeI_DTeeJHot
 TDTeeH_DTeeIHot
 TDTeeI_SCnrIHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeIHot= [490,1]
+TDTeeIHot = [490,1]
 
+
+! DTeeJ
+! cold side
+! DTeeJCold
 UNIT 491 TYPE 929
-!DTeeJCold
-PARAMETERS 0
 INPUTS 6
 MDTeeJCold_A
 MDTeeJCold_B
@@ -1056,14 +1156,18 @@ MDTeeJCold_C
 TDTeeJ_SCnrZCold
 TDTeeI_DTeeJCold
 TDTeeJ_SCnrJCold
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniCold
+dpTIniCold
+dpTIniCold
 EQUATIONS 1
-TDTeeJCold= [491,1]
-
+TDTeeJCold = [491,1]
+! hot side
+! DTeeJHot
 UNIT 492 TYPE 929
-!DTeeJHot
-PARAMETERS 0
 INPUTS 6
 MDTeeJHot_A
 MDTeeJHot_B
@@ -1071,10 +1175,16 @@ MDTeeJHot_C
 TDTeeJ_SCnrZHot
 TDTeeI_DTeeJHot
 TDTeeJ_SCnrJHot
-***Initial values
-0 0 0 20 20 20 
+***
+0
+0
+0
+dpTIniHot
+dpTIniHot
+dpTIniHot
 EQUATIONS 1
-TDTeeJHot= [492,1]
+TDTeeJHot = [492,1]
+
 
 UNIT 493 TYPE 9511
 ! DTeeB_DTeeC

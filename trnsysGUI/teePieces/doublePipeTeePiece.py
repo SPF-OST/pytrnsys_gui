@@ -5,27 +5,25 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
-import pytrnsys.utils.serialization as _ser
 
+import pytrnsys.utils.serialization as _ser
+import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
+import trnsysGUI.doublePipePortItem as _dppi
+import trnsysGUI.globalNames as _gnames
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
-from trnsysGUI.connectors.doublePipeConnectorBase import DoublePipeBlockItemModel
-from trnsysGUI.doublePipePortItem import DoublePipePortItem  # type: ignore[attr-defined]
+import trnsysGUI.teePieces.exportHelper as _eh
+import trnsysGUI.teePieces.teePieceBase as _tpb
 
 
-class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
+class DoublePipeTeePiece(_tpb.TeePieceBase):
     def __init__(self, trnsysType, editor, **kwargs):
         super().__init__(trnsysType, editor, **kwargs)
 
         self.w = 60
         self.h = 40
-
-        self.inputs.append(DoublePipePortItem("i", 0, self))
-        self.outputs.append(DoublePipePortItem("o", 2, self))
-        self.outputs.append(DoublePipePortItem("o", 2, self))
 
         self.changeSize()
 
@@ -35,14 +33,12 @@ class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
 
         self._updateModels(self.displayName)
 
-    def getDisplayName(self) -> str:
-        return self.displayName
-
-    def hasDdckPlaceHolders(self) -> bool:
-        return False
-
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
-        return False
+    def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
+        return (
+            _dppi.DoublePipePortItem("i", 0, self),
+            _dppi.DoublePipePortItem("o", 2, self),
+            _dppi.DoublePipePortItem("o", 2, self),
+        )
 
     def _updateModels(self, newDisplayName: str) -> None:
         coldInput: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
@@ -71,26 +67,6 @@ class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
             return _img.DP_TEE_PIECE_ROTATED_270
 
         raise AssertionError("Invalid rotation angle.")
-
-    def changeSize(self):
-        width, _ = self._getCappedWithAndHeight()
-        self._positionLabel()
-
-        self.origInputsPos = [[0, 30]]
-        self.origOutputsPos = [[width, 30], [30, 0]]
-
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
-        self.outputs[1].setPos(self.origOutputsPos[1][0], self.origOutputsPos[1][1])
-
-        # pylint: disable=duplicate-code  # 1
-        self.updateFlipStateH(self.flippedH)
-        self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-        self.outputs[0].side = (self.rotationN + 2 - 2 * self.flippedH) % 4
-        # pylint: disable=duplicate-code  # 1
-        self.outputs[1].side = (self.rotationN + 1 - 2 * self.flippedV) % 4
 
     def encode(self):
         portListInputs = []
@@ -160,49 +136,44 @@ class DoublePipeTeePiece(BlockItem, _ip.HasInternalPiping):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals
         unitNumber = startingUnit
-        tNr = 929  # Temperature calculation from a tee-piece
 
-        unitText = ""
-        ambientT = 20
-        equationConstant = 1
-
-        unitNumber, unitText = self._getExport(
-            ambientT, equationConstant, self._coldTeePiece, tNr, "Cold", unitNumber, unitText
+        coldComponentName = f"{self.displayName}{self._coldTeePiece.name}"
+        coldUnitText = _eh.getTeePieceUnit(
+            unitNumber,
+            self,
+            self._coldTeePiece,
+            _mfn.PortItemType.COLD,
+            _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE,
+            componentName=coldComponentName,
+            extraNewlines="",
         )
-        unitNumber, unitText = self._getExport(
-            ambientT, equationConstant, self._hotTeePiece, tNr, "Hot", unitNumber, unitText
+
+        hotComponentName = f"{self.displayName}{self._hotTeePiece.name}"
+        hotUnitText = _eh.getTeePieceUnit(
+            unitNumber + 1,
+            self,
+            self._hotTeePiece,
+            _mfn.PortItemType.HOT,
+            _gnames.DoublePipes.INITIAL_HOT_TEMPERATURE,
+            componentName=hotComponentName,
+            extraNewlines="",
         )
-        return unitText, unitNumber
 
-    def _getExport(self, ambientT, equationConstant, teePiece, tNr, temperature, unitNumber, unitText):
-        unitText += "UNIT " + str(unitNumber) + " TYPE " + str(tNr) + "\n"
-        unitText += "!" + self.displayName + temperature + "\n"
-        unitText += "PARAMETERS 0\n"
-        unitText += "INPUTS 6\n"
+        unitText = f"""\
+! {self.displayName}
+! cold side
+{coldUnitText}
+! hot side
+{hotUnitText}
 
-        portItems = teePiece.getPortItems()
-        massFlowVariableNames = [
-            _mnames.getMassFlowVariableName(self, teePiece, portItems[0]),
-            _mnames.getMassFlowVariableName(self, teePiece, portItems[1]),
-            _mnames.getMassFlowVariableName(self, teePiece, portItems[2]),
-        ]
 
-        unitText += "\n".join(massFlowVariableNames) + "\n"
+"""
 
-        unitText += f"T{self.inputs[0].connectionList[0].displayName}{temperature}\n"
-        unitText += f"T{self.outputs[0].connectionList[0].displayName}{temperature}\n"
-        unitText += f"T{self.outputs[1].connectionList[0].displayName}{temperature}\n"
+        return unitText, unitNumber + 2
 
-        unitText += "***Initial values\n"
-        unitText += 3 * "0 " + 3 * (str(ambientT) + " ") + "\n"
-
-        unitText += "EQUATIONS 1\n"
-        unitText += (
-            "T" + self.displayName + temperature + "= [" + str(unitNumber) + "," + str(equationConstant) + "]\n\n"
-        )
-        unitNumber += 1
-
-        return unitNumber, unitText
+    @property
+    def _portOffset(self):
+        return 30
 
 
 @_dc.dataclass
@@ -224,16 +195,16 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
         cls,
         data: _dcj.JsonDict,
         validate=True,  # pylint: disable=duplicate-code
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # /NOSONAR
     ) -> "DoublePipeTeePieceModel":
         doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums)
         return _tp.cast(DoublePipeTeePieceModel, doublePipeTeePieceModel)
 
     def to_dict(
         self,
-        omit_none: bool = True,
+        omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code
         data[".__BlockDict__"] = True
@@ -241,10 +212,10 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return DoublePipeBlockItemModel
+        return _dpcb.DoublePipeBlockItemModel
 
     @classmethod
-    def upgrade(cls, superseded: DoublePipeBlockItemModel) -> "DoublePipeTeePieceModel":  # type: ignore[override]
+    def upgrade(cls, superseded: _dpcb.DoublePipeBlockItemModel) -> "DoublePipeTeePieceModel":  # type: ignore[override]
         assert len(superseded.portsIdsIn) == 2
         assert len(superseded.portsIdsOut) == 1
 
