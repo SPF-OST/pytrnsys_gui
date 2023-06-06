@@ -91,6 +91,52 @@ class TestCleanConnector:
             yEndCoordsExpected=[99.667, 100.0],
         )
 
+    def testDPconnectionUsingFromAboveConnectorWithOtherPortSide(self):
+        self._RunNiceConnWithTests(
+            ConnectorType=_gnc.NiceConnectorFromAbove,
+            patchString="NiceConnectorFromAbove",
+            addItemCount=1,
+            fromPortSide=3,
+            toPortSide=None,
+            nrOfNewItems=3,
+            nSegsExpected=2,
+            xStartCoordsExpected=[0.0, 0.0],
+            xEndCoordsExpected=[0.0, 100.0],
+            yStartCoordsExpected=[0.0, 100.333],
+            yEndCoordsExpected=[100.333, 100.0],
+        )
+
+    def testDPconnectionUsingFromBelowConnector(self):
+        self._RunNiceConnWithTests(
+            ConnectorType=_gnc.NiceConnectorFromBelow,
+            patchString="NiceConnectorFromBelow",
+            addItemCount=1,
+            fromPortSide=1,
+            toPortSide=None,
+            nrOfNewItems=5,
+            nSegsExpected=3,
+            xStartCoordsExpected=[0.0, 0.0, 100.0],
+            xEndCoordsExpected=[0.0, 100.0, 100.0],
+            yStartCoordsExpected=[0.0, -15.666, -15.666],
+            yEndCoordsExpected=[-15.666, -15.666, 100.0],
+        )
+
+    def testDPconnectionUsingFromBelowConnectorWithOtherPortSide(self):
+        self._RunNiceConnWithTests(
+            ConnectorType=_gnc.NiceConnectorFromBelow,
+            patchString="NiceConnectorFromBelow",
+            operation="add",
+            addItemCount=1,
+            fromPortSide=3,
+            toPortSide=None,
+            nrOfNewItems=5,
+            nSegsExpected=3,
+            xStartCoordsExpected=[0.0, 0.0, 100.0],
+            xEndCoordsExpected=[0.0, 100.0, 100.0],
+            yStartCoordsExpected=[0.0, 15.666, 15.666],
+            yEndCoordsExpected=[15.666, 15.666, 100.0],
+        )
+
     def _RunNiceConnWithTests(
         self,
         ConnectorType,
@@ -104,10 +150,13 @@ class TestCleanConnector:
         xStartCoordsExpected,
         yEndCoordsExpected,
         yStartCoordsExpected,
+        operation="subtract",
     ):
 
         dpConnection, rad, segmentItemFactory = self._getSetup()
-        mockMethod = self._runNiceConn(ConnectorType, dpConnection, patchString, rad, segmentItemFactory)
+        mockMethod = self._runNiceConn(
+            ConnectorType, dpConnection, patchString, rad, segmentItemFactory, fromPortSide, operation
+        )
 
         assert dpConnection.fromPort.createdAtSide == fromPortSide
         if toPortSide:
@@ -133,10 +182,19 @@ class TestCleanConnector:
         return dpConnection, rad, segmentItemFactory
 
     @staticmethod
-    def _runNiceConn(ConnectorType, dpConnection, patchString, rad, segmentItemFactory):
+    def _runNiceConn(
+        ConnectorType, dpConnection, patchString, rad, segmentItemFactory, fromPortSide=None, operation="subtract"
+    ):
         fullPatchString = "trnsysGUI.connection.getNiceConnector." + patchString + "._addGraphicsItems"
         with _m.patch(fullPatchString, return_value=None) as mockMethod:
-            ConnectorType(dpConnection, segmentItemFactory, rad).createNiceConn()
+            if patchString == "NiceConnectorFromAbove":
+                ConnectorType(dpConnection, segmentItemFactory, rad, fromSide=fromPortSide).createNiceConn()
+            elif patchString == "NiceConnectorFromBelow":
+                ConnectorType(
+                    dpConnection, segmentItemFactory, rad, fromSide=fromPortSide, operation=operation
+                ).createNiceConn()
+            else:
+                ConnectorType(dpConnection, segmentItemFactory, rad).createNiceConn()
         return mockMethod
 
     @staticmethod

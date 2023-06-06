@@ -1,11 +1,12 @@
 from PyQt5 import QtCore as _qtc
 
 from trnsysGUI import CornerItem as _ci
+import trnsysGUI.connection.connectionBase as _cb
 
 
 class NiceConnectorBase:
     # pylint: disable = too-many-instance-attributes
-    def __init__(self, connection, segmentItemFactory, rad):
+    def __init__(self, connection: _cb.ConnectionBase, segmentItemFactory, rad):
         self.connection = connection
         self.segmentItemFactory = segmentItemFactory
         self.rad = rad
@@ -233,8 +234,10 @@ class NiceConnectorFromAbove(NiceConnectorBase):
 
         points = [posStart]
 
-        # position of the connecting node
-        points.append(_qtc.QPointF(posStart.x(), posEnd.y() - 0.333))
+        if operation == "add":
+            points.append(_qtc.QPointF(posStart.x(), posEnd.y() + 0.333))
+        elif operation == "subtract":
+            points.append(_qtc.QPointF(posStart.x(), posEnd.y() - 0.333))
 
         points.append(posEnd)
 
