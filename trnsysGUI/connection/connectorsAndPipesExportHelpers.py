@@ -35,7 +35,7 @@ PARAMETERS 4
 {_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
 {_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
 <<initialTemp>>
-<% endif %>
+<% endif -%>
 INPUTS 3
 <<massFlowRate>> <<posFlowInputTemp>> <<negFlowInputTemp>>
 ***

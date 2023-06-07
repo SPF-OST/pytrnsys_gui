@@ -137,8 +137,8 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def _getHydraulicExportConnectionModel(self) -> _hedpc.ExportDoublePipeConnection:
         hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
-            self.fromPort,
-            self.toPort,
+            self._createAdjacentComponent(self.fromPort),
+            self._createAdjacentComponent(self.toPort),
             self.coldModelPipe,
             self.hotModelPipe,
         )
@@ -154,6 +154,11 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         )
 
         return exportConnection
+
+    @staticmethod
+    def _createAdjacentComponent(port: _dppi.DoublePipePortItem) -> _cehc.AdjacentComponent:
+        adjacentComponent = _cehc.AdjacentComponent(port.parent, port)
+        return adjacentComponent
 
     def _updateModels(self, newDisplayName: str):
         self.coldModelPipe, self.hotModelPipe = _chmp.createColdAndHotModelPipes()

@@ -27,7 +27,7 @@ from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defin
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
 from trnsysGUI.WTap import WTap  # type: ignore[attr-defined]
 from trnsysGUI.WTap_main import WTap_main  # type: ignore[attr-defined]
-from trnsysGUI.connection.connectors import Connector  # type: ignore[attr-defined]
+from trnsysGUI.connection.connectors.connector import Connector  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer

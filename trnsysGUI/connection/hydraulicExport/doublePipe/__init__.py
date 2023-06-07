@@ -10,4 +10,4 @@ def export(doublePipeConnection: _dpc.ExportDoublePipeConnection, unitNumber: in
         return _sim.exportSimulatedConnection(doublePipeConnection, unitNumber)
 
     hydraulicConnection = doublePipeConnection.hydraulicConnection
-    return _dummy.exportDummyConnection(hydraulicConnection, unitNumber)
+    return _dummy.exportDummyConnection(hydraulicConnection, unitNumber, shallDefineCanonicalMassFlowVariables=True)

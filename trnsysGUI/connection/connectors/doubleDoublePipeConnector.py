@@ -3,8 +3,8 @@ from __future__ import annotations
 import typing as _tp
 
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
-import trnsysGUI.connection.hydraulicExport.doublePipe.createExportHydraulicDoublePipeConnection as _cehc
 import trnsysGUI.connection.createHydraulicModelPipes as _chmp
+import trnsysGUI.connection.hydraulicExport.doublePipe.createExportHydraulicDoublePipeConnection as _cehc
 import trnsysGUI.connection.hydraulicExport.doublePipe.dummy as _he
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.images as _img
@@ -67,8 +67,8 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
-            self.fromPort,
-            self.toPort,
+            self._createAdjacentComponent(self.fromPort),
+            self._createAdjacentComponent(self.toPort),
             self._coldPipe,
             self._hotPipe,
         )
@@ -76,4 +76,11 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         hydraulicExportConnection = _cehc.createModel(hydraulicConnection)
 
         unitNumber = startingUnit
-        return _he.exportDummyConnection(hydraulicExportConnection, unitNumber)
+        return _he.exportDummyConnection(
+            hydraulicExportConnection, unitNumber, shallDefineCanonicalMassFlowVariables=False
+        )
+
+    @staticmethod
+    def _createAdjacentComponent(port: _dppi.DoublePipePortItem) -> _cehc.AdjacentComponent:
+        adjacentComponent = _cehc.AdjacentComponent(port.getConnection(), port)
+        return adjacentComponent

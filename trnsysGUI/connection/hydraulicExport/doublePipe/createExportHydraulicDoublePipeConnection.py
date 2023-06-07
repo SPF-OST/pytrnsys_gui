@@ -6,23 +6,27 @@ import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
+AdjacentComponent = _com.GenericAdjacentComponent[_dppi.DoublePipePortItem]
+
 
 @_dc.dataclass
 class HydraulicDoublePipeConnection:
     displayName: str
-    fromPort: _dppi.DoublePipePortItem
-    toPort: _dppi.DoublePipePortItem
+    fromComponent: AdjacentComponent
+    toComponent: AdjacentComponent
     coldModelPipe: _mfn.Pipe
     hotModelPipe: _mfn.Pipe
 
 
 def createModel(hydraulicConnection: HydraulicDoublePipeConnection) -> _hedpc.ExportHydraulicDoublePipeConnection:
     coldInputTemperature = _helpers.getTemperatureVariableName(
-        hydraulicConnection.toPort.parent, hydraulicConnection.toPort, _mfn.PortItemType.COLD
+        hydraulicConnection.toComponent.component, hydraulicConnection.toComponent.sharedPort, _mfn.PortItemType.COLD
     )
     coldMassFlowRate = _helpers.getInputMfrName(hydraulicConnection.displayName, hydraulicConnection.coldModelPipe)
     coldRevInputTemperature = _helpers.getTemperatureVariableName(
-        hydraulicConnection.fromPort.parent, hydraulicConnection.fromPort, _mfn.PortItemType.COLD
+        hydraulicConnection.fromComponent.component,
+        hydraulicConnection.fromComponent.sharedPort,
+        _mfn.PortItemType.COLD,
     )
     # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
     assert hydraulicConnection.coldModelPipe.name
@@ -34,11 +38,11 @@ def createModel(hydraulicConnection: HydraulicDoublePipeConnection) -> _hedpc.Ex
     )
 
     hotInputTemperature = _helpers.getTemperatureVariableName(
-        hydraulicConnection.fromPort.parent, hydraulicConnection.fromPort, _mfn.PortItemType.HOT
+        hydraulicConnection.fromComponent.component, hydraulicConnection.fromComponent.sharedPort, _mfn.PortItemType.HOT
     )
     hotMassFlowRate = _helpers.getInputMfrName(hydraulicConnection.displayName, hydraulicConnection.hotModelPipe)
     hotRevInputTemperature = _helpers.getTemperatureVariableName(
-        hydraulicConnection.toPort.parent, hydraulicConnection.toPort, _mfn.PortItemType.HOT
+        hydraulicConnection.toComponent.component, hydraulicConnection.toComponent.sharedPort, _mfn.PortItemType.HOT
     )
     # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
     assert hydraulicConnection.hotModelPipe.name

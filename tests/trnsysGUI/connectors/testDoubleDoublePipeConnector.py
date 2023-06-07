@@ -51,7 +51,8 @@ class TestDoubleDoublePipeConnector:
 
         unitNumber = 1
         text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(unitNumber)
-
+        
+        print(text)
         assert nextUnitNumber == unitNumber + 2
         assert text == _EXPECTED_TEXT
 
