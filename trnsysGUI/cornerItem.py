@@ -96,8 +96,9 @@ class CornerItem(QGraphicsEllipseItem):
             for segment in self.parent.segments:
                 try:
                     segment.resetLinePens()
-                except:  # pylint: disable=bare-except
+                except Warning as warn:
                     self.logger.warning("Could not update color gradient of pipe.")
+                    self.logger.warning(warn)
 
             for callback in self.posCallbacks:
                 callback(value)

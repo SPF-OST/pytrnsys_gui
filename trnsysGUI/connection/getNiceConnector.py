@@ -25,7 +25,7 @@ class NiceConnectorBase:
 
     nrOfCorners: int = _dc.field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self):  # /NOSONAR
         self.fromSide: _tp.Optional[int] = None
         self.toSide: _tp.Optional[int] = None
         self.logStatement: _tp.Optional[str] = None
@@ -230,7 +230,7 @@ class NiceConnectorFromAbove(NiceConnectorBase):
     fromSide: int = 1
     logStatement: str = "To port ABOVE from port 1"
 
-    def __post_init__(self) -> None:
+    def __post_init__(self) -> None:  # /NOSONAR
         self.nrOfCorners = 1
         self.createBothPorts = False
         self.setFirstSeg = True
@@ -269,7 +269,7 @@ class NiceConnectorFromBelow(NiceConnectorBase):
     logStatement: str = "To port BELOW from port 1"
     operation: str = "subtract"
 
-    def __post_init__(self) -> None:
+    def __post_init__(self) -> None:  # /NOSONAR
         self.nrOfCorners = 2
         self.createBothPorts = False
         self.setFirstSeg = True

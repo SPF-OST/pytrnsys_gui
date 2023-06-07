@@ -92,6 +92,7 @@ def createFullDoublePipeConnectionMock(displayName: str, fromPort=None, toPort=N
     coldModelPipe, hotModelPipe = getHotAndColdPipes()
 
     def printConnNodes():
+        # The messages sent to the debugger are ignored for this mock
         pass
 
     mock = _StrictMockWithMethods(

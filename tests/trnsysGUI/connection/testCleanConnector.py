@@ -32,7 +32,7 @@ class FakeSegmentItemFactory:
 
 class TestCleanConnector:
     def testDPconnectionUsingBothTwoConnector(self):
-        self._RunNiceConnWithTests(
+        self._runNiceConnWithTests(
             connectorType=_gnc.NiceConnectorBothTwo,
             patchString="NiceConnectorBothTwo",
             addItemCount=1,
@@ -47,7 +47,7 @@ class TestCleanConnector:
         )
 
     def testDPconnectionUsingBothZeroConnector(self):
-        self._RunNiceConnWithTests(
+        self._runNiceConnWithTests(
             patchString="NiceConnectorBothZero",
             connectorType=_gnc.NiceConnectorBothZero,
             addItemCount=1,
@@ -62,7 +62,7 @@ class TestCleanConnector:
         )
 
     def testDPconnectionUsingOtherConnector(self):
-        self._RunNiceConnWithTests(
+        self._runNiceConnWithTests(
             connectorType=_gnc.NiceConnectorOther,
             patchString="NiceConnectorOther",
             addItemCount=1,
@@ -77,7 +77,7 @@ class TestCleanConnector:
         )
 
     def testDPconnectionUsingFromAboveConnector(self):
-        self._RunNiceConnWithTests(
+        self._runNiceConnWithTests(
             connectorType=_gnc.NiceConnectorFromAbove,
             patchString="NiceConnectorFromAbove",
             addItemCount=1,
@@ -92,7 +92,7 @@ class TestCleanConnector:
         )
 
     def testDPconnectionUsingFromAboveConnectorWithOtherPortSide(self):
-        self._RunNiceConnWithTests(
+        self._runNiceConnWithTests(
             connectorType=_gnc.NiceConnectorFromAbove,
             patchString="NiceConnectorFromAbove",
             addItemCount=1,
@@ -107,7 +107,7 @@ class TestCleanConnector:
         )
 
     def testDPconnectionUsingFromBelowConnector(self):
-        self._RunNiceConnWithTests(
+        self._runNiceConnWithTests(
             connectorType=_gnc.NiceConnectorFromBelow,
             patchString="NiceConnectorFromBelow",
             addItemCount=1,
@@ -122,7 +122,7 @@ class TestCleanConnector:
         )
 
     def testDPconnectionUsingFromBelowConnectorWithOtherPortSide(self):
-        self._RunNiceConnWithTests(
+        self._runNiceConnWithTests(
             connectorType=_gnc.NiceConnectorFromBelow,
             patchString="NiceConnectorFromBelow",
             operation="add",
@@ -137,7 +137,7 @@ class TestCleanConnector:
             yEndCoordsExpected=[15.666, 15.666, 100.0],
         )
 
-    def _RunNiceConnWithTests(  # pylint: disable = too-many-arguments, too-many-locals
+    def _runNiceConnWithTests(  # pylint: disable = too-many-arguments, too-many-locals
         self,
         connectorType,
         addItemCount,
