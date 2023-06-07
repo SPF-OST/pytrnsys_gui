@@ -4,7 +4,7 @@ import trnsysGUI.globalNames as _gnames
 from . import _getEnergyBalanceVariables as _vars
 
 
-def exportSimulatedConnection(doublePipeConnection: _dpc.DoublePipeConnection, unitNumber):
+def exportSimulatedConnection(doublePipeConnection: _dpc.ExportDoublePipeConnection, unitNumber):
     headerAndParameters = _getHeaderAndParameters(doublePipeConnection, unitNumber)
     hydraulicConnection = doublePipeConnection.hydraulicConnection
     inputs = _getInputs(hydraulicConnection)
@@ -14,7 +14,7 @@ def exportSimulatedConnection(doublePipeConnection: _dpc.DoublePipeConnection, u
     return unitText, nextUnitNumber
 
 
-def _getHeaderAndParameters(connection: _dpc.DoublePipeConnection, unitNumber: int) -> str:
+def _getHeaderAndParameters(connection: _dpc.ExportDoublePipeConnection, unitNumber: int) -> str:
     headerAndParameters = f"""\
 UNIT {unitNumber} TYPE 9511
 ! {connection.hydraulicConnection.displayName}
@@ -66,7 +66,7 @@ dpRadNdDist                             ! Radial distance of node 10, m
     return headerAndParameters
 
 
-def _getInputs(hydraulicConnection: _dpc.HydraulicDoublePipeConnection) -> str:
+def _getInputs(hydraulicConnection: _dpc.ExportHydraulicDoublePipeConnection) -> str:
     coldPipe = hydraulicConnection.coldPipe
     hotPipe = hydraulicConnection.hotPipe
 
@@ -91,7 +91,7 @@ INPUTS 6
 
 
 def _getEquations(
-    hydraulicConnection: _dpc.HydraulicDoublePipeConnection,
+    hydraulicConnection: _dpc.ExportHydraulicDoublePipeConnection,
     unitNumber: int,
 ) -> str:
     energyBalanceVariables = _vars.getEnergyBalanceVariables(

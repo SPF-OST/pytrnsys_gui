@@ -28,16 +28,18 @@ _IF_THEN_ELSE_UNIT_TEMPLATE = _jinja.Template(
 <%- if componentName %>
 ! <<componentName>>
 <% endif -%>
-UNIT <<unitNumber>> TYPE 222
+UNIT <<unitNumber>> TYPE <<typeNumber>>
+<% if typeNumber == 223 %>
 PARAMETERS 4
 {_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
 {_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
 {_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
 <<initialTemp>>
+<% endif %>
 INPUTS 3
 <<massFlowRate>> <<posFlowInputTemp>> <<negFlowInputTemp>>
 ***
-0 20 20
+0 <<initialTemp>> <<initialTemp>>
 EQUATIONS <<2 if canonicalMassFlowRate else 1>>
 <<outputTemp>> = [<<unitNumber>>,1]
 <%- if canonicalMassFlowRate %>
@@ -61,12 +63,14 @@ def getIfThenElseUnit(
     posFlowInputTemp: str,
     negFlowInputTemp: str,
     *,
+    typeNumber: _tp.Literal[222, 223] = 222,
     canonicalMassFlowRate: _tp.Optional[str] = None,
     componentName: _tp.Optional[str] = None,
     extraNewlines: str = "\n\n",
 ) -> str:
     unitText = _IF_THEN_ELSE_UNIT_TEMPLATE.render(
         unitNumber=unitNumber,
+        typeNumber=typeNumber,
         outputTemp=outputTemp,
         initialTemp=initialTemp,
         massFlowRate=massFlowRate,

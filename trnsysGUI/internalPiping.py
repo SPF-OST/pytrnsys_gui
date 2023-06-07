@@ -66,9 +66,6 @@ class InternalPiping:
 
 
 class HasInternalPiping:
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
     def getDisplayName(self) -> str:
         raise NotImplementedError()
 

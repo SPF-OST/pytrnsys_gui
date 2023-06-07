@@ -60,7 +60,7 @@ def _getPlaceholdersForPort(
     modelPortItem: _mfn.PortItem,
 ) -> _tp.Dict[str, str]:
     displayName = component.getDisplayName()
-    
+
     if modelPortItem.direction == _mfn.PortItemDirection.OUTPUT:
         outputTemperatureVariableName = _temps.getInternalTemperatureVariableName(
             componentDisplayName=displayName, nodeName=node.name

@@ -1,11 +1,11 @@
 import typing as _tp
 
 import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helper
-from . import doublePipeConnection as _dpc
+import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _dpc
 
 
 def exportDummyConnection(
-    doublePipeConnection: _dpc.HydraulicDoublePipeConnection, unitNumber: int
+    doublePipeConnection: _dpc.ExportHydraulicDoublePipeConnection, unitNumber: int
 ) -> _tp.Tuple[str, int]:
     coldIfThenElseUnitNumber = unitNumber
     coldPipe = doublePipeConnection.coldPipe
@@ -33,8 +33,8 @@ def exportDummyConnection(
 
 
 def _getIfThenElseUnitText(
-    doublePipeConnection: _dpc.HydraulicDoublePipeConnection,
-    pipe: _dpc.SinglePipe,
+    doublePipeConnection: _dpc.ExportHydraulicDoublePipeConnection,
+    pipe: _dpc.DoublePipe,
     unitNumber: int,
 ) -> str:
     canonicalMassFlowRateVariableName = doublePipeConnection.getCanonicalMassFlowRateVariableName(pipe)

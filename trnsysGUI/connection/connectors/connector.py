@@ -1,16 +1,15 @@
 import typing as _tp
 
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehc
+import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.temperatures as _temps
-import trnsysGUI.globalNames as _gnames
 
 
-class Connector(_bi.BlockItem, _ip.HasInternalPiping):
+class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-instance-attributes
     def __init__(self, trnsysType, editor, **kwargs):
         super().__init__(trnsysType, editor, **kwargs)
 
@@ -18,8 +17,11 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
         self.w = 40
         self.h = 40
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self.fromPort = _cspi.createSinglePipePortItem("i", 0, self)
+        self.toPort = _cspi.createSinglePipePortItem("o", 2, self)
+
+        self.inputs.append(self.fromPort)
+        self.outputs.append(self.toPort)
 
         self._updateModels(self.displayName)
 
@@ -76,32 +78,14 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):
         return width, height
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        tempName = _temps.getTemperatureVariableName(
-            self.shallRenameOutputTemperaturesInHydraulicFile(),
-            componentDisplayName=self.displayName,
-            nodeName=self._modelPipe.name,
+        hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
+            self.displayName,
+            self.fromPort,
+            self.toPort,
+            self._modelPipe,
         )
-        mfrName = _helpers.getInputMfrName(self.displayName, self._modelPipe)
 
-        fromConnection = self.inputs[0].getConnection()
-        toConnection = self.outputs[0].getConnection()
-
-        posFlowTempName = _helpers.getTemperatureVariableName(
-            fromConnection, self.inputs[0], _mfn.PortItemType.STANDARD
-        )
-        negFlowTempName = _helpers.getTemperatureVariableName(toConnection, self.outputs[0], _mfn.PortItemType.STANDARD)
+        hydraulicExportConnection = _cehc.createModel(hydraulicConnection)
 
         unitNumber = startingUnit
-        unitText = _helpers.getIfThenElseUnit(
-            unitNumber,
-            tempName,
-            _gnames.SinglePipes.INITIAL_TEMPERATURE,
-            mfrName,
-            posFlowTempName,
-            negFlowTempName,
-            componentName=self.displayName,
-        )
-
-        nextUnitNumber = unitNumber + 1
-
-        return unitText, nextUnitNumber
+        return _he.exportDummyConnection(hydraulicExportConnection, unitNumber)

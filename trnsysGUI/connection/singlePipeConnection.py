@@ -8,11 +8,12 @@ import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
+import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehc
+import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
+import trnsysGUI.connection.hydraulicExport.singlePipe.singlePipeConnection as _hespc
 import trnsysGUI.connection.singlePipeConnectionModel as _model
 import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
-import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
-import trnsysGUI.globalNames as _gnames
 import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.internalPiping as _pi
 import trnsysGUI.massFlowSolver.names as _mnames
@@ -145,46 +146,36 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             [self.modelPipe], {self.modelPipe.fromPort: self.fromPort, self.modelPipe.toPort: self.toPort}
         )
 
-    def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals, too-many-statements
-        inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+        unitNumber = startingUnit
+
+        exportConnection = self._getHydraulicExportConnectionModel()
+        exportHydraulicConnection = exportConnection.hydraulicConnection
+
+        if not exportConnection.shallBeSimulated:
+            return _he.exportDummyConnection(exportHydraulicConnection, unitNumber)
+
+        return self._exportSimulatedPipe(exportHydraulicConnection, unitNumber)
+
+    def _exportSimulatedPipe(self, exportHydraulicConnection, unitNumber) -> _tp.Tuple[str, int]:
+
         canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(
-            componentDisplayName=self.displayName, pipeName=self.modelPipe.name
-        )
-
-        portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
-
-        inputTemperatureVariableName = _helpers.getTemperatureVariableName(
-            portItemsWithParent[0][1], portItemsWithParent[0][0], _mfn.PortItemType.STANDARD
-        )
-        revInputTemperatureVariableName = _helpers.getTemperatureVariableName(
-            portItemsWithParent[1][1], portItemsWithParent[1][0], _mfn.PortItemType.STANDARD
+            componentDisplayName=exportHydraulicConnection.displayName, pipeName=None
         )
 
         outputTemperatureName = _temps.getTemperatureVariableName(
-            self.shallRenameOutputTemperaturesInHydraulicFile(),
-            componentDisplayName=self.displayName,
-            nodeName=self.modelPipe.name,
+            shallRenameOutputInHydraulicFile=False,
+            componentDisplayName=exportHydraulicConnection.displayName,
+            nodeName=None,
         )
 
-        unitNumber = startingUnit
-
-        if not self.shallBeSimulated:
-            unitText = self._getPassThroughPipeUnitText(
-                startingUnit,
-                inputMfrName,
-                canonicalMfrName,
-                inputTemperatureVariableName,
-                revInputTemperatureVariableName,
-                outputTemperatureName,
-            )
-            return unitText, unitNumber + 1
-
+        exportPipe = exportHydraulicConnection.pipe
         unitText = self._getSimulatedPipeUnitText(
             unitNumber,
-            inputMfrName,
+            exportPipe.inputPort.massFlowRateVariableName,
             canonicalMfrName,
-            inputTemperatureVariableName,
-            revInputTemperatureVariableName,
+            exportPipe.inputPort.inputTemperatureVariableName,
+            exportPipe.outputPort.inputTemperatureVariableName,
             outputTemperatureName,
         )
 
@@ -192,27 +183,20 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         return unitText, nextUnitNumber
 
-    def _getPassThroughPipeUnitText(
-        self,
-        unitNumber,
-        inputMfrName,
-        canonicalMfrName,
-        inputTemperatureVariableName,
-        revInputTemperatureVariableName,
-        outputTemperatureName,
-    ):
-        unitText = _helpers.getIfThenElseUnit(
-            unitNumber,
-            outputTemperatureName,
-            _gnames.SinglePipes.INITIAL_TEMPERATURE,
-            inputMfrName,
-            inputTemperatureVariableName,
-            revInputTemperatureVariableName,
-            canonicalMassFlowRate=canonicalMfrName,
-            componentName=self.displayName,
+    def _getHydraulicExportConnectionModel(self) -> _hespc.ExportSinglePipeConnection:
+        hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
+            self.displayName, self.fromPort, self.toPort, self.modelPipe
         )
 
-        return unitText
+        hydraulicExportConnection = _cehc.createModel(hydraulicConnection)
+
+        exportConnection = _hespc.ExportSinglePipeConnection(
+            hydraulicExportConnection,
+            self.lengthInM,
+            self.shallBeSimulated,
+        )
+
+        return exportConnection
 
     def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals
         self,
@@ -235,6 +219,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         convectedHeatFluxName = self.getConvectedHeatFluxVariableName()
         dissipatedHeatFluxName = self.getDissipatedHeatFluxVariableName()
         internalHeatName = self.getInternalHeatVariableName()
+
         unitText = f"""\
 UNIT {unitNumber} TYPE 931
 ! {self.displayName}

@@ -1,0 +1,39 @@
+import dataclasses as _dc
+
+import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.connection.hydraulicExport.common as _com
+import trnsysGUI.connection.hydraulicExport.singlePipe.singlePipeConnection as _hespc
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.singlePipePortItem as _sppi
+
+
+@_dc.dataclass
+class HydraulicSinglePipeConnection:
+    displayName: str
+    fromPort: _sppi.SinglePipePortItem
+    toPort: _sppi.SinglePipePortItem
+    modelPipe: _mfn.Pipe
+
+
+def createModel(hydraulicConnection: HydraulicSinglePipeConnection) -> _hespc.ExportHydraulicSinglePipeConnection:
+    inputTemperature = _helpers.getTemperatureVariableName(
+        hydraulicConnection.toPort.parent, hydraulicConnection.toPort, _mfn.PortItemType.STANDARD
+    )
+    massFlowRate = _helpers.getInputMfrName(hydraulicConnection.displayName, hydraulicConnection.modelPipe)
+    revInputTemperature = _helpers.getTemperatureVariableName(
+        hydraulicConnection.fromPort.parent, hydraulicConnection.fromPort, _mfn.PortItemType.STANDARD
+    )
+
+    # single pipe should not have a name for their model pipes
+    assert not hydraulicConnection.modelPipe.name
+
+    hydraulicExportPipe = _hespc.SinglePipe(
+        _com.InputPort(inputTemperature, massFlowRate),
+        _com.OutputPort(revInputTemperature),
+    )
+
+    exportHydraulicConnection = _hespc.ExportHydraulicSinglePipeConnection(
+        hydraulicConnection.displayName, hydraulicExportPipe
+    )
+
+    return exportHydraulicConnection

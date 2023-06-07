@@ -5,7 +5,7 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.connection.createExportHydraulicDoublePipeConnection as _cehc
+import trnsysGUI.connection.hydraulicExport.doublePipe.createExportHydraulicDoublePipeConnection as _cehc
 import trnsysGUI.connection.createHydraulicModelPipes as _chmp
 import trnsysGUI.connection.doublePipeConnectionModel as _model
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
@@ -134,8 +134,8 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         exportModel = self._getHydraulicExportConnectionModel()
         return _he.export(exportModel, unitNumber)
 
-    def _getHydraulicExportConnectionModel(self) -> _hedpc.DoublePipeConnection:
-        hydraulicConnection = _cehc.HydraulicConnection(
+    def _getHydraulicExportConnectionModel(self) -> _hedpc.ExportDoublePipeConnection:
+        hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
             self.fromPort,
             self.toPort,
@@ -147,7 +147,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         assert isinstance(self.lengthInM, float)
 
-        exportConnection = _hedpc.DoublePipeConnection(
+        exportConnection = _hedpc.ExportDoublePipeConnection(
             hydraulicExportConnection,
             self.lengthInM,
             self.shallBeSimulated,

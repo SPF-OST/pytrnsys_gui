@@ -9,7 +9,8 @@ import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.temperatures as _temps
-from trnsysGUI.massFlowSolver import networkModel as _mfn
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.globalNames as _gnames
 
 
 class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
@@ -118,7 +119,13 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         )
 
         coldEquation = _helpers.getIfThenElseUnit(
-            unitNumber, coldOutputTemp, coldMfr, posFlowColdInputTemp, negFlowColdInputTemp, extraNewlines=""
+            unitNumber,
+            coldOutputTemp,
+            _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE,
+            coldMfr,
+            posFlowColdInputTemp,
+            negFlowColdInputTemp,
+            extraNewlines="",
         )
 
         return coldEquation
@@ -145,7 +152,13 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             doubleConnection, self.outputs[0], _mfn.PortItemType.HOT
         )
         hotEquation = _helpers.getIfThenElseUnit(
-            unitNumber, hotOutputTemp, hotMfr, posFlowHotInputTemp, negFlowHotInputTemp, extraNewlines=""
+            unitNumber,
+            hotOutputTemp,
+            _gnames.SinglePipes.INITIAL_TEMPERATURE,
+            hotMfr,
+            posFlowHotInputTemp,
+            negFlowHotInputTemp,
+            extraNewlines="",
         )
 
         return hotEquation

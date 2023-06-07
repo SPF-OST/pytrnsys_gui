@@ -1,13 +1,14 @@
 import dataclasses as _dc
 
 import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helpers
+import trnsysGUI.connection.hydraulicExport.common as _com
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _hedpc
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 @_dc.dataclass
-class HydraulicConnection:
+class HydraulicDoublePipeConnection:
     displayName: str
     fromPort: _dppi.DoublePipePortItem
     toPort: _dppi.DoublePipePortItem
@@ -15,7 +16,7 @@ class HydraulicConnection:
     hotModelPipe: _mfn.Pipe
 
 
-def createModel(hydraulicConnection: HydraulicConnection) -> _hedpc.HydraulicDoublePipeConnection:
+def createModel(hydraulicConnection: HydraulicDoublePipeConnection) -> _hedpc.ExportHydraulicDoublePipeConnection:
     coldInputTemperature = _helpers.getTemperatureVariableName(
         hydraulicConnection.toPort.parent, hydraulicConnection.toPort, _mfn.PortItemType.COLD
     )
@@ -24,12 +25,12 @@ def createModel(hydraulicConnection: HydraulicConnection) -> _hedpc.HydraulicDou
         hydraulicConnection.fromPort.parent, hydraulicConnection.fromPort, _mfn.PortItemType.COLD
     )
     # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
-    assert hydraulicConnection.coldModelPipe.name and hydraulicConnection.hotModelPipe.name
+    assert hydraulicConnection.coldModelPipe.name
 
-    coldHydraulicExportPipe = _hedpc.SinglePipe(
+    coldHydraulicExportPipe = _hedpc.DoublePipe(
         hydraulicConnection.coldModelPipe.name,
-        _hedpc.InputPort(coldInputTemperature, coldMassFlowRate),
-        _hedpc.OutputPort(coldRevInputTemperature),
+        _com.InputPort(coldInputTemperature, coldMassFlowRate),
+        _com.OutputPort(coldRevInputTemperature),
     )
 
     hotInputTemperature = _helpers.getTemperatureVariableName(
@@ -42,14 +43,14 @@ def createModel(hydraulicConnection: HydraulicConnection) -> _hedpc.HydraulicDou
     # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
     assert hydraulicConnection.hotModelPipe.name
 
-    hotHydraulicExportPipe = _hedpc.SinglePipe(
+    hotHydraulicExportPipe = _hedpc.DoublePipe(
         hydraulicConnection.hotModelPipe.name,
-        _hedpc.InputPort(hotInputTemperature, hotMassFlowRate),
-        _hedpc.OutputPort(hotRevInputTemperature),
+        _com.InputPort(hotInputTemperature, hotMassFlowRate),
+        _com.OutputPort(hotRevInputTemperature),
     )
 
-    hydraulicConnectionModel = _hedpc.HydraulicDoublePipeConnection(
+    exportHydraulicConnection = _hedpc.ExportHydraulicDoublePipeConnection(
         hydraulicConnection.displayName, coldHydraulicExportPipe, hotHydraulicExportPipe
     )
 
-    return hydraulicConnectionModel
+    return exportHydraulicConnection

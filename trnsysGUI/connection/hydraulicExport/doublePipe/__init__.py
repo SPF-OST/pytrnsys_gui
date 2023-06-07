@@ -5,7 +5,7 @@ from . import _simulated as _sim
 from . import doublePipeConnection as _dpc
 
 
-def export(doublePipeConnection: _dpc.DoublePipeConnection, unitNumber: int) -> _tp.Tuple[str, int]:
+def export(doublePipeConnection: _dpc.ExportDoublePipeConnection, unitNumber: int) -> _tp.Tuple[str, int]:
     if doublePipeConnection.shallBeSimulated:
         return _sim.exportSimulatedConnection(doublePipeConnection, unitNumber)
 

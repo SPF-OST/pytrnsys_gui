@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as _tp
 
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
-import trnsysGUI.connection.createExportHydraulicDoublePipeConnection as _cehc
+import trnsysGUI.connection.hydraulicExport.doublePipe.createExportHydraulicDoublePipeConnection as _cehc
 import trnsysGUI.connection.createHydraulicModelPipes as _chmp
 import trnsysGUI.connection.hydraulicExport.doublePipe.dummy as _he
 import trnsysGUI.doublePipePortItem as _dppi
@@ -65,7 +65,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         return internalPiping
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        hydraulicConnection = _cehc.HydraulicConnection(
+        hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
             self.fromPort,
             self.toPort,

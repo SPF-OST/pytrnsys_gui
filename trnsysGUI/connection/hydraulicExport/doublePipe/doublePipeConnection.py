@@ -1,45 +1,31 @@
-import abc as _abc
 import dataclasses as _dc
 
+import trnsysGUI.connection.hydraulicExport.common as _com
 import trnsysGUI.globalNames as _gnames
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.temperatures as _temps
 
 
 @_dc.dataclass
-class PortBase(_abc.ABC):
-    inputTemperatureVariableName: str
-
-
-@_dc.dataclass
-class InputPort(PortBase):
-    massFlowRateVariableName: str
-
-
-@_dc.dataclass
-class OutputPort(PortBase):
-    pass
-
-
-@_dc.dataclass
-class SinglePipe:
+class DoublePipe:
     name: str
-    inputPort: InputPort
-    outputPort: OutputPort
+    inputPort: _com.InputPort
+    outputPort: _com.OutputPort
 
 
 @_dc.dataclass
-class HydraulicDoublePipeConnection:
+class ExportHydraulicDoublePipeConnection:
     displayName: str
-    coldPipe: SinglePipe
-    hotPipe: SinglePipe
+    coldPipe: DoublePipe
+    hotPipe: DoublePipe
 
-    def getOutputTemperatureVariableName(self, pipe: SinglePipe) -> str:
+    def getOutputTemperatureVariableName(self, pipe: DoublePipe) -> str:
+        self._ensureIsOurPipe(pipe)
         return _temps.getTemperatureVariableName(
             shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=pipe.name
         )
 
-    def getInitialOutputTemperatureVariableName(self, pipe: SinglePipe) -> str:
+    def getInitialOutputTemperatureVariableName(self, pipe: DoublePipe) -> str:
         if pipe is self.coldPipe:
             return _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE
 
@@ -48,12 +34,13 @@ class HydraulicDoublePipeConnection:
 
         raise ValueError("`pipe` single pipe does not belong to this double pipe")
 
-    def getCanonicalMassFlowRateVariableName(self, pipe: SinglePipe) -> str:
+    def getCanonicalMassFlowRateVariableName(self, pipe: DoublePipe) -> str:
+        self._ensureIsOurPipe(pipe)
         return _mnames.getCanonicalMassFlowVariableName(componentDisplayName=self.displayName, pipeName=pipe.name)
 
+    def _ensureIsOurPipe(self, pipe: DoublePipe) -> None:
+        if pipe not in [self.coldPipe, self.hotPipe]:
+            raise ValueError("Not our pipe.", pipe)
 
-@_dc.dataclass
-class DoublePipeConnection:
-    hydraulicConnection: HydraulicDoublePipeConnection
-    lengthInM: float
-    shallBeSimulated: bool
+
+ExportDoublePipeConnection = _com.GenericConnection[ExportHydraulicDoublePipeConnection]
