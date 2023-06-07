@@ -1,4 +1,5 @@
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _dpc
+import trnsysGUI.globalNames as _gnames
 
 from . import _getEnergyBalanceVariables as _vars
 
@@ -34,8 +35,8 @@ dpLambdaFl                              ! Thermal conductivity of fluid, kJ/(h*m
 dpCpFl                                  ! Specific heat of fluid, kJ/(kg*K)
 dpViscFl                                ! Viscosity of fluid, kg/(m*h)
 ****** initial conditions ******
-dpTIniCold                              ! Initial fluid temperature - Pipe cold, deg C
-dpTIniHot                               ! Initial fluid temperature - Pipe hot, deg C
+{_gnames.DoublePipes.INITIAL_COLD_TEMPERATURE.ljust(39)} ! Initial fluid temperature - Pipe cold, deg C
+{_gnames.DoublePipes.INITIAL_HOT_TEMPERATURE.ljust(39)} ! Initial fluid temperature - Pipe hot, deg C
 ****** thermal properties soil ******
 dpLamdaSl                               ! Thermal conductivity of soil, kJ/(h*m*K)
 dpRhoSl                                 ! Density of soil, kg/m^3
@@ -77,12 +78,12 @@ INPUTS 6
 {hotPipe.inputPort.massFlowRateVariableName} ! Inlet fluid flow rate - hot pipe, kg/h
 {hotPipe.outputPort.inputTemperatureVariableName} ! ! Other side of pipe - hot pipe, deg C
 *** initial values
-dpTIniCold
+{_gnames.DoublePipes.INITIAL_COLD_TEMPERATURE}
 0
-dpTIniCold
-dpTIniHot
+{_gnames.DoublePipes.INITIAL_COLD_TEMPERATURE}
+{_gnames.DoublePipes.INITIAL_HOT_TEMPERATURE}
 0
-dpTIniHot
+{_gnames.DoublePipes.INITIAL_HOT_TEMPERATURE}
 
 """
     return inputs

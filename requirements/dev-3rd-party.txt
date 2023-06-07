@@ -66,7 +66,7 @@ pywin32-ctypes==0.2.0
     #   pyinstaller
 readme-renderer==35.0
     # via twine
-reloadium==0.9.10
+reloadium==1.1.1
     # via -r requirements\dev-3rd-party.in
 requests==2.28.1
     # via

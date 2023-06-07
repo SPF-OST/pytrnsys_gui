@@ -1436,7 +1436,6 @@ TPiHpEvapMix
 EQUATIONS 1
 TDivHpEvap= [50,1] !Changed automatically
 UNIT 51 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeHpEvap_A
 MTeeHpEvap_B
@@ -1444,9 +1443,14 @@ MTeeHpEvap_C
 TPiDivCooltoHp
 TPiHPEvapOut
 TPiHpEvapMix
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeHpEvap= [51,1] !Changed automatically
+TTeeHpEvap = [51,1] !Changed automatically
 UNIT 52 TYPE 929 !Changed automatically
 PARAMETERS 0
 INPUTS 6
@@ -1472,7 +1476,6 @@ TPiHxCoolWatIn
 EQUATIONS 1
 TDivSHCool= [53,1] !Changed automatically
 UNIT 54 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeCoolRadIn_A
 MTeeCoolRadIn_B
@@ -1480,9 +1483,14 @@ MTeeCoolRadIn_C
 TPiTeeMixSHIn
 TPiTesShOut
 TConn1455
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeCoolRadIn= [54,1] !Changed automatically
+TTeeCoolRadIn = [54,1] !Changed automatically
 UNIT 55 TYPE 929 !Changed automatically
 PARAMETERS 0
 INPUTS 6
@@ -1496,7 +1504,6 @@ TPiCircIn
 EQUATIONS 1
 TDivDhw= [55,1] !Changed automatically
 UNIT 56 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeePieceCirc2_A
 MTeePieceCirc2_B
@@ -1504,9 +1511,14 @@ MTeePieceCirc2_C
 TPiHxDhwSecIn
 TPiDhwMains
 TPiPuCircOut
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeePieceCirc2= [56,1] !Changed automatically
+TTeePieceCirc2 = [56,1] !Changed automatically
 UNIT 57 TYPE 929 !Changed automatically
 PARAMETERS 0
 INPUTS 6
@@ -1552,7 +1564,6 @@ PPiHpToTesShInConv_kW = [59,4]/3600  !Changed automatically
 PPiHpToTesShInInt_kJ = [59,5]  !Changed automatically
 MPiHpToTesShIn = MPiHpToTesShIn_A
 UNIT 60 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeeTesShOut_A
 MTeeTesShOut_B
@@ -1560,9 +1571,14 @@ MTeeTesShOut_C
 TPiHpCondIn
 TPiHpToTesShOut
 TPiTesDhwCond
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeeTesShOut= [60,1] !Changed automatically
+TTeeTesShOut = [60,1] !Changed automatically
 UNIT 61 TYPE 929 !Changed automatically
 PARAMETERS 0
 INPUTS 6
@@ -1608,7 +1624,6 @@ PPiHxDhwInConv_kW = [63,4]/3600  !Changed automatically
 PPiHxDhwInInt_kJ = [63,5]  !Changed automatically
 MPiHxDhwIn = MPiHxDhwIn_A
 UNIT 64 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeePieceCirc1_A
 MTeePieceCirc1_B
@@ -1616,9 +1631,14 @@ MTeePieceCirc1_C
 TPiDhwDemand
 TPiDhwSecOut
 TPiPuCircIn
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeePieceCirc1= [64,1] !Changed automatically
+TTeePieceCirc1 = [64,1] !Changed automatically
 UNIT 65 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1680,7 +1700,6 @@ PPiDhwDemandConv_kW = [67,4]/3600  !Changed automatically
 PPiDhwDemandInt_kJ = [67,5]  !Changed automatically
 MPiDhwDemand = MPiDhwDemand_A
 UNIT 68 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeePiece_6032_A
 MTeePiece_6032_B
@@ -1688,9 +1707,14 @@ MTeePiece_6032_C
 TPiSHOutMix
 TPiTeeMixSHIn
 TPiSHInMix
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeePiece_6032= [68,1] !Changed automatically
+TTeePiece_6032 = [68,1] !Changed automatically
 UNIT 69 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1732,7 +1756,6 @@ PPiRadInConv_kW = [70,4]/3600  !Changed automatically
 PPiRadInInt_kJ = [70,5]  !Changed automatically
 MPiRadIn = MPiRadIn_A
 UNIT 71 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeePiece5329_A
 MTeePiece5329_B
@@ -1740,9 +1763,14 @@ MTeePiece5329_C
 TPiCondToDes
 TPiHpDesIn
 TPiTesDhwToDes
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeePiece5329= [71,1] !Changed automatically
+TTeePiece5329 = [71,1] !Changed automatically
 UNIT 72 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1784,7 +1812,6 @@ PPiHpToTesDhwInConv_kW = [73,4]/3600  !Changed automatically
 PPiHpToTesDhwInInt_kJ = [73,5]  !Changed automatically
 MPiHpToTesDhwIn = MPiHpToTesDhwIn_A
 UNIT 74 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeePiece_6088_A
 MTeePiece_6088_B
@@ -1792,9 +1819,14 @@ MTeePiece_6088_C
 TPiPuHpDhwIn
 TPiHpDesOut
 TPiDesToCond
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeePiece_6088= [74,1] !Changed automatically
+TTeePiece_6088 = [74,1] !Changed automatically
 UNIT 75 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1836,7 +1868,6 @@ PPiHxCoolBriOutConv_kW = [76,4]/3600  !Changed automatically
 PPiHxCoolBriOutInt_kJ = [76,5]  !Changed automatically
 MPiHxCoolBriOut = MPiHxCoolBriOut_A
 UNIT 77 TYPE 929 !Changed automatically
-PARAMETERS 0
 INPUTS 6
 MTeePiece3852_A
 MTeePiece3852_B
@@ -1844,9 +1875,14 @@ MTeePiece3852_C
 TPiHxCoolBriIn
 TPiDivCooltoHp
 TPiDivCool
-0 0 0 20 20 20 
+0
+0
+0
+20.0
+20.0
+20.0
 EQUATIONS 1
-TTeePiece3852= [77,1] !Changed automatically
+TTeePiece3852 = [77,1] !Changed automatically
 UNIT 78 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
