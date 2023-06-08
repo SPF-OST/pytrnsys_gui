@@ -90,6 +90,10 @@ class Helper:
         expectedContent = expectedFilePath.read_text(encoding="windows-1252")
         if replaceInExpected:
             old, new = replaceInExpected
+
+            if old not in expectedContent:
+                raise ValueError(f"Could not find string '{old}' in file '{expectedFilePath}.")
+
             expectedContent = expectedContent.replace(old, new)
 
         assert actualContent == expectedContent

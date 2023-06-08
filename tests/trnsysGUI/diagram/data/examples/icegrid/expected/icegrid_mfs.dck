@@ -139,7 +139,7 @@ MfrQSnkG = 500
 MfrQSnkE = 500
 MfrQSnkF = 500
 
-*** Default global PARAMETERS for TYPES 9511 ***
+*** Default global PARAMETERS for double pipes ***
 CONSTANTS 25
 
 ****** Pipe and soil properties ******
@@ -182,6 +182,11 @@ CONSTANTS 3
 TambAvg = 7.96 ! Average surface temperature in degrees celsius
 dTambAmpl = 13.32 ! Amplitude of surface temperature in n degrees celsius
 ddTcwOffset = 36 ! Days of minimum surface temperature
+
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 484
 mfrSolverAbsTol

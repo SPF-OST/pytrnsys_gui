@@ -31,7 +31,7 @@ TQSnkGH=TQSnkG
 TQSnkEH=TQSnkE
 TQSnkFH=TQSnkF
 
-*** Default global PARAMETERS for TYPES 9511 ***
+*** Default global PARAMETERS for double pipes ***
 CONSTANTS 25
 
 ****** Pipe and soil properties ******
@@ -68,6 +68,11 @@ dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
 dpNrSlAx = 20  ! Number of axial soil nodes
 dpNrSlCirc = 4  ! Number of circumferential soil nodes
+
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 484
 mfrSolverAbsTol

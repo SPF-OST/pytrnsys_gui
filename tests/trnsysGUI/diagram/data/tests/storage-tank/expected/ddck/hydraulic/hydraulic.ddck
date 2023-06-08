@@ -24,6 +24,10 @@ TTesDpL50_10H=TTesDpL50_10
 TColH=TCol
 THPH=THP
 
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 52
 mfrSolverAbsTol

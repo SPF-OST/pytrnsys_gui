@@ -29,11 +29,9 @@ _IF_THEN_ELSE_UNIT_TEMPLATE = _jinja.Template(
 ! <<componentName>>
 <% endif -%>
 UNIT <<unitNumber>> TYPE <<typeNumber>>
-<% if typeNumber == 223 %>
-PARAMETERS 4
+<% if typeNumber == 223 -%>
+PARAMETERS 2
 {_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
-{_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
-{_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
 <<initialTemp>>
 <% endif -%>
 INPUTS 3

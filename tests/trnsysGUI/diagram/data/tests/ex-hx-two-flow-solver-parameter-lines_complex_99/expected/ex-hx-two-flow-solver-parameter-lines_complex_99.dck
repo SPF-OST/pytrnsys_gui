@@ -81,6 +81,8 @@ TFloor3H=TFloor3
 TFloor4H=TFloor4
 TFloor5H=TFloor5
 TFloor6H=TFloor6
+CONSTANTS 1
+spTIni = 20
 UNIT 11 TYPE 9352 !Changed automatically
 PARAMETERS 396
 mfrSolverAbsTol

@@ -71,6 +71,8 @@ TTesInHxH=TTesInHx
 TTesDpL50_10H=TTesDpL50_10
 TColH=TCol
 THPH=THP
+CONSTANTS 1
+spTIni = 20
 UNIT 11 TYPE 9352 !Changed automatically
 PARAMETERS 52
 mfrSolverAbsTol

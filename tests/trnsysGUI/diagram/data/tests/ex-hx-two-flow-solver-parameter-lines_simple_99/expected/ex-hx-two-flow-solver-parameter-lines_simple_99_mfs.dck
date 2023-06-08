@@ -127,6 +127,10 @@ EQUATIONS 2
 TPump88 = TPiTes_Pump88
 TPump93 = TPiPump93_Col
 
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 52
 mfrSolverAbsTol

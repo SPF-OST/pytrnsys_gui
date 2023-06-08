@@ -71,6 +71,8 @@ TTesDpL50_10H=TTesDpL50_10
 TExHxSide1H=TExHxSide1
 TExHxSide2H=TExHxSide2
 TColH=TCol
+CONSTANTS 1
+spTIni = 20
 UNIT 11 TYPE 9352 !Changed automatically
 PARAMETERS 52
 mfrSolverAbsTol

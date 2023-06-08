@@ -34,6 +34,10 @@ TFloor4H=TFloor4
 TFloor5H=TFloor5
 TFloor6H=TFloor6
 
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 396
 mfrSolverAbsTol

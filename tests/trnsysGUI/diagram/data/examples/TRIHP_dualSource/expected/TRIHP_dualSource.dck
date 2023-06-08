@@ -1086,6 +1086,8 @@ TGhxH=TGhx
 THPEvapH=THPEvap
 THPCond1H=THPCond1
 THPCond2H=THPCond2
+CONSTANTS 1
+spTIni = 20
 UNIT 48 TYPE 9352 !Changed automatically
 PARAMETERS 356
 mfrSolverAbsTol

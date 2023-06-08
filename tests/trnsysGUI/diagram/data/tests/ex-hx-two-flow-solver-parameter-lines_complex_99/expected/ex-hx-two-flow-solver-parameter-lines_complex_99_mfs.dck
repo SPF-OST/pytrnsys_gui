@@ -158,6 +158,10 @@ TPUSh6 = TPiShFlToPu6
 TPuHxDhwSec = TPiTesDhwtoPuHx
 TPuOverflowSh = TPiPuOvFl
 
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 396
 mfrSolverAbsTol

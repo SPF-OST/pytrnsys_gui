@@ -34,6 +34,10 @@ THPEvapH=THPEvap
 THPCond1H=THPCond1
 THPCond2H=THPCond2
 
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 356
 mfrSolverAbsTol

@@ -494,9 +494,11 @@ qSysOut_PipeLoss = {SinglePipeTotals.DISSIPATED}
 qSysOut_{SinglePipeTotals.PIPE_INTERNAL_CHANGE} = {SinglePipeTotals.PIPE_INTERNAL_CHANGE}
 
 """
-            doublePipes = [o for o in self.trnsysObj if isinstance(o, DoublePipeConnection)]
+            simulatedDoublePipes = [
+                o for o in self.trnsysObj if isinstance(o, DoublePipeConnection) and o.shallBeSimulated
+            ]
             doublePipesEnergyBalanceEquations = ""
-            if doublePipes:
+            if simulatedDoublePipes:
                 doublePipesEnergyBalanceEquations = f"""\
 EQUATIONS 3
 *** double pipes
@@ -539,6 +541,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         fullExportText += exporter.exportDoublePipeParameters(exportTo=exportTo)
+        fullExportText += exporter.exportSinglePipeParameters()
 
         fullExportText += exporter.exportParametersFlowSolver(simulationUnit, simulationType, descConnLength)
 
