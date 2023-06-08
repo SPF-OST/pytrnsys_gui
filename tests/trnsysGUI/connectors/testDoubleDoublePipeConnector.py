@@ -1,14 +1,14 @@
 import cgitb as _cgitb
 import logging as _log
-import unittest.mock as _mock
 import typing as _tp
+import unittest.mock as _mock
 
 from PyQt5 import QtWidgets as _widgets
 
 import trnsysGUI.connection.connectors.doubleDoublePipeConnector as _ddpc
-import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
@@ -51,8 +51,7 @@ class TestDoubleDoublePipeConnector:
 
         unitNumber = 1
         text, nextUnitNumber = connector.exportPipeAndTeeTypesForTemp(unitNumber)
-        
-        print(text)
+
         assert nextUnitNumber == unitNumber + 2
         assert text == _EXPECTED_TEXT
 

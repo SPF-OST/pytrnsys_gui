@@ -8,20 +8,21 @@ import trnsysGUI.singlePipePortItem as _sppi
 
 
 @_dc.dataclass
-class HydraulicSinglePipeConnection:
-    displayName: str
-    fromPort: _sppi.SinglePipePortItem
-    toPort: _sppi.SinglePipePortItem
+class HydraulicSinglePipeConnection(_com.HydraulicConnectionBase[_sppi.SinglePipePortItem]):
     modelPipe: _mfn.Pipe
 
 
 def createModel(hydraulicConnection: HydraulicSinglePipeConnection) -> _hespc.ExportHydraulicSinglePipeConnection:
     inputTemperature = _helpers.getTemperatureVariableName(
-        hydraulicConnection.toPort.parent, hydraulicConnection.toPort, _mfn.PortItemType.STANDARD
+        hydraulicConnection.toAdjacentHasPiping.hasInternalPiping,
+        hydraulicConnection.toAdjacentHasPiping.sharedPort,
+        _mfn.PortItemType.STANDARD,
     )
     massFlowRate = _helpers.getInputMfrName(hydraulicConnection.displayName, hydraulicConnection.modelPipe)
     revInputTemperature = _helpers.getTemperatureVariableName(
-        hydraulicConnection.fromPort.parent, hydraulicConnection.fromPort, _mfn.PortItemType.STANDARD
+        hydraulicConnection.toAdjacentHasPiping.hasInternalPiping,
+        hydraulicConnection.toAdjacentHasPiping.sharedPort,
+        _mfn.PortItemType.STANDARD,
     )
 
     # single pipe should not have a name for their model pipes

@@ -6,6 +6,7 @@ import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
@@ -80,8 +81,8 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
             self.displayName,
-            self.fromPort,
-            self.toPort,
+            _hecom.getAdjacentConnection(self.fromPort),
+            _hecom.getAdjacentConnection(self.toPort),
             self._modelPipe,
         )
 

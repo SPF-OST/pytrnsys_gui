@@ -2,8 +2,9 @@ import abc as _abc
 import dataclasses as _dc
 import typing as _tp
 
+import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.values as _values
-from trnsysGUI import PortItemBase as _pib, internalPiping as _ip
+import trnsysGUI.internalPiping as _ip
 
 
 @_dc.dataclass
@@ -35,8 +36,23 @@ _TPort = _tp.TypeVar("_TPort", bound=_pib.PortItemBase)
 
 
 @_dc.dataclass
-class GenericAdjacentComponent(_tp.Generic[_TPort]):
+class AdjacentHasInternalPiping(_tp.Generic[_TPort]):
     """A "component" (i.e. a connection or block item) that shares a port with us"""
 
-    component: _ip.HasInternalPiping
+    hasInternalPiping: _ip.HasInternalPiping
     sharedPort: _TPort
+
+
+def getAdjacentConnection(port: _TPort) -> AdjacentHasInternalPiping[_TPort]:
+    return AdjacentHasInternalPiping(port.getConnection(), port)
+
+
+def getAdjacentBlockItem(port: _TPort) -> AdjacentHasInternalPiping[_TPort]:
+    return AdjacentHasInternalPiping(port.parent, port)
+
+
+@_dc.dataclass
+class HydraulicConnectionBase(_tp.Generic[_TPort], _abc.ABC):
+    displayName: str
+    fromAdjacentHasPiping: AdjacentHasInternalPiping[_TPort]
+    toAdjacentHasPiping: AdjacentHasInternalPiping[_TPort]

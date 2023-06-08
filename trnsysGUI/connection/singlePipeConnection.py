@@ -8,6 +8,7 @@ import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
+import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehc
 import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
 import trnsysGUI.connection.hydraulicExport.singlePipe.singlePipeConnection as _hespc
@@ -185,7 +186,10 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
     def _getHydraulicExportConnectionModel(self) -> _hespc.ExportSinglePipeConnection:
         hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
-            self.displayName, self.fromPort, self.toPort, self.modelPipe
+            self.displayName,
+            _hecom.getAdjacentBlockItem(self.fromPort),
+            _hecom.getAdjacentBlockItem(self.toPort),
+            self.modelPipe,
         )
 
         hydraulicExportConnection = _cehc.createModel(hydraulicConnection)
