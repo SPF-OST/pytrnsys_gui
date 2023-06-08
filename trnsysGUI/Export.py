@@ -237,9 +237,9 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         resultText = f"""\
 UNIT {simulationUnit} TYPE {simulationType}
 PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
-{_mnames.ABSOLUTE_TOLERANCE_NAME}
-{_mnames.RELATIVE_TOLERANCE_NAME}
-{_mnames.TOLERANCE_SWITCHING_THRESHOLD_NAME}
+{_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
+{_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
+{_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
 {len(serializedNodes)}
 {jointLines}
 """

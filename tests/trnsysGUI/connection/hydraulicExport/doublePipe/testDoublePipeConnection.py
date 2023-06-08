@@ -127,7 +127,7 @@ UNIT 503 TYPE 222
 INPUTS 3
 MDTeeD_SCnrDCold_A TSCnrDCold TDTeeDCold
 ***
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeD_SCnrDCold = [503,1]
 MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A
@@ -137,7 +137,7 @@ UNIT 504 TYPE 222
 INPUTS 3
 MDTeeD_SCnrDHot_A TDTeeDHot TSCnrDHot
 ***
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeD_SCnrDHot = [504,1]
 MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A

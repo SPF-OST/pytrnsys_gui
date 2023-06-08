@@ -267,9 +267,9 @@ class TestEditor:
     @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
     @_pt.mark.parametrize("testProject", TEST_CASES)
     def testToolUpdateExpectedFiles(self, testProject: _th.Project) -> None:
-        """Make `Helper.ensureFilesAreEqual` always return True, then run a test that generates
-        actual files that you'd with which you'd like to update the expected files. Then run this
-        test tool. Repeat the same for each tests for which you want to update the expected files.
+        """Make `Helper.ensureFilesAreEqual` always succeed, then run a test that generates
+        actual files with which you'd like to update the expected files. Then run this
+        test tool. Repeat the same for each test for which you want to update the expected files.
         Finally, don't forget to check the modifications to the expected files before committing
         and undo the changes to `Helper`! ;)"""
         helper = _th.Helper(testProject)

@@ -14,8 +14,8 @@ class HydraulicSinglePipeConnection(_com.HydraulicConnectionBase[_sppi.SinglePip
 
 def createModel(hydraulicConnection: HydraulicSinglePipeConnection) -> _hespc.ExportHydraulicSinglePipeConnection:
     inputTemperature = _helpers.getTemperatureVariableName(
-        hydraulicConnection.toAdjacentHasPiping.hasInternalPiping,
-        hydraulicConnection.toAdjacentHasPiping.sharedPort,
+        hydraulicConnection.fromAdjacentHasPiping.hasInternalPiping,
+        hydraulicConnection.fromAdjacentHasPiping.sharedPort,
         _mfn.PortItemType.STANDARD,
     )
     massFlowRate = _helpers.getInputMfrName(hydraulicConnection.displayName, hydraulicConnection.modelPipe)

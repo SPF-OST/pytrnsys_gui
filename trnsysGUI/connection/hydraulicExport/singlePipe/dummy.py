@@ -27,7 +27,8 @@ def exportDummyConnection(
         singlePipeConnection.pipe.inputPort.inputTemperatureVariableName,
         singlePipeConnection.pipe.outputPort.inputTemperatureVariableName,
         canonicalMassFlowRate=canonicalMassFlowRateVariableName,
-        extraNewlines=r"\n\n",
+        extraNewlines="\n\n",
     )
 
-    return unitText, unitNumber
+    nextUnitNumber = unitNumber + 1
+    return unitText, nextUnitNumber
