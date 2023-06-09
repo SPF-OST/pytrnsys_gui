@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as _tp
 
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
-import trnsysGUI.connection.createHydraulicModelPipes as _chmp
+import trnsysGUI.connection.createMassFlowSolverNetworkPipes as _cmnp
 import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.connection.hydraulicExport.doublePipe.createExportDoublePipeConnection as _cec
 import trnsysGUI.connection.hydraulicExport.doublePipe.dummy as _he
@@ -27,7 +27,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         self.changeSize()
 
     def _updateModels(self, newDisplayName: str) -> None:
-        self._coldPipe, self._hotPipe = _chmp.createColdAndHotModelPipes()
+        self._coldPipe, self._hotPipe = _cmnp.createMassFlowSolverNetworkPipes()
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG

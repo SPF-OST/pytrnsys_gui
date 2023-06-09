@@ -3,7 +3,7 @@ import typing as _tp
 from trnsysGUI.massFlowSolver import networkModel as _mfn
 
 
-def createColdAndHotModelPipes() -> _tp.Tuple[_mfn.Pipe, _mfn.Pipe]:
+def createMassFlowSolverNetworkPipes() -> _tp.Tuple[_mfn.Pipe, _mfn.Pipe]:
     coldInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
     coldOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
     coldPipe = _mfn.Pipe(coldInput, coldOutput, "Cold")

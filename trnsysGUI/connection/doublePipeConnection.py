@@ -5,7 +5,7 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.connection.createHydraulicModelPipes as _chmp
+import trnsysGUI.connection.createMassFlowSolverNetworkPipes as _cmnp
 import trnsysGUI.connection.doublePipeConnectionModel as _model
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 import trnsysGUI.connection.hydraulicExport.common as _hecom
@@ -151,7 +151,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return exportConnection
 
     def _updateModels(self, newDisplayName: str):
-        self.coldModelPipe, self.hotModelPipe = _chmp.createColdAndHotModelPipes()
+        self.coldModelPipe, self.hotModelPipe = _cmnp.createMassFlowSolverNetworkPipes()
 
     def setMassFlowAndTemperature(
         self, coldMassFlow: float, coldTemperature: float, hotMassFlow: float, hotTemperature: float
