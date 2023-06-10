@@ -1,6 +1,6 @@
 import trnsysGUI.connection.connectorsAndPipesExportHelpers as _helper
 
-_EXPECTED_TYPE_222_UNIT_TEXT = """\
+_EXPECTED_TYPE_2221_UNIT_TEXT = """\
 UNIT 11 TYPE 2221
 PARAMETERS 2
 mfrSolverAbsTol
@@ -28,4 +28,4 @@ class TestConnectorsAndPipesExportHelpers:
             extraNewlines="\n\n",
         )
 
-        assert unitText == _EXPECTED_TYPE_222_UNIT_TEXT
+        assert unitText == _EXPECTED_TYPE_2221_UNIT_TEXT
