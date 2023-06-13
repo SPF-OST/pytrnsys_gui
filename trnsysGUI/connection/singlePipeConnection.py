@@ -150,7 +150,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         unitNumber = startingUnit
 
-        exportConnection = self._getHydraulicExportConnectionModel()
+        exportConnection = self._getHydraulicExportConnection()
         exportHydraulicConnection = exportConnection.hydraulicConnection
 
         if not exportConnection.shallBeSimulated:
@@ -184,7 +184,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         return unitText, nextUnitNumber
 
-    def _getHydraulicExportConnectionModel(self) -> _hespc.ExportSinglePipeConnection:
+    def _getHydraulicExportConnection(self) -> _hespc.ExportSinglePipeConnection:
         hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
             self.displayName,
             _hecom.getAdjacentBlockItem(self.fromPort),
