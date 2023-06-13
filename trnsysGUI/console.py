@@ -35,6 +35,8 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-met
         self.kernel_client = self.kernel_manager.client()
         self.kernel_client.start_channels()
 
+        self.execute("print('')", hidden=True)
+        self.execute("print('FOR LOGGING OUTPUT PLEASE REFER TO THE \"Logging\" TAB JUST ABOVE.')", hidden=True)
         self.execute(f"%cd {dirPathToStartIPythonIn}")
 
     def shutdown(self) -> None:
