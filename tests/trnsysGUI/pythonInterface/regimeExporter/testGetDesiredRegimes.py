@@ -4,7 +4,7 @@ import pathlib as _pl
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI as _GUI
 
-_DATA_DIR_ = _pl.Path(_GUI.__file__).parent / "..\\tests\\trnsysGUI\\data"
+_DATA_DIR_ = _pl.Path(_GUI.__file__).parent / "..\\tests\\trnsysGUI\\data\\diagramForRegimes"
 
 
 class TestGetDesiredRegimes:
