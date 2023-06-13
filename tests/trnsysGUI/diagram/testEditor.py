@@ -193,16 +193,9 @@ class TestEditor:
         temperaturesPrintFilePath = helper.actualProjectFolderPath / temperaturesPintFileName
         self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow)
 
-    @staticmethod
-    def _createMainWindow(helper, qtbot, monkeypatch):
-        def patchedCloseEvent(_, closeEvent):
-            return closeEvent.accept()
-
-        monkeypatch.setattr(
-            _mw.MainWindow,  # type: ignore[attr-defined]
-            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            patchedCloseEvent,
-        )
+    @classmethod
+    def _createMainWindow(cls, helper, qtbot, monkeypatch):
+        cls._configureDontAskWhetherWindowShouldBeClosed(monkeypatch)
 
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
@@ -215,6 +208,17 @@ class TestEditor:
         qtbot.addWidget(mainWindow)
 
         return mainWindow
+
+    @staticmethod
+    def _configureDontAskWhetherWindowShouldBeClosed(monkeypatch) -> None:
+        def patchedCloseEvent(_, closeEvent):
+            return closeEvent.accept()
+
+        monkeypatch.setattr(
+            _mw.MainWindow,  # type: ignore[attr-defined]
+            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
+            patchedCloseEvent,
+        )
 
     @staticmethod
     def _assertMassFlowVisualizerLoadsData(
