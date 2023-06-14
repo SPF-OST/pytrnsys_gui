@@ -32,6 +32,4 @@ class TestPrintRegimesAndCopyFiles:
         _rdopfp.printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow)
         assert True is False
 
-# massFlowSolver should raise error when issue encountered.
-# rest of workflow should be ignored for this regime, instead a warning should be issued
 # non-qtbot solution?
