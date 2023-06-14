@@ -22,6 +22,7 @@ def _createMainWindow(PROJECT_FOLDER, PROJECT_NAME, qtbot):
 
     qtbot.addWidget(mainWindow)
     mainWindow.showBoxOnClose = False
+    mainWindow.editor.forceOverwrite = True
 
     return mainWindow
 

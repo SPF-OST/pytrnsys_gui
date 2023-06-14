@@ -1,24 +1,16 @@
 import os as _os
 import pathlib as _pl
-import pytest as _pt
 import subprocess as _sp
 import typing as _tp
 
 import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
 
-from tests.trnsysGUI.diagram import _testHelper as _th
-import trnsysGUI.project as _prj
-import trnsysGUI as _GUI
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
-import trnsysGUI.mainWindow as _mw
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.diagram.Editor as _de
 
 
-# regimeValue = {regimeName: "", pumps: [], valves [] }
-# regimeValues = df[]
-# for regimeRow in df:
 import trnsysGUI.pump as _pump
 import trnsysGUI.TVentil as _tv
 
@@ -35,6 +27,8 @@ def getPumpsAndValves(pumpsAndValvesNames, mainWindow):
 
 def printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow):
     # createPDF of diagram only
+    pdfName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_diagram.pdf"
+    printDiagramToPDF(pdfName, mainWindow)
 
     regimeValues = _gdr.getRegimesFromFile(_DATA_DIR_ / _DATA_FILENAME_)
     pumpsAndValvesNames = list(regimeValues.columns)
@@ -67,8 +61,8 @@ def printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWi
         massFlowSolverVisualizer.slider.setValue(timeStep)
 
         pdfName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_" + regimeName + ".pdf"
-        print(pdfName)
         printDiagramToPDF(pdfName, mainWindow)
+        massFlowSolverVisualizer.close()
         break
 
 
