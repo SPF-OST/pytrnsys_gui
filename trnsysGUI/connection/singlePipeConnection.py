@@ -17,8 +17,10 @@ import trnsysGUI.internalPiping as _pi
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.singlePipePortItem as _sppi
-import trnsysGUI.segments.singlePipeSegmentItem as _spsi
 import trnsysGUI.temperatures as _temps
+import trnsysGUI.segments.segmentItemFactoryBase as _sif
+import trnsysGUI.segments.singlePipeSegmentItemFactory as _spsif
+
 from . import _massFlowLabels as _mfl
 
 if _tp.TYPE_CHECKING:
@@ -43,6 +45,10 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self._updateModels(self.displayName)
 
     @property
+    def _segmentItemFactory(self) -> _sif.SegmentItemFactoryBase:
+        return _spsif.SinglePipeSegmentItemFactory(self)
+
+    @property
     def fromPort(self) -> _sppi.SinglePipePortItem:
         assert isinstance(self._fromPort, _sppi.SinglePipePortItem)
         return self._fromPort
@@ -59,9 +65,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             )
 
         return self.modelPipe
-
-    def _createSegmentItem(self, startNode, endNode):
-        return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
 
     def _updateModels(self, newDisplayName: str) -> None:
         fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
