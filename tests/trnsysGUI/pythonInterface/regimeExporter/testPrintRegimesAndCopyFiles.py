@@ -1,6 +1,6 @@
 import unittest as _ut
 import pathlib as _pl
-from diff_pdf_visually import pdf_similar
+import diff_pdf_visually as _dpv
 
 import pytrnsys.utils.log as _ulog
 
@@ -43,20 +43,26 @@ class TestPrintRegimesAndCopyFiles:
         assert pdfPathDiagram.is_file()
         assert pdfPathName1.is_file()
         assert pdfPathName2.is_file()
-        pdf_similar(pdfPathDiagram, _EXPECTED_PDFS_DIR_ / pdfDiagram)
-        pdf_similar(pdfPathName1, _EXPECTED_PDFS_DIR_ / pdfName1)
-        pdf_similar(pdfPathName2, _EXPECTED_PDFS_DIR_ / pdfName2)
+        _dpv.pdf_similar(pdfPathDiagram, _EXPECTED_PDFS_DIR_ / pdfDiagram)
+        _dpv.pdf_similar(pdfPathName1, _EXPECTED_PDFS_DIR_ / pdfName1)
+        _dpv.pdf_similar(pdfPathName2, _EXPECTED_PDFS_DIR_ / pdfName2)
 
     def testUsingQtBotForGivenRegimes(self, qtbot):
         onlyTheseRegimes = ["name1"]
         mainWindow = _createMainWindow(_DATA_DIR_, _PROJECT_NAME_, qtbot)
         _rdopfp.printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow, onlyTheseRegimes=onlyTheseRegimes)
+        pdfDiagram = _PROJECT_NAME_ + "_diagram.pdf"
         pdfName1 = _PROJECT_NAME_ + "_name1.pdf"
         pdfName2 = _PROJECT_NAME_ + "_name2.pdf"
+        pdfPathDiagram = _DATA_DIR_ / pdfDiagram
         pdfPathName1 = _DATA_DIR_ / pdfName1
         pdfPathName2 = _DATA_DIR_ / pdfName2
+        assert not pdfPathDiagram.is_file()
         assert pdfPathName1.is_file()
         assert not pdfPathName2.is_file()
+        _dpv.pdf_similar(pdfPathName1, _EXPECTED_PDFS_DIR_ / pdfName1)
+
+
 
 
 

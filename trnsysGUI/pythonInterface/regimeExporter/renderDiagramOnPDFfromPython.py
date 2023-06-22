@@ -41,8 +41,9 @@ def getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow):
 
 def printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None): # list for onlyTheseRegimes
     # createPDF of diagram only
-    pdfName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_diagram.pdf"
-    printDiagramToPDF(pdfName, mainWindow)
+    if not onlyTheseRegimes:
+        pdfName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_diagram.pdf"
+        printDiagramToPDF(pdfName, mainWindow)
 
     regimeValues = _gdr.getRegimes(_DATA_DIR_ / _DATA_FILENAME_, onlyTheseRegimes)
     pumpsAndValvesNames = list(regimeValues.columns)
