@@ -19,3 +19,11 @@ def getRegimesFromFile(fileName):
 #
 # if isPump(name):
 # if isValve(name):
+
+
+def getRegimes(filePath, onlyTheseRegimes):
+    regimeValues = getRegimesFromFile(filePath)
+    regimeValues = regimeValues.set_index('regimeName')
+    if onlyTheseRegimes:
+        return regimeValues.loc[onlyTheseRegimes]
+    return regimeValues

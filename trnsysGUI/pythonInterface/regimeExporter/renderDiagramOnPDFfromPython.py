@@ -5,6 +5,8 @@ import typing as _tp
 
 import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
+import PyQt5.QtSvg as _qtsvg
+import PyQt5.QtCore as _qtc
 
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.MassFlowVisualizer as _mfv
@@ -14,36 +16,48 @@ import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.pump as _pump
 import trnsysGUI.TVentil as _tv
 
+import trnsysGUI.WTap_main as _wtm
 
-def getPumpsAndValves(pumpsAndValvesNames, mainWindow):
+
+def getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow):
     pumpsAndValves = []
+    mainTaps = dict()
     blockItemsAndConnections = mainWindow.editor.trnsysObj
     for blockItem in blockItemsAndConnections:
         if isinstance(blockItem, _pump.Pump) or isinstance(blockItem, _tv.TVentil):
             if blockItem.displayName in pumpsAndValvesNames:
                 pumpsAndValves.append(blockItem)
-    return pumpsAndValves
+        elif isinstance(blockItem, _wtm.WTap_main):
+            mainTaps[blockItem.displayName] = blockItem
+
+    return pumpsAndValves, mainTaps
+
+# def changeMfrOfTaps(tapNames):
+#     with in_place.InPlace('data.txt') as file:
+#         for line in file:
+#             line = line.replace('test', 'testZ')
+#             file.write(line)
 
 
-def printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow):
+def printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None): # list for onlyTheseRegimes
     # createPDF of diagram only
     pdfName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_diagram.pdf"
     printDiagramToPDF(pdfName, mainWindow)
 
-    regimeValues = _gdr.getRegimesFromFile(_DATA_DIR_ / _DATA_FILENAME_)
+    regimeValues = _gdr.getRegimes(_DATA_DIR_ / _DATA_FILENAME_, onlyTheseRegimes)
     pumpsAndValvesNames = list(regimeValues.columns)
-    pumpsAndValvesNames.remove('regimeName')
+    # pumpsAndValvesNames.remove('regimeName')
     massFlowRatesPrintFileName = f"{_PROJECT_NAME_}_Mfr.prt"
     temperaturesPintFileName = f"{_PROJECT_NAME_}_T.prt"
     massFlowRatesPrintFilePath = _DATA_DIR_ / massFlowRatesPrintFileName
     temperaturesPrintFilePath = _DATA_DIR_ / temperaturesPintFileName
-    pumpsAndValves = getPumpsAndValves(pumpsAndValvesNames, mainWindow)
+    pumpsAndValves, mainTaps = getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow)
 
-    for ix in regimeValues.index:
-        regimeRow = regimeValues.loc[ix]
-        regimeName = regimeRow["regimeName"]
+    for regimeName in regimeValues.index:
+        regimeRow = regimeValues.loc[regimeName]
+        # regimeName = regimeRow["regimeName"]
 
-        adjustPumpsAndValves(pumpsAndValves, regimeRow)
+        adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps)
 
         exception = runMassFlowSolver(mainWindow)
 
@@ -61,12 +75,13 @@ def printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWi
         massFlowSolverVisualizer.slider.setValue(timeStep)
 
         pdfName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_" + regimeName + ".pdf"
+        svgName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_" + regimeName + ".svg"
         printDiagramToPDF(pdfName, mainWindow)
+        printDiagramToSVG(svgName, mainWindow)
         massFlowSolverVisualizer.close()
-        break
 
 
-def adjustPumpsAndValves(pumpsAndValves, regimeRow):
+def adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps):
 
     for blockItem in pumpsAndValves:
         blockItemName = blockItem.displayName
@@ -74,6 +89,9 @@ def adjustPumpsAndValves(pumpsAndValves, regimeRow):
         if isinstance(blockItem, _pump.Pump):
             # assert desiredValue meaningful
             blockItem.massFlowRateInKgPerH = desiredValue
+            if pumpTapPairs and (blockItemName in pumpTapPairs):
+                associatedTap = pumpTapPairs[blockItemName]
+                mainTaps[associatedTap].massFlowRateInKgPerH = desiredValue
         elif isinstance(blockItem, _tv.TVentil):
             # assert desiredValue meaningful
             blockItem.positionForMassFlowSolver = desiredValue
@@ -115,6 +133,18 @@ def printDiagramToPDF(fileName, mainWindow):
         printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
         printer.setOutputFileName(fileName)
         painter = _qtg.QPainter(printer)
+        mainWindow.editor.diagramScene.render(painter)
+        painter.end()
+
+
+def printDiagramToSVG(fileName, mainWindow):
+    # upside down and tiny compared to canvas
+    if fileName != "":
+        generator = _qtsvg.QSvgGenerator()
+        generator.setSize(_qtc.QSize(1600, 1600))
+        generator.setViewBox(_qtc.QRect(0, 0, 1600, 1600))
+        generator.setFileName(fileName)
+        painter = _qtg.QPainter(generator)
         mainWindow.editor.diagramScene.render(painter)
         painter.end()
 
