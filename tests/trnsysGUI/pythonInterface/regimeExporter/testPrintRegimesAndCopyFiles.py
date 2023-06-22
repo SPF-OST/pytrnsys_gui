@@ -1,6 +1,5 @@
-import unittest as _ut
 import pathlib as _pl
-import diff_pdf_visually as _dpv
+import matplotlib.testing.compare as _mpltc
 
 import pytrnsys.utils.log as _ulog
 
@@ -10,13 +9,14 @@ import trnsysGUI.project as _prj
 import trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython as _rdopfp
 
 _PROJECT_NAME_ = "diagramForRegimes"
-_DATA_DIR_ = _pl.Path(_GUI.__file__).parent / "..\\tests\\trnsysGUI\\data\\diagramForRegimes"
+_DATA_DIR_ = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME_}"
 _DATA_FILENAME_ = "regimes.csv"
 _EXPECTED_PDFS_DIR_ = _DATA_DIR_ / "expectedPDFs"
 
 _DIAGRAM_ENDING_ = "_diagram.pdf"
 _NAME1_ENDING_ = "_name1.pdf"
 _NAME2_ENDING_ = "_name2.pdf"
+_NAME1_SVG_ENDING_ = "_name1.svg"
 
 
 def _getExpectedAndNewPdfPaths(ending):
@@ -55,20 +55,21 @@ class TestPrintRegimesAndCopyFiles:
         self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_, _EXPECTED_NAME1_PATH_)
         self._FileExistsAndIsCorrect(_NEW_NAME2_PATH_, _EXPECTED_NAME2_PATH_)
 
-    def _FileExistsAndIsCorrect(self, producedPdf, expectedPdf):
+    @staticmethod
+    def _FileExistsAndIsCorrect(producedPdf, expectedPdf):
         assert producedPdf.is_file()
-        _dpv.pdf_similar(producedPdf, expectedPdf)
+        _mpltc.compare_images(str(producedPdf), str(expectedPdf), 0, in_decorator=False)
 
     def testUsingQtBotForGivenRegimes(self, qtbot):
         onlyTheseRegimes = ["name1"]
         mainWindow = _createMainWindow(_DATA_DIR_, _PROJECT_NAME_, qtbot)
-        _rdopfp.printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow, onlyTheseRegimes=onlyTheseRegimes)
+        _rdopfp.printRegimesAndCopyFiles(
+            _DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow, onlyTheseRegimes=onlyTheseRegimes
+        )
         self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_, _EXPECTED_NAME1_PATH_)
+        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_, _EXPECTED_DIAGRAM_PATH_)
         assert not _NEW_DIAGRAM_PATH_.is_file()
         assert not _NEW_NAME2_PATH_.is_file()
-
-
-
 
 
 # non-qtbot solution?

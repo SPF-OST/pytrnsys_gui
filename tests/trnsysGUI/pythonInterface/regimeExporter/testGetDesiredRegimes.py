@@ -1,5 +1,6 @@
-import pandas as _pd
 import pathlib as _pl
+
+import pandas as _pd
 import pytest as _pt
 
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
@@ -30,4 +31,3 @@ class TestGetDesiredRegimes:
         fileName = _DATA_DIR_ / "regimes_incorrect.csv"
         with _pt.raises(ValueError, match=f"Column name '{_COL_NAME_}' not found."):
             _gdr.getRegimesFromFile(fileName)
-

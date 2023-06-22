@@ -4,11 +4,11 @@ import pandas as _pd
 
 
 def getRegimesFromFile(fileName):
-    df = _pd.read_csv(fileName)
-    _COL_NAME_ = "regimeName"
-    if _COL_NAME_ in df.keys():
-        return df
-    raise ValueError(f"Column name '{_COL_NAME_}' not found.")
+    table = _pd.read_csv(fileName)
+    colName = "regimeName"
+    if colName in table.keys():
+        return table
+    raise ValueError(f"Column name '{colName}' not found.")
 
 # error handling?
 #   - will throw "fileNotFoundError" as it is.

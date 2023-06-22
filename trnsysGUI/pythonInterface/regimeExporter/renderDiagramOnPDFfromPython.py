@@ -21,16 +21,17 @@ import trnsysGUI.WTap_main as _wtm
 
 def getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow):
     pumpsAndValves = []
-    mainTaps = dict()
+    mainTaps = {}
     blockItemsAndConnections = mainWindow.editor.trnsysObj
     for blockItem in blockItemsAndConnections:
-        if isinstance(blockItem, _pump.Pump) or isinstance(blockItem, _tv.TVentil):
+        if isinstance(blockItem, (_pump.Pump, _tv.TVentil)):
             if blockItem.displayName in pumpsAndValvesNames:
                 pumpsAndValves.append(blockItem)
         elif isinstance(blockItem, _wtm.WTap_main):
             mainTaps[blockItem.displayName] = blockItem
 
     return pumpsAndValves, mainTaps
+
 
 # def changeMfrOfTaps(tapNames):
 #     with in_place.InPlace('data.txt') as file:
@@ -39,7 +40,9 @@ def getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow):
 #             file.write(line)
 
 
-def printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None): # list for onlyTheseRegimes
+def printRegimesAndCopyFiles(
+    _DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None
+):  # list for onlyTheseRegimes
     # createPDF of diagram only
     if not onlyTheseRegimes:
         pdfName = str(_DATA_DIR_) + "\\" + _PROJECT_NAME_ + "_diagram.pdf"
@@ -97,7 +100,7 @@ def adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps):
             # assert desiredValue meaningful
             blockItem.positionForMassFlowSolver = desiredValue
         else:
-            raise TypeError(f'Encountered blockItem of type {blockItem}, instead of a pump or a Valve')
+            raise TypeError(f"Encountered blockItem of type {blockItem}, instead of a pump or a Valve")
 
 
 def runMassFlowSolver(mainWindow) -> _tp.Optional[Exception]:
@@ -110,7 +113,7 @@ def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor):  # type: ignore[n
 
     trnExePath = str(_getTrnExePath())
 
-    skipOther, exception = runDck(trnExePath, exportedFilePath)
+    _, exception = runDck(trnExePath, exportedFilePath)
     return exception
 
 
