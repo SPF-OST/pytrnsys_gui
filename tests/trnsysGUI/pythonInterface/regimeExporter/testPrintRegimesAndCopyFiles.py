@@ -19,16 +19,17 @@ _NAME2_ENDING_ = "_name2.pdf"
 _NAME1_SVG_ENDING_ = "_name1.svg"
 
 
-def _getExpectedAndNewPdfPaths(ending):
+def _getExpectedAndNewFilePaths(ending):
     pdfName = _PROJECT_NAME_ + ending
     expectedPdfPath = _EXPECTED_PDFS_DIR_ / pdfName
     newPdfPath = _DATA_DIR_ / pdfName
     return expectedPdfPath, newPdfPath
 
 
-_EXPECTED_DIAGRAM_PATH_, _NEW_DIAGRAM_PATH_ = _getExpectedAndNewPdfPaths(_DIAGRAM_ENDING_)
-_EXPECTED_NAME1_PATH_, _NEW_NAME1_PATH_ = _getExpectedAndNewPdfPaths(_NAME1_ENDING_)
-_EXPECTED_NAME2_PATH_, _NEW_NAME2_PATH_ = _getExpectedAndNewPdfPaths(_NAME2_ENDING_)
+_EXPECTED_DIAGRAM_PATH_, _NEW_DIAGRAM_PATH_ = _getExpectedAndNewFilePaths(_DIAGRAM_ENDING_)
+_EXPECTED_NAME1_PATH_, _NEW_NAME1_PATH_ = _getExpectedAndNewFilePaths(_NAME1_ENDING_)
+_EXPECTED_NAME2_PATH_, _NEW_NAME2_PATH_ = _getExpectedAndNewFilePaths(_NAME2_ENDING_)
+_EXPECTED_NAME1_SVG_PATH_, _NEW_NAME1_SVG_PATH_ = _getExpectedAndNewFilePaths(_NAME1_SVG_ENDING_)
 
 
 def _createMainWindow(PROJECT_FOLDER, PROJECT_NAME, qtbot):
@@ -47,18 +48,24 @@ def _createMainWindow(PROJECT_FOLDER, PROJECT_NAME, qtbot):
 
 
 class TestPrintRegimesAndCopyFiles:
+    def testMplInstallation(self):
+        assert 'pdf' in _mpltc.comparable_formats()
+        assert 'svg' in _mpltc.comparable_formats()
+
     def testUsingQtBot(self, qtbot):
         mainWindow = _createMainWindow(_DATA_DIR_, _PROJECT_NAME_, qtbot)
         _rdopfp.printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _DATA_FILENAME_, mainWindow)
 
         self._FileExistsAndIsCorrect(_NEW_DIAGRAM_PATH_, _EXPECTED_DIAGRAM_PATH_)
         self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_, _EXPECTED_NAME1_PATH_)
+        self._FileExistsAndIsCorrect(_NEW_NAME1_SVG_PATH_, _EXPECTED_NAME1_SVG_PATH_)
         self._FileExistsAndIsCorrect(_NEW_NAME2_PATH_, _EXPECTED_NAME2_PATH_)
 
+
     @staticmethod
-    def _FileExistsAndIsCorrect(producedPdf, expectedPdf):
-        assert producedPdf.is_file()
-        _mpltc.compare_images(str(producedPdf), str(expectedPdf), 0, in_decorator=False)
+    def _FileExistsAndIsCorrect(producedFile, expectedFile):
+        assert producedFile.is_file()
+        _mpltc.compare_images(str(producedFile), str(expectedFile), 0, in_decorator=False)
 
     def testUsingQtBotForGivenRegimes(self, qtbot):
         onlyTheseRegimes = ["name1"]
