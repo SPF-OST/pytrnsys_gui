@@ -5,6 +5,7 @@ import typing as _tp
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.values as _values
 import trnsysGUI.internalPiping as _ip
+from trnsysGUI.connection import connectorsAndPipesExportHelpers as _helpers
 
 
 @_dc.dataclass
@@ -53,3 +54,18 @@ class HydraulicConnectionBase(_abc.ABC):
     displayName: str
     fromAdjacentHasPiping: AdjacentHasInternalPiping
     toAdjacentHasPiping: AdjacentHasInternalPiping
+
+
+def getTemperatureMassFlowAndReverseTemperatureVariableNames(hydraulicConnection, pipe, portItemType):
+    inputTemperature = _helpers.getTemperatureVariableName(
+        hydraulicConnection.fromAdjacentHasPiping.hasInternalPiping,
+        hydraulicConnection.fromAdjacentHasPiping.sharedPort,
+        portItemType,
+    )
+    massFlowRate = _helpers.getInputMfrName(hydraulicConnection.displayName, pipe)
+    revInputTemperature = _helpers.getTemperatureVariableName(
+        hydraulicConnection.toAdjacentHasPiping.hasInternalPiping,
+        hydraulicConnection.toAdjacentHasPiping.sharedPort,
+        portItemType,
+    )
+    return inputTemperature, massFlowRate, revInputTemperature

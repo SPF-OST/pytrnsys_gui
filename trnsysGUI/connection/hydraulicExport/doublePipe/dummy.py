@@ -11,14 +11,38 @@ def exportDummyConnection(
 ) -> _tp.Tuple[str, int]:
     coldIfThenElseUnitNumber = unitNumber
     coldPipe = doublePipeConnection.coldPipe
-    coldUnitText = _getIfThenElseUnitText(
-        doublePipeConnection, coldPipe, coldIfThenElseUnitNumber, shallDefineCanonicalMassFlowVariables
+
+    coldCanonicalMassFlowRateVariableName: _tp.Optional[str] = None
+    if shallDefineCanonicalMassFlowVariables:
+        coldCanonicalMassFlowRateVariableName = doublePipeConnection.coldCanonicalMassFlowRateVariableName
+
+    coldUnitText = _helper.getIfThenElseUnit(
+        coldIfThenElseUnitNumber,
+        doublePipeConnection.coldOutputTemperatureVariableName,
+        doublePipeConnection.initialColdOutputTemperatureVariableName,
+        coldPipe.inputPort.massFlowRateVariableName,
+        coldPipe.inputPort.inputTemperatureVariableName,
+        coldPipe.outputPort.inputTemperatureVariableName,
+        canonicalMassFlowRate=coldCanonicalMassFlowRateVariableName,
+        extraNewlines="",
     )
 
     hotIfThenElseUnitNumber = unitNumber + 1
     hotPipe = doublePipeConnection.hotPipe
-    hotUnitText = _getIfThenElseUnitText(
-        doublePipeConnection, hotPipe, hotIfThenElseUnitNumber, shallDefineCanonicalMassFlowVariables
+
+    hotCanonicalMassFlowRateVariableName: _tp.Optional[str] = None
+    if shallDefineCanonicalMassFlowVariables:
+        hotCanonicalMassFlowRateVariableName = doublePipeConnection.hotCanonicalMassFlowRateVariableName
+
+    hotUnitText = _helper.getIfThenElseUnit(
+        hotIfThenElseUnitNumber,
+        doublePipeConnection.hotOutputTemperatureVariableName,
+        doublePipeConnection.initialHotOutputTemperatureVariableName,
+        hotPipe.inputPort.massFlowRateVariableName,
+        hotPipe.inputPort.inputTemperatureVariableName,
+        hotPipe.outputPort.inputTemperatureVariableName,
+        canonicalMassFlowRate=hotCanonicalMassFlowRateVariableName,
+        extraNewlines="",
     )
 
     dummyConnectionText = f"""\
@@ -36,30 +60,3 @@ def exportDummyConnection(
     nextFreeUnitNumber = unitNumber + 2
 
     return dummyConnectionText, nextFreeUnitNumber
-
-
-def _getIfThenElseUnitText(
-    doublePipeConnection: _dpc.ExportHydraulicDoublePipeConnection,
-    pipe: _dpc.DoublePipe,
-    unitNumber: int,
-    shallDefineCanonicalMassFlowVariables: bool,
-) -> str:
-    canonicalMassFlowRateVariableName: _tp.Optional[str] = None
-    if shallDefineCanonicalMassFlowVariables:
-        canonicalMassFlowRateVariableName = doublePipeConnection.getCanonicalMassFlowRateVariableName(pipe)
-
-    outputTemperatureVariableName = doublePipeConnection.getOutputTemperatureVariableName(pipe)
-    initialOutputTemperatureVariableName = doublePipeConnection.getInitialOutputTemperatureVariableName(pipe)
-
-    unitText = _helper.getIfThenElseUnit(
-        unitNumber,
-        outputTemperatureVariableName,
-        initialOutputTemperatureVariableName,
-        pipe.inputPort.massFlowRateVariableName,
-        pipe.inputPort.inputTemperatureVariableName,
-        pipe.outputPort.inputTemperatureVariableName,
-        canonicalMassFlowRate=canonicalMassFlowRateVariableName,
-        extraNewlines="",
-    )
-
-    return unitText

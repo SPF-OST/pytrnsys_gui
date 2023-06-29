@@ -104,20 +104,16 @@ def _getEquations(
         f"{v.name} = [{unitNumber},{v.outputNumber}]*{v.conversionFactor} ! {v.comment}" for v in energyBalanceVariables
     )
     coldPipe = hydraulicConnection.coldPipe
-    coldOutputTemperature = hydraulicConnection.getOutputTemperatureVariableName(coldPipe)
-    coldCanonicalMassFlowRate = hydraulicConnection.getCanonicalMassFlowRateVariableName(coldPipe)
-
     hotPipe = hydraulicConnection.hotPipe
-    hotOutputTemperature = hydraulicConnection.getOutputTemperatureVariableName(hotPipe)
-    hotCanonicalMassFlow = hydraulicConnection.getCanonicalMassFlowRateVariableName(hotPipe)
 
+    conn = hydraulicConnection
     equations = f"""\
 EQUATIONS {4 + len(energyBalanceVariables)}
-{coldOutputTemperature} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
-{coldCanonicalMassFlowRate} = {coldPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.coldOutputTemperatureVariableName} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
+{conn.coldCanonicalMassFlowRateVariableName} = {coldPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
 
-{hotOutputTemperature} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
-{hotCanonicalMassFlow} = {hotPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.hotOutputTemperatureVariableName} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
+{conn.hotCanonicalMassFlowRateVariableName} = {hotPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
 
 {formattedEnergyBalanceVariables}
 

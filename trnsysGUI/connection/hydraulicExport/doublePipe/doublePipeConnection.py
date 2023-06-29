@@ -2,12 +2,12 @@ import dataclasses as _dc
 
 import trnsysGUI.connection.hydraulicExport.common as _com
 import trnsysGUI.globalNames as _gnames
-import trnsysGUI.massFlowSolver.names as _mnames
-import trnsysGUI.temperatures as _temps
+from trnsysGUI import temperatures as _temps
+from trnsysGUI.massFlowSolver import names as _mnames
 
 
 @_dc.dataclass
-class DoublePipe:
+class Pipe:
     name: str
     inputPort: _com.InputPort
     outputPort: _com.OutputPort
@@ -16,31 +16,40 @@ class DoublePipe:
 @_dc.dataclass
 class ExportHydraulicDoublePipeConnection:
     displayName: str
-    coldPipe: DoublePipe
-    hotPipe: DoublePipe
+    coldPipe: Pipe
+    hotPipe: Pipe
 
-    def getOutputTemperatureVariableName(self, pipe: DoublePipe) -> str:
-        self._ensureIsOurPipe(pipe)
+    @property
+    def coldOutputTemperatureVariableName(self) -> str:
         return _temps.getTemperatureVariableName(
-            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=pipe.name
+            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=self.coldPipe.name
         )
 
-    def getInitialOutputTemperatureVariableName(self, pipe: DoublePipe) -> str:
-        if pipe is self.coldPipe:
-            return _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE
+    @property
+    def hotOutputTemperatureVariableName(self) -> str:
+        return _temps.getTemperatureVariableName(
+            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=self.hotPipe.name
+        )
 
-        if pipe is self.hotPipe:
-            return _gnames.DoublePipes.INITIAL_HOT_TEMPERATURE
+    @property
+    def initialColdOutputTemperatureVariableName(self) -> str:
+        return _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE
 
-        raise ValueError("`pipe` single pipe does not belong to this double pipe")
+    @property
+    def initialHotOutputTemperatureVariableName(self) -> str:
+        return _gnames.DoublePipes.INITIAL_HOT_TEMPERATURE
 
-    def getCanonicalMassFlowRateVariableName(self, pipe: DoublePipe) -> str:
-        self._ensureIsOurPipe(pipe)
-        return _mnames.getCanonicalMassFlowVariableName(componentDisplayName=self.displayName, pipeName=pipe.name)
+    @property
+    def coldCanonicalMassFlowRateVariableName(self) -> str:
+        return _mnames.getCanonicalMassFlowVariableName(
+            componentDisplayName=self.displayName, pipeName=self.coldPipe.name
+        )
 
-    def _ensureIsOurPipe(self, pipe: DoublePipe) -> None:
-        if pipe not in [self.coldPipe, self.hotPipe]:
-            raise ValueError("Not our pipe.", pipe)
+    @property
+    def hotCanonicalMassFlowRateVariableName(self) -> str:
+        return _mnames.getCanonicalMassFlowVariableName(
+            componentDisplayName=self.displayName, pipeName=self.hotPipe.name
+        )
 
 
 ExportDoublePipeConnection = _com.GenericConnection[ExportHydraulicDoublePipeConnection]

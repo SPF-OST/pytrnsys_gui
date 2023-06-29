@@ -5,12 +5,12 @@ import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _
 _SIMULATED_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
     _model.ExportHydraulicDoublePipeConnection(
         displayName="DTeeD_SCnrD",
-        coldPipe=_model.DoublePipe(
+        coldPipe=_model.Pipe(
             name="Cold",
             inputPort=_com.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
             outputPort=_com.OutputPort("TDTeeDCold"),
         ),
-        hotPipe=_model.DoublePipe(
+        hotPipe=_model.Pipe(
             name="Hot",
             inputPort=_com.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
             outputPort=_com.OutputPort("TSCnrDHot"),
@@ -105,12 +105,12 @@ DTeeD_SCnrDSlInt = [503,16]*1/3600 ! Change in soil's internal heat content comp
 _DUMMY_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
     _model.ExportHydraulicDoublePipeConnection(
         displayName="DTeeD_SCnrD",
-        coldPipe=_model.DoublePipe(
+        coldPipe=_model.Pipe(
             name="Cold",
             inputPort=_com.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
             outputPort=_com.OutputPort("TDTeeDCold"),
         ),
-        hotPipe=_model.DoublePipe(
+        hotPipe=_model.Pipe(
             name="Hot",
             inputPort=_com.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
             outputPort=_com.OutputPort("TSCnrDHot"),

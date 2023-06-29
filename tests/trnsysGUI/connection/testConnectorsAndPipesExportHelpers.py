@@ -24,7 +24,6 @@ class TestConnectorsAndPipesExportHelpers:
             massFlowRate="MSCnr1Cold_A",
             posFlowInputTemp="TSCnr1_DTeeACold",
             negFlowInputTemp="TSCnr1_QSrc1",
-            typeNumber=2221,
             extraNewlines="\n\n",
         )
 
