@@ -2,12 +2,11 @@ import dataclasses as _dc
 
 import trnsysGUI.connection.hydraulicExport.common as _com
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _hedpc
-import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 @_dc.dataclass
-class HydraulicDoublePipeConnection(_com.HydraulicConnectionBase[_dppi.DoublePipePortItem]):
+class HydraulicDoublePipeConnection(_com.HydraulicConnectionBase):
     coldModelPipe: _mfn.Pipe
     hotModelPipe: _mfn.Pipe
 
@@ -18,7 +17,11 @@ def createModel(hydraulicConnection: HydraulicDoublePipeConnection) -> _hedpc.Ex
         coldMassFlowRate,
         coldRevInputTemperature,
     ) = _com.getTemperatureMassFlowAndReverseTemperatureVariableNames(
-        hydraulicConnection, hydraulicConnection.coldModelPipe, _mfn.PortItemType.COLD
+        hydraulicConnection.displayName,
+        hydraulicConnection.toAdjacentHasPiping,
+        hydraulicConnection.fromAdjacentHasPiping,
+        hydraulicConnection.coldModelPipe,
+        _mfn.PortItemType.COLD,
     )
 
     # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
@@ -35,7 +38,11 @@ def createModel(hydraulicConnection: HydraulicDoublePipeConnection) -> _hedpc.Ex
         hotMassFlowRate,
         hotRevInputTemperature,
     ) = _com.getTemperatureMassFlowAndReverseTemperatureVariableNames(
-        hydraulicConnection, hydraulicConnection.hotModelPipe, _mfn.PortItemType.HOT
+        hydraulicConnection.displayName,
+        hydraulicConnection.fromAdjacentHasPiping,
+        hydraulicConnection.toAdjacentHasPiping,
+        hydraulicConnection.hotModelPipe,
+        _mfn.PortItemType.HOT,
     )
 
     # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.

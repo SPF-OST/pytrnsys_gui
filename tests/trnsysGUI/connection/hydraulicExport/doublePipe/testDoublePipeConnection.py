@@ -123,7 +123,10 @@ _DUMMY_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
 _EXPECTED_DUMMY_UNIT_TEXT = """\
 ! BEGIN DTeeD_SCnrD
 ! cold pipe
-UNIT 503 TYPE 222
+UNIT 503 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeD_SCnrDCold_A TSCnrDCold TDTeeDCold
 ***
@@ -133,7 +136,10 @@ TDTeeD_SCnrDCold = [503,1]
 MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A
 
 ! hot pipe
-UNIT 504 TYPE 222
+UNIT 504 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeD_SCnrDHot_A TDTeeDHot TSCnrDHot
 ***

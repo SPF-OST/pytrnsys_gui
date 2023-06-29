@@ -5,7 +5,7 @@ import typing as _tp
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
 import trnsysGUI.connection.createMassFlowSolverNetworkPipes as _cmnp
 import trnsysGUI.connection.hydraulicExport.common as _hecom
-import trnsysGUI.connection.hydraulicExport.doublePipe.createExportDoublePipeConnection as _cec
+import trnsysGUI.connection.hydraulicExport.doublePipe.createExportHydraulicDoublePipeConnection as _cehc
 import trnsysGUI.connection.hydraulicExport.doublePipe.dummy as _he
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.images as _img
@@ -66,7 +66,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         return internalPiping
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        hydraulicConnection = _cec.HydraulicDoublePipeConnection(
+        hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
             _hecom.getAdjacentConnection(self.fromPort),
             _hecom.getAdjacentConnection(self.toPort),
@@ -74,7 +74,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
             self._hotPipe,
         )
 
-        hydraulicExportConnection = _cec.createExportHydraulicConnection(hydraulicConnection)
+        hydraulicExportConnection = _cehc.createModel(hydraulicConnection)
 
         unitNumber = startingUnit
         return _he.exportDummyConnection(

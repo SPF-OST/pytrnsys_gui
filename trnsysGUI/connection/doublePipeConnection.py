@@ -10,7 +10,7 @@ import trnsysGUI.connection.doublePipeConnectionModel as _model
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.connection.hydraulicExport.doublePipe as _he
-import trnsysGUI.connection.hydraulicExport.doublePipe.createExportDoublePipeConnection as _cec
+import trnsysGUI.connection.hydraulicExport.doublePipe.createExportHydraulicDoublePipeConnection as _cehc
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _hedpc
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.internalPiping as _ip
@@ -136,7 +136,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return _he.export(exportModel, unitNumber)
 
     def _getHydraulicExportConnectionModel(self) -> _hedpc.ExportDoublePipeConnection:
-        hydraulicConnection = _cec.HydraulicDoublePipeConnection(
+        hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
             self.displayName,
             _hecom.getAdjacentBlockItem(self.fromPort),
             _hecom.getAdjacentBlockItem(self.toPort),
@@ -144,9 +144,13 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self.hotModelPipe,
         )
 
+        exportHydraulicConnection = _cehc.createModel(hydraulicConnection)
+
         assert isinstance(self.lengthInM, float)
 
-        exportConnection = _cec.createExportConnection(hydraulicConnection, self.lengthInM, self.shallBeSimulated)
+        exportConnection = _hedpc.ExportDoublePipeConnection(
+            exportHydraulicConnection, self.lengthInM, self.shallBeSimulated
+        )
 
         return exportConnection
 

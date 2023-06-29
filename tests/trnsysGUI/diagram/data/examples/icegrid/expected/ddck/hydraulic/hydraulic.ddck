@@ -552,7 +552,10 @@ Lloop12Cp = FwaterCp
 
 ! BEGIN SCnr1
 ! cold pipe
-UNIT 451 TYPE 222
+UNIT 451 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnr1Cold_A TSCnr1_DTeeACold TSCnr1_QSrc1
 ***
@@ -561,7 +564,10 @@ EQUATIONS 1
 TSCnr1Cold = [451,1]
 
 ! hot pipe
-UNIT 452 TYPE 222
+UNIT 452 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnr1Hot_A TQSrc1_SCnr1 TSCnr1_DTeeAHot
 ***
@@ -614,7 +620,10 @@ TDTeeAHot = [454,1]
 
 ! BEGIN SCnrA
 ! cold pipe
-UNIT 455 TYPE 222
+UNIT 455 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrACold_A TDTeeA_SCnrACold TQSnkA_SCnrA
 ***
@@ -623,7 +632,10 @@ EQUATIONS 1
 TSCnrACold = [455,1]
 
 ! hot pipe
-UNIT 456 TYPE 222
+UNIT 456 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrAHot_A TSCnrA_QSnkA TDTeeA_SCnrAHot
 ***
@@ -635,7 +647,10 @@ TSCnrAHot = [456,1]
 
 ! BEGIN SCnrB
 ! cold pipe
-UNIT 457 TYPE 222
+UNIT 457 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrBCold_A TDTeeB_SCnrBCold TQSnkB_SCnrB
 ***
@@ -644,7 +659,10 @@ EQUATIONS 1
 TSCnrBCold = [457,1]
 
 ! hot pipe
-UNIT 458 TYPE 222
+UNIT 458 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrBHot_A TSCnrB_QSnkB TDTeeB_SCnrBHot
 ***
@@ -656,7 +674,10 @@ TSCnrBHot = [458,1]
 
 ! BEGIN SCnrC
 ! cold pipe
-UNIT 459 TYPE 222
+UNIT 459 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrCCold_A TDTeeC_SCnrCCold TQSnkC_SCnrC
 ***
@@ -665,7 +686,10 @@ EQUATIONS 1
 TSCnrCCold = [459,1]
 
 ! hot pipe
-UNIT 460 TYPE 222
+UNIT 460 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrCHot_A TSCnrC_QSnkC TDTeeC_SCnrCHot
 ***
@@ -677,7 +701,10 @@ TSCnrCHot = [460,1]
 
 ! BEGIN SCnrD
 ! cold pipe
-UNIT 461 TYPE 222
+UNIT 461 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrDCold_A TDTeeD_SCnrDCold TQSnkD_SCnrD
 ***
@@ -686,7 +713,10 @@ EQUATIONS 1
 TSCnrDCold = [461,1]
 
 ! hot pipe
-UNIT 462 TYPE 222
+UNIT 462 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrDHot_A TSCnrD_QSnkD TDTeeD_SCnrDHot
 ***
@@ -698,7 +728,10 @@ TSCnrDHot = [462,1]
 
 ! BEGIN SCnrE
 ! cold pipe
-UNIT 463 TYPE 222
+UNIT 463 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrECold_A TDTeeE_SCnrECold TQSnkE_SCnrE
 ***
@@ -707,7 +740,10 @@ EQUATIONS 1
 TSCnrECold = [463,1]
 
 ! hot pipe
-UNIT 464 TYPE 222
+UNIT 464 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrEHot_A TSCnrE_QSnkE TDTeeE_SCnrEHot
 ***
@@ -719,7 +755,10 @@ TSCnrEHot = [464,1]
 
 ! BEGIN SCnrF
 ! cold pipe
-UNIT 465 TYPE 222
+UNIT 465 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrFCold_A TDTeeF_SCnrFCold TQSnkF_SCnrF
 ***
@@ -728,7 +767,10 @@ EQUATIONS 1
 TSCnrFCold = [465,1]
 
 ! hot pipe
-UNIT 466 TYPE 222
+UNIT 466 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrFHot_A TSCnrF_QSnkF TDTeeF_SCnrFHot
 ***
@@ -740,7 +782,10 @@ TSCnrFHot = [466,1]
 
 ! BEGIN SCnrG
 ! cold pipe
-UNIT 467 TYPE 222
+UNIT 467 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrGCold_A TDTeeG_SCnrGCold TQSnkG_SCnrG
 ***
@@ -749,7 +794,10 @@ EQUATIONS 1
 TSCnrGCold = [467,1]
 
 ! hot pipe
-UNIT 468 TYPE 222
+UNIT 468 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrGHot_A TSCnrG_QSnkG TDTeeG_SCnrGHot
 ***
@@ -761,7 +809,10 @@ TSCnrGHot = [468,1]
 
 ! BEGIN SCnrH
 ! cold pipe
-UNIT 469 TYPE 222
+UNIT 469 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrHCold_A TDTeeH_SCnrHCold TQSnkH_SCnrH
 ***
@@ -770,7 +821,10 @@ EQUATIONS 1
 TSCnrHCold = [469,1]
 
 ! hot pipe
-UNIT 470 TYPE 222
+UNIT 470 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrHHot_A TSCnrH_QSnkH TDTeeH_SCnrHHot
 ***
@@ -782,7 +836,10 @@ TSCnrHHot = [470,1]
 
 ! BEGIN SCnrI
 ! cold pipe
-UNIT 471 TYPE 222
+UNIT 471 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrICold_A TDTeeI_SCnrICold TQSnkI_SCnrI
 ***
@@ -791,7 +848,10 @@ EQUATIONS 1
 TSCnrICold = [471,1]
 
 ! hot pipe
-UNIT 472 TYPE 222
+UNIT 472 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrIHot_A TSCnrI_QSnkI TDTeeI_SCnrIHot
 ***
@@ -803,7 +863,10 @@ TSCnrIHot = [472,1]
 
 ! BEGIN SCnrJ
 ! cold pipe
-UNIT 473 TYPE 222
+UNIT 473 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnrJCold_A TDTeeJ_SCnrJCold TQSnkJ_SCnrJ
 ***
@@ -812,7 +875,10 @@ EQUATIONS 1
 TSCnrJCold = [473,1]
 
 ! hot pipe
-UNIT 474 TYPE 222
+UNIT 474 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrJHot_A TSCnrJ_QSnkJ TDTeeJ_SCnrJHot
 ***
@@ -1825,7 +1891,10 @@ DTeeI_DTeeJSlInt = [500,16]*1/3600 ! Change in soil's internal heat content comp
 
 ! BEGIN DTeeB_SCnrB
 ! cold pipe
-UNIT 501 TYPE 222
+UNIT 501 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeB_SCnrBCold_A TSCnrBCold TDTeeBCold
 ***
@@ -1835,7 +1904,10 @@ TDTeeB_SCnrBCold = [501,1]
 MDTeeB_SCnrBCold = MDTeeB_SCnrBCold_A
 
 ! hot pipe
-UNIT 502 TYPE 222
+UNIT 502 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeB_SCnrBHot_A TDTeeBHot TSCnrBHot
 ***
@@ -1848,7 +1920,10 @@ MDTeeB_SCnrBHot = MDTeeB_SCnrBHot_A
 
 ! BEGIN DTeeC_SCnrC
 ! cold pipe
-UNIT 503 TYPE 222
+UNIT 503 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeC_SCnrCCold_A TSCnrCCold TDTeeCCold
 ***
@@ -1858,7 +1933,10 @@ TDTeeC_SCnrCCold = [503,1]
 MDTeeC_SCnrCCold = MDTeeC_SCnrCCold_A
 
 ! hot pipe
-UNIT 504 TYPE 222
+UNIT 504 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeC_SCnrCHot_A TDTeeCHot TSCnrCHot
 ***
@@ -1871,7 +1949,10 @@ MDTeeC_SCnrCHot = MDTeeC_SCnrCHot_A
 
 ! BEGIN DTeeD_SCnrD
 ! cold pipe
-UNIT 505 TYPE 222
+UNIT 505 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeD_SCnrDCold_A TSCnrDCold TDTeeDCold
 ***
@@ -1881,7 +1962,10 @@ TDTeeD_SCnrDCold = [505,1]
 MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A
 
 ! hot pipe
-UNIT 506 TYPE 222
+UNIT 506 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeD_SCnrDHot_A TDTeeDHot TSCnrDHot
 ***
@@ -1894,7 +1978,10 @@ MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
 
 ! BEGIN DTeeE_SCnrE
 ! cold pipe
-UNIT 507 TYPE 222
+UNIT 507 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeE_SCnrECold_A TSCnrECold TDTeeECold
 ***
@@ -1904,7 +1991,10 @@ TDTeeE_SCnrECold = [507,1]
 MDTeeE_SCnrECold = MDTeeE_SCnrECold_A
 
 ! hot pipe
-UNIT 508 TYPE 222
+UNIT 508 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeE_SCnrEHot_A TDTeeEHot TSCnrEHot
 ***
@@ -1917,7 +2007,10 @@ MDTeeE_SCnrEHot = MDTeeE_SCnrEHot_A
 
 ! BEGIN DTeeF_SCnrF
 ! cold pipe
-UNIT 509 TYPE 222
+UNIT 509 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeF_SCnrFCold_A TSCnrFCold TDTeeFCold
 ***
@@ -1927,7 +2020,10 @@ TDTeeF_SCnrFCold = [509,1]
 MDTeeF_SCnrFCold = MDTeeF_SCnrFCold_A
 
 ! hot pipe
-UNIT 510 TYPE 222
+UNIT 510 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeF_SCnrFHot_A TDTeeFHot TSCnrFHot
 ***
@@ -1940,7 +2036,10 @@ MDTeeF_SCnrFHot = MDTeeF_SCnrFHot_A
 
 ! BEGIN DTeeG_SCnrG
 ! cold pipe
-UNIT 511 TYPE 222
+UNIT 511 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeG_SCnrGCold_A TSCnrGCold TDTeeGCold
 ***
@@ -1950,7 +2049,10 @@ TDTeeG_SCnrGCold = [511,1]
 MDTeeG_SCnrGCold = MDTeeG_SCnrGCold_A
 
 ! hot pipe
-UNIT 512 TYPE 222
+UNIT 512 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeG_SCnrGHot_A TDTeeGHot TSCnrGHot
 ***
@@ -1963,7 +2065,10 @@ MDTeeG_SCnrGHot = MDTeeG_SCnrGHot_A
 
 ! BEGIN DTeeH_SCnrH
 ! cold pipe
-UNIT 513 TYPE 222
+UNIT 513 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeH_SCnrHCold_A TSCnrHCold TDTeeHCold
 ***
@@ -1973,7 +2078,10 @@ TDTeeH_SCnrHCold = [513,1]
 MDTeeH_SCnrHCold = MDTeeH_SCnrHCold_A
 
 ! hot pipe
-UNIT 514 TYPE 222
+UNIT 514 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeH_SCnrHHot_A TDTeeHHot TSCnrHHot
 ***
@@ -1986,7 +2094,10 @@ MDTeeH_SCnrHHot = MDTeeH_SCnrHHot_A
 
 ! BEGIN DTeeI_SCnrI
 ! cold pipe
-UNIT 515 TYPE 222
+UNIT 515 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeI_SCnrICold_A TSCnrICold TDTeeICold
 ***
@@ -1996,7 +2107,10 @@ TDTeeI_SCnrICold = [515,1]
 MDTeeI_SCnrICold = MDTeeI_SCnrICold_A
 
 ! hot pipe
-UNIT 516 TYPE 222
+UNIT 516 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeI_SCnrIHot_A TDTeeIHot TSCnrIHot
 ***
@@ -2009,7 +2123,10 @@ MDTeeI_SCnrIHot = MDTeeI_SCnrIHot_A
 
 ! BEGIN DTeeJ_SCnrJ
 ! cold pipe
-UNIT 517 TYPE 222
+UNIT 517 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeJ_SCnrJCold_A TSCnrJCold TDTeeJCold
 ***
@@ -2019,7 +2136,10 @@ TDTeeJ_SCnrJCold = [517,1]
 MDTeeJ_SCnrJCold = MDTeeJ_SCnrJCold_A
 
 ! hot pipe
-UNIT 518 TYPE 222
+UNIT 518 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeJ_SCnrJHot_A TDTeeJHot TSCnrJHot
 ***
@@ -2032,7 +2152,10 @@ MDTeeJ_SCnrJHot = MDTeeJ_SCnrJHot_A
 
 ! BEGIN SCnr99
 ! cold pipe
-UNIT 519 TYPE 222
+UNIT 519 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MSCnr99Cold_A TDTeeJ_SCnrZCold TSCnrZ_SCnrZ
 ***
@@ -2041,7 +2164,10 @@ EQUATIONS 1
 TSCnr99Cold = [519,1]
 
 ! hot pipe
-UNIT 520 TYPE 222
+UNIT 520 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnr99Hot_A TSCnrZ_SCnrZ TDTeeJ_SCnrZHot
 ***
@@ -2051,7 +2177,10 @@ TSCnr99Hot = [520,1]
 ! END SCnr99
 
 
-UNIT 521 TYPE 222
+UNIT 521 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnr1_QSrc1_A TSCnr1Cold TQSrc1H
 ***
@@ -2060,7 +2189,10 @@ EQUATIONS 2
 TSCnr1_QSrc1 = [521,1]
 MSCnr1_QSrc1 = MSCnr1_QSrc1_A
 
-UNIT 522 TYPE 222
+UNIT 522 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSrc1_SCnr1_A TQSrc1H TSCnr1Hot
 ***
@@ -2069,7 +2201,10 @@ EQUATIONS 2
 TQSrc1_SCnr1 = [522,1]
 MQSrc1_SCnr1 = MQSrc1_SCnr1_A
 
-UNIT 523 TYPE 222
+UNIT 523 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrA_QSnkA_A TSCnrAHot TQSnkAH
 ***
@@ -2078,7 +2213,10 @@ EQUATIONS 2
 TSCnrA_QSnkA = [523,1]
 MSCnrA_QSnkA = MSCnrA_QSnkA_A
 
-UNIT 524 TYPE 222
+UNIT 524 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkA_SCnrA_A TQSnkAH TSCnrACold
 ***
@@ -2087,7 +2225,10 @@ EQUATIONS 2
 TQSnkA_SCnrA = [524,1]
 MQSnkA_SCnrA = MQSnkA_SCnrA_A
 
-UNIT 525 TYPE 222
+UNIT 525 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrB_QSnkB_A TSCnrBHot TQSnkBH
 ***
@@ -2096,7 +2237,10 @@ EQUATIONS 2
 TSCnrB_QSnkB = [525,1]
 MSCnrB_QSnkB = MSCnrB_QSnkB_A
 
-UNIT 526 TYPE 222
+UNIT 526 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkB_SCnrB_A TQSnkBH TSCnrBCold
 ***
@@ -2105,7 +2249,10 @@ EQUATIONS 2
 TQSnkB_SCnrB = [526,1]
 MQSnkB_SCnrB = MQSnkB_SCnrB_A
 
-UNIT 527 TYPE 222
+UNIT 527 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrC_QSnkC_A TSCnrCHot TQSnkCH
 ***
@@ -2114,7 +2261,10 @@ EQUATIONS 2
 TSCnrC_QSnkC = [527,1]
 MSCnrC_QSnkC = MSCnrC_QSnkC_A
 
-UNIT 528 TYPE 222
+UNIT 528 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkC_SCnrC_A TQSnkCH TSCnrCCold
 ***
@@ -2123,7 +2273,10 @@ EQUATIONS 2
 TQSnkC_SCnrC = [528,1]
 MQSnkC_SCnrC = MQSnkC_SCnrC_A
 
-UNIT 529 TYPE 222
+UNIT 529 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrD_QSnkD_A TSCnrDHot TQSnkDH
 ***
@@ -2132,7 +2285,10 @@ EQUATIONS 2
 TSCnrD_QSnkD = [529,1]
 MSCnrD_QSnkD = MSCnrD_QSnkD_A
 
-UNIT 530 TYPE 222
+UNIT 530 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkD_SCnrD_A TQSnkDH TSCnrDCold
 ***
@@ -2141,7 +2297,10 @@ EQUATIONS 2
 TQSnkD_SCnrD = [530,1]
 MQSnkD_SCnrD = MQSnkD_SCnrD_A
 
-UNIT 531 TYPE 222
+UNIT 531 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrE_QSnkE_A TSCnrEHot TQSnkEH
 ***
@@ -2150,7 +2309,10 @@ EQUATIONS 2
 TSCnrE_QSnkE = [531,1]
 MSCnrE_QSnkE = MSCnrE_QSnkE_A
 
-UNIT 532 TYPE 222
+UNIT 532 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkE_SCnrE_A TQSnkEH TSCnrECold
 ***
@@ -2159,7 +2321,10 @@ EQUATIONS 2
 TQSnkE_SCnrE = [532,1]
 MQSnkE_SCnrE = MQSnkE_SCnrE_A
 
-UNIT 533 TYPE 222
+UNIT 533 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrF_QSnkF_A TSCnrFHot TQSnkFH
 ***
@@ -2168,7 +2333,10 @@ EQUATIONS 2
 TSCnrF_QSnkF = [533,1]
 MSCnrF_QSnkF = MSCnrF_QSnkF_A
 
-UNIT 534 TYPE 222
+UNIT 534 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkF_SCnrF_A TQSnkFH TSCnrFCold
 ***
@@ -2177,7 +2345,10 @@ EQUATIONS 2
 TQSnkF_SCnrF = [534,1]
 MQSnkF_SCnrF = MQSnkF_SCnrF_A
 
-UNIT 535 TYPE 222
+UNIT 535 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrG_QSnkG_A TSCnrGHot TQSnkGH
 ***
@@ -2186,7 +2357,10 @@ EQUATIONS 2
 TSCnrG_QSnkG = [535,1]
 MSCnrG_QSnkG = MSCnrG_QSnkG_A
 
-UNIT 536 TYPE 222
+UNIT 536 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkG_SCnrG_A TQSnkGH TSCnrGCold
 ***
@@ -2195,7 +2369,10 @@ EQUATIONS 2
 TQSnkG_SCnrG = [536,1]
 MQSnkG_SCnrG = MQSnkG_SCnrG_A
 
-UNIT 537 TYPE 222
+UNIT 537 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrH_QSnkH_A TSCnrHHot TQSnkHH
 ***
@@ -2204,7 +2381,10 @@ EQUATIONS 2
 TSCnrH_QSnkH = [537,1]
 MSCnrH_QSnkH = MSCnrH_QSnkH_A
 
-UNIT 538 TYPE 222
+UNIT 538 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkH_SCnrH_A TQSnkHH TSCnrHCold
 ***
@@ -2213,7 +2393,10 @@ EQUATIONS 2
 TQSnkH_SCnrH = [538,1]
 MQSnkH_SCnrH = MQSnkH_SCnrH_A
 
-UNIT 539 TYPE 222
+UNIT 539 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrI_QSnkI_A TSCnrIHot TQSnkIH
 ***
@@ -2222,7 +2405,10 @@ EQUATIONS 2
 TSCnrI_QSnkI = [539,1]
 MSCnrI_QSnkI = MSCnrI_QSnkI_A
 
-UNIT 540 TYPE 222
+UNIT 540 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkI_SCnrI_A TQSnkIH TSCnrICold
 ***
@@ -2231,7 +2417,10 @@ EQUATIONS 2
 TQSnkI_SCnrI = [540,1]
 MQSnkI_SCnrI = MQSnkI_SCnrI_A
 
-UNIT 541 TYPE 222
+UNIT 541 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrJ_QSnkJ_A TSCnrJHot TQSnkJH
 ***
@@ -2240,7 +2429,10 @@ EQUATIONS 2
 TSCnrJ_QSnkJ = [541,1]
 MSCnrJ_QSnkJ = MSCnrJ_QSnkJ_A
 
-UNIT 542 TYPE 222
+UNIT 542 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MQSnkJ_SCnrJ_A TQSnkJH TSCnrJCold
 ***
@@ -2328,7 +2520,10 @@ DTeeJ_SCnrZGrSl = [543,14]*1/3600 ! Dissipated heat from gravel to soil [kW]
 DTeeJ_SCnrZSlFf = [543,15]*1/3600 ! Dissipated heat from soil to "far field" [kW]
 DTeeJ_SCnrZSlInt = [543,16]*1/3600 ! Change in soil's internal heat content compared to previous time step [kW]
 
-UNIT 544 TYPE 222
+UNIT 544 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
 INPUTS 3
 MSCnrZ_SCnrZ_A TSCnr99Hot TSCnr99Cold
 ***
@@ -2418,7 +2613,10 @@ DTeeA_DTeeBSlInt = [545,16]*1/3600 ! Change in soil's internal heat content comp
 
 ! BEGIN DTeeA_SCnrA
 ! cold pipe
-UNIT 546 TYPE 222
+UNIT 546 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeA_SCnrACold_A TSCnrACold TDTeeACold
 ***
@@ -2428,7 +2626,10 @@ TDTeeA_SCnrACold = [546,1]
 MDTeeA_SCnrACold = MDTeeA_SCnrACold_A
 
 ! hot pipe
-UNIT 547 TYPE 222
+UNIT 547 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeA_SCnrAHot_A TDTeeAHot TSCnrAHot
 ***

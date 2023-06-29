@@ -23,7 +23,10 @@ class _StrictMock:
 _EXPECTED_TEXT = """\
 ! BEGIN DPCnr
 ! cold pipe
-UNIT 1 TYPE 222
+UNIT 1 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDPCnrCold_A ToutputConnectionCold TinputConnectionCold
 ***
@@ -32,7 +35,10 @@ EQUATIONS 1
 TDPCnrCold = [1,1]
 
 ! hot pipe
-UNIT 2 TYPE 222
+UNIT 2 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDPCnrHot_A TinputConnectionHot ToutputConnectionHot
 ***

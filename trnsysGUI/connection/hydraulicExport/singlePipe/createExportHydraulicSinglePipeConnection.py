@@ -18,7 +18,11 @@ def createExportHydraulicConnection(
         massFlowRate,
         revInputTemperature,
     ) = _com.getTemperatureMassFlowAndReverseTemperatureVariableNames(
-        hydraulicConnection, hydraulicConnection.modelPipe, _mfn.PortItemType.STANDARD
+        hydraulicConnection.displayName,
+        hydraulicConnection.fromAdjacentHasPiping,
+        hydraulicConnection.toAdjacentHasPiping,
+        hydraulicConnection.modelPipe,
+        _mfn.PortItemType.STANDARD,
     )
 
     # single pipe should not have a name for their model pipes
