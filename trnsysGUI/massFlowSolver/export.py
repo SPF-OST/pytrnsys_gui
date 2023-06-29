@@ -42,7 +42,7 @@ def _getOutputLines(
 
     lines = []
     for nodeIndex, node in enumerate(nodes):
-        portItems = node.getPortItems()
+        portItems = node.getPortItemsRelevantToOutputEquations()
         for variableIndex, portItem in enumerate(portItems):
             outputVariable = _mnames.getMassFlowVariableName(hasInternalPiping, node, portItem)
             index = equationNumber + nodeIndex * _mfn.MAX_N_OUTPUT_VARIABLES_PER_NODE + variableIndex

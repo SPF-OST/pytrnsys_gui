@@ -14,13 +14,15 @@ def getMassFlowVariableName(hasInternalPiping: _ip.HasInternalPiping, node: _mfn
     if portItem not in node.getPortItems():
         raise ValueError("`portItem` not one of `node`'s port items.")
 
-    postfix = _getPostfix(node, portItem)
-
     displayName = hasInternalPiping.getDisplayName()
-
     nodeNameOrEmpty = node.name or ""
+    massFlowVariableNameWithoutPostfix = f"M{displayName}{nodeNameOrEmpty}"
 
-    return f"M{displayName}{nodeNameOrEmpty}_{postfix}"
+    postfix = _getPostfix(node, portItem)
+    if not postfix:
+        return massFlowVariableNameWithoutPostfix
+
+    return f"{massFlowVariableNameWithoutPostfix}_{postfix}"
 
 
 def getCanonicalMassFlowVariableName(*, componentDisplayName: str, pipeName: _tp.Optional[str]) -> str:
@@ -28,9 +30,12 @@ def getCanonicalMassFlowVariableName(*, componentDisplayName: str, pipeName: _tp
     return f"M{componentDisplayName}{pipeNameOrEmpty}"
 
 
-def _getPostfix(node: _mfn.Node, portItem: _mfn.PortItem) -> str:
+def _getPostfix(node: _mfn.Node, portItem: _mfn.PortItem) -> _tp.Optional[str]:
+    portItems = node.getPortItemsRelevantToOutputEquations()
+    if len(portItems) == 1:
+        return None
+
     postfixes = "ABC"
-    portItems = node.getPortItems()
 
     for candidatePortItem, postfix in zip(portItems, postfixes):
         if candidatePortItem == portItem:

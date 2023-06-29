@@ -14,10 +14,9 @@ import trnsysGUI.connection.values as _values
 import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.internalPiping as _pi
-import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.segments.singlePipeSegmentItem as _spsi
+import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.temperatures as _temps
 from . import _massFlowLabels as _mfl
 
@@ -143,9 +142,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):  # pylint: disable=too-many-locals, too-many-statements
         inputMfrName = _helpers.getInputMfrName(self, self.modelPipe)
-        canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(
-            componentDisplayName=self.displayName, pipeName=self.modelPipe.name
-        )
 
         portItemsWithParent = self._getFromAndToPortsAndParentBlockItems()
 
@@ -168,7 +164,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             unitText = self._getPassThroughPipeUnitText(
                 startingUnit,
                 inputMfrName,
-                canonicalMfrName,
                 inputTemperatureVariableName,
                 revInputTemperatureVariableName,
                 outputTemperatureName,
@@ -178,7 +173,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         unitText = self._getSimulatedPipeUnitText(
             unitNumber,
             inputMfrName,
-            canonicalMfrName,
             inputTemperatureVariableName,
             revInputTemperatureVariableName,
             outputTemperatureName,
@@ -192,7 +186,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self,
         unitNumber,
         inputMfrName,
-        canonicalMfrName,
         inputTemperatureVariableName,
         revInputTemperatureVariableName,
         outputTemperatureName,
@@ -203,7 +196,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             inputMfrName,
             inputTemperatureVariableName,
             revInputTemperatureVariableName,
-            canonicalMassFlowRate=canonicalMfrName,
             componentName=self.displayName,
         )
 
@@ -213,7 +205,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self,
         unitNumber,
         inputMfrName,
-        canonicalMfrName,
         inputTemperatureVariableName,
         revInputTemperatureVariableName,
         outputTemperatureName,
@@ -248,12 +239,11 @@ TRoomStore ! ambient temperature [deg C]
 ***Initial values
 20 0.0 20 20
 
-EQUATIONS 5
+EQUATIONS 4
 {outputTemperatureName} = [{unitNumber},1] ! Output flow temperature [deg C]
 {dissipatedHeatFluxName} = [{unitNumber},3]/3600 ! Dissipated heat [kW]
 {convectedHeatFluxName} = [{unitNumber},4]/3600 ! Convected heat [kW]
 {internalHeatName} = [{unitNumber},5] ! Accumulated internal energy since start of simulation [kJ]
-{canonicalMfrName} = {inputMfrName}
 
 """
         return unitText

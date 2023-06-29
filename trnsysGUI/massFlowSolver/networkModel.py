@@ -78,6 +78,9 @@ class Node(_abc.ABC):
     def getPortItems(self) -> _tp.Sequence["PortItem"]:
         raise NotImplementedError()
 
+    def getPortItemsRelevantToOutputEquations(self) -> _tp.Sequence["PortItem"]:
+        return self.getPortItems()
+
     @_abc.abstractmethod
     def getNodeType(self) -> NodeType:
         raise NotImplementedError()
@@ -127,6 +130,9 @@ class TwoNeighboursBase(Node, _abc.ABC):
 class Pipe(TwoNeighboursBase):
     def getNodeType(self) -> NodeType:
         return NodeType.PIPE
+
+    def getPortItemsRelevantToOutputEquations(self) -> _tp.Sequence["PortItem"]:
+        return [self.fromPort]
 
 
 class Pump(TwoNeighboursBase):
