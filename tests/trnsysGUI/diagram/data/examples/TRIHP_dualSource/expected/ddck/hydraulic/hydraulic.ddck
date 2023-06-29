@@ -34,6 +34,10 @@ THPEvapH=THPEvap
 THPCond1H=THPCond1
 THPCond2H=THPCond2
 
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
 UNIT 450 TYPE 9352
 PARAMETERS 356
 mfrSolverAbsTol
@@ -551,7 +555,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPuHpShCond ! input flow temperature [deg C]
 MPiHpToTesShIn_A ! input mass flow [kg/h]
@@ -624,7 +628,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivDhwOut ! input flow temperature [deg C]
 MPiHxDhwIn_A ! input mass flow [kg/h]
@@ -667,7 +671,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePieceCirc1 ! input flow temperature [deg C]
 MPiPuCircIn_A ! input mass flow [kg/h]
@@ -691,7 +695,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPuCirc ! input flow temperature [deg C]
 MPiPuCircOut_A ! input mass flow [kg/h]
@@ -715,7 +719,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePieceCirc1 ! input flow temperature [deg C]
 MPiDhwDemand_A ! input mass flow [kg/h]
@@ -758,7 +762,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece_6032 ! input flow temperature [deg C]
 MPiSHInMix_A ! input mass flow [kg/h]
@@ -782,7 +786,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPuSH ! input flow temperature [deg C]
 MPiRadIn_A ! input mass flow [kg/h]
@@ -825,7 +829,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece5329 ! input flow temperature [deg C]
 MPiTesDhwToDes_A ! input mass flow [kg/h]
@@ -849,7 +853,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPuHpDhwCond ! input flow temperature [deg C]
 MPiHpToTesDhwIn_A ! input mass flow [kg/h]
@@ -892,7 +896,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece_6088 ! input flow temperature [deg C]
 MPiDesToCond_A ! input mass flow [kg/h]
@@ -916,7 +920,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 THxCoolSide1H ! input flow temperature [deg C]
 MPiHxCoolBriOut_A ! input mass flow [kg/h]
@@ -959,7 +963,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece3852 ! input flow temperature [deg C]
 MPiHxCoolBriIn_A ! input mass flow [kg/h]
@@ -983,7 +987,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece3852 ! input flow temperature [deg C]
 MPiDivCool_A ! input mass flow [kg/h]
@@ -1007,7 +1011,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivCool ! input flow temperature [deg C]
 MPiGhxIn_A ! input mass flow [kg/h]
@@ -1031,7 +1035,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TGhxH ! input flow temperature [deg C]
 MPiGhxOut_A ! input mass flow [kg/h]
@@ -1055,7 +1059,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivDhw ! input flow temperature [deg C]
 MPiTesDhwIn_A ! input mass flow [kg/h]
@@ -1079,7 +1083,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivDhw ! input flow temperature [deg C]
 MPiCircIn_A ! input mass flow [kg/h]
@@ -1103,7 +1107,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTesDhwDpR70_90H ! input flow temperature [deg C]
 MPiCircOut_A ! input mass flow [kg/h]
@@ -1127,7 +1131,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece_6088 ! input flow temperature [deg C]
 MPiPuHpDhwIn_A ! input mass flow [kg/h]
@@ -1151,7 +1155,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivCondTOTesDhw ! input flow temperature [deg C]
 MPiPuHpShIn_A ! input mass flow [kg/h]
@@ -1175,7 +1179,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivHp ! input flow temperature [deg C]
 MPiHpTeeToDiv_A ! input mass flow [kg/h]
@@ -1199,7 +1203,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTesShDpL95_5H ! input flow temperature [deg C]
 MPiHpToTesShOut_A ! input mass flow [kg/h]
@@ -1223,7 +1227,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TsupplyWater ! input flow temperature [deg C]
 MPiDhwMains_A ! input mass flow [kg/h]
@@ -1247,7 +1251,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 THxDHWSide1H ! input flow temperature [deg C]
 MPiHxDhwOut_A ! input mass flow [kg/h]
@@ -1271,7 +1275,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPuDhw ! input flow temperature [deg C]
 MPiPuDhwOut_A ! input mass flow [kg/h]
@@ -1295,7 +1299,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop2Rho ! density [kg/m^3]
 Lloop2Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTesDhwDpR5_95H ! input flow temperature [deg C]
 MPiTesDhwOut_A ! input mass flow [kg/h]
@@ -1319,7 +1323,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTesShDpR5_95H ! input flow temperature [deg C]
 MPiTesShOut_A ! input mass flow [kg/h]
@@ -1343,7 +1347,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeeCoolRadIn ! input flow temperature [deg C]
 MPiTeeMixSHIn_A ! input mass flow [kg/h]
@@ -1367,7 +1371,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece_6032 ! input flow temperature [deg C]
 MPiSHOutMix_A ! input mass flow [kg/h]
@@ -1391,7 +1395,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivSHCool ! input flow temperature [deg C]
 MPiTesShIn_A ! input mass flow [kg/h]
@@ -1415,7 +1419,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TRadiatorSHH ! input flow temperature [deg C]
 MPiRadOut_A ! input mass flow [kg/h]
@@ -1439,7 +1443,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivSh ! input flow temperature [deg C]
 MPiDivSHCool_A ! input mass flow [kg/h]
@@ -1463,7 +1467,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeeTesShOut ! input flow temperature [deg C]
 MPiTesDhwCond_A ! input mass flow [kg/h]
@@ -1487,7 +1491,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTesDhwDpL95_35H ! input flow temperature [deg C]
 MPiHpToTesDhwOut_A ! input mass flow [kg/h]
@@ -1511,7 +1515,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivTesDhwOut ! input flow temperature [deg C]
 MPiCondToDes_A ! input mass flow [kg/h]
@@ -1535,7 +1539,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TPuHpEvap ! input flow temperature [deg C]
 MPiPuGhxOut_A ! input mass flow [kg/h]
@@ -1559,7 +1563,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 THPEvapH ! input flow temperature [deg C]
 MPiHPEvapOut_A ! input mass flow [kg/h]
@@ -1583,7 +1587,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeeHpEvap ! input flow temperature [deg C]
 MPiDivCooltoHp_A ! input mass flow [kg/h]
@@ -1607,7 +1611,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivHpEvap ! input flow temperature [deg C]
 MPiHpEvapMix_A ! input mass flow [kg/h]
@@ -1631,7 +1635,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop5Rho ! density [kg/m^3]
 Lloop5Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TDivHpEvap ! input flow temperature [deg C]
 MPiHPEvapIn_A ! input mass flow [kg/h]
@@ -1655,7 +1659,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 THxDHWSide2H ! input flow temperature [deg C]
 MPiDhwSecOut_A ! input mass flow [kg/h]
@@ -1679,7 +1683,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop3Rho ! density [kg/m^3]
 Lloop3Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePieceCirc2 ! input flow temperature [deg C]
 MPiHxDhwSecIn_A ! input mass flow [kg/h]
@@ -1703,7 +1707,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 THxCoolSide2H ! input flow temperature [deg C]
 MPiHxCoolWatIn_A ! input mass flow [kg/h]
@@ -1727,7 +1731,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop4Rho ! density [kg/m^3]
 Lloop4Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeeCoolRadIn ! input flow temperature [deg C]
 MConn1455_A ! input mass flow [kg/h]
@@ -1751,7 +1755,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 THPCond2H ! input flow temperature [deg C]
 MPiHpDesOut_A ! input mass flow [kg/h]
@@ -1775,7 +1779,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeePiece5329 ! input flow temperature [deg C]
 MPiHpDesIn_A ! input mass flow [kg/h]
@@ -1799,7 +1803,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 THPCond1H ! input flow temperature [deg C]
 MPiHpCondOut_A ! input mass flow [kg/h]
@@ -1823,7 +1827,7 @@ PARAMETERS 6
 2.99988 ! U-value [kJ/(h*m^2*K)]  (= 0.8333 W/(m^2*K))
 Lloop1Rho ! density [kg/m^3]
 Lloop1Cp ! specific heat [kJ/(kg*K)]
-20 ! Initial fluid temperature [deg C]
+spTIni ! Initial fluid temperature [deg C]
 INPUTS 4
 TTeeTesShOut ! input flow temperature [deg C]
 MPiHpCondIn_A ! input mass flow [kg/h]

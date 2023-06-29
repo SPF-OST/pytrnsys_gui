@@ -1,44 +1,55 @@
-import abc as _abc
 import dataclasses as _dc
 
-import trnsysGUI.massFlowSolver.names as _mnames
-import trnsysGUI.temperatures as _temps
+import trnsysGUI.connection.hydraulicExport.common as _com
+import trnsysGUI.globalNames as _gnames
+from trnsysGUI import temperatures as _temps
+from trnsysGUI.massFlowSolver import names as _mnames
 
 
 @_dc.dataclass
-class PortBase(_abc.ABC):
-    inputTemperatureVariableName: str
-
-
-@_dc.dataclass
-class InputPort(PortBase):
-    massFlowRateVariableName: str
-
-
-@_dc.dataclass
-class OutputPort(PortBase):
-    pass
-
-
-@_dc.dataclass
-class SinglePipe:
+class Pipe:
     name: str
-    inputPort: InputPort
-    outputPort: OutputPort
+    inputPort: _com.InputPort
+    outputPort: _com.OutputPort
 
 
 @_dc.dataclass
-class DoublePipeConnection:
+class ExportHydraulicDoublePipeConnection:
     displayName: str
-    lengthInM: float
-    shallBeSimulated: bool
-    coldPipe: SinglePipe
-    hotPipe: SinglePipe
+    coldPipe: Pipe
+    hotPipe: Pipe
 
-    def getOutputTemperatureVariableName(self, pipe: SinglePipe) -> str:
+    @property
+    def coldOutputTemperatureVariableName(self) -> str:
         return _temps.getTemperatureVariableName(
-            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=pipe.name
+            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=self.coldPipe.name
         )
 
-    def getCanonicalMassFlowRateVariableName(self, pipe: SinglePipe) -> str:
-        return _mnames.getCanonicalMassFlowVariableName(componentDisplayName=self.displayName, pipeName=pipe.name)
+    @property
+    def hotOutputTemperatureVariableName(self) -> str:
+        return _temps.getTemperatureVariableName(
+            shallRenameOutputInHydraulicFile=False, componentDisplayName=self.displayName, nodeName=self.hotPipe.name
+        )
+
+    @property
+    def initialColdOutputTemperatureVariableName(self) -> str:
+        return _gnames.DoublePipes.INITIAL_COLD_TEMPERATURE
+
+    @property
+    def initialHotOutputTemperatureVariableName(self) -> str:
+        return _gnames.DoublePipes.INITIAL_HOT_TEMPERATURE
+
+    @property
+    def coldCanonicalMassFlowRateVariableName(self) -> str:
+        return _mnames.getCanonicalMassFlowVariableName(
+            componentDisplayName=self.displayName, pipeName=self.coldPipe.name
+        )
+
+    @property
+    def hotCanonicalMassFlowRateVariableName(self) -> str:
+        return _mnames.getCanonicalMassFlowVariableName(
+            componentDisplayName=self.displayName, pipeName=self.hotPipe.name
+        )
+
+
+ExportDoublePipeConnection = _com.GenericConnection[ExportHydraulicDoublePipeConnection]

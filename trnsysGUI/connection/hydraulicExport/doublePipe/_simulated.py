@@ -4,19 +4,20 @@ import trnsysGUI.globalNames as _gnames
 from . import _getEnergyBalanceVariables as _vars
 
 
-def exportSimulatedConnection(doublePipeConnection, unitNumber):
+def exportSimulatedConnection(doublePipeConnection: _dpc.ExportDoublePipeConnection, unitNumber):
     headerAndParameters = _getHeaderAndParameters(doublePipeConnection, unitNumber)
-    inputs = _getInputs(doublePipeConnection)
-    equations = _getEquations(doublePipeConnection, unitNumber)
+    hydraulicConnection = doublePipeConnection.hydraulicConnection
+    inputs = _getInputs(hydraulicConnection)
+    equations = _getEquations(hydraulicConnection, unitNumber)
     unitText = headerAndParameters + inputs + equations
     nextUnitNumber = unitNumber + 1
     return unitText, nextUnitNumber
 
 
-def _getHeaderAndParameters(connection: _dpc.DoublePipeConnection, unitNumber: int) -> str:
+def _getHeaderAndParameters(connection: _dpc.ExportDoublePipeConnection, unitNumber: int) -> str:
     headerAndParameters = f"""\
 UNIT {unitNumber} TYPE 9511
-! {connection.displayName}
+! {connection.hydraulicConnection.displayName}
 PARAMETERS 36
 ****** pipe and soil properties ******
 {connection.lengthInM}                                ! Length of buried pipe, m
@@ -65,9 +66,9 @@ dpRadNdDist                             ! Radial distance of node 10, m
     return headerAndParameters
 
 
-def _getInputs(connectionNames: _dpc.DoublePipeConnection) -> str:
-    coldPipe = connectionNames.coldPipe
-    hotPipe = connectionNames.hotPipe
+def _getInputs(hydraulicConnection: _dpc.ExportHydraulicDoublePipeConnection) -> str:
+    coldPipe = hydraulicConnection.coldPipe
+    hotPipe = hydraulicConnection.hotPipe
 
     inputs = f"""\
 INPUTS 6
@@ -90,33 +91,29 @@ INPUTS 6
 
 
 def _getEquations(
-    doublePipeConnection: _dpc.DoublePipeConnection,
+    hydraulicConnection: _dpc.ExportHydraulicDoublePipeConnection,
     unitNumber: int,
 ) -> str:
     energyBalanceVariables = _vars.getEnergyBalanceVariables(
-        doublePipeConnection.displayName,
-        coldPipeName=doublePipeConnection.coldPipe.name,
-        hotPipeName=doublePipeConnection.hotPipe.name,
+        hydraulicConnection.displayName,
+        coldPipeName=hydraulicConnection.coldPipe.name,
+        hotPipeName=hydraulicConnection.hotPipe.name,
     )
 
     formattedEnergyBalanceVariables = "\n".join(
         f"{v.name} = [{unitNumber},{v.outputNumber}]*{v.conversionFactor} ! {v.comment}" for v in energyBalanceVariables
     )
-    coldPipe = doublePipeConnection.coldPipe
-    coldOutputTemperature = doublePipeConnection.getOutputTemperatureVariableName(coldPipe)
-    coldCanonicalMassFlowRate = doublePipeConnection.getCanonicalMassFlowRateVariableName(coldPipe)
+    coldPipe = hydraulicConnection.coldPipe
+    hotPipe = hydraulicConnection.hotPipe
 
-    hotPipe = doublePipeConnection.hotPipe
-    hotOutputTemperature = doublePipeConnection.getOutputTemperatureVariableName(hotPipe)
-    hotCanonicalMassFlow = doublePipeConnection.getCanonicalMassFlowRateVariableName(hotPipe)
-
+    conn = hydraulicConnection
     equations = f"""\
 EQUATIONS {4 + len(energyBalanceVariables)}
-{coldOutputTemperature} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
-{coldCanonicalMassFlowRate} = {coldPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.coldOutputTemperatureVariableName} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
+{conn.coldCanonicalMassFlowRateVariableName} = {coldPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
 
-{hotOutputTemperature} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
-{hotCanonicalMassFlow} = {hotPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.hotOutputTemperatureVariableName} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
+{conn.hotCanonicalMassFlowRateVariableName} = {hotPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
 
 {formattedEnergyBalanceVariables}
 

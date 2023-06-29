@@ -8,9 +8,11 @@ import jinja2 as _jinja
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.connection.hydraulicExport.doublePipe.getDoublePipeEnergyBalanceEquations as _gdpebe
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.connection.singlePipeDefaultValues as _spdValues
+import trnsysGUI.globalNames as _gnames
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.hydraulicLoops.names as _lnames
 import trnsysGUI.internalPiping as _ip
@@ -20,8 +22,6 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.temperatures.hydraulic as _thyd
-import trnsysGUI.connection.hydraulicExport.doublePipe.getDoublePipeEnergyBalanceEquations as _gdpebe
-import trnsysGUI.globalNames as _gnames
 
 _UNUSED_INDEX = 0
 
@@ -89,6 +89,21 @@ class Export:
         problemEncountered = False
         return problemEncountered, f
 
+    def exportSinglePipeParameters(self) -> str:
+        doesHydraulicContainSinglePipes = any(
+            isinstance(obj, _spc.SinglePipeConnection) for obj in self._hasInternalPipings
+        )
+
+        if not doesHydraulicContainSinglePipes:
+            return ""
+
+        return f"""\
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+{_gnames.SinglePipes.INITIAL_TEMPERATURE} = 20
+
+"""
+
     def exportDoublePipeParameters(self, exportTo="ddck"):
         doesHydraulicContainDoublePipes = any(
             isinstance(obj, _dpc.DoublePipeConnection) for obj in self._hasInternalPipings
@@ -98,7 +113,7 @@ class Export:
             return ""
 
         constantsBlock = f"""\
-*** Default global PARAMETERS for TYPES 9511 ***
+*** Default global PARAMETERS for double pipes ***
 CONSTANTS 25
 
 ****** Pipe and soil properties ******
@@ -143,9 +158,9 @@ dTambAmpl = 13.32 ! Amplitude of surface temperature in n degrees celsius
 ddTcwOffset = 36 ! Days of minimum surface temperature
 """
         if exportTo == "ddck":
-            return constantsBlock
+            return constantsBlock + "\n"
         elif exportTo == "mfs":
-            return constantsBlock + "\n\n" + massFlowSolverConstantsBlock
+            return constantsBlock + "\n\n" + massFlowSolverConstantsBlock + "\n"
         else:
             raise ValueError("Unknown value for `exportTo`", exportTo)
 
@@ -237,9 +252,9 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         resultText = f"""\
 UNIT {simulationUnit} TYPE {simulationType}
 PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
-{_mnames.ABSOLUTE_TOLERANCE_NAME}
-{_mnames.RELATIVE_TOLERANCE_NAME}
-{_mnames.TOLERANCE_SWITCHING_THRESHOLD_NAME}
+{_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
+{_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
+{_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
 {len(serializedNodes)}
 {jointLines}
 """

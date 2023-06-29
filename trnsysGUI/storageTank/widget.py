@@ -461,7 +461,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
 
             modelPipe = directPortPair.modelPipe
-            massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
+            massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
 
             outgoingConnection = directPortPair.toPort.getConnection()
             reverseInputTemperatureName = _cnames.getTemperatureVariableName(
@@ -501,7 +501,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         incomingConnection = heatExchanger.port1.getConnection()
         inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
         modelPipe = heatExchanger.modelPipe
-        massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
+        massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
 
         outgoingConnection = heatExchanger.port2.getConnection()
         reverseInputTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, _mfn.PortItemType.STANDARD)
