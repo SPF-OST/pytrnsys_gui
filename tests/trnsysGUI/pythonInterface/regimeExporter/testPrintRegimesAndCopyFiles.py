@@ -1,6 +1,6 @@
 import os as _os
-import matplotlib.testing.compare as _mpltc
 import pathlib as _pl
+import matplotlib.testing.compare as _mpltc  # type: ignore[import]
 
 import pytrnsys.utils.log as _ulog
 
@@ -9,17 +9,17 @@ import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython as _rdopfp
 
-_PROJECT_NAME_ = "diagramForRegimes"
-_DATA_DIR_ = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME_}"
-_DATA_FILENAME_ = "regimes.csv"
-_EXPECTED_PDFS_DIR_ = _DATA_DIR_ / "expectedPDFs"
-_RESULTS_DIR_ = _DATA_DIR_ / "results"
-_RESULTS_DIR_2_ = _DATA_DIR_ / "resultsReducedUsage"
+_PROJECT_NAME = "diagramForRegimes"
+_DATA_DIR = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME}"
+_DATA_FILENAME = "regimes.csv"
+_EXPECTED_PDFS_DIR = _DATA_DIR / "expectedPDFs"
+_RESULTS_DIR = _DATA_DIR / "results"
+_RESULTS_DIR_2 = _DATA_DIR / "resultsReducedUsage"
 
-_DIAGRAM_ENDING_ = "_diagram.pdf"
-_NAME1_ENDING_ = "_name1.pdf"
-_NAME2_ENDING_ = "_name2.pdf"
-_NAME1_SVG_ENDING_ = "_name1.svg"
+_DIAGRAM_ENDING = "_diagram.pdf"
+_NAME1_ENDING = "_name1.pdf"
+_NAME2_ENDING = "_name2.pdf"
+_NAME1_SVG_ENDING = "_name1.svg"
 
 
 def _ensureDirExists(dirPath):
@@ -27,30 +27,30 @@ def _ensureDirExists(dirPath):
         _os.makedirs(dirPath)
 
 
-_ensureDirExists(_RESULTS_DIR_)
-_ensureDirExists(_RESULTS_DIR_2_)
+_ensureDirExists(_RESULTS_DIR)
+_ensureDirExists(_RESULTS_DIR_2)
 
 
 def _getExpectedAndNewFilePaths(ending, resultsDir):
-    pdfName = _PROJECT_NAME_ + ending
-    expectedPdfPath = _EXPECTED_PDFS_DIR_ / pdfName
-    newPdfPath = _DATA_DIR_ / resultsDir / pdfName
+    pdfName = _PROJECT_NAME + ending
+    expectedPdfPath = _EXPECTED_PDFS_DIR / pdfName
+    newPdfPath = _DATA_DIR / resultsDir / pdfName
     return expectedPdfPath, newPdfPath
 
 
-_EXPECTED_DIAGRAM_PATH_, _NEW_DIAGRAM_PATH_ = _getExpectedAndNewFilePaths(_DIAGRAM_ENDING_, _RESULTS_DIR_)
-_EXPECTED_NAME1_PATH_, _NEW_NAME1_PATH_ = _getExpectedAndNewFilePaths(_NAME1_ENDING_, _RESULTS_DIR_)
-_EXPECTED_NAME2_PATH_, _NEW_NAME2_PATH_ = _getExpectedAndNewFilePaths(_NAME2_ENDING_, _RESULTS_DIR_)
-_EXPECTED_NAME1_SVG_PATH_, _NEW_NAME1_SVG_PATH_ = _getExpectedAndNewFilePaths(_NAME1_SVG_ENDING_, _RESULTS_DIR_)
+_EXPECTED_DIAGRAM_PATH, _NEW_DIAGRAM_PATH = _getExpectedAndNewFilePaths(_DIAGRAM_ENDING, _RESULTS_DIR)
+_EXPECTED_NAME1_PATH, _NEW_NAME1_PATH = _getExpectedAndNewFilePaths(_NAME1_ENDING, _RESULTS_DIR)
+_EXPECTED_NAME2_PATH, _NEW_NAME2_PATH = _getExpectedAndNewFilePaths(_NAME2_ENDING, _RESULTS_DIR)
+_EXPECTED_NAME1_SVG_PATH, _NEW_NAME1_SVG_PATH = _getExpectedAndNewFilePaths(_NAME1_SVG_ENDING, _RESULTS_DIR)
 
-_, _NEW_DIAGRAM_PATH_2_ = _getExpectedAndNewFilePaths(_DIAGRAM_ENDING_, _RESULTS_DIR_2_)
-_, _NEW_NAME1_PATH_2_ = _getExpectedAndNewFilePaths(_NAME1_ENDING_, _RESULTS_DIR_2_)
-_, _NEW_NAME2_PATH_2_ = _getExpectedAndNewFilePaths(_NAME2_ENDING_, _RESULTS_DIR_2_)
-_, _NEW_NAME1_SVG_PATH_2_ = _getExpectedAndNewFilePaths(_NAME1_SVG_ENDING_, _RESULTS_DIR_2_)
+_, _NEW_DIAGRAM_PATH_2 = _getExpectedAndNewFilePaths(_DIAGRAM_ENDING, _RESULTS_DIR_2)
+_, _NEW_NAME1_PATH_2 = _getExpectedAndNewFilePaths(_NAME1_ENDING, _RESULTS_DIR_2)
+_, _NEW_NAME2_PATH_2 = _getExpectedAndNewFilePaths(_NAME2_ENDING, _RESULTS_DIR_2)
+_, _NEW_NAME1_SVG_PATH_2 = _getExpectedAndNewFilePaths(_NAME1_SVG_ENDING, _RESULTS_DIR_2)
 
 
-def _createMainWindow(PROJECT_FOLDER, PROJECT_NAME, qtbot):
-    projectJsonFilePath = PROJECT_FOLDER / f"{PROJECT_NAME}.json"
+def _createMainWindow(projectFolder, projectName, qtbot):
+    projectJsonFilePath = projectFolder / f"{projectName}.json"
     project = _prj.LoadProject(projectJsonFilePath)
 
     logger = _ulog.getOrCreateCustomLogger("root", "DEBUG")  # type: ignore[attr-defined]
@@ -70,13 +70,13 @@ class TestPrintRegimesAndCopyFiles:
         assert "svg" in _mpltc.comparable_formats()
 
     def testUsingQtBot(self, qtbot):
-        mainWindow = _createMainWindow(_DATA_DIR_, _PROJECT_NAME_, qtbot)
-        _rdopfp.printRegimesAndCopyFiles(_DATA_DIR_, _PROJECT_NAME_, _RESULTS_DIR_, _DATA_FILENAME_, mainWindow)
+        mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
+        _rdopfp.printRegimesAndCopyFiles(_DATA_DIR, _PROJECT_NAME, _RESULTS_DIR, _DATA_FILENAME, mainWindow)
 
-        self._FileExistsAndIsCorrect(_NEW_DIAGRAM_PATH_, _EXPECTED_DIAGRAM_PATH_)
-        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_, _EXPECTED_NAME1_PATH_)
-        self._FileExistsAndIsCorrect(_NEW_NAME1_SVG_PATH_, _EXPECTED_NAME1_SVG_PATH_)
-        self._FileExistsAndIsCorrect(_NEW_NAME2_PATH_, _EXPECTED_NAME2_PATH_)
+        self._FileExistsAndIsCorrect(_NEW_DIAGRAM_PATH, _EXPECTED_DIAGRAM_PATH)
+        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH, _EXPECTED_NAME1_PATH)
+        self._FileExistsAndIsCorrect(_NEW_NAME1_SVG_PATH, _EXPECTED_NAME1_SVG_PATH)
+        self._FileExistsAndIsCorrect(_NEW_NAME2_PATH, _EXPECTED_NAME2_PATH)
 
     @staticmethod
     def _FileExistsAndIsCorrect(producedFile, expectedFile):
@@ -85,14 +85,13 @@ class TestPrintRegimesAndCopyFiles:
 
     def testUsingQtBotForGivenRegimes(self, qtbot):
         onlyTheseRegimes = ["name1"]
-        mainWindow = _createMainWindow(_DATA_DIR_, _PROJECT_NAME_, qtbot)
-        _rdopfp.printRegimesAndCopyFiles(
-            _DATA_DIR_, _PROJECT_NAME_, _RESULTS_DIR_2_, _DATA_FILENAME_, mainWindow, onlyTheseRegimes=onlyTheseRegimes
-        )
-        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_2_, _EXPECTED_NAME1_PATH_)
-        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_2_, _EXPECTED_DIAGRAM_PATH_)
-        assert not _NEW_DIAGRAM_PATH_2_.is_file()
-        assert not _NEW_NAME2_PATH_2_.is_file()
+        mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
+        _rdopfp.printRegimesAndCopyFiles(_DATA_DIR, _PROJECT_NAME, _RESULTS_DIR_2, _DATA_FILENAME, mainWindow,
+                                         onlyTheseRegimes=onlyTheseRegimes)
+        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
+        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_DIAGRAM_PATH)
+        assert not _NEW_DIAGRAM_PATH_2.is_file()
+        assert not _NEW_NAME2_PATH_2.is_file()
 
 
 # non-qtbot solution?

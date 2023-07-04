@@ -9,13 +9,12 @@ def exportRegimeTemplate(projectJson, regimeFileName):
 
 
 def getPumpsAndValvesWithValuesFromJson(projectJson):
-    f = open(projectJson)
-    jsonValues = json.load(f)
-    f.close()
+    with open(projectJson, 'r', encoding='utf-8') as openFile:
+        jsonValues = json.load(openFile)
 
     data = {}
     undesiredBlocks = [".__BlockDct__", "IDs", "Strings"]
-    for i, block in enumerate(jsonValues["Blocks"]):
+    for block in jsonValues["Blocks"]:
         if block not in undesiredBlocks:
             curDict = jsonValues["Blocks"][block]
             if "BlockName" in curDict:

@@ -34,20 +34,16 @@ def getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow):
 
 
 def printRegimesAndCopyFiles(
-    _DATA_DIR_, _PROJECT_NAME_, _RESULTS_DIR_, _DATA_FILENAME_, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None
+    _DATA_DIR, _PROJECT_NAME, _RESULTS_DIR, _DATA_FILENAME, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None
 ):
     # createPDF of diagram only
     if not onlyTheseRegimes:
-        pdfName = str(_RESULTS_DIR_) + "\\" + _PROJECT_NAME_ + "_diagram.pdf"
-        printDiagramToPDF(pdfName, mainWindow)
+        makeDiagramFiles(_PROJECT_NAME, _RESULTS_DIR, mainWindow)
 
-    regimeValues = _gdr.getRegimes(_DATA_DIR_ / _DATA_FILENAME_, onlyTheseRegimes)
+    regimeValues = _gdr.getRegimes(_DATA_DIR / _DATA_FILENAME, onlyTheseRegimes)
     pumpsAndValvesNames = list(regimeValues.columns)
-    massFlowRatesPrintFileName = f"{_PROJECT_NAME_}_Mfr.prt"
-    temperaturesPintFileName = f"{_PROJECT_NAME_}_T.prt"
-    massFlowRatesPrintFilePath = _DATA_DIR_ / massFlowRatesPrintFileName
-    temperaturesPrintFilePath = _DATA_DIR_ / temperaturesPintFileName
     pumpsAndValves, mainTaps = getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow)
+    massFlowRatesPrintFilePath, temperaturesPrintFilePath = getPrtFilePaths(_DATA_DIR, _PROJECT_NAME)
 
     for regimeName in regimeValues.index:
         regimeRow = regimeValues.loc[regimeName]
@@ -57,7 +53,6 @@ def printRegimesAndCopyFiles(
         exception = runMassFlowSolver(mainWindow)
 
         if not exception:
-            print("massflowSolver ran without issue")
             timeStep = 2
         else:
             regimeName = regimeName + "_FAILED"
@@ -68,11 +63,24 @@ def printRegimesAndCopyFiles(
         )
         massFlowSolverVisualizer.slider.setValue(timeStep)
 
-        pdfName = str(_RESULTS_DIR_) + "\\" + _PROJECT_NAME_ + "_" + regimeName + ".pdf"
-        svgName = str(_RESULTS_DIR_) + "\\" + _PROJECT_NAME_ + "_" + regimeName + ".svg"
-        printDiagramToPDF(pdfName, mainWindow)
-        printDiagramToSVG(svgName, mainWindow)
+        makeDiagramFiles(_PROJECT_NAME, _RESULTS_DIR, mainWindow, regimeName=regimeName)
+
         massFlowSolverVisualizer.close()
+
+
+def getPrtFilePaths(_DATA_DIR, _PROJECT_NAME):
+    massFlowRatesPrintFileName = f"{_PROJECT_NAME}_Mfr.prt"
+    temperaturesPintFileName = f"{_PROJECT_NAME}_T.prt"
+    massFlowRatesPrintFilePath = _DATA_DIR / massFlowRatesPrintFileName
+    temperaturesPrintFilePath = _DATA_DIR / temperaturesPintFileName
+    return massFlowRatesPrintFilePath, temperaturesPrintFilePath
+
+
+def makeDiagramFiles(_PROJECT_NAME, _RESULTS_DIR, mainWindow, regimeName="diagram"):
+    pdfName = str(_RESULTS_DIR) + "\\" + _PROJECT_NAME + "_" + regimeName + ".pdf"
+    svgName = str(_RESULTS_DIR) + "\\" + _PROJECT_NAME + "_" + regimeName + ".svg"
+    printDiagramToPDF(pdfName, mainWindow)
+    printDiagramToSVG(svgName, mainWindow)
 
 
 def adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps):

@@ -3,16 +3,16 @@ import pathlib as _pl
 import trnsysGUI as _GUI
 import trnsysGUI.pythonInterface.regimeExporter.exportRegimes as _er
 
-_PROJECT_NAME_ = "diagramForRegimes"
-_DATA_DIR_ = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME_}"
-_EXPECTED_CVSS_DIR_ = _DATA_DIR_ / "expectedCSVs"
+_PROJECT_NAME = "diagramForRegimes"
+_DATA_DIR = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME}"
+_EXPECTED_CVSS_DIR = _DATA_DIR / "expectedCSVs"
 
 
 class TestExportRegimeTemplate:
     def testExportTemplate(self):
-        projectJson = _DATA_DIR_ / f"{_PROJECT_NAME_}.json"
-        regimeFileName = _DATA_DIR_ / "regimeTemplate.csv"
-        expectedFileName = _EXPECTED_CVSS_DIR_ / "expectedRegimeTemplate.csv"
+        projectJson = _DATA_DIR / f"{_PROJECT_NAME}.json"
+        regimeFileName = _DATA_DIR / "regimeTemplate.csv"
+        expectedFileName = _EXPECTED_CVSS_DIR / "expectedRegimeTemplate.csv"
 
         _er.exportRegimeTemplate(projectJson, regimeFileName)
 
