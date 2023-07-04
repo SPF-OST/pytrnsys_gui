@@ -34,16 +34,16 @@ def getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow):
 
 
 def printRegimesAndCopyFiles(
-    _DATA_DIR, _PROJECT_NAME, _RESULTS_DIR, _DATA_FILENAME, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None
+    dataDir, projectName, resultsDir, dataFileName, mainWindow, pumpTapPairs=None, onlyTheseRegimes=None
 ):
     # createPDF of diagram only
     if not onlyTheseRegimes:
-        makeDiagramFiles(_PROJECT_NAME, _RESULTS_DIR, mainWindow)
+        makeDiagramFiles(projectName, resultsDir, mainWindow)
 
-    regimeValues = _gdr.getRegimes(_DATA_DIR / _DATA_FILENAME, onlyTheseRegimes)
+    regimeValues = _gdr.getRegimes(dataDir / dataFileName, onlyTheseRegimes)
     pumpsAndValvesNames = list(regimeValues.columns)
     pumpsAndValves, mainTaps = getPumpsAndValvesAndMainTaps(pumpsAndValvesNames, mainWindow)
-    massFlowRatesPrintFilePath, temperaturesPrintFilePath = getPrtFilePaths(_DATA_DIR, _PROJECT_NAME)
+    massFlowRatesPrintFilePath, temperaturesPrintFilePath = getPrtFilePaths(dataDir, projectName)
 
     for regimeName in regimeValues.index:
         regimeRow = regimeValues.loc[regimeName]
@@ -63,22 +63,22 @@ def printRegimesAndCopyFiles(
         )
         massFlowSolverVisualizer.slider.setValue(timeStep)
 
-        makeDiagramFiles(_PROJECT_NAME, _RESULTS_DIR, mainWindow, regimeName=regimeName)
+        makeDiagramFiles(projectName, resultsDir, mainWindow, regimeName=regimeName)
 
         massFlowSolverVisualizer.close()
 
 
-def getPrtFilePaths(_DATA_DIR, _PROJECT_NAME):
-    massFlowRatesPrintFileName = f"{_PROJECT_NAME}_Mfr.prt"
-    temperaturesPintFileName = f"{_PROJECT_NAME}_T.prt"
-    massFlowRatesPrintFilePath = _DATA_DIR / massFlowRatesPrintFileName
-    temperaturesPrintFilePath = _DATA_DIR / temperaturesPintFileName
+def getPrtFilePaths(dataDir, projectName):
+    massFlowRatesPrintFileName = f"{projectName}_Mfr.prt"
+    temperaturesPintFileName = f"{projectName}_T.prt"
+    massFlowRatesPrintFilePath = dataDir / massFlowRatesPrintFileName
+    temperaturesPrintFilePath = dataDir / temperaturesPintFileName
     return massFlowRatesPrintFilePath, temperaturesPrintFilePath
 
 
-def makeDiagramFiles(_PROJECT_NAME, _RESULTS_DIR, mainWindow, regimeName="diagram"):
-    pdfName = str(_RESULTS_DIR) + "\\" + _PROJECT_NAME + "_" + regimeName + ".pdf"
-    svgName = str(_RESULTS_DIR) + "\\" + _PROJECT_NAME + "_" + regimeName + ".svg"
+def makeDiagramFiles(projectName, resultsDir, mainWindow, regimeName="diagram"):
+    pdfName = str(resultsDir) + "\\" + projectName + "_" + regimeName + ".pdf"
+    svgName = str(resultsDir) + "\\" + projectName + "_" + regimeName + ".svg"
     printDiagramToPDF(pdfName, mainWindow)
     printDiagramToSVG(svgName, mainWindow)
 
