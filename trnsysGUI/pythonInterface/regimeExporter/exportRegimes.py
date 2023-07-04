@@ -14,19 +14,19 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
     f.close()
 
     data = {}
-    undesiredBlocks = ['.__BlockDct__', 'IDs', 'Strings']
-    for i, block in enumerate(jsonValues['Blocks']):
+    undesiredBlocks = [".__BlockDct__", "IDs", "Strings"]
+    for i, block in enumerate(jsonValues["Blocks"]):
         if block not in undesiredBlocks:
-            curDict = jsonValues['Blocks'][block]
-            if 'BlockName' in curDict:
-                curBlockName = curDict['BlockName']
-                if curBlockName == 'Pump':
-                    desiredValueName = 'massFlowRateInKgPerH'
+            curDict = jsonValues["Blocks"][block]
+            if "BlockName" in curDict:
+                curBlockName = curDict["BlockName"]
+                if curBlockName == "Pump":
+                    desiredValueName = "massFlowRateInKgPerH"
                     data = getData(curDict, data, desiredValueName)
-                elif curBlockName == 'TVentil':
-                    desiredValueName = 'PositionForMassFlowSolver'
+                elif curBlockName == "TVentil":
+                    desiredValueName = "PositionForMassFlowSolver"
                     data = getData(curDict, data, desiredValueName)
-    pumpsAndValvesAndValues = _pd.DataFrame(data, index=["\'dummy regime\'"])
+    pumpsAndValvesAndValues = _pd.DataFrame(data, index=["'dummy regime'"])
     pumpsAndValvesAndValues.index.name = "regimeName"
     return pumpsAndValvesAndValues
 
@@ -39,5 +39,5 @@ def getData(curDict, data, desiredValueName):
 
 
 def writeToCsv(pumpsAndValvesAndValues, regimeFileName):
-    pumpsAndValvesAndValues = pumpsAndValvesAndValues.sort_index(axis='columns')
+    pumpsAndValvesAndValues = pumpsAndValvesAndValues.sort_index(axis="columns")
     pumpsAndValvesAndValues.to_csv(regimeFileName)
