@@ -73,13 +73,13 @@ class TestPrintRegimesAndCopyFiles:
         mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
         _rdopfp.printRegimesAndCopyFiles(_DATA_DIR, _PROJECT_NAME, _RESULTS_DIR, _DATA_FILENAME, mainWindow)
 
-        self._FileExistsAndIsCorrect(_NEW_DIAGRAM_PATH, _EXPECTED_DIAGRAM_PATH)
-        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH, _EXPECTED_NAME1_PATH)
-        self._FileExistsAndIsCorrect(_NEW_NAME1_SVG_PATH, _EXPECTED_NAME1_SVG_PATH)
-        self._FileExistsAndIsCorrect(_NEW_NAME2_PATH, _EXPECTED_NAME2_PATH)
+        self._fileExistsAndIsCorrect(_NEW_DIAGRAM_PATH, _EXPECTED_DIAGRAM_PATH)
+        self._fileExistsAndIsCorrect(_NEW_NAME1_PATH, _EXPECTED_NAME1_PATH)
+        self._fileExistsAndIsCorrect(_NEW_NAME1_SVG_PATH, _EXPECTED_NAME1_SVG_PATH)
+        self._fileExistsAndIsCorrect(_NEW_NAME2_PATH, _EXPECTED_NAME2_PATH)
 
     @staticmethod
-    def _FileExistsAndIsCorrect(producedFile, expectedFile):
+    def _fileExistsAndIsCorrect(producedFile, expectedFile):
         assert producedFile.is_file()
         _mpltc.compare_images(str(producedFile), str(expectedFile), 0, in_decorator=False)
 
@@ -88,8 +88,8 @@ class TestPrintRegimesAndCopyFiles:
         mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
         _rdopfp.printRegimesAndCopyFiles(_DATA_DIR, _PROJECT_NAME, _RESULTS_DIR_2, _DATA_FILENAME, mainWindow,
                                          onlyTheseRegimes=onlyTheseRegimes)
-        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
-        self._FileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_DIAGRAM_PATH)
+        self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
+        self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_DIAGRAM_PATH)
         assert not _NEW_DIAGRAM_PATH_2.is_file()
         assert not _NEW_NAME2_PATH_2.is_file()
 

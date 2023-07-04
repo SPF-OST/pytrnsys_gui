@@ -107,7 +107,7 @@ def runMassFlowSolver(mainWindow) -> _tp.Optional[Exception]:
 
 
 def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor):  # type: ignore[name-defined]
-    exportedFilePath = str(_exportHydraulic(editor, _format="mfs"))
+    exportedFilePath = str(_exportHydraulic(editor, formatting="mfs"))
 
     trnExePath = str(_getTrnExePath())
 
@@ -115,8 +115,8 @@ def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor):  # type: ignore[n
     return exception
 
 
-def _exportHydraulic(editor: _de.Editor, *, _format) -> str:  # type: ignore[name-defined]
-    exportedFilePath = editor.exportHydraulics(exportTo=_format)
+def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[name-defined]
+    exportedFilePath = editor.exportHydraulics(exportTo=formatting)
     return exportedFilePath
 
 
