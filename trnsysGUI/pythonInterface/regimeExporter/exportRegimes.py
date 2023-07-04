@@ -9,7 +9,7 @@ def exportRegimeTemplate(projectJson, regimeFileName):
 
 
 def getPumpsAndValvesWithValuesFromJson(projectJson):
-    with open(projectJson, 'r', encoding='utf-8') as openFile:
+    with open(projectJson, "r", encoding="utf-8") as openFile:
         jsonValues = json.load(openFile)
 
     data = {}

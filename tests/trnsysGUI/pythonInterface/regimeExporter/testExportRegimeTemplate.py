@@ -16,7 +16,7 @@ class TestExportRegimeTemplate:
 
         _er.exportRegimeTemplate(projectJson, regimeFileName)
 
-        expectedContent = _pl.Path(expectedFileName).read_text(encoding='utf-8')
-        actualContent = _pl.Path(regimeFileName).read_text(encoding='utf-8')
+        expectedContent = _pl.Path(expectedFileName).read_text(encoding="utf-8")
+        actualContent = _pl.Path(regimeFileName).read_text(encoding="utf-8")
 
         assert actualContent == expectedContent

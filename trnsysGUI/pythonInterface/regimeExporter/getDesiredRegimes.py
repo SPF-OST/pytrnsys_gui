@@ -10,6 +10,7 @@ def getRegimesFromFile(fileName):
         return table
     raise ValueError(f"Column name '{colName}' not found.")
 
+
 # error handling?
 #   - will throw "fileNotFoundError" as it is.
 #
@@ -23,7 +24,7 @@ def getRegimesFromFile(fileName):
 
 def getRegimes(filePath, onlyTheseRegimes):
     regimeValues = getRegimesFromFile(filePath)
-    regimeValues = regimeValues.set_index('regimeName')
+    regimeValues = regimeValues.set_index("regimeName")
     if onlyTheseRegimes:
         return regimeValues.loc[onlyTheseRegimes]
     return regimeValues

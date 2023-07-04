@@ -8,6 +8,7 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtSvg as _qtsvg
 import PyQt5.QtCore as _qtc
+import pandas as _pd
 
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.MassFlowVisualizer as _mfv
@@ -18,26 +19,26 @@ import trnsysGUI.TVentil as _tv
 import trnsysGUI.WTap_main as _wtm
 
 
-@_dc.dataclass()
+@_dc.dataclass
 class RegimeExporter:
     projectName: _tp.Union[str, _pl.Path]
     dataDir: _tp.Union[str, _pl.Path]
     resultsDir: _tp.Union[str, _pl.Path]
     regimesFileName: _tp.Union[str, _pl.Path]
-    mainWindow: _mw.MainWindow
+    mainWindow: _mw.MainWindow  # type: ignore[name-defined]
 
-    def __post_init__(self):
-        self.printFilePaths: list = self._getPrtFilePaths()
+    def __post_init__(self) -> None:
+        self.massFlowRatesPrintFilePath, self.temperaturesPrintFilePath = self._getPrtFilePaths()
 
-    def _getPrtFilePaths(self):
+    def _getPrtFilePaths(self) -> [str, str]:
         massFlowRatesPrintFileName = f"{self.projectName}_Mfr.prt"
         temperaturesPintFileName = f"{self.projectName}_T.prt"
         massFlowRatesPrintFilePath = self.dataDir / massFlowRatesPrintFileName
         temperaturesPrintFilePath = self.dataDir / temperaturesPintFileName
 
-        return [massFlowRatesPrintFilePath, temperaturesPrintFilePath]
+        return massFlowRatesPrintFilePath, temperaturesPrintFilePath
 
-    def export(self, pumpTapPairs=None, onlyTheseRegimes=None):
+    def export(self, pumpTapPairs: list = None, onlyTheseRegimes: list = None) -> None:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()
@@ -48,13 +49,13 @@ class RegimeExporter:
 
         self._simulateAndVisualizeMassFlows(mainTaps, pumpTapPairs, pumpsAndValves, regimeValues)
 
-    def _makeDiagramFiles(self, regimeName="diagram"):
+    def _makeDiagramFiles(self, regimeName="diagram") -> None:
         pdfName = str(self.resultsDir) + "\\" + self.projectName + "_" + regimeName + ".pdf"
         svgName = str(self.resultsDir) + "\\" + self.projectName + "_" + regimeName + ".svg"
         self._printDiagramToPDF(pdfName)
         self._printDiagramToSVG(svgName)
 
-    def getPumpsAndValvesAndMainTaps(self, pumpsAndValvesNames):
+    def getPumpsAndValvesAndMainTaps(self, pumpsAndValvesNames: list) -> [list, dict]:
         pumpsAndValves = []
         mainTaps = {}
         blockItemsAndConnections = self.mainWindow.editor.trnsysObj
@@ -67,8 +68,9 @@ class RegimeExporter:
 
         return pumpsAndValves, mainTaps
 
-    def _simulateAndVisualizeMassFlows(self, mainTaps, pumpTapPairs, pumpsAndValves, regimeValues):
-        massFlowRatesPrintFilePath, temperaturesPrintFilePath = self.printFilePaths
+    def _simulateAndVisualizeMassFlows(
+        self, mainTaps: dict, pumpTapPairs: list, pumpsAndValves: list, regimeValues: _pd.DataFrame
+    ) -> None:
 
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
@@ -86,8 +88,8 @@ class RegimeExporter:
             massFlowSolverVisualizer = _mfv.MassFlowVisualizer(
                 # type: ignore[attr-defined]  # pylint: disable=unused-variable
                 self.mainWindow,
-                massFlowRatesPrintFilePath,
-                temperaturesPrintFilePath,
+                self.massFlowRatesPrintFilePath,
+                self.temperaturesPrintFilePath,
             )
             massFlowSolverVisualizer.slider.setValue(timeStep)
 
@@ -96,7 +98,9 @@ class RegimeExporter:
             massFlowSolverVisualizer.close()
 
     @staticmethod
-    def _adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps):
+    def _adjustPumpsAndValves(
+        pumpsAndValves: list, regimeRow: _pd.DataFrame, pumpTapPairs: list, mainTaps: dict
+    ) -> None:
 
         for blockItem in pumpsAndValves:
             blockItemName = blockItem.displayName
@@ -111,7 +115,7 @@ class RegimeExporter:
             else:
                 raise TypeError(f"Encountered blockItem of type {blockItem}, instead of a pump or a Valve")
 
-    def _printDiagramToPDF(self, fileName):
+    def _printDiagramToPDF(self, fileName: str) -> None:
         if fileName != "":
             printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
             printer.setOrientation(_qtp.QPrinter.Landscape)
@@ -121,7 +125,7 @@ class RegimeExporter:
             self.mainWindow.editor.diagramScene.render(painter)
             painter.end()
 
-    def _printDiagramToSVG(self, fileName):
+    def _printDiagramToSVG(self, fileName: str) -> None:
         # upside down and tiny compared to canvas
         if fileName != "":
             generator = _qtsvg.QSvgGenerator()
@@ -160,7 +164,7 @@ def _getTrnExePath():
     return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
 
 
-def runDck(cmd, dckName):
+def runDck(cmd: str, dckName: str) -> [bool, _tp.Optional[Exception]]:
     exception = None
     try:
         if _os.path.isfile(dckName):
