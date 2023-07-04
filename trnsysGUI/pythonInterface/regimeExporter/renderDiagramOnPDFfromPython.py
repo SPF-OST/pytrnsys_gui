@@ -26,7 +26,7 @@ class RegimeExporter:
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
 
-    def __post_init__(self) -> None:
+    def __post_init__(self) -> None:  # /NOSONAR
         self.massFlowRatesPrintFilePath, self.temperaturesPrintFilePath = self._getPrtFilePaths()
 
     def _getPrtFilePaths(self):
