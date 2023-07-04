@@ -8,7 +8,6 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtSvg as _qtsvg
 import PyQt5.QtCore as _qtc
-import pandas as _pd
 
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.MassFlowVisualizer as _mfv
@@ -21,16 +20,16 @@ import trnsysGUI.WTap_main as _wtm
 
 @_dc.dataclass
 class RegimeExporter:
-    projectName: _tp.Union[str, _pl.Path]
-    dataDir: _tp.Union[str, _pl.Path]
-    resultsDir: _tp.Union[str, _pl.Path]
-    regimesFileName: _tp.Union[str, _pl.Path]
+    projectName: str
+    dataDir: _pl.Path
+    resultsDir: _pl.Path
+    regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
 
     def __post_init__(self) -> None:
         self.massFlowRatesPrintFilePath, self.temperaturesPrintFilePath = self._getPrtFilePaths()
 
-    def _getPrtFilePaths(self) -> [str, str]:
+    def _getPrtFilePaths(self):
         massFlowRatesPrintFileName = f"{self.projectName}_Mfr.prt"
         temperaturesPintFileName = f"{self.projectName}_T.prt"
         massFlowRatesPrintFilePath = self.dataDir / massFlowRatesPrintFileName
@@ -38,7 +37,7 @@ class RegimeExporter:
 
         return massFlowRatesPrintFilePath, temperaturesPrintFilePath
 
-    def export(self, pumpTapPairs: list = None, onlyTheseRegimes: list = None) -> None:
+    def export(self, pumpTapPairs=None, onlyTheseRegimes=None) -> None:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()
@@ -55,7 +54,7 @@ class RegimeExporter:
         self._printDiagramToPDF(pdfName)
         self._printDiagramToSVG(svgName)
 
-    def getPumpsAndValvesAndMainTaps(self, pumpsAndValvesNames: list) -> [list, dict]:
+    def getPumpsAndValvesAndMainTaps(self, pumpsAndValvesNames):
         pumpsAndValves = []
         mainTaps = {}
         blockItemsAndConnections = self.mainWindow.editor.trnsysObj
@@ -68,9 +67,7 @@ class RegimeExporter:
 
         return pumpsAndValves, mainTaps
 
-    def _simulateAndVisualizeMassFlows(
-        self, mainTaps: dict, pumpTapPairs: list, pumpsAndValves: list, regimeValues: _pd.DataFrame
-    ) -> None:
+    def _simulateAndVisualizeMassFlows(self, mainTaps, pumpTapPairs, pumpsAndValves, regimeValues) -> None:
 
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
@@ -85,8 +82,7 @@ class RegimeExporter:
                 regimeName = regimeName + "_FAILED"
                 timeStep = 1
 
-            massFlowSolverVisualizer = _mfv.MassFlowVisualizer(
-                # type: ignore[attr-defined]  # pylint: disable=unused-variable
+            massFlowSolverVisualizer = _mfv.MassFlowVisualizer(  # type: ignore[attr-defined]
                 self.mainWindow,
                 self.massFlowRatesPrintFilePath,
                 self.temperaturesPrintFilePath,
@@ -98,9 +94,7 @@ class RegimeExporter:
             massFlowSolverVisualizer.close()
 
     @staticmethod
-    def _adjustPumpsAndValves(
-        pumpsAndValves: list, regimeRow: _pd.DataFrame, pumpTapPairs: list, mainTaps: dict
-    ) -> None:
+    def _adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps) -> None:
 
         for blockItem in pumpsAndValves:
             blockItemName = blockItem.displayName
@@ -164,7 +158,7 @@ def _getTrnExePath():
     return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
 
 
-def runDck(cmd: str, dckName: str) -> [bool, _tp.Optional[Exception]]:
+def runDck(cmd, dckName):
     exception = None
     try:
         if _os.path.isfile(dckName):
