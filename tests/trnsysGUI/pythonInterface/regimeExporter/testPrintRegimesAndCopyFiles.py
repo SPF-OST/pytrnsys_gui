@@ -11,7 +11,7 @@ import trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython as 
 
 _PROJECT_NAME = "diagramForRegimes"
 _DATA_DIR = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME}"
-_DATA_FILENAME = "regimes.csv"
+_REGIMES_FILENAME = "regimes.csv"
 _EXPECTED_PDFS_DIR = _DATA_DIR / "expectedPDFs"
 _RESULTS_DIR = _DATA_DIR / "results"
 _RESULTS_DIR_2 = _DATA_DIR / "resultsReducedUsage"
@@ -71,7 +71,8 @@ class TestPrintRegimesAndCopyFiles:
 
     def testUsingQtBot(self, qtbot):
         mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
-        _rdopfp.printRegimesAndCopyFiles(_DATA_DIR, _PROJECT_NAME, _RESULTS_DIR, _DATA_FILENAME, mainWindow)
+        regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME, _DATA_DIR, _RESULTS_DIR, _REGIMES_FILENAME, mainWindow)
+        regimeExporter.export()
 
         self._fileExistsAndIsCorrect(_NEW_DIAGRAM_PATH, _EXPECTED_DIAGRAM_PATH)
         self._fileExistsAndIsCorrect(_NEW_NAME1_PATH, _EXPECTED_NAME1_PATH)
@@ -86,8 +87,9 @@ class TestPrintRegimesAndCopyFiles:
     def testUsingQtBotForGivenRegimes(self, qtbot):
         onlyTheseRegimes = ["name1"]
         mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
-        _rdopfp.printRegimesAndCopyFiles(_DATA_DIR, _PROJECT_NAME, _RESULTS_DIR_2, _DATA_FILENAME, mainWindow,
-                                         onlyTheseRegimes=onlyTheseRegimes)
+        regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME, _DATA_DIR, _RESULTS_DIR_2, _REGIMES_FILENAME, mainWindow)
+        regimeExporter.export(onlyTheseRegimes=onlyTheseRegimes)
+
         self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
         self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_DIAGRAM_PATH)
         assert not _NEW_DIAGRAM_PATH_2.is_file()
