@@ -26,13 +26,16 @@ class PathFinder:
     expectedFolderName: str
     resultsFolderName: str
     resultsFolderName2: _tp.Optional[str]
+    fileEnding: str = _dc.field(init=False)
+    pdfName: str = _dc.field(init=False)
+    svgName: str = _dc.field(init=False)
 
     @property
     def dataDir(self):
         return _pl.Path(_GUI.__file__).parent / self.baseFolderRelativePath / self.projectName
 
     @property
-    def expectedPdfsDir(self):
+    def expectedFilesDir(self):
         return self.dataDir / self.expectedFolderName
 
     @property
@@ -43,19 +46,55 @@ class PathFinder:
     def resultsDir2(self):
         return self.dataDir / self.resultsFolderName2
 
+    def setFileEnding(self, fileEnding):
+        self.fileEnding = fileEnding
+        self._setPdfName()
+        self._setSvgName()
+
+    def _setPdfName(self):
+        self.pdfName = self.projectName + self.fileEnding + ".pdf"
+
+    def _setSvgName(self):
+        self.svgName = self.projectName + self.fileEnding + ".svg"
+
+    @property
+    def expectedPdfPath(self):
+        return self.expectedFilesDir / self.pdfName
+
+    @property
+    def newPdfPath(self):
+        return self.dataDir / self.resultsDir / self.pdfName
+
+    @property
+    def alternatePdfPath(self):
+        return self.dataDir / self.resultsDir2 / self.pdfName
+
+    @property
+    def expectedSvgPath(self):
+        return self.expectedFilesDir / self.svgName
+
+    @property
+    def newSvgPath(self):
+        return self.dataDir / self.resultsDir / self.svgName
+
+    @property
+    def alternateSvgPath(self):
+        return self.dataDir / self.resultsDir2 / self.svgName
+
 
 pathFinder = PathFinder(_PROJECT_NAME, baseFolderRelativePath, expectedFolderName, resultsDirName, resultsDirName2)
 
 
 _DATA_DIR = pathFinder.dataDir
-_EXPECTED_PDFS_DIR = pathFinder.expectedPdfsDir
+# _EXPECTED_PDFS_DIR = pathFinder.expectedFilesDir
 _RESULTS_DIR = pathFinder.resultsDir
 _RESULTS_DIR_2 = pathFinder.resultsDir2
 
-_DIAGRAM_ENDING = "_diagram.pdf"
-_NAME1_ENDING = "_name1.pdf"
-_NAME2_ENDING = "_name2.pdf"
-_NAME1_SVG_ENDING = "_name1.svg"
+
+# _DIAGRAM_ENDING = "_diagram.pdf"
+# _NAME1_ENDING = "_name1.pdf"
+# _NAME2_ENDING = "_name2.pdf"
+# _NAME1_SVG_ENDING = "_name1.svg"
 
 
 def _ensureDirExists(dirPath):
@@ -67,38 +106,30 @@ _ensureDirExists(_RESULTS_DIR)
 _ensureDirExists(_RESULTS_DIR_2)
 
 
-def _getExpectedAndNewFilePaths(ending, resultsDir, dataDir, projectName, expectedPdfsDir):
-    pdfName = projectName + ending
-    expectedPdfPath = expectedPdfsDir / pdfName
-    newPdfPath = dataDir / resultsDir / pdfName
-    return expectedPdfPath, newPdfPath
+# def _getExpectedAndNewFilePaths(ending, resultsDir, dataDir, projectName, expectedPdfsDir):
+#     pdfName = projectName + ending
+#     expectedPdfPath = expectedPdfsDir / pdfName
+#     newPdfPath = dataDir / resultsDir / pdfName
+#     return expectedPdfPath, newPdfPath
 
 
-_EXPECTED_DIAGRAM_PATH, _NEW_DIAGRAM_PATH = _getExpectedAndNewFilePaths(
-    _DIAGRAM_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
-_EXPECTED_NAME1_PATH, _NEW_NAME1_PATH = _getExpectedAndNewFilePaths(
-    _NAME1_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
-_EXPECTED_NAME2_PATH, _NEW_NAME2_PATH = _getExpectedAndNewFilePaths(
-    _NAME2_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
-_EXPECTED_NAME1_SVG_PATH, _NEW_NAME1_SVG_PATH = _getExpectedAndNewFilePaths(
-    _NAME1_SVG_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
+pathFinder.setFileEnding("_diagram")
+_EXPECTED_DIAGRAM_PATH = pathFinder.expectedPdfPath
+_NEW_DIAGRAM_PATH = pathFinder.newPdfPath
+_NEW_DIAGRAM_PATH_2 = pathFinder.alternatePdfPath
 
-_, _NEW_DIAGRAM_PATH_2 = _getExpectedAndNewFilePaths(
-    _DIAGRAM_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
-_, _NEW_NAME1_PATH_2 = _getExpectedAndNewFilePaths(
-    _NAME1_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
-_, _NEW_NAME2_PATH_2 = _getExpectedAndNewFilePaths(
-    _NAME2_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
-_, _NEW_NAME1_SVG_PATH_2 = _getExpectedAndNewFilePaths(
-    _NAME1_SVG_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
-)
+pathFinder.setFileEnding("_name1")
+_EXPECTED_NAME1_PATH = pathFinder.expectedPdfPath
+_NEW_NAME1_PATH = pathFinder.newPdfPath
+_NEW_NAME1_PATH_2 = pathFinder.alternatePdfPath
+_EXPECTED_NAME1_SVG_PATH = pathFinder.expectedSvgPath
+_NEW_NAME1_SVG_PATH = pathFinder.newSvgPath
+_NEW_NAME1_SVG_PATH_2 = pathFinder.alternateSvgPath
+
+pathFinder.setFileEnding("_name2")
+_EXPECTED_NAME2_PATH = pathFinder.expectedPdfPath
+_NEW_NAME2_PATH = pathFinder.newPdfPath
+_NEW_NAME2_PATH_2 = pathFinder.alternatePdfPath
 
 
 def _createMainWindow(projectFolder, projectName, qtbot):
@@ -151,31 +182,26 @@ class TestPrintRegimesAndCopyFiles:
         pumpTapPairs = {"Pump5": "WtSp1"}
         onlyTheseRegimes = ["dummy_regime"]
         projectName = "diagramWithTapForRegimes"
+        regimeEnding = "_dummy_regime"
 
         pathFinder2 = PathFinder(
             projectName, baseFolderRelativePath, expectedFolderName, resultsDirName, resultsDirName2
         )
         dataDir = pathFinder2.dataDir
-        expectedPdfsDir = pathFinder2.expectedPdfsDir
         resultsDir = pathFinder2.resultsDir
 
         _ensureDirExists(resultsDir)
 
-        _, newDiagramPath = _getExpectedAndNewFilePaths(
-            _DIAGRAM_ENDING, resultsDir, dataDir, projectName, expectedPdfsDir
-        )
-        regimeEnding = "_dummy_regime.pdf"
-        expectedFilePath, newFilePath = _getExpectedAndNewFilePaths(
-            regimeEnding, resultsDir, dataDir, projectName, expectedPdfsDir
-        )
+        pathFinder2.setFileEnding(regimeEnding)
 
         mainWindow = _createMainWindow(dataDir, projectName, qtbot)
         regimeExporter = _rdopfp.RegimeExporter(projectName, dataDir, resultsDir, _REGIMES_FILENAME, mainWindow)
         regimeExporter.export(pumpTapPairs=pumpTapPairs, onlyTheseRegimes=onlyTheseRegimes)
 
-        self._fileExistsAndIsCorrect(newFilePath, expectedFilePath)
+        self._fileExistsAndIsCorrect(pathFinder2.newPdfPath, pathFinder2.expectedPdfPath)
 
-        assert not newDiagramPath.is_file()
+        pathFinder2.setFileEnding("_diagram")
+        assert not pathFinder2.newPdfPath.is_file()
 
 
 # non-qtbot solution?
