@@ -19,7 +19,7 @@ jobs:
         run: echo %PATH%
         shell: cmd
       - name: Add Inkscape to the path
-        run: echo "C:\CI-Progams\Inkscape\bin" >> $env:GITHUB_PATH
+        run: echo "C:\CI-Progams\Inkscape\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         shell: pwsh
       - name: Display the path AGAIN
         run: echo %PATH%
