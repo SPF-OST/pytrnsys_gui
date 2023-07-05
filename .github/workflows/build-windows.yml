@@ -16,10 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Display the path
-        run: |
-          import os
-          print(os.environ['PATH'])
-        shell: python
+        run: echo %PATH%
+        shell: cmd
       - name: Remove old venv
         run: |
           if (Test-Path -LiteralPath venv) {
