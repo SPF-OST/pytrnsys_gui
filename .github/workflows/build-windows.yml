@@ -18,6 +18,12 @@ jobs:
       - name: Display the path
         run: echo %PATH%
         shell: cmd
+      - name: Add Inkscape to the path
+        run: "{C:\CI-Progams\Inkscape\bin}" >> $env:GITHUB_PATH
+        shell: pwsh
+      - name: Display the path AGAIN
+        run: echo %PATH%
+        shell: cmd
       - name: Remove old venv
         run: |
           if (Test-Path -LiteralPath venv) {
