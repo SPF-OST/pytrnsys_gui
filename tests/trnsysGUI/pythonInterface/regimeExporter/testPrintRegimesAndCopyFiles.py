@@ -1,6 +1,8 @@
+import dataclasses as _dc
 import os as _os
-import pathlib as _pl
 import matplotlib.testing.compare as _mpltc  # type: ignore[import]
+import pathlib as _pl
+import typing as _tp
 
 import pytrnsys.utils.log as _ulog
 
@@ -10,11 +12,45 @@ import trnsysGUI.project as _prj
 import trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython as _rdopfp
 
 _PROJECT_NAME = "diagramForRegimes"
-_DATA_DIR = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME}"
+baseFolderRelativePath = "..\\tests\\trnsysGUI\\data\\"
+expectedFolderName = "expectedPDFs"
+resultsDirName = "results"
+resultsDirName2 = "resultsReducedUsage"
 _REGIMES_FILENAME = "regimes.csv"
-_EXPECTED_PDFS_DIR = _DATA_DIR / "expectedPDFs"
-_RESULTS_DIR = _DATA_DIR / "results"
-_RESULTS_DIR_2 = _DATA_DIR / "resultsReducedUsage"
+
+
+@_dc.dataclass
+class PathFinder:
+    projectName: str
+    baseFolderRelativePath: str
+    expectedFolderName: str
+    resultsFolderName: str
+    resultsFolderName2: _tp.Optional[str]
+
+    @property
+    def dataDir(self):
+        return _pl.Path(_GUI.__file__).parent / self.baseFolderRelativePath / self.projectName
+
+    @property
+    def expectedPdfsDir(self):
+        return self.dataDir / self.expectedFolderName
+
+    @property
+    def resultsDir(self):
+        return self.dataDir / self.resultsFolderName
+
+    @property
+    def resultsDir2(self):
+        return self.dataDir / self.resultsFolderName2
+
+
+pathFinder = PathFinder(_PROJECT_NAME, baseFolderRelativePath, expectedFolderName, resultsDirName, resultsDirName2)
+
+
+_DATA_DIR = pathFinder.dataDir
+_EXPECTED_PDFS_DIR = pathFinder.expectedPdfsDir
+_RESULTS_DIR = pathFinder.resultsDir
+_RESULTS_DIR_2 = pathFinder.resultsDir2
 
 _DIAGRAM_ENDING = "_diagram.pdf"
 _NAME1_ENDING = "_name1.pdf"
@@ -31,22 +67,38 @@ _ensureDirExists(_RESULTS_DIR)
 _ensureDirExists(_RESULTS_DIR_2)
 
 
-def _getExpectedAndNewFilePaths(ending, resultsDir):
-    pdfName = _PROJECT_NAME + ending
-    expectedPdfPath = _EXPECTED_PDFS_DIR / pdfName
-    newPdfPath = _DATA_DIR / resultsDir / pdfName
+def _getExpectedAndNewFilePaths(ending, resultsDir, dataDir, projectName, expectedPdfsDir):
+    pdfName = projectName + ending
+    expectedPdfPath = expectedPdfsDir / pdfName
+    newPdfPath = dataDir / resultsDir / pdfName
     return expectedPdfPath, newPdfPath
 
 
-_EXPECTED_DIAGRAM_PATH, _NEW_DIAGRAM_PATH = _getExpectedAndNewFilePaths(_DIAGRAM_ENDING, _RESULTS_DIR)
-_EXPECTED_NAME1_PATH, _NEW_NAME1_PATH = _getExpectedAndNewFilePaths(_NAME1_ENDING, _RESULTS_DIR)
-_EXPECTED_NAME2_PATH, _NEW_NAME2_PATH = _getExpectedAndNewFilePaths(_NAME2_ENDING, _RESULTS_DIR)
-_EXPECTED_NAME1_SVG_PATH, _NEW_NAME1_SVG_PATH = _getExpectedAndNewFilePaths(_NAME1_SVG_ENDING, _RESULTS_DIR)
+_EXPECTED_DIAGRAM_PATH, _NEW_DIAGRAM_PATH = _getExpectedAndNewFilePaths(
+    _DIAGRAM_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
+_EXPECTED_NAME1_PATH, _NEW_NAME1_PATH = _getExpectedAndNewFilePaths(
+    _NAME1_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
+_EXPECTED_NAME2_PATH, _NEW_NAME2_PATH = _getExpectedAndNewFilePaths(
+    _NAME2_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
+_EXPECTED_NAME1_SVG_PATH, _NEW_NAME1_SVG_PATH = _getExpectedAndNewFilePaths(
+    _NAME1_SVG_ENDING, _RESULTS_DIR, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
 
-_, _NEW_DIAGRAM_PATH_2 = _getExpectedAndNewFilePaths(_DIAGRAM_ENDING, _RESULTS_DIR_2)
-_, _NEW_NAME1_PATH_2 = _getExpectedAndNewFilePaths(_NAME1_ENDING, _RESULTS_DIR_2)
-_, _NEW_NAME2_PATH_2 = _getExpectedAndNewFilePaths(_NAME2_ENDING, _RESULTS_DIR_2)
-_, _NEW_NAME1_SVG_PATH_2 = _getExpectedAndNewFilePaths(_NAME1_SVG_ENDING, _RESULTS_DIR_2)
+_, _NEW_DIAGRAM_PATH_2 = _getExpectedAndNewFilePaths(
+    _DIAGRAM_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
+_, _NEW_NAME1_PATH_2 = _getExpectedAndNewFilePaths(
+    _NAME1_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
+_, _NEW_NAME2_PATH_2 = _getExpectedAndNewFilePaths(
+    _NAME2_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
+_, _NEW_NAME1_SVG_PATH_2 = _getExpectedAndNewFilePaths(
+    _NAME1_SVG_ENDING, _RESULTS_DIR_2, _DATA_DIR, _PROJECT_NAME, _EXPECTED_PDFS_DIR
+)
 
 
 def _createMainWindow(projectFolder, projectName, qtbot):
@@ -94,6 +146,36 @@ class TestPrintRegimesAndCopyFiles:
         self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_DIAGRAM_PATH)
         assert not _NEW_DIAGRAM_PATH_2.is_file()
         assert not _NEW_NAME2_PATH_2.is_file()
+
+    def testUsingQtBotForRegimeWithTap(self, qtbot):
+        pumpTapPairs = {"Pump5": "WtSp1"}
+        onlyTheseRegimes = ["dummy_regime"]
+        projectName = "diagramWithTapForRegimes"
+
+        pathFinder2 = PathFinder(
+            projectName, baseFolderRelativePath, expectedFolderName, resultsDirName, resultsDirName2
+        )
+        dataDir = pathFinder2.dataDir
+        expectedPdfsDir = pathFinder2.expectedPdfsDir
+        resultsDir = pathFinder2.resultsDir
+
+        _ensureDirExists(resultsDir)
+
+        _, newDiagramPath = _getExpectedAndNewFilePaths(
+            _DIAGRAM_ENDING, resultsDir, dataDir, projectName, expectedPdfsDir
+        )
+        regimeEnding = "_dummy_regime.pdf"
+        expectedFilePath, newFilePath = _getExpectedAndNewFilePaths(
+            regimeEnding, resultsDir, dataDir, projectName, expectedPdfsDir
+        )
+
+        mainWindow = _createMainWindow(dataDir, projectName, qtbot)
+        regimeExporter = _rdopfp.RegimeExporter(projectName, dataDir, resultsDir, _REGIMES_FILENAME, mainWindow)
+        regimeExporter.export(pumpTapPairs=pumpTapPairs, onlyTheseRegimes=onlyTheseRegimes)
+
+        self._fileExistsAndIsCorrect(newFilePath, expectedFilePath)
+
+        assert not newDiagramPath.is_file()
 
 
 # non-qtbot solution?

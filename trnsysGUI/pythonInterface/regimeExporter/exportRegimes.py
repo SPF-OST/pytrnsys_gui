@@ -25,7 +25,7 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
                 elif curBlockName == "TVentil":
                     desiredValueName = "PositionForMassFlowSolver"
                     data = getData(curDict, data, desiredValueName)
-    pumpsAndValvesAndValues = _pd.DataFrame(data, index=["'dummy regime'"])
+    pumpsAndValvesAndValues = _pd.DataFrame(data, index=["dummy regime"])
     pumpsAndValvesAndValues.index.name = "regimeName"
     return pumpsAndValvesAndValues
 
