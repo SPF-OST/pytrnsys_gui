@@ -1,8 +1,8 @@
 import dataclasses as _dc
 import os as _os
-import matplotlib.testing.compare as _mpltc  # type: ignore[import]
 import pathlib as _pl
 import typing as _tp
+import matplotlib.testing.compare as _mpltc  # type: ignore[import]
 
 import pytrnsys.utils.log as _ulog
 
@@ -12,15 +12,15 @@ import trnsysGUI.project as _prj
 import trnsysGUI.pythonInterface.regimeExporter.renderDiagramOnPDFfromPython as _rdopfp
 
 _PROJECT_NAME = "diagramForRegimes"
-baseFolderRelativePath = "..\\tests\\trnsysGUI\\data\\"
-expectedFolderName = "expectedPDFs"
-resultsDirName = "results"
-resultsDirName2 = "resultsReducedUsage"
+_BASE_FOLDER_FILE_PATH = "..\\tests\\trnsysGUI\\data\\"
+_EXPECTED_FILES_PATH = "expectedPDFs"
+_RESULTS_DIR_NAME = "results"
+_RESULTS_DIR_NAME_2 = "resultsReducedUsage"
 _REGIMES_FILENAME = "regimes.csv"
 
 
 @_dc.dataclass
-class PathFinder:
+class PathFinder:  # pylint: disable=too-many-instance-attributes
     projectName: str
     baseFolderRelativePath: str
     expectedFolderName: str
@@ -82,19 +82,14 @@ class PathFinder:
         return self.dataDir / self.resultsDir2 / self.svgName
 
 
-pathFinder = PathFinder(_PROJECT_NAME, baseFolderRelativePath, expectedFolderName, resultsDirName, resultsDirName2)
+pathFinder = PathFinder(
+    _PROJECT_NAME, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
+)
 
 
 _DATA_DIR = pathFinder.dataDir
-# _EXPECTED_PDFS_DIR = pathFinder.expectedFilesDir
 _RESULTS_DIR = pathFinder.resultsDir
 _RESULTS_DIR_2 = pathFinder.resultsDir2
-
-
-# _DIAGRAM_ENDING = "_diagram.pdf"
-# _NAME1_ENDING = "_name1.pdf"
-# _NAME2_ENDING = "_name2.pdf"
-# _NAME1_SVG_ENDING = "_name1.svg"
 
 
 def _ensureDirExists(dirPath):
@@ -104,13 +99,6 @@ def _ensureDirExists(dirPath):
 
 _ensureDirExists(_RESULTS_DIR)
 _ensureDirExists(_RESULTS_DIR_2)
-
-
-# def _getExpectedAndNewFilePaths(ending, resultsDir, dataDir, projectName, expectedPdfsDir):
-#     pdfName = projectName + ending
-#     expectedPdfPath = expectedPdfsDir / pdfName
-#     newPdfPath = dataDir / resultsDir / pdfName
-#     return expectedPdfPath, newPdfPath
 
 
 pathFinder.setFileEnding("_diagram")
@@ -185,7 +173,7 @@ class TestPrintRegimesAndCopyFiles:
         regimeEnding = "_dummy_regime"
 
         pathFinder2 = PathFinder(
-            projectName, baseFolderRelativePath, expectedFolderName, resultsDirName, resultsDirName2
+            projectName, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
         )
         dataDir = pathFinder2.dataDir
         resultsDir = pathFinder2.resultsDir
