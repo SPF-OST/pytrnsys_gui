@@ -31,20 +31,20 @@ class PathFinder:  # pylint: disable=too-many-instance-attributes
     svgName: str = _dc.field(init=False)
 
     @property
-    def dataDir(self):
+    def projectDir(self):
         return _pl.Path(_GUI.__file__).parent / self.baseFolderRelativePath / self.projectName
 
     @property
     def expectedFilesDir(self):
-        return self.dataDir / self.expectedFolderName
+        return self.projectDir / self.expectedFolderName
 
     @property
     def resultsDir(self):
-        return self.dataDir / self.resultsFolderName
+        return self.projectDir / self.resultsFolderName
 
     @property
     def resultsDir2(self):
-        return self.dataDir / self.resultsFolderName2
+        return self.projectDir / self.resultsFolderName2
 
     def setFileEnding(self, fileEnding):
         self.fileEnding = fileEnding
@@ -63,11 +63,11 @@ class PathFinder:  # pylint: disable=too-many-instance-attributes
 
     @property
     def newPdfPath(self):
-        return self.dataDir / self.resultsDir / self.pdfName
+        return self.projectDir / self.resultsDir / self.pdfName
 
     @property
     def alternatePdfPath(self):
-        return self.dataDir / self.resultsDir2 / self.pdfName
+        return self.projectDir / self.resultsDir2 / self.pdfName
 
     @property
     def expectedSvgPath(self):
@@ -75,11 +75,11 @@ class PathFinder:  # pylint: disable=too-many-instance-attributes
 
     @property
     def newSvgPath(self):
-        return self.dataDir / self.resultsDir / self.svgName
+        return self.projectDir / self.resultsDir / self.svgName
 
     @property
     def alternateSvgPath(self):
-        return self.dataDir / self.resultsDir2 / self.svgName
+        return self.projectDir / self.resultsDir2 / self.svgName
 
 
 pathFinder = PathFinder(
@@ -87,7 +87,7 @@ pathFinder = PathFinder(
 )
 
 
-_DATA_DIR = pathFinder.dataDir
+_DATA_DIR = pathFinder.projectDir
 _RESULTS_DIR = pathFinder.resultsDir
 _RESULTS_DIR_2 = pathFinder.resultsDir2
 
@@ -175,7 +175,7 @@ class TestPrintRegimesAndCopyFiles:
         pathFinder2 = PathFinder(
             projectName, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
         )
-        dataDir = pathFinder2.dataDir
+        dataDir = pathFinder2.projectDir
         resultsDir = pathFinder2.resultsDir
 
         _ensureDirExists(resultsDir)

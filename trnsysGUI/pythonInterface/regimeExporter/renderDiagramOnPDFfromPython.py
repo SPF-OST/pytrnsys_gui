@@ -21,36 +21,37 @@ import trnsysGUI.WTap_main as _wtm
 @_dc.dataclass
 class RegimeExporter:
     projectName: str
-    dataDir: _pl.Path
+    projectDir: _pl.Path
     resultsDir: _pl.Path
     regimesFileName: str
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
 
-    def __post_init__(self) -> None:  # /NOSONAR
-        self.massFlowRatesPrintFilePath, self.temperaturesPrintFilePath = self._getPrtFilePaths()
-
-    def _getPrtFilePaths(self):
+    @property
+    def massFlowRatesPrintFilePath(self):
         massFlowRatesPrintFileName = f"{self.projectName}_Mfr.prt"
+        return self.projectDir / massFlowRatesPrintFileName
+
+    @property
+    def temperaturesPrintFilePath(self):
         temperaturesPintFileName = f"{self.projectName}_T.prt"
-        massFlowRatesPrintFilePath = self.dataDir / massFlowRatesPrintFileName
-        temperaturesPrintFilePath = self.dataDir / temperaturesPintFileName
+        return self.projectDir / temperaturesPintFileName
 
-        return massFlowRatesPrintFilePath, temperaturesPrintFilePath
-
-    def export(self, pumpTapPairs=None, onlyTheseRegimes=None) -> None:
+    def export(
+        self, pumpTapPairs: _tp.Optional[_tp.Dict] = None, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
+    ) -> None:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()
 
-        regimeValues = _gdr.getRegimes(self.dataDir / self.regimesFileName, onlyTheseRegimes)
+        regimeValues = _gdr.getRegimes(self.projectDir / self.regimesFileName, onlyTheseRegimes)
         pumpsAndValvesNames = list(regimeValues.columns)
         pumpsAndValves, mainTaps = self.getPumpsAndValvesAndMainTaps(pumpsAndValvesNames)
 
         self._simulateAndVisualizeMassFlows(mainTaps, pumpTapPairs, pumpsAndValves, regimeValues)
 
     def _makeDiagramFiles(self, regimeName="diagram") -> None:
-        pdfName = str(self.resultsDir) + "\\" + self.projectName + "_" + regimeName + ".pdf"
-        svgName = str(self.resultsDir) + "\\" + self.projectName + "_" + regimeName + ".svg"
+        pdfName = self.resultsDir / f"{self.projectName}_{regimeName}.pdf"
+        svgName = self.resultsDir / f"{self.projectName}_{regimeName}.svg"
         self._printDiagramToPDF(pdfName)
         self._printDiagramToSVG(svgName)
 
@@ -107,25 +108,25 @@ class RegimeExporter:
             elif isinstance(blockItem, _tv.TVentil):
                 blockItem.positionForMassFlowSolver = desiredValue
             else:
-                raise TypeError(f"Encountered blockItem of type {blockItem}, instead of a pump or a Valve")
+                raise AssertionError(f"Encountered blockItem of type {blockItem}, instead of a pump or a Valve")
 
-    def _printDiagramToPDF(self, fileName: str) -> None:
+    def _printDiagramToPDF(self, fileName: _pl.Path) -> None:
         if fileName != "":
             printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
             printer.setOrientation(_qtp.QPrinter.Landscape)
             printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
-            printer.setOutputFileName(fileName)
+            printer.setOutputFileName(str(fileName))
             painter = _qtg.QPainter(printer)
             self.mainWindow.editor.diagramScene.render(painter)
             painter.end()
 
-    def _printDiagramToSVG(self, fileName: str) -> None:
+    def _printDiagramToSVG(self, fileName: _pl.Path) -> None:
         # upside down and tiny compared to canvas
         if fileName != "":
             generator = _qtsvg.QSvgGenerator()
             generator.setSize(_qtc.QSize(1600, 1600))
             generator.setViewBox(_qtc.QRect(0, 0, 1600, 1600))
-            generator.setFileName(fileName)
+            generator.setFileName(str(fileName))
             painter = _qtg.QPainter(generator)
             self.mainWindow.editor.diagramScene.render(painter)
             painter.end()
