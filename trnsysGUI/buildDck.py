@@ -5,17 +5,17 @@ import logging
 import os
 import typing as _tp
 
-import numpy as num
-
-import pytrnsys.trnsys_util.buildTrnsysDeck as build
-import pytrnsys.trnsys_util.readConfigTrnsys as readConfig
+import pytrnsys.rsim.getConfigMixin as _rcm
+import pytrnsys.trnsys_util.buildTrnsysDeck as _btd
+import pytrnsys.trnsys_util.readConfigTrnsys as _rc
 import pytrnsys.utils.result as _res
 
 logger = logging.getLogger("root")
 
 
-class buildDck:
-    def __init__(self, pathConfig, name="pytrnsysRun", configFile=None, runPath=None):
+class buildDck(_rcm.GetConfigMixin):
+    def __init__(self, pathConfig):
+        super().__init__()
 
         self.pathConfig = pathConfig
         self.path = pathConfig
@@ -63,13 +63,18 @@ class buildDck:
         if _res.isError(readConfigResult):
             return _res.error(readConfigResult)
 
-        self._getConfig()
+        try:
+            self.getConfig()
+        except ValueError as valueError:
+            return _res.error(str(valueError))
 
         self.nameBase = self.inputs["nameRef"]
 
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
-        deck = build.BuildTrnsysDeck(self.path, self.nameBase, self.listDdck, self._ddckPlaceHolderValuesJsonPath)
+        deck = _btd.BuildTrnsysDeck(
+            self.path, self.nameBase, self._ddckFilePathWithComponentNames, self._ddckPlaceHolderValuesJsonPath
+        )
         result = deck.readDeckList(
             self.pathConfig,
             doAutoUnitNumbering=self.inputs["doAutoUnitNumbering"],
@@ -101,53 +106,13 @@ class buildDck:
 
         return deck.nameDeck
 
-    def _addParametricVariations(self, variations):
-        """
-        it fills a variableOutput with a list of all variations to run
-        format <class 'list'>: [['Ac', 'AcollAp', 1.5, 2.0, 1.5, 2.0], ['Vice', 'VIceS', 0.3, 0.3, 0.4, 0.4]]
-
-        Parameters
-        ----------
-        variations : list of list
-            list object containing the variations to be used.
-
-        Returns
-        -------
-
-        """
-
-        if self.inputs["combineAllCases"] == True:
-
-            labels = []
-            values = []
-            for i, row in enumerate(variations):
-                labels.append(row[:2])
-                values.append(row[2:])
-
-            value_permutations = num.array(num.meshgrid(*values), dtype=object).reshape(len(variations), -1)
-            result = num.concatenate((labels, value_permutations), axis=1)
-            self.variablesOutput = result.tolist()
-
-        else:
-            nVariations = len(variations)
-            sizeOneVariation = len(variations[0]) - 2
-            for n in range(len(variations)):
-                sizeCase = len(variations[n]) - 2
-                if sizeCase != sizeOneVariation:
-                    raise ValueError(
-                        "for combineAllCases=False all variations must have same lenght :%d case n:%d has a lenght of :%d"
-                        % (sizeOneVariation, n + 1, sizeCase)
-                    )
-
-            self.variablesOutput = variations
-
     def _readConfig(self, path, name, parseFileCreated=False) -> _res.Result[None]:
 
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
         It also loads the read lines into self.lines
         """
-        tool = readConfig.ReadConfigTrnsys()
+        tool = _rc.ReadConfigTrnsys()
 
         self.lines = tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated, controlDataType=False)
         if "pathBaseSimulations" in self.inputs:
@@ -166,113 +131,3 @@ class buildDck:
                 os.mkdir(self.path)
             except FileNotFoundError:
                 return _res.Error(f"The path could not be found: {self.path}")
-
-    def _getConfig(self):
-        """
-        Reads the config file.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
-        """
-        self.variation = []  # parametric studies
-        self.parDeck = []  # fixed values changed in all simulations
-        self.listDdck = []
-        self.parameters = {}  # deck parameters fixed for all simulations
-        self.listFit = {}
-        self.listFitObs = []
-        self.listDdckPaths = set()
-        self.dictDdckPaths = {}
-        self.caseDict = {}
-        self.sourceFilesToChange = []
-        self.sinkFilesToChange = []
-        self.foldersForDDckVariation = []
-        self.replaceLines = []
-
-        for line in self.lines:
-
-            splitLine = line.split()
-
-            if splitLine[0] == "variation":
-                variation = []
-                for i in range(len(splitLine)):
-                    if i == 0:
-                        pass
-                    elif i <= 2:
-                        variation.append(splitLine[i])
-                    else:
-                        try:
-                            variation.append(float(splitLine[i]))
-                        except:
-                            variation.append(splitLine[i])
-
-                self.variation.append(variation)
-
-            elif splitLine[0] == "deck":
-
-                if splitLine[2] == "string":
-                    self.parameters[splitLine[1]] = splitLine[3]
-                else:
-                    if splitLine[2].isdigit():
-                        self.parameters[splitLine[1]] = float(splitLine[2])
-                    else:
-                        self.parameters[splitLine[1]] = splitLine[2]
-
-            elif splitLine[0] == "replace":
-
-                splitString = line.split('$"')
-
-                oldString = splitString[1].split('"')[0]
-                newString = splitString[2].split('"')[0]
-
-                self.replaceLines.append((oldString, newString))
-
-            elif splitLine[0] == "changeDDckFile":
-                self.sourceFilesToChange.append(splitLine[1])
-                sinkFilesToChange = []
-                for i in range(len(splitLine)):
-                    if i < 2:
-                        pass
-                    else:
-                        sinkFilesToChange.append(splitLine[i])
-                self.sinkFilesToChange.append(sinkFilesToChange)
-
-            elif splitLine[0] == "addDDckFolder":
-                for i in range(len(splitLine)):
-                    if i > 0:
-                        self.foldersForDDckVariation.append(splitLine[i])
-
-            elif splitLine[0] == "fit":
-                self.listFit[splitLine[1]] = [splitLine[2], splitLine[3], splitLine[4]]
-            elif splitLine[0] == "case":
-                self.listFit[splitLine[1]] = splitLine[2:]
-            elif splitLine[0] == "fitobs":
-                self.listFitObs.append(splitLine[1])
-
-            elif splitLine[0] in self.inputs.keys():
-                fullPath = os.path.join(self.inputs[splitLine[0]], splitLine[1])
-                self.listDdck.append(fullPath)
-                self.listDdckPaths.add(self.inputs[splitLine[0]])
-                self.dictDdckPaths[fullPath] = self.inputs[splitLine[0]]
-            else:
-
-                pass
-
-        if len(self.variation) > 0:
-            self._addParametricVariations(self.variation)
-            self.variationsUsed = True
-        else:
-            self.variationsUsed = False
-
-        if len(self.sourceFilesToChange) > 0:
-            self.changeDDckFilesUsed = True
-        else:
-            self.changeDDckFilesUsed = False
-
-        if len(self.foldersForDDckVariation) > 0:
-            self.foldersForDDckVariationUsed = True
-        else:
-            self.foldersForDDckVariationUsed = False
