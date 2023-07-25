@@ -2,21 +2,21 @@
 from PyInstaller.utils.hooks import collect_data_files
 
 datas = []
-datas += collect_data_files('pytrnsys')
-datas += collect_data_files('trnsysGUI')
+datas += collect_data_files("pytrnsys")
+datas += collect_data_files("trnsysGUI")
 
 
 block_cipher = None
 
 
 a = Analysis(
-    ['pytrnsys-gui.py'],
+    ["pytrnsys-gui.py"],
     pathex=[],
     binaries=[],
     datas=datas,
     hiddenimports=[],
     hookspath=[],
-    hooksconfig={},
+    hooksconfig={"matplotlib": {"backends": ["AGG", "PDF"]}},
     runtime_hooks=[],
     excludes=[],
     win_no_prefer_redirects=False,
@@ -33,7 +33,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='pytrnsys-gui',
+    name="pytrnsys-gui",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
