@@ -1,4 +1,5 @@
 import logging as _log
+import multiprocessing as _mp
 import pathlib as _pl
 import sys as _sys
 
@@ -83,4 +84,9 @@ def _registerExceptionHook(logger: _log.Logger) -> None:
 
 
 if __name__ == "__main__":
+    # Support freezing using PyInstaller, see
+    # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing and
+    # https://docs.python.org/3/library/multiprocessing.html#multiprocessing.freeze_support
+    _mp.freeze_support()
+
     main()
