@@ -132,11 +132,11 @@ dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in degrees celsius
 dpLamdaSl = 8.64  ! Thermal conductivity of soil in kJ/hr.m.K
 dpRhoSl = 1800  ! Density of soil in kg/m^3
 dpCpSl = 1.0  ! Specific heat of soil in kJ/kg.K
-dpNrFlNds = 60  ! Number of fluid nodes
+dpNrFlNds = 10  ! Number of fluid nodes
 dpNrSlRad = 10  ! Number of radial soil nodes
 dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
-dpNrSlAx = 20  ! Number of axial soil nodes
+dpNrSlAx = 10  ! Number of axial soil nodes
 dpNrSlCirc = 4  ! Number of circumferential soil nodes
 UNIT 10 TYPE 9352 !Changed automatically
 PARAMETERS 484
