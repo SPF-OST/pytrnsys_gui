@@ -1,31 +1,38 @@
+import pytest as _pt
+
 import trnsysGUI.connection.hydraulicExport.common as _com
 import trnsysGUI.connection.hydraulicExport.doublePipe as _he
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _model
 
-_SIMULATED_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
-    _model.ExportHydraulicDoublePipeConnection(
-        displayName="DTeeD_SCnrD",
-        coldPipe=_model.Pipe(
-            name="Cold",
-            inputPort=_com.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
-            outputPort=_com.OutputPort("TDTeeDCold"),
-        ),
-        hotPipe=_model.Pipe(
-            name="Hot",
-            inputPort=_com.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
-            outputPort=_com.OutputPort("TSCnrDHot"),
-        ),
-    ),
-    lengthInM=400.0,
-    shallBeSimulated=True,
-)
 
-_EXPECTED_SIMULATED_UNIT_TEXT = """\
+def getSimulatedDPConnection(dpLengthInM, nFlNodesdp):
+    return _model.ExportDoublePipeConnection(
+        _model.ExportHydraulicDoublePipeConnection(
+            displayName="DTeeD_SCnrD",
+            coldPipe=_model.Pipe(
+                name="Cold",
+                inputPort=_com.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
+                outputPort=_com.OutputPort("TDTeeDCold"),
+            ),
+            hotPipe=_model.Pipe(
+                name="Hot",
+                inputPort=_com.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
+                outputPort=_com.OutputPort("TSCnrDHot"),
+            ),
+        ),
+        lengthInM=dpLengthInM,
+        shallBeSimulated=True,
+        dpNrFlNds=nFlNodesdp
+    )
+
+
+def getExpectedSimulatedUnitText(dpLengthInM, dpNrFlNds):
+    return f"""\
 UNIT 503 TYPE 9511
 ! DTeeD_SCnrD
 PARAMETERS 36
 ****** pipe and soil properties ******
-400.0                                ! Length of buried pipe, m
+{dpLengthInM}                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -52,9 +59,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+{dpNrFlNds}                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+{dpNrFlNds}                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -102,6 +109,7 @@ DTeeD_SCnrDSlInt = [503,16]*1/3600 ! Change in soil's internal heat content comp
 
 """
 
+
 _DUMMY_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
     _model.ExportHydraulicDoublePipeConnection(
         displayName="DTeeD_SCnrD",
@@ -118,6 +126,7 @@ _DUMMY_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
     ),
     lengthInM=400.0,
     shallBeSimulated=False,
+    dpNrFlNds=0
 )
 
 _EXPECTED_DUMMY_UNIT_TEXT = """\
@@ -154,9 +163,20 @@ MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
 
 
 class TestDoublePipeConnection:
-    def testSimulatedExport(self):
-        actualUnitText, nextUnitNumber = _he.export(_SIMULATED_DOUBLE_PIPE_CONNECTION, 503)
-        assert actualUnitText == _EXPECTED_SIMULATED_UNIT_TEXT
+    @_pt.mark.parametrize("dpLengthInM, dpNrFlNds", [
+        (10, 2),
+        (115.8808, 2),
+        (200, 4),
+        (400, 7),
+        (579.404, 10),
+        (637.3444, 11),
+        (700, 13)
+    ])
+    def testSimulatedExport(self, dpLengthInM, dpNrFlNds):
+        dpConnection = getSimulatedDPConnection(dpLengthInM, dpNrFlNds)
+        expectedText = getExpectedSimulatedUnitText(dpLengthInM, dpNrFlNds)
+        actualUnitText, nextUnitNumber = _he.export(dpConnection, 503)
+        assert actualUnitText == expectedText
         assert nextUnitNumber == 504
 
     def testDummyExport(self):

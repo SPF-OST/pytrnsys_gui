@@ -31,6 +31,7 @@ class GenericConnection(_tp.Generic[_T]):
     hydraulicConnection: _T
     lengthInM: _values.Value
     shallBeSimulated: bool
+    dpNrFlNds: _values.Value  # why _values.Value?
 
 
 @_dc.dataclass
