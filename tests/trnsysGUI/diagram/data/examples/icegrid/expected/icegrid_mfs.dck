@@ -174,11 +174,11 @@ dpRhoSl = 1800  ! Density of soil in kg/m^3
 dpCpSl = 1.0  ! Specific heat of soil in kJ/kg.K
 
 ****** Definition of nodes ******
-dpNrFlNds = 60  ! Number of fluid nodes
+dpNrFlNds = 10  ! Number of fluid nodes
 dpNrSlRad = 10  ! Number of radial soil nodes
 dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
-dpNrSlAx = 20  ! Number of axial soil nodes
+dpNrSlAx = 10  ! Number of axial soil nodes
 dpNrSlCirc = 4  ! Number of circumferential soil nodes
 
 
