@@ -852,7 +852,7 @@
                 -60.0,
                 190.0
             ],
-            "lengthInM": 2.0,
+            "lengthInM": 10.0,
             "massFlowLabelPos": [
                 -110.18446180555554,
                 123.53949652777777
@@ -886,7 +886,7 @@
                 80.0,
                 190.0
             ],
-            "lengthInM": 2.0,
+            "lengthInM": 115.0,
             "massFlowLabelPos": [
                 20.32118055555557,
                 61.14800347222223
@@ -920,7 +920,7 @@
                 220.0,
                 190.0
             ],
-            "lengthInM": 2.0,
+            "lengthInM": 200.0,
             "massFlowLabelPos": [
                 220.0,
                 190.0
@@ -954,7 +954,7 @@
                 360.0,
                 190.0
             ],
-            "lengthInM": 2.0,
+            "lengthInM": 400.0,
             "massFlowLabelPos": [
                 360.0,
                 190.0
@@ -988,7 +988,7 @@
                 500.0,
                 190.0
             ],
-            "lengthInM": 2.0,
+            "lengthInM": 579.404,
             "massFlowLabelPos": [
                 500.0,
                 190.0
@@ -1022,7 +1022,7 @@
                 640.0,
                 190.0
             ],
-            "lengthInM": 2.0,
+            "lengthInM": 637.34,
             "massFlowLabelPos": [
                 591.1718749999999,
                 109.97612847222223
@@ -1056,7 +1056,7 @@
                 780.0,
                 190.0
             ],
-            "lengthInM": 2.0,
+            "lengthInM": 700.0,
             "massFlowLabelPos": [
                 721.6775173611111,
                 43.51562500000003

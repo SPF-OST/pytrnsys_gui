@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math as _math
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
@@ -148,8 +149,10 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         assert isinstance(self.lengthInM, float)
 
+        fluidNodeNr = calculateNodeNr(self.lengthInM)
+
         exportConnection = _hedpc.ExportDoublePipeConnection(
-            exportHydraulicConnection, self.lengthInM, self.shallBeSimulated
+            exportHydraulicConnection, self.lengthInM, self.shallBeSimulated, fluidNodeNr
         )
 
         return exportConnection
@@ -186,3 +189,10 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def redo(self):
         self._connection.deleteConn()
         self._connection = None
+
+
+def calculateNodeNr(dpLengthInM):
+    # todo: make into class
+    defaultLength = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
+    nNodes = _math.ceil(10*dpLengthInM/defaultLength)
+    return max(nNodes, 2)

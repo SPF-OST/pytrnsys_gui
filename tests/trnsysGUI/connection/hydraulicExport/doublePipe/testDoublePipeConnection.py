@@ -3,6 +3,7 @@ import pytest as _pt
 import trnsysGUI.connection.hydraulicExport.common as _com
 import trnsysGUI.connection.hydraulicExport.doublePipe as _he
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _model
+import trnsysGUI.connection.doublePipeConnection as _dpc
 
 
 def getSimulatedDPConnection(dpLengthInM, nFlNodesdp):
@@ -186,3 +187,16 @@ class TestDoublePipeConnection:
         )
         assert actualUnitText == _EXPECTED_DUMMY_UNIT_TEXT
         assert nextUnitNumber == 505
+
+    @_pt.mark.parametrize("dpLengthInM, dpNrFlNds", [
+        (10, 2),
+        (115.8808, 2),
+        (200, 4),
+        (400, 7),
+        (579.404, 10),
+        (637.3444, 11),
+        (700, 13)
+    ])
+    def testCalculateNodeNr(self, dpLengthInM, dpNrFlNds):
+        nodeNr = _dpc.calculateNodeNr(dpLengthInM)
+        assert nodeNr == dpNrFlNds

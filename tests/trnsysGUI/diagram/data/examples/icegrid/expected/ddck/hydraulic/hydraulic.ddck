@@ -1288,9 +1288,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+2                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+2                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -1340,7 +1340,7 @@ UNIT 494 TYPE 9511
 ! DTeeC_DTeeD
 PARAMETERS 36
 ****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
+10.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1367,9 +1367,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+2                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+2                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -1419,7 +1419,7 @@ UNIT 495 TYPE 9511
 ! DTeeD_DTeeE
 PARAMETERS 36
 ****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
+115.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1446,9 +1446,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+2                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+2                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -1498,7 +1498,7 @@ UNIT 496 TYPE 9511
 ! DTeeE_DTeeF
 PARAMETERS 36
 ****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
+200.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1525,9 +1525,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+4                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+4                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -1577,7 +1577,7 @@ UNIT 497 TYPE 9511
 ! DTeeF_DTeeG
 PARAMETERS 36
 ****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
+400.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1604,9 +1604,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+7                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+7                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -1656,7 +1656,7 @@ UNIT 498 TYPE 9511
 ! DTeeG_DTeeH
 PARAMETERS 36
 ****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
+579.404                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1683,9 +1683,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+10                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+10                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -1735,7 +1735,7 @@ UNIT 499 TYPE 9511
 ! DTeeH_DTeeI
 PARAMETERS 36
 ****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
+637.34                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1762,9 +1762,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+11                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+11                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -1814,7 +1814,7 @@ UNIT 500 TYPE 9511
 ! DTeeI_DTeeJ
 PARAMETERS 36
 ****** pipe and soil properties ******
-2.0                                ! Length of buried pipe, m
+700.0                                ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -1841,9 +1841,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+13                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+13                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -2472,9 +2472,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+2                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+2                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -2563,9 +2563,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+2                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+2                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
@@ -2671,9 +2671,9 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+2                               ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
+2                                ! Number of axial soil nodes
 dpNrSlCirc                              ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
