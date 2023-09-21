@@ -21,11 +21,18 @@ _SIMULATED_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
 )
 
 _EXPECTED_SIMULATED_UNIT_TEXT = """\
+CONSTANTS 4
+DTeeD_SCnrD_Len = 400.0
+! Round up to smallest larger integer
+DTeeD_SCnrD_NrSlAx = INT(DTeeD_SCnrD_Len*dpNrSlAxRef/dpLengthRef) + 1
+DTeeD_SCnrD_NrFlNds = dpNrFlNdsToNrSlAxRatio*DTeeD_SCnrD_NrSlAx
+DTeeD_SCnrD_NrSlCirc = dpNrSlCirc
+
 UNIT 503 TYPE 9511
 ! DTeeD_SCnrD
 PARAMETERS 36
 ****** pipe and soil properties ******
-400.0                                ! Length of buried pipe, m
+DTeeD_SCnrD_Len                        ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -52,10 +59,10 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+DTeeD_SCnrD_NrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeD_SCnrD_NrSlAx                   ! Number of axial soil nodes
+DTeeD_SCnrD_NrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -156,6 +163,7 @@ MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
 class TestDoublePipeConnection:
     def testSimulatedExport(self):
         actualUnitText, nextUnitNumber = _he.export(_SIMULATED_DOUBLE_PIPE_CONNECTION, 503)
+        print(actualUnitText)
         assert actualUnitText == _EXPECTED_SIMULATED_UNIT_TEXT
         assert nextUnitNumber == 504
 
