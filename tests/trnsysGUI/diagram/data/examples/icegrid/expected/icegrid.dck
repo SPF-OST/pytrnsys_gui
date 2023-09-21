@@ -112,8 +112,8 @@ TQSnkEH=TQSnkE
 TQSnkFH=TQSnkF
 CONSTANTS 1
 spTIni = 20
-CONSTANTS 25
-dpLength = 579.404 ! Length of buried pipe in m
+CONSTANTS 28
+dpLengthRef = 579.404 ! Length of buried pipe in m
 dpDiamIn = 0.4028 ! Inner diameter of pipes in m
 dpDiamOut = 0.429 ! Outer diameter of pipes in m
 dpLambda = 175 ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -132,12 +132,15 @@ dpTIniCold  = 10  ! Initial fluid temperature - pipe 2 in degrees celsius
 dpLamdaSl = 8.64  ! Thermal conductivity of soil in kJ/hr.m.K
 dpRhoSl = 1800  ! Density of soil in kg/m^3
 dpCpSl = 1.0  ! Specific heat of soil in kJ/kg.K
-dpNrFlNds = 60  ! Number of fluid nodes
+dpNrSlAxRef = 20
+dpNrFlNdsToNrSlAxRatio = 3
 dpNrSlRad = 10  ! Number of radial soil nodes
 dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
-dpNrSlAx = 20  ! Number of axial soil nodes
 dpNrSlCirc = 4  ! Number of circumferential soil nodes
+dpNrFlNdsFactor = 1
+dpNrSlAxFactor = 1
+dpNrSlCircFactor = 1
 UNIT 10 TYPE 9352 !Changed automatically
 PARAMETERS 484
 mfrSolverAbsTol
@@ -1098,6 +1101,13 @@ dpTIniHot
 dpTIniHot
 EQUATIONS 1
 TDTeeJHot = [52,1] !Changed automatically
+CONSTANTS 6
+DTeeB_DTeeCNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeB_DTeeCNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeB_DTeeCNrSlAxCeil = MAX(DTeeB_DTeeCNrSlAxFrac - DTeeB_DTeeCNrSlAxRem, 1)
+DTeeB_DTeeCNrSlAx = dpNrSlAxFactor*DTeeB_DTeeCNrSlAxCeil
+DTeeB_DTeeCNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeB_DTeeCNrSlAx
+DTeeB_DTeeCNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 53 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1122,10 +1132,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeB_DTeeCNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeB_DTeeCNrSlAx                   ! Number of axial soil nodes
+DTeeB_DTeeCNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -1164,6 +1174,13 @@ DTeeB_DTeeCExch = [53,13]*1/3600  !Changed automatically
 DTeeB_DTeeCGrSl = [53,14]*1/3600  !Changed automatically
 DTeeB_DTeeCSlFf = [53,15]*1/3600  !Changed automatically
 DTeeB_DTeeCSlInt = [53,16]*1/3600  !Changed automatically
+CONSTANTS 6
+DTeeC_DTeeDNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeC_DTeeDNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeC_DTeeDNrSlAxCeil = MAX(DTeeC_DTeeDNrSlAxFrac - DTeeC_DTeeDNrSlAxRem, 1)
+DTeeC_DTeeDNrSlAx = dpNrSlAxFactor*DTeeC_DTeeDNrSlAxCeil
+DTeeC_DTeeDNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeC_DTeeDNrSlAx
+DTeeC_DTeeDNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 54 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1188,10 +1205,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeC_DTeeDNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeC_DTeeDNrSlAx                   ! Number of axial soil nodes
+DTeeC_DTeeDNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -1230,6 +1247,13 @@ DTeeC_DTeeDExch = [54,13]*1/3600  !Changed automatically
 DTeeC_DTeeDGrSl = [54,14]*1/3600  !Changed automatically
 DTeeC_DTeeDSlFf = [54,15]*1/3600  !Changed automatically
 DTeeC_DTeeDSlInt = [54,16]*1/3600  !Changed automatically
+CONSTANTS 6
+DTeeD_DTeeENrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeD_DTeeENrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeD_DTeeENrSlAxCeil = MAX(DTeeD_DTeeENrSlAxFrac - DTeeD_DTeeENrSlAxRem, 1)
+DTeeD_DTeeENrSlAx = dpNrSlAxFactor*DTeeD_DTeeENrSlAxCeil
+DTeeD_DTeeENrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeD_DTeeENrSlAx
+DTeeD_DTeeENrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 55 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1254,10 +1278,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeD_DTeeENrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeD_DTeeENrSlAx                   ! Number of axial soil nodes
+DTeeD_DTeeENrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -1296,6 +1320,13 @@ DTeeD_DTeeEExch = [55,13]*1/3600  !Changed automatically
 DTeeD_DTeeEGrSl = [55,14]*1/3600  !Changed automatically
 DTeeD_DTeeESlFf = [55,15]*1/3600  !Changed automatically
 DTeeD_DTeeESlInt = [55,16]*1/3600  !Changed automatically
+CONSTANTS 6
+DTeeE_DTeeFNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeE_DTeeFNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeE_DTeeFNrSlAxCeil = MAX(DTeeE_DTeeFNrSlAxFrac - DTeeE_DTeeFNrSlAxRem, 1)
+DTeeE_DTeeFNrSlAx = dpNrSlAxFactor*DTeeE_DTeeFNrSlAxCeil
+DTeeE_DTeeFNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeE_DTeeFNrSlAx
+DTeeE_DTeeFNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 56 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1320,10 +1351,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeE_DTeeFNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeE_DTeeFNrSlAx                   ! Number of axial soil nodes
+DTeeE_DTeeFNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -1362,6 +1393,13 @@ DTeeE_DTeeFExch = [56,13]*1/3600  !Changed automatically
 DTeeE_DTeeFGrSl = [56,14]*1/3600  !Changed automatically
 DTeeE_DTeeFSlFf = [56,15]*1/3600  !Changed automatically
 DTeeE_DTeeFSlInt = [56,16]*1/3600  !Changed automatically
+CONSTANTS 6
+DTeeF_DTeeGNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeF_DTeeGNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeF_DTeeGNrSlAxCeil = MAX(DTeeF_DTeeGNrSlAxFrac - DTeeF_DTeeGNrSlAxRem, 1)
+DTeeF_DTeeGNrSlAx = dpNrSlAxFactor*DTeeF_DTeeGNrSlAxCeil
+DTeeF_DTeeGNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeF_DTeeGNrSlAx
+DTeeF_DTeeGNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 57 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1386,10 +1424,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeF_DTeeGNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeF_DTeeGNrSlAx                   ! Number of axial soil nodes
+DTeeF_DTeeGNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -1428,6 +1466,13 @@ DTeeF_DTeeGExch = [57,13]*1/3600  !Changed automatically
 DTeeF_DTeeGGrSl = [57,14]*1/3600  !Changed automatically
 DTeeF_DTeeGSlFf = [57,15]*1/3600  !Changed automatically
 DTeeF_DTeeGSlInt = [57,16]*1/3600  !Changed automatically
+CONSTANTS 6
+DTeeG_DTeeHNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeG_DTeeHNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeG_DTeeHNrSlAxCeil = MAX(DTeeG_DTeeHNrSlAxFrac - DTeeG_DTeeHNrSlAxRem, 1)
+DTeeG_DTeeHNrSlAx = dpNrSlAxFactor*DTeeG_DTeeHNrSlAxCeil
+DTeeG_DTeeHNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeG_DTeeHNrSlAx
+DTeeG_DTeeHNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 58 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1452,10 +1497,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeG_DTeeHNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeG_DTeeHNrSlAx                   ! Number of axial soil nodes
+DTeeG_DTeeHNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -1494,6 +1539,13 @@ DTeeG_DTeeHExch = [58,13]*1/3600  !Changed automatically
 DTeeG_DTeeHGrSl = [58,14]*1/3600  !Changed automatically
 DTeeG_DTeeHSlFf = [58,15]*1/3600  !Changed automatically
 DTeeG_DTeeHSlInt = [58,16]*1/3600  !Changed automatically
+CONSTANTS 6
+DTeeH_DTeeINrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeH_DTeeINrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeH_DTeeINrSlAxCeil = MAX(DTeeH_DTeeINrSlAxFrac - DTeeH_DTeeINrSlAxRem, 1)
+DTeeH_DTeeINrSlAx = dpNrSlAxFactor*DTeeH_DTeeINrSlAxCeil
+DTeeH_DTeeINrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeH_DTeeINrSlAx
+DTeeH_DTeeINrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 59 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1518,10 +1570,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeH_DTeeINrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeH_DTeeINrSlAx                   ! Number of axial soil nodes
+DTeeH_DTeeINrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -1560,6 +1612,13 @@ DTeeH_DTeeIExch = [59,13]*1/3600  !Changed automatically
 DTeeH_DTeeIGrSl = [59,14]*1/3600  !Changed automatically
 DTeeH_DTeeISlFf = [59,15]*1/3600  !Changed automatically
 DTeeH_DTeeISlInt = [59,16]*1/3600  !Changed automatically
+CONSTANTS 6
+DTeeI_DTeeJNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeI_DTeeJNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeI_DTeeJNrSlAxCeil = MAX(DTeeI_DTeeJNrSlAxFrac - DTeeI_DTeeJNrSlAxRem, 1)
+DTeeI_DTeeJNrSlAx = dpNrSlAxFactor*DTeeI_DTeeJNrSlAxCeil
+DTeeI_DTeeJNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeI_DTeeJNrSlAx
+DTeeI_DTeeJNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 60 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -1584,10 +1643,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeI_DTeeJNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeI_DTeeJNrSlAx                   ! Number of axial soil nodes
+DTeeI_DTeeJNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -2044,6 +2103,13 @@ MQSnkJ_SCnrJ_A TQSnkJH TSCnrJCold
 EQUATIONS 2
 TQSnkJ_SCnrJ = [102,1] !Changed automatically
 MQSnkJ_SCnrJ = MQSnkJ_SCnrJ_A
+CONSTANTS 6
+DTeeJ_SCnrZNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeJ_SCnrZNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeJ_SCnrZNrSlAxCeil = MAX(DTeeJ_SCnrZNrSlAxFrac - DTeeJ_SCnrZNrSlAxRem, 1)
+DTeeJ_SCnrZNrSlAx = dpNrSlAxFactor*DTeeJ_SCnrZNrSlAxCeil
+DTeeJ_SCnrZNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeJ_SCnrZNrSlAx
+DTeeJ_SCnrZNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 103 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -2068,10 +2134,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeJ_SCnrZNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeJ_SCnrZNrSlAx                   ! Number of axial soil nodes
+DTeeJ_SCnrZNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -2120,6 +2186,13 @@ MSCnrZ_SCnrZ_A TSCnr99Hot TSCnr99Cold
 EQUATIONS 2
 TSCnrZ_SCnrZ = [104,1] !Changed automatically
 MSCnrZ_SCnrZ = MSCnrZ_SCnrZ_A
+CONSTANTS 6
+DTeeA_DTeeBNrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+DTeeA_DTeeBNrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+DTeeA_DTeeBNrSlAxCeil = MAX(DTeeA_DTeeBNrSlAxFrac - DTeeA_DTeeBNrSlAxRem, 1)
+DTeeA_DTeeBNrSlAx = dpNrSlAxFactor*DTeeA_DTeeBNrSlAxCeil
+DTeeA_DTeeBNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeA_DTeeBNrSlAx
+DTeeA_DTeeBNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 105 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -2144,10 +2217,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+DTeeA_DTeeBNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeA_DTeeBNrSlAx                   ! Number of axial soil nodes
+DTeeA_DTeeBNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -2206,6 +2279,13 @@ MDTeeA_SCnrAHot_A TDTeeAHot TSCnrAHot
 EQUATIONS 2
 TDTeeA_SCnrAHot = [107,1] !Changed automatically
 MDTeeA_SCnrAHot = MDTeeA_SCnrAHot_A
+CONSTANTS 6
+SCnr1_DTeeANrSlAxFrac = 2.0*dpNrSlAxRef/dpLengthRef
+SCnr1_DTeeANrSlAxRem = MOD(2.0*dpNrSlAxRef, dpLengthRef)
+SCnr1_DTeeANrSlAxCeil = MAX(SCnr1_DTeeANrSlAxFrac - SCnr1_DTeeANrSlAxRem, 1)
+SCnr1_DTeeANrSlAx = dpNrSlAxFactor*SCnr1_DTeeANrSlAxCeil
+SCnr1_DTeeANrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*SCnr1_DTeeANrSlAx
+SCnr1_DTeeANrSlCirc = dpNrSlCircFactor*dpNrSlCirc
 UNIT 108 TYPE 9511 !Changed automatically
 PARAMETERS 36
 2.0                                ! Length of buried pipe, m
@@ -2230,10 +2310,10 @@ dpCpSl                                  ! Specific heat of soil, kJ/(kg*K)
 TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
-dpNrFlNds                               ! Number of fluid nodes
+SCnr1_DTeeANrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+SCnr1_DTeeANrSlAx                   ! Number of axial soil nodes
+SCnr1_DTeeANrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m

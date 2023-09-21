@@ -21,6 +21,16 @@ _SIMULATED_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
 )
 
 _EXPECTED_SIMULATED_UNIT_TEXT = """\
+CONSTANTS 6
+! Round down to largest smaller integer
+DTeeD_SCnrDNrSlAxFrac = 400.0*dpNrSlAxRef/dpLengthRef
+DTeeD_SCnrDNrSlAxRem = MOD(400.0*dpNrSlAxRef, dpLengthRef)
+DTeeD_SCnrDNrSlAxCeil = MAX(DTeeD_SCnrDNrSlAxFrac - DTeeD_SCnrDNrSlAxRem, 1)
+DTeeD_SCnrDNrSlAx = dpNrSlAxFactor*DTeeD_SCnrDNrSlAxCeil
+
+DTeeD_SCnrDNrFlNds = dpNrFlNdsFactor*dpNrFlNdsToNrSlAxRatio*DTeeD_SCnrDNrSlAx
+DTeeD_SCnrDNrSlCirc = dpNrSlCircFactor*dpNrSlCirc
+
 UNIT 503 TYPE 9511
 ! DTeeD_SCnrD
 PARAMETERS 36
@@ -52,10 +62,10 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+DTeeD_SCnrDNrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeD_SCnrDNrSlAx                   ! Number of axial soil nodes
+DTeeD_SCnrDNrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
