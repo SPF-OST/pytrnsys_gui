@@ -10,3 +10,5 @@ lark
 appdirs
 Jinja2
 qtconsole
+typer
+typing_extensions
