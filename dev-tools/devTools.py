@@ -146,7 +146,7 @@ def _maybeRunMypy(arguments):
     ]
 
     additionalArgs = arguments.mypyArguments or ""
-    args = [*cmd, *additionalArgs, *_SOURCE_DIRS]
+    args = [*cmd, *additionalArgs, *_SOURCE_DIRS.split()]
 
     _printAndRun(args)
 
