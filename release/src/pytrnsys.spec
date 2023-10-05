@@ -8,7 +8,7 @@ datas += collect_data_files("trnsysGUI")
 block_cipher = None
 
 a = Analysis(
-    ["run_pytrnsys.py"],
+    ["runPytrnsys.py"],
     pathex=[],
     binaries=[],
     datas=datas,
@@ -43,7 +43,7 @@ exe = EXE(
 )
 
 ga = Analysis(
-    ["run_pytrnsys_gui.py"],
+    ["runPytrnsysGui.py"],
     pathex=[],
     binaries=[],
     datas=datas,

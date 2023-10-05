@@ -11,13 +11,13 @@ import qtconsole.rich_jupyter_widget as _qtcjw
 class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-method,too-many-ancestors
     _KERNEL = "python3"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.kernel_manager: _tp.Optional[_qtcm.KernelManager] = None  # pylint: disable=invalid-name # /NOSONAR
         self.kernel_client: _tp.Optional[_qtcc.KernelClient] = None  # pylint: disable=invalid-name # /NOSONAR
 
-    def isRunning(self):
-        return self.kernel_manager and self.kernel_client
+    def isRunning(self) -> bool:
+        return bool(self.kernel_manager and self.kernel_client)
 
     def startInFolder(self, dirPathToStartIPythonIn: _pl.Path) -> None:
         if self.isRunning():

@@ -4,6 +4,7 @@
 
 import argparse as ap
 import contextlib as ctx
+import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
@@ -16,7 +17,7 @@ import time
 
 _SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
 
-_SOURCE_DIRS = "trnsysGUI tests dev-tools release"
+_SOURCE_DIRS = ["trnsysGUI", "tests", "dev-tools", "release/src"]
 
 
 def main():
@@ -146,7 +147,7 @@ def _maybeRunMypy(arguments):
     ]
 
     additionalArgs = arguments.mypyArguments or ""
-    args = [*cmd, *additionalArgs, *_SOURCE_DIRS.split()]
+    args = [*cmd, *additionalArgs, *_SOURCE_DIRS]
 
     _printAndRun(args)
 
@@ -155,20 +156,20 @@ def _maybeRunPylint(arguments):
     if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None):
         return
 
-    cmd = f"{_SCRIPTS_DIR / 'pylint'} {_SOURCE_DIRS}"
+    cmd = f"{_SCRIPTS_DIR / 'pylint'}  --recursive=yes"
     additionalArgs = arguments.lintArguments or ""
 
-    _printAndRun([*cmd.split(), *additionalArgs.split()])
+    _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
 
 
 def _maybeRunBlack(arguments):
     if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None):
         return
 
-    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 {_SOURCE_DIRS}"
+    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120"
     additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
 
-    _printAndRun([*cmd.split(), *additionalArgs.split()])
+    _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
 
 
 def _maybeCreateDiagrams(arguments):
@@ -204,9 +205,21 @@ def _maybeCreateExecutable(arguments):
     for cmd in commands:
         _printAndRun(cmd.split())
 
-    with ctx.chdir("release"):
-        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys.spec"
+    with _chdir("release"):
+        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe .\src\pytrnsys.spec"
         _printAndRun(cmd.split())
+
+
+@ctx.contextmanager
+def _chdir(newWorkingDirPath: tp.Union[pl.Path, str]) -> tp.Iterator[None]:
+    oldWorkingDirPath = pl.Path()
+    newWorkingDirPath = pl.Path(newWorkingDirPath)
+
+    try:
+        os.chdir(newWorkingDirPath)
+        yield
+    finally:
+        os.chdir(oldWorkingDirPath)
 
 
 def _maybeRunPytest(arguments, testResultsDirPath):
