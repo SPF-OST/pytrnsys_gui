@@ -56,11 +56,11 @@ pkginfo==1.8.3
     # via twine
 pre-commit==2.20.0
     # via -r requirements\dev-3rd-party.in
-pyinstaller==5.6.2
+pyinstaller==6.0.0
     # via -r requirements\dev-3rd-party.in
 pyinstaller-hooks-contrib==2022.13
     # via pyinstaller
-pywin32-ctypes==0.2.0
+pywin32-ctypes==0.2.2
     # via
     #   keyring
     #   pyinstaller

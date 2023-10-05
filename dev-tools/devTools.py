@@ -3,18 +3,21 @@
 # Run from top-level directory
 
 import argparse as ap
+import contextlib as ctx
 import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import sysconfig as _sysconfig
+import sysconfig as sc
 import typing as tp
 import venv
 
 import sys
 import time
 
-_SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
+_SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
+
+_SOURCE_DIRS = ["trnsysGUI", "tests", "dev-tools", "release/src"]
 
 
 def main():
@@ -131,73 +134,92 @@ def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: 
 
 
 def _maybeRunMypy(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = [
-            _SCRIPTS_DIR / "mypy",
-            "--show-error-codes",
-            "--exclude",
-            # Don't include python scripts which are copied into test
-            # data directories (from, e.g., `examples`) during tests
-            "^tests/(.+/)?data/.*",
-        ]
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None):
+        return
 
-        additionalArgs = arguments.mypyArguments or ""
-        args = [*cmd, *additionalArgs, "trnsysGUI", "tests", "dev-tools"]
+    cmd = [
+        _SCRIPTS_DIR / "mypy",
+        "--show-error-codes",
+        "--exclude",
+        # Don't include python scripts which are copied into test
+        # data directories (from, e.g., `examples`) during tests
+        "^tests/(.+/)?data/.*",
+    ]
 
-        _printAndRun(args)
+    additionalArgs = arguments.mypyArguments or ""
+    args = [*cmd, *additionalArgs, *_SOURCE_DIRS]
+
+    _printAndRun(args)
 
 
 def _maybeRunPylint(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'pylint'} trnsysGUI tests dev-tools"
-        additionalArgs = arguments.lintArguments or ""
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None):
+        return
 
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    cmd = f"{_SCRIPTS_DIR / 'pylint'}  --recursive=yes"
+    additionalArgs = arguments.lintArguments or ""
+
+    _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
 
 
 def _maybeRunBlack(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 trnsysGUI tests dev-tools"
-        additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None):
+        return
 
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120"
+    additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
+
+    _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
 
 
 def _maybeCreateDiagrams(arguments):
-    if arguments.shallRunAll or arguments.diagramsFormat:
-        diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
-        _printAndRun(cmd.split())
+    if not (arguments.shallRunAll or arguments.diagramsFormat):
+        return
+
+    diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+    cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
+    _printAndRun(cmd.split())
 
 
 def _maybeCreateExecutable(arguments):
-    if arguments.shallRunAll or arguments.shallCreateExecutable:
-        releaseDirPath = pl.Path("release").resolve(strict=True)
+    if not (arguments.shallRunAll or arguments.shallCreateExecutable):
+        return
 
-        sh.rmtree(releaseDirPath / "build", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
+    releaseDirPath = pl.Path("release").resolve(strict=True)
 
-        venvDirPath = releaseDirPath / "pyinstaller-venv"
-        venv.create(venvDirPath, with_pip=True)
+    sh.rmtree(releaseDirPath / "build", ignore_errors=True)
+    sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
+    sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
 
-        commands = [
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
-            r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
-        ]
+    venvDirPath = releaseDirPath / "pyinstaller-venv"
+    venv.create(venvDirPath, with_pip=True)
 
-        for cmd in commands:
-            _printAndRun(cmd.split())
+    commands = [
+        r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
+        r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
+        r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
+        r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
+        r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
+    ]
 
-        os.chdir("release")
-
-        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
+    for cmd in commands:
         _printAndRun(cmd.split())
 
-        os.chdir("..")
+    with _chdir("release"):
+        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe .\src\pytrnsys.spec"
+        _printAndRun(cmd.split())
+
+
+@ctx.contextmanager
+def _chdir(newWorkingDirPath: tp.Union[pl.Path, str]) -> tp.Iterator[None]:
+    oldWorkingDirPath = pl.Path()
+    newWorkingDirPath = pl.Path(newWorkingDirPath)
+
+    try:
+        os.chdir(newWorkingDirPath)
+        yield
+    finally:
+        os.chdir(oldWorkingDirPath)
 
 
 def _maybeRunPytest(arguments, testResultsDirPath):

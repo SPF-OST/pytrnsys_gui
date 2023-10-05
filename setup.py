@@ -19,9 +19,7 @@ class _DestDirSourceFilePath:
 def _getDataFilePairs():
     dataDirPath = _pl.Path(__file__).parent / "data"
 
-    dataFilePaths = [
-        p.relative_to(dataDirPath) for p in dataDirPath.rglob("*") if p.is_file()
-    ]
+    dataFilePaths = [p.relative_to(dataDirPath) for p in dataDirPath.rglob("*") if p.is_file()]
 
     destDirSourcePathPairs = [
         _DestDirSourceFilePath(str("pytrnsys_gui_data" / p.parent), str("data" / p)) for p in dataFilePaths
@@ -30,11 +28,16 @@ def _getDataFilePairs():
     sortedPairs = sorted(destDirSourcePathPairs, key=lambda dp: dp.destDir)
 
     dataFilePairs = [
-        (d, [dp.sourceFilePath for dp in dps])
-        for d, dps in _it.groupby(sortedPairs, key=lambda dp: dp.destDir)
+        (d, [dp.sourceFilePath for dp in dps]) for d, dps in _it.groupby(sortedPairs, key=lambda dp: dp.destDir)
     ]
 
     return dataFilePairs
+
+
+def _getInstallRequirements():
+    requirementsFile = _pl.Path(__file__).parent / "requirements" / "release-3rd-party.in"
+    requirements = requirementsFile.read_text().split("\n")
+    return requirements
 
 
 _MASTER_VERSION_TEMPLATE = "0.0.0+master.{sha}"
@@ -46,8 +49,7 @@ setuptools.setup(
         "enabled": True,
         "template": _MASTER_VERSION_TEMPLATE,
         "dev_template": _MASTER_VERSION_TEMPLATE,
-        "dirty_template": f"{_MASTER_VERSION_TEMPLATE}.dirty"
-
+        "dirty_template": f"{_MASTER_VERSION_TEMPLATE}.dirty",
     },
     author_email="martin.neugebauer@ost.ch",
     description="A GUI for Trnsys",
@@ -69,18 +71,8 @@ setuptools.setup(
         ]
     },
     data_files=_getDataFilePairs(),
-    entry_points={"console_scripts": ["pytrnsys-gui=trnsysGUI.gui:main"]},
-    install_requires=[
-        "pytrnsys",
-        "PyQT5",
-        "matplotlib",
-        "numpy",
-        "pandas",
-        "bokeh",
-        "dataclasses_jsonschema",
-        "appdirs",
-        "Jinja2"
-    ],
+    entry_points={"console_scripts": ["pytrnsys-gui=trnsysGUI.gui:main", "pytrnsys=trnsysGUI.console:main"]},
+    install_requires=_getInstallRequirements(),
     setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.9",
 )
