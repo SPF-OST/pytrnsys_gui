@@ -4,7 +4,9 @@ import typer as _typer
 import typing_extensions as _te
 
 
-def main(python_script_path: _te.Annotated[_pl.Path, _typer.Argument(readable=True, dir_okay=False)]) -> None:
+def main(
+        python_script_path: _te.Annotated[_pl.Path, _typer.Argument(readable=True, dir_okay=False)]  # /NOSONAR
+) -> None:
     _runFile(python_script_path)
 
 

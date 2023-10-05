@@ -27,10 +27,10 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-met
         self.kernel_manager.start_kernel()
         self.kernel_manager.kernel.gui = "qt"
 
-        kernel_client = self.kernel_manager.client()
-        kernel_client.start_channels()
+        kernelClient = self.kernel_manager.client()
+        kernelClient.start_channels()
 
-        self.kernel_client = kernel_client
+        self.kernel_client = kernelClient
 
         self.execute(f"%cd {dirPathToStartIPythonIn}")
 
