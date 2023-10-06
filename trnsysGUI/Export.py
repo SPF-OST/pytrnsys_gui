@@ -117,7 +117,7 @@ CONSTANTS 1
 CONSTANTS 25
 
 ****** Pipe and soil properties ******
-dpLength = 579.404 ! Length of buried pipe in m
+{_gnames.DoublePipes.REFERENCE_LENGTH} = 579.404 ! Length of buried pipe in m
 dpDiamIn = 0.4028 ! Inner diameter of pipes in m
 dpDiamOut = 0.429 ! Outer diameter of pipes in m
 dpLambda = 175 ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -144,12 +144,12 @@ dpRhoSl = 1800  ! Density of soil in kg/m^3
 dpCpSl = 1.0  ! Specific heat of soil in kJ/kg.K
 
 ****** Definition of nodes ******
-dpNrFlNds = 60  ! Number of fluid nodes
+{_gnames.DoublePipes.N_AXIAL_SOIL_NODES_AT_REFERENCE_LENGTH} = 10
+{_gnames.DoublePipes.FLUID_TO_SOIL_NODES_RATIO} = 1
 dpNrSlRad = 10  ! Number of radial soil nodes
 dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
-dpNrSlAx = 20  ! Number of axial soil nodes
-dpNrSlCirc = 4  ! Number of circumferential soil nodes
+{_gnames.DoublePipes.N_CIRCUMFERENTIAL_SOIL_NODES} = 4  ! Number of circumferential soil nodes
 """
         massFlowSolverConstantsBlock = """\
 CONSTANTS 3
