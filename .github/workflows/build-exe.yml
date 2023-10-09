@@ -1,11 +1,9 @@
 name: Build EXE
 
 on:
-  release: 
-    branches:
-      - '*'
-    types:
-      - published
+  push:
+    tags:
+      - v*
   repository_dispatch:
     types:
       - build-executable-pull-request
@@ -44,11 +42,14 @@ jobs:
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: ${{github.event_name == 'release' && github.ref_name != 'bleeding-edge'}}
-        uses: johnwbyrd/update-release@v1.0.0
+      - if: ${{github.event_name == 'push'}}
+        name: Release artifacts (bleeding-edge)
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: ${{steps.fn.outputs.file_name_base}}.zip 
+          repo_token: "${{secrets.GITHUB_TOKEN}}"
+          title: "Release"
+          # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
+          files: ${{steps.fn.outputs.file_name_base}}.zip
 
       - if: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-pull-request'}}
         name: Upload artifacts
