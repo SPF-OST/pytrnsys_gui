@@ -5,12 +5,12 @@ on:
     branches:
       - '*'
   repository_dispatch:
-    type:
+    types:
       - build-executable-pull-request
       - build-executable-push
 
 jobs:
-  build-executable:
+  build-exe:
     runs-on: [self-hosted, etzel]
     steps:
       - uses: actions/checkout@v3
