@@ -8,7 +8,8 @@ on:
     branches:
       - '*'
   repository_dispatch:
-    type: run-tests-and-build-executable
+    types:
+      - run-tests-and-build-executable
 
 jobs:
   test:
