@@ -1,0 +1,69 @@
+name: Static checks and unit tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '*'
+  repository_dispatch:
+    type: run-tests-and-build-executable
+
+jobs:
+  test:
+    runs-on: [self-hosted, etzel]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Remove old venv
+        run: |
+          if (Test-Path -LiteralPath venv) {
+            Remove-Item -LiteralPath venv -Recurse
+          }
+      - name: Create virtual environment
+        run: py -3.9 -m venv venv
+      - name: Install dependencies
+        run: |
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel
+          venv\Scripts\python -m pip install -r requirements/test.txt
+      - name: Generate UI code from Qt Creator Studio .ui files
+        run: venv\Scripts\python dev-tools/generateGuiClassesFromQtCreatorStudioUiFiles.py
+      - name: Static type checking with mypy
+        run: venv\Scripts\python dev-tools/devTools.py --type
+      - name: Lint with pylint
+        run: venv\Scripts\python dev-tools/devTools.py --lint --keep-results
+      - name: Syntax checking with black
+        run: venv\Scripts\python dev-tools/devTools.py --black --keep-results
+      - name: Generate class and package diagrams
+        run: venv\Scripts\python dev-tools/devTools.py --diagram=dot --keep-results
+      - name: Test with pytest
+        run: venv\Scripts\python dev-tools/devTools.py --unit --keep-results
+      - name: Post coverage report to Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: test-results/coverage.lcov
+      - name: Upload test results and coverage reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-and-coverage-report-windows
+          path: test-results
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
+      - if: ${{github.event_name == 'pull_request'}}
+        name: Trigger build of executable for pull request
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          repository: SPF-OST/pytrnsys_gui
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: build-executable-pull-request
+          client-payload: '{"type": "build-executable-pull-request"}'
+      - if: ${{github.event_name == 'push'}}
+        name: Trigger build of executable for push
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          repository: SPF-OST/pytrnsys_gui
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: build-executable-push
+          client-payload: '{"type": "build-executable-push"}'
