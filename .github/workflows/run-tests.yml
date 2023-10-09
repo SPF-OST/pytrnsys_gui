@@ -1,4 +1,4 @@
-name: Static checks and unit tests
+name: Run tests and static checks
 
 on:
   push:

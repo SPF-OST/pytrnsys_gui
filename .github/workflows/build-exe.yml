@@ -1,9 +1,11 @@
-name: Static checks and unit tests
+name: Build EXE
 
 on:
   release: 
     branches:
       - '*'
+    types:
+      - published
   repository_dispatch:
     types:
       - build-executable-pull-request
