@@ -43,14 +43,13 @@ jobs:
           title: "Development Build"
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
+      
       - if: ${{github.event_name == 'release'}}
-        name: Release artifacts (${{github.event.release.release_id}})
-        uses: "marvinpinto/action-automatic-releases@latest"
+        uses: johnwbyrd/update-release@v1
         with:
-          repo_token: "${{secrets.GITHUB_TOKEN}}"
-          title: "Release ${{github.event.release.release_id}}"
-          # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: ${{steps.fn.outputs.file_name_base}}.zip 
+
       - if: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-pull-request'}}
         name: Upload artifacts
         uses: actions/upload-artifact@v3
