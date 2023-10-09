@@ -44,8 +44,8 @@ jobs:
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: ${{github.event_name == 'release'}}
-        uses: johnwbyrd/update-release@v1
+      - if: ${{github.event_name == 'release' && github.ref_name != 'bleeding-edge'}}
+        uses: johnwbyrd/update-release@v1.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: ${{steps.fn.outputs.file_name_base}}.zip 
