@@ -28,7 +28,7 @@ jobs:
           $pytrnsys_sha=$(release\pyinstaller-venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
           $ref_name="${{github.ref_name}}".replace("/","-")
           echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
-      - if: ${{github.event_name == 'release' || (github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push')}}
+      - if: ${{github.event_name == 'push' || (github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push')}}
         name: Create zip file
         run: Compress-Archive -Path data, release\pyinstaller-venv\pytrnsys_data, release\dist -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
       - if: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push'}}
@@ -43,7 +43,7 @@ jobs:
           files: ${{steps.fn.outputs.file_name_base}}.zip
       
       - if: ${{github.event_name == 'push'}}
-        name: Release artifacts (bleeding-edge)
+        name: Release artifacts (proper release)
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
