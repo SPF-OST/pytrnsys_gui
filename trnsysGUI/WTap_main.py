@@ -22,6 +22,7 @@ class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
         self._modelSource = _mfn.Source(outputPort)
 
         self.changeSize()
+        self.massFlowRateInKgPerH = 1000
 
     def getDisplayName(self) -> str:
         return self.displayName
@@ -64,7 +65,7 @@ class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
         return w, h
 
     def exportMassFlows(self):
-        resStr = "Mfr" + self.displayName + " = 1000" + "\n"
+        resStr = "Mfr" + self.displayName + f" = {self.massFlowRateInKgPerH}" + "\n"
         equationNr = 1
         return resStr, equationNr
 
