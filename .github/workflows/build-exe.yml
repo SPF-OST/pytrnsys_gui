@@ -2,10 +2,8 @@ name: Build EXE
 
 on:
   push:
-    branches:
-      - master
     tags:
-      - 'v*'
+      - v*
   repository_dispatch:
     types:
       - build-executable-pull-request
