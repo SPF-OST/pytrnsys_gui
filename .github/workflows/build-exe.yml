@@ -36,11 +36,11 @@ jobs:
           $ref_name="${{github.ref_name}}".replace("/","-")
           echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
       
-      - if: ${{env.TAG_PUSH_TO_MASTER || env.NORMAL_PUSH_TO_MASTER}}
+      - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Create zip file
         run: Compress-Archive -Path data, release\pyinstaller-venv\pytrnsys_data, release\dist -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: ${{env.NORMAL_PUSH_TO_MASTER}}
+      - if: env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Release artifacts (bleeding-edge)
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -51,7 +51,7 @@ jobs:
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
       
-      - if: ${{env.TAG_PUSH_TO_MASTER}}
+      - if: env.TAG_PUSH_TO_MASTER == 'true'
         name: Release artifacts (proper release)
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -61,7 +61,7 @@ jobs:
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
 
-      - if: $${{env.PUSH_TO_PULL_REQUEST}}
+      - if: env.PUSH_TO_PULL_REQUEST == 'true'
         name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
