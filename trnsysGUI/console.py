@@ -25,7 +25,6 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-met
 
         self.kernel_manager = _qtcm.QtKernelManager(self._KERNEL)
         self.kernel_manager.start_kernel()
-        self.kernel_manager.kernel.gui = "qt"
 
         kernelClient = self.kernel_manager.client()
         kernelClient.start_channels()
