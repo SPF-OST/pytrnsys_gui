@@ -64,13 +64,13 @@ class _KernelSpecManager(_jcksp.KernelSpecManager):
     def find_kernel_specs(self) -> _tp.Mapping[str, str]:
         return {_jcksp.NATIVE_KERNEL_NAME: _ipyksp.RESOURCES}
 
-    def remove_kernel_spec(self, name):
+    def remove_kernel_spec(self, name):  # /NOSONAR
         raise NotImplementedError()
 
-    def install_kernel_spec(self, source_dir, kernel_name=None, user=False, replace=None, prefix=None):
+    def install_kernel_spec(self, source_dir, kernel_name=None, user=False, replace=None, prefix=None):  # /NOSONAR
         raise NotImplementedError()
 
-    def install_native_kernel_spec(self, user=False):
+    def install_native_kernel_spec(self, user=False):  # /NOSONAR
         raise NotImplementedError()
 
 
