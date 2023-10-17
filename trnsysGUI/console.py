@@ -52,7 +52,7 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-met
 
 
 class _KernelSpecManager(_jcksp.KernelSpecManager):
-    def get_kernel_spec(self, kernel_name: str) -> _jcksp.KernelSpec:
+    def get_kernel_spec(self, kernel_name: str) -> _jcksp.KernelSpec:  # /NOSONAR
         if kernel_name != _jcksp.NATIVE_KERNEL_NAME:
             raise _jcksp.NoSuchKernel(kernel_name)
 
