@@ -1,6 +1,7 @@
 __all__ = ["QtConsoleWidget"]
 
 import pathlib as _pl
+import sys as _sys
 import typing as _tp
 
 import ipykernel.kernelspec as _ipyksp
@@ -8,7 +9,6 @@ import jupyter_client.kernelspec as _jcksp
 import qtconsole.client as _qtcc
 import qtconsole.manager as _qtcm
 import qtconsole.rich_jupyter_widget as _qtcjw
-import sys as _sys
 
 import trnsysGUI.pyinstaller as _pyinst
 
@@ -56,10 +56,10 @@ class _KernelSpecManager(_jcksp.KernelSpecManager):
         if kernel_name != _jcksp.NATIVE_KERNEL_NAME:
             raise _jcksp.NoSuchKernel(kernel_name)
 
-        return _jcksp.KernelSpec(_ipyksp.RESOURCES, **_get_kernel_dict())
+        return _jcksp.KernelSpec(_ipyksp.RESOURCES, **_getKernelDict())
 
-    def get_all_specs(self) -> _tp.Mapping[str, _tp.Mapping[str, str]]:
-        return {_jcksp.NATIVE_KERNEL_NAME: {"resource_dir": _ipyksp.RESOURCES, "spec": _get_kernel_dict()}}
+    def get_all_specs(self) -> _tp.Mapping[str, _tp.Any]:
+        return {_jcksp.NATIVE_KERNEL_NAME: {"resource_dir": _ipyksp.RESOURCES, "spec": _getKernelDict()}}
 
     def find_kernel_specs(self) -> _tp.Mapping[str, str]:
         return {_jcksp.NATIVE_KERNEL_NAME: _ipyksp.RESOURCES}
@@ -74,7 +74,7 @@ class _KernelSpecManager(_jcksp.KernelSpecManager):
         raise NotImplementedError()
 
 
-def _get_kernel_dict() -> _tp.Mapping[str, str]:
+def _getKernelDict() -> _tp.Mapping[str, _tp.Any]:
     if _pyinst.isRunAsPyInstallerExe():
         dirContainingExes = _pl.Path(_sys.executable).parent
         ipykernelLauncherExePath = dirContainingExes / "launchIPythonKernel.exe"

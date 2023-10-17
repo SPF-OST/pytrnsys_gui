@@ -1,9 +1,9 @@
 import logging as _log
 import multiprocessing as _mp
 import pathlib as _pl
+import sys as _sys
 
 import PyQt5.QtWidgets as _qtw
-import sys as _sys
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
