@@ -1,9 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules, copy_metadata
 
-datas = []
-datas += collect_data_files("pytrnsys")
-datas += collect_data_files("trnsysGUI")
 
 block_cipher = None
 
@@ -11,7 +8,7 @@ a = Analysis(
     ["runPytrnsys.py"],
     pathex=[],
     binaries=[],
-    datas=datas,
+    datas=collect_data_files("pytrnsys"),
     hiddenimports=collect_submodules("pytrnsys"),
     hookspath=[],
     hooksconfig={"matplotlib": {"backends": ["AGG", "PDF"]}},
@@ -47,10 +44,10 @@ ga = Analysis(
     ["runPytrnsysGui.py"],
     pathex=[],
     binaries=[],
-    datas=datas,
-    hiddenimports=[],
+    datas=collect_data_files("pytrnsys-gui"),
+    hiddenimports=copy_metadata("jupyter_client"),
     hookspath=[],
-    hooksconfig={"matplotlib": {"backends": ["AGG", "PDF"]}},
+    hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     win_no_prefer_redirects=False,
@@ -79,6 +76,42 @@ gexe = EXE(
     entitlements_file=None,
 )
 
+ka = Analysis(
+    ["launchIPythonKernel.py"],
+    pathex=[],
+    binaries=[],
+    datas=collect_data_files("pytrnsys"),
+    hiddenimports=["ipykernel.kernelapp", *collect_submodules("pytrnsys")],
+    hookspath=[],
+    hooksconfig={"matplotlib": {"backends": ["AGG", "PDF"]}},
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+kpyz = PYZ(ka.pure)
+
+kexe = EXE(
+    kpyz,
+    ka.scripts,
+    [],
+    exclude_binaries=True,
+    name="launchIPythonKernel",
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+)
+
 coll = COLLECT(
     exe,
     a.binaries,
@@ -86,6 +119,9 @@ coll = COLLECT(
     gexe,
     ga.binaries,
     ga.datas,
+    kexe,
+    ka.binaries,
+    ka.datas,
     strip=False,
     upx=True,
     upx_exclude=[],

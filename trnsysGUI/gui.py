@@ -1,14 +1,15 @@
 import logging as _log
 import multiprocessing as _mp
 import pathlib as _pl
-import sys as _sys
 
 import PyQt5.QtWidgets as _qtw
+import sys as _sys
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI.arguments as _args
 import trnsysGUI.errors as _err
+import trnsysGUI.pyinstaller as _pyinst
 import trnsysGUI.setup as _setup
 
 
@@ -63,12 +64,11 @@ def main():
 
 
 def _getLogFilePath():
-    isRunAsPyinstallerExe = getattr(_sys, "frozen", False) and hasattr(_sys, "_MEIPASS")
-    if isRunAsPyinstallerExe:
+    if _pyinst.isRunAsPyInstallerExe():
         containingDir = _pl.Path(_sys.executable).parent
         return containingDir / "pytrnsys-gui.log"
 
-    return _pl.Path("pytrnsys-gui.log")
+    return _pl.Path("pytrnsys-gui.log").absolute()
 
 
 def _registerExceptionHook(logger: _log.Logger) -> None:
