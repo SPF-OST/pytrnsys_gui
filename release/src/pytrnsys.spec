@@ -44,7 +44,7 @@ ga = Analysis(
     ["runPytrnsysGui.py"],
     pathex=[],
     binaries=[],
-    datas=[*collect_data_files("pytrnsys-gui"), *copy_metadata("jupyter_client")],
+    datas=[*collect_data_files("trnsysGUI"), *copy_metadata("jupyter_client")],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
