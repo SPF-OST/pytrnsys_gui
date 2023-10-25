@@ -8,11 +8,6 @@ _ReadableFilePath = _te.Annotated[_pl.Path, _typer.Argument(readable=True, dir_o
 
 
 def main(python_script_path: _ReadableFilePath) -> None:  # /NOSONAR  # pylint: disable=invalid-name
-    # Support freezing using PyInstaller, see
-    # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing and
-    # https://docs.python.org/3/library/multiprocessing.html#multiprocessing.freeze_support
-    _mp.freeze_support()
-
     _runFile(python_script_path)
 
 
@@ -22,4 +17,10 @@ def _runFile(pythonScriptPath: _pl.Path) -> None:
     exec(compiledCode)  # pylint: disable=exec-used
 
 
-_typer.run(main)
+if __name__ == "__main__":
+    # Support freezing using PyInstaller, see
+    # https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing and
+    # https://docs.python.org/3/library/multiprocessing.html#multiprocessing.freeze_support
+    _mp.freeze_support()
+
+    _typer.run(main)
