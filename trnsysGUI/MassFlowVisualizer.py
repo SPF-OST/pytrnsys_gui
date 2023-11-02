@@ -2,12 +2,13 @@
 # type: ignore
 
 import datetime as _dt
-import itertools as _it
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
+import itertools as _it
 import numpy as _np
 import pandas as _pd
+import typing as _tp
 
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.connectionBase as _cb
@@ -16,6 +17,8 @@ import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+
+_MAX_HEADER_LENGTH = 25
 
 
 class MassFlowVisualizer(_qtw.QDialog):
@@ -167,11 +170,13 @@ class MassFlowVisualizer(_qtw.QDialog):
     def loadFile(self):
         if not self.loadedFile:
             self.massFlowData = _pd.read_csv(self.dataFilePath, sep="\t").rename(columns=lambda x: x.strip())
+            _truncateColumnNames(self.massFlowData)
         self.loadedFile = True
 
     def loadTempFile(self):
         if not self.tempLoadedFile:
             self.tempMassFlowData = _pd.read_csv(self.tempDatafilePath, sep="\t").rename(columns=lambda x: x.strip())
+            _truncateColumnNames(self.tempMassFlowData)
         self.tempLoadedFile = True
 
     def start(self):
@@ -256,11 +261,13 @@ class MassFlowVisualizer(_qtw.QDialog):
             return
 
     def _getMassFlow(self, mfrVariableName: str, timeStep: int) -> float:
-        mass = self.massFlowData[mfrVariableName[:25]].iloc[timeStep]
+        truncatedMfrVariableName = _truncateName(mfrVariableName)
+        mass = self.massFlowData[truncatedMfrVariableName].iloc[timeStep]
         return mass
 
     def _getTemperature(self, temperatureVariableName: str, timeStep: int) -> float:
-        return self.tempMassFlowData[temperatureVariableName[:25]].iloc[timeStep]
+        truncatedTemperatureVariableName = temperatureVariableName
+        return self.tempMassFlowData[truncatedTemperatureVariableName].iloc[timeStep]
 
     def pauseVis(self):
         self.paused = True
@@ -460,3 +467,29 @@ class MassFlowVisualizer(_qtw.QDialog):
         elif e.key() == _qtc.Qt.Key_Down:
             self.logger.debug("Down is pressed")
             self.decreaseValue()
+
+
+def _truncateColumnNames(df: _pd.DataFrame) -> None:
+    _ensureNamesDontCollideAfterTruncating(df.columns)
+    df.columns = [_truncateName(n) for n in df.columns]
+
+
+def _ensureNamesDontCollideAfterTruncating(columnNames: _tp.Sequence[str]) -> None:
+    sortedColumnNames = sorted(columnNames)
+    groupedNames = [list(g) for _, g in _it.groupby(sortedColumnNames, key=_truncateName)]
+    collidingNames = _flatten(g for g in groupedNames if len(g) > 1)
+    if collidingNames:
+        formattedCollidingNames = "\n\t".join(collidingNames)
+        errorMessage = (
+            f"The following column names collide after truncating them to "
+            f"{_MAX_HEADER_LENGTH} characters:\n\t{formattedCollidingNames}"
+        )
+        raise ValueError(errorMessage)
+
+
+def _truncateName(name: str):
+    return name[:_MAX_HEADER_LENGTH]
+
+
+def _flatten(iterable: _tp.Iterable[_tp.Iterable[str]]) -> _tp.Sequence[str]:
+    return list(_it.chain.from_iterable(iterable))
