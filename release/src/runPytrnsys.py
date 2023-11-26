@@ -11,9 +11,11 @@ _ReadableFilePath = _te.Annotated[_pl.Path, _typer.Argument(readable=True, dir_o
 
 
 def main(
-    python_script_path: _ReadableFilePath,
-    arguments_to_script: _te.Annotated[_tp.Optional[list[str]], _typer.Argument()] = None,
-) -> None:  # /NOSONAR  # pylint: disable=invalid-name
+    python_script_path: _ReadableFilePath,  # /NOSONAR  # pylint: disable=invalid-name
+    arguments_to_script: _te.Annotated[  # /NOSONAR  # pylint: disable=invalid-name
+        _tp.Optional[list[str]], _typer.Argument()
+    ] = None,
+) -> None:
     if arguments_to_script is None:
         arguments_to_script = []
 
