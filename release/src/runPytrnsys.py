@@ -1,9 +1,8 @@
 import multiprocessing as _mp
-import subprocess as _sp
-import sys as _sys
 import pathlib as _pl
 import typing as _tp
 
+import sys as _sys
 import typer as _typer
 import typing_extensions as _te
 
@@ -25,10 +24,10 @@ def main(
 def _runFile(pythonScriptPath: _pl.Path, argumentsToScript: _tp.Sequence[str]) -> None:
     oldArgv = _sys.argv
     try:
-        _sys.argv = [pythonScriptPath, *argumentsToScript]
+        _sys.argv = [str(pythonScriptPath), *argumentsToScript]
         sourceCode = pythonScriptPath.read_text()
         compiledCode = compile(sourceCode, pythonScriptPath, mode="exec")
-        exec(compiledCode)  # pylint: disable=exec-use
+        exec(compiledCode)  # pylint: disable=exec-used
     finally:
         _sys.argv = oldArgv
 
