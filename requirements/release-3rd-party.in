@@ -10,5 +10,9 @@ lark
 appdirs
 Jinja2
 qtconsole
+
+# used by IPython, which is used by qtconsole in turn
+pickleshare
+
 typer
 typing_extensions

@@ -1,6 +1,4 @@
 -r release-3rd-party.in
 
 git+https://github.com/SPF-OST/pytrnsys.git@master#egg=pytrnsys
--e file:.
-
-pyinstaller
+file:.

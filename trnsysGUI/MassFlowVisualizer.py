@@ -2,13 +2,14 @@
 # type: ignore
 
 import datetime as _dt
+import itertools as _it
+import numpy as _np
+import typing as _tp
+
+import pandas as _pd
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
-import itertools as _it
-import numpy as _np
-import pandas as _pd
-import typing as _tp
 
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.connectionBase as _cb
@@ -322,7 +323,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep += float(self.jumpValueLE.text())
+        self.timeStep += int(self.jumpValueLE.text())
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
         self.slider.setValue(self.timeStep)
@@ -333,7 +334,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep -= float(self.jumpValueLE.text())
+        self.timeStep -= int(self.jumpValueLE.text())
         if self.timeStep < 0:
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)
@@ -358,7 +359,7 @@ class MassFlowVisualizer(_qtw.QDialog):
     def checkTempTimeStep(self):
         tempMassFlowDataDup = self.tempMassFlowData
         tempMassFlowDataDup = tempMassFlowDataDup.drop(tempMassFlowDataDup.index[0])
-        for items in tempMassFlowDataDup.nunique().iteritems():
+        for items in tempMassFlowDataDup.nunique().items():
             if items[0] != "TIME":
                 if items[1] > 1:
                     return False

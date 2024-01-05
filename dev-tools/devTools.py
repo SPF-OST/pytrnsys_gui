@@ -8,12 +8,10 @@ import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import sysconfig as sc
-import typing as tp
-import venv
-
 import sys
+import sysconfig as sc
 import time
+import typing as tp
 
 _SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
 
@@ -34,7 +32,7 @@ def main():
 
     _maybeCreateDiagrams(arguments)
 
-    _maybeCreateExecutable(arguments)
+    _maybeCreateRelease(arguments)
 
     _maybeRunPytest(arguments, testResultsDirPath)
 
@@ -181,33 +179,15 @@ def _maybeCreateDiagrams(arguments):
     _printAndRun(cmd.split())
 
 
-def _maybeCreateExecutable(arguments):
+def _maybeCreateRelease(arguments):
     if not (arguments.shallRunAll or arguments.shallCreateExecutable):
         return
 
-    releaseDirPath = pl.Path("release").resolve(strict=True)
+    createReleaseScriptFilePath = pl.Path("release") / "createRelease.py"
 
-    sh.rmtree(releaseDirPath / "build", ignore_errors=True)
-    sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
-    sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
+    cmd = f"{sys.executable} {createReleaseScriptFilePath}"
 
-    venvDirPath = releaseDirPath / "pyinstaller-venv"
-    venv.create(venvDirPath, with_pip=True)
-
-    commands = [
-        r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
-        r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
-        r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
-        r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
-        r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
-    ]
-
-    for cmd in commands:
-        _printAndRun(cmd.split())
-
-    with _chdir("release"):
-        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe .\src\pytrnsys.spec"
-        _printAndRun(cmd.split())
+    _printAndRun(cmd.split())
 
 
 @ctx.contextmanager

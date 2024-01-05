@@ -1,0 +1,1 @@
+https://www.python.org/ftp/python/3.12.1/python-3.12.1-embed-amd64.zip

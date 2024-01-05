@@ -71,8 +71,7 @@ setuptools.setup(
         ]
     },
     data_files=_getDataFilePairs(),
-    entry_points={"console_scripts": ["pytrnsys-gui=trnsysGUI.gui:main", "pytrnsys=trnsysGUI.console:main"]},
     install_requires=_getInstallRequirements(),
     setup_requires=["setuptools-git-versioning"],
-    python_requires=">=3.9",
+    python_requires=">=3.12",
 )

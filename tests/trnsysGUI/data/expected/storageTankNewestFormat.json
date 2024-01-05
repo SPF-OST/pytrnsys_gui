@@ -72,10 +72,10 @@
                 "side": "left",
                 "trnsysId": -1
             },
-            "width": 40
+            "width": 40.0
         }
     ],
-    "height": 220.0,
+    "height": 220,
     "id": 1975,
     "isHorizontallyFlipped": false,
     "isVerticallyFlipped": false,
