@@ -15,7 +15,7 @@ import typing as tp
 
 _SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
 
-_SOURCE_DIRS = ["trnsysGUI", "tests", "dev-tools", "release/src"]
+_SOURCE_DIRS = ["trnsysGUI", "tests", "dev-tools", "release"]
 
 
 def main():
@@ -138,10 +138,12 @@ def _maybeRunMypy(arguments):
     cmd = [
         _SCRIPTS_DIR / "mypy",
         "--show-error-codes",
-        "--exclude",
         # Don't include python scripts which are copied into test
         # data directories (from, e.g., `examples`) during tests
+        "--exclude",
         "^tests/(.+/)?data/.*",
+        "--exclude",
+        "^release/build/.*",
     ]
 
     additionalArgs = arguments.mypyArguments or ""
