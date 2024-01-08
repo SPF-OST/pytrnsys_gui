@@ -38,7 +38,7 @@ jobs:
       
       - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Create zip file
-        run: Compress-Archive -Path release\build\pytrnsys\site-packages\pytrnsys_gui_data, release\build\pytrnsys\site-packages\pytrnsys_data, release\build\pytrnsys -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
+        run: mv release\build\pytrnsys.zip ${{steps.fn.outputs.file_name_base}}.zip
       
       - if: env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Release artifacts (bleeding-edge)
@@ -67,6 +67,6 @@ jobs:
         with:
           name: ${{steps.fn.outputs.file_name_base}}
           path: |
-            data
-            release\pyinstaller-venv\pytrnsys_data
-            release\dist
+            release\build\pytrnsys\site-packages\pytrnsys_gui_data
+            release\build\pytrnsys\site-packages\pytrnsys_data
+            release\build\pytrnsys
