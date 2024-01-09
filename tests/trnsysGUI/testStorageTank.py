@@ -1,4 +1,4 @@
-import cgitb as _cgitb
+import cgitb as _cgitb  # pylint: disable=deprecated-module
 import json as _json
 import logging as _log
 import pathlib as _pl

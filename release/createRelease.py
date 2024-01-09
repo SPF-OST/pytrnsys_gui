@@ -1,5 +1,3 @@
-import sys
-
 import http.client as _htc
 import pathlib as _pl
 import shutil as _sh
@@ -96,12 +94,7 @@ def _installPackages(embeddablePythonDistDirPath: _pl.Path) -> None:
 
 
 def _copyOverBatchScriptsAndReadmeFiles() -> None:
-    fileNames = [
-        "pytrnsys.bat",
-        "pytrnsys-gui.bat",
-        "install-pytrnsys-gui-RUN-AS-ADMIN.bat",
-        "README.txt"
-    ]
+    fileNames = ["pytrnsys.bat", "pytrnsys-gui.bat", "install-pytrnsys-gui-RUN-AS-ADMIN.bat", "README.txt"]
     for fileName in fileNames:
         sourceFilePath = RELEASE_DIR_PATH / fileName
         _sh.copy(sourceFilePath, DIST_DIR_PATH)

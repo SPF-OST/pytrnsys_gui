@@ -1,10 +1,11 @@
 __all__ = ["QtConsoleWidget"]
 
 import pathlib as _pl
+import typing as _tp
+
 import qtconsole.client as _qtcc
 import qtconsole.manager as _qtcm
 import qtconsole.rich_jupyter_widget as _qtcjw
-import typing as _tp
 
 
 class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-method,too-many-ancestors
@@ -13,7 +14,7 @@ class QtConsoleWidget(_qtcjw.RichJupyterWidget):  # pylint: disable=abstract-met
     def __init__(self) -> None:
         super().__init__()
         self.kernel_manager: _tp.Optional[_qtcm.KernelManager] = None  # pylint: disable=invalid-name # /NOSONAR
-        self.kernel_client: _tp.Optional[_qtcc.KernelClient] = None  # pylint: disable=invalid-name # /NOSONAR
+        self.kernel_client: _tp.Optional[_qtcc.QtKernelClient] = None  # pylint: disable=invalid-name # /NOSONAR
 
     def isRunning(self) -> bool:
         return bool(self.kernel_manager and self.kernel_client)
