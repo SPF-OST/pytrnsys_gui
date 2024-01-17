@@ -94,7 +94,8 @@ followed by
 
 
 def _getInstalledNonEditableVersions() -> _res.Result[_tp.Set[_VersionedPackage]]:
-    completedPipFreezeProcess = _sp.run("pip freeze --no-color".split(), capture_output=True, text=True, check=True)
+    args = [_sys.executable, "-m", "pip", "freeze", "--no-color"]
+    completedPipFreezeProcess = _sp.run(args, capture_output=True, text=True, check=True)
     serializedInstalledVersions = completedPipFreezeProcess.stdout.split("\n")
     serializedNonEditableInstalledVersions = [
         v for v in serializedInstalledVersions if v.strip() and not v.startswith("-e")
