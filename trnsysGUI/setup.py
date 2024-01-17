@@ -1,11 +1,10 @@
+import dataclasses as _dc
 import pathlib as _pl
+import pkg_resources  # type: ignore[import]
 import re as _re
 import subprocess as _sp
+import sys as _sys
 import typing as _tp
-import dataclasses as _dc
-
-
-import pkg_resources  # type: ignore[import]
 
 import pytrnsys.utils.result as _res
 
@@ -134,5 +133,5 @@ def _generateCodeFromQtCreatorUiFiles():
     uiGenerateFilePath = (
         _pl.Path(__file__).parent.parent / "dev-tools" / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
     )
-    cmd = ["python.exe", uiGenerateFilePath]
+    cmd = [_sys.executable, uiGenerateFilePath]
     _sp.run(cmd, check=True)
