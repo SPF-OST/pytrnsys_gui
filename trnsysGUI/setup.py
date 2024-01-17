@@ -5,7 +5,7 @@ import subprocess as _sp
 import sys as _sys
 import typing as _tp
 
-import pkg_resources  # type: ignore[import]
+import pkg_resources as _pres  # type: ignore[import]
 
 import pytrnsys.utils.result as _res
 
@@ -42,7 +42,7 @@ class _VersionedPackage:
 
 
 def setup() -> _res.Result[None]:
-    localVersionPart = pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local
+    localVersionPart = _pres.get_distribution("pytrnsys-gui").parsed_version.local
     isDeveloperInstall = localVersionPart and localVersionPart.endswith("dev")
     if isDeveloperInstall:
         result = _checkRequirements()
