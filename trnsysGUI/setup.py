@@ -80,8 +80,8 @@ activate your virtual environment first)
 (or
 
     `python -m piptools sync requirements\\dev.txt`
-    
-if you're using `pip-tools` [if you don't know what that means 
+
+if you're using `pip-tools` [if you don't know what that means
 use the command just above])
 
 followed by
@@ -110,7 +110,7 @@ Could not parse `pip` freeze output:
 
 Please try updating `pip` from within your virtual environment like so:
 
-    (venv) C:\\...\\pytrnsys_gui> python -m pip install --upgrade pip    
+    (venv) C:\\...\\pytrnsys_gui> python -m pip install --upgrade pip==22.3.1
 """
         return _res.Error(errorMessage)
 
