@@ -1,10 +1,11 @@
 import dataclasses as _dc
 import pathlib as _pl
-import pkg_resources  # type: ignore[import]
 import re as _re
 import subprocess as _sp
 import sys as _sys
 import typing as _tp
+
+import pkg_resources  # type: ignore[import]
 
 import pytrnsys.utils.result as _res
 
