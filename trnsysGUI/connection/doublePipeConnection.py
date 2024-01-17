@@ -195,4 +195,4 @@ def calculateNodeNr(dpLengthInM):
     # todo: make into class
     defaultLength = _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M
     nNodes = _math.ceil(10*dpLengthInM/defaultLength)
-    return max(nNodes, 2)
+    return max(nNodes, 3) - 0.1

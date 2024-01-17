@@ -189,8 +189,9 @@ class TestDoublePipeConnection:
         assert nextUnitNumber == 505
 
     @_pt.mark.parametrize("dpLengthInM, dpNrFlNds", [
-        (10, 2),
-        (115.8808, 2),
+        (10, 3),
+        (115.8808, 3),
+        (173.8212, 3),
         (200, 4),
         (400, 7),
         (579.404, 10),
