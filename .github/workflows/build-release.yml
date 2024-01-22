@@ -47,7 +47,7 @@ jobs:
         id: fn
         run: |
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
-          $pytrnsys_sha=$(release\pyinstaller-venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
+          $pytrnsys_sha=$(release\build\pytrnsys\python-3.12.1-embed-amd64\python.exe release\getInstalledPytrnsysGitSha.py)
           $ref_name="${{github.ref_name}}".replace("/","-")
           echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
       
