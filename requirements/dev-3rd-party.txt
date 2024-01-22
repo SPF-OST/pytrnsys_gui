@@ -34,6 +34,8 @@ idna==3.6
     # via requests
 imagesize==1.4.1
     # via sphinx
+importlib-metadata==7.0.1
+    # via twine
 jaraco-classes==3.3.0
     # via keyring
 keyring==24.3.0
@@ -117,6 +119,8 @@ urllib3==2.1.0
     #   twine
 virtualenv==20.25.0
     # via pre-commit
+zipp==3.17.0
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

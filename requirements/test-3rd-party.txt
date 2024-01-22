@@ -54,13 +54,6 @@ pytest-xvfb==3.0.0
     # via -r requirements\test-3rd-party.in
 pyvirtualdisplay==3.0
     # via pytest-xvfb
-tomli==2.0.1
-    # via
-    #   black
-    #   coverage
-    #   mypy
-    #   pylint
-    #   pytest
 tomlkit==0.12.3
     # via pylint
 wheel==0.42.0

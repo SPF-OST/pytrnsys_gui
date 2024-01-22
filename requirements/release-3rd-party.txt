@@ -35,15 +35,9 @@ debugpy==1.8.0
     # via ipykernel
 decorator==5.1.1
     # via ipython
-exceptiongroup==1.2.0
-    # via ipython
 executing==2.0.1
     # via stack-data
 fonttools==4.46.0
-    # via matplotlib
-importlib-metadata==7.0.0
-    # via jupyter-client
-importlib-resources==6.1.1
     # via matplotlib
 ipykernel==6.27.1
     # via qtconsole
@@ -191,7 +185,6 @@ typer==0.9.0
 typing-extensions==4.9.0
     # via
     #   -r requirements\release-3rd-party.in
-    #   ipython
     #   typer
 tzdata==2023.3
     # via pandas
@@ -199,7 +192,3 @@ wcwidth==0.2.12
     # via prompt-toolkit
 xyzservices==2023.10.1
     # via bokeh
-zipp==3.17.0
-    # via
-    #   importlib-metadata
-    #   importlib-resources

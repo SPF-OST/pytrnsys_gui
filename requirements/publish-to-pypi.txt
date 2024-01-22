@@ -14,9 +14,7 @@ docutils==0.20.1
 idna==3.6
     # via requests
 importlib-metadata==7.0.0
-    # via
-    #   keyring
-    #   twine
+    # via twine
 jaraco-classes==3.3.0
     # via keyring
 keyring==24.3.0
