@@ -7,7 +7,8 @@ def main() -> None:
     serializedVersion = _imeta.version("pytrnsys")
     version = _pver.parse(serializedVersion)
     localPart = version.local
-    sha = localPart.split(".")[-1]
+    assert localPart
+    sha = localPart.rsplit(".", maxsplit=1)[-1]
     shortenedSha = sha[0:7]
     print(shortenedSha)
 

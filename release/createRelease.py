@@ -1,11 +1,10 @@
 import http.client as _htc
 import pathlib as _pl
 import shutil as _sh
-import sys as _sys
 import subprocess as _sp
-import typing as _tp
-import urllib.request as _urlreq
+import sys as _sys
 import urllib.parse as _urlp
+import urllib.request as _urlreq
 import zipfile as _zip
 
 PYTHON_312_DIST_DIR_PATH = _pl.Path(r"C:\Program Files\Python312")
@@ -28,6 +27,15 @@ BUILD_DIR_PATH = RELEASE_DIR_PATH / "build"
 DIST_DIR_PATH = BUILD_DIR_PATH / "pytrnsys"
 SITE_PACKAGES_DIR_PATH = DIST_DIR_PATH / "site-packages"
 
+PACKAGE_DATA_DIR_NAMES_TO_COPY_TO_DIST_DIR = ["pytrnsys_data", "pytrnsys_gui_data"]
+
+RELEASE_FILE_NAMES_TO_COPY_TO_DIST_DIR = [
+    "pytrnsys.bat",
+    "pytrnsys-gui.bat",
+    "install-pytrnsys-gui-RUN-AS-ADMIN.bat",
+    "README.txt",
+]
+
 
 def createRelease() -> None:
     if BUILD_DIR_PATH.is_dir():
@@ -41,9 +49,18 @@ def createRelease() -> None:
 
     _installPackages(embeddablePythonDistDirPath)
 
-    _copyOverBatchScriptsAndReadmeFiles()
+    _copyDataDirPathsToDistFolder()
+
+    _copyBatchScriptsAndReadmeFileToDistFolder()
 
     _createReleaseZipFile()
+
+
+def _copyDataDirPathsToDistFolder():
+    for dataDirName in PACKAGE_DATA_DIR_NAMES_TO_COPY_TO_DIST_DIR:
+        sourceDataDirPath = SITE_PACKAGES_DIR_PATH / dataDirName
+        destinationDataDirPath = DIST_DIR_PATH / dataDirName
+        _sh.copytree(sourceDataDirPath, destinationDataDirPath)
 
 
 def _downloadAndExtractEmbeddablePythonDist() -> _pl.Path:
@@ -93,9 +110,8 @@ def _installPackages(embeddablePythonDistDirPath: _pl.Path) -> None:
     _sh.copy(pthFilePath, embeddablePythonDistDirPath)
 
 
-def _copyOverBatchScriptsAndReadmeFiles() -> None:
-    fileNames = ["pytrnsys.bat", "pytrnsys-gui.bat", "install-pytrnsys-gui-RUN-AS-ADMIN.bat", "README.txt"]
-    for fileName in fileNames:
+def _copyBatchScriptsAndReadmeFileToDistFolder() -> None:
+    for fileName in RELEASE_FILE_NAMES_TO_COPY_TO_DIST_DIR:
         sourceFilePath = RELEASE_DIR_PATH / fileName
         _sh.copy(sourceFilePath, DIST_DIR_PATH)
 
