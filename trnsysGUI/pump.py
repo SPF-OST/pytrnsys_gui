@@ -13,7 +13,7 @@ import trnsysGUI.BlockItem as _bi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.temperatures as _temps
 
-_DEFAULT_MASS_FLOW_RATE = 500
+_DEFAULT_MASS_FLOW_RATE = 500.0
 
 
 class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-instance-attributes
