@@ -112,7 +112,7 @@ class PumpDlg(QDialog):
         self.block.updateSidesFlippedV()
 
     def setPumpPower(self):
-        self.block.massFlowRateInKgPerH = int(self.LineEdit.text())
+        self.block.massFlowRateInKgPerH = float(self.LineEdit.text())
 
     def cancel(self):
         self.close()
