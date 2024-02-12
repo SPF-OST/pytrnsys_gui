@@ -156,9 +156,9 @@ class TestEditor:
         mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
 
         convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
-        while convertedProjectFolderPath.exists():
+        if convertedProjectFolderPath.exists():
             _su.rmtree(convertedProjectFolderPath)
-            _time.sleep(0.5)
+            _time.sleep(1)
         _os.mkdir(convertedProjectFolderPath)
 
         mainWindow.copyContentsToNewFolder(convertedProjectFolderPath, helper.actualProjectFolderPath)
