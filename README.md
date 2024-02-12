@@ -63,7 +63,7 @@ work or if `pytrnsys-gui.exe` has crashed.
 
 ##### Required
 
-1. [Python 3.9](https://www.python.org/downloads/)
+1. [Python 3.12](https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe)
 1. Local clones of the following GIT repositories:
     1. `https://github.com/SPF-OST/pytrnsys.git`
     1. `https://github.com/SPF-OST/pytrnsys_gui.git`
@@ -76,7 +76,7 @@ work or if `pytrnsys-gui.exe` has crashed.
     ```
 
 ##### Recommended
-* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/downloa)
+* [PyCharm Community IDE](https://www.jetbrains.com/pycharm/download)
 
 #### Getting started
 
@@ -85,7 +85,7 @@ All the following commands should be run from the `pytrnsys_gui` directory. The 
 
 1. Create a virtual environment:
     ```commandline
-    py -3.9 -m venv venv
+    py -3.12 -m venv venv
     ```
 2. Activate it:
     ```commandline
@@ -107,8 +107,7 @@ All the following commands should be run from the `pytrnsys_gui` directory. The 
    (By adding this tag we make sure that the Qt Creator .ui files are re-generated each time the GUI is started.)
 6. Now you can run `pytrnsys-gui`!
     ```commandline
-    cd trnsysGUI
-    python release\src\runPytrnsysGui.py
+    python trnsysGUI\gui.py
     ```
 
 Several custom TRNSYS types in the form of compiled DLLs are delivered with `pytrnsys`.
