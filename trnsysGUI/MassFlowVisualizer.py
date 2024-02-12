@@ -189,9 +189,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.qtm.start(1000)
 
     def advance(self):
-        timeStep = int(self.timeStep)
-
-        if timeStep == self.maxTimeStep:
+        if self.timeStep == self.maxTimeStep:
             self.logger.debug("reached end of data, returning")
             self.qtm.stop()
 
@@ -208,13 +206,13 @@ class MassFlowVisualizer(_qtw.QDialog):
                         mfrVariableName in self.massFlowData.columns
                         and temperatureVariableName in self.tempMassFlowData
                     ):
-                        massFlow = self._getMassFlow(mfrVariableName, timeStep)
-                        temperature = self._getTemperature(temperatureVariableName, timeStep)
+                        massFlow = self._getMassFlow(mfrVariableName, self.timeStep)
+                        temperature = self._getTemperature(temperatureVariableName, self.timeStep)
 
                         t.setMassFlowAndTemperature(massFlow, temperature)
                         thickValue = self.getThickness(massFlow)
                         self.logger.debug("Thickvalue: " + str(thickValue))
-                        if self.massFlowData[mfrVariableName].iloc[timeStep] == 0:
+                        if self.massFlowData[mfrVariableName].iloc[self.timeStep] == 0:
                             t.setColor(thickValue, mfr="ZeroMfr")
                         elif round(abs(temperature)) == self.maxValue:
                             t.setColor(thickValue, mfr="max")
@@ -242,18 +240,18 @@ class MassFlowVisualizer(_qtw.QDialog):
                     )
                     hotTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.HOT)
 
-                    coldMassFlow = self._getMassFlow(coldMassFlowVariableName, timeStep)
-                    coldTemperature = self._getTemperature(coldTemperatureVariableName, timeStep)
+                    coldMassFlow = self._getMassFlow(coldMassFlowVariableName, self.timeStep)
+                    coldTemperature = self._getTemperature(coldTemperatureVariableName, self.timeStep)
 
-                    hotMassFlow = self._getMassFlow(hotMassFlowVariableName, timeStep)
-                    hotTemperature = self._getTemperature(hotTemperatureVariableName, timeStep)
+                    hotMassFlow = self._getMassFlow(hotMassFlowVariableName, self.timeStep)
+                    hotTemperature = self._getTemperature(hotTemperatureVariableName, self.timeStep)
 
                     t.setMassFlowAndTemperature(coldMassFlow, coldTemperature, hotMassFlow, hotTemperature)
 
                 elif isinstance(t, _tv.TVentil):
                     valvePositionVariableName = _mnames.getInputVariableName(t, t.modelDiverter)
                     if valvePositionVariableName in self.massFlowData.columns:
-                        valvePosition = str(self.massFlowData[valvePositionVariableName].iloc[timeStep])
+                        valvePosition = str(self.massFlowData[valvePositionVariableName].iloc[self.timeStep])
                         t.setPositionForMassFlowSolver(valvePosition)
                         t.posLabel.setPlainText(valvePosition)
                         self.logger.debug("valve position: " + str(valvePosition))
@@ -323,7 +321,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep += int(self.jumpValueLE.text())
+        self.timeStep += self._getTimeStepIncrease()
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
         self.slider.setValue(self.timeStep)
@@ -334,10 +332,13 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep -= int(self.jumpValueLE.text())
+        self.timeStep -= self._getTimeStepIncrease()
         if self.timeStep < 0:
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)
+
+    def _getTimeStepIncrease(self) -> int:
+        return int(round(float(self.jumpValueLE.text())))
 
     def checkTimeStep(self):
         """
