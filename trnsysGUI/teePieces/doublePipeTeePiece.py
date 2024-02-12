@@ -196,8 +196,9 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
         data: _dcj.JsonDict,
         validate=True,  # pylint: disable=duplicate-code
         validate_enums: bool = True,  # /NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "DoublePipeTeePieceModel":
-        doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums)
+        doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(DoublePipeTeePieceModel, doublePipeTeePieceModel)
 
     def to_dict(
@@ -205,8 +206,9 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
         omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
         validate_enums: bool = True,  # /NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)  # pylint: disable=duplicate-code
         data[".__BlockDict__"] = True
         return data
 

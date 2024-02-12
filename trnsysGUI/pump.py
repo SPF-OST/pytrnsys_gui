@@ -163,8 +163,9 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
         data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
         validate=True,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "PumpModel":
-        pumpModel = super().from_dict(data, validate, validate_enums)
+        pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(PumpModel, pumpModel)
 
     def to_dict(
@@ -172,8 +173,9 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-ins
         omit_none: bool = True,
         validate: bool = False,
         validate_enums: bool = True,  # pylint: disable=duplicate-code 2
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
         data[".__BlockDict__"] = True
         return data
 

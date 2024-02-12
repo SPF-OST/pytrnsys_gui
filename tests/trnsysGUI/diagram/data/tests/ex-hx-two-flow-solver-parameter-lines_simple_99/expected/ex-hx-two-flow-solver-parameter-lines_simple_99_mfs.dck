@@ -119,8 +119,8 @@ TColH=1
 
 EQUATIONS 2
 *** Massflowrates
-MfrPump88 = 300
-MfrPump93 = 200
+MfrPump88 = 300.0
+MfrPump93 = 200.0
 
 EQUATIONS 2
 *** Pump outlet temperatures

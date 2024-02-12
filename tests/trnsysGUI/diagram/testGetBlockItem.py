@@ -1,4 +1,4 @@
-import cgitb as _cgitb
+import cgitb as _cgitb  # pylint: disable=deprecated-module
 import logging as _log
 import unittest.mock as _mock
 

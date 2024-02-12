@@ -129,19 +129,19 @@ TFloor6H=1
 
 EQUATIONS 13
 *** Massflowrates
-MfrPuAux = 500
+MfrPuAux = 500.0
 xFracDivAux = 1.0
 MfrsupplyWater = 1000
-MfrPuCirc = 500
-MfrPuAuxEvap = 500
-MfrPuSh1 = 500
-MfrPuSh2 = 500
-MfrPuSh3 = 500
-MfrPuSh4 = 500
-MfrPuSh5 = 500
-MfrPUSh6 = 500
-MfrPuHxDhwSec = 500
-MfrPuOverflowSh = 500
+MfrPuCirc = 500.0
+MfrPuAuxEvap = 500.0
+MfrPuSh1 = 500.0
+MfrPuSh2 = 500.0
+MfrPuSh3 = 500.0
+MfrPuSh4 = 500.0
+MfrPuSh5 = 500.0
+MfrPUSh6 = 500.0
+MfrPuHxDhwSec = 500.0
+MfrPuOverflowSh = 500.0
 
 EQUATIONS 12
 *** Pump outlet temperatures

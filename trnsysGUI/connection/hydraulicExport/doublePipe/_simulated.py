@@ -157,15 +157,20 @@ def _getEquations(
     hotPipe = hydraulicConnection.hotPipe
 
     conn = hydraulicConnection
+
+    coldInputMfrName = coldPipe.inputPort.massFlowRateVariableName
+    hotInputMfrName = hotPipe.inputPort.massFlowRateVariableName
+
     equations = f"""\
 EQUATIONS {4 + len(energyBalanceVariables)}
 {conn.coldOutputTemperatureVariableName} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
-{conn.coldCanonicalMassFlowRateVariableName} = {coldPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.coldCanonicalMassFlowRateVariableName} = {coldInputMfrName}  ! Outlet mass flow rate, kg/h
 
 {conn.hotOutputTemperatureVariableName} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
-{conn.hotCanonicalMassFlowRateVariableName} = {hotPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.hotCanonicalMassFlowRateVariableName} = {hotInputMfrName}  ! Outlet mass flow rate, kg/h
 
 {formattedEnergyBalanceVariables}
 
 """
+
     return equations

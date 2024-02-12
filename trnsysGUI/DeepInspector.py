@@ -57,8 +57,8 @@ class DeepInspector(QDialog):
             # if "(" in t:
             #     b = True
             if self.rMeth.isChecked():
-                funcStr = re.findall(".{0,}\(", t)[0][:-1]
-                argStr = re.findall("\(.{0,}\)", t)[0][1:-1]
+                funcStr = re.findall(r".{0,}\(", t)[0][:-1]
+                argStr = re.findall(r"\(.{0,}\)", t)[0][1:-1]
                 print(funcStr + ", " + argStr)
                 if argStr == "":
                     self.executeMeth((funcStr))

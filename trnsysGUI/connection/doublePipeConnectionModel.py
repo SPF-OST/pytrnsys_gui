@@ -114,9 +114,10 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
         data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 1
         validate=True,
         validate_enums: bool = True,  # /NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "DoublePipeConnectionModel":
         data.pop(".__ConnectionDict__")
-        doublePipeConnectionModel = super().from_dict(data, validate, validate_enums)
+        doublePipeConnectionModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(DoublePipeConnectionModel, doublePipeConnectionModel)
 
     def to_dict(
@@ -124,8 +125,9 @@ class DoublePipeConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disa
         omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
         validate_enums: bool = True,  # pylint: disable=duplicate-code # 1 # /NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
         data[".__ConnectionDict__"] = True
         return data
 

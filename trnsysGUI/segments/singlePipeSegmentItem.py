@@ -111,18 +111,18 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         blue2 = 0
         green2 = 0
 
-        try:
-            factor1 = int(segmentLength / connectionLength)
-            factor2 = int((connectionLength - segmentLength) / connectionLength)
-        except ZeroDivisionError:
+        if connectionLength == 0:
             return QColor(100, 100, 100, alpha)
-        else:
-            return QColor(
-                factor1 * red2 + factor2 * red1,
-                factor1 * green2 + factor2 * green1,
-                factor1 * blue2 + factor2 * blue1,
-                alpha,
-            )
+
+        factor1 = int(segmentLength / connectionLength)
+        factor2 = int((connectionLength - segmentLength) / connectionLength)
+
+        return QColor(
+            factor1 * red2 + factor2 * red1,
+            factor1 * green2 + factor2 * green1,
+            factor1 * blue2 + factor2 * blue1,
+            alpha,
+        )
 
     def _updateLine(self, gradient: _qtg.QGradient) -> None:
         pen = self._createPen(gradient)

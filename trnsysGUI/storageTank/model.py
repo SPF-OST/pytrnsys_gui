@@ -165,9 +165,10 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-i
         data: _dcj.JsonDict,  # pylint: disable=duplicate-code  # 2
         validate=True,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR,
     ) -> "StorageTank":
         data.pop(".__BlockDict__")
-        storageTank = super().from_dict(data, validate, validate_enums)
+        storageTank = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(StorageTank, storageTank)
 
     def to_dict(
@@ -175,8 +176,9 @@ class StorageTank(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-i
         omit_none: bool = True,
         validate: bool = False,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR,
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code  # 1
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)  # pylint: disable=duplicate-code  # 1
         data[".__BlockDict__"] = True
         return data
 
@@ -325,7 +327,7 @@ class HeatExchangerVersion1(_ser.UpgradableJsonSchemaMixin):
 
 
 @_dc.dataclass
-class HeatExchanger(_ser.UpgradableJsonSchemaMixin):
+class HeatExchangerVersion2(_ser.UpgradableJsonSchemaMixin):
     portPair: PortPair
     name: str
     width: float
@@ -337,17 +339,45 @@ class HeatExchanger(_ser.UpgradableJsonSchemaMixin):
         return HeatExchangerVersion1
 
     @classmethod
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HeatExchanger":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HeatExchangerVersion2":
         if not isinstance(superseded, HeatExchangerVersion1):
             raise ValueError(f"`superseded` is not of type {HeatExchangerVersion1.__name__}")
 
         portPair = PortPair.fromInstance(superseded.portPair)
 
-        return HeatExchanger(portPair, superseded.portPair.name, superseded.width, superseded.parentId, superseded.id)
+        return HeatExchangerVersion2(
+            portPair, superseded.portPair.name, superseded.width, superseded.parentId, superseded.id
+        )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("be068f84-2627-4f53-87a9-9a1f4fd1c529")
+
+
+@_dc.dataclass
+class HeatExchanger(_ser.UpgradableJsonSchemaMixin):
+    portPair: PortPair
+    name: str
+    width: int
+    parentId: int
+    id: int  # pylint: disable=invalid-name
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return HeatExchangerVersion2
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "HeatExchanger":
+        if not isinstance(superseded, HeatExchangerVersion2):
+            raise ValueError(f"`superseded` is not of type {HeatExchangerVersion1.__name__}")
+
+        return HeatExchanger(
+            superseded.portPair, superseded.name, int(superseded.width), superseded.parentId, superseded.id
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("2edc9b30-baef-4c2f-b105-e88987007e74")
 
 
 @_dc.dataclass

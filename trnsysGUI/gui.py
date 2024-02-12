@@ -80,3 +80,7 @@ def _registerExceptionHook(logger: _log.Logger) -> None:
         _sys.exit(-1)
 
     _sys.excepthook = exceptionHook
+
+
+if __name__ == "__main__":
+    main()

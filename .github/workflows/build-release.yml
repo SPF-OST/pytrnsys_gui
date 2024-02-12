@@ -1,4 +1,4 @@
-name: Build EXE
+name: Build release
 
 on:
   push:
@@ -24,21 +24,36 @@ jobs:
           echo "Event name: ${{github.event_name}}"
           echo "Event type (via client payload): ${{github.event.client_payload.type}}"
           echo "Event type (via event_type): ${{github.event.event_type}}"
-      
+
+      - name: Remove old venv
+        run: |
+          if (Test-Path -LiteralPath venv) {
+            Remove-Item -LiteralPath venv -Recurse
+          }
+
+      - name: Create virtual environment
+        run: py -3.12 -m venv venv
+
+      - name: Install dependencies
+        run: |
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel
+          venv\Scripts\python -m pip install -r requirements/test.txt
+        
       - name: Build executable
-        run: py -3.9 dev-tools/devTools.py -x
+        run: venv\Scripts\python dev-tools/devTools.py -x
       
       - name: Compute file name
         id: fn
         run: |
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
-          $pytrnsys_sha=$(release\pyinstaller-venv\Scripts\pip show pytrnsys | Select-String -Pattern "^Version:.*$").Matches.Value.Split(".")[-1].Substring(0,7)
+          $pytrnsys_sha=$(release\build\pytrnsys\python-3.12.1-embed-amd64\python.exe release\getInstalledPytrnsysGitSha.py)
           $ref_name="${{github.ref_name}}".replace("/","-")
           echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
       
       - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Create zip file
-        run: Compress-Archive -Path data, release\pyinstaller-venv\pytrnsys_data, release\dist -DestinationPath ${{steps.fn.outputs.file_name_base}}.zip
+        run: mv release\build\pytrnsys.zip ${{steps.fn.outputs.file_name_base}}.zip
       
       - if: env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Release artifacts (bleeding-edge)
@@ -67,6 +82,6 @@ jobs:
         with:
           name: ${{steps.fn.outputs.file_name_base}}
           path: |
-            data
-            release\pyinstaller-venv\pytrnsys_data
-            release\dist
+            release\build\pytrnsys\site-packages\pytrnsys_gui_data
+            release\build\pytrnsys\site-packages\pytrnsys_data
+            release\build\pytrnsys

@@ -299,8 +299,9 @@ class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-
         data: _dcj.JsonDict,  # pylint: disable = duplicate-code
         validate=True,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "TVentilModel":
-        tVentilModel = super().from_dict(data, validate, validate_enums)
+        tVentilModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(TVentilModel, tVentilModel)
 
     def to_dict(
@@ -308,8 +309,9 @@ class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-
         omit_none: bool = True,
         validate: bool = False,
         validate_enums: bool = True,  # pylint: disable=duplicate-code
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:  # pylint: disable = duplicate-code
-        data = super().to_dict(omit_none, validate, validate_enums)
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
         data[".__BlockDict__"] = True
         return data
 

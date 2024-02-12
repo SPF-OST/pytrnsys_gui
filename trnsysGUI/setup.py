@@ -1,11 +1,12 @@
 import dataclasses as _dc
+import importlib.metadata as _imeta
 import pathlib as _pl
 import re as _re
 import subprocess as _sp
 import sys as _sys
 import typing as _tp
 
-import pkg_resources as _pres  # type: ignore[import]
+import packaging.version as _pver
 
 import pytrnsys.utils.result as _res
 
@@ -42,16 +43,43 @@ class _VersionedPackage:
 
 
 def setup() -> _res.Result[None]:
-    localVersionPart = _pres.get_distribution("pytrnsys-gui").parsed_version.local
-    isDeveloperInstall = localVersionPart and localVersionPart.endswith("dev")
-    if isDeveloperInstall:
-        result = _checkRequirements()
-        if _res.isError(result):
-            return _res.error(result)
+    isDeveloperInstallResult = _isDeveloperInstall()
+    if _res.isError(isDeveloperInstallResult):
+        return _res.error(isDeveloperInstallResult)
 
-        _generateCodeFromQtCreatorUiFiles()
+    isDeveloperInstall = _res.value(isDeveloperInstallResult)
+    if not isDeveloperInstall:
+        return None
+
+    requirementsResult = _checkRequirements()
+    if _res.isError(requirementsResult):
+        return _res.error(requirementsResult)
+
+    _generateCodeFromQtCreatorUiFiles()
 
     return None
+
+
+def _isDeveloperInstall() -> _res.Result[bool]:
+    versionResult = _getPytrnsysVersion()
+    if _res.isError(versionResult):
+        return _res.error(versionResult)
+
+    version = _res.value(versionResult)
+    localVersionPart = version.local
+
+    isDeveloperInstall = localVersionPart.endswith("dev") if localVersionPart else False
+
+    return isDeveloperInstall
+
+
+def _getPytrnsysVersion() -> _res.Result[_pver.Version]:
+    serializedVersion = _imeta.version("pytrnsys-gui")
+    try:
+        return _pver.parse(serializedVersion)
+    except _pver.InvalidVersion as invalidVersion:
+        error = _res.error(f"Could not parse version of `pytrnsys-gui`:\n\t{invalidVersion}")
+        return error
 
 
 def _checkRequirements() -> _res.Result[None]:
