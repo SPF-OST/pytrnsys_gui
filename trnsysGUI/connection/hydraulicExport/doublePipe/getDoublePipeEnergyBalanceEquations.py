@@ -56,7 +56,8 @@ EQUATIONS 5
 {totals.PIPE_INTERNAL_CHANGE} = {summedPipeInternalEnergyChanges}
 {totals.SOIL_INTERNAL_CHANGE} = {summedSoilInternalEnergyChanges}
 {totals.IMBALANCE} = {totals.CONVECTED} - {totals.DISSIPATION_TO_FAR_FIELD}  - {totals.PIPE_INTERNAL_CHANGE} - {totals.SOIL_INTERNAL_CHANGE}
-"""
+"""  # pylint: disable=line-too-long
+
     return equations
 
 

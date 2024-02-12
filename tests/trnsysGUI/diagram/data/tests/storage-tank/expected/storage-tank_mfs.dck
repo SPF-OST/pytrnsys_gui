@@ -119,8 +119,8 @@ THPH=1
 
 EQUATIONS 2
 *** Massflowrates
-MfrPump109 = 500
-MfrPump114 = 500
+MfrPump109 = 500.0
+MfrPump114 = 500.0
 
 EQUATIONS 2
 *** Pump outlet temperatures

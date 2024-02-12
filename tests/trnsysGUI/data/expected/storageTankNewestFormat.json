@@ -55,7 +55,7 @@
     ],
     "heatExchangers": [
         {
-            "__version__": "be068f84-2627-4f53-87a9-9a1f4fd1c529",
+            "__version__": "2edc9b30-baef-4c2f-b105-e88987007e74",
             "id": 1976,
             "name": "SolarHx",
             "parentId": 1975,
@@ -75,7 +75,7 @@
             "width": 40
         }
     ],
-    "height": 220.0,
+    "height": 220,
     "id": 1975,
     "isHorizontallyFlipped": false,
     "isVerticallyFlipped": false,

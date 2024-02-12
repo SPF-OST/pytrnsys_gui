@@ -26,9 +26,9 @@ def main():
 def _generatePythonCodeFromUiFiles():
     print(f"Using pyuic5 executable from {_PYUIC5_FILE_PATH}.")
 
-    currentDirPath = _pl.Path()
+    trnsysGuiDirPath = _pl.Path("trnsysGUI")
 
-    uiFilePaths = currentDirPath.rglob("*.ui")
+    uiFilePaths = trnsysGuiDirPath.rglob("*.ui")
     for uiFilePath in uiFilePaths:
         generatedFilePath = _getGeneratedFilePath(uiFilePath, "UI")
 
