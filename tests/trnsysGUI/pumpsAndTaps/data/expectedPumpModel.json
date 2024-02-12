@@ -1,8 +1,8 @@
 {
+  "BlockName": "Pump",
+  "BlockDisplayName": "PuHpShCond",
   "blockItemWithPrescribedMassFlow": {
     "blockItem": {
-      "BlockName": "Pump",
-      "BlockDisplayName": "PuHpShCond",
       "blockPosition": [
         -820.0,
         -289.0

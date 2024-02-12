@@ -103,8 +103,6 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
         position = (self.pos().x(), self.pos().y())
 
         blockItemModel = _ser.BlockItemBaseModel(
-            self.name,
-            self.displayName,
             position,
             self.id,
             self.trnsysId,
@@ -122,6 +120,8 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
         outputPortId = self._getSinglePortId(self.outputs)
 
         pumpModel = _ser.PumpModel(
+            self.name,
+            self.displayName,
             blockItemWithPrescribedMassFlowModel,
             inputPortId,
             outputPortId,
@@ -137,8 +137,10 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
     def decode(self, i: _dcj.JsonDict, resBlockList) -> None:
         model = _ser.PumpModel.from_dict(i)
 
+        assert model.BlockName == self.name
+
         blockItemModel = model.blockItemWithPrescribedMassFlow.blockItem
-        self.setDisplayName(blockItemModel.BlockDisplayName)
+        self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(blockItemModel.blockPosition[0]), float(blockItemModel.blockPosition[1]))
         self.id = blockItemModel.Id
         self.trnsysId = blockItemModel.trnsysId

@@ -11,8 +11,6 @@ from . import _defaults
 
 @_dc.dataclass
 class BlockItemBaseModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
     Id: int  # pylint: disable=invalid-name,duplicate-code # 1
     trnsysId: int
@@ -38,7 +36,7 @@ class BlockItemWithPrescribedMassFlowBaseModel(_ser.UpgradableJsonSchemaMixinVer
 
 
 @_dc.dataclass
-class PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     BlockName: str  # pylint: disable=invalid-name
     BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
@@ -59,10 +57,10 @@ class PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-
 
     @classmethod
     @_tp.override
-    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "PumpModelVersion1":
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "_PumpModelVersion1":
         assert isinstance(superseded, _bim.BlockItemModel)
 
-        return PumpModelVersion1(
+        return _PumpModelVersion1(
             superseded.BlockName,
             superseded.BlockDisplayName,
             superseded.blockPosition,
@@ -83,7 +81,15 @@ class PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-
 
 
 @_dc.dataclass
-class PumpModel(_ser.UpgradableJsonSchemaMixin):
+class _RequiredDecoderFieldsMixin:
+    BlockName: str  # pylint: disable=invalid-name
+    BlockDisplayName: str  # pylint: disable=invalid-name
+
+
+@_dc.dataclass
+class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
+    BlockName: str  # pylint: disable=invalid-name
+
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     inputPortId: int
@@ -116,16 +122,14 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):
     @classmethod
     @_tp.override
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return PumpModelVersion1
+        return _PumpModelVersion1
 
     @classmethod
     @_tp.override
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "PumpModel":
-        assert isinstance(superseded, PumpModelVersion1)
+        assert isinstance(superseded, _PumpModelVersion1)
 
         blockItem = BlockItemBaseModel(
-            superseded.BlockName,
-            superseded.BlockDisplayName,
             superseded.blockPosition,
             superseded.Id,
             superseded.trnsysId,
@@ -142,6 +146,8 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):
         outputPortId = superseded.portsIdsOut[0]
 
         return PumpModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
             blockItemWithPrescribedMassFlow,
             inputPortId,
             outputPortId,
@@ -154,7 +160,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):
 
 
 @_dc.dataclass
-class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0):
+class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0, _RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     portId: int
