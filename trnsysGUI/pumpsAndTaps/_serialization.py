@@ -82,14 +82,12 @@ class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too
 
 @_dc.dataclass
 class _RequiredDecoderFieldsMixin:
-    BlockName: str  # pylint: disable=invalid-name
-    BlockDisplayName: str  # pylint: disable=invalid-name
+    BlockName: str  # /NOSONAR  # pylint: disable=invalid-name
+    BlockDisplayName: str  # /NOSONAR  # pylint: disable=invalid-name
 
 
 @_dc.dataclass
 class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
-    BlockName: str  # pylint: disable=invalid-name
-
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     inputPortId: int
@@ -110,7 +108,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
     @_tp.override
     def to_dict(
         self,
-        omit_none: bool = True,
+        omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
         validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 2
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
@@ -180,7 +178,7 @@ class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0
     @_tp.override
     def to_dict(
         self,
-        omit_none: bool = True,
+        omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
         validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 3
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
