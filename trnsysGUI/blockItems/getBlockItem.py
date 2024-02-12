@@ -25,8 +25,8 @@ from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
-from trnsysGUI.pumpsAndTaps.WTap import WTap  # type: ignore[attr-defined]
-from trnsysGUI.pumpsAndTaps.WTap_main import WTap_main  # type: ignore[attr-defined]
+from trnsysGUI.pumpsAndTaps.tap import Tap  # type: ignore[attr-defined]
+from trnsysGUI.pumpsAndTaps.tapMains import TapMains  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectors.connector import Connector  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
@@ -67,8 +67,8 @@ def getBlockItem(
         "IceStorage": {"blockItem": IceStorage, "displayNamePrefix": "IceS"},
         "PitStorage": {"blockItem": PitStorage, "displayNamePrefix": "PitS"},
         "Radiator": {"blockItem": Radiator, "displayNamePrefix": "Rad"},
-        "WTap": {"blockItem": WTap, "displayNamePrefix": "WtTp"},
-        "WTap_main": {"blockItem": WTap_main, "displayNamePrefix": "WtSp"},
+        "WTap": {"blockItem": Tap, "displayNamePrefix": "WtTp"},
+        "WTap_main": {"blockItem": TapMains, "displayNamePrefix": "WtSp"},
         "Connector": {"blockItem": Connector, "displayNamePrefix": "Conn"},
         "GenericBlock": {"blockItem": GenericBlock, "displayNamePrefix": "GBlk"},
         "HPTwoHx": {"blockItem": HeatPumpTwoHx, "displayNamePrefix": "HP"},

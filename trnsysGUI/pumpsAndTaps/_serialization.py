@@ -95,7 +95,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):
         cls,  # pylint: disable = duplicate-code 2
         data: _dcj.JsonDict,  # pylint: disable = duplicate-code 2
         validate=True,
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "PumpModel":
         pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
@@ -106,7 +106,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin):
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code 2
+        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 2
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
@@ -165,7 +165,7 @@ class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0
         cls,  # pylint: disable = duplicate-code 3
         data: _dcj.JsonDict,  # pylint: disable = duplicate-code 3
         validate=True,
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "TerminalWithPrescribedMassFlowModel":
         pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
@@ -176,7 +176,7 @@ class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0
         self,
         omit_none: bool = True,
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code 3
+        validate_enums: bool = True,  # /NOSONAR  # pylint: disable=duplicate-code 3
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)

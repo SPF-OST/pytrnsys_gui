@@ -28,8 +28,8 @@ from trnsysGUI.SaltTankCold import SaltTankCold
 from trnsysGUI.SaltTankHot import SaltTankHot
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.pumpsAndTaps.WTap import WTap
-from trnsysGUI.pumpsAndTaps.WTap_main import WTap_main
+from trnsysGUI.pumpsAndTaps.tap import Tap
+from trnsysGUI.pumpsAndTaps.tapMains import TapMains
 from trnsysGUI.connection.connectors.connector import Connector
 from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
@@ -57,14 +57,14 @@ _BLOCK_ITEM_CASES = [
     ("Pump", Pump, "Pump7701"),
     ("Connector", Connector, "Conn7701"),
     ("Crystalizer", Crystalizer, "Cryt7701"),
-    ("WTap_main", WTap_main, "WtSp7701"),
+    ("WTap_main", TapMains, "WtSp7701"),
     ("Collector", Collector, "Coll7701"),
     ("Kollektor", Collector, "Coll7701"),
     ("HP", HeatPump, "HP7701"),
     ("IceStorage", IceStorage, "IceS7701"),
     ("PitStorage", PitStorage, "PitS7701"),
     ("Radiator", Radiator, "Rad7701"),
-    ("WTap", WTap, "WtTp7701"),
+    ("WTap", Tap, "WtTp7701"),
     ("GenericBlock", GenericBlock, "GBlk7701"),
     ("HPTwoHx", HeatPumpTwoHx, "HP7701"),
     ("HPDoubleDual", HPDoubleDual, "HPDD7701"),

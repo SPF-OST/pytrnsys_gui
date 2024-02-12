@@ -15,9 +15,9 @@ from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class WTap(BlockItem, _ip.HasInternalPiping):
+class Tap(BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, editor, **kwargs):
-        super(WTap, self).__init__(trnsysType, editor, **kwargs)
+        super(Tap, self).__init__(trnsysType, editor, **kwargs)
         self.w = 40
         self.h = 40
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
@@ -36,7 +36,7 @@ class WTap(BlockItem, _ip.HasInternalPiping):
         return False
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        return _img.W_TAP_SVG
+        return _img.TAP_SVG
 
     def changeSize(self):
         w = self.w
@@ -52,7 +52,7 @@ class WTap(BlockItem, _ip.HasInternalPiping):
             w = 40
         # center label:
         rect = self.label.boundingRect()
-        lw, lh = rect.width(), rect.height()
+        lw = rect.width()
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
@@ -73,7 +73,7 @@ class WTap(BlockItem, _ip.HasInternalPiping):
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         portItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
-        sink = _mfn.TerminalWithPrescribedFlow(portItem)
+        sink = _mfn.TerminalWithFreeFlow(portItem)
 
         return _ip.InternalPiping([sink], {portItem: self.inputs[0]})
 

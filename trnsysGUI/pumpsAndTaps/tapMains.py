@@ -10,9 +10,9 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 
 
-class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
+class TapMains(_bi.BlockItem, _ip.HasInternalPiping):
     def __init__(self, trnsysType, editor, **kwargs):
-        super(WTap_main, self).__init__(trnsysType, editor, **kwargs)
+        super(TapMains, self).__init__(trnsysType, editor, **kwargs)
         self.w = 40
         self.h = 40
 
@@ -33,7 +33,7 @@ class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
         return False
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        return _img.W_TAP_MAIN_SVG
+        return _img.TAP_MAINS_SVG
 
     def changeSize(self):
         w = self.w
@@ -49,7 +49,7 @@ class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
             w = 40
         # center label:
         rect = self.label.boundingRect()
-        lw, lh = rect.width(), rect.height()
+        lw = rect.width()
         lx = (w - lw) / 2
         self.label.setPos(lx, h)
 
