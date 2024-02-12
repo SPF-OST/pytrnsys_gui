@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 )
 
-import trnsysGUI.pump as _pmp
+import trnsysGUI.pumpsAndTaps.pump as _pmp
 
 
 class PumpDlg(QDialog):

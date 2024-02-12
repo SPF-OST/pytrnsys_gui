@@ -2,8 +2,8 @@ __all__ = [
     "NodeType",
     "PortItem",
     "OneNeighbourBase",
-    "Source",
-    "Sink",
+    "TerminalWithPrescribedFlow",
+    "TerminalWithFreeFlow",
     "TwoNeighboursBase",
     "Pipe",
     "Pump",
@@ -23,8 +23,8 @@ class NodeType(_enum.IntEnum):
     PUMP = 1
     TEE_PIECE = 2
     DIVERTER = 3
-    SOURCE = 4
-    SINK = 5
+    TERMINAL_WITH_PRESCRIBED_FLOW = 4
+    TERMINAL_WITH_FREE_FLOW = 5
 
 
 @_dc.dataclass(eq=False)
@@ -98,9 +98,9 @@ class OneNeighbourBase(Node, _abc.ABC):
         return [self.portItem]
 
 
-class Source(OneNeighbourBase):
+class TerminalWithPrescribedFlow(OneNeighbourBase):
     def getNodeType(self) -> NodeType:
-        return NodeType.SOURCE
+        return NodeType.TERMINAL_WITH_PRESCRIBED_FLOW
 
     def hasInput(self) -> bool:
         return True
@@ -109,9 +109,9 @@ class Source(OneNeighbourBase):
         return "Mfr"
 
 
-class Sink(OneNeighbourBase):
+class TerminalWithFreeFlow(OneNeighbourBase):
     def getNodeType(self) -> NodeType:
-        return NodeType.SINK
+        return NodeType.TERMINAL_WITH_FREE_FLOW
 
 
 class TwoNeighboursBase(Node, _abc.ABC):

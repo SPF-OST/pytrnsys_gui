@@ -28,14 +28,14 @@ from trnsysGUI.SaltTankCold import SaltTankCold
 from trnsysGUI.SaltTankHot import SaltTankHot
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.WTap import WTap
-from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.pumpsAndTaps.WTap import WTap
+from trnsysGUI.pumpsAndTaps.WTap_main import WTap_main
 from trnsysGUI.connection.connectors.connector import Connector
 from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.geotherm import Geotherm
-from trnsysGUI.pump import Pump
+from trnsysGUI.pumpsAndTaps.pump import Pump
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink

@@ -73,7 +73,7 @@ class WTap(BlockItem, _ip.HasInternalPiping):
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         portItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
-        sink = _mfn.Sink(portItem)
+        sink = _mfn.TerminalWithPrescribedFlow(portItem)
 
         return _ip.InternalPiping([sink], {portItem: self.inputs[0]})
 
@@ -85,7 +85,7 @@ class WTap(BlockItem, _ip.HasInternalPiping):
         self.logger.debug(self.editor)
         pathName = self.displayName
         self.path = self.editor.projectFolder
-        self.path = os.path.join(self.path, "ddck")
+        self.path = os.path.join(self.path, "../ddck")
         self.path = os.path.join(self.path, pathName)
         if not os.path.exists(self.path):
             os.makedirs(self.path)

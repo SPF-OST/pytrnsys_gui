@@ -19,7 +19,7 @@ class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
         self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
 
         outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
-        self._modelSource = _mfn.Source(outputPort)
+        self._modelSource = _mfn.TerminalWithPrescribedFlow(outputPort)
 
         self.changeSize()
 
