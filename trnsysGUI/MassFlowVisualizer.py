@@ -16,6 +16,7 @@ import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.errors as _err
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
@@ -60,8 +61,12 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.getThresholdValues()
         self.getTempThresholdValues()
 
-        self.jumpValue = _qtw.QLabel("Jump by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )")
-        self.jumpValueLE = _qtw.QLineEdit("1")
+        timeStepIncreaseLabelText = "Increase time-step by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )"
+        self._timeStepIncreaseLabel = _qtw.QLabel(timeStepIncreaseLabelText)
+        self._timeStepIncrease = 1
+        self._timeStepIncreaseLineEdit = _qtw.QLineEdit()
+        self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
+        self._timeStepIncreaseLineEdit.editingFinished.connect(self._onTimeStepIncreaseLineEditEditingFinished)
 
         self.slider = _qtw.QSlider(parent)
         self.setSlider()
@@ -108,8 +113,8 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         buttonLayout = _qtw.QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(self.jumpValue)
-        buttonLayout.addWidget(self.jumpValueLE)
+        buttonLayout.addWidget(self._timeStepIncreaseLabel)
+        buttonLayout.addWidget(self._timeStepIncreaseLineEdit)
         buttonLayout.addWidget(self.showMassButton)  # comment out
         buttonLayout.addWidget(self.togglePauseButton)
         buttonLayout.addWidget(self.cancelButton)
@@ -138,6 +143,21 @@ class MassFlowVisualizer(_qtw.QDialog):
         dh = self.height()
         self.move(parent.editor.diagramView.geometry().topLeft())
         self.show()
+
+    def _onTimeStepIncreaseLineEditEditingFinished(self) -> None:
+        try:
+            lineEditText = self._timeStepIncreaseLineEdit.text()
+            timeStepIncrease = int(lineEditText)
+        except ValueError:
+            timeStepIncrease = None
+
+        if timeStepIncrease is None or not (1 <= timeStepIncrease <= self.maxTimeStep):
+            errorMessage = f"The time-step increase must be an integer between 1 and {self.maxTimeStep}, inclusive."
+            _err.showErrorMessageBox(errorMessage=errorMessage, title="Invalid value")
+            self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
+            return
+
+        self._timeStepIncrease = timeStepIncrease
 
     def togglePause(self):
         if self.paused:
@@ -321,7 +341,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep += self._getTimeStepIncrease()
+        self.timeStep += self._timeStepIncrease
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
         self.slider.setValue(self.timeStep)
@@ -332,13 +352,10 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep -= self._getTimeStepIncrease()
+        self.timeStep -= self._timeStepIncrease
         if self.timeStep < 0:
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)
-
-    def _getTimeStepIncrease(self) -> int:
-        return int(round(float(self.jumpValueLE.text())))
 
     def checkTimeStep(self):
         """
