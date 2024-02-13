@@ -175,6 +175,7 @@ class TestGetBlockItem:
         graphicsScene = _qtw.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
         editorMock.graphicalObj = []
+        editorMock.componentAndPipeNameValidator = None
 
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()

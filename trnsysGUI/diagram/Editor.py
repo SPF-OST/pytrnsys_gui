@@ -1043,8 +1043,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         c = hxDlg(hx, self)
 
     def showSegmentDlg(self, seg):
-        existingNames = [o.displayName for o in self.trnsysObj]
-        segmentDialog = SegmentDialog(seg.connection, existingNames)
+        segmentDialog = SegmentDialog(seg.connection, self.componentAndPipeNameValidator)
         segmentDialog.exec()
 
     def showTVentilDlg(self, bl):

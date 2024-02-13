@@ -7,7 +7,7 @@ import pytrnsys.utils.result as _res
 
 class AbstractComponentAndPipeNameValidator(_abc.ABC):
     @_abc.abstractmethod
-    def validateName(self, newName: str, currentName: _tp.Optional[str]) -> _res.Result[None]:
+    def validateName(self, newName: str, checkDdckFolder: bool, currentName: _tp.Optional[str]) -> _res.Result[None]:
         pass
 
 
@@ -34,36 +34,21 @@ class DdckDirFileOrDirNamesProvider(AbstractDdckDirFileOrDirNamesProvider):
         return hasFileOrDirName
 
 
-class DummyDdckFileOrDirNamesProvider(AbstractDdckDirFileOrDirNamesProvider):
-    _instance = None
-
-    @_tp.override
-    def hasFileOrDirName(self, name: str) -> bool:
-        return False
-
-    @staticmethod
-    def instance():
-        clazz = DummyDdckFileOrDirNamesProvider
-
-        if not clazz._instance:  # pylint: disable=protected-access
-            clazz._instance = clazz()  # pylint: disable=protected-access
-
-        return clazz._instance  # pylint: disable=protected-access
-
-
 class ComponentAndPipeNameValidator(AbstractComponentAndPipeNameValidator):
     def __init__(
         self,
         existingNames: _tp.Sequence[str],
-        ddckDirFileOrDirNamesProvider: DdckDirFileOrDirNamesProvider = DummyDdckFileOrDirNamesProvider.instance(),
+        ddckDirFileOrDirNamesProvider: AbstractDdckDirFileOrDirNamesProvider,
     ) -> None:
         self._existingNamesInLowerCase = {n.lower() for n in existingNames}
         self._ddckDirFileOrDirNamesProvider = ddckDirFileOrDirNamesProvider
 
     @_tp.override
-    def validateName(self, newName: str, currentName: _tp.Optional[str] = None) -> _res.Result[None]:
+    def validateName(
+        self, newName: str, checkDdckFolder: bool, currentName: _tp.Optional[str] = None
+    ) -> _res.Result[None]:
         if currentName:
-            isNameUnchangedExceptForCasing = (newName.lower() == currentName.lower())
+            isNameUnchangedExceptForCasing = newName.lower() == currentName.lower()
             if isNameUnchangedExceptForCasing:
                 return None
 
@@ -80,7 +65,7 @@ class ComponentAndPipeNameValidator(AbstractComponentAndPipeNameValidator):
         if self._doesNameExist(newName):
             return _res.Error("Name already exist (note: names are case insensitive).")
 
-        if self._ddckDirFileOrDirNamesProvider.hasFileOrDirName(newName):
+        if checkDdckFolder and self._ddckDirFileOrDirNamesProvider.hasFileOrDirName(newName):
             message = (
                 f'There exists a file or folder named "{newName}" in the ddck folder. '
                 f'Please delete it first before using "{newName}" as a name.'
@@ -90,6 +75,9 @@ class ComponentAndPipeNameValidator(AbstractComponentAndPipeNameValidator):
         return None
 
     def addName(self, name: str) -> None:
+        if self._doesNameExist(name):
+            raise ValueError("Name already exists.", name)
+
         nameInLowerCase = name.lower()
         self._existingNamesInLowerCase.add(nameInLowerCase)
 

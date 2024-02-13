@@ -9,10 +9,12 @@ import trnsysGUI.errors as _err
 
 
 class SegmentDialog(_qtw.QDialog):
-    def __init__(self, connection: _cb.ConnectionBase, existingNames: _tp.Sequence[str]) -> None:
+    def __init__(
+        self, connection: _cb.ConnectionBase, nameValidator: _cpn.AbstractComponentAndPipeNameValidator
+    ) -> None:
         super().__init__()
         self._connection = connection
-        self._nameValidator = _cpn.ComponentAndPipeNameValidator(existingNames)
+        self._nameValidator = nameValidator
 
         nameLabel = _qtw.QLabel("Name:")
         self._lineEdit = _qtw.QLineEdit(self._connection.displayName)
@@ -38,7 +40,8 @@ class SegmentDialog(_qtw.QDialog):
         newName = self._lineEdit.text()
         currentName = self._connection.displayName
 
-        result = self._nameValidator.validateName(newName, currentName)
+        checkDdckFolder = False
+        result = self._nameValidator.validateName(newName, checkDdckFolder, currentName)
         if _res.isError(result):
             errorMessage = _res.error(result)
             _err.showErrorMessageBox(errorMessage.message)

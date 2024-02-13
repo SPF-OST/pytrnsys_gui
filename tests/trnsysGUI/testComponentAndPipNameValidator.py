@@ -1,3 +1,5 @@
+import typing as _tp
+
 import pytest as _pt
 
 import pytrnsys.utils.result as _res
@@ -36,11 +38,17 @@ _NAMES_AND_ERROR_MESSAGES = [
 _INVALID_NAMES = [n for n, _ in _NAMES_AND_ERROR_MESSAGES]
 
 
+class _DummyDdckFileOrDirNamesProvider(_cpn.AbstractDdckDirFileOrDirNamesProvider):
+    @_tp.override
+    def hasFileOrDirName(self, name: str) -> bool:
+        raise AssertionError("Shouldn't get here")
+
+
 class TestComponentAndPipeNameValidator:
     @_pt.mark.parametrize(["newName", "expectedErrorMessage"], _NAMES_AND_ERROR_MESSAGES)
-    def testValidateNameInvalidNames(self, newName, expectedErrorMessage):
-        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES)
-        result = validator.validateName(newName)
+    def testValidateNameInvalidNames(self, newName: str, expectedErrorMessage: str) -> None:
+        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider())
+        result = validator.validateName(newName, checkDdckFolder=False)
 
         assert _res.isError(result)
 
@@ -48,8 +56,8 @@ class TestComponentAndPipeNameValidator:
         assert errorMessage == expectedErrorMessage
 
     @_pt.mark.parametrize("newName", _VALID_NAMES)
-    def testValidateNameValidNames(self, newName):
-        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES)
-        result = validator.validateName(newName)
+    def testValidateNameValidNames(self, newName: str) -> None:
+        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider())
+        result = validator.validateName(newName, checkDdckFolder=False)
 
         assert not _res.isError(result)
