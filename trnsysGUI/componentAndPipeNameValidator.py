@@ -13,7 +13,7 @@ class AbstractComponentAndPipeNameValidator(_abc.ABC):
         raise NotImplementedError()
 
     @_abc.abstractmethod
-    def generateName(self, prefix: str) -> str:
+    def createAndAddName(self, prefix: str) -> str:
         raise NotImplementedError()
 
     @_abc.abstractmethod
@@ -93,12 +93,13 @@ class ComponentAndPipeNameValidator(AbstractComponentAndPipeNameValidator):
         return self.validateName(newName, checkDdckFolder)
 
     @_tp.override
-    def generateName(self, prefix: str, checkDdckFolder: bool) -> str:
+    def createAndAddName(self, prefix: str, checkDdckFolder: bool) -> str:
         for _ in range(1000):
             newId = self._idGenerator.getID()
             newNameCandidate = f"{prefix}{newId}"
             result = self.validateName(newNameCandidate, checkDdckFolder)
             if not _res.isError(result):
+                self.addName(newNameCandidate)
                 return newNameCandidate
 
         raise AssertionError(f'Could not generate a name with prefix "{prefix}".')

@@ -44,7 +44,7 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         self._editor.componentAndPipeNameValidator.removeName(self._blockItem.displayName)
 
     def undo(self):
-        displayName = self._getNonCollidingDisplayName()
+        displayName = self._getOrCreateAndAddNonCollidingDisplayName()
         self._blockItem.setDisplayName(displayName)
 
         self._editor.trnsysObj.append(self._blockItem)
@@ -53,13 +53,15 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
 
         super().undo()
 
-    def _getNonCollidingDisplayName(self) -> str:
+    def _getOrCreateAndAddNonCollidingDisplayName(self) -> str:
         checkDdckFolder = self._blockItem.hasDdckPlaceHolders()
         result = self._editor.componentAndPipeNameValidator.validateName(self._blockItem.displayName, checkDdckFolder)
         if not _res.isError(result):
             return self._blockItem.displayName
 
-        generatedName = self._editor.componentAndPipeNameValidator.generateName(self._blockItem.name, checkDdckFolder)
+        generatedName = self._editor.componentAndPipeNameValidator.createAndAddName(
+            self._blockItem.name, checkDdckFolder
+        )
         errorMessage = (
             f'Could not use previous name "{self._blockItem.displayName}" of component as it '
             f"has been used for other components or pipes in the meantime. The newly generated "
