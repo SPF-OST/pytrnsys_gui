@@ -10,13 +10,18 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+
 from . import _defaults
+from . import _dialog
 from . import _serialization as _ser
 
 
 class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-instance-attributes
     def __init__(self, trnsysType, editor, **kwargs):
         super().__init__(trnsysType, editor, **kwargs)
+
+        self._componentAndPipeNameValidator = editor.componentAndPipeNameValidator
+
         self.w = 40
         self.h = 40
 
@@ -154,3 +159,8 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
         self.outputs[0].id = model.outputPortId
 
         resBlockList.append(self)
+
+    def mouseDoubleClickEvent(self, event):
+        dialogModel = _dialog.Model(self.displayName, self.flippedH, self.flippedV, self.massFlowRateInKgPerH)
+        dialog = _dialog.Dialog(dialogModel, self._componentAndPipeNameValidator)
+        dialog.exec()

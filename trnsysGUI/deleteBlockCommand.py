@@ -35,10 +35,12 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         super().redo()
 
         self._blockItem.deleteBlock()
+        self._editor.componentAndPipeNameValidator.removeName(self._blockItem.displayName)
 
     def undo(self):
         self._editor.trnsysObj.append(self._blockItem)
         self._editor.diagramScene.addItem(self._blockItem)
+        self._editor.componentAndPipeNameValidator.addName(self._blockItem.displayName)
         self._blockItem.addTree()
 
         super().undo()

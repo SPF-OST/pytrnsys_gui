@@ -36,11 +36,9 @@ class SegmentDialog(_qtw.QDialog):
 
     def _acceptedEdit(self) -> None:
         newName = self._lineEdit.text()
-        if self._isOldName(newName):
-            self.close()
-            return
+        currentName = self._connection.displayName
 
-        result = self._nameValidator.validateName(newName)
+        result = self._nameValidator.validateName(newName, currentName)
         if _res.isError(result):
             errorMessage = _res.error(result)
             _err.showErrorMessageBox(errorMessage.message)
@@ -53,11 +51,6 @@ class SegmentDialog(_qtw.QDialog):
         self._connection.setDisplayName(newName)
         for segment in self._connection.segments:
             segment.setToolTip(newName)
-
-    def _isOldName(self, newName: str) -> bool:
-        oldName = self._connection.displayName
-
-        return newName.lower() == oldName.lower()
 
     def _cancel(self) -> None:
         self.close()

@@ -2,6 +2,7 @@
 # type: ignore
 
 import json
+import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
@@ -12,11 +13,11 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtWidgets as _qtw
-import math as _math
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
+import trnsysGUI.componentAndPipeNameValidator as _valid
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
@@ -38,7 +39,6 @@ from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
-from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
 from trnsysGUI.connection.connectionBase import ConnectionBase
@@ -136,6 +136,14 @@ class Editor(_qtw.QWidget):
         self._currentlyDraggedConnectionFromPort = None
         self.connectionList = []
         self.trnsysObj = []
+
+        ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
+        ddckDirFileOrDirNamesProvider = _valid.DdckDirFileOrDirNamesProvider(ddckDirPath)
+        existingNames = []
+        self.componentAndPipeNameValidator = _valid.ComponentAndPipeNameValidator(
+            existingNames, ddckDirFileOrDirNamesProvider
+        )
+
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
@@ -826,6 +834,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         self._setHydraulicLoopsOnStorageTanks()
 
+        self._addNamesToNameValidator()
+
     def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
         if "hydraulicLoops" not in blocklist:
@@ -846,6 +856,10 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             storageTank = trnsysObject
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
+
+    def _addNamesToNameValidator(self) -> None:
+        for trnsysObject in self.trnsysObj:
+            self.componentAndPipeNameValidator.addName(trnsysObject.displayName)
 
     def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
         if not self._isHydraulicConnected():
@@ -1018,9 +1032,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
     def showDoublePipeBlockDlg(self, bl):
         c = DoublePipeBlockDlg(bl, self)
-
-    def showPumpDlg(self, bl):
-        c = PumpDlg(bl, self)
 
     def showDiagramDlg(self):
         c = diagramDlg(self)
