@@ -10,6 +10,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+import trnsysGUI.common.cancelled as _cancel
 
 from . import _defaults
 from . import _dialog
@@ -160,7 +161,18 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
 
         resBlockList.append(self)
 
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event) -> None:
         dialogModel = _dialog.Model(self.displayName, self.flippedH, self.flippedV, self.massFlowRateInKgPerH)
-        dialog = _dialog.Dialog(dialogModel, self._componentAndPipeNameValidator)
-        dialog.exec()
+
+        maybeCancelled = _dialog.Dialog.showDialogAndGetResult(dialogModel, self._componentAndPipeNameValidator)
+        if _cancel.isCancelled(maybeCancelled):
+            return
+
+        newDialogModel = _cancel.value(maybeCancelled)
+
+        self._componentAndPipeNameValidator.rename(dialogModel.name, newDialogModel.name)
+
+        self.setDisplayName(newDialogModel.name)
+        self.updateFlipStateH(newDialogModel.isHorizontallyFlipped)
+        self.updateFlipStateV(newDialogModel.isVerticallyFlipped)
+        self.massFlowRateInKgPerH = newDialogModel.massFlowRateKgPerH

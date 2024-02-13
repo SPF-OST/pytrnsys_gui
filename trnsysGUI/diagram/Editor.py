@@ -141,7 +141,7 @@ class Editor(_qtw.QWidget):
         ddckDirFileOrDirNamesProvider = _valid.DdckDirFileOrDirNamesProvider(ddckDirPath)
         existingNames = []
         self.componentAndPipeNameValidator = _valid.ComponentAndPipeNameValidator(
-            existingNames, ddckDirFileOrDirNamesProvider
+            existingNames, ddckDirFileOrDirNamesProvider, self.idGen
         )
 
         self.graphicalObj = []

@@ -4,11 +4,25 @@ import typing as _tp
 
 import pytrnsys.utils.result as _res
 
+import trnsysGUI.idGenerator as _idgen
+
 
 class AbstractComponentAndPipeNameValidator(_abc.ABC):
     @_abc.abstractmethod
-    def validateName(self, newName: str, checkDdckFolder: bool, currentName: _tp.Optional[str]) -> _res.Result[None]:
-        pass
+    def validateName(self, newName: str, checkDdckFolder: bool) -> _res.Result[None]:
+        raise NotImplementedError()
+
+    @_abc.abstractmethod
+    def generateName(self, prefix: str) -> str:
+        raise NotImplementedError()
+
+    @_abc.abstractmethod
+    def canRename(self, currentName: str, newName: str, checkDdckFolder: bool) -> _res.Result[None]:
+        raise NotImplementedError()
+
+    @_abc.abstractmethod
+    def rename(self, oldName: str, newName: str) -> None:
+        raise NotImplementedError()
 
 
 class AbstractDdckDirFileOrDirNamesProvider(_abc.ABC):
@@ -39,19 +53,14 @@ class ComponentAndPipeNameValidator(AbstractComponentAndPipeNameValidator):
         self,
         existingNames: _tp.Sequence[str],
         ddckDirFileOrDirNamesProvider: AbstractDdckDirFileOrDirNamesProvider,
+        idGenerator: _idgen.IdGenerator,
     ) -> None:
         self._existingNamesInLowerCase = {n.lower() for n in existingNames}
         self._ddckDirFileOrDirNamesProvider = ddckDirFileOrDirNamesProvider
+        self._idGenerator = idGenerator
 
     @_tp.override
-    def validateName(
-        self, newName: str, checkDdckFolder: bool, currentName: _tp.Optional[str] = None
-    ) -> _res.Result[None]:
-        if currentName:
-            isNameUnchangedExceptForCasing = newName.lower() == currentName.lower()
-            if isNameUnchangedExceptForCasing:
-                return None
-
+    def validateName(self, newName: str, checkDdckFolder: bool) -> _res.Result[None]:
         if newName == "":
             return _res.Error("Please enter a name.")
 
@@ -74,19 +83,44 @@ class ComponentAndPipeNameValidator(AbstractComponentAndPipeNameValidator):
 
         return None
 
+    @_tp.override
+    def canRename(self, currentName: _tp.Optional[str], newName: str, checkDdckFolder: bool) -> _res.Result[None]:
+        if currentName:
+            isNameUnchangedExceptForCasing = newName.lower() == currentName.lower()
+            if isNameUnchangedExceptForCasing:
+                return None
+
+        return self.validateName(newName, checkDdckFolder)
+
+    @_tp.override
+    def generateName(self, prefix: str, checkDdckFolder: bool) -> str:
+        for _ in range(1000):
+            newId = self._idGenerator.getID()
+            newNameCandidate = f"{prefix}{newId}"
+            result = self.validateName(newNameCandidate, checkDdckFolder)
+            if not _res.isError(result):
+                return newNameCandidate
+
+        raise AssertionError(f'Could not generate a name with prefix "{prefix}".')
+
     def addName(self, name: str) -> None:
         if self._doesNameExist(name):
-            raise ValueError("Name already exists.", name)
+            raise ValueError(f'Name already exists: "{name}".')
 
         nameInLowerCase = name.lower()
         self._existingNamesInLowerCase.add(nameInLowerCase)
 
     def removeName(self, name: str) -> None:
         if not self._doesNameExist(name):
-            raise ValueError("Name does not exist.", name)
+            raise ValueError(f'Name does not exist: "{name}".')
 
         nameInLowerCase = name.lower()
         self._existingNamesInLowerCase.remove(nameInLowerCase)
+
+    @_tp.override
+    def rename(self, oldName: str, newName: str) -> None:
+        self.removeName(oldName)
+        self.addName(newName)
 
     def _doesNameExist(self, newName: str) -> bool:
         newNameInLowerCase = newName.lower()

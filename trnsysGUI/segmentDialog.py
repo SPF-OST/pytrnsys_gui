@@ -41,7 +41,7 @@ class SegmentDialog(_qtw.QDialog):
         currentName = self._connection.displayName
 
         checkDdckFolder = False
-        result = self._nameValidator.validateName(newName, checkDdckFolder, currentName)
+        result = self._nameValidator.canRename(currentName, newName, checkDdckFolder)
         if _res.isError(result):
             errorMessage = _res.error(result)
             _err.showErrorMessageBox(errorMessage.message)

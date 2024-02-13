@@ -4,6 +4,7 @@ import pytest as _pt
 
 import pytrnsys.utils.result as _res
 import trnsysGUI.componentAndPipeNameValidator as _cpn
+import trnsysGUI.idGenerator as _idgen
 
 _EXISTING_NAMES = ["SCnrA_QSnkA", "SCnrB_QSnkB", "SCnrC_QSnkC", "SCnrD_QSnkD"]
 _VALID_NAMES = [
@@ -47,7 +48,7 @@ class _DummyDdckFileOrDirNamesProvider(_cpn.AbstractDdckDirFileOrDirNamesProvide
 class TestComponentAndPipeNameValidator:
     @_pt.mark.parametrize(["newName", "expectedErrorMessage"], _NAMES_AND_ERROR_MESSAGES)
     def testValidateNameInvalidNames(self, newName: str, expectedErrorMessage: str) -> None:
-        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider())
+        validator = self._createValidator()
         result = validator.validateName(newName, checkDdckFolder=False)
 
         assert _res.isError(result)
@@ -57,7 +58,14 @@ class TestComponentAndPipeNameValidator:
 
     @_pt.mark.parametrize("newName", _VALID_NAMES)
     def testValidateNameValidNames(self, newName: str) -> None:
-        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider())
+        validator = self._createValidator()
         result = validator.validateName(newName, checkDdckFolder=False)
 
         assert not _res.isError(result)
+
+    @staticmethod
+    def _createValidator() -> _cpn.ComponentAndPipeNameValidator:
+        validator = _cpn.ComponentAndPipeNameValidator(
+            _EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider(), _idgen.IdGenerator()
+        )
+        return validator

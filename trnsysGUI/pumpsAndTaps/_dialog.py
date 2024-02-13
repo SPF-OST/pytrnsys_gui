@@ -64,7 +64,7 @@ class Dialog(_qtw.QDialog, _gen.Ui_dialog):
         currentName = self._model.name
 
         checkDdckFolder = False
-        result = self._nameValidator.validateName(newNameCandidate, checkDdckFolder, currentName)
+        result = self._nameValidator.canRename(currentName, newNameCandidate, checkDdckFolder)
         if _res.isError(result):
             error = _res.error(result)
             _errors.showErrorMessageBox(error.message)
