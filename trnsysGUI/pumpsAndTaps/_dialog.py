@@ -6,9 +6,9 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.result as _res
 
 import trnsysGUI.common.cancelled as _cancel
-import trnsysGUI.componentAndPipeNameValidator as _valid
 import trnsysGUI.dialogs as _dlgs
 import trnsysGUI.errors as _errors
+import trnsysGUI.names.rename as _rename
 
 _dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
 
@@ -24,22 +24,19 @@ class Model:
 
 
 class Dialog(_qtw.QDialog, _gen.Ui_dialog):
-    def __init__(self, model: Model, nameValidator: _valid.AbstractComponentAndPipeNameValidator) -> None:
+    def __init__(self, model: Model, renameHelper: _rename.RenameHelper) -> None:
         super().__init__()
         self.setupUi(self)
 
         self._model = _dc.replace(model)
-        self._nameValidator = nameValidator
-
+        self._renameHelper = renameHelper
         self._updateDialogFromModel()
 
         self._configure()
 
     @staticmethod
-    def showDialogAndGetResult(
-        model: Model, nameValidator: _valid.ComponentAndPipeNameValidator
-    ) -> _cancel.MaybeCancelled[Model]:
-        dialog = Dialog(model, nameValidator)
+    def showDialogAndGetResult(model: Model, renameHelper: _rename.RenameHelper) -> _cancel.MaybeCancelled[Model]:
+        dialog = Dialog(model, renameHelper)
 
         returnCode = dialog.exec()
         if returnCode == _qtw.QDialog.Rejected:
@@ -64,7 +61,7 @@ class Dialog(_qtw.QDialog, _gen.Ui_dialog):
         currentName = self._model.name
 
         checkDdckFolder = False
-        result = self._nameValidator.canRename(currentName, newNameCandidate, checkDdckFolder)
+        result = self._renameHelper.canRename(currentName, newNameCandidate, checkDdckFolder)
         if _res.isError(result):
             error = _res.error(result)
             _errors.showErrorMessageBox(error.message)

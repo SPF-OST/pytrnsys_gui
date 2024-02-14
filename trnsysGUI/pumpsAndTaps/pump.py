@@ -5,12 +5,13 @@ import dataclasses_jsonschema as _dcj
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.common as _com
+import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.names.rename as _rename
 import trnsysGUI.temperatures as _temps
-import trnsysGUI.common.cancelled as _cancel
 
 from . import _defaults
 from . import _dialog
@@ -21,7 +22,7 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
     def __init__(self, trnsysType, editor, **kwargs):
         super().__init__(trnsysType, editor, **kwargs)
 
-        self._componentAndPipeNameValidator = editor.componentAndPipeNameValidator
+        self._renameHelper = _rename.RenameHelper(self.editor.namesManager)
 
         self.w = 40
         self.h = 40
@@ -164,13 +165,13 @@ class Pump(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-in
     def mouseDoubleClickEvent(self, event) -> None:
         dialogModel = _dialog.Model(self.displayName, self.flippedH, self.flippedV, self.massFlowRateInKgPerH)
 
-        maybeCancelled = _dialog.Dialog.showDialogAndGetResult(dialogModel, self._componentAndPipeNameValidator)
+        maybeCancelled = _dialog.Dialog.showDialogAndGetResult(dialogModel, self._renameHelper)
         if _cancel.isCancelled(maybeCancelled):
             return
 
         newDialogModel = _cancel.value(maybeCancelled)
 
-        self._componentAndPipeNameValidator.rename(dialogModel.name, newDialogModel.name)
+        self._renameHelper.rename(dialogModel.name, newDialogModel.name)
 
         self.setDisplayName(newDialogModel.name)
         self.updateFlipStateH(newDialogModel.isHorizontallyFlipped)

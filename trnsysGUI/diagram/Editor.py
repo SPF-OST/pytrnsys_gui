@@ -17,7 +17,7 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
-import trnsysGUI.componentAndPipeNameValidator as _valid
+import trnsysGUI.names.manager as _nm
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
@@ -138,11 +138,9 @@ class Editor(_qtw.QWidget):
         self.trnsysObj = []
 
         ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
-        ddckDirFileOrDirNamesProvider = _valid.DdckDirFileOrDirNamesProvider(ddckDirPath)
+        ddckDirFileOrDirNamesProvider = _nm.DdckDirFileOrDirNamesProvider(ddckDirPath)
         existingNames = []
-        self.componentAndPipeNameValidator = _valid.ComponentAndPipeNameValidator(
-            existingNames, ddckDirFileOrDirNamesProvider, self.idGen
-        )
+        self.namesManager = _nm.NamesManager(existingNames, ddckDirFileOrDirNamesProvider)
 
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
@@ -859,7 +857,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
     def _addNamesToNameValidator(self) -> None:
         for trnsysObject in self.trnsysObj:
-            self.componentAndPipeNameValidator.addName(trnsysObject.displayName)
+            self.namesManager.addName(trnsysObject.displayName)
 
     def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
         if not self._isHydraulicConnected():
@@ -1043,7 +1041,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         c = hxDlg(hx, self)
 
     def showSegmentDlg(self, seg):
-        segmentDialog = SegmentDialog(seg.connection, self.componentAndPipeNameValidator)
+        segmentDialog = SegmentDialog(seg.connection, self.namesManager)
         segmentDialog.exec()
 
     def showTVentilDlg(self, bl):
