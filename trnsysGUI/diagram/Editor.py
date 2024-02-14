@@ -17,7 +17,6 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
-import trnsysGUI.names.manager as _nm
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
@@ -28,6 +27,10 @@ import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.names.create as _nc
+import trnsysGUI.names.manager as _nm
+import trnsysGUI.names.rename as _nr
+import trnsysGUI.names.undo as _nu
 import trnsysGUI.placeholders as _ph
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
@@ -334,14 +337,49 @@ class Editor(_qtw.QWidget):
             isValidSinglePipeConnection = isinstance(startPort, SinglePipePortItem) and isinstance(
                 endPort, SinglePipePortItem
             )
+            isValidDoublePipeConnection = isinstance(startPort, DoublePipePortItem) and isinstance(
+                endPort, DoublePipePortItem
+            )
+
             if isValidSinglePipeConnection:
-                command = CreateSinglePipeConnectionCommand(startPort, endPort, self)
-            elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
-                command = CreateDoublePipeConnectionCommand(startPort, endPort, self)
+                command = self._createCreateSinglePipeConnectionCommand(startPort, endPort)
+            elif isValidDoublePipeConnection:
+                command = self._createCreateDoublePipeConnectionCommand(startPort, endPort)
             else:
                 raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
             self.parent().undoStack.push(command)
+
+    def _createCreateSinglePipeConnectionCommand(
+        self, startPort: SinglePipePortItem, endPort: SinglePipePortItem
+    ) -> CreateSinglePipeConnectionCommand:
+        displayName, createNamingHelper, undoNamingHelper = self._createDisplayNameAndCreateAndUndoNamingHelpers(
+            startPort, endPort
+        )
+        displayName = _cnames.generateAndAddDefaultConnectionName(startPort, endPort, createNamingHelper)
+        connection = SinglePipeConnection(displayName, startPort, endPort, self)
+        command = CreateSinglePipeConnectionCommand(connection, undoNamingHelper, self)
+        return command
+
+    def _createCreateDoublePipeConnectionCommand(
+        self, startPort: DoublePipePortItem, endPort: DoublePipePortItem
+    ) -> CreateDoublePipeConnectionCommand:
+        (
+            displayName,
+            createNamingHelper,
+            undoNamingHelper,
+        ) = self._createDisplayNameAndCreateAndUndoNamingHelpers(startPort, endPort)
+        connection = DoublePipeConnection(displayName, startPort, endPort, self)
+        command = CreateDoublePipeConnectionCommand(connection, undoNamingHelper, self)
+        return command
+
+    def _createDisplayNameAndCreateAndUndoNamingHelpers(
+        self, endPort: PortItemBase, startPort: PortItemBase
+    ) -> _tp.Tuple[str, _nc.CreateNamingHelper, _nu.UndoNamingHelper]:
+        createNamingHelper = _nc.CreateNamingHelper(self.namesManager)
+        displayName = _cnames.generateAndAddDefaultConnectionName(startPort, endPort, createNamingHelper)
+        undoNamingHelper = _nu.UndoNamingHelper(self.namesManager, createNamingHelper)
+        return displayName, createNamingHelper, undoNamingHelper
 
     def sceneMouseMoveEvent(self, event):
         """
@@ -832,7 +870,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         self._setHydraulicLoopsOnStorageTanks()
 
-        self._addNamesToNameValidator()
+        self._addNamesToNamesManager()
 
     def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
@@ -855,7 +893,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
 
-    def _addNamesToNameValidator(self) -> None:
+    def _addNamesToNamesManager(self) -> None:
+        print("foo")
         for trnsysObject in self.trnsysObj:
             self.namesManager.addName(trnsysObject.displayName)
 
@@ -1041,7 +1080,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         c = hxDlg(hx, self)
 
     def showSegmentDlg(self, seg):
-        segmentDialog = SegmentDialog(seg.connection, self.namesManager)
+        renameHelper = _nr.RenameHelper(self.namesManager)
+        segmentDialog = SegmentDialog(seg.connection, renameHelper)
         segmentDialog.exec()
 
     def showTVentilDlg(self, bl):

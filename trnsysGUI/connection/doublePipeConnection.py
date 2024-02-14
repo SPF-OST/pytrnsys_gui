@@ -6,6 +6,7 @@ import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.createMassFlowSolverNetworkPipes as _cmnp
+import trnsysGUI.connection.deleteDoublePipeConnectionCommand as _ddpcc
 import trnsysGUI.connection.doublePipeConnectionModel as _model
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
 import trnsysGUI.connection.hydraulicExport.common as _hecom
@@ -15,13 +16,24 @@ import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.names.undo as _nu
 import trnsysGUI.segments.doublePipeSegmentItem as _dpsi
 from . import _massFlowLabels as _mfl
 
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.diagram.Editor as _ed
+
 
 class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
-    def __init__(self, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem, parent):
+    def __init__(
+        self,
+        displayName: str,
+        fromPort: _dppi.DoublePipePortItem,
+        toPort: _dppi.DoublePipePortItem,
+        parent: _ed.Editor,  # type: ignore[name-defined]
+    ) -> None:
         super().__init__(
+            displayName,
             fromPort,
             toPort,
             _defaults.DEFAULT_SHALL_BE_SIMULATED,
@@ -62,7 +74,9 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return rad
 
     def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
-        undoCommand = DeleteDoublePipeConnectionCommand(self, parentCommand)
+        undoNamingHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
+
+        undoCommand = _ddpcc.DeleteDoublePipeConnectionCommand(self, undoNamingHelper, parentCommand)
         return undoCommand
 
     def encode(self):
@@ -168,21 +182,3 @@ Hot: {formattedHotMassFlowAndTemperature}
 """
         for segment in self.segments:
             segment.labelMass.setPlainText(labelText)
-
-
-class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
-    def __init__(
-        self, doublePipeConnection: DoublePipeConnection, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None
-    ) -> None:
-        super().__init__("Delete double pipe connection", parentCommand)
-        self._connection = doublePipeConnection
-        self._fromPort = self._connection.fromPort
-        self._toPort = self._connection.toPort
-        self._editor = self._connection.parent
-
-    def undo(self):
-        self._connection = DoublePipeConnection(self._fromPort, self._toPort, self._editor)
-
-    def redo(self):
-        self._connection.deleteConn()
-        self._connection = None

@@ -52,8 +52,12 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         oldName = self._blockItem.displayName
         generatedNamePrefix = self._blockItem.name
 
-        displayName = self._undoNamingHelper.getOrCreateAndAddNonCollidingNameForAdd(
-            oldName, _nu.DeleteCommandTargetType.COMPONENT, checkDdckFolder, generatedNamePrefix
+        displayName = self._undoNamingHelper.addOrGenerateAndAddAnNonCollidingNameForAdd(
+            oldName,
+            _nu.DeleteCommandTargetType.COMPONENT,
+            checkDdckFolder,
+            generatedNamePrefix,
+            firstGeneratedNameHasNumber=True,
         )
         self._blockItem.setDisplayName(displayName)
 

@@ -6,22 +6,28 @@ from PyQt5 import QtWidgets as _qtw
 
 import pytrnsys.utils.result as _res
 import trnsysGUI.connection.singlePipeConnection as _spc  # pylint: disable=cyclic-import
+import trnsysGUI.connection.undo as _cundo
 import trnsysGUI.hydraulicLoops.merge as _hlmerge  # pylint: disable=cyclic-import
 import trnsysGUI.hydraulicLoops.model as _hlmodel
 import trnsysGUI.hydraulicLoops.split as _hlsplit  # pylint: disable=cyclic-import
+import trnsysGUI.names.undo as _un
 
 
 class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
         connection: _spc.SinglePipeConnection,
+        undoNamingHelper: _un.UndoNamingHelper,
         hydraulicLoops: _hlmodel.HydraulicLoops,
         fluids: _tp.Sequence[_hlmodel.Fluid],
         defaultFluid: _hlmodel.Fluid,
         parentCommand: _tp.Optional[_qtw.QUndoCommand],
     ):
         super().__init__("Delete single pipe connection", parentCommand)
-        self._connection: _tp.Optional[_spc.SinglePipeConnection] = connection
+        self._connection = connection
+
+        self._undoNamingHelper = undoNamingHelper
+
         self._hydraulicLoops = hydraulicLoops
         self._fluids = fluids
         self._defaultFluid = defaultFluid
@@ -44,12 +50,11 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         self._splitSummary = cancellable
 
         self._connection.deleteConn()
-        self._connection = None
+        self._undoNamingHelper.removeNameForDelete(self._connection.displayName)
 
     def undo(self) -> None:
-        self._connection = _spc.SinglePipeConnection(  # type: ignore[attr-defined]
-            self._fromPort, self._toPort, self._connectionParent
-        )
+        _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
+        _cundo.reAddConnection(self._connection)
 
         mergedLoopSummary = self._splitSummary.before if self._splitSummary else None  # pylint: disable=no-member
 

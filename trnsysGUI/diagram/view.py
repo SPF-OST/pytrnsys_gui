@@ -76,6 +76,6 @@ class View(_qtw.QGraphicsView):
                 self.scale(0.8, 0.8)
 
     def deleteBlockCom(self, blockItem):
-        undoNamesHelper = _nu.UndoNamingHelper(self._editor.namesManager, self._editor.idGen)
+        undoNamesHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
         command = _dbc.DeleteBlockCommand(blockItem, self._editor, undoNamesHelper)
         self._editor.parent().undoStack.push(command)

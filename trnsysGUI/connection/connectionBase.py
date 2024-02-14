@@ -10,13 +10,16 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.CornerItem as _ci
-import trnsysGUI.segments.Node as _node
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.segments.SegmentItemBase as _sib
 import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.segments.Node as _node
+import trnsysGUI.segments.SegmentItemBase as _sib
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.diagram.Editor as _ed
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -29,12 +32,13 @@ class ConnectionBase(_ip.HasInternalPiping):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(
         self,
+        displayName: str,
         fromPort: _pib.PortItemBase,
         toPort: _pib.PortItemBase,
         shallBeSimulated: bool,
         lengthInMeters: _values.Value,
-        parent,
-    ):
+        parent: _ed.Editor,  # type: ignore[name-defined]
+    ) -> None:
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
         self.logger = parent.logger
@@ -45,9 +49,10 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.shallBeSimulated = shallBeSimulated
         self.lengthInM = lengthInMeters
 
-        self.displayName = ""
+        self.displayName = displayName
 
         self.parent = parent
+        self._editor = parent
 
         # Global
         self.id = self.parent.idGen.getID()  # pylint: disable = invalid-name
@@ -208,8 +213,6 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.parent = parent
 
         self.parent.trnsysObj.append(self)
-
-        self.displayName = self.fromPort.parent.displayName + "_" + self.toPort.parent.displayName
 
         if self.parent.editorMode == 0:
             self.logger.debug("Creating a new connection in mode 0")

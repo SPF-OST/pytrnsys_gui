@@ -4,30 +4,28 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.undo as _cundo
 import trnsysGUI.names.undo as _nu
 
 if _tp.TYPE_CHECKING:
-    import trnsysGUI.diagram.Editor as _ed
+    import trnsysGUI.connection.doublePipeConnection as _dpc
 
 
-class CreateDoublePipeConnectionCommand(_qtw.QUndoCommand):
+class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
     def __init__(
         self,
-        connection: _dpc.DoublePipeConnection,
+        doublePipeConnection: _dpc.DoublePipeConnection,
         undoNamingHelper: _nu.UndoNamingHelper,
-        editor: _ed.Editor,  # type: ignore[name-defined]
+        parentCommand: _tp.Optional[_qtw.QUndoCommand] = None,
     ) -> None:
-        super().__init__("Create double pipe connection")
-        self._connection = connection
+        super().__init__("Delete double pipe connection", parentCommand)
         self._undoNamingHelper = undoNamingHelper
-        self._editor = editor
+        self._connection = doublePipeConnection
 
-    def redo(self):
+    def undo(self):
         _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
         _cundo.reAddConnection(self._connection)
 
-    def undo(self):
+    def redo(self):
         self._connection.deleteConn()
         self._undoNamingHelper.removeNameForDelete(self._connection.displayName)

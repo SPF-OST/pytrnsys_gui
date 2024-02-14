@@ -1,5 +1,7 @@
+import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.names.create as _nc
 import trnsysGUI.temperatures as _temps
 
 
@@ -11,6 +13,22 @@ def getTemperatureVariableName(connection: _cb.ConnectionBase, portItemType: _mf
         nodeName=modelPipe.name,
     )
     return variableName
+
+
+def generateAndAddDefaultConnectionName(
+    fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, createNamingHelper: _nc.CreateNamingHelper
+) -> str:
+    baseName = getDefaultConnectionNameBase(fromPort, toPort)
+    defaultDisplayName = createNamingHelper.generateAndAdd(
+        baseName, checkDdckFolder=False, firstGeneratedNameHasNumber=False
+    )
+    return defaultDisplayName
+
+
+def getDefaultConnectionNameBase(fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase) -> str:
+    fromDisplayName = fromPort.parent.getDisplayName()
+    toDisplayName = toPort.parent.getDisplayName()
+    return f"{fromDisplayName}_{toDisplayName}"
 
 
 class EnergyBalanceTotals:

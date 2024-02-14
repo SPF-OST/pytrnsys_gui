@@ -17,6 +17,8 @@ class Decoder(json.JSONDecoder):
     Decodes the diagram
     """
 
+    _UNSET_ERROR_NAME = "ERROR_NAME_NOT_SET_IN_DECODE"
+
     def __init__(self, *args, **kwargs):
 
         self.editor = kwargs["editor"]
@@ -94,9 +96,9 @@ class Decoder(json.JSONDecoder):
                         self.logger.debug("Error: Did not found a toPort")
 
                     if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
-                        c = SinglePipeConnection(fromPort, toPort, self.editor)
+                        c = SinglePipeConnection(self._UNSET_ERROR_NAME, fromPort, toPort, self.editor)
                     elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
-                        c = DoublePipeConnection(fromPort, toPort, self.editor)
+                        c = DoublePipeConnection(self._UNSET_ERROR_NAME, fromPort, toPort, self.editor)
                     else:
                         raise AssertionError("`fromPort' and `toPort' have different types.")
                     c.decode(i)
