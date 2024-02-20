@@ -3,8 +3,6 @@
 # Run from top-level directory
 
 import argparse as ap
-import contextlib as ctx
-import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
@@ -110,11 +108,11 @@ def _parseArguments() -> ap.Namespace:
         dest="shallRunAll",
     )
     parser.add_argument(
-        "-x",
-        "--executable",
-        help="Create executable using pyinstaller",
+        "-r",
+        "--release",
+        help="Create release",
         action="store_true",
-        dest="shallCreateExecutable",
+        dest="shallCreateRelease",
     )
     arguments = parser.parse_args()
     return arguments
@@ -190,7 +188,7 @@ def _maybeCreateDiagrams(arguments):
 
 
 def _maybeCreateRelease(arguments):
-    if not (arguments.shallRunAll or arguments.shallCreateExecutable):
+    if not (arguments.shallRunAll or arguments.shallCreateRelease):
         return
 
     createReleaseScriptFilePath = pl.Path("release") / "createRelease.py"
@@ -200,18 +198,6 @@ def _maybeCreateRelease(arguments):
     _printAndRun(cmd.split())
 
 
-@ctx.contextmanager
-def _chdir(newWorkingDirPath: tp.Union[pl.Path, str]) -> tp.Iterator[None]:
-    oldWorkingDirPath = pl.Path()
-    newWorkingDirPath = pl.Path(newWorkingDirPath)
-
-    try:
-        os.chdir(newWorkingDirPath)
-        yield
-    finally:
-        os.chdir(oldWorkingDirPath)
-
-
 def _maybeRunPytest(arguments, testResultsDirPath):
     wasCalledWithoutArguments = (
         not arguments.shallPerformStaticChecks
@@ -219,7 +205,7 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         and arguments.lintArguments is None
         and arguments.blackArguments is None
         and arguments.diagramsFormat is None
-        and not arguments.shallCreateExecutable
+        and not arguments.shallCreateRelease
     )
     if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
         markerExpressions = _getMarkerExpressions(arguments.pytestMarkersExpression)

@@ -41,7 +41,7 @@ jobs:
           venv\Scripts\python -m pip install -r requirements/test.txt
         
       - name: Build executable
-        run: venv\Scripts\python dev-tools/devTools.py -x
+        run: venv\Scripts\python dev-tools/devTools.py -r
       
       - name: Compute file name
         id: fn
