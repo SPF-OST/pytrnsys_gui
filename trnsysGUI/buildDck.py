@@ -107,7 +107,6 @@ class buildDck(_rcm.GetConfigMixin):
         return deck.nameDeck
 
     def _readConfig(self, path, name, parseFileCreated=False) -> _res.Result[None]:
-
         """
         It reads the config file used for running TRNSYS and loads the self.inputs dictionary.
         It also loads the read lines into self.lines

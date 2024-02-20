@@ -600,9 +600,7 @@ INPUTS {len(allVariableNames)}
         return temperatureVariableNames
 
     def exportFluids(self) -> str:
-        def getValueOrVariableName(
-            valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1
-        ) -> _tp.Union[float, str]:
+        def getValueOrVariableName(valueOrVariable: float | _hlm.Variable, factor: float = 1) -> float | str:
             if isinstance(valueOrVariable, float):
                 return valueOrVariable * factor
 

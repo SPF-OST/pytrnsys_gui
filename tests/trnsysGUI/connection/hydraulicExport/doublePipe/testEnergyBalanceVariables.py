@@ -136,9 +136,9 @@ class TestEnergyBalanceVariables:
         assert portItemTypesByVariable == expectedPortItemTypesByVariable
 
     @staticmethod
-    def _getPortItemTypesByVariableFromTestCases() -> _cabc.Mapping[
-        _ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]
-    ]:
+    def _getPortItemTypesByVariableFromTestCases() -> (
+        _cabc.Mapping[_ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]]
+    ):
         portItemTypesByVariable = dict[_ebv.EnergyBalanceVariables, set[_tp.Optional[_mfn.PortItemType]]]()
         for testCase in _TEST_CASES:
             defaultReturnIfNotFound = set[_tp.Optional[_mfn.PortItemType]]()

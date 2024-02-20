@@ -20,7 +20,7 @@ CANCELLED = _Cancelled()
 
 _TCo = _tp.TypeVar("_TCo", covariant=True)
 
-MaybeCancelled = _tp.Union[_TCo, _Cancelled]
+MaybeCancelled = _TCo | _Cancelled
 
 
 class SettingsDlg(_widgets.QDialog):
