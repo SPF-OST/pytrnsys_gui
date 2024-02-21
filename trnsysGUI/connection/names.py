@@ -15,11 +15,11 @@ def getTemperatureVariableName(connection: _cb.ConnectionBase, portItemType: _mf
     return variableName
 
 
-def generateAndAddDefaultConnectionName(
+def generateDefaultConnectionName(
     fromPort: _pib.PortItemBase, toPort: _pib.PortItemBase, createNamingHelper: _nc.CreateNamingHelper
 ) -> str:
     baseName = getDefaultConnectionNameBase(fromPort, toPort)
-    defaultDisplayName = createNamingHelper.generateAndAdd(
+    defaultDisplayName = createNamingHelper.generateName(
         baseName, checkDdckFolder=False, firstGeneratedNameHasNumber=False
     )
     return defaultDisplayName

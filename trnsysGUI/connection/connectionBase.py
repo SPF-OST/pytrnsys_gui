@@ -223,10 +223,6 @@ class ConnectionBase(_ip.HasInternalPiping):
         else:
             self.logger.debug("No valid mode during creating of connection")
 
-        self.parent.connectionList.append(self)
-        self.fromPort.connectionList.append(self)
-        self.toPort.connectionList.append(self)
-
     def _initSegmentM0(self):
         self.startNode.setParent(self)
         self.endNode.setParent(self)

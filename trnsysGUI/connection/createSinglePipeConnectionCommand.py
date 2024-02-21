@@ -31,9 +31,6 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
         self._mergeSummary: _tp.Optional[_hlmerge.MergeSummary] = None
 
     def redo(self):
-        _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
-        _cundo.reAddConnection(self._connection)
-
         mergedLoopSummary = self._mergeSummary.after if self._mergeSummary else None  # pylint: disable=no-member
 
         cancellable = _hlmerge.merge(
@@ -49,13 +46,15 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
                 _err.showErrorMessageBox(error.message, "Cannot create connection")
 
             self._connection.deleteConn()
-            self._connection = None
             self.setObsolete(True)
             return
 
         mergeSummary = cancellable
 
         self._mergeSummary = mergeSummary
+
+        _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
+        _cundo.reAddConnection(self._connection)
 
     def undo(self):
         splitLoopsSummary = self._mergeSummary.before if self._mergeSummary else None  # pylint: disable=no-member

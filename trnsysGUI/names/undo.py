@@ -34,7 +34,7 @@ class UndoNamingHelper:
             self._namesManager.addName(oldName)
             return oldName
 
-        generatedName = self._createNamingHelper.generateAndAdd(
+        generatedName = self._createNamingHelper.generateName(
             generatedNameBase, checkDdckFolder, firstGeneratedNameHasNumber
         )
         errorMessage = (
@@ -44,6 +44,9 @@ class UndoNamingHelper:
             f"meaningful value manually."
         )
         _errors.showErrorMessageBox(errorMessage, title="Name changed")
+
+        self._namesManager.addName(generatedName)
+
         return generatedName
 
     def removeNameForDelete(self, name: str) -> None:

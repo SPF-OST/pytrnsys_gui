@@ -26,6 +26,7 @@ _QRC_*_generated.py
 
 # Virtual environment
 /venv/
+/venv312/
 
 docs/_build/
 docs/trnsysGUI.uml

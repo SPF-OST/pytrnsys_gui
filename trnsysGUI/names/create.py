@@ -9,7 +9,7 @@ class CreateNamingHelper:
     def __init__(self, namesManager: _nm.NamesManager) -> None:
         self._namesManager = namesManager
 
-    def generateAndAdd(
+    def generateName(
         self,
         baseName: str,
         checkDdckFolder: bool,
@@ -23,7 +23,6 @@ class CreateNamingHelper:
 
             result = self._namesManager.validateName(newNameCandidate, checkDdckFolder)
             if not _res.isError(result):
-                self._namesManager.addName(newNameCandidate)
                 return newNameCandidate
 
         raise AssertionError(f'Could not generate a name with base "{baseName}" after {self._N_MAX_TRIES} tries.')

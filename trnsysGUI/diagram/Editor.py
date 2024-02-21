@@ -356,7 +356,6 @@ class Editor(_qtw.QWidget):
         displayName, createNamingHelper, undoNamingHelper = self._createDisplayNameAndCreateAndUndoNamingHelpers(
             startPort, endPort
         )
-        displayName = _cnames.generateAndAddDefaultConnectionName(startPort, endPort, createNamingHelper)
         connection = SinglePipeConnection(displayName, startPort, endPort, self)
         command = CreateSinglePipeConnectionCommand(connection, undoNamingHelper, self)
         return command
@@ -377,8 +376,8 @@ class Editor(_qtw.QWidget):
         self, endPort: PortItemBase, startPort: PortItemBase
     ) -> _tp.Tuple[str, _nc.CreateNamingHelper, _nu.UndoNamingHelper]:
         createNamingHelper = _nc.CreateNamingHelper(self.namesManager)
-        displayName = _cnames.generateAndAddDefaultConnectionName(startPort, endPort, createNamingHelper)
         undoNamingHelper = _nu.UndoNamingHelper(self.namesManager, createNamingHelper)
+        displayName = _cnames.generateDefaultConnectionName(startPort, endPort, createNamingHelper)
         return displayName, createNamingHelper, undoNamingHelper
 
     def sceneMouseMoveEvent(self, event):
