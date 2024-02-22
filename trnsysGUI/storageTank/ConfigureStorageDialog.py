@@ -417,7 +417,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         if port.isConnected():
             connection = port.getConnection()
             _hls.split(connection, self._editor.hydraulicLoops, self._editor.fluids)
-            connection.deleteConn()
+            connection.deleteConnection()
 
     def modifyHx(self):
         """

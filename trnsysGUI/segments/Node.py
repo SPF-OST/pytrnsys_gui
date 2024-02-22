@@ -2,7 +2,7 @@
 # type: ignore
 
 
-class Node(object):
+class Node:
     def __init__(self, parent=None, prevNode=None, nextNode=None):
         """
         Nodes

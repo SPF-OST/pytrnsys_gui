@@ -55,7 +55,7 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         self._doublePipeConnection.lengthInM = connection.lengthInM
         self._doublePipeConnection.shallBeSimulated = connection.shallBeSimulated
 
-        self._doublePipeConnection.updateSegGrads()
+        self._doublePipeConnection.updateSegmentGradients()
 
     def _setLineImpl(self, x1, y1, x2, y2):
         self.resetLinePens()

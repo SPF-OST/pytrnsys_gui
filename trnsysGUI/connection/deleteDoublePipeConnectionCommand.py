@@ -27,5 +27,5 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
         _cundo.reAddConnection(self._connection)
 
     def redo(self):
-        self._connection.deleteConn()
+        self._connection.deleteConnection()
         self._undoNamingHelper.removeNameForDelete(self._connection.displayName)

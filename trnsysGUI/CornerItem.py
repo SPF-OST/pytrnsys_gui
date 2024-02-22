@@ -9,7 +9,7 @@ from trnsysGUI.segments.Node import Node
 
 
 class CornerItem(QGraphicsEllipseItem):
-    def __init__(self, x, y, r1, r2, prevNode, nextNode, parent=None):
+    def __init__(self, x, y, r1, r2, prevNode, nextNode, parent):
         """
         CornerItems represent corners for each Connection.
         When a segmentItem is dragged, it will also move the corners, which will trigger the CornerItem
@@ -30,7 +30,7 @@ class CornerItem(QGraphicsEllipseItem):
         nextNode
         parent
         """
-        super(CornerItem, self).__init__(x, y, r1, r2, None)
+        super().__init__(x, y, r1, r2, parent=parent)
 
         self.logger = parent.logger
 

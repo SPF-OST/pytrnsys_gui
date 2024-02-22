@@ -27,7 +27,6 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         self._singlePipeConnection = parent
 
         self.singleLine = _qtw.QGraphicsLineItem(self)
-        self.initGrad()
 
     def _createSegment(self, startNode, endNode) -> _sib.SegmentItemBase:  # type: ignore[name-defined]
         return SinglePipeSegmentItem(startNode, endNode, self._singlePipeConnection)
@@ -42,30 +41,8 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         return menu
 
     def _setLineImpl(self, x1, y1, x2, y2):
-        self.initGrad()
         self.singleLine.setLine(x1, y1, x2, y2)
         self.linePoints = self.singleLine.line()
-
-    def initGrad(self) -> None:
-        gradient = self._createGradient()
-        self._updateLine(gradient)
-
-    def _createGradient(self) -> _qtg.QGradient:
-        if isinstance(self.startNode.parent, _ci.CornerItem):  # type: ignore[attr-defined]
-            startBlock = self.startNode.firstNode().parent
-        else:
-            startBlock = self.startNode.parent
-        if isinstance(self.endNode.parent, _ci.CornerItem):  # type: ignore[attr-defined]
-            endBlock = self.endNode.lastNode().parent
-        else:
-            endBlock = self.endNode.parent
-        gradient = _qtg.QLinearGradient(
-            _qtc.QPointF(startBlock.fromPort.scenePos().x(), startBlock.fromPort.scenePos().y()),
-            _qtc.QPointF(endBlock.toPort.scenePos().x(), endBlock.toPort.scenePos().y()),
-        )
-        gradient.setColorAt(0, _qtc.Qt.gray)
-        gradient.setColorAt(1, _qtc.Qt.black)
-        return gradient
 
     def _setStandardLinesPens(self) -> None:
         gradient = self._createUpdatedGradient()

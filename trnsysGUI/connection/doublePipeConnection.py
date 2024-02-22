@@ -127,7 +127,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.shallBeSimulated = model.shallBeSimulated
 
         if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
+            self._loadSegments(model.segmentsCorners)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {

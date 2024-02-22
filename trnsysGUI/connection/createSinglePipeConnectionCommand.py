@@ -45,7 +45,7 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
                 error = _res.error(cancellable)
                 _err.showErrorMessageBox(error.message, "Cannot create connection")
 
-            self._connection.deleteConn()
+            self._connection.deleteConnection()
             self.setObsolete(True)
             return
 
@@ -55,6 +55,7 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
 
         _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
         _cundo.reAddConnection(self._connection)
+        self._editor.diagramScene.addItem(self._connection)
 
     def undo(self):
         splitLoopsSummary = self._mergeSummary.before if self._mergeSummary else None  # pylint: disable=no-member
@@ -64,5 +65,6 @@ class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
         )
         assert cancellable != "cancelled"
 
-        self._connection.deleteConn()
+        self._editor.diagramScene.removeItem(self._connection)
+        self._connection.deleteConnection()
         self._undoNamingHelper.removeNameForDelete(self._connection.displayName)

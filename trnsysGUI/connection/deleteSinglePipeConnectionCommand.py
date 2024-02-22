@@ -21,6 +21,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         hydraulicLoops: _hlmodel.HydraulicLoops,
         fluids: _tp.Sequence[_hlmodel.Fluid],
         defaultFluid: _hlmodel.Fluid,
+        scene: _qtw.QGraphicsScene,
         parentCommand: _tp.Optional[_qtw.QUndoCommand],
     ):
         super().__init__("Delete single pipe connection", parentCommand)
@@ -32,9 +33,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         self._fluids = fluids
         self._defaultFluid = defaultFluid
 
-        self._fromPort = connection.fromPort
-        self._toPort = connection.toPort
-        self._connectionParent = self._connection.parent
+        self._scene = scene
 
         self._splitSummary: _tp.Optional[_hlsplit.SplitSummary] = None
 
@@ -49,16 +48,18 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
             return
         self._splitSummary = cancellable
 
-        self._connection.deleteConn()
+        self._scene.removeItem(self._connection)
+        self._connection.deleteConnection()
         self._undoNamingHelper.removeNameForDelete(self._connection.displayName)
 
     def undo(self) -> None:
-        _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
-        _cundo.reAddConnection(self._connection)
-
         mergedLoopSummary = self._splitSummary.before if self._splitSummary else None  # pylint: disable=no-member
 
         cancellable = _hlmerge.merge(
             self._connection, self._hydraulicLoops, self._fluids, self._defaultFluid, mergedLoopSummary
         )
         assert cancellable != "cancelled" and not _res.isError(cancellable)
+
+        _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
+        _cundo.reAddConnection(self._connection)
+        self._scene.addItem(self._connection)

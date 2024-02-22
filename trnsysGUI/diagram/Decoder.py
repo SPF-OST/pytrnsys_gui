@@ -109,6 +109,7 @@ class Decoder(_json.JSONDecoder):
 
                     connection.decode(i)
                     _cundo.reAddConnection(connection)
+                    self.editor.diagramScene.addItem(connection)
                     resConnList.append(connection)
 
                 elif "__idDct__" in i:

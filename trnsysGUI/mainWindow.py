@@ -397,10 +397,6 @@ class MainWindow(_qtw.QMainWindow):
             self.logger.info("Canceling")
             return
 
-    def tidyUp(self):
-        self.logger.info("Tidying up...")
-        self.editor.cleanUpConnections()
-
     def setZoomIn(self):
         self.logger.info("Setting zoom in")
         self.editor.diagramView.scale(1.2, 1.2)

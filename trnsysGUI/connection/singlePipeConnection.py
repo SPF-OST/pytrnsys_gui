@@ -88,6 +88,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
             self._editor.hydraulicLoops,
             self._editor.fluids.fluids,
             self._editor.fluids.WATER,
+            self._editor.diagramScene,
             parentCommand,
         )
 
@@ -145,7 +146,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.shallBeSimulated = model.shallBeSimulated
 
         if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
+            self._loadSegments(model.segmentsCorners)
 
     def getInternalPiping(self) -> _pi.InternalPiping:
         return _pi.InternalPiping(

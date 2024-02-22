@@ -13,6 +13,7 @@ if _tp.TYPE_CHECKING:
 def reAddConnection(connection: _cb.ConnectionBase) -> None:
     editor: _ed.Editor = connection.parent  # type: ignore[name-defined]
     editor.connectionList.append(connection)
+    editor.trnsysObj.append(connection)
     connection.fromPort.connectionList.append(connection)
     connection.toPort.connectionList.append(connection)
 

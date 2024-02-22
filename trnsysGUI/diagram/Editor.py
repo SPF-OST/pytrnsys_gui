@@ -296,29 +296,6 @@ class Editor(_qtw.QWidget):
     def shutdown(self) -> None:
         self._consoleWidget.shutdown()
 
-    # Debug function
-    def dumpInformation(self):
-        self.logger.debug("Diagram information:")
-        self.logger.debug("Mode is " + str(self.editorMode))
-
-        self.logger.debug("Next ID is " + str(self.idGen.getID()))
-        self.logger.debug("Next cID is " + str(self.idGen.getConnID()))
-
-        self.logger.debug("TrnsysObjects are:")
-        for t in self.trnsysObj:
-            self.logger.debug(str(t))
-        self.logger.debug("")
-
-        self.logger.debug("Scene items are:")
-        sItems = self.diagramScene.items()
-        for it in sItems:
-            self.logger.info(str(it))
-        self.logger.debug("")
-
-        for c in self.connectionList:
-            c.printConn()
-        self.logger.debug("")
-
     # Connections related methods
     def startConnection(self, port):
         self._currentlyDraggedConnectionFromPort = port
@@ -477,10 +454,6 @@ class Editor(_qtw.QWidget):
             i for i in hitItems if isinstance(i, PortItemBase) and type(i) == type(fromPort) and not i.connectionList
         ]
         return relevantPortItems
-
-    def cleanUpConnections(self):
-        for c in self.connectionList:
-            c.niceConn()
 
     def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
         assert exportTo in ["ddck", "mfs"]
@@ -768,7 +741,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             if isinstance(trnsysObject, BlockItem):
                 trnsysObject.deleteBlock()
             elif isinstance(trnsysObject, ConnectionBase):
-                trnsysObject.deleteConn()
+                trnsysObject.deleteConnection()
             else:
                 raise AssertionError(f"Don't know how to delete {trnsysObject}.")
 
@@ -893,7 +866,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             storageTank.setHydraulicLoops(self.hydraulicLoops)
 
     def _addNamesToNamesManager(self) -> None:
-        print("foo")
         for trnsysObject in self.trnsysObj:
             self.namesManager.addName(trnsysObject.displayName)
 
@@ -1060,7 +1032,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def updateConnGrads(self):
         for t in self.trnsysObj:
             if isinstance(t, ConnectionBase):
-                t.updateSegGrads()
+                t.updateSegmentGradients()
 
     # Dialog calls
     def showBlockDlg(self, bl):
@@ -1290,12 +1262,12 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
 
-        self._updateGradients(hydraulicLoop)
+        self._updateGradientsInHydraulicLoop(hydraulicLoop)
 
     @staticmethod
-    def _updateGradients(hydraulicLoop: _hlm.HydraulicLoop) -> None:
+    def _updateGradientsInHydraulicLoop(hydraulicLoop: _hlm.HydraulicLoop) -> None:
         for connection in hydraulicLoop.connections:
-            connection.updateSegGrads()
+            connection.updateSegmentGradients()
 
     def _getDdckDirNames(self) -> _tp.Sequence[str]:
         ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
