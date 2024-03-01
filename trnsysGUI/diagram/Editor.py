@@ -44,9 +44,9 @@ from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
+from trnsysGUI.connection.addDoublePipeConnectionCommand import AddDoublePipeConnectionCommand
+from trnsysGUI.connection.addSinglePipeConnectionCommand import AddSinglePipeConnectionCommand
 from trnsysGUI.connection.connectionBase import ConnectionBase
-from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
-from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
@@ -329,24 +329,24 @@ class Editor(_qtw.QWidget):
 
     def _createCreateSinglePipeConnectionCommand(
         self, startPort: SinglePipePortItem, endPort: SinglePipePortItem
-    ) -> CreateSinglePipeConnectionCommand:
+    ) -> AddSinglePipeConnectionCommand:
         displayName, createNamingHelper, undoNamingHelper = self._createDisplayNameAndCreateAndUndoNamingHelpers(
             startPort, endPort
         )
         connection = SinglePipeConnection(displayName, startPort, endPort, self)
-        command = CreateSinglePipeConnectionCommand(connection, undoNamingHelper, self)
+        command = AddSinglePipeConnectionCommand(connection, undoNamingHelper, self)
         return command
 
     def _createCreateDoublePipeConnectionCommand(
         self, startPort: DoublePipePortItem, endPort: DoublePipePortItem
-    ) -> CreateDoublePipeConnectionCommand:
+    ) -> AddDoublePipeConnectionCommand:
         (
             displayName,
             createNamingHelper,
             undoNamingHelper,
         ) = self._createDisplayNameAndCreateAndUndoNamingHelpers(startPort, endPort)
         connection = DoublePipeConnection(displayName, startPort, endPort, self)
-        command = CreateDoublePipeConnectionCommand(connection, undoNamingHelper, self)
+        command = AddDoublePipeConnectionCommand(connection, undoNamingHelper, self)
         return command
 
     def _createDisplayNameAndCreateAndUndoNamingHelpers(

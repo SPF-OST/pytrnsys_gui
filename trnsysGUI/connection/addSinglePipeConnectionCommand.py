@@ -16,7 +16,7 @@ if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-class CreateSinglePipeConnectionCommand(_qtw.QUndoCommand):
+class AddSinglePipeConnectionCommand(_qtw.QUndoCommand):
     def __init__(
         self,
         connection: _spc.SinglePipeConnection,
