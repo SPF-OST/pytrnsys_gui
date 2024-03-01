@@ -104,7 +104,6 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
         validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "PumpModel":
-        del data[".__BlockDict__"]
         pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(PumpModel, pumpModel)
 
