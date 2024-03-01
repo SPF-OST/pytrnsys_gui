@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets as _qtw
 
 def deleteGraphicsItem(item: _qtw.QGraphicsItem) -> None:
     scene = item.scene()
-    item.setParentItem(None)
+    item.setParentItem(None)  # type: ignore[arg-type]
     if scene:
         scene.removeItem(item)
 

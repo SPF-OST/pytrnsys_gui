@@ -82,12 +82,16 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
         undoNamingHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
 
-        undoCommand = _dspc.DeleteSinglePipeConnectionCommand(
-            self,
-            undoNamingHelper,
+        hydraulicLoopsData = _dspc.HydraulicLoopsData(
             self._editor.hydraulicLoops,
             self._editor.fluids.fluids,
             self._editor.fluids.WATER,
+        )
+
+        undoCommand = _dspc.DeleteSinglePipeConnectionCommand(
+            self,
+            undoNamingHelper,
+            hydraulicLoopsData,
             self._editor.diagramScene,
             parentCommand,
         )

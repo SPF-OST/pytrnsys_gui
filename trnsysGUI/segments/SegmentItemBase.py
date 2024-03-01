@@ -571,7 +571,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         raise NotImplementedError()
 
     def resetLinePens(self) -> None:
-        if self.connection.isSelected:
+        if self.connection.isConnectionSelected:
             self._setSelectedLinesPen()
         else:
             self._setStandardLinesPens()

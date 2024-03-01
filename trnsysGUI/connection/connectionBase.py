@@ -64,7 +64,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         self.segments: _tp.List[_sib.SegmentItemBase] = []  # type: ignore[name-defined]
 
-        self.isSelected = False
+        self.isConnectionSelected = False
 
         self.startNode = _node.Node(self)  # type: ignore[attr-defined]
         self.endNode = _node.Node(self)  # type: ignore[attr-defined]
@@ -293,7 +293,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             segment.setLine(pos1[0], pos1[1], pos2[0], pos2[1])
 
         self.firstS = self.segments[0]
-        
+
         self.updateSegmentGradients()
         self.positionLabel()
 
@@ -701,7 +701,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         element.setPrev(nextNode)
 
     def selectConnection(self):
-        self.isSelected = True
+        self.isConnectionSelected = True
 
         for segment in self.segments:
             segment.resetLinePens()
@@ -709,7 +709,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self.setLabelsSelected(True)
 
     def deselectConnection(self):
-        self.isSelected = False
+        self.isConnectionSelected = False
 
         for segment in self.segments:
             segment.resetLinePens()
