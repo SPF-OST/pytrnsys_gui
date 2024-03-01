@@ -1,81 +1,34 @@
-# pylint: skip-file
-
-import os
-import shutil
+import os as _os
+import shutil as _su
 import typing as _tp
 
 from PyQt5.QtWidgets import QTreeView
 
-import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.MyQFileSystemModel as _fs
+import trnsysGUI.MyQTreeView as _tv
 import trnsysGUI.images as _img
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
+
+from . import _tapBase
 
 
-class Tap(BlockItem, _ip.HasInternalPiping):
+class Tap(_tapBase.TapBase):
     def __init__(self, trnsysType, editor, **kwargs):
-        super(Tap, self).__init__(trnsysType, editor, **kwargs)
-        self.w = 40
-        self.h = 40
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
+        super().__init__(trnsysType, editor, _mfn.PortItemDirection.INPUT, **kwargs)
+
         self.loadedFiles = []
-
-        self.changeSize()
         self.addTree()
-
-    def getDisplayName(self) -> str:
-        return self.displayName
-
-    def hasDdckPlaceHolders(self) -> bool:
-        return True
-
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
-        return False
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.TAP_SVG
 
-    def changeSize(self):
-        w = self.w
-        h = self.h
-
-        """ Resize block function """
-        delta = 20
-
-        # Limit the block size:
-        if h < 20:
-            h = 20
-        if w < 40:
-            w = 40
-        # center label:
-        rect = self.label.boundingRect()
-        lw = rect.width()
-        lx = (w - lw) / 2
-        self.label.setPos(lx, h)
-
-        self.origInputsPos = [[0, delta]]
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-
-        self.updateFlipStateH(self.flippedH)
-        self.updateFlipStateV(self.flippedV)
-
-        self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-
-        return w, h
+    def _getCanonicalMassFlowRate(self) -> float:
+        return -self._massFlowRateInKgPerH
 
     def exportPumpOutlets(self):
         resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
         equationNr = 1
         return resStr, equationNr
-
-    def getInternalPiping(self) -> _ip.InternalPiping:
-        portItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
-        sink = _mfn.TerminalWithFreeFlow(portItem)
-
-        return _ip.InternalPiping([sink], {portItem: self.inputs[0]})
 
     def addTree(self):
         """
@@ -85,18 +38,18 @@ class Tap(BlockItem, _ip.HasInternalPiping):
         self.logger.debug(self.editor)
         pathName = self.displayName
         self.path = self.editor.projectFolder
-        self.path = os.path.join(self.path, "../ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = _os.path.join(self.path, "../ddck")
+        self.path = _os.path.join(self.path, pathName)
+        if not _os.path.exists(self.path):
+            _os.makedirs(self.path)
 
-        self.model = MyQFileSystemModel()
+        self.model = _fs.MyQFileSystemModel()
         self.model.setRootPath(self.path)
         self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
+        self.tree = _tv.MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName("%sTree" % self.displayName)
+        self.tree.setObjectName(f"{self.displayName}Tree")
         for i in range(1, self.model.columnCount() - 1):
             self.tree.hideColumn(i)
         self.tree.setMinimumHeight(200)
@@ -112,7 +65,7 @@ class Tap(BlockItem, _ip.HasInternalPiping):
         self.logger.debug("deleting block " + str(self) + self.displayName)
         self.editor.diagramScene.removeItem(self)
         widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        shutil.rmtree(self.path)
+        _su.rmtree(self.path)
         self.deleteLoadedFile()
         try:
             widgetToRemove.hide()
@@ -129,10 +82,14 @@ class Tap(BlockItem, _ip.HasInternalPiping):
         self.displayName = newName
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
-        self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
+        self.tree.setObjectName(f"{self.displayName}Tree")
+        self.logger.debug(_os.path.dirname(self.path))
+        destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
+        if _os.path.exists(self.path):
+            _os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)
+
+    def _setUnFlippedPortPos(self, delta: float) -> None:
+        self.origInputsPos = [[0, delta]]
+        self._graphicalPortItem.setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])

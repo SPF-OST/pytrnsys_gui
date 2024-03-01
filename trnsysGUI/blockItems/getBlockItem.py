@@ -41,6 +41,8 @@ from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
 
+import trnsysGUI.blockItems.names as _names
+
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
@@ -67,7 +69,7 @@ def getBlockItem(
         "IceStorage": {"blockItem": IceStorage, "displayNamePrefix": "IceS"},
         "PitStorage": {"blockItem": PitStorage, "displayNamePrefix": "PitS"},
         "Radiator": {"blockItem": Radiator, "displayNamePrefix": "Rad"},
-        "WTap": {"blockItem": Tap, "displayNamePrefix": "WtTp"},
+        _names.TAP: {"blockItem": Tap, "displayNamePrefix": "WtTp"},
         "WTap_main": {"blockItem": TapMains, "displayNamePrefix": "WtSp"},
         "Connector": {"blockItem": Connector, "displayNamePrefix": "Conn"},
         "GenericBlock": {"blockItem": GenericBlock, "displayNamePrefix": "GBlk"},

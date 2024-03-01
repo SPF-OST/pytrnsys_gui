@@ -17,6 +17,7 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
+import trnsysGUI.blockItems.names as _bnames
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
@@ -239,7 +240,7 @@ class Editor(_qtw.QWidget):
             ("DPCnr", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("TVentil", _img.T_VENTIL_SVG.icon()),
             ("WTap_main", _img.TAP_MAINS_SVG.icon()),
-            ("WTap", _img.TAP_SVG.icon()),
+            (_bnames.TAP, _img.TAP_SVG.icon()),
             ("Pump", _img.PUMP_SVG.icon()),
             ("Collector", _img.COLLECTOR_SVG.icon()),
             ("GroundSourceHx", _img.GROUND_SOURCE_HX_SVG.icon()),

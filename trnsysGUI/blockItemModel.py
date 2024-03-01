@@ -47,7 +47,6 @@ class BlockItemModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-man
         validate_enums: bool = True,
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "BlockItemModel":
-        del data[".__BlockDict__"]
         blockItemModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(BlockItemModel, blockItemModel)
 

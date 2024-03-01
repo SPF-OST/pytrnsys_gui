@@ -4,8 +4,10 @@ import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
 
-from pytrnsys.utils import serialization as _ser
-from trnsysGUI import blockItemModel as _bim
+import pytrnsys.utils.serialization as _ser
+import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.blockItems.names as _bnames
+
 from . import _defaults
 
 
@@ -102,6 +104,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
         validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "PumpModel":
+        del data[".__BlockDict__"]
         pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(PumpModel, pumpModel)
 
@@ -158,7 +161,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
 
 
 @_dc.dataclass
-class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0, _RequiredDecoderFieldsMixin):
+class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     portId: int
@@ -172,8 +175,8 @@ class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0
         validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "TerminalWithPrescribedMassFlowModel":
-        pumpModel = super().from_dict(data, validate, validate_enums, schema_type)
-        return _tp.cast(TerminalWithPrescribedMassFlowModel, pumpModel)
+        terminalModel = super().from_dict(data, validate, validate_enums, schema_type)
+        return _tp.cast(TerminalWithPrescribedMassFlowModel, terminalModel)
 
     @_tp.override
     def to_dict(
@@ -186,6 +189,41 @@ class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixinVersion0
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
         data[".__BlockDict__"] = True
         return data
+
+    @classmethod
+    @_tp.override
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return _bim.BlockItemModel
+
+    @classmethod
+    @_tp.override
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "TerminalWithPrescribedMassFlowModel":
+        assert isinstance(superseded, _bim.BlockItemModel)
+
+        blockItemBaseModel = BlockItemBaseModel(
+            superseded.blockPosition,
+            superseded.Id,
+            superseded.trnsysId,
+            superseded.flippedH,
+            superseded.flippedV,
+            superseded.rotationN,
+        )
+
+        prescribedMassFlowModel = BlockItemWithPrescribedMassFlowBaseModel(
+            blockItemBaseModel,
+            _defaults.DEFAULT_MASS_FLOW_RATE,
+        )
+
+        portId = superseded.portsIdsIn[0] if superseded.BlockName == _bnames.TAP else superseded.portsIdsOut[0]
+
+        terminalModel = TerminalWithPrescribedMassFlowModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            prescribedMassFlowModel,
+            portId,
+        )
+
+        return terminalModel
 
     @classmethod
     @_tp.override

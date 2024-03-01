@@ -46,8 +46,8 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         if "loadedBlock" not in kwargs:
             self.editor.trnsysObj.append(self)
 
-        self.inputs: _tp.Sequence[_pib.PortItemBase] = []
-        self.outputs: _tp.Sequence[_pib.PortItemBase] = []
+        self.inputs: list[_pib.PortItemBase] = []
+        self.outputs: list[_pib.PortItemBase] = []
 
         self.path = None
 
