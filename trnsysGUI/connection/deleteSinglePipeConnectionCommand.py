@@ -27,7 +27,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         connection: _spc.SinglePipeConnection,
         undoNamingHelper: _un.UndoNamingHelper,
         hydraulicLoopsData: HydraulicLoopsData,
-        scene: _qtw.QGraphicsScene,
+        graphicsScene: _qtw.QGraphicsScene,
         parentCommand: _tp.Optional[_qtw.QUndoCommand],
     ):
         super().__init__("Delete single pipe connection", parentCommand)
@@ -35,7 +35,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
         self._connection = connection
         self._undoNamingHelper = undoNamingHelper
         self._hydraulicLoopsData = hydraulicLoopsData
-        self._scene = scene
+        self._graphicsScene = graphicsScene
         self._splitSummary: _tp.Optional[_hlsplit.SplitSummary] = None
 
     def redo(self) -> None:
@@ -54,7 +54,7 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
             return
         self._splitSummary = cancellable
 
-        self._scene.removeItem(self._connection)
+        self._graphicsScene.removeItem(self._connection)
         self._connection.deleteConnection()
         self._undoNamingHelper.removeNameForDelete(self._connection.displayName)
 
@@ -72,4 +72,4 @@ class DeleteSinglePipeConnectionCommand(_qtw.QUndoCommand):  # pylint: disable=t
 
         _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
         _cundo.reAddConnection(self._connection)
-        self._scene.addItem(self._connection)
+        self._graphicsScene.addItem(self._connection)

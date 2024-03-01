@@ -16,16 +16,20 @@ class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
         self,
         doublePipeConnection: _dpc.DoublePipeConnection,
         undoNamingHelper: _nu.UndoNamingHelper,
+        graphicsScene: _qtw.QGraphicsScene,
         parentCommand: _tp.Optional[_qtw.QUndoCommand] = None,
     ) -> None:
         super().__init__("Delete double pipe connection", parentCommand)
-        self._undoNamingHelper = undoNamingHelper
         self._connection = doublePipeConnection
+        self._undoNamingHelper = undoNamingHelper
+        self._graphicsScene = graphicsScene
+
+    def redo(self):
+        self._graphicsScene.removeItem(self._connection)
+        self._connection.deleteConnection()
+        self._undoNamingHelper.removeNameForDelete(self._connection.displayName)
 
     def undo(self):
         _cundo.setDisplayNameForReAdd(self._connection, self._undoNamingHelper)
         _cundo.reAddConnection(self._connection)
-
-    def redo(self):
-        self._connection.deleteConnection()
-        self._undoNamingHelper.removeNameForDelete(self._connection.displayName)
+        self._graphicsScene.addItem(self._connection)

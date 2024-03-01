@@ -76,7 +76,9 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
         undoNamingHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
 
-        undoCommand = _ddpcc.DeleteDoublePipeConnectionCommand(self, undoNamingHelper, parentCommand)
+        undoCommand = _ddpcc.DeleteDoublePipeConnectionCommand(
+            self, undoNamingHelper, self._editor.diagramScene, parentCommand
+        )
         return undoCommand
 
     def encode(self):
