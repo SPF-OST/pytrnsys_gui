@@ -19,6 +19,9 @@ class Tap(_tapBase.TapBase):
         self.loadedFiles = []
         self.addTree()
 
+    def hasDdckPlaceHolders(self) -> bool:
+        return True
+
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.TAP_SVG
 

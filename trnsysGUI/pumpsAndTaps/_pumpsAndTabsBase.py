@@ -26,9 +26,6 @@ class PumpsAndTabsBase(_bi.BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
-        return False
-
     def shallRenameOutputTemperaturesInHydraulicFile(self) -> bool:
         return False
 
