@@ -127,11 +127,12 @@ THPCond1H=1
 THPCond2H=1
 
 
-EQUATIONS 16
+EQUATIONS 17
 *** Massflowrates
 MfrPuSH = 500.0
 xFracDivSh = 0.0
-MfrsupplyWater = 1000
+MfrtapWater = -1000.0
+MfrsupplyWater = 1000.0
 xFracDivHpEvap = 0.0
 xFracDivCondTOTesDhw = 1.0
 xFracDivSHCool = 0.0
@@ -169,7 +170,7 @@ mfrTolSwitchThreshold
 41 71 0 0      !1 : RadiatorSH
 69 41 0 1      !2 : PuSH
 71 72 40 3     !3 : DivSh
-38 0 0 5       !4 : tapWater
+38 0 0 4       !4 : tapWater
 63 0 0 4       !5 : supplyWater
 76 80 79 3     !6 : DivHpEvap
 78 77 79 2     !7 : TeeHpEvap
@@ -255,7 +256,7 @@ mfrTolSwitchThreshold
 54 31 0 0      !87 : PiHpCondOut
 29 54 0 0      !88 : PiHpCondIn
 INPUTS 88! for Type 9351
-0,0 MfrPuSH xFracDivSh 0,0 MfrsupplyWater xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
+0,0 MfrPuSH xFracDivSh MfrtapWater MfrsupplyWater xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
 xFracDivSHCool 0,0 0,0 0,0 MfrPuHpEvap MfrPuHpShCond 0,0 0,0 0,0 0,0 0,0 
 xFracDivDhw 0,0 xFracDivDhwOut xFracDivCool 0,0 MfrPuHpDhwCond 0,0 0,0 xFracDivTesDhwOut xFracDivHp 
 MfrPuDhw 0,0 0,0 MfrPuCirc 0,0 0,0 0,0 0,0 0,0 0,0 

@@ -127,11 +127,12 @@ TFloor5H=1
 TFloor6H=1
 
 
-EQUATIONS 13
+EQUATIONS 14
 *** Massflowrates
 MfrPuAux = 500.0
 xFracDivAux = 1.0
-MfrsupplyWater = 1000
+MfrtapWater = -1000.0
+MfrsupplyWater = 1000.0
 MfrPuCirc = 500.0
 MfrPuAuxEvap = 500.0
 MfrPuSh1 = 500.0
@@ -176,7 +177,7 @@ mfrTolSwitchThreshold
 80 92 0 0      !6 : TesDhwDpR50_99
 20 73 68 3     !7 : DivAux
 98 78 69 2     !8 : TeeAuxHxRt
-19 0 0 5       !9 : tapWater
+19 0 0 4       !9 : tapWater
 94 0 0 4       !10 : supplyWater
 18 80 0 1      !11 : PuCirc
 68 69 0 0      !12 : HxDHWSide1
@@ -267,7 +268,7 @@ mfrTolSwitchThreshold
 15 1 0 0       !97 : PiHP_PuAux
 8 15 0 0       !98 : PiTeeAuxHxRt_HP
 INPUTS 98! for Type 9351
-MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 0,0 MfrsupplyWater 
+MfrPuAux 0,0 0,0 0,0 0,0 0,0 xFracDivAux 0,0 MfrtapWater MfrsupplyWater 
 MfrPuCirc 0,0 0,0 MfrPuAuxEvap 0,0 0,0 0,0 0,0 0,0 0,0 
 0,0 0,0 0,0 MfrPuSh1 MfrPuSh2 0,0 0,0 0,0 MfrPuSh3 0,0 
 0,0 MfrPuSh4 0,0 0,0 MfrPuSh5 0,0 0,0 MfrPUSh6 0,0 0,0 
