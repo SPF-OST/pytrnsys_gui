@@ -100,7 +100,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
     def encode(self):
         if len(self.segments) > 0:
-            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
+            labelPos = self._label.pos().x(), self._label.pos().y()
             labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
         else:
             self.logger.debug("This connection has no segment")

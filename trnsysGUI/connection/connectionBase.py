@@ -70,6 +70,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self.endNode = _node.Node(self)  # type: ignore[attr-defined]
         self.firstS: _tp.Optional[_sib.SegmentItemBase] = None  # type: ignore[name-defined]
 
+        self._label = _qtw.QGraphicsTextItem(self.displayName, parent=self)
+        self._label.setVisible(False)
+        self._label.setFlag(self.ItemIsMovable, True)
+
         self.startPos = None
 
         self.initNew(parent)
@@ -119,7 +123,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
-        self.updateSegLabels()
+        self._label.setPlainText(self.displayName)
         self._updateModels(newName)
 
     def setLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
@@ -127,7 +131,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         assert self.firstS
 
-        self.firstS.label.setPos(pos)
+        self._label.setPos(pos)
 
     def setMassLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
@@ -299,25 +303,20 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     # Label related
     def setLabelVisible(self, isVisible: bool) -> None:
-        assert self.firstS
-        self.firstS.setLabelVisible(isVisible)
+        self._label.setVisible(isVisible)
 
     def toggleLabelVisible(self) -> None:
-        assert self.firstS
-        self.firstS.toggleLabelVisible()
-
-    def updateSegLabels(self):
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.label.setPlainText(self.displayName)
+        wasVisible = self._label.isVisible()
+        self._label.setVisible(not wasVisible)
 
     def positionLabel(self):
-        self.firstS.label.setPos(self.getStartPoint())
+        self._label.setPos(self.getStartPoint())
         self.firstS.labelMass.setPos(self.getStartPoint())
         self.rotateLabel()
 
     def rotateLabel(self):
         angle = 0 if self.firstS.isHorizontal() else 90
-        self.firstS.label.setRotation(angle)
+        self._label.setRotation(angle)
 
     def setMassFlowLabelVisible(self, isVisible: bool) -> None:
         assert self.firstS
@@ -718,7 +717,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     def setLabelsSelected(self, isSelected: bool) -> None:
         assert self.firstS
-        self._setBold(self.firstS.label, isSelected)
+        self._setBold(self._label, isSelected)
         self._setBold(self.firstS.labelMass, isSelected)
 
     @staticmethod

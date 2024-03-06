@@ -68,9 +68,6 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         self._insertIntoParentSegments()
 
-        self.label = _qtw.QGraphicsTextItem(self.connection.displayName, parent=self)
-        self.label.setVisible(False)
-        self.label.setFlag(self.ItemIsMovable, True)
         self.labelMass = _qtw.QGraphicsTextItem(parent=self)
         self.labelMass.setVisible(False)
         self.labelMass.setFlag(self.ItemIsMovable, True)
@@ -552,13 +549,6 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         a5 = menu.addAction("Toggle mass flow")
         a5.triggered.connect(self.connection.toggleMassFlowLabelVisible)
         return menu
-
-    def setLabelVisible(self, isVisible: bool) -> None:
-        self.label.setVisible(isVisible)
-
-    def toggleLabelVisible(self) -> None:
-        wasVisible = self.label.isVisible()
-        self.setLabelVisible(not wasVisible)
 
     def setMassFlowLabelVisible(self, isVisible: bool) -> None:
         self.labelMass.setVisible(isVisible)
