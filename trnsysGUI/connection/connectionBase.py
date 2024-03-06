@@ -297,7 +297,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self.firstS = self.segments[0]
 
         self.updateSegmentGradients()
-        self.positionLabel()
+        self.rotateLabel()
 
     # Label related
     def setLabelVisible(self, isVisible: bool) -> None:
@@ -599,7 +599,8 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self.firstS = self.getFirstSeg()
 
     def _clearConnection(self):
-        _cdel.deleteChildGraphicsItems(self)
+        labels = [self._label, self.massFlowLabel]
+        _cdel.deleteChildGraphicsItems(self, exclude=labels)
 
         self.segments.clear()
 

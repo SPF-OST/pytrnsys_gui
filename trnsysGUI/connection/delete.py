@@ -1,6 +1,6 @@
-from __future__ import annotations
+import typing as _tp
 
-from PyQt5 import QtWidgets as _qtw
+import PyQt5.QtWidgets as _qtw
 
 
 def deleteGraphicsItem(item: _qtw.QGraphicsItem) -> None:
@@ -10,7 +10,12 @@ def deleteGraphicsItem(item: _qtw.QGraphicsItem) -> None:
         scene.removeItem(item)
 
 
-def deleteChildGraphicsItems(item: _qtw.QGraphicsItem) -> None:
-    children = list(item.childItems())
+def deleteChildGraphicsItems(
+    item: _qtw.QGraphicsItem, exclude: _tp.Optional[_tp.Sequence[_qtw.QGraphicsItem]] = None
+) -> None:
+    if not exclude:
+        exclude = []
+
+    children = list(i for i in item.childItems() if i not in exclude)
     for child in children:
         deleteGraphicsItem(child)
