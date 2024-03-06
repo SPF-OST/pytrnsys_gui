@@ -230,10 +230,7 @@ class TestEditor:
         valves = [o for o in blockItemsAndConnections if isinstance(o, _tv.TVentil)]
 
         for singlePipeConnection in singlePipeConnections:
-            firstSegment = singlePipeConnection.firstS
-            assert firstSegment
-
-            firstSegment.labelMass.setPlainText("")
+            singlePipeConnection.massFlowLabel.setPlainText("")
 
         for valve in valves:
             valve.posLabel.setPlainText("")
@@ -242,7 +239,7 @@ class TestEditor:
             mainWindow, massFlowRatesPrintFilePath, temperaturesPrintFilePath
         )
 
-        areAllMassFlowLabelsSet = all(s.firstS and s.firstS.labelMass.toPlainText() for s in singlePipeConnections)
+        areAllMassFlowLabelsSet = all(c.massFlowLabel.toPlainText() for c in singlePipeConnections)
         areAllValvePositionLabelsSet = all(v.posLabel.toPlainText() for v in valves)
         assert areAllMassFlowLabelsSet and areAllValvePositionLabelsSet
 

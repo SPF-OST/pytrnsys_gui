@@ -101,7 +101,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def encode(self):
         if len(self.segments) > 0:
             labelPos = self._label.pos().x(), self._label.pos().y()
-            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
+            labelMassPos = self.massFlowLabel.pos().x(), self.massFlowLabel.pos().y()
         else:
             self.logger.debug("This connection has no segment")
             defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 2
@@ -279,5 +279,4 @@ EQUATIONS 5
 
     def setMassFlowAndTemperature(self, massFlow: float, temperature: float) -> None:
         label = _mfl.getFormattedMassFlowAndTemperature(massFlow, temperature)
-        for segment in self.segments:
-            segment.labelMass.setPlainText(label)
+        self.massFlowLabel.setPlainText(label)

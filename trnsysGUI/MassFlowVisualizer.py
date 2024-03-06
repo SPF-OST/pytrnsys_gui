@@ -181,10 +181,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         for t in self.parent.editor.trnsysObj:
             if isinstance(t, _cb.ConnectionBase):
-                if self.showMass:
-                    t.firstS.labelMass.setVisible(True)
-                else:
-                    t.firstS.labelMass.setVisible(False)
+                t.massFlowLabel.setVisible(self.showMass)
 
         self.logger.debug("%s %s %s" % (str(self.minValue), str(self.medianValue), str(self.maxValue)))
 

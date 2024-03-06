@@ -84,7 +84,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def encode(self):
         if len(self.segments) > 0:
             labelPos = self._label.pos().x(), self._label.pos().y()
-            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
+            labelMassPos = self.massFlowLabel.pos().x(), self.massFlowLabel.pos().y()
         else:
             self.logger.debug("This connection has no segment")
             defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 1
@@ -182,5 +182,4 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 Cold: {formattedColdMassFlowAndTemperature}
 Hot: {formattedHotMassFlowAndTemperature}
 """
-        for segment in self.segments:
-            segment.labelMass.setPlainText(labelText)
+        self.massFlowLabel.setPlainText(labelText)

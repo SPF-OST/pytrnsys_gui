@@ -74,6 +74,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self._label.setVisible(False)
         self._label.setFlag(self.ItemIsMovable, True)
 
+        self.massFlowLabel = _qtw.QGraphicsTextItem(parent=self)
+        self.massFlowLabel.setVisible(False)
+        self.massFlowLabel.setFlag(self.ItemIsMovable, True)
+
         self.startPos = None
 
         self.initNew(parent)
@@ -128,17 +132,11 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     def setLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
-
-        assert self.firstS
-
         self._label.setPos(pos)
 
     def setMassLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
-
-        assert self.firstS
-
-        self.firstS.labelMass.setPos(pos)
+        self.massFlowLabel.setPos(pos)
 
     @staticmethod
     def _toPoint(tup):
@@ -311,20 +309,16 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     def positionLabel(self):
         self._label.setPos(self.getStartPoint())
-        self.firstS.labelMass.setPos(self.getStartPoint())
+        self.massFlowLabel.setPos(self.getStartPoint())
         self.rotateLabel()
 
     def rotateLabel(self):
         angle = 0 if self.firstS.isHorizontal() else 90
         self._label.setRotation(angle)
 
-    def setMassFlowLabelVisible(self, isVisible: bool) -> None:
-        assert self.firstS
-        self.firstS.setMassFlowLabelVisible(isVisible)
-
     def toggleMassFlowLabelVisible(self) -> None:
-        assert self.firstS
-        self.firstS.toggleMassFlowLabelVisible()
+        wasVisible = self.massFlowLabel.isVisible()
+        self.massFlowLabel.setVisible(not wasVisible)
 
     def getRadius(self):
         raise NotImplementedError()
@@ -716,9 +710,8 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self.setLabelsSelected(False)
 
     def setLabelsSelected(self, isSelected: bool) -> None:
-        assert self.firstS
         self._setBold(self._label, isSelected)
-        self._setBold(self.firstS.labelMass, isSelected)
+        self._setBold(self.massFlowLabel, isSelected)
 
     @staticmethod
     def _setBold(label: _qtw.QGraphicsTextItem, isBold: bool) -> None:
