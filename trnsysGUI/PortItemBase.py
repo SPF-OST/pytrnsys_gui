@@ -84,7 +84,6 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
             if conn.fromPort is self:
                 if (self.createdAtSide not in (1, 3)) or not conn.segments[0].isVertical():
                     if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
-                        self.logger.debug("inside here")
                         cor = conn.getCorners()[0]
                         cor.setPos(cor.pos().x(), self.scenePos().y())
 
@@ -101,14 +100,12 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                                     <= int(nextSeg.line().p2().y())
                                     <= int(seg.endNode.parent.pos().y() + 0)
                                 ):
-                                    self.logger.debug("both segments are horizontal from fromport")
                                     self.hideCorners(conn)
                                     verSeg.setVisible(False)
                                 else:
                                     self.showCorners(conn)
                                     verSeg.setVisible(True)
                 else:
-                    self.logger.debug("inside else")
                     if len(conn.getCorners()) > 0 and len(conn.segments) > 0:
                         cor = conn.getCorners()[0]
                         cor.setPos(self.scenePos().x(), cor.pos().y())
@@ -138,7 +135,6 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                                     <= int(seg.line().p2().y())
                                     <= int(nextSeg.endNode.parent.pos().y() + 0)
                                 ):
-                                    self.logger.debug("both segments are horizontal from toport")
                                     self.hideCorners(conn)
                                     verSeg.setVisible(False)
                                 else:
@@ -148,20 +144,18 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
                     if len(conn.getCorners()) == 1 and len(conn.segments) > 0:
                         cor = conn.getCorners()[-1]
                         cor.setPos(cor.pos().x(), self.scenePos().y())
-                        self.logger.debug("Inside 2nd")
 
                         seg = conn.segments[-1]  # last segment
                         seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
                     elif len(conn.getCorners()) == 2 and len(conn.segments) > 0:
                         cor = conn.getCorners()[-1]
                         cor.setPos(self.scenePos().x(), cor.pos().y())
-                        self.logger.debug("Inside 3rd")
 
                         seg = conn.segments[-1]  # last segment
                         seg.setLine(self.scenePos().x(), self.scenePos().y(), cor.scenePos().x(), cor.scenePos().y())
 
             else:
-                self.logger.debug("moving a portItem, portItem is neither from nor toPort")
+                raise ValueError("moving a portItem, portItem is neither from nor toPort")
 
         for posCallback in self.posCallbacks:  # pylint: disable = invalid-name
             posCallback(value)
