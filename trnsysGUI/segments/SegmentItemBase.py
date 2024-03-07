@@ -57,7 +57,6 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         self.start = None
         self.end = None
 
-        # Only for editorMode 1
         self.firstLine = None
         self.secondLine = None
         self.secondCorner = None
@@ -120,27 +119,19 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         self.connection.selectConnection()
 
-        currentPos = event.scenePos()
-        if self._getEditorMode() == 0:
-            self._initDraggingFirstOrLastSegmentInMode0()
-            self._dragInMode0(currentPos)
-
         if not self._isFirstOrLastSegment():
             return
 
-        self._initDraggingFirstOrLastSegmentInMode1()
-        self._dragFirstOrLastSegmentInMode1(currentPos)
+        self._initDraggingFirstOrLastSegment()
+
+        currentPos = event.scenePos()
+        self._dragFirstOrLastSegment(currentPos)
 
     def mouseMoveEvent(self, e):
         if self._startingXWhileDragging is None:
             return
 
         newPos = e.pos()
-
-        editorMode = self._getEditorMode()
-        if editorMode == 0:
-            self._dragInMode0(newPos)
-            return
 
         if type(self.startNode.parent) is _ci.CornerItem and type(self.endNode.parent) is _ci.CornerItem:
             if not self.startNode.parent.isVisible():
@@ -164,12 +155,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
             if not self._isFirstOrLastSegment():
                 return
 
-            self._dragFirstOrLastSegmentInMode1(newPos)
-
-    def _getEditorMode(self) -> _tp.Literal[0, 1]:
-        editorMode = self.connection.parent.editorMode
-        assert editorMode in (0, 1)
-        return editorMode
+            self._dragFirstOrLastSegment(newPos)
 
     def _isFirstOrLastSegment(self) -> bool:
         isFirstSegment = self._isFirstSegment()
@@ -254,18 +240,6 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         startingXWhileDragging = self._startingXWhileDragging
         self._startingXWhileDragging = None
-
-        editorMode = self._getEditorMode()
-
-        if editorMode == 0:
-            if self._isFirstOrLastSegment():
-                self.cornerChild.setFlag(self.ItemSendsScenePositionChanges, True)
-
-                self.hide()
-                self.connection.segments.remove(self)
-                _cdel.deleteGraphicsItem(self)
-
-            return
 
         if self.isVertical():
             command = _smvc.HorizSegmentMoveCommand(self, startingXWhileDragging, "Moving segment command")
@@ -352,35 +326,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         else:
             self.logger.debug("Second corner is none")
 
-    def _initDraggingFirstOrLastSegmentInMode0(self):
-        if (hasattr(self.startNode.parent, "fromPort")) and (self.startNode.prevN() is not None):
-            self.start = self.startNode.prevN().prevN()
-        else:
-            self.start = self.startNode
-
-        if (hasattr(self.endNode.parent, "fromPort")) and (self.endNode.nextN() is not None):
-            self.end = self.endNode.nextN().nextN()
-        else:
-            self.end = self.endNode
-
-        rad = self.connection.getRadius()
-
-        self.cornerChild = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.start, self.end, self.connection)
-        self.firstChild = self._createSegment(self.start, self.cornerChild.node)
-        self.secondChild = self._createSegment(self.cornerChild.node, self.end)
-
-        self.start.setNext(self.cornerChild.node)
-        self.end.setPrev(self.cornerChild.node)
-
-        self.firstChild.setVisible(False)
-        self.secondChild.setVisible(False)
-        self.cornerChild.setVisible(False)
-
-        self.connection.parent.diagramScene.addItem(self.firstChild)
-        self.connection.parent.diagramScene.addItem(self.secondChild)
-        self.connection.parent.diagramScene.addItem(self.cornerChild)
-
-    def _initDraggingFirstOrLastSegmentInMode1(self) -> None:
+    def _initDraggingFirstOrLastSegment(self) -> None:
         rad = self.connection.getRadius()
 
         if self._isFirstSegment():
@@ -431,29 +377,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
     def isHorizontal(self):
         return self.line().p1().y() == self.line().p2().y()
 
-    def _dragInMode0(self, newPos):
-        p1 = self.line().p1()
-        p2 = self.line().p2()
-
-        if len(self.scene().items(newPos)) == 0:
-            self.firstChild.setLine(p1.x(), p1.y(), newPos.x(), newPos.y())
-            self.secondChild.setLine(newPos.x(), newPos.y(), p2.x(), p2.y())
-
-            self.cornerChild.setPos(newPos)
-
-            self.firstChild.resetLinePens()
-            self.secondChild.resetLinePens()
-
-            # Bring corner to front
-            self.cornerChild.setZValue(100)
-            self.firstChild.setZValue(1)
-            self.secondChild.setZValue(1)
-
-            self.firstChild.setVisible(True)
-            self.secondChild.setVisible(True)
-            self.cornerChild.setVisible(True)
-
-    def _dragFirstOrLastSegmentInMode1(self, newPos: _qtc.QPoint) -> None:
+    def _dragFirstOrLastSegment(self, newPos: _qtc.QPoint) -> None:
         if self._isFirstSegment():
             self.thirdCorner.setPos(newPos.x() - 10, newPos.y())
 

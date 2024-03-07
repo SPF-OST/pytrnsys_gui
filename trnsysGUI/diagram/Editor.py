@@ -89,8 +89,6 @@ class Editor(_qtw.QWidget):
 
         self.moveDirectPorts = False
 
-        self.editorMode = 1
-
         # Related to the grid blocks can snap to
         self.snapGrid = False
         self.snapSize = 20

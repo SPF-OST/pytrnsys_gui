@@ -216,7 +216,6 @@ class MainWindow(_qtw.QMainWindow):
 
         # Status bar
         self.sb = self.statusBar()
-        self.sb.showMessage("Mode is " + str(self.editor.editorMode))
 
         # QUndo framework
         self.undoStack = _qtw.QUndoStack(self)

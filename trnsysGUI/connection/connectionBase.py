@@ -226,28 +226,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         self.parent = parent
 
-        if self.parent.editorMode == 0:
-            self.logger.debug("Creating a new connection in mode 0")
-            self._initializeSegmentMode0()
-        elif self.parent.editorMode == 1:
-            self.logger.debug("Creating a new connection in mode 1")
-            self._initializeSegmentsMode1()
-        else:
-            self.logger.debug("No valid mode during creating of connection")
+        self._initializeSegments()
 
-    def _initializeSegmentMode0(self):
-        self.startNode.setNext(self.endNode)
-        self.endNode.setPrev(self.startNode)
-
-        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
-        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
-
-        self.updateSegmentGradients()
-
-        self.positionLabel()
-
-    def _initializeSegmentsMode1(self):
-        self._createSegmentsMode1()
+    def _initializeSegments(self):
+        self._createSegments()
         self.updateSegmentGradients()
         self.positionLabel()
 
@@ -324,7 +306,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         raise NotImplementedError()
 
     # Makes 90deg angles of connection
-    def _createSegmentsMode1(self):  # pylint: disable = too-many-locals, too-many-statements
+    def _createSegments(self):  # pylint: disable = too-many-locals, too-many-statements
         rad = self.getRadius()
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
