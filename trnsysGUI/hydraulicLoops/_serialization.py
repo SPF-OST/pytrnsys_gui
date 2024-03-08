@@ -17,8 +17,8 @@ class Variable(_ser.UpgradableJsonSchemaMixinVersion0):
 @_dc.dataclass(frozen=True, eq=False)
 class Fluid(_ser.UpgradableJsonSchemaMixinVersion0):
     name: str
-    specificHeatCapacityInJPerKgK: float | Variable
-    densityInKgPerM3: float | Variable
+    specificHeatCapacityInJPerKgK: _tp.Union[Variable, float]
+    densityInKgPerM3: _tp.Union[Variable, float]
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:

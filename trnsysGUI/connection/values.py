@@ -1,4 +1,5 @@
 import dataclasses as _dc
+import typing as _tp
 
 import dataclasses_jsonschema as _dcj
 
@@ -8,7 +9,7 @@ class Variable(_dcj.JsonSchemaMixin):
     name: str
 
 
-Value = Variable | float
+Value = _tp.Union[Variable, float]
 
 
 def getConvertedValueOrName(valueOrName: Value, conversionFactor=1.0) -> float | str:
