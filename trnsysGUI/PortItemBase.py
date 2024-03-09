@@ -32,7 +32,7 @@ class PortItemBase(QGraphicsEllipseItem):  # pylint: disable = too-many-instance
         self.ashColorR = QColor(239, 57, 75)
         self.ashColorB = QColor(20, 83, 245)
 
-        QGraphicsEllipseItem.__init__(self, QRectF(-4, -4, 7.0, 7.0), parent)
+        super().__init__(-4, -4, 7.0, 7.0, parent)
 
         self.innerCircle = QGraphicsEllipseItem(-4, -4, 6, 6, self)
         self.innerCircle.setPen(QPen(QColor(0, 0, 0, 0), 0))

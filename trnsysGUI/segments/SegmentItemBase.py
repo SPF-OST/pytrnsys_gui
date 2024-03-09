@@ -110,60 +110,16 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         self.connection.segments.insert(self.connection.segments.index(previousSegment) + 1, self)
 
-    def mousePressEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
-        if event.button() != _qtc.Qt.MouseButton.LeftButton:
-            return
+    def isIntermediateSegment(self) -> bool:
+        return isinstance(self.startNode.parent, _ci.CornerItem) and isinstance(self.endNode.parent, _ci.CornerItem)
 
-        assert not self._startingXWhileDragging
-        self._startingXWhileDragging = self.startNode.parent.scenePos().x()
-
-        self.connection.selectConnection()
-
-        if not self._isFirstOrLastSegment():
-            return
-
-        self._initDraggingFirstOrLastSegment()
-
-        currentPos = event.scenePos()
-        self._dragFirstOrLastSegment(currentPos)
-
-    def mouseMoveEvent(self, e):
-        if self._startingXWhileDragging is None:
-            return
-
-        newPos = e.pos()
-
-        if type(self.startNode.parent) is _ci.CornerItem and type(self.endNode.parent) is _ci.CornerItem:
-            if not self.startNode.parent.isVisible():
-                self.startNode.parent.setVisible(True)
-            if not self.endNode.parent.isVisible():
-                self.endNode.parent.setVisible(True)
-            if self.isVertical():
-                self.endNode.parent.setPos(newPos.x(), self.endNode.parent.scenePos().y())
-                self.startNode.parent.setPos(newPos.x(), self.startNode.parent.scenePos().y())
-                self.resetLinePens()
-
-            if self.isHorizontal():
-                self.logger.debug("Segment is horizontal")
-                self.endNode.parent.setPos(self.endNode.parent.scenePos().x(), newPos.y())
-                self.startNode.parent.setPos(self.startNode.parent.scenePos().x(), newPos.y())
-
-        elif type(self.endNode.parent) is _ci.CornerItem and self.isVertical():
-            self.logger.debug("Segment is vertical and can't be moved")
-
-        if self.isHorizontal():
-            if not self._isFirstOrLastSegment():
-                return
-
-            self._dragFirstOrLastSegment(newPos)
-
-    def _isFirstOrLastSegment(self) -> bool:
-        isFirstSegment = self._isFirstSegment()
+    def isFirstOrLastSegment(self) -> bool:
+        isFirstSegment = self.isFirstSegment()
         isLastSegment = self._isLastSegment()
         isFirstOrLastSegment = isFirstSegment or isLastSegment
         return isFirstOrLastSegment
 
-    def _isFirstSegment(self) -> bool:
+    def isFirstSegment(self) -> bool:
         isFirstSegment = hasattr(self.startNode.parent, "fromPort") and not self.startNode.prevN()
         return isFirstSegment
 
@@ -231,105 +187,10 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
                 self.endNode.parent.scenePos().y(),
             )
 
-    def mouseReleaseEvent(self, e):
-        if e.button() != 1:
-            return
-
-        if self._startingXWhileDragging is None:
-            return
-
-        startingXWhileDragging = self._startingXWhileDragging
-        self._startingXWhileDragging = None
-
-        if self.isVertical():
-            command = _smvc.HorizSegmentMoveCommand(self, startingXWhileDragging, "Moving segment command")
-            self.connection.parent.parent().undoStack.push(command)
-
-        if self.isHorizontal():
-            if type(self.startNode.parent) is _ci.CornerItem and type(self.endNode.parent) is _ci.CornerItem:
-                try:
-
-                    nextHorizSeg = self.connection.segments[self.connection.segments.index(self) + 2]
-                    prevHorizSeg = self.connection.segments[self.connection.segments.index(self) - 2]
-                except IndexError:
-                    self.logger.debug("no next or prev segments")
-                else:
-                    if nextHorizSeg.isHorizontal() and int(self.endNode.parent.pos().y() - 10) <= int(
-                        nextHorizSeg.line().p2().y()
-                    ) <= int(self.endNode.parent.pos().y() + 10):
-                        self.deleteNextHorizSeg(False, nextHorizSeg)
-                        self.logger.debug("next horizontal")
-                        return
-
-                    if prevHorizSeg.isHorizontal() and int(self.startNode.parent.pos().y() - 10) <= int(
-                        prevHorizSeg.line().p2().y()
-                    ) <= int(self.startNode.parent.pos().y() + 10):
-                        self.deletePrevHorizSeg(False, prevHorizSeg)
-                        self.logger.debug("previous horizontal")
-                        return
-
-        if self.secondCorner is not None:
-            self.logger.debug("Second corner is not none")
-            # if PortItem
-            if hasattr(self.endNode.parent, "fromPort"):
-                segbef = self.connection.segments[self.connection.getNodePos(self.secondCorner.node.prevN().parent)]
-
-                segbef.setLine(
-                    segbef.line().p1().x(),
-                    segbef.line().p1().y(),
-                    segbef.line().p2().x(),
-                    self.secondCorner.scenePos().y(),
-                )
-                self.setLine(
-                    self.thirdCorner.scenePos().x(),
-                    self.thirdCorner.scenePos().y(),
-                    self.line().p2().x(),
-                    self.line().p2().y(),
-                )
-                self.secondCorner.setFlag(self.ItemSendsScenePositionChanges, True)
-                self.thirdCorner.setFlag(self.ItemSendsScenePositionChanges, True)
-
-                # Allow for iterative branching
-                self.secondCorner = None
-                self.thirdCorner = None
-                self.firstLine = None
-                self.secondLine = None
-
-            elif hasattr(self.startNode.parent, "fromPort"):
-                segafter = self.connection.segments[self.connection.getNodePos(self.thirdCorner.node.nextN().parent)]
-
-                segafter.setLine(
-                    segafter.line().p1().x(),
-                    self.thirdCorner.scenePos().y(),
-                    segafter.line().p2().x(),
-                    segafter.line().p2().y(),
-                )
-                self.setLine(
-                    self.line().p1().x(),
-                    self.line().p1().y(),
-                    self.secondCorner.scenePos().x(),
-                    self.secondCorner.scenePos().y(),
-                )
-
-                self.secondCorner.setFlag(self.ItemSendsScenePositionChanges, True)
-                self.thirdCorner.setFlag(self.ItemSendsScenePositionChanges, True)
-
-                # Allow for iterative branching
-                self.secondCorner = None
-                self.thirdCorner = None
-                self.firstLine = None
-                self.secondLine = None
-
-            else:
-                self.logger.debug("getting no start or end")
-
-        else:
-            self.logger.debug("Second corner is none")
-
     def _initDraggingFirstOrLastSegment(self) -> None:
         rad = self.connection.getRadius()
 
-        if self._isFirstSegment():
+        if self.isFirstSegment():
             self.secondCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
             self.thirdCorner = _ci.CornerItem(
                 -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
@@ -378,7 +239,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         return self.line().p1().y() == self.line().p2().y()
 
     def _dragFirstOrLastSegment(self, newPos: _qtc.QPoint) -> None:
-        if self._isFirstSegment():
+        if self.isFirstSegment():
             self.thirdCorner.setPos(newPos.x() - 10, newPos.y())
 
             self.secondCorner.setPos(newPos.x() - 10, self.connection.fromPort.scenePos().y())
@@ -495,3 +356,15 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
             selectPen.setStyle(_qtc.Qt.DashLine)
 
         return selectPen
+
+    @_tp.override
+    def mousePressEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        self.connection.onMousePressed(self, event)
+
+    @_tp.override
+    def mouseMoveEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        self.connection.onMouseMoved(event)
+
+    @_tp.override
+    def mouseReleaseEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        self.connection.onMouseReleased(event)
