@@ -29,9 +29,6 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
     def _doublePipeConnection(self) -> _dpc.DoublePipeConnection:
         return self.connection
 
-    def _createSegment(self, startNode, endNode) -> _sib.SegmentItemBase:  # type: ignore[name-defined]
-        return DoublePipeSegmentItem(startNode, endNode, self._doublePipeConnection)
-
     def _getContextMenu(self) -> _qtw.QMenu:
         menu = super()._getContextMenu()
         action = menu.addAction("Edit properties...")

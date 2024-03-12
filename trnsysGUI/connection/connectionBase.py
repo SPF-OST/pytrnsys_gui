@@ -70,7 +70,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         self.startNode = _node.Node(self)  # type: ignore[attr-defined]
         self.endNode = _node.Node(self)  # type: ignore[attr-defined]
-        self.firstS: _tp.Optional[_sib.SegmentItemBase] = None  # type: ignore[name-defined]
 
         self._label = _qtw.QGraphicsTextItem(self.displayName, parent=self)
         self._label.setVisible(False)
@@ -147,19 +146,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         pos = _qtc.QPointF(tup[0], tup[1])
         return pos
 
-    def setStartPort(self, newStartPort):
-        self._fromPort = newStartPort
-        self.startPos = newStartPort.scenePos()
-
-    def setEndPort(self, newEndPort):
-        self._toPort = newEndPort
-
-    def setStartPos(self):
-        pass
-
-    def setEndPos(self):
-        pass
-
     def setColor(self, value, **kwargs):
         if "mfr" in kwargs:
             if kwargs["mfr"] == "NegMfr":
@@ -192,23 +178,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def getStartPoint(self):
         return _qtc.QPointF(self.fromPort.scenePos())
 
-    def getEndPoint(self):
-        return _qtc.QPointF(self.toPort.scenePos())
-
-    def getNodePos(self, searchCorner):
-
-        corners = self.getCorners()
-
-        for i, corner in enumerate(corners):
-            if corner == searchCorner:
-                return i
-        self.logger.debug("corner not found is " + str(searchCorner))
-
-        return 0
-
-    def getFirstSeg(self):
-        return self.segments[0]
-
     def getCorners(self):
         res = []
 
@@ -219,11 +188,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             tempNode = tempNode.nextN()
 
         return res
-
-    def switchPorts(self):
-        temp = self.fromPort
-        self._fromPort = self.toPort
-        self._toPort = temp
 
     # Initialization
     def initNew(self, parent):
@@ -280,8 +244,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
             segment.setLine(pos1[0], pos1[1], pos2[0], pos2[1])
 
-        self.firstS = self.segments[0]
-
         self.updateSegmentGradients()
         self.rotateLabel()
 
@@ -299,7 +261,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self.rotateLabel()
 
     def rotateLabel(self):
-        angle = 0 if self.firstS.isHorizontal() else 90
+        angle = 0 if self.segments[0].isHorizontal() else 90
         self._label.setRotation(angle)
 
     def toggleMassFlowLabelVisible(self) -> None:
@@ -582,8 +544,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             corner1.setPos(helperPoint1)
             corner2.setPos(helperPoint2)
 
-        self.firstS = self.getFirstSeg()
-
     def _clearConnection(self):
         labels = [self._label, self.massFlowLabel]
         _cdel.deleteChildGraphicsItems(self, exclude=labels)
@@ -706,37 +666,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         originalFontCopy.setBold(isBold)
         label.setFont(originalFontCopy)
 
-    def printConnNodes(self):
-        self.logger.debug("These are the nodes: ")
-
-        element = self.startNode
-        while element.nextN() is not None:
-            self.logger.debug(
-                "Node is "
-                + str(element)
-                + " has nextNode "
-                + str(element.nextN())
-                + " has pL "
-                + str(self.partialLength(element))
-            )
-            element = element.nextN()
-
-        self.logger.debug("Node is " + str(element) + " has nextNode " + str(element.nextN()))
-
-    def printConnSegs(self):
-        self.logger.debug("These are the segments in order")
-        for s in self.segments:  # pylint: disable = invalid-name
-            self.logger.debug(
-                "Segment is "
-                + str(s)
-                + " has global id "
-                + str(s.id)
-                + " has startnode "
-                + str(s.startNode)
-                + " endnode "
-                + str(s.endNode)
-            )
-
     # Saving / Loading
     def encode(self):
         raise NotImplementedError()
@@ -761,24 +690,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError()
-
-    def findStoragePort(self, virtualBlock):
-        portToPrint = None
-        for port in virtualBlock.inputs + virtualBlock.outputs:
-            if self in port.connectionList:
-                # Found the port of the generated block adjacent to this pipe
-                # Assumes 1st connection is with storageTank
-                if self.fromPort == port:
-                    if self.toPort.connectionList[0].fromPort == self.toPort:
-                        portToPrint = self.toPort.connectionList[0].toPort
-                    else:
-                        portToPrint = self.toPort.connectionList[0].fromPort
-                else:
-                    if self.fromPort.connectionList[0].fromPort == self.fromPort:
-                        portToPrint = self.fromPort.connectionList[0].toPort
-                    else:
-                        portToPrint = self.fromPort.connectionList[0].fromPort
-        return portToPrint
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
@@ -939,16 +850,3 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
                 return previousSegment, nextSegment
 
         raise ValueError("Segment doesn't belong to connection.")
-
-    def _getHitSegmentOrNone(self, event: _qtw.QGraphicsSceneMouseEvent) -> _sib.SegmentItemBase | None:
-        hitItems = self.scene().items(event.scenePos())
-
-        hitSegments = [s for s in self.segments if any(i for i in hitItems if s.isAncestorOf(i))]
-
-        if not hitSegments:
-            return None
-
-        hitSegment = hitSegments[0]
-        assert isinstance(hitSegment, _sib.SegmentItemBase)
-
-        return hitSegment

@@ -28,9 +28,6 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
 
         self.singleLine = _qtw.QGraphicsLineItem(self)
 
-    def _createSegment(self, startNode, endNode) -> _sib.SegmentItemBase:  # type: ignore[name-defined]
-        return SinglePipeSegmentItem(startNode, endNode, self._singlePipeConnection)
-
     def _getContextMenu(self) -> _qtw.QMenu:
         menu = super()._getContextMenu()
 
