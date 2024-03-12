@@ -10,8 +10,6 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.CornerItem as _ci
-import trnsysGUI.HorizSegmentMoveCommand as _smvc
-from trnsysGUI.connection import delete as _cdel
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
@@ -40,37 +38,16 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         self.setFlag(self.ItemIsSelectable, True)
 
-        self.dragged = False
-        self.initialised = False
         self.connection = parent
-
-        self.firstChild = None
-        self.secondChild = None
-        self.cornerChild = None
 
         self.linePoints = None
 
         self.startNode = startNode
         self.endNode = endNode
 
-        # These nodes are the nodes before and after the crossing
-        self.start = None
-        self.end = None
-
-        self.firstLine = None
-        self.secondLine = None
-        self.secondCorner = None
-        self.thirdCorner = None
-
-        # Used to only create the child objects once
-        self._startingXWhileDragging: _tp.Optional[float] = None
-
         self._insertIntoParentSegments()
 
         self.setToolTip(self.connection.displayName)
-
-    def segLength(self):
-        return calcDist(self.line().p1(), self.line().p2())
 
     def line(self):
         return self.linePoints
@@ -127,187 +104,11 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         isLastSegment = hasattr(self.endNode.parent, "fromPort") and not self.endNode.nextN()
         return isLastSegment
 
-    def deleteNextHorizSeg(self, keepSeg, nextS):
-        if not keepSeg:
-            nodeTodelete1 = self.endNode
-            nodeTodelete2 = self.endNode.nextN()
-            self.endNode = nextS.endNode
-
-            self.startNode.setNext(self.endNode)
-            self.endNode.setPrev(self.startNode)
-
-            # x-position of the ending point of the next segment line
-
-            posx1 = self.connection.segments[self.connection.segments.index(self) + 2].line().p2().x()
-
-            _cdel.deleteGraphicsItem(nextS)
-            self.connection.segments.remove(nextS)
-            _cdel.deleteGraphicsItem(nodeTodelete1.parent)
-
-            indexOfSelf = self.connection.segments.index(self)
-            nextVS = self.connection.segments[indexOfSelf + 1]
-
-            _cdel.deleteGraphicsItem(nextVS)
-            self.connection.segments.remove(nextVS)
-            _cdel.deleteGraphicsItem(nodeTodelete2.parent)
-
-            self.setLine(
-                self.startNode.parent.scenePos().x(),
-                self.startNode.parent.scenePos().y(),
-                posx1,
-                self.startNode.parent.scenePos().y(),
-            )
-
-    def deletePrevHorizSeg(self, keepPrevSeg, prevS):
-        if not keepPrevSeg:
-            nodeTodelete1 = self.startNode
-            nodeTodelete2 = self.startNode.prevN()
-            self.startNode = prevS.startNode
-
-            self.startNode.setNext(self.endNode)
-            self.endNode.setPrev(self.startNode)
-
-            posx1 = self.connection.segments[self.connection.segments.index(self) - 2].line().p1().x()
-
-            _cdel.deleteGraphicsItem(prevS)
-            self.connection.segments.remove(prevS)
-            _cdel.deleteGraphicsItem(nodeTodelete1.parent)
-
-            indexOfSelf = self.connection.segments.index(self)
-            nextVS = self.connection.segments[indexOfSelf - 1]
-
-            _cdel.deleteGraphicsItem(nextVS)
-            self.connection.segments.remove(nextVS)
-            _cdel.deleteGraphicsItem(nodeTodelete2.parent)
-
-            self.setLine(
-                posx1,
-                self.endNode.parent.scenePos().y(),
-                self.endNode.parent.scenePos().x(),
-                self.endNode.parent.scenePos().y(),
-            )
-
-    def _initDraggingFirstOrLastSegment(self) -> None:
-        rad = self.connection.getRadius()
-
-        if self.isFirstSegment():
-            self.secondCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
-            self.thirdCorner = _ci.CornerItem(
-                -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
-            )
-
-            self.secondCorner.node.setNext(self.thirdCorner.node)
-            self.startNode.setNext(self.secondCorner.node)
-            self.endNode.setPrev(self.thirdCorner.node)
-
-            self.endNode = self.secondCorner.node
-
-            self.firstLine = self._createSegment(self.secondCorner.node, self.thirdCorner.node)
-            self.secondLine = self._createSegment(self.thirdCorner.node, self.thirdCorner.node.nextN())
-
-            self.secondCorner.setVisible(False)
-            self.thirdCorner.setVisible(False)
-            self.firstLine.setVisible(False)
-            self.secondLine.setVisible(False)
-        else:
-            self.secondCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self.connection)
-            self.thirdCorner = _ci.CornerItem(
-                -rad, -rad, 2 * rad, 2 * rad, self.secondCorner.node, self.endNode, self.connection
-            )
-
-            self.secondCorner.node.setNext(self.thirdCorner.node)
-            self.startNode.setNext(self.secondCorner.node)
-            self.endNode.setPrev(self.thirdCorner.node)
-
-            self.startNode = self.thirdCorner.node
-
-            self.firstLine = self._createSegment(self.secondCorner.node.prevN(), self.secondCorner.node)
-            self.secondLine = self._createSegment(self.secondCorner.node, self.thirdCorner.node)
-
-            self.secondCorner.setVisible(False)
-            self.thirdCorner.setVisible(False)
-            self.firstLine.setVisible(False)
-            self.secondLine.setVisible(False)
-
-    def _createSegment(self, startNode, endNode) -> "SegmentItemBase":
-        raise NotImplementedError()
-
     def isVertical(self):
         return self.line().p1().x() == self.line().p2().x()
 
     def isHorizontal(self):
         return self.line().p1().y() == self.line().p2().y()
-
-    def _dragFirstOrLastSegment(self, newPos: _qtc.QPoint) -> None:
-        if self.isFirstSegment():
-            self.thirdCorner.setPos(newPos.x() - 10, newPos.y())
-
-            self.secondCorner.setPos(newPos.x() - 10, self.connection.fromPort.scenePos().y())
-            self.thirdCorner.node.nextN().parent.setY(newPos.y())
-
-            self.firstLine.setLine(
-                self.secondCorner.scenePos().x(),
-                self.secondCorner.scenePos().y(),
-                self.thirdCorner.scenePos().x(),
-                newPos.y(),
-            )
-            self.secondLine.setLine(
-                self.thirdCorner.scenePos().x(),
-                self.thirdCorner.scenePos().y(),
-                self.thirdCorner.node.nextN().parent.scenePos().x(),
-                self.thirdCorner.node.nextN().parent.scenePos().y(),
-            )
-            self.setLine(
-                self.startNode.parent.fromPort.scenePos().x(),
-                self.startNode.parent.fromPort.scenePos().y(),
-                self.secondCorner.scenePos().x(),
-                self.secondCorner.scenePos().y(),
-            )
-
-            self.secondCorner.setZValue(100)
-            self.thirdCorner.setZValue(100)
-            self.firstLine.setZValue(1)
-            self.secondLine.setZValue(1)
-
-            self.secondCorner.setVisible(True)
-            self.thirdCorner.setVisible(True)
-            self.firstLine.setVisible(True)
-            self.secondLine.setVisible(True)
-
-        else:
-            self.secondCorner.setPos(newPos.x() + 10, newPos.y())
-
-            self.thirdCorner.setPos(newPos.x() + 10, self.connection.toPort.scenePos().y())
-            self.secondCorner.node.prevN().parent.setY(newPos.y())
-
-            self.firstLine.setLine(
-                self.secondCorner.node.prevN().parent.scenePos().x(),
-                newPos.y(),
-                self.secondCorner.scenePos().x(),
-                newPos.y(),
-            )
-            self.secondLine.setLine(
-                self.secondCorner.scenePos().x(),
-                self.secondCorner.scenePos().y(),
-                self.thirdCorner.scenePos().x(),
-                self.thirdCorner.scenePos().y(),
-            )
-            self.setLine(
-                self.thirdCorner.scenePos().x(),
-                self.thirdCorner.scenePos().y(),
-                self.endNode.parent.toPort.scenePos().x(),
-                self.endNode.parent.toPort.scenePos().y(),
-            )
-
-            self.secondCorner.setZValue(100)
-            self.thirdCorner.setZValue(100)
-            self.firstLine.setZValue(1)
-            self.secondLine.setZValue(1)
-
-            self.secondCorner.setVisible(True)
-            self.thirdCorner.setVisible(True)
-            self.firstLine.setVisible(True)
-            self.secondLine.setVisible(True)
 
     def renameConn(self):
         self.connection.parent.showSegmentDlg(self)
