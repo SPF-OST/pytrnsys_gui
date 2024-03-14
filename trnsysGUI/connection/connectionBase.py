@@ -178,6 +178,18 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def getStartPoint(self):
         return _qtc.QPointF(self.fromPort.scenePos())
 
+    def getPreviousAndNextSegment(
+        self, intermediateNode: _node.Node
+    ) -> _tp.Tuple[_sib.SegmentItemBase, _sib.SegmentItemBase]:
+        previousAndNextSegments: _tp.Sequence[_tp.Tuple[_sib.SegmentItemBase, _sib.SegmentItemBase]] = zip(
+            self.segments[:-1], self.segments[1:], strict=True
+        )
+        for previousSegment, nextSegment in previousAndNextSegments:
+            if previousSegment.endNode == intermediateNode and nextSegment.startNode == intermediateNode:
+                return previousSegment, nextSegment
+
+        raise ValueError("Node is not an intermediate node of connection.")
+
     def getCorners(self):
         res = []
 
@@ -576,7 +588,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         return summedLength
 
     def partialLength(self, node):
-        # Returns the cummulative length of line up to given node
+        # Returns the cumulative length of line up to given node
         # Assumes that segments is ordered correctly!
         res = 0
         if node == self.startNode:
@@ -713,6 +725,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         secondCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, segment.startNode, None, self)
         thirdCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, secondCorner.node, segment.endNode, self)
+
+        secondCorner.setFlag(_qtw.QGraphicsItem.GraphicsItemFlag.ItemSendsScenePositionChanges)
+        thirdCorner.setFlag(_qtw.QGraphicsItem.GraphicsItemFlag.ItemSendsScenePositionChanges)
+
         secondCorner.node.setNext(thirdCorner.node)
 
         segment.startNode.setNext(secondCorner.node)
@@ -723,15 +739,11 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
             firstAdditionalSegment = self._createSegmentItem(secondCorner.node, thirdCorner.node)
             secondAdditionalSegment = self._createSegmentItem(thirdCorner.node, thirdCorner.node.nextN())
-
-            # self.segments = [segment, firstAdditionalSegment, secondAdditionalSegment, *self.segments[1:]]
         else:
             segment.startNode = thirdCorner.node
 
             firstAdditionalSegment = self._createSegmentItem(secondCorner.node.prevN(), secondCorner.node)
             secondAdditionalSegment = self._createSegmentItem(secondCorner.node, thirdCorner.node)
-
-            # self.segments = [*self.segments[:-1], firstAdditionalSegment, secondAdditionalSegment, segment]
 
         secondCorner.setZValue(100)
         thirdCorner.setZValue(100)
@@ -753,15 +765,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             nextCorner = thirdCorner.node.nextN().parent
             nextCorner.setY(newPos.y())
 
-            segment.setLine(self.fromPort.scenePos(), secondCorner.scenePos())
-
-            firstAdditionalSegment.setLine(secondCorner.scenePos(), thirdCorner.scenePos())
-
-            secondAdditionalSegment.setLine(
-                thirdCorner.scenePos(),
-                nextCorner.scenePos(),
-            )
-
             self._draggedSegment = secondAdditionalSegment
 
         else:
@@ -771,21 +774,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             secondCorner.setPos(newPos.x() + 10, newPos.y())
 
             thirdCorner.setPos(newPos.x() + 10, self.toPort.scenePos().y())
-
-            firstAdditionalSegment.setLine(
-                previousCorner.scenePos(),
-                secondCorner.scenePos(),
-            )
-
-            secondAdditionalSegment.setLine(
-                secondCorner.scenePos(),
-                thirdCorner.scenePos(),
-            )
-
-            segment.setLine(
-                thirdCorner.scenePos(),
-                self.toPort.scenePos(),
-            )
 
             self._draggedSegment = firstAdditionalSegment
 
@@ -817,8 +805,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         startPos = startCorner.scenePos()
         endPos = endCorner.scenePos()
 
-        previousSegment, nextSegment = self._getPreviousAndNextSegment(self._draggedSegment)
-
         if self._draggedSegment.isVertical():
             startCorner.setPos(newPos.x(), startPos.y())
             endCorner.setPos(newPos.x(), endPos.y())
@@ -826,27 +812,3 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         if self._draggedSegment.isHorizontal():
             startCorner.setPos(startPos.x(), newPos.y())
             endCorner.setPos(endPos.x(), newPos.y())
-
-        previousSegment.setLine(previousSegment.line().p1(), startPos)
-        self._draggedSegment.setLine(startPos, endPos)
-        nextSegment.setLine(endPos, nextSegment.line().p2())
-
-    def _getPreviousAndNextSegment(
-        self, intermediateSegment: _sib.SegmentItemBase
-    ) -> _tp.Tuple[_sib.SegmentItemBase, _sib.SegmentItemBase]:
-        if not intermediateSegment.isIntermediateSegment():
-            raise ValueError("Not an intermediate segment.")
-
-        previousSegments = [None, *self.segments[:-1]]
-        nextSegments = [*self.segments[1:], None]
-
-        zipped = zip(previousSegments, self.segments, nextSegments, strict=True)
-
-        for previousSegment, segment, nextSegment in zipped:
-            if segment == intermediateSegment:
-                assert previousSegment
-                assert nextSegment
-
-                return previousSegment, nextSegment
-
-        raise ValueError("Segment doesn't belong to connection.")

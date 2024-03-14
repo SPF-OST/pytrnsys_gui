@@ -92,7 +92,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
     def isFirstOrLastSegment(self) -> bool:
         isFirstSegment = self.isFirstSegment()
-        isLastSegment = self._isLastSegment()
+        isLastSegment = self.isLastSegment()
         isFirstOrLastSegment = isFirstSegment or isLastSegment
         return isFirstOrLastSegment
 
@@ -100,14 +100,14 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
         isFirstSegment = hasattr(self.startNode.parent, "fromPort") and not self.startNode.prevN()
         return isFirstSegment
 
-    def _isLastSegment(self) -> bool:
+    def isLastSegment(self) -> bool:
         isLastSegment = hasattr(self.endNode.parent, "fromPort") and not self.endNode.nextN()
         return isLastSegment
 
-    def isVertical(self):
+    def isVertical(self) -> bool:
         return self.line().p1().x() == self.line().p2().x()
 
-    def isHorizontal(self):
+    def isHorizontal(self) -> bool:
         return self.line().p1().y() == self.line().p2().y()
 
     def renameConn(self):
