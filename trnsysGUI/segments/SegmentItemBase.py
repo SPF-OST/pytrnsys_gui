@@ -10,6 +10,7 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.CornerItem as _ci
+import trnsysGUI.segments.Node as _node
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
@@ -23,7 +24,7 @@ def calcDist(p1, p2):
 
 
 class SegmentItemBase(_qtw.QGraphicsItemGroup):
-    def __init__(self, startNode, endNode, parent: _cib.ConnectionBase):
+    def __init__(self, startNode: _node.Node, endNode: _node.Node, parent: _cib.ConnectionBase) -> None:
         """
         A connection is displayed as a chain of segmentItems (stored in Connection.segments)
         Parameters.
@@ -40,7 +41,7 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         self.connection = parent
 
-        self.linePoints = None
+        self.linePoints = _qtc.QLineF()
 
         self.startNode = startNode
         self.endNode = endNode
@@ -49,7 +50,12 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
 
         self.setToolTip(self.connection.displayName)
 
-    def line(self):
+    def setEndNode(self, newEndNode) -> None:
+        self.endNode = newEndNode
+        self.endNode.setPrev(self.startNode)
+        self.startNode.setNext(self.endNode)
+
+    def line(self) -> _qtc.QLineF:
         return self.linePoints
 
     def setLine(self, *args):
@@ -110,6 +116,9 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
     def isHorizontal(self) -> bool:
         return self.line().p1().y() == self.line().p2().y()
 
+    def isZeroLength(self) -> bool:
+        return self.line().isNull()
+
     def renameConn(self):
         self.connection.parent.showSegmentDlg(self)
 
@@ -169,3 +178,4 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
     @_tp.override
     def mouseReleaseEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
         self.connection.onMouseReleased(event)
+

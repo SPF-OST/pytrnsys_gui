@@ -22,10 +22,10 @@ class Node:
         self.nextNode = nextNode
         self.parent = parent
 
-    def nextN(self):
+    def nextN(self) -> "Node":
         return self.nextNode
 
-    def prevN(self):
+    def prevN(self) -> "Node":
         return self.prevNode
 
     def setPrev(self, prevNode):

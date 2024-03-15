@@ -12,6 +12,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.CornerItem as _ci
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.delete as _cdel
+import trnsysGUI.connection.delete as _cdelete
 import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
@@ -777,6 +778,8 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
             self._draggedSegment = firstAdditionalSegment
 
+        self._assertSegmentsAreConsistent()
+
     def onMouseMoved(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
         if not self._draggedSegment:
             return
@@ -795,6 +798,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         self._draggedSegment = None
 
+        self._removeUnnecessarySegments()
+
+        self._assertSegmentsAreConsistent()
+
     def _dragIntermediateSegment(self, newPos: _qtc.QPointF) -> None:
         assert self._draggedSegment
         assert self._draggedSegment.isIntermediateSegment()
@@ -812,3 +819,137 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         if self._draggedSegment.isHorizontal():
             startCorner.setPos(startPos.x(), newPos.y())
             endCorner.setPos(endPos.x(), newPos.y())
+
+    def _removeUnnecessarySegments(self) -> None:
+        # We must guarantee the invariant self._isHorizontal() => len(self.segments) >= 3
+        if not self._isHorizontal() or len(self.segments) >= 3:
+            remainingIntermediateSegments = self._removeUnnecessaryIntermediateSegmentsFromSceneAndGetRemaining()
+            newSegments = self._possiblyMergeLastTwoSegments(remainingIntermediateSegments)
+
+            self.segments = newSegments
+
+        if self._isHorizontal() and len(self.segments) == 3:
+            self._recenterVerticalConnection()
+
+    def _possiblyMergeLastTwoSegments(
+        self, remainingIntermediateSegments: _tp.Sequence[_sib.SegmentItemBase]
+    ) -> _tp.Sequence[_sib.SegmentItemBase]:
+        firstSegment = self.segments[0]
+        lastSegment = self.segments[-1]
+        lastRemainingIntermediate = remainingIntermediateSegments[-1]
+
+        areLastTwoSegmentsHorizontal = lastRemainingIntermediate.isHorizontal() and lastSegment.isHorizontal()
+
+        canMergeLastTwoSegments = areLastTwoSegmentsHorizontal
+        if self._isHorizontal():
+            # We must guarantee the invariant self._isHorizontal() => len(self.segments) >= 3
+            canMergeLastTwoSegments &= len(remainingIntermediateSegments) > 1
+
+        if not canMergeLastTwoSegments:
+            newSegments = [firstSegment, *remainingIntermediateSegments, lastSegment]
+        else:
+            self._removeFromScene(lastRemainingIntermediate, lastSegment)
+            newAllButLastSegments = remainingIntermediateSegments
+
+            newSegments = [firstSegment, *newAllButLastSegments]
+
+        return newSegments
+
+    def _removeUnnecessaryIntermediateSegmentsFromSceneAndGetRemaining(self) -> _tp.Sequence[_sib.SegmentItemBase]:
+        if self._isHorizontal():
+            assert len(self.segments) >= 3
+
+        intermediateSegments = self.segments[1:-1]
+        remainingIntermediateSegments = [intermediateSegments[0]]
+        for currentSegment in intermediateSegments[1:]:
+            previousSegment = remainingIntermediateSegments[-1]
+
+            if self._isTrulyVertical(previousSegment) or self._isTrulyVertical(currentSegment):
+                remainingIntermediateSegments.append(currentSegment)
+                continue
+
+            self._removeFromScene(previousSegment, segmentToDelete=currentSegment)
+
+        return remainingIntermediateSegments
+
+    @staticmethod
+    def _isTrulyVertical(segment: _sib.SegmentItemBase) -> bool:
+        return not segment.isZeroLength() and segment.isVertical()
+
+    @staticmethod
+    def _removeFromScene(previousSegment: _sib.SegmentItemBase, segmentToDelete: _sib.SegmentItemBase) -> None:
+        endPortOrCornerItem = _getPortOrCornerItem(segmentToDelete.endNode)
+
+        previousLine = previousSegment.line()
+        previousEndCorner = previousSegment.endNode.parent
+
+        newEndNode = segmentToDelete.endNode
+        previousSegment.setEndNode(newEndNode)
+
+        previousSegment.setLine(previousLine.p1(), endPortOrCornerItem.scenePos())
+
+        _cdelete.deleteGraphicsItem(previousEndCorner)
+        _cdelete.deleteChildGraphicsItems(segmentToDelete)
+
+    def _isHorizontal(self) -> bool:
+        return all(s.isHorizontal() for s in self.segments)
+
+    def _recenterVerticalConnection(self) -> None:
+        assert len(self.segments) == 3, "Can only recenter connections with three segments."
+
+        intermediateSegment = self.segments[1]
+        midPoint = self.fromPort.scenePos() + 0.5 * (self.toPort.scenePos() - self.fromPort.scenePos())
+        intermediateSegment.startNode.parent.setPos(midPoint)
+        intermediateSegment.endNode.parent.setPos(midPoint)
+
+    def _assertSegmentsAreConsistent(self):
+        if self._isHorizontal():
+            assert len(self.segments) >= 3, "Horizontal segments must always have 3 or more segments."
+
+        firstSegment = self.segments[0]
+        assert firstSegment.isFirstSegment()
+
+        lastSegment = self.segments[-1]
+        assert lastSegment.isLastSegment()
+
+        startNode = self.startNode
+        assert startNode
+        assert startNode == firstSegment.startNode
+        assert not startNode.prevN()
+        assert startNode.parent == self
+
+        endNode = self.endNode
+        assert endNode
+        assert endNode == lastSegment.endNode
+        assert not endNode.nextN()
+        assert endNode.parent == self
+
+        for segment in self.segments:
+            endNode = startNode.nextN()
+            assert endNode
+            assert endNode.prevN() == startNode
+
+            if segment != lastSegment:
+                isinstance(endNode.parent, _ci.CornerItem)
+
+            assert segment.startNode == startNode
+            assert segment.endNode == endNode
+
+            startNode = endNode
+
+        lastEndNode = endNode
+        assert lastEndNode == lastSegment.endNode
+
+
+def _getPortOrCornerItem(node: _node.Node) -> _qtw.QGraphicsItem:
+    parent = node.parent
+
+    match parent:
+        case ConnectionBase() if node == parent.startNode:
+            return parent.fromPort
+        case ConnectionBase() if node == parent.endNode:
+            return parent.toPort
+        case _ci.CornerItem():
+            return parent
+        case _:
+            raise AssertionError("Shouldn't get here.")
