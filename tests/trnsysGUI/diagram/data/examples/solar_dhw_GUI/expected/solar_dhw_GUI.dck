@@ -1,0 +1,1306 @@
+**********************************************************************
+** head.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\generic 
+**********************************************************************
+*******************************
+**BEGIN Head.ddck
+*******************************
+VERSION 17    
+CONSTANTS 3
+START = 0     
+STOP = 8760     
+dtSim = 1/30.  ! time step in hours
+CONSTANTS 13
+nIteTrnsys = 30      ! TRNSYS Limit of iterations
+nWarnTrnsys = 12000  ! TRNSYS Limit of warnings
+nCallTraceTrnys = 31 ! TRNSYS limit of calls to a component before it will be traced
+FrInte_Tol = 0.003   ! TRNSYS solver tolerances      
+FrConv_Tol = 0.0005  ! TRNSYS solver tolerances    
+nan_check_bool = 1   ! TRNSYS nan check boolean
+time_report = 1      ! TRNSYS time report
+solver_equation = 0  ! TRNSYS EQUATION SOLVER statement
+debug_statement = 0  ! TRNSYS Overwrite DEBUG statement
+solver_statement = 0 ! TRNSYS Solver statement
+min_relax_factor = 1 ! TRNSYS Minimum relaxation factor
+max_relac_factor = 1 ! TRNSYS Maximum relaxation factor 
+solver_integration = 1    ! TRNSYS numerical integration solver method
+SIMULATION START STOP dtSim     
+TOLERANCES    FrInte_Tol  FrConv_Tol     
+LIMITS nIteTrnsys nWarnTrnsys nCallTraceTrnys ! Limit of Iterations, limit of warnings, limit of calls to a component before it will be traced
+DFQ solver_integration                        ! TRNSYS numerical integration solver method
+WIDTH 132                                     ! TRNSYS output file width, number of characters
+LIST                                          ! NOLIST statement
+SOLVER solver_statement min_relax_factor max_relac_factor      ! Solver statement, Minimum relaxation factor, Maximum relaxation factor
+NAN_CHECK nan_check_bool  ! Nan DEBUG statement
+OVERWRITE_CHECK debug_statement     ! Overwrite DEBUG statement
+EQSOLVER solver_equation           ! EQUATION SOLVER statement
+TIME_REPORT time_report
+CONSTANTS 3
+mfrSolverAbsTol = 1e-8
+mfrSolverRelTol = 1e-8
+mfrTolSwitchThreshold = 1e2
+CONSTANTS 3    
+tStrtUser = START     ! START start time of user defined printer
+tEndUser  = STOP      ! END time of user defined printer
+dtPrUser  = dtSim     ! timestep of user defined printer
+CONSTANTS 6 
+versionDeck = 1 !can be changed from config file to adapt processes and so on
+PI   = 3.1415926     
+Zero = 0
+Nix  = 0
+notused  = 0
+NPlotsPerSim = 18
+CONSTANTS 7 
+CPBRI = 3.8160   ! spec. heat of Glycol  [kJ/kgK]; Value for an average pipe temperature with 55 °C Tyfocor LS
+RHOBRI = 1016.0  ! density Glycol [kg/m³]; Value for an average pipe temperature with 55 °C Tyfocor L
+CPWAT = 4.19     ! spec. heat of Water [kJ/kgK] at 20 °C
+RHOWAT = 998.0   ! density of Water  [kg/m³] at20 °C
+LAMWAT = 0.58    ! heat conductivity W/(mK) 
+CPWAT_SI = CPWAT*1000 ! J/(kgK)    
+CPBRI_SI = CPBRI*1000 ! J/(kgK)    
+**********************************************************************
+** type1.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\Collector 
+**********************************************************************
+*******************************
+**BEGIN Type1.ddck 
+*******************************
+EQUATIONS 2
+TCollIn = TPiColIn
+MfrColl = ABS(MfrPiColIn)
+EQUATIONS 1
+TCollOut = [10,1] !Changed automatically
+EQUATIONS 1
+qSysIn_Collector = PColl_kW  
+EQUATIONS 1
+pumpColOn = puColOn
+CONSTANTS 2
+C_tilt = slopeSurfUser_1  ! @dependencyDdck Collector tilt angle / slope [°]
+C_azim = aziSurfUSer_1    ! @dependencyDdck Collector azimuth  (0:s, 90:w, 270: e) [°]
+EQUATIONS 4
+IT_Coll_kJhm2 = IT_surfUser_1  ! Incident total radiation on collector plane, kJ/hm2 
+IB_Coll_kJhm2 = IB_surfUser_1  ! incident beam radiation on collector plane, kJ/hm2
+ID_Coll_kJhm2 = ID_surfUser_1  ! diffuse and ground reflected irradiance on collector tilt
+AI_Coll = AI_surfUser_1  ! incident angle on collector plane, °
+EQUATIONS 5
+IT_Coll_kW = IT_Coll_kJhm2/3600     ! Incident total radiation on collector plane, kW/m2
+IB_Coll_kW = IB_Coll_kJhm2/3600     ! incident beam radiation on collector plane, kW/m2
+ID_Coll_kW = ID_Coll_kJhm2/3600     ! diffuse and ground reflected irradiance on collector tilt (kW/m2)
+IT_Coll_Wm2 = IT_surfUser_1/3.6
+IT_Coll_kWm2 = IT_surfUser_1/3600
+CONSTANTS 3  
+MfrCPriSpec = 15  ! Coll. Prim. loop spec. mass flow [kg/hm2]
+AcollAp=5         ! Collector area  
+MfrCPriNom = MfrCPriSpec*AcollAp !
+UNIT 10 TYPE 1 !Changed automatically
+PARAMETERS 11
+nSeries       ! number in series
+AcollAp       ! collector area
+cpBri          ! fluid specific heat kj(kgK
+efficiencyMode ! efficiency mode
+testedMfr      ! tested flow rate kg/(hm2)
+Eta0          ! intercept efficiency 
+a1            ! efficiency slope kJ/hm^2K
+a2            ! efficiency curvature kJ/hm^2K^2
+2             ! optical mode
+FirstOrderIAM  ! 1st order IAM
+SecondOrderIAM ! 2nd order IAM
+INPUTS 9
+TCollIn
+MfrColl
+Tamb
+IT_Coll_kJhm2
+IT_H
+ID_Coll_kJhm2
+0,0
+AI_Coll !Flo check ! JS: This was defined wrong before (C_azim, even though it is incident angle input). Now it should be correct.
+C_tilt !Flo check  ! JS: This should be correct
+20 0 10 0 0 0 GroundReflectance 45 0 
+EQUATIONS 4
+Pcoll = [10,3]  !Changed automatically
+PColl_kW = Pcoll/3600
+PColl_kWm2 = PColl_kW/(AcollAp+1e-30)   
+PColl_Wm2  = PColl_kWm2*1000   
+CONSTANTS 1
+unitPrintSol = 14
+ ASSIGN temp\SOLAR_MO.Prt unitPrintSol 
+UNIT 11 TYPE 46       !Changed automatically
+PARAMETERS 6   
+unitPrintSol ! 1: Logical unit number, -
+-1           ! 2: Logical unit for monthly summaries, -
+1            ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1           ! 4: Printing & integrating interval, h. -1 for monthly integration
+1            ! 5: Number of inputs to avoid integration, -
+1            ! 6: Output number to avoid integration
+INPUTS 4
+Time  Pcoll_kW  PColl_kWm2  IT_Coll_kWm2
+Time  Pcoll_kW  PColl_kWm2  IT_Coll_kWm2
+CONSTANTS 1
+unitHourlyCol = 15
+ ASSIGN    temp\SOLAR_HR.Prt    unitHourlyCol     
+UNIT 12 TYPE 46      !Changed automatically
+PARAMETERS 7    
+unitHourlyCol ! 1: Logical unit number, -
+-1            ! 2: Logical unit for monthly summaries, -
+1             ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1             ! 4: Printing & integrating interval, h. -1 for monthly integration
+2             ! 5: Number of inputs to avoid integration, -
+4             ! 6: Output number to avoid integration
+5             ! 7: Output number to avoid integration
+INPUTS 6
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2 TCollOut TCollIn MfrColl
+UNIT 13 TYPE 65       !Changed automatically
+PARAMETERS 12     
+4     ! 1 Nb. of left-axis variables
+2     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+10     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+100  ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 6    
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2  MfrColl
+TCollOut TCollIn
+Pcoll_kW  PColl_kWm2  IT_Coll_kWm2  MfrColl
+TCollOut TCollIn
+LABELS  3     
+Power_and_Mfr 
+Temperatures   
+Collector
+**********************************************************************
+** type1_constants_CobraAK2_8V.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\Collector 
+**********************************************************************
+******************************
+**BEGIN Type1_Constants_CobraAK2_8V.ddck
+*******************************
+CONSTANTS 11
+Eta0= 0.857     ! Eta0 (a0) of collector (zero heat loss efficiency)
+a1 = 4.16*3.6    ! linear heat loss coefficient of collector [kJ/hm^2K] ![W/m2K]*3.6
+a2 = 0.0089*3.6   ! quadratic heat loss coefficient of collector [kJ/hm^2K^2] ![W/m2K2]*3.6
+AbsorberArea = 2.435 !m2
+TotArea = 2.768 !m2
+nSeries = 1
+efficiencyMode = 1 
+testedMfr = 200/AbsorberArea !l/hm2
+GroundReflectance = 0.2
+FirstOrderIAM = 0.108
+SecondOrderIAM = 0
+**********************************************************************
+** solar_dhw_control.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\control 
+**********************************************************************
+***************************************************
+**Solar controller
+**************************************************
+EQUATIONS 6
+myTCollOut = TCollOut          !@dependencyDdck
+mySenTesSolarTop = Tsen9_Tes1 !@dependencyDdck
+mySenTesSolarBot = Tsen1_Tes1 !@dependencyDdck
+mySenTesAux = Tsen8_Tes1 !@dependencyDdck
+tSetAux = 50
+TdhwSet = 45
+CONSTANTS 3
+dtAuxOn = -3     ! Upper dead band coll. pump ON
+dtAuxOff = -7     ! Lower dead band coll. pump OFF
+sizeAux = 1
+UNIT 17 TYPE 2   !Changed automatically
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+98   ! 2 High limit cut-out
+INPUTS 6     
+tSetAux        ! Setpoint temperature, Tset
+mySenTesAux ! Temperature to watch, Tmonitored
+mySenTesAux ! High limit monitoring temperature
+auxOn          ! 70,1 Input control function
+dtAuxOn        ! Turn on temperature difference, Upper dead band, UDB dT
+dtAuxOff       ! Turn off temperature difference, Lower dead band dT, LDB
+0.0 20.0 0.0 0 dtAuxOn dtAuxOff      
+EQUATIONS 1  
+auxOn = [17,1] !Changed automatically
+CONSTANTS 2
+dtColOn = 7    ! Upper dead band coll. pump ON, JS: was 10 before, yield is higher with 7, to be improved
+dtColOff = 3    ! Lower dead band coll. pump OFF
+UNIT 18 TYPE 2   !Changed automatically
+PARAMETERS 2     
+5     ! 1 No. of oscillations
+98   ! 2 High limit cut-out
+INPUTS 6     
+myTCollOut     ! Upper input temperature Th
+mySenTesSolarBot ! Lower input temperature Tl
+mySenTesSolarTop ! Monitoring temperature Tin
+puColOn        ! 70,1 Input control function
+dtColOn        ! Upper dead band dT
+dtColOff       ! Lower dead band dT
+0.0 20.0 0.0 0 dtColOn dtColOff      
+EQUATIONS 1  
+puColOn = [18,1]*LT(myTcollOut,120) !Changed automatically
+EQUATIONS 3
+MfrPuCol = puColOnRc*MfrCPriNom
+MfrWTapBottom = MfrDHWset
+MfrDhwDemand = ABS(MfrPiDhwDemand)
+UNIT 16 TYPE 993  !Changed automatically
+PARAMETERS 1     
+2   ! 1: number of variables to be remembered    
+INPUTS 2     
+auxOn puColOn     
+0.0  0.0  
+EQUATIONS 2    ! outputs of Input Value Recall
+auxOnRc = [16,1]       !Changed automatically
+puColOnRc = [16,2]   !Changed automatically
+**********************************************************************
+** solar_dhw_control_plotter.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\control 
+**********************************************************************
+*******************************
+**BEGIN ControlPlotter.ddck
+*******************************
+UNIT 19 TYPE 65      !Changed automatically
+PARAMETERS 12     
+10     ! 1 Nb. of left-axis variables
+10     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+100     ! 4 Left axis maximum
+-0.5     ! 5 Right axis minimum
+1.5  ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 20    
+mySenTesSolarTop mySenTesSolarBot mySenTesAux nix nix nix myTCollOut nix nix nix 
+nix  puColOn puColOnRc auxOn auxOnRc nix nix nix nix nix 
+mySenTesSolarTop mySenTesSolarBot mySenTesAux nix nix nix myTCollOut nix nix nix 
+nix  puColOn puColOnRc auxOn auxOnRc nix nix nix nix nix 
+LABELS  3     
+Temperatures  
+Boolean   
+Control
+**********************************************************************
+** valve_control.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\control 
+**********************************************************************
+*************************************
+**BEGIN valve_control.ddck
+*************************************
+CONSTANTS 1
+T_set_MixDhw=50
+UNIT 20 TYPE 811  !Changed automatically
+PARAMETERS 1
+5 !Nb.of iterations before fixing the value 
+INPUTS 4 
+TPiTesDhwOut
+TPiCirc
+MfrPiDhwDemand
+T_set_MixDhw
+35.0 21.0 800.0 T_set_MixDhw
+EQUATIONS 1
+xFracMixDhw =  1.-[20,5]  !Changed automatically
+**********************************************************************
+** Dhw.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\Dhw 
+**********************************************************************
+*************************************
+**BEGIN Dhw.ddck
+*************************************
+EQUATIONS 3
+qSysOut_DhwLoss = QLoss_Tes1
+qSysOut_DhwAcum = QAcum_Tes1
+elSysIn_Q_DhwAux = qHeatSource_Tes1
+EQUATIONS 3
+Tdp1In_Tes1 = TPiTesDhwIn
+Mfrdp1_Tes1 = MDhwDpR1_99_A
+Tdp1InRev_Tes1 = TPiTesDhwOut
+EQUATIONS 3
+Thx1In_Tes1 = TPiColOut
+Mfrhx1_Tes1 = MDhwTesHx24_A
+Thx1InRev_Tes1 = TPiTesToCol
+CONSTANTS 2
+zAux1_Tes1=0.00
+qAux1_Tes1=0.00
+EQUATIONS 1
+TDhwDpR1_99=[21,1] !Changed automatically
+EQUATIONS 1
+TDhwTesHx24=[21,102] !Changed automatically
+CONSTANTS 3
+TRoomStore=15 ! 
+VStoreRef = 0.763
+ratioTes1 = Vol_Tes1 / VStoreRef
+CONSTANTS 2
+zInDp1_Tes1=0.01
+zOutDp1_Tes1=0.99
+CONSTANTS 4
+zInhx1_Tes1=0.40
+zOuthx1_Tes1=0.13
+Cphx1_Tes1=Lloop2Cp
+Rhohx1_Tes1=Lloop2Rho
+CONSTANTS 1
+Dp1Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
+CONSTANTS 1
+nHxUsed_Tes1=1 
+CONSTANTS 15
+dInHx1_Tes1=0.05 ! m only if modHx1=1
+dOutHx1_Tes1=0.06 ! m only if modHx1=1
+LHx1_Tes1=20 ! m only if modHx1=1
+LamHx1_Tes1=50 ! W/mK only if modHx1=1
+brineConcHx1_Tes1=30 ! [0-100] only if modHx1=1
+VHx1_Tes1=0. 
+nCvHx1_Tes1=20 
+modHx1_Tes1=1 ! modHX1, 0 = physical model, 1 = Drueck-model (Multiport)
+nNuHx1_Tes1=0.5 !  only if modHx1=1
+cNuHx1_Tes1=0.25 !  only if modHx1=1
+dUaMfrHx1_Tes1=0.375 ! only if modHx1=0
+dUadTHx1_Tes1=0.0 ! only if modHx1=0
+dUaTHx1_Tes1=0.458 ! only if modHx1=0
+UaHx1_Tes1=1105*ratioTes1 ! kJ/hK only if modHx1=0
+startUpHx1_Tes1=0. ! only if modHx1=0
+CONSTANTS 10
+zSen1_Tes1=0.05
+zSen2_Tes1=0.15
+zSen3_Tes1=0.25
+zSen4_Tes1=0.35
+zSen5_Tes1=0.45
+zSen6_Tes1=0.55
+zSen7_Tes1=0.65
+zSen8_Tes1=0.75
+zSen9_Tes1=0.85
+zSen10_Tes1=0.95
+CONSTANTS 10
+zSenAvgBot1_Tes1 = 0.05
+zSenAvgTop1_Tes1 = 0.15
+zSenAvgBot2_Tes1 = 0.25
+zSenAvgTop2_Tes1 = 0.35
+zSenAvgBot3_Tes1 = 0.45
+zSenAvgTop3_Tes1 = 0.55
+zSenAvgBot4_Tes1 = 0.65
+zSenAvgTop4_Tes1 = 0.75
+zSenAvgBot5_Tes1 = 0.85
+zSenAvgTop5_Tes1 = 0.95
+CONSTANTS 12
+Vol_Tes1=1          ! 1: m3, volume of store
+RhoWat_Tes1=RhoWat  ! 2: kg/m3, density of storage media
+CpWat_Tes1=CpWat    ! 3: kJ/kgK, specific heat of storage media
+lamZ_Tes1=0.6       ! 4: W/mK, effective vertical thermal conductivity of TES
+Heigh_Tes1=1.       ! 5: m, storage height
+Tini_Tes1=60.       ! 6: oC, initial temperature
+nCvMax_Tes1=400     ! 7: -, minimum relative plug height
+nCvMin_Tes1=20      ! 8: -, maximum relative plug height
+maxTDiff_Tes1=0.015 ! 9: K, maximum temperature difference between plugs
+readMode_Tes1=0     ! 10: 1: from table, 0: Tini and CapTot
+Tref_Tes1=273.15    ! 11: oC, reference temperature
+Tmax_Tes1=100.       ! 6: oC, initial temperature
+CONSTANTS 10
+Ufoam_Tes1= 0.67 ! W/(m2K) 6 cm of foam of 0.04 W/(mK) 
+Ubot_Tes1 = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
+Atop_Tes1 = Vol_Tes1/Heigh_Tes1 ! m2
+Diameter_Tes1 = (4*ATop_Tes1/PI)^0.5 ! m 
+ALat_Tes1 = Heigh_Tes1*PI*Diameter_Tes1 ! m2
+UaBot_Tes1= Ubot_Tes1*ATop_Tes1 !  W/k 
+Uaz1_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+Uaz2_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+Uaz3_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+UaTop_Tes1 = Ufoam_Tes1*ATop_Tes1 !  W/k
+CONSTANTS 4
+MoInsPlate_Tes1=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
+zInsPlate_Tes1=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
+TinsPlate_Tes1=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
+UAinsPlate_Tes1=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
+UNIT 21 TYPE 1924      !Changed automatically
+PARAMETERS 219 
+Vol_Tes1     ! 1: m3, volume of store
+RhoWat_Tes1  ! 2: kg/m3, density of storage media
+CpWat_Tes1   ! 3: kJ/kgK, specific heat of storage media
+lamZ_Tes1    ! 4: W/mK, effective vertical thermal conductivity of TES
+Heigh_Tes1   ! 5: m, storage height
+TIni_Tes1   ! 6: oC, initial temperature
+nCvMax_Tes1  ! 7: -, minimum relative plug height
+nCvMin_Tes1  ! 8: -, maximum relative plug height
+maxTDiff_Tes1  ! 9: K, maximum temperature difference between plugs
+readMode_Tes1  ! 10: 1: from table, 0: Tini and CapTot
+Tref_Tes1     ! 11: oC, reference temperature
+UaBot_Tes1 ! W/k 
+Uaz1_Tes1  ! W/k
+Uaz2_Tes1  ! W/k
+Uaz3_Tes1  ! W/k
+UaTop_Tes1 ! W/k
+tMax_Tes1
+0	0	0 ! 17-20 unsused parameters
+zInDp1_Tes1 zOutDp1_Tes1 zero Dp1Strat_Tes1 ! 21 - 25: zIn, zOut, cp, strat
+-1 -1 zero zero ! 26 - 30: zIn, zOut, cp, strat
+-1 -1 zero zero ! 31 - 35: zIn, zOut, cp, strat
+-1 -1 zero zero ! 36 - 40: zIn, zOut, cp, strat
+-1 -1 zero zero ! 41 - 45: zIn, zOut, cp, strat
+-1 -1 zero zero ! 46 - 50: zIn, zOut, cp, strat
+-1 -1 zero zero ! 51 - 55: zIn, zOut, cp, strat
+-1 -1 zero zero ! 56 - 60: zIn, zOut, cp, strat
+-1 -1 zero zero ! 61 - 65: zIn, zOut, cp, strat
+-1 -1 zero zero ! 66 - 70: zIn, zOut, cp, strat
+zSen1_Tes1 zSen2_Tes1 zSen3_Tes1 zSen4_Tes1 zSen5_Tes1 zSen6_Tes1 zSen7_Tes1 zSen8_Tes1 zSen9_Tes1 zSen10_Tes1 ! 61-71 : relative storage temperature sensor heights 
+zSenAvgBot1_Tes1 zSenAvgTop1_Tes1 ! 71-72 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot2_Tes1 zSenAvgTop2_Tes1 ! 73-74 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot3_Tes1 zSenAvgTop3_Tes1 ! 75-76 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot4_Tes1 zSenAvgTop4_Tes1 ! 77-78 : relative position of lower and upper edge temeprature sensors
+zSenAvgBot5_Tes1 zSenAvgTop5_Tes1 ! 79-80 : relative position of lower and upper edge temeprature sensors
+MoInsPlate_Tes1 ! 81: 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
+zInsPlate_Tes1  ! 82: 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
+TinsPlate_Tes1  ! 83: oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
+UAinsPlate_Tes1 ! 84: W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
+nHxUsed_Tes1     ! 85: number Of used Hx
+zInHx1_Tes1 zOutHx1_Tes1 dInHx1_Tes1 dOutHx1_Tes1 LHx1_Tes1 LamHx1_Tes1 brineConcHx1_Tes1 VHx1_Tes1 CpHx1_Tes1 RhoHx1_Tes1 nCvHx1_Tes1 modHx1_Tes1 nNuHx1_Tes1 cNuHx1_Tes1 dUaMfrHx1_Tes1 dUadTHx1_Tes1 dUaTHx1_Tes1 UaHx1_Tes1 startUpHx1_Tes1 ! Heax exchanger 1
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 2
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 3
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 4
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 5
+-1 -1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero ! Heax exchanger 6
+zAux1_Tes1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
+INPUTS 69
+Tdp1In_Tes1 Mfrdp1_Tes1 Tdp1InRev_Tes1
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+TroomStore
+Thx1In_Tes1 Mfrhx1_Tes1 Thx1InRev_Tes1
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+zero zero zero
+qAux1_Tes1 zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero zero 
+zero zero zero zero zero zero zero zero zero 
+EQUATIONS 1
+Qdp1_Tes1=[21,31]  !Changed automatically
+EQUATIONS 21
+TAvg_Tes1 = [21,180]  !Changed automatically
+T1_Tes1 =[21,21]  !Changed automatically
+T2_Tes1 =[21,22]  !Changed automatically
+T3_Tes1 =[21,23]  !Changed automatically
+T4_Tes1 =[21,24]  !Changed automatically
+T5_Tes1 =[21,25]  !Changed automatically
+T6_Tes1 =[21,26]  !Changed automatically
+T7_Tes1 =[21,27]  !Changed automatically
+T8_Tes1 =[21,28]  !Changed automatically
+T9_Tes1 =[21,29]  !Changed automatically
+T10_Tes1 =[21,30]  !Changed automatically
+Tsen1_Tes1 =[21,71]  !Changed automatically
+Tsen2_Tes1 =[21,72]  !Changed automatically
+Tsen3_Tes1 =[21,73]  !Changed automatically
+Tsen4_Tes1 =[21,74]  !Changed automatically
+Tsen5_Tes1 =[21,75]  !Changed automatically
+Tsen6_Tes1 =[21,76]  !Changed automatically
+Tsen7_Tes1 =[21,77]  !Changed automatically
+Tsen8_Tes1 =[21,78]  !Changed automatically
+Tsen9_Tes1 =[21,79]  !Changed automatically
+Tsen10_Tes1 =[21,80]  !Changed automatically
+EQUATIONS 1
+Qhx1Out_Tes1=[21,104]  !Changed automatically
+EQUATIONS 1
+qHeatSource_Tes1 = [21,181]  !Changed automatically
+EQUATIONS 5
+Qv_Tes1     = [21,176]  !Changed automatically
+QLoss_Tes1  = [21,177]  !Changed automatically
+QAcum_Tes1  = [21,178]  !Changed automatically
+QPorts_Tes1 = [21,179]  !Changed automatically
+QImb_Tes1   = [21,64]   !Changed automatically
+CONSTANTS 1 
+unitPrinter_Tes1 = 24
+ ASSIGN temp\TES1_MO.Prt unitPrinter_Tes1
+UNIT 22 TYPE 46 !Changed automatically
+PARAMETERS 5
+unitPrinter_Tes1 ! 1: Logical unit number, -
+-1  ! 2: Logical unit for monthly summaries
+1 ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1  ! 4: Printing & integrating interval, h. -1 for monthly integration
+0  ! 5: Number of inputs to avoid integration
+INPUTS 8
+Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qhx1Out_Tes1 qHeatSource_Tes1 
+zero zero zero zero zero zero zero zero 
+UNIT 23 TYPE 65      !Changed automatically
+PARAMETERS 12   
+10     ! 1 Nb. of left-axis variables 
+0     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum 
+100     ! 4 Left axis maximum -
+0     ! 5 Right axis minimum 
+100     ! 6 Right axis maximum 
+nPlotsPerSim     ! 7 Number of plots per simulation 
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing 
+-1     ! 10 Logical unit for output file 
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 10     
+T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1 
+LABELS  3         
+Temperatures  
+MassFlows  
+Tes1
+**********************************************************************
+** hydraulic.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\hydraulic 
+**********************************************************************
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+EQUATIONS 2
+qSysOut_PipeLoss = PipeLossTot
+qSysOut_spPipeIntTot = spPipeIntTot
+EQUATIONS 3
+TDhwTesHx24H=TDhwTesHx24
+TDhwDpR1_99H=TDhwDpR1_99
+TCollectorH=TCollector
+CONSTANTS 1
+spTIni = 20
+UNIT 26 TYPE 9352 !Changed automatically
+PARAMETERS 84
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
+20
+14 13 0 0      !1 : DhwTesHx24
+10 11 0 0      !2 : DhwDpR1_99
+10 15 9 2      !3 : TeePiece
+15 0 0 4       !4 : WTap_main
+13 12 0 1      !5 : PuCol
+12 14 0 0      !6 : Collector
+17 11 9 3      !7 : MixDhw
+20 0 0 4       !8 : WTap
+3 7 0 0        !9 : PiCirc
+3 2 0 0        !10 : PiTesDhwIn
+2 7 0 0        !11 : PiTesDhwOut
+5 6 0 0        !12 : PiColIn
+1 5 0 0        !13 : PiTesToCol
+6 1 0 0        !14 : PiColOut
+4 3 0 0        !15 : PiDhwMains
+17 20 19 2     !16 : Tee536
+7 16 0 0       !17 : Tee536_MixDhw
+19 0 0 4       !18 : WTap2
+16 18 0 0      !19 : Tee536_WTap2
+16 8 0 0       !20 : Tee536_WTap
+INPUTS 20! for Type 9351
+0,0 0,0 0,0 MfrWTap_main MfrPuCol 0,0 xFracMixDhw MfrWTap 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 0,0 0,0 MfrWTap2 0,0 0,0 
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+EQUATIONS 40	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MDhwTesHx24_A=[26,1] !Changed automatically
+MDhwTesHx24_B=[26,2] !Changed automatically
+MDhwDpR1_99_A=[26,4] !Changed automatically
+MDhwDpR1_99_B=[26,5] !Changed automatically
+MTeePiece_A=[26,7] !Changed automatically
+MTeePiece_B=[26,8] !Changed automatically
+MTeePiece_C=[26,9] !Changed automatically
+MWTap_main_A=[26,10] !Changed automatically
+MPuCol_A=[26,13] !Changed automatically
+MPuCol_B=[26,14] !Changed automatically
+MCollector_A=[26,16] !Changed automatically
+MCollector_B=[26,17] !Changed automatically
+MMixDhw_A=[26,19] !Changed automatically
+MMixDhw_B=[26,20] !Changed automatically
+MMixDhw_C=[26,21] !Changed automatically
+MWTap_A=[26,22] !Changed automatically
+MPiCirc_A=[26,25] !Changed automatically
+MPiCirc_B=[26,26] !Changed automatically
+MPiTesDhwIn_A=[26,28] !Changed automatically
+MPiTesDhwIn_B=[26,29] !Changed automatically
+MPiTesDhwOut_A=[26,31] !Changed automatically
+MPiTesDhwOut_B=[26,32] !Changed automatically
+MPiColIn_A=[26,34] !Changed automatically
+MPiColIn_B=[26,35] !Changed automatically
+MPiTesToCol_A=[26,37] !Changed automatically
+MPiTesToCol_B=[26,38] !Changed automatically
+MPiColOut_A=[26,40] !Changed automatically
+MPiColOut_B=[26,41] !Changed automatically
+MPiDhwMains_A=[26,43] !Changed automatically
+MPiDhwMains_B=[26,44] !Changed automatically
+MTee536_A=[26,46] !Changed automatically
+MTee536_B=[26,47] !Changed automatically
+MTee536_C=[26,48] !Changed automatically
+MTee536_MixDhw_A=[26,49] !Changed automatically
+MTee536_MixDhw_B=[26,50] !Changed automatically
+MWTap2_A=[26,52] !Changed automatically
+MTee536_WTap2_A=[26,55] !Changed automatically
+MTee536_WTap2_B=[26,56] !Changed automatically
+MTee536_WTap_A=[26,58] !Changed automatically
+MTee536_WTap_B=[26,59] !Changed automatically
+EQUATIONS 4
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+EQUATIONS 12
+loop1NPipes = 7
+loop1Len = 2.0 ! [m]
+loop1Dia = 0.02 ! [m]
+loop1UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop1Rho = FwaterRho
+Lloop1Cp = FwaterCp
+loop2NPipes = 3
+loop2Len = 2.0 ! [m]
+loop2Dia = 0.02 ! [m]
+loop2UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+UNIT 27 TYPE 929 !Changed automatically
+INPUTS 6
+MTeePiece_A
+MTeePiece_B
+MTeePiece_C
+TPiTesDhwIn
+TPiDhwMains
+TPiCirc
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TTeePiece = [27,1] !Changed automatically
+EQUATIONS 2
+Tcw = 1
+TWTap_main = Tcw
+UNIT 28 TYPE 929 !Changed automatically
+PARAMETERS 0
+INPUTS 6
+MMixDhw_A
+MMixDhw_B
+MMixDhw_C
+TTee536_MixDhw
+TPiTesDhwOut
+TPiCirc
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixDhw= [28,1] !Changed automatically
+UNIT 29 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TTeePiece ! input flow temperature [deg C]
+MPiCirc_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TMixDhw ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TPiCirc = [29,1]  !Changed automatically
+PPiCirc_kW = [29,3]/3600  !Changed automatically
+PPiCircConv_kW = [29,4]/3600  !Changed automatically
+PPiCircInt_kJ = [29,5]  !Changed automatically
+MPiCirc = MPiCirc_A
+UNIT 30 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TTeePiece ! input flow temperature [deg C]
+MPiTesDhwIn_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TDhwDpR1_99H ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TPiTesDhwIn = [30,1]  !Changed automatically
+PPiTesDhwIn_kW = [30,3]/3600  !Changed automatically
+PPiTesDhwInConv_kW = [30,4]/3600  !Changed automatically
+PPiTesDhwInInt_kJ = [30,5]  !Changed automatically
+MPiTesDhwIn = MPiTesDhwIn_A
+UNIT 31 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TDhwDpR1_99H ! input flow temperature [deg C]
+MPiTesDhwOut_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TMixDhw ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TPiTesDhwOut = [31,1]  !Changed automatically
+PPiTesDhwOut_kW = [31,3]/3600  !Changed automatically
+PPiTesDhwOutConv_kW = [31,4]/3600  !Changed automatically
+PPiTesDhwOutInt_kJ = [31,5]  !Changed automatically
+MPiTesDhwOut = MPiTesDhwOut_A
+UNIT 32 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TPuCol ! input flow temperature [deg C]
+MPiColIn_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TCollectorH ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TPiColIn = [32,1]  !Changed automatically
+PPiColIn_kW = [32,3]/3600  !Changed automatically
+PPiColInConv_kW = [32,4]/3600  !Changed automatically
+PPiColInInt_kJ = [32,5]  !Changed automatically
+MPiColIn = MPiColIn_A
+UNIT 33 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TDhwTesHx24H ! input flow temperature [deg C]
+MPiTesToCol_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TPuCol ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TPiTesToCol = [33,1]  !Changed automatically
+PPiTesToCol_kW = [33,3]/3600  !Changed automatically
+PPiTesToColConv_kW = [33,4]/3600  !Changed automatically
+PPiTesToColInt_kJ = [33,5]  !Changed automatically
+MPiTesToCol = MPiTesToCol_A
+UNIT 34 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TCollectorH ! input flow temperature [deg C]
+MPiColOut_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TDhwTesHx24H ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TPiColOut = [34,1]  !Changed automatically
+PPiColOut_kW = [34,3]/3600  !Changed automatically
+PPiColOutConv_kW = [34,4]/3600  !Changed automatically
+PPiColOutInt_kJ = [34,5]  !Changed automatically
+MPiColOut = MPiColOut_A
+UNIT 35 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TWTap_main ! input flow temperature [deg C]
+MPiDhwMains_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TTeePiece ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TPiDhwMains = [35,1]  !Changed automatically
+PPiDhwMains_kW = [35,3]/3600  !Changed automatically
+PPiDhwMainsConv_kW = [35,4]/3600  !Changed automatically
+PPiDhwMainsInt_kJ = [35,5]  !Changed automatically
+MPiDhwMains = MPiDhwMains_A
+UNIT 36 TYPE 929 !Changed automatically
+INPUTS 6
+MTee536_A
+MTee536_B
+MTee536_C
+TTee536_MixDhw
+TTee536_WTap
+TTee536_WTap2
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TTee536 = [36,1] !Changed automatically
+UNIT 37 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TMixDhw ! input flow temperature [deg C]
+MTee536_MixDhw_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TTee536 ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TTee536_MixDhw = [37,1]  !Changed automatically
+PTee536_MixDhw_kW = [37,3]/3600  !Changed automatically
+PTee536_MixDhwConv_kW = [37,4]/3600  !Changed automatically
+PTee536_MixDhwInt_kJ = [37,5]  !Changed automatically
+MTee536_MixDhw = MTee536_MixDhw_A
+UNIT 38 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TTee536 ! input flow temperature [deg C]
+MTee536_WTap2_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TWTap2 ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TTee536_WTap2 = [38,1]  !Changed automatically
+PTee536_WTap2_kW = [38,3]/3600  !Changed automatically
+PTee536_WTap2Conv_kW = [38,4]/3600  !Changed automatically
+PTee536_WTap2Int_kJ = [38,5]  !Changed automatically
+MTee536_WTap2 = MTee536_WTap2_A
+UNIT 39 TYPE 931 !Changed automatically
+PARAMETERS 6
+loop1Dia ! diameter [m]
+loop1Len ! length [m]
+loop1UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop1Rho ! density [kg/m^3]
+Lloop1Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TTee536 ! input flow temperature [deg C]
+MTee536_WTap_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TWTap ! reverse flow input temperature [deg C]
+20 0.0 20 20
+EQUATIONS 5
+TTee536_WTap = [39,1]  !Changed automatically
+PTee536_WTap_kW = [39,3]/3600  !Changed automatically
+PTee536_WTapConv_kW = [39,4]/3600  !Changed automatically
+PTee536_WTapInt_kJ = [39,5]  !Changed automatically
+MTee536_WTap = MTee536_WTap_A
+EQUATIONS 1
+spPipeEnIntTot = PPiCircInt_kJ+PPiTesDhwInInt_kJ+PPiTesDhwOutInt_kJ+PPiColInInt_kJ+PPiTesToColInt_kJ+PPiColOutInt_kJ+PPiDhwMainsInt_kJ+PTee536_MixDhwInt_kJ+PTee536_WTap2Int_kJ+PTee536_WTapInt_kJ
+UNIT 25 TYPE 993 !Changed automatically
+PARAMETERS 1
+1 ! Number of inputs
+INPUTS 1
+spPipeEnIntTot
+0
+EQUATIONS 4
+spPipeConvectedTot = PPiCircConv_kW+PPiTesDhwInConv_kW+PPiTesDhwOutConv_kW+PPiColInConv_kW+PPiTesToColConv_kW+PPiColOutConv_kW+PPiDhwMainsConv_kW+PTee536_MixDhwConv_kW+PTee536_WTap2Conv_kW+PTee536_WTapConv_kW
+PipeLossTot = PPiCirc_kW+PPiTesDhwIn_kW+PPiTesDhwOut_kW+PPiColIn_kW+PPiTesToCol_kW+PPiColOut_kW+PPiDhwMains_kW+PTee536_MixDhw_kW+PTee536_WTap2_kW+PTee536_WTap_kW
+spPipeIntTot = (spPipeEnIntTot - [25,1]) / dtSim / 3600  !Changed automatically
+spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
+ASSIGN solar_dhw_GUI_Mfr.prt 464
+UNIT 40 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+464! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+INPUTS 11
+xFracMixDhw MPiCirc MPiTesDhwIn MPiTesDhwOut MPiColIn MPiTesToCol MPiColOut MPiDhwMains
+MTee536_MixDhw MTee536_WTap2 MTee536_WTap
+xFracMixDhw MPiCirc MPiTesDhwIn MPiTesDhwOut MPiColIn MPiTesToCol MPiColOut MPiDhwMains
+MTee536_MixDhw MTee536_WTap2 MTee536_WTap
+ASSIGN solar_dhw_GUI_T.prt 465
+UNIT 41 TYPE 25 !Changed automatically
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+465! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+INPUTS 10
+TPiCirc TPiTesDhwIn TPiTesDhwOut TPiColIn TPiTesToCol TPiColOut TPiDhwMains TTee536_MixDhw
+TTee536_WTap2 TTee536_WTap
+TPiCirc TPiTesDhwIn TPiTesDhwOut TPiColIn TPiTesToCol TPiColOut TPiDhwMains TTee536_MixDhw
+TTee536_WTap2 TTee536_WTap
+**********************************************************************
+** SMA_hourly.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\weather 
+**********************************************************************
+*******************************
+**BEGIN City.dck
+*******************************
+CONSTANTS 8     
+NrCity = 7     ! number of the city dataset, -
+Lat = 47.38     ! Latitude, °
+TambD = -16.6    ! ambient design temperature of heating system, °C
+TambAvg = 10.07    ! average outdoor temperature, °C
+dTambAmpl = 9.3     ! amplitude of outside temperature, K
+tTambShift = 488     ! Offset of outside air temperature minimum , h
+ddTcwOffset = 40     ! time shift of minimum cold water temperature, d
+altid = 556     
+CONSTANTS 4
+formatWeatherData = 1! 1 = user format, 2 = Standard weather file in the TMY2 format
+unitWeatherData = 42
+ unitWeatherData2 = 43
+ unitWeatherData3 = 44
+ ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\weather\SMA_hourly.99" unitWeatherData 
+ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\weather\SMA_hourly.99" unitWeatherData2 
+ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\weather\SMA_hourly.99" unitWeatherData3 
+**********************************************************************
+** weather_data_base.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\weather 
+**********************************************************************
+*******************************
+**BEGIN WeatherData.dck
+*******************************
+EQUATIONS 11
+tAmbDry = [46,1]       !Changed automatically
+relHum  = [46,2]	   !Changed automatically
+vWind   = [46,3]       !Changed automatically
+dirWind = [46,4]       !Changed automatically
+pAmb_Pa = [46,5]       !Changed automatically
+AISZ = [46,10]         !Changed automatically
+AISA = [46,11]         !Changed automatically
+IT_H = Max([46,12],0)  !Changed automatically
+IB_H = Max([46,13],0)  !Changed automatically
+ID_H = [46,14]         !Changed automatically
+AI_H = [46,16]         !Changed automatically
+EQUATIONS 39
+IT_N = [46,18]      !Changed automatically
+AI_N = [46,22]      !Changed automatically
+IB_N = [46,19] * LT(AI_N,90)      !Changed automatically
+IT_S = [46,24]      !Changed automatically
+IB_S = [46,25]      !Changed automatically
+ID_S = [46,26]+[46,27]       !Changed automatically
+AI_S = [46,28]      !Changed automatically
+IT_E = [46,30]     !Changed automatically
+IB_E = [46,31]      !Changed automatically
+ID_E = [46,32]+[46,33]  !Changed automatically
+AI_E = [46,34]     !Changed automatically
+IT_W = [46,36]     !Changed automatically
+IB_W = [46,37]      !Changed automatically
+ID_W = [46,38]+[46,39]  !Changed automatically
+AI_W = [46,40]      !Changed automatically
+IT_surfUser_1 = [46,42]     !Changed automatically
+IB_surfUser_1 = [46,43]      !Changed automatically
+ID_surfUser_1 = [46,44] +[46,45]  !Changed automatically
+IDS_surfUser_1 = [46,44]  !Changed automatically
+IDG_surfUser_1 = [46,45]  !Changed automatically
+AI_surfUser_1 = [46,46]      !Changed automatically
+IT_surfUser_2 = [46,48]      !Changed automatically
+IB_surfUser_2 = [46,49]      !Changed automatically
+ID_surfUser_2 = [46,50] +[46,51]  !Changed automatically
+IDS_surfUser_2 = [46,50]  !Changed automatically
+IDG_surfUser_2 = [46,51]  !Changed automatically
+AI_surfUser_2 = [46,52]      !Changed automatically
+IT_surfUser_3 = [46,54]      !Changed automatically
+IB_surfUser_3 = [46,55]   !Changed automatically
+ID_surfUser_3 = [46,56] +[46,57]   !Changed automatically
+IDS_surfUser_3 = [46,56]  !Changed automatically
+IDG_surfUser_3 = [46,57]   !Changed automatically
+AI_surfUser_3 = [46,58] !Changed automatically
+IT_surfUser_4 = [46,60]      !Changed automatically
+IB_surfUser_4 = [46,61]   !Changed automatically
+ID_surfUser_4 = [46,62] +[46,63] !Changed automatically
+IDS_surfUser_4 = [46,62]  !Changed automatically
+IDG_surfUser_4 = [46,63]      !Changed automatically
+AI_surfUser_4 = [46,64] !Changed automatically
+EQUATIONS 8
+IT_surfUser_4_Wm2 = IT_surfUser_4/3.6
+IT_surfUser_3_Wm2 = IT_surfUser_3/3.6
+IT_surfUser_2_Wm2 = IT_surfUser_2/3.6
+IT_surfUser_1_Wm2 = IT_surfUser_1/3.6
+IT_S_Wm2 =IT_S/3.6
+IT_N_Wm2 =IT_N/3.6
+IT_W_Wm2 =IT_W/3.6
+IT_E_Wm2 =IT_E/3.6
+EQUATIONS 4
+IT_H_kW = IT_H/3600  
+IB_H_kW = IB_H/3600  
+IT_S_kW = IT_S/3600     ! Irradiation on south plane in kW/m2
+IB_S_kW = IB_S/3600     ! Direct Irradiation on south plane in kW/m3
+EQUATIONS 2
+IT_H_Wm2 = IT_H_kW*100  
+IB_H_Wm2 = IB_H_KW*100  
+EQUATIONS 3    ! pressure conversions
+pamb_kPa = pamb_Pa/1000     ! ambient pressure [kPa]
+pamb_atm = pamb_kPa/101.325     ! Ambient pressure [atm]
+pamb_bar = pamb_kPa/100     ! Ambient pressure [bar]
+EQUATIONS 2     
+Tsky = [45,1]      !Changed automatically
+dTsky = Tsky-Tamb     ! delta-T from sky to ambient (K)
+CONSTANTS 8    ! Turn the North,South,East and West orientations with "TURN"
+TcwAvg = TambAvg     
+TURN = 0.0     
+AA_N = 180.0 + TURN     
+AA_S = TURN     
+AA_E = 270.0      
+AA_W = 90.0 + TURN     
+groundRef = 0.2
+slope90 = 90.0
+CONSTANTS 2
+myUnitWeatherData   = unitWeatherData   !from the specific weatherFile
+myFormatWeatherData = formatWeatherData   !formatWeatherData from the specific weatherFile
+CONSTANTS 8  ! Values to be filled up by GUI
+slopeSurfUser_1 = 45. ! Slope of surface-5
+aziSurfUser_1 = 0.    ! Azimuth of surface-5
+slopeSurfUser_2 = 10. ! Slope of surface-6
+aziSurfUser_2 = 110.    ! Azimuth of surface-6
+slopeSurfUser_3 = 10. ! Slope of surface-7
+aziSurfUser_3 = 70.    ! Azimuth of surface-7
+slopeSurfUser_4 = 10. ! Slope of surface-8
+aziSurfUser_4 = 70.    ! Azimuth of surface-8
+UNIT 46 TYPE 109  !Changed automatically
+PARAMETERS 4
+myFormatWeatherData  ! 1 = user format, 2 = Standard weather file in the TMY2 format  FROM CITY...
+myUnitWeatherData    ! 2 Logical unit 
+4     ! 3 Sky model for diffuse radiation: 1: Isotropic sky model; 2: Hay and Davies model; 3: Reindl model; 4: Perez model
+1     ! 4 Tracking mode: 1: Fixed surface; 2: single-axis tracking,vertical axis (fixed slope); 3: single-axis tracking in the plane of the surface; 4 two axis tracking
+INPUTS 17 ! these inputs don't accept numbers but variables
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+0,0
+groundRef ! ground reflectance
+slope90   ! Slope of surface-1
+AA_N      ! Azimuth of surface-1
+slope90   ! Slope of surface-2
+AA_S      ! Azimuth of surface-2
+slope90   ! Slope of surface-3
+AA_E      ! Azimuth of surface-3
+slope90   ! Slope of surface-4
+AA_W      ! Azimuth of surface-4
+slopeSurfUser_1 ! Slope of surface-5
+aziSurfUser_1   ! Azimuth of surface-5
+slopeSurfUser_2 ! Slope of surface-6
+aziSurfUser_2   ! Azimuth of surface-6
+slopeSurfUser_3 ! Slope of surface-7
+aziSurfUser_3   ! Azimuth of surface-7
+slopeSurfUser_4 ! Slope of surface-8
+aziSurfUser_4   ! Azimuth of surface-8
+UNIT 47 TYPE 33      !Changed automatically
+PARAMETERS 3     
+2     ! 1 Psychrometrics mode 2: dry bulb and relative humidity known
+1     ! 2 Wet bulb mode 1: calculate wet bulb temperature; 0: do not calculate wet bulb temperature
+1     ! 3 Error mode 1: only one warning will be printed for the whole simulation; 2: all warnings will be printed
+INPUTS 3     
+tAmbDry ! Ambient dry bulb temperature [°C]
+relHum  ! Relative humidity [0..100]
+pamb_atm     ! Ambient pressure [atm]
+20 50 1      
+EQUATIONS 6     
+tAmb_Met = [47,7]       !Changed automatically
+tAmbDewPoint = [47,8]      !Changed automatically
+RHamb_100 = [47,6]       !Changed automatically
+tAmb = Tamb_Met     ! Psychrometrics:Dry bulb temperature
+RHamb_1 = RHamb_100/100     
+Tcw = MAX(TcwAvg,0.1)     !  Temperature shift cold water, K . We avoid below 0 °C
+UNIT 45 TYPE 69      !Changed automatically
+PARAMETERS 2     
+0     ! 1 mode for cloudiness factor
+altid     ! 2 height over sea level
+INPUTS 4     
+tamb_Met        ! Psychrometrics:Dry bulb temperature ->Ambient temperature
+tambDewPoint        ! Psychrometrics:Dew point temperature. ->Dew point temperature at ambient conditions
+IB_H       ! Weather data:beam radiation on horizontal ->Beam radiation on the horizontal
+ID_H      ! Weather data:sky diffuse radiation on horizontal ->Diffuse radiation on the horizontal
+0 20 0 0     
+CONSTANTS 1
+unitPrinterWeather = 49
+ ASSIGN    temp\WEATHER_BASE_MO.Prt     unitPrinterWeather
+UNIT 48 Type 46      !Changed automatically
+PARAMETERS 6   
+unitPrinterWeather    ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+INPUTS 3  
+Tamb IT_H_KW IB_H_kW
+Tamb IT_H_KW IB_H_kW
+**********************************************************************
+** dhw_sfh_task44.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\WTap 
+**********************************************************************
+*******************************
+**BEGIN DHW-SFH.dck
+*******************************
+EQUATIONS 2
+Tdhw = TPiDHWDemand ![22,1]     ! Warm water supply temperature from WW heat exchanger or mixing valve [�C]
+MfrDhw = ABS(MfrPiDHWDemand) ! Mass flow on consumption side mixed down, kg/h = MfrDHWSet
+EQUATIONS 1
+qSysOut_DhwDemand = Pdhw_kW
+CONSTANTS 1
+TDhwSupply = Tcw !TcwAvg   Standard cold water temperature (�C)   TcwAvg  from weatherData
+CONSTANTS 1
+unitReadDhw = 54
+ ASSIGN "C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\WTap\T44A38_DHW_load_year_V3.txt" unitReadDhw 
+CONSTANTS 2
+scaleDHW = 1
+PelPuDHW_kW = 0     ! Electricity consumption of DHW pump! [kW]
+EQUATIONS 2
+Pdhw_kW = MfrDhw*(Tdhw-TDhwSupply)*CPWAT/3600                ! DHW-consumption power [kW]
+PdhwTheoretic_kW = MfrDhw*(TdhwSet-TDhwSupply)*CPWAT/3600    ! DHW-consumption power [kW]
+EQUATIONS 1     
+dtDHWdata = 1/30.     ! timestep of DHW data-file
+UNIT 50 TYPE 9      !Changed automatically
+PARAMETERS 26     !
+6     ! 1 Mode
+2     ! 2 Header Lines to Skip  --  SFH has 2 lines, MFH has 1 line
+5     ! 3 No. of values to read
+dtDHWdata    ! 4 Time interval of data
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+-1  1  0  0  ! 5 Interpolate (+) or not (-)? 6: Multuplication factor, 7: Addition factor, 8: Average (0) or instantaneous (1) value
+unitReadDhw           ! 9 Logical unit for input file
+-1           ! 10 Free format mode
+EQUATIONS 4     
+tDRdhw = [50,2]       !Changed automatically
+QDHWstd = [50,3]      !Changed automatically
+MfrDHWreal = [50,4]*scaleDHW    !Changed automatically
+TdhwSetProfile = GT(MfrDHWreal,0) * [50,5] + LE(MfrDHWreal,0) * 45      !Changed automatically
+EQUATIONS 6
+TcwStd = 10.     ! Standard cold water temperature (deg C)
+QDHWloc = QDHWstd*(TdhwSetProfile-Tcw)/(TdhwSetProfile-TcwStd)     ! local average draw off energy (according to T44A38_Rep_C1_A) [kWh] Before was [kJ]
+QDHWset = QDHWstd*(1+0.2*COS((time-ddTcwOffset*24)/8760*360))  ! local time dependent draw off energy (according to T44A38_Rep_C1_A) [kWh] Before was [kJ] 
+MfrDHWset = (QDHWset*3600*scaleDHW)/dtDHWdata/(CpWat*(TdhwSetProfile-Tcw)) ! mass flow of hot water draw off [kg/h]
+TdhwHxSet = TdhwSetProfile+ 0.1               ! Setpoint for heat exchanger control (if present), �C
+PdhwIdeal_kW = QDHWstd/dtDHWdata  ! ideal draw off power, kW
+EQUATIONS 2     ! post calculations of DHW loop
+dTdhwFlow = GT(MfrDHWset,0)*(TdhwSet-Tdhw)     ! missed temperature of warm water, K
+PpenDHW_kW = 1.5*MfrDHWset*CPWAT*dTdhwFlow/3600
+UNIT 51 TYPE 65      !Changed automatically
+PARAMETERS 12     
+1     ! 1 Nb. of left-axis variables
+1     ! 2 Nb. of right-axis variables
+0     ! 3 Left axis minimum
+300     ! 4 Left axis maximum
+0     ! 5 Right axis minimum
+60     ! 6 Right axis maximum
+nPlotsPerSim     ! 7 Number of plots per simulation
+12     ! 8 X-axis gridpoints
+1     ! 9 Shut off Online w/o removing
+-1     ! 10 Logical unit for output file
+0     ! 11 Output file units
+0     ! 12 Output file delimiter
+INPUTS 2    
+MfrDhw  
+Tdhw 
+MfrDhw  
+Tdhw 
+LABELS  3     
+massFlow
+Temperatures     
+DHW-Hyd
+CONSTANTS 1
+unitPrinterDHW = 55
+ ASSIGN    temp\DHW_MO.Prt  unitPrinterDHW     
+UNIT 52 TYPE 46      !Changed automatically
+PARAMETERS 5     
+unitPrinterDHW     ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+-1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+0     ! 5: Number of inputs to avoid integration, -
+INPUTS 5
+Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW        
+Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW 
+CONSTANTS 1
+unitHourlyDHW = 56
+ ASSIGN    temp\DHW_HR.Prt  unitHourlyDHW     
+UNIT 53 TYPE 46      !Changed automatically
+PARAMETERS 6   
+unitHourlyDHW    ! 1: Logical unit number, -
+-1     ! 2: Logical unit for monthly summaries, -
+1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
+1     ! 4: Printing & integrating interval, h. -1 for monthly integration
+1     ! 5: Number of inputs to avoid integration, -
+1		! 6: Output number to avoid integration
+INPUTS 5
+Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW          
+Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW
+**********************************************************************
+** end.ddck from C:\actions-runner\_work\pytrnsys_gui\pytrnsys_gui\tests\trnsysGUI\diagram\data\examples\solar_dhw_GUI\solar_dhw_GUI\ddck\generic 
+**********************************************************************
+***************************************************************
+**BEGIN Monthly Energy Balance printer automatically generated from DDck files
+***************************************************************
+EQUATIONS 1
+qImb =  + qSysIn_Collector - qSysOut_DhwLoss - qSysOut_DhwAcum + elSysIn_Q_DhwAux - qSysOut_PipeLoss - qSysOut_spPipeIntTot - qSysOut_DhwDemand
+CONSTANTS 1
+unitPrintEBal=57
+ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal
+UNIT 57 Type 46
+PARAMETERS 6
+unitPrintEBal !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+-1 !4 -1: monthly integration
+1  !5 number of outputs to avoid integration
+1  !6 output number to avoid integration
+INPUTS 9
+TIME qSysIn_Collector qSysOut_DhwLoss qSysOut_DhwAcum elSysIn_Q_DhwAux qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_DhwDemand qImb
+*******************************
+TIME qSysIn_Collector qSysOut_DhwLoss qSysOut_DhwAcum elSysIn_Q_DhwAux qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_DhwDemand qImb
+***************************************************************
+**BEGIN Hourly Energy Balance printer automatically generated from DDck files
+***************************************************************
+CONSTANTS 1
+unitPrintEBal_h=58
+ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h
+UNIT 58 Type 46
+PARAMETERS 6
+unitPrintEBal_h !1: Logical unit number
+-1 !2: for monthly summaries
+1  !3: 1:print at absolute times
+1 !4 1: hourly integration
+1  !5 number of outputs to avoid integration
+1  !6 output number to avoid integration
+INPUTS 9
+TIME qSysIn_Collector qSysOut_DhwLoss qSysOut_DhwAcum elSysIn_Q_DhwAux qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_DhwDemand qImb
+*******************************
+TIME qSysIn_Collector qSysOut_DhwLoss qSysOut_DhwAcum elSysIn_Q_DhwAux qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_DhwDemand qImb
+*******************************
+**BEGIN Head.ddck
+*******************************
+END

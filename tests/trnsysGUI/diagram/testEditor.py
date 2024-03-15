@@ -9,6 +9,7 @@ import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
 import pytrnsys.utils.log as _ulog
+import pytrnsys.utils.result as _res
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -16,12 +17,14 @@ import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
+import trnsysGUI.errors as _err
 from . import _testHelper as _th
 
 
 def getProjects() -> _tp.Iterable[_th.Project]:
     yield _th.Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
     yield _th.Project.createForExampleProject("icegrid")
+    yield _th.Project.createForExampleProject("solar_dhw_GUI")
 
     yield from getTestProjects()
 
@@ -116,7 +119,10 @@ class TestEditor:
             _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
         )
 
-        editor.exportDdckPlaceHolderValuesJsonFile()
+        result = editor.exportDdckPlaceHolderValuesJsonFile()
+
+        assert not _res.isError(result), _res.error(result).message
+
         helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
 
     def _exportAndTestDeckFile(self, mainWindow, testProject, helper, monkeypatch):
@@ -126,6 +132,12 @@ class TestEditor:
         monkeypatch.setattr(
             _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
         )
+
+        def dummyShowErrorMessageBox(errorMessage: str, title: str = "Error") -> None:
+            failMessage = f"{title}: {errorMessage}"
+            _pt.fail(failMessage)
+
+        monkeypatch.setattr(_err, _err.showErrorMessageBox.__name__, dummyShowErrorMessageBox)
 
         mainWindow.exportDck()
 
