@@ -27,9 +27,7 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
 
     @property
     def _doublePipeConnection(self) -> _dpc.DoublePipeConnection:
-        assert isinstance(self.connection, _dpc.DoublePipeConnection)
-
-        return self.connection
+        return _tp.cast("_dpc.DoublePipeConnection", self.connection)
 
     def _getContextMenu(self) -> _qtw.QMenu:
         menu = super()._getContextMenu()
