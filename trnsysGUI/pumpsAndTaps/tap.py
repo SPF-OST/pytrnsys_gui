@@ -41,7 +41,7 @@ class Tap(_tapBase.TapBase):
         self.logger.debug(self.editor)
         pathName = self.displayName
         self.path = self.editor.projectFolder
-        self.path = _os.path.join(self.path, "../ddck")
+        self.path = _os.path.join(self.path, "ddck")
         self.path = _os.path.join(self.path, pathName)
         if not _os.path.exists(self.path):
             _os.makedirs(self.path)
