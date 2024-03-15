@@ -329,9 +329,7 @@ class Editor(_qtw.QWidget):
     def _createCreateSinglePipeConnectionCommand(
         self, startPort: SinglePipePortItem, endPort: SinglePipePortItem
     ) -> AddSinglePipeConnectionCommand:
-        displayName, createNamingHelper, undoNamingHelper = self._createDisplayNameAndCreateAndUndoNamingHelpers(
-            startPort, endPort
-        )
+        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(startPort, endPort)
         connection = SinglePipeConnection(displayName, startPort, endPort, self)
         command = AddSinglePipeConnectionCommand(connection, undoNamingHelper, self)
         return command
@@ -339,22 +337,18 @@ class Editor(_qtw.QWidget):
     def _createCreateDoublePipeConnectionCommand(
         self, startPort: DoublePipePortItem, endPort: DoublePipePortItem
     ) -> AddDoublePipeConnectionCommand:
-        (
-            displayName,
-            createNamingHelper,
-            undoNamingHelper,
-        ) = self._createDisplayNameAndCreateAndUndoNamingHelpers(startPort, endPort)
+        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(startPort, endPort)
         connection = DoublePipeConnection(displayName, startPort, endPort, self)
         command = AddDoublePipeConnectionCommand(connection, undoNamingHelper, self)
         return command
 
-    def _createDisplayNameAndCreateAndUndoNamingHelpers(
+    def _createDisplayAndUndoNamingHelper(
         self, endPort: PortItemBase, startPort: PortItemBase
-    ) -> _tp.Tuple[str, _nc.CreateNamingHelper, _nu.UndoNamingHelper]:
+    ) -> _tp.Tuple[str, _nu.UndoNamingHelper]:
         createNamingHelper = _nc.CreateNamingHelper(self.namesManager)
         undoNamingHelper = _nu.UndoNamingHelper(self.namesManager, createNamingHelper)
         displayName = _cnames.generateDefaultConnectionName(startPort, endPort, createNamingHelper)
-        return displayName, createNamingHelper, undoNamingHelper
+        return displayName, undoNamingHelper
 
     def sceneMouseMoveEvent(self, event):
         """
