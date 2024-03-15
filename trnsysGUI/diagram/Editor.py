@@ -343,7 +343,7 @@ class Editor(_qtw.QWidget):
         return command
 
     def _createDisplayAndUndoNamingHelper(
-        self, endPort: PortItemBase, startPort: PortItemBase
+        self, startPort: PortItemBase, endPort: PortItemBase
     ) -> _tp.Tuple[str, _nu.UndoNamingHelper]:
         createNamingHelper = _nc.CreateNamingHelper(self.namesManager)
         undoNamingHelper = _nu.UndoNamingHelper(self.namesManager, createNamingHelper)
