@@ -5,7 +5,6 @@ wheel
 pytest
 pytest-cov
 pytest-html
-pytest-xvfb
 mypy
 pylint
 black
