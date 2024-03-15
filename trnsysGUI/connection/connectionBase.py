@@ -45,8 +45,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
-        self.setAcceptedMouseButtons(_qtc.Qt.LeftButton)
-
         self.logger = parent.logger
 
         self._fromPort = fromPort
@@ -711,7 +709,8 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         pass
 
     def onMousePressed(self, segment: _sib.SegmentItemBase, event: _qtw.QGraphicsSceneMouseEvent) -> None:
-        assert event.button() == _qtc.Qt.LeftButton
+        if event.button() != _qtc.Qt.LeftButton:
+            return
 
         self.selectConnection()
 
@@ -794,7 +793,8 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self._dragIntermediateSegment(newPos)
 
     def onMouseReleased(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
-        assert event.button() == _qtc.Qt.LeftButton
+        if event.button() != _qtc.Qt.LeftButton:
+            return
 
         if not self._draggedSegment:
             return
