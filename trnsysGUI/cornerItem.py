@@ -6,21 +6,21 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.segments.Node as _node
+import trnsysGUI.segments.node as _node
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.connection.connectionBase as _cb
 
 
 class CornerItem(_qtw.QGraphicsEllipseItem):
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         x: float,
         y: float,
         r1: float,
         r2: float,
-        prevNode: _node.Node,
-        nextNode: _node.Node,
+        prevNode: _node.Node | None,
+        nextNode: _node.Node | None,
         connection: _cb.ConnectionBase,
     ) -> None:
         super().__init__(x, y, r1, r2, parent=connection)

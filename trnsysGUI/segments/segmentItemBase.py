@@ -1,5 +1,3 @@
-# pylint: skip-file
-# type: ignore
 from __future__ import annotations
 
 import math as _math
@@ -9,8 +7,8 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.CornerItem as _ci
-import trnsysGUI.segments.Node as _node
+import trnsysGUI.cornerItem as _ci
+import trnsysGUI.segments.node as _node
 
 # This is needed to avoid a circular import but still be able to type check
 if _tp.TYPE_CHECKING:
@@ -178,4 +176,3 @@ class SegmentItemBase(_qtw.QGraphicsItemGroup):
     @_tp.override
     def mouseReleaseEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
         self.connection.onMouseReleased(event)
-

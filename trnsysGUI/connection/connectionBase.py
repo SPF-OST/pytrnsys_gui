@@ -9,16 +9,16 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.CornerItem as _ci
+import trnsysGUI.cornerItem as _ci
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.connection.delete as _cdel
-import trnsysGUI.connection.delete as _cdelete
 import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.segments.Node as _node
-import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.segments.node as _node
+import trnsysGUI.segments.segmentItemBase as _sib
+from . import _clean
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -45,7 +45,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
-        self.setAcceptedMouseButtons(_qtc.Qt.MouseButton.LeftButton)
+        self.setAcceptedMouseButtons(_qtc.Qt.LeftButton)
 
         self.logger = parent.logger
 
@@ -182,9 +182,10 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def getPreviousAndNextSegment(
         self, intermediateNode: _node.Node
     ) -> _tp.Tuple[_sib.SegmentItemBase, _sib.SegmentItemBase]:
-        previousAndNextSegments: _tp.Sequence[_tp.Tuple[_sib.SegmentItemBase, _sib.SegmentItemBase]] = zip(
-            self.segments[:-1], self.segments[1:], strict=True
-        )
+        previousSegment: _sib.SegmentItemBase
+        nextSegment: _sib.SegmentItemBase
+
+        previousAndNextSegments = zip(self.segments[:-1], self.segments[1:], strict=True)
         for previousSegment, nextSegment in previousAndNextSegments:
             if previousSegment.endNode == intermediateNode and nextSegment.startNode == intermediateNode:
                 return previousSegment, nextSegment
@@ -708,7 +709,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         pass
 
     def onMousePressed(self, segment: _sib.SegmentItemBase, event: _qtw.QGraphicsSceneMouseEvent) -> None:
-        assert event.button() == _qtc.Qt.MouseButton.LeftButton
+        assert event.button() == _qtc.Qt.LeftButton
 
         self.selectConnection()
 
@@ -727,8 +728,8 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         secondCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, segment.startNode, None, self)
         thirdCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, secondCorner.node, segment.endNode, self)
 
-        secondCorner.setFlag(_qtw.QGraphicsItem.GraphicsItemFlag.ItemSendsScenePositionChanges)
-        thirdCorner.setFlag(_qtw.QGraphicsItem.GraphicsItemFlag.ItemSendsScenePositionChanges)
+        secondCorner.setFlag(_qtw.QGraphicsItem.ItemSendsScenePositionChanges)
+        thirdCorner.setFlag(_qtw.QGraphicsItem.ItemSendsScenePositionChanges)
 
         secondCorner.node.setNext(thirdCorner.node)
 
@@ -791,7 +792,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
         self._dragIntermediateSegment(newPos)
 
     def onMouseReleased(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
-        assert event.button() == _qtc.Qt.MouseButton.LeftButton
+        assert event.button() == _qtc.Qt.LeftButton
 
         if not self._draggedSegment:
             return
@@ -821,86 +822,32 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             endCorner.setPos(endPos.x(), newPos.y())
 
     def _removeUnnecessarySegments(self) -> None:
+        isHorizontal = self._isHorizontal()
+
         # We must guarantee the invariant self._isHorizontal() => len(self.segments) >= 3
-        if not self._isHorizontal() or len(self.segments) >= 3:
-            remainingIntermediateSegments = self._removeUnnecessaryIntermediateSegmentsFromSceneAndGetRemaining()
-            newSegments = self._possiblyMergeLastTwoSegments(remainingIntermediateSegments)
+        if not isHorizontal or len(self.segments) >= 3:
+            newSegments = _clean.removeUnnecessarySegments(self.segments)
 
-            self.segments = newSegments
+            self.segments = list(newSegments)
 
-        if self._isHorizontal() and len(self.segments) == 3:
+        if isHorizontal and len(self.segments) == 3:
             self._recenterVerticalConnection()
-
-    def _possiblyMergeLastTwoSegments(
-        self, remainingIntermediateSegments: _tp.Sequence[_sib.SegmentItemBase]
-    ) -> _tp.Sequence[_sib.SegmentItemBase]:
-        firstSegment = self.segments[0]
-        lastSegment = self.segments[-1]
-        lastRemainingIntermediate = remainingIntermediateSegments[-1]
-
-        areLastTwoSegmentsHorizontal = lastRemainingIntermediate.isHorizontal() and lastSegment.isHorizontal()
-
-        canMergeLastTwoSegments = areLastTwoSegmentsHorizontal
-        if self._isHorizontal():
-            # We must guarantee the invariant self._isHorizontal() => len(self.segments) >= 3
-            canMergeLastTwoSegments &= len(remainingIntermediateSegments) > 1
-
-        if not canMergeLastTwoSegments:
-            newSegments = [firstSegment, *remainingIntermediateSegments, lastSegment]
-        else:
-            self._removeFromScene(lastRemainingIntermediate, lastSegment)
-            newAllButLastSegments = remainingIntermediateSegments
-
-            newSegments = [firstSegment, *newAllButLastSegments]
-
-        return newSegments
-
-    def _removeUnnecessaryIntermediateSegmentsFromSceneAndGetRemaining(self) -> _tp.Sequence[_sib.SegmentItemBase]:
-        if self._isHorizontal():
-            assert len(self.segments) >= 3
-
-        intermediateSegments = self.segments[1:-1]
-        remainingIntermediateSegments = [intermediateSegments[0]]
-        for currentSegment in intermediateSegments[1:]:
-            previousSegment = remainingIntermediateSegments[-1]
-
-            if self._isTrulyVertical(previousSegment) or self._isTrulyVertical(currentSegment):
-                remainingIntermediateSegments.append(currentSegment)
-                continue
-
-            self._removeFromScene(previousSegment, segmentToDelete=currentSegment)
-
-        return remainingIntermediateSegments
-
-    @staticmethod
-    def _isTrulyVertical(segment: _sib.SegmentItemBase) -> bool:
-        return not segment.isZeroLength() and segment.isVertical()
-
-    @staticmethod
-    def _removeFromScene(previousSegment: _sib.SegmentItemBase, segmentToDelete: _sib.SegmentItemBase) -> None:
-        endPortOrCornerItem = _getPortOrCornerItem(segmentToDelete.endNode)
-
-        previousLine = previousSegment.line()
-        previousEndCorner = previousSegment.endNode.parent
-
-        newEndNode = segmentToDelete.endNode
-        previousSegment.setEndNode(newEndNode)
-
-        previousSegment.setLine(previousLine.p1(), endPortOrCornerItem.scenePos())
-
-        _cdelete.deleteGraphicsItem(previousEndCorner)
-        _cdelete.deleteChildGraphicsItems(segmentToDelete)
-
-    def _isHorizontal(self) -> bool:
-        return all(s.isHorizontal() for s in self.segments)
 
     def _recenterVerticalConnection(self) -> None:
         assert len(self.segments) == 3, "Can only recenter connections with three segments."
 
         intermediateSegment = self.segments[1]
-        midPoint = self.fromPort.scenePos() + 0.5 * (self.toPort.scenePos() - self.fromPort.scenePos())
+
+        fromPos = self.fromPort.scenePos()
+        toPos = self.toPort.scenePos()
+
+        midPoint = fromPos + 0.5 * (toPos - fromPos)  # type: ignore[operator]
+
         intermediateSegment.startNode.parent.setPos(midPoint)
         intermediateSegment.endNode.parent.setPos(midPoint)
+
+    def _isHorizontal(self):
+        return all(s.isHorizontal() for s in self.segments)
 
     def _assertSegmentsAreConsistent(self):
         if self._isHorizontal():
@@ -939,17 +886,3 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
 
         lastEndNode = endNode
         assert lastEndNode == lastSegment.endNode
-
-
-def _getPortOrCornerItem(node: _node.Node) -> _qtw.QGraphicsItem:
-    parent = node.parent
-
-    match parent:
-        case ConnectionBase() if node == parent.startNode:
-            return parent.fromPort
-        case ConnectionBase() if node == parent.endNode:
-            return parent.toPort
-        case _ci.CornerItem():
-            return parent
-        case _:
-            raise AssertionError("Shouldn't get here.")

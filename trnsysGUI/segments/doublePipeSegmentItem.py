@@ -6,7 +6,7 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.dialogs.connections.doublePipe as _dpcldlg
 
 from trnsysGUI.segments import _common
@@ -27,6 +27,8 @@ class DoublePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
 
     @property
     def _doublePipeConnection(self) -> _dpc.DoublePipeConnection:
+        assert isinstance(self.connection, _dpc.DoublePipeConnection)
+
         return self.connection
 
     def _getContextMenu(self) -> _qtw.QMenu:
