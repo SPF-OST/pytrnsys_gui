@@ -256,6 +256,8 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             if isinstance(segment.endNode.parent, _ci.CornerItem):
                 pos2 = segment.endNode.parent.scenePos().x(), segment.endNode.parent.scenePos().y()
 
+            assert pos1 and pos2
+
             segment.setLine(pos1[0], pos1[1], pos2[0], pos2[1])
 
         self.updateSegmentGradients()
@@ -877,7 +879,7 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
             assert endNode.prevN() == startNode
 
             if segment != lastSegment:
-                isinstance(endNode.parent, _ci.CornerItem)
+                assert isinstance(endNode.parent, _ci.CornerItem)
 
             assert segment.startNode == startNode
             assert segment.endNode == endNode

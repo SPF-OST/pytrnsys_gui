@@ -47,16 +47,16 @@ class Decoder(_json.JSONDecoder):
 
             resConnList = []
 
-            sorted_items = sorted(arr.items(), key=lambda t: t[0])
+            sortedItems = sorted(arr.items(), key=lambda t: t[0])
 
-            sorted_keys: _tp.Sequence[str]
-            sorted_values: _tp.Sequence[_tp.Mapping[str, _tp.Any]]
-            sorted_keys, sorted_values = zip(*sorted_items)
+            sortedKeys: _tp.Sequence[str]
+            sortedValues: _tp.Sequence[_tp.Mapping[str, _tp.Any]]
+            sortedKeys, sortedValues = zip(*sortedItems)
 
-            formatted_sorted_keys = ", ".join(sorted_keys)
-            self.logger.debug("keys are %s", formatted_sorted_keys)
+            formattedSortedKeys = ", ".join(sortedKeys)
+            self.logger.debug("keys are %s", formattedSortedKeys)
 
-            for i in sorted_values:
+            for i in sortedValues:
                 if type(i) is not dict:
                     continue
 
