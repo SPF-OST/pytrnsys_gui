@@ -28,14 +28,14 @@ from trnsysGUI.SaltTankCold import SaltTankCold
 from trnsysGUI.SaltTankHot import SaltTankHot
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock
 from trnsysGUI.TVentil import TVentil
-from trnsysGUI.WTap import WTap
-from trnsysGUI.WTap_main import WTap_main
+from trnsysGUI.pumpsAndTaps.tap import Tap
+from trnsysGUI.pumpsAndTaps.tapMains import TapMains
 from trnsysGUI.connection.connectors.connector import Connector
 from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.geotherm import Geotherm
-from trnsysGUI.pump import Pump
+from trnsysGUI.pumpsAndTaps.pump import Pump
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink
@@ -57,14 +57,14 @@ _BLOCK_ITEM_CASES = [
     ("Pump", Pump, "Pump7701"),
     ("Connector", Connector, "Conn7701"),
     ("Crystalizer", Crystalizer, "Cryt7701"),
-    ("WTap_main", WTap_main, "WtSp7701"),
+    ("WTap_main", TapMains, "WtSp7701"),
     ("Collector", Collector, "Coll7701"),
     ("Kollektor", Collector, "Coll7701"),
     ("HP", HeatPump, "HP7701"),
     ("IceStorage", IceStorage, "IceS7701"),
     ("PitStorage", PitStorage, "PitS7701"),
     ("Radiator", Radiator, "Rad7701"),
-    ("WTap", WTap, "WtTp7701"),
+    ("WTap", Tap, "WtTp7701"),
     ("GenericBlock", GenericBlock, "GBlk7701"),
     ("HPTwoHx", HeatPumpTwoHx, "HP7701"),
     ("HPDoubleDual", HPDoubleDual, "HPDD7701"),
@@ -163,7 +163,6 @@ class TestGetBlockItem:
             ],
         )
         editorMock.moveDirectPorts = True
-        editorMock.editorMode = 1
         editorMock.snapGrid = False
         editorMock.alignMode = False
 
@@ -175,6 +174,7 @@ class TestGetBlockItem:
         graphicsScene = _qtw.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
         editorMock.graphicalObj = []
+        editorMock.namesManager = None
 
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()

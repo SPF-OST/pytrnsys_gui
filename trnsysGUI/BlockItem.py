@@ -46,8 +46,8 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         if "loadedBlock" not in kwargs:
             self.editor.trnsysObj.append(self)
 
-        self.inputs: _tp.Sequence[_pib.PortItemBase] = []
-        self.outputs: _tp.Sequence[_pib.PortItemBase] = []
+        self.inputs: list[_pib.PortItemBase] = []
+        self.outputs: list[_pib.PortItemBase] = []
 
         self.path = None
 
@@ -158,8 +158,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
         if hasattr(self, "isTempering"):
             self.editor.showTVentilDlg(self)
-        elif self.name == "Pump":
-            self.editor.showPumpDlg(self)
         elif self.name in ("TeePiece", "WTap_main"):
             self.editor.showBlockDlg(self)
         elif self.name in ["SPCnr", "DPCnr", "DPTee"]:

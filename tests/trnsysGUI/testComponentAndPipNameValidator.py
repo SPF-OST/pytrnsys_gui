@@ -1,7 +1,10 @@
+import typing as _tp
+
 import pytest as _pt
 
 import pytrnsys.utils.result as _res
-import trnsysGUI.componentAndPipeNameValidator as _cpn
+import trnsysGUI.names.manager as _nm
+import trnsysGUI.idGenerator as _idgen
 
 _EXISTING_NAMES = ["SCnrA_QSnkA", "SCnrB_QSnkB", "SCnrC_QSnkC", "SCnrD_QSnkD"]
 _VALID_NAMES = [
@@ -36,11 +39,17 @@ _NAMES_AND_ERROR_MESSAGES = [
 _INVALID_NAMES = [n for n, _ in _NAMES_AND_ERROR_MESSAGES]
 
 
+class _DummyDdckFileOrDirNamesProvider(_nm.AbstractDdckDirFileOrDirNamesProvider):
+    @_tp.override
+    def hasFileOrDirName(self, name: str) -> bool:
+        raise AssertionError("Shouldn't get here")
+
+
 class TestComponentAndPipeNameValidator:
     @_pt.mark.parametrize(["newName", "expectedErrorMessage"], _NAMES_AND_ERROR_MESSAGES)
-    def testValidateNameInvalidNames(self, newName, expectedErrorMessage):
-        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES)
-        result = validator.validateName(newName)
+    def testValidateNameInvalidNames(self, newName: str, expectedErrorMessage: str) -> None:
+        validator = self._createManager()
+        result = validator.validateName(newName, checkDdckFolder=False)
 
         assert _res.isError(result)
 
@@ -48,8 +57,13 @@ class TestComponentAndPipeNameValidator:
         assert errorMessage == expectedErrorMessage
 
     @_pt.mark.parametrize("newName", _VALID_NAMES)
-    def testValidateNameValidNames(self, newName):
-        validator = _cpn.ComponentAndPipeNameValidator(_EXISTING_NAMES)
-        result = validator.validateName(newName)
+    def testValidateNameValidNames(self, newName: str) -> None:
+        validator = self._createManager()
+        result = validator.validateName(newName, checkDdckFolder=False)
 
         assert not _res.isError(result)
+
+    @staticmethod
+    def _createManager() -> _nm.NamesManager:
+        manager = _nm.NamesManager(_EXISTING_NAMES, _DummyDdckFileOrDirNamesProvider())
+        return manager

@@ -9,6 +9,7 @@ import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
 import pytrnsys.utils.log as _ulog
+import pytrnsys.utils.result as _res
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
@@ -16,12 +17,14 @@ import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
+import trnsysGUI.errors as _err
 from . import _testHelper as _th
 
 
 def getProjects() -> _tp.Iterable[_th.Project]:
     yield _th.Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
     yield _th.Project.createForExampleProject("icegrid")
+    yield _th.Project.createForExampleProject("solar_dhw_GUI")
 
     yield from getTestProjects()
 
@@ -116,7 +119,10 @@ class TestEditor:
             _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
         )
 
-        editor.exportDdckPlaceHolderValuesJsonFile()
+        result = editor.exportDdckPlaceHolderValuesJsonFile()
+
+        assert not _res.isError(result), _res.error(result).message
+
         helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
 
     def _exportAndTestDeckFile(self, mainWindow, testProject, helper, monkeypatch):
@@ -126,6 +132,12 @@ class TestEditor:
         monkeypatch.setattr(
             _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
         )
+
+        def dummyShowErrorMessageBox(errorMessage: str, title: str = "Error") -> None:
+            failMessage = f"{title}: {errorMessage}"
+            _pt.fail(failMessage)
+
+        monkeypatch.setattr(_err, _err.showErrorMessageBox.__name__, dummyShowErrorMessageBox)
 
         mainWindow.exportDck()
 
@@ -156,9 +168,9 @@ class TestEditor:
         mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
 
         convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
-        while convertedProjectFolderPath.exists():
+        if convertedProjectFolderPath.exists():
             _su.rmtree(convertedProjectFolderPath)
-            _time.sleep(0.5)
+            _time.sleep(1)
         _os.mkdir(convertedProjectFolderPath)
 
         mainWindow.copyContentsToNewFolder(convertedProjectFolderPath, helper.actualProjectFolderPath)
@@ -230,10 +242,7 @@ class TestEditor:
         valves = [o for o in blockItemsAndConnections if isinstance(o, _tv.TVentil)]
 
         for singlePipeConnection in singlePipeConnections:
-            firstSegment = singlePipeConnection.firstS
-            assert firstSegment
-
-            firstSegment.labelMass.setPlainText("")
+            singlePipeConnection.massFlowLabel.setPlainText("")
 
         for valve in valves:
             valve.posLabel.setPlainText("")
@@ -242,7 +251,7 @@ class TestEditor:
             mainWindow, massFlowRatesPrintFilePath, temperaturesPrintFilePath
         )
 
-        areAllMassFlowLabelsSet = all(s.firstS and s.firstS.labelMass.toPlainText() for s in singlePipeConnections)
+        areAllMassFlowLabelsSet = all(c.massFlowLabel.toPlainText() for c in singlePipeConnections)
         areAllValvePositionLabelsSet = all(v.posLabel.toPlainText() for v in valves)
         assert areAllMassFlowLabelsSet and areAllValvePositionLabelsSet
 

@@ -2,6 +2,7 @@
 # type: ignore
 
 import json
+import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
@@ -12,11 +13,11 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtWidgets as _qtw
-import math as _math
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
+import trnsysGUI.blockItems.names as _bnames
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
@@ -27,6 +28,10 @@ import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.names.create as _nc
+import trnsysGUI.names.manager as _nm
+import trnsysGUI.names.rename as _nr
+import trnsysGUI.names.undo as _nu
 import trnsysGUI.placeholders as _ph
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
@@ -38,12 +43,11 @@ from trnsysGUI.LibraryModel import LibraryModel
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
-from trnsysGUI.PumpDlg import PumpDlg
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
+from trnsysGUI.connection.addDoublePipeConnectionCommand import AddDoublePipeConnectionCommand
+from trnsysGUI.connection.addSinglePipeConnectionCommand import AddSinglePipeConnectionCommand
 from trnsysGUI.connection.connectionBase import ConnectionBase
-from trnsysGUI.connection.createDoublePipeConnectionCommand import CreateDoublePipeConnectionCommand
-from trnsysGUI.connection.createSinglePipeConnectionCommand import CreateSinglePipeConnectionCommand
 from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
 from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 from trnsysGUI.diagram.Decoder import Decoder
@@ -84,8 +88,6 @@ class Editor(_qtw.QWidget):
         self.alignMode = False
 
         self.moveDirectPorts = False
-
-        self.editorMode = 1
 
         # Related to the grid blocks can snap to
         self.snapGrid = False
@@ -136,6 +138,12 @@ class Editor(_qtw.QWidget):
         self._currentlyDraggedConnectionFromPort = None
         self.connectionList = []
         self.trnsysObj = []
+
+        ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
+        ddckDirFileOrDirNamesProvider = _nm.DdckDirFileOrDirNamesProvider(ddckDirPath)
+        existingNames = []
+        self.namesManager = _nm.NamesManager(existingNames, ddckDirFileOrDirNamesProvider)
+
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
@@ -229,8 +237,8 @@ class Editor(_qtw.QWidget):
             ("SPCnr", _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("DPCnr", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
             ("TVentil", _img.T_VENTIL_SVG.icon()),
-            ("WTap_main", _img.W_TAP_MAIN_SVG.icon()),
-            ("WTap", _img.W_TAP_SVG.icon()),
+            ("WTap_main", _img.TAP_MAINS_SVG.icon()),
+            (_bnames.TAP, _img.TAP_SVG.icon()),
             ("Pump", _img.PUMP_SVG.icon()),
             ("Collector", _img.COLLECTOR_SVG.icon()),
             ("GroundSourceHx", _img.GROUND_SOURCE_HX_SVG.icon()),
@@ -287,29 +295,6 @@ class Editor(_qtw.QWidget):
     def shutdown(self) -> None:
         self._consoleWidget.shutdown()
 
-    # Debug function
-    def dumpInformation(self):
-        self.logger.debug("Diagram information:")
-        self.logger.debug("Mode is " + str(self.editorMode))
-
-        self.logger.debug("Next ID is " + str(self.idGen.getID()))
-        self.logger.debug("Next cID is " + str(self.idGen.getConnID()))
-
-        self.logger.debug("TrnsysObjects are:")
-        for t in self.trnsysObj:
-            self.logger.debug(str(t))
-        self.logger.debug("")
-
-        self.logger.debug("Scene items are:")
-        sItems = self.diagramScene.items()
-        for it in sItems:
-            self.logger.info(str(it))
-        self.logger.debug("")
-
-        for c in self.connectionList:
-            c.printConn()
-        self.logger.debug("")
-
     # Connections related methods
     def startConnection(self, port):
         self._currentlyDraggedConnectionFromPort = port
@@ -328,14 +313,42 @@ class Editor(_qtw.QWidget):
             isValidSinglePipeConnection = isinstance(startPort, SinglePipePortItem) and isinstance(
                 endPort, SinglePipePortItem
             )
+            isValidDoublePipeConnection = isinstance(startPort, DoublePipePortItem) and isinstance(
+                endPort, DoublePipePortItem
+            )
+
             if isValidSinglePipeConnection:
-                command = CreateSinglePipeConnectionCommand(startPort, endPort, self)
-            elif isinstance(startPort, DoublePipePortItem) and isinstance(endPort, DoublePipePortItem):
-                command = CreateDoublePipeConnectionCommand(startPort, endPort, self)
+                command = self._createCreateSinglePipeConnectionCommand(startPort, endPort)
+            elif isValidDoublePipeConnection:
+                command = self._createCreateDoublePipeConnectionCommand(startPort, endPort)
             else:
                 raise AssertionError("Can only connect port items. Also, they have to be of the same type.")
 
             self.parent().undoStack.push(command)
+
+    def _createCreateSinglePipeConnectionCommand(
+        self, startPort: SinglePipePortItem, endPort: SinglePipePortItem
+    ) -> AddSinglePipeConnectionCommand:
+        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(startPort, endPort)
+        connection = SinglePipeConnection(displayName, startPort, endPort, self)
+        command = AddSinglePipeConnectionCommand(connection, undoNamingHelper, self)
+        return command
+
+    def _createCreateDoublePipeConnectionCommand(
+        self, startPort: DoublePipePortItem, endPort: DoublePipePortItem
+    ) -> AddDoublePipeConnectionCommand:
+        displayName, undoNamingHelper = self._createDisplayAndUndoNamingHelper(startPort, endPort)
+        connection = DoublePipeConnection(displayName, startPort, endPort, self)
+        command = AddDoublePipeConnectionCommand(connection, undoNamingHelper, self)
+        return command
+
+    def _createDisplayAndUndoNamingHelper(
+        self, startPort: PortItemBase, endPort: PortItemBase
+    ) -> _tp.Tuple[str, _nu.UndoNamingHelper]:
+        createNamingHelper = _nc.CreateNamingHelper(self.namesManager)
+        undoNamingHelper = _nu.UndoNamingHelper(self.namesManager, createNamingHelper)
+        displayName = _cnames.generateDefaultConnectionName(startPort, endPort, createNamingHelper)
+        return displayName, undoNamingHelper
 
     def sceneMouseMoveEvent(self, event):
         """
@@ -434,10 +447,6 @@ class Editor(_qtw.QWidget):
             i for i in hitItems if isinstance(i, PortItemBase) and type(i) == type(fromPort) and not i.connectionList
         ]
         return relevantPortItems
-
-    def cleanUpConnections(self):
-        for c in self.connectionList:
-            c.niceConn()
 
     def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
         assert exportTo in ["ddck", "mfs"]
@@ -725,7 +734,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             if isinstance(trnsysObject, BlockItem):
                 trnsysObject.deleteBlock()
             elif isinstance(trnsysObject, ConnectionBase):
-                trnsysObject.deleteConn()
+                trnsysObject.deleteConnection()
             else:
                 raise AssertionError(f"Don't know how to delete {trnsysObject}.")
 
@@ -826,6 +835,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         self._setHydraulicLoopsOnStorageTanks()
 
+        self._addNamesToNamesManager()
+
     def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
         if "hydraulicLoops" not in blocklist:
@@ -846,6 +857,10 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             storageTank = trnsysObject
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
+
+    def _addNamesToNamesManager(self) -> None:
+        for trnsysObject in self.trnsysObj:
+            self.namesManager.addName(trnsysObject.displayName)
 
     def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
         if not self._isHydraulicConnected():
@@ -1010,7 +1025,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def updateConnGrads(self):
         for t in self.trnsysObj:
             if isinstance(t, ConnectionBase):
-                t.updateSegGrads()
+                t.updateSegmentGradients()
 
     # Dialog calls
     def showBlockDlg(self, bl):
@@ -1018,9 +1033,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
     def showDoublePipeBlockDlg(self, bl):
         c = DoublePipeBlockDlg(bl, self)
-
-    def showPumpDlg(self, bl):
-        c = PumpDlg(bl, self)
 
     def showDiagramDlg(self):
         c = diagramDlg(self)
@@ -1032,8 +1044,8 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         c = hxDlg(hx, self)
 
     def showSegmentDlg(self, seg):
-        existingNames = [o.displayName for o in self.trnsysObj]
-        segmentDialog = SegmentDialog(seg.connection, existingNames)
+        renameHelper = _nr.RenameHelper(self.namesManager)
+        segmentDialog = SegmentDialog(seg.connection, renameHelper)
         segmentDialog.exec()
 
     def showTVentilDlg(self, bl):
@@ -1243,12 +1255,12 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         hydraulicLoop = self.hydraulicLoops.getLoopForExistingConnection(singlePipeConnection)
         _hledit.edit(hydraulicLoop, self.hydraulicLoops, self.fluids)
 
-        self._updateGradients(hydraulicLoop)
+        self._updateGradientsInHydraulicLoop(hydraulicLoop)
 
     @staticmethod
-    def _updateGradients(hydraulicLoop: _hlm.HydraulicLoop) -> None:
+    def _updateGradientsInHydraulicLoop(hydraulicLoop: _hlm.HydraulicLoop) -> None:
         for connection in hydraulicLoop.connections:
-            connection.updateSegGrads()
+            connection.updateSegmentGradients()
 
     def _getDdckDirNames(self) -> _tp.Sequence[str]:
         ddckDirPath = _pl.Path(self.projectFolder) / "ddck"

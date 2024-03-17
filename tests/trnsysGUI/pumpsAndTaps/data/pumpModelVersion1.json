@@ -1,0 +1,22 @@
+{
+  ".__BlockDict__": true,
+  "BlockDisplayName": "PuHpShCond",
+  "BlockName": "Pump",
+  "Id": 1617,
+  "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
+  "blockPosition": [
+    -820.0,
+    -289.0
+  ],
+  "flippedH": false,
+  "flippedV": false,
+  "massFlowRateInKgPerH": 500,
+  "portsIdsIn": [
+    1618
+  ],
+  "portsIdsOut": [
+    1619
+  ],
+  "rotationN": 0,
+  "trnsysId": 522
+}

@@ -20,6 +20,7 @@ import trnsysGUI.hydraulicLoops.names as _names
 import trnsysGUI.internalPiping as _pi
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.names.undo as _nu
 import trnsysGUI.segments.singlePipeSegmentItem as _spsi
 import trnsysGUI.singlePipePortItem as _sppi
 import trnsysGUI.temperatures as _temps
@@ -32,14 +33,13 @@ if _tp.TYPE_CHECKING:
 class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
+        displayName: str,
         fromPort: _sppi.SinglePipePortItem,
         toPort: _sppi.SinglePipePortItem,
         parent: _ed.Editor,  # type: ignore[name-defined]
     ):
         shallBeSimulated = True
-        super().__init__(fromPort, toPort, shallBeSimulated, _defaults.DEFAULT_LENGTH_IN_M, parent)
-
-        self._editor = parent
+        super().__init__(displayName, fromPort, toPort, shallBeSimulated, _defaults.DEFAULT_LENGTH_IN_M, parent)
 
         self.diameterInCm: _values.Value = _defaults.DEFAULT_DIAMETER_IN_CM
         self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
@@ -80,16 +80,28 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self._editor.editHydraulicLoop(self)
 
     def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
+        undoNamingHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
+
+        hydraulicLoopsData = _dspc.HydraulicLoopsData(
+            self._editor.hydraulicLoops,
+            self._editor.fluids.fluids,
+            self._editor.fluids.WATER,
+        )
+
         undoCommand = _dspc.DeleteSinglePipeConnectionCommand(
-            self, self._editor.hydraulicLoops, self._editor.fluids.fluids, self._editor.fluids.WATER, parentCommand
+            self,
+            undoNamingHelper,
+            hydraulicLoopsData,
+            self._editor.diagramScene,
+            parentCommand,
         )
 
         return undoCommand
 
     def encode(self):
         if len(self.segments) > 0:
-            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
+            labelPos = self._label.pos().x(), self._label.pos().y()
+            labelMassPos = self.massFlowLabel.pos().x(), self.massFlowLabel.pos().y()
         else:
             self.logger.debug("This connection has no segment")
             defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 2
@@ -138,7 +150,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.shallBeSimulated = model.shallBeSimulated
 
         if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
+            self._loadSegments(model.segmentsCorners)
 
     def getInternalPiping(self) -> _pi.InternalPiping:
         return _pi.InternalPiping(
@@ -267,5 +279,4 @@ EQUATIONS 5
 
     def setMassFlowAndTemperature(self, massFlow: float, temperature: float) -> None:
         label = _mfl.getFormattedMassFlowAndTemperature(massFlow, temperature)
-        for segment in self.segments:
-            segment.labelMass.setPlainText(label)
+        self.massFlowLabel.setPlainText(label)

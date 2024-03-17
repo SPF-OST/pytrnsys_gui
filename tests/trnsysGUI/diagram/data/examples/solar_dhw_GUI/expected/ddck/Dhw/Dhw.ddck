@@ -8,7 +8,7 @@
 
 *************************************
 ** To be checked: 
-** check cp and rho values for the cirquits 
+** check cp and rho values for the circuits 
 ** default is cpwat and rhowat, for solarcirc usually cpbri and rhobri have to be used 
 *************************************
 
@@ -17,52 +17,52 @@
 ** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
 *************************************
 EQUATIONS 3
-qSysOut_TesDhwLoss = sumQLoss_Tes1
-qSysOut_TesDhwAcum = sumQAcum_Tes1
-elSysIn_Q_TesDhwAux = qHeatSource_Tes1
+qSysOut_DhwLoss = QLoss_Tes1
+qSysOut_DhwAcum = QAcum_Tes1
+elSysIn_Q_DhwAux = qHeatSource_Tes1
 
 *************************************
 *** Inputs from hydraulic solver ****
 *************************************
 EQUATIONS 3
-Tdp1In_Tes1 = TPiTesDhwIn ! @connectDdck
-Mfrdp1_Tes1 = MfrPiTesDhwIn ! @connectDdck
-Tdp1InRev_Tes1 = TPiTesDhwOut ! @connectDdck
+Tdp1In_Tes1 = TPiTesDhwIn
+Mfrdp1_Tes1 = MDhwDpR1_99_A
+Tdp1InRev_Tes1 = TPiTesDhwOut
 EQUATIONS 3
-Thx1In_Tes1 = TPiColOut ! @connectDdck
-Mfrhx1_Tes1 = MfrPiColOut ! @connectDdck
-Thx1InRev_Tes1 = TPiTesToColl ! @connectDdck
+Thx1In_Tes1 = TPiColOut
+Mfrhx1_Tes1 = MDhwTesHx24_A
+Thx1InRev_Tes1 = TPiTesToCol
 CONSTANTS 2
-zAux1_Tes1=0.00 !connectDDck
-qAux1_Tes1=0.00 !connectDDck
+zAux1_Tes1=0.00
+qAux1_Tes1=0.00
 
 *************************************
 **** Outputs to hydraulic solver ****
 *************************************
 EQUATIONS 1
 *** direct port outputs
-Tdp1Out_Tes1=[50,1] ! 
+TDhwDpR1_99=[50,1]
 EQUATIONS 1
 *** heat exchanger outputs
-Thx1Out_Tes1=[50,102] ! 
+TDhwTesHx24=[50,102]
 
 *************************************
 ****** Parameters of Type1924 *******
 *************************************
 CONSTANTS 3
-TRoomStore=15 ! @userDefined
+TRoomStore=15 ! 
 VStoreRef = 0.763
-ratioTes = Vol_Tes1 / VStoreRef
+ratioTes1 = Vol_Tes1 / VStoreRef
 *********Connecting values of DIRECT PORT=1***********
 CONSTANTS 2
-zInDp1_Tes1=0.01 ! @connectDdck 
-zOutDp1_Tes1=0.99 ! @connectDdck 
+zInDp1_Tes1=0.01
+zOutDp1_Tes1=0.99
 *********Connecting values of HX=1***********
 CONSTANTS 4
-zInhx1_Tes1=0.40  ! @connectDdck
-zOuthx1_Tes1=0.13 ! @connectDdck
-Cphx1_Tes1=cpwat     ! @connectDdck
-Rhohx1_Tes1=rhowat    ! @connectDdck
+zInhx1_Tes1=0.40
+zOuthx1_Tes1=0.13
+Cphx1_Tes1=Lloop2Cp
+Rhohx1_Tes1=Lloop2Rho
 *********Constant of DIRECT PORT=1***********
 CONSTANTS 1
 Dp1Strat_Tes1=0 ! 0: no forced stratification ; 1: force to stratify
@@ -84,7 +84,7 @@ cNuHx1_Tes1=0.25 !  only if modHx1=1
 dUaMfrHx1_Tes1=0.375 ! only if modHx1=0
 dUadTHx1_Tes1=0.0 ! only if modHx1=0
 dUaTHx1_Tes1=0.458 ! only if modHx1=0
-UaHx1_Tes1=1105*ratioTes ! kJ/hK only if modHx1=0
+UaHx1_Tes1=1105*ratioTes1 ! kJ/hK only if modHx1=0
 startUpHx1_Tes1=0. ! only if modHx1=0
 *************************************
 ** USER DEFINED TEMPERATURE SENSOR HEIGHTS. To be changed by user 
@@ -133,11 +133,11 @@ Ubot_Tes1 = 1.5 ! W/(m2K) 2 cm of foam of 0.04 W/(mK)
 Atop_Tes1 = Vol_Tes1/Heigh_Tes1 ! m2
 Diameter_Tes1 = (4*ATop_Tes1/PI)^0.5 ! m 
 ALat_Tes1 = Heigh_Tes1*PI*Diameter_Tes1 ! m2
-UaBot_Tes1= Ubot_Tes1*ATop_Tes1 ! @userDefined W/k 
-Uaz1_Tes1 = Ufoam_Tes1*ALat_Tes1/3 ! @userDefined W/k
-Uaz2_Tes1 = Ufoam_Tes1*ALat_Tes1/3 ! @userDefined W/k
-Uaz3_Tes1 = Ufoam_Tes1*ALat_Tes1/3 ! @userDefined W/k
-UaTop_Tes1 = Ufoam_Tes1*ATop_Tes1 ! @userDefined W/k
+UaBot_Tes1= Ubot_Tes1*ATop_Tes1 !  W/k 
+Uaz1_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+Uaz2_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+Uaz3_Tes1 = Ufoam_Tes1*ALat_Tes1/3 !  W/k
+UaTop_Tes1 = Ufoam_Tes1*ATop_Tes1 !  W/k
 ************* MOVING PLATE *******************
 CONSTANTS 4
 MoInsPlate_Tes1=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside TES, 1 = insulation plate at fixed relative height, 2 = insulation plate at fixed temperature / density controlled 
@@ -265,11 +265,11 @@ Qhx1Out_Tes1=[50,104] !
 EQUATIONS 1
 qHeatSource_Tes1 = [50,181] ! Heat input of all auxiliary heat sources [kW]
 EQUATIONS 5
-sumQv_Tes1     = [50,176] ! Heat input of all heat exchangers [kW]
-sumQLoss_Tes1  = [50,177] ! Heat Losses of the Tes [kW]
-sumQAcum_Tes1  = [50,178] ! Sensible accumulated heat [kW]
-sumQPorts_Tes1 = [50,179] ! Heat Input by direct ports [kW]
-Imb_Tes1       = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
+Qv_Tes1     = [50,176] ! Heat input of all heat exchangers and auxiliary heat sources [kW]
+QLoss_Tes1  = [50,177] ! Heat Losses of the Tes [kW]
+QAcum_Tes1  = [50,178] ! Sensible accumulated heat [kW]
+QPorts_Tes1 = [50,179] ! Heat Input by direct ports [kW]
+QImb_Tes1   = [50,64]  ! Heat Imbalance in Tes  IMB = sumQv - sumQLoss -sumQAcum + sumQPort
 CONSTANTS 1 
 unitPrinter_Tes1 = 51 
 ASSIGN temp\TES1_MO.Prt unitPrinter_Tes1
@@ -281,7 +281,7 @@ unitPrinter_Tes1 ! 1: Logical unit number, -
 -1  ! 4: Printing & integrating interval, h. -1 for monthly integration
 0  ! 5: Number of inputs to avoid integration
 INPUTS 8
-sumQv_Tes1 sumQLoss_Tes1 sumQAcum_Tes1 sumQPorts_Tes1 Imb_Tes1 Qdp1_Tes1 Qhx1Out_Tes1 qHeatSource_Tes1 
+Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qhx1Out_Tes1 qHeatSource_Tes1 
 zero zero zero zero zero zero zero zero 
 *************************************
 ********** Online Plotter ***********
@@ -307,6 +307,6 @@ T1_Tes1 T2_Tes1 T3_Tes1 T4_Tes1 T5_Tes1 T6_Tes1 T7_Tes1 T8_Tes1 T9_Tes1 T10_Tes1
 LABELS  3         
 Temperatures  
 MassFlows  
-Tes%d 
+Tes1
 
 

@@ -1,30 +1,33 @@
 # pylint: skip-file
 # type: ignore
 
-import json
-import typing as tp
+import json as _json
+import typing as _tp
 
 import trnsysGUI.blockItems.getBlockItem as _gbi
+import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.connection.undo as _cundo
+import trnsysGUI.doublePipePortItem as _dbi
+import trnsysGUI.singlePipePortItem as _spi
 
-from trnsysGUI.doublePipePortItem import DoublePipePortItem
-from trnsysGUI.singlePipePortItem import SinglePipePortItem
-from trnsysGUI.connection.doublePipeConnection import DoublePipeConnection
-from trnsysGUI.connection.singlePipeConnection import SinglePipeConnection
 
-
-class Decoder(json.JSONDecoder):
+class Decoder(_json.JSONDecoder):
     """
     Decodes the diagram
     """
+
+    _UNSET_ERROR_NAME = "ERROR_NAME_NOT_SET_IN_DECODE"
 
     def __init__(self, *args, **kwargs):
 
         self.editor = kwargs["editor"]
         self.logger = self.editor.logger
         kwargs.pop("editor")
-        json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
+        _json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
-    def object_hook(self, arr: tp.Mapping[str, tp.Mapping[str, tp.Any]]) -> tp.Any:
+    def object_hook(self, arr: _tp.Mapping[str, _tp.Mapping[str, _tp.Any]]) -> _tp.Any:
         """
         This is the decoding function. object_hook seems to get executed for every sub dictionary in the json file.
         By looking for the specific key containing the name of dict elements, one can extract the needed dict.
@@ -44,16 +47,16 @@ class Decoder(json.JSONDecoder):
 
             resConnList = []
 
-            sorted_items = sorted(arr.items(), key=lambda t: t[0])
+            sortedItems = sorted(arr.items(), key=lambda t: t[0])
 
-            sorted_keys: tp.Sequence[str]
-            sorted_values: tp.Sequence[tp.Mapping[str, tp.Any]]
-            sorted_keys, sorted_values = zip(*sorted_items)
+            sortedKeys: _tp.Sequence[str]
+            sortedValues: _tp.Sequence[_tp.Mapping[str, _tp.Any]]
+            sortedKeys, sortedValues = zip(*sortedItems)
 
-            formatted_sorted_keys = ", ".join(sorted_keys)
-            self.logger.debug("keys are %s", formatted_sorted_keys)
+            formattedSortedKeys = ", ".join(sortedKeys)
+            self.logger.debug("keys are %s", formattedSortedKeys)
 
-            for i in sorted_values:
+            for i in sortedValues:
                 if type(i) is not dict:
                     continue
 
@@ -87,20 +90,27 @@ class Decoder(json.JSONDecoder):
                             if p.id == toPortId:
                                 toPort = p
 
-                    if fromPort is None:
-                        self.logger.debug("Error: Did not found a fromPort")
+                    connection: _cb.ConnectionBase
+                    match (fromPort, toPort):
+                        case (None, _):
+                            raise AssertionError("Couldn't find from port.")
+                        case (_, None):
+                            raise AssertionError("Couldn't find to port.")
+                        case (_spi.SinglePipePortItem(), _spi.SinglePipePortItem()):
+                            connection = _spc.SinglePipeConnection(
+                                self._UNSET_ERROR_NAME, fromPort, toPort, self.editor
+                            )
+                        case (_dbi.DoublePipePortItem(), _dbi.DoublePipePortItem()):
+                            connection = _dpc.DoublePipeConnection(
+                                self._UNSET_ERROR_NAME, fromPort, toPort, self.editor
+                            )
+                        case _:
+                            raise AssertionError("`fromPort' and `toPort' have different types.")
 
-                    if toPort is None:
-                        self.logger.debug("Error: Did not found a toPort")
-
-                    if isinstance(fromPort, SinglePipePortItem) and isinstance(toPort, SinglePipePortItem):
-                        c = SinglePipeConnection(fromPort, toPort, self.editor)
-                    elif isinstance(fromPort, DoublePipePortItem) and isinstance(toPort, DoublePipePortItem):
-                        c = DoublePipeConnection(fromPort, toPort, self.editor)
-                    else:
-                        raise AssertionError("`fromPort' and `toPort' have different types.")
-                    c.decode(i)
-                    resConnList.append(c)
+                    connection.decode(i)
+                    _cundo.reAddConnection(connection)
+                    self.editor.diagramScene.addItem(connection)
+                    resConnList.append(connection)
 
                 elif "__idDct__" in i:
                     resBlockList.append(i)

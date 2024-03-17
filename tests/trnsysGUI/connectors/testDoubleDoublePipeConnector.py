@@ -139,7 +139,6 @@ class TestDoubleDoublePipeConnector:
             ],
         )
         editorMock.moveDirectPorts = True
-        editorMock.editorMode = 1
         editorMock.snapGrid = False
         editorMock.alignMode = False
 

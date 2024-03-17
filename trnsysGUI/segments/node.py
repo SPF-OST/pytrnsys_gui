@@ -1,8 +1,4 @@
-# pylint: skip-file
-# type: ignore
-
-
-class Node(object):
+class Node:
     def __init__(self, parent=None, prevNode=None, nextNode=None):
         """
         Nodes
@@ -22,10 +18,10 @@ class Node(object):
         self.nextNode = nextNode
         self.parent = parent
 
-    def nextN(self):
+    def nextN(self) -> "Node":
         return self.nextNode
 
-    def prevN(self):
+    def prevN(self) -> "Node":
         return self.prevNode
 
     def setPrev(self, prevNode):

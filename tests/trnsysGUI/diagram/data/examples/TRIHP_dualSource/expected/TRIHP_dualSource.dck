@@ -71,9 +71,10 @@ HpIsOn = OR(BoHpWWon,BoHpSHon) ! HP is on
 qAuxStoreDHW_KW = 0 ! No internal heat source dhw storage
 qAuxStoreSH_KW = 0 ! No internal heat source sh storage
 BoDHWTapping = GT(MfrDHWset,0) ! Bo DHW water tapped in this timestep
-EQUATIONS 7
+EQUATIONS 8
 MfrPuSH = MfrBuiRd				! Mfr control pump SH-loop
-MfrsupplyWater = MfrDHWset		! Mfr tapping water
+MfrtapWater = MfrDHWset		    ! Mfr tapping water
+MfrsupplyWater = MfrtapWater
 MfrPuDHW = MfrSrcDHWHXUsed*BoDHWTapping+NOT(BoDHWTapping)*MfrSrcDHWHXUsed	! Mfr DHW water external heat exchanger source side
 MfrPuCirc = NOT(BoDHWTapping)*150	! Mfr circulation loop
 MfrPuHpEvap = MfrHpEvapNom*hpIsOn+MfrPuSH*CoolingOn	! Mfr control pump ground source loop
@@ -1097,7 +1098,7 @@ mfrTolSwitchThreshold
 41 71 0 0      !1 : RadiatorSH
 69 41 0 1      !2 : PuSH
 71 72 40 3     !3 : DivSh
-38 0 0 5       !4 : tapWater
+38 0 0 4       !4 : tapWater
 63 0 0 4       !5 : supplyWater
 76 80 79 3     !6 : DivHpEvap
 78 77 79 2     !7 : TeeHpEvap
@@ -1183,7 +1184,7 @@ mfrTolSwitchThreshold
 54 31 0 0      !87 : PiHpCondOut
 29 54 0 0      !88 : PiHpCondIn
 INPUTS 88! for Type 9351
-0,0 MfrPuSH xFracDivSh 0,0 MfrsupplyWater xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
+0,0 MfrPuSH xFracDivSh MfrtapWater MfrsupplyWater xFracDivHpEvap 0,0 xFracDivCondTOTesDhw 0,0 0,0 
 xFracDivSHCool 0,0 0,0 0,0 MfrPuHpEvap MfrPuHpShCond 0,0 0,0 0,0 0,0 0,0 
 xFracDivDhw 0,0 xFracDivDhwOut xFracDivCool 0,0 MfrPuHpDhwCond 0,0 0,0 xFracDivTesDhwOut xFracDivHp 
 MfrPuDhw 0,0 0,0 MfrPuCirc 0,0 0,0 0,0 0,0 0,0 0,0 

@@ -61,7 +61,7 @@ class Scene(_qtw.QGraphicsScene):
 
         if event.key() == Qt.Key_Delete:
             trnsysObjects = self._editor.trnsysObj
-            selectedObjects = [o for o in trnsysObjects if o.isSelected]
+            selectedObjects = [o for o in trnsysObjects if self._isSelected(o)]
 
             if not selectedObjects:
                 return
@@ -74,6 +74,10 @@ class Scene(_qtw.QGraphicsScene):
                 selectedObject.createDeleteUndoCommandAndAddToStack()
             if isinstance(selectedObject, BlockItem):
                 selectedObject.deleteBlockCom()
+
+    @staticmethod
+    def _isSelected(o):
+        return o.isConnectionSelected if isinstance(o, ConnectionBase) else o.isSelected
 
     def mousePressEvent(self, event):
         for connection in self._editor.connectionList:

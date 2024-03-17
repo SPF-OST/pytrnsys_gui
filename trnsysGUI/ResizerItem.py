@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 class ResizerItem(QGraphicsEllipseItem):
     def __init__(self, parent):
-        QGraphicsEllipseItem.__init__(self, QRectF(-4, -4, 8, 8), parent)
+        super().__init__(-4, -4, 8, 8, parent)
         self.parent = parent
         self.setPos(self.parent.w, self.parent.h)
         self.setBrush(Qt.transparent)

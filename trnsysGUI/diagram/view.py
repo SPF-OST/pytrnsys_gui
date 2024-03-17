@@ -6,8 +6,9 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-from trnsysGUI.deleteBlockCommand import DeleteBlockCommand
-from trnsysGUI.blockItems.getBlockItem import getBlockItem
+import trnsysGUI.blockItems.getBlockItem as _gbi
+import trnsysGUI.deleteBlockCommand as _dbc
+import trnsysGUI.names.undo as _nu
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -41,7 +42,7 @@ class View(_qtw.QGraphicsView):
         if event.mimeData().hasFormat("component/name"):
             componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
             self.logger.debug("name is " + componentType)
-            blockItem = getBlockItem(componentType, self._editor)
+            blockItem = _gbi.getBlockItem(componentType, self._editor)
             if componentType == "StorageTank":
                 blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
                 self._editor.showConfigStorageDlg(blockItem)
@@ -75,5 +76,6 @@ class View(_qtw.QGraphicsView):
                 self.scale(0.8, 0.8)
 
     def deleteBlockCom(self, blockItem):
-        command = DeleteBlockCommand(blockItem, self._editor)
+        undoNamesHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
+        command = _dbc.DeleteBlockCommand(blockItem, self._editor, undoNamesHelper)
         self._editor.parent().undoStack.push(command)

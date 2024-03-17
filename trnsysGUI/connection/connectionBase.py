@@ -9,14 +9,19 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.CornerItem as _ci
-import trnsysGUI.segments.Node as _node
+import trnsysGUI.cornerItem as _ci
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.connection.delete as _cdel
 import trnsysGUI.connection.values as _values
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.segments.node as _node
+import trnsysGUI.segments.segmentItemBase as _sib
+from . import _clean
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.diagram.Editor as _ed
 
 
 def calcDist(p1, p2):  # pylint: disable = invalid-name
@@ -25,16 +30,19 @@ def calcDist(p1, p2):  # pylint: disable = invalid-name
     return norm
 
 
-class ConnectionBase(_ip.HasInternalPiping):
+class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(
         self,
+        displayName: str,
         fromPort: _pib.PortItemBase,
         toPort: _pib.PortItemBase,
         shallBeSimulated: bool,
         lengthInMeters: _values.Value,
-        parent,
-    ):
+        parent: _ed.Editor,  # type: ignore[name-defined]
+    ) -> None:
+        super().__init__(parent=None)
+
         assert isinstance(fromPort.parent, _ip.HasInternalPiping) and isinstance(toPort.parent, _ip.HasInternalPiping)
 
         self.logger = parent.logger
@@ -45,9 +53,10 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.shallBeSimulated = shallBeSimulated
         self.lengthInM = lengthInMeters
 
-        self.displayName = ""
+        self.displayName = displayName
 
         self.parent = parent
+        self._editor = parent
 
         # Global
         self.id = self.parent.idGen.getID()  # pylint: disable = invalid-name
@@ -56,15 +65,33 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         self.segments: _tp.List[_sib.SegmentItemBase] = []  # type: ignore[name-defined]
 
-        self.isSelected = False
+        self.isConnectionSelected = False
 
-        self.startNode = _node.Node()  # type: ignore[attr-defined]
-        self.endNode = _node.Node()  # type: ignore[attr-defined]
-        self.firstS: _tp.Optional[_sib.SegmentItemBase] = None  # type: ignore[name-defined]
+        self.startNode = _node.Node(self)  # type: ignore[attr-defined]
+        self.endNode = _node.Node(self)  # type: ignore[attr-defined]
+
+        self._label = _qtw.QGraphicsTextItem(self.displayName, parent=self)
+        self._label.setVisible(False)
+        self._label.setFlag(self.ItemIsMovable, True)
+
+        self.massFlowLabel = _qtw.QGraphicsTextItem(parent=self)
+        self.massFlowLabel.setVisible(False)
+        self.massFlowLabel.setFlag(self.ItemIsMovable, True)
 
         self.startPos = None
 
+        self._draggedSegment: _tp.Optional[_sib.SegmentItemBase] = None
+
         self.initNew(parent)
+
+    def boundingRect(self) -> _qtc.QRectF:
+        return self.childrenBoundingRect()
+
+    def paint(
+        self, painter: _qtg.QPainter, option: _qtw.QStyleOptionGraphicsItem, widget: _tp.Optional[_qtw.QWidget] = None
+    ) -> None:
+        for child in self.childItems():
+            child.paint(painter, option, widget)
 
     def getDisplayName(self) -> str:
         return self.displayName
@@ -102,40 +129,21 @@ class ConnectionBase(_ip.HasInternalPiping):
 
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
-        self.updateSegLabels()
+        self._label.setPlainText(self.displayName)
         self._updateModels(newName)
 
     def setLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
-
-        assert self.firstS
-
-        self.firstS.label.setPos(pos)
+        self._label.setPos(pos)
 
     def setMassLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)
-
-        assert self.firstS
-
-        self.firstS.labelMass.setPos(pos)
+        self.massFlowLabel.setPos(pos)
 
     @staticmethod
     def _toPoint(tup):
         pos = _qtc.QPointF(tup[0], tup[1])
         return pos
-
-    def setStartPort(self, newStartPort):
-        self._fromPort = newStartPort
-        self.startPos = newStartPort.scenePos()
-
-    def setEndPort(self, newEndPort):
-        self._toPort = newEndPort
-
-    def setStartPos(self):
-        pass
-
-    def setEndPos(self):
-        pass
 
     def setColor(self, value, **kwargs):
         if "mfr" in kwargs:
@@ -169,22 +177,18 @@ class ConnectionBase(_ip.HasInternalPiping):
     def getStartPoint(self):
         return _qtc.QPointF(self.fromPort.scenePos())
 
-    def getEndPoint(self):
-        return _qtc.QPointF(self.toPort.scenePos())
+    def getPreviousAndNextSegment(
+        self, intermediateNode: _node.Node
+    ) -> _tp.Tuple[_sib.SegmentItemBase, _sib.SegmentItemBase]:
+        previousSegment: _sib.SegmentItemBase
+        nextSegment: _sib.SegmentItemBase
 
-    def getNodePos(self, searchCorner):
+        previousAndNextSegments = zip(self.segments[:-1], self.segments[1:], strict=True)
+        for previousSegment, nextSegment in previousAndNextSegments:
+            if previousSegment.endNode == intermediateNode and nextSegment.startNode == intermediateNode:
+                return previousSegment, nextSegment
 
-        corners = self.getCorners()
-
-        for i, corner in enumerate(corners):
-            if corner == searchCorner:
-                return i
-        self.logger.debug("corner not found is " + str(searchCorner))
-
-        return 0
-
-    def getFirstSeg(self):
-        return self.segments[0]
+        raise ValueError("Node is not an intermediate node of connection.")
 
     def getCorners(self):
         res = []
@@ -197,69 +201,20 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         return res
 
-    def switchPorts(self):
-        temp = self.fromPort
-        self._fromPort = self.toPort
-        self._toPort = temp
-
     # Initialization
     def initNew(self, parent):
 
         self.parent = parent
 
-        self.parent.trnsysObj.append(self)
+        self._initializeSegments()
 
-        self.displayName = self.fromPort.parent.displayName + "_" + self.toPort.parent.displayName
-
-        if self.parent.editorMode == 0:
-            self.logger.debug("Creating a new connection in mode 0")
-            self._initSegmentM0()
-        elif self.parent.editorMode == 1:
-            self.logger.debug("Creating a new connection in mode 1")
-            self._initializeSingleSegmentConnection()
-        else:
-            self.logger.debug("No valid mode during creating of connection")
-
-        self.parent.connectionList.append(self)
-        self.fromPort.connectionList.append(self)
-        self.toPort.connectionList.append(self)
-
-    def _initSegmentM0(self):
-        self.startNode.setParent(self)
-        self.endNode.setParent(self)
-
-        self.startNode.setNext(self.endNode)
-        self.endNode.setPrev(self.startNode)
-
-        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
-
-        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
-
-        self.parent.diagramScene.addItem(self.firstS)
-
+    def _initializeSegments(self):
+        self._createSegments()
+        self.updateSegmentGradients()
         self.positionLabel()
 
-    def _initializeSingleSegmentConnection(self):
-        # Can be rewritten for efficiency etc. (e.g not doing initSegmentM0 and calling niceConn())
-
-        self.startNode.setParent(self)
-        self.endNode.setParent(self)
-
-        self.startNode.setNext(self.endNode)
-        self.endNode.setPrev(self.startNode)
-
-        self.firstS = self._createSegmentItem(self.startNode, self.endNode)
-
-        self.firstS.setLine(self.getStartPoint(), self.getEndPoint())
-
-        self.parent.diagramScene.addItem(self.firstS)
-
-        self.niceConn()
-
-        self.positionLabel()
-
-    def loadSegments(self, segmentsCorners):
-        self.clearConn()
+    def _loadSegments(self, segmentsCorners):
+        self._clearConnection()
 
         tempNode = self.startNode
 
@@ -274,104 +229,70 @@ class ConnectionBase(_ip.HasInternalPiping):
             cor.setZValue(100)
             cor.setVisible(True)
 
-            self.parent.diagramScene.addItem(cor)
-
             cor.node.nextNode.setPrev(cor.node)
             cor.node.prevNode.setNext(cor.node)
             self._createSegmentItem(tempNode, cor.node)
 
             tempNode = cor.node
 
-            self.printConn()
-
         self._createSegmentItem(tempNode, tempNode.nextN())
 
-        self.printConn()
-
-        for s in self.segments:  # pylint: disable = invalid-name
+        for segment in self.segments:  # pylint: disable = invalid-name
             pos1 = None
             pos2 = None
 
-            if isinstance(s.startNode.parent, ConnectionBase) and s.startNode.prevNode is None:
-                pos1 = s.startNode.parent.fromPort.scenePos().x(), s.startNode.parent.fromPort.scenePos().y()
-            if isinstance(s.endNode.parent, ConnectionBase) and s.endNode.nextNode is None:
-                pos2 = s.endNode.parent.toPort.scenePos().x(), s.endNode.parent.toPort.scenePos().y()
-
-            if isinstance(s.startNode.parent, _ci.CornerItem):
-                self.logger.debug(
-                    str(s.startNode.parent) + " " + str(s.startNode) + "cor " + str(s.startNode.parent.scenePos())
+            if isinstance(segment.startNode.parent, ConnectionBase) and segment.startNode.prevNode is None:
+                pos1 = (
+                    segment.startNode.parent.fromPort.scenePos().x(),
+                    segment.startNode.parent.fromPort.scenePos().y(),
                 )
-                pos1 = s.startNode.parent.scenePos().x(), s.startNode.parent.scenePos().y()
-            if isinstance(s.endNode.parent, _ci.CornerItem):
-                pos2 = s.endNode.parent.scenePos().x(), s.endNode.parent.scenePos().y()
+            if isinstance(segment.endNode.parent, ConnectionBase) and segment.endNode.nextNode is None:
+                pos2 = segment.endNode.parent.toPort.scenePos().x(), segment.endNode.parent.toPort.scenePos().y()
 
-            self.logger.debug("pos1 is " + str(pos1))
-            self.logger.debug("pos2 is " + str(pos2))
-            s.setLine(pos1[0], pos1[1], pos2[0], pos2[1])
+            if isinstance(segment.startNode.parent, _ci.CornerItem):
+                pos1 = segment.startNode.parent.scenePos().x(), segment.startNode.parent.scenePos().y()
+            if isinstance(segment.endNode.parent, _ci.CornerItem):
+                pos2 = segment.endNode.parent.scenePos().x(), segment.endNode.parent.scenePos().y()
 
-            self.parent.diagramScene.addItem(s)
+            assert pos1 and pos2
 
-        self.firstS = self.segments[0]
+            segment.setLine(pos1[0], pos1[1], pos2[0], pos2[1])  # /NOSONAR
 
-        self.positionLabel()
+        self.updateSegmentGradients()
+        self.rotateLabel()
 
     # Label related
     def setLabelVisible(self, isVisible: bool) -> None:
-        assert self.firstS
-        self.firstS.setLabelVisible(isVisible)
+        self._label.setVisible(isVisible)
 
     def toggleLabelVisible(self) -> None:
-        assert self.firstS
-        self.firstS.toggleLabelVisible()
-
-    def updateSegLabels(self):
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.label.setPlainText(self.displayName)
+        wasVisible = self._label.isVisible()
+        self._label.setVisible(not wasVisible)
 
     def positionLabel(self):
-        self.firstS.label.setPos(self.getStartPoint())
-        self.firstS.labelMass.setPos(self.getStartPoint())
+        self._label.setPos(self.getStartPoint())
+        self.massFlowLabel.setPos(self.getStartPoint())
         self.rotateLabel()
 
     def rotateLabel(self):
-        angle = 0 if self.firstS.isHorizontal() else 90
-        self.firstS.label.setRotation(angle)
-
-    def setMassFlowLabelVisible(self, isVisible: bool) -> None:
-        assert self.firstS
-        self.firstS.setMassFlowLabelVisible(isVisible)
+        angle = 0 if self.segments[0].isHorizontal() else 90
+        self._label.setRotation(angle)
 
     def toggleMassFlowLabelVisible(self) -> None:
-        assert self.firstS
-        self.firstS.toggleMassFlowLabelVisible()
+        wasVisible = self.massFlowLabel.isVisible()
+        self.massFlowLabel.setVisible(not wasVisible)
 
     def getRadius(self):
         raise NotImplementedError()
 
     # Makes 90deg angles of connection
-    def niceConn(self):  # pylint: disable = too-many-locals, too-many-statements
-        """
-        Creates the segments and corners depending on the side of the fromPort and toPort
-        Returns
-        -------
-
-        """
-        # Here different cases can be implemented using self.PORT.side as sketched on paper
+    def _createSegments(self):  # pylint: disable = too-many-locals, too-many-statements
         rad = self.getRadius()
-
-        self.logger.debug(
-            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
-        )
-        self.logger.debug(
-            "FPort " + str(self.fromPort) + " has side " + str(self.fromPort.side) + " has " + str(self.fromPort.name)
-        )
 
         if (self.fromPort.side == 2) and (self.toPort.side == 2):
             self.fromPort.createdAtSide = 2
             self.toPort.createdAtSide = 2
-            self.logger.debug("NiceConn 2 to 2")
             portOffset = 30
-            self.clearConn()
 
             corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
             corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
@@ -390,17 +311,6 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
-
-            self.parent.diagramScene.addItem(seg1)
-            self.parent.diagramScene.addItem(seg2)
-            self.parent.diagramScene.addItem(seg3)
-            self.parent.diagramScene.addItem(seg4)
-            self.parent.diagramScene.addItem(seg5)
-
-            self.parent.diagramScene.addItem(corner1)
-            self.parent.diagramScene.addItem(corner2)
-            self.parent.diagramScene.addItem(corner3)
-            self.parent.diagramScene.addItem(corner4)
 
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
@@ -436,9 +346,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         elif (self.fromPort.side == 0) and (self.toPort.side == 0):
             self.fromPort.createdAtSide = 0
             self.toPort.createdAtSide = 0
-            self.logger.debug("NiceConn 0 to 0")
             portOffset = 30
-            self.clearConn()
 
             corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
             corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, None, self)
@@ -457,17 +365,6 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner4.node)
-
-            self.parent.diagramScene.addItem(seg1)
-            self.parent.diagramScene.addItem(seg2)
-            self.parent.diagramScene.addItem(seg3)
-            self.parent.diagramScene.addItem(seg4)
-            self.parent.diagramScene.addItem(seg5)
-
-            self.parent.diagramScene.addItem(corner1)
-            self.parent.diagramScene.addItem(corner2)
-            self.parent.diagramScene.addItem(corner3)
-            self.parent.diagramScene.addItem(corner4)
 
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
@@ -505,10 +402,6 @@ class ConnectionBase(_ip.HasInternalPiping):
             # pylint: disable = fixme
             # todo :  when rotated, it cause a problem because side gets changed
 
-            self.logger.debug("NiceConn from 1")
-            portOffset = 30
-            self.clearConn()
-
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
 
@@ -520,10 +413,6 @@ class ConnectionBase(_ip.HasInternalPiping):
 
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
-
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(corner1)
 
                 # position of the connecting node
                 p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
@@ -537,10 +426,7 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.toPort.setZValue(100)
 
                 corner1.setPos(p1)
-                self.firstS = self.getFirstSeg()
-
             else:
-                self.logger.debug("To port below from port")
                 corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
                 corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
@@ -553,13 +439,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(seg3)
-
-                self.parent.diagramScene.addItem(corner1)
-                self.parent.diagramScene.addItem(corner2)
-
                 offsetPoint = pos1.y() - 15.666
 
                 helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
@@ -569,7 +448,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                 seg2.setLine(helperPoint1, helperPoint2)
                 seg3.setLine(helperPoint2, pos2)
 
-                self.printConnNodes()
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
 
@@ -580,14 +458,9 @@ class ConnectionBase(_ip.HasInternalPiping):
 
                 corner1.setPos(helperPoint1)
                 corner2.setPos(helperPoint2)
-                self.firstS = self.getFirstSeg()
 
         elif self.fromPort.side == 3:
             self.fromPort.createdAtSide = 3
-
-            self.logger.debug("NiceConn from 1")
-            portOffset = 30
-            self.clearConn()
 
             pos1 = self.fromPort.scenePos()
             pos2 = self.toPort.scenePos()
@@ -601,10 +474,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner1.node)
 
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(corner1)
-
                 # position of the connecting node
                 p1 = _qtc.QPointF(pos1.x(), pos2.y() - 0.333)  # pylint: disable = invalid-name
 
@@ -617,9 +486,7 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.toPort.setZValue(100)
 
                 corner1.setPos(p1)
-                self.firstS = self.getFirstSeg()
             else:
-                self.logger.debug("To port above from port")
                 corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
                 corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
 
@@ -632,13 +499,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                 self.startNode.setNext(corner1.node)
                 self.endNode.setPrev(corner2.node)
 
-                self.parent.diagramScene.addItem(seg1)
-                self.parent.diagramScene.addItem(seg2)
-                self.parent.diagramScene.addItem(seg3)
-
-                self.parent.diagramScene.addItem(corner1)
-                self.parent.diagramScene.addItem(corner2)
-
                 offsetPoint = pos1.y() + 15.666
 
                 helperPoint1 = _qtc.QPointF(pos1.x(), offsetPoint)  # pylint: disable = invalid-name
@@ -648,8 +508,6 @@ class ConnectionBase(_ip.HasInternalPiping):
                 seg2.setLine(helperPoint1, helperPoint2)
                 seg3.setLine(helperPoint2, pos2)
 
-                self.printConnNodes()
-
                 corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
                 corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
 
@@ -657,11 +515,9 @@ class ConnectionBase(_ip.HasInternalPiping):
                 corner2.setZValue(100)
                 self.fromPort.setZValue(100)
                 self.toPort.setZValue(100)
-                self.logger.debug("Here in niceconn")
 
                 corner1.setPos(helperPoint1)
                 corner2.setPos(helperPoint2)
-                self.firstS = self.getFirstSeg()
 
         else:
             pos1 = self.fromPort.scenePos()
@@ -669,8 +525,6 @@ class ConnectionBase(_ip.HasInternalPiping):
 
             self.fromPort.createdAtSide = self.fromPort.side
             self.toPort.createdAtSide = self.toPort.side
-            self.logger.debug("Ports are directed to each other")
-            self.clearConn()
 
             corner1 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, self.startNode, None, self)
             corner2 = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, corner1.node, self.endNode, self)
@@ -684,19 +538,11 @@ class ConnectionBase(_ip.HasInternalPiping):
             self.startNode.setNext(corner1.node)
             self.endNode.setPrev(corner2.node)
 
-            self.parent.diagramScene.addItem(seg1)
-            self.parent.diagramScene.addItem(seg2)
-            self.parent.diagramScene.addItem(seg3)
-
-            self.parent.diagramScene.addItem(corner1)
-            self.parent.diagramScene.addItem(corner2)
-
             midx = pos1.x() + 0.5 * (pos2.x() - pos1.x())
 
             seg1.setLine(pos1.x(), pos1.y(), midx, pos1.y())
             seg2.setLine(midx, pos1.y(), midx, pos2.y())
             seg3.setLine(midx, pos2.y(), pos2.x(), pos2.y())
-            self.printConnNodes()
 
             corner1.setFlag(corner1.ItemSendsScenePositionChanges, True)
             corner2.setFlag(corner2.ItemSendsScenePositionChanges, True)
@@ -706,153 +552,24 @@ class ConnectionBase(_ip.HasInternalPiping):
             self.toPort.setZValue(100)
             self.fromPort.setZValue(100)
 
-            self.logger.debug("Here in niceconn")
-
             helperPoint1 = _qtc.QPointF(midx, pos1.y())  # pylint: disable = invalid-name
             helperPoint2 = _qtc.QPointF(midx, pos2.y())  # pylint: disable = invalid-name
 
             corner1.setPos(helperPoint1)
             corner2.setPos(helperPoint2)
-            self.firstS = self.getFirstSeg()
 
-            self.logger.debug("Conn has now " + str(self.firstS))
-
-    # Unused
-    def buildBridges(self):  # pylint: disable = too-many-locals, too-many-statements
-        # This function finds the colliding line segments and creates the interrupted line effect
-
-        for s in self.segments:  # pylint: disable = invalid-name
-            col = s.collidingItems()
-            # Why do the child segments have again colliding Items?
-
-            for c in col:  # pylint: disable = invalid-name
-                if isinstance(c, _sib.SegmentItemBase):
-                    # Both have no bridge and do not collide at the endpoints:
-                    if (c.endNode is not s.startNode) and (c.startNode is not s.endNode):
-                        qp1 = s.line().p1()
-                        qp2 = s.line().p2()
-                        qp1_ = c.line().p1()  # pylint: disable = invalid-name
-                        qp2_ = c.line().p2()  # pylint: disable = invalid-name
-
-                        eps2 = 5
-                        if abs(qp1.x() - qp2.x()) < eps2 or abs(qp1_.x() - qp2_.x()) < eps2:
-                            self.logger.debug("Can't build bridge because one segment is almost verical")
-
-                        else:
-                            node1 = _node.Node()
-                            node2 = _node.Node()
-
-                            node1.setPrev(s.startNode)
-                            node1.setNext(node2)
-                            node2.setPrev(node1)
-                            node2.setNext(s.endNode)
-                            node1.setParent(self)
-                            node2.setParent(self)
-
-                            s.startNode.setNext(node1)
-                            s.endNode.setPrev(node2)
-
-                            s.firstChild = self._createSegmentItem(s.startNode, node1)
-                            s.secondChild = self._createSegmentItem(node2, s.endNode)
-
-                            s.hasBridge = True
-                            c.hasBridge = True
-                            s.bridgedSegment = c
-                            c.bridgedSegment = s
-
-                            s.firstChild.setVisible(False)
-                            s.secondChild.setVisible(False)
-
-                            self.parent.diagramScene.addItem(s.firstChild)
-                            self.parent.diagramScene.addItem(s.secondChild)
-
-                            # pylint: disable = invalid-name
-                            n1 = (qp1.y() * qp2.x() - qp2.y() * qp1.x()) / (qp2.x() - qp1.x())
-                            # pylint: disable = invalid-name
-                            n2 = (qp1_.y() * qp2_.x() - qp2_.y() * qp1_.x()) / (qp2_.x() - qp1_.x())
-
-                            m1 = (qp2.y() - qp1.y()) / (qp2.x() - qp1.x())  # pylint: disable = invalid-name
-                            m2 = (qp2_.y() - qp1_.y()) / (qp2_.x() - qp1_.x())  # pylint: disable = invalid-name
-
-                            collisionPos = _qtc.QPointF((n1 - n2) / (m2 - m1), m1 * (n1 - n2) / (m2 - m1) + n1)
-
-                            vecp2p1 = qp2 - qp1  # pylint: disable = invalid-name
-                            vecp2p1_ = qp2_ - qp1_  # pylint: disable = invalid-name
-
-                            normVec = _math.sqrt(vecp2p1.x() ** 2 + vecp2p1.y() ** 2)
-                            normVec_ = _math.sqrt(vecp2p1_.x() ** 2 + vecp2p1_.y() ** 2)  # pylint:disable=invalid-name
-
-                            # Compute angle between lines
-                            scalarProd = vecp2p1.x() * vecp2p1_.x() + vecp2p1.y() + vecp2p1_.y()
-                            angleBetween = _math.acos(scalarProd / (normVec * normVec_))
-
-                            # Almost working: if line approaches 90 deg or if lines touch because too steep, problem
-                            f = 10  # pylint: disable = invalid-name
-                            distFactor = max(f * 1 / angleBetween, f)
-
-                            normVecp2p1 = _qtc.QPointF(
-                                distFactor / normVec * vecp2p1.x(), distFactor / normVec * vecp2p1.y()
-                            )
-
-                            newPos1 = collisionPos - normVecp2p1
-                            newPos2 = collisionPos + normVecp2p1
-
-                            s.firstChild.setLine(qp1.x(), qp1.y(), newPos1.x(), newPos1.y())
-                            s.secondChild.setLine(newPos2.x(), newPos2.y(), qp2.x(), qp2.y())
-
-                            s.firstChild.setVisible(True)
-                            s.secondChild.setVisible(True)
-
-                            s.hide()
-
-                            self.parent.diagramScene.removeItem(s)
-                            self.segments.remove(s)
-
-    # Delete a connection
-    def clearConn(self):
-        # Deletes all segments and corners in connection
-        walker = self.endNode
-
-        items = self.parent.diagramScene.items()
-
-        for item in items:
-            if isinstance(item, _sib.SegmentItemBase):
-                if item.startNode.lastNode() is self.endNode or item.startNode.firstNode() is self.startNode:
-                    self.parent.diagramScene.removeItem(item)
-            if isinstance(item, _qtw.QGraphicsTextItem):
-                if isinstance(item.parent, _pib.PortItemBase):
-                    self.parent.diagramScene.removeItem(item)
-
-        for seg in self.segments:
-            self.parent.diagramScene.removeItem(seg.label)
+    def _clearConnection(self):
+        labels = [self._label, self.massFlowLabel]
+        _cdel.deleteChildGraphicsItems(self, exclude=labels)
 
         self.segments.clear()
 
-        if walker.prevN() is not self.startNode:
-            walker = walker.prevN()
+        self.startNode.setNext(self.endNode)
+        self.endNode.setPrev(self.startNode)
 
-            while walker.prevN() is not self.startNode:
-                if not isinstance(walker.parent, ConnectionBase):
-                    self.parent.diagramScene.removeItem(walker.parent)
-                else:
-                    self.logger.debug("Caution, this is a disrupt.")
-                walker = walker.prevN()
-
-            if not isinstance(walker.parent, ConnectionBase):
-                self.parent.diagramScene.removeItem(walker.parent)
-            else:
-                self.logger.debug("Caution.")
-
-            self.startNode.setNext(self.endNode)
-            self.endNode.setPrev(self.startNode)
-
-    def deleteConn(self):
-        self.clearConn()
+    def deleteConnection(self):
         self.fromPort.connectionList.remove(self)
         self.toPort.connectionList.remove(self)
-
-        if self not in self.parent.trnsysObj:
-            return
 
         self.parent.trnsysObj.remove(self)
         self.parent.connectionList.remove(self)
@@ -873,7 +590,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         return summedLength
 
     def partialLength(self, node):
-        # Returns the cummulative length of line up to given node
+        # Returns the cumulative length of line up to given node
         # Assumes that segments is ordered correctly!
         res = 0
         if node == self.startNode:
@@ -886,9 +603,9 @@ class ConnectionBase(_ip.HasInternalPiping):
 
         return res
 
-    def updateSegGrads(self):
-        for s in self.segments:  # pylint: disable = invalid-name
-            s.resetLinePens()
+    def updateSegmentGradients(self):
+        for segment in self.segments:
+            segment.resetLinePens()
 
     # Invert connection
     def invertConnection(self):
@@ -938,7 +655,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         element.setPrev(nextNode)
 
     def selectConnection(self):
-        self.isSelected = True
+        self.isConnectionSelected = True
 
         for segment in self.segments:
             segment.resetLinePens()
@@ -946,7 +663,7 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.setLabelsSelected(True)
 
     def deselectConnection(self):
-        self.isSelected = False
+        self.isConnectionSelected = False
 
         for segment in self.segments:
             segment.resetLinePens()
@@ -954,66 +671,14 @@ class ConnectionBase(_ip.HasInternalPiping):
         self.setLabelsSelected(False)
 
     def setLabelsSelected(self, isSelected: bool) -> None:
-        assert self.firstS
-        self._setBold(self.firstS.label, isSelected)
-        self._setBold(self.firstS.labelMass, isSelected)
+        self._setBold(self._label, isSelected)
+        self._setBold(self.massFlowLabel, isSelected)
 
     @staticmethod
     def _setBold(label: _qtw.QGraphicsTextItem, isBold: bool) -> None:
         originalFontCopy = label.font()
         originalFontCopy.setBold(isBold)
         label.setFont(originalFontCopy)
-
-    # Debug
-    def inspectConn(self):
-        self.parent.contextInfoList.clear()
-        self.parent.contextInfoList.addItem("Display name: " + self.displayName)
-        self.parent.contextInfoList.addItem("Parent: " + str(self.parent))
-        self.parent.contextInfoList.addItem("fromPort: " + str(self.fromPort) + str(self.fromPort.id))
-        self.parent.contextInfoList.addItem("toPort: " + str(self.toPort) + str(self.toPort.id))
-
-    def printConn(self):
-        self.logger.debug("------------------------------------")
-        self.logger.debug("This is the printout of connection: " + self.displayName + str(self))
-        self.logger.debug("It has fromPort " + str(self.fromPort))
-        self.logger.debug("It has toPort " + str(self.toPort))
-        self.logger.debug("It has startNode " + str(self.startNode))
-        self.logger.debug("It has endNode " + str(self.endNode))
-
-        self.logger.debug("\n")
-        self.logger.debug("It goes from " + self.fromPort.parent.displayName + " to " + self.toPort.parent.displayName)
-        self.logger.debug("------------------------------------")
-
-    def printConnNodes(self):
-        self.logger.debug("These are the nodes: ")
-
-        element = self.startNode
-        while element.nextN() is not None:
-            self.logger.debug(
-                "Node is "
-                + str(element)
-                + " has nextNode "
-                + str(element.nextN())
-                + " has pL "
-                + str(self.partialLength(element))
-            )
-            element = element.nextN()
-
-        self.logger.debug("Node is " + str(element) + " has nextNode " + str(element.nextN()))
-
-    def printConnSegs(self):
-        self.logger.debug("These are the segments in order")
-        for s in self.segments:  # pylint: disable = invalid-name
-            self.logger.debug(
-                "Segment is "
-                + str(s)
-                + " has global id "
-                + str(s.id)
-                + " has startnode "
-                + str(s.startNode)
-                + " endnode "
-                + str(s.endNode)
-            )
 
     # Saving / Loading
     def encode(self):
@@ -1040,23 +705,186 @@ class ConnectionBase(_ip.HasInternalPiping):
     def exportPipeAndTeeTypesForTemp(self, startingUnit):
         raise NotImplementedError()
 
-    def findStoragePort(self, virtualBlock):
-        portToPrint = None
-        for port in virtualBlock.inputs + virtualBlock.outputs:
-            if self in port.connectionList:
-                # Found the port of the generated block adjacent to this pipe
-                # Assumes 1st connection is with storageTank
-                if self.fromPort == port:
-                    if self.toPort.connectionList[0].fromPort == self.toPort:
-                        portToPrint = self.toPort.connectionList[0].toPort
-                    else:
-                        portToPrint = self.toPort.connectionList[0].fromPort
-                else:
-                    if self.fromPort.connectionList[0].fromPort == self.fromPort:
-                        portToPrint = self.fromPort.connectionList[0].toPort
-                    else:
-                        portToPrint = self.fromPort.connectionList[0].fromPort
-        return portToPrint
-
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(self, generator: _id.IdGenerator) -> None:
         pass
+
+    def onMousePressed(self, segment: _sib.SegmentItemBase, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        if event.button() != _qtc.Qt.LeftButton:
+            return
+
+        self.selectConnection()
+
+        if segment.isIntermediateSegment():
+            self._draggedSegment = segment
+            return
+
+        assert segment.isFirstOrLastSegment()
+
+        if segment.isVertical():
+            # Dragging of vertical first or last segment not yet supported
+            return
+
+        rad = self.getRadius()
+
+        secondCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, segment.startNode, None, self)
+        thirdCorner = _ci.CornerItem(-rad, -rad, 2 * rad, 2 * rad, secondCorner.node, segment.endNode, self)
+
+        secondCorner.setFlag(_qtw.QGraphicsItem.ItemSendsScenePositionChanges)
+        thirdCorner.setFlag(_qtw.QGraphicsItem.ItemSendsScenePositionChanges)
+
+        secondCorner.node.setNext(thirdCorner.node)
+
+        segment.startNode.setNext(secondCorner.node)
+        segment.endNode.setPrev(thirdCorner.node)
+
+        if segment.isFirstSegment():
+            segment.endNode = secondCorner.node
+
+            firstAdditionalSegment = self._createSegmentItem(secondCorner.node, thirdCorner.node)
+            secondAdditionalSegment = self._createSegmentItem(thirdCorner.node, thirdCorner.node.nextN())
+        else:
+            segment.startNode = thirdCorner.node
+
+            firstAdditionalSegment = self._createSegmentItem(secondCorner.node.prevN(), secondCorner.node)
+            secondAdditionalSegment = self._createSegmentItem(secondCorner.node, thirdCorner.node)
+
+        secondCorner.setZValue(100)
+        thirdCorner.setZValue(100)
+        firstAdditionalSegment.setZValue(1)
+        secondAdditionalSegment.setZValue(1)
+
+        secondCorner.setVisible(True)
+        thirdCorner.setVisible(True)
+
+        firstAdditionalSegment.setVisible(True)
+        secondAdditionalSegment.setVisible(True)
+
+        newPos = event.scenePos()
+        if segment.isFirstSegment():
+            secondCorner.setPos(newPos.x() - 10, self.fromPort.scenePos().y())
+
+            thirdCorner.setPos(newPos.x() - 10, newPos.y())
+
+            nextCorner = thirdCorner.node.nextN().parent
+            nextCorner.setY(newPos.y())
+
+            self._draggedSegment = secondAdditionalSegment
+
+        else:
+            previousCorner = secondCorner.node.prevN().parent
+            previousCorner.setY(newPos.y())
+
+            secondCorner.setPos(newPos.x() + 10, newPos.y())
+
+            thirdCorner.setPos(newPos.x() + 10, self.toPort.scenePos().y())
+
+            self._draggedSegment = firstAdditionalSegment
+
+        self._assertSegmentsAreConsistent()
+
+    def onMouseMoved(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        if not self._draggedSegment:
+            return
+
+        assert self._draggedSegment.isIntermediateSegment()
+
+        newPos = event.scenePos()
+
+        self._dragIntermediateSegment(newPos)
+
+    def onMouseReleased(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        if event.button() != _qtc.Qt.LeftButton:
+            return
+
+        if not self._draggedSegment:
+            return
+
+        self._draggedSegment = None
+
+        self._removeUnnecessarySegments()
+
+        self._assertSegmentsAreConsistent()
+
+    def _dragIntermediateSegment(self, newPos: _qtc.QPointF) -> None:
+        assert self._draggedSegment
+        assert self._draggedSegment.isIntermediateSegment()
+
+        startCorner = self._draggedSegment.startNode.parent
+        endCorner = self._draggedSegment.endNode.parent
+
+        startPos = startCorner.scenePos()
+        endPos = endCorner.scenePos()
+
+        if self._draggedSegment.isVertical():
+            startCorner.setPos(newPos.x(), startPos.y())
+            endCorner.setPos(newPos.x(), endPos.y())
+
+        if self._draggedSegment.isHorizontal():
+            startCorner.setPos(startPos.x(), newPos.y())
+            endCorner.setPos(endPos.x(), newPos.y())
+
+    def _removeUnnecessarySegments(self) -> None:
+        isHorizontal = self._isHorizontal()
+
+        # We must guarantee the invariant self._isHorizontal() => len(self.segments) >= 3
+        if not isHorizontal or len(self.segments) >= 3:
+            newSegments = _clean.removeUnnecessarySegments(self.segments)
+
+            self.segments = list(newSegments)
+
+        if isHorizontal and len(self.segments) == 3:
+            self._recenterVerticalConnection()
+
+    def _recenterVerticalConnection(self) -> None:
+        assert len(self.segments) == 3, "Can only recenter connections with three segments."
+
+        intermediateSegment = self.segments[1]
+
+        fromPos = self.fromPort.scenePos()
+        toPos = self.toPort.scenePos()
+
+        midPoint = fromPos + 0.5 * (toPos - fromPos)  # type: ignore[operator]
+
+        intermediateSegment.startNode.parent.setPos(midPoint)
+        intermediateSegment.endNode.parent.setPos(midPoint)
+
+    def _isHorizontal(self):
+        return all(s.isHorizontal() for s in self.segments)
+
+    def _assertSegmentsAreConsistent(self):
+        if self._isHorizontal():
+            assert len(self.segments) >= 3, "Horizontal segments must always have 3 or more segments."
+
+        firstSegment = self.segments[0]
+        assert firstSegment.isFirstSegment()
+
+        lastSegment = self.segments[-1]
+        assert lastSegment.isLastSegment()
+
+        startNode = self.startNode
+        assert startNode
+        assert startNode == firstSegment.startNode
+        assert not startNode.prevN()
+        assert startNode.parent == self
+
+        endNode = self.endNode
+        assert endNode
+        assert endNode == lastSegment.endNode
+        assert not endNode.nextN()
+        assert endNode.parent == self
+
+        for segment in self.segments:
+            endNode = startNode.nextN()
+            assert endNode
+            assert endNode.prevN() == startNode
+
+            if segment != lastSegment:
+                assert isinstance(endNode.parent, _ci.CornerItem)
+
+            assert segment.startNode == startNode
+            assert segment.endNode == endNode
+
+            startNode = endNode
+
+        lastEndNode = endNode
+        assert lastEndNode == lastSegment.endNode

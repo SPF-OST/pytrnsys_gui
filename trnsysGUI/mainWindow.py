@@ -216,7 +216,6 @@ class MainWindow(_qtw.QMainWindow):
 
         # Status bar
         self.sb = self.statusBar()
-        self.sb.showMessage("Mode is " + str(self.editor.editorMode))
 
         # QUndo framework
         self.undoStack = _qtw.QUndoStack(self)
@@ -396,10 +395,6 @@ class MainWindow(_qtw.QMainWindow):
         else:
             self.logger.info("Canceling")
             return
-
-    def tidyUp(self):
-        self.logger.info("Tidying up...")
-        self.editor.cleanUpConnections()
 
     def setZoomIn(self):
         self.logger.info("Setting zoom in")
