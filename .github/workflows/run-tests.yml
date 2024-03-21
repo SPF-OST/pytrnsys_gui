@@ -12,48 +12,54 @@ on:
       - run-tests-and-build-executable
 
 jobs:
+  developer-install:
+    runs-on: [ self-hosted, etna ]
+
+    defaults: 
+      run:
+        working-directory: dev_install/pytrnsys_gui
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          path: dev_install/pytrnsys_gui
+          
+      - uses: actions/checkout@v3
+        with:
+          repository: SPF-OST/pytrnsys
+          path: dev_install/pytrnsys
+
+      - name: Remove old venv
+        run: |
+          if (Test-Path -LiteralPath venv) {
+            Remove-Item -LiteralPath venv -Recurse
+          }
+
+      - name: Create virtual environment
+        run: py -3.12 -m venv venv
+
+      - name: Install dependencies
+        run: |
+          venv\Scripts\python -m pip install wheel
+          venv\Scripts\python -m pip install -r requirements/dev.txt
+
+      - name: Generate UI code from Qt Creator Studio .ui files
+        run: venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
+
+      - name: Check that trnsysGUI can be imported
+        run: venv\Scripts\python -c "import trnsysGUI"
+
+      - name: Run pip-compile-multi
+        run: venv\Scripts\pip-compile-multi -d requirements --no-upgrade
+
   test:
     runs-on: [self-hosted, etna]
     
     env:
       PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable'}}
-    
-    defaults: 
-      run:
-        working-directory: pytrnsys_gui
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          path: pytrnsys_gui
-          
-      - uses: actions/checkout@v3
-        with:
-          repository: SPF-OST/pytrnsys
-          path: pytrnsys
-
-      - name: Remove old venv (dev-venv)
-        run: |
-          if (Test-Path -LiteralPath dev-venv) {
-            Remove-Item -LiteralPath dev-venv -Recurse
-          }
-
-      - name: Create virtual environment (dev-venv)
-        run: py -3.12 -m venv dev-venv
-
-      - name: Install dependencies (dev-venv)
-        run: |
-          dev-venv\Scripts\python -m pip install wheel
-          dev-venv\Scripts\python -m pip install -r requirements/dev.txt
-
-      - name: Generate UI code from Qt Creator Studio .ui files (dev-venv)
-        run: dev-venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-
-      - name: Check that trnsysGUI can be imported (dev-venv)
-        run: dev-venv\Scripts\python -c "import trnsysGUI"
-
-      - name: Run pip-compile-multi (dev-venv)
-        run: dev-venv\Scripts\pip-compile-multi -d requirements --no-upgrade
 
       - name: Remove old venv
         run: |
@@ -92,14 +98,13 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          base-path: pytrnsys_gui
           path-to-lcov: test-results/coverage.lcov
 
       - name: Upload test results and coverage reports
         uses: actions/upload-artifact@v3
         with:
           name: test-results-and-coverage-report-windows
-          path: pytrnsys_gui/test-results
+          path: test-results
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
 
