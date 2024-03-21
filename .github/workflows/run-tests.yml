@@ -31,7 +31,8 @@ jobs:
       - name: Install dev dependencies
         run: |
           dev-venv\Scripts\python -m pip install wheel
-          dev-venv\Scripts\python -m pip install -r requirements/dev.txt
+          dev-venv\Scripts\python -m pip install -r requirements/dev-3rd-party.txt
+          dev-venv\Scripts\python -m pip install git+https://github.com/SPF-OST/pytrnsys.git#egg=pytrnsys
           
       - name: Generate UI code from Qt Creator Studio .ui files (dev-venv)
         run: dev-venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
