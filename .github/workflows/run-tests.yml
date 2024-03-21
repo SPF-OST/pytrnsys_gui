@@ -29,7 +29,7 @@ jobs:
           
       - uses: actions/checkout@v3
         with:
-          repository: https://github.com/SPF-OST/pytrnsys.git
+          repository: SPF-OST/pytrnsys.git
           path: pytrnsys
 
       - name: Remove old venv (dev-venv)
