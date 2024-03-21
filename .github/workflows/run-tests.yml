@@ -18,27 +18,7 @@ jobs:
       PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable'}}
     steps:
       - uses: actions/checkout@v3
-        
-      - name: Remove old dev venv
-        run: |
-          if (Test-Path -LiteralPath dev-venv) {
-            Remove-Item -LiteralPath dev-venv -Recurse
-          }
-
-      - name: Create dev virtual environment
-        run: py -3.12 -m venv dev-venv
-        
-      - name: Install dev dependencies
-        run: |
-          dev-venv\Scripts\python -m pip install wheel
-          dev-venv\Scripts\python -m pip install -r requirements/dev.txt
-          
-      - name: Generate UI code from Qt Creator Studio .ui files (dev-venv)
-        run: dev-venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
-        
-      - name: Check that trnsysGUI can be imported
-        run: dev-venv\Scripts\python -c "import trnsysGUI"
-
+      
       - name: Remove old venv
         run: |
           if (Test-Path -LiteralPath venv) {
