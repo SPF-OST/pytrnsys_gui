@@ -93,7 +93,7 @@ All the following commands should be run from the `pytrnsys_gui` directory. The 
     ```
 3. Install the requirements:
     ```commandline
-    pip install wheel pip==22.3.1
+    python -m pip install wheel pip==22.3.1
     python -m pip install -r requirements\dev.txt
     ```
 4. Generate Python files from the include Qt creator files:
