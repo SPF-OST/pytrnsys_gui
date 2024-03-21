@@ -14,10 +14,23 @@ on:
 jobs:
   test:
     runs-on: [ self-hosted, etzel ]
+    
     env:
       PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable'}}
+    
+    defaults: 
+      run:
+        working-directory: pytrnsys_gui
+
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: pytrnsys_gui
+          
+      - uses: actions/checkout@v3
+        with:
+          repository: https://github.com/SPF-OST/pytrnsys.git
+          path: pytrnsys
 
       - name: Remove old venv (dev-venv)
         run: |
@@ -31,8 +44,7 @@ jobs:
       - name: Install dependencies (dev-venv)
         run: |
           dev-venv\Scripts\python -m pip install wheel
-          dev-venv\Scripts\python -m pip install -r requirements/dev-3rd-party.txt
-          dev-venv\Scripts\python -m pip install git+https://github.com/SPF-OST/pytrnsys.git#egg=pytrnsys
+          dev-venv\Scripts\python -m pip install -r requirements/dev.txt
 
       - name: Generate UI code from Qt Creator Studio .ui files (dev-venv)
         run: dev-venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
@@ -80,13 +92,13 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: test-results/coverage.lcov
+          path-to-lcov: pytrnsys_gui/test-results/coverage.lcov
 
       - name: Upload test results and coverage reports
         uses: actions/upload-artifact@v3
         with:
           name: test-results-and-coverage-report-windows
-          path: test-results
+          path: pytrnsys_gui/test-results
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
 
