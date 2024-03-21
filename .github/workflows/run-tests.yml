@@ -19,16 +19,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         
-      - name: Remove old dev venv
+      - name: Remove old venv (dev-venv)
         run: |
           if (Test-Path -LiteralPath dev-venv) {
             Remove-Item -LiteralPath dev-venv -Recurse
           }
 
-      - name: Create dev virtual environment
+      - name: Create virtual environment (dev-venv)
         run: py -3.12 -m venv dev-venv
         
-      - name: Install dev dependencies
+      - name: Install dependencies (dev-venv)
         run: |
           dev-venv\Scripts\python -m pip install wheel
           dev-venv\Scripts\python -m pip install -r requirements/dev-3rd-party.txt
@@ -37,7 +37,7 @@ jobs:
       - name: Generate UI code from Qt Creator Studio .ui files (dev-venv)
         run: dev-venv\Scripts\python dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py
         
-      - name: Check that trnsysGUI can be imported
+      - name: Check that trnsysGUI can be imported (dev-venv)
         run: dev-venv\Scripts\python -c "import trnsysGUI"
 
       - name: Remove old venv
