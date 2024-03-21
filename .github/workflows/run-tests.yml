@@ -92,7 +92,8 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: pytrnsys_gui/test-results/coverage.lcov
+          base-path: pytrnsys_gui
+          path-to-lcov: test-results/coverage.lcov
 
       - name: Upload test results and coverage reports
         uses: actions/upload-artifact@v3
