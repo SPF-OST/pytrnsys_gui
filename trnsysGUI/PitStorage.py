@@ -20,7 +20,7 @@ class PitStorage(BlockItemFourPorts):
         super().__init__(trnsysType, editor, displayName)
         self.w = 240
         self.h = 160
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.addTree()
         self.changeSize()

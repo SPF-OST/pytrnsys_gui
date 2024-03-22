@@ -26,7 +26,9 @@ class PumpsAndTabsBase(_bi.BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self) -> bool:
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
     def _getCanonicalMassFlowRate(self) -> float:

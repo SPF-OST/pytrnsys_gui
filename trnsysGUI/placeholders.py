@@ -17,7 +17,7 @@ import trnsysGUI.temperatures as _temps
 def getPlaceholderValues(
     ddckDirNames: _tp.Sequence[str], trnsysObjects, hydraulicLoops: _hlm.HydraulicLoops
 ) -> _res.Result[dict]:
-    allPlaceholders = {}
+    allPlaceholders: dict[str, dict] = {}
     for component in trnsysObjects:
         if not (
             isinstance(component, _ip.HasInternalPiping)

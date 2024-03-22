@@ -34,7 +34,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.h = 120
         self.editor = editor
         self.id = self.editor.idGen.getID()
-        self.propertyFile = []
 
         if not displayName:
             raise ValueError("Display name cannot be empty.")
@@ -44,7 +43,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.inputs: list[_pib.PortItemBase] = []
         self.outputs: list[_pib.PortItemBase] = []
 
-        self.path = None
+        self.path: str | None = None
 
         # Export related:
         self.name = trnsysType
@@ -74,8 +73,8 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         # Undo framework related
         self.oldPos = None
 
-        self.origOutputsPos = None
-        self.origInputsPos = None
+        self.origOutputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
+        self.origInputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if isinstance(self, BlockItem):
@@ -156,9 +155,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
             self.editor.showDoublePipeBlockDlg(self)
         else:
             self.editor.showBlockDlg(self)
-            if len(self.propertyFile) > 0:
-                for files in self.propertyFile:
-                    os.startfile(files, "open")
 
     def mouseReleaseEvent(self, event):
         # self.logger.debug("Released mouse over block")

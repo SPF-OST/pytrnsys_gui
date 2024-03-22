@@ -37,6 +37,6 @@ Tcw = 1
 """
         return equations, startingUnit
 
-    def _setUnFlippedPortPos(self, delta: float) -> None:
+    def _setUnFlippedPortPos(self, delta: int) -> None:
         self.origOutputsPos = [[0, delta]]
         self._graphicalPortItem.setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])

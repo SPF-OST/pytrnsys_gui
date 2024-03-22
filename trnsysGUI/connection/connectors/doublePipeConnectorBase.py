@@ -29,7 +29,9 @@ class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
     def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
     def _updateModels(self, newDisplayName: str) -> None:

@@ -19,7 +19,7 @@ class IceStorageTwoHx(BlockItemFourPorts):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.addTree()
         self.changeSize()

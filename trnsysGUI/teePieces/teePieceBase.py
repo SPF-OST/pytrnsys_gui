@@ -30,7 +30,9 @@ class TeePieceBase(_bi.BlockItem, _ip.HasInternalPiping):
     def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
     def getInternalPiping(self) -> _ip.InternalPiping:

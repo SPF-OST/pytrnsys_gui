@@ -23,7 +23,7 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.childIds = []
         self.childIds.append(self.trnsysId)

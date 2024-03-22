@@ -74,5 +74,5 @@ class TapBase(_ptb.PumpsAndTabsBase):
 
         return w, h
 
-    def _setUnFlippedPortPos(self, delta: float) -> None:
+    def _setUnFlippedPortPos(self, delta: int) -> None:
         raise NotImplementedError()

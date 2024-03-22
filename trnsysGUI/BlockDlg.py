@@ -26,8 +26,8 @@ class BlockDlg(_ndialog.ChangeNameDialogBase):  # pylint: disable=too-many-insta
 
         self.vFlipBox.setTristate(False)
         self.hFlipBox.setTristate(False)
-        self.hFlipBox.setCheckState(self._blockItem.flippedH * 2)
-        self.vFlipBox.setCheckState(self._blockItem.flippedV * 2)
+        self.hFlipBox.setCheckState(self._blockItem.flippedH * 2)  # type: ignore[arg-type]
+        self.vFlipBox.setCheckState(self._blockItem.flippedV * 2)  # type: ignore[arg-type]
 
         flipLayout = _qtw.QHBoxLayout()
         flipLayout.addWidget(self.hFlipBoxLabel)

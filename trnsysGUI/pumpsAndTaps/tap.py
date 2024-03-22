@@ -16,7 +16,7 @@ class Tap(_tapBase.TapBase):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, _mfn.PortItemDirection.INPUT, displayName)
 
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
         self.addTree()
 
     @classmethod
@@ -95,6 +95,6 @@ class Tap(_tapBase.TapBase):
             self.path = destPath
             self.logger.debug(self.path)
 
-    def _setUnFlippedPortPos(self, delta: float) -> None:
+    def _setUnFlippedPortPos(self, delta: int) -> None:
         self.origInputsPos = [[0, delta]]
         self._graphicalPortItem.setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])

@@ -21,7 +21,7 @@ class Radiator(BlockItem, _Ip.HasInternalPiping):
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.changeSize()
         self.addTree()

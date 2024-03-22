@@ -49,7 +49,9 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
     def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:

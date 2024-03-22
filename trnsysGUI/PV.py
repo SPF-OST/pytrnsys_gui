@@ -19,7 +19,7 @@ class PV(BlockItem):
         factor = 0.97
         self.w = 100
         self.h = 100
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.changeSize()
         self.addTree()

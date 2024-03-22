@@ -27,7 +27,7 @@ class HPDoubleDual(BlockItem, _ip.HasInternalPiping):
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         # For restoring correct order of trnsysObj list
         self.childIds = []

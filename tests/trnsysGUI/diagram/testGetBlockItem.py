@@ -1,6 +1,7 @@
 import cgitb as _cgitb  # pylint: disable=deprecated-module
 import logging as _log
 import unittest.mock as _mock
+import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
@@ -43,6 +44,8 @@ from trnsysGUI.storageTank.widget import StorageTank
 from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
+
+import trnsysGUI.names.manager as _nman
 
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
@@ -96,39 +99,52 @@ class TestGetBlockItem:
         self, componentTypeName, componentType, displayName, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.createBlockItem(componentTypeName, editorMock)
+        namesManagerMock = _tp.cast(_nman.NamesManager, None)
+        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, namesManagerMock)
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
     def testGetNewStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.createBlockItem("StorageTank", editorMock)
+        namesManagerMock = _tp.cast(_nman.NamesManager, None)
+
+        blockItem = _gbi.createBlockItem("StorageTank", editorMock, namesManagerMock)
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "Tes7701"
 
     def testGetNewGraphicalItem(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.createBlockItem("GraphicalItem", editorMock)
+        namesManagerMock = _tp.cast(_nman.NamesManager, None)
+
+        blockItem = _gbi.createBlockItem("GraphicalItem", editorMock, namesManagerMock)
         assert isinstance(blockItem, GraphicalItem)
 
     def testGetNewUnknownBlockItemRaises(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
 
         with _pt.raises(ValueError):
-            _gbi.createBlockItem("Blk", editorMock)
+            namesManagerMock = _tp.cast(_nman.NamesManager, None)
+
+            _gbi.createBlockItem("Blk", editorMock, namesManagerMock)
 
     @_pt.mark.parametrize("componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
     def testGetLoadedBlockItem(
         self, componentTypeName, componentType, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, displayName=componentTypeName)
+        namesManagerMock = _tp.cast(_nman.NamesManager, None)
+
+        displayName = componentTypeName
+        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, namesManagerMock, displayName)
+
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == componentTypeName
 
     def testGetLoadedStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.createBlockItem("StorageTank", editorMock, displayName="StorageTank")
+        namesManagerMock = _tp.cast(_nman.NamesManager, None)
+
+        blockItem = _gbi.createBlockItem("StorageTank", editorMock, namesManagerMock, "StorageTank")
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "StorageTank"
 
@@ -174,7 +190,6 @@ class TestGetBlockItem:
         graphicsScene = _qtw.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
         editorMock.graphicalObj = []
-        editorMock.namesManager = None
 
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()
