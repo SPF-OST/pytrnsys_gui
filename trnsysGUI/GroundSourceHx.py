@@ -17,8 +17,8 @@ from trnsysGUI.internalPiping import HasInternalPiping
 
 
 class GroundSourceHx(BlockItem, HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(GroundSourceHx, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 60
         self.h = 80

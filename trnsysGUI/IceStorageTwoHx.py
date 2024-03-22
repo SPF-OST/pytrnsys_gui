@@ -16,8 +16,8 @@ from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class IceStorageTwoHx(BlockItemFourPorts):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(IceStorageTwoHx, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.loadedFiles = []
 

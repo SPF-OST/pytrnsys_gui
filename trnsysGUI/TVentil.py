@@ -20,8 +20,8 @@ import trnsysGUI.temperatures as _temps
 
 
 class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.h = 40
         self.w = 40
@@ -44,7 +44,9 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
     def shallRenameOutputTemperaturesInHydraulicFile(self):
@@ -160,15 +162,6 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
 
         resBlockList.append(self)
 
-        if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
-            self.logger.debug("Old version of diagram")
-            self.positionForMassFlowSolver = 1.0
-        else:
-            self.isTempering = i["IsTempering"]
-            self.positionForMassFlowSolver = i["PositionForMassFlowSolver"]
-
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        super().decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
             self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0

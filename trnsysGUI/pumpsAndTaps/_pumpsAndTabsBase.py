@@ -10,10 +10,10 @@ from trnsysGUI.pumpsAndTaps import _defaults, _serialization as _ser, _dialog
 
 
 class PumpsAndTabsBase(_bi.BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs) -> None:
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
-        self._renameHelper = _rename.RenameHelper(self.editor.namesManager)
+        self._renameHelper = _rename.RenameHelper(editor.namesManager)
 
         self.w = 40
         self.h = 40

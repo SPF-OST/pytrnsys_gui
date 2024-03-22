@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import typing as _tp
 
+import trnsysGUI.blockItems.names as _names
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.names.create as _cname
+import trnsysGUI.names.manager as _nm
 from trnsysGUI.AirSourceHP import AirSourceHP  # type: ignore[attr-defined]
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 from trnsysGUI.Boiler import Boiler  # type: ignore[attr-defined]
@@ -25,14 +29,14 @@ from trnsysGUI.SaltTankCold import SaltTankCold  # type: ignore[attr-defined]
 from trnsysGUI.SaltTankHot import SaltTankHot  # type: ignore[attr-defined]
 from trnsysGUI.SteamPowerBlock import SteamPowerBlock  # type: ignore[attr-defined]
 from trnsysGUI.TVentil import TVentil  # type: ignore[attr-defined]
-from trnsysGUI.pumpsAndTaps.tap import Tap  # type: ignore[attr-defined]
-from trnsysGUI.pumpsAndTaps.tapMains import TapMains  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectors.connector import Connector  # type: ignore[attr-defined]
 from trnsysGUI.connection.connectors.doubleDoublePipeConnector import DoubleDoublePipeConnector
 from trnsysGUI.connection.connectors.singleDoublePipeConnector import SingleDoublePipeConnector
 from trnsysGUI.crystalizer import Crystalizer
 from trnsysGUI.geotherm import Geotherm
 from trnsysGUI.pumpsAndTaps.pump import Pump  # type: ignore[attr-defined]
+from trnsysGUI.pumpsAndTaps.tap import Tap  # type: ignore[attr-defined]
+from trnsysGUI.pumpsAndTaps.tapMains import TapMains  # type: ignore[attr-defined]
 from trnsysGUI.sink import Sink
 from trnsysGUI.source import Source
 from trnsysGUI.sourceSink import SourceSink
@@ -41,14 +45,15 @@ from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
 
-import trnsysGUI.blockItems.names as _names
-
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
 
-def getBlockItem(
-    componentTypeName: str, editor: _ed.Editor, displayName: _tp.Optional[str] = None  # type: ignore[name-defined]
+def createBlockItem(
+    componentTypeName: str,
+    editor: _ed.Editor,  # type: ignore[name-defined]
+    namesManager: _nm.NamesManager,
+    displayName: _tp.Optional[str] = None,
 ) -> BlockItem | GraphicalItem:
     """
     returns a "blockItem" instance of a specific diagram component
@@ -105,7 +110,24 @@ def getBlockItem(
     clazz = parts["blockItem"]
     prefix = parts["displayNamePrefix"]
 
-    if displayName:
-        return clazz(componentTypeName, editor, displayName=displayName, loadedBlock=True)
+    displayName = _addOrCreateAndAddDisplayName(displayName, clazz, prefix, namesManager)
 
-    return clazz(componentTypeName, editor, displayNamePrefix=prefix)
+    blockItem = clazz(componentTypeName, editor, displayName)
+
+    return blockItem
+
+
+def _addOrCreateAndAddDisplayName(
+    displayName: str | None,
+    blockItemClass: type[_ip.HasInternalPiping],
+    baseName: str,
+    namesManager: _nm.NamesManager,
+) -> str:
+    if not displayName:
+        createNamingHelper = _cname.CreateNamingHelper(namesManager)
+        checkDdckFolder = blockItemClass.hasDdckPlaceHolders()
+        displayName = createNamingHelper.generateName(baseName, checkDdckFolder, firstGeneratedNameHasNumber=False)
+
+    namesManager.addName(displayName)
+
+    return displayName

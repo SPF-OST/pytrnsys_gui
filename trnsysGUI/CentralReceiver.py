@@ -16,8 +16,8 @@ import trnsysGUI.internalPiping as _ip
 
 
 class CentralReceiver(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 160
         self.h = 240

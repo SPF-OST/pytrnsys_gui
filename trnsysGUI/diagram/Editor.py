@@ -18,6 +18,7 @@ import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
 import trnsysGUI.blockItems.names as _bnames
+import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
@@ -30,9 +31,11 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
-import trnsysGUI.names.rename as _nr
+import trnsysGUI.names.rename as _rename
 import trnsysGUI.names.undo as _nu
 import trnsysGUI.placeholders as _ph
+import trnsysGUI.segments.segmentItemBase as _sib
+import trnsysGUI.storageTank.widget as _stwidget
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
@@ -835,8 +838,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         self._setHydraulicLoopsOnStorageTanks()
 
-        self._addNamesToNamesManager()
-
     def _decodeHydraulicLoops(self, blocklist) -> None:
         singlePipeConnections = [c for c in self.connectionList if isinstance(c, SinglePipeConnection)]
         if "hydraulicLoops" not in blocklist:
@@ -857,10 +858,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             storageTank = trnsysObject
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
-
-    def _addNamesToNamesManager(self) -> None:
-        for trnsysObject in self.trnsysObj:
-            self.namesManager.addName(trnsysObject.displayName)
 
     def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
         if not self._isHydraulicConnected():
@@ -1028,11 +1025,15 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
                 t.updateSegmentGradients()
 
     # Dialog calls
-    def showBlockDlg(self, bl):
-        c = BlockDlg(bl, self)
+    def showBlockDlg(self, blockItem: BlockItem) -> None:
+        renameHelper = self._createRenameHelper()
+        dialog = BlockDlg(blockItem, renameHelper)
+        dialog.exec()
 
-    def showDoublePipeBlockDlg(self, bl):
-        c = DoublePipeBlockDlg(bl, self)
+    def showDoublePipeBlockDlg(self, connector: _dctor.DoublePipeConnectorBase) -> None:
+        renameHelper = self._createRenameHelper()
+        dialog = DoublePipeBlockDlg(connector, renameHelper)
+        dialog.exec()
 
     def showDiagramDlg(self):
         c = diagramDlg(self)
@@ -1043,84 +1044,24 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def showHxDlg(self, hx):
         c = hxDlg(hx, self)
 
-    def showSegmentDlg(self, seg):
-        renameHelper = _nr.RenameHelper(self.namesManager)
-        segmentDialog = SegmentDialog(seg.connection, renameHelper)
+    def showSegmentDlg(self, segmentItem: _sib.SegmentItemBase) -> None:
+        renameHelper = self._createRenameHelper()
+        segmentDialog = SegmentDialog(segmentItem.connection, renameHelper)
         segmentDialog.exec()
 
-    def showTVentilDlg(self, bl):
-        c = TVentilDlg(bl, self)
+    def showTVentilDlg(self, valve: TVentil) -> None:
+        renameHelper = self._createRenameHelper()
+        valveDialog = TVentilDlg(valve, renameHelper)
+        valveDialog.exec()
 
-    def showConfigStorageDlg(self, bl):
-        c = ConfigureStorageDialog(bl, self)
+    def showConfigStorageDlg(self, storageTank: _stwidget.StorageTank) -> None:
+        renameHelper = self._createRenameHelper()
+        storageDialog = ConfigureStorageDialog(storageTank, self, renameHelper)
+        storageDialog.exec()
 
-    def getConnection(self, n):
-        return self.connectionList[int(n)]
-
-    # Unused
-    def create_icon(self, map_icon):
-        map_icon.fill()
-        painter = _qtg.QPainter(map_icon)
-        painter.fillRect(10, 10, 40, 40, _qtg.QColor(88, 233, 252))
-        # painter.setBrush(Qt.red)
-        painter.setBrush(_qtg.QColor(252, 136, 98))
-        painter.drawEllipse(36, 2, 15, 15)
-        painter.setBrush(_qtc.Qt.yellow)
-        painter.drawEllipse(20, 20, 20, 20)
-        painter.end()
-
-    def findStorageCorrespPorts1(self, portList):
-        """
-        This function gets the ports on the other side of pipes connected to a port of the StorageTank. Unused
-
-        Parameters
-        ----------
-        portList : :obj:`List` of :obj:`PortItems`
-
-        Returns
-        -------
-
-        """
-
-        res = []
-        # print("Finding c ports")
-        for p in portList:
-            if len(p.connectionList) > 0:  # check if not >1 needed
-                # connectionList[0] is the hidden connection created when the portPair is
-                i = 0
-                # while type(p.connectionList[i].fromPort.parent) is StorageTank and type(p.connectionList[i].toPort.parent) is StorageTank:
-                while (p.connectionList[i].fromPort.parent) == (p.connectionList[i].toPort.parent):
-                    i += 1
-                if len(p.connectionList) >= i + 1:
-                    if p.connectionList[i].fromPort is p:
-                        res.append(p.connectionList[i].toPort)
-                    elif p.connectionList[i].toPort is p:
-                        res.append(p.connectionList[i].fromPort)
-                    else:
-                        self.logger.debug("Port is not fromPort nor toPort")
-
-        # [print(p.parent.newDisplayName) for p in res]
-        return res
-
-    def printPDF(self):
-        """
-        ---------------------------------------------
-        Export diagram as pdf onto specified folder
-        fn = user input directory
-        ---------------------------------------------
-        """
-        fn, _ = _qtw.QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
-        if fn != "":
-            if _qtc.QFileInfo(fn).suffix() == "":
-                fn += ".pdf"
-            printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
-            printer.setOrientation(_qtp.QPrinter.Landscape)
-            printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
-            printer.setOutputFileName(fn)
-            painter = _qtg.QPainter(printer)
-            self.diagramScene.render(painter)
-            painter.end()
-            self.logger.info("File exported to %s" % fn)
+    def _createRenameHelper(self) -> _rename.RenameHelper:
+        renameHelper = _rename.RenameHelper(self.namesManager)
+        return renameHelper
 
     def createDdckTree(self, loadPath):
         treeToRemove = self.findChild(_qtw.QTreeView, "ddck")
@@ -1226,14 +1167,12 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         assert data, f"{resourcePath} package resource not found"
         return data
 
-    def createHydraulicDir(self, projectFolder):
+    @staticmethod
+    def createHydraulicDir(projectFolder):
+        hydraulicFolder = os.path.join(projectFolder, "ddck", "hydraulic")
 
-        self.hydraulicFolder = os.path.join(projectFolder, "ddck")
-        self.hydraulicFolder = os.path.join(self.hydraulicFolder, "hydraulic")
-
-        if not os.path.exists(self.hydraulicFolder):
-            self.logger.info("Creating " + self.hydraulicFolder)
-            os.makedirs(self.hydraulicFolder)
+        if not os.path.exists(hydraulicFolder):
+            os.makedirs(hydraulicFolder)
 
     def createWeatherAndControlDirs(self, projectFolder):
 
@@ -1274,10 +1213,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         return ddckDirNames
 
     def nameExists(self, name):
-        for item in self.trnsysObj:
-            if str(item.displayName).lower() == name.lower():
-                return True
-        return False
+        return self.namesManager.va
 
     def nameExistsInDdckFolder(self, name):
         projectFolderDdckPath = _pl.Path(self.projectFolder) / "ddck"

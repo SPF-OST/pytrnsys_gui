@@ -16,8 +16,8 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 class PitStorage(BlockItemFourPorts):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(PitStorage, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
         self.w = 240
         self.h = 160
         self.loadedFiles = []

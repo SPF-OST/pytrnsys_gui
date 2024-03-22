@@ -16,8 +16,8 @@ from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(HeatPumpTwoHx, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
@@ -132,24 +132,6 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
         self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
         self.trnsysId = i["trnsysID"]
         self.id = i["ID"]
-
-        resBlockList.append(self)
-
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.flippedH = i["FlippedH"]
-        self.flippedV = i["FlippedV"]
-
-        self.changeSize()
-
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
-            self.logger.debug("Input at heatExchanger")
-
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
-            self.logger.debug("Output at heatExchanger")
-
-        self.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1] + offset_y))
 
         resBlockList.append(self)
 

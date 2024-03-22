@@ -19,8 +19,8 @@ import trnsysGUI.teePieces.teePieceBase as _tpb
 
 
 class DoublePipeTeePiece(_tpb.TeePieceBase):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 60
         self.h = 40

@@ -14,8 +14,8 @@ from . import _serialization as _ser
 
 
 class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attributes
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
@@ -33,7 +33,9 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         }
         return _ip.InternalPiping([self._modelPump], modelPortItemsToGraphicalPortItem)
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:

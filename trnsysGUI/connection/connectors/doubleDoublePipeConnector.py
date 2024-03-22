@@ -13,8 +13,8 @@ import trnsysGUI.internalPiping as _ip
 
 
 class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.fromPort = _dppi.DoublePipePortItem("i", 0, self)
         self.toPort = _dppi.DoublePipePortItem("o", 2, self)

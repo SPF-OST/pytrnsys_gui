@@ -42,8 +42,8 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
-    def __init__(self, trnsysType, editor, **kwargs) -> None:
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.parent = editor
 
@@ -70,7 +70,9 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
     @property
@@ -91,9 +93,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
     def setParent(self, p):
         self.logger.debug("Setting parent of Storage Tank (and its hx)")
         self.parent = p
-
-        if self not in self.editor.trnsysObj:
-            self.editor.trnsysObj.append(self)
 
         for heatExchanger in self.heatExchangers:
             heatExchanger.storageTank = self
@@ -317,11 +316,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         heatExchanger.port1.id = portPair.inputPort.id
         heatExchanger.port2.id = portPair.outputPort.id
-
-    def decodePaste(  # pylint: disable=too-many-arguments
-        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
-    ):
-        self._decodeInternal(i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=False)
 
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(
         self, generator: _id.IdGenerator

@@ -11,8 +11,8 @@ import trnsysGUI.internalPiping as _ip
 
 
 class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 40
         self.h = 20
@@ -24,7 +24,9 @@ class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
     def shallRenameOutputTemperaturesInHydraulicFile(self):

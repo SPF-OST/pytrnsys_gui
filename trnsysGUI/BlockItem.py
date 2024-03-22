@@ -25,7 +25,7 @@ FILEPATH = "res/Config.txt"
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
-    def __init__(self, trnsysType, editor, displayNamePrefix=None, displayName=None, **kwargs):
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(None)
 
         self.logger = editor.logger
@@ -36,15 +36,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.id = self.editor.idGen.getID()
         self.propertyFile = []
 
-        if displayNamePrefix:
-            self.displayName = displayNamePrefix + str(self.id)
-        elif displayName:
-            self.displayName = displayName
-        else:
-            raise Exception("No display name defined.")
+        if not displayName:
+            raise ValueError("Display name cannot be empty.")
 
-        if "loadedBlock" not in kwargs:
-            self.editor.trnsysObj.append(self)
+        self.displayName = displayName
 
         self.inputs: list[_pib.PortItemBase] = []
         self.outputs: list[_pib.PortItemBase] = []
@@ -110,9 +105,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     # Setter functions
     def setParent(self, p):
         self.editor = p
-
-        if self not in self.editor.trnsysObj:
-            self.editor.trnsysObj.append(self)
 
     def setId(self, newId):
         self.id = newId
@@ -618,26 +610,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
-
-        resBlockList.append(self)
-
-    def decodePaste(
-        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs  # /NOSONAR
-    ):  # pylint: disable=unused-argument
-        self.setPos(
-            float(i["BlockPosition"][0] + offset_x),
-            float(i["BlockPosition"][1] + offset_y),
-        )
-
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-
-        for x, inputPort in enumerate(self.inputs):
-            inputPort.id = i["PortsIDIn"][x]
-
-        for x, outputPort in enumerate(self.outputs):
-            outputPort.id = i["PortsIDOut"][x]
 
         resBlockList.append(self)
 

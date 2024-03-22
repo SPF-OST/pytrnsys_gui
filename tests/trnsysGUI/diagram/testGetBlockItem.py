@@ -96,39 +96,39 @@ class TestGetBlockItem:
         self, componentTypeName, componentType, displayName, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem(componentTypeName, editorMock)
+        blockItem = _gbi.createBlockItem(componentTypeName, editorMock)
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
     def testGetNewStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem("StorageTank", editorMock)
+        blockItem = _gbi.createBlockItem("StorageTank", editorMock)
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "Tes7701"
 
     def testGetNewGraphicalItem(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
+        blockItem = _gbi.createBlockItem("GraphicalItem", editorMock)
         assert isinstance(blockItem, GraphicalItem)
 
     def testGetNewUnknownBlockItemRaises(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
 
         with _pt.raises(ValueError):
-            _gbi.getBlockItem("Blk", editorMock)
+            _gbi.createBlockItem("Blk", editorMock)
 
     @_pt.mark.parametrize("componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
     def testGetLoadedBlockItem(
         self, componentTypeName, componentType, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem(componentTypeName, editorMock, displayName=componentTypeName)
+        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, displayName=componentTypeName)
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == componentTypeName
 
     def testGetLoadedStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem("StorageTank", editorMock, displayName="StorageTank")
+        blockItem = _gbi.createBlockItem("StorageTank", editorMock, displayName="StorageTank")
         assert isinstance(blockItem, StorageTank)
         assert blockItem.displayName == "StorageTank"
 

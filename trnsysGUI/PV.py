@@ -14,8 +14,8 @@ import trnsysGUI.images as _img
 
 
 class PV(BlockItem):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(PV, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
         factor = 0.97
         self.w = 100
         self.h = 100
