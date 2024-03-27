@@ -11,7 +11,6 @@ import typing as _tp
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
-import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
@@ -1211,14 +1210,3 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             ddckDirNames.append(componentDirPath.name)
 
         return ddckDirNames
-
-    def nameExists(self, name):
-        return self.namesManager.va
-
-    def nameExistsInDdckFolder(self, name):
-        projectFolderDdckPath = _pl.Path(self.projectFolder) / "ddck"
-        projectDdckFiles = projectFolderDdckPath.iterdir()
-        for file in projectDdckFiles:
-            if file.name.lower() == name.lower():
-                return True
-        return False
