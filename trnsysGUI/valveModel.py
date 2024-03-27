@@ -60,10 +60,10 @@ class ValveModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixi
 
     @classmethod
     def from_dict(
-        cls,  # pylint: disable = duplicate-code
-        data: _dcj.JsonDict,  # pylint: disable = duplicate-code
+        cls,
+        data: _dcj.JsonDict,
         validate=True,
-        validate_enums: bool = True,
+        validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "ValveModel":
         tVentilModel = super().from_dict(data, validate, validate_enums, schema_type)
@@ -71,9 +71,9 @@ class ValveModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixi
 
     def to_dict(
         self,
-        omit_none: bool = True,
+        omit_none: bool = True,  # /NOSONAR
         validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,  # /NOSONAR
         schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:  # pylint: disable = duplicate-code
         data = super().to_dict(omit_none, validate, validate_enums, schema_type)
