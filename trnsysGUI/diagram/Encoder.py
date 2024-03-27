@@ -16,13 +16,13 @@ class Encoder(json.JSONEncoder):
         res = {}
         blockDct = {".__BlockDct__": True}
 
-        for t in obj.trnsysObj:
-            if isinstance(t, _bi.BlockItem) and not t.isVisible():
-                logger.debug("Invisible block [probably an insideBlock?]" + str(t) + str(t.displayName))
-                continue
+        for i, trnsysObject in enumerate(obj.trnsysObj, start=1):
+            if isinstance(trnsysObject, _bi.BlockItem):
+                assert trnsysObject.isVisible()
 
-            dictName, dct = t.encode()
-            blockDct[dictName + str(t.id)] = dct
+            dictName, dct = trnsysObject.encode()
+            key = f"{dictName}-{i}"
+            blockDct[key] = dct
 
         idDict = {
             "__idDct__": True,

@@ -49,12 +49,8 @@ class Decoder(_json.JSONDecoder):
 
             sortedItems = sorted(arr.items(), key=lambda t: t[0])
 
-            sortedKeys: _tp.Sequence[str]
             sortedValues: _tp.Sequence[_tp.Mapping[str, _tp.Any]]
-            sortedKeys, sortedValues = zip(*sortedItems)
-
-            formattedSortedKeys = ", ".join(sortedKeys)
-            self.logger.debug("keys are %s", formattedSortedKeys)
+            sortedValues = [v for _, v in sortedItems]
 
             namesManager = self.editor.namesManager
 
