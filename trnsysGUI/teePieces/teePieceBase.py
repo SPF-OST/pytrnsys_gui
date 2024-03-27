@@ -3,6 +3,7 @@ import typing as _tp
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.teePieces.teePieceBaseModel as _tpbm
 
 
 class TeePieceBase(_bi.BlockItem, _ip.HasInternalPiping):
@@ -37,6 +38,28 @@ class TeePieceBase(_bi.BlockItem, _ip.HasInternalPiping):
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
+
+    def _encodeTeePieceBaseModel(self) -> _tpbm.TeePieceBaseModel:
+        blockItemModel = self._encodeBaseModel()
+
+        inputPortId = self.inputs[0].id
+        outputPortIds = (self.outputs[0].id, self.outputs[1].id)
+
+        baseModel = _tpbm.TeePieceBaseModel(
+            blockItemModel,
+            inputPortId,
+            outputPortIds,
+        )
+
+        return baseModel
+
+    def _decodeTeePieceBaseModel(self, baseModel: _tpbm.TeePieceBaseModel) -> None:
+        self.inputs[0].id = baseModel.inputPortId
+
+        self.outputs[0].id = baseModel.outputPortIds[0]
+        self.outputs[1].id = baseModel.outputPortIds[1]
+
+        self._decodeBaseModel(baseModel.blockItemModel)
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         raise NotImplementedError()

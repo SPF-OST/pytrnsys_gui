@@ -11,8 +11,6 @@ class Encoder(json.JSONEncoder):
     def default(self, obj):
         assert isinstance(obj, _de.Editor), f"Object to encode must be an `{_de.Editor.__name__}`."
 
-        logger = obj.logger
-
         res = {}
         blockDct = {".__BlockDct__": True}
 

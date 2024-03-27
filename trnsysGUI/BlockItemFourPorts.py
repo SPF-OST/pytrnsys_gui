@@ -50,7 +50,6 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
         dct["PortsIDIn"] = portListInputs
         dct["PortsIDOut"] = portListOutputs
         dct[self.name + "Position"] = (float(self.pos().x()), float(self.pos().y()))
-        dct["ID"] = self.id
         dct["trnsysID"] = self.trnsysId
         dct["childIds"] = self.childIds
         dct["FlippedH"] = self.flippedH

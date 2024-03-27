@@ -8,7 +8,6 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.globalNames as _gnames
@@ -18,6 +17,7 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.serialization as _gser
 import trnsysGUI.teePieces.exportHelper as _eh
 import trnsysGUI.teePieces.teePieceBase as _tpb
+import trnsysGUI.teePieces.teePieceBaseModel as _tpbm
 
 
 class DoublePipeTeePiece(_tpb.TeePieceBase):
@@ -69,36 +69,28 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
         raise AssertionError("Invalid rotation angle.")
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
-        blockItemModel = self._encodeBaseModel()
+        baseModel = self._encodeTeePieceBaseModel()
 
         childTrnsysIds = (self.childIds[0], self.childIds[1])
-        inputPortId = self.inputs[0].id
-        outputPortIds = (self.outputs[0].id, self.outputs[1].id)
 
         doublePipeTeePieceModel = DoublePipeTeePieceModel(
             self.name,
             self.displayName,
-            blockItemModel,
+            baseModel,
             childTrnsysIds,
-            inputPortId,
-            outputPortIds,
         )
 
         dictName = "Block-"
         return dictName, doublePipeTeePieceModel.to_dict()
 
-    def decode(self, i, resBlockList) -> None:
+    def decode(self, i: _dcj.JsonDict, resBlockList: list) -> None:
         model = DoublePipeTeePieceModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
 
         self.childIds = model.childTrnsysIds
 
-        self.inputs[0].id = model.inputPortId
-        self.outputs[0].id = model.outputPortIds[0]
-        self.outputs[1].id = model.outputPortIds[1]
-
-        self._decodeBaseModel(model.blockItemModel)
+        self._decodeTeePieceBaseModel(model.teePieceModel)
 
         resBlockList.append(self)
 
@@ -212,10 +204,8 @@ class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint
 
 @_dc.dataclass
 class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
-    blockItemModel: _bim.BlockItemBaseModel
+    teePieceModel: _tpbm.TeePieceBaseModel
     childTrnsysIds: _tp.Tuple[int, int]
-    inputPortId: int
-    outputPortIds: _tp.Tuple[int, int]
 
     @classmethod
     def from_dict(
@@ -247,24 +237,16 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDeco
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeTeePieceModel":
         assert isinstance(superseded, DoublePipeTeePieceModelVersion0)
 
-        blockItemModel = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
+        baseModel = _tpbm.createTeePieceBaseModelFromLegacyModel(superseded)
 
         assert len(superseded.childIds) == 2
         chidTrnsysIds = (superseded.childIds[0], superseded.childIds[1])
 
-        assert len(superseded.portsIdsIn) == 1
-        inputPortId = superseded.portsIdsIn[0]
-
-        assert len(superseded.portsIdsOut) == 2
-        outputPortIds = (superseded.portsIdsOut[0], superseded.portsIdsOut[1])
-
         return DoublePipeTeePieceModel(
             superseded.BlockName,
             superseded.BlockDisplayName,
-            blockItemModel,
+            baseModel,
             chidTrnsysIds,
-            inputPortId,
-            outputPortIds,
         )
 
     @classmethod
