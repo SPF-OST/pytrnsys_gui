@@ -99,7 +99,6 @@ class TeePiece(_tpb.TeePieceBase):
 
         self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
-        self.id = model.Id
         self.trnsysId = model.trnsysId
 
         self.inputs[0].id = model.portsIdsIn[0]
@@ -154,10 +153,10 @@ class TeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
-        return _bim.BlockItemModel
+        return _bim.BlockItemModelVersion1
 
     @classmethod
-    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TeePieceModel":  # type: ignore[override]
+    def upgrade(cls, superseded: _bim.BlockItemModelVersion1) -> "TeePieceModel":  # type: ignore[override]
         assert len(superseded.portsIdsIn) == 2
         assert len(superseded.portsIdsOut) == 1
 

@@ -51,8 +51,8 @@ class TapBase(_ptb.PumpsAndTabsBase):
         assert model.BlockName == self.name
 
         self.setDisplayName(model.BlockDisplayName)
-        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
         self._graphicalPortItem.id = model.portId
+        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
 
         resBlockList.append(self)
 

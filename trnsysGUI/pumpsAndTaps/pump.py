@@ -89,10 +89,10 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
 
         self.setDisplayName(model.BlockDisplayName)
 
-        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
-
         self.inputs[0].id = model.inputPortId
         self.outputs[0].id = model.outputPortId
+
+        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
 
         resBlockList.append(self)
 

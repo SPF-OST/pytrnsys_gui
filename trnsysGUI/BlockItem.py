@@ -4,19 +4,24 @@ import os
 import typing as _tp
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QPointF, QEvent, QTimer
-from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
+from PyQt5.QtCore import QEvent
+from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QGraphicsPixmapItem
+from PyQt5.QtWidgets import QGraphicsTextItem
+from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.idGenerator as _id
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-
-import trnsysGUI.idGenerator as _id
-
 from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
 from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
-from trnsysGUI.blockItemModel import BlockItemModel
 
 FILEPATH = "res/Config.txt"
 
@@ -33,7 +38,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.w = 120
         self.h = 120
         self.editor = editor
-        self.id = self.editor.idGen.getID()
 
         if not displayName:
             raise ValueError("Display name cannot be empty.")
@@ -104,9 +108,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     # Setter functions
     def setParent(self, p):
         self.editor = p
-
-    def setId(self, newId):
-        self.id = newId
 
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
@@ -557,6 +558,31 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                     return True
         return False
 
+    def _encodeBaseModel(self) -> _bim.BlockItemBaseModel:
+        position = (self.pos().x(), self.pos().y())
+
+        blockItemModel = _bim.BlockItemBaseModel(
+            position,
+            self.trnsysId,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+        )
+
+        return blockItemModel
+
+    def _decodeBaseModel(self, blockItemModel: _bim.BlockItemBaseModel) -> None:
+        x = float(blockItemModel.blockPosition[0])
+        y = float(blockItemModel.blockPosition[1])
+        self.setPos(x, y)
+
+        self.trnsysId = blockItemModel.trnsysId
+
+        self.updateFlipStateH(blockItemModel.flippedH)
+        self.updateFlipStateV(blockItemModel.flippedV)
+
+        self.rotateBlockToN(blockItemModel.rotationN)
+
     def encode(self):
         portListInputs = []
         portListOutputs = []
@@ -568,11 +594,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-        blockItemModel = BlockItemModel(
+        blockItemModel = _bim.BlockItemModel(
             self.name,
             self.displayName,
             blockPosition,
-            self.id,
             self.trnsysId,
             portListInputs,  # pylint: disable = duplicate-code # 1
             portListOutputs,
@@ -585,11 +610,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         return dictName, blockItemModel.to_dict()
 
     def decode(self, i, resBlockList):
-        model = BlockItemModel.from_dict(i)
+        model = _bim.BlockItemModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
-        self.id = model.Id
         self.trnsysId = model.trnsysId
 
         if len(self.inputs) != len(model.portsIdsIn) or len(self.outputs) != len(model.portsIdsOut):

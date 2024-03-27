@@ -77,7 +77,6 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
 
         self.setPos(float(i[self.name + "Position"][0]), float(i[self.name + "Position"][1]))
         self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
 
         resBlockList.append(self)
 

@@ -187,7 +187,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             self.flippedV,
             self.name,
             self.displayName,
-            self.id,
             self.trnsysId,
             self.h,
             position,
@@ -233,7 +232,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             portPair = _model.PortPair(side, heatExchanger.trnsysId, inputPort, outputPort)
 
             heatExchangerModel = _model.HeatExchanger(
-                portPair, heatExchanger.displayName, heatExchanger.w, self.id, heatExchanger.id
+                portPair, heatExchanger.displayName, heatExchanger.w, heatExchanger.id
             )
 
             heatExchangerModels.append(heatExchangerModel)
@@ -270,7 +269,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         if shallSetNamesAndIDs:
             self.trnsysId = model.trnsysId
-            self.id = model.id
 
         for heatExchangerModel in model.heatExchangers:
             self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)
