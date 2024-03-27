@@ -104,11 +104,11 @@ class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=to
     ) -> _tp.Sequence["HeatExchanger"]:
         heatExchangers = []
         for supersededHeatExchanger in supersededHeatExchangers:
-            heatExchangerLegacyVersion = HeatExchangerVersion0.createFromLegacyHeatExchanger(
+            heatExchangerVersion0 = HeatExchangerVersion0.createFromLegacyHeatExchanger(
                 supersededHeatExchanger, storageTankHeight
             )
 
-            heatExchanger = HeatExchanger.fromInstance(heatExchangerLegacyVersion)
+            heatExchanger = HeatExchanger.fromInstance(heatExchangerVersion0)
 
             heatExchangers.append(heatExchanger)
 
@@ -122,11 +122,9 @@ class StorageTankVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=to
     ) -> _tp.Sequence["DirectPortPair"]:
         directPortPairs = []
         for supersededPair in supersededPairs:
-            directPortPairLegacyVersion = DirectPortPairVersion0.createFromLegacyPortPair(
-                supersededPair, storageTankHeight
-            )
+            directPortPairVersion0 = DirectPortPairVersion0.createFromLegacyPortPair(supersededPair, storageTankHeight)
 
-            directPortPair = DirectPortPair.fromInstance(directPortPairLegacyVersion)
+            directPortPair = DirectPortPair.fromInstance(directPortPairVersion0)
 
             directPortPairs.append(directPortPair)
 

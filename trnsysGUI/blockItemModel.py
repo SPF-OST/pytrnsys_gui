@@ -165,7 +165,7 @@ class BlockItemBaseModel(_ser.UpgradableJsonSchemaMixin):
         return _uuid.UUID("7b792574-5fa6-4c3e-b2e3-7e4eb71d7746")
 
 
-class LegacyBlockItemModelProtocol(_tp.Protocol):
+class BlockItemLegacyModelProtocol(_tp.Protocol):
     blockPosition: _tp.Tuple[float, float]
     trnsysId: int
     flippedH: bool
@@ -173,7 +173,7 @@ class LegacyBlockItemModelProtocol(_tp.Protocol):
     rotationN: int
 
 
-def createBlockItemBaseModelFromLegacyModel(superseded: LegacyBlockItemModelProtocol) -> BlockItemBaseModel:
+def createBlockItemBaseModelFromLegacyModel(superseded: BlockItemLegacyModelProtocol) -> BlockItemBaseModel:
     return BlockItemBaseModel(
         superseded.blockPosition, superseded.trnsysId, superseded.flippedH, superseded.flippedV, superseded.rotationN
     )

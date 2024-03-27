@@ -17,7 +17,7 @@ class TeePieceBaseModel(_ser.UpgradableJsonSchemaMixinVersion0):
         return _uuid.UUID("260c8083-5343-4345-8cb3-0cdd374bc076")
 
 
-class TeePieceLegacyModelProtocol(_bim.LegacyBlockItemModelProtocol, _tp.Protocol):
+class TeePieceLegacyModelProtocol(_bim.BlockItemLegacyModelProtocol, _tp.Protocol):
     portsIdsIn: list[int]
     portsIdsOut: list[int]
 
