@@ -6,16 +6,14 @@ on:
       - v*
   repository_dispatch:
     types:
-      - build-executable-pull-request
       - build-executable-push
 
 jobs:
   build-exe:
-    runs-on: [self-hosted, etzel]
+    runs-on: [self-hosted, etna]
     env:
       NORMAL_PUSH_TO_MASTER: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push'}}
       TAG_PUSH_TO_MASTER: ${{github.event_name == 'push'}}
-      PUSH_TO_PULL_REQUEST: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-pull-request'}}
     steps:
       - uses: actions/checkout@v3
       
@@ -75,13 +73,3 @@ jobs:
           prerelease: false
           # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
           files: ${{steps.fn.outputs.file_name_base}}.zip
-
-      - if: env.PUSH_TO_PULL_REQUEST == 'true'
-        name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{steps.fn.outputs.file_name_base}}
-          path: |
-            release\build\pytrnsys\site-packages\pytrnsys_gui_data
-            release\build\pytrnsys\site-packages\pytrnsys_data
-            release\build\pytrnsys
