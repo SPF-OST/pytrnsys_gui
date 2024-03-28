@@ -16,15 +16,15 @@ from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class SteamPowerBlock(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 240
         self.h = 160
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.changeSize()
         self.addTree()

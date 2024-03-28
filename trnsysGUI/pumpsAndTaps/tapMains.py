@@ -8,10 +8,12 @@ from . import _tapBase as _tb
 
 
 class TapMains(_tb.TapBase):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, _mfn.PortItemDirection.OUTPUT, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, _mfn.PortItemDirection.OUTPUT, displayName)
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
@@ -35,6 +37,6 @@ Tcw = 1
 """
         return equations, startingUnit
 
-    def _setUnFlippedPortPos(self, delta: float) -> None:
+    def _setUnFlippedPortPos(self, delta: int) -> None:
         self.origOutputsPos = [[0, delta]]
         self._graphicalPortItem.setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])

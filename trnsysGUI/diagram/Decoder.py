@@ -49,12 +49,10 @@ class Decoder(_json.JSONDecoder):
 
             sortedItems = sorted(arr.items(), key=lambda t: t[0])
 
-            sortedKeys: _tp.Sequence[str]
             sortedValues: _tp.Sequence[_tp.Mapping[str, _tp.Any]]
-            sortedKeys, sortedValues = zip(*sortedItems)
+            sortedValues = [v for _, v in sortedItems]
 
-            formattedSortedKeys = ", ".join(sortedKeys)
-            self.logger.debug("keys are %s", formattedSortedKeys)
+            namesManager = self.editor.namesManager
 
             for i in sortedValues:
                 if type(i) is not dict:
@@ -68,14 +66,18 @@ class Decoder(_json.JSONDecoder):
                     self.logger.debug("Found a block ")
 
                     if componentType == "GraphicalItem":
-                        bl = _gbi.getBlockItem("GraphicalItem", self.editor)
+                        blockItem = _gbi.createBlockItem("GraphicalItem", self.editor, namesManager)
                     elif componentType == "Control" or componentType == "MasterControl":
                         self.logger.warning(f"BlockItem: '{componentType}' is no longer supported in the GUI.")
                         continue
                     else:
-                        bl = _gbi.getBlockItem(componentType, self.editor, displayName=i["BlockDisplayName"])
+                        blockItem = _gbi.createBlockItem(
+                            componentType, self.editor, namesManager, displayName=i["BlockDisplayName"]
+                        )
 
-                    bl.decode(i, resBlockList)
+                    self.editor.trnsysObj.append(blockItem)
+
+                    blockItem.decode(i, resBlockList)
 
                 elif ".__ConnectionDict__" in i:
                     fromPortId, toPortId = self._getPortIds(i)
@@ -109,6 +111,8 @@ class Decoder(_json.JSONDecoder):
 
                     connection.decode(i)
                     _cundo.reAddConnection(connection)
+                    namesManager.addName(connection.displayName)
+
                     self.editor.diagramScene.addItem(connection)
                     resConnList.append(connection)
 

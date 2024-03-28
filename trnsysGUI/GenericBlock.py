@@ -18,12 +18,12 @@ from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class GenericBlock(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(GenericBlock, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
@@ -163,18 +163,6 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         numberOfPortPairs = len(self.inputs)
         for portPairIndex in range(numberOfPortPairs):
             self.removePortPair(portPairIndex)
-
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        correcter = 0
-        for j in range(4):
-            if j == 2:
-                correcter = -1
-            for k in range(i["PortPairsNb"][j] + correcter):
-                self.addPortPair(j)
-
-        super(GenericBlock, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
-        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
-        self.setImage()
 
     def addPortPair(self, side):
         h = self.h

@@ -4,19 +4,24 @@ import os
 import typing as _tp
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QPointF, QEvent, QTimer
-from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
+from PyQt5.QtCore import QEvent
+from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import QTimer
+from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QGraphicsPixmapItem
+from PyQt5.QtWidgets import QGraphicsTextItem
+from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.idGenerator as _id
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-
-import trnsysGUI.idGenerator as _id
-
 from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
 from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
-from trnsysGUI.blockItemModel import BlockItemModel
 
 FILEPATH = "res/Config.txt"
 
@@ -25,7 +30,7 @@ FILEPATH = "res/Config.txt"
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
 class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
-    def __init__(self, trnsysType, editor, displayNamePrefix=None, displayName=None, **kwargs):
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(None)
 
         self.logger = editor.logger
@@ -33,23 +38,16 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.w = 120
         self.h = 120
         self.editor = editor
-        self.id = self.editor.idGen.getID()
-        self.propertyFile = []
 
-        if displayNamePrefix:
-            self.displayName = displayNamePrefix + str(self.id)
-        elif displayName:
-            self.displayName = displayName
-        else:
-            raise Exception("No display name defined.")
+        if not displayName:
+            raise ValueError("Display name cannot be empty.")
 
-        if "loadedBlock" not in kwargs:
-            self.editor.trnsysObj.append(self)
+        self.displayName = displayName
 
         self.inputs: list[_pib.PortItemBase] = []
         self.outputs: list[_pib.PortItemBase] = []
 
-        self.path = None
+        self.path: str | None = None
 
         # Export related:
         self.name = trnsysType
@@ -79,8 +77,8 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         # Undo framework related
         self.oldPos = None
 
-        self.origOutputsPos = None
-        self.origInputsPos = None
+        self.origOutputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
+        self.origInputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if isinstance(self, BlockItem):
@@ -110,12 +108,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     # Setter functions
     def setParent(self, p):
         self.editor = p
-
-        if self not in self.editor.trnsysObj:
-            self.editor.trnsysObj.append(self)
-
-    def setId(self, newId):
-        self.id = newId
 
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
@@ -164,9 +156,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
             self.editor.showDoublePipeBlockDlg(self)
         else:
             self.editor.showBlockDlg(self)
-            if len(self.propertyFile) > 0:
-                for files in self.propertyFile:
-                    os.startfile(files, "open")
 
     def mouseReleaseEvent(self, event):
         # self.logger.debug("Released mouse over block")
@@ -569,6 +558,31 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                     return True
         return False
 
+    def _encodeBaseModel(self) -> _bim.BlockItemBaseModel:
+        position = (self.pos().x(), self.pos().y())
+
+        blockItemModel = _bim.BlockItemBaseModel(
+            position,
+            self.trnsysId,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+        )
+
+        return blockItemModel
+
+    def _decodeBaseModel(self, blockItemModel: _bim.BlockItemBaseModel) -> None:
+        x = float(blockItemModel.blockPosition[0])
+        y = float(blockItemModel.blockPosition[1])
+        self.setPos(x, y)
+
+        self.trnsysId = blockItemModel.trnsysId
+
+        self.updateFlipStateH(blockItemModel.flippedH)
+        self.updateFlipStateV(blockItemModel.flippedV)
+
+        self.rotateBlockToN(blockItemModel.rotationN)
+
     def encode(self):
         portListInputs = []
         portListOutputs = []
@@ -580,11 +594,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-        blockItemModel = BlockItemModel(
+        blockItemModel = _bim.BlockItemModel(
             self.name,
             self.displayName,
             blockPosition,
-            self.id,
             self.trnsysId,
             portListInputs,  # pylint: disable = duplicate-code # 1
             portListOutputs,
@@ -597,11 +610,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         return dictName, blockItemModel.to_dict()
 
     def decode(self, i, resBlockList):
-        model = BlockItemModel.from_dict(i)
+        model = _bim.BlockItemModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
-        self.id = model.Id
         self.trnsysId = model.trnsysId
 
         if len(self.inputs) != len(model.portsIdsIn) or len(self.outputs) != len(model.portsIdsOut):
@@ -618,26 +630,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.updateFlipStateH(model.flippedH)
         self.updateFlipStateV(model.flippedV)
         self.rotateBlockToN(model.rotationN)
-
-        resBlockList.append(self)
-
-    def decodePaste(
-        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs  # /NOSONAR
-    ):  # pylint: disable=unused-argument
-        self.setPos(
-            float(i["BlockPosition"][0] + offset_x),
-            float(i["BlockPosition"][1] + offset_y),
-        )
-
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-
-        for x, inputPort in enumerate(self.inputs):
-            inputPort.id = i["PortsIDIn"][x]
-
-        for x, outputPort in enumerate(self.outputs):
-            outputPort.id = i["PortsIDOut"][x]
 
         resBlockList.append(self)
 

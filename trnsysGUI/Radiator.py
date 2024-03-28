@@ -16,12 +16,12 @@ from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class Radiator(BlockItem, _Ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(Radiator, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
 
         self.changeSize()
         self.addTree()

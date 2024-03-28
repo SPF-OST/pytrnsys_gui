@@ -91,11 +91,6 @@ class GraphicalItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
-    def decodePaste(self, i, offsetX, offsetY, resConnList, resBlockList, **kwargs):
-        self.setPos(float(i["BlockPosition"][0] + offsetX), float(i["BlockPosition"][1] + offsetY))
-
-        resBlockList.append(self)
-
     def setParent(self, parent):
         self._editor = parent
         if self not in self._editor.graphicalObj:

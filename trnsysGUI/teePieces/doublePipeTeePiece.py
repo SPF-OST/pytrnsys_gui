@@ -14,22 +14,22 @@ import trnsysGUI.globalNames as _gnames
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.serialization as _gser
 import trnsysGUI.teePieces.exportHelper as _eh
 import trnsysGUI.teePieces.teePieceBase as _tpb
+import trnsysGUI.teePieces.teePieceBaseModel as _tpbm
 
 
 class DoublePipeTeePiece(_tpb.TeePieceBase):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 60
         self.h = 40
 
         self.changeSize()
 
-        self.childIds = []
-        self.childIds.append(self.trnsysId)
-        self.childIds.append(self.editor.idGen.getTrnsysID())
+        self.childIds = (self.trnsysId, self.editor.idGen.getTrnsysID())
 
         self._updateModels(self.displayName)
 
@@ -68,50 +68,29 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
         raise AssertionError("Invalid rotation angle.")
 
-    def encode(self):
-        portListInputs = []
-        portListOutputs = []
+    def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
+        baseModel = self._encodeTeePieceBaseModel()
 
-        for inp in self.inputs:
-            portListInputs.append(inp.id)
-        for output in self.outputs:
-            portListOutputs.append(output.id)
-
-        blockPosition = (float(self.pos().x()), float(self.pos().y()))
+        childTrnsysIds = (self.childIds[0], self.childIds[1])
 
         doublePipeTeePieceModel = DoublePipeTeePieceModel(
             self.name,
             self.displayName,
-            blockPosition,
-            self.id,
-            self.trnsysId,
-            self.childIds,
-            portListInputs,
-            portListOutputs,
-            self.flippedH,
-            self.flippedV,
-            self.rotationN,
+            baseModel,
+            childTrnsysIds,
         )
 
         dictName = "Block-"
         return dictName, doublePipeTeePieceModel.to_dict()
 
-    def decode(self, i, resBlockList):
+    def decode(self, i: _dcj.JsonDict, resBlockList: list) -> None:
         model = DoublePipeTeePieceModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
-        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
-        self.id = model.id
-        self.trnsysId = model.trnsysId
-        self.childIds = model.childIds
 
-        self.inputs[0].id = model.portsIdsIn[0]
-        self.outputs[0].id = model.portsIdsOut[0]
-        self.outputs[1].id = model.portsIdsOut[1]
+        self.childIds = model.childTrnsysIds
 
-        self.updateFlipStateH(model.flippedH)
-        self.updateFlipStateV(model.flippedV)
-        self.rotateBlockToN(model.rotationN)
+        self._decodeTeePieceBaseModel(model.teePieceModel)
 
         resBlockList.append(self)
 
@@ -177,7 +156,7 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
 
 @_dc.dataclass
-class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     BlockName: str  # pylint: disable=invalid-name
     BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
@@ -189,6 +168,44 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
     flippedH: bool
     flippedV: bool
     rotationN: int
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return _dpcb.DoublePipeBlockItemModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeTeePieceModelVersion0":
+        assert isinstance(superseded, _dpcb.DoublePipeBlockItemModelVersion0)
+
+        assert len(superseded.portsIdsIn) == 2
+        assert len(superseded.portsIdsOut) == 1
+
+        inputPortIds = [superseded.portsIdsIn[0]]
+        outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
+
+        return DoublePipeTeePieceModelVersion0(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            superseded.blockPosition,
+            superseded.id,
+            superseded.trnsysId,
+            superseded.childIds,
+            inputPortIds,
+            outputPortIds,
+            superseded.flippedH,
+            superseded.flippedV,
+            superseded.rotationN,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")
+
+
+@_dc.dataclass
+class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+    teePieceModel: _tpbm.TeePieceBaseModel
+    childTrnsysIds: _tp.Tuple[int, int]
 
     @classmethod
     def from_dict(
@@ -214,30 +231,24 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
 
     @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return _dpcb.DoublePipeBlockItemModel
+        return DoublePipeTeePieceModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _dpcb.DoublePipeBlockItemModel) -> "DoublePipeTeePieceModel":  # type: ignore[override]
-        assert len(superseded.portsIdsIn) == 2
-        assert len(superseded.portsIdsOut) == 1
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeTeePieceModel":
+        assert isinstance(superseded, DoublePipeTeePieceModelVersion0)
 
-        inputPortIds = [superseded.portsIdsIn[0]]
-        outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
+        baseModel = _tpbm.createTeePieceBaseModelFromLegacyModel(superseded)
+
+        assert len(superseded.childIds) == 2
+        chidTrnsysIds = (superseded.childIds[0], superseded.childIds[1])
 
         return DoublePipeTeePieceModel(
             superseded.BlockName,
             superseded.BlockDisplayName,
-            superseded.blockPosition,
-            superseded.id,
-            superseded.trnsysId,
-            superseded.childIds,
-            inputPortIds,
-            outputPortIds,
-            superseded.flippedH,
-            superseded.flippedV,
-            superseded.rotationN,
+            baseModel,
+            chidTrnsysIds,
         )
 
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")
+        return _uuid.UUID("2864bcb3-172b-47dd-b4cf-20ad9ac97384")

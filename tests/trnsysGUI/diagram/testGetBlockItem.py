@@ -1,6 +1,7 @@
 import cgitb as _cgitb  # pylint: disable=deprecated-module
 import logging as _log
 import unittest.mock as _mock
+import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
@@ -44,50 +45,57 @@ from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
 
+import trnsysGUI.names.manager as _nman
+
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
 _cgitb.enable(format="text")
 
 _BLOCK_ITEM_CASES = [
-    ("TeePiece", TeePiece, "Tee7701"),
-    ("DPTee", DoublePipeTeePiece, "DTee7701"),
-    ("SPCnr", SingleDoublePipeConnector, "SCnr7701"),
-    ("DPCnr", DoubleDoublePipeConnector, "DCnr7701"),
-    ("TVentil", TVentil, "Val7701"),
-    ("Pump", Pump, "Pump7701"),
-    ("Connector", Connector, "Conn7701"),
-    ("Crystalizer", Crystalizer, "Cryt7701"),
-    ("WTap_main", TapMains, "WtSp7701"),
-    ("Collector", Collector, "Coll7701"),
-    ("Kollektor", Collector, "Coll7701"),
-    ("HP", HeatPump, "HP7701"),
-    ("IceStorage", IceStorage, "IceS7701"),
-    ("PitStorage", PitStorage, "PitS7701"),
-    ("Radiator", Radiator, "Rad7701"),
-    ("WTap", Tap, "WtTp7701"),
-    ("GenericBlock", GenericBlock, "GBlk7701"),
-    ("HPTwoHx", HeatPumpTwoHx, "HP7701"),
-    ("HPDoubleDual", HPDoubleDual, "HPDD7701"),
-    ("HPDual", HPDual, "HPDS7701"),
-    ("Boiler", Boiler, "Bolr7701"),
-    ("AirSourceHP", AirSourceHP, "Ashp7701"),
-    ("PV", PV, "PV7701"),
-    ("GroundSourceHx", GroundSourceHx, "Gshx7701"),
-    ("ExternalHx", ExternalHx, "Hx7701"),
-    ("IceStorageTwoHx", IceStorageTwoHx, "IceS7701"),
-    ("Sink", Sink, "QSnk7701"),
-    ("Source", Source, "QSrc7701"),
-    ("SourceSink", SourceSink, "QExc7701"),
-    ("Geotherm", Geotherm, "GeoT7701"),
-    ("Water", Water, "QWat7701"),
-    ("powerBlock", SteamPowerBlock, "StPB7701"),
-    ("CSP_PT", ParabolicTroughField, "PT7701"),
-    ("CSP_CR", CentralReceiver, "CR7701"),
-    ("coldSaltTank", SaltTankCold, "ClSt7701"),
-    ("hotSaltTank", SaltTankHot, "HtSt7701"),
+    ("TeePiece", TeePiece, "Tee5"),
+    ("DPTee", DoublePipeTeePiece, "DTee5"),
+    ("SPCnr", SingleDoublePipeConnector, "SCnr5"),
+    ("DPCnr", DoubleDoublePipeConnector, "DCnr5"),
+    ("TVentil", TVentil, "Val5"),
+    ("Pump", Pump, "Pump5"),
+    ("Connector", Connector, "Conn5"),
+    ("Crystalizer", Crystalizer, "Cryt5"),
+    ("WTap_main", TapMains, "WtSp5"),
+    ("Collector", Collector, "Coll5"),
+    ("Kollektor", Collector, "Coll5"),
+    ("HP", HeatPump, "HP5"),
+    ("IceStorage", IceStorage, "IceS5"),
+    ("PitStorage", PitStorage, "PitS5"),
+    ("Radiator", Radiator, "Rad5"),
+    ("WTap", Tap, "WtTp5"),
+    ("GenericBlock", GenericBlock, "GBlk5"),
+    ("HPTwoHx", HeatPumpTwoHx, "HP5"),
+    ("HPDoubleDual", HPDoubleDual, "HPDD5"),
+    ("HPDual", HPDual, "HPDS5"),
+    ("Boiler", Boiler, "Bolr5"),
+    ("AirSourceHP", AirSourceHP, "Ashp5"),
+    ("PV", PV, "PV5"),
+    ("GroundSourceHx", GroundSourceHx, "Gshx5"),
+    ("ExternalHx", ExternalHx, "Hx5"),
+    ("IceStorageTwoHx", IceStorageTwoHx, "IceS5"),
+    ("Sink", Sink, "QSnk5"),
+    ("Source", Source, "QSrc5"),
+    ("SourceSink", SourceSink, "QExc5"),
+    ("Geotherm", Geotherm, "GeoT5"),
+    ("Water", Water, "QWat5"),
+    ("powerBlock", SteamPowerBlock, "StPB5"),
+    ("CSP_PT", ParabolicTroughField, "PT5"),
+    ("CSP_CR", CentralReceiver, "CR5"),
+    ("coldSaltTank", SaltTankCold, "ClSt5"),
+    ("hotSaltTank", SaltTankHot, "HtSt5"),
 ]
 
 _BLOCK_ITEM_CASES_WITHOUT_NAME = [(x, y) for x, y, _ in _BLOCK_ITEM_CASES]
+
+
+class _DummyDdckDirFileOrDirNamesProvider(_nman.AbstractDdckDirFileOrDirNamesProvider):
+    def hasFileOrDirName(self, name: str) -> bool:
+        return False
 
 
 class TestGetBlockItem:
@@ -96,41 +104,58 @@ class TestGetBlockItem:
         self, componentTypeName, componentType, displayName, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem(componentTypeName, editorMock)
+        namesManagerMock = self._createNamesManager()
+        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, namesManagerMock, displayName)
         assert isinstance(blockItem, componentType)
         assert blockItem.displayName == displayName
 
     def testGetNewStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem("StorageTank", editorMock)
+        namesManagerMock = self._createNamesManager()
+
+        displayName = "Tes"
+        blockItem = _gbi.createBlockItem("StorageTank", editorMock, namesManagerMock, displayName)
+
         assert isinstance(blockItem, StorageTank)
-        assert blockItem.displayName == "Tes7701"
+        assert blockItem.displayName == displayName
 
     def testGetNewGraphicalItem(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem("GraphicalItem", editorMock)
+        namesManagerMock = self._createNamesManager()
+
+        blockItem = _gbi.createBlockItem("GraphicalItem", editorMock, namesManagerMock)
         assert isinstance(blockItem, GraphicalItem)
 
     def testGetNewUnknownBlockItemRaises(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
 
         with _pt.raises(ValueError):
-            _gbi.getBlockItem("Blk", editorMock)
+            namesManagerMock = self._createNamesManager()
+
+            _gbi.createBlockItem("Blk", editorMock, namesManagerMock)
 
     @_pt.mark.parametrize("componentTypeName, componentType", _BLOCK_ITEM_CASES_WITHOUT_NAME)
     def testGetLoadedBlockItem(
         self, componentTypeName, componentType, tmp_path, qtbot  # pylint: disable=invalid-name  # /NOSONAR
     ) -> None:
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem(componentTypeName, editorMock, displayName=componentTypeName)
+        namesManagerMock = self._createNamesManager()
+
+        displayName = f"{componentTypeName}753"
+        blockItem = _gbi.createBlockItem(componentTypeName, editorMock, namesManagerMock, displayName)
+
         assert isinstance(blockItem, componentType)
-        assert blockItem.displayName == componentTypeName
+        assert blockItem.displayName == displayName
 
     def testGetLoadedStorageTank(self, tmp_path, qtbot) -> None:  # pylint: disable=invalid-name  # /NOSONAR
         editorMock = self._testHelper(tmp_path, qtbot)
-        blockItem = _gbi.getBlockItem("StorageTank", editorMock, displayName="StorageTank")
+        namesManagerMock = self._createNamesManager()
+
+        displayName = "StorageTank753"
+        blockItem = _gbi.createBlockItem("StorageTank", editorMock, namesManagerMock, displayName)
+
         assert isinstance(blockItem, StorageTank)
-        assert blockItem.displayName == "StorageTank"
+        assert blockItem.displayName == displayName
 
     def _testHelper(self, tmp_path, bot):  # pylint: disable=invalid-name  # /NOSONAR
         logger = _log.getLogger("root")
@@ -142,6 +167,21 @@ class TestGetBlockItem:
         bot.addWidget(mainWindow)
 
         return editorMock
+
+    @staticmethod
+    def _createNamesManager() -> _nman.NamesManager:
+        existingNames = []
+
+        expectedDisplayName: str
+        for [*_, expectedDisplayName] in _BLOCK_ITEM_CASES:
+            baseName = expectedDisplayName[: -len("5")]
+            existingNames.append(baseName)
+            existingNames.extend(f"{baseName}{i}" for i in range(2, 5))
+
+        ddckDirFileOrDirNamesProvider = _DummyDdckDirFileOrDirNamesProvider()
+        namesManager = _nman.NamesManager(existingNames, ddckDirFileOrDirNamesProvider)
+
+        return namesManager
 
     @staticmethod
     def _createEditorMock(logger, projectFolder):
@@ -171,10 +211,11 @@ class TestGetBlockItem:
         editorMock.idGen.getStoragenTes = lambda: 7703
         editorMock.idGen.getStorageType = lambda: 7704
 
+        editorMock.namesManager = None
+
         graphicsScene = _qtw.QGraphicsScene(parent=editorMock)
         editorMock.diagramScene = graphicsScene
         editorMock.graphicalObj = []
-        editorMock.namesManager = None
 
         mainWindow.setCentralWidget(editorMock)
         mainWindow.showMinimized()

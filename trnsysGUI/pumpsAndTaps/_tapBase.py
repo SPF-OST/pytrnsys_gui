@@ -8,8 +8,8 @@ from trnsysGUI.pumpsAndTaps import _pumpsAndTabsBase as _ptb, _serialization as 
 
 
 class TapBase(_ptb.PumpsAndTabsBase):
-    def __init__(self, trnsysType, editor, direction: _mfn.PortItemDirection, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, direction: _mfn.PortItemDirection, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         if direction == _mfn.PortItemDirection.OUTPUT:
             self._graphicalPortItem = _cspi.createSinglePipePortItem("o", 0, self)
@@ -51,8 +51,8 @@ class TapBase(_ptb.PumpsAndTabsBase):
         assert model.BlockName == self.name
 
         self.setDisplayName(model.BlockDisplayName)
-        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
         self._graphicalPortItem.id = model.portId
+        self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
 
         resBlockList.append(self)
 
@@ -74,5 +74,5 @@ class TapBase(_ptb.PumpsAndTabsBase):
 
         return w, h
 
-    def _setUnFlippedPortPos(self, delta: float) -> None:
+    def _setUnFlippedPortPos(self, delta: int) -> None:
         raise NotImplementedError()

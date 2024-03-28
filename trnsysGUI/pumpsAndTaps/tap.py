@@ -13,13 +13,15 @@ from . import _tapBase
 
 
 class Tap(_tapBase.TapBase):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, _mfn.PortItemDirection.INPUT, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, _mfn.PortItemDirection.INPUT, displayName)
 
-        self.loadedFiles = []
+        self.loadedFiles: list[str] = []
         self.addTree()
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return True
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
@@ -93,6 +95,6 @@ class Tap(_tapBase.TapBase):
             self.path = destPath
             self.logger.debug(self.path)
 
-    def _setUnFlippedPortPos(self, delta: float) -> None:
+    def _setUnFlippedPortPos(self, delta: int) -> None:
         self.origInputsPos = [[0, delta]]
         self._graphicalPortItem.setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])

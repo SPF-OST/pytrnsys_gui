@@ -59,7 +59,7 @@ class TestStorageTank:
         storageTank = _st.StorageTank(
             trnsysType="StorageTank",
             editor=editorMock,
-            displayNamePrefix=legacySerializedStorageTank["BlockName"],
+            displayName=legacySerializedStorageTank["BlockDisplayName"],
         )  # pylint: disable=no-member
 
         blocks = []
@@ -86,7 +86,7 @@ class TestStorageTank:
 
         storageTank.exportDck()
 
-        actualDdckPath = self.ACTUAL_DIR_PATH / "ddck" / "StorageTank7701" / "TesDhw.ddck"
+        actualDdckPath = self.ACTUAL_DIR_PATH / "ddck" / "TesDhw" / "TesDhw.ddck"
         actualDdckContent = actualDdckPath.read_text()
         print(actualDdckContent)
 

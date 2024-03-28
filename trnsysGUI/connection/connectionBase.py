@@ -96,10 +96,14 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
     def getModelPipe(self, portItemType: _mfn.PortItemType) -> _mfn.Pipe:

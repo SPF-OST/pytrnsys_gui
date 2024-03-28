@@ -39,29 +39,35 @@ class View(_qtw.QGraphicsView):
 
     def dropEvent(self, event):  # pylint: disable=too-many-branches,too-many-statements
         """Here, the dropped icons create BlockItems/GraphicalItems"""
-        if event.mimeData().hasFormat("component/name"):
-            componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
-            self.logger.debug("name is " + componentType)
-            blockItem = _gbi.getBlockItem(componentType, self._editor)
-            if componentType == "StorageTank":
-                blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
-                self._editor.showConfigStorageDlg(blockItem)
-            elif componentType == "GenericBlock":
-                self._editor.showGenericPortPairDlg(blockItem)
+        if not event.mimeData().hasFormat("component/name"):
+            return
 
-            snapSize = self._editor.snapSize
-            if self._editor.snapGrid:
-                position = _qtc.QPoint(
-                    event.pos().x() - event.pos().x() % snapSize, event.pos().y() - event.pos().y() % snapSize
-                )
-                scenePosition = self.mapToScene(position)
-            else:
-                scenePosition = self.mapToScene(event.pos())
+        componentType = str(event.mimeData().data("component/name"), encoding="utf-8")
+        self.logger.debug("name is " + componentType)
 
-            blockItem.setPos(scenePosition)
-            self.scene().addItem(blockItem)
+        blockItem = _gbi.createBlockItem(componentType, self._editor, self._editor.namesManager)
 
-            blockItem.oldPos = blockItem.scenePos()
+        self._editor.trnsysObj.append(blockItem)
+
+        if componentType == "StorageTank":
+            blockItem.setHydraulicLoops(self._editor.hydraulicLoops)
+            self._editor.showConfigStorageDlg(blockItem)
+        elif componentType == "GenericBlock":
+            self._editor.showGenericPortPairDlg(blockItem)
+
+        snapSize = self._editor.snapSize
+        if self._editor.snapGrid:
+            position = _qtc.QPoint(
+                event.pos().x() - event.pos().x() % snapSize, event.pos().y() - event.pos().y() % snapSize
+            )
+            scenePosition = self.mapToScene(position)
+        else:
+            scenePosition = self.mapToScene(event.pos())
+
+        blockItem.setPos(scenePosition)
+        self.scene().addItem(blockItem)
+
+        blockItem.oldPos = blockItem.scenePos()
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)

@@ -7,28 +7,13 @@ import dataclasses_jsonschema as _dcj
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.blockItems.names as _bnames
-
+import trnsysGUI.serialization as _gser
 from . import _defaults
 
 
 @_dc.dataclass
-class BlockItemBaseModel(_ser.UpgradableJsonSchemaMixinVersion0):  # pylint: disable=too-many-instance-attributes
-    blockPosition: _tp.Tuple[float, float]
-    Id: int  # pylint: disable=invalid-name,duplicate-code # 1
-    trnsysId: int
-    flippedH: bool
-    flippedV: bool
-    rotationN: int
-
-    @classmethod
-    @_tp.override
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("4f64dfcd-a0cf-45fd-a788-ff774c5b608f")
-
-
-@_dc.dataclass
 class BlockItemWithPrescribedMassFlowBaseModel(_ser.UpgradableJsonSchemaMixinVersion0):
-    blockItem: BlockItemBaseModel
+    blockItem: _bim.BlockItemBaseModel
     massFlowRateInKgPerH: float
 
     @classmethod
@@ -55,12 +40,12 @@ class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too
     @classmethod
     @_tp.override
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return _bim.BlockItemModel
+        return _bim.BlockItemModelVersion1
 
     @classmethod
     @_tp.override
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "_PumpModelVersion1":
-        assert isinstance(superseded, _bim.BlockItemModel)
+        assert isinstance(superseded, _bim.BlockItemModelVersion1)
 
         return _PumpModelVersion1(
             superseded.BlockName,
@@ -83,13 +68,7 @@ class _PumpModelVersion1(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too
 
 
 @_dc.dataclass
-class _RequiredDecoderFieldsMixin:
-    BlockName: str  # /NOSONAR  # pylint: disable=invalid-name
-    BlockDisplayName: str  # /NOSONAR  # pylint: disable=invalid-name
-
-
-@_dc.dataclass
-class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
+class PumpModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     inputPortId: int
@@ -129,14 +108,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "PumpModel":
         assert isinstance(superseded, _PumpModelVersion1)
 
-        blockItem = BlockItemBaseModel(
-            superseded.blockPosition,
-            superseded.Id,
-            superseded.trnsysId,
-            superseded.flippedH,
-            superseded.flippedV,
-            superseded.rotationN,
-        )
+        blockItem = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
 
         blockItemWithPrescribedMassFlow = BlockItemWithPrescribedMassFlowBaseModel(
             blockItem, superseded.massFlowRateInKgPerH
@@ -160,7 +132,7 @@ class PumpModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
 
 
 @_dc.dataclass
-class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixin, _RequiredDecoderFieldsMixin):
+class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
     blockItemWithPrescribedMassFlow: BlockItemWithPrescribedMassFlowBaseModel
 
     portId: int
@@ -192,21 +164,14 @@ class TerminalWithPrescribedMassFlowModel(_ser.UpgradableJsonSchemaMixin, _Requi
     @classmethod
     @_tp.override
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return _bim.BlockItemModel
+        return _bim.BlockItemModelVersion1
 
     @classmethod
     @_tp.override
     def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "TerminalWithPrescribedMassFlowModel":
-        assert isinstance(superseded, _bim.BlockItemModel)
+        assert isinstance(superseded, _bim.BlockItemModelVersion1)
 
-        blockItemBaseModel = BlockItemBaseModel(
-            superseded.blockPosition,
-            superseded.Id,
-            superseded.trnsysId,
-            superseded.flippedH,
-            superseded.flippedV,
-            superseded.rotationN,
-        )
+        blockItemBaseModel = _bim.createBlockItemBaseModelFromLegacyModel(superseded)
 
         prescribedMassFlowModel = BlockItemWithPrescribedMassFlowBaseModel(
             blockItemBaseModel,

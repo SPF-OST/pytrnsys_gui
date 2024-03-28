@@ -69,10 +69,12 @@ class HasInternalPiping:
     def getDisplayName(self) -> str:
         raise NotImplementedError()
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    def hasDdckPlaceHolders(cls) -> bool:
         return True
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
+    @classmethod
+    def shallRenameOutputTemperaturesInHydraulicFile(cls):
         return True
 
     def getInternalPiping(self) -> InternalPiping:

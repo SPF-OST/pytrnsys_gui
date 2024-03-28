@@ -5,15 +5,19 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.names.rename as _rename
-from trnsysGUI import BlockItem as _bi, internalPiping as _ip, common as _com
-from trnsysGUI.pumpsAndTaps import _defaults, _serialization as _ser, _dialog
+from trnsysGUI import BlockItem as _bi
+from trnsysGUI import common as _com
+from trnsysGUI import internalPiping as _ip
+from trnsysGUI.pumpsAndTaps import _defaults
+from trnsysGUI.pumpsAndTaps import _dialog
+from trnsysGUI.pumpsAndTaps import _serialization as _ser
 
 
 class PumpsAndTabsBase(_bi.BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs) -> None:
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
-        self._renameHelper = _rename.RenameHelper(self.editor.namesManager)
+        self._renameHelper = _rename.RenameHelper(editor.namesManager)
 
         self.w = 40
         self.h = 40
@@ -26,7 +30,9 @@ class PumpsAndTabsBase(_bi.BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self) -> bool:
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
     def _getCanonicalMassFlowRate(self) -> float:
@@ -42,31 +48,21 @@ class PumpsAndTabsBase(_bi.BlockItem, _ip.HasInternalPiping):
         return result, equationNr
 
     def _createBlockItemWithPrescribedMassFlowForEncode(self) -> _ser.BlockItemWithPrescribedMassFlowBaseModel:
-        position = (self.pos().x(), self.pos().y())
-        blockItemModel = _ser.BlockItemBaseModel(
-            position,
-            self.id,
-            self.trnsysId,
-            self.flippedH,
-            self.flippedV,
-            self.rotationN,
-        )
+        blockItemModel = self._encodeBaseModel()
+
         blockItemWithPrescribedMassFlowModel = _ser.BlockItemWithPrescribedMassFlowBaseModel(
             blockItemModel,
             self._massFlowRateInKgPerH,
         )
+
         return blockItemWithPrescribedMassFlowModel
 
     def _applyBlockItemModelWithPrescribedMassFlowForDecode(
         self, blockItemWithPrescribedMassFlow: _ser.BlockItemWithPrescribedMassFlowBaseModel
     ) -> None:
         blockItemModel = blockItemWithPrescribedMassFlow.blockItem
-        self.setPos(float(blockItemModel.blockPosition[0]), float(blockItemModel.blockPosition[1]))
-        self.id = blockItemModel.Id
-        self.trnsysId = blockItemModel.trnsysId
-        self.updateFlipStateH(blockItemModel.flippedH)
-        self.updateFlipStateV(blockItemModel.flippedV)
-        self.rotateBlockToN(blockItemModel.rotationN)
+        self._decodeBaseModel(blockItemModel)
+
         self._massFlowRateInKgPerH = blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
 
     def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:

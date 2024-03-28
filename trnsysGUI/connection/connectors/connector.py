@@ -11,8 +11,8 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
 class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-instance-attributes
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.sizeFactor = 0.5
         self.w = 40
@@ -31,10 +31,14 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
     def getInternalPiping(self) -> _ip.InternalPiping:
