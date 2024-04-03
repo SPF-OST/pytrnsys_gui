@@ -14,37 +14,51 @@ import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 
 
+PlaceHolders = _tp.NewType("PlaceHolders", _tp.Mapping[str, str])
+PlaceHoldersByQualifiedPortName = _tp.NewType("PlaceHoldersByQualifiedPortName", _tp.Mapping[str, PlaceHolders])
+PlaceHoldersByComponentName = _tp.NewType(
+    "PlaceHoldersByComponentName", _tp.Mapping[str, PlaceHoldersByQualifiedPortName]
+)
+
+
 def getPlaceholderValues(
-    ddckDirNames: _tp.Sequence[str], trnsysObjects, hydraulicLoops: _hlm.HydraulicLoops
-) -> _warn.ValueWithWarnings[dict]:
-    warnings = list[str]()
-    allPlaceholders: dict[str, dict] = {}
-    for component in trnsysObjects:
-        if not (
-            isinstance(component, _ip.HasInternalPiping)
-            and isinstance(component, _bi.BlockItem)
-            and component.hasDdckPlaceHolders()
-        ):
+    ddckDirNames: _tp.Sequence[str],
+    blockItems: _tp.Sequence[_ip.HasInternalPiping],
+    hydraulicLoops: _hlm.HydraulicLoops,
+) -> _warn.ValueWithWarnings[PlaceHoldersByComponentName]:
+    namesOfComponentsWithoutCorrespondingDdckDir = list[str]()
+    allPlaceholders: dict[str, PlaceHoldersByQualifiedPortName] = {}
+    for blockItem in blockItems:
+        if not blockItem.hasDdckPlaceHolders():
             continue
 
-        _addNonExistentPathsWarnings(component, ddckDirNames, warnings)
+        componentName = blockItem.getDisplayName()
+        if componentName not in ddckDirNames:
+            namesOfComponentsWithoutCorrespondingDdckDir.append(componentName)
 
-        placholdersForComponent = {}
-        internalPiping = component.getInternalPiping()
+        placeholdersForComponent: dict[str, PlaceHolders] = {}
+        internalPiping = blockItem.getInternalPiping()
         for node in internalPiping.nodes:
-            for modelPortItem in node.getPortItems():
-                nodeNameOrEmpty = node.name or ""
-                qualifiedPortName = f"{nodeNameOrEmpty}{modelPortItem.name}"
+            placeHoldersForNode = _getPlaceHoldersForNode(node, componentName, internalPiping, hydraulicLoops)
 
-                placeholdersForPort = _getPlaceholdersForPort(
-                    hydraulicLoops, component, internalPiping, node, modelPortItem
-                )
+            placeholdersForComponent |= placeHoldersForNode
 
-                placholdersForComponent[qualifiedPortName] = placeholdersForPort
+        allPlaceholders[componentName] = PlaceHoldersByQualifiedPortName(placeholdersForComponent)
 
-        allPlaceholders[component.displayName] = placholdersForComponent
+    warning: str | None = None
+    if namesOfComponentsWithoutCorrespondingDdckDir:
+        warning = f"""\
+The following components didn't have a corresponding directory of the same name in the ddck folder:
 
-    allPlaceholdersWithWarnings = _warn.ValueWithWarnings(allPlaceholders, warnings)
+{"\t\n".join(namesOfComponentsWithoutCorrespondingDdckDir)}
+
+This can happen if you're using a "template" ddck under a different name as its containing directory
+(i.e. "PROJECT path\\to\\your\\template.ddck as different_name") - in which case you can ignore this warning
+for that particular component - or it could indicate a missing ddck file.
+"""
+
+    placeHoldersByComponentName = PlaceHoldersByComponentName(allPlaceholders)
+    allPlaceholdersWithWarnings = _warn.ValueWithWarnings.create(placeHoldersByComponentName, warning)
 
     return allPlaceholdersWithWarnings
 
@@ -62,15 +76,30 @@ def _addNonExistentPathsWarnings(
         warnings.append(f"No directory called `{componentName}` found in the project folder.")
 
 
+def _getPlaceHoldersForNode(
+    node: _mfn.Node, componentName: str, internalPiping: _ip.InternalPiping, hydraulicLoops: _hlm.HydraulicLoops
+) -> PlaceHoldersByQualifiedPortName:
+    placeHoldersForNode = {}
+    for modelPortItem in node.getPortItems():
+        nodeNameOrEmpty = node.name or ""
+        qualifiedPortName = f"{nodeNameOrEmpty}{modelPortItem.name}"
+
+        placeholdersForPort = _getPlaceholdersForPort(
+            hydraulicLoops, componentName, internalPiping, node, modelPortItem
+        )
+
+        placeHoldersForNode[qualifiedPortName] = placeholdersForPort
+
+    return PlaceHoldersByQualifiedPortName(placeHoldersForNode)
+
+
 def _getPlaceholdersForPort(
     hydraulicLoops: _hlm.HydraulicLoops,
-    component: _ip.HasInternalPiping,
+    displayName: str,
     internalPiping: _ip.InternalPiping,
     node: _mfn.Node,
     modelPortItem: _mfn.PortItem,
-) -> _tp.Dict[str, str]:
-    displayName = component.getDisplayName()
-
+) -> PlaceHolders:
     if modelPortItem.direction == _mfn.PortItemDirection.OUTPUT:
         outputTemperatureVariableName = _temps.getInternalTemperatureVariableName(
             componentDisplayName=displayName, nodeName=node.name
@@ -111,26 +140,32 @@ def _getConnectionAt(internalPiping: _ip.InternalPiping, modelPortItem: _mfn.Por
 
 def _createInputPlaceholdersDict(
     inputMfrVariableName: str, inputTemperatureVariableName: str, loop: _tp.Optional[_hlm.HydraulicLoop]
-) -> _tp.Dict[str, str]:
+) -> PlaceHolders:
     if not loop:
-        return {
-            "@temp": inputTemperatureVariableName,
-            "@mfr": inputMfrVariableName,
-        }
+        return PlaceHolders(
+            {
+                "@temp": inputTemperatureVariableName,
+                "@mfr": inputMfrVariableName,
+            }
+        )
 
     loopName = loop.name.value
 
-    return {
-        "@temp": inputTemperatureVariableName,
-        "@mfr": inputMfrVariableName,
-        "@cp": _lnames.getHeatCapacityName(loopName),
-        "@rho": _lnames.getDensityName(loopName),
-    }
+    return PlaceHolders(
+        {
+            "@temp": inputTemperatureVariableName,
+            "@mfr": inputMfrVariableName,
+            "@cp": _lnames.getHeatCapacityName(loopName),
+            "@rho": _lnames.getDensityName(loopName),
+        }
+    )
 
 
-def _createOutputPlaceholdersDict(outputTemperatureVariableName, reverseInputTemperatureVariableName):
+def _createOutputPlaceholdersDict(
+    outputTemperatureVariableName: str, reverseInputTemperatureVariableName: str
+) -> PlaceHolders:
     placeholdersForPort = {"@temp": outputTemperatureVariableName, "@revtemp": reverseInputTemperatureVariableName}
-    return placeholdersForPort
+    return PlaceHolders(placeholdersForPort)
 
 
 def _getLoop(

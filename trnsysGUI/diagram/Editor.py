@@ -905,7 +905,9 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _warn.ValueWithWarnings[None]:
         ddckDirNames = self._getDdckDirNames()
 
-        placeHoldersWithWarnings = _ph.getPlaceholderValues(ddckDirNames, self.trnsysObj, self.hydraulicLoops)
+        blockItems = [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, BlockItem)]
+
+        placeHoldersWithWarnings = _ph.getPlaceholderValues(ddckDirNames, blockItems, self.hydraulicLoops)
 
         ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
 

@@ -192,11 +192,11 @@ class MainWindow(_qtw.QMainWindow):
         self.projectMenu.addAction(openVisualizerActionMenu)
         self.projectMenu.addAction(exportHydraulicsActionMenu)
         self.projectMenu.addAction(exportHydCtrlActionMenu)
+        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
         self.projectMenu.addAction(updateConfigActionMenu)
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
-        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = _qtw.QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
