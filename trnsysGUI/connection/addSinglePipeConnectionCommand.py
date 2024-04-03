@@ -6,7 +6,7 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.result as _res
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.errors as _err
+import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.hydraulicLoops.merge as _hlmerge
 import trnsysGUI.hydraulicLoops.split as _hlsplit
 import trnsysGUI.names.undo as _nu
@@ -43,7 +43,7 @@ class AddSinglePipeConnectionCommand(_qtw.QUndoCommand):
         if cancellable == "cancelled" or _res.isError(cancellable):
             if _res.isError(cancellable):
                 error = _res.error(cancellable)
-                _err.showErrorMessageBox(error.message, "Cannot create connection")
+                _werrors.showMessageBox(error.message, "Cannot create connection")
 
             self._connection.deleteConnection()
             self.setObsolete(True)

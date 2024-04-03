@@ -1,7 +1,7 @@
 import pathlib as _pl
 import typing as _tp
 
-import pytrnsys.utils.result as _res
+import pytrnsys.utils.warnings as _warn
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.names as _cnames
@@ -16,7 +16,8 @@ import trnsysGUI.temperatures as _temps
 
 def getPlaceholderValues(
     ddckDirNames: _tp.Sequence[str], trnsysObjects, hydraulicLoops: _hlm.HydraulicLoops
-) -> _res.Result[dict]:
+) -> _warn.ValueWithWarnings[dict]:
+    warnings = list[str]()
     allPlaceholders: dict[str, dict] = {}
     for component in trnsysObjects:
         if not (
@@ -26,13 +27,7 @@ def getPlaceholderValues(
         ):
             continue
 
-        if not component.path:
-            return _res.Error(f"{component.displayName} doesn't have ddck template path.")
-
-        componentPath = _pl.Path(component.path)
-        componentName = componentPath.stem
-        if componentName not in ddckDirNames:
-            return _res.Error(f"No directory called `{componentName}` found in the project folder.")
+        _addNonExistentPathsWarnings(component, ddckDirNames, warnings)
 
         placholdersForComponent = {}
         internalPiping = component.getInternalPiping()
@@ -47,9 +42,24 @@ def getPlaceholderValues(
 
                 placholdersForComponent[qualifiedPortName] = placeholdersForPort
 
-        allPlaceholders[componentName] = placholdersForComponent
+        allPlaceholders[component.displayName] = placholdersForComponent
 
-    return allPlaceholders
+    allPlaceholdersWithWarnings = _warn.ValueWithWarnings(allPlaceholders, warnings)
+
+    return allPlaceholdersWithWarnings
+
+
+def _addNonExistentPathsWarnings(
+    component: _bi.BlockItem, ddckDirNames: _tp.Sequence[str], warnings: list[str]
+) -> None:
+    if not component.path:
+        warnings.append(f"{component.displayName} doesn't have ddck template path.")
+        return
+
+    componentPath = _pl.Path(component.path)
+    componentName = componentPath.stem
+    if componentName not in ddckDirNames:
+        warnings.append(f"No directory called `{componentName}` found in the project folder.")
 
 
 def _getPlaceholdersForPort(

@@ -16,7 +16,7 @@ import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
-import trnsysGUI.errors as _err
+import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
@@ -153,7 +153,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         if timeStepIncrease is None or not (1 <= timeStepIncrease <= self.maxTimeStep):
             errorMessage = f"The time-step increase must be an integer between 1 and {self.maxTimeStep}, inclusive."
-            _err.showErrorMessageBox(errorMessage=errorMessage, title="Invalid value")
+            _werrors.showMessageBox(errorMessage, title="Invalid value")
             self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
             return
 

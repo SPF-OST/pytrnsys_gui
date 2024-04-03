@@ -17,7 +17,7 @@ import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
-import trnsysGUI.errors as _err
+import trnsysGUI.warningsAndErrors as _werrors
 from . import _testHelper as _th
 
 
@@ -137,7 +137,7 @@ class TestEditor:
             failMessage = f"{title}: {errorMessage}"
             _pt.fail(failMessage)
 
-        monkeypatch.setattr(_err, _err.showErrorMessageBox.__name__, dummyShowErrorMessageBox)
+        monkeypatch.setattr(_werrors, _werrors.showMessageBox.__name__, dummyShowErrorMessageBox)
 
         mainWindow.exportDck()
 

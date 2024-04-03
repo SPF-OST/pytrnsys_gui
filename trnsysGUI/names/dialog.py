@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets as _qtw
 
 from pytrnsys.utils import result as _res
 from trnsysGUI import BlockItem as _bi
-from trnsysGUI import errors as _errors
+from trnsysGUI import warningsAndErrors as _werrors
 from trnsysGUI import internalPiping as _ip
 from trnsysGUI.names import rename as _rename
 
@@ -28,7 +28,7 @@ class ChangeNameDialogBase(_qtw.QDialog):
 
         if _res.isError(result):
             errorMessage = _res.error(result).message
-            _errors.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             self._displayNameLineEdit.setText(oldName)
             return
 

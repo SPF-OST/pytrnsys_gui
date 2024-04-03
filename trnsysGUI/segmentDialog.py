@@ -3,7 +3,7 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.result as _res
 
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.errors as _err
+import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.names.rename as _rename
 
 
@@ -41,7 +41,7 @@ class SegmentDialog(_qtw.QDialog):
         result = self._renameHelper.canRename(currentName, newName, checkDdckFolder)
         if _res.isError(result):
             errorMessage = _res.error(result)
-            _err.showErrorMessageBox(errorMessage.message)
+            _werrors.showMessageBox(errorMessage.message)
             return
 
         self._applyNameChange(newName)

@@ -1,7 +1,7 @@
 import enum as _enum
 
 import pytrnsys.utils.result as _res
-import trnsysGUI.errors as _errors
+import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
 
@@ -43,7 +43,7 @@ class UndoNamingHelper:
             f'name "{generatedName}" will be used instead. You might want to change it to a more '
             f"meaningful value manually."
         )
-        _errors.showErrorMessageBox(errorMessage, title="Name changed")
+        _werrors.showMessageBox(errorMessage, title="Name changed")
 
         self._namesManager.addName(generatedName)
 

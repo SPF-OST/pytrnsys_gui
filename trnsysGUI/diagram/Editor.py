@@ -15,14 +15,13 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
+import pytrnsys.utils.warnings as _warn
 import trnsysGUI as _tgui
 import trnsysGUI.blockItems.names as _bnames
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
-import trnsysGUI.errors as _err
-import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
@@ -35,6 +34,7 @@ import trnsysGUI.names.undo as _nu
 import trnsysGUI.placeholders as _ph
 import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.storageTank.widget as _stwidget
+import trnsysGUI.warningsAndErrors as _werrs
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
@@ -439,7 +439,7 @@ class Editor(_qtw.QWidget):
             "Overlapping port items are not supported. Please move the containing components so that the "
             "port items don't overlap if you want to connect them."
         )
-        _err.showErrorMessageBox(errorMessage, title="Not implemented")
+        _werrs.showMessageBox(errorMessage, title="Not implemented")
 
     def _getRelevantHitPortItems(
         self, mousePosition: _qtc.QPointF, fromPort: PortItemBase
@@ -594,7 +594,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             _du.checkEquationsAndConstants(lines, exportPath)
         except Exception as error:
             errorMessage = f"An error occurred while exporting the system hydraulics: {error}"
-            _errs.showErrorMessageBox(errorMessage)
+            _werrs.showMessageBox(errorMessage)
             return None
 
         return exportPath
@@ -884,9 +884,14 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             if pressedButton != _qtw.QMessageBox.Save:
                 return None
 
-        result = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
-        if _res.isError(result):
-            return _res.error(result)
+        valueWithWarnings = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
+        if valueWithWarnings.hasWarnings():
+            message = (
+                "The following warnings were generated while creating the ddck placeholder file:\n\n"
+                + valueWithWarnings.toWarningMessage()
+                + "\n"
+            )
+            _werrs.showMessageBox(message, title="Warnings encountered generating placeholders")
 
         _qtw.QMessageBox.information(
             self,
@@ -897,17 +902,17 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         return None
 
-    def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _res.Result[None]:
+    def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _warn.ValueWithWarnings[None]:
         ddckDirNames = self._getDdckDirNames()
 
-        result = _ph.getPlaceholderValues(ddckDirNames, self.trnsysObj, self.hydraulicLoops)
-        if _res.isError(result):
-            return _res.error(result)
+        placeHoldersWithWarnings = _ph.getPlaceholderValues(ddckDirNames, self.trnsysObj, self.hydraulicLoops)
 
-        ddckPlaceHolderValuesDictionary = _res.value(result)
+        ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
 
         jsonContent = json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
         filePath.write_text(jsonContent)
+
+        return placeHoldersWithWarnings.withValue(None)
 
     # Saving related
     def save(self, showWarning=True):
