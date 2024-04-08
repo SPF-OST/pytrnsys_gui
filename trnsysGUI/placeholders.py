@@ -105,7 +105,7 @@ The following components didn't have a corresponding directory of the same name 
 {"\t\n".join(namesOfComponentsWithoutCorrespondingDdckDir)}
 
 This can happen if you're using a "template" ddck under a different name as its containing directory
-(i.e. "PROJECT path\\to\\your\\template.ddck as different_name") - in which case you can ignore this warning
+(i.e. "PROJECT$ path\\to\\your\\template.ddck as different_name") - in which case you can ignore this warning
 for that particular component - or it could indicate a missing ddck file.
 """
 
