@@ -21,43 +21,57 @@ PlaceHoldersByComponentName = _tp.NewType(
     "PlaceHoldersByComponentName", _tp.Mapping[str, PlaceHoldersByQualifiedPortName]
 )
 
+
 class BorgTrnsysObjects:
     __shared_state = {}
     trnsysObj = []
+
     def __init__(self):
-        self.__dict__ = self.__class__.__shared_state
+        self.__dict__ = self.__class__.__shared_state  # pylint: disable=protected-access
+
 
 class BorgHydraulicLoops:
     __shared_state = {}
-    trnsysObj = []
+    hydraulicLoops = _hlm.HydraulicLoops([])
+
     def __init__(self):
-        self.__dict__ = self.__class__.__shared_state
+        self.__dict__ = self.__class__.__shared_state  # pylint: disable=protected-access
 
-def encodeDdckPlaceHolderValuesToJson(editor, filePath: _pl.Path, trnsysObjBorg=BorgTrnsysObjects) -> _warn.ValueWithWarnings[None]:
-        ddckDirNames = getDdckDirNames(editor.projectFolder)
-        trnsysObj = trnsysObjBorg().trnsysObj
 
-        blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
+def encodeDdckPlaceHolderValuesToJson(
+    projectFolder: _pl.Path,
+    filePath: _pl.Path,
+    trnsysObjBorg: BorgTrnsysObjects = BorgTrnsysObjects,
+    hydraulicLoopsBorg: BorgHydraulicLoops = BorgHydraulicLoops,
+) -> _warn.ValueWithWarnings[None]:
 
-        placeHoldersWithWarnings = getPlaceholderValues(ddckDirNames, blockItems, editor.hydraulicLoops)
+    ddckDirNames = getDdckDirNames(projectFolder)
+    trnsysObj = trnsysObjBorg().trnsysObj
+    hydraulicLoops = hydraulicLoopsBorg().hydraulicLoops
 
-        ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
+    blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
 
-        jsonContent = _json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
-        filePath.write_text(jsonContent)
+    placeHoldersWithWarnings = getPlaceholderValues(ddckDirNames, blockItems, hydraulicLoops)
 
-        return placeHoldersWithWarnings.withValue(None)
+    ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
+
+    jsonContent = _json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
+    filePath.write_text(jsonContent)
+
+    return placeHoldersWithWarnings.withValue(None)
+
 
 def getDdckDirNames(projectFolder) -> _tp.Sequence[str]:
-        ddckDirPath = _pl.Path(projectFolder) / "ddck"
+    ddckDirPath = _pl.Path(projectFolder) / "ddck"
 
-        componentDdckDirPaths = list(ddckDirPath.iterdir())
+    componentDdckDirPaths = list(ddckDirPath.iterdir())
 
-        ddckDirNames = []
-        for componentDirPath in componentDdckDirPaths:
-            ddckDirNames.append(componentDirPath.name)
+    ddckDirNames = []
+    for componentDirPath in componentDdckDirPaths:
+        ddckDirNames.append(componentDirPath.name)
 
-        return ddckDirNames
+    return ddckDirNames
+
 
 def getPlaceholderValues(
     ddckDirNames: _tp.Sequence[str],

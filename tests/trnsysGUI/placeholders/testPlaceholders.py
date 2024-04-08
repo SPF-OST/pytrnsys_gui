@@ -19,7 +19,7 @@ class TestPlaceholders:
         editor = self._createEditor(actualDirPath)
         qtbot.addWidget(editor)
 
-        valueWithWarnings = _ph.encodeDdckPlaceHolderValuesToJson(editor, actualJsonFilePath)
+        valueWithWarnings = _ph.encodeDdckPlaceHolderValuesToJson(editor.projectFolder, actualJsonFilePath)
         assert not valueWithWarnings.hasWarnings()
 
         actualJsonText = actualJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding
@@ -28,6 +28,7 @@ class TestPlaceholders:
         assert actualJsonText == expectedJsonText
 
     def testPlaceholdersMissingDdckDirCreatesWarning(self, qtbot):
+        # leaving this for now to show simultaneous working of both.
         actualDirPath = _DATA_DIR_ / "TRIHP_dualSource"
 
         editor = self._createEditor(actualDirPath)

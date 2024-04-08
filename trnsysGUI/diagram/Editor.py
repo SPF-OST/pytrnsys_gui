@@ -152,6 +152,9 @@ class Editor(_qtw.QWidget):
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
+        self.holdBorgHydraulicLoops = _ph.BorgHydraulicLoops()
+        self.holdBorgHydraulicLoops.hydraulicLoops = self.hydraulicLoops  # pointer to automatically update
+        # self.holdBorgHydraulicLoops.hydraulicLoops.hydraulicLoops = self.hydraulicLoops.hydraulicLoops  # pointer to automatically update
 
         self.copyGroupList = _qtw.QGraphicsItemGroup()
         self.selectionGroupList = _qtw.QGraphicsItemGroup()
@@ -855,6 +858,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             )
 
         self.hydraulicLoops = hydraulicLoops
+        self.holdBorgHydraulicLoops.hydraulicLoops = hydraulicLoops
 
     def _setHydraulicLoopsOnStorageTanks(self) -> None:
         for trnsysObject in self.trnsysObj:
@@ -891,7 +895,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             if pressedButton != _qtw.QMessageBox.Save:
                 return None
 
-        valueWithWarnings = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
+        valueWithWarnings = _ph.encodeDdckPlaceHolderValuesToJson(self.projectFolder, jsonFilePath)
         if valueWithWarnings.hasWarnings():
             message = (
                 "The following warnings were generated while creating the ddck placeholder file:\n\n"
@@ -909,20 +913,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         return None
 
-    def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path, trnsysObjBorg=_ph.BorgTrnsysObjects) -> _warn.ValueWithWarnings[None]:
-        ddckDirNames = self._getDdckDirNames()
-        trnsysObj = trnsysObjBorg().trnsysObj
-
-        blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, BlockItem)]
-
-        placeHoldersWithWarnings = _ph.getPlaceholderValues(ddckDirNames, blockItems, self.hydraulicLoops)
-
-        ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
-
-        jsonContent = json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
-        filePath.write_text(jsonContent)
-
-        return placeHoldersWithWarnings.withValue(None)
 
     # Saving related
     def save(self, showWarning=True):
@@ -1214,14 +1204,3 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def _updateGradientsInHydraulicLoop(hydraulicLoop: _hlm.HydraulicLoop) -> None:
         for connection in hydraulicLoop.connections:
             connection.updateSegmentGradients()
-
-    def _getDdckDirNames(self) -> _tp.Sequence[str]:
-        ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
-
-        componentDdckDirPaths = list(ddckDirPath.iterdir())
-
-        ddckDirNames = []
-        for componentDirPath in componentDdckDirPaths:
-            ddckDirNames.append(componentDirPath.name)
-
-        return ddckDirNames
