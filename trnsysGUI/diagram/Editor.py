@@ -139,7 +139,10 @@ class Editor(_qtw.QWidget):
 
         self._currentlyDraggedConnectionFromPort = None
         self.connectionList = []
+
+        self.holdBorgTrnsysObj = _ph.BorgTrnsysObjects()
         self.trnsysObj = []
+        self.holdBorgTrnsysObj.trnsysObj = self.trnsysObj  # pointer to automatically update
 
         ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
         ddckDirFileOrDirNamesProvider = _nm.DdckDirFileOrDirNamesProvider(ddckDirPath)
@@ -192,6 +195,10 @@ class Editor(_qtw.QWidget):
             self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
         elif loadValue == "json":
             self._decodeDiagram(jsonPath, loadValue=loadValue)
+
+    # @property
+    # def trnsysObj(self):
+    #     return self.holdBorgTrnsysObj.trnsysObj
 
     def _setupWidgetHierarchy(self):
         libraryBrowserView = self._createLibraryBrowserView()
@@ -902,10 +909,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
 
         return None
 
-    def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _warn.ValueWithWarnings[None]:
+    def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path, trnsysObjBorg=_ph.BorgTrnsysObjects) -> _warn.ValueWithWarnings[None]:
         ddckDirNames = self._getDdckDirNames()
+        trnsysObj = trnsysObjBorg().trnsysObj
 
-        blockItems = [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, BlockItem)]
+        blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, BlockItem)]
 
         placeHoldersWithWarnings = _ph.getPlaceholderValues(ddckDirNames, blockItems, self.hydraulicLoops)
 

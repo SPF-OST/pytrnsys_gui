@@ -19,7 +19,7 @@ class TestPlaceholders:
         editor = self._createEditor(actualDirPath)
         qtbot.addWidget(editor)
 
-        valueWithWarnings = editor.encodeDdckPlaceHolderValuesToJson(actualJsonFilePath)
+        valueWithWarnings = _ph.encodeDdckPlaceHolderValuesToJson(editor, actualJsonFilePath)
         assert not valueWithWarnings.hasWarnings()
 
         actualJsonText = actualJsonFilePath.read_text()  # pylint: disable=bad-option-value,unspecified-encoding

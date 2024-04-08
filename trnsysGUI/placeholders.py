@@ -1,5 +1,6 @@
 import pathlib as _pl
 import typing as _tp
+import json as _json
 
 import pytrnsys.utils.warnings as _warn
 import trnsysGUI.BlockItem as _bi
@@ -20,6 +21,43 @@ PlaceHoldersByComponentName = _tp.NewType(
     "PlaceHoldersByComponentName", _tp.Mapping[str, PlaceHoldersByQualifiedPortName]
 )
 
+class BorgTrnsysObjects:
+    __shared_state = {}
+    trnsysObj = []
+    def __init__(self):
+        self.__dict__ = self.__class__.__shared_state
+
+class BorgHydraulicLoops:
+    __shared_state = {}
+    trnsysObj = []
+    def __init__(self):
+        self.__dict__ = self.__class__.__shared_state
+
+def encodeDdckPlaceHolderValuesToJson(editor, filePath: _pl.Path, trnsysObjBorg=BorgTrnsysObjects) -> _warn.ValueWithWarnings[None]:
+        ddckDirNames = getDdckDirNames(editor.projectFolder)
+        trnsysObj = trnsysObjBorg().trnsysObj
+
+        blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
+
+        placeHoldersWithWarnings = getPlaceholderValues(ddckDirNames, blockItems, editor.hydraulicLoops)
+
+        ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
+
+        jsonContent = _json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
+        filePath.write_text(jsonContent)
+
+        return placeHoldersWithWarnings.withValue(None)
+
+def getDdckDirNames(projectFolder) -> _tp.Sequence[str]:
+        ddckDirPath = _pl.Path(projectFolder) / "ddck"
+
+        componentDdckDirPaths = list(ddckDirPath.iterdir())
+
+        ddckDirNames = []
+        for componentDirPath in componentDdckDirPaths:
+            ddckDirNames.append(componentDirPath.name)
+
+        return ddckDirNames
 
 def getPlaceholderValues(
     ddckDirNames: _tp.Sequence[str],
