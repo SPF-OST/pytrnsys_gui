@@ -22,32 +22,15 @@ PlaceHoldersByComponentName = _tp.NewType(
 )
 
 
-class BorgTrnsysObjects:
-    __shared_state = {}
-    trnsysObj = []
-
-    def __init__(self):
-        self.__dict__ = self.__class__.__shared_state  # pylint: disable=protected-access
-
-
-class BorgHydraulicLoops:
-    __shared_state = {}
-    hydraulicLoops = _hlm.HydraulicLoops([])
-
-    def __init__(self):
-        self.__dict__ = self.__class__.__shared_state  # pylint: disable=protected-access
-
-
 def encodeDdckPlaceHolderValuesToJson(
     projectFolder: _pl.Path,
     filePath: _pl.Path,
-    trnsysObjBorg: BorgTrnsysObjects = BorgTrnsysObjects,
-    hydraulicLoopsBorg: BorgHydraulicLoops = BorgHydraulicLoops,
+    trnsysObj, #: _tp.Sequence[],
+    hydraulicLoops: _hlm.HydraulicLoops
 ) -> _warn.ValueWithWarnings[None]:
 
     ddckDirNames = getDdckDirNames(projectFolder)
-    trnsysObj = trnsysObjBorg().trnsysObj
-    hydraulicLoops = hydraulicLoopsBorg().hydraulicLoops
+
 
     blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
 

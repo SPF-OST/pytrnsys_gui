@@ -15,7 +15,6 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import pytrnsys.utils.result as _res
-import pytrnsys.utils.warnings as _warn
 import trnsysGUI as _tgui
 import trnsysGUI.blockItems.names as _bnames
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
@@ -31,7 +30,7 @@ import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.names.undo as _nu
-import trnsysGUI.placeholders as _ph
+import trnsysGUI.menus.projectMenu.placeholders as _ph
 import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.storageTank.widget as _stwidget
 import trnsysGUI.warningsAndErrors as _werrs
@@ -139,10 +138,7 @@ class Editor(_qtw.QWidget):
 
         self._currentlyDraggedConnectionFromPort = None
         self.connectionList = []
-
-        self.holdBorgTrnsysObj = _ph.BorgTrnsysObjects()
         self.trnsysObj = []
-        self.holdBorgTrnsysObj.trnsysObj = self.trnsysObj  # pointer to automatically update
 
         ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
         ddckDirFileOrDirNamesProvider = _nm.DdckDirFileOrDirNamesProvider(ddckDirPath)
@@ -152,9 +148,6 @@ class Editor(_qtw.QWidget):
         self.graphicalObj = []
         self.fluids = _hlm.Fluids.createDefault()
         self.hydraulicLoops = _hlm.HydraulicLoops([])
-        self.holdBorgHydraulicLoops = _ph.BorgHydraulicLoops()
-        self.holdBorgHydraulicLoops.hydraulicLoops = self.hydraulicLoops  # pointer to automatically update
-        # self.holdBorgHydraulicLoops.hydraulicLoops.hydraulicLoops = self.hydraulicLoops.hydraulicLoops  # pointer to automatically update
 
         self.copyGroupList = _qtw.QGraphicsItemGroup()
         self.selectionGroupList = _qtw.QGraphicsItemGroup()
@@ -198,10 +191,6 @@ class Editor(_qtw.QWidget):
             self._decodeDiagram(os.path.join(self.projectFolder, self.diagramName), loadValue=loadValue)
         elif loadValue == "json":
             self._decodeDiagram(jsonPath, loadValue=loadValue)
-
-    # @property
-    # def trnsysObj(self):
-    #     return self.holdBorgTrnsysObj.trnsysObj
 
     def _setupWidgetHierarchy(self):
         libraryBrowserView = self._createLibraryBrowserView()
@@ -858,7 +847,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             )
 
         self.hydraulicLoops = hydraulicLoops
-        self.holdBorgHydraulicLoops.hydraulicLoops = hydraulicLoops
 
     def _setHydraulicLoopsOnStorageTanks(self) -> None:
         for trnsysObject in self.trnsysObj:
@@ -895,7 +883,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             if pressedButton != _qtw.QMessageBox.Save:
                 return None
 
-        valueWithWarnings = _ph.encodeDdckPlaceHolderValuesToJson(self.projectFolder, jsonFilePath)
+        valueWithWarnings = _ph.encodeDdckPlaceHolderValuesToJson(self.projectFolder, jsonFilePath, self.trnsysObj, self.hydraulicLoops)
         if valueWithWarnings.hasWarnings():
             message = (
                 "The following warnings were generated while creating the ddck placeholder file:\n\n"
