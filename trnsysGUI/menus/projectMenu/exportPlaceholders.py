@@ -38,13 +38,14 @@ def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]
         if pressedButton != _qtw.QMessageBox.Save:
             return None
 
-    valueWithWarnings = encodeDdckPlaceHolderValuesToJson(editor.projectFolder, jsonFilePath, editor.trnsysObj,
-                                                          editor.hydraulicLoops)
+    valueWithWarnings = encodeDdckPlaceHolderValuesToJson(
+        editor.projectFolder, jsonFilePath, editor.trnsysObj, editor.hydraulicLoops
+    )
     if valueWithWarnings.hasWarnings():
         message = (
-                "The following warnings were generated while creating the ddck placeholder file:\n\n"
-                + valueWithWarnings.toWarningMessage()
-                + "\n"
+            "The following warnings were generated while creating the ddck placeholder file:\n\n"
+            + valueWithWarnings.toWarningMessage()
+            + "\n"
         )
         _werrs.showMessageBox(message, title="Warnings encountered generating placeholders")
 
@@ -62,7 +63,7 @@ def encodeDdckPlaceHolderValuesToJson(
     projectFolder: _pl.Path,
     filePath: _pl.Path,
     trnsysObj: _tp.Sequence[_ip.HasInternalPiping],
-    hydraulicLoops: _hlm.HydraulicLoops
+    hydraulicLoops: _hlm.HydraulicLoops,
 ) -> _warn.ValueWithWarnings[None]:
 
     ddckDirNames = _getDdckDirNames(projectFolder)
