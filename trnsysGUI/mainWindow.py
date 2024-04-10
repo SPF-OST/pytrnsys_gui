@@ -27,6 +27,7 @@ from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.configFile import configFile
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
+import trnsysGUI.menus.projectMenu.export_placeholders as _eph
 
 
 class MainWindow(_qtw.QMainWindow):
@@ -372,7 +373,7 @@ class MainWindow(_qtw.QMainWindow):
         return
 
     def exportDdckPlaceHolderValuesJson(self):
-        result = self.editor.exportDdckPlaceHolderValuesJsonFile()
+        result = _eph.exportDdckPlaceHolderValuesJsonFile(self.editor)
         if _res.isError(result):
             errorMessage = f"The json file could not be generated: {result.message}"
             _werrors.showMessageBox(errorMessage)
@@ -476,7 +477,7 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.exportHydraulicControl()
 
     def exportDck(self):
-        jsonResult = self.editor.exportDdckPlaceHolderValuesJsonFile()
+        jsonResult = _eph.exportDdckPlaceHolderValuesJsonFile(self.editor)
         if _res.isError(jsonResult):
             errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
             _werrors.showMessageBox(errorMessage)

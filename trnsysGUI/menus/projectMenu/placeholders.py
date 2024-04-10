@@ -25,7 +25,7 @@ PlaceHoldersByComponentName = _tp.NewType(
 def encodeDdckPlaceHolderValuesToJson(
     projectFolder: _pl.Path,
     filePath: _pl.Path,
-    trnsysObj, #: _tp.Sequence[],
+    trnsysObj: _tp.Sequence[_ip.HasInternalPiping],
     hydraulicLoops: _hlm.HydraulicLoops
 ) -> _warn.ValueWithWarnings[None]:
 
