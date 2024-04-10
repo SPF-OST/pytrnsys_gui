@@ -12,7 +12,7 @@ from trnsysGUI.hydraulicLoops import model as _hlm
 from trnsysGUI.menus.projectMenu.placeholders import getPlaceholderValues
 
 
-def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]:
+def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]:  # type: ignore[name-defined]
     if not editor.isHydraulicConnected():
         return _res.Error("You need to connect all port items before you can export the hydraulics.")
 
