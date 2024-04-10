@@ -1,10 +1,15 @@
+import json as _json
 import pathlib as _pl
+import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.result as _res
 import trnsysGUI.diagram.Editor as _ed
-import trnsysGUI.menus.projectMenu.placeholders as _ph
 import trnsysGUI.warningsAndErrors as _werrs
+from pytrnsys.utils import warnings as _warn
+from trnsysGUI import internalPiping as _ip, BlockItem as _bi
+from trnsysGUI.hydraulicLoops import model as _hlm
+from trnsysGUI.menus.projectMenu.placeholders import getPlaceholderValues
 
 
 def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]:
@@ -33,8 +38,8 @@ def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]
         if pressedButton != _qtw.QMessageBox.Save:
             return None
 
-    valueWithWarnings = _ph.encodeDdckPlaceHolderValuesToJson(editor.projectFolder, jsonFilePath, editor.trnsysObj,
-                                                              editor.hydraulicLoops)
+    valueWithWarnings = encodeDdckPlaceHolderValuesToJson(editor.projectFolder, jsonFilePath, editor.trnsysObj,
+                                                          editor.hydraulicLoops)
     if valueWithWarnings.hasWarnings():
         message = (
                 "The following warnings were generated while creating the ddck placeholder file:\n\n"
@@ -51,3 +56,36 @@ def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]
     )
 
     return None
+
+
+def encodeDdckPlaceHolderValuesToJson(
+    projectFolder: _pl.Path,
+    filePath: _pl.Path,
+    trnsysObj: _tp.Sequence[_ip.HasInternalPiping],
+    hydraulicLoops: _hlm.HydraulicLoops
+) -> _warn.ValueWithWarnings[None]:
+
+    ddckDirNames = _getDdckDirNames(projectFolder)
+
+    blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
+
+    placeHoldersWithWarnings = getPlaceholderValues(ddckDirNames, blockItems, hydraulicLoops)
+
+    ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
+
+    jsonContent = _json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
+    filePath.write_text(jsonContent)
+
+    return placeHoldersWithWarnings.withValue(None)
+
+
+def _getDdckDirNames(projectFolder) -> _tp.Sequence[str]:
+    ddckDirPath = _pl.Path(projectFolder) / "ddck"
+
+    componentDdckDirPaths = list(ddckDirPath.iterdir())
+
+    ddckDirNames = []
+    for componentDirPath in componentDdckDirPaths:
+        ddckDirNames.append(componentDirPath.name)
+
+    return ddckDirNames
