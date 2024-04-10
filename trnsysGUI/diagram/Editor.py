@@ -21,8 +21,6 @@ import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
 import trnsysGUI.diagram.Encoder as _enc
-import trnsysGUI.errors as _err
-import trnsysGUI.errors as _errs
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
@@ -32,9 +30,10 @@ import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.names.undo as _nu
-import trnsysGUI.placeholders as _ph
+import trnsysGUI.menus.projectMenu.placeholders as _ph
 import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.storageTank.widget as _stwidget
+import trnsysGUI.warningsAndErrors as _werrs
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
@@ -439,7 +438,7 @@ class Editor(_qtw.QWidget):
             "Overlapping port items are not supported. Please move the containing components so that the "
             "port items don't overlap if you want to connect them."
         )
-        _err.showErrorMessageBox(errorMessage, title="Not implemented")
+        _werrs.showMessageBox(errorMessage, title="Not implemented")
 
     def _getRelevantHitPortItems(
         self, mousePosition: _qtc.QPointF, fromPort: PortItemBase
@@ -453,7 +452,7 @@ class Editor(_qtw.QWidget):
     def exportHydraulics(self, exportTo=_tp.Literal["ddck", "mfs"]):
         assert exportTo in ["ddck", "mfs"]
 
-        if not self._isHydraulicConnected():
+        if not self.isHydraulicConnected():
             messageBox = _qtw.QMessageBox()
             messageBox.setWindowTitle("Hydraulic not connected")
             messageBox.setText("You need to connect all port items before you can export the hydraulics.")
@@ -594,7 +593,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             _du.checkEquationsAndConstants(lines, exportPath)
         except Exception as error:
             errorMessage = f"An error occurred while exporting the system hydraulics: {error}"
-            _errs.showErrorMessageBox(errorMessage)
+            _werrs.showMessageBox(errorMessage)
             return None
 
         return exportPath
@@ -615,7 +614,7 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         massFlowContributors = [o for o in self.trnsysObj if isinstance(o, _ip.HasInternalPiping)]
         return massFlowContributors
 
-    def _isHydraulicConnected(self) -> bool:
+    def isHydraulicConnected(self) -> bool:
         for obj in self.trnsysObj:
             if not isinstance(obj, _ip.HasInternalPiping):
                 continue
@@ -857,57 +856,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             storageTank = trnsysObject
 
             storageTank.setHydraulicLoops(self.hydraulicLoops)
-
-    def exportDdckPlaceHolderValuesJsonFile(self) -> _res.Result[None]:
-        if not self._isHydraulicConnected():
-            return _res.Error("You need to connect all port items before you can export the hydraulics.")
-
-        jsonFilePath = _pl.Path(self.projectFolder) / "DdckPlaceHolderValues.json"
-
-        if jsonFilePath.is_dir():
-            _qtw.QMessageBox.information(
-                self,
-                "Folder already exists",
-                f"A folder already exits at f{jsonFilePath}. Chose a different location or delete the folder first.",
-            )
-            return None
-
-        if jsonFilePath.is_file():
-            pressedButton = _qtw.QMessageBox.question(
-                self,
-                "Overwrite file?",
-                f"The file {jsonFilePath} already exists. Do you want to overwrite it or cancel?",
-                buttons=(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel),
-                defaultButton=_qtw.QMessageBox.Cancel,
-            )
-
-            if pressedButton != _qtw.QMessageBox.Save:
-                return None
-
-        result = self.encodeDdckPlaceHolderValuesToJson(jsonFilePath)
-        if _res.isError(result):
-            return _res.error(result)
-
-        _qtw.QMessageBox.information(
-            self,
-            "Saved successfully",
-            f"Saved place holder values JSON file at {jsonFilePath}.",
-            buttons=_qtw.QMessageBox.Ok,
-        )
-
-        return None
-
-    def encodeDdckPlaceHolderValuesToJson(self, filePath: _pl.Path) -> _res.Result[None]:
-        ddckDirNames = self._getDdckDirNames()
-
-        result = _ph.getPlaceholderValues(ddckDirNames, self.trnsysObj, self.hydraulicLoops)
-        if _res.isError(result):
-            return _res.error(result)
-
-        ddckPlaceHolderValuesDictionary = _res.value(result)
-
-        jsonContent = json.dumps(ddckPlaceHolderValuesDictionary, indent=4, sort_keys=True)
-        filePath.write_text(jsonContent)
 
     # Saving related
     def save(self, showWarning=True):
@@ -1199,14 +1147,3 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
     def _updateGradientsInHydraulicLoop(hydraulicLoop: _hlm.HydraulicLoop) -> None:
         for connection in hydraulicLoop.connections:
             connection.updateSegmentGradients()
-
-    def _getDdckDirNames(self) -> _tp.Sequence[str]:
-        ddckDirPath = _pl.Path(self.projectFolder) / "ddck"
-
-        componentDdckDirPaths = list(ddckDirPath.iterdir())
-
-        ddckDirNames = []
-        for componentDirPath in componentDdckDirPaths:
-            ddckDirNames.append(componentDirPath.name)
-
-        return ddckDirNames

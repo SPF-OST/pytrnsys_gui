@@ -14,7 +14,7 @@ import trnsysGUI.loggingCallback as _lgcb
 from trnsysGUI import (
     project as _prj,
     images as _img,
-    errors as _err,
+    warningsAndErrors as _werrors,
     buildDck as buildDck,
     settings as _settings,
     settingsDlg as _sdlg,
@@ -27,6 +27,7 @@ from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.configFile import configFile
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
+import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 
 
 class MainWindow(_qtw.QMainWindow):
@@ -172,6 +173,9 @@ class MainWindow(_qtw.QMainWindow):
         exportHydCtrlActionMenu = _qtw.QAction("Export hydraulic_control.ddck", self)
         exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
 
+        exportDdckPlaceHolderValuesJsonFileActionMenu = _qtw.QAction("Export ddck placeholder values JSON file", self)
+        exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
+
         updateConfigActionMenu = _qtw.QAction("Update run.config", self)
         updateConfigActionMenu.triggered.connect(self.updateRun)
 
@@ -184,21 +188,16 @@ class MainWindow(_qtw.QMainWindow):
         processSimulationActionMenu = _qtw.QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValuesJsonFileActionMenu = _qtw.QAction(
-            "Export json-file containing connection information", self
-        )
-        exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
-
         self.projectMenu = _qtw.QMenu("Project")
         self.projectMenu.addAction(runMassflowSolverActionMenu)
         self.projectMenu.addAction(openVisualizerActionMenu)
         self.projectMenu.addAction(exportHydraulicsActionMenu)
         self.projectMenu.addAction(exportHydCtrlActionMenu)
+        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
         self.projectMenu.addAction(updateConfigActionMenu)
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
-        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = _qtw.QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
@@ -342,7 +341,7 @@ class MainWindow(_qtw.QMainWindow):
             errorMessage += (
                 "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
             )
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return
 
         #   Update run.config
@@ -354,7 +353,7 @@ class MainWindow(_qtw.QMainWindow):
 
         if executionFailed:
             errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
 
         return
 
@@ -362,22 +361,22 @@ class MainWindow(_qtw.QMainWindow):
         processPath = os.path.join(self.projectFolder, "process.config")
         if not os.path.isfile(processPath):
             errorMessage = f"No such file: {processPath}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return
         processApp = ProcessMain()
         result = processApp.processAction(self.logger, self.editor.projectFolder)
 
         if _res.isError(result):
             error = _res.error(result)
-            _err.showErrorMessageBox(error.message)
+            _werrors.showMessageBox(error.message)
 
         return
 
     def exportDdckPlaceHolderValuesJson(self):
-        result = self.editor.exportDdckPlaceHolderValuesJsonFile()
+        result = _eph.exportDdckPlaceHolderValuesJsonFile(self.editor)
         if _res.isError(result):
             errorMessage = f"The json file could not be generated: {result.message}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
 
     def renameDia(self):
         self.logger.info("Renaming diagram...")
@@ -478,10 +477,10 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.exportHydraulicControl()
 
     def exportDck(self):
-        jsonResult = self.editor.exportDdckPlaceHolderValuesJsonFile()
+        jsonResult = _eph.exportDdckPlaceHolderValuesJsonFile(self.editor)
         if _res.isError(jsonResult):
             errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return
 
         builder = buildDck.buildDck(self.projectFolder)
@@ -489,7 +488,7 @@ class MainWindow(_qtw.QMainWindow):
         result = builder.buildTrnsysDeck()
         if _res.isError(result):
             errorMessage = f"The deck file could not be generated: {result.message}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
 
     def toggleAlignMode(self):
         self.logger.info("Toggling alignMode")
@@ -511,7 +510,7 @@ class MainWindow(_qtw.QMainWindow):
 
         if not self.editor.trnsysPath.is_file():
             errorMessage = "TRNExe.exe not found! Consider correcting the path in the settings."
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return None
 
         try:
@@ -522,7 +521,7 @@ class MainWindow(_qtw.QMainWindow):
             return mfrFile, tempFile
         except Exception as exception:
             errorMessage = f"An exception occurred while trying to execute the mass flow solver: {exception}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             self.logger.error(errorMessage)
 
             return None

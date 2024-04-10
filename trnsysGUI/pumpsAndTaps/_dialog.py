@@ -7,7 +7,7 @@ import pytrnsys.utils.result as _res
 
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.dialogs as _dlgs
-import trnsysGUI.errors as _errors
+import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.names.rename as _rename
 
 _dlgs.assertThatLocalGeneratedUIModuleAndResourcesExist(__name__)
@@ -64,7 +64,7 @@ class Dialog(_qtw.QDialog, _gen.Ui_dialog):
         result = self._renameHelper.canRename(currentName, newNameCandidate, checkDdckFolder)
         if _res.isError(result):
             error = _res.error(result)
-            _errors.showErrorMessageBox(error.message)
+            _werrors.showMessageBox(error.message)
         else:
             self._model.name = newNameCandidate
 
@@ -79,7 +79,7 @@ class Dialog(_qtw.QDialog, _gen.Ui_dialog):
             newMassFlowCandidate = None
 
         if newMassFlowCandidate is None:
-            _errors.showErrorMessageBox(errorMessage="Mass flow must be a number.", title="Invalid value")
+            _werrors.showMessageBox(message="Mass flow must be a number.", title="Invalid value")
         else:
             self._model.massFlowRateKgPerH = newMassFlowCandidate
 

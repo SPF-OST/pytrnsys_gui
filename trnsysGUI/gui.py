@@ -7,7 +7,7 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI.arguments as _args
-import trnsysGUI.errors as _err
+import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.pyinstaller as _pyinst
 import trnsysGUI.setup as _setup
 
@@ -29,7 +29,7 @@ def main():
     app.setApplicationName("Diagram Creator")
 
     if errorMessage:
-        _err.showErrorMessageBox(errorMessage, title="Missing requirements")
+        _werrors.showMessageBox(errorMessage, title="Missing requirements")
         return
 
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel

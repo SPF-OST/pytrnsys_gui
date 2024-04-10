@@ -15,9 +15,10 @@ import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
+import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
-import trnsysGUI.errors as _err
+import trnsysGUI.warningsAndErrors as _werrors
 from . import _testHelper as _th
 
 
@@ -119,7 +120,7 @@ class TestEditor:
             _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
         )
 
-        result = editor.exportDdckPlaceHolderValuesJsonFile()
+        result = _eph.exportDdckPlaceHolderValuesJsonFile(editor)
 
         assert not _res.isError(result), _res.error(result).message
 
@@ -137,7 +138,7 @@ class TestEditor:
             failMessage = f"{title}: {errorMessage}"
             _pt.fail(failMessage)
 
-        monkeypatch.setattr(_err, _err.showErrorMessageBox.__name__, dummyShowErrorMessageBox)
+        monkeypatch.setattr(_werrors, _werrors.showMessageBox.__name__, dummyShowErrorMessageBox)
 
         mainWindow.exportDck()
 

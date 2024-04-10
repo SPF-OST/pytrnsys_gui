@@ -3,7 +3,7 @@ import dataclasses as _dc
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.errors as _error
+import trnsysGUI.warningsAndErrors as _werrors
 
 import trnsysGUI.dialogs as _dlgs
 
@@ -42,7 +42,7 @@ class DoublePipeConnectionPropertiesDialog(_qtw.QDialog, _gen.Ui_doublePipeDialo
                 lengthInM = _parsePositiveFloat(lengthText)
                 self.model.lengthInM = lengthInM
             except ValueError:
-                _error.showErrorMessageBox("Could not parse the length. Please make sure it's a non-negative number.")
+                _werrors.showMessageBox("Could not parse the length. Please make sure it's a non-negative number.")
                 self.lengthInMLineEdit.setText(str(self.model.lengthInM))
 
         self.lengthInMLineEdit.editingFinished.connect(setLengthOrShowError)
