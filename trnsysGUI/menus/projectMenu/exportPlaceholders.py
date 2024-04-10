@@ -4,9 +4,9 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.result as _res
+import pytrnsys.utils.warnings as _warn
 import trnsysGUI.diagram.Editor as _ed
 import trnsysGUI.warningsAndErrors as _werrs
-from pytrnsys.utils import warnings as _warn
 from trnsysGUI import internalPiping as _ip, BlockItem as _bi
 from trnsysGUI.hydraulicLoops import model as _hlm
 from trnsysGUI.menus.projectMenu.placeholders import getPlaceholderValues

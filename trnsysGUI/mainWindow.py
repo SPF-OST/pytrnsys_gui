@@ -27,7 +27,7 @@ from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.configFile import configFile
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
-import trnsysGUI.menus.projectMenu.export_placeholders as _eph
+import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 
 
 class MainWindow(_qtw.QMainWindow):

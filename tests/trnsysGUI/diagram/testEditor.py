@@ -15,7 +15,7 @@ import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
-import trnsysGUI.menus.projectMenu.export_placeholders as _eph
+import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
 import trnsysGUI.warningsAndErrors as _werrors
