@@ -62,13 +62,13 @@ def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]
 def encodeDdckPlaceHolderValuesToJson(
     projectFolder: _pl.Path,
     filePath: _pl.Path,
-    trnsysObj: _tp.Sequence[_ip.HasInternalPiping],
+    trnsysObjects: _tp.Sequence[_ip.HasInternalPiping],
     hydraulicLoops: _hlm.HydraulicLoops,
 ) -> _warn.ValueWithWarnings[None]:
 
     ddckDirNames = _getDdckDirNames(projectFolder)
 
-    blockItems = [o for o in trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
+    blockItems = [o for o in trnsysObjects if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
 
     placeHoldersWithWarnings = getPlaceholderValues(ddckDirNames, blockItems, hydraulicLoops)
 
