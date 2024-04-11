@@ -72,6 +72,5 @@ setuptools.setup(
     },
     data_files=_getDataFilePairs(),
     install_requires=_getInstallRequirements(),
-    setup_requires=["setuptools-git-versioning"],
     python_requires=">=3.12",
 )

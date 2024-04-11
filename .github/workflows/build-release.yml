@@ -31,12 +31,18 @@ jobs:
 
       - name: Create virtual environment
         run: py -3.12 -m venv venv
+        
+      - name: Compute pytrnsys git SHA
+        id: sha
+        run: |
+          $pytrnsys_sha=$(venv\Scripts\python release\getPytrnsysMasterGitSha.py)
+          echo "pytrnsys_sha=${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
 
       - name: Install dependencies
         run: |
           venv\Scripts\python -m pip install --upgrade pip
           venv\Scripts\python -m pip install wheel
-          venv\Scripts\python -m pip install -r requirements/test.txt
+          venv\Scripts\python -m pip install -r requirements/release.txt
         
       - name: Build executable
         run: venv\Scripts\python dev-tools/devTools.py -r
@@ -45,9 +51,8 @@ jobs:
         id: fn
         run: |
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
-          $pytrnsys_sha=$(release\build\pytrnsys\python-3.12.1-embed-amd64\python.exe release\getInstalledPytrnsysGitSha.py)
           $ref_name="${{github.ref_name}}".replace("/","-")
-          echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
+          echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${{steps.sha.outputs.pytrnsys_sha}}" >> $env:GITHUB_OUTPUT
       
       - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Create zip file
