@@ -16,6 +16,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.names.rename as _rename
 import trnsysGUI.storageTank.side as _sd
 import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
@@ -369,7 +370,9 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         menu.exec(event.screenPos())
 
     def mouseDoubleClickEvent(self, event):
-        ConfigureStorageDialog(self, self.editor)
+        renameHelper = _rename.RenameHelper(self.editor.namesManager)
+        dialog = ConfigureStorageDialog(self, self.editor, renameHelper)
+        dialog.exec()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         heatExchangerNodes = [hx.modelPipe for hx in self.heatExchangers]
