@@ -1,0 +1,496 @@
+*************************************
+** BEGIN hydraulic.ddck
+*************************************
+
+*************************************
+** Outputs to energy balance in kWh
+
+** Following this naming standard : qSysIn_name, qSysOut_name, elSysIn_name, elSysOut_name
+
+*************************************
+EQUATIONS 2
+*** single pipes
+qSysOut_PipeLoss = PipeLossTot
+qSysOut_spPipeIntTot = spPipeIntTot
+
+
+
+
+
+EQUATIONS 3
+*** Black box component temperatures
+TDhwTesHx24H=TDhwTesHx24
+TDhwDpR1_99H=TDhwDpR1_99
+TCollectorH=TCollector
+
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+spTIni = 20
+
+UNIT 450 TYPE 9352
+PARAMETERS 84
+mfrSolverAbsTol
+mfrSolverRelTol
+mfrTolSwitchThreshold
+20
+13 19 0 0      !1 : DhwTesHx24
+10 11 0 0      !2 : DhwDpR1_99
+10 14 9 2      !3 : TeePiece
+14 0 0 4       !4 : WTap_main
+19 12 0 1      !5 : PuCol
+12 13 0 0      !6 : Collector
+20 11 9 3      !7 : MixDhw
+18 0 0 4       !8 : WTap
+3 7 0 0        !9 : PiCirc
+3 2 0 0        !10 : PiTesDhwIn
+2 7 0 0        !11 : PiTesDhwOut
+5 6 0 0        !12 : PiColIn
+6 1 0 0        !13 : PiColOut
+4 3 0 0        !14 : PiDhwMains
+20 18 17 2     !15 : SplitDhw
+17 0 0 4       !16 : WTap2
+15 16 0 0      !17 : Tee536_WTap2
+15 8 0 0       !18 : Tee536_WTap
+1 5 0 0        !19 : Dhw_PuCol
+7 15 0 0       !20 : MixDhw_SplitDhw
+INPUTS 20! for Type 9351
+0,0 0,0 0,0 MfrWTap_main MfrPuCol 0,0 xFracMixDhw MfrWTap 0,0 0,0 
+0,0 0,0 0,0 0,0 0,0 MfrWTap2 0,0 0,0 0,0 0,0 
+*** Initial Inputs
+0 0 0 0 0 0 0 0 0 0 
+0 0 0 0 0 0 0 0 0 0 
+
+
+EQUATIONS 40	! Output up to three (A,B,C) mass flow rates of each component, positive = input/inlet, negative = output/outlet 
+MDhwTesHx24_A=[450,1]
+MDhwTesHx24_B=[450,2]
+MDhwDpR1_99_A=[450,4]
+MDhwDpR1_99_B=[450,5]
+MTeePiece_A=[450,7]
+MTeePiece_B=[450,8]
+MTeePiece_C=[450,9]
+MWTap_main_A=[450,10]
+MPuCol_A=[450,13]
+MPuCol_B=[450,14]
+MCollector_A=[450,16]
+MCollector_B=[450,17]
+MMixDhw_A=[450,19]
+MMixDhw_B=[450,20]
+MMixDhw_C=[450,21]
+MWTap_A=[450,22]
+MPiCirc_A=[450,25]
+MPiCirc_B=[450,26]
+MPiTesDhwIn_A=[450,28]
+MPiTesDhwIn_B=[450,29]
+MPiTesDhwOut_A=[450,31]
+MPiTesDhwOut_B=[450,32]
+MPiColIn_A=[450,34]
+MPiColIn_B=[450,35]
+MPiColOut_A=[450,37]
+MPiColOut_B=[450,38]
+MPiDhwMains_A=[450,40]
+MPiDhwMains_B=[450,41]
+MSplitDhw_A=[450,43]
+MSplitDhw_B=[450,44]
+MSplitDhw_C=[450,45]
+MWTap2_A=[450,46]
+MTee536_WTap2_A=[450,49]
+MTee536_WTap2_B=[450,50]
+MTee536_WTap_A=[450,52]
+MTee536_WTap_B=[450,53]
+MDhw_PuCol_A=[450,55]
+MDhw_PuCol_B=[450,56]
+MMixDhw_SplitDhw_A=[450,58]
+MMixDhw_SplitDhw_B=[450,59]
+
+
+** Fluids:
+EQUATIONS 4
+** brine
+FbrineRho = RHOBRI ! [kg/m^3]
+FbrineCp = CPBRI_SI*0.001 ! [kJ/(kg*K)]
+** water
+FwaterRho = RHOWAT ! [kg/m^3]
+FwaterCp = CPWAT_SI*0.001 ! [kJ/(kg*K)]
+
+** Hydraulic loops
+EQUATIONS 12
+** loop2
+loop2NPipes = 3
+loop2Len = 2.0 ! [m]
+loop2Dia = 0.02 ! [m]
+loop2UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop2Rho = FwaterRho
+Lloop2Cp = FwaterCp
+
+** loop4
+loop4NPipes = 7
+loop4Len = 2.0 ! [m]
+loop4Dia = 0.02 ! [m]
+loop4UVal = 2.99988 ! [kJ/(h*m^2*K)] (= 0.8333 W/(m^2*K))
+Lloop4Rho = FwaterRho
+Lloop4Cp = FwaterCp
+
+
+! TeePiece
+UNIT 451 TYPE 929
+INPUTS 6
+MTeePiece_A
+MTeePiece_B
+MTeePiece_C
+TPiTesDhwIn
+TPiDhwMains
+TPiCirc
+***
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TTeePiece = [451,1]
+
+! WTap_main
+EQUATIONS 1
+TWTap_main = Tcw
+
+UNIT 452 TYPE 929
+!MixDhw
+PARAMETERS 0
+INPUTS 6
+MMixDhw_A
+MMixDhw_B
+MMixDhw_C
+TMixDhw_SplitDhw
+TPiTesDhwOut
+TPiCirc
+***Initial values
+0 0 0 20 20 20 
+EQUATIONS 1
+TMixDhw= [452,1]
+
+UNIT 453 TYPE 931
+! PiCirc
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop4Rho ! density [kg/m^3]
+Lloop4Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TTeePiece ! input flow temperature [deg C]
+MPiCirc_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TMixDhw ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiCirc = [453,1] ! Output flow temperature [deg C]
+PPiCirc_kW = [453,3]/3600 ! Dissipated heat [kW]
+PPiCircConv_kW = [453,4]/3600 ! Convected heat [kW]
+PPiCircInt_kJ = [453,5] ! Accumulated internal energy since start of simulation [kJ]
+MPiCirc = MPiCirc_A
+
+UNIT 454 TYPE 931
+! PiTesDhwIn
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop4Rho ! density [kg/m^3]
+Lloop4Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TTeePiece ! input flow temperature [deg C]
+MPiTesDhwIn_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TDhwDpR1_99H ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiTesDhwIn = [454,1] ! Output flow temperature [deg C]
+PPiTesDhwIn_kW = [454,3]/3600 ! Dissipated heat [kW]
+PPiTesDhwInConv_kW = [454,4]/3600 ! Convected heat [kW]
+PPiTesDhwInInt_kJ = [454,5] ! Accumulated internal energy since start of simulation [kJ]
+MPiTesDhwIn = MPiTesDhwIn_A
+
+UNIT 455 TYPE 931
+! PiTesDhwOut
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop4Rho ! density [kg/m^3]
+Lloop4Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TDhwDpR1_99H ! input flow temperature [deg C]
+MPiTesDhwOut_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TMixDhw ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiTesDhwOut = [455,1] ! Output flow temperature [deg C]
+PPiTesDhwOut_kW = [455,3]/3600 ! Dissipated heat [kW]
+PPiTesDhwOutConv_kW = [455,4]/3600 ! Convected heat [kW]
+PPiTesDhwOutInt_kJ = [455,5] ! Accumulated internal energy since start of simulation [kJ]
+MPiTesDhwOut = MPiTesDhwOut_A
+
+UNIT 456 TYPE 931
+! PiColIn
+PARAMETERS 6
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TPuCol ! input flow temperature [deg C]
+MPiColIn_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TCollectorH ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiColIn = [456,1] ! Output flow temperature [deg C]
+PPiColIn_kW = [456,3]/3600 ! Dissipated heat [kW]
+PPiColInConv_kW = [456,4]/3600 ! Convected heat [kW]
+PPiColInInt_kJ = [456,5] ! Accumulated internal energy since start of simulation [kJ]
+MPiColIn = MPiColIn_A
+
+UNIT 457 TYPE 931
+! PiColOut
+PARAMETERS 6
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TCollectorH ! input flow temperature [deg C]
+MPiColOut_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TDhwTesHx24H ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiColOut = [457,1] ! Output flow temperature [deg C]
+PPiColOut_kW = [457,3]/3600 ! Dissipated heat [kW]
+PPiColOutConv_kW = [457,4]/3600 ! Convected heat [kW]
+PPiColOutInt_kJ = [457,5] ! Accumulated internal energy since start of simulation [kJ]
+MPiColOut = MPiColOut_A
+
+UNIT 458 TYPE 931
+! PiDhwMains
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop4Rho ! density [kg/m^3]
+Lloop4Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TWTap_main ! input flow temperature [deg C]
+MPiDhwMains_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TTeePiece ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TPiDhwMains = [458,1] ! Output flow temperature [deg C]
+PPiDhwMains_kW = [458,3]/3600 ! Dissipated heat [kW]
+PPiDhwMainsConv_kW = [458,4]/3600 ! Convected heat [kW]
+PPiDhwMainsInt_kJ = [458,5] ! Accumulated internal energy since start of simulation [kJ]
+MPiDhwMains = MPiDhwMains_A
+
+! SplitDhw
+UNIT 459 TYPE 929
+INPUTS 6
+MSplitDhw_A
+MSplitDhw_B
+MSplitDhw_C
+TMixDhw_SplitDhw
+TTee536_WTap
+TTee536_WTap2
+***
+0
+0
+0
+20.0
+20.0
+20.0
+EQUATIONS 1
+TSplitDhw = [459,1]
+
+UNIT 460 TYPE 931
+! Tee536_WTap2
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop4Rho ! density [kg/m^3]
+Lloop4Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TSplitDhw ! input flow temperature [deg C]
+MTee536_WTap2_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TWTap2 ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TTee536_WTap2 = [460,1] ! Output flow temperature [deg C]
+PTee536_WTap2_kW = [460,3]/3600 ! Dissipated heat [kW]
+PTee536_WTap2Conv_kW = [460,4]/3600 ! Convected heat [kW]
+PTee536_WTap2Int_kJ = [460,5] ! Accumulated internal energy since start of simulation [kJ]
+MTee536_WTap2 = MTee536_WTap2_A
+
+UNIT 461 TYPE 931
+! Tee536_WTap
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop4Rho ! density [kg/m^3]
+Lloop4Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TSplitDhw ! input flow temperature [deg C]
+MTee536_WTap_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TWTap ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TTee536_WTap = [461,1] ! Output flow temperature [deg C]
+PTee536_WTap_kW = [461,3]/3600 ! Dissipated heat [kW]
+PTee536_WTapConv_kW = [461,4]/3600 ! Convected heat [kW]
+PTee536_WTapInt_kJ = [461,5] ! Accumulated internal energy since start of simulation [kJ]
+MTee536_WTap = MTee536_WTap_A
+
+UNIT 462 TYPE 931
+! Dhw_PuCol
+PARAMETERS 6
+loop2Dia ! diameter [m]
+loop2Len ! length [m]
+loop2UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop2Rho ! density [kg/m^3]
+Lloop2Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TDhwTesHx24H ! input flow temperature [deg C]
+MDhw_PuCol_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TPuCol ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TDhw_PuCol = [462,1] ! Output flow temperature [deg C]
+PDhw_PuCol_kW = [462,3]/3600 ! Dissipated heat [kW]
+PDhw_PuColConv_kW = [462,4]/3600 ! Convected heat [kW]
+PDhw_PuColInt_kJ = [462,5] ! Accumulated internal energy since start of simulation [kJ]
+MDhw_PuCol = MDhw_PuCol_A
+
+UNIT 463 TYPE 931
+! MixDhw_SplitDhw
+PARAMETERS 6
+loop4Dia ! diameter [m]
+loop4Len ! length [m]
+loop4UVal ! U-value [kJ/(h*m^2*K)] 
+Lloop4Rho ! density [kg/m^3]
+Lloop4Cp ! specific heat [kJ/(kg*K)]
+spTIni ! Initial fluid temperature [deg C]
+INPUTS 4
+TMixDhw ! input flow temperature [deg C]
+MMixDhw_SplitDhw_A ! input mass flow [kg/h]
+TRoomStore ! ambient temperature [deg C]
+TSplitDhw ! reverse flow input temperature [deg C]
+***Initial values
+20 0.0 20 20
+
+EQUATIONS 5
+TMixDhw_SplitDhw = [463,1] ! Output flow temperature [deg C]
+PMixDhw_SplitDhw_kW = [463,3]/3600 ! Dissipated heat [kW]
+PMixDhw_SplitDhwConv_kW = [463,4]/3600 ! Convected heat [kW]
+PMixDhw_SplitDhwInt_kJ = [463,5] ! Accumulated internal energy since start of simulation [kJ]
+MMixDhw_SplitDhw = MMixDhw_SplitDhw_A
+
+*** Single pipe losses
+EQUATIONS 1
+spPipeEnIntTot = PPiCircInt_kJ+PPiTesDhwInInt_kJ+PPiTesDhwOutInt_kJ+PPiColInInt_kJ+PPiColOutInt_kJ+PPiDhwMainsInt_kJ+PTee536_WTap2Int_kJ+PTee536_WTapInt_kJ+PDhw_PuColInt_kJ+PMixDhw_SplitDhwInt_kJ
+
+UNIT 100 TYPE 993
+PARAMETERS 1
+1 ! Number of inputs
+INPUTS 1
+spPipeEnIntTot
+**
+0
+
+EQUATIONS 4
+spPipeConvectedTot = PPiCircConv_kW+PPiTesDhwInConv_kW+PPiTesDhwOutConv_kW+PPiColInConv_kW+PPiColOutConv_kW+PPiDhwMainsConv_kW+PTee536_WTap2Conv_kW+PTee536_WTapConv_kW+PDhw_PuColConv_kW+PMixDhw_SplitDhwConv_kW
+PipeLossTot = PPiCirc_kW+PPiTesDhwIn_kW+PPiTesDhwOut_kW+PPiColIn_kW+PPiColOut_kW+PPiDhwMains_kW+PTee536_WTap2_kW+PTee536_WTap_kW+PDhw_PuCol_kW+PMixDhw_SplitDhw_kW
+spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
+spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
+ASSIGN solar_dhw_GUI_Mfr.prt 464
+
+UNIT 464 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+464! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 11
+xFracMixDhw MPiCirc MPiTesDhwIn MPiTesDhwOut MPiColIn MPiColOut MPiDhwMains MTee536_WTap2
+MTee536_WTap MDhw_PuCol MMixDhw_SplitDhw
+
+***
+xFracMixDhw MPiCirc MPiTesDhwIn MPiTesDhwOut MPiColIn MPiColOut MPiDhwMains MTee536_WTap2
+MTee536_WTap MDhw_PuCol MMixDhw_SplitDhw
+
+
+ASSIGN solar_dhw_GUI_T.prt 465
+
+UNIT 465 TYPE 25! User defined Printer
+PARAMETERS 10
+dtSim! 1 Printing interval
+START! 2 Start time
+STOP! 3 Stop time
+465! 4 Logical unit
+0! 5 Units printing mode
+0! 6 Relative or absolute start time
+-1! 7 Overwrite or Append
+-1! 8 Print header
+0! 9 Delimiter
+1! 10 Print labels
+
+INPUTS 10
+TPiCirc TPiTesDhwIn TPiTesDhwOut TPiColIn TPiColOut TPiDhwMains TTee536_WTap2 TTee536_WTap
+TDhw_PuCol TMixDhw_SplitDhw
+
+***
+TPiCirc TPiTesDhwIn TPiTesDhwOut TPiColIn TPiColOut TPiDhwMains TTee536_WTap2 TTee536_WTap
+TDhw_PuCol TMixDhw_SplitDhw
+
+

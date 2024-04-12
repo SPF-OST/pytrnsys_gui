@@ -77,12 +77,17 @@ EQUATIONS 1
 puColOn = [28,1]*LT(myTcollOut,120)
 
 
-EQUATIONS 3
+EQUATIONS 4
 *** Massflowrates
 MfrPuCol = puColOnRc*MfrCPriNom
-MfrWTapBottom = MfrDHWset
-MfrDhwDemand = ABS(MfrPiDhwDemand)
+MfrWTap = -MfrDHWset*0.125
+MfrWTap2 = -MfrDHWset*0.875
+MfrWTap_main = MfrDHWset
 
+EQUATIONS 3
+TPuCol = TDhw_PuCol
+TWTap = -300
+TWTap2 = -300
 ***********************************
 ** Begin TYPE Recall
 ***********************************
