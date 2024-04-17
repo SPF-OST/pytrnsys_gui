@@ -567,7 +567,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)
 
         if exportTo == "mfs":
-            fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
+            fullExportText += f"""\
+CONSTANTS 2
+TRoomStore=1
+Tcw=1
+"""
             fullExportText += "ENDS"
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
