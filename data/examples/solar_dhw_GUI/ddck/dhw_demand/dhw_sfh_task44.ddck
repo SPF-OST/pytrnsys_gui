@@ -78,11 +78,12 @@ QDHWstd = [16,3]     ! energy of this datareader  for this time step [kWh] BE CA
 MfrDHWreal = [16,4]*scaleDHW   ! mass flow kg/h
 TdhwSetProfile = GT(MfrDHWreal,0) * [16,5] + LE(MfrDHWreal,0) * 45     ! Set temperature for DHW, �C  
 
-EQUATIONS 6
+EQUATIONS 7
 TcwStd = 10.     ! Standard cold water temperature (deg C)
 QDHWloc = QDHWstd*(TdhwSetProfile-Tcw)/(TdhwSetProfile-TcwStd)     ! local average draw off energy (according to T44A38_Rep_C1_A) [kWh] Before was [kJ]
 QDHWset = QDHWstd*(1+0.2*COS((time-ddTcwOffset*24)/8760*360))  ! local time dependent draw off energy (according to T44A38_Rep_C1_A) [kWh] Before was [kJ] 
-MfrDHWset = (QDHWset*3600*scaleDHW)/dtDHWdata/(CpWat*(TdhwSetProfile-Tcw)) ! mass flow of hot water draw off [kg/h]
+PDHWSet_kW = (QDHWset*scaleDHW)/dtDHWdata
+MfrDHWset = PDHWSet_kW/(CpWat*(TdhwSetProfile-Tcw))*3600 ! mass flow of hot water draw off [kg/h]
 TdhwHxSet = TdhwSetProfile+ 0.1               ! Setpoint for heat exchanger control (if present), �C
 PdhwIdeal_kW = QDHWstd/dtDHWdata  ! ideal draw off power, kW
 
@@ -136,10 +137,10 @@ unitPrinterDHW     ! 1: Logical unit number, -
 1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 -1     ! 4: Printing & integrating interval, h. -1 for monthly integration
 0     ! 5: Number of inputs to avoid integration, -
-INPUTS 5
-Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW        
+INPUTS 6
+Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW PDHWSet_kW        
 **  
-Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW 
+Time  Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW PDHWSet_kW
 
 
 ***********************************
@@ -153,17 +154,18 @@ ASSIGN    temp\DHW_HR.Prt  unitHourlyDHW
 
 
 UNIT 218 TYPE 46     ! Printegrator Monthly Values for System
-PARAMETERS 6   
+PARAMETERS 7   
 unitHourlyDHW    ! 1: Logical unit number, -
 -1     ! 2: Logical unit for monthly summaries, -
 1     ! 3: Relative or absolute start time. 0: print at time intervals relative to the simulation start time. 1: print at absolute time intervals. No effect for monthly integrations
 1     ! 4: Printing & integrating interval, h. -1 for monthly integration
-1     ! 5: Number of inputs to avoid integration, -
-1		! 6: Output number to avoid integration
-INPUTS 5
-Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW          
+2     ! 5: Number of inputs to avoid integration, -
+1     ! 6: Output number to avoid integration
+2     ! 6: Output number to avoid integration
+INPUTS 7
+Tdhw TdhwSet Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW PDHWSet_kW    
 **  
-Tdhw Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW
+Tdhw TdhwSet Pdhw_kW  PpenDHW_kW  PelPuDHW_kW  PdhwIdeal_kW PDHWSet_kW    
 
 *******************************
 **END DHW.dck
