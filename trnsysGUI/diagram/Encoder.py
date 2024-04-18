@@ -19,7 +19,7 @@ class Encoder(json.JSONEncoder):
                 assert trnsysObject.isVisible()
 
             dictName, dct = trnsysObject.encode()
-            key = f"{dictName}-{i}"
+            key = f"{dictName}{i}"
             blockDct[key] = dct
 
         idDict = {
