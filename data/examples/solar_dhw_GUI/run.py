@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     logger.info("Running config file %s...", "run.config")
 
-    nameDeck = f"solar_DHW_gui"
+    nameDeck = "solar_DHW_gui"
     pathBase = os.getcwd()
 
     runTool = runTrnsys.RunParallelTrnsys(pathBase, nameDeck)
