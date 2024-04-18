@@ -30,8 +30,7 @@ class TapMains(_tb.TapBase):
         )
         equations = f"""\
 ! {self.displayName}
-EQUATIONS 2
-Tcw = 1
+EQUATIONS 1
 {temperatureVariable} = Tcw
 
 """

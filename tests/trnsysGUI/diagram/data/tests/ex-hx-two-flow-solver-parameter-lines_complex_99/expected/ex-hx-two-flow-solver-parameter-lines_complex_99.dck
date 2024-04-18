@@ -463,8 +463,7 @@ TPiHxDhwPriRt
 20.0
 EQUATIONS 1
 TTeeAuxHxRt = [13,1] !Changed automatically
-EQUATIONS 2
-Tcw = 1
+EQUATIONS 1
 TsupplyWater = Tcw
 UNIT 14 TYPE 929 !Changed automatically
 INPUTS 6
@@ -2070,7 +2069,7 @@ unitPrinter_Tes2 ! 1: Logical unit number, -
 0  ! 5: Number of inputs to avoid integration
 INPUTS 9
 Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 Qdp3_Tes2 qHeatSource_Tes2 
-zero zero zero zero zero zero zero zero zero 
+Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 Qdp3_Tes2 qHeatSource_Tes2 
 UNIT 87 TYPE 65      !Changed automatically
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 
@@ -2291,7 +2290,7 @@ unitPrinter_Tes1 ! 1: Logical unit number, -
 0  ! 5: Number of inputs to avoid integration
 INPUTS 7
 Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 qHeatSource_Tes1 
-zero zero zero zero zero zero zero 
+Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 qHeatSource_Tes1 
 UNIT 91 TYPE 65      !Changed automatically
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 

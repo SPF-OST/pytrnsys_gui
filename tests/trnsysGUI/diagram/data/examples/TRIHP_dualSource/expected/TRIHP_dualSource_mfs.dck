@@ -519,8 +519,7 @@ EQUATIONS 1
 TDivSh= [451,1]
 
 ! supplyWater
-EQUATIONS 2
-Tcw = 1
+EQUATIONS 1
 TsupplyWater = Tcw
 
 UNIT 452 TYPE 929
@@ -2051,6 +2050,7 @@ TPiTesDhwCond TPiHpToTesDhwOut TPiCondToDes TPiPuGhxOut TPiHPEvapOut TPiDivCoolt
 TPiDhwSecOut TPiHxDhwSecIn TPiHxCoolWatIn TConn1455 TPiHpDesOut TPiHpDesIn TPiHpCondOut TPiHpCondIn
 
 
-CONSTANTS 1
+CONSTANTS 2
 TRoomStore=1
+Tcw=1
 ENDS

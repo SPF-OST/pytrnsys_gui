@@ -1423,8 +1423,7 @@ TPiSHInMix
 0 0 0 20 20 20 
 EQUATIONS 1
 TDivSh= [49,1] !Changed automatically
-EQUATIONS 2
-Tcw = 1
+EQUATIONS 1
 TsupplyWater = Tcw
 UNIT 50 TYPE 929 !Changed automatically
 PARAMETERS 0
@@ -3330,7 +3329,7 @@ unitPrinter_Tes1 ! 1: Logical unit number, -
 0  ! 5: Number of inputs to avoid integration
 INPUTS 9
 Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qdp2_Tes1 Qdp3_Tes1 qHeatSource_Tes1 
-zero zero zero zero zero zero zero zero zero 
+Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qdp2_Tes1 Qdp3_Tes1 qHeatSource_Tes1 
 UNIT 136 TYPE 65      !Changed automatically
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 
@@ -3560,7 +3559,7 @@ unitPrinter_Tes2 ! 1: Logical unit number, -
 0  ! 5: Number of inputs to avoid integration
 INPUTS 8
 Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 qHeatSource_Tes2 
-zero zero zero zero zero zero zero zero 
+Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 qHeatSource_Tes2 
 UNIT 140 TYPE 65      !Changed automatically
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 

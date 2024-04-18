@@ -3,6 +3,7 @@ import pathlib as _pl
 import shutil as _su
 import typing as _tp
 
+import PyQt5.QtWidgets as _qtw
 import pandas as _pd
 
 from . import _git
@@ -11,18 +12,57 @@ DATA_DIR = _pl.Path(__file__).parent / "data"
 
 
 @_dc.dataclass
+class LoadDiagramWarning:
+    title: str
+    message: str
+
+
+class LoadDiagramWarningHelper:
+    def __init__(self, loadDiagramWarning: LoadDiagramWarning | None) -> None:
+        self._loadDiagramWarning = loadDiagramWarning
+        self._wasWarningReceived = False
+
+    def warning(self, _, title: str, message: str) -> _qtw.QMessageBox.StandardButton:  # parent
+        assert self._loadDiagramWarning
+
+        assert not self._wasWarningReceived
+        self._wasWarningReceived = True
+
+        assert title == self._loadDiagramWarning.title
+        assert message == self._loadDiagramWarning.message
+
+        return _qtw.QMessageBox.Ok
+
+    def verifyOrRaise(self) -> None:
+        if self._loadDiagramWarning:
+            assert self._wasWarningReceived
+        else:
+            assert not self._wasWarningReceived
+
+    def reset(self) -> None:
+        self._wasWarningReceived = False
+
+
+@_dc.dataclass
 class Project:
     projectName: str
     testCasesDirName: str
     exampleDirNameToCopyFrom: _tp.Optional[str] = None
+    resultsDirPathOrNone: _pl.Path | None = None
+    loadDiagramWarningOrNone: LoadDiagramWarning | None = None
 
     @staticmethod
     def createForTestProject(projectName: str) -> "Project":
         return Project(projectName, "tests")
 
     @staticmethod
-    def createForExampleProject(projectName: str, exampleDirNameToCopyFrom: str = "examples") -> "Project":
-        return Project(projectName, "examples", exampleDirNameToCopyFrom)
+    def createForExampleProject(
+        projectName: str,
+        exampleDirNameToCopyFrom: str = "examples",
+        resultsDirPath: _pl.Path | None = None,
+        loadDiagramWarning: LoadDiagramWarning | None = None,
+    ) -> "Project":
+        return Project(projectName, "examples", exampleDirNameToCopyFrom, resultsDirPath, loadDiagramWarning)
 
     @property
     def testId(self) -> str:

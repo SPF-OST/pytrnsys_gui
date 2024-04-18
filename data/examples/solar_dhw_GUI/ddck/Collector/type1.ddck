@@ -18,15 +18,17 @@
 ***********************************
 
 EQUATIONS 2
-TCollIn = TPiColIn
-MfrColl = ABS(MfrPiColIn)
+TCollIn = @temp(In)
+MfrColl = @mfr(In)
 
 ***********************************
 ** outputs to hydraulic solver
 ***********************************
 
-EQUATIONS 1
+EQUATIONS 2
 TCollOut = [28,1]
+@temp(Out) = TCollOut
+
 
 ***********************************
 ** outputs to other ddck
@@ -38,7 +40,7 @@ TCollOut = [28,1]
 ******************************************************************************************
 
 EQUATIONS 1
-qSysIn_Collector = PColl_kW  
+@energy(in, heat, Collector) =  PColl_kW
 
 ***********************************
 ** Dependencies with other ddck
@@ -77,12 +79,14 @@ MfrCPriNom = MfrCPriSpec*AcollAp !
 ***********************************
 ** Begin TYPE
 ***********************************
+EQUATIONS 1
+cp = @cp(In)
 
 UNIT 28 TYPE 1
 PARAMETERS 11
 nSeries       ! number in series
 AcollAp       ! collector area
-cpBri          ! fluid specific heat kj(kgK
+cp            ! fluid specific heat kj/(kgK)
 efficiencyMode ! efficiency mode
 testedMfr      ! tested flow rate kg/(hm2)
 Eta0          ! intercept efficiency 

@@ -306,7 +306,7 @@ unitPrinter_Tes7703 ! 1: Logical unit number, -
 0  ! 5: Number of inputs to avoid integration
 INPUTS 10
 Qv_Tes7703 QLoss_Tes7703 QAcum_Tes7703 QPorts_Tes7703 QImb_Tes7703 Qdp1_Tes7703 Qdp2_Tes7703 Qdp3_Tes7703 Qhx1Out_Tes7703 qHeatSource_Tes7703 
-zero zero zero zero zero zero zero zero zero zero 
+Qv_Tes7703 QLoss_Tes7703 QAcum_Tes7703 QPorts_Tes7703 QImb_Tes7703 Qdp1_Tes7703 Qdp2_Tes7703 Qdp3_Tes7703 Qhx1Out_Tes7703 qHeatSource_Tes7703 
 *************************************
 ********** Online Plotter ***********
 *************************************

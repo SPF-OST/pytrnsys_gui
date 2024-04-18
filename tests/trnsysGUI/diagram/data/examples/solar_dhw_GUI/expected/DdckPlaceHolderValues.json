@@ -13,17 +13,17 @@
     },
     "WTap": {
         "In": {
-            "@cp": "Lloop1Cp",
+            "@cp": "Lloop4Cp",
             "@mfr": "MWTap_A",
-            "@rho": "Lloop1Rho",
+            "@rho": "Lloop4Rho",
             "@temp": "TTee536_WTap"
         }
     },
     "WTap2": {
         "In": {
-            "@cp": "Lloop1Cp",
+            "@cp": "Lloop4Cp",
             "@mfr": "MWTap2_A",
-            "@rho": "Lloop1Rho",
+            "@rho": "Lloop4Rho",
             "@temp": "TTee536_WTap2"
         }
     }

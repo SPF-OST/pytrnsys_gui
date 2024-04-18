@@ -25,7 +25,15 @@ from . import _testHelper as _th
 def getProjects() -> _tp.Iterable[_th.Project]:
     yield _th.Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
     yield _th.Project.createForExampleProject("icegrid")
-    yield _th.Project.createForExampleProject("solar_dhw_GUI")
+
+    resultsDirPath = _pl.Path("results")
+    loadDiagramWarning = _th.LoadDiagramWarning(
+        "Orphaned ddck folders",
+        "The following ddck folder does not have a corresponding component in the diagram:\n\tdhw_demand",
+    )
+    yield _th.Project.createForExampleProject(
+        "solar_dhw_GUI", resultsDirPath=resultsDirPath, loadDiagramWarning=loadDiagramWarning
+    )
 
     yield from getTestProjects()
 
@@ -47,7 +55,10 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
         editor = mainWindow.editor
 
         self._exportAndTestStorageDdckFiles(editor, helper)
@@ -57,7 +68,10 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
         editor = mainWindow.editor
 
         self._exportAndTestHydraulicDdckFile(editor, helper)
@@ -67,7 +81,10 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
         editor = mainWindow.editor
 
         self._exportAndTestDdckPlaceholdersJsonFile(editor, helper, monkeypatch)
@@ -77,7 +94,9 @@ class TestEditor:
         helper = _th.Helper(testProject, shallComparisonsAlwaysSucceed)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
         editor = mainWindow.editor
 
         monkeypatch.chdir(helper.actualProjectFolderPath)
@@ -143,9 +162,13 @@ class TestEditor:
         mainWindow.exportDck()
 
         deckFileName = f"{testProject.projectName}.dck"
+        relativeDeckFilePathAsString = (
+            testProject.resultsDirPathOrNone / deckFileName if testProject.resultsDirPathOrNone else deckFileName
+        )
 
         pathPrefixes = self._getHardCodedPathPrefixesForReplacingInExpectedDeck()
-        helper.ensureFilesAreEqual(deckFileName, replaceInExpected=pathPrefixes)
+
+        helper.ensureFilesAreEqual(relativeDeckFilePathAsString, replaceInExpected=pathPrefixes)
 
     @staticmethod
     def _getHardCodedPathPrefixesForReplacingInExpectedDeck():
@@ -166,7 +189,9 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, warningHelper = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
 
         convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
         if convertedProjectFolderPath.exists():
@@ -174,11 +199,16 @@ class TestEditor:
             _time.sleep(1)
         _os.mkdir(convertedProjectFolderPath)
 
+        warningHelper.reset()
         mainWindow.copyContentsToNewFolder(convertedProjectFolderPath, helper.actualProjectFolderPath)
+        warningHelper.verifyOrRaise()
 
         convertedJsonFilePath = convertedProjectFolderPath / f"{convertedProjectFolderPath.name}.json"
         convertedProject = _prj.LoadProject(convertedJsonFilePath)
+
+        warningHelper.reset()
         _mw.MainWindow(logger, convertedProject)  # type: ignore[attr-defined]
+        warningHelper.verifyOrRaise()
 
     @_pt.mark.needs_trnsys
     @_pt.mark.parametrize("testProject", TEST_CASES)
@@ -188,7 +218,9 @@ class TestEditor:
         helper = _th.Helper(testProject, shallComparisonsAlwaysSucceed)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
 
         self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
 
@@ -206,8 +238,16 @@ class TestEditor:
         self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow)
 
     @classmethod
-    def _createMainWindow(cls, helper, qtbot, monkeypatch):
+    def _createMainWindowAndWarningHelper(
+        cls, helper: _th.Helper, loadDiagramWarningOrNone: _th.LoadDiagramWarning | None, qtbot, monkeypatch
+    ) -> _tp.Tuple[_mw.MainWindow, _th.LoadDiagramWarningHelper]:  # type: ignore[name-defined]
         cls._configureDontAskWhetherWindowShouldBeClosed(monkeypatch)
+
+        warningHelper = _th.LoadDiagramWarningHelper(loadDiagramWarningOrNone)
+
+        monkeypatch.setattr(
+            _qtw.QMessageBox, _qtw.QMessageBox.warning.__name__, warningHelper.warning  # pylint: disable=no-member
+        )
 
         projectFolderPath = helper.actualProjectFolderPath
         projectJsonFilePath = projectFolderPath / f"{projectFolderPath.name}.json"
@@ -217,9 +257,11 @@ class TestEditor:
 
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
 
+        warningHelper.verifyOrRaise()
+
         qtbot.addWidget(mainWindow)
 
-        return mainWindow
+        return mainWindow, warningHelper
 
     @staticmethod
     def _configureDontAskWhetherWindowShouldBeClosed(monkeypatch) -> None:
@@ -300,7 +342,11 @@ class TestEditor:
         self._resetHardCodedPathsInDeckFile(testProject, helper)
 
     def _resetHardCodedPathsInDeckFile(self, project: _th.Project, helper: _th.Helper) -> None:
-        deckFilePath = helper.expectedProjectFolderPath / f"{project.projectName}.dck"
+        deckFileName = f"{project.projectName}.dck"
+        relativeDeckFilePath: str | _pl.Path = (
+            project.resultsDirPathOrNone / deckFileName if project.resultsDirPathOrNone else deckFileName
+        )
+        deckFilePath = helper.expectedProjectFolderPath / relativeDeckFilePath
         (
             hardcodedPathInExpectedDeck,
             hardCodedPathInActualDeck,

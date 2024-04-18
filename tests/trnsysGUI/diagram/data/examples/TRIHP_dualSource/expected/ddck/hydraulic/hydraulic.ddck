@@ -396,8 +396,7 @@ EQUATIONS 1
 TDivSh= [451,1]
 
 ! supplyWater
-EQUATIONS 2
-Tcw = 1
+EQUATIONS 1
 TsupplyWater = Tcw
 
 UNIT 452 TYPE 929

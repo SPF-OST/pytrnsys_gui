@@ -567,7 +567,11 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         fullExportText += exporter.exportTempPrinter(self.printerUnitnr + 1, 15)
 
         if exportTo == "mfs":
-            fullExportText += "CONSTANTS 1\nTRoomStore=1\n"
+            fullExportText += """\
+CONSTANTS 2
+TRoomStore=1
+Tcw=1
+"""
             fullExportText += "ENDS"
 
         self.logger.info("------------------------> END OF EXPORT <------------------------")
@@ -814,17 +818,14 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
             warnBox.setWindowTitle("Additional ddck-folders")
 
             if len(additionalFolders) == 1:
-                text = "The following ddck-folder does not have a corresponding component in the diagram:"
+                message = "The following ddck folder does not have a corresponding component in the diagram:"
             else:
-                text = "The following ddck-folders do not have a corresponding component in the diagram:"
+                message = "The following ddck folders do not have a corresponding component in the diagram:"
 
             for folder in additionalFolders:
-                text += "\n\t" + folder
+                message += "\n\t" + folder
 
-            warnBox.setText(text)
-            warnBox.setStandardButtons(_qtw.QMessageBox.Ok)
-            warnBox.setDefaultButton(_qtw.QMessageBox.Ok)
-            warnBox.exec()
+            _qtw.QMessageBox.warning(None, "Orphaned ddck folders", message)
 
         for t in self.trnsysObj:
             t.assignIDsToUninitializedValuesAfterJsonFormatMigration(self.idGen)

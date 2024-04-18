@@ -2993,6 +2993,7 @@ TDTeeJ_SCnrZCold TDTeeJ_SCnrZHot TSCnrZ_SCnrZ TDTeeA_DTeeBCold TDTeeA_DTeeBHot T
 TSCnr1_DTeeAHot
 
 
-CONSTANTS 1
+CONSTANTS 2
 TRoomStore=1
+Tcw=1
 ENDS

@@ -443,8 +443,7 @@ EQUATIONS 1
 TTeeAuxHxRt = [452,1]
 
 ! supplyWater
-EQUATIONS 2
-Tcw = 1
+EQUATIONS 1
 TsupplyWater = Tcw
 
 ! TeeCircOut

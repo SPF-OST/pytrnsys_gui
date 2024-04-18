@@ -31,7 +31,7 @@ Tdp1InRev_Tes1 = TPiTesDhwOut
 EQUATIONS 3
 Thx1In_Tes1 = TPiColOut
 Mfrhx1_Tes1 = MDhwTesHx24_A
-Thx1InRev_Tes1 = TPiTesToCol
+Thx1InRev_Tes1 = TDhw_PuCol
 CONSTANTS 2
 zAux1_Tes1=0.00
 qAux1_Tes1=0.00
@@ -282,7 +282,7 @@ unitPrinter_Tes1 ! 1: Logical unit number, -
 0  ! 5: Number of inputs to avoid integration
 INPUTS 8
 Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qhx1Out_Tes1 qHeatSource_Tes1 
-zero zero zero zero zero zero zero zero 
+Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qhx1Out_Tes1 qHeatSource_Tes1 
 *************************************
 ********** Online Plotter ***********
 *************************************

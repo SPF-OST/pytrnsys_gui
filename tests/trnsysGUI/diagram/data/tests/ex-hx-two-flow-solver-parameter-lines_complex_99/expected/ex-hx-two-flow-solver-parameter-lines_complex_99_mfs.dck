@@ -568,8 +568,7 @@ EQUATIONS 1
 TTeeAuxHxRt = [452,1]
 
 ! supplyWater
-EQUATIONS 2
-Tcw = 1
+EQUATIONS 1
 TsupplyWater = Tcw
 
 ! TeeCircOut
@@ -2233,6 +2232,7 @@ TPiShFlToPu6 TPiPuOvFl TPiFloor6Rt TPiPuOvRt6to5 TPiDhwtoTCirc TPiTesDhwTapOut T
 TPiDhwMains TPiPuHxDhw2HxDHW TPiHxDHW_Dhw TPiHP_PuAux TPiTeeAuxHxRt_HP
 
 
-CONSTANTS 1
+CONSTANTS 2
 TRoomStore=1
+Tcw=1
 ENDS

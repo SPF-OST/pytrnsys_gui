@@ -408,6 +408,7 @@ THx_Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
 THx_Col TPiExHx_Tes TPiTes_Pump88 TPiPump88_ExHx TPiPump93_ExHx TPiPump93_Col
 
 
-CONSTANTS 1
+CONSTANTS 2
 TRoomStore=1
+Tcw=1
 ENDS
