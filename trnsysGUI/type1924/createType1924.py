@@ -678,26 +678,23 @@ class Type1924_TesPlugFlow:
 
         line = "INPUTS %d\n" % nInputs
         lines = lines + line
-        line = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d " % (nTes, nTes, nTes, nTes, nTes)
-        lines = lines + line
+
+        inputsLine = "Qv_Tes%d QLoss_Tes%d QAcum_Tes%d QPorts_Tes%d QImb_Tes%d " % (nTes, nTes, nTes, nTes, nTes)
         for i in range(inputs["nPorts"]):
-            line = "Qdp%d_Tes%d " % (i + 1, nTes)
-            lines = lines + line
+            nextInput = "Qdp%d_Tes%d " % (i + 1, nTes)
+            inputsLine += nextInput
 
         for i in range(inputs["nHx"]):
-            line = "Qhx%dOut_Tes%d " % (i + 1, nTes)
-            lines = lines + line
+            nextInput = "Qhx%dOut_Tes%d " % (i + 1, nTes)
+            inputsLine += nextInput
 
-        line = "qHeatSource_Tes%d " % (nTes)
-        lines = lines + line
+        nextInput = "qHeatSource_Tes%d " % nTes
+        inputsLine += nextInput
 
-        lines = lines + "\n"
-
-        for i in range(nInputs):
-            line = "zero "
-            lines = lines + line
-
-        lines = lines + "\n"
+        lines += f"""\
+{inputsLine}
+{inputsLine}
+"""
 
         return lines
 
