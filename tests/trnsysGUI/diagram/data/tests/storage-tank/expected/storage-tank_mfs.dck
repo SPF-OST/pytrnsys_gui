@@ -408,6 +408,7 @@ TTes_Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
 TTes_Col TPiTes_HP TPiTes_Pump109 TPiPump109_HP TPiCol_Pump114 TPiPump114_Tes
 
 
-CONSTANTS 1
+CONSTANTS 2
 TRoomStore=1
+Tcw=1
 ENDS

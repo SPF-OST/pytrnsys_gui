@@ -818,17 +818,14 @@ Tcw=1
             warnBox.setWindowTitle("Additional ddck-folders")
 
             if len(additionalFolders) == 1:
-                text = "The following ddck-folder does not have a corresponding component in the diagram:"
+                message = "The following ddck folder does not have a corresponding component in the diagram:"
             else:
-                text = "The following ddck-folders do not have a corresponding component in the diagram:"
+                message = "The following ddck folders do not have a corresponding component in the diagram:"
 
             for folder in additionalFolders:
-                text += "\n\t" + folder
+                message += "\n\t" + folder
 
-            warnBox.setText(text)
-            warnBox.setStandardButtons(_qtw.QMessageBox.Ok)
-            warnBox.setDefaultButton(_qtw.QMessageBox.Ok)
-            warnBox.exec()
+            _qtw.QMessageBox.warning(None, "Orphaned ddck folders", message)
 
         for t in self.trnsysObj:
             t.assignIDsToUninitializedValuesAfterJsonFormatMigration(self.idGen)
