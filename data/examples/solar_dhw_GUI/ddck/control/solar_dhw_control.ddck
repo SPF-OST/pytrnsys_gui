@@ -58,6 +58,8 @@ dtAuxOff       ! Turn off temperature difference, Lower dead band dT, LDB
 EQUATIONS 1  
 auxOn = [27,1]
 
+CONSTANTS 1
+DhwPAux_kW = 5
 
 ***********************************
 ** Begin TYPE COLLECTOR CONTROLLER

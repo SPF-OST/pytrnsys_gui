@@ -1,7 +1,7 @@
 {
     "Blocks": {
         ".__BlockDct__": true,
-        "Block--1": {
+        "Block-1": {
             ".__BlockDict__": true,
             "BlockDisplayName": "Dhw",
             "BlockName": "StorageTank",
@@ -54,7 +54,7 @@
             ],
             "trnsysId": 7
         },
-        "Block--2": {
+        "Block-2": {
             ".__BlockDict__": true,
             "BlockDisplayName": "SplitDhw",
             "BlockName": "TeePiece",
@@ -79,7 +79,7 @@
                 ]
             }
         },
-        "Block--3": {
+        "Block-3": {
             ".__BlockDict__": true,
             "BlockDisplayName": "WTap2",
             "BlockName": "WTap",
@@ -101,7 +101,7 @@
             },
             "portId": 543
         },
-        "Block--4": {
+        "Block-4": {
             ".__BlockDict__": true,
             "BlockDisplayName": "TeePiece",
             "BlockName": "TeePiece",
@@ -126,7 +126,7 @@
                 ]
             }
         },
-        "Block--5": {
+        "Block-5": {
             ".__BlockDict__": true,
             "BlockDisplayName": "WTap_main",
             "BlockName": "WTap_main",
@@ -148,7 +148,7 @@
             },
             "portId": 35
         },
-        "Block--6": {
+        "Block-6": {
             ".__BlockDict__": true,
             "BlockDisplayName": "PuCol",
             "BlockName": "Pump",
@@ -171,7 +171,7 @@
             "inputPortId": 43,
             "outputPortId": 44
         },
-        "Block--7": {
+        "Block-7": {
             ".__BlockDict__": true,
             "BlockDisplayName": "Collector",
             "BlockName": "Collector",
@@ -191,7 +191,7 @@
             "rotationN": 0,
             "trnsysId": 16
         },
-        "Block--8": {
+        "Block-8": {
             ".__BlockDict__": true,
             "BlockDisplayName": "MixDhw",
             "BlockName": "TVentil",
@@ -215,7 +215,7 @@
                 251
             ]
         },
-        "Block--9": {
+        "Block-9": {
             ".__BlockDict__": true,
             "BlockDisplayName": "WTap",
             "BlockName": "WTap",
@@ -237,7 +237,7 @@
             },
             "portId": 260
         },
-        "Connection--10": {
+        "Connection-10": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 74,
@@ -283,7 +283,7 @@
                 "name": "loop4UVal"
             }
         },
-        "Connection--11": {
+        "Connection-11": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 79,
@@ -321,7 +321,7 @@
                 "name": "loop2UVal"
             }
         },
-        "Connection--12": {
+        "Connection-12": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 91,
@@ -367,7 +367,7 @@
                 "name": "loop2UVal"
             }
         },
-        "Connection--13": {
+        "Connection-13": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 97,
@@ -405,7 +405,7 @@
                 "name": "loop4UVal"
             }
         },
-        "Connection--14": {
+        "Connection-14": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 154,
@@ -439,7 +439,7 @@
                 "name": "loop4UVal"
             }
         },
-        "Connection--15": {
+        "Connection-15": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 155,
@@ -477,7 +477,7 @@
                 "name": "loop4UVal"
             }
         },
-        "Connection--16": {
+        "Connection-16": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 163,
@@ -515,7 +515,7 @@
                 "name": "loop2UVal"
             }
         },
-        "Connection--17": {
+        "Connection-17": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 172,
@@ -553,7 +553,7 @@
                 "name": "loop4UVal"
             }
         },
-        "Connection--18": {
+        "Connection-18": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 57,
@@ -587,7 +587,7 @@
                 "name": "loop4UVal"
             }
         },
-        "Connection--19": {
+        "Connection-19": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 72,
@@ -630,10 +630,10 @@
             }
         },
         "IDs": {
-            "GlobalId": 587,
+            "GlobalId": 591,
             "__idDct__": true,
-            "globalConnID": 175,
-            "trnsysID": 234
+            "globalConnID": 179,
+            "trnsysID": 238
         },
         "Strings": {
             "DiagramName": "solar_dhw_GUI.json",
@@ -649,7 +649,7 @@
                 130,
                 222
             ],
-            "fluidName": "water",
+            "fluidName": "brine",
             "hasUserDefinedName": false,
             "name": "loop2",
             "useLoopWideDefaults": true
