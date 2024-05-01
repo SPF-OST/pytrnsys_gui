@@ -7,9 +7,8 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI.arguments as _args
-import trnsysGUI.warningsAndErrors as _werrors
-import trnsysGUI.pyinstaller as _pyinst
 import trnsysGUI.setup as _setup
+import trnsysGUI.warningsAndErrors as _werrors
 
 
 def main():
