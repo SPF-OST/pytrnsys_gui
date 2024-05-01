@@ -63,10 +63,6 @@ def main():
 
 
 def _getLogFilePath():
-    if _pyinst.isRunAsPyInstallerExe():
-        containingDir = _pl.Path(_sys.executable).parent
-        return containingDir / "pytrnsys-gui.log"
-
     return _pl.Path("pytrnsys-gui.log").absolute()
 
 
