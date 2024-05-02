@@ -20,11 +20,11 @@ jobs:
         working-directory: dev_install/pytrnsys_gui
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           path: dev_install/pytrnsys_gui
           
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: SPF-OST/pytrnsys
           path: dev_install/pytrnsys
@@ -62,7 +62,7 @@ jobs:
       PYTRNSYS_DEPENDENCY_CHANGED: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'run-tests-and-build-executable'}}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Remove old venv
         run: |
@@ -98,13 +98,13 @@ jobs:
         run: venv\Scripts\python dev-tools/devTools.py --unit --keep-results
 
       - name: Post coverage report to Coveralls
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: test-results/coverage.lcov
 
       - name: Upload test results and coverage reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-and-coverage-report-windows
           path: test-results
@@ -113,7 +113,7 @@ jobs:
 
       - if: github.event_name == 'push' || env.PYTRNSYS_DEPENDENCY_CHANGED == 'true'
         name: Trigger build of executable for push
-        uses: peter-evans/repository-dispatch@v2
+        uses: peter-evans/repository-dispatch@v3
         with:
           repository: SPF-OST/pytrnsys_gui
           token: ${{ secrets.GITHUB_TOKEN }}
