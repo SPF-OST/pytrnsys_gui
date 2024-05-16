@@ -103,7 +103,6 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
             dct["PortsIDIn"] = portListInputs
             dct["PortsIDOut"] = portListOutputs
             dct["HeatPumpPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
             dct["trnsysID"] = self.trnsysId
             dct["childIds"] = self.childIds
             dct["FlippedH"] = self.flippedH
@@ -131,7 +130,6 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
 
         self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
         self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
 
         resBlockList.append(self)
 
