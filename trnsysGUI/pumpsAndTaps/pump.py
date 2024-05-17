@@ -47,6 +47,9 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PUMP_SVG
 
+    def _getCanonicalMassFlowRate(self) -> float:
+        return self._massFlowRateInKgPerH
+
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         blockItemWithPrescribedMassFlowModel = self._createBlockItemWithPrescribedMassFlowForEncode()
 
