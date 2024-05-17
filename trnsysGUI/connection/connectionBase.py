@@ -117,9 +117,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def toPort(self) -> _pib.PortItemBase:
         return self._toPort
 
-    def _updateModels(self, newDisplayName: str) -> None:
-        raise NotImplementedError()
-
     def _createSegmentItem(self, startNode, endNode):
         raise NotImplementedError()
 
@@ -134,7 +131,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self._label.setPlainText(self.displayName)
-        self._updateModels(newName)
 
     def setLabelPos(self, tup: _tp.Tuple[float, float]) -> None:
         pos = self._toPoint(tup)

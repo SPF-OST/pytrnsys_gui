@@ -112,10 +112,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self.label.setPlainText(newName)
-        self._updateModels(newName)
-
-    def _updateModels(self, newDisplayName: str) -> None:
-        pass
 
     # Interaction related
     def contextMenuEvent(self, event):

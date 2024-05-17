@@ -22,11 +22,11 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         self.inputs.append(self.fromPort)
         self.outputs.append(self.toPort)
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
         self.changeSize()
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         self._coldPipe, self._hotPipe = _cmnp.createMassFlowSolverNetworkPipes()
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:

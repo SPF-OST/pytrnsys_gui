@@ -42,7 +42,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.diameterInCm: _values.Value = _defaults.DEFAULT_DIAMETER_IN_CM
         self.uValueInWPerM2K: _values.Value = _defaults.DEFAULT_U_VALUE_IN_W_PER_M2_K
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
     @property
     def fromPort(self) -> _sppi.SinglePipePortItem:
@@ -65,7 +65,7 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def _createSegmentItem(self, startNode, endNode):
         return _spsi.SinglePipeSegmentItem(startNode, endNode, self)
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         toPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         self.modelPipe = _mfn.Pipe(fromPort, toPort)

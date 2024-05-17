@@ -21,11 +21,11 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(_dppi.DoublePipePortItem("o", 2, self))
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
         self.changeSize()
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         coldInput = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
         coldOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.STANDARD)
         self._coldPipe = _mfn.Pipe(coldInput, coldOutput, name="Cold")

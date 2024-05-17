@@ -25,9 +25,9 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
 
         self.changeSize()
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         modelInputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         modelOutputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         self._modelPump = _mfn.Pump(modelInputPort, modelOutputPort)

@@ -23,7 +23,7 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
         self.inputs.append(self.fromPort)
         self.outputs.append(self.toPort)
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
         self.changeSize()
 
@@ -48,7 +48,7 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.CONNECTOR_PNG
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         toPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         self._modelPipe = _mfn.Pipe(fromPort, toPort)

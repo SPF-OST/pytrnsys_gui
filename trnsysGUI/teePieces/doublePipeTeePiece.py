@@ -31,7 +31,7 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
 
         self.childIds = (self.trnsysId, self.editor.idGen.getTrnsysID())
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
     def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         return (
@@ -40,7 +40,7 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
             _dppi.DoublePipePortItem("o", 2, self),
         )
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         coldInput: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
         coldOutput1: _mfn.PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
         coldOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
