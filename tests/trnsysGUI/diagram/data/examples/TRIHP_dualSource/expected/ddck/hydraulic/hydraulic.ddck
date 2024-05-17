@@ -380,7 +380,19 @@ Lloop5Rho = FwaterRho
 Lloop5Cp = FwaterCp
 
 
-UNIT 451 TYPE 929
+UNIT 451 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPuSH_A TPiSHOutMix TPiRadIn
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPuSH = [451,1]
+MPuSH = MPuSH_A
+
+UNIT 452 TYPE 929
 !DivSh
 PARAMETERS 0
 INPUTS 6
@@ -393,13 +405,16 @@ TPiSHInMix
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivSh= [451,1]
+TDivSh= [452,1]
+
+EQUATIONS 1
+TtapWater = TPiDhwDemand
 
 ! supplyWater
 EQUATIONS 1
 TsupplyWater = Tcw
 
-UNIT 452 TYPE 929
+UNIT 453 TYPE 929
 !DivHpEvap
 PARAMETERS 0
 INPUTS 6
@@ -412,10 +427,10 @@ TPiHpEvapMix
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivHpEvap= [452,1]
+TDivHpEvap= [453,1]
 
 ! TeeHpEvap
-UNIT 453 TYPE 929
+UNIT 454 TYPE 929
 INPUTS 6
 MTeeHpEvap_A
 MTeeHpEvap_B
@@ -431,9 +446,9 @@ TPiHpEvapMix
 20.0
 20.0
 EQUATIONS 1
-TTeeHpEvap = [453,1]
+TTeeHpEvap = [454,1]
 
-UNIT 454 TYPE 929
+UNIT 455 TYPE 929
 !DivCondTOTesDhw
 PARAMETERS 0
 INPUTS 6
@@ -446,9 +461,9 @@ TPiDesToCond
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivCondTOTesDhw= [454,1]
+TDivCondTOTesDhw= [455,1]
 
-UNIT 455 TYPE 929
+UNIT 456 TYPE 929
 !DivSHCool
 PARAMETERS 0
 INPUTS 6
@@ -461,10 +476,10 @@ TPiHxCoolWatIn
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivSHCool= [455,1]
+TDivSHCool= [456,1]
 
 ! TeeCoolRadIn
-UNIT 456 TYPE 929
+UNIT 457 TYPE 929
 INPUTS 6
 MTeeCoolRadIn_A
 MTeeCoolRadIn_B
@@ -480,9 +495,33 @@ TConn1455
 20.0
 20.0
 EQUATIONS 1
-TTeeCoolRadIn = [456,1]
+TTeeCoolRadIn = [457,1]
 
-UNIT 457 TYPE 929
+UNIT 458 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPuHpEvap_A TPiGhxOut TPiPuGhxOut
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPuHpEvap = [458,1]
+MPuHpEvap = MPuHpEvap_A
+
+UNIT 459 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPuHpShCond_A TPiPuHpShIn TPiHpToTesShIn
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPuHpShCond = [459,1]
+MPuHpShCond = MPuHpShCond_A
+
+UNIT 460 TYPE 929
 !DivDhw
 PARAMETERS 0
 INPUTS 6
@@ -495,10 +534,10 @@ TPiCircIn
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivDhw= [457,1]
+TDivDhw= [460,1]
 
 ! TeePieceCirc2
-UNIT 458 TYPE 929
+UNIT 461 TYPE 929
 INPUTS 6
 MTeePieceCirc2_A
 MTeePieceCirc2_B
@@ -514,9 +553,9 @@ TPiPuCircOut
 20.0
 20.0
 EQUATIONS 1
-TTeePieceCirc2 = [458,1]
+TTeePieceCirc2 = [461,1]
 
-UNIT 459 TYPE 929
+UNIT 462 TYPE 929
 !DivDhwOut
 PARAMETERS 0
 INPUTS 6
@@ -529,9 +568,9 @@ TPiCircOut
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivDhwOut= [459,1]
+TDivDhwOut= [462,1]
 
-UNIT 460 TYPE 929
+UNIT 463 TYPE 929
 !DivCool
 PARAMETERS 0
 INPUTS 6
@@ -544,9 +583,21 @@ TPiDivCool
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivCool= [460,1]
+TDivCool= [463,1]
 
-UNIT 461 TYPE 931
+UNIT 464 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPuHpDhwCond_A TPiPuHpDhwIn TPiHpToTesDhwIn
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPuHpDhwCond = [464,1]
+MPuHpDhwCond = MPuHpDhwCond_A
+
+UNIT 465 TYPE 931
 ! PiHpToTesShIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -564,14 +615,14 @@ TTesShDpL95_5H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpToTesShIn = [461,1] ! Output flow temperature [deg C]
-PPiHpToTesShIn_kW = [461,3]/3600 ! Dissipated heat [kW]
-PPiHpToTesShInConv_kW = [461,4]/3600 ! Convected heat [kW]
-PPiHpToTesShInInt_kJ = [461,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpToTesShIn = [465,1] ! Output flow temperature [deg C]
+PPiHpToTesShIn_kW = [465,3]/3600 ! Dissipated heat [kW]
+PPiHpToTesShInConv_kW = [465,4]/3600 ! Convected heat [kW]
+PPiHpToTesShInInt_kJ = [465,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpToTesShIn = MPiHpToTesShIn_A
 
 ! TeeTesShOut
-UNIT 462 TYPE 929
+UNIT 466 TYPE 929
 INPUTS 6
 MTeeTesShOut_A
 MTeeTesShOut_B
@@ -587,9 +638,9 @@ TPiTesDhwCond
 20.0
 20.0
 EQUATIONS 1
-TTeeTesShOut = [462,1]
+TTeeTesShOut = [466,1]
 
-UNIT 463 TYPE 929
+UNIT 467 TYPE 929
 !DivTesDhwOut
 PARAMETERS 0
 INPUTS 6
@@ -602,9 +653,9 @@ TPiTesDhwCond
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivTesDhwOut= [463,1]
+TDivTesDhwOut= [467,1]
 
-UNIT 464 TYPE 929
+UNIT 468 TYPE 929
 !DivHp
 PARAMETERS 0
 INPUTS 6
@@ -617,9 +668,21 @@ TPiTesDhwToDes
 ***Initial values
 0 0 0 20 20 20 
 EQUATIONS 1
-TDivHp= [464,1]
+TDivHp= [468,1]
 
-UNIT 465 TYPE 931
+UNIT 469 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPuDhw_A TPiHxDhwOut TPiPuDhwOut
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPuDhw = [469,1]
+MPuDhw = MPuDhw_A
+
+UNIT 470 TYPE 931
 ! PiHxDhwIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -637,14 +700,14 @@ THxDHWSide1H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHxDhwIn = [465,1] ! Output flow temperature [deg C]
-PPiHxDhwIn_kW = [465,3]/3600 ! Dissipated heat [kW]
-PPiHxDhwInConv_kW = [465,4]/3600 ! Convected heat [kW]
-PPiHxDhwInInt_kJ = [465,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHxDhwIn = [470,1] ! Output flow temperature [deg C]
+PPiHxDhwIn_kW = [470,3]/3600 ! Dissipated heat [kW]
+PPiHxDhwInConv_kW = [470,4]/3600 ! Convected heat [kW]
+PPiHxDhwInInt_kJ = [470,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHxDhwIn = MPiHxDhwIn_A
 
 ! TeePieceCirc1
-UNIT 466 TYPE 929
+UNIT 471 TYPE 929
 INPUTS 6
 MTeePieceCirc1_A
 MTeePieceCirc1_B
@@ -660,9 +723,21 @@ TPiPuCircIn
 20.0
 20.0
 EQUATIONS 1
-TTeePieceCirc1 = [466,1]
+TTeePieceCirc1 = [471,1]
 
-UNIT 467 TYPE 931
+UNIT 472 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPuCirc_A TPiPuCircIn TPiPuCircOut
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPuCirc = [472,1]
+MPuCirc = MPuCirc_A
+
+UNIT 473 TYPE 931
 ! PiPuCircIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -680,13 +755,13 @@ TPuCirc ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPuCircIn = [467,1] ! Output flow temperature [deg C]
-PPiPuCircIn_kW = [467,3]/3600 ! Dissipated heat [kW]
-PPiPuCircInConv_kW = [467,4]/3600 ! Convected heat [kW]
-PPiPuCircInInt_kJ = [467,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPuCircIn = [473,1] ! Output flow temperature [deg C]
+PPiPuCircIn_kW = [473,3]/3600 ! Dissipated heat [kW]
+PPiPuCircInConv_kW = [473,4]/3600 ! Convected heat [kW]
+PPiPuCircInInt_kJ = [473,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuCircIn = MPiPuCircIn_A
 
-UNIT 468 TYPE 931
+UNIT 474 TYPE 931
 ! PiPuCircOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -704,13 +779,13 @@ TTeePieceCirc2 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPuCircOut = [468,1] ! Output flow temperature [deg C]
-PPiPuCircOut_kW = [468,3]/3600 ! Dissipated heat [kW]
-PPiPuCircOutConv_kW = [468,4]/3600 ! Convected heat [kW]
-PPiPuCircOutInt_kJ = [468,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPuCircOut = [474,1] ! Output flow temperature [deg C]
+PPiPuCircOut_kW = [474,3]/3600 ! Dissipated heat [kW]
+PPiPuCircOutConv_kW = [474,4]/3600 ! Convected heat [kW]
+PPiPuCircOutInt_kJ = [474,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuCircOut = MPiPuCircOut_A
 
-UNIT 469 TYPE 931
+UNIT 475 TYPE 931
 ! PiDhwDemand
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -728,14 +803,14 @@ TtapWater ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiDhwDemand = [469,1] ! Output flow temperature [deg C]
-PPiDhwDemand_kW = [469,3]/3600 ! Dissipated heat [kW]
-PPiDhwDemandConv_kW = [469,4]/3600 ! Convected heat [kW]
-PPiDhwDemandInt_kJ = [469,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiDhwDemand = [475,1] ! Output flow temperature [deg C]
+PPiDhwDemand_kW = [475,3]/3600 ! Dissipated heat [kW]
+PPiDhwDemandConv_kW = [475,4]/3600 ! Convected heat [kW]
+PPiDhwDemandInt_kJ = [475,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiDhwDemand = MPiDhwDemand_A
 
 ! TeePiece_6032
-UNIT 470 TYPE 929
+UNIT 476 TYPE 929
 INPUTS 6
 MTeePiece_6032_A
 MTeePiece_6032_B
@@ -751,9 +826,9 @@ TPiSHInMix
 20.0
 20.0
 EQUATIONS 1
-TTeePiece_6032 = [470,1]
+TTeePiece_6032 = [476,1]
 
-UNIT 471 TYPE 931
+UNIT 477 TYPE 931
 ! PiSHInMix
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -771,13 +846,13 @@ TDivSh ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiSHInMix = [471,1] ! Output flow temperature [deg C]
-PPiSHInMix_kW = [471,3]/3600 ! Dissipated heat [kW]
-PPiSHInMixConv_kW = [471,4]/3600 ! Convected heat [kW]
-PPiSHInMixInt_kJ = [471,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiSHInMix = [477,1] ! Output flow temperature [deg C]
+PPiSHInMix_kW = [477,3]/3600 ! Dissipated heat [kW]
+PPiSHInMixConv_kW = [477,4]/3600 ! Convected heat [kW]
+PPiSHInMixInt_kJ = [477,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiSHInMix = MPiSHInMix_A
 
-UNIT 472 TYPE 931
+UNIT 478 TYPE 931
 ! PiRadIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -795,14 +870,14 @@ TRadiatorSHH ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiRadIn = [472,1] ! Output flow temperature [deg C]
-PPiRadIn_kW = [472,3]/3600 ! Dissipated heat [kW]
-PPiRadInConv_kW = [472,4]/3600 ! Convected heat [kW]
-PPiRadInInt_kJ = [472,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiRadIn = [478,1] ! Output flow temperature [deg C]
+PPiRadIn_kW = [478,3]/3600 ! Dissipated heat [kW]
+PPiRadInConv_kW = [478,4]/3600 ! Convected heat [kW]
+PPiRadInInt_kJ = [478,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiRadIn = MPiRadIn_A
 
 ! TeePiece5329
-UNIT 473 TYPE 929
+UNIT 479 TYPE 929
 INPUTS 6
 MTeePiece5329_A
 MTeePiece5329_B
@@ -818,9 +893,9 @@ TPiTesDhwToDes
 20.0
 20.0
 EQUATIONS 1
-TTeePiece5329 = [473,1]
+TTeePiece5329 = [479,1]
 
-UNIT 474 TYPE 931
+UNIT 480 TYPE 931
 ! PiTesDhwToDes
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -838,13 +913,13 @@ TDivHp ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTesDhwToDes = [474,1] ! Output flow temperature [deg C]
-PPiTesDhwToDes_kW = [474,3]/3600 ! Dissipated heat [kW]
-PPiTesDhwToDesConv_kW = [474,4]/3600 ! Convected heat [kW]
-PPiTesDhwToDesInt_kJ = [474,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTesDhwToDes = [480,1] ! Output flow temperature [deg C]
+PPiTesDhwToDes_kW = [480,3]/3600 ! Dissipated heat [kW]
+PPiTesDhwToDesConv_kW = [480,4]/3600 ! Convected heat [kW]
+PPiTesDhwToDesInt_kJ = [480,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTesDhwToDes = MPiTesDhwToDes_A
 
-UNIT 475 TYPE 931
+UNIT 481 TYPE 931
 ! PiHpToTesDhwIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -862,14 +937,14 @@ TTesDhwDpL95_35H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpToTesDhwIn = [475,1] ! Output flow temperature [deg C]
-PPiHpToTesDhwIn_kW = [475,3]/3600 ! Dissipated heat [kW]
-PPiHpToTesDhwInConv_kW = [475,4]/3600 ! Convected heat [kW]
-PPiHpToTesDhwInInt_kJ = [475,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpToTesDhwIn = [481,1] ! Output flow temperature [deg C]
+PPiHpToTesDhwIn_kW = [481,3]/3600 ! Dissipated heat [kW]
+PPiHpToTesDhwInConv_kW = [481,4]/3600 ! Convected heat [kW]
+PPiHpToTesDhwInInt_kJ = [481,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpToTesDhwIn = MPiHpToTesDhwIn_A
 
 ! TeePiece_6088
-UNIT 476 TYPE 929
+UNIT 482 TYPE 929
 INPUTS 6
 MTeePiece_6088_A
 MTeePiece_6088_B
@@ -885,9 +960,9 @@ TPiDesToCond
 20.0
 20.0
 EQUATIONS 1
-TTeePiece_6088 = [476,1]
+TTeePiece_6088 = [482,1]
 
-UNIT 477 TYPE 931
+UNIT 483 TYPE 931
 ! PiDesToCond
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -905,13 +980,13 @@ TDivCondTOTesDhw ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiDesToCond = [477,1] ! Output flow temperature [deg C]
-PPiDesToCond_kW = [477,3]/3600 ! Dissipated heat [kW]
-PPiDesToCondConv_kW = [477,4]/3600 ! Convected heat [kW]
-PPiDesToCondInt_kJ = [477,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiDesToCond = [483,1] ! Output flow temperature [deg C]
+PPiDesToCond_kW = [483,3]/3600 ! Dissipated heat [kW]
+PPiDesToCondConv_kW = [483,4]/3600 ! Convected heat [kW]
+PPiDesToCondInt_kJ = [483,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiDesToCond = MPiDesToCond_A
 
-UNIT 478 TYPE 931
+UNIT 484 TYPE 931
 ! PiHxCoolBriOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -929,14 +1004,14 @@ TDivCool ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHxCoolBriOut = [478,1] ! Output flow temperature [deg C]
-PPiHxCoolBriOut_kW = [478,3]/3600 ! Dissipated heat [kW]
-PPiHxCoolBriOutConv_kW = [478,4]/3600 ! Convected heat [kW]
-PPiHxCoolBriOutInt_kJ = [478,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHxCoolBriOut = [484,1] ! Output flow temperature [deg C]
+PPiHxCoolBriOut_kW = [484,3]/3600 ! Dissipated heat [kW]
+PPiHxCoolBriOutConv_kW = [484,4]/3600 ! Convected heat [kW]
+PPiHxCoolBriOutInt_kJ = [484,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHxCoolBriOut = MPiHxCoolBriOut_A
 
 ! TeePiece3852
-UNIT 479 TYPE 929
+UNIT 485 TYPE 929
 INPUTS 6
 MTeePiece3852_A
 MTeePiece3852_B
@@ -952,9 +1027,9 @@ TPiDivCool
 20.0
 20.0
 EQUATIONS 1
-TTeePiece3852 = [479,1]
+TTeePiece3852 = [485,1]
 
-UNIT 480 TYPE 931
+UNIT 486 TYPE 931
 ! PiHxCoolBriIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -972,13 +1047,13 @@ THxCoolSide1H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHxCoolBriIn = [480,1] ! Output flow temperature [deg C]
-PPiHxCoolBriIn_kW = [480,3]/3600 ! Dissipated heat [kW]
-PPiHxCoolBriInConv_kW = [480,4]/3600 ! Convected heat [kW]
-PPiHxCoolBriInInt_kJ = [480,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHxCoolBriIn = [486,1] ! Output flow temperature [deg C]
+PPiHxCoolBriIn_kW = [486,3]/3600 ! Dissipated heat [kW]
+PPiHxCoolBriInConv_kW = [486,4]/3600 ! Convected heat [kW]
+PPiHxCoolBriInInt_kJ = [486,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHxCoolBriIn = MPiHxCoolBriIn_A
 
-UNIT 481 TYPE 931
+UNIT 487 TYPE 931
 ! PiDivCool
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -996,13 +1071,13 @@ TDivCool ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiDivCool = [481,1] ! Output flow temperature [deg C]
-PPiDivCool_kW = [481,3]/3600 ! Dissipated heat [kW]
-PPiDivCoolConv_kW = [481,4]/3600 ! Convected heat [kW]
-PPiDivCoolInt_kJ = [481,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiDivCool = [487,1] ! Output flow temperature [deg C]
+PPiDivCool_kW = [487,3]/3600 ! Dissipated heat [kW]
+PPiDivCoolConv_kW = [487,4]/3600 ! Convected heat [kW]
+PPiDivCoolInt_kJ = [487,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiDivCool = MPiDivCool_A
 
-UNIT 482 TYPE 931
+UNIT 488 TYPE 931
 ! PiGhxIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1020,13 +1095,13 @@ TGhxH ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiGhxIn = [482,1] ! Output flow temperature [deg C]
-PPiGhxIn_kW = [482,3]/3600 ! Dissipated heat [kW]
-PPiGhxInConv_kW = [482,4]/3600 ! Convected heat [kW]
-PPiGhxInInt_kJ = [482,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiGhxIn = [488,1] ! Output flow temperature [deg C]
+PPiGhxIn_kW = [488,3]/3600 ! Dissipated heat [kW]
+PPiGhxInConv_kW = [488,4]/3600 ! Convected heat [kW]
+PPiGhxInInt_kJ = [488,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiGhxIn = MPiGhxIn_A
 
-UNIT 483 TYPE 931
+UNIT 489 TYPE 931
 ! PiGhxOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1044,13 +1119,13 @@ TPuHpEvap ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiGhxOut = [483,1] ! Output flow temperature [deg C]
-PPiGhxOut_kW = [483,3]/3600 ! Dissipated heat [kW]
-PPiGhxOutConv_kW = [483,4]/3600 ! Convected heat [kW]
-PPiGhxOutInt_kJ = [483,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiGhxOut = [489,1] ! Output flow temperature [deg C]
+PPiGhxOut_kW = [489,3]/3600 ! Dissipated heat [kW]
+PPiGhxOutConv_kW = [489,4]/3600 ! Convected heat [kW]
+PPiGhxOutInt_kJ = [489,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiGhxOut = MPiGhxOut_A
 
-UNIT 484 TYPE 931
+UNIT 490 TYPE 931
 ! PiTesDhwIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1068,13 +1143,13 @@ TTesDhwDpR5_95H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTesDhwIn = [484,1] ! Output flow temperature [deg C]
-PPiTesDhwIn_kW = [484,3]/3600 ! Dissipated heat [kW]
-PPiTesDhwInConv_kW = [484,4]/3600 ! Convected heat [kW]
-PPiTesDhwInInt_kJ = [484,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTesDhwIn = [490,1] ! Output flow temperature [deg C]
+PPiTesDhwIn_kW = [490,3]/3600 ! Dissipated heat [kW]
+PPiTesDhwInConv_kW = [490,4]/3600 ! Convected heat [kW]
+PPiTesDhwInInt_kJ = [490,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTesDhwIn = MPiTesDhwIn_A
 
-UNIT 485 TYPE 931
+UNIT 491 TYPE 931
 ! PiCircIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1092,13 +1167,13 @@ TTesDhwDpR70_90H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiCircIn = [485,1] ! Output flow temperature [deg C]
-PPiCircIn_kW = [485,3]/3600 ! Dissipated heat [kW]
-PPiCircInConv_kW = [485,4]/3600 ! Convected heat [kW]
-PPiCircInInt_kJ = [485,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiCircIn = [491,1] ! Output flow temperature [deg C]
+PPiCircIn_kW = [491,3]/3600 ! Dissipated heat [kW]
+PPiCircInConv_kW = [491,4]/3600 ! Convected heat [kW]
+PPiCircInInt_kJ = [491,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiCircIn = MPiCircIn_A
 
-UNIT 486 TYPE 931
+UNIT 492 TYPE 931
 ! PiCircOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1116,13 +1191,13 @@ TDivDhwOut ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiCircOut = [486,1] ! Output flow temperature [deg C]
-PPiCircOut_kW = [486,3]/3600 ! Dissipated heat [kW]
-PPiCircOutConv_kW = [486,4]/3600 ! Convected heat [kW]
-PPiCircOutInt_kJ = [486,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiCircOut = [492,1] ! Output flow temperature [deg C]
+PPiCircOut_kW = [492,3]/3600 ! Dissipated heat [kW]
+PPiCircOutConv_kW = [492,4]/3600 ! Convected heat [kW]
+PPiCircOutInt_kJ = [492,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiCircOut = MPiCircOut_A
 
-UNIT 487 TYPE 931
+UNIT 493 TYPE 931
 ! PiPuHpDhwIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1140,13 +1215,13 @@ TPuHpDhwCond ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPuHpDhwIn = [487,1] ! Output flow temperature [deg C]
-PPiPuHpDhwIn_kW = [487,3]/3600 ! Dissipated heat [kW]
-PPiPuHpDhwInConv_kW = [487,4]/3600 ! Convected heat [kW]
-PPiPuHpDhwInInt_kJ = [487,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPuHpDhwIn = [493,1] ! Output flow temperature [deg C]
+PPiPuHpDhwIn_kW = [493,3]/3600 ! Dissipated heat [kW]
+PPiPuHpDhwInConv_kW = [493,4]/3600 ! Convected heat [kW]
+PPiPuHpDhwInInt_kJ = [493,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuHpDhwIn = MPiPuHpDhwIn_A
 
-UNIT 488 TYPE 931
+UNIT 494 TYPE 931
 ! PiPuHpShIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1164,13 +1239,13 @@ TPuHpShCond ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPuHpShIn = [488,1] ! Output flow temperature [deg C]
-PPiPuHpShIn_kW = [488,3]/3600 ! Dissipated heat [kW]
-PPiPuHpShInConv_kW = [488,4]/3600 ! Convected heat [kW]
-PPiPuHpShInInt_kJ = [488,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPuHpShIn = [494,1] ! Output flow temperature [deg C]
+PPiPuHpShIn_kW = [494,3]/3600 ! Dissipated heat [kW]
+PPiPuHpShInConv_kW = [494,4]/3600 ! Convected heat [kW]
+PPiPuHpShInInt_kJ = [494,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuHpShIn = MPiPuHpShIn_A
 
-UNIT 489 TYPE 931
+UNIT 495 TYPE 931
 ! PiHpTeeToDiv
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1188,13 +1263,13 @@ TDivCondTOTesDhw ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpTeeToDiv = [489,1] ! Output flow temperature [deg C]
-PPiHpTeeToDiv_kW = [489,3]/3600 ! Dissipated heat [kW]
-PPiHpTeeToDivConv_kW = [489,4]/3600 ! Convected heat [kW]
-PPiHpTeeToDivInt_kJ = [489,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpTeeToDiv = [495,1] ! Output flow temperature [deg C]
+PPiHpTeeToDiv_kW = [495,3]/3600 ! Dissipated heat [kW]
+PPiHpTeeToDivConv_kW = [495,4]/3600 ! Convected heat [kW]
+PPiHpTeeToDivInt_kJ = [495,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpTeeToDiv = MPiHpTeeToDiv_A
 
-UNIT 490 TYPE 931
+UNIT 496 TYPE 931
 ! PiHpToTesShOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1212,13 +1287,13 @@ TTeeTesShOut ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpToTesShOut = [490,1] ! Output flow temperature [deg C]
-PPiHpToTesShOut_kW = [490,3]/3600 ! Dissipated heat [kW]
-PPiHpToTesShOutConv_kW = [490,4]/3600 ! Convected heat [kW]
-PPiHpToTesShOutInt_kJ = [490,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpToTesShOut = [496,1] ! Output flow temperature [deg C]
+PPiHpToTesShOut_kW = [496,3]/3600 ! Dissipated heat [kW]
+PPiHpToTesShOutConv_kW = [496,4]/3600 ! Convected heat [kW]
+PPiHpToTesShOutInt_kJ = [496,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpToTesShOut = MPiHpToTesShOut_A
 
-UNIT 491 TYPE 931
+UNIT 497 TYPE 931
 ! PiDhwMains
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1236,13 +1311,13 @@ TTeePieceCirc2 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiDhwMains = [491,1] ! Output flow temperature [deg C]
-PPiDhwMains_kW = [491,3]/3600 ! Dissipated heat [kW]
-PPiDhwMainsConv_kW = [491,4]/3600 ! Convected heat [kW]
-PPiDhwMainsInt_kJ = [491,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiDhwMains = [497,1] ! Output flow temperature [deg C]
+PPiDhwMains_kW = [497,3]/3600 ! Dissipated heat [kW]
+PPiDhwMainsConv_kW = [497,4]/3600 ! Convected heat [kW]
+PPiDhwMainsInt_kJ = [497,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiDhwMains = MPiDhwMains_A
 
-UNIT 492 TYPE 931
+UNIT 498 TYPE 931
 ! PiHxDhwOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1260,13 +1335,13 @@ TPuDhw ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHxDhwOut = [492,1] ! Output flow temperature [deg C]
-PPiHxDhwOut_kW = [492,3]/3600 ! Dissipated heat [kW]
-PPiHxDhwOutConv_kW = [492,4]/3600 ! Convected heat [kW]
-PPiHxDhwOutInt_kJ = [492,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHxDhwOut = [498,1] ! Output flow temperature [deg C]
+PPiHxDhwOut_kW = [498,3]/3600 ! Dissipated heat [kW]
+PPiHxDhwOutConv_kW = [498,4]/3600 ! Convected heat [kW]
+PPiHxDhwOutInt_kJ = [498,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHxDhwOut = MPiHxDhwOut_A
 
-UNIT 493 TYPE 931
+UNIT 499 TYPE 931
 ! PiPuDhwOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1284,13 +1359,13 @@ TDivDhw ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPuDhwOut = [493,1] ! Output flow temperature [deg C]
-PPiPuDhwOut_kW = [493,3]/3600 ! Dissipated heat [kW]
-PPiPuDhwOutConv_kW = [493,4]/3600 ! Convected heat [kW]
-PPiPuDhwOutInt_kJ = [493,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPuDhwOut = [499,1] ! Output flow temperature [deg C]
+PPiPuDhwOut_kW = [499,3]/3600 ! Dissipated heat [kW]
+PPiPuDhwOutConv_kW = [499,4]/3600 ! Convected heat [kW]
+PPiPuDhwOutInt_kJ = [499,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuDhwOut = MPiPuDhwOut_A
 
-UNIT 494 TYPE 931
+UNIT 500 TYPE 931
 ! PiTesDhwOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1308,13 +1383,13 @@ TDivDhwOut ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTesDhwOut = [494,1] ! Output flow temperature [deg C]
-PPiTesDhwOut_kW = [494,3]/3600 ! Dissipated heat [kW]
-PPiTesDhwOutConv_kW = [494,4]/3600 ! Convected heat [kW]
-PPiTesDhwOutInt_kJ = [494,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTesDhwOut = [500,1] ! Output flow temperature [deg C]
+PPiTesDhwOut_kW = [500,3]/3600 ! Dissipated heat [kW]
+PPiTesDhwOutConv_kW = [500,4]/3600 ! Convected heat [kW]
+PPiTesDhwOutInt_kJ = [500,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTesDhwOut = MPiTesDhwOut_A
 
-UNIT 495 TYPE 931
+UNIT 501 TYPE 931
 ! PiTesShOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1332,13 +1407,13 @@ TTeeCoolRadIn ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTesShOut = [495,1] ! Output flow temperature [deg C]
-PPiTesShOut_kW = [495,3]/3600 ! Dissipated heat [kW]
-PPiTesShOutConv_kW = [495,4]/3600 ! Convected heat [kW]
-PPiTesShOutInt_kJ = [495,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTesShOut = [501,1] ! Output flow temperature [deg C]
+PPiTesShOut_kW = [501,3]/3600 ! Dissipated heat [kW]
+PPiTesShOutConv_kW = [501,4]/3600 ! Convected heat [kW]
+PPiTesShOutInt_kJ = [501,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTesShOut = MPiTesShOut_A
 
-UNIT 496 TYPE 931
+UNIT 502 TYPE 931
 ! PiTeeMixSHIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1356,13 +1431,13 @@ TTeePiece_6032 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTeeMixSHIn = [496,1] ! Output flow temperature [deg C]
-PPiTeeMixSHIn_kW = [496,3]/3600 ! Dissipated heat [kW]
-PPiTeeMixSHInConv_kW = [496,4]/3600 ! Convected heat [kW]
-PPiTeeMixSHInInt_kJ = [496,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTeeMixSHIn = [502,1] ! Output flow temperature [deg C]
+PPiTeeMixSHIn_kW = [502,3]/3600 ! Dissipated heat [kW]
+PPiTeeMixSHInConv_kW = [502,4]/3600 ! Convected heat [kW]
+PPiTeeMixSHInInt_kJ = [502,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTeeMixSHIn = MPiTeeMixSHIn_A
 
-UNIT 497 TYPE 931
+UNIT 503 TYPE 931
 ! PiSHOutMix
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1380,13 +1455,13 @@ TPuSH ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiSHOutMix = [497,1] ! Output flow temperature [deg C]
-PPiSHOutMix_kW = [497,3]/3600 ! Dissipated heat [kW]
-PPiSHOutMixConv_kW = [497,4]/3600 ! Convected heat [kW]
-PPiSHOutMixInt_kJ = [497,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiSHOutMix = [503,1] ! Output flow temperature [deg C]
+PPiSHOutMix_kW = [503,3]/3600 ! Dissipated heat [kW]
+PPiSHOutMixConv_kW = [503,4]/3600 ! Convected heat [kW]
+PPiSHOutMixInt_kJ = [503,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiSHOutMix = MPiSHOutMix_A
 
-UNIT 498 TYPE 931
+UNIT 504 TYPE 931
 ! PiTesShIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1404,13 +1479,13 @@ TTesShDpR5_95H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTesShIn = [498,1] ! Output flow temperature [deg C]
-PPiTesShIn_kW = [498,3]/3600 ! Dissipated heat [kW]
-PPiTesShInConv_kW = [498,4]/3600 ! Convected heat [kW]
-PPiTesShInInt_kJ = [498,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTesShIn = [504,1] ! Output flow temperature [deg C]
+PPiTesShIn_kW = [504,3]/3600 ! Dissipated heat [kW]
+PPiTesShInConv_kW = [504,4]/3600 ! Convected heat [kW]
+PPiTesShInInt_kJ = [504,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTesShIn = MPiTesShIn_A
 
-UNIT 499 TYPE 931
+UNIT 505 TYPE 931
 ! PiRadOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1428,13 +1503,13 @@ TDivSh ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiRadOut = [499,1] ! Output flow temperature [deg C]
-PPiRadOut_kW = [499,3]/3600 ! Dissipated heat [kW]
-PPiRadOutConv_kW = [499,4]/3600 ! Convected heat [kW]
-PPiRadOutInt_kJ = [499,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiRadOut = [505,1] ! Output flow temperature [deg C]
+PPiRadOut_kW = [505,3]/3600 ! Dissipated heat [kW]
+PPiRadOutConv_kW = [505,4]/3600 ! Convected heat [kW]
+PPiRadOutInt_kJ = [505,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiRadOut = MPiRadOut_A
 
-UNIT 500 TYPE 931
+UNIT 506 TYPE 931
 ! PiDivSHCool
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1452,13 +1527,13 @@ TDivSHCool ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiDivSHCool = [500,1] ! Output flow temperature [deg C]
-PPiDivSHCool_kW = [500,3]/3600 ! Dissipated heat [kW]
-PPiDivSHCoolConv_kW = [500,4]/3600 ! Convected heat [kW]
-PPiDivSHCoolInt_kJ = [500,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiDivSHCool = [506,1] ! Output flow temperature [deg C]
+PPiDivSHCool_kW = [506,3]/3600 ! Dissipated heat [kW]
+PPiDivSHCoolConv_kW = [506,4]/3600 ! Convected heat [kW]
+PPiDivSHCoolInt_kJ = [506,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiDivSHCool = MPiDivSHCool_A
 
-UNIT 501 TYPE 931
+UNIT 507 TYPE 931
 ! PiTesDhwCond
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1476,13 +1551,13 @@ TDivTesDhwOut ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTesDhwCond = [501,1] ! Output flow temperature [deg C]
-PPiTesDhwCond_kW = [501,3]/3600 ! Dissipated heat [kW]
-PPiTesDhwCondConv_kW = [501,4]/3600 ! Convected heat [kW]
-PPiTesDhwCondInt_kJ = [501,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTesDhwCond = [507,1] ! Output flow temperature [deg C]
+PPiTesDhwCond_kW = [507,3]/3600 ! Dissipated heat [kW]
+PPiTesDhwCondConv_kW = [507,4]/3600 ! Convected heat [kW]
+PPiTesDhwCondInt_kJ = [507,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTesDhwCond = MPiTesDhwCond_A
 
-UNIT 502 TYPE 931
+UNIT 508 TYPE 931
 ! PiHpToTesDhwOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1500,13 +1575,13 @@ TDivTesDhwOut ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpToTesDhwOut = [502,1] ! Output flow temperature [deg C]
-PPiHpToTesDhwOut_kW = [502,3]/3600 ! Dissipated heat [kW]
-PPiHpToTesDhwOutConv_kW = [502,4]/3600 ! Convected heat [kW]
-PPiHpToTesDhwOutInt_kJ = [502,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpToTesDhwOut = [508,1] ! Output flow temperature [deg C]
+PPiHpToTesDhwOut_kW = [508,3]/3600 ! Dissipated heat [kW]
+PPiHpToTesDhwOutConv_kW = [508,4]/3600 ! Convected heat [kW]
+PPiHpToTesDhwOutInt_kJ = [508,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpToTesDhwOut = MPiHpToTesDhwOut_A
 
-UNIT 503 TYPE 931
+UNIT 509 TYPE 931
 ! PiCondToDes
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1524,13 +1599,13 @@ TTeePiece5329 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiCondToDes = [503,1] ! Output flow temperature [deg C]
-PPiCondToDes_kW = [503,3]/3600 ! Dissipated heat [kW]
-PPiCondToDesConv_kW = [503,4]/3600 ! Convected heat [kW]
-PPiCondToDesInt_kJ = [503,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiCondToDes = [509,1] ! Output flow temperature [deg C]
+PPiCondToDes_kW = [509,3]/3600 ! Dissipated heat [kW]
+PPiCondToDesConv_kW = [509,4]/3600 ! Convected heat [kW]
+PPiCondToDesInt_kJ = [509,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiCondToDes = MPiCondToDes_A
 
-UNIT 504 TYPE 931
+UNIT 510 TYPE 931
 ! PiPuGhxOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1548,13 +1623,13 @@ TDivHpEvap ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPuGhxOut = [504,1] ! Output flow temperature [deg C]
-PPiPuGhxOut_kW = [504,3]/3600 ! Dissipated heat [kW]
-PPiPuGhxOutConv_kW = [504,4]/3600 ! Convected heat [kW]
-PPiPuGhxOutInt_kJ = [504,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPuGhxOut = [510,1] ! Output flow temperature [deg C]
+PPiPuGhxOut_kW = [510,3]/3600 ! Dissipated heat [kW]
+PPiPuGhxOutConv_kW = [510,4]/3600 ! Convected heat [kW]
+PPiPuGhxOutInt_kJ = [510,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPuGhxOut = MPiPuGhxOut_A
 
-UNIT 505 TYPE 931
+UNIT 511 TYPE 931
 ! PiHPEvapOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1572,13 +1647,13 @@ TTeeHpEvap ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHPEvapOut = [505,1] ! Output flow temperature [deg C]
-PPiHPEvapOut_kW = [505,3]/3600 ! Dissipated heat [kW]
-PPiHPEvapOutConv_kW = [505,4]/3600 ! Convected heat [kW]
-PPiHPEvapOutInt_kJ = [505,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHPEvapOut = [511,1] ! Output flow temperature [deg C]
+PPiHPEvapOut_kW = [511,3]/3600 ! Dissipated heat [kW]
+PPiHPEvapOutConv_kW = [511,4]/3600 ! Convected heat [kW]
+PPiHPEvapOutInt_kJ = [511,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHPEvapOut = MPiHPEvapOut_A
 
-UNIT 506 TYPE 931
+UNIT 512 TYPE 931
 ! PiDivCooltoHp
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1596,13 +1671,13 @@ TTeePiece3852 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiDivCooltoHp = [506,1] ! Output flow temperature [deg C]
-PPiDivCooltoHp_kW = [506,3]/3600 ! Dissipated heat [kW]
-PPiDivCooltoHpConv_kW = [506,4]/3600 ! Convected heat [kW]
-PPiDivCooltoHpInt_kJ = [506,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiDivCooltoHp = [512,1] ! Output flow temperature [deg C]
+PPiDivCooltoHp_kW = [512,3]/3600 ! Dissipated heat [kW]
+PPiDivCooltoHpConv_kW = [512,4]/3600 ! Convected heat [kW]
+PPiDivCooltoHpInt_kJ = [512,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiDivCooltoHp = MPiDivCooltoHp_A
 
-UNIT 507 TYPE 931
+UNIT 513 TYPE 931
 ! PiHpEvapMix
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1620,13 +1695,13 @@ TTeeHpEvap ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpEvapMix = [507,1] ! Output flow temperature [deg C]
-PPiHpEvapMix_kW = [507,3]/3600 ! Dissipated heat [kW]
-PPiHpEvapMixConv_kW = [507,4]/3600 ! Convected heat [kW]
-PPiHpEvapMixInt_kJ = [507,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpEvapMix = [513,1] ! Output flow temperature [deg C]
+PPiHpEvapMix_kW = [513,3]/3600 ! Dissipated heat [kW]
+PPiHpEvapMixConv_kW = [513,4]/3600 ! Convected heat [kW]
+PPiHpEvapMixInt_kJ = [513,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpEvapMix = MPiHpEvapMix_A
 
-UNIT 508 TYPE 931
+UNIT 514 TYPE 931
 ! PiHPEvapIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1644,13 +1719,13 @@ THPEvapH ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHPEvapIn = [508,1] ! Output flow temperature [deg C]
-PPiHPEvapIn_kW = [508,3]/3600 ! Dissipated heat [kW]
-PPiHPEvapInConv_kW = [508,4]/3600 ! Convected heat [kW]
-PPiHPEvapInInt_kJ = [508,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHPEvapIn = [514,1] ! Output flow temperature [deg C]
+PPiHPEvapIn_kW = [514,3]/3600 ! Dissipated heat [kW]
+PPiHPEvapInConv_kW = [514,4]/3600 ! Convected heat [kW]
+PPiHPEvapInInt_kJ = [514,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHPEvapIn = MPiHPEvapIn_A
 
-UNIT 509 TYPE 931
+UNIT 515 TYPE 931
 ! PiDhwSecOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1668,13 +1743,13 @@ TTeePieceCirc1 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiDhwSecOut = [509,1] ! Output flow temperature [deg C]
-PPiDhwSecOut_kW = [509,3]/3600 ! Dissipated heat [kW]
-PPiDhwSecOutConv_kW = [509,4]/3600 ! Convected heat [kW]
-PPiDhwSecOutInt_kJ = [509,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiDhwSecOut = [515,1] ! Output flow temperature [deg C]
+PPiDhwSecOut_kW = [515,3]/3600 ! Dissipated heat [kW]
+PPiDhwSecOutConv_kW = [515,4]/3600 ! Convected heat [kW]
+PPiDhwSecOutInt_kJ = [515,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiDhwSecOut = MPiDhwSecOut_A
 
-UNIT 510 TYPE 931
+UNIT 516 TYPE 931
 ! PiHxDhwSecIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1692,13 +1767,13 @@ THxDHWSide2H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHxDhwSecIn = [510,1] ! Output flow temperature [deg C]
-PPiHxDhwSecIn_kW = [510,3]/3600 ! Dissipated heat [kW]
-PPiHxDhwSecInConv_kW = [510,4]/3600 ! Convected heat [kW]
-PPiHxDhwSecInInt_kJ = [510,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHxDhwSecIn = [516,1] ! Output flow temperature [deg C]
+PPiHxDhwSecIn_kW = [516,3]/3600 ! Dissipated heat [kW]
+PPiHxDhwSecInConv_kW = [516,4]/3600 ! Convected heat [kW]
+PPiHxDhwSecInInt_kJ = [516,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHxDhwSecIn = MPiHxDhwSecIn_A
 
-UNIT 511 TYPE 931
+UNIT 517 TYPE 931
 ! PiHxCoolWatIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1716,13 +1791,13 @@ TDivSHCool ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHxCoolWatIn = [511,1] ! Output flow temperature [deg C]
-PPiHxCoolWatIn_kW = [511,3]/3600 ! Dissipated heat [kW]
-PPiHxCoolWatInConv_kW = [511,4]/3600 ! Convected heat [kW]
-PPiHxCoolWatInInt_kJ = [511,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHxCoolWatIn = [517,1] ! Output flow temperature [deg C]
+PPiHxCoolWatIn_kW = [517,3]/3600 ! Dissipated heat [kW]
+PPiHxCoolWatInConv_kW = [517,4]/3600 ! Convected heat [kW]
+PPiHxCoolWatInInt_kJ = [517,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHxCoolWatIn = MPiHxCoolWatIn_A
 
-UNIT 512 TYPE 931
+UNIT 518 TYPE 931
 ! Conn1455
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1740,13 +1815,13 @@ THxCoolSide2H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TConn1455 = [512,1] ! Output flow temperature [deg C]
-PConn1455_kW = [512,3]/3600 ! Dissipated heat [kW]
-PConn1455Conv_kW = [512,4]/3600 ! Convected heat [kW]
-PConn1455Int_kJ = [512,5] ! Accumulated internal energy since start of simulation [kJ]
+TConn1455 = [518,1] ! Output flow temperature [deg C]
+PConn1455_kW = [518,3]/3600 ! Dissipated heat [kW]
+PConn1455Conv_kW = [518,4]/3600 ! Convected heat [kW]
+PConn1455Int_kJ = [518,5] ! Accumulated internal energy since start of simulation [kJ]
 MConn1455 = MConn1455_A
 
-UNIT 513 TYPE 931
+UNIT 519 TYPE 931
 ! PiHpDesOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1764,13 +1839,13 @@ TTeePiece_6088 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpDesOut = [513,1] ! Output flow temperature [deg C]
-PPiHpDesOut_kW = [513,3]/3600 ! Dissipated heat [kW]
-PPiHpDesOutConv_kW = [513,4]/3600 ! Convected heat [kW]
-PPiHpDesOutInt_kJ = [513,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpDesOut = [519,1] ! Output flow temperature [deg C]
+PPiHpDesOut_kW = [519,3]/3600 ! Dissipated heat [kW]
+PPiHpDesOutConv_kW = [519,4]/3600 ! Convected heat [kW]
+PPiHpDesOutInt_kJ = [519,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpDesOut = MPiHpDesOut_A
 
-UNIT 514 TYPE 931
+UNIT 520 TYPE 931
 ! PiHpDesIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1788,13 +1863,13 @@ THPCond2H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpDesIn = [514,1] ! Output flow temperature [deg C]
-PPiHpDesIn_kW = [514,3]/3600 ! Dissipated heat [kW]
-PPiHpDesInConv_kW = [514,4]/3600 ! Convected heat [kW]
-PPiHpDesInInt_kJ = [514,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpDesIn = [520,1] ! Output flow temperature [deg C]
+PPiHpDesIn_kW = [520,3]/3600 ! Dissipated heat [kW]
+PPiHpDesInConv_kW = [520,4]/3600 ! Convected heat [kW]
+PPiHpDesInInt_kJ = [520,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpDesIn = MPiHpDesIn_A
 
-UNIT 515 TYPE 931
+UNIT 521 TYPE 931
 ! PiHpCondOut
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1812,13 +1887,13 @@ TDivHp ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpCondOut = [515,1] ! Output flow temperature [deg C]
-PPiHpCondOut_kW = [515,3]/3600 ! Dissipated heat [kW]
-PPiHpCondOutConv_kW = [515,4]/3600 ! Convected heat [kW]
-PPiHpCondOutInt_kJ = [515,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpCondOut = [521,1] ! Output flow temperature [deg C]
+PPiHpCondOut_kW = [521,3]/3600 ! Dissipated heat [kW]
+PPiHpCondOutConv_kW = [521,4]/3600 ! Convected heat [kW]
+PPiHpCondOutInt_kJ = [521,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpCondOut = MPiHpCondOut_A
 
-UNIT 516 TYPE 931
+UNIT 522 TYPE 931
 ! PiHpCondIn
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -1836,10 +1911,10 @@ THPCond1H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiHpCondIn = [516,1] ! Output flow temperature [deg C]
-PPiHpCondIn_kW = [516,3]/3600 ! Dissipated heat [kW]
-PPiHpCondInConv_kW = [516,4]/3600 ! Convected heat [kW]
-PPiHpCondInInt_kJ = [516,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiHpCondIn = [522,1] ! Output flow temperature [deg C]
+PPiHpCondIn_kW = [522,3]/3600 ! Dissipated heat [kW]
+PPiHpCondInConv_kW = [522,4]/3600 ! Convected heat [kW]
+PPiHpCondInInt_kJ = [522,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiHpCondIn = MPiHpCondIn_A
 
 *** Single pipe losses
@@ -1859,14 +1934,14 @@ spPipeConvectedTot = PPiHpToTesShInConv_kW+PPiHxDhwInConv_kW+PPiPuCircInConv_kW+
 PipeLossTot = PPiHpToTesShIn_kW+PPiHxDhwIn_kW+PPiPuCircIn_kW+PPiPuCircOut_kW+PPiDhwDemand_kW+PPiSHInMix_kW+PPiRadIn_kW+PPiTesDhwToDes_kW+PPiHpToTesDhwIn_kW+PPiDesToCond_kW+PPiHxCoolBriOut_kW+PPiHxCoolBriIn_kW+PPiDivCool_kW+PPiGhxIn_kW+PPiGhxOut_kW+PPiTesDhwIn_kW+PPiCircIn_kW+PPiCircOut_kW+PPiPuHpDhwIn_kW+PPiPuHpShIn_kW+PPiHpTeeToDiv_kW+PPiHpToTesShOut_kW+PPiDhwMains_kW+PPiHxDhwOut_kW+PPiPuDhwOut_kW+PPiTesDhwOut_kW+PPiTesShOut_kW+PPiTeeMixSHIn_kW+PPiSHOutMix_kW+PPiTesShIn_kW+PPiRadOut_kW+PPiDivSHCool_kW+PPiTesDhwCond_kW+PPiHpToTesDhwOut_kW+PPiCondToDes_kW+PPiPuGhxOut_kW+PPiHPEvapOut_kW+PPiDivCooltoHp_kW+PPiHpEvapMix_kW+PPiHPEvapIn_kW+PPiDhwSecOut_kW+PPiHxDhwSecIn_kW+PPiHxCoolWatIn_kW+PConn1455_kW+PPiHpDesOut_kW+PPiHpDesIn_kW+PPiHpCondOut_kW+PPiHpCondIn_kW
 spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
-ASSIGN TRIHP_dualSource_Mfr.prt 517
+ASSIGN TRIHP_dualSource_Mfr.prt 523
 
-UNIT 517 TYPE 25! User defined Printer
+UNIT 523 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-517! 4 Logical unit
+523! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -1895,14 +1970,14 @@ MPiHPEvapIn MPiDhwSecOut MPiHxDhwSecIn MPiHxCoolWatIn MConn1455 MPiHpDesOut MPiH
 MPiHpCondIn
 
 
-ASSIGN TRIHP_dualSource_T.prt 518
+ASSIGN TRIHP_dualSource_T.prt 524
 
-UNIT 518 TYPE 25! User defined Printer
+UNIT 524 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-518! 4 Logical unit
+524! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append

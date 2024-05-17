@@ -171,7 +171,17 @@ PPiTes_HP_kW = [13,3]/3600  !Changed automatically
 PPiTes_HPConv_kW = [13,4]/3600  !Changed automatically
 PPiTes_HPInt_kJ = [13,5]  !Changed automatically
 MPiTes_HP = MPiTes_HP_A
-UNIT 14 TYPE 931 !Changed automatically
+UNIT 14 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump109_A TPiTes_Pump109 TPiPump109_HP
+0 spTIni spTIni
+EQUATIONS 2
+TPump109 = [14,1] !Changed automatically
+MPump109 = MPump109_A
+UNIT 15 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -186,12 +196,12 @@ TRoomStore ! ambient temperature [deg C]
 TPump109 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 EQUATIONS 5
-TPiTes_Pump109 = [14,1]  !Changed automatically
-PPiTes_Pump109_kW = [14,3]/3600  !Changed automatically
-PPiTes_Pump109Conv_kW = [14,4]/3600  !Changed automatically
-PPiTes_Pump109Int_kJ = [14,5]  !Changed automatically
+TPiTes_Pump109 = [15,1]  !Changed automatically
+PPiTes_Pump109_kW = [15,3]/3600  !Changed automatically
+PPiTes_Pump109Conv_kW = [15,4]/3600  !Changed automatically
+PPiTes_Pump109Int_kJ = [15,5]  !Changed automatically
 MPiTes_Pump109 = MPiTes_Pump109_A
-UNIT 15 TYPE 931 !Changed automatically
+UNIT 16 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -206,12 +216,22 @@ TRoomStore ! ambient temperature [deg C]
 THPH ! reverse flow input temperature [deg C]
 20 0.0 20 20
 EQUATIONS 5
-TPiPump109_HP = [15,1]  !Changed automatically
-PPiPump109_HP_kW = [15,3]/3600  !Changed automatically
-PPiPump109_HPConv_kW = [15,4]/3600  !Changed automatically
-PPiPump109_HPInt_kJ = [15,5]  !Changed automatically
+TPiPump109_HP = [16,1]  !Changed automatically
+PPiPump109_HP_kW = [16,3]/3600  !Changed automatically
+PPiPump109_HPConv_kW = [16,4]/3600  !Changed automatically
+PPiPump109_HPInt_kJ = [16,5]  !Changed automatically
 MPiPump109_HP = MPiPump109_HP_A
-UNIT 16 TYPE 931 !Changed automatically
+UNIT 17 TYPE 2221 !Changed automatically
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump114_A TPiCol_Pump114 TPiPump114_Tes
+0 spTIni spTIni
+EQUATIONS 2
+TPump114 = [17,1] !Changed automatically
+MPump114 = MPump114_A
+UNIT 18 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -226,12 +246,12 @@ TRoomStore ! ambient temperature [deg C]
 TPump114 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 EQUATIONS 5
-TPiCol_Pump114 = [16,1]  !Changed automatically
-PPiCol_Pump114_kW = [16,3]/3600  !Changed automatically
-PPiCol_Pump114Conv_kW = [16,4]/3600  !Changed automatically
-PPiCol_Pump114Int_kJ = [16,5]  !Changed automatically
+TPiCol_Pump114 = [18,1]  !Changed automatically
+PPiCol_Pump114_kW = [18,3]/3600  !Changed automatically
+PPiCol_Pump114Conv_kW = [18,4]/3600  !Changed automatically
+PPiCol_Pump114Int_kJ = [18,5]  !Changed automatically
 MPiCol_Pump114 = MPiCol_Pump114_A
-UNIT 17 TYPE 931 !Changed automatically
+UNIT 19 TYPE 931 !Changed automatically
 PARAMETERS 6
 0.02 ! diameter [m]
 2.0 ! length [m]
@@ -246,10 +266,10 @@ TRoomStore ! ambient temperature [deg C]
 TTesDpL50_10H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 EQUATIONS 5
-TPiPump114_Tes = [17,1]  !Changed automatically
-PPiPump114_Tes_kW = [17,3]/3600  !Changed automatically
-PPiPump114_TesConv_kW = [17,4]/3600  !Changed automatically
-PPiPump114_TesInt_kJ = [17,5]  !Changed automatically
+TPiPump114_Tes = [19,1]  !Changed automatically
+PPiPump114_Tes_kW = [19,3]/3600  !Changed automatically
+PPiPump114_TesConv_kW = [19,4]/3600  !Changed automatically
+PPiPump114_TesInt_kJ = [19,5]  !Changed automatically
 MPiPump114_Tes = MPiPump114_Tes_A
 EQUATIONS 1
 spPipeEnIntTot = PTes_ColInt_kJ+PPiTes_HPInt_kJ+PPiTes_Pump109Int_kJ+PPiPump109_HPInt_kJ+PPiCol_Pump114Int_kJ+PPiPump114_TesInt_kJ
@@ -264,13 +284,13 @@ spPipeConvectedTot = PTes_ColConv_kW+PPiTes_HPConv_kW+PPiTes_Pump109Conv_kW+PPiP
 PipeLossTot = PTes_Col_kW+PPiTes_HP_kW+PPiTes_Pump109_kW+PPiPump109_HP_kW+PPiCol_Pump114_kW+PPiPump114_Tes_kW
 spPipeIntTot = (spPipeEnIntTot - [10,1]) / dtSim / 3600  !Changed automatically
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
-ASSIGN storage-tank_Mfr.prt 457
-UNIT 18 TYPE 25 !Changed automatically
+ASSIGN storage-tank_Mfr.prt 459
+UNIT 20 TYPE 25 !Changed automatically
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-457! 4 Logical unit
+459! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -280,13 +300,13 @@ STOP! 3 Stop time
 INPUTS 6
 MTes_Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
 MTes_Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
-ASSIGN storage-tank_T.prt 458
-UNIT 19 TYPE 25 !Changed automatically
+ASSIGN storage-tank_T.prt 460
+UNIT 21 TYPE 25 !Changed automatically
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-458! 4 Logical unit
+460! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -318,9 +338,9 @@ CONSTANTS 2
 zAux1_Tes1=0.00
 qAux1_Tes1=0.00
 EQUATIONS 1
-TTesDpL50_10=[20,1] !Changed automatically
+TTesDpL50_10=[22,1] !Changed automatically
 EQUATIONS 1
-TTesInHx=[20,102] !Changed automatically
+TTesInHx=[22,102] !Changed automatically
 CONSTANTS 3
 TRoomStore=15 ! 
 VStoreRef = 0.763
@@ -404,7 +424,7 @@ MoInsPlate_Tes1=0 ! 0-2, Insulation Plate Mode: 0 = no insulation plate inside T
 zInsPlate_Tes1=0  ! 0-1, relative position of fixed height insulation plate inside TES (only for Insulation Plate Mode = 1
 TinsPlate_Tes1=0  ! oC, temperature at which moveable insulation plate floats in TES (only for Insulation Plate Mode = 2)
 UAinsPlate_Tes1=0 ! W/K, overall heat transfer coefficient across moveable insulation plate (including heat transfer in gap between plate and wall and in wall at the respective height)
-UNIT 20 TYPE 1924      !Changed automatically
+UNIT 22 TYPE 1924      !Changed automatically
 PARAMETERS 219 
 Vol_Tes1     ! 1: m3, volume of store
 RhoWat_Tes1  ! 2: kg/m3, density of storage media
@@ -479,43 +499,43 @@ zero zero zero zero zero zero zero zero zero zero
 zero zero zero zero zero zero zero zero zero zero 
 zero zero zero zero zero zero zero zero zero 
 EQUATIONS 1
-Qdp1_Tes1=[20,31]  !Changed automatically
+Qdp1_Tes1=[22,31]  !Changed automatically
 EQUATIONS 21
-TAvg_Tes1 = [20,180]  !Changed automatically
-T1_Tes1 =[20,21]  !Changed automatically
-T2_Tes1 =[20,22]  !Changed automatically
-T3_Tes1 =[20,23]  !Changed automatically
-T4_Tes1 =[20,24]  !Changed automatically
-T5_Tes1 =[20,25]  !Changed automatically
-T6_Tes1 =[20,26]  !Changed automatically
-T7_Tes1 =[20,27]  !Changed automatically
-T8_Tes1 =[20,28]  !Changed automatically
-T9_Tes1 =[20,29]  !Changed automatically
-T10_Tes1 =[20,30]  !Changed automatically
-Tsen1_Tes1 =[20,71]  !Changed automatically
-Tsen2_Tes1 =[20,72]  !Changed automatically
-Tsen3_Tes1 =[20,73]  !Changed automatically
-Tsen4_Tes1 =[20,74]  !Changed automatically
-Tsen5_Tes1 =[20,75]  !Changed automatically
-Tsen6_Tes1 =[20,76]  !Changed automatically
-Tsen7_Tes1 =[20,77]  !Changed automatically
-Tsen8_Tes1 =[20,78]  !Changed automatically
-Tsen9_Tes1 =[20,79]  !Changed automatically
-Tsen10_Tes1 =[20,80]  !Changed automatically
+TAvg_Tes1 = [22,180]  !Changed automatically
+T1_Tes1 =[22,21]  !Changed automatically
+T2_Tes1 =[22,22]  !Changed automatically
+T3_Tes1 =[22,23]  !Changed automatically
+T4_Tes1 =[22,24]  !Changed automatically
+T5_Tes1 =[22,25]  !Changed automatically
+T6_Tes1 =[22,26]  !Changed automatically
+T7_Tes1 =[22,27]  !Changed automatically
+T8_Tes1 =[22,28]  !Changed automatically
+T9_Tes1 =[22,29]  !Changed automatically
+T10_Tes1 =[22,30]  !Changed automatically
+Tsen1_Tes1 =[22,71]  !Changed automatically
+Tsen2_Tes1 =[22,72]  !Changed automatically
+Tsen3_Tes1 =[22,73]  !Changed automatically
+Tsen4_Tes1 =[22,74]  !Changed automatically
+Tsen5_Tes1 =[22,75]  !Changed automatically
+Tsen6_Tes1 =[22,76]  !Changed automatically
+Tsen7_Tes1 =[22,77]  !Changed automatically
+Tsen8_Tes1 =[22,78]  !Changed automatically
+Tsen9_Tes1 =[22,79]  !Changed automatically
+Tsen10_Tes1 =[22,80]  !Changed automatically
 EQUATIONS 1
-Qhx1Out_Tes1=[20,104]  !Changed automatically
+Qhx1Out_Tes1=[22,104]  !Changed automatically
 EQUATIONS 1
-qHeatSource_Tes1 = [20,181]  !Changed automatically
+qHeatSource_Tes1 = [22,181]  !Changed automatically
 EQUATIONS 5
-Qv_Tes1     = [20,176]  !Changed automatically
-QLoss_Tes1  = [20,177]  !Changed automatically
-QAcum_Tes1  = [20,178]  !Changed automatically
-QPorts_Tes1 = [20,179]  !Changed automatically
-QImb_Tes1   = [20,64]   !Changed automatically
+Qv_Tes1     = [22,176]  !Changed automatically
+QLoss_Tes1  = [22,177]  !Changed automatically
+QAcum_Tes1  = [22,178]  !Changed automatically
+QPorts_Tes1 = [22,179]  !Changed automatically
+QImb_Tes1   = [22,64]   !Changed automatically
 CONSTANTS 1 
-unitPrinter_Tes1 = 23
+unitPrinter_Tes1 = 25
  ASSIGN temp\TES1_MO.Prt unitPrinter_Tes1
-UNIT 21 TYPE 46 !Changed automatically
+UNIT 23 TYPE 46 !Changed automatically
 PARAMETERS 5
 unitPrinter_Tes1 ! 1: Logical unit number, -
 -1  ! 2: Logical unit for monthly summaries
@@ -525,7 +545,7 @@ unitPrinter_Tes1 ! 1: Logical unit number, -
 INPUTS 8
 Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qhx1Out_Tes1 qHeatSource_Tes1 
 Qv_Tes1 QLoss_Tes1 QAcum_Tes1 QPorts_Tes1 QImb_Tes1 Qdp1_Tes1 Qhx1Out_Tes1 qHeatSource_Tes1 
-UNIT 22 TYPE 65      !Changed automatically
+UNIT 24 TYPE 65      !Changed automatically
 PARAMETERS 12   
 10     ! 1 Nb. of left-axis variables 
 0     ! 2 Nb. of right-axis variables
@@ -555,9 +575,9 @@ Tes1
 EQUATIONS 1
 qImb =  - qSysOut_PipeLoss - qSysOut_spPipeIntTot - qSysOut_TesLoss - qSysOut_TesAcum + elSysIn_Q_TesAux
 CONSTANTS 1
-unitPrintEBal=24
+unitPrintEBal=26
 ASSIGN temp\ENERGY_BALANCE_MO.Prt unitPrintEBal
-UNIT 24 Type 46
+UNIT 26 Type 46
 PARAMETERS 6
 unitPrintEBal !1: Logical unit number
 -1 !2: for monthly summaries
@@ -573,9 +593,9 @@ TIME qSysOut_PipeLoss qSysOut_spPipeIntTot qSysOut_TesLoss qSysOut_TesAcum elSys
 **BEGIN Hourly Energy Balance printer automatically generated from DDck files
 ***************************************************************
 CONSTANTS 1
-unitPrintEBal_h=25
+unitPrintEBal_h=27
 ASSIGN temp\ENERGY_BALANCE_HR.Prt unitPrintEBal_h
-UNIT 25 Type 46
+UNIT 27 Type 46
 PARAMETERS 6
 unitPrintEBal_h !1: Logical unit number
 -1 !2: for monthly summaries

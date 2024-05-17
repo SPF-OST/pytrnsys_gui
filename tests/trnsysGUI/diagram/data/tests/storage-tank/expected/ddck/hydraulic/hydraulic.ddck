@@ -148,7 +148,19 @@ PPiTes_HPConv_kW = [452,4]/3600 ! Convected heat [kW]
 PPiTes_HPInt_kJ = [452,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTes_HP = MPiTes_HP_A
 
-UNIT 453 TYPE 931
+UNIT 453 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump109_A TPiTes_Pump109 TPiPump109_HP
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump109 = [453,1]
+MPump109 = MPump109_A
+
+UNIT 454 TYPE 931
 ! PiTes_Pump109
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -166,13 +178,13 @@ TPump109 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTes_Pump109 = [453,1] ! Output flow temperature [deg C]
-PPiTes_Pump109_kW = [453,3]/3600 ! Dissipated heat [kW]
-PPiTes_Pump109Conv_kW = [453,4]/3600 ! Convected heat [kW]
-PPiTes_Pump109Int_kJ = [453,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTes_Pump109 = [454,1] ! Output flow temperature [deg C]
+PPiTes_Pump109_kW = [454,3]/3600 ! Dissipated heat [kW]
+PPiTes_Pump109Conv_kW = [454,4]/3600 ! Convected heat [kW]
+PPiTes_Pump109Int_kJ = [454,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTes_Pump109 = MPiTes_Pump109_A
 
-UNIT 454 TYPE 931
+UNIT 455 TYPE 931
 ! PiPump109_HP
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -190,13 +202,25 @@ THPH ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPump109_HP = [454,1] ! Output flow temperature [deg C]
-PPiPump109_HP_kW = [454,3]/3600 ! Dissipated heat [kW]
-PPiPump109_HPConv_kW = [454,4]/3600 ! Convected heat [kW]
-PPiPump109_HPInt_kJ = [454,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPump109_HP = [455,1] ! Output flow temperature [deg C]
+PPiPump109_HP_kW = [455,3]/3600 ! Dissipated heat [kW]
+PPiPump109_HPConv_kW = [455,4]/3600 ! Convected heat [kW]
+PPiPump109_HPInt_kJ = [455,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPump109_HP = MPiPump109_HP_A
 
-UNIT 455 TYPE 931
+UNIT 456 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump114_A TPiCol_Pump114 TPiPump114_Tes
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump114 = [456,1]
+MPump114 = MPump114_A
+
+UNIT 457 TYPE 931
 ! PiCol_Pump114
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -214,13 +238,13 @@ TPump114 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiCol_Pump114 = [455,1] ! Output flow temperature [deg C]
-PPiCol_Pump114_kW = [455,3]/3600 ! Dissipated heat [kW]
-PPiCol_Pump114Conv_kW = [455,4]/3600 ! Convected heat [kW]
-PPiCol_Pump114Int_kJ = [455,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiCol_Pump114 = [457,1] ! Output flow temperature [deg C]
+PPiCol_Pump114_kW = [457,3]/3600 ! Dissipated heat [kW]
+PPiCol_Pump114Conv_kW = [457,4]/3600 ! Convected heat [kW]
+PPiCol_Pump114Int_kJ = [457,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiCol_Pump114 = MPiCol_Pump114_A
 
-UNIT 456 TYPE 931
+UNIT 458 TYPE 931
 ! PiPump114_Tes
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -238,10 +262,10 @@ TTesDpL50_10H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPump114_Tes = [456,1] ! Output flow temperature [deg C]
-PPiPump114_Tes_kW = [456,3]/3600 ! Dissipated heat [kW]
-PPiPump114_TesConv_kW = [456,4]/3600 ! Convected heat [kW]
-PPiPump114_TesInt_kJ = [456,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPump114_Tes = [458,1] ! Output flow temperature [deg C]
+PPiPump114_Tes_kW = [458,3]/3600 ! Dissipated heat [kW]
+PPiPump114_TesConv_kW = [458,4]/3600 ! Convected heat [kW]
+PPiPump114_TesInt_kJ = [458,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPump114_Tes = MPiPump114_Tes_A
 
 *** Single pipe losses
@@ -261,14 +285,14 @@ spPipeConvectedTot = PTes_ColConv_kW+PPiTes_HPConv_kW+PPiTes_Pump109Conv_kW+PPiP
 PipeLossTot = PTes_Col_kW+PPiTes_HP_kW+PPiTes_Pump109_kW+PPiPump109_HP_kW+PPiCol_Pump114_kW+PPiPump114_Tes_kW
 spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
-ASSIGN storage-tank_Mfr.prt 457
+ASSIGN storage-tank_Mfr.prt 459
 
-UNIT 457 TYPE 25! User defined Printer
+UNIT 459 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-457! 4 Logical unit
+459! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -283,14 +307,14 @@ MTes_Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
 MTes_Col MPiTes_HP MPiTes_Pump109 MPiPump109_HP MPiCol_Pump114 MPiPump114_Tes
 
 
-ASSIGN storage-tank_T.prt 458
+ASSIGN storage-tank_T.prt 460
 
-UNIT 458 TYPE 25! User defined Printer
+UNIT 460 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-458! 4 Logical unit
+460! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
