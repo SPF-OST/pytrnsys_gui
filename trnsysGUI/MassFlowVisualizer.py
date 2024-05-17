@@ -282,7 +282,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         return mass
 
     def _getTemperature(self, temperatureVariableName: str, timeStep: int) -> float:
-        truncatedTemperatureVariableName = temperatureVariableName
+        truncatedTemperatureVariableName = _truncateName(temperatureVariableName)
         return self.tempMassFlowData[truncatedTemperatureVariableName].iloc[timeStep]
 
     def pauseVis(self):
