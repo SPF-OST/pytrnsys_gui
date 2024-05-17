@@ -15,14 +15,14 @@ class TapBase(_ptb.PumpsAndTabsBase):
             self._graphicalPortItem = _cspi.createSinglePipePortItem("o", 0, self)
             self.outputs.append(self._graphicalPortItem)
             modelPortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+            self._modelTerminal = _mfn.TerminalWithPrescribedPosFlow(modelPortItem)
         elif direction == _mfn.PortItemDirection.INPUT:
             self._graphicalPortItem = _cspi.createSinglePipePortItem("i", 0, self)
             self.inputs.append(self._graphicalPortItem)
             modelPortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+            self._modelTerminal = _mfn.TerminalWithPrescribedNegFlow(modelPortItem)
         else:
             raise AssertionError("Shouldn't get here.")
-
-        self._modelTerminal = _mfn.TerminalWithPrescribedFlow(modelPortItem)
 
         self.changeSize()
 
