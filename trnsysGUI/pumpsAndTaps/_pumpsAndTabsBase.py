@@ -35,15 +35,11 @@ class PumpsAndTabsBase(_bi.BlockItem, _ip.HasInternalPiping):
     def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _getCanonicalMassFlowRate(self) -> float:
-        raise NotImplementedError()
-
     def exportMassFlows(self) -> _tp.Tuple[str, int]:
         internalPiping = self.getInternalPiping()
         node = _com.getSingle(internalPiping.nodes)
         inputVariableName = _mnames.getInputVariableName(self, node)
-        canonicalMassFlowRate = self._getCanonicalMassFlowRate()
-        result = f"{inputVariableName} = {canonicalMassFlowRate}\n"
+        result = f"{inputVariableName} = {self._massFlowRateInKgPerH}\n"
         equationNr = 1
         return result, equationNr
 

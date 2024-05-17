@@ -8,10 +8,8 @@ import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.deleteSinglePipeConnectionCommand as _dspc
-import trnsysGUI.connection.hydraulicExport.common as _hecom
-import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehc
+import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehspc
 import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
-import trnsysGUI.connection.hydraulicExport.singlePipe.singlePipeConnection as _hespc
 import trnsysGUI.connection.singlePipeConnectionModel as _model
 import trnsysGUI.connection.singlePipeDefaultValues as _defaults
 import trnsysGUI.connection.values as _values
@@ -160,7 +158,9 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         unitNumber = startingUnit
 
-        exportHydraulicConnection = self._createExportHydraulicConnection()
+        exportHydraulicConnection = _cehspc.createExportHydraulicSinglePipeConnection(
+            self, self.fromPort, self.toPort, self.modelPipe
+        )
 
         if not self.shallBeSimulated:
             return _he.exportDummyConnection(exportHydraulicConnection, unitNumber)
@@ -168,7 +168,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return self._exportSimulatedPipe(exportHydraulicConnection, unitNumber)
 
     def _exportSimulatedPipe(self, exportHydraulicConnection, unitNumber) -> _tp.Tuple[str, int]:
-
         canonicalMfrName = _mnames.getCanonicalMassFlowVariableName(
             componentDisplayName=exportHydraulicConnection.displayName, pipeName=None
         )
@@ -192,18 +191,6 @@ class SinglePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         nextUnitNumber = unitNumber + 1
 
         return unitText, nextUnitNumber
-
-    def _createExportHydraulicConnection(self) -> _hespc.ExportHydraulicSinglePipeConnection:
-        hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
-            self.displayName,
-            _hecom.getAdjacentBlockItem(self.fromPort),
-            _hecom.getAdjacentBlockItem(self.toPort),
-            self.modelPipe,
-        )
-
-        exportHydraulicConnection = _cehc.createExportHydraulicConnection(hydraulicConnection)
-
-        return exportHydraulicConnection
 
     def _getSimulatedPipeUnitText(  # pylint: disable=too-many-locals
         self,

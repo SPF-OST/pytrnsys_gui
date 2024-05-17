@@ -6,9 +6,11 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.MyQFileSystemModel as _fs
 import trnsysGUI.MyQTreeView as _tv
+import trnsysGUI.connection.connectorsAndPipesExportHelpers as _ehelpers
+import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.images as _img
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-
+import trnsysGUI.temperatures as _temps
 from . import _tapBase
 
 
@@ -27,13 +29,27 @@ class Tap(_tapBase.TapBase):
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.TAP_SVG
 
-    def _getCanonicalMassFlowRate(self) -> float:
-        return -self._massFlowRateInKgPerH
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+        fromAdjacentHasPiping = _hecom.getAdjacentConnection(self._graphicalPortItem)
 
-    def exportPumpOutlets(self):
-        resStr = "T" + self.displayName + " = " + "T" + self.inputs[0].connectionList[0].displayName + "\n"
-        equationNr = 1
-        return resStr, equationNr
+        inputTemperature = _ehelpers.getTemperatureVariableName(
+            fromAdjacentHasPiping.hasInternalPiping,
+            fromAdjacentHasPiping.sharedPort,
+            _mfn.PortItemType.STANDARD,
+        )
+
+        tapTemperature = _temps.getTemperatureVariableName(
+            shallRenameOutputInHydraulicFile=False,
+            componentDisplayName=self.displayName,
+            nodeName=self._modelTerminal.name,
+        )
+
+        equation = f"""\
+EQUATIONS 1
+{tapTemperature} = {inputTemperature}
+
+"""
+        return equation, startingUnit
 
     def addTree(self):
         """

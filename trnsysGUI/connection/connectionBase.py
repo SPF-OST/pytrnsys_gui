@@ -691,9 +691,6 @@ class ConnectionBase(_qtw.QGraphicsItem, _ip.HasInternalPiping):
     def decode(self, i):
         raise NotImplementedError()
 
-    def exportPumpOutlets(self):
-        return "", 0
-
     def exportMassFlows(self):
         return "", 0
 

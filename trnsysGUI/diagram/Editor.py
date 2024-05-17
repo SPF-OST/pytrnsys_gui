@@ -547,7 +547,6 @@ qSysOut_{DoublePipeTotals.SOIL_INTERNAL_CHANGE} = {DoublePipeTotals.SOIL_INTERNA
         fullExportText += blackBoxText
         if exportTo == "mfs":
             fullExportText += exporter.exportMassFlows()
-            fullExportText += exporter.exportPumpOutlets()
             fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 
         fullExportText += exporter.exportSinglePipeParameters()
@@ -685,7 +684,6 @@ Tcw=1
 
         exporter = self._createExporter()
 
-        fullExportText += exporter.exportPumpOutlets()
         fullExportText += exporter.exportMassFlows()
         fullExportText += exporter.exportDivSetting(simulationUnit - 10)
 

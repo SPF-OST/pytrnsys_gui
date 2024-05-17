@@ -19,9 +19,6 @@ class TapMains(_tb.TapBase):
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.TAP_MAINS_SVG
 
-    def _getCanonicalMassFlowRate(self) -> float:
-        return self._massFlowRateInKgPerH
-
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         temperatureVariable = _temps.getTemperatureVariableName(
             self.shallRenameOutputTemperaturesInHydraulicFile(),

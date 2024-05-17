@@ -1,12 +1,11 @@
 import typing as _tp
 
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehc
-import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
+import trnsysGUI.connection.hydraulicExport.exportDummySinglePipeConnection as _edspc
+import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
@@ -83,14 +82,6 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
         return width, height
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
-            self.displayName,
-            _hecom.getAdjacentConnection(self.fromPort),
-            _hecom.getAdjacentConnection(self.toPort),
-            self._modelPipe,
+        return trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection.exportDummySinglePipeConnection(
+            self, startingUnit, self.fromPort, self.toPort, self._modelPipe
         )
-
-        hydraulicExportConnection = _cehc.createExportHydraulicConnection(hydraulicConnection)
-
-        unitNumber = startingUnit
-        return _he.exportDummyConnection(hydraulicExportConnection, unitNumber)

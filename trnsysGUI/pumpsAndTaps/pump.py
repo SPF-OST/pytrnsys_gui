@@ -4,11 +4,11 @@ import dataclasses_jsonschema as _dcj
 
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.common as _com
+import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehspc
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.temperatures as _temps
 from . import _pumpsAndTabsBase as _patb
 from . import _serialization as _ser
 
@@ -17,19 +17,25 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
-        self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
+        self._fromPort = _cspi.createSinglePipePortItem("i", 0, self)
+        self._toPort = _cspi.createSinglePipePortItem("o", 2, self)
 
-        inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
-        outputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
-        self._modelPump = _mfn.Pump(inputPort, outputPort)
+        self.inputs.append(self._fromPort)
+        self.outputs.append(self._toPort)
 
         self.changeSize()
 
+        self._updateModels(self.displayName)
+
+    def _updateModels(self, newDisplayName: str) -> None:
+        modelInputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
+        modelOutputPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
+        self._modelPump = _mfn.Pump(modelInputPort, modelOutputPort)
+
     def getInternalPiping(self) -> _ip.InternalPiping:
         modelPortItemsToGraphicalPortItem = {
-            self._modelPump.fromPort: self.inputs[0],
-            self._modelPump.toPort: self.outputs[0],
+            self._modelPump.fromPort: self._fromPort,
+            self._modelPump.toPort: self._toPort,
         }
         return _ip.InternalPiping([self._modelPump], modelPortItemsToGraphicalPortItem)
 
@@ -40,26 +46,6 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.PUMP_SVG
-
-    def _getCanonicalMassFlowRate(self) -> float:
-        return self._massFlowRateInKgPerH
-
-    def exportPumpOutlets(self):
-        temperatureVariableName = _temps.getTemperatureVariableName(
-            self.shallRenameOutputTemperaturesInHydraulicFile(),
-            componentDisplayName=self.displayName,
-            nodeName=self._modelPump.name,
-        )
-        inputConnection = self.inputs[0].getConnection()
-        inputConnectionNode = inputConnection.getInternalPiping().getNode(self.inputs[0], _mfn.PortItemType.STANDARD)
-        inputTemperatureVariable = _temps.getTemperatureVariableName(
-            inputConnection.shallRenameOutputTemperaturesInHydraulicFile(),
-            componentDisplayName=inputConnection.getDisplayName(),
-            nodeName=inputConnectionNode.name,
-        )
-        equation = f"{temperatureVariableName} = {inputTemperatureVariable}\n"
-        equationNr = 1
-        return equation, equationNr
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         blockItemWithPrescribedMassFlowModel = self._createBlockItemWithPrescribedMassFlowForEncode()
@@ -95,6 +81,11 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         self._applyBlockItemModelWithPrescribedMassFlowForDecode(model.blockItemWithPrescribedMassFlow)
 
         resBlockList.append(self)
+
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
+        return _cehspc.exportDummySinglePipeConnection(
+            self, startingUnit, self._fromPort, self._toPort, self._modelPump
+        )
 
     def changeSize(self) -> _tp.Tuple[int, int]:
         width = self.w

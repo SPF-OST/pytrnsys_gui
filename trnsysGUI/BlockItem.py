@@ -633,9 +633,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         resBlockList.append(self)
 
-    def exportPumpOutlets(self):
-        return "", 0
-
     def exportMassFlows(self):
         return "", 0
 
