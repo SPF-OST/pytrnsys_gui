@@ -1,12 +1,11 @@
 import dataclasses as _dc
 
 import trnsysGUI.connection.hydraulicExport.common as _com
-from trnsysGUI import internalPiping as _ip
-from trnsysGUI import singlePipePortItem as _spi
-from trnsysGUI.connection.hydraulicExport import common as _hecom
-from trnsysGUI.connection.hydraulicExport.singlePipe import dummy as _he
-from trnsysGUI.connection.hydraulicExport.singlePipe import singlePipeConnection as _hespc
-from trnsysGUI.massFlowSolver import networkModel as _mfn
+import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
+import trnsysGUI.connection.hydraulicExport.singlePipe.singlePipeConnection as _hespc
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.singlePipePortItem as _spi
 
 
 @_dc.dataclass
@@ -22,8 +21,8 @@ def createExportHydraulicSinglePipeConnection(
 ) -> _hespc.ExportHydraulicSinglePipeConnection:
     hydraulicConnection = HydraulicSinglePipeConnection(
         hasInternalPiping.getDisplayName(),
-        _hecom.getAdjacentHasInternalPiping(hasInternalPiping, fromPort),
-        _hecom.getAdjacentHasInternalPiping(hasInternalPiping, toPort),
+        _com.getAdjacentHasInternalPiping(hasInternalPiping, fromPort),
+        _com.getAdjacentHasInternalPiping(hasInternalPiping, toPort),
         twoNeighboursBaseModel,
     )
 

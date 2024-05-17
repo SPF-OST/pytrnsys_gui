@@ -53,13 +53,16 @@ def getAdjacentBlockItem(port: _pib.PortItemBase) -> AdjacentHasInternalPiping:
 def getAdjacentHasInternalPiping(
     hasInternalPiping: _ip.HasInternalPiping, port: _pib.PortItemBase
 ) -> AdjacentHasInternalPiping:
-    match hasInternalPiping:
-        case port.getConnection():
-            return AdjacentHasInternalPiping(port.parent, port)
-        case port.parent:
-            return AdjacentHasInternalPiping(port.getConnection(), port)
-        case _:
-            raise ValueError("Port doesn't belong to `hasInternalPiping`.")
+    connection = port.getConnection()
+    blockItem = port.parent
+
+    if hasInternalPiping is connection:
+        return AdjacentHasInternalPiping(blockItem, port)
+
+    if hasInternalPiping is blockItem:
+        return AdjacentHasInternalPiping(connection, port)
+
+    raise ValueError("Port doesn't belong to `hasInternalPiping`.")
 
 
 @_dc.dataclass
