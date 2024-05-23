@@ -162,8 +162,8 @@ mfrTolSwitchThreshold
 80 92 0 0      !6 : TesDhwDpR50_99
 20 73 68 3     !7 : DivAux
 98 78 69 2     !8 : TeeAuxHxRt
-19 0 0 4       !9 : tapWater
-94 0 0 4       !10 : supplyWater
+19 0 0 7       !9 : tapWater
+94 0 0 6       !10 : supplyWater
 18 80 0 1      !11 : PuCirc
 68 69 0 0      !12 : HxDHWSide1
 95 96 0 0      !13 : HxDHWSide2

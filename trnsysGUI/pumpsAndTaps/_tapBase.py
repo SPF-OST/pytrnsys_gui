@@ -11,6 +11,8 @@ class TapBase(_ptb.PumpsAndTabsBase):
     def __init__(self, trnsysType: str, editor, direction: _mfn.PortItemDirection, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
+        self._modelTerminal: _mfn.TerminalWithPrescribedFlowBase
+
         if direction == _mfn.PortItemDirection.OUTPUT:
             self._graphicalPortItem = _cspi.createSinglePipePortItem("o", 0, self)
             self.outputs.append(self._graphicalPortItem)
