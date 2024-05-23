@@ -251,10 +251,6 @@ MfrPuCol = puColOnRc*MfrCPriNom
 MfrWTap = -MfrDHWset*0.125
 MfrWTap2 = -MfrDHWset*0.875
 MfrWTap_main = MfrDHWset
-EQUATIONS 3
-TPuCol = TDhw_PuCol
-TWTap = -300
-TWTap2 = -300
 UNIT 16 TYPE 993  !Changed automatically
 PARAMETERS 1     
 2   ! 1: number of variables to be remembered    
