@@ -45,7 +45,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -170,7 +170,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 
         return exportConnection
 
-    def _updateModels(self, newDisplayName: str):
+    def _setModels(self):
         self.coldModelPipe, self.hotModelPipe = _cmnp.createMassFlowSolverNetworkPipes()
 
     def setMassFlowAndTemperature(

@@ -148,7 +148,19 @@ PPiExHx_TesConv_kW = [452,4]/3600 ! Convected heat [kW]
 PPiExHx_TesInt_kJ = [452,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiExHx_Tes = MPiExHx_Tes_A
 
-UNIT 453 TYPE 931
+UNIT 453 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump88_A TPiTes_Pump88 TPiPump88_ExHx
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump88 = [453,1]
+MPump88 = MPump88_A
+
+UNIT 454 TYPE 931
 ! PiTes_Pump88
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -166,13 +178,13 @@ TPump88 ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiTes_Pump88 = [453,1] ! Output flow temperature [deg C]
-PPiTes_Pump88_kW = [453,3]/3600 ! Dissipated heat [kW]
-PPiTes_Pump88Conv_kW = [453,4]/3600 ! Convected heat [kW]
-PPiTes_Pump88Int_kJ = [453,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiTes_Pump88 = [454,1] ! Output flow temperature [deg C]
+PPiTes_Pump88_kW = [454,3]/3600 ! Dissipated heat [kW]
+PPiTes_Pump88Conv_kW = [454,4]/3600 ! Convected heat [kW]
+PPiTes_Pump88Int_kJ = [454,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiTes_Pump88 = MPiTes_Pump88_A
 
-UNIT 454 TYPE 931
+UNIT 455 TYPE 931
 ! PiPump88_ExHx
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -190,13 +202,25 @@ TExHxSide2H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPump88_ExHx = [454,1] ! Output flow temperature [deg C]
-PPiPump88_ExHx_kW = [454,3]/3600 ! Dissipated heat [kW]
-PPiPump88_ExHxConv_kW = [454,4]/3600 ! Convected heat [kW]
-PPiPump88_ExHxInt_kJ = [454,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPump88_ExHx = [455,1] ! Output flow temperature [deg C]
+PPiPump88_ExHx_kW = [455,3]/3600 ! Dissipated heat [kW]
+PPiPump88_ExHxConv_kW = [455,4]/3600 ! Convected heat [kW]
+PPiPump88_ExHxInt_kJ = [455,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPump88_ExHx = MPiPump88_ExHx_A
 
-UNIT 455 TYPE 931
+UNIT 456 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+spTIni
+INPUTS 3
+MPump93_A TPiPump93_Col TPiPump93_ExHx
+***
+0 spTIni spTIni
+EQUATIONS 2
+TPump93 = [456,1]
+MPump93 = MPump93_A
+
+UNIT 457 TYPE 931
 ! PiPump93_ExHx
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -214,13 +238,13 @@ TExHxSide1H ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPump93_ExHx = [455,1] ! Output flow temperature [deg C]
-PPiPump93_ExHx_kW = [455,3]/3600 ! Dissipated heat [kW]
-PPiPump93_ExHxConv_kW = [455,4]/3600 ! Convected heat [kW]
-PPiPump93_ExHxInt_kJ = [455,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPump93_ExHx = [457,1] ! Output flow temperature [deg C]
+PPiPump93_ExHx_kW = [457,3]/3600 ! Dissipated heat [kW]
+PPiPump93_ExHxConv_kW = [457,4]/3600 ! Convected heat [kW]
+PPiPump93_ExHxInt_kJ = [457,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPump93_ExHx = MPiPump93_ExHx_A
 
-UNIT 456 TYPE 931
+UNIT 458 TYPE 931
 ! PiPump93_Col
 PARAMETERS 6
 0.02 ! diameter [m]
@@ -238,10 +262,10 @@ TColH ! reverse flow input temperature [deg C]
 20 0.0 20 20
 
 EQUATIONS 5
-TPiPump93_Col = [456,1] ! Output flow temperature [deg C]
-PPiPump93_Col_kW = [456,3]/3600 ! Dissipated heat [kW]
-PPiPump93_ColConv_kW = [456,4]/3600 ! Convected heat [kW]
-PPiPump93_ColInt_kJ = [456,5] ! Accumulated internal energy since start of simulation [kJ]
+TPiPump93_Col = [458,1] ! Output flow temperature [deg C]
+PPiPump93_Col_kW = [458,3]/3600 ! Dissipated heat [kW]
+PPiPump93_ColConv_kW = [458,4]/3600 ! Convected heat [kW]
+PPiPump93_ColInt_kJ = [458,5] ! Accumulated internal energy since start of simulation [kJ]
 MPiPump93_Col = MPiPump93_Col_A
 
 *** Single pipe losses
@@ -261,14 +285,14 @@ spPipeConvectedTot = PHx_ColConv_kW+PPiExHx_TesConv_kW+PPiTes_Pump88Conv_kW+PPiP
 PipeLossTot = PHx_Col_kW+PPiExHx_Tes_kW+PPiTes_Pump88_kW+PPiPump88_ExHx_kW+PPiPump93_ExHx_kW+PPiPump93_Col_kW
 spPipeIntTot = (spPipeEnIntTot - [100,1]) / dtSim / 3600 ! kW
 spImbalance = spPipeConvectedTot - PipeLossTot - spPipeIntTot
-ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 457
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_Mfr.prt 459
 
-UNIT 457 TYPE 25! User defined Printer
+UNIT 459 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-457! 4 Logical unit
+459! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append
@@ -283,14 +307,14 @@ MHx_Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
 MHx_Col MPiExHx_Tes MPiTes_Pump88 MPiPump88_ExHx MPiPump93_ExHx MPiPump93_Col
 
 
-ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_T.prt 458
+ASSIGN ex-hx-two-flow-solver-parameter-lines_simple_99_T.prt 460
 
-UNIT 458 TYPE 25! User defined Printer
+UNIT 460 TYPE 25! User defined Printer
 PARAMETERS 10
 dtSim! 1 Printing interval
 START! 2 Start time
 STOP! 3 Stop time
-458! 4 Logical unit
+460! 4 Logical unit
 0! 5 Units printing mode
 0! 6 Relative or absolute start time
 -1! 7 Overwrite or Append

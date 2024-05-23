@@ -1,12 +1,10 @@
 import typing as _tp
 
 import trnsysGUI.BlockItem as _bi
-import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehc
-import trnsysGUI.connection.hydraulicExport.singlePipe.dummy as _he
+import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehspc
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
@@ -24,7 +22,7 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
         self.inputs.append(self.fromPort)
         self.outputs.append(self.toPort)
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
         self.changeSize()
 
@@ -49,7 +47,7 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         return _img.CONNECTOR_PNG
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         toPort = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT)
         self._modelPipe = _mfn.Pipe(fromPort, toPort)
@@ -83,14 +81,4 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
         return width, height
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
-        hydraulicConnection = _cehc.HydraulicSinglePipeConnection(
-            self.displayName,
-            _hecom.getAdjacentConnection(self.fromPort),
-            _hecom.getAdjacentConnection(self.toPort),
-            self._modelPipe,
-        )
-
-        hydraulicExportConnection = _cehc.createExportHydraulicConnection(hydraulicConnection)
-
-        unitNumber = startingUnit
-        return _he.exportDummyConnection(hydraulicExportConnection, unitNumber)
+        return _cehspc.exportDummySinglePipeConnection(self, startingUnit, self.fromPort, self.toPort, self._modelPipe)

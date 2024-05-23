@@ -93,10 +93,6 @@ MfrWTap = -MfrDHWset*0.125
 MfrWTap2 = -MfrDHWset*0.875
 MfrWTap_main = MfrDHWset
 
-EQUATIONS 3
-TPuCol = TDhw_PuCol
-TWTap = -300
-TWTap2 = -300
 ***********************************
 ** Begin TYPE Recall
 ***********************************

@@ -21,7 +21,7 @@ class TeePiece(_tpb.TeePieceBase):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
         self.changeSize()
 
@@ -32,7 +32,7 @@ class TeePiece(_tpb.TeePieceBase):
             _cspi.createSinglePipePortItem("o", 2, self),
         )
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         inputPortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
         output1PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT)
         output2PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT)

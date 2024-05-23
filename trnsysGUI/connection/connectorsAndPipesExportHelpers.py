@@ -79,5 +79,5 @@ def getIfThenElseUnit(  # pylint: disable=too-many-arguments
     return unitText
 
 
-def getInputMfrName(displayName: str, pipe: _mfn.Pipe) -> str:
+def getInputMfrName(displayName: str, pipe: _mfn.TwoNeighboursBase) -> str:
     return _mnames.getMassFlowVariableName(displayName, pipe, pipe.fromPort)

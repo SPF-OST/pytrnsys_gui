@@ -164,20 +164,6 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         else:
             raise ValueError("Unknown value for `exportTo`", exportTo)
 
-    def exportPumpOutlets(self):
-        f = "*** Pump outlet temperatures" + "\n"
-        equationNr = 0
-        for t in self._hasInternalPipings:
-            f += t.exportPumpOutlets()[0]
-            equationNr += t.exportPumpOutlets()[1]
-
-        if equationNr == 0:
-            f = ""
-        else:
-            f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
-
-        return f
-
     def exportMassFlows(self):  # What the controller should give
         f = "*** Massflowrates" + "\n"
         equationNr = 0

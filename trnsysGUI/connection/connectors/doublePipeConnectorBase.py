@@ -37,9 +37,6 @@ class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
     def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _updateModels(self, newDisplayName: str) -> None:
-        raise NotImplementedError()
-
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         raise NotImplementedError()
 
