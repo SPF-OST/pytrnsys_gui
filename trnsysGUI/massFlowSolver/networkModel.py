@@ -25,6 +25,8 @@ class NodeType(_enum.IntEnum):
     DIVERTER = 3
     TERMINAL_WITH_PRESCRIBED_FLOW = 4
     TERMINAL_WITH_FREE_FLOW = 5
+    TERMINAL_WITH_PRESCRIBED_POS_FLOW = 6
+    TERMINAL_WITH_PRESCRIBED_NEG_FLOW = 7
 
 
 @_dc.dataclass(eq=False)
@@ -98,15 +100,27 @@ class OneNeighbourBase(Node, _abc.ABC):
         return [self.portItem]
 
 
-class TerminalWithPrescribedFlow(OneNeighbourBase):
-    def getNodeType(self) -> NodeType:
-        return NodeType.TERMINAL_WITH_PRESCRIBED_FLOW
-
+class TerminalWithPrescribedFlowBase(OneNeighbourBase, _abc.ABC):
     def hasInput(self) -> bool:
         return True
 
     def getInputVariablePrefix(self) -> str:
         return "Mfr"
+
+
+class TerminalWithPrescribedFlow(TerminalWithPrescribedFlowBase):
+    def getNodeType(self) -> NodeType:
+        return NodeType.TERMINAL_WITH_PRESCRIBED_FLOW
+
+
+class TerminalWithPrescribedPosFlow(TerminalWithPrescribedFlowBase):
+    def getNodeType(self) -> NodeType:
+        return NodeType.TERMINAL_WITH_PRESCRIBED_POS_FLOW
+
+
+class TerminalWithPrescribedNegFlow(TerminalWithPrescribedFlowBase):
+    def getNodeType(self) -> NodeType:
+        return NodeType.TERMINAL_WITH_PRESCRIBED_NEG_FLOW
 
 
 class TerminalWithFreeFlow(OneNeighbourBase):
