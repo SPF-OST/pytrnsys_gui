@@ -94,49 +94,6 @@ class ImageAccessorBase(_abc.ABC):
     def __init__(self, dataLoader: _DataLoaderBase) -> None:
         self._dataLoader = dataLoader
 
-    @classmethod
-    def createForPackageResource(cls, resourcePath: str, logger: _log.Logger = _logger):
-        dataLoader = _PackageResourceDataLoader(resourcePath, logger)
-
-        return cls._createFromDataLoader(dataLoader)
-
-    @classmethod
-    def createForFile(cls, filePath: _pl.Path, logger: _log.Logger = _logger):
-        dataLoader = _FileDataLoader(filePath, logger)
-
-        return cls._createFromDataLoader(dataLoader)
-
-    @classmethod
-    def createFromResourcePath(cls, resourcePath: str, logger: _log.Logger = _logger) -> "ImageAccessorBase":
-        dataLoader = cls._createDataLoaderFromResourcePath(resourcePath, logger)
-
-        return ImageAccessorBase(dataLoader)
-
-    @staticmethod
-    def _createDataLoaderFromResourcePath(resourcePath: str, logger: _log.Logger) -> _DataLoaderBase:
-        if resourcePath.startswith(_PackageResourceDataLoader.PATH_PREFIX):
-            path = resourcePath[len(_PackageResourceDataLoader.PATH_PREFIX) :]
-            return _PackageResourceDataLoader(path, logger)
-
-        if resourcePath.startswith(_FileDataLoader.PATH_PREFIX):
-            path = resourcePath[len(_FileDataLoader.PATH_PREFIX) :]
-            return _FileDataLoader(_pl.Path(path), logger)
-
-        logger.warning("Found legacy resource path %s: assuming it's a package resource.", resourcePath)
-        return _PackageResourceDataLoader(resourcePath, logger)
-
-    @classmethod
-    def _createFromDataLoader(cls, dataLoader: _DataLoaderBase):
-        extension = dataLoader.getExtension()
-
-        match extension:
-            case "png":
-                return PngImageAccessor(dataLoader)
-            case "svg":
-                return SvgImageAccessor(dataLoader)
-            case _:
-                raise ValueError("Unknown file extension.", extension)
-
     def getResourcePath(self) -> str:
         return self._dataLoader.getResourcePath()
 
@@ -145,16 +102,15 @@ class ImageAccessorBase(_abc.ABC):
 
     def pixmap(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QPixmap:
         image = self.image(width=width, height=height)
-
         return _qtg.QPixmap(image)
-
-    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
-        raise NotImplementedError()
 
     def icon(self) -> _qtg.QIcon:
         pixmap = self.pixmap()
-
         return _qtg.QIcon(pixmap)
+
+    @_abc.abstractmethod
+    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
+        raise NotImplementedError()
 
     def _loadBytes(self) -> bytes:
         return self._dataLoader.loadData()
@@ -209,3 +165,34 @@ class SvgImageAccessor(ImageAccessorBase):
         imageBytes = self._loadBytes()
         svgRenderer = _qsvg.QSvgRenderer(imageBytes)
         return svgRenderer
+
+
+_T_co = _tp.TypeVar("_T_co", covariant=True, bound=ImageAccessorBase)
+
+
+def createForPackageResource(clazz: _tp.Type[_T_co], resourcePath: str, logger: _log.Logger = _logger) -> _T_co:
+    dataLoader = _PackageResourceDataLoader(resourcePath, logger)
+    return clazz(dataLoader)
+
+
+def createForFile(clazz: _tp.Type[_T_co], filePath: _pl.Path, logger: _log.Logger = _logger) -> _T_co:
+    dataLoader = _FileDataLoader(filePath, logger)
+    return clazz(dataLoader)
+
+
+def createFromResourcePath(clazz: _tp.Type[_T_co], resourcePath: str, logger: _log.Logger = _logger) -> _T_co:
+    dataLoader = _createDataLoaderFromResourcePath(resourcePath, logger)
+    return clazz(dataLoader)
+
+
+def _createDataLoaderFromResourcePath(resourcePath: str, logger: _log.Logger) -> _DataLoaderBase:
+    if resourcePath.startswith(_PackageResourceDataLoader.PATH_PREFIX):
+        path = resourcePath[len(_PackageResourceDataLoader.PATH_PREFIX) :]
+        return _PackageResourceDataLoader(path, logger)
+
+    if resourcePath.startswith(_FileDataLoader.PATH_PREFIX):
+        path = resourcePath[len(_FileDataLoader.PATH_PREFIX) :]
+        return _FileDataLoader(_pl.Path(path), logger)
+
+    logger.warning("Found legacy resource path %s: assuming it's a package resource.", resourcePath)
+    return _PackageResourceDataLoader(resourcePath, logger)
