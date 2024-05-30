@@ -3,13 +3,15 @@ import pathlib as _pl
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
+
 import pytrnsys.utils.result as _res
 import pytrnsys.utils.warnings as _warn
+import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.diagram.Editor as _ed
+import trnsysGUI.hydraulicLoops.model as _hlm
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.menus.projectMenu.placeholders as _ph
 import trnsysGUI.warningsAndErrors as _werrs
-from trnsysGUI import internalPiping as _ip, BlockItem as _bi
-from trnsysGUI.hydraulicLoops import model as _hlm
-from trnsysGUI.menus.projectMenu.placeholders import getPlaceholderValues
 
 
 def exportDdckPlaceHolderValuesJsonFile(editor: _ed.Editor) -> _res.Result[None]:  # type: ignore[name-defined]
@@ -68,9 +70,9 @@ def encodeDdckPlaceHolderValuesToJson(
 
     ddckDirNames = _getDdckDirNames(projectFolder)
 
-    blockItems = [o for o in trnsysObjects if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)]
+    blockItems = [o for o in trnsysObjects if isinstance(o, _biip.BlockItemHasInternalPiping)]
 
-    placeHoldersWithWarnings = getPlaceholderValues(ddckDirNames, blockItems, hydraulicLoops)
+    placeHoldersWithWarnings = _ph.getPlaceholderValues(ddckDirNames, blockItems, hydraulicLoops)
 
     ddckPlaceHolderValuesDictionary = placeHoldersWithWarnings.value
 
