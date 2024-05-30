@@ -44,7 +44,7 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
     def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.PUMP_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:

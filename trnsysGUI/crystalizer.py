@@ -2,12 +2,12 @@ import typing as _tp
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
-import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.svgBlockItem as _svgbi
 
 
-class Crystalizer(BlockItem, _ip.HasInternalPiping):
+class Crystalizer(_svgbi.SvgBlockItem):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -22,7 +22,7 @@ class Crystalizer(BlockItem, _ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.CRYSTALIZER_SVG
 
     def changeSize(self):

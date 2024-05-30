@@ -1,14 +1,14 @@
 import typing as _tp
 
-import trnsysGUI.BlockItem as _bi
 import trnsysGUI.connection.hydraulicExport.singlePipe.createExportHydraulicSinglePipeConnection as _cehspc
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.svgBlockItem as _svgbi
 
 
-class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-many-instance-attributes
+class Connector(_svgbi.SvgBlockItem):  # pylint: disable=too-many-instance-attributes
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -44,8 +44,8 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
             [self._modelPipe], {self._modelPipe.fromPort: self.inputs[0], self._modelPipe.toPort: self.outputs[0]}
         )
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        return _img.CONNECTOR_PNG
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+        return _img.CONNECTOR_SVG
 
     def _setModels(self) -> None:
         fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)

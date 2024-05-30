@@ -8,14 +8,14 @@ from PyQt5.QtWidgets import QTreeView
 
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
+import trnsysGUI.svgBlockItem as _svgbi
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
-import trnsysGUI.internalPiping as _ip
 
 
-class ParabolicTroughField(BlockItem, _ip.HasInternalPiping):
+class ParabolicTroughField(_svgbi.SvgBlockItem):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -38,7 +38,7 @@ class ParabolicTroughField(BlockItem, _ip.HasInternalPiping):
 
         return _ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.PT_FIELD_SVG
 
     def changeSize(self):

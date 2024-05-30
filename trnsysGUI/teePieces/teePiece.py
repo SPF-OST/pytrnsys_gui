@@ -38,7 +38,7 @@ class TeePiece(_tpb.TeePieceBase):
         output2PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT)
         self._modelTeePiece = _mfn.TeePiece(inputPortItem, output1PortItem, output2PortItem)
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.TEE_PIECE_SVG
 
     def getInternalPiping(self) -> _ip.InternalPiping:

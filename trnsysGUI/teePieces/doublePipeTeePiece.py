@@ -51,7 +51,7 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
         hotOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self._hotTeePiece = _mfn.TeePiece(hotInput, hotOutput1, hotOutput2, name="Hot")
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         rotationAngle = (self.rotationN % 4) * 90
 
         if rotationAngle == 0:

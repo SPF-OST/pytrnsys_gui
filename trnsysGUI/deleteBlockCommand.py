@@ -5,8 +5,8 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.BlockItem as _bi
+import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.common as _com
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.names.undo as _nu
 
 if _tp.TYPE_CHECKING:
@@ -20,7 +20,7 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
         editor: _ed.Editor,  # type: ignore[name-defined]
         undoNamingHelper: _nu.UndoNamingHelper,
     ) -> None:
-        assert isinstance(blockItem, _ip.HasInternalPiping) and isinstance(blockItem, _bi.BlockItem)
+        assert isinstance(blockItem, _biip.BlockItemHasInternalPiping)
 
         description = f"Delete {blockItem.name}"
         super().__init__(description)

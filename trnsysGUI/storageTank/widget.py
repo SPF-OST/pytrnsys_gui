@@ -18,9 +18,9 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.storageTank.side as _sd
+import trnsysGUI.svgBlockItem as _svgbi
 import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
@@ -40,7 +40,7 @@ class PortIds:
     outputId: int
 
 
-class StorageTank(BlockItem, _ip.HasInternalPiping):
+class StorageTank(_svgbi.SvgBlockItem):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
@@ -88,7 +88,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
     def _getDirectPortPairPortItems(self, side: _sd.Side):
         return [p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]]
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.STORAGE_TANK_SVG
 
     # Setter functions

@@ -3,17 +3,9 @@
 import os
 import typing as _tp
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QEvent
-from PyQt5.QtCore import QPointF
-from PyQt5.QtCore import QTimer
-from PyQt5.QtGui import QCursor
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QGraphicsPixmapItem
-from PyQt5.QtWidgets import QGraphicsTextItem
-from PyQt5.QtWidgets import QMenu
-from PyQt5.QtWidgets import QTreeView
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.blockItemModel as _bim
@@ -29,7 +21,7 @@ FILEPATH = "res/Config.txt"
 # pylint: disable = fixme
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
-class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
+class BlockItem(_qtw.QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(None)
 
@@ -66,9 +58,9 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
         self.setFlag(self.ItemSendsScenePositionChanges, True)
-        self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.setCursor(_qtg.QCursor(_qtc.Qt.PointingHandCursor))
 
-        self.label = QGraphicsTextItem(self.displayName, self)
+        self.label = _qtw.QGraphicsTextItem(self.displayName, self)
         self.label.setVisible(False)
 
         # Experimental, used for detecting genereated blocks attached to storage ports
@@ -115,7 +107,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
     # Interaction related
     def contextMenuEvent(self, event):
-        menu = QMenu()
+        menu = _qtw.QMenu()
 
         a1 = menu.addAction("Launch NotePad++")
         a1.triggered.connect(self.launchNotepadFile)
@@ -363,7 +355,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
     def deleteBlock(self):
         self.editor.trnsysObj.remove(self)
         self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
+        widgetToRemove = self.editor.findChild(_qtw.QTreeView, self.displayName + "Tree")
         if widgetToRemove:
             widgetToRemove.hide()
 
@@ -429,7 +421,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         if self.flippedV:
             self.updateFlipStateV(self.flippedV)
 
-    def _getPixmap(self) -> QPixmap:
+    def _getPixmap(self) -> _qtg.QPixmap:
         imageAccessor = self._getImageAccessor()  # pylint: disable = assignment-from-no-return
 
         assert imageAccessor
@@ -437,7 +429,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         image = imageAccessor.image(width=self.w, height=self.h).mirrored(
             horizontal=self.flippedH, vertical=self.flippedV
         )
-        pixmap = QPixmap(image)
+        pixmap = _qtg.QPixmap(image)
 
         return pixmap
 
@@ -458,7 +450,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                 snapSize = self.editor.snapSize
                 self.logger.debug("itemchange")
                 self.logger.debug(type(value))
-                value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
+                value = _qtc.QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
                 return value
             if self.editor.alignMode:
                 if self.hasElementsInYBand():
@@ -470,47 +462,47 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         for t in self.editor.trnsysObj:
             if isinstance(t, BlockItem) and t is not self:
                 if self.elementInYBand(t):
-                    value = QPointF(self.pos().x(), t.pos().y())
+                    value = _qtc.QPointF(self.pos().x(), t.pos().y())
                     self.editor.alignYLineItem.setLine(
                         self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
                     )
 
                     self.editor.alignYLineItem.setVisible(True)
 
-                    qtm = QTimer(self.editor)
+                    qtm = _qtc.QTimer(self.editor)
                     qtm.timeout.connect(self.timerfunc)
                     qtm.setSingleShot(True)
                     qtm.start(1000)
 
-                    e = QMouseEvent(
-                        QEvent.MouseButtonRelease,
+                    e = _qtg.QMouseEvent(
+                        _qtc.QEvent.MouseButtonRelease,
                         self.pos(),
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoModifier,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoModifier,
                     )
                     self.editor.diagramView.mouseReleaseEvent(e)
                     self.editor.alignMode = False
 
                 if self.elementInXBand(t):
-                    value = QPointF(t.pos().x(), self.pos().y())
+                    value = _qtc.QPointF(t.pos().x(), self.pos().y())
                     self.editor.alignXLineItem.setLine(
                         t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
                     )
 
                     self.editor.alignXLineItem.setVisible(True)
 
-                    qtm = QTimer(self.editor)
+                    qtm = _qtc.QTimer(self.editor)
                     qtm.timeout.connect(self.timerfunc2)
                     qtm.setSingleShot(True)
                     qtm.start(1000)
 
-                    e = QMouseEvent(
-                        QEvent.MouseButtonRelease,
+                    e = _qtg.QMouseEvent(
+                        _qtc.QEvent.MouseButtonRelease,
                         self.pos(),
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoModifier,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoModifier,
                     )
                     self.editor.diagramView.mouseReleaseEvent(e)
                     self.editor.alignMode = False

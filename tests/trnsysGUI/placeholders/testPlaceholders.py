@@ -1,9 +1,8 @@
 import logging as _log
 import pathlib as _pl
 
-import trnsysGUI.BlockItem as _bi
+import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.diagram.Editor as _de
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 import trnsysGUI.menus.projectMenu.placeholders as _ph
 
@@ -37,9 +36,7 @@ class TestPlaceholders:
         editor = self._createEditor(actualDirPath)
         qtbot.addWidget(editor)
 
-        blockItems = [
-            o for o in editor.trnsysObj if isinstance(o, _ip.HasInternalPiping) and isinstance(o, _bi.BlockItem)
-        ]
+        blockItems = [o for o in editor.trnsysObj if isinstance(o, _biip.BlockItemHasInternalPiping)]
 
         ddckDirNames = [b.getDisplayName() for b in blockItems]
         ddckDirNames.remove("HP")

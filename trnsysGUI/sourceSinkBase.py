@@ -1,14 +1,14 @@
 import pathlib as _pl
 import typing as _tp
 
-import trnsysGUI.BlockItem as _bi
+import trnsysGUI.svgBlockItem as _svgbi
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
+class SourceSinkBase(_svgbi.SvgBlockItem):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -33,7 +33,7 @@ class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
         ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
         self.path = str(ddckFilePath)
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     def changeSize(self):
