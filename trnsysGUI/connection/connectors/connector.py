@@ -45,7 +45,7 @@ class Connector(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable=too-ma
         )
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        return _img.CONNECTOR_PNG
+        return _img.CONNECTOR_SVG
 
     def _setModels(self) -> None:
         fromPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
