@@ -1,11 +1,11 @@
 # pylint: disable = invalid-name
 
-import trnsysGUI.BlockItem as _bi
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.svgBlockItem as _svgbi
 
 
-class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
+class BlockItemFourPorts(_svgbi.SvgBlockItem):  # pylint: disable = too-many-instance-attributes
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 

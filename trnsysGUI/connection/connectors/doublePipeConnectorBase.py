@@ -5,15 +5,14 @@ import uuid as _uuid
 import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
-
-import trnsysGUI.serialization as _gser
-import trnsysGUI.BlockItem as _bi
+import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.serialization as _gser
+import trnsysGUI.svgBlockItem as _svgbi
 
 
-class DoublePipeConnectorBase(_bi.BlockItem, _ip.HasInternalPiping):
+class DoublePipeConnectorBase(_svgbi.SvgBlockItem):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 

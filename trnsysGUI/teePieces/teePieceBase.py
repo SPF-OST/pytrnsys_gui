@@ -1,12 +1,12 @@
 import typing as _tp
 
-import trnsysGUI.BlockItem as _bi
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.internalPiping as _ip
+import trnsysGUI.svgBlockItem as _svgbi
 import trnsysGUI.teePieces.teePieceBaseModel as _tpbm
 
 
-class TeePieceBase(_bi.BlockItem, _ip.HasInternalPiping):
+class TeePieceBase(_svgbi.SvgBlockItem):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 

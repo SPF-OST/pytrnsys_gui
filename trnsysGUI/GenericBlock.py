@@ -6,18 +6,20 @@ import pathlib as _pl
 import shutil
 import typing as _tp
 
-from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeView
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import QTreeView
 
+import trnsysGUI.MyQFileSystemModel as _fsm
+import trnsysGUI.MyQTreeView as _tv
+import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class GenericBlock(BlockItem, _ip.HasInternalPiping):
+class GenericBlock(_biip.BlockItemHasInternalPiping):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -275,10 +277,10 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
 
-        self.model = MyQFileSystemModel()
+        self.model = _fsm.MyQFileSystemModel()
         self.model.setRootPath(self.path)
         self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
+        self.tree = _tv.MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)

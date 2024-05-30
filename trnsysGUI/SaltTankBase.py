@@ -11,12 +11,12 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
+import trnsysGUI.svgBlockItem as _svgbi
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class SaltTankBase(BlockItem, _ip.HasInternalPiping):
+class SaltTankBase(_svgbi.SvgBlockItem):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
