@@ -24,7 +24,7 @@ class IceStorageTwoHx(BlockItemFourPorts):
         self.addTree()
         self.changeSize()
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.ICE_STORAGE_TWO_HX_SVG
 
     def changeSize(self):

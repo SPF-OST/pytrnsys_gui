@@ -37,7 +37,7 @@ class AirSourceHP(_svgbi.SvgBlockItem):
 
         return _ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.AIR_SOURCE_HP_SVG
 
     def changeSize(self):

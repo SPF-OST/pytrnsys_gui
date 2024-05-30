@@ -16,7 +16,7 @@ class TapMains(_tb.TapBase):
     def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.TAP_MAINS_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:

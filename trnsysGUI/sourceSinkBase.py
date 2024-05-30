@@ -33,7 +33,7 @@ class SourceSinkBase(_svgbi.SvgBlockItem):
         ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
         self.path = str(ddckFilePath)
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     def changeSize(self):

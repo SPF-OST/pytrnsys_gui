@@ -88,7 +88,7 @@ class StorageTank(_svgbi.SvgBlockItem):
     def _getDirectPortPairPortItems(self, side: _sd.Side):
         return [p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]]
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.STORAGE_TANK_SVG
 
     # Setter functions

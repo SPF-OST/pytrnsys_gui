@@ -29,7 +29,7 @@ class DoubleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
     def _setModels(self) -> None:
         self._coldPipe, self._hotPipe = _cmnp.createMassFlowSolverNetworkPipes()
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG
 
     def changeSize(self):

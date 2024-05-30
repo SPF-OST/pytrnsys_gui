@@ -8,5 +8,5 @@ class Geotherm(SourceSinkBase):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.GEOTHERM_SVG

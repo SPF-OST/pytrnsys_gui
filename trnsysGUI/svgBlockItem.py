@@ -9,10 +9,16 @@ import trnsysGUI.imageAccessor as _ia
 
 class SvgBlockItem(_bip.BlockItemHasInternalPiping):
     @_tp.override
-    def _getImageAccessor(self) -> _tp.Optional[_ia.SvgImageAccessor]:
+    def _getImageAccessor(self) -> _ia.SvgImageAccessor:
         raise NotImplementedError()
 
-    def paint(self, painter: _qtg.QPainter, option: _qtw.QStyleOptionGraphicsItem, widget: _qtw.QWidget) -> None:
+    @_tp.override
+    def paint(
+        self,
+        painter: _qtg.QPainter,
+        option: _qtw.QStyleOptionGraphicsItem,  # pylint: disable=unused-argument
+        widget: _qtw.QWidget | None = None,  # pylint: disable=unused-argument
+    ) -> None:
         imageAccessor = self._getImageAccessor()
         renderer = imageAccessor.createRenderer()
 

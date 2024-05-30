@@ -5,5 +5,5 @@ from trnsysGUI.sourceSinkBase import SourceSinkBase
 
 
 class Water(SourceSinkBase):
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.WATER_SVG

@@ -51,7 +51,7 @@ class TVentil(_svgbi.SvgBlockItem):  # pylint: disable = too-many-instance-attri
     def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.SvgImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.T_VENTIL_SVG
 
     def changeSize(self):

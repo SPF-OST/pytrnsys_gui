@@ -34,7 +34,7 @@ class SaltTankBase(_svgbi.SvgBlockItem):
         return self.displayName
 
     @_abc.abstractmethod
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     def getInternalPiping(self) -> _ip.InternalPiping:

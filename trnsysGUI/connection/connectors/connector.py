@@ -44,7 +44,7 @@ class Connector(_svgbi.SvgBlockItem):  # pylint: disable=too-many-instance-attri
             [self._modelPipe], {self._modelPipe.fromPort: self.inputs[0], self._modelPipe.toPort: self.outputs[0]}
         )
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.CONNECTOR_SVG
 
     def _setModels(self) -> None:

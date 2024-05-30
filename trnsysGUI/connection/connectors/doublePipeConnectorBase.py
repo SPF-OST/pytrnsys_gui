@@ -36,7 +36,7 @@ class DoublePipeConnectorBase(_svgbi.SvgBlockItem):
     def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         raise NotImplementedError()
 
     def rotateBlockCW(self):

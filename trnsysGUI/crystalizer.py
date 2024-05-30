@@ -22,7 +22,7 @@ class Crystalizer(_svgbi.SvgBlockItem):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _img.SvgImageAccessor:
         return _img.CRYSTALIZER_SVG
 
     def changeSize(self):
