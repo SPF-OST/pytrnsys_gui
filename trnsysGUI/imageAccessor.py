@@ -125,7 +125,7 @@ class ImageAccessorBase(_abc.ABC):
 
 class PngImageAccessor(ImageAccessorBase):
     def __init__(self, dataLoader: _DataLoaderBase) -> None:
-        if not dataLoader.getExtension() == "png":
+        if dataLoader.getExtension() != "png":
             raise ValueError("Can only be used for PNGs.")
 
         super().__init__(dataLoader)
@@ -142,7 +142,7 @@ class PngImageAccessor(ImageAccessorBase):
 
 class SvgImageAccessor(ImageAccessorBase):
     def __init__(self, dataLoader: _DataLoaderBase) -> None:
-        if not dataLoader.getExtension() == "svg":
+        if dataLoader.getExtension() != "svg":
             raise ValueError("Can only be used for SVGs.")
 
         super().__init__(dataLoader)
