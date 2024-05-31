@@ -59,7 +59,7 @@ class GraphicalItem(QGraphicsPixmapItem):
             print("No image picked, name is " + fileName)
 
     def setImageSource(self, s: str):
-        self._imageAccessor = _ia.ImageAccessor.createForFile(_pl.Path(s))
+        self._imageAccessor = _ia.createForFile(_pl.Path(s))
 
     def updateImage(self):
         pixmap = self._imageAccessor.pixmap(width=self.w, height=self.h)
@@ -82,7 +82,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         return dictName, dct
 
     def decode(self, i, resBlockList):
-        self._imageAccessor = _ia.ImageAccessor.createFromResourcePath(i["ImageSource"])
+        self._imageAccessor = _ia.createFromResourcePath(i["ImageSource"])
 
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
         self.id = i["ID"]

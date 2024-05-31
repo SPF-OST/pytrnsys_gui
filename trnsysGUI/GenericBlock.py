@@ -14,6 +14,7 @@ import trnsysGUI.MyQFileSystemModel as _fsm
 import trnsysGUI.MyQTreeView as _tv
 import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.imageAccessor as _ia
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
@@ -42,7 +43,7 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_ia.ImageAccessorBase]:
         return _img.GENERIC_BLOCK_PNG
 
     def changeSize(self):
@@ -97,7 +98,7 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
             self.logger.debug("No image picked, name is " + name)
 
     def setImageSource(self, name):
-        self._imageAccessor = _img.ImageAccessor.createForFile(_pl.Path(name))
+        self._imageAccessor = _ia.createForFile(_pl.Path(name))
 
     def pickImage(self):
         return _pl.Path(QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
@@ -149,7 +150,7 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
         numberOfPortPairsBySide = i["PortPairsNb"]
         self._addPortPairs(numberOfPortPairsBySide)
 
-        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
+        self._imageAccessor = _ia.createFromResourcePath(i["Imagesource"])
         self.setImage()
 
         super().decode(i, resBlockList)

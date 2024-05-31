@@ -5,7 +5,7 @@ import typing as _tp
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
-import PyQt5.QtWidgets as _qtw
+from PyQt5 import QtWidgets as _qtw
 
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.blockItemModel as _bim
@@ -49,8 +49,6 @@ class BlockItem(_qtw.QGraphicsPixmapItem):  # pylint: disable = too-many-public-
         self.flippedV = False
         self.flippedH = False
         self.rotationN = 0
-        self.flippedHInt = -1
-        self.flippedVInt = -1
 
         pixmap = self._getPixmap()
         self.setPixmap(pixmap)
@@ -183,8 +181,6 @@ class BlockItem(_qtw.QGraphicsPixmapItem):  # pylint: disable = too-many-public-
         pixmap = self._getPixmap()
         self.setPixmap(pixmap)
 
-        self.flippedHInt = 1 if self.flippedH else -1
-
         if self.flippedH:
             for i, inputPort in enumerate(self.inputs):
                 distanceToMirrorAxis = self.w / 2.0 - self.origInputsPos[i][0]  # pylint:disable=unsubscriptable-object
@@ -217,8 +213,6 @@ class BlockItem(_qtw.QGraphicsPixmapItem):  # pylint: disable = too-many-public-
         pixmap = self._getPixmap()
         self.setPixmap(pixmap)
 
-        self.flippedVInt = 1 if self.flippedV else -1
-
         if self.flippedV:
             for i, inputPort in enumerate(self.inputs):
                 distanceToMirrorAxis = self.h / 2.0 - self.origInputsPos[i][1]  # pylint:disable=unsubscriptable-object
@@ -246,108 +240,68 @@ class BlockItem(_qtw.QGraphicsPixmapItem):  # pylint: disable = too-many-public-
                 )  # pylint: disable = unsubscriptable-object
 
     def updateSidesFlippedH(self):
-        if self.rotationN % 2 == 0:
-            for p in self.inputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-        if self.rotationN % 2 == 1:
-            for p in self.inputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
+        affectedSides = [0, 2] if self.rotationN % 2 == 0 else [1, 3]
+
+        nQuarterTurnsNeeded = 2
+        self._updatePortSides(nQuarterTurnsNeeded, affectedSides)
 
     def updateSidesFlippedV(self):
-        if self.rotationN % 2 == 1:
-            for p in self.inputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-        if self.rotationN % 2 == 0:
-            for p in self.inputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
+        affectedSides = [0, 2] if self.rotationN % 2 == 1 else [1, 3]
 
-    def updateSide(self, port, n):
+        nQuarterTurnsNeeded = 2
+        self._updatePortSides(nQuarterTurnsNeeded, affectedSides)
+
+    @staticmethod
+    def updateSide(port, n):
         port.side = (port.side + n) % 4
 
     def rotateBlockCW(self):
-        # Rotate block clockwise
-        # self.setTransformOriginPoint(50, 50)
-        # self.setTransformOriginPoint(self.w/2, self.h/2)
-        self.setTransformOriginPoint(0, 0)
-        self.setRotation((self.rotationN + 1) * 90)
-        self.label.setRotation(-(self.rotationN + 1) * 90)
-        self.rotationN += 1
-        self.logger.debug("rotated by " + str(self.rotationN))
-
-        for p in self.inputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, 1)
-
-        for p in self.outputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, 1)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
-    def rotateBlockToN(self, n):
-        if n > 0:
-            while self.rotationN != n:
-                self.rotateBlockCW()
-        if n < 0:
-            while self.rotationN != n:
-                self.rotateBlockCCW()
+        self.rotateBlockToN(1)
 
     def rotateBlockCCW(self):
-        # Rotate block clockwise
-        # self.setTransformOriginPoint(50, 50)
-        self.setTransformOriginPoint(0, 0)
-        self.setRotation((self.rotationN - 1) * 90)
-        self.label.setRotation(-(self.rotationN - 1) * 90)
-        self.rotationN -= 1
-        self.logger.debug("rotated by " + str(self.rotationN))
+        self.rotateBlockToN(-1)
 
-        for p in self.inputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -1)
-
-        for p in self.outputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -1)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
+    def rotateBlockToN(self, n: int) -> None:
+        nQuarterTurns = self.rotationN + n
+        self._rotateBlock(nQuarterTurns)
 
     def resetRotation(self):
-        self.logger.debug("Resetting rotation...")
-        self.setRotation(0)
-        self.label.setRotation(0)
+        self._rotateBlock(0)
 
-        for p in self.inputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -self.rotationN)
-            # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
+    def _rotateBlock(self, nQuarterTurns: int) -> None:
+        nQuarterTurnsNeeded = nQuarterTurns - self.rotationN
 
-        for p in self.outputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -self.rotationN)
-            # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
+        self.rotationN = nQuarterTurns
 
-        self.rotationN = 0
+        self.setRotation(self.rotationN * 90)
+        self.label.setRotation(-self.rotationN * 90)
+
+        self._updatePortSides(nQuarterTurnsNeeded)
 
         pixmap = self._getPixmap()
         self.setPixmap(pixmap)
+
+    def _updatePortSides(
+        self, nQuarterTurnsNeeded: int, affectedSides: _tp.Sequence[_tp.Literal[0, 1, 2, 3]] | None = None
+    ) -> None:
+        if affectedSides is None:
+            affectedSides = [0, 1, 2, 3]
+
+        self._updatePortSidesForPorts(self.inputs, nQuarterTurnsNeeded, affectedSides)
+        self._updatePortSidesForPorts(self.outputs, nQuarterTurnsNeeded, affectedSides)
+
+    def _updatePortSidesForPorts(
+        self,
+        ports: _tp.Sequence[_pib.PortItemBase],
+        nQuarterTurnsNeeded: int,
+        affectedSides: _tp.Sequence[_tp.Literal[0, 1, 2, 3]],
+    ) -> None:
+        for port in ports:
+            if port.side not in affectedSides:
+                continue
+
+            port.itemChange(_qtw.QGraphicsItem.ItemScenePositionHasChanged, port.scenePos())
+            self.updateSide(port, nQuarterTurnsNeeded)
 
     def printRotation(self):
         self.logger.debug("Rotation is " + str(self.rotationN))
