@@ -1,30 +1,23 @@
-# pylint: skip-file
-# type: ignore
-
-from PyQt5.QtWidgets import QUndoCommand
+import PyQt5.QtCore as _qtc
+import PyQt5.QtWidgets as _qtw
 
 
-class MoveCommand(QUndoCommand):
-    def __init__(self, diagramItem, oldPos, descr):
-        super(MoveCommand, self).__init__(descr)
-        self.oldPos = oldPos
-        self.newPos = diagramItem.scenePos()
-        self.item = diagramItem
+class MoveCommand(_qtw.QUndoCommand):
+    def __init__(
+        self, graphicsItem: _qtw.QGraphicsItem, *, oldScenePos: _qtc.QPointF, newScenePos: _qtc.QPointF, descr: str
+    ) -> None:
+        super().__init__(descr)
+        self._oldScenePos = oldScenePos
+        self._newScenePos = newScenePos
+        self._item = graphicsItem
 
-    def redo(self):
-        self.item.setPos(self.newPos)
+    def redo(self) -> None:
+        self._setScenePos(self._newScenePos)
 
-    def undo(self):
-        self.item.setPos(self.oldPos)
+    def undo(self) -> None:
+        self._setScenePos(self._oldScenePos)
 
-    # mergeWith does not get execute, as opposed to the Qt reference
-    # def mergeWith(self, mc):
-    #     print("in mergeWith")
-    #     item = mc.item
-    #
-    #     if self.item != item:
-    #         return False
-    #
-    #     self.newPos = item.scenePos()
-    #
-    #     return True
+    def _setScenePos(self, scenePos: _qtc.QPointF) -> None:
+        offset = self._item.scenePos() - self._item.pos()
+        newPos = scenePos - offset
+        self._item.setPos(newPos)

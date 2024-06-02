@@ -14,7 +14,6 @@ class BlockDlg(_ndialog.ChangeNameDialogBase):  # pylint: disable=too-many-insta
         self._blockItem = blockItem
         self._renameHelper = renameHelper
 
-        self.setWindowIcon(_qtg.QIcon(blockItem.pixmap()))
         self.okButton = _qtw.QPushButton("OK")
         self.cancelButton = _qtw.QPushButton("Cancel")
 

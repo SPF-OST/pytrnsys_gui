@@ -21,9 +21,9 @@ class ChangeNameDialogBase(_qtw.QDialog):
         newName = self._displayNameLineEdit.text()
         oldName = self._blockItem.displayName
 
-        assert isinstance(self._blockItem, _ip.HasInternalPiping)
-
-        checkDdckFolder = self._blockItem.hasDdckPlaceHolders()
+        checkDdckFolder = (
+            self._blockItem.hasDdckPlaceHolders() if isinstance(self._blockItem, _ip.HasInternalPiping) else False
+        )
         result = self._renameHelper.canRename(oldName, newName, checkDdckFolder)
 
         if _res.isError(result):

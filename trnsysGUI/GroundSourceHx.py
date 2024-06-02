@@ -10,12 +10,13 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.svgBlockItem as _svgbi
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
 from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class GroundSourceHx(_svgbi.SvgBlockItem):
+class GroundSourceHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 

@@ -1,7 +1,6 @@
 # pylint: skip-file
 # type: ignore
 
-from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QLabel
@@ -17,7 +16,6 @@ class DoublePipeBlockDlg(_ndialog.ChangeNameDialogBase):
         super().__init__(blockItem, renameHelper)
 
         self._blockItem = blockItem
-        self.setWindowIcon(QIcon(blockItem.pixmap()))
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 

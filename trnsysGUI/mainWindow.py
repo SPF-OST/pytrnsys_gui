@@ -6,19 +6,21 @@ import pathlib as _pl
 import shutil
 import subprocess
 
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI.loggingCallback as _lgcb
-from trnsysGUI import (
-    project as _prj,
-    images as _img,
-    warningsAndErrors as _werrors,
-    buildDck as buildDck,
-    settings as _settings,
-    settingsDlg as _sdlg,
-)
+import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
+from trnsysGUI import buildDck as buildDck
+from trnsysGUI import images as _img
+from trnsysGUI import project as _prj
+from trnsysGUI import settings as _settings
+from trnsysGUI import settingsDlg as _sdlg
+from trnsysGUI import warningsAndErrors as _werrors
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
@@ -27,7 +29,6 @@ from trnsysGUI.common import cancelled as _ccl
 from trnsysGUI.configFile import configFile
 from trnsysGUI.diagram import Editor as _de
 from trnsysGUI.storageTank.widget import StorageTank
-import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 
 
 class MainWindow(_qtw.QMainWindow):
@@ -529,14 +530,27 @@ class MainWindow(_qtw.QMainWindow):
     def movePorts(self):
         self.editor.moveDirectPorts = True
 
-    def mouseMoveEvent(self, e):
-        pass
-
     def openPytrnsysOnlineDoc(self):
         os.system('start "" https://pytrnsys.readthedocs.io')
 
     def exportPDF(self):
-        self.editor.printPDF()
+        fileName, _ = _qtw.QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
+        if fileName == "":
+            return
+
+        if _qtc.QFileInfo(fileName).suffix() == "":
+            fileName += ".pdf"
+
+        printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
+        printer.setOrientation(_qtp.QPrinter.Landscape)
+        printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
+        printer.setOutputFileName(fileName)
+
+        painter = _qtg.QPainter(printer)
+        self.editor.diagramScene.render(painter)
+        painter.end()
+
+        self.logger.info("File exported to %s." % fileName)
 
     def closeEvent(self, e):
         qmb = _qtw.QMessageBox()

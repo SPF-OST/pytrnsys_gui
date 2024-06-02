@@ -1,22 +1,23 @@
 # pylint: skip-file
 
-import os
-import shutil
+import os as _os
+import shutil as _sh
 import typing as _tp
 
+import PyQt5.QtWidgets as _qtw
 
-from PyQt5.QtWidgets import QTreeView
-
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
+import trnsysGUI.BlockItem as _bi
+import trnsysGUI.MyQFileSystemModel as _fsm
+import trnsysGUI.MyQTreeView as _tv
+import trnsysGUI.blockItemGraphicItemMixins as _bimx
 import trnsysGUI.images as _img
 
 
-class PV(BlockItem):
+class PV(_bi.BlockItem, _bimx.PngBlockItemMixin):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
-        super().__init__(trnsysType, editor, displayName)
-        factor = 0.97
+        _bi.BlockItem.__init__(self, trnsysType, editor, displayName)
+        _bimx.PngBlockItemMixin.__init__(self)
+
         self.w = 100
         self.h = 100
         self.loadedFiles: list[str] = []
@@ -51,15 +52,15 @@ class PV(BlockItem):
         self.logger.debug(self.editor)
         pathName = self.displayName
         self.path = self.editor.projectFolder
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = _os.path.join(self.path, "ddck")
+        self.path = _os.path.join(self.path, pathName)
+        if not _os.path.exists(self.path):
+            _os.makedirs(self.path)
 
-        self.model = MyQFileSystemModel()
+        self.model = _fsm.MyQFileSystemModel()
         self.model.setRootPath(self.path)
         self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
+        self.tree = _tv.MyQTreeView(self.model, self)
         self.tree.setModel(self.model)
         self.tree.setRootIndex(self.model.index(self.path))
         self.tree.setObjectName("%sTree" % self.displayName)
@@ -77,8 +78,8 @@ class PV(BlockItem):
         self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
         self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        shutil.rmtree(self.path)
+        widgetToRemove = self.editor.findChild(_qtw.QTreeView, self.displayName + "Tree")
+        _sh.rmtree(self.path)
         self.deleteLoadedFile()
         try:
             widgetToRemove.hide()
@@ -96,9 +97,9 @@ class PV(BlockItem):
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
+        self.logger.debug(_os.path.dirname(self.path))
+        destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
+        if _os.path.exists(self.path):
+            _os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)

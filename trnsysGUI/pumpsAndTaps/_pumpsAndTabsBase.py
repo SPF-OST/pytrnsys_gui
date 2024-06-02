@@ -5,7 +5,8 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.common.cancelled as _cancel
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.names.rename as _rename
-import trnsysGUI.svgBlockItem as _svgbi
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 from trnsysGUI import common as _com
 from trnsysGUI import internalPiping as _ip
 from trnsysGUI.pumpsAndTaps import _defaults
@@ -13,7 +14,7 @@ from trnsysGUI.pumpsAndTaps import _dialog
 from trnsysGUI.pumpsAndTaps import _serialization as _ser
 
 
-class PumpsAndTabsBase(_svgbi.SvgBlockItem):
+class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 

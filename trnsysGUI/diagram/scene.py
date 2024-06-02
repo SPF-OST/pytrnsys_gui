@@ -1,5 +1,6 @@
 import PyQt5.QtWidgets as _qtw
-from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
@@ -96,10 +97,8 @@ class Scene(_qtw.QGraphicsScene):
             for item in self._previouslyHitItems:
                 if isinstance(item, (GraphicalItem, BlockItem)) and hasattr(item, "resizer"):
                     self.removeItem(item.resizer)
-                    item.deleteResizer()
                 if isinstance(item, ResizerItem):
                     self.removeItem(item)
-                    item.parent.deleteResizer()
 
             self._previouslyHitItems.clear()
 

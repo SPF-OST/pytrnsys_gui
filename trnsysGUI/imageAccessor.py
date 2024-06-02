@@ -59,7 +59,10 @@ class _PackageResourceDataLoader(_DataLoaderBase):
     def getExtension(self) -> _tp.Optional[str]:
         parts = self._resourcePath.split(".")
 
-        extension = parts[-1] if parts else None
+        if not parts:
+            return None
+
+        extension = f".{parts[-1]}"
 
         return extension
 
@@ -125,7 +128,7 @@ class ImageAccessorBase(_abc.ABC):
 
 class PngImageAccessor(ImageAccessorBase):
     def __init__(self, dataLoader: _DataLoaderBase) -> None:
-        if dataLoader.getExtension() != "png":
+        if dataLoader.getExtension() != ".png":
             raise ValueError("Can only be used for PNGs.")
 
         super().__init__(dataLoader)
@@ -142,7 +145,7 @@ class PngImageAccessor(ImageAccessorBase):
 
 class SvgImageAccessor(ImageAccessorBase):
     def __init__(self, dataLoader: _DataLoaderBase) -> None:
-        if dataLoader.getExtension() != "svg":
+        if dataLoader.getExtension() != ".svg":
             raise ValueError("Can only be used for SVGs.")
 
         super().__init__(dataLoader)
@@ -195,9 +198,9 @@ def createFromResourcePath(resourcePath: str, logger: _log.Logger = _logger) -> 
 def _createFromDataLoader(dataLoader: _DataLoaderBase) -> ImageAccessorBase:
     extension = dataLoader.getExtension()
     match extension:
-        case "png":
+        case ".png":
             return PngImageAccessor(dataLoader)
-        case "svg":
+        case ".svg":
             return SvgImageAccessor(dataLoader)
         case _:
             raise ValueError("Unknown extension.", extension)

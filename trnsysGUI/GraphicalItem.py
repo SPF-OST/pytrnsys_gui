@@ -5,11 +5,12 @@ import pathlib as _pl
 
 from PyQt5 import QtCore
 from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QMenu, QFileDialog
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QGraphicsPixmapItem
+from PyQt5.QtWidgets import QMenu
 
 import trnsysGUI.imageAccessor as _ia
 import trnsysGUI.images as _img
-from trnsysGUI.ResizerItem import ResizerItem
 
 
 class GraphicalItem(QGraphicsPixmapItem):
@@ -100,16 +101,3 @@ class GraphicalItem(QGraphicsPixmapItem):
         self._editor.graphicalObj.remove(self)
         self._editor.diagramScene.removeItem(self)
         del self
-
-    def mousePressEvent(self, event):
-        try:
-            self.resizer
-        except AttributeError:
-            self.resizer = ResizerItem(self)
-            self.resizer.setPos(self.w, self.h)
-            self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
-        else:
-            return
-
-    def deleteResizer(self):
-        del self.resizer

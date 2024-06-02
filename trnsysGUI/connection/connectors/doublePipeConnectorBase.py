@@ -9,10 +9,11 @@ import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.serialization as _gser
-import trnsysGUI.svgBlockItem as _svgbi
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class DoublePipeConnectorBase(_svgbi.SvgBlockItem):
+class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 

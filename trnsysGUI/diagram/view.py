@@ -69,10 +69,6 @@ class View(_qtw.QGraphicsView):
 
         blockItem.oldPos = blockItem.scenePos()
 
-    def mouseMoveEvent(self, event):
-        super().mouseMoveEvent(event)
-        self._editor.mouseMoveEvent(event)
-
     def wheelEvent(self, event):
         super().wheelEvent(event)
         if int(event.modifiers()) == 0b100000000000000000000000000:
