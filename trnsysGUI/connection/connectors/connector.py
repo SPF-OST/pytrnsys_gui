@@ -47,7 +47,9 @@ class Connector(
             [self._modelPipe], {self._modelPipe.fromPort: self.inputs[0], self._modelPipe.toPort: self.outputs[0]}
         )
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.CONNECTOR_SVG
 
     def _setModels(self) -> None:

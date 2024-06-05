@@ -2,16 +2,18 @@ import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
 
-import trnsysGUI.common.cancelled as _cancel
-import trnsysGUI.massFlowSolver.names as _mnames
-import trnsysGUI.names.rename as _rename
 import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
-from trnsysGUI import common as _com
-from trnsysGUI import internalPiping as _ip
-from trnsysGUI.pumpsAndTaps import _defaults
-from trnsysGUI.pumpsAndTaps import _dialog
-from trnsysGUI.pumpsAndTaps import _serialization as _ser
+import trnsysGUI.common as _com
+import trnsysGUI.common.cancelled as _cancel
+import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.names as _mnames
+import trnsysGUI.names.rename as _rename
+
+from . import _defaults
+from . import _dialog
+from . import _serialization as _ser
 
 
 class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
@@ -24,6 +26,11 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         self.h = 40
 
         self._massFlowRateInKgPerH = _defaults.DEFAULT_MASS_FLOW_RATE
+
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        raise NotImplementedError()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()

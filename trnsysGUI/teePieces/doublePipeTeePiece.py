@@ -51,22 +51,10 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
         hotOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self._hotTeePiece = _mfn.TeePiece(hotInput, hotOutput1, hotOutput2, name="Hot")
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
-        rotationAngle = (self.rotationN % 4) * 90
-
-        if rotationAngle == 0:
-            return _img.DP_TEE_PIECE_SVG
-
-        if rotationAngle == 90:
-            return _img.DP_TEE_PIECE_ROTATED_90
-
-        if rotationAngle == 180:
-            return _img.DP_TEE_PIECE_ROTATED_180
-
-        if rotationAngle == 270:
-            return _img.DP_TEE_PIECE_ROTATED_270
-
-        raise AssertionError("Invalid rotation angle.")
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        return _img.DP_TEE_PIECE_SVG
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         baseModel = self._encodeTeePieceBaseModel()

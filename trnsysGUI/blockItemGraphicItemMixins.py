@@ -26,7 +26,12 @@ class BlockItemGraphicItemMixinBase:
 
 class SvgBlockItemGraphicItemMixin(BlockItemGraphicItemMixinBase):
     @classmethod
+    @_tp.override
     def _getImageAccessor(cls) -> _ia.SvgImageAccessor:
+        raise NotImplementedError()
+
+    @_tp.override
+    def boundingRect(self) -> _qtc.QRectF:
         raise NotImplementedError()
 
     @_tp.override
@@ -45,6 +50,15 @@ class PngBlockItemMixin(BlockItemGraphicItemMixinBase):
     def __init__(self):
         imageAccessor = self._getImageAccessor()
         self._image = imageAccessor.image()
+
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _ia.ImageAccessorBase:
+        raise NotImplementedError()
+
+    @_tp.override
+    def boundingRect(self) -> _qtc.QRectF:
+        raise NotImplementedError()
 
     @_tp.override
     def paint(

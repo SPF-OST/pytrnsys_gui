@@ -1,9 +1,11 @@
 # pylint: disable = invalid-name
+import typing as _tp
 
-import trnsysGUI.createSinglePipePortItem as _cspi
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
+import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 
 
 class BlockItemFourPorts(
@@ -26,6 +28,11 @@ class BlockItemFourPorts(
         self.childIds.append(self.editor.idGen.getTrnsysID())
 
         self.changeSize()
+
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        raise NotImplementedError()
 
     def getDisplayName(self) -> str:
         return self.displayName

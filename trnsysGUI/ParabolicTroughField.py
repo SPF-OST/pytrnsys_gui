@@ -39,7 +39,9 @@ class ParabolicTroughField(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGr
 
         return _ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.PT_FIELD_SVG
 
     def changeSize(self):

@@ -1,9 +1,10 @@
 import typing as _tp
 
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.internalPiping as _ip
 import trnsysGUI.blockItemGraphicItemMixins as _gimx
 import trnsysGUI.blockItemHasInternalPiping as _bip
+import trnsysGUI.images as _img
+import trnsysGUI.internalPiping as _ip
 import trnsysGUI.teePieces.teePieceBaseModel as _tpbm
 
 
@@ -20,6 +21,11 @@ class TeePieceBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
 
         self.outputs.append(outputPort1)
         self.outputs.append(outputPort2)
+
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        raise NotImplementedError()
 
     def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         raise NotImplementedError()

@@ -34,7 +34,9 @@ class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
         ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
         self.path = str(ddckFilePath)
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         raise NotImplementedError()
 
     def changeSize(self):

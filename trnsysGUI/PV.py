@@ -13,10 +13,10 @@ import trnsysGUI.blockItemGraphicItemMixins as _bimx
 import trnsysGUI.images as _img
 
 
-class PV(_bi.BlockItem, _bimx.PngBlockItemMixin):
+class PV(_bi.BlockItem, _bimx.SvgBlockItemGraphicItemMixin):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         _bi.BlockItem.__init__(self, trnsysType, editor, displayName)
-        _bimx.PngBlockItemMixin.__init__(self)
+        _bimx.SvgBlockItemGraphicItemMixin.__init__(self)
 
         self.w = 100
         self.h = 100
@@ -25,7 +25,9 @@ class PV(_bi.BlockItem, _bimx.PngBlockItemMixin):
         self.changeSize()
         self.addTree()
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.PV_SVG
 
     def changeSize(self):

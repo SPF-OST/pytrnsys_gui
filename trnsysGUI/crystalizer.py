@@ -23,7 +23,9 @@ class Crystalizer(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.CRYSTALIZER_SVG
 
     def changeSize(self):

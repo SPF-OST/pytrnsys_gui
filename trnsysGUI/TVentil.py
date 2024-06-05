@@ -54,7 +54,9 @@ class TVentil(
     def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.T_VENTIL_SVG
 
     def changeSize(self):

@@ -26,7 +26,11 @@ class ExternalHx(BlockItemFourPorts):
         self.changeSize()
         self.addTree()
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(
+        cls,
+    ) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ  # pylint: disable=arguments-differ
         return _img.EXTERNAL_HX_SVG
 
     def changeSize(self):

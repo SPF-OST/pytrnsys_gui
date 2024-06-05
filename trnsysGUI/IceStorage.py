@@ -31,7 +31,9 @@ class IceStorage(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemM
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.ICE_STORAGE_SVG
 
     def getInternalPiping(self) -> _ip.InternalPiping:

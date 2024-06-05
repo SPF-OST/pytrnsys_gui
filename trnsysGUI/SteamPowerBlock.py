@@ -40,7 +40,9 @@ class SteamPowerBlock(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphic
 
         return _ip.InternalPiping([pipe], {inputPort: self.inputs[0], outputPort: self.outputs[0]})
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.STEAM_POWER_BLOCK_SVG
 
     def changeSize(self):

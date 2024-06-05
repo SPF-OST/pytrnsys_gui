@@ -1,6 +1,6 @@
 # pylint: disable=invalid-name
 
-import os
+import os as _os
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
@@ -12,8 +12,7 @@ import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.idGenerator as _id
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
-from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
+import trnsysGUI.moveCommand as _mc
 
 FILEPATH = "res/Config.txt"
 
@@ -66,7 +65,8 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         self.origOutputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
         self.origInputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
 
-        self.isSelected = False
+        # TODO: The fact that we're assigning to a method is bad, but can't deal with it now
+        self.isSelected = False  # type: ignore[method-assign,assignment]
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if isinstance(self, BlockItem):
@@ -133,7 +133,7 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
     def launchNotepadFile(self):
         self.logger.debug("Launching notpad")
-        os.system("start notepad++ " + FILEPATH)
+        _os.system("start notepad++ " + FILEPATH)
 
     def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
         if hasattr(self, "isTempering"):
@@ -145,7 +145,7 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         else:
             self.editor.showBlockDlg(self)
 
-    def mousePressEvent(self, event):  # pylint: disable = unused-argument
+    def mousePressEvent(self, event):
         self.isSelected = True
         super().mousePressEvent(event)
 
@@ -159,7 +159,7 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         if oldPos is None or newPos == oldPos:
             return
 
-        command = MoveCommand(self, oldScenePos=oldPos, newScenePos=newPos, descr="Move BlockItem")
+        command = _mc.MoveCommand(self, oldScenePos=oldPos, newScenePos=newPos, descr="Move BlockItem")
         self.editor.parent().undoStack.push(command)
 
     # Transform related
@@ -240,7 +240,7 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         angle = self.rotationN * 90
         rotate = _qtg.QTransform().rotate(angle)
 
-        transform = scale * translate * rotate
+        transform = scale * translate * rotate  # type: ignore[operator]
 
         self.setTransform(transform)
 

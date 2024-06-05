@@ -14,7 +14,6 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
-import pytrnsys.utils.result as _res
 import trnsysGUI as _tgui
 import trnsysGUI.blockItems.names as _bnames
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
@@ -30,7 +29,6 @@ import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.names.undo as _nu
-import trnsysGUI.menus.projectMenu.placeholders as _ph
 import trnsysGUI.segments.segmentItemBase as _sib
 import trnsysGUI.storageTank.widget as _stwidget
 import trnsysGUI.warningsAndErrors as _werrs
@@ -812,9 +810,6 @@ Tcw=1
                 additionalFolders.append(folder)
 
         if len(additionalFolders) > 0:
-            warnBox = _qtw.QMessageBox()
-            warnBox.setWindowTitle("Additional ddck-folders")
-
             if len(additionalFolders) == 1:
                 message = "The following ddck folder does not have a corresponding component in the diagram:"
             else:

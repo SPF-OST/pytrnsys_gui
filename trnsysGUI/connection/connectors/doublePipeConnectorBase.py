@@ -37,7 +37,9 @@ class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockIte
     def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         raise NotImplementedError()
 
     def rotateBlockCW(self):

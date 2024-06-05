@@ -89,7 +89,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def _getDirectPortPairPortItems(self, side: _sd.Side):
         return [p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]]
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.STORAGE_TANK_SVG
 
     # Setter functions
