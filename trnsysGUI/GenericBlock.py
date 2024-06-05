@@ -1,27 +1,28 @@
 # pylint: skip-file
 # type: ignore
 
-import os
+import os as _os
 import pathlib as _pl
-import shutil
+import shutil as _sh
 import typing as _tp
 
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QMenu
-from PyQt5.QtWidgets import QTreeView
+import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.MyQFileSystemModel as _fsm
 import trnsysGUI.MyQTreeView as _tv
+import trnsysGUI.blockItemGraphicItemMixins as _bmx
 import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.imageAccessor as _ia
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class GenericBlock(_biip.BlockItemHasInternalPiping):
+class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.PngBlockItemMixin):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
-        super().__init__(trnsysType, editor, displayName)
+        _biip.BlockItemHasInternalPiping.__init__(self, trnsysType, editor, displayName)
+        _bmx.PngBlockItemMixin.__init__(self)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
@@ -42,7 +43,7 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_ia.ImageAccessorBase]:
         return _img.GENERIC_BLOCK_PNG
 
     def changeSize(self):
@@ -85,8 +86,7 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
         self.logger.debug(relH)
 
     def setImage(self):
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
+        self._image = self._imageAccessor.image()
 
     def changeImage(self):
         name = str(self.pickImage().resolve())
@@ -97,13 +97,13 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
             self.logger.debug("No image picked, name is " + name)
 
     def setImageSource(self, name):
-        self._imageAccessor = _img.ImageAccessor.createForFile(_pl.Path(name))
+        self._imageAccessor = _ia.createForFile(_pl.Path(name))
 
     def pickImage(self):
-        return _pl.Path(QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
+        return _pl.Path(_qtw.QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
 
     def contextMenuEvent(self, event):
-        menu = QMenu()
+        menu = _qtw.QMenu()
 
         a1 = menu.addAction("Launch NotePad++")
         a1.triggered.connect(self.launchNotepadFile)
@@ -149,7 +149,7 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
         numberOfPortPairsBySide = i["PortPairsNb"]
         self._addPortPairs(numberOfPortPairsBySide)
 
-        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
+        self._imageAccessor = _ia.createFromResourcePath(i["Imagesource"])
         self.setImage()
 
         super().decode(i, resBlockList)
@@ -225,18 +225,6 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
         self.inputs.remove(self.inputs[n])
         self.outputs.remove(self.outputs[n])
 
-    def updateFlipStateH(self, state):
-        self.flippedH = bool(state)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
-    def updateFlipStateV(self, state):
-        self.flippedV = bool(state)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
     def getInternalPiping(self) -> _ip.InternalPiping:
         assert len(self.inputs) == len(self.outputs)
 
@@ -272,10 +260,10 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
         pathName = self.displayName
         self.path = self.editor.projectFolder
 
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.path = _os.path.join(self.path, "ddck")
+        self.path = _os.path.join(self.path, pathName)
+        if not _os.path.exists(self.path):
+            _os.makedirs(self.path)
 
         self.model = _fsm.MyQFileSystemModel()
         self.model.setRootPath(self.path)
@@ -298,8 +286,8 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
         self.editor.trnsysObj.remove(self)
         self.logger.debug("deleting block " + str(self) + self.displayName)
         self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        shutil.rmtree(self.path)
+        widgetToRemove = self.editor.findChild(_qtw.QTreeView, self.displayName + "Tree")
+        _sh.rmtree(self.path)
         self.deleteLoadedFile()
         try:
             widgetToRemove.hide()
@@ -317,9 +305,9 @@ class GenericBlock(_biip.BlockItemHasInternalPiping):
         self.label.setPlainText(newName)
         self.model.setName(self.displayName)
         self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
+        self.logger.debug(_os.path.dirname(self.path))
+        destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
+        if _os.path.exists(self.path):
+            _os.rename(self.path, destPath)
             self.path = destPath
             self.logger.debug(self.path)

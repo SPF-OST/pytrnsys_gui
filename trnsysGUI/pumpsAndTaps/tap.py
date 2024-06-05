@@ -26,7 +26,9 @@ class Tap(_tapBase.TapBase):
     def hasDdckPlaceHolders(cls) -> bool:
         return True
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.TAP_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:

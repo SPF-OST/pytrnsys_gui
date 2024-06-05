@@ -22,7 +22,6 @@ class TVentilDlg(_ndialog.ChangeNameDialogBase):
 
         self._blockItem = ventil
         self.valvePosition = self._blockItem.positionForMassFlowSolver
-        self.setWindowIcon(QIcon(ventil.pixmap()))
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 

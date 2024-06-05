@@ -49,9 +49,6 @@ STEAM_POWER_BLOCK_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "imag
 STORAGE_TANK_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/StorageTank.svg")
 TEE_PIECE_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/TeePiece.svg")
 DP_TEE_PIECE_SVG = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/DPTeePiece.svg")
-DP_TEE_PIECE_ROTATED_90 = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/DPTeePieceRotated90.svg")
-DP_TEE_PIECE_ROTATED_180 = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/DPTeePieceRotated180.svg")
-DP_TEE_PIECE_ROTATED_270 = _ia.createForPackageResource(_ia.SvgImageAccessor, "images/DPTeePieceRotated270.svg")
 SINGLE_DOUBLE_PIPE_CONNECTOR_SVG = _ia.createForPackageResource(
     _ia.SvgImageAccessor, "images/SingleDoublePipeConnector.svg"
 )

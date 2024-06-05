@@ -38,7 +38,9 @@ class TeePiece(_tpb.TeePieceBase):
         output2PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT)
         self._modelTeePiece = _mfn.TeePiece(inputPortItem, output1PortItem, output2PortItem)
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.TEE_PIECE_SVG
 
     def getInternalPiping(self) -> _ip.InternalPiping:

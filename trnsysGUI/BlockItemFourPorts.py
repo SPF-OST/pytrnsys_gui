@@ -1,11 +1,16 @@
 # pylint: disable = invalid-name
+import typing as _tp
 
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-import trnsysGUI.svgBlockItem as _svgbi
 
 
-class BlockItemFourPorts(_svgbi.SvgBlockItem):  # pylint: disable = too-many-instance-attributes
+class BlockItemFourPorts(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):  # pylint: disable = too-many-instance-attributes
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -23,6 +28,11 @@ class BlockItemFourPorts(_svgbi.SvgBlockItem):  # pylint: disable = too-many-ins
         self.childIds.append(self.editor.idGen.getTrnsysID())
 
         self.changeSize()
+
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        raise NotImplementedError()
 
     def getDisplayName(self) -> str:
         return self.displayName

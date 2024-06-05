@@ -11,12 +11,15 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.svgBlockItem as _svgbi
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.valveModel as _vm
 
 
-class TVentil(_svgbi.SvgBlockItem):  # pylint: disable = too-many-instance-attributes
+class TVentil(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):  # pylint: disable = too-many-instance-attributes
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(trnsysType, editor, displayName)
 
@@ -51,7 +54,9 @@ class TVentil(_svgbi.SvgBlockItem):  # pylint: disable = too-many-instance-attri
     def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.T_VENTIL_SVG
 
     def changeSize(self):

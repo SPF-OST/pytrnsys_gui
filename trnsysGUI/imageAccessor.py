@@ -59,7 +59,10 @@ class _PackageResourceDataLoader(_DataLoaderBase):
     def getExtension(self) -> _tp.Optional[str]:
         parts = self._resourcePath.split(".")
 
-        extension = parts[-1] if parts else None
+        if not parts:
+            return None
+
+        extension = f".{parts[-1]}"
 
         return extension
 
@@ -125,7 +128,7 @@ class ImageAccessorBase(_abc.ABC):
 
 class PngImageAccessor(ImageAccessorBase):
     def __init__(self, dataLoader: _DataLoaderBase) -> None:
-        if dataLoader.getExtension() != "png":
+        if dataLoader.getExtension() != ".png":
             raise ValueError("Can only be used for PNGs.")
 
         super().__init__(dataLoader)
@@ -142,29 +145,34 @@ class PngImageAccessor(ImageAccessorBase):
 
 class SvgImageAccessor(ImageAccessorBase):
     def __init__(self, dataLoader: _DataLoaderBase) -> None:
-        if dataLoader.getExtension() != "svg":
+        if dataLoader.getExtension() != ".svg":
             raise ValueError("Can only be used for SVGs.")
 
         super().__init__(dataLoader)
 
-    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
-        svgRenderer = self.createRenderer()
+        self._renderer: _qsvg.QSvgRenderer | None = None
 
-        defaultSize = svgRenderer.defaultSize()
+    def image(self, *, width: _tp.Optional[int] = None, height: _tp.Optional[int] = None) -> _qtg.QImage:
+        defaultSize = self.renderer.defaultSize()
         size = self._getSize(defaultSize, width=width, height=height)
 
         image = _qtg.QImage(size, _qtg.QImage.Format_ARGB32_Premultiplied)
         image.fill(_qtc.Qt.transparent)
 
         painter = _qtg.QPainter(image)
-        svgRenderer.render(painter)
+        self.renderer.render(painter)
 
         return image
 
-    def createRenderer(self) -> _qsvg.QSvgRenderer:
+    @property
+    def renderer(self) -> _qsvg.QSvgRenderer:
+        if self._renderer:
+            return self._renderer
+
         imageBytes = self._loadBytes()
-        svgRenderer = _qsvg.QSvgRenderer(imageBytes)
-        return svgRenderer
+        self._renderer = _qsvg.QSvgRenderer(imageBytes)
+
+        return self._renderer
 
 
 _T_co = _tp.TypeVar("_T_co", covariant=True, bound=ImageAccessorBase)
@@ -175,14 +183,27 @@ def createForPackageResource(clazz: _tp.Type[_T_co], resourcePath: str, logger: 
     return clazz(dataLoader)
 
 
-def createForFile(clazz: _tp.Type[_T_co], filePath: _pl.Path, logger: _log.Logger = _logger) -> _T_co:
+def createForFile(filePath: _pl.Path, logger: _log.Logger = _logger) -> ImageAccessorBase:
     dataLoader = _FileDataLoader(filePath, logger)
-    return clazz(dataLoader)
+    imageAccessor = _createFromDataLoader(dataLoader)
+    return imageAccessor
 
 
-def createFromResourcePath(clazz: _tp.Type[_T_co], resourcePath: str, logger: _log.Logger = _logger) -> _T_co:
+def createFromResourcePath(resourcePath: str, logger: _log.Logger = _logger) -> ImageAccessorBase:
     dataLoader = _createDataLoaderFromResourcePath(resourcePath, logger)
-    return clazz(dataLoader)
+    imageAccessor = _createFromDataLoader(dataLoader)
+    return imageAccessor
+
+
+def _createFromDataLoader(dataLoader: _DataLoaderBase) -> ImageAccessorBase:
+    extension = dataLoader.getExtension()
+    match extension:
+        case ".png":
+            return PngImageAccessor(dataLoader)
+        case ".svg":
+            return SvgImageAccessor(dataLoader)
+        case _:
+            raise ValueError("Unknown extension.", extension)
 
 
 def _createDataLoaderFromResourcePath(resourcePath: str, logger: _log.Logger) -> _DataLoaderBase:

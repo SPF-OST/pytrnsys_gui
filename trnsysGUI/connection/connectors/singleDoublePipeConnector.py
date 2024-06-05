@@ -34,7 +34,9 @@ class SingleDoublePipeConnector(_dpcb.DoublePipeConnectorBase):
         hotOutput = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self._hotPipe = _mfn.Pipe(hotInput, hotOutput, name="Hot")
 
-    def _getImageAccessor(self) -> _img.SvgImageAccessor:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG
 
     def changeSize(self):

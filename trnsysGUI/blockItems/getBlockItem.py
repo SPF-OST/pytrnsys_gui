@@ -119,13 +119,15 @@ def createBlockItem(
 
 def _addOrCreateAndAddDisplayName(
     displayName: str | None,
-    blockItemClass: type[_ip.HasInternalPiping],
+    blockItemClass: type[BlockItem],
     baseName: str,
     namesManager: _nm.NamesManager,
 ) -> str:
     if not displayName:
         createNamingHelper = _cname.CreateNamingHelper(namesManager)
-        checkDdckFolder = blockItemClass.hasDdckPlaceHolders()
+        checkDdckFolder = (
+            blockItemClass.hasDdckPlaceHolders() if issubclass(blockItemClass, _ip.HasInternalPiping) else False
+        )
         displayName = createNamingHelper.generateName(baseName, checkDdckFolder, firstGeneratedNameHasNumber=False)
 
     namesManager.addName(displayName)
