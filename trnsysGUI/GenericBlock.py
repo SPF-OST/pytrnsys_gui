@@ -19,10 +19,10 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.PngBlockItemMixin):
+class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMixin):
     def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         _biip.BlockItemHasInternalPiping.__init__(self, trnsysType, editor, displayName)
-        _bmx.PngBlockItemMixin.__init__(self)
+        _bmx.RasterImageBlockItemMixin.__init__(self)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))

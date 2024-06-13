@@ -15,7 +15,6 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import trnsysGUI as _tgui
-import trnsysGUI.blockItems.names as _bnames
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
@@ -61,6 +60,9 @@ from trnsysGUI.segmentDialog import SegmentDialog
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
+
+import trnsysGUI.components.factory as _cfactory
+
 from . import _sizes
 
 
@@ -228,53 +230,13 @@ class Editor(_qtw.QWidget):
 
     @staticmethod
     def _createLibraryBrowserView():
-
-        componentNamesWithIcon = [
-            ("Connector", _img.CONNECTOR_SVG.icon()),
-            ("TeePiece", _img.TEE_PIECE_SVG.icon()),
-            ("DPTee", _img.DP_TEE_PIECE_SVG.icon()),
-            ("SPCnr", _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
-            ("DPCnr", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
-            ("TVentil", _img.T_VENTIL_SVG.icon()),
-            ("WTap_main", _img.TAP_MAINS_SVG.icon()),
-            (_bnames.TAP, _img.TAP_SVG.icon()),
-            ("Pump", _img.PUMP_SVG.icon()),
-            ("Collector", _img.COLLECTOR_SVG.icon()),
-            ("GroundSourceHx", _img.GROUND_SOURCE_HX_SVG.icon()),
-            ("PV", _img.PV_SVG.icon()),
-            ("HP", _img.HP_SVG.icon()),
-            ("HPTwoHx", _img.HP_TWO_HX_SVG.icon()),
-            ("HPDoubleDual", _img.HP_DOUBLE_DUAL_SVG.icon()),
-            ("HPDual", _img.HP_DUAL_SVG.icon()),
-            ("AirSourceHP", _img.AIR_SOURCE_HP_SVG.icon()),
-            ("StorageTank", _img.STORAGE_TANK_SVG.icon()),
-            ("IceStorage", _img.ICE_STORAGE_SVG.icon()),
-            ("PitStorage", _img.PIT_STORAGE_SVG.icon()),
-            ("IceStorageTwoHx", _img.ICE_STORAGE_TWO_HX_SVG.icon()),
-            ("ExternalHx", _img.EXTERNAL_HX_SVG.icon()),
-            ("Radiator", _img.RADIATOR_SVG.icon()),
-            ("Boiler", _img.BOILER_SVG.icon()),
-            ("Sink", _img.SINK_SVG.icon()),
-            ("Source", _img.SOURCE_SVG.icon()),
-            ("SourceSink", _img.SOURCE_SINK_SVG.icon()),
-            ("Geotherm", _img.GEOTHERM_SVG.icon()),
-            ("Water", _img.WATER_SVG.icon()),
-            ("Crystalizer", _img.CRYSTALIZER_SVG.icon()),
-            ("CSP_CR", _img.CENTRAL_RECEVIER_SVG.icon()),
-            ("CSP_PT", _img.PT_FIELD_SVG.icon()),
-            ("powerBlock", _img.STEAM_POWER_BLOCK_SVG.icon()),
-            ("coldSaltTank", _img.SALT_TANK_COLD_SVG.icon()),
-            ("hotSaltTank", _img.SALT_TANK_HOT_SVG.icon()),
-            ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
-            ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
-        ]
-
-        libItems = [_qtg.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
-
         libraryModel = LibraryModel()
         libraryModel.setColumnCount(0)
-        for i in libItems:
-            libraryModel.appendRow(i)
+
+        components = _cfactory.getComponents()
+        for component in components:
+            item = _qtg.QStandardItem(component.icon, component.name)
+            libraryModel.appendRow(item)
 
         libraryBrowserView = _qtw.QListView()
         libraryBrowserView.setGridSize(_qtc.QSize(65, 65))

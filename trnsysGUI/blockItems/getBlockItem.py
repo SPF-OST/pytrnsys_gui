@@ -45,6 +45,9 @@ from trnsysGUI.teePieces.doublePipeTeePiece import DoublePipeTeePiece
 from trnsysGUI.teePieces.teePiece import TeePiece
 from trnsysGUI.water import Water
 
+import trnsysGUI.components.pluginComponent as _pcomp
+import trnsysGUI.components.plugin.factory as _pfactory
+
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
 
@@ -61,66 +64,74 @@ def createBlockItem(
     """
 
     blockItems = {
-        "StorageTank": {"blockItem": StorageTank, "displayNamePrefix": "Tes"},
-        "TeePiece": {"blockItem": TeePiece, "displayNamePrefix": "Tee"},
-        "DPTee": {"blockItem": DoublePipeTeePiece, "displayNamePrefix": "DTee"},
-        "SPCnr": {"blockItem": SingleDoublePipeConnector, "displayNamePrefix": "SCnr"},
-        "DPCnr": {"blockItem": DoubleDoublePipeConnector, "displayNamePrefix": "DCnr"},
-        "TVentil": {"blockItem": TVentil, "displayNamePrefix": "Val"},
-        "Pump": {"blockItem": Pump, "displayNamePrefix": "Pump"},
-        "Collector": {"blockItem": Collector, "displayNamePrefix": "Coll"},
-        "Kollektor": {"blockItem": Collector, "displayNamePrefix": "Coll"},
-        "HP": {"blockItem": HeatPump, "displayNamePrefix": "HP"},
-        "IceStorage": {"blockItem": IceStorage, "displayNamePrefix": "IceS"},
-        "PitStorage": {"blockItem": PitStorage, "displayNamePrefix": "PitS"},
-        "Radiator": {"blockItem": Radiator, "displayNamePrefix": "Rad"},
-        _names.TAP: {"blockItem": Tap, "displayNamePrefix": "WtTp"},
-        "WTap_main": {"blockItem": TapMains, "displayNamePrefix": "WtSp"},
-        "Connector": {"blockItem": Connector, "displayNamePrefix": "Conn"},
-        "GenericBlock": {"blockItem": GenericBlock, "displayNamePrefix": "GBlk"},
-        "HPTwoHx": {"blockItem": HeatPumpTwoHx, "displayNamePrefix": "HP"},
-        "HPDoubleDual": {"blockItem": HPDoubleDual, "displayNamePrefix": "HPDD"},
-        "HPDual": {"blockItem": HPDual, "displayNamePrefix": "HPDS"},
-        "Boiler": {"blockItem": Boiler, "displayNamePrefix": "Bolr"},
-        "AirSourceHP": {"blockItem": AirSourceHP, "displayNamePrefix": "Ashp"},
-        "PV": {"blockItem": PV, "displayNamePrefix": "PV"},
-        "GroundSourceHx": {"blockItem": GroundSourceHx, "displayNamePrefix": "Gshx"},
-        "ExternalHx": {"blockItem": ExternalHx, "displayNamePrefix": "Hx"},
-        "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "displayNamePrefix": "IceS"},
-        "Sink": {"blockItem": Sink, "displayNamePrefix": "QSnk"},
-        "Source": {"blockItem": Source, "displayNamePrefix": "QSrc"},
-        "SourceSink": {"blockItem": SourceSink, "displayNamePrefix": "QExc"},
-        "Geotherm": {"blockItem": Geotherm, "displayNamePrefix": "GeoT"},
-        "Water": {"blockItem": Water, "displayNamePrefix": "QWat"},
-        "Crystalizer": {"blockItem": Crystalizer, "displayNamePrefix": "Cryt"},
-        "powerBlock": {"blockItem": SteamPowerBlock, "displayNamePrefix": "StPB"},
-        "CSP_PT": {"blockItem": ParabolicTroughField, "displayNamePrefix": "PT"},
-        "CSP_CR": {"blockItem": CentralReceiver, "displayNamePrefix": "CR"},
-        "coldSaltTank": {"blockItem": SaltTankCold, "displayNamePrefix": "ClSt"},
-        "hotSaltTank": {"blockItem": SaltTankHot, "displayNamePrefix": "HtSt"},
+        "StorageTank": {"blockItem": StorageTank, "baseDisplayName": "Tes"},
+        "TeePiece": {"blockItem": TeePiece, "baseDisplayName": "Tee"},
+        "DPTee": {"blockItem": DoublePipeTeePiece, "baseDisplayName": "DTee"},
+        "SPCnr": {"blockItem": SingleDoublePipeConnector, "baseDisplayName": "SCnr"},
+        "DPCnr": {"blockItem": DoubleDoublePipeConnector, "baseDisplayName": "DCnr"},
+        "TVentil": {"blockItem": TVentil, "baseDisplayName": "Val"},
+        "Pump": {"blockItem": Pump, "baseDisplayName": "Pump"},
+        "Collector": {"blockItem": Collector, "baseDisplayName": "Coll"},
+        "Kollektor": {"blockItem": Collector, "baseDisplayName": "Coll"},
+        "HP": {"blockItem": HeatPump, "baseDisplayName": "HP"},
+        "IceStorage": {"blockItem": IceStorage, "baseDisplayName": "IceS"},
+        "PitStorage": {"blockItem": PitStorage, "baseDisplayName": "PitS"},
+        "Radiator": {"blockItem": Radiator, "baseDisplayName": "Rad"},
+        _names.TAP: {"blockItem": Tap, "baseDisplayName": "WtTp"},
+        "WTap_main": {"blockItem": TapMains, "baseDisplayName": "WtSp"},
+        "Connector": {"blockItem": Connector, "baseDisplayName": "Conn"},
+        "GenericBlock": {"blockItem": GenericBlock, "baseDisplayName": "GBlk"},
+        "HPTwoHx": {"blockItem": HeatPumpTwoHx, "baseDisplayName": "HP"},
+        "HPDoubleDual": {"blockItem": HPDoubleDual, "baseDisplayName": "HPDD"},
+        "HPDual": {"blockItem": HPDual, "baseDisplayName": "HPDS"},
+        "Boiler": {"blockItem": Boiler, "baseDisplayName": "Bolr"},
+        "AirSourceHP": {"blockItem": AirSourceHP, "baseDisplayName": "Ashp"},
+        "PV": {"blockItem": PV, "baseDisplayName": "PV"},
+        "GroundSourceHx": {"blockItem": GroundSourceHx, "baseDisplayName": "Gshx"},
+        "ExternalHx": {"blockItem": ExternalHx, "baseDisplayName": "Hx"},
+        "IceStorageTwoHx": {"blockItem": IceStorageTwoHx, "baseDisplayName": "IceS"},
+        "Sink": {"blockItem": Sink, "baseDisplayName": "QSnk"},
+        "Source": {"blockItem": Source, "baseDisplayName": "QSrc"},
+        "SourceSink": {"blockItem": SourceSink, "baseDisplayName": "QExc"},
+        "Geotherm": {"blockItem": Geotherm, "baseDisplayName": "GeoT"},
+        "Water": {"blockItem": Water, "baseDisplayName": "QWat"},
+        "Crystalizer": {"blockItem": Crystalizer, "baseDisplayName": "Cryt"},
+        "powerBlock": {"blockItem": SteamPowerBlock, "baseDisplayName": "StPB"},
+        "CSP_PT": {"blockItem": ParabolicTroughField, "baseDisplayName": "PT"},
+        "CSP_CR": {"blockItem": CentralReceiver, "baseDisplayName": "CR"},
+        "coldSaltTank": {"blockItem": SaltTankCold, "baseDisplayName": "ClSt"},
+        "hotSaltTank": {"blockItem": SaltTankHot, "baseDisplayName": "HtSt"},
     }
 
     if componentTypeName == "GraphicalItem":
         return GraphicalItem(editor)
 
-    if componentTypeName not in blockItems:
-        raise ValueError(f"Unknown kind of block item: `{componentTypeName}`.")
+    if componentTypeName in blockItems:
+        parts = blockItems[componentTypeName]
+        clazz = parts["blockItem"]
+        baseDisplayName = parts["baseDisplayName"]
+    else:
+        clazz = _pcomp.PluginComponent
+        baseDisplayName = _getBaseDisplayNameForPluginComponent(componentTypeName)
 
-    parts = blockItems[componentTypeName]
-    clazz = parts["blockItem"]
-    prefix = parts["displayNamePrefix"]
-
-    displayName = _addOrCreateAndAddDisplayName(displayName, clazz, prefix, namesManager)
+    displayName = _addOrCreateAndAddDisplayName(displayName, clazz, baseDisplayName, namesManager)
 
     blockItem = clazz(componentTypeName, editor, displayName)
 
     return blockItem
 
 
+def _getBaseDisplayNameForPluginComponent(componentTypeName: str) -> str:
+    factory = _pfactory.Factory.createDefault()
+    plugin = factory.createOrNone(componentTypeName)
+    baseDisplayName = plugin.baseDisplayName
+    return baseDisplayName
+
+
 def _addOrCreateAndAddDisplayName(
     displayName: str | None,
     blockItemClass: type[BlockItem],
-    baseName: str,
+    baseDisplayName: str,
     namesManager: _nm.NamesManager,
 ) -> str:
     if not displayName:
@@ -128,7 +139,9 @@ def _addOrCreateAndAddDisplayName(
         checkDdckFolder = (
             blockItemClass.hasDdckPlaceHolders() if issubclass(blockItemClass, _ip.HasInternalPiping) else False
         )
-        displayName = createNamingHelper.generateName(baseName, checkDdckFolder, firstGeneratedNameHasNumber=False)
+        displayName = createNamingHelper.generateName(
+            baseDisplayName, checkDdckFolder, firstGeneratedNameHasNumber=False
+        )
 
     namesManager.addName(displayName)
 

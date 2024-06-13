@@ -39,22 +39,23 @@ class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
     def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         raise NotImplementedError()
 
+    @classmethod
+    def _getInputAndOutputXPos(cls) -> tuple[int, int]:
+        raise NotImplementedError()
+
     def changeSize(self):
         self._positionLabel()
 
-        self.origInputsPos = [[20, 0]]
-        self.origOutputsPos = [[40, 0]]
+        inputX, outputX = self._getInputAndOutputXPos()
 
-        # pylint: disable=duplicate-code  # 1
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.inputs[0].setPos(inputX, 0)
+        self.outputs[0].setPos(outputX, 0)
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
         self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
-        # pylint: disable=duplicate-code  # 1
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)

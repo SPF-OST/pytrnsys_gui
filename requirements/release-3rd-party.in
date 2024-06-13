@@ -18,3 +18,6 @@ typer
 typing_extensions
 
 packaging
+
+pydantic
+pyyaml
