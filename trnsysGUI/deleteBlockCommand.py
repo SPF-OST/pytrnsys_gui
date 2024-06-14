@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pathlib as _pl
 import typing as _tp
 
 import PyQt5.QtWidgets as _qtw
@@ -7,6 +8,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.common as _com
+import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.names.undo as _nu
 
 if _tp.TYPE_CHECKING:
@@ -46,6 +48,8 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
 
         self._blockItem.deleteBlock()
         self._undoNamingHelper.removeNameForDelete(self._blockItem.displayName)
+
+        _dfh.maybeDeleteNonEmptyComponentDdckFolder(self._blockItem, _pl.Path(self._editor.projectFolder))
 
     def undo(self):
         checkDdckFolder = self._blockItem.hasDdckPlaceHolders()

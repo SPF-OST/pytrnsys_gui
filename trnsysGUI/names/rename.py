@@ -11,11 +11,16 @@ class RenameHelper:
 
     def canRename(self, currentName: _tp.Optional[str], newName: str, checkDdckFolder: bool) -> _res.Result[None]:
         if currentName:
-            isNameUnchangedExceptForCasing = newName.lower() == currentName.lower()
+            isNameUnchangedExceptForCasing = self.isSameName(currentName, newName)
             if isNameUnchangedExceptForCasing:
                 return None
 
         return self._namesManager.validateName(newName, checkDdckFolder)
+
+    @staticmethod
+    def isSameName(currentName, newName):
+        isNameUnchangedExceptForCasing = newName.lower() == currentName.lower()
+        return isNameUnchangedExceptForCasing
 
     def rename(self, oldName: str, newName: str) -> None:
         self._namesManager.removeName(oldName)

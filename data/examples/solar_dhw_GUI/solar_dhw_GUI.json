@@ -79,30 +79,6 @@
                 ]
             }
         },
-        "Block-20": {
-            ".__BlockDict__": true,
-            "BlockDisplayName": "AbsHP",
-            "BlockName": "thermallyDrivenHeatPump",
-            "__version__": "e8cfde2f-8239-4338-a5f0-63a7abb93900",
-            "blockPosition": [
-                -780.0,
-                -463.0
-            ],
-            "flippedH": true,
-            "flippedV": false,
-            "portsIdsIn": [
-                591,
-                593,
-                595
-            ],
-            "portsIdsOut": [
-                592,
-                594,
-                596
-            ],
-            "rotationN": 0,
-            "trnsysId": 238
-        },
         "Block-3": {
             ".__BlockDict__": true,
             "BlockDisplayName": "WTap2",
@@ -654,10 +630,10 @@
             }
         },
         "IDs": {
-            "GlobalId": 598,
+            "GlobalId": 605,
             "__idDct__": true,
-            "globalConnID": 180,
-            "trnsysID": 240
+            "globalConnID": 181,
+            "trnsysID": 242
         },
         "Strings": {
             "DiagramName": "solar_dhw_GUI.json",

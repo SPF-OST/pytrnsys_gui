@@ -57,6 +57,7 @@ from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 from . import _sizes
+from . import fileSystemTreeView as _fst
 
 
 class Editor(_qtw.QWidget):
@@ -72,12 +73,6 @@ class Editor(_qtw.QWidget):
         self.diagramName = os.path.split(self.projectFolder)[-1] + ".json"
         self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
-
-        self.testEnabled = False
-        self.existReference = True
-
-        self.controlExists = 0
-        self.controlDirectory = ""
 
         self.alignMode = False
 
@@ -103,16 +98,11 @@ class Editor(_qtw.QWidget):
 
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
-        self.scroll = _qtw.QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.splitter = _qtw.QSplitter(
-            _qtc.Qt.Vertical,
-        )
-        self.splitter.setChildrenCollapsible(False)
-        self.scroll.setWidget(self.splitter)
-        self.scroll.setFixedWidth(350)
+
+        treeView = _fst.FileSystemTreeView(_pl.Path(self.projectFolder))
+
         self.fileBrowserLayout.addLayout(self.pathLayout)
-        self.fileBrowserLayout.addWidget(self.scroll)
+        self.fileBrowserLayout.addWidget(treeView)
 
         if loadValue == "new" or loadValue == "json":
             self.copyGenericFolder(self.projectFolder)
@@ -918,12 +908,12 @@ Tcw=1
     # Dialog calls
     def showBlockDlg(self, blockItem: BlockItem) -> None:
         renameHelper = self._createRenameHelper()
-        dialog = BlockDlg(blockItem, renameHelper)
+        dialog = BlockDlg(blockItem, renameHelper, self.projectFolder)
         dialog.exec()
 
     def showDoublePipeBlockDlg(self, connector: _dctor.DoublePipeConnectorBase) -> None:
         renameHelper = self._createRenameHelper()
-        dialog = DoublePipeBlockDlg(connector, renameHelper)
+        dialog = DoublePipeBlockDlg(connector, renameHelper, self.projectFolder)
         dialog.exec()
 
     def showDiagramDlg(self):
@@ -942,12 +932,12 @@ Tcw=1
 
     def showTVentilDlg(self, valve: TVentil) -> None:
         renameHelper = self._createRenameHelper()
-        valveDialog = TVentilDlg(valve, renameHelper)
+        valveDialog = TVentilDlg(valve, renameHelper, self.projectFolder)
         valveDialog.exec()
 
     def showConfigStorageDlg(self, storageTank: _stwidget.StorageTank) -> None:
         renameHelper = self._createRenameHelper()
-        storageDialog = ConfigureStorageDialog(storageTank, self, renameHelper)
+        storageDialog = ConfigureStorageDialog(storageTank, self, renameHelper, self.projectFolder)
         storageDialog.exec()
 
     def _createRenameHelper(self) -> _rename.RenameHelper:
@@ -963,7 +953,7 @@ Tcw=1
 
         if not genericFolderPath.exists():
             self.logger.info("Creating %s", genericFolderPath)
-            genericFolderPath.mkdir()
+            genericFolderPath.mkdir(parents=True)
 
         headData = self._getPackageResourceData("templates/generic/head.ddck")
         self.logger.info("Copying head.ddck")

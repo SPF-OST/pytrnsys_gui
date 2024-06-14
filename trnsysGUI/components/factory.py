@@ -83,7 +83,3 @@ def _createPluginComponent(pluginComponentName: str, pluginFactory: _pfactory.Fa
     icon = plugin.graphics.accessor.icon()
     pluginComponent = Component(pluginComponentName, icon)
     return pluginComponent
-
-
-class Factory:
-    pass
