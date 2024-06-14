@@ -6,7 +6,6 @@ import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
-import shutil
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
@@ -15,6 +14,7 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import trnsysGUI as _tgui
+import trnsysGUI.components.factory as _cfactory
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
@@ -22,7 +22,6 @@ import trnsysGUI.diagram.Encoder as _enc
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
-import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
@@ -34,12 +33,9 @@ import trnsysGUI.warningsAndErrors as _werrs
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
-from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.GraphicalItem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
@@ -60,9 +56,6 @@ from trnsysGUI.segmentDialog import SegmentDialog
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
-
-import trnsysGUI.components.factory as _cfactory
-
 from . import _sizes
 
 
@@ -99,9 +92,6 @@ class Editor(_qtw.QWidget):
         self.diagramScene = Scene(self)
         self.diagramView = View(self.diagramScene, self)
 
-        # for file browser
-        self.fileList = []
-
         if loadValue == "new" or loadValue == "json":
             self.createProjectFolder()
 
@@ -123,10 +113,8 @@ class Editor(_qtw.QWidget):
         self.scroll.setFixedWidth(350)
         self.fileBrowserLayout.addLayout(self.pathLayout)
         self.fileBrowserLayout.addWidget(self.scroll)
-        self.createDdckTree(self.projectFolder)
 
         if loadValue == "new" or loadValue == "json":
-            self.createConfigBrowser(self.projectFolder)
             self.copyGenericFolder(self.projectFolder)
             self.createHydraulicDir(self.projectFolder)
             self.createWeatherAndControlDirs(self.projectFolder)
@@ -966,88 +954,9 @@ Tcw=1
         renameHelper = _rename.RenameHelper(self.namesManager)
         return renameHelper
 
-    def createDdckTree(self, loadPath):
-        treeToRemove = self.findChild(_qtw.QTreeView, "ddck")
-        try:
-            treeToRemove.deleteLater()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        loadPath = os.path.join(loadPath, "ddck")
-        if not os.path.exists(loadPath):
-            os.makedirs(loadPath)
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(loadPath)
-        self.model.setName("ddck")
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(loadPath))
-        self.tree.setObjectName("ddck")
-        self.tree.setMinimumHeight(600)
-        self.tree.setSortingEnabled(True)
-        self.splitter.insertWidget(0, self.tree)
-
-    def createConfigBrowser(self, loadPath):
-        self.layoutToRemove = self.findChild(_qtw.QHBoxLayout, "Config_Layout")
-        try:
-            # treeToRemove.hide()
-            self.layoutToRemove.deleteLater()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-
-        runConfigData = self._getPackageResourceData("templates/run.config")
-        runConfigPath = _pl.Path(loadPath) / "run.config"
-        runConfigPath.write_bytes(runConfigData)
-
-        self.HBox = _qtw.QHBoxLayout()
-        self.refreshButton = _qtw.QPushButton(self)
-        self.refreshButton.setIcon(_img.ROTATE_TO_RIGHT_PNG.icon())
-        self.refreshButton.clicked.connect(self.refreshConfig)
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(loadPath)
-        self.model.setName("Config File")
-        self.model.setFilter(_qtc.QDir.Files)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(loadPath))
-        self.tree.setObjectName("config")
-        self.tree.setFixedHeight(60)
-        self.tree.setSortingEnabled(False)
-        self.HBox.addWidget(self.refreshButton)
-        self.HBox.addWidget(self.tree)
-        self.HBox.setObjectName("Config_Layout")
-        self.fileBrowserLayout.addLayout(self.HBox)
-
     def createProjectFolder(self):
         if not os.path.exists(self.projectFolder):
             os.makedirs(self.projectFolder)
-
-    def refreshConfig(self):
-        localPath = self.projectFolder
-
-        self.configToEdit = os.path.join(localPath, "run.config")
-        os.remove(self.configToEdit)
-        shutil.copy(self.emptyConfig, localPath)
-        self.configToEdit = os.path.join(localPath, "run.config")
-
-        localDdckPath = os.path.join(localPath, "ddck")
-        with open(self.configToEdit, "r") as file:
-            lines = file.readlines()
-        localPathStr = "string LOCAL$ %s" % str(localDdckPath)
-        lines[21] = localPathStr + "\n"
-
-        with open(self.configToEdit, "w") as file:
-            file.writelines(lines)
-
-        # print(localPathStr)
-        self.userInputList()
-
-    def userInputList(self):
-        self.logger.debug(self.fileList)
-        dia = FileOrderingDialog(self.fileList, self)
 
     def copyGenericFolder(self, loadPath):
         genericFolderPath = _pl.Path(loadPath) / "ddck" / "generic"

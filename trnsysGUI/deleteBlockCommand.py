@@ -63,6 +63,5 @@ class DeleteBlockCommand(_qtw.QUndoCommand):
 
         self._editor.trnsysObj.append(self._blockItem)
         self._editor.diagramScene.addItem(self._blockItem)
-        self._blockItem.addTree()
 
         super().undo()

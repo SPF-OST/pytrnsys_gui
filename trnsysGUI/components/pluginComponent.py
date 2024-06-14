@@ -28,18 +28,11 @@ class PluginComponent(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphic
 
         self.changeSize()
 
-        self._updateDdckFilePath()
-
     def getDisplayName(self) -> str:
         return self.displayName
 
     def setDisplayName(self, newName: str) -> None:
         super().setDisplayName(newName)
-        self._updateDdckFilePath()
-
-    def _updateDdckFilePath(self):
-        ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
-        self.path = str(ddckFilePath)
 
     @_tp.override
     def _getImageAccessor(self) -> _img.SvgImageAccessor:

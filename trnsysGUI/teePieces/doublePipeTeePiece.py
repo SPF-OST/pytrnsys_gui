@@ -142,6 +142,9 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
     def _portOffset(self):
         return 30
 
+    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+        self.editor.showDoublePipeBlockDlg(self)
+
 
 @_dc.dataclass
 class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
