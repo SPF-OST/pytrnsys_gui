@@ -6,7 +6,6 @@ import math as _math
 import os
 import pathlib as _pl
 import pkgutil as _pu
-import shutil
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
@@ -15,7 +14,7 @@ import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.trnsys_util.deckUtils as _du
 import trnsysGUI as _tgui
-import trnsysGUI.blockItems.names as _bnames
+import trnsysGUI.components.factory as _cfactory
 import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dctor
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.console as _con
@@ -23,7 +22,6 @@ import trnsysGUI.diagram.Encoder as _enc
 import trnsysGUI.hydraulicLoops.edit as _hledit
 import trnsysGUI.hydraulicLoops.migration as _hlmig
 import trnsysGUI.hydraulicLoops.model as _hlm
-import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.names.create as _nc
 import trnsysGUI.names.manager as _nm
@@ -35,12 +33,9 @@ import trnsysGUI.warningsAndErrors as _werrs
 from trnsysGUI.BlockDlg import BlockDlg
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.Export import Export
-from trnsysGUI.FileOrderingDialog import FileOrderingDialog
 from trnsysGUI.GenericPortPairDlg import GenericPortPairDlg
 from trnsysGUI.GraphicalItem import GraphicalItem
 from trnsysGUI.LibraryModel import LibraryModel
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.PortItemBase import PortItemBase
 from trnsysGUI.TVentil import TVentil
 from trnsysGUI.TVentilDlg import TVentilDlg
@@ -62,6 +57,7 @@ from trnsysGUI.singlePipePortItem import SinglePipePortItem
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.storageTank.widget import StorageTank
 from . import _sizes
+from . import fileSystemTreeView as _fst
 
 
 class Editor(_qtw.QWidget):
@@ -78,12 +74,6 @@ class Editor(_qtw.QWidget):
         self.saveAsPath = _pl.Path()
         self.idGen = IdGenerator()
 
-        self.testEnabled = False
-        self.existReference = True
-
-        self.controlExists = 0
-        self.controlDirectory = ""
-
         self.alignMode = False
 
         self.moveDirectPorts = False
@@ -97,9 +87,6 @@ class Editor(_qtw.QWidget):
         self.diagramScene = Scene(self)
         self.diagramView = View(self.diagramScene, self)
 
-        # for file browser
-        self.fileList = []
-
         if loadValue == "new" or loadValue == "json":
             self.createProjectFolder()
 
@@ -111,20 +98,13 @@ class Editor(_qtw.QWidget):
 
         self.pathLayout.addWidget(self.projectPathLabel)
         self.pathLayout.addWidget(self.PPL)
-        self.scroll = _qtw.QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.splitter = _qtw.QSplitter(
-            _qtc.Qt.Vertical,
-        )
-        self.splitter.setChildrenCollapsible(False)
-        self.scroll.setWidget(self.splitter)
-        self.scroll.setFixedWidth(350)
+
+        treeView = _fst.FileSystemTreeView(_pl.Path(self.projectFolder))
+
         self.fileBrowserLayout.addLayout(self.pathLayout)
-        self.fileBrowserLayout.addWidget(self.scroll)
-        self.createDdckTree(self.projectFolder)
+        self.fileBrowserLayout.addWidget(treeView)
 
         if loadValue == "new" or loadValue == "json":
-            self.createConfigBrowser(self.projectFolder)
             self.copyGenericFolder(self.projectFolder)
             self.createHydraulicDir(self.projectFolder)
             self.createWeatherAndControlDirs(self.projectFolder)
@@ -228,53 +208,18 @@ class Editor(_qtw.QWidget):
 
     @staticmethod
     def _createLibraryBrowserView():
-
-        componentNamesWithIcon = [
-            ("Connector", _img.CONNECTOR_SVG.icon()),
-            ("TeePiece", _img.TEE_PIECE_SVG.icon()),
-            ("DPTee", _img.DP_TEE_PIECE_SVG.icon()),
-            ("SPCnr", _img.SINGLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
-            ("DPCnr", _img.DOUBLE_DOUBLE_PIPE_CONNECTOR_SVG.icon()),
-            ("TVentil", _img.T_VENTIL_SVG.icon()),
-            ("WTap_main", _img.TAP_MAINS_SVG.icon()),
-            (_bnames.TAP, _img.TAP_SVG.icon()),
-            ("Pump", _img.PUMP_SVG.icon()),
-            ("Collector", _img.COLLECTOR_SVG.icon()),
-            ("GroundSourceHx", _img.GROUND_SOURCE_HX_SVG.icon()),
-            ("PV", _img.PV_SVG.icon()),
-            ("HP", _img.HP_SVG.icon()),
-            ("HPTwoHx", _img.HP_TWO_HX_SVG.icon()),
-            ("HPDoubleDual", _img.HP_DOUBLE_DUAL_SVG.icon()),
-            ("HPDual", _img.HP_DUAL_SVG.icon()),
-            ("AirSourceHP", _img.AIR_SOURCE_HP_SVG.icon()),
-            ("StorageTank", _img.STORAGE_TANK_SVG.icon()),
-            ("IceStorage", _img.ICE_STORAGE_SVG.icon()),
-            ("PitStorage", _img.PIT_STORAGE_SVG.icon()),
-            ("IceStorageTwoHx", _img.ICE_STORAGE_TWO_HX_SVG.icon()),
-            ("ExternalHx", _img.EXTERNAL_HX_SVG.icon()),
-            ("Radiator", _img.RADIATOR_SVG.icon()),
-            ("Boiler", _img.BOILER_SVG.icon()),
-            ("Sink", _img.SINK_SVG.icon()),
-            ("Source", _img.SOURCE_SVG.icon()),
-            ("SourceSink", _img.SOURCE_SINK_SVG.icon()),
-            ("Geotherm", _img.GEOTHERM_SVG.icon()),
-            ("Water", _img.WATER_SVG.icon()),
-            ("Crystalizer", _img.CRYSTALIZER_SVG.icon()),
-            ("CSP_CR", _img.CENTRAL_RECEVIER_SVG.icon()),
-            ("CSP_PT", _img.PT_FIELD_SVG.icon()),
-            ("powerBlock", _img.STEAM_POWER_BLOCK_SVG.icon()),
-            ("coldSaltTank", _img.SALT_TANK_COLD_SVG.icon()),
-            ("hotSaltTank", _img.SALT_TANK_HOT_SVG.icon()),
-            ("GenericBlock", _img.GENERIC_BLOCK_PNG.icon()),
-            ("GraphicalItem", _img.GENERIC_ITEM_PNG.icon()),
-        ]
-
-        libItems = [_qtg.QStandardItem(icon, name) for name, icon in componentNamesWithIcon]
-
         libraryModel = LibraryModel()
         libraryModel.setColumnCount(0)
-        for i in libItems:
-            libraryModel.appendRow(i)
+
+        componentsWithWarnings = _cfactory.getComponents()
+        if componentsWithWarnings.hasWarnings():
+            warningMessage = componentsWithWarnings.toWarningMessage()
+            _werrs.showMessageBox(warningMessage, _werrs.Title.WARNING)
+        components = componentsWithWarnings.value
+
+        for component in components:
+            item = _qtg.QStandardItem(component.icon, component.name)
+            libraryModel.appendRow(item)
 
         libraryBrowserView = _qtw.QListView()
         libraryBrowserView.setGridSize(_qtc.QSize(65, 65))
@@ -968,12 +913,12 @@ Tcw=1
     # Dialog calls
     def showBlockDlg(self, blockItem: BlockItem) -> None:
         renameHelper = self._createRenameHelper()
-        dialog = BlockDlg(blockItem, renameHelper)
+        dialog = BlockDlg(blockItem, renameHelper, self.projectFolder)
         dialog.exec()
 
     def showDoublePipeBlockDlg(self, connector: _dctor.DoublePipeConnectorBase) -> None:
         renameHelper = self._createRenameHelper()
-        dialog = DoublePipeBlockDlg(connector, renameHelper)
+        dialog = DoublePipeBlockDlg(connector, renameHelper, self.projectFolder)
         dialog.exec()
 
     def showDiagramDlg(self):
@@ -992,107 +937,28 @@ Tcw=1
 
     def showTVentilDlg(self, valve: TVentil) -> None:
         renameHelper = self._createRenameHelper()
-        valveDialog = TVentilDlg(valve, renameHelper)
+        valveDialog = TVentilDlg(valve, renameHelper, self.projectFolder)
         valveDialog.exec()
 
     def showConfigStorageDlg(self, storageTank: _stwidget.StorageTank) -> None:
         renameHelper = self._createRenameHelper()
-        storageDialog = ConfigureStorageDialog(storageTank, self, renameHelper)
+        storageDialog = ConfigureStorageDialog(storageTank, self, renameHelper, self.projectFolder)
         storageDialog.exec()
 
     def _createRenameHelper(self) -> _rename.RenameHelper:
         renameHelper = _rename.RenameHelper(self.namesManager)
         return renameHelper
 
-    def createDdckTree(self, loadPath):
-        treeToRemove = self.findChild(_qtw.QTreeView, "ddck")
-        try:
-            treeToRemove.deleteLater()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        loadPath = os.path.join(loadPath, "ddck")
-        if not os.path.exists(loadPath):
-            os.makedirs(loadPath)
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(loadPath)
-        self.model.setName("ddck")
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(loadPath))
-        self.tree.setObjectName("ddck")
-        self.tree.setMinimumHeight(600)
-        self.tree.setSortingEnabled(True)
-        self.splitter.insertWidget(0, self.tree)
-
-    def createConfigBrowser(self, loadPath):
-        self.layoutToRemove = self.findChild(_qtw.QHBoxLayout, "Config_Layout")
-        try:
-            # treeToRemove.hide()
-            self.layoutToRemove.deleteLater()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-
-        runConfigData = self._getPackageResourceData("templates/run.config")
-        runConfigPath = _pl.Path(loadPath) / "run.config"
-        runConfigPath.write_bytes(runConfigData)
-
-        self.HBox = _qtw.QHBoxLayout()
-        self.refreshButton = _qtw.QPushButton(self)
-        self.refreshButton.setIcon(_img.ROTATE_TO_RIGHT_PNG.icon())
-        self.refreshButton.clicked.connect(self.refreshConfig)
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(loadPath)
-        self.model.setName("Config File")
-        self.model.setFilter(_qtc.QDir.Files)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(loadPath))
-        self.tree.setObjectName("config")
-        self.tree.setFixedHeight(60)
-        self.tree.setSortingEnabled(False)
-        self.HBox.addWidget(self.refreshButton)
-        self.HBox.addWidget(self.tree)
-        self.HBox.setObjectName("Config_Layout")
-        self.fileBrowserLayout.addLayout(self.HBox)
-
     def createProjectFolder(self):
         if not os.path.exists(self.projectFolder):
             os.makedirs(self.projectFolder)
-
-    def refreshConfig(self):
-        localPath = self.projectFolder
-
-        self.configToEdit = os.path.join(localPath, "run.config")
-        os.remove(self.configToEdit)
-        shutil.copy(self.emptyConfig, localPath)
-        self.configToEdit = os.path.join(localPath, "run.config")
-
-        localDdckPath = os.path.join(localPath, "ddck")
-        with open(self.configToEdit, "r") as file:
-            lines = file.readlines()
-        localPathStr = "string LOCAL$ %s" % str(localDdckPath)
-        lines[21] = localPathStr + "\n"
-
-        with open(self.configToEdit, "w") as file:
-            file.writelines(lines)
-
-        # print(localPathStr)
-        self.userInputList()
-
-    def userInputList(self):
-        self.logger.debug(self.fileList)
-        dia = FileOrderingDialog(self.fileList, self)
 
     def copyGenericFolder(self, loadPath):
         genericFolderPath = _pl.Path(loadPath) / "ddck" / "generic"
 
         if not genericFolderPath.exists():
             self.logger.info("Creating %s", genericFolderPath)
-            genericFolderPath.mkdir()
+            genericFolderPath.mkdir(parents=True)
 
         headData = self._getPackageResourceData("templates/generic/head.ddck")
         self.logger.info("Copying head.ddck")

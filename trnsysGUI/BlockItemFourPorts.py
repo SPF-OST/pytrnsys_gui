@@ -88,14 +88,3 @@ class BlockItemFourPorts(
         self.trnsysId = i["trnsysID"]
 
         resBlockList.append(self)
-
-    def getSubBlockOffset(self, c):  # pylint: disable = invalid-name
-        for i in range(2):
-            if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
-            ):
-                return i
-        return None

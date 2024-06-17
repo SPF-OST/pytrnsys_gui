@@ -96,8 +96,3 @@ class GraphicalItem(QGraphicsPixmapItem):
         self._editor = parent
         if self not in self._editor.graphicalObj:
             self._editor.graphicalObj.append(self)
-
-    def deleteBlock(self):
-        self._editor.graphicalObj.remove(self)
-        self._editor.diagramScene.removeItem(self)
-        del self

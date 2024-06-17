@@ -11,3 +11,5 @@ black
 
 PyQT5-stubs
 pytest-qt
+
+types-PyYAML

@@ -63,19 +63,6 @@ for that particular component - or it could indicate a missing ddck file.
     return allPlaceholdersWithWarnings
 
 
-def _addNonExistentPathsWarnings(
-    component: _bi.BlockItem, ddckDirNames: _tp.Sequence[str], warnings: list[str]
-) -> None:
-    if not component.path:
-        warnings.append(f"{component.displayName} doesn't have ddck template path.")
-        return
-
-    componentPath = _pl.Path(component.path)
-    componentName = componentPath.stem
-    if componentName not in ddckDirNames:
-        warnings.append(f"No directory called `{componentName}` found in the project folder.")
-
-
 def _getPlaceHoldersForNode(
     node: _mfn.Node, componentName: str, internalPiping: _ip.InternalPiping, hydraulicLoops: _hlm.HydraulicLoops
 ) -> PlaceHoldersByQualifiedPortName:

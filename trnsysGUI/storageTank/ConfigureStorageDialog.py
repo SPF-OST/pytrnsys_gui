@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as _tp
+import pathlib as _pl
 
 import PyQt5.QtCore as _qtc
 from PyQt5.QtWidgets import QGridLayout
@@ -40,9 +41,10 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         storage: _st.StorageTank,
         editor: _ed.Editor,  # type: ignore[name-defined]
         renameHelper: _rename.RenameHelper,
+        projectDirPath: str,
     ) -> None:
         # pylint: disable = too-many-locals, too-many-statements
-        super().__init__(storage, renameHelper)
+        super().__init__(storage, renameHelper, _pl.Path(projectDirPath))
         self._editor = editor
         self.storage = storage
         self.n = 0  # pylint: disable = invalid-name

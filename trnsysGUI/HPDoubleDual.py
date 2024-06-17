@@ -1,19 +1,13 @@
 # pylint: skip-file
 
-import os
-import shutil
 import typing as _tp
 
-from PyQt5.QtWidgets import QTreeView
-
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.blockItemGraphicItemMixins as _gimx
-import trnsysGUI.blockItemHasInternalPiping as _bip
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
 class HPDoubleDual(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
@@ -28,8 +22,6 @@ class HPDoubleDual(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
-        self.loadedFiles: list[str] = []
-
         # For restoring correct order of trnsysObj list
         self.childIds = []
         self.childIds.append(self.trnsysId)
@@ -37,7 +29,6 @@ class HPDoubleDual(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         self.childIds.append(self.editor.idGen.getTrnsysID())
 
         self.changeSize()
-        self.addTree()
 
     def getDisplayName(self) -> str:
         return self.displayName
@@ -160,73 +151,3 @@ class HPDoubleDual(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicIte
         nodes = [evaporatorPipe, condenser1Pipe, condenser2Pipe]
 
         return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
-
-    def getSubBlockOffset(self, c):
-        for i in range(3):
-            if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
-            ):
-                return i
-
-    def addTree(self):
-        """
-        When a blockitem is added to the main window.
-        A file explorer for that item is added to the right of the main window by calling this method
-        """
-        self.logger.debug(self.editor)
-        pathName = self.displayName
-        self.path = self.editor.projectFolder
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(self.path)
-        self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount() - 1):
-            self.tree.hideColumn(i)
-        self.tree.setMinimumHeight(200)
-        self.tree.setSortingEnabled(True)
-        self.editor.splitter.addWidget(self.tree)
-
-    def deleteBlock(self):
-        """
-        Overridden method to also delete folder
-        """
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.editor.trnsysObj.remove(self)
-        self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        shutil.rmtree(self.path)
-        self.deleteLoadedFile()
-        try:
-            widgetToRemove.hide()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        del self
-
-    def setDisplayName(self, newName):
-        """
-        Overridden method to also change folder name
-        """
-        self.displayName = newName
-        self.label.setPlainText(newName)
-        self.model.setName(self.displayName)
-        self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
-            self.path = destPath
-            self.logger.debug(self.path)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as _tp
+import pathlib as _pl
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
@@ -9,6 +10,7 @@ import PyQt5.QtWidgets as _qtw
 import trnsysGUI.blockItems.getBlockItem as _gbi
 import trnsysGUI.deleteBlockCommand as _dbc
 import trnsysGUI.names.undo as _nu
+import trnsysGUI.components.ddckFolderHelpers as _dfh
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -46,6 +48,9 @@ class View(_qtw.QGraphicsView):
         self.logger.debug("name is " + componentType)
 
         blockItem = _gbi.createBlockItem(componentType, self._editor, self._editor.namesManager)
+
+        if _dfh.hasComponentDdckFolder(blockItem):
+            _dfh.createComponentDdckFolder(blockItem.displayName, _pl.Path(self._editor.projectFolder))
 
         self._editor.trnsysObj.append(blockItem)
 

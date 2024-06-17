@@ -1,13 +1,15 @@
 import dataclasses as _dc
-import os as _os
+import pathlib as _pl
 import random as _rnd
-import shutil as _sh
 import typing as _tp
 
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
+import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.hydraulicLoops.model as _hlm
@@ -18,12 +20,8 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.storageTank.side as _sd
-import trnsysGUI.blockItemGraphicItemMixins as _gimx
-import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.heatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
@@ -63,9 +61,6 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         self.storageType = idGenerator.getStorageType()
 
         self.changeSize()
-
-        self.path = None
-        self.addTree()
 
     def setHydraulicLoops(self, hydraulicLoops: _hlm.HydraulicLoops) -> None:
         self._hydraulicLoops = hydraulicLoops
@@ -347,9 +342,6 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
     def contextMenuEvent(self, event):
         menu = _qtw.QMenu()
 
-        launchNotepadAction = menu.addAction("Launch NotePad++")
-        launchNotepadAction.triggered.connect(self.launchNotepadFile)
-
         rotateRightIcon = _img.ROTATE_TO_RIGHT_PNG.icon()
         rotateRightAction = menu.addAction(rotateRightIcon, "Rotate Block clockwise")
         rotateRightAction.triggered.connect(self.rotateBlockCW)
@@ -360,9 +352,6 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         resetRotationAction = menu.addAction("Reset Rotation")
         resetRotationAction.triggered.connect(self.resetRotation)
-
-        printRotationAction = menu.addAction("Print Rotation")
-        printRotationAction.triggered.connect(self.printRotation)
 
         deleteBlockAction = menu.addAction("Delete this Block")
         deleteBlockAction.triggered.connect(self.deleteBlockCom)
@@ -439,7 +428,10 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
 
-        tool.createDDck(self.path, self.displayName, typeFile="ddck")
+        projectDirPath = _pl.Path(self.editor.projectFolder)
+        ddckDirPath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath)
+
+        tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
 
     def _getDirectPairPortsForExport(self):
         directPairsPorts = []
@@ -566,62 +558,3 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
                 return False
 
         return True
-
-    def addTree(self):
-        """
-        When a blockitem is added to the main window.
-        A file explorer for that item is added to the right of the main window by calling this method
-        """
-        pathName = self.displayName
-        self.path = self.editor.projectFolder
-        self.path = _os.path.join(self.path, "ddck")
-        self.path = _os.path.join(self.path, pathName)
-        if not _os.path.exists(self.path):
-            _os.makedirs(self.path)
-
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(self.path)
-        self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName(f"{self.displayName}Tree")
-        self.tree.setMinimumHeight(200)
-        self.tree.setSortingEnabled(True)
-        self.editor.splitter.addWidget(self.tree)
-
-    def deleteBlock(self):
-        """
-        Overridden method to also delete folder
-        """
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.editor.trnsysObj.remove(self)
-        self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(_qtw.QTreeView, self.displayName + "Tree")
-        _sh.rmtree(self.path)
-        try:
-            widgetToRemove.hide()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        del self
-
-    def setDisplayName(self, newName):
-        """
-        Overridden method to also change folder name
-        """
-        self.displayName = newName
-        self.label.setPlainText(newName)
-        self.model.setName(self.displayName)
-        self.tree.setObjectName(f"{self.displayName}Tree")
-        self.logger.debug(_os.path.dirname(self.path))
-        destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
-        if _os.path.split(self.path)[-1] == "" or _os.path.split(self.path)[-1] == "ddck":
-            _os.makedirs(destPath)
-        else:
-            if _os.path.exists(self.path):
-                _os.rename(self.path, destPath)
-        self.path = destPath
-        self.logger.debug(self.path)

@@ -76,6 +76,9 @@ class TestStorageTank:
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, self.ACTUAL_DIR_PATH, qtbot)
 
+        actualComponentDdckDirPath = self.ACTUAL_DIR_PATH / "ddck" / "TesDhw"
+        actualComponentDdckDirPath.mkdir(parents=True, exist_ok=True)
+
         legacyJson = self.LEGACY_JSON_PATH.read_text()
         storageTank = self._deserializeStorageTank(legacyJson, editorMock)
 
@@ -86,8 +89,8 @@ class TestStorageTank:
 
         storageTank.exportDck()
 
-        actualDdckPath = self.ACTUAL_DIR_PATH / "ddck" / "TesDhw" / "TesDhw.ddck"
-        actualDdckContent = actualDdckPath.read_text()
+        actualDdckFilePath = actualComponentDdckDirPath / "TesDhw.ddck"
+        actualDdckContent = actualDdckFilePath.read_text()
         print(actualDdckContent)
 
         expectedDdckContent = (self.EXPECTED_DIR_PATH / "TesDhw.ddck").read_text()

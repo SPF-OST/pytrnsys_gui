@@ -104,6 +104,9 @@ class DoublePipeConnectorBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockIte
         elif angle == 270:
             self.updateFlipStateV(False)
 
+    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+        self.editor.showDoublePipeBlockDlg(self)
+
 
 @_dc.dataclass
 class DoublePipeBlockItemModelVersion0(

@@ -5,14 +5,14 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi  # pylint: disable=cyclic-import
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.blockItemGraphicItemMixins as _gimx
-import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.valveModel as _vm
 
@@ -262,3 +262,6 @@ class TVentil(
 
             return lines, unitNumber
         return "", startingUnit
+
+    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+        self.editor.showTVentilDlg(self)

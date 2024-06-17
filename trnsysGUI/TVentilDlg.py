@@ -1,7 +1,8 @@
 # pylint: skip-file
 # type: ignore
 
-from PyQt5.QtGui import QIcon
+import pathlib as _pl
+
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QDoubleSpinBox
 from PyQt5.QtWidgets import QGridLayout
@@ -17,8 +18,8 @@ import trnsysGUI.names.rename as _rename
 
 
 class TVentilDlg(_ndialog.ChangeNameDialogBase):
-    def __init__(self, ventil: _vnt.TVentil, renameHelper: _rename.RenameHelper) -> None:
-        super().__init__(ventil, renameHelper)
+    def __init__(self, ventil: _vnt.TVentil, renameHelper: _rename.RenameHelper, projectFolder: str) -> None:
+        super().__init__(ventil, renameHelper, _pl.Path(projectFolder))
 
         self._blockItem = ventil
         self.valvePosition = self._blockItem.positionForMassFlowSolver

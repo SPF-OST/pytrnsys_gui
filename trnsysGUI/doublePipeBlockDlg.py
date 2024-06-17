@@ -1,10 +1,6 @@
-# pylint: skip-file
-# type: ignore
+import pathlib as _pl
 
-from PyQt5.QtWidgets import QGridLayout
-from PyQt5.QtWidgets import QHBoxLayout
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtWidgets import QPushButton
+import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.names.dialog as _ndialog
@@ -12,19 +8,19 @@ import trnsysGUI.names.rename as _rename
 
 
 class DoublePipeBlockDlg(_ndialog.ChangeNameDialogBase):
-    def __init__(self, blockItem: _bi.BlockItem, renameHelper: _rename.RenameHelper) -> None:
-        super().__init__(blockItem, renameHelper)
+    def __init__(self, blockItem: _bi.BlockItem, renameHelper: _rename.RenameHelper, projectFolder: str) -> None:
+        super().__init__(blockItem, renameHelper, _pl.Path(projectFolder))
 
         self._blockItem = blockItem
-        self.okButton = QPushButton("OK")
-        self.cancelButton = QPushButton("Cancel")
+        self.okButton = _qtw.QPushButton("OK")
+        self.cancelButton = _qtw.QPushButton("Cancel")
 
-        buttonLayout = QHBoxLayout()
+        buttonLayout = _qtw.QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(self.okButton)
         buttonLayout.addWidget(self.cancelButton)
-        layout = QGridLayout()
-        nameLabel = QLabel("Name:")
+        layout = _qtw.QGridLayout()
+        nameLabel = _qtw.QLabel("Name:")
         layout.addWidget(nameLabel, 0, 0)
         layout.addWidget(self._displayNameLineEdit, 0, 1)
         layout.addLayout(buttonLayout, 2, 0, 2, 0)

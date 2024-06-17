@@ -12,3 +12,7 @@ class Geotherm(SourceSinkBase):
     @_tp.override
     def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.GEOTHERM_SVG
+
+    @classmethod
+    def _getInputAndOutputXPos(cls) -> tuple[int, int]:
+        return (20, 40)

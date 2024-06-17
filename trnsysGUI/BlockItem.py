@@ -1,6 +1,5 @@
 # pylint: disable=invalid-name
 
-import os as _os
 import typing as _tp
 
 import PyQt5.QtCore as _qtc
@@ -13,8 +12,6 @@ import trnsysGUI.idGenerator as _id
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.moveCommand as _mc
-
-FILEPATH = "res/Config.txt"
 
 
 # pylint: disable = fixme
@@ -94,9 +91,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def boundingRect(self) -> _qtc.QRectF:
         return _qtc.QRectF(0, 0, self.w, self.h)
 
-    def addTree(self):
-        pass
-
     # Setter functions
     def setParent(self, p):
         self.editor = p
@@ -109,9 +103,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def contextMenuEvent(self, event):
         menu = _qtw.QMenu()
 
-        a1 = menu.addAction("Launch NotePad++")
-        a1.triggered.connect(self.launchNotepadFile)
-
         rr = _img.ROTATE_TO_RIGHT_PNG.icon()
         a2 = menu.addAction(rr, "Rotate Block clockwise")
         a2.triggered.connect(self.rotateBlockCW)
@@ -123,27 +114,13 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         a4 = menu.addAction("Reset Rotation")
         a4.triggered.connect(self.resetRotation)
 
-        b1 = menu.addAction("Print Rotation")
-        b1.triggered.connect(self.printRotation)
-
         c1 = menu.addAction("Delete this Block")
         c1.triggered.connect(self.deleteBlockCom)
 
         menu.exec_(event.screenPos())
 
-    def launchNotepadFile(self):
-        self.logger.debug("Launching notpad")
-        _os.system("start notepad++ " + FILEPATH)
-
     def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
-        if hasattr(self, "isTempering"):
-            self.editor.showTVentilDlg(self)
-        elif self.name in ("TeePiece", "WTap_main"):
-            self.editor.showBlockDlg(self)
-        elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
-            self.editor.showDoublePipeBlockDlg(self)
-        else:
-            self.editor.showBlockDlg(self)
+        self.editor.showBlockDlg(self)
 
     def mousePressEvent(self, event):
         self.isSelected = True
@@ -201,7 +178,7 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
         self._updatePortSides(nQuarterTurnsNeeded, affectedSides)
 
     @staticmethod
-    def updateSide(port, n):
+    def _updateSide(port, n):
         port.side = (port.side + n) % 4
 
     def rotateBlockCW(self):
@@ -264,36 +241,14 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
                 continue
 
             port.itemChange(_qtw.QGraphicsItem.ItemScenePositionHasChanged, port.scenePos())
-            self.updateSide(port, nQuarterTurnsNeeded)
-
-    def printRotation(self):
-        self.logger.debug("Rotation is " + str(self.rotationN))
+            self._updateSide(port, nQuarterTurnsNeeded)
 
     def deleteBlock(self):
         self.editor.trnsysObj.remove(self)
         self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(_qtw.QTreeView, self.displayName + "Tree")
-        if widgetToRemove:
-            widgetToRemove.hide()
 
     def deleteBlockCom(self):
         self.editor.diagramView.deleteBlockCom(self)
-
-    def getConnections(self):
-        """
-        Get the connections from inputs and outputs of this block.
-        Returns
-        -------
-        c : :obj:`List` of :obj:`BlockItem`
-        """
-        c = []
-        for i in self.inputs:
-            for cl in i.connectionList:
-                c.append(cl)
-        for o in self.outputs:
-            for cl in o.connectionList:
-                c.append(cl)
-        return c
 
     def setItemSize(self, w, h):
         self.logger.debug("Inside block item set item size")
@@ -388,14 +343,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
         return False
 
-    def hasElementsInXBand(self):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem):
-                if self.elementInXBand(t):
-                    return True
-
-        return False
-
     def elementInYBand(self, t):
         eps = 50
         return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
@@ -403,13 +350,6 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
     def elementInXBand(self, t):
         eps = 50
         return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
-
-    def elementInY(self):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem):
-                if self.scenePos().y == t.scenePos().y():
-                    return True
-        return False
 
     def _encodeBaseModel(self) -> _bim.BlockItemBaseModel:
         position = (self.pos().x(), self.pos().y())
@@ -503,11 +443,3 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
-
-    def deleteLoadedFile(self):
-        for items in self.loadedFiles:
-            try:
-                self.editor.fileList.remove(str(items))
-            except ValueError:
-                self.logger.debug("File already deleted from file list.")
-                self.logger.debug("filelist:", self.editor.fileList)
