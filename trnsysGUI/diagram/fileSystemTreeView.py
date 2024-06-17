@@ -23,7 +23,7 @@ class FileSystemTreeView(_qtw.QTreeView):
         rootModelIndex = self._model.index(rootFolder)
         self.setRootIndex(rootModelIndex)
 
-    def mouseDoubleClickEvent(self, event: _qtg.QMouseEvent) -> None:
+    def mouseDoubleClickEvent(self, event: _qtg.QMouseEvent) -> None:  # pylint: disable=unused-argument
         self._openCurrentFileOrNoOp()
 
     def contextMenuEvent(self, event):
@@ -70,7 +70,7 @@ importing or remove the directory."""
             A file of the name `{targetFilePath.name}` already exists. Do you want to overwrite it?"""
 
             standardButton = _qtw.QMessageBox.question(None, "Overwrite file?", message)
-            if standardButton != _qtw.QMessageBox.StandardButton.Yes:
+            if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
                 return
 
         _su.copy(sourceFilePath, targetFilePath)

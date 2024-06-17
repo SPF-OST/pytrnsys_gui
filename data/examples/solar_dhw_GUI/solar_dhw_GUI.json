@@ -630,10 +630,10 @@
             }
         },
         "IDs": {
-            "GlobalId": 605,
+            "GlobalId": 591,
             "__idDct__": true,
-            "globalConnID": 181,
-            "trnsysID": 242
+            "globalConnID": 179,
+            "trnsysID": 238
         },
         "Strings": {
             "DiagramName": "solar_dhw_GUI.json",

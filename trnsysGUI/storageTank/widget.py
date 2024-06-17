@@ -1,13 +1,15 @@
 import dataclasses as _dc
-import os as _os
+import pathlib as _pl
 import random as _rnd
-import shutil as _sh
 import typing as _tp
 
 import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
 
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
+import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.hydraulicLoops.model as _hlm
@@ -18,11 +20,8 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.names.rename as _rename
 import trnsysGUI.storageTank.side as _sd
-import trnsysGUI.blockItemGraphicItemMixins as _gimx
-import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
-
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.heatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
@@ -62,8 +61,6 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
         self.storageType = idGenerator.getStorageType()
 
         self.changeSize()
-
-        self.path = None
 
     def setHydraulicLoops(self, hydraulicLoops: _hlm.HydraulicLoops) -> None:
         self._hydraulicLoops = hydraulicLoops
@@ -431,7 +428,10 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
 
-        tool.createDDck(self.path, self.displayName, typeFile="ddck")
+        projectDirPath = _pl.Path(self.editor.projectFolder)
+        ddckFilePath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath) / f"{self.displayName}.ddck"
+
+        tool.createDDck(str(ddckFilePath), self.displayName, typeFile="ddck")
 
     def _getDirectPairPortsForExport(self):
         directPairsPorts = []

@@ -211,7 +211,12 @@ class Editor(_qtw.QWidget):
         libraryModel = LibraryModel()
         libraryModel.setColumnCount(0)
 
-        components = _cfactory.getComponents()
+        componentsWithWarnings = _cfactory.getComponents()
+        if componentsWithWarnings.hasWarnings():
+            warningMessage = componentsWithWarnings.toWarningMessage()
+            _werrs.showMessageBox(warningMessage, _werrs.Title.WARNING)
+        components = componentsWithWarnings.value
+
         for component in components:
             item = _qtg.QStandardItem(component.icon, component.name)
             libraryModel.appendRow(item)

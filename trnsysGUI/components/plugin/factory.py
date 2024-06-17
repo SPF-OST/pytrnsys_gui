@@ -8,6 +8,7 @@ import pytrnsys.utils.result as _res
 import trnsysGUI.BlockItem as _bi
 import trnsysGUI.PortItemBase as _pib
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.singlePipePortItem as _spi
 import trnsysGUI.doublePipePortItem as _dpi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
@@ -39,8 +40,10 @@ class Factory:
     def hasTypeName(candidateTypeName: str) -> bool:
         return candidateTypeName in Factory.getTypeNames()
 
-    def createOrNone(self, typeName: str) -> _tp.Optional[_res.Result[_plugin.Plugin]]:
-        # TODO: deal with non-existent
+    def create(self, typeName: str) -> _res.Result[_plugin.Plugin]:
+        if not self.hasTypeName(typeName):
+            raise ValueError("Unknown type.", typeName)
+
         specificationResult = self.specificationLoader.load(typeName)
         if _res.isError(specificationResult):
             return _res.error(specificationResult)
@@ -60,62 +63,53 @@ class _PortPropertiesBase(_abc.ABC):
     def getName(self, nameSpec: str | None) -> str:
         return nameSpec or self.defaultName
 
-    @classmethod
     @property
     @_abc.abstractmethod
-    def defaultName(cls) -> str:
+    def defaultName(self) -> str:
         raise NotImplementedError()
 
-    @classmethod
     @property
     @_abc.abstractmethod
-    def directionLabel(cls) -> str:
+    def directionLabel(self) -> str:
         raise NotImplementedError()
 
-    @classmethod
     @property
     @_abc.abstractmethod
-    def direction(cls) -> _mfn.PortItemDirection:
+    def direction(self) -> _mfn.PortItemDirection:
         raise NotImplementedError()
 
 
 class _InputPortProperties(_PortPropertiesBase):
-    @classmethod
     @property
     @_tp.override
-    def defaultName(cls) -> str:
+    def defaultName(self) -> str:
         return "In"
 
-    @classmethod
     @property
     @_tp.override
-    def directionLabel(cls) -> str:
+    def directionLabel(self) -> str:
         return "in"
 
-    @classmethod
     @property
     @_tp.override
-    def direction(cls) -> _mfn.PortItemDirection:
+    def direction(self) -> _mfn.PortItemDirection:
         return _mfn.PortItemDirection.INPUT
 
 
 class _OutputPortProperties(_PortPropertiesBase):
-    @classmethod
     @property
     @_tp.override
-    def defaultName(cls) -> str:
+    def defaultName(self) -> str:
         return "Out"
 
-    @classmethod
     @property
     @_tp.override
-    def directionLabel(cls) -> str:
+    def directionLabel(self) -> str:
         return "in"
 
-    @classmethod
     @property
     @_tp.override
-    def direction(cls) -> _mfn.PortItemDirection:
+    def direction(self) -> _mfn.PortItemDirection:
         return _mfn.PortItemDirection.OUTPUT
 
 
@@ -185,7 +179,7 @@ class InternalPipingFactory(_plugin.AbstractInternalPipingFactory):
             case _:
                 _tp.assert_never(portSpec.type)
 
-    def _getSide(self, portPosition: tuple[int, int]) -> _tp.Literal[0, 1, 2, 3]:
+    def _getSide(self, portPosition: tuple[int, int]) -> _spi.Side:
         posX, posY = portPosition
         width, height = self.specification.size
 

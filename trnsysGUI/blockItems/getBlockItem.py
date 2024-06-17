@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import typing as _tp
 
+import pytrnsys.utils.result as _res
+
 import trnsysGUI.blockItems.names as _names
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.names.create as _cname
@@ -47,6 +49,7 @@ from trnsysGUI.water import Water
 
 import trnsysGUI.components.pluginComponent as _pcomp
 import trnsysGUI.components.plugin.factory as _pfactory
+
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.diagram.Editor as _ed
@@ -123,7 +126,8 @@ def createBlockItem(
 
 def _getBaseDisplayNameForPluginComponent(componentTypeName: str) -> str:
     factory = _pfactory.Factory.createDefault()
-    plugin = factory.createOrNone(componentTypeName)
+    pluginResult = factory.create(componentTypeName)
+    plugin = _res.value(pluginResult)
     baseDisplayName = plugin.baseDisplayName
     return baseDisplayName
 

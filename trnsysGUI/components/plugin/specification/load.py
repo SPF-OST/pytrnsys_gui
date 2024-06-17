@@ -30,7 +30,11 @@ class FileResourceLoader(ResourceLoaderBase):
 
 class PackageResourceLoader(ResourceLoaderBase):
     def loadBytes(self, resourcePath: str) -> bytes:
-        return _pu.get_data(_trnsysGui.__name__, resourcePath)
+        data = _pu.get_data(_trnsysGui.__name__, resourcePath)
+        if not data:
+            raise ValueError("No data found at resource path.", resourcePath)
+
+        return data
 
 
 PACKAGE_RESOURCE_LOADER = PackageResourceLoader()
@@ -61,9 +65,9 @@ class Loader:
         bytesResult = self._loadData(specResourcePath)
         if _res.isError(bytesResult):
             return _res.error(bytesResult)
-        bytes_ = _res.value(bytesResult)
+        _bytes = _res.value(bytesResult)
 
-        dataResult = self._loadYaml(bytes_)
+        dataResult = self._loadYaml(_bytes)
         if _res.isError(dataResult):
             return _res.error(dataResult).withContext(f"Syntax error in `{specResourcePath}`")
         data = _res.value(dataResult)
@@ -84,9 +88,9 @@ class Loader:
             return _res.Error(f"`{resourcePath}` could not be read. Maybe it's a directory instead of a file?")
 
     @staticmethod
-    def _loadYaml(bytes_: bytes) -> _res.Result[_cabc.Mapping]:
+    def _loadYaml(_bytes: bytes) -> _res.Result[_cabc.Mapping]:
         try:
-            return _yaml.safe_load(bytes_)
+            return _yaml.safe_load(_bytes)
         except _yp.ParserError as parseError:
             return _res.Error(str(parseError))
 

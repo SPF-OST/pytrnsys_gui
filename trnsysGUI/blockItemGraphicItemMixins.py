@@ -8,8 +8,7 @@ import trnsysGUI.imageAccessor as _ia
 
 
 class BlockItemGraphicItemMixinBase:
-    @classmethod
-    def _getImageAccessor(cls) -> _ia.ImageAccessorBase:
+    def _getImageAccessor(self) -> _ia.ImageAccessorBase:
         raise NotImplementedError()
 
     def boundingRect(self) -> _qtc.QRectF:
@@ -50,9 +49,8 @@ class RasterImageBlockItemMixin(BlockItemGraphicItemMixinBase):
         imageAccessor = self._getImageAccessor()
         self._image = imageAccessor.image()
 
-    @classmethod
     @_tp.override
-    def _getImageAccessor(cls) -> _ia.ImageAccessorBase:
+    def _getImageAccessor(self) -> _ia.ImageAccessorBase:
         raise NotImplementedError()
 
     @_tp.override

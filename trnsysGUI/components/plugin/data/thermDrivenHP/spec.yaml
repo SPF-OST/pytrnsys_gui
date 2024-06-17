@@ -1,5 +1,5 @@
 defaultName: AbsHP
-description: Ab-/Adsorption heat pump
+description: Thermally driven heat pump
 connections:
   - name: cold
     input:

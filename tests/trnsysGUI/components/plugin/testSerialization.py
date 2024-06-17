@@ -7,7 +7,7 @@ import trnsysGUI.components.plugin.serialization as _ser
 
 class TestSerialization:
     def test(self) -> None:
-        specFilePath = _pl.Path(__file__).parent / "data" / "spec.yaml"
+        specFilePath = _pl.Path(__file__).parent / "data" / "thermallyDrivenHeatPump" / "spec.yaml"
         with specFilePath.open() as file:
             data = _yaml.safe_load(file)
 

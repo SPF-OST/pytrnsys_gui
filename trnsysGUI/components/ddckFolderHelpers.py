@@ -22,6 +22,7 @@ def moveComponentDdckFolderIfNecessary(
     oldComponentDirPath = getComponentDdckDirPath(oldName, projectDirPath)
 
     if oldComponentDirPath.is_dir():
+        newComponentDirPath = getComponentDdckDirPath(newName, projectDirPath)
         _su.move(oldComponentDirPath, newComponentDirPath)
     else:
         _werrors.showMessageBox(
@@ -61,7 +62,8 @@ def maybeDeleteNonEmptyComponentDdckFolder(blockItem: _bi.BlockItem, projectFold
     if childItems:
         formattedChildItems = "\n".join(p.name for p in childItems)
         message = f"""\
-You're about to delete component `{displayName}`. Its component ddck folder is not empty and contains the following items:
+You're about to delete component `{displayName}`. Its component ddck folder is not empty
+and contains the following items:
 
 {formattedChildItems}
 
@@ -69,7 +71,7 @@ Would you like to delete the component ddck folder nonetheless? This cannot be u
 """
         standardButton = _qtw.QMessageBox.question(None, "Delete component ddck folder?", message)
 
-        if standardButton != _qtw.QMessageBox.StandardButton.Yes:
+        if standardButton != _qtw.QMessageBox.StandardButton.Yes:  # pylint: disable=no-member
             return
 
     _su.rmtree(dirPath)

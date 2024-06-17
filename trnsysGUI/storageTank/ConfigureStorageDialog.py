@@ -41,7 +41,7 @@ class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable 
         storage: _st.StorageTank,
         editor: _ed.Editor,  # type: ignore[name-defined]
         renameHelper: _rename.RenameHelper,
-        projectDirPath: str
+        projectDirPath: str,
     ) -> None:
         # pylint: disable = too-many-locals, too-many-statements
         super().__init__(storage, renameHelper, _pl.Path(projectDirPath))
