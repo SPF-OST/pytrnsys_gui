@@ -40,8 +40,8 @@ def getTestCases() -> _cabc.Iterable[TestCase]:
                 ),
                 _model.Connection(
                     name="hot",
-                    input=_model.Port(name=None, position=(40, 0)),
-                    output=_model.Port(name=None, position=(80, 0)),
+                    input=_model.Port(name=None, position=(80, 0)),
+                    output=_model.Port(name=None, position=(40, 0)),
                 ),
             ],
             size=(120, 120),
