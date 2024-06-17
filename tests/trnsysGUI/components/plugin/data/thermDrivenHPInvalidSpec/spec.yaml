@@ -5,7 +5,7 @@ connections:
     input:
       position: [0, 20]
     output:
-      position: [0, 100]
+      position: 100
   - name: medium
     input:
       position: [120, 20]
