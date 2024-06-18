@@ -68,7 +68,8 @@ setuptools.setup(
             "images/*.svg",
             "templates/run.config",
             "templates/generic/*.ddck",
-        ]
+        ],
+        "trnsysGUI.components.plugin": ["data/*/*.svg", "data/*/*.yaml"],
     },
     data_files=_getDataFilePairs(),
     install_requires=_getInstallRequirements(),
