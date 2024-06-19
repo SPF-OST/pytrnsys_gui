@@ -119,7 +119,7 @@ class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-method
 
         menu.exec_(event.screenPos())
 
-    def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
+    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:  # pylint: disable=unused-argument
         self.editor.showBlockDlg(self)
 
     def mousePressEvent(self, event):

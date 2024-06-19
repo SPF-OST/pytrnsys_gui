@@ -22,7 +22,7 @@ class ChangeNameDialogBase(_qtw.QDialog):
 
         self.setModal(True)
 
-    def acceptedEdit(self):
+    def acceptedEdit(self) -> None:
         newName = self._displayNameLineEdit.text()
         oldName = self._blockItem.displayName
 

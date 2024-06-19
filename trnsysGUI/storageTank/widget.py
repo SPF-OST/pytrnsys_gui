@@ -361,7 +361,7 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         menu.exec(event.screenPos())
 
-    def mouseDoubleClickEvent(self, event: _qtg.QMouseEvent) -> None:
+    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
         dialog = ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder)
         dialog.exec()
