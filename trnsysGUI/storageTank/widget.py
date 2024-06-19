@@ -361,9 +361,9 @@ class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItem
 
         menu.exec(event.screenPos())
 
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event: _qtg.QMouseEvent) -> None:
         renameHelper = _rename.RenameHelper(self.editor.namesManager)
-        dialog = ConfigureStorageDialog(self, self.editor, renameHelper)
+        dialog = ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder)
         dialog.exec()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
