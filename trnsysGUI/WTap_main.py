@@ -65,7 +65,7 @@ class WTap_main(_bi.BlockItem, _ip.HasInternalPiping):
         return w, h
 
     def exportMassFlows(self):
-        resStr = "Mfr" + self.displayName + f" = {self.massFlowRateInKgPerH}" + "\n"
+        resStr = f"Mfr{self.displayName} = {self.massFlowRateInKgPerH}\n"
         equationNr = 1
         return resStr, equationNr
 
