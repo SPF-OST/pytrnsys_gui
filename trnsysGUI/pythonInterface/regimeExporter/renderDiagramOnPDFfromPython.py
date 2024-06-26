@@ -15,7 +15,7 @@ import trnsysGUI.mainWindow as _mw
 import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.TVentil as _tv
-import trnsysGUI.pumpsAndTaps.tapMains as _tm
+import trnsysGUI.pumpsAndTaps._tapBase as _tb
 
 
 @_dc.dataclass
@@ -63,7 +63,7 @@ class RegimeExporter:
             if isinstance(blockItem, (_pump.Pump, _tv.TVentil)):
                 if blockItem.displayName in pumpsAndValvesNames:
                     pumpsAndValves.append(blockItem)
-            elif isinstance(blockItem, _tm.TapMains):
+            elif isinstance(blockItem, _tb.TapBase):
                 mainTaps[blockItem.displayName] = blockItem
 
         return pumpsAndValves, mainTaps
@@ -104,7 +104,11 @@ class RegimeExporter:
                 blockItem._massFlowRateInKgPerH = desiredValue
                 if pumpTapPairs and (blockItemName in pumpTapPairs):
                     associatedTap = pumpTapPairs[blockItemName]
-                    mainTaps[associatedTap].massFlowRateInKgPerH = desiredValue
+                    if isinstance(associatedTap, list):
+                        for tap in associatedTap:
+                            mainTaps[tap]._massFlowRateInKgPerH = desiredValue
+                    else:
+                        mainTaps[associatedTap]._massFlowRateInKgPerH = desiredValue
             elif isinstance(blockItem, _tv.TVentil):
                 blockItem.positionForMassFlowSolver = desiredValue
             else:

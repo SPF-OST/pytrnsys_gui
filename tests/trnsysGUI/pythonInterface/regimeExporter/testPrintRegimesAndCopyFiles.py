@@ -189,7 +189,7 @@ class TestPrintRegimesAndCopyFiles:
             raise Exception(errors)
 
     def testUsingQtBotForRegimeWithTap(self, qtbot):
-        pumpTapPairs = {"Pump5": "WtSp1"}
+        pumpTapPairs = {"Pump5": ["WtSp1", "WtTp3"]}
         onlyTheseRegimes = ["dummy_regime"]
         projectName = "diagramWithTapForRegimes"
         regimeEnding = "_dummy_regime"
@@ -208,9 +208,19 @@ class TestPrintRegimesAndCopyFiles:
         regimeExporter = _rdopfp.RegimeExporter(projectName, dataDir, resultsDir, _REGIMES_FILENAME, mainWindow)
         regimeExporter.export(pumpTapPairs=pumpTapPairs, onlyTheseRegimes=onlyTheseRegimes)
 
-        self._fileExistsAndIsCorrect(pathFinder2.newPdfPath, pathFinder2.expectedPdfPath)
+        errors = []
+        try:
+            self._fileExistsAndIsCorrect(pathFinder2.newPdfPath, pathFinder2.expectedPdfPath)
+        except AssertionError as current_error:
+            errors.append(current_error)
 
         pathFinder2.setFileEnding("_diagram")
-        assert not pathFinder2.newPdfPath.is_file()
+        try:
+            assert not pathFinder2.newPdfPath.is_file()
+        except AssertionError as current_error:
+            errors.append(current_error)
+
+        if errors:
+            raise Exception(errors)
 
 # non-qtbot solution?
