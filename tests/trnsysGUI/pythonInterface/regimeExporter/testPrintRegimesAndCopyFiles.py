@@ -1,9 +1,8 @@
 import dataclasses as _dc
-import matplotlib.testing.compare as _mpltc  # type: ignore[import]
 import os as _os
 import pathlib as _pl
-import pytest as _pt
 import typing as _tp
+import matplotlib.testing.compare as _mpltc  # type: ignore[import]
 
 import pytrnsys.utils.log as _ulog
 
@@ -144,19 +143,25 @@ class TestPrintRegimesAndCopyFiles:
         regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME, _DATA_DIR, _RESULTS_DIR, _REGIMES_FILENAME, mainWindow)
         regimeExporter.export()
 
-        files_to_compare = {'new_file': [_NEW_DIAGRAM_PATH, _NEW_NAME1_PATH, _NEW_NAME1_SVG_PATH, _NEW_NAME2_PATH],
-                            'expected_file': [_EXPECTED_DIAGRAM_PATH, _EXPECTED_NAME1_PATH, _EXPECTED_NAME1_SVG_PATH,
-                                              _EXPECTED_NAME2_PATH]}
+        filesToCompare = {
+            "new_file": [_NEW_DIAGRAM_PATH, _NEW_NAME1_PATH, _NEW_NAME1_SVG_PATH, _NEW_NAME2_PATH],
+            "expected_file": [
+                _EXPECTED_DIAGRAM_PATH,
+                _EXPECTED_NAME1_PATH,
+                _EXPECTED_NAME1_SVG_PATH,
+                _EXPECTED_NAME2_PATH,
+            ],
+        }
 
         errors = []
-        for i, new_file in enumerate(files_to_compare['new_file']):
+        for i, newFile in enumerate(filesToCompare["new_file"]):
             try:
-                self._fileExistsAndIsCorrect(new_file, files_to_compare['expected_file'][i])
-            except AssertionError as current_error:
-                errors.append(current_error)
+                self._fileExistsAndIsCorrect(newFile, filesToCompare["expected_file"][i])
+            except AssertionError as currentError:
+                errors.append(currentError)
 
         if errors:
-            raise Exception(errors)
+            raise ExceptionGroup("multiple errors", errors)
 
     @staticmethod
     def _fileExistsAndIsCorrect(producedFile, expectedFile):
@@ -172,21 +177,21 @@ class TestPrintRegimesAndCopyFiles:
         errors = []
         try:
             self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
-        except AssertionError as current_error:
-            errors.append(current_error)
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         try:
             assert not _NEW_DIAGRAM_PATH_2.is_file()
-        except AssertionError as current_error:
-            errors.append(current_error)
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         try:
             assert not _NEW_NAME2_PATH_2.is_file()
-        except AssertionError as current_error:
-            errors.append(current_error)
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         if errors:
-            raise Exception(errors)
+            raise ExceptionGroup("multiple errors", errors)
 
     def testUsingQtBotForRegimeWithTap(self, qtbot):
         pumpTapPairs = {"Pump5": ["WtSp1", "WtTp3"]}
@@ -211,16 +216,17 @@ class TestPrintRegimesAndCopyFiles:
         errors = []
         try:
             self._fileExistsAndIsCorrect(pathFinder2.newPdfPath, pathFinder2.expectedPdfPath)
-        except AssertionError as current_error:
-            errors.append(current_error)
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         pathFinder2.setFileEnding("_diagram")
         try:
             assert not pathFinder2.newPdfPath.is_file()
-        except AssertionError as current_error:
-            errors.append(current_error)
+        except AssertionError as currentError:
+            errors.append(currentError)
 
         if errors:
-            raise Exception(errors)
+            raise ExceptionGroup("multiple errors", errors)
+
 
 # non-qtbot solution?
