@@ -12,10 +12,10 @@ import PyQt5.QtCore as _qtc
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.mainWindow as _mw
-import trnsysGUI.pump as _pump
+import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
 import trnsysGUI.TVentil as _tv
-import trnsysGUI.WTap_main as _wtm
+import trnsysGUI.pumpsAndTaps.tapMains as _tm
 
 
 @_dc.dataclass
@@ -63,7 +63,7 @@ class RegimeExporter:
             if isinstance(blockItem, (_pump.Pump, _tv.TVentil)):
                 if blockItem.displayName in pumpsAndValvesNames:
                     pumpsAndValves.append(blockItem)
-            elif isinstance(blockItem, _wtm.WTap_main):
+            elif isinstance(blockItem, _tm.TapMains):
                 mainTaps[blockItem.displayName] = blockItem
 
         return pumpsAndValves, mainTaps
