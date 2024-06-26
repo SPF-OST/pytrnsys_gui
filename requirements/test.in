@@ -1,4 +1,4 @@
 -r test-3rd-party.in
 
-git+https://github.com/SPF-OST/pytrnsys.git@master#egg=pytrnsys
+git+https://github.com/SPF-OST/pytrnsys.git#egg=pytrnsys
 -e file:.

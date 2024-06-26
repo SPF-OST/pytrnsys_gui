@@ -7,7 +7,7 @@ class Cancelled:
 
 CANCELLED = Cancelled()
 _T = _tp.TypeVar("_T")
-MaybeCancelled = _tp.Union[_T, Cancelled]
+MaybeCancelled: _tp.TypeAlias = _T | Cancelled
 
 
 def isCancelled(maybeCancelled: MaybeCancelled[_T]) -> bool:

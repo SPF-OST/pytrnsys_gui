@@ -14,6 +14,13 @@
 ** TODO:
 ***************************************************************************
 
+***********************************
+** Sizing constants - just define here (overriden from config file)
+***********************************
+CONSTANTS 3
+CollAM2PerMWh = 1
+DhwVM3PerM2 = 1
+QDemandMWh = 1
 
 ***********************************
 ** Control Temperatures
@@ -25,7 +32,7 @@ mySenTesSolarTop = Tsen9_Tes1 !@dependencyDdck
 mySenTesSolarBot = Tsen1_Tes1 !@dependencyDdck
 mySenTesAux = Tsen8_Tes1 !@dependencyDdck
 tSetAux = 50
-TdhwSet = 45
+TdhwSet = TdhwSetProfile
 
 ***********************************
 ** Begin TYPE AUXILIAR CONTROLLER
@@ -51,6 +58,8 @@ dtAuxOff       ! Turn off temperature difference, Lower dead band dT, LDB
 EQUATIONS 1  
 auxOn = [27,1]
 
+CONSTANTS 1
+DhwPAux_kW = 5
 
 ***********************************
 ** Begin TYPE COLLECTOR CONTROLLER
@@ -77,11 +86,12 @@ EQUATIONS 1
 puColOn = [28,1]*LT(myTcollOut,120)
 
 
-EQUATIONS 3
+EQUATIONS 4
 *** Massflowrates
 MfrPuCol = puColOnRc*MfrCPriNom
-MfrWTapBottom = MfrDHWset
-MfrDhwDemand = ABS(MfrPiDhwDemand)
+MfrWTap = -MfrDHWset*0.125
+MfrWTap2 = -MfrDHWset*0.875
+MfrWTap_main = MfrDHWset
 
 ***********************************
 ** Begin TYPE Recall

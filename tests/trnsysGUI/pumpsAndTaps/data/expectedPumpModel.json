@@ -1,0 +1,23 @@
+{
+  "BlockName": "Pump",
+  "BlockDisplayName": "PuHpShCond",
+  "blockItemWithPrescribedMassFlow": {
+    "blockItem": {
+      "blockPosition": [
+        -820.0,
+        -289.0
+      ],
+      "trnsysId": 522,
+      "flippedH": false,
+      "flippedV": false,
+      "rotationN": 0,
+      "__version__": "7b792574-5fa6-4c3e-b2e3-7e4eb71d7746"
+    },
+    "massFlowRateInKgPerH": 500.0,
+    "__version__": "e9fd1a0e-c00a-46e2-abfb-7381fa1b2e2d"
+  },
+  "inputPortId": 1618,
+  "outputPortId": 1619,
+  "__version__": "3d1e7f06-c7a6-49af-98b8-f593b34c5754",
+  ".__BlockDict__": true
+}

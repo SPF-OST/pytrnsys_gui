@@ -1,4 +1,4 @@
-import cgitb as _cgitb
+import cgitb as _cgitb  # pylint: disable=deprecated-module
 import json as _json
 import logging as _log
 import pathlib as _pl
@@ -59,7 +59,7 @@ class TestStorageTank:
         storageTank = _st.StorageTank(
             trnsysType="StorageTank",
             editor=editorMock,
-            displayNamePrefix=legacySerializedStorageTank["BlockName"],
+            displayName=legacySerializedStorageTank["BlockDisplayName"],
         )  # pylint: disable=no-member
 
         blocks = []
@@ -76,6 +76,9 @@ class TestStorageTank:
             objectsNeededToBeKeptAliveWhileTanksAlive,  # pylint: disable=unused-variable
         ) = self._createDiagramViewMocksAndOtherObjectsToKeepAlive(logger, self.ACTUAL_DIR_PATH, qtbot)
 
+        actualComponentDdckDirPath = self.ACTUAL_DIR_PATH / "ddck" / "TesDhw"
+        actualComponentDdckDirPath.mkdir(parents=True, exist_ok=True)
+
         legacyJson = self.LEGACY_JSON_PATH.read_text()
         storageTank = self._deserializeStorageTank(legacyJson, editorMock)
 
@@ -86,8 +89,8 @@ class TestStorageTank:
 
         storageTank.exportDck()
 
-        actualDdckPath = self.ACTUAL_DIR_PATH / "ddck" / "StorageTank7701" / "TesDhw.ddck"
-        actualDdckContent = actualDdckPath.read_text()
+        actualDdckFilePath = actualComponentDdckDirPath / "TesDhw.ddck"
+        actualDdckContent = actualDdckFilePath.read_text()
         print(actualDdckContent)
 
         expectedDdckContent = (self.EXPECTED_DIR_PATH / "TesDhw.ddck").read_text()
@@ -184,7 +187,6 @@ class TestStorageTank:
             ],
         )
         editorMock.moveDirectPorts = True
-        editorMock.editorMode = 1
         editorMock.snapGrid = False
         editorMock.alignMode = False
 

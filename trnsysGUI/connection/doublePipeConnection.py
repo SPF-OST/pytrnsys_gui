@@ -5,29 +5,47 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.connection.connectionBase as _cb
+import trnsysGUI.connection.createMassFlowSolverNetworkPipes as _cmnp
+import trnsysGUI.connection.deleteDoublePipeConnectionCommand as _ddpcc
 import trnsysGUI.connection.doublePipeConnectionModel as _model
 import trnsysGUI.connection.doublePipeDefaultValues as _defaults
+import trnsysGUI.connection.hydraulicExport.common as _hecom
 import trnsysGUI.connection.hydraulicExport.doublePipe as _he
+import trnsysGUI.connection.hydraulicExport.doublePipe.createExportHydraulicDoublePipeConnection as _cehc
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _hedpc
-import trnsysGUI.connectorsAndPipesExportHelpers as _helpers
 import trnsysGUI.doublePipePortItem as _dppi
-import trnsysGUI.segments.doublePipeSegmentItem as _dpsi
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.names.undo as _nu
+import trnsysGUI.segments.doublePipeSegmentItem as _dpsi
 from . import _massFlowLabels as _mfl
+
+if _tp.TYPE_CHECKING:
+    import trnsysGUI.diagram.Editor as _ed
 
 
 class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-instance-attributes
-    def __init__(self, fromPort: _dppi.DoublePipePortItem, toPort: _dppi.DoublePipePortItem, parent):
+    def __init__(
+        self,
+        displayName: str,
+        fromPort: _dppi.DoublePipePortItem,
+        toPort: _dppi.DoublePipePortItem,
+        parent: _ed.Editor,  # type: ignore[name-defined]
+    ) -> None:
         super().__init__(
-            fromPort, toPort, _defaults.DEFAULT_SHALL_BE_SIMULATED, _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M, parent
+            displayName,
+            fromPort,
+            toPort,
+            _defaults.DEFAULT_SHALL_BE_SIMULATED,
+            _defaults.DEFAULT_DOUBLE_PIPE_LENGTH_IN_M,
+            parent,
         )
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
         self.childIds.append(self.parent.idGen.getTrnsysID())
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
     @property
     def fromPort(self) -> _dppi.DoublePipePortItem:
@@ -56,13 +74,17 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         return rad
 
     def createDeleteUndoCommand(self, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None) -> _qtw.QUndoCommand:
-        undoCommand = DeleteDoublePipeConnectionCommand(self, parentCommand)
+        undoNamingHelper = _nu.UndoNamingHelper.create(self._editor.namesManager)
+
+        undoCommand = _ddpcc.DeleteDoublePipeConnectionCommand(
+            self, undoNamingHelper, self._editor.diagramScene, parentCommand
+        )
         return undoCommand
 
     def encode(self):
         if len(self.segments) > 0:
-            labelPos = self.segments[0].label.pos().x(), self.segments[0].label.pos().y()
-            labelMassPos = self.segments[0].labelMass.pos().x(), self.segments[0].labelMass.pos().y()
+            labelPos = self._label.pos().x(), self._label.pos().y()
+            labelMassPos = self.massFlowLabel.pos().x(), self.massFlowLabel.pos().y()
         else:
             self.logger.debug("This connection has no segment")
             defaultPos = self.fromPort.pos().x(), self.fromPort.pos().y()  # pylint: disable = duplicate-code # 1
@@ -107,7 +129,7 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         self.shallBeSimulated = model.shallBeSimulated
 
         if len(model.segmentsCorners) > 0:
-            self.loadSegments(model.segmentsCorners)
+            self._loadSegments(model.segmentsCorners)
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         coldModelPortItemsToGraphicalPortItem = {
@@ -123,60 +145,33 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
         modelPortItemsToGraphicalPortItem = coldModelPortItemsToGraphicalPortItem | hotModelPortItemsToGraphicalPortItem
         return _ip.InternalPiping([self.coldModelPipe, self.hotModelPipe], modelPortItemsToGraphicalPortItem)
 
-    def exportPipeAndTeeTypesForTemp(
-        self, startingUnit: int
-    ) -> _tp.Tuple[str, int]:  # pylint: disable=too-many-locals,too-many-statements
+    def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         unitNumber = startingUnit
 
         exportModel = self._getHydraulicExportConnectionModel()
         return _he.export(exportModel, unitNumber)
 
-    def _getHydraulicExportConnectionModel(self) -> _hedpc.DoublePipeConnection:
-        coldInputTemperature = _helpers.getTemperatureVariableName(
-            self.toPort.parent, self.toPort, _mfn.PortItemType.COLD
-        )
-        coldMassFlowRate = _helpers.getInputMfrName(self, self.coldModelPipe)
-        coldRevInputTemperature = _helpers.getTemperatureVariableName(
-            self.fromPort.parent, self.fromPort, _mfn.PortItemType.COLD
-        )
-
-        hotInputTemperature = _helpers.getTemperatureVariableName(
-            self.fromPort.parent, self.fromPort, _mfn.PortItemType.HOT
-        )
-        hotMassFlowRate = _helpers.getInputMfrName(self, self.hotModelPipe)
-        hotRevInputTemperature = _helpers.getTemperatureVariableName(
-            self.toPort.parent, self.toPort, _mfn.PortItemType.HOT
+    def _getHydraulicExportConnectionModel(self) -> _hedpc.ExportDoublePipeConnection:
+        hydraulicConnection = _cehc.HydraulicDoublePipeConnection(
+            self.displayName,
+            _hecom.getAdjacentBlockItem(self.fromPort),
+            _hecom.getAdjacentBlockItem(self.toPort),
+            self.coldModelPipe,
+            self.hotModelPipe,
         )
 
-        # This assert is only used to satisfy MyPy, because we know that for double pipes, these have names.
-        assert self.coldModelPipe.name and self.hotModelPipe.name
+        exportHydraulicConnection = _cehc.createModel(hydraulicConnection)
+
         assert isinstance(self.lengthInM, float)
 
-        connectionModel = _hedpc.DoublePipeConnection(
-            self.displayName,
-            self.lengthInM,
-            self.shallBeSimulated,
-            coldPipe=_hedpc.SinglePipe(
-                self.coldModelPipe.name,
-                _hedpc.InputPort(coldInputTemperature, coldMassFlowRate),
-                _hedpc.OutputPort(coldRevInputTemperature),
-            ),
-            hotPipe=_hedpc.SinglePipe(
-                self.hotModelPipe.name,
-                _hedpc.InputPort(hotInputTemperature, hotMassFlowRate),
-                _hedpc.OutputPort(hotRevInputTemperature),
-            ),
+        exportConnection = _hedpc.ExportDoublePipeConnection(
+            exportHydraulicConnection, self.lengthInM, self.shallBeSimulated
         )
-        return connectionModel
 
-    def _updateModels(self, newDisplayName: str):
-        coldFromPort: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
-        coldToPort: _mfn.PortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
-        self.coldModelPipe = _mfn.Pipe(coldFromPort, coldToPort, name="Cold")
+        return exportConnection
 
-        hotFromPort: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.HOT)
-        hotToPort: _mfn.PortItem = _mfn.PortItem("Out", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
-        self.hotModelPipe = _mfn.Pipe(hotFromPort, hotToPort, name="Hot")
+    def _setModels(self):
+        self.coldModelPipe, self.hotModelPipe = _cmnp.createMassFlowSolverNetworkPipes()
 
     def setMassFlowAndTemperature(
         self, coldMassFlow: float, coldTemperature: float, hotMassFlow: float, hotTemperature: float
@@ -187,23 +182,4 @@ class DoublePipeConnection(_cb.ConnectionBase):  # pylint: disable=too-many-inst
 Cold: {formattedColdMassFlowAndTemperature}
 Hot: {formattedHotMassFlowAndTemperature}
 """
-        for segment in self.segments:
-            segment.labelMass.setPlainText(labelText)
-
-
-class DeleteDoublePipeConnectionCommand(_qtw.QUndoCommand):
-    def __init__(
-        self, doublePipeConnection: DoublePipeConnection, parentCommand: _tp.Optional[_qtw.QUndoCommand] = None
-    ) -> None:
-        super().__init__("Delete double pipe connection", parentCommand)
-        self._connection = doublePipeConnection
-        self._fromPort = self._connection.fromPort
-        self._toPort = self._connection.toPort
-        self._editor = self._connection.parent
-
-    def undo(self):
-        self._connection = DoublePipeConnection(self._fromPort, self._toPort, self._editor)
-
-    def redo(self):
-        self._connection.deleteConn()
-        self._connection = None
+        self.massFlowLabel.setPlainText(labelText)

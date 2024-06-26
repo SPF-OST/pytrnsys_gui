@@ -261,7 +261,7 @@ unitPrinter_Tes2 ! 1: Logical unit number, -
 0  ! 5: Number of inputs to avoid integration
 INPUTS 8
 Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 qHeatSource_Tes2 
-zero zero zero zero zero zero zero zero 
+Qv_Tes2 QLoss_Tes2 QAcum_Tes2 QPorts_Tes2 QImb_Tes2 Qdp1_Tes2 Qdp2_Tes2 qHeatSource_Tes2 
 *************************************
 ********** Online Plotter ***********
 *************************************

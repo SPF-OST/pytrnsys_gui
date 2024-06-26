@@ -3,19 +3,24 @@
 
 import datetime as _dt
 import itertools as _it
+import numpy as _np
+import typing as _tp
+
+import pandas as _pd
 
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
-import numpy as _np
-import pandas as _pd
 
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
+import trnsysGUI.warningsAndErrors as _werrors
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+
+_MAX_HEADER_LENGTH = 25
 
 
 class MassFlowVisualizer(_qtw.QDialog):
@@ -56,8 +61,12 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.getThresholdValues()
         self.getTempThresholdValues()
 
-        self.jumpValue = _qtw.QLabel("Jump by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )")
-        self.jumpValueLE = _qtw.QLineEdit("1")
+        timeStepIncreaseLabelText = "Increase time-step by ( 30 = 1 Hour ):\n              ( 720 = 1 Day )"
+        self._timeStepIncreaseLabel = _qtw.QLabel(timeStepIncreaseLabelText)
+        self._timeStepIncrease = 1
+        self._timeStepIncreaseLineEdit = _qtw.QLineEdit()
+        self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
+        self._timeStepIncreaseLineEdit.editingFinished.connect(self._onTimeStepIncreaseLineEditEditingFinished)
 
         self.slider = _qtw.QSlider(parent)
         self.setSlider()
@@ -104,8 +113,8 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         buttonLayout = _qtw.QHBoxLayout()
         buttonLayout.addStretch()
-        buttonLayout.addWidget(self.jumpValue)
-        buttonLayout.addWidget(self.jumpValueLE)
+        buttonLayout.addWidget(self._timeStepIncreaseLabel)
+        buttonLayout.addWidget(self._timeStepIncreaseLineEdit)
         buttonLayout.addWidget(self.showMassButton)  # comment out
         buttonLayout.addWidget(self.togglePauseButton)
         buttonLayout.addWidget(self.cancelButton)
@@ -135,6 +144,21 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.move(parent.editor.diagramView.geometry().topLeft())
         self.show()
 
+    def _onTimeStepIncreaseLineEditEditingFinished(self) -> None:
+        try:
+            lineEditText = self._timeStepIncreaseLineEdit.text()
+            timeStepIncrease = int(lineEditText)
+        except ValueError:
+            timeStepIncrease = None
+
+        if timeStepIncrease is None or not (1 <= timeStepIncrease <= self.maxTimeStep):
+            errorMessage = f"The time-step increase must be an integer between 1 and {self.maxTimeStep}, inclusive."
+            _werrors.showMessageBox(errorMessage, title="Invalid value")
+            self._timeStepIncreaseLineEdit.setText(str(self._timeStepIncrease))
+            return
+
+        self._timeStepIncrease = timeStepIncrease
+
     def togglePause(self):
         if self.paused:
             self.continueVis()
@@ -157,21 +181,20 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         for t in self.parent.editor.trnsysObj:
             if isinstance(t, _cb.ConnectionBase):
-                if self.showMass:
-                    t.firstS.labelMass.setVisible(True)
-                else:
-                    t.firstS.labelMass.setVisible(False)
+                t.massFlowLabel.setVisible(self.showMass)
 
         self.logger.debug("%s %s %s" % (str(self.minValue), str(self.medianValue), str(self.maxValue)))
 
     def loadFile(self):
         if not self.loadedFile:
             self.massFlowData = _pd.read_csv(self.dataFilePath, sep="\t").rename(columns=lambda x: x.strip())
+            _truncateColumnNames(self.massFlowData)
         self.loadedFile = True
 
     def loadTempFile(self):
         if not self.tempLoadedFile:
             self.tempMassFlowData = _pd.read_csv(self.tempDatafilePath, sep="\t").rename(columns=lambda x: x.strip())
+            _truncateColumnNames(self.tempMassFlowData)
         self.tempLoadedFile = True
 
     def start(self):
@@ -183,9 +206,7 @@ class MassFlowVisualizer(_qtw.QDialog):
         self.qtm.start(1000)
 
     def advance(self):
-        timeStep = int(self.timeStep)
-
-        if timeStep == self.maxTimeStep:
+        if self.timeStep == self.maxTimeStep:
             self.logger.debug("reached end of data, returning")
             self.qtm.stop()
 
@@ -202,13 +223,13 @@ class MassFlowVisualizer(_qtw.QDialog):
                         mfrVariableName in self.massFlowData.columns
                         and temperatureVariableName in self.tempMassFlowData
                     ):
-                        massFlow = self._getMassFlow(mfrVariableName, timeStep)
-                        temperature = self._getTemperature(temperatureVariableName, timeStep)
+                        massFlow = self._getMassFlow(mfrVariableName, self.timeStep)
+                        temperature = self._getTemperature(temperatureVariableName, self.timeStep)
 
                         t.setMassFlowAndTemperature(massFlow, temperature)
                         thickValue = self.getThickness(massFlow)
                         self.logger.debug("Thickvalue: " + str(thickValue))
-                        if self.massFlowData[mfrVariableName].iloc[timeStep] == 0:
+                        if self.massFlowData[mfrVariableName].iloc[self.timeStep] == 0:
                             t.setColor(thickValue, mfr="ZeroMfr")
                         elif round(abs(temperature)) == self.maxValue:
                             t.setColor(thickValue, mfr="max")
@@ -236,18 +257,18 @@ class MassFlowVisualizer(_qtw.QDialog):
                     )
                     hotTemperatureVariableName = _cnames.getTemperatureVariableName(t, _mfn.PortItemType.HOT)
 
-                    coldMassFlow = self._getMassFlow(coldMassFlowVariableName, timeStep)
-                    coldTemperature = self._getTemperature(coldTemperatureVariableName, timeStep)
+                    coldMassFlow = self._getMassFlow(coldMassFlowVariableName, self.timeStep)
+                    coldTemperature = self._getTemperature(coldTemperatureVariableName, self.timeStep)
 
-                    hotMassFlow = self._getMassFlow(hotMassFlowVariableName, timeStep)
-                    hotTemperature = self._getTemperature(hotTemperatureVariableName, timeStep)
+                    hotMassFlow = self._getMassFlow(hotMassFlowVariableName, self.timeStep)
+                    hotTemperature = self._getTemperature(hotTemperatureVariableName, self.timeStep)
 
                     t.setMassFlowAndTemperature(coldMassFlow, coldTemperature, hotMassFlow, hotTemperature)
 
                 elif isinstance(t, _tv.TVentil):
                     valvePositionVariableName = _mnames.getInputVariableName(t, t.modelDiverter)
                     if valvePositionVariableName in self.massFlowData.columns:
-                        valvePosition = str(self.massFlowData[valvePositionVariableName].iloc[timeStep])
+                        valvePosition = str(self.massFlowData[valvePositionVariableName].iloc[self.timeStep])
                         t.setPositionForMassFlowSolver(valvePosition)
                         t.posLabel.setPlainText(valvePosition)
                         self.logger.debug("valve position: " + str(valvePosition))
@@ -256,11 +277,13 @@ class MassFlowVisualizer(_qtw.QDialog):
             return
 
     def _getMassFlow(self, mfrVariableName: str, timeStep: int) -> float:
-        mass = self.massFlowData[mfrVariableName[:25]].iloc[timeStep]
+        truncatedMfrVariableName = _truncateName(mfrVariableName)
+        mass = self.massFlowData[truncatedMfrVariableName].iloc[timeStep]
         return mass
 
     def _getTemperature(self, temperatureVariableName: str, timeStep: int) -> float:
-        return self.tempMassFlowData[temperatureVariableName[:25]].iloc[timeStep]
+        truncatedTemperatureVariableName = _truncateName(temperatureVariableName)
+        return self.tempMassFlowData[truncatedTemperatureVariableName].iloc[timeStep]
 
     def pauseVis(self):
         self.paused = True
@@ -315,7 +338,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep += float(self.jumpValueLE.text())
+        self.timeStep += self._timeStepIncrease
         if self.timeStep > self.maxTimeStep:
             self.timeStep = 0
         self.slider.setValue(self.timeStep)
@@ -326,7 +349,7 @@ class MassFlowVisualizer(_qtw.QDialog):
 
         """
 
-        self.timeStep -= float(self.jumpValueLE.text())
+        self.timeStep -= self._timeStepIncrease
         if self.timeStep < 0:
             self.timeStep = self.maxTimeStep
         self.slider.setValue(self.timeStep)
@@ -460,3 +483,29 @@ class MassFlowVisualizer(_qtw.QDialog):
         elif e.key() == _qtc.Qt.Key_Down:
             self.logger.debug("Down is pressed")
             self.decreaseValue()
+
+
+def _truncateColumnNames(df: _pd.DataFrame) -> None:
+    _ensureNamesDontCollideAfterTruncating(df.columns)
+    df.columns = [_truncateName(n) for n in df.columns]
+
+
+def _ensureNamesDontCollideAfterTruncating(columnNames: _tp.Sequence[str]) -> None:
+    sortedColumnNames = sorted(columnNames)
+    groupedNames = [list(g) for _, g in _it.groupby(sortedColumnNames, key=_truncateName)]
+    collidingNames = _flatten(g for g in groupedNames if len(g) > 1)
+    if collidingNames:
+        formattedCollidingNames = "\n\t".join(collidingNames)
+        errorMessage = (
+            f"The following column names collide after truncating them to "
+            f"{_MAX_HEADER_LENGTH} characters:\n\t{formattedCollidingNames}"
+        )
+        raise ValueError(errorMessage)
+
+
+def _truncateName(name: str):
+    return name[:_MAX_HEADER_LENGTH]
+
+
+def _flatten(iterable: _tp.Iterable[_tp.Iterable[str]]) -> _tp.Sequence[str]:
+    return list(_it.chain.from_iterable(iterable))

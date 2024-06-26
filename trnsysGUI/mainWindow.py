@@ -6,19 +6,21 @@ import pathlib as _pl
 import shutil
 import subprocess
 
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI.loggingCallback as _lgcb
-from trnsysGUI import (
-    project as _prj,
-    images as _img,
-    errors as _err,
-    buildDck as buildDck,
-    settings as _settings,
-    settingsDlg as _sdlg,
-)
+import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
+from trnsysGUI import buildDck as buildDck
+from trnsysGUI import images as _img
+from trnsysGUI import project as _prj
+from trnsysGUI import settings as _settings
+from trnsysGUI import settingsDlg as _sdlg
+from trnsysGUI import warningsAndErrors as _werrors
 from trnsysGUI.BlockItem import BlockItem
 from trnsysGUI.MassFlowVisualizer import MassFlowVisualizer
 from trnsysGUI.ProcessMain import ProcessMain
@@ -173,6 +175,9 @@ class MainWindow(_qtw.QMainWindow):
         exportHydCtrlActionMenu = _qtw.QAction("Export hydraulic_control.ddck", self)
         exportHydCtrlActionMenu.triggered.connect(self.exportHydraulicControl)
 
+        exportDdckPlaceHolderValuesJsonFileActionMenu = _qtw.QAction("Export ddck placeholder values JSON file", self)
+        exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
+
         updateConfigActionMenu = _qtw.QAction("Update run.config", self)
         updateConfigActionMenu.triggered.connect(self.updateRun)
 
@@ -185,21 +190,16 @@ class MainWindow(_qtw.QMainWindow):
         processSimulationActionMenu = _qtw.QAction("Process simulation...", self)
         processSimulationActionMenu.triggered.connect(self.processSimulation)
 
-        exportDdckPlaceHolderValuesJsonFileActionMenu = _qtw.QAction(
-            "Export json-file containing connection information", self
-        )
-        exportDdckPlaceHolderValuesJsonFileActionMenu.triggered.connect(self.exportDdckPlaceHolderValuesJson)
-
         self.projectMenu = _qtw.QMenu("Project")
         self.projectMenu.addAction(runMassflowSolverActionMenu)
         self.projectMenu.addAction(openVisualizerActionMenu)
         self.projectMenu.addAction(exportHydraulicsActionMenu)
         self.projectMenu.addAction(exportHydCtrlActionMenu)
+        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
         self.projectMenu.addAction(updateConfigActionMenu)
         self.projectMenu.addAction(exportDckActionMenu)
         self.projectMenu.addAction(runSimulationActionMenu)
         self.projectMenu.addAction(processSimulationActionMenu)
-        self.projectMenu.addAction(exportDdckPlaceHolderValuesJsonFileActionMenu)
 
         pytrnsysOnlineDocAction = _qtw.QAction("pytrnsys online documentation", self)
         pytrnsysOnlineDocAction.triggered.connect(self.openPytrnsysOnlineDoc)
@@ -217,7 +217,6 @@ class MainWindow(_qtw.QMainWindow):
 
         # Status bar
         self.sb = self.statusBar()
-        self.sb.showMessage("Mode is " + str(self.editor.editorMode))
 
         # QUndo framework
         self.undoStack = _qtw.QUndoStack(self)
@@ -344,7 +343,7 @@ class MainWindow(_qtw.QMainWindow):
             errorMessage += (
                 "\nPlease make sure you that you export the ddck for every storage tank before starting a simulation."
             )
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return
 
         #   Update run.config
@@ -356,7 +355,7 @@ class MainWindow(_qtw.QMainWindow):
 
         if executionFailed:
             errorMessage = f"Exception while trying to execute RunParallelTrnsys:\n\n{errorStatement}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
 
         return
 
@@ -364,22 +363,22 @@ class MainWindow(_qtw.QMainWindow):
         processPath = os.path.join(self.projectFolder, "process.config")
         if not os.path.isfile(processPath):
             errorMessage = f"No such file: {processPath}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return
         processApp = ProcessMain()
         result = processApp.processAction(self.logger, self.editor.projectFolder)
 
         if _res.isError(result):
             error = _res.error(result)
-            _err.showErrorMessageBox(error.message)
+            _werrors.showMessageBox(error.message)
 
         return
 
     def exportDdckPlaceHolderValuesJson(self):
-        result = self.editor.exportDdckPlaceHolderValuesJsonFile()
+        result = _eph.exportDdckPlaceHolderValuesJsonFile(self.editor)
         if _res.isError(result):
             errorMessage = f"The json file could not be generated: {result.message}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
 
     def renameDia(self):
         self.logger.info("Renaming diagram...")
@@ -397,10 +396,6 @@ class MainWindow(_qtw.QMainWindow):
         else:
             self.logger.info("Canceling")
             return
-
-    def tidyUp(self):
-        self.logger.info("Tidying up...")
-        self.editor.cleanUpConnections()
 
     def setZoomIn(self):
         self.logger.info("Setting zoom in")
@@ -484,10 +479,10 @@ class MainWindow(_qtw.QMainWindow):
         self.editor.exportHydraulicControl()
 
     def exportDck(self):
-        jsonResult = self.editor.exportDdckPlaceHolderValuesJsonFile()
+        jsonResult = _eph.exportDdckPlaceHolderValuesJsonFile(self.editor)
         if _res.isError(jsonResult):
             errorMessage = f"The placeholder values JSON file could not be generated: {jsonResult.message}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return
 
         builder = buildDck.buildDck(self.projectFolder)
@@ -495,7 +490,7 @@ class MainWindow(_qtw.QMainWindow):
         result = builder.buildTrnsysDeck()
         if _res.isError(result):
             errorMessage = f"The deck file could not be generated: {result.message}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
 
     def toggleAlignMode(self):
         self.logger.info("Toggling alignMode")
@@ -517,7 +512,7 @@ class MainWindow(_qtw.QMainWindow):
 
         if not self.editor.trnsysPath.is_file():
             errorMessage = "TRNExe.exe not found! Consider correcting the path in the settings."
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             return None
 
         try:
@@ -528,7 +523,7 @@ class MainWindow(_qtw.QMainWindow):
             return mfrFile, tempFile
         except Exception as exception:
             errorMessage = f"An exception occurred while trying to execute the mass flow solver: {exception}"
-            _err.showErrorMessageBox(errorMessage)
+            _werrors.showMessageBox(errorMessage)
             self.logger.error(errorMessage)
 
             return None
@@ -536,14 +531,27 @@ class MainWindow(_qtw.QMainWindow):
     def movePorts(self):
         self.editor.moveDirectPorts = True
 
-    def mouseMoveEvent(self, e):
-        pass
-
     def openPytrnsysOnlineDoc(self):
         os.system('start "" https://pytrnsys.readthedocs.io')
 
     def exportPDF(self):
-        self.editor.printPDF()
+        fileName, _ = _qtw.QFileDialog.getSaveFileName(self, "Export PDF", None, "PDF files (.pdf);;All Files()")
+        if fileName == "":
+            return
+
+        if _qtc.QFileInfo(fileName).suffix() == "":
+            fileName += ".pdf"
+
+        printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
+        printer.setOrientation(_qtp.QPrinter.Landscape)
+        printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
+        printer.setOutputFileName(fileName)
+
+        painter = _qtg.QPainter(printer)
+        self.editor.diagramScene.render(painter)
+        painter.end()
+
+        self.logger.info("File exported to %s." % fileName)
 
     def closeEvent(self, e):
         if self.showBoxOnClose:

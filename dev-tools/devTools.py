@@ -3,18 +3,22 @@
 # Run from top-level directory
 
 import argparse as ap
-import os
 import pathlib as pl
 import shutil as sh
 import subprocess as sp
-import typing as tp
-import sysconfig as _sysconfig
-import venv
-
 import sys
+import sysconfig as sc
 import time
+import typing as tp
 
-_SCRIPTS_DIR = pl.Path(_sysconfig.get_path("scripts"))
+_SCRIPTS_DIR = pl.Path(sc.get_path("scripts"))
+
+_SOURCE_DIRS = ["trnsysGUI", "tests", "dev-tools", "release"]
+
+_EXCLUDED_PATH_PATTERNS = [
+    "^tests/(.+/)?data/.*",
+    "^release/build/.*",
+]
 
 
 def main():
@@ -31,7 +35,7 @@ def main():
 
     _maybeCreateDiagrams(arguments)
 
-    _maybeCreateExecutable(arguments)
+    _maybeCreateRelease(arguments)
 
     _maybeRunPytest(arguments, testResultsDirPath)
 
@@ -104,11 +108,11 @@ def _parseArguments() -> ap.Namespace:
         dest="shallRunAll",
     )
     parser.add_argument(
-        "-x",
-        "--executable",
-        help="Create executable using pyinstaller",
+        "-r",
+        "--release",
+        help="Create release",
         action="store_true",
-        dest="shallCreateExecutable",
+        dest="shallCreateRelease",
     )
     arguments = parser.parse_args()
     return arguments
@@ -131,63 +135,67 @@ def _prepareTestResultsDirectory(testResultsDirPath: pl.Path, shallKeepResults: 
 
 
 def _maybeRunMypy(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'mypy'} --show-error-codes trnsysGUI tests dev-tools"
-        additionalArgs = arguments.mypyArguments or ""
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.mypyArguments is not None):
+        return
+
+    excludeArguments = [a for p in _EXCLUDED_PATH_PATTERNS for a in ["--exclude", p]]
+
+    cmd = [
+        _SCRIPTS_DIR / "mypy",
+        "--show-error-codes",
+        # Don't include python scripts which are copied into test
+        # data directories (from, e.g., `examples`) during tests
+        *excludeArguments,
+    ]
+
+    additionalArgs = arguments.mypyArguments or ""
+
+    args = [*cmd, *additionalArgs, *_SOURCE_DIRS]
+
+    _printAndRun(args)
 
 
 def _maybeRunPylint(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'pylint'} trnsysGUI tests dev-tools"
-        additionalArgs = arguments.lintArguments or ""
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.lintArguments is not None):
+        return
 
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    cmd = f"{_SCRIPTS_DIR / 'pylint'}  --recursive=yes"
+    ignorePaths = ",".join(_EXCLUDED_PATH_PATTERNS)
+    additionalArgs = arguments.lintArguments or ""
+
+    allArgs = [*cmd.split(), "--ignore-paths", ignorePaths, *additionalArgs.split(), *_SOURCE_DIRS]
+
+    _printAndRun(allArgs)
 
 
 def _maybeRunBlack(arguments):
-    if arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None:
-        cmd = f"{_SCRIPTS_DIR / 'black'} -l 120 trnsysGUI tests dev-tools"
-        additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
+    if not (arguments.shallRunAll or arguments.shallPerformStaticChecks or arguments.blackArguments is not None):
+        return
 
-        _printAndRun([*cmd.split(), *additionalArgs.split()])
+    cmd = f"{_SCRIPTS_DIR / 'black'} -l 120"
+    additionalArgs = "--check" if arguments.blackArguments is None else arguments.blackArguments
+
+    _printAndRun([*cmd.split(), *additionalArgs.split(), *_SOURCE_DIRS])
 
 
 def _maybeCreateDiagrams(arguments):
-    if arguments.shallRunAll or arguments.diagramsFormat:
-        diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
-        cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
-        _printAndRun(cmd.split())
+    if not (arguments.shallRunAll or arguments.diagramsFormat):
+        return
+
+    diagramsFormat = arguments.diagramsFormat if arguments.diagramsFormat else "pdf"
+    cmd = f"{_SCRIPTS_DIR / 'pyreverse'} -k -o {diagramsFormat} -p pytrnsys_gui -d test-results trnsysGUI"
+    _printAndRun(cmd.split())
 
 
-def _maybeCreateExecutable(arguments):
-    if arguments.shallRunAll or arguments.shallCreateExecutable:
-        releaseDirPath = pl.Path("release").resolve(strict=True)
+def _maybeCreateRelease(arguments):
+    if not (arguments.shallRunAll or arguments.shallCreateRelease):
+        return
 
-        sh.rmtree(releaseDirPath / "build", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "dist", ignore_errors=True)
-        sh.rmtree(releaseDirPath / "pyinstaller-venv", ignore_errors=True)
+    createReleaseScriptFilePath = pl.Path("release") / "createRelease.py"
 
-        venvDirPath = releaseDirPath / "pyinstaller-venv"
-        venv.create(venvDirPath, with_pip=True)
+    cmd = f"{sys.executable} {createReleaseScriptFilePath}"
 
-        commands = [
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install --upgrade pip",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install wheel",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip install -r requirements\release.txt",
-            r"release\pyinstaller-venv\Scripts\python.exe -m pip uninstall --yes -r requirements\pyinstaller.remove",
-            r"release\pyinstaller-venv\Scripts\python.exe dev-tools\generateGuiClassesFromQtCreatorStudioUiFiles.py",
-        ]
-
-        for cmd in commands:
-            _printAndRun(cmd.split())
-
-        os.chdir("release")
-
-        cmd = r".\pyinstaller-venv\Scripts\pyinstaller.exe pytrnsys-gui.spec"
-        _printAndRun(cmd.split())
-
-        os.chdir("..")
+    _printAndRun(cmd.split())
 
 
 def _maybeRunPytest(arguments, testResultsDirPath):
@@ -197,7 +205,7 @@ def _maybeRunPytest(arguments, testResultsDirPath):
         and arguments.lintArguments is None
         and arguments.blackArguments is None
         and arguments.diagramsFormat is None
-        and not arguments.shallCreateExecutable
+        and not arguments.shallCreateRelease
     )
     if arguments.shallRunAll or arguments.pytestMarkersExpression is not None or wasCalledWithoutArguments:
         markerExpressions = _getMarkerExpressions(arguments.pytestMarkersExpression)

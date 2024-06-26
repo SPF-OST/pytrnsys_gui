@@ -4,7 +4,7 @@ import typing as _tp
 import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qwt
 
-NewHeight = _tp.Union[float, _tp.Literal["empty"]]
+NewHeight = float | _tp.Literal["empty"]
 
 
 @_dc.dataclass

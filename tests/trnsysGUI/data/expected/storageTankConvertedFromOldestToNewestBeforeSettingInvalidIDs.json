@@ -2,7 +2,7 @@
     ".__BlockDict__": true,
     "BlockDisplayName": "TesDhw",
     "BlockName": "StorageTank",
-    "__version__": "05f422d3-41fd-48d1-b8d0-4655d9f65247",
+    "__version__": "35f8800b-3a22-4080-acc2-13f332a84d50",
     "directPortPairs": [
         {
             "__version__": "67aaee05-7d09-40e1-a6e2-d367c7196832",
@@ -55,10 +55,9 @@
     ],
     "heatExchangers": [
         {
-            "__version__": "be068f84-2627-4f53-87a9-9a1f4fd1c529",
+            "__version__": "2a5d6090-3ef5-4959-bba4-332654f007ac",
             "id": 1976,
             "name": "SolarHx",
-            "parentId": 1975,
             "portPair": {
                 "__version__": "ed17e7a7-4798-4a80-beb7-81730523cf35",
                 "inputPort": {
@@ -75,8 +74,7 @@
             "width": 40
         }
     ],
-    "height": 220.0,
-    "id": 1975,
+    "height": 220,
     "isHorizontallyFlipped": false,
     "isVerticallyFlipped": false,
     "position": [

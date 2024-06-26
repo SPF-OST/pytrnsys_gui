@@ -1,16 +1,17 @@
 import pathlib as _pl
 import typing as _tp
 
-import trnsysGUI.BlockItem as _bi
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 
-class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 60
         self.h = 60
@@ -33,25 +34,28 @@ class SourceSinkBase(_bi.BlockItem, _ip.HasInternalPiping):
         ddckFilePath = _pl.Path(self.editor.projectFolder) / "ddck" / f"{self.displayName}.ddck"
         self.path = str(ddckFilePath)
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        raise NotImplementedError()
+
+    @classmethod
+    def _getInputAndOutputXPos(cls) -> tuple[int, int]:
         raise NotImplementedError()
 
     def changeSize(self):
         self._positionLabel()
 
-        self.origInputsPos = [[20, 0]]
-        self.origOutputsPos = [[40, 0]]
+        inputX, outputX = self._getInputAndOutputXPos()
 
-        # pylint: disable=duplicate-code  # 1
-        self.inputs[0].setPos(self.origInputsPos[0][0], self.origInputsPos[0][1])
-        self.outputs[0].setPos(self.origOutputsPos[0][0], self.origOutputsPos[0][1])
+        self.inputs[0].setPos(inputX, 0)
+        self.outputs[0].setPos(outputX, 0)
 
         self.updateFlipStateH(self.flippedH)
         self.updateFlipStateV(self.flippedV)
 
         self.inputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
         self.outputs[0].side = (self.rotationN + 1 + 2 * self.flippedV) % 4
-        # pylint: disable=duplicate-code  # 1
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)

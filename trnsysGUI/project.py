@@ -34,7 +34,7 @@ class MigrateProject:
     newProjectFolderPath: _pl.Path
 
 
-Project = _tp.Union[CreateProject, LoadProject, MigrateProject]
+Project = CreateProject | LoadProject | MigrateProject
 
 
 def getProject() -> _ccl.MaybeCancelled[Project]:
@@ -140,7 +140,7 @@ def _isEmptyDirectory(path: _pl.Path) -> bool:
     return isDirectoryEmpty
 
 
-def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[_tp.Union[LoadProject, MigrateProject]]:
+def getLoadOrMigrateProject() -> _ccl.MaybeCancelled[LoadProject | MigrateProject]:
     projectFolderPathString, _ = _qtw.QFileDialog.getOpenFileName(caption="Open diagram", filter="*.json")
     if not projectFolderPathString:
         return _ccl.CANCELLED

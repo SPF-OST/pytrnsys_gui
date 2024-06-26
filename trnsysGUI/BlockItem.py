@@ -1,55 +1,40 @@
 # pylint: disable=invalid-name
 
-import os
 import typing as _tp
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QPointF, QEvent, QTimer
-from PyQt5.QtGui import QPixmap, QCursor, QMouseEvent
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QGraphicsTextItem, QMenu, QTreeView
+import PyQt5.QtCore as _qtc
+import PyQt5.QtGui as _qtg
+from PyQt5 import QtWidgets as _qtw
 
 import trnsysGUI.PortItemBase as _pib
+import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.idGenerator as _id
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
-
-import trnsysGUI.idGenerator as _id
-
-from trnsysGUI.MoveCommand import MoveCommand  # type: ignore[attr-defined]
-from trnsysGUI.ResizerItem import ResizerItem  # type: ignore[attr-defined]
-from trnsysGUI.blockItemModel import BlockItemModel
-
-FILEPATH = "res/Config.txt"
+import trnsysGUI.moveCommand as _mc
 
 
 # pylint: disable = fixme
 # TODO : TeePiece and AirSourceHp size ratio need to be fixed, maybe just use original
 #  svg instead of modified ones, TVentil is flipped. heatExchangers are also wrongly oriented
-class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
-    def __init__(self, trnsysType, editor, displayNamePrefix=None, displayName=None, **kwargs):
+class BlockItem(_qtw.QGraphicsItem):  # pylint: disable = too-many-public-methods, too-many-instance-attributes
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
         super().__init__(None)
-
         self.logger = editor.logger
 
         self.w = 120
         self.h = 120
         self.editor = editor
-        self.id = self.editor.idGen.getID()
-        self.propertyFile = []
 
-        if displayNamePrefix:
-            self.displayName = displayNamePrefix + str(self.id)
-        elif displayName:
-            self.displayName = displayName
-        else:
-            raise Exception("No display name defined.")
+        if not displayName:
+            raise ValueError("Display name cannot be empty.")
 
-        if "loadedBlock" not in kwargs:
-            self.editor.trnsysObj.append(self)
+        self.displayName = displayName
 
-        self.inputs: _tp.Sequence[_pib.PortItemBase] = []
-        self.outputs: _tp.Sequence[_pib.PortItemBase] = []
+        self.inputs: list[_pib.PortItemBase] = []
+        self.outputs: list[_pib.PortItemBase] = []
 
-        self.path = None
+        self.path: str | None = None
 
         # Export related:
         self.name = trnsysType
@@ -59,18 +44,13 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         self.flippedV = False
         self.flippedH = False
         self.rotationN = 0
-        self.flippedHInt = -1
-        self.flippedVInt = -1
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
 
         # To set flags of this item
         self.setFlags(self.ItemIsSelectable | self.ItemIsMovable)
         self.setFlag(self.ItemSendsScenePositionChanges, True)
-        self.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+        self.setCursor(_qtg.QCursor(_qtc.Qt.PointingHandCursor))
 
-        self.label = QGraphicsTextItem(self.displayName, self)
+        self.label = _qtw.QGraphicsTextItem(self.displayName, self)
         self.label.setVisible(False)
 
         # Experimental, used for detecting genereated blocks attached to storage ports
@@ -79,8 +59,11 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         # Undo framework related
         self.oldPos = None
 
-        self.origOutputsPos = None
-        self.origInputsPos = None
+        self.origOutputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
+        self.origInputsPos: _tp.Sequence[_tp.Sequence[int]] | None = None
+
+        # TODO: The fact that we're assigning to a method is bad, but can't deal with it now
+        self.isSelected = False  # type: ignore[method-assign,assignment]
 
     def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
         if isinstance(self, BlockItem):
@@ -104,33 +87,21 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         raise exception
 
-    def addTree(self):
-        pass
+    @_tp.override
+    def boundingRect(self) -> _qtc.QRectF:
+        return _qtc.QRectF(0, 0, self.w, self.h)
 
     # Setter functions
     def setParent(self, p):
         self.editor = p
 
-        if self not in self.editor.trnsysObj:
-            self.editor.trnsysObj.append(self)
-
-    def setId(self, newId):
-        self.id = newId
-
     def setDisplayName(self, newName: str) -> None:
         self.displayName = newName
         self.label.setPlainText(newName)
-        self._updateModels(newName)
-
-    def _updateModels(self, newDisplayName: str) -> None:
-        pass
 
     # Interaction related
     def contextMenuEvent(self, event):
-        menu = QMenu()
-
-        a1 = menu.addAction("Launch NotePad++")
-        a1.triggered.connect(self.launchNotepadFile)
+        menu = _qtw.QMenu()
 
         rr = _img.ROTATE_TO_RIGHT_PNG.icon()
         a2 = menu.addAction(rr, "Rotate Block clockwise")
@@ -143,46 +114,30 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         a4 = menu.addAction("Reset Rotation")
         a4.triggered.connect(self.resetRotation)
 
-        b1 = menu.addAction("Print Rotation")
-        b1.triggered.connect(self.printRotation)
-
         c1 = menu.addAction("Delete this Block")
         c1.triggered.connect(self.deleteBlockCom)
 
         menu.exec_(event.screenPos())
 
-    def launchNotepadFile(self):
-        self.logger.debug("Launching notpad")
-        os.system("start notepad++ " + FILEPATH)
+    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:  # pylint: disable=unused-argument
+        self.editor.showBlockDlg(self)
 
-    def mouseDoubleClickEvent(self, event):  # pylint: disable=unused-argument
-        if hasattr(self, "isTempering"):
-            self.editor.showTVentilDlg(self)
-        elif self.name == "Pump":
-            self.editor.showPumpDlg(self)
-        elif self.name in ("TeePiece", "WTap_main"):
-            self.editor.showBlockDlg(self)
-        elif self.name in ["SPCnr", "DPCnr", "DPTee"]:
-            self.editor.showDoublePipeBlockDlg(self)
-        else:
-            self.editor.showBlockDlg(self)
-            if len(self.propertyFile) > 0:
-                for files in self.propertyFile:
-                    os.startfile(files, "open")
+    def mousePressEvent(self, event):
+        self.isSelected = True
+        super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
-        # self.logger.debug("Released mouse over block")
-        if self.oldPos is None:
-            self.logger.debug("For Undo Framework: oldPos is None")
-        else:
-            if self.scenePos() != self.oldPos:
-                self.logger.debug("Block was dragged")
-                self.logger.debug("Old pos is" + str(self.oldPos))
-                command = MoveCommand(self, self.oldPos, "Move BlockItem")
-                self.editor.parent().undoStack.push(command)
-                self.oldPos = self.scenePos()
-
         super().mouseReleaseEvent(event)
+        newPos = self.scenePos()
+
+        oldPos = self.oldPos
+        self.oldPos = newPos
+
+        if oldPos is None or newPos == oldPos:
+            return
+
+        command = _mc.MoveCommand(self, oldScenePos=oldPos, newScenePos=newPos, descr="Move BlockItem")
+        self.editor.parent().undoStack.push(command)
 
     # Transform related
     def changeSize(self):
@@ -202,269 +157,109 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         width = max(width, 40)
         return width, height
 
-    def updateFlipStateH(self, state):
+    def updateFlipStateH(self, state: bool) -> None:
         self.flippedH = bool(state)
+        self._updateTransform()
 
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
-        self.flippedHInt = 1 if self.flippedH else -1
-
-        if self.flippedH:
-            for i, inputPort in enumerate(self.inputs):
-                distanceToMirrorAxis = self.w / 2.0 - self.origInputsPos[i][0]  # pylint:disable=unsubscriptable-object
-                inputPort.setPos(
-                    self.origInputsPos[i][0] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
-                    inputPort.pos().y(),
-                )
-
-            for i, outPort in enumerate(self.outputs):
-                distanceToMirrorAxis = self.w / 2.0 - self.origOutputsPos[i][0]  # pylint:disable=unsubscriptable-object
-                outPort.setPos(
-                    self.origOutputsPos[i][0] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
-                    outPort.pos().y(),
-                )
-
-        else:
-            for i, inputPort in enumerate(self.inputs):
-                inputPort.setPos(
-                    self.origInputsPos[i][0], inputPort.pos().y()  # pylint: disable = unsubscriptable-object
-                )
-
-            for i, outputPort in enumerate(self.outputs):
-                outputPort.setPos(
-                    self.origOutputsPos[i][0], outputPort.pos().y()  # pylint: disable = unsubscriptable-object
-                )
-
-    def updateFlipStateV(self, state):
+    def updateFlipStateV(self, state: bool) -> None:
         self.flippedV = bool(state)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
-        self.flippedVInt = 1 if self.flippedV else -1
-
-        if self.flippedV:
-            for i, inputPort in enumerate(self.inputs):
-                distanceToMirrorAxis = self.h / 2.0 - self.origInputsPos[i][1]  # pylint:disable=unsubscriptable-object
-                inputPort.setPos(
-                    inputPort.pos().x(),
-                    self.origInputsPos[i][1] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
-                )
-
-            for i, outputPort in enumerate(self.outputs):
-                distanceToMirrorAxis = self.h / 2.0 - self.origOutputsPos[i][1]  # pylint:disable=unsubscriptable-object
-                outputPort.setPos(
-                    outputPort.pos().x(),
-                    self.origOutputsPos[i][1] + 2.0 * distanceToMirrorAxis,  # pylint: disable = unsubscriptable-object
-                )
-
-        else:
-            for i, inputPort in enumerate(self.inputs):
-                inputPort.setPos(
-                    inputPort.pos().x(), self.origInputsPos[i][1]
-                )  # pylint: disable = unsubscriptable-object
-
-            for i, outputPort in enumerate(self.outputs):
-                outputPort.setPos(
-                    outputPort.pos().x(), self.origOutputsPos[i][1]
-                )  # pylint: disable = unsubscriptable-object
+        self._updateTransform()
 
     def updateSidesFlippedH(self):
-        if self.rotationN % 2 == 0:
-            for p in self.inputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-        if self.rotationN % 2 == 1:
-            for p in self.inputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
+        affectedSides = [0, 2] if self.rotationN % 2 == 0 else [1, 3]
+
+        nQuarterTurnsNeeded = 2
+        self._updatePortSides(nQuarterTurnsNeeded, affectedSides)
 
     def updateSidesFlippedV(self):
-        if self.rotationN % 2 == 1:
-            for p in self.inputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (0, 2):
-                    self.updateSide(p, 2)
-        if self.rotationN % 2 == 0:
-            for p in self.inputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
-            for p in self.outputs:
-                if p.side in (1, 3):
-                    self.updateSide(p, 2)
+        affectedSides = [0, 2] if self.rotationN % 2 == 1 else [1, 3]
 
-    def updateSide(self, port, n):
+        nQuarterTurnsNeeded = 2
+        self._updatePortSides(nQuarterTurnsNeeded, affectedSides)
+
+    @staticmethod
+    def _updateSide(port, n):
         port.side = (port.side + n) % 4
 
     def rotateBlockCW(self):
-        # Rotate block clockwise
-        # self.setTransformOriginPoint(50, 50)
-        # self.setTransformOriginPoint(self.w/2, self.h/2)
-        self.setTransformOriginPoint(0, 0)
-        self.setRotation((self.rotationN + 1) * 90)
-        self.label.setRotation(-(self.rotationN + 1) * 90)
-        self.rotationN += 1
-        self.logger.debug("rotated by " + str(self.rotationN))
-
-        for p in self.inputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, 1)
-
-        for p in self.outputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, 1)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
-    def rotateBlockToN(self, n):
-        if n > 0:
-            while self.rotationN != n:
-                self.rotateBlockCW()
-        if n < 0:
-            while self.rotationN != n:
-                self.rotateBlockCCW()
+        self.rotateBlockToN(1)
 
     def rotateBlockCCW(self):
-        # Rotate block clockwise
-        # self.setTransformOriginPoint(50, 50)
-        self.setTransformOriginPoint(0, 0)
-        self.setRotation((self.rotationN - 1) * 90)
-        self.label.setRotation(-(self.rotationN - 1) * 90)
-        self.rotationN -= 1
-        self.logger.debug("rotated by " + str(self.rotationN))
+        self.rotateBlockToN(-1)
 
-        for p in self.inputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -1)
-
-        for p in self.outputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -1)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
+    def rotateBlockToN(self, n: int) -> None:
+        nQuarterTurns = self.rotationN + n
+        self._rotateBlock(nQuarterTurns)
 
     def resetRotation(self):
-        self.logger.debug("Resetting rotation...")
-        self.setRotation(0)
-        self.label.setRotation(0)
+        self._rotateBlock(0)
 
-        for p in self.inputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -self.rotationN)
-            # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
+    def _rotateBlock(self, nQuarterTurns: int) -> None:
+        self.rotationN = nQuarterTurns
 
-        for p in self.outputs:
-            p.itemChange(27, p.scenePos())
-            self.updateSide(p, -self.rotationN)
-            # self.logger.debug("Portside of port " + str(p) + " is " + str(p.portSide))
+        self.label.setRotation(-self.rotationN * 90)
 
-        self.rotationN = 0
+        self._updateTransform()
 
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
+        nQuarterTurnsNeeded = nQuarterTurns - self.rotationN
+        self._updatePortSides(nQuarterTurnsNeeded)
 
-    def printRotation(self):
-        self.logger.debug("Rotation is " + str(self.rotationN))
+    def _updateTransform(self) -> None:
+        scaleX = -1 if self.flippedH else 1
+        scaleY = -1 if self.flippedV else 1
+
+        scale = _qtg.QTransform.fromScale(scaleX, scaleY)
+
+        translateX = self.h if self.flippedH else 0
+        translateY = self.w if self.flippedV else 0
+        translate = _qtg.QTransform.fromTranslate(translateX, translateY)
+
+        angle = self.rotationN * 90
+        rotate = _qtg.QTransform().rotate(angle)
+
+        transform = scale * translate * rotate  # type: ignore[operator]
+
+        self.setTransform(transform)
+
+    def _updatePortSides(
+        self, nQuarterTurnsNeeded: int, affectedSides: _tp.Sequence[_tp.Literal[0, 1, 2, 3]] | None = None
+    ) -> None:
+        if affectedSides is None:
+            affectedSides = [0, 1, 2, 3]
+
+        self._updatePortSidesForPorts(self.inputs, nQuarterTurnsNeeded, affectedSides)
+        self._updatePortSidesForPorts(self.outputs, nQuarterTurnsNeeded, affectedSides)
+
+    def _updatePortSidesForPorts(
+        self,
+        ports: _tp.Sequence[_pib.PortItemBase],
+        nQuarterTurnsNeeded: int,
+        affectedSides: _tp.Sequence[_tp.Literal[0, 1, 2, 3]],
+    ) -> None:
+        for port in ports:
+            if port.side not in affectedSides:
+                continue
+
+            port.itemChange(_qtw.QGraphicsItem.ItemScenePositionHasChanged, port.scenePos())
+            self._updateSide(port, nQuarterTurnsNeeded)
 
     def deleteBlock(self):
         self.editor.trnsysObj.remove(self)
         self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        if widgetToRemove:
-            widgetToRemove.hide()
 
     def deleteBlockCom(self):
         self.editor.diagramView.deleteBlockCom(self)
-
-    def getConnections(self):
-        """
-        Get the connections from inputs and outputs of this block.
-        Returns
-        -------
-        c : :obj:`List` of :obj:`BlockItem`
-        """
-        c = []
-        for i in self.inputs:
-            for cl in i.connectionList:
-                c.append(cl)
-        for o in self.outputs:
-            for cl in o.connectionList:
-                c.append(cl)
-        return c
-
-    # Scaling related
-    def mousePressEvent(self, event):  # pylint: disable = unused-argument
-        """
-        Using try catch to avoid creating extra resizers.
-
-        When an item is clicked on, it will check if a resizer already existed. If
-        there exist a resizer, returns. else, creates one.
-
-        Resizer will not be created for GenericBlock due to complications in the code.
-        Resizer will not be created for storageTank as there's already a built in function for it in the storageTank
-        dialog.
-
-        Resizers are deleted inside mousePressEvent function inside GUI.py
-
-        """
-        self.logger.debug("Inside Block Item mouse click")
-
-        self.isSelected = True
-        if self.name in ("GenericBlock", "StorageTank"):
-            return
-        try:
-            self.resizer
-        except AttributeError:
-            self.resizer = ResizerItem(self)  # pylint: disable = attribute-defined-outside-init
-            self.resizer.setPos(self.w, self.h)
-            self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
 
     def setItemSize(self, w, h):
         self.logger.debug("Inside block item set item size")
         self.w, self.h = w, h
 
     def updateImage(self):
-        self.logger.debug("Inside block item update image")
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
         if self.flippedH:
             self.updateFlipStateH(self.flippedH)
 
         if self.flippedV:
             self.updateFlipStateV(self.flippedV)
-
-    def _getPixmap(self) -> QPixmap:
-        imageAccessor = self._getImageAccessor()  # pylint: disable = assignment-from-no-return
-
-        assert imageAccessor
-
-        image = imageAccessor.image(width=self.w, height=self.h).mirrored(
-            horizontal=self.flippedH, vertical=self.flippedV
-        )
-        pixmap = QPixmap(image)
-
-        return pixmap
-
-    def deleteResizer(self):
-        try:
-            self.resizer
-        except AttributeError:
-            self.logger.debug("No resizer")
-        else:
-            del self.resizer
 
     # AlignMode related
     def itemChange(self, change, value):
@@ -475,7 +270,7 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
                 snapSize = self.editor.snapSize
                 self.logger.debug("itemchange")
                 self.logger.debug(type(value))
-                value = QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
+                value = _qtc.QPointF(value.x() - value.x() % snapSize, value.y() - value.y() % snapSize)
                 return value
             if self.editor.alignMode:
                 if self.hasElementsInYBand():
@@ -487,47 +282,47 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         for t in self.editor.trnsysObj:
             if isinstance(t, BlockItem) and t is not self:
                 if self.elementInYBand(t):
-                    value = QPointF(self.pos().x(), t.pos().y())
+                    value = _qtc.QPointF(self.pos().x(), t.pos().y())
                     self.editor.alignYLineItem.setLine(
                         self.pos().x() + self.w / 2, t.pos().y(), t.pos().x() + t.w / 2, t.pos().y()
                     )
 
                     self.editor.alignYLineItem.setVisible(True)
 
-                    qtm = QTimer(self.editor)
+                    qtm = _qtc.QTimer(self.editor)
                     qtm.timeout.connect(self.timerfunc)
                     qtm.setSingleShot(True)
                     qtm.start(1000)
 
-                    e = QMouseEvent(
-                        QEvent.MouseButtonRelease,
+                    e = _qtg.QMouseEvent(
+                        _qtc.QEvent.MouseButtonRelease,
                         self.pos(),
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoModifier,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoModifier,
                     )
                     self.editor.diagramView.mouseReleaseEvent(e)
                     self.editor.alignMode = False
 
                 if self.elementInXBand(t):
-                    value = QPointF(t.pos().x(), self.pos().y())
+                    value = _qtc.QPointF(t.pos().x(), self.pos().y())
                     self.editor.alignXLineItem.setLine(
                         t.pos().x(), t.pos().y() + self.w / 2, t.pos().x(), self.pos().y() + t.w / 2
                     )
 
                     self.editor.alignXLineItem.setVisible(True)
 
-                    qtm = QTimer(self.editor)
+                    qtm = _qtc.QTimer(self.editor)
                     qtm.timeout.connect(self.timerfunc2)
                     qtm.setSingleShot(True)
                     qtm.start(1000)
 
-                    e = QMouseEvent(
-                        QEvent.MouseButtonRelease,
+                    e = _qtg.QMouseEvent(
+                        _qtc.QEvent.MouseButtonRelease,
                         self.pos(),
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoButton,
-                        QtCore.Qt.NoModifier,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoButton,
+                        _qtc.Qt.NoModifier,
                     )
                     self.editor.diagramView.mouseReleaseEvent(e)
                     self.editor.alignMode = False
@@ -548,14 +343,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         return False
 
-    def hasElementsInXBand(self):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem):
-                if self.elementInXBand(t):
-                    return True
-
-        return False
-
     def elementInYBand(self, t):
         eps = 50
         return self.scenePos().y() - eps <= t.scenePos().y() <= self.scenePos().y() + eps
@@ -564,12 +351,30 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         eps = 50
         return self.scenePos().x() - eps <= t.scenePos().x() <= self.scenePos().x() + eps
 
-    def elementInY(self):
-        for t in self.editor.trnsysObj:
-            if isinstance(t, BlockItem):
-                if self.scenePos().y == t.scenePos().y():
-                    return True
-        return False
+    def _encodeBaseModel(self) -> _bim.BlockItemBaseModel:
+        position = (self.pos().x(), self.pos().y())
+
+        blockItemModel = _bim.BlockItemBaseModel(
+            position,
+            self.trnsysId,
+            self.flippedH,
+            self.flippedV,
+            self.rotationN,
+        )
+
+        return blockItemModel
+
+    def _decodeBaseModel(self, blockItemModel: _bim.BlockItemBaseModel) -> None:
+        x = float(blockItemModel.blockPosition[0])
+        y = float(blockItemModel.blockPosition[1])
+        self.setPos(x, y)
+
+        self.trnsysId = blockItemModel.trnsysId
+
+        self.updateFlipStateH(blockItemModel.flippedH)
+        self.updateFlipStateV(blockItemModel.flippedV)
+
+        self.rotateBlockToN(blockItemModel.rotationN)
 
     def encode(self):
         portListInputs = []
@@ -582,11 +387,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         blockPosition = (float(self.pos().x()), float(self.pos().y()))
 
-        blockItemModel = BlockItemModel(
+        blockItemModel = _bim.BlockItemModel(
             self.name,
             self.displayName,
             blockPosition,
-            self.id,
             self.trnsysId,
             portListInputs,  # pylint: disable = duplicate-code # 1
             portListOutputs,
@@ -599,11 +403,10 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
         return dictName, blockItemModel.to_dict()
 
     def decode(self, i, resBlockList):
-        model = BlockItemModel.from_dict(i)
+        model = _bim.BlockItemModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
         self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
-        self.id = model.Id
         self.trnsysId = model.trnsysId
 
         if len(self.inputs) != len(model.portsIdsIn) or len(self.outputs) != len(model.portsIdsOut):
@@ -623,29 +426,6 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
         resBlockList.append(self)
 
-    def decodePaste(
-        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs  # /NOSONAR
-    ):  # pylint: disable=unused-argument
-        self.setPos(
-            float(i["BlockPosition"][0] + offset_x),
-            float(i["BlockPosition"][1] + offset_y),
-        )
-
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-
-        for x, inputPort in enumerate(self.inputs):
-            inputPort.id = i["PortsIDIn"][x]
-
-        for x, outputPort in enumerate(self.outputs):
-            outputPort.id = i["PortsIDOut"][x]
-
-        resBlockList.append(self)
-
-    def exportPumpOutlets(self):
-        return "", 0
-
     def exportMassFlows(self):
         return "", 0
 
@@ -663,11 +443,3 @@ class BlockItem(QGraphicsPixmapItem):  # pylint: disable = too-many-public-metho
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         raise NotImplementedError()
-
-    def deleteLoadedFile(self):
-        for items in self.loadedFiles:
-            try:
-                self.editor.fileList.remove(str(items))
-            except ValueError:
-                self.logger.debug("File already deleted from file list.")
-                self.logger.debug("filelist:", self.editor.fileList)

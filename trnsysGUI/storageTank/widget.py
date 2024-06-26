@@ -1,32 +1,33 @@
 import dataclasses as _dc
-import os as _os
+import pathlib as _pl
 import random as _rnd
-import shutil as _sh
 import typing as _tp
 
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMenu, QMessageBox, QTreeView
+import PyQt5.QtGui as _qtg
+import PyQt5.QtWidgets as _qtw
+import dataclasses_jsonschema as _dcj
 
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
+import trnsysGUI.components.ddckFolderHelpers as _dfh
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.hydraulicLoops.model as _hlm
+import trnsysGUI.hydraulicLoops.names as _lnames
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.storageTank.model as _model
+import trnsysGUI.names.rename as _rename
 import trnsysGUI.storageTank.side as _sd
 import trnsysGUI.temperatures as _temps
 from trnsysGUI import idGenerator as _id
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 from trnsysGUI.directPortPair import DirectPortPair
 from trnsysGUI.heatExchanger import HeatExchanger  # type: ignore[attr-defined]
 from trnsysGUI.singlePipePortItem import SinglePipePortItem
+from trnsysGUI.storageTank import model as _model
 from trnsysGUI.storageTank.ConfigureStorageDialog import ConfigureStorageDialog
 from trnsysGUI.type1924.createType1924 import Type1924_TesPlugFlow  # type: ignore[attr-defined]
-import trnsysGUI.hydraulicLoops.model as _hlm
-import trnsysGUI.hydraulicLoops.names as _lnames
 
 InOut = _tp.Literal["In", "Out"]
 _T_co = _tp.TypeVar("_T_co", covariant=True)
@@ -38,12 +39,12 @@ class PortIds:
     outputId: int
 
 
-class StorageTank(BlockItem, _ip.HasInternalPiping):
+class StorageTank(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     HEAT_EXCHANGER_WIDTH = 40
 
-    def __init__(self, trnsysType, editor, **kwargs) -> None:
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.parent = editor
 
@@ -61,16 +62,15 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         self.changeSize()
 
-        self.path = None
-        self.addTree()
-
     def setHydraulicLoops(self, hydraulicLoops: _hlm.HydraulicLoops) -> None:
         self._hydraulicLoops = hydraulicLoops
 
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
     @property
@@ -84,16 +84,15 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
     def _getDirectPortPairPortItems(self, side: _sd.Side):
         return [p for dpp in self.directPortPairs if dpp.side == side for p in [dpp.fromPort, dpp.toPort]]
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.STORAGE_TANK_SVG
 
     # Setter functions
     def setParent(self, p):
         self.logger.debug("Setting parent of Storage Tank (and its hx)")
         self.parent = p
-
-        if self not in self.editor.trnsysObj:
-            self.editor.trnsysObj.append(self)
 
         for heatExchanger in self.heatExchangers:
             heatExchanger.storageTank = self
@@ -111,7 +110,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         outputPort = self._createPort("o", relativeOutputHeight, storageTankHeight, side)
 
         randomInt = int(_rnd.uniform(20, 200))
-        randomColor = QColor(randomInt, randomInt, randomInt)
+        randomColor = _qtg.QColor(randomInt, randomInt, randomInt)
         self._setPortColor(inputPort, randomColor)
         self._setPortColor(outputPort, randomColor)
 
@@ -141,7 +140,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         return portItem
 
     @staticmethod
-    def _setPortColor(portItem: SinglePipePortItem, color: QColor) -> None:
+    def _setPortColor(portItem: SinglePipePortItem, color: _qtg.QColor) -> None:
         portItem.innerCircle.setBrush(color)
         portItem.visibleColor = color
 
@@ -188,7 +187,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             self.flippedV,
             self.name,
             self.displayName,
-            self.id,
             self.trnsysId,
             self.h,
             position,
@@ -234,47 +232,34 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             portPair = _model.PortPair(side, heatExchanger.trnsysId, inputPort, outputPort)
 
             heatExchangerModel = _model.HeatExchanger(
-                portPair, heatExchanger.displayName, heatExchanger.w, self.id, heatExchanger.id
+                portPair, heatExchanger.displayName, heatExchanger.w, heatExchanger.id
             )
 
             heatExchangerModels.append(heatExchangerModel)
 
         return heatExchangerModels
 
-    def decode(self, i, resBlockList):
+    def decode(self, i: _dcj.JsonDict, resBlockList: list) -> None:
         offsetX = 0
         offsetY = 0
-        self._decodeInternal(i, offsetX, offsetY, resBlockList, shallSetNamesAndIDs=True)
 
-    def _decodeInternal(  # pylint: disable=too-many-arguments
-        self,
-        i,
-        offsetX,
-        offsetY,
-        resBlockList,
-        shallSetNamesAndIDs: bool,
-    ):
         self.logger.debug("Loading a Storage in Decoder")
 
         model = _model.StorageTank.from_dict(i)
-
         self.flippedH = model.isHorizontallyFlipped
-
-        if shallSetNamesAndIDs:
-            self.displayName = model.BlockDisplayName
+        self.displayName = model.BlockDisplayName
 
         self.changeSize()
+
         self.h = model.height
+
         self.updateImage()
 
         self.setPos(model.position[0] + offsetX, model.position[1] + offsetY)
-
-        if shallSetNamesAndIDs:
-            self.trnsysId = model.trnsysId
-            self.id = model.id
+        self.trnsysId = model.trnsysId
 
         for heatExchangerModel in model.heatExchangers:
-            self._decodeHeatExchanger(heatExchangerModel, shallSetNamesAndIDs)
+            self._decodeHeatExchanger(heatExchangerModel, True)
 
         for portPairModel in model.directPortPairs:
             self._decodeDirectPortPair(portPairModel)
@@ -318,11 +303,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         heatExchanger.port1.id = portPair.inputPort.id
         heatExchanger.port2.id = portPair.outputPort.id
 
-    def decodePaste(  # pylint: disable=too-many-arguments
-        self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs
-    ):
-        self._decodeInternal(i, offset_x, offset_y, resBlockList, shallSetNamesAndIDs=False)
-
     def assignIDsToUninitializedValuesAfterJsonFormatMigration(
         self, generator: _id.IdGenerator
     ) -> None:  # type: ignore[attr-defined]
@@ -360,10 +340,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
     # Misc
     def contextMenuEvent(self, event):
-        menu = QMenu()
-
-        launchNotepadAction = menu.addAction("Launch NotePad++")
-        launchNotepadAction.triggered.connect(self.launchNotepadFile)
+        menu = _qtw.QMenu()
 
         rotateRightIcon = _img.ROTATE_TO_RIGHT_PNG.icon()
         rotateRightAction = menu.addAction(rotateRightIcon, "Rotate Block clockwise")
@@ -376,9 +353,6 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         resetRotationAction = menu.addAction("Reset Rotation")
         resetRotationAction.triggered.connect(self.resetRotation)
 
-        printRotationAction = menu.addAction("Print Rotation")
-        printRotationAction.triggered.connect(self.printRotation)
-
         deleteBlockAction = menu.addAction("Delete this Block")
         deleteBlockAction.triggered.connect(self.deleteBlockCom)
 
@@ -387,8 +361,10 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         menu.exec(event.screenPos())
 
-    def mouseDoubleClickEvent(self, event):
-        ConfigureStorageDialog(self, self.editor)
+    def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
+        renameHelper = _rename.RenameHelper(self.editor.namesManager)
+        dialog = ConfigureStorageDialog(self, self.editor, renameHelper, self.editor.projectFolder)
+        dialog.exec()
 
     def getInternalPiping(self) -> _ip.InternalPiping:
         heatExchangerNodes = [hx.modelPipe for hx in self.heatExchangers]
@@ -412,19 +388,19 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
     def exportDck(self) -> None:  # pylint: disable=too-many-locals,too-many-statements
         if not self._areAllPortsConnected():
-            msgb = QMessageBox()
+            msgb = _qtw.QMessageBox()
             msgb.setText("Please connect all ports before exporting!")
             msgb.exec_()
             return
         success = self._debugConn()
 
         if not success:
-            qmb = QMessageBox()
+            qmb = _qtw.QMessageBox()
             qmb.setText("Ignore connection errors and continue with export?")
-            qmb.setStandardButtons(QMessageBox.Save | QMessageBox.Cancel)
-            qmb.setDefaultButton(QMessageBox.Cancel)
+            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Cancel)
+            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
             ret = qmb.exec()
-            if ret == QMessageBox.Save:
+            if ret == _qtw.QMessageBox.Save:
                 self.logger.debug("Overwriting")
             else:
                 self.logger.debug("Canceling")
@@ -452,7 +428,10 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
 
         tool.setInputs(inputs, directPairsPorts, heatExchangerPorts, auxiliaryPorts)
 
-        tool.createDDck(self.path, self.displayName, typeFile="ddck")
+        projectDirPath = _pl.Path(self.editor.projectFolder)
+        ddckDirPath = _dfh.getComponentDdckDirPath(self.displayName, projectDirPath)
+
+        tool.createDDck(str(ddckDirPath), self.displayName, typeFile="ddck")
 
     def _getDirectPairPortsForExport(self):
         directPairsPorts = []
@@ -461,7 +440,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
 
             modelPipe = directPortPair.modelPipe
-            massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
+            massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
 
             outgoingConnection = directPortPair.toPort.getConnection()
             reverseInputTemperatureName = _cnames.getTemperatureVariableName(
@@ -501,7 +480,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
         incomingConnection = heatExchanger.port1.getConnection()
         inputTemperatureName = _cnames.getTemperatureVariableName(incomingConnection, _mfn.PortItemType.STANDARD)
         modelPipe = heatExchanger.modelPipe
-        massFlowRateName = _mnames.getMassFlowVariableName(self, modelPipe, modelPipe.fromPort)
+        massFlowRateName = _mnames.getMassFlowVariableName(self.displayName, modelPipe, modelPipe.fromPort)
 
         outgoingConnection = heatExchanger.port2.getConnection()
         reverseInputTemperatureName = _cnames.getTemperatureVariableName(outgoingConnection, _mfn.PortItemType.STANDARD)
@@ -554,7 +533,7 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
             if stToPort != fromPort2:
                 errorConnList = errorConnList + connName2 + "\n"
         if errorConnList != "":
-            msgBox = QMessageBox()
+            msgBox = _qtw.QMessageBox()
             msgBox.setText(f"{errorConnList} is connected wrongly, right click StorageTank to invert connection.")
             msgBox.exec()
             noError = False
@@ -579,62 +558,3 @@ class StorageTank(BlockItem, _ip.HasInternalPiping):
                 return False
 
         return True
-
-    def addTree(self):
-        """
-        When a blockitem is added to the main window.
-        A file explorer for that item is added to the right of the main window by calling this method
-        """
-        pathName = self.displayName
-        self.path = self.editor.projectFolder
-        self.path = _os.path.join(self.path, "ddck")
-        self.path = _os.path.join(self.path, pathName)
-        if not _os.path.exists(self.path):
-            _os.makedirs(self.path)
-
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(self.path)
-        self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName(f"{self.displayName}Tree")
-        self.tree.setMinimumHeight(200)
-        self.tree.setSortingEnabled(True)
-        self.editor.splitter.addWidget(self.tree)
-
-    def deleteBlock(self):
-        """
-        Overridden method to also delete folder
-        """
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.editor.trnsysObj.remove(self)
-        self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        _sh.rmtree(self.path)
-        try:
-            widgetToRemove.hide()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        del self
-
-    def setDisplayName(self, newName):
-        """
-        Overridden method to also change folder name
-        """
-        self.displayName = newName
-        self.label.setPlainText(newName)
-        self.model.setName(self.displayName)
-        self.tree.setObjectName(f"{self.displayName}Tree")
-        self.logger.debug(_os.path.dirname(self.path))
-        destPath = _os.path.join(_os.path.split(self.path)[0], self.displayName)
-        if _os.path.split(self.path)[-1] == "" or _os.path.split(self.path)[-1] == "ddck":
-            _os.makedirs(destPath)
-        else:
-            if _os.path.exists(self.path):
-                _os.rename(self.path, destPath)
-        self.path = destPath
-        self.logger.debug(self.path)

@@ -8,30 +8,30 @@ import dataclasses_jsonschema as _dcj
 
 import pytrnsys.utils.serialization as _ser
 import trnsysGUI.PortItemBase as _pib
-import trnsysGUI.connectors.doublePipeConnectorBase as _dpcb
+import trnsysGUI.connection.connectors.doublePipeConnectorBase as _dpcb
 import trnsysGUI.doublePipePortItem as _dppi
 import trnsysGUI.globalNames as _gnames
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
+import trnsysGUI.serialization as _gser
 import trnsysGUI.teePieces.exportHelper as _eh
 import trnsysGUI.teePieces.teePieceBase as _tpb
+import trnsysGUI.teePieces.teePieceBaseModel as _tpbm
 
 
 class DoublePipeTeePiece(_tpb.TeePieceBase):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.w = 60
         self.h = 40
 
         self.changeSize()
 
-        self.childIds = []
-        self.childIds.append(self.trnsysId)
-        self.childIds.append(self.editor.idGen.getTrnsysID())
+        self.childIds = (self.trnsysId, self.editor.idGen.getTrnsysID())
 
-        self._updateModels(self.displayName)
+        self._setModels()
 
     def _createInputAndOutputPorts(self) -> _tp.Tuple[_pib.PortItemBase, _pib.PortItemBase, _pib.PortItemBase]:
         return (
@@ -40,7 +40,7 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
             _dppi.DoublePipePortItem("o", 2, self),
         )
 
-    def _updateModels(self, newDisplayName: str) -> None:
+    def _setModels(self) -> None:
         coldInput: _mfn.PortItem = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT, _mfn.PortItemType.COLD)
         coldOutput1: _mfn.PortItem = _mfn.PortItem("StrOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
         coldOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.COLD)
@@ -51,67 +51,34 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
         hotOutput2: _mfn.PortItem = _mfn.PortItem("OrtOut", _mfn.PortItemDirection.OUTPUT, _mfn.PortItemType.HOT)
         self._hotTeePiece = _mfn.TeePiece(hotInput, hotOutput1, hotOutput2, name="Hot")
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
-        rotationAngle = (self.rotationN % 4) * 90
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        return _img.DP_TEE_PIECE_SVG
 
-        if rotationAngle == 0:
-            return _img.DP_TEE_PIECE_SVG
+    def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
+        baseModel = self._encodeTeePieceBaseModel()
 
-        if rotationAngle == 90:
-            return _img.DP_TEE_PIECE_ROTATED_90
-
-        if rotationAngle == 180:
-            return _img.DP_TEE_PIECE_ROTATED_180
-
-        if rotationAngle == 270:
-            return _img.DP_TEE_PIECE_ROTATED_270
-
-        raise AssertionError("Invalid rotation angle.")
-
-    def encode(self):
-        portListInputs = []
-        portListOutputs = []
-
-        for inp in self.inputs:
-            portListInputs.append(inp.id)
-        for output in self.outputs:
-            portListOutputs.append(output.id)
-
-        blockPosition = (float(self.pos().x()), float(self.pos().y()))
+        childTrnsysIds = (self.childIds[0], self.childIds[1])
 
         doublePipeTeePieceModel = DoublePipeTeePieceModel(
             self.name,
             self.displayName,
-            blockPosition,
-            self.id,
-            self.trnsysId,
-            self.childIds,
-            portListInputs,
-            portListOutputs,
-            self.flippedH,
-            self.flippedV,
-            self.rotationN,
+            baseModel,
+            childTrnsysIds,
         )
 
         dictName = "Block-"
         return dictName, doublePipeTeePieceModel.to_dict()
 
-    def decode(self, i, resBlockList):
+    def decode(self, i: _dcj.JsonDict, resBlockList: list) -> None:
         model = DoublePipeTeePieceModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
-        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
-        self.id = model.id
-        self.trnsysId = model.trnsysId
-        self.childIds = model.childIds
 
-        self.inputs[0].id = model.portsIdsIn[0]
-        self.outputs[0].id = model.portsIdsOut[0]
-        self.outputs[1].id = model.portsIdsOut[1]
+        self.childIds = model.childTrnsysIds
 
-        self.updateFlipStateH(model.flippedH)
-        self.updateFlipStateV(model.flippedV)
-        self.rotateBlockToN(model.rotationN)
+        self._decodeTeePieceBaseModel(model.teePieceModel)
 
         resBlockList.append(self)
 
@@ -175,9 +142,12 @@ class DoublePipeTeePiece(_tpb.TeePieceBase):
     def _portOffset(self):
         return 30
 
+    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+        self.editor.showDoublePipeBlockDlg(self)
+
 
 @_dc.dataclass
-class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
+class DoublePipeTeePieceModelVersion0(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
     BlockName: str  # pylint: disable=invalid-name
     BlockDisplayName: str  # pylint: disable=invalid-name
     blockPosition: _tp.Tuple[float, float]
@@ -191,38 +161,20 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
     rotationN: int
 
     @classmethod
-    def from_dict(
-        cls,
-        data: _dcj.JsonDict,
-        validate=True,  # pylint: disable=duplicate-code
-        validate_enums: bool = True,  # /NOSONAR
-    ) -> "DoublePipeTeePieceModel":
-        doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(DoublePipeTeePieceModel, doublePipeTeePieceModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,  # /NOSONAR
-        validate: bool = False,
-        validate_enums: bool = True,  # /NOSONAR
-    ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)  # pylint: disable=duplicate-code
-        data[".__BlockDict__"] = True
-        return data
-
-    @classmethod
     def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
-        return _dpcb.DoublePipeBlockItemModel
+        return _dpcb.DoublePipeBlockItemModelVersion0
 
     @classmethod
-    def upgrade(cls, superseded: _dpcb.DoublePipeBlockItemModel) -> "DoublePipeTeePieceModel":  # type: ignore[override]
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeTeePieceModelVersion0":
+        assert isinstance(superseded, _dpcb.DoublePipeBlockItemModelVersion0)
+
         assert len(superseded.portsIdsIn) == 2
         assert len(superseded.portsIdsOut) == 1
 
         inputPortIds = [superseded.portsIdsIn[0]]
         outputPortIds = [superseded.portsIdsIn[1], superseded.portsIdsOut[0]]
 
-        return DoublePipeTeePieceModel(
+        return DoublePipeTeePieceModelVersion0(
             superseded.BlockName,
             superseded.BlockDisplayName,
             superseded.blockPosition,
@@ -239,3 +191,55 @@ class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disabl
     @classmethod
     def getVersion(cls) -> _uuid.UUID:
         return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")
+
+
+@_dc.dataclass
+class DoublePipeTeePieceModel(_ser.UpgradableJsonSchemaMixin, _gser.RequiredDecoderFieldsMixin):
+    teePieceModel: _tpbm.TeePieceBaseModel
+    childTrnsysIds: _tp.Tuple[int, int]
+
+    @classmethod
+    def from_dict(
+        cls,
+        data: _dcj.JsonDict,
+        validate=True,  # pylint: disable=duplicate-code
+        validate_enums: bool = True,  # /NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+    ) -> "DoublePipeTeePieceModel":
+        doublePipeTeePieceModel = super().from_dict(data, validate, validate_enums, schema_type)
+        return _tp.cast(DoublePipeTeePieceModel, doublePipeTeePieceModel)
+
+    def to_dict(
+        self,
+        omit_none: bool = True,  # /NOSONAR
+        validate: bool = False,
+        validate_enums: bool = True,  # /NOSONAR
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
+    ) -> _dcj.JsonDict:
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)  # pylint: disable=duplicate-code
+        data[".__BlockDict__"] = True
+        return data
+
+    @classmethod
+    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixinVersion0]:
+        return DoublePipeTeePieceModelVersion0
+
+    @classmethod
+    def upgrade(cls, superseded: _ser.UpgradableJsonSchemaMixinVersion0) -> "DoublePipeTeePieceModel":
+        assert isinstance(superseded, DoublePipeTeePieceModelVersion0)
+
+        baseModel = _tpbm.createTeePieceBaseModelFromLegacyModel(superseded)
+
+        assert len(superseded.childIds) == 2
+        chidTrnsysIds = (superseded.childIds[0], superseded.childIds[1])
+
+        return DoublePipeTeePieceModel(
+            superseded.BlockName,
+            superseded.BlockDisplayName,
+            baseModel,
+            chidTrnsysIds,
+        )
+
+    @classmethod
+    def getVersion(cls) -> _uuid.UUID:
+        return _uuid.UUID("2864bcb3-172b-47dd-b4cf-20ad9ac97384")

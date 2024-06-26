@@ -1,13 +1,18 @@
 # pylint: disable = invalid-name
+import typing as _tp
 
-import trnsysGUI.BlockItem as _bi
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 
 
-class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+class BlockItemFourPorts(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):  # pylint: disable = too-many-instance-attributes
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.logger = editor.logger
 
@@ -23,6 +28,11 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
         self.childIds.append(self.editor.idGen.getTrnsysID())
 
         self.changeSize()
+
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
+        raise NotImplementedError()
 
     def getDisplayName(self) -> str:
         return self.displayName
@@ -50,7 +60,6 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
         dct["PortsIDIn"] = portListInputs
         dct["PortsIDOut"] = portListOutputs
         dct[self.name + "Position"] = (float(self.pos().x()), float(self.pos().y()))
-        dct["ID"] = self.id
         dct["trnsysID"] = self.trnsysId
         dct["childIds"] = self.childIds
         dct["FlippedH"] = self.flippedH
@@ -77,35 +86,5 @@ class BlockItemFourPorts(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disab
 
         self.setPos(float(i[self.name + "Position"][0]), float(i[self.name + "Position"][1]))
         self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
 
         resBlockList.append(self)
-
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-
-        self.changeSize()
-
-        self.updateFlipStateH(i["FlippedH"])
-        self.updateFlipStateV(i["FlippedV"])
-        self.rotateBlockToN(i["RotationN"])
-
-        for x, inputPort in enumerate(self.inputs):
-            inputPort.id = i["PortsIDIn"][x]
-
-        for x, outputPort in enumerate(self.outputs):
-            outputPort.id = i["PortsIDOut"][x]
-
-        self.setPos(float(i[self.name + "Position"][0]) + offset_x, float(i[self.name + "Position"][1] + offset_y))
-
-        resBlockList.append(self)
-
-    def getSubBlockOffset(self, c):  # pylint: disable = invalid-name
-        for i in range(2):
-            if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
-            ):
-                return i
-        return None

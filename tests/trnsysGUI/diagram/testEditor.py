@@ -8,23 +8,32 @@ import typing as _tp
 import PyQt5.QtWidgets as _qtw
 import pytest as _pt
 
-
 import pytrnsys.utils.log as _ulog
-
+import pytrnsys.utils.result as _res
 import trnsysGUI.MassFlowVisualizer as _mfv
 import trnsysGUI.TVentil as _tv
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
+import trnsysGUI.menus.projectMenu.exportPlaceholders as _eph
 import trnsysGUI.project as _prj
 import trnsysGUI.storageTank.widget as _stw
-
+import trnsysGUI.warningsAndErrors as _werrors
 from . import _testHelper as _th
 
 
 def getProjects() -> _tp.Iterable[_th.Project]:
     yield _th.Project.createForExampleProject("TRIHP_dualSource", exampleDirNameToCopyFrom="examplesToBeCompleted")
     yield _th.Project.createForExampleProject("icegrid")
+
+    resultsDirPath = _pl.Path("results")
+    loadDiagramWarning = _th.LoadDiagramWarning(
+        "Orphaned ddck folders",
+        "The following ddck folder does not have a corresponding component in the diagram:\n\tdhw_demand",
+    )
+    yield _th.Project.createForExampleProject(
+        "solar_dhw_GUI", resultsDirPath=resultsDirPath, loadDiagramWarning=loadDiagramWarning
+    )
 
     yield from getTestProjects()
 
@@ -46,7 +55,10 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
         editor = mainWindow.editor
 
         self._exportAndTestStorageDdckFiles(editor, helper)
@@ -56,7 +68,10 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
         editor = mainWindow.editor
 
         self._exportAndTestHydraulicDdckFile(editor, helper)
@@ -66,17 +81,22 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
+
         editor = mainWindow.editor
 
         self._exportAndTestDdckPlaceholdersJsonFile(editor, helper, monkeypatch)
 
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testExportDeck(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
-        helper = _th.Helper(testProject)
+    def testExportDeck(self, testProject: _th.Project, qtbot, monkeypatch, shallComparisonsAlwaysSucceed=False) -> None:
+        helper = _th.Helper(testProject, shallComparisonsAlwaysSucceed)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
         editor = mainWindow.editor
 
         monkeypatch.chdir(helper.actualProjectFolderPath)
@@ -119,7 +139,10 @@ class TestEditor:
             _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
         )
 
-        editor.exportDdckPlaceHolderValuesJsonFile()
+        result = _eph.exportDdckPlaceHolderValuesJsonFile(editor)
+
+        assert not _res.isError(result), _res.error(result).message
+
         helper.ensureFilesAreEqual("DdckPlaceHolderValues.json")
 
     def _exportAndTestDeckFile(self, mainWindow, testProject, helper, monkeypatch):
@@ -130,12 +153,22 @@ class TestEditor:
             _qtw.QMessageBox, _qtw.QMessageBox.information.__name__, dummyInformation  # pylint: disable=no-member
         )
 
+        def dummyShowErrorMessageBox(errorMessage: str, title: str = "Error") -> None:
+            failMessage = f"{title}: {errorMessage}"
+            _pt.fail(failMessage)
+
+        monkeypatch.setattr(_werrors, _werrors.showMessageBox.__name__, dummyShowErrorMessageBox)
+
         mainWindow.exportDck()
 
         deckFileName = f"{testProject.projectName}.dck"
+        relativeDeckFilePathAsString = (
+            testProject.resultsDirPathOrNone / deckFileName if testProject.resultsDirPathOrNone else deckFileName
+        )
 
         pathPrefixes = self._getHardCodedPathPrefixesForReplacingInExpectedDeck()
-        helper.ensureFilesAreEqual(deckFileName, replaceInExpected=pathPrefixes)
+
+        helper.ensureFilesAreEqual(relativeDeckFilePathAsString, replaceInExpected=pathPrefixes)
 
     @staticmethod
     def _getHardCodedPathPrefixesForReplacingInExpectedDeck():
@@ -156,27 +189,38 @@ class TestEditor:
         helper = _th.Helper(testProject)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, warningHelper = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
 
         convertedProjectFolderPath = helper.actualProjectFolderPath.parent / "converted"
-        while convertedProjectFolderPath.exists():
+        if convertedProjectFolderPath.exists():
             _su.rmtree(convertedProjectFolderPath)
-            _time.sleep(0.5)
+            _time.sleep(1)
         _os.mkdir(convertedProjectFolderPath)
 
+        warningHelper.reset()
         mainWindow.copyContentsToNewFolder(convertedProjectFolderPath, helper.actualProjectFolderPath)
+        warningHelper.verifyOrRaise()
 
         convertedJsonFilePath = convertedProjectFolderPath / f"{convertedProjectFolderPath.name}.json"
         convertedProject = _prj.LoadProject(convertedJsonFilePath)
+
+        warningHelper.reset()
         _mw.MainWindow(logger, convertedProject)  # type: ignore[attr-defined]
+        warningHelper.verifyOrRaise()
 
     @_pt.mark.needs_trnsys
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testMassFlowSolver(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
-        helper = _th.Helper(testProject)
+    def testMassFlowSolver(
+        self, testProject: _th.Project, qtbot, monkeypatch, shallComparisonsAlwaysSucceed=False
+    ) -> None:
+        helper = _th.Helper(testProject, shallComparisonsAlwaysSucceed)
         helper.setup()
 
-        mainWindow = self._createMainWindow(helper, qtbot, monkeypatch)
+        mainWindow, _ = self._createMainWindowAndWarningHelper(
+            helper, testProject.loadDiagramWarningOrNone, qtbot, monkeypatch
+        )
 
         self._exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
 
@@ -193,15 +237,16 @@ class TestEditor:
         temperaturesPrintFilePath = helper.actualProjectFolderPath / temperaturesPintFileName
         self._assertMassFlowVisualizerLoadsData(massFlowRatesPrintFilePath, temperaturesPrintFilePath, mainWindow)
 
-    @staticmethod
-    def _createMainWindow(helper, qtbot, monkeypatch):
-        def patchedCloseEvent(_, closeEvent):
-            return closeEvent.accept()
+    @classmethod
+    def _createMainWindowAndWarningHelper(
+        cls, helper: _th.Helper, loadDiagramWarningOrNone: _th.LoadDiagramWarning | None, qtbot, monkeypatch
+    ) -> _tp.Tuple[_mw.MainWindow, _th.LoadDiagramWarningHelper]:  # type: ignore[name-defined]
+        cls._configureDontAskWhetherWindowShouldBeClosed(monkeypatch)
+
+        warningHelper = _th.LoadDiagramWarningHelper(loadDiagramWarningOrNone)
 
         monkeypatch.setattr(
-            _mw.MainWindow,  # type: ignore[attr-defined]
-            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
-            patchedCloseEvent,
+            _qtw.QMessageBox, _qtw.QMessageBox.warning.__name__, warningHelper.warning  # pylint: disable=no-member
         )
 
         projectFolderPath = helper.actualProjectFolderPath
@@ -212,9 +257,22 @@ class TestEditor:
 
         mainWindow = _mw.MainWindow(logger, project)  # type: ignore[attr-defined]
 
+        warningHelper.verifyOrRaise()
+
         qtbot.addWidget(mainWindow)
 
-        return mainWindow
+        return mainWindow, warningHelper
+
+    @staticmethod
+    def _configureDontAskWhetherWindowShouldBeClosed(monkeypatch) -> None:
+        def patchedCloseEvent(_, closeEvent):
+            return closeEvent.accept()
+
+        monkeypatch.setattr(
+            _mw.MainWindow,  # type: ignore[attr-defined]
+            _mw.MainWindow.closeEvent.__name__,  # type: ignore[attr-defined]
+            patchedCloseEvent,
+        )
 
     @staticmethod
     def _assertMassFlowVisualizerLoadsData(
@@ -227,10 +285,7 @@ class TestEditor:
         valves = [o for o in blockItemsAndConnections if isinstance(o, _tv.TVentil)]
 
         for singlePipeConnection in singlePipeConnections:
-            firstSegment = singlePipeConnection.firstS
-            assert firstSegment
-
-            firstSegment.labelMass.setPlainText("")
+            singlePipeConnection.massFlowLabel.setPlainText("")
 
         for valve in valves:
             valve.posLabel.setPlainText("")
@@ -239,7 +294,7 @@ class TestEditor:
             mainWindow, massFlowRatesPrintFilePath, temperaturesPrintFilePath
         )
 
-        areAllMassFlowLabelsSet = all(s.firstS and s.firstS.labelMass.toPlainText() for s in singlePipeConnections)
+        areAllMassFlowLabelsSet = all(c.massFlowLabel.toPlainText() for c in singlePipeConnections)
         areAllValvePositionLabelsSet = all(v.posLabel.toPlainText() for v in valves)
         assert areAllMassFlowLabelsSet and areAllValvePositionLabelsSet
 
@@ -266,20 +321,32 @@ class TestEditor:
     @_pt.mark.tool
     @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
     @_pt.mark.parametrize("testProject", TEST_CASES)
-    def testToolUpdateExpectedFiles(self, testProject: _th.Project) -> None:
-        """Make `Helper.ensureFilesAreEqual` always return True, then run a test that generates
-        actual files that you'd with which you'd like to update the expected files. Then run this
-        test tool. Repeat the same for each tests for which you want to update the expected files.
-        Finally, don't forget to check the modifications to the expected files before committing
-        and undo the changes to `Helper`! ;)"""
+    def testToolUpdateExportDeckExpectedFiles(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        shallComparisonsAlwaysSucceed = True
+        self.testExportDeck(testProject, qtbot, monkeypatch, shallComparisonsAlwaysSucceed)
+
+        self._updateExpectedFiles(testProject)
+
+    @_pt.mark.tool
+    @_pt.mark.skip("This test is really a script to be run by the user from the IDE to update the expected files.")
+    @_pt.mark.parametrize("testProject", TEST_CASES)
+    def testToolUpdateMassFlowSolverExpectedFiles(self, testProject: _th.Project, qtbot, monkeypatch) -> None:
+        shallComparisonsAlwaysSucceed = True
+        self.testMassFlowSolver(testProject, qtbot, monkeypatch, shallComparisonsAlwaysSucceed)
+
+        self._updateExpectedFiles(testProject)
+
+    def _updateExpectedFiles(self, testProject):
         helper = _th.Helper(testProject)
-
         _su.copytree(helper.actualProjectFolderPath, helper.expectedProjectFolderPath, dirs_exist_ok=True)
-
         self._resetHardCodedPathsInDeckFile(testProject, helper)
 
     def _resetHardCodedPathsInDeckFile(self, project: _th.Project, helper: _th.Helper) -> None:
-        deckFilePath = helper.expectedProjectFolderPath / f"{project.projectName}.dck"
+        deckFileName = f"{project.projectName}.dck"
+        relativeDeckFilePath: str | _pl.Path = (
+            project.resultsDirPathOrNone / deckFileName if project.resultsDirPathOrNone else deckFileName
+        )
+        deckFilePath = helper.expectedProjectFolderPath / relativeDeckFilePath
         (
             hardcodedPathInExpectedDeck,
             hardCodedPathInActualDeck,

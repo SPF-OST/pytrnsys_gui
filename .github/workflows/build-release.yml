@@ -1,0 +1,80 @@
+name: Build release
+
+on:
+  push:
+    tags:
+      - v*
+  repository_dispatch:
+    types:
+      - build-executable-push
+
+jobs:
+  build-exe:
+    runs-on: [self-hosted, etna]
+    env:
+      NORMAL_PUSH_TO_MASTER: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push'}}
+      TAG_PUSH_TO_MASTER: ${{github.event_name == 'push'}}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Report github.event_name and event_type
+        run: |
+          echo "Event name: ${{github.event_name}}"
+          echo "Event type (via client payload): ${{github.event.client_payload.type}}"
+          echo "Event type (via event_type): ${{github.event.event_type}}"
+
+      - name: Remove old venv
+        run: |
+          if (Test-Path -LiteralPath venv) {
+            Remove-Item -LiteralPath venv -Recurse
+          }
+
+      - name: Create virtual environment
+        run: py -3.12 -m venv venv
+        
+      - name: Compute pytrnsys git SHA
+        id: sha
+        run: |
+          $pytrnsys_sha=$(venv\Scripts\python release\getPytrnsysMasterGitSha.py)
+          echo "pytrnsys_sha=${pytrnsys_sha}" >> $env:GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: |
+          venv\Scripts\python -m pip install --upgrade pip
+          venv\Scripts\python -m pip install wheel
+          venv\Scripts\python -m pip install -r requirements/release.txt
+        
+      - name: Build executable
+        run: venv\Scripts\python dev-tools/devTools.py -r
+      
+      - name: Compute file name
+        id: fn
+        run: |
+          $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
+          $ref_name="${{github.ref_name}}".replace("/","-")
+          echo "file_name_base=pytrnsys-gui-${ref_name}-${pytrnsys_gui_sha}-${{steps.sha.outputs.pytrnsys_sha}}" >> $env:GITHUB_OUTPUT
+      
+      - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
+        name: Create zip file
+        run: mv release\build\pytrnsys.zip ${{steps.fn.outputs.file_name_base}}.zip
+      
+      - if: env.NORMAL_PUSH_TO_MASTER == 'true'
+        name: Release artifacts (bleeding-edge)
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{secrets.GITHUB_TOKEN}}"
+          automatic_release_tag: "bleeding-edge"
+          prerelease: true
+          title: "Development Build"
+          # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
+          files: ${{steps.fn.outputs.file_name_base}}.zip
+      
+      - if: env.TAG_PUSH_TO_MASTER == 'true'
+        name: Release artifacts (proper release)
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{secrets.GITHUB_TOKEN}}"
+          title: "Release"
+          prerelease: false
+          # ATTENTION: `action-automatic-releases` *needs* forward slashes in the paths given to `files`.
+          files: ${{steps.fn.outputs.file_name_base}}.zip

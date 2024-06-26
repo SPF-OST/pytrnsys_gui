@@ -4,10 +4,10 @@ import PyQt5.QtCore as _qtc
 import PyQt5.QtWidgets as _qtw
 
 import trnsysGUI.dialogs.connections.doublePipe as _dpcdlg
-import trnsysGUI.errors as _errors
+import trnsysGUI.warningsAndErrors as _werrors
 
 
-_SHOW_ERROR_FUNCTION_NAME = f"{_errors.__name__}.{_errors.showErrorMessageBox.__name__}"
+_SHOW_ERROR_FUNCTION_NAME = f"{_werrors.__name__}.{_werrors.showMessageBox.__name__}"
 
 
 class TestDoublePipeConnectionPropertiesDialog:  # pylint: disable = attribute-defined-outside-init

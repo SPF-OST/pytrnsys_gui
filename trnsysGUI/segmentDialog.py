@@ -1,18 +1,17 @@
-import typing as _tp
-
 import PyQt5.QtWidgets as _qtw
 
 import pytrnsys.utils.result as _res
-import trnsysGUI.componentAndPipeNameValidator as _cpn
+
 import trnsysGUI.connection.connectionBase as _cb
-import trnsysGUI.errors as _err
+import trnsysGUI.warningsAndErrors as _werrors
+import trnsysGUI.names.rename as _rename
 
 
 class SegmentDialog(_qtw.QDialog):
-    def __init__(self, connection: _cb.ConnectionBase, existingNames: _tp.Sequence[str]) -> None:
+    def __init__(self, connection: _cb.ConnectionBase, renameHelper: _rename.RenameHelper) -> None:
         super().__init__()
         self._connection = connection
-        self._nameValidator = _cpn.ComponentAndPipeNameValidator(existingNames)
+        self._renameHelper = renameHelper
 
         nameLabel = _qtw.QLabel("Name:")
         self._lineEdit = _qtw.QLineEdit(self._connection.displayName)
@@ -36,28 +35,23 @@ class SegmentDialog(_qtw.QDialog):
 
     def _acceptedEdit(self) -> None:
         newName = self._lineEdit.text()
-        if self._isOldName(newName):
-            self.close()
-            return
+        currentName = self._connection.displayName
 
-        result = self._nameValidator.validateName(newName)
+        checkDdckFolder = False
+        result = self._renameHelper.canRename(currentName, newName, checkDdckFolder)
         if _res.isError(result):
             errorMessage = _res.error(result)
-            _err.showErrorMessageBox(errorMessage.message)
+            _werrors.showMessageBox(errorMessage.message)
             return
 
         self._applyNameChange(newName)
+        self._renameHelper.rename(currentName, newName)
         self.close()
 
     def _applyNameChange(self, newName: str) -> None:
         self._connection.setDisplayName(newName)
         for segment in self._connection.segments:
             segment.setToolTip(newName)
-
-    def _isOldName(self, newName: str) -> bool:
-        oldName = self._connection.displayName
-
-        return newName.lower() == oldName.lower()
 
     def _cancel(self) -> None:
         self.close()

@@ -5,11 +5,12 @@ import pathlib as _pl
 
 from PyQt5 import QtCore
 from PyQt5.QtGui import QCursor
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QMenu, QFileDialog
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QGraphicsPixmapItem
+from PyQt5.QtWidgets import QMenu
 
 import trnsysGUI.imageAccessor as _ia
 import trnsysGUI.images as _img
-from trnsysGUI.ResizerItem import ResizerItem
 
 
 class GraphicalItem(QGraphicsPixmapItem):
@@ -59,7 +60,7 @@ class GraphicalItem(QGraphicsPixmapItem):
             print("No image picked, name is " + fileName)
 
     def setImageSource(self, s: str):
-        self._imageAccessor = _ia.ImageAccessor.createForFile(_pl.Path(s))
+        self._imageAccessor = _ia.createForFile(_pl.Path(s))
 
     def updateImage(self):
         pixmap = self._imageAccessor.pixmap(width=self.w, height=self.h)
@@ -82,7 +83,7 @@ class GraphicalItem(QGraphicsPixmapItem):
         return dictName, dct
 
     def decode(self, i, resBlockList):
-        self._imageAccessor = _ia.ImageAccessor.createFromResourcePath(i["ImageSource"])
+        self._imageAccessor = _ia.createFromResourcePath(i["ImageSource"])
 
         self.setPos(float(i["BlockPosition"][0]), float(i["BlockPosition"][1]))
         self.id = i["ID"]
@@ -91,30 +92,7 @@ class GraphicalItem(QGraphicsPixmapItem):
 
         resBlockList.append(self)
 
-    def decodePaste(self, i, offsetX, offsetY, resConnList, resBlockList, **kwargs):
-        self.setPos(float(i["BlockPosition"][0] + offsetX), float(i["BlockPosition"][1] + offsetY))
-
-        resBlockList.append(self)
-
     def setParent(self, parent):
         self._editor = parent
         if self not in self._editor.graphicalObj:
             self._editor.graphicalObj.append(self)
-
-    def deleteBlock(self):
-        self._editor.graphicalObj.remove(self)
-        self._editor.diagramScene.removeItem(self)
-        del self
-
-    def mousePressEvent(self, event):
-        try:
-            self.resizer
-        except AttributeError:
-            self.resizer = ResizerItem(self)
-            self.resizer.setPos(self.w, self.h)
-            self.resizer.itemChange(self.resizer.ItemPositionChange, self.resizer.pos())
-        else:
-            return
-
-    def deleteResizer(self):
-        del self.resizer

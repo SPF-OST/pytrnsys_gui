@@ -242,7 +242,7 @@ class HydraulicLoopDialog(_qtw.QDialog, _uigen.Ui_hydraulicLoopDialog):
         raise AssertionError(f"Unknown dialog code {dialogCode}.")
 
 
-_PropertyValue = _tp.Union[str, float, bool]
+_PropertyValue = str | float | bool
 
 
 @_dc.dataclass

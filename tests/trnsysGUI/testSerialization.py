@@ -308,6 +308,10 @@ class TestSerialization:
 
         assert json == """{"values": {"name": "Voldemort"}}"""
 
+        deserializedOuterObject = OuterClass.from_json(json)
+
+        assert deserializedOuterObject == outerObject
+
 
 @_dc.dataclass
 class Variable(_dcj.JsonSchemaMixin):

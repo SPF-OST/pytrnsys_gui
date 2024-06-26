@@ -1,29 +1,27 @@
 # pylint: skip-file
 # type: ignore
 
-import os
 import pathlib as _pl
-import shutil
 import typing as _tp
 
-from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeView
+import PyQt5.QtWidgets as _qtw
 
+import trnsysGUI.blockItemGraphicItemMixins as _bmx
+import trnsysGUI.blockItemHasInternalPiping as _biip
 import trnsysGUI.createSinglePipePortItem as _cspi
+import trnsysGUI.imageAccessor as _ia
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class GenericBlock(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(GenericBlock, self).__init__(trnsysType, editor, **kwargs)
+class GenericBlock(_biip.BlockItemHasInternalPiping, _bmx.RasterImageBlockItemMixin):
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        _biip.BlockItemHasInternalPiping.__init__(self, trnsysType, editor, displayName)
+        _bmx.RasterImageBlockItemMixin.__init__(self)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
-        self.loadedFiles = []
 
         self.childIds = []
         self.childIds.append(self.trnsysId)
@@ -35,12 +33,11 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         self.isSet = True
 
         self.changeSize()
-        self.addTree()
 
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    def _getImageAccessor(self) -> _tp.Optional[_ia.ImageAccessorBase]:
         return _img.GENERIC_BLOCK_PNG
 
     def changeSize(self):
@@ -83,8 +80,7 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         self.logger.debug(relH)
 
     def setImage(self):
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
+        self._image = self._imageAccessor.image()
 
     def changeImage(self):
         name = str(self.pickImage().resolve())
@@ -95,16 +91,13 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
             self.logger.debug("No image picked, name is " + name)
 
     def setImageSource(self, name):
-        self._imageAccessor = _img.ImageAccessor.createForFile(_pl.Path(name))
+        self._imageAccessor = _ia.createForFile(_pl.Path(name))
 
     def pickImage(self):
-        return _pl.Path(QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
+        return _pl.Path(_qtw.QFileDialog.getOpenFileName(self.editor, filter="*.png *.svg")[0])
 
     def contextMenuEvent(self, event):
-        menu = QMenu()
-
-        a1 = menu.addAction("Launch NotePad++")
-        a1.triggered.connect(self.launchNotepadFile)
+        menu = _qtw.QMenu()
 
         rr = _img.ROTATE_TO_RIGHT_PNG.icon()
         a2 = menu.addAction(rr, "Rotate Block clockwise")
@@ -116,9 +109,6 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
 
         a4 = menu.addAction("Reset Rotation")
         a4.triggered.connect(self.resetRotation)
-
-        b1 = menu.addAction("Print Rotation")
-        b1.triggered.connect(self.printRotation)
 
         c1 = menu.addAction("Delete this Block")
         c1.triggered.connect(self.deleteBlock)
@@ -147,7 +137,7 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         numberOfPortPairsBySide = i["PortPairsNb"]
         self._addPortPairs(numberOfPortPairsBySide)
 
-        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
+        self._imageAccessor = _ia.createFromResourcePath(i["Imagesource"])
         self.setImage()
 
         super().decode(i, resBlockList)
@@ -163,18 +153,6 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         numberOfPortPairs = len(self.inputs)
         for portPairIndex in range(numberOfPortPairs):
             self.removePortPair(portPairIndex)
-
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        correcter = 0
-        for j in range(4):
-            if j == 2:
-                correcter = -1
-            for k in range(i["PortPairsNb"][j] + correcter):
-                self.addPortPair(j)
-
-        super(GenericBlock, self).decodePaste(i, offset_x, offset_y, resConnList, resBlockList)
-        self._imageAccessor = _img.ImageAccessor.createFromResourcePath(i["Imagesource"])
-        self.setImage()
 
     def addPortPair(self, side):
         h = self.h
@@ -235,18 +213,6 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
         self.inputs.remove(self.inputs[n])
         self.outputs.remove(self.outputs[n])
 
-    def updateFlipStateH(self, state):
-        self.flippedH = bool(state)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
-    def updateFlipStateV(self, state):
-        self.flippedV = bool(state)
-
-        pixmap = self._getPixmap()
-        self.setPixmap(pixmap)
-
     def getInternalPiping(self) -> _ip.InternalPiping:
         assert len(self.inputs) == len(self.outputs)
 
@@ -262,74 +228,3 @@ class GenericBlock(BlockItem, _ip.HasInternalPiping):
             portItems[outputPort] = graphicalOutputPort
 
         return _ip.InternalPiping(pipes, portItems)
-
-    def getSubBlockOffset(self, c):
-        for i in range(len(self.inputs)):
-            if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
-            ):
-                return i
-
-    def addTree(self):
-        """
-        When a blockitem is added to the main window.
-        A file explorer for that item is added to the right of the main window by calling this method
-        """
-        self.logger.debug(self.editor)
-        pathName = self.displayName
-        self.path = self.editor.projectFolder
-
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(self.path)
-        self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount() - 1):
-            self.tree.hideColumn(i)
-        self.tree.setMinimumHeight(200)
-        self.tree.setSortingEnabled(True)
-        self.editor.splitter.addWidget(self.tree)
-
-    def deleteBlock(self):
-        """
-        Overridden method to also delete folder
-        """
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.editor.trnsysObj.remove(self)
-        self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        shutil.rmtree(self.path)
-        self.deleteLoadedFile()
-        try:
-            widgetToRemove.hide()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        del self
-
-    def setDisplayName(self, newName):
-        """
-        Overridden method to also change folder name
-        """
-        self.displayName = newName
-        self.label.setPlainText(newName)
-        self.model.setName(self.displayName)
-        self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
-            self.path = destPath
-            self.logger.debug(self.path)

@@ -6,6 +6,7 @@
 ** See pytrnsys_trihp\pytrnsys_trihp\heatPumpFit
 ** Author : Martin Neugebauer, 
 ** 06.02.2023 IGG Coefficients and modes, MfrHpCond1Ref, MfrHpCond2Ref
+** 13.02.2023 IGG MfrHpCond1Ref = 1148
 **************************************************
 
 *********************************
@@ -14,7 +15,7 @@
 CONSTANTS 5
 sizeHpNom = 10 !12 IGG From 2nd Campaign Pdhw=7.78 kW at Te0-Tc20 and Psh=6.5kW at Te0-Tc20
 
-MfrHpCond1Ref = 861 !SH IGG 10 kW  deltaT 10.0C
+MfrHpCond1Ref = 1148 !SH IGG 10 kW  deltaT 7.5C
 MfrHpCond2Ref = 246 !DHW IGG 10 kW  deltaT 35.0C
 TMinEvapTout = TMinEvapTin - 3
 tCondMaxHp = 80

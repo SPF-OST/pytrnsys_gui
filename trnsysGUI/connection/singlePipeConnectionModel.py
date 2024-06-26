@@ -198,9 +198,10 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
         data: _dcj.JsonDict,
         validate=True,
         validate_enums: bool = True,
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> "ConnectionModel":
         data.pop(".__ConnectionDict__")
-        connectionModel = super().from_dict(data, validate, validate_enums)
+        connectionModel = super().from_dict(data, validate, validate_enums, schema_type)
         return _tp.cast(ConnectionModel, connectionModel)
 
     def to_dict(
@@ -208,8 +209,9 @@ class ConnectionModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-ma
         omit_none: bool = True,
         validate: bool = False,
         validate_enums: bool = True,  # pylint: disable=duplicate-code
+        schema_type: _dcj.SchemaType = _dcj.DEFAULT_SCHEMA_TYPE,  # /NOSONAR
     ) -> _dcj.JsonDict:
-        data = super().to_dict(omit_none, validate, validate_enums)
+        data = super().to_dict(omit_none, validate, validate_enums, schema_type)
         data[".__ConnectionDict__"] = True
         return data
 

@@ -8,9 +8,11 @@ import jinja2 as _jinja
 import trnsysGUI.TVentil as _tventil
 import trnsysGUI.connection.connectionBase as _cb
 import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.connection.hydraulicExport.doublePipe.getDoublePipeEnergyBalanceEquations as _gdpebe
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.connection.singlePipeConnection as _spc
 import trnsysGUI.connection.singlePipeDefaultValues as _spdValues
+import trnsysGUI.globalNames as _gnames
 import trnsysGUI.hydraulicLoops.model as _hlm
 import trnsysGUI.hydraulicLoops.names as _lnames
 import trnsysGUI.internalPiping as _ip
@@ -20,8 +22,6 @@ import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
 import trnsysGUI.temperatures.hydraulic as _thyd
-import trnsysGUI.connection.hydraulicExport.doublePipe.getDoublePipeEnergyBalanceEquations as _gdpebe
-import trnsysGUI.globalNames as _gnames
 
 _UNUSED_INDEX = 0
 
@@ -89,6 +89,21 @@ class Export:
         problemEncountered = False
         return problemEncountered, f
 
+    def exportSinglePipeParameters(self) -> str:
+        doesHydraulicContainSinglePipes = any(
+            isinstance(obj, _spc.SinglePipeConnection) for obj in self._hasInternalPipings
+        )
+
+        if not doesHydraulicContainSinglePipes:
+            return ""
+
+        return f"""\
+*** Default global PARAMETERS for single pipes
+CONSTANTS 1
+{_gnames.SinglePipes.INITIAL_TEMPERATURE} = 20
+
+"""
+
     def exportDoublePipeParameters(self, exportTo="ddck"):
         doesHydraulicContainDoublePipes = any(
             isinstance(obj, _dpc.DoublePipeConnection) for obj in self._hasInternalPipings
@@ -98,11 +113,11 @@ class Export:
             return ""
 
         constantsBlock = f"""\
-*** Default global PARAMETERS for TYPES 9511 ***
+*** Default global PARAMETERS for double pipes ***
 CONSTANTS 25
 
 ****** Pipe and soil properties ******
-dpLength = 579.404 ! Length of buried pipe in m
+{_gnames.DoublePipes.REFERENCE_LENGTH} = 579.404 ! Length of buried pipe in m
 dpDiamIn = 0.4028 ! Inner diameter of pipes in m
 dpDiamOut = 0.429 ! Outer diameter of pipes in m
 dpLambda = 175 ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -129,12 +144,12 @@ dpRhoSl = 1800  ! Density of soil in kg/m^3
 dpCpSl = 1.0  ! Specific heat of soil in kJ/kg.K
 
 ****** Definition of nodes ******
-dpNrFlNds = 60  ! Number of fluid nodes
+{_gnames.DoublePipes.N_AXIAL_SOIL_NODES_AT_REFERENCE_LENGTH} = 10
+{_gnames.DoublePipes.FLUID_TO_SOIL_NODES_RATIO} = 1
 dpNrSlRad = 10  ! Number of radial soil nodes
 dpSoilThickness = 0.5  ! Thickness of soil around the gravel considered in the model in m
 dpRadNdDist = dpSoilThickness/dpNrSlRad ! Radial distance of any node in m
-dpNrSlAx = 20  ! Number of axial soil nodes
-dpNrSlCirc = 4  ! Number of circumferential soil nodes
+{_gnames.DoublePipes.N_CIRCUMFERENTIAL_SOIL_NODES} = 4  ! Number of circumferential soil nodes
 """
         massFlowSolverConstantsBlock = """\
 CONSTANTS 3
@@ -143,25 +158,11 @@ dTambAmpl = 13.32 ! Amplitude of surface temperature in n degrees celsius
 ddTcwOffset = 36 ! Days of minimum surface temperature
 """
         if exportTo == "ddck":
-            return constantsBlock
+            return constantsBlock + "\n"
         elif exportTo == "mfs":
-            return constantsBlock + "\n\n" + massFlowSolverConstantsBlock
+            return constantsBlock + "\n\n" + massFlowSolverConstantsBlock + "\n"
         else:
             raise ValueError("Unknown value for `exportTo`", exportTo)
-
-    def exportPumpOutlets(self):
-        f = "*** Pump outlet temperatures" + "\n"
-        equationNr = 0
-        for t in self._hasInternalPipings:
-            f += t.exportPumpOutlets()[0]
-            equationNr += t.exportPumpOutlets()[1]
-
-        if equationNr == 0:
-            f = ""
-        else:
-            f = "EQUATIONS " + str(equationNr) + "\n" + f + "\n"
-
-        return f
 
     def exportMassFlows(self):  # What the controller should give
         f = "*** Massflowrates" + "\n"
@@ -237,9 +238,9 @@ ddTcwOffset = 36 ! Days of minimum surface temperature
         resultText = f"""\
 UNIT {simulationUnit} TYPE {simulationType}
 PARAMETERS {nToleranceParameters + 1 + len(serializedNodes) * 4}
-{_mnames.ABSOLUTE_TOLERANCE_NAME}
-{_mnames.RELATIVE_TOLERANCE_NAME}
-{_mnames.TOLERANCE_SWITCHING_THRESHOLD_NAME}
+{_gnames.MassFlowSolver.ABSOLUTE_TOLERANCE}
+{_gnames.MassFlowSolver.RELATIVE_TOLERANCE}
+{_gnames.MassFlowSolver.SWITCHING_THRESHOLD}
 {len(serializedNodes)}
 {jointLines}
 """
@@ -585,9 +586,7 @@ INPUTS {len(allVariableNames)}
         return temperatureVariableNames
 
     def exportFluids(self) -> str:
-        def getValueOrVariableName(
-            valueOrVariable: _tp.Union[float, _hlm.Variable], factor: float = 1
-        ) -> _tp.Union[float, str]:
+        def getValueOrVariableName(valueOrVariable: float | _hlm.Variable, factor: float = 1) -> float | str:
             if isinstance(valueOrVariable, float):
                 return valueOrVariable * factor
 

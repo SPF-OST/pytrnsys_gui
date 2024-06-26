@@ -41,7 +41,7 @@ EQUATIONS 1
 @_dc.dataclass
 class _Variable:
     name: str
-    initialValue: _tp.Union[str, float]
+    initialValue: str | float
 
 
 @_dc.dataclass
@@ -79,7 +79,7 @@ def getTeePieceUnit(
     teePiece: _tpb.TeePieceBase,
     massFlowNetworkNode: _mfn.TeePiece,
     portItemType: _mfn.PortItemType,
-    initialTemperature: _tp.Union[str, float],
+    initialTemperature: str | float,
     componentName: _tp.Optional[str] = None,
     extraNewlines: str = "",
 ) -> str:
@@ -109,7 +109,7 @@ def _createPorts(
     teePiece: _tpb.TeePieceBase,
     massFlowNetworkNode: _mfn.TeePiece,
     portItemType: _mfn.PortItemType,
-    initialTemperature: _tp.Union[str, float],
+    initialTemperature: str | float,
 ) -> _tp.Tuple[_Port, _Port, _Port]:
 
     inputPort = _createPort(
@@ -148,10 +148,10 @@ def _createPort(
     teePiece: _tpb.TeePieceBase,
     massFlowNetworkNode: _mfn.TeePiece,
     portItemType: _mfn.PortItemType,
-    initialTemperature: _tp.Union[str, float],
+    initialTemperature: str | float,
 ) -> _Port:
 
-    massFlowName = _mnames.getMassFlowVariableName(teePiece, massFlowNetworkNode, modelPortItem)
+    massFlowName = _mnames.getMassFlowVariableName(teePiece.displayName, massFlowNetworkNode, modelPortItem)
     temperatureName = _cnames.getTemperatureVariableName(connection, portItemType)
     port = _Port(_Variable(massFlowName, 0), _Variable(temperatureName, initialTemperature))
     return port

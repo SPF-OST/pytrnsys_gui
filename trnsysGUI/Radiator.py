@@ -10,21 +10,18 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _Ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 
 
-class Radiator(BlockItem, _Ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(Radiator, self).__init__(trnsysType, editor, **kwargs)
+class Radiator(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 0, self))
-        self.loadedFiles = []
 
         self.changeSize()
-        self.addTree()
 
     def getInternalPiping(self) -> _Ip.InternalPiping:
         inputPort = _mfn.PortItem("In", _mfn.PortItemDirection.INPUT)
@@ -36,7 +33,9 @@ class Radiator(BlockItem, _Ip.HasInternalPiping):
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.RADIATOR_SVG
 
     def changeSize(self):
@@ -68,63 +67,3 @@ class Radiator(BlockItem, _Ip.HasInternalPiping):
 
         self.inputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
         self.outputs[0].side = (self.rotationN + 2 * self.flippedH) % 4
-
-    def addTree(self):
-        """
-        When a blockitem is added to the main window.
-        A file explorer for that item is added to the right of the main window by calling this method
-        """
-        self.logger.debug(self.editor)
-        pathName = self.displayName
-        self.path = self.editor.projectFolder
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(self.path)
-        self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount() - 1):
-            self.tree.hideColumn(i)
-        self.tree.setMinimumHeight(200)
-        self.tree.setSortingEnabled(True)
-        self.editor.splitter.addWidget(self.tree)
-
-    def deleteBlock(self):
-        """
-        Overridden method to also delete folder
-        """
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.editor.trnsysObj.remove(self)
-        self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        shutil.rmtree(self.path)
-        self.deleteLoadedFile()
-        try:
-            widgetToRemove.hide()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        del self
-
-    def setDisplayName(self, newName):
-        """
-        Overridden method to also change folder name
-        """
-        self.displayName = newName
-        self.label.setPlainText(newName)
-        self.model.setName(self.displayName)
-        self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
-            self.path = destPath
-            self.logger.debug(self.path)

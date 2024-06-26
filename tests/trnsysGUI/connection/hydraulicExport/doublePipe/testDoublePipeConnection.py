@@ -1,28 +1,38 @@
+import trnsysGUI.connection.hydraulicExport.common as _com
 import trnsysGUI.connection.hydraulicExport.doublePipe as _he
 import trnsysGUI.connection.hydraulicExport.doublePipe.doublePipeConnection as _model
 
-_SIMULATED_DOUBLE_PIPE_CONNECTION = _model.DoublePipeConnection(
-    displayName="DTeeD_SCnrD",
+_SIMULATED_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
+    _model.ExportHydraulicDoublePipeConnection(
+        displayName="DTeeD_SCnrD",
+        coldPipe=_model.Pipe(
+            name="Cold",
+            inputPort=_com.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
+            outputPort=_com.OutputPort("TDTeeDCold"),
+        ),
+        hotPipe=_model.Pipe(
+            name="Hot",
+            inputPort=_com.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
+            outputPort=_com.OutputPort("TSCnrDHot"),
+        ),
+    ),
     lengthInM=400.0,
     shallBeSimulated=True,
-    coldPipe=_model.SinglePipe(
-        name="Cold",
-        inputPort=_model.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
-        outputPort=_model.OutputPort("TDTeeDCold"),
-    ),
-    hotPipe=_model.SinglePipe(
-        name="Hot",
-        inputPort=_model.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
-        outputPort=_model.OutputPort("TSCnrDHot"),
-    ),
 )
 
 _EXPECTED_SIMULATED_UNIT_TEXT = """\
+CONSTANTS 4
+DTeeD_SCnrD_Len = 400.0
+! Round up to smallest larger integer
+DTeeD_SCnrD_NrSlAx = INT(DTeeD_SCnrD_Len*dpNrSlAxRef/dpLengthRef) + 1
+DTeeD_SCnrD_NrFlNds = dpNrFlNdsToNrSlAxRatio*DTeeD_SCnrD_NrSlAx
+DTeeD_SCnrD_NrSlCirc = dpNrSlCirc
+
 UNIT 503 TYPE 9511
 ! DTeeD_SCnrD
 PARAMETERS 36
 ****** pipe and soil properties ******
-400.0                                ! Length of buried pipe, m
+DTeeD_SCnrD_Len                        ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -49,10 +59,10 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+DTeeD_SCnrD_NrFlNds                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+DTeeD_SCnrD_NrSlAx                   ! Number of axial soil nodes
+DTeeD_SCnrD_NrSlCirc                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -99,40 +109,48 @@ DTeeD_SCnrDSlInt = [503,16]*1/3600 ! Change in soil's internal heat content comp
 
 """
 
-_DUMMY_DOUBLE_PIPE_CONNECTION = _model.DoublePipeConnection(
-    displayName="DTeeD_SCnrD",
+_DUMMY_DOUBLE_PIPE_CONNECTION = _model.ExportDoublePipeConnection(
+    _model.ExportHydraulicDoublePipeConnection(
+        displayName="DTeeD_SCnrD",
+        coldPipe=_model.Pipe(
+            name="Cold",
+            inputPort=_com.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
+            outputPort=_com.OutputPort("TDTeeDCold"),
+        ),
+        hotPipe=_model.Pipe(
+            name="Hot",
+            inputPort=_com.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
+            outputPort=_com.OutputPort("TSCnrDHot"),
+        ),
+    ),
     lengthInM=400.0,
     shallBeSimulated=False,
-    coldPipe=_model.SinglePipe(
-        name="Cold",
-        inputPort=_model.InputPort("TSCnrDCold", "MDTeeD_SCnrDCold_A"),
-        outputPort=_model.OutputPort("TDTeeDCold"),
-    ),
-    hotPipe=_model.SinglePipe(
-        name="Hot",
-        inputPort=_model.InputPort("TDTeeDHot", "MDTeeD_SCnrDHot_A"),
-        outputPort=_model.OutputPort("TSCnrDHot"),
-    ),
 )
 
 _EXPECTED_DUMMY_UNIT_TEXT = """\
 ! BEGIN DTeeD_SCnrD
 ! cold pipe
-UNIT 503 TYPE 222
+UNIT 503 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDTeeD_SCnrDCold_A TSCnrDCold TDTeeDCold
 ***
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 2
 TDTeeD_SCnrDCold = [503,1]
 MDTeeD_SCnrDCold = MDTeeD_SCnrDCold_A
 
 ! hot pipe
-UNIT 504 TYPE 222
+UNIT 504 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
 INPUTS 3
 MDTeeD_SCnrDHot_A TDTeeDHot TSCnrDHot
 ***
-0 20 20
+0 dpTIniHot dpTIniHot
 EQUATIONS 2
 TDTeeD_SCnrDHot = [504,1]
 MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
@@ -145,6 +163,7 @@ MDTeeD_SCnrDHot = MDTeeD_SCnrDHot_A
 class TestDoublePipeConnection:
     def testSimulatedExport(self):
         actualUnitText, nextUnitNumber = _he.export(_SIMULATED_DOUBLE_PIPE_CONNECTION, 503)
+        print(actualUnitText)
         assert actualUnitText == _EXPECTED_SIMULATED_UNIT_TEXT
         assert nextUnitNumber == 504
 

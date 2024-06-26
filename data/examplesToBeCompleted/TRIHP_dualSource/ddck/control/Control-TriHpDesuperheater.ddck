@@ -22,9 +22,10 @@ BoDHWTapping = GT(MfrDHWset,0) ! Bo DHW water tapped in this timestep
 
 
 *** Massflowrates
-EQUATIONS 7
+EQUATIONS 8
 MfrPuSH = MfrBuiRd				! Mfr control pump SH-loop
-MfrsupplyWater = MfrDHWset		! Mfr tapping water
+MfrtapWater = MfrDHWset		    ! Mfr tapping water
+MfrsupplyWater = MfrtapWater
 MfrPuDHW = MfrSrcDHWHXUsed*BoDHWTapping+NOT(BoDHWTapping)*MfrSrcDHWHXUsed	! Mfr DHW water external heat exchanger source side
 MfrPuCirc = NOT(BoDHWTapping)*150	! Mfr circulation loop
 MfrPuHpEvap = MfrHpEvapNom*hpIsOn+MfrPuSH*CoolingOn	! Mfr control pump ground source loop

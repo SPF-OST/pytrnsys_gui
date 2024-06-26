@@ -1,14 +1,14 @@
-import cgitb as _cgitb
+import cgitb as _cgitb  # pylint: disable=deprecated-module
 import logging as _log
-import unittest.mock as _mock
 import typing as _tp
+import unittest.mock as _mock
 
 from PyQt5 import QtWidgets as _widgets
 
-import trnsysGUI.connectors.doubleDoublePipeConnector as _ddpc
-import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.internalPiping as _ip
+import trnsysGUI.connection.connectors.doubleDoublePipeConnector as _ddpc
 import trnsysGUI.connection.doublePipeConnection as _dpc
+import trnsysGUI.internalPiping as _ip
+import trnsysGUI.massFlowSolver.networkModel as _mfn
 
 # Sometimes PyQT crashes only returning with quite a cryptic error code. Sometimes, again, we can get
 # a more helpful stack trace using the cgitb module.
@@ -22,23 +22,29 @@ class _StrictMock:
 
 _EXPECTED_TEXT = """\
 ! BEGIN DPCnr
-! hot pipe
-UNIT 1 TYPE 222
-INPUTS 3
-MDPCnrHot_A TinputConnectionHot ToutputConnectionHot
-***
-0 20 20
-EQUATIONS 1
-TDPCnrHot = [1,1]
-
 ! cold pipe
-UNIT 2 TYPE 222
+UNIT 1 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniCold
 INPUTS 3
 MDPCnrCold_A ToutputConnectionCold TinputConnectionCold
 ***
-0 20 20
+0 dpTIniCold dpTIniCold
 EQUATIONS 1
-TDPCnrCold = [2,1]
+TDPCnrCold = [1,1]
+
+! hot pipe
+UNIT 2 TYPE 2221
+PARAMETERS 2
+mfrSolverAbsTol
+dpTIniHot
+INPUTS 3
+MDPCnrHot_A TinputConnectionHot ToutputConnectionHot
+***
+0 dpTIniHot dpTIniHot
+EQUATIONS 1
+TDPCnrHot = [2,1]
 ! END DPCnr
 
 
@@ -133,7 +139,6 @@ class TestDoubleDoublePipeConnector:
             ],
         )
         editorMock.moveDirectPorts = True
-        editorMock.editorMode = 1
         editorMock.snapGrid = False
         editorMock.alignMode = False
 

@@ -7,8 +7,10 @@ from trnsysGUI.SaltTankBase import SaltTankBase
 
 
 class SaltTankHot(SaltTankBase):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(SaltTankHot, self).__init__(trnsysType, editor, **kwargs)
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.SALT_TANK_HOT_SVG

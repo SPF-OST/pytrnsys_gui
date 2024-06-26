@@ -212,8 +212,7 @@ _TValue_co = _tp.TypeVar("_TValue_co", covariant=True)
 
 
 class _SupportsLessThan(_tp.Protocol):
-    def __lt__(self, other: _tp.Any) -> bool:
-        ...
+    def __lt__(self, other: _tp.Any) -> bool: ...
 
 
 _SupportsLessThanT = _tp.TypeVar("_SupportsLessThanT", bound=_SupportsLessThan)

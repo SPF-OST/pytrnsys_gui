@@ -7,8 +7,8 @@ import PyQt5.QtGui as _qtg
 import PyQt5.QtWidgets as _qtw
 from PyQt5.QtGui import QColor
 
-import trnsysGUI.CornerItem as _ci
-import trnsysGUI.segments.SegmentItemBase as _sib
+import trnsysGUI.cornerItem as _ci
+import trnsysGUI.segments.segmentItemBase as _sib
 
 from . import _common
 
@@ -27,10 +27,6 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         self._singlePipeConnection = parent
 
         self.singleLine = _qtw.QGraphicsLineItem(self)
-        self.initGrad()
-
-    def _createSegment(self, startNode, endNode) -> _sib.SegmentItemBase:  # type: ignore[name-defined]
-        return SinglePipeSegmentItem(startNode, endNode, self._singlePipeConnection)
 
     def _getContextMenu(self) -> _qtw.QMenu:
         menu = super()._getContextMenu()
@@ -42,30 +38,8 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         return menu
 
     def _setLineImpl(self, x1, y1, x2, y2):
-        self.initGrad()
         self.singleLine.setLine(x1, y1, x2, y2)
         self.linePoints = self.singleLine.line()
-
-    def initGrad(self) -> None:
-        gradient = self._createGradient()
-        self._updateLine(gradient)
-
-    def _createGradient(self) -> _qtg.QGradient:
-        if isinstance(self.startNode.parent, _ci.CornerItem):  # type: ignore[attr-defined]
-            startBlock = self.startNode.firstNode().parent
-        else:
-            startBlock = self.startNode.parent
-        if isinstance(self.endNode.parent, _ci.CornerItem):  # type: ignore[attr-defined]
-            endBlock = self.endNode.lastNode().parent
-        else:
-            endBlock = self.endNode.parent
-        gradient = _qtg.QLinearGradient(
-            _qtc.QPointF(startBlock.fromPort.scenePos().x(), startBlock.fromPort.scenePos().y()),
-            _qtc.QPointF(endBlock.toPort.scenePos().x(), endBlock.toPort.scenePos().y()),
-        )
-        gradient.setColorAt(0, _qtc.Qt.gray)
-        gradient.setColorAt(1, _qtc.Qt.black)
-        return gradient
 
     def _setStandardLinesPens(self) -> None:
         gradient = self._createUpdatedGradient()
@@ -111,18 +85,18 @@ class SinglePipeSegmentItem(_sib.SegmentItemBase):  # type: ignore[name-defined]
         blue2 = 0
         green2 = 0
 
-        try:
-            factor1 = int(segmentLength / connectionLength)
-            factor2 = int((connectionLength - segmentLength) / connectionLength)
-        except ZeroDivisionError:
+        if connectionLength == 0:
             return QColor(100, 100, 100, alpha)
-        else:
-            return QColor(
-                factor1 * red2 + factor2 * red1,
-                factor1 * green2 + factor2 * green1,
-                factor1 * blue2 + factor2 * blue1,
-                alpha,
-            )
+
+        factor1 = int(segmentLength / connectionLength)
+        factor2 = int((connectionLength - segmentLength) / connectionLength)
+
+        return QColor(
+            factor1 * red2 + factor2 * red1,
+            factor1 * green2 + factor2 * green1,
+            factor1 * blue2 + factor2 * blue1,
+            alpha,
+        )
 
     def _updateLine(self, gradient: _qtg.QGradient) -> None:
         pen = self._createPen(gradient)

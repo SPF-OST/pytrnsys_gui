@@ -1,36 +1,28 @@
 # pylint: skip-file
 # type: ignore
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import (
-    QDialog,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QCheckBox,
-    QHBoxLayout,
-    QGridLayout,
-    QTabWidget,
-    QWidget,
-    QDoubleSpinBox,
-    QMessageBox,
-)
+import pathlib as _pl
+
+from PyQt5.QtWidgets import QCheckBox
+from PyQt5.QtWidgets import QDoubleSpinBox
+from PyQt5.QtWidgets import QGridLayout
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QTabWidget
+from PyQt5.QtWidgets import QWidget
 
 import trnsysGUI.TVentil as _vnt
+import trnsysGUI.names.dialog as _ndialog
+import trnsysGUI.names.rename as _rename
 
 
-class TVentilDlg(QDialog):
-    def __init__(self, ventil: _vnt.TVentil, editor):
-        super(TVentilDlg, self).__init__(editor)
-        self._editor = editor
-        nameLabel = QLabel("Name:")
+class TVentilDlg(_ndialog.ChangeNameDialogBase):
+    def __init__(self, ventil: _vnt.TVentil, renameHelper: _rename.RenameHelper, projectFolder: str) -> None:
+        super().__init__(ventil, renameHelper, _pl.Path(projectFolder))
 
-        self.logger = editor.logger
-
-        self.block = ventil
-        self.valvePosition = self.block.positionForMassFlowSolver
-        self.le = QLineEdit(self.block.label.toPlainText())
-        self.setWindowIcon(QIcon(ventil.pixmap()))
+        self._blockItem = ventil
+        self.valvePosition = self._blockItem.positionForMassFlowSolver
         self.okButton = QPushButton("OK")
         self.cancelButton = QPushButton("Cancel")
 
@@ -43,11 +35,10 @@ class TVentilDlg(QDialog):
 
         self.vFlipBox.setTristate(False)
         self.hFlipBox.setTristate(False)
-        self.hFlipBox.setCheckState(self.block.flippedH * 2)
-        self.vFlipBox.setCheckState(self.block.flippedV * 2)
+        self.hFlipBox.setCheckState(self._blockItem.flippedH * 2)
+        self.vFlipBox.setCheckState(self._blockItem.flippedV * 2)
         self.complexDiv.setTristate(False)
-        self.logger.debug("complexdiv is " + str(self.block.isTempering))
-        self.complexDiv.setCheckState(self.block.isTempering * 2)
+        self.complexDiv.setCheckState(self._blockItem.isTempering * 2)
 
         flipLayout = QHBoxLayout()
         flipLayout.addWidget(self.hFlipBoxLabel)
@@ -66,8 +57,9 @@ class TVentilDlg(QDialog):
         buttonLayout.addWidget(self.okButton)
         buttonLayout.addWidget(self.cancelButton)
         tab1Layout = QGridLayout(self)
+        nameLabel = QLabel("Name:")
         tab1Layout.addWidget(nameLabel, 0, 0)
-        tab1Layout.addWidget(self.le, 0, 1)
+        tab1Layout.addWidget(self._displayNameLineEdit, 0, 1)
         tab1Layout.addLayout(flipLayout, 1, 0, 3, 0)
         tab1Layout.addLayout(textLayout, 3, 0, 3, 0)
 
@@ -86,15 +78,13 @@ class TVentilDlg(QDialog):
         self.tabs = QTabWidget()
         self.tab1 = QWidget()
         self.tab2 = QWidget()
+
         # Add tabs
         self.tabs.addTab(self.tab1, "Diagram")
         self.tabs.addTab(self.tab2, "Mass Flow Solver")
         self.tab1.setLayout(tab1Layout)
         self.tab2.setLayout(positionLayout)
-        # self.tab2 = layout
-        # self.tabs.resize(300, 200)
 
-        # self.tabs.addTab(self.tab2, "Tab 2")
         self.layout2 = QGridLayout(self)
         self.layout2.addWidget(self.tabs, 0, 0)
         self.layout2.addLayout(buttonLayout, 2, 0, 3, 0)
@@ -110,46 +100,23 @@ class TVentilDlg(QDialog):
         self.setWindowTitle("Properties")
         self.show()
 
-    def acceptedEdit(self):
-        self.logger.debug("Changing displayName")
-        newName = self.le.text()
-        if self.block.isTempering:
-            self.block.setPositionForMassFlowSolver(0.0)
-            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
-        if newName.lower() == str(self.block.displayName).lower():
-            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
-            self.close()
-        elif newName == "":
-            msgb = QMessageBox()
-            msgb.setText("Please Enter a name!")
-            msgb.exec()
-        elif self._editor.nameExists(newName) or self._editor.nameExistsInDdckFolder(newName):
-            msgb = QMessageBox()
-            msgb.setText("Name already exist!")
-            msgb.exec()
-        else:
-            self.block.label.setPlainText(newName)
-            self.block.displayName = newName
-            self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
-            self.close()
-
     def setNewFlipStateH(self, state):
-        self.block.updateFlipStateH(state)
-        self.block.updateSidesFlippedH()
+        self._blockItem.updateFlipStateH(state)
+        self._blockItem.updateSidesFlippedH()
 
     def setNewFlipStateV(self, state):
-        self.block.updateFlipStateV(state)
-        self.block.updateSidesFlippedV()
+        self._blockItem.updateFlipStateV(state)
+        self._blockItem.updateSidesFlippedV()
 
     def setNewComplexState(self, state):
-        self.block.setComplexDiv(state)
-        self.block.posLabel.setPlainText(str(self.block.positionForMassFlowSolver))
+        self._blockItem.setComplexDiv(state)
+        self._blockItem.posLabel.setPlainText(str(self._blockItem.positionForMassFlowSolver))
 
     def positionMassFlowSolverChanged(self, value):
-        if self.block.isTempering:
-            self.block.setPositionForMassFlowSolver(0.0)
+        if self._blockItem.isTempering:
+            self._blockItem.setPositionForMassFlowSolver(0.0)
         else:
-            self.block.setPositionForMassFlowSolver(value)
+            self._blockItem.setPositionForMassFlowSolver(value)
 
     def cancel(self):
         self.close()

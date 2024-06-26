@@ -1,0 +1,30 @@
+{
+    "Collector": {
+        "In": {
+            "@cp": "Lloop2Cp",
+            "@mfr": "MCollector_A",
+            "@rho": "Lloop2Rho",
+            "@temp": "TPiColIn"
+        },
+        "Out": {
+            "@revtemp": "TPiColOut",
+            "@temp": "TCollector"
+        }
+    },
+    "WTap": {
+        "In": {
+            "@cp": "Lloop4Cp",
+            "@mfr": "MWTap_A",
+            "@rho": "Lloop4Rho",
+            "@temp": "TTee536_WTap"
+        }
+    },
+    "WTap2": {
+        "In": {
+            "@cp": "Lloop4Cp",
+            "@mfr": "MWTap2_A",
+            "@rho": "Lloop4Rho",
+            "@temp": "TTee536_WTap2"
+        }
+    }
+}

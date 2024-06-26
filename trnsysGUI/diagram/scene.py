@@ -1,5 +1,6 @@
 import PyQt5.QtWidgets as _qtw
-from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 
 from trnsysGUI.BlockItem import BlockItem  # type: ignore[attr-defined]
@@ -61,7 +62,7 @@ class Scene(_qtw.QGraphicsScene):
 
         if event.key() == Qt.Key_Delete:
             trnsysObjects = self._editor.trnsysObj
-            selectedObjects = [o for o in trnsysObjects if o.isSelected]
+            selectedObjects = [o for o in trnsysObjects if self._isSelected(o)]
 
             if not selectedObjects:
                 return
@@ -74,6 +75,10 @@ class Scene(_qtw.QGraphicsScene):
                 selectedObject.createDeleteUndoCommandAndAddToStack()
             if isinstance(selectedObject, BlockItem):
                 selectedObject.deleteBlockCom()
+
+    @staticmethod
+    def _isSelected(o):
+        return o.isConnectionSelected if isinstance(o, ConnectionBase) else o.isSelected
 
     def mousePressEvent(self, event):
         for connection in self._editor.connectionList:
@@ -92,10 +97,8 @@ class Scene(_qtw.QGraphicsScene):
             for item in self._previouslyHitItems:
                 if isinstance(item, (GraphicalItem, BlockItem)) and hasattr(item, "resizer"):
                     self.removeItem(item.resizer)
-                    item.deleteResizer()
                 if isinstance(item, ResizerItem):
                     self.removeItem(item)
-                    item.parent.deleteResizer()
 
             self._previouslyHitItems.clear()
 

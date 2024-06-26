@@ -1,11 +1,12 @@
+import dataclasses as _dc
+import importlib.metadata as _imeta
 import pathlib as _pl
 import re as _re
 import subprocess as _sp
+import sys as _sys
 import typing as _tp
-import dataclasses as _dc
 
-
-import pkg_resources  # type: ignore[import]
+import packaging.version as _pver
 
 import pytrnsys.utils.result as _res
 
@@ -42,16 +43,43 @@ class _VersionedPackage:
 
 
 def setup() -> _res.Result[None]:
-    localVersionPart = pkg_resources.get_distribution("pytrnsys-gui").parsed_version.local
-    isDeveloperInstall = localVersionPart and localVersionPart.endswith("dev")
-    if isDeveloperInstall:
-        result = _checkRequirements()
-        if _res.isError(result):
-            return _res.error(result)
+    isDeveloperInstallResult = _isDeveloperInstall()
+    if _res.isError(isDeveloperInstallResult):
+        return _res.error(isDeveloperInstallResult)
 
-        _generateCodeFromQtCreatorUiFiles()
+    isDeveloperInstall = _res.value(isDeveloperInstallResult)
+    if not isDeveloperInstall:
+        return None
+
+    requirementsResult = _checkRequirements()
+    if _res.isError(requirementsResult):
+        return _res.error(requirementsResult)
+
+    _generateCodeFromQtCreatorUiFiles()
 
     return None
+
+
+def _isDeveloperInstall() -> _res.Result[bool]:
+    versionResult = _getPytrnsysVersion()
+    if _res.isError(versionResult):
+        return _res.error(versionResult)
+
+    version = _res.value(versionResult)
+    localVersionPart = version.local
+
+    isDeveloperInstall = localVersionPart.endswith("dev") if localVersionPart else False
+
+    return isDeveloperInstall
+
+
+def _getPytrnsysVersion() -> _res.Result[_pver.Version]:
+    serializedVersion = _imeta.version("pytrnsys-gui")
+    try:
+        return _pver.parse(serializedVersion)
+    except _pver.InvalidVersion as invalidVersion:
+        error = _res.error(f"Could not parse version of `pytrnsys-gui`:\n\t{invalidVersion}")
+        return error
 
 
 def _checkRequirements() -> _res.Result[None]:
@@ -80,8 +108,8 @@ activate your virtual environment first)
 (or
 
     `python -m piptools sync requirements\\dev.txt`
-    
-if you're using `pip-tools` [if you don't know what that means 
+
+if you're using `pip-tools` [if you don't know what that means
 use the command just above])
 
 followed by
@@ -94,7 +122,8 @@ followed by
 
 
 def _getInstalledNonEditableVersions() -> _res.Result[_tp.Set[_VersionedPackage]]:
-    completedPipFreezeProcess = _sp.run("pip freeze --no-color".split(), capture_output=True, text=True, check=True)
+    args = [_sys.executable, "-m", "pip", "freeze", "--no-color"]
+    completedPipFreezeProcess = _sp.run(args, capture_output=True, text=True, check=True)
     serializedInstalledVersions = completedPipFreezeProcess.stdout.split("\n")
     serializedNonEditableInstalledVersions = [
         v for v in serializedInstalledVersions if v.strip() and not v.startswith("-e")
@@ -109,7 +138,7 @@ Could not parse `pip` freeze output:
 
 Please try updating `pip` from within your virtual environment like so:
 
-    (venv) C:\\...\\pytrnsys_gui> python -m pip install --upgrade pip    
+    (venv) C:\\...\\pytrnsys_gui> python -m pip install --upgrade pip==22.3.1
 """
         return _res.Error(errorMessage)
 
@@ -134,5 +163,5 @@ def _generateCodeFromQtCreatorUiFiles():
     uiGenerateFilePath = (
         _pl.Path(__file__).parent.parent / "dev-tools" / "generateGuiClassesFromQtCreatorStudioUiFiles.py"
     )
-    cmd = ["python.exe", uiGenerateFilePath]
+    cmd = [_sys.executable, uiGenerateFilePath]
     _sp.run(cmd, check=True)

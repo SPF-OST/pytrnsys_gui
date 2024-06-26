@@ -4,22 +4,73 @@ import trnsysGUI.globalNames as _gnames
 from . import _getEnergyBalanceVariables as _vars
 
 
-def exportSimulatedConnection(doublePipeConnection, unitNumber):
+def exportSimulatedConnection(doublePipeConnection: _dpc.ExportDoublePipeConnection, unitNumber):
+    constants = _getConstants(doublePipeConnection)
     headerAndParameters = _getHeaderAndParameters(doublePipeConnection, unitNumber)
-    inputs = _getInputs(doublePipeConnection)
-    equations = _getEquations(doublePipeConnection, unitNumber)
-    unitText = headerAndParameters + inputs + equations
+    hydraulicConnection = doublePipeConnection.hydraulicConnection
+    inputs = _getInputs(hydraulicConnection)
+    equations = _getEquations(hydraulicConnection, unitNumber)
+    unitText = constants + headerAndParameters + inputs + equations
     nextUnitNumber = unitNumber + 1
     return unitText, nextUnitNumber
 
 
-def _getHeaderAndParameters(connection: _dpc.DoublePipeConnection, unitNumber: int) -> str:
+def _getNCircumferentialSoilNodes(displayName: str) -> str:
+    nCircularSoilNodesName = f"{displayName}_NrSlCirc"
+    return nCircularSoilNodesName
+
+
+def _getNFluidNodesName(displayName: str) -> str:
+    nFluidNodesName = f"{displayName}_NrFlNds"
+    return nFluidNodesName
+
+
+def _getNAxialSoilNodesName(displayName: str) -> str:
+    nAxialSoilNodesName = f"{displayName}_NrSlAx"
+    return nAxialSoilNodesName
+
+
+def _getPipeLengthName(displayName: str) -> str:
+    pipeLengthName = f"{displayName}_Len"
+    return pipeLengthName
+
+
+def _getConstants(connection: _dpc.ExportDoublePipeConnection) -> str:
+    names = _gnames.DoublePipes
+    displayName = connection.hydraulicConnection.displayName
+    nAxialSoilNodesReference = names.N_AXIAL_SOIL_NODES_AT_REFERENCE_LENGTH
+
+    pipeLengthName = _getPipeLengthName(displayName)
+    nAxialSoilNodesName = _getNAxialSoilNodesName(displayName)
+    nFluidNodesName = _getNFluidNodesName(displayName)
+    nCircumferentialSoilNodes = _getNCircumferentialSoilNodes(displayName)
+
+    constants = f"""\
+CONSTANTS 4
+{pipeLengthName} = {connection.lengthInM}
+! Round up to smallest larger integer
+{nAxialSoilNodesName} = INT({pipeLengthName}*{nAxialSoilNodesReference}/{names.REFERENCE_LENGTH}) + 1
+{nFluidNodesName} = {names.FLUID_TO_SOIL_NODES_RATIO}*{nAxialSoilNodesName}
+{nCircumferentialSoilNodes} = {names.N_CIRCUMFERENTIAL_SOIL_NODES}
+
+"""
+    return constants
+
+
+def _getHeaderAndParameters(connection: _dpc.ExportDoublePipeConnection, unitNumber: int) -> str:
+    displayName = connection.hydraulicConnection.displayName
+
+    pipeLengthName = _getPipeLengthName(displayName)
+    nFluidNodesName = _getNFluidNodesName(displayName)
+    nAxialSoilNodesName = _getNAxialSoilNodesName(displayName)
+    nCircularSoilNodesName = _getNCircumferentialSoilNodes(displayName)
+
     headerAndParameters = f"""\
 UNIT {unitNumber} TYPE 9511
-! {connection.displayName}
+! {displayName}
 PARAMETERS 36
 ****** pipe and soil properties ******
-{connection.lengthInM}                                ! Length of buried pipe, m
+{pipeLengthName}                        ! Length of buried pipe, m
 dpDiamIn                                ! Inner diameter of pipes, m
 dpDiamOut                               ! Outer diameter of pipes, m
 dpLambda                                ! Thermal conductivity of pipe material, kJ/(h*m*K)
@@ -46,10 +97,10 @@ TambAvg                                 ! Average surface temperature, deg C
 dTambAmpl                               ! Amplitude of surface temperature, deg C
 ddTcwOffset                             ! Days of minimum surface temperature
 ****** definition of nodes ******
-dpNrFlNds                               ! Number of fluid nodes
+{nFluidNodesName}                       ! Number of fluid nodes
 dpNrSlRad                               ! Number of radial soil nodes
-dpNrSlAx                                ! Number of axial soil nodes
-dpNrSlCirc                              ! Number of circumferential soil nodes
+{nAxialSoilNodesName}                   ! Number of axial soil nodes
+{nCircularSoilNodesName}                ! Number of circumferential soil nodes
 dpRadNdDist                             ! Radial distance of node 1, m
 dpRadNdDist                             ! Radial distance of node 2, m
 dpRadNdDist                             ! Radial distance of node 3, m
@@ -65,9 +116,9 @@ dpRadNdDist                             ! Radial distance of node 10, m
     return headerAndParameters
 
 
-def _getInputs(connectionNames: _dpc.DoublePipeConnection) -> str:
-    coldPipe = connectionNames.coldPipe
-    hotPipe = connectionNames.hotPipe
+def _getInputs(hydraulicConnection: _dpc.ExportHydraulicDoublePipeConnection) -> str:
+    coldPipe = hydraulicConnection.coldPipe
+    hotPipe = hydraulicConnection.hotPipe
 
     inputs = f"""\
 INPUTS 6
@@ -90,35 +141,36 @@ INPUTS 6
 
 
 def _getEquations(
-    doublePipeConnection: _dpc.DoublePipeConnection,
+    hydraulicConnection: _dpc.ExportHydraulicDoublePipeConnection,
     unitNumber: int,
 ) -> str:
     energyBalanceVariables = _vars.getEnergyBalanceVariables(
-        doublePipeConnection.displayName,
-        coldPipeName=doublePipeConnection.coldPipe.name,
-        hotPipeName=doublePipeConnection.hotPipe.name,
+        hydraulicConnection.displayName,
+        coldPipeName=hydraulicConnection.coldPipe.name,
+        hotPipeName=hydraulicConnection.hotPipe.name,
     )
 
     formattedEnergyBalanceVariables = "\n".join(
         f"{v.name} = [{unitNumber},{v.outputNumber}]*{v.conversionFactor} ! {v.comment}" for v in energyBalanceVariables
     )
-    coldPipe = doublePipeConnection.coldPipe
-    coldOutputTemperature = doublePipeConnection.getOutputTemperatureVariableName(coldPipe)
-    coldCanonicalMassFlowRate = doublePipeConnection.getCanonicalMassFlowRateVariableName(coldPipe)
+    coldPipe = hydraulicConnection.coldPipe
+    hotPipe = hydraulicConnection.hotPipe
 
-    hotPipe = doublePipeConnection.hotPipe
-    hotOutputTemperature = doublePipeConnection.getOutputTemperatureVariableName(hotPipe)
-    hotCanonicalMassFlow = doublePipeConnection.getCanonicalMassFlowRateVariableName(hotPipe)
+    conn = hydraulicConnection
+
+    coldInputMfrName = coldPipe.inputPort.massFlowRateVariableName
+    hotInputMfrName = hotPipe.inputPort.massFlowRateVariableName
 
     equations = f"""\
 EQUATIONS {4 + len(energyBalanceVariables)}
-{coldOutputTemperature} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
-{coldCanonicalMassFlowRate} = {coldPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.coldOutputTemperatureVariableName} = [{unitNumber},1]  ! Outlet fluid temperature, deg C
+{conn.coldCanonicalMassFlowRateVariableName} = {coldInputMfrName}  ! Outlet mass flow rate, kg/h
 
-{hotOutputTemperature} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
-{hotCanonicalMassFlow} = {hotPipe.inputPort.massFlowRateVariableName}  ! Outlet mass flow rate, kg/h
+{conn.hotOutputTemperatureVariableName} = [{unitNumber},3]  ! Outlet fluid temperature, deg C
+{conn.hotCanonicalMassFlowRateVariableName} = {hotInputMfrName}  ! Outlet mass flow rate, kg/h
 
 {formattedEnergyBalanceVariables}
 
 """
+
     return equations

@@ -1,23 +1,18 @@
 # pylint: skip-file
 
-import os
-import shutil
 import typing as _tp
 
-from PyQt5.QtWidgets import QTreeView
-
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-from trnsysGUI.BlockItem import BlockItem
-from trnsysGUI.MyQFileSystemModel import MyQFileSystemModel  # type: ignore[attr-defined]
-from trnsysGUI.MyQTreeView import MyQTreeView  # type: ignore[attr-defined]
 
 
-class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
-    def __init__(self, trnsysType, editor, **kwargs):
-        super(HeatPumpTwoHx, self).__init__(trnsysType, editor, **kwargs)
+class HeatPumpTwoHx(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 0, self))
         self.inputs.append(_cspi.createSinglePipePortItem("i", 2, self))
@@ -27,8 +22,6 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
 
-        self.loadedFiles = []
-
         # For restoring correct order of trnsysObj list
         self.childIds = []
         self.childIds.append(self.trnsysId)
@@ -36,12 +29,13 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
         self.childIds.append(self.editor.idGen.getTrnsysID())
 
         self.changeSize()
-        self.addTree()
 
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.HP_TWO_HX_SVG
 
     def changeSize(self):
@@ -103,7 +97,6 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
             dct["PortsIDIn"] = portListInputs
             dct["PortsIDOut"] = portListOutputs
             dct["HeatPumpPosition"] = (float(self.pos().x()), float(self.pos().y()))
-            dct["ID"] = self.id
             dct["trnsysID"] = self.trnsysId
             dct["childIds"] = self.childIds
             dct["FlippedH"] = self.flippedH
@@ -131,25 +124,6 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
 
         self.setPos(float(i["HeatPumpPosition"][0]), float(i["HeatPumpPosition"][1]))
         self.trnsysId = i["trnsysID"]
-        self.id = i["ID"]
-
-        resBlockList.append(self)
-
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        self.flippedH = i["FlippedH"]
-        self.flippedV = i["FlippedV"]
-
-        self.changeSize()
-
-        for x in range(len(self.inputs)):
-            self.inputs[x].id = i["PortsIDIn"][x]
-            self.logger.debug("Input at heatExchanger")
-
-        for x in range(len(self.outputs)):
-            self.outputs[x].id = i["PortsIDOut"][x]
-            self.logger.debug("Output at heatExchanger")
-
-        self.setPos(float(i["HeatPumpPosition"][0] + offset_x), float(i["HeatPumpPosition"][1] + offset_y))
 
         resBlockList.append(self)
 
@@ -177,73 +151,3 @@ class HeatPumpTwoHx(BlockItem, _ip.HasInternalPiping):
         nodes = [evaporatorPipe, condenser1Pipe, condenser2Pipe]
 
         return _ip.InternalPiping(nodes, modelPortItemsToGraphicalPortItem)
-
-    def getSubBlockOffset(self, c):
-        for i in range(3):
-            if (
-                self.inputs[i] == c.toPort
-                or self.inputs[i] == c.fromPort
-                or self.outputs[i] == c.toPort
-                or self.outputs[i] == c.fromPort
-            ):
-                return i
-
-    def addTree(self):
-        """
-        When a blockitem is added to the main window.
-        A file explorer for that item is added to the right of the main window by calling this method
-        """
-        self.logger.debug(self.editor)
-        pathName = self.displayName
-        self.path = self.editor.projectFolder
-        self.path = os.path.join(self.path, "ddck")
-        self.path = os.path.join(self.path, pathName)
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-
-        self.model = MyQFileSystemModel()
-        self.model.setRootPath(self.path)
-        self.model.setName(self.displayName)
-        self.tree = MyQTreeView(self.model, self)
-        self.tree.setModel(self.model)
-        self.tree.setRootIndex(self.model.index(self.path))
-        self.tree.setObjectName("%sTree" % self.displayName)
-        for i in range(1, self.model.columnCount() - 1):
-            self.tree.hideColumn(i)
-        self.tree.setMinimumHeight(200)
-        self.tree.setSortingEnabled(True)
-        self.editor.splitter.addWidget(self.tree)
-
-    def deleteBlock(self):
-        """
-        Overridden method to also delete folder
-        """
-        self.logger.debug("Block " + str(self) + " is deleting itself (" + self.displayName + ")")
-        self.editor.trnsysObj.remove(self)
-        self.logger.debug("deleting block " + str(self) + self.displayName)
-        self.editor.diagramScene.removeItem(self)
-        widgetToRemove = self.editor.findChild(QTreeView, self.displayName + "Tree")
-        shutil.rmtree(self.path)
-        self.deleteLoadedFile()
-        try:
-            widgetToRemove.hide()
-        except AttributeError:
-            self.logger.debug("Widget doesnt exist!")
-        else:
-            self.logger.debug("Deleted widget")
-        del self
-
-    def setDisplayName(self, newName):
-        """
-        Overridden method to also change folder name
-        """
-        self.displayName = newName
-        self.label.setPlainText(newName)
-        self.model.setName(self.displayName)
-        self.tree.setObjectName("%sTree" % self.displayName)
-        self.logger.debug(os.path.dirname(self.path))
-        destPath = os.path.join(os.path.split(self.path)[0], self.displayName)
-        if os.path.exists(self.path):
-            os.rename(self.path, destPath)
-            self.path = destPath
-            self.logger.debug(self.path)

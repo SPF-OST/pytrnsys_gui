@@ -1,15 +1,12 @@
 # pylint: disable = invalid-name
 
-import dataclasses as _dc
 import typing as _tp
-import uuid as _uuid
 
+import PyQt5.QtWidgets as _qtw
 import dataclasses_jsonschema as _dcj
-import pytrnsys.utils.serialization as _ser
-from PyQt5.QtWidgets import QGraphicsTextItem
 
-import trnsysGUI.BlockItem as _bi
-import trnsysGUI.blockItemModel as _bim
+import trnsysGUI.blockItemGraphicItemMixins as _gimx
+import trnsysGUI.blockItemHasInternalPiping as _bip
 import trnsysGUI.connection.names as _cnames
 import trnsysGUI.createSinglePipePortItem as _cspi  # pylint: disable=cyclic-import
 import trnsysGUI.images as _img
@@ -17,17 +14,20 @@ import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.names as _mnames
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 import trnsysGUI.temperatures as _temps
+import trnsysGUI.valveModel as _vm
 
 
-class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-many-instance-attributes
-    def __init__(self, trnsysType, editor, **kwargs):
-        super().__init__(trnsysType, editor, **kwargs)
+class TVentil(
+    _bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin
+):  # pylint: disable = too-many-instance-attributes
+    def __init__(self, trnsysType: str, editor, displayName: str) -> None:
+        super().__init__(trnsysType, editor, displayName)
 
         self.h = 40
         self.w = 40
         self.isTempering = False
         self.positionForMassFlowSolver = 1.0
-        self.posLabel = QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
+        self.posLabel = _qtw.QGraphicsTextItem(str(self.positionForMassFlowSolver), self)
         self.posLabel.setVisible(False)
 
         self.outputs.append(_cspi.createSinglePipePortItem("o", 2, self))
@@ -44,13 +44,19 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
     def getDisplayName(self) -> str:
         return self.displayName
 
-    def hasDdckPlaceHolders(self) -> bool:
+    @classmethod
+    @_tp.override
+    def hasDdckPlaceHolders(cls) -> bool:
         return False
 
-    def shallRenameOutputTemperaturesInHydraulicFile(self):
+    @classmethod
+    @_tp.override
+    def shallRenameOutputTemperaturesInHydraulicFile(cls) -> bool:
         return False
 
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.T_VENTIL_SVG
 
     def changeSize(self):
@@ -110,7 +116,7 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
     def setPositionForMassFlowSolver(self, f):  # pylint: disable = invalid-name
         self.positionForMassFlowSolver = f
 
-    def encode(self):
+    def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         portListInputs = []
         portListOutputs = []
 
@@ -119,56 +125,34 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
         for output in self.outputs:
             portListOutputs.append(output.id)
 
-        blockPosition = (float(self.pos().x()), float(self.pos().y()))
+        blockItemModel = self._encodeBaseModel()
 
-        tVentilModel = TVentilModel(
-            self.name,
-            self.displayName,
-            blockPosition,
-            self.id,
-            self.trnsysId,
-            portListInputs,  # pylint: disable = duplicate-code # 2
-            portListOutputs,
-            self.flippedH,
-            self.flippedV,
-            self.rotationN,
-        )
+        inputPortId = self.inputs[0].id
+        outputPortIds = (self.outputs[0].id, self.outputs[1].id)
+
+        valveModel = _vm.ValveModel(self.name, self.displayName, blockItemModel, inputPortId, outputPortIds)
 
         dictName = "Block-"
 
-        dct = tVentilModel.to_dict()
+        dct = valveModel.to_dict()
 
         dct["IsTempering"] = self.isTempering
         dct["PositionForMassFlowSolver"] = self.positionForMassFlowSolver
         return dictName, dct
 
-    def decode(self, i, resBlockList):
-        model = TVentilModel.from_dict(i)
+    def decode(self, i, resBlockList) -> None:
+        model = _vm.ValveModel.from_dict(i)
 
         self.setDisplayName(model.BlockDisplayName)
-        self.setPos(float(model.blockPosition[0]), float(model.blockPosition[1]))
-        self.id = model.Id
-        self.trnsysId = model.trnsysId
 
-        self.inputs[0].id = model.portsIdsIn[0]
-        self.outputs[0].id = model.portsIdsOut[0]
-        self.outputs[1].id = model.portsIdsOut[1]
+        self.inputs[0].id = model.inputPortId
+        self.outputs[0].id = model.outputPortIds[0]
+        self.outputs[1].id = model.outputPortIds[1]
 
-        self.updateFlipStateH(model.flippedH)
-        self.updateFlipStateV(model.flippedV)
-        self.rotateBlockToN(model.rotationN)
+        self._decodeBaseModel(model.blockItemModel)
 
         resBlockList.append(self)
 
-        if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
-            self.logger.debug("Old version of diagram")
-            self.positionForMassFlowSolver = 1.0
-        else:
-            self.isTempering = i["IsTempering"]
-            self.positionForMassFlowSolver = i["PositionForMassFlowSolver"]
-
-    def decodePaste(self, i, offset_x, offset_y, resConnList, resBlockList, **kwargs):
-        super().decodePaste(i, offset_x, offset_y, resConnList, resBlockList, **kwargs)
         if "IsTempering" not in i or "PositionForMassFlowSolver" not in i:
             self.logger.debug("Old version of diagram")
             self.positionForMassFlowSolver = 1.0
@@ -249,9 +233,9 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
 
             portItems = self.modelDiverter.getPortItems()
             massFlowVariableNames = [
-                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[0]),
-                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[1]),
-                _mnames.getMassFlowVariableName(self, self.modelDiverter, portItems[2]),
+                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[0]),
+                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[1]),
+                _mnames.getMassFlowVariableName(self.displayName, self.modelDiverter, portItems[2]),
             ]
 
             unitText += "\n".join(massFlowVariableNames) + "\n"
@@ -279,65 +263,5 @@ class TVentil(_bi.BlockItem, _ip.HasInternalPiping):  # pylint: disable = too-ma
             return lines, unitNumber
         return "", startingUnit
 
-
-@_dc.dataclass
-class TVentilModel(_ser.UpgradableJsonSchemaMixin):  # pylint: disable=too-many-instance-attributes
-    BlockName: str  # pylint: disable = invalid-name
-    BlockDisplayName: str  # pylint: disable = invalid-name
-    blockPosition: _tp.Tuple[float, float]
-    Id: int  # pylint: disable = invalid-name
-    trnsysId: int
-    portsIdsIn: _tp.List[int]
-    portsIdsOut: _tp.List[int]
-    flippedH: bool
-    flippedV: bool
-    rotationN: int
-
-    @classmethod
-    def from_dict(
-        cls,  # pylint: disable = duplicate-code
-        data: _dcj.JsonDict,  # pylint: disable = duplicate-code
-        validate=True,
-        validate_enums: bool = True,
-    ) -> "TVentilModel":
-        tVentilModel = super().from_dict(data, validate, validate_enums)
-        return _tp.cast(TVentilModel, tVentilModel)
-
-    def to_dict(
-        self,
-        omit_none: bool = True,
-        validate: bool = False,
-        validate_enums: bool = True,  # pylint: disable=duplicate-code
-    ) -> _dcj.JsonDict:  # pylint: disable = duplicate-code
-        data = super().to_dict(omit_none, validate, validate_enums)
-        data[".__BlockDict__"] = True
-        return data
-
-    @classmethod
-    def getSupersededClass(cls) -> _tp.Type[_ser.UpgradableJsonSchemaMixin]:
-        return _bim.BlockItemModel
-
-    @classmethod
-    def upgrade(cls, superseded: _bim.BlockItemModel) -> "TVentilModel":  # type: ignore[override]
-        assert len(superseded.portsIdsIn) == 2
-        assert len(superseded.portsIdsOut) == 1
-
-        inputPortIds = [superseded.portsIdsOut[0]]
-        outputPortIds = [superseded.portsIdsIn[0], superseded.portsIdsIn[1]]
-
-        return TVentilModel(
-            superseded.BlockName,
-            superseded.BlockDisplayName,
-            superseded.blockPosition,
-            superseded.Id,
-            superseded.trnsysId,
-            inputPortIds,
-            outputPortIds,
-            superseded.flippedH,
-            superseded.flippedV,
-            superseded.rotationN,
-        )
-
-    @classmethod
-    def getVersion(cls) -> _uuid.UUID:
-        return _uuid.UUID("3fff9a8a-d40e-42e2-824d-c015116d0a1d")
+    def mouseDoubleClickEvent(self, event) -> None:  # pylint: disable=unused-argument
+        self.editor.showTVentilDlg(self)

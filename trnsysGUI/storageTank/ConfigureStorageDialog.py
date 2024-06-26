@@ -3,43 +3,48 @@
 from __future__ import annotations
 
 import typing as _tp
+import pathlib as _pl
 
 import PyQt5.QtCore as _qtc
-from PyQt5.QtWidgets import (
-    QLabel,
-    QLineEdit,
-    QGridLayout,
-    QHBoxLayout,
-    QListWidget,
-    QPushButton,
-    QSpacerItem,
-    QVBoxLayout,
-    QRadioButton,
-    QDialog,
-    QTabWidget,
-    QWidget,
-    QMessageBox,
-    QListWidgetItem,
-)
+from PyQt5.QtWidgets import QGridLayout
+from PyQt5.QtWidgets import QHBoxLayout
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QLineEdit
+from PyQt5.QtWidgets import QListWidget
+from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QRadioButton
+from PyQt5.QtWidgets import QSpacerItem
+from PyQt5.QtWidgets import QTabWidget
+from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QWidget
 
 import trnsysGUI.directPortPair as _dpp
 import trnsysGUI.hydraulicLoops.split as _hls
 import trnsysGUI.modifyRelativeHeightsDialog as _mhd
+import trnsysGUI.names.dialog as _ndialog
+import trnsysGUI.names.rename as _rename
 import trnsysGUI.storageTank.side as _sd
-
 
 if _tp.TYPE_CHECKING:
     import trnsysGUI.storageTank.widget as _st
     import trnsysGUI.diagram.Editor as _ed
 
 
-class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-attributes
+class ConfigureStorageDialog(_ndialog.ChangeNameDialogBase):  # pylint: disable = too-many-instance-attributes
     WIDTH_INCREMENT = 10
     HEIGHT_INCREMENT = 100
 
-    def __init__(self, storage: _st.StorageTank, editor: _ed.Editor):  # type: ignore[name-defined]
+    def __init__(
+        self,
+        storage: _st.StorageTank,
+        editor: _ed.Editor,  # type: ignore[name-defined]
+        renameHelper: _rename.RenameHelper,
+        projectDirPath: str,
+    ) -> None:
         # pylint: disable = too-many-locals, too-many-statements
-        super().__init__(editor)
+        super().__init__(storage, renameHelper, _pl.Path(projectDirPath))
         self._editor = editor
         self.storage = storage
         self.n = 0  # pylint: disable = invalid-name
@@ -65,7 +70,6 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
 
         tankNameLabel = QLabel()
         tankNameLabel.setText("<b>Tank name: </b>")
-        self.lineEdit = QLineEdit(self.storage.label.toPlainText())
 
         gridLayout = QGridLayout()
         hxsLabel = QLabel("<b>Heat Exchangers </b>")
@@ -174,7 +178,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         layout = QVBoxLayout()
         layout.addLayout(h0)
         layout.addWidget(tankNameLabel)
-        layout.addWidget(self.lineEdit)
+        layout.addWidget(self._displayNameLineEdit)
 
         t1Layout = QVBoxLayout()
         t1Layout.addLayout(qhbL)
@@ -417,7 +421,7 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         if port.isConnected():
             connection = port.getConnection()
             _hls.split(connection, self._editor.hydraulicLoops, self._editor.fluids)
-            connection.deleteConn()
+            connection.deleteConnection()
 
     def modifyHx(self):
         """
@@ -514,26 +518,6 @@ class ConfigureStorageDialog(QDialog):  # pylint: disable = too-many-instance-at
         self.storage.w += deltaW
         self.storage.updateHeatExchangersAfterTankSizeChange()
         self.storage.updateImage()
-
-    def acceptedEdit(self):
-        newName = self.lineEdit.text()
-        if newName.lower() == str(self.storage.displayName).lower():
-            self.close()
-            return
-        if self.lineEdit.text() == "":
-            qmb = QMessageBox()
-            qmb.setText("Please set a name for this storage tank.")
-            qmb.setStandardButtons(QMessageBox.Ok)
-            qmb.setDefaultButton(QMessageBox.Ok)
-            qmb.exec()
-            return
-        if self._editor.nameExists(newName) or self._editor.nameExistsInDdckFolder(newName):
-            msgb = QMessageBox()
-            msgb.setText("Name already exist!")
-            msgb.exec()
-            return
-        self.storage.setDisplayName(self.lineEdit.text())
-        self.close()
 
     def cancel(self):
         self.close()

@@ -5,10 +5,11 @@ wheel
 pytest
 pytest-cov
 pytest-html
-pytest-xvfb
 mypy
 pylint
-black==22.6.0
+black
 
 PyQT5-stubs
 pytest-qt
+
+types-PyYAML

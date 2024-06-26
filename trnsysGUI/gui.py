@@ -7,8 +7,8 @@ import PyQt5.QtWidgets as _qtw
 import pytrnsys.utils.log as _ulog
 import pytrnsys.utils.result as _res
 import trnsysGUI.arguments as _args
-import trnsysGUI.errors as _err
 import trnsysGUI.setup as _setup
+import trnsysGUI.warningsAndErrors as _werrors
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
     app.setApplicationName("Diagram Creator")
 
     if errorMessage:
-        _err.showErrorMessageBox(errorMessage, title="Missing requirements")
+        _werrors.showMessageBox(errorMessage, title="Missing requirements")
         return
 
     import trnsysGUI.common.cancelled as _ccl  # pylint: disable=import-outside-toplevel
@@ -62,12 +62,7 @@ def main():
 
 
 def _getLogFilePath():
-    isRunAsPyinstallerExe = getattr(_sys, "frozen", False) and hasattr(_sys, "_MEIPASS")
-    if isRunAsPyinstallerExe:
-        containingDir = _pl.Path(_sys.executable).parent
-        return containingDir / "pytrnsys-gui.log"
-
-    return _pl.Path("pytrnsys-gui.log")
+    return _pl.Path("pytrnsys-gui.log").absolute()
 
 
 def _registerExceptionHook(logger: _log.Logger) -> None:

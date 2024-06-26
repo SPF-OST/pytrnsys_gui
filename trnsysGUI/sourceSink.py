@@ -5,5 +5,11 @@ from trnsysGUI.sourceSinkBase import SourceSinkBase
 
 
 class SourceSink(SourceSinkBase):
-    def _getImageAccessor(self) -> _tp.Optional[_img.ImageAccessor]:
+    @classmethod
+    @_tp.override
+    def _getImageAccessor(cls) -> _img.SvgImageAccessor:  # pylint: disable=arguments-differ
         return _img.SOURCE_SINK_SVG
+
+    @classmethod
+    def _getInputAndOutputXPos(cls) -> tuple[int, int]:
+        return (20, 40)
