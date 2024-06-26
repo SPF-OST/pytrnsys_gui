@@ -351,7 +351,7 @@ class MassFlowVisualizer(_qtw.QDialog):
     def checkTempTimeStep(self):
         tempMassFlowDataDup = self.tempMassFlowData
         tempMassFlowDataDup = tempMassFlowDataDup.drop(tempMassFlowDataDup.index[0])
-        for items in tempMassFlowDataDup.nunique().iteritems():
+        for items in tempMassFlowDataDup.nunique().items():
             if items[0] != "TIME":
                 if items[1] > 1:
                     return False

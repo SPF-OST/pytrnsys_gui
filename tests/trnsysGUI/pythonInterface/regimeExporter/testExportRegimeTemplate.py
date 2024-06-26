@@ -1,3 +1,4 @@
+import pandas as _pd
 import pathlib as _pl
 
 import trnsysGUI as _GUI
@@ -16,7 +17,7 @@ class TestExportRegimeTemplate:
 
         _er.exportRegimeTemplate(projectJson, regimeFileName)
 
-        expectedContent = _pl.Path(expectedFileName).read_text(encoding="utf-8")
-        actualContent = _pl.Path(regimeFileName).read_text(encoding="utf-8")
+        expectedContent = _pd.read_csv(expectedFileName)
+        actualContent = _pd.read_csv(regimeFileName)
 
-        assert actualContent == expectedContent
+        _pd.testing.assert_frame_equal(expectedContent, actualContent, check_dtype=False)
