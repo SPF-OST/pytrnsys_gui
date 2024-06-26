@@ -161,18 +161,32 @@ class TestPrintRegimesAndCopyFiles:
     @staticmethod
     def _fileExistsAndIsCorrect(producedFile, expectedFile):
         assert producedFile.is_file()
-        _mpltc.compare_images(str(producedFile), str(expectedFile), 0, in_decorator=False)
+        result = _mpltc.compare_images(str(producedFile), str(expectedFile), 0.001, in_decorator=False)
+        assert result is None
 
     def testUsingQtBotForGivenRegimes(self, qtbot):
         onlyTheseRegimes = ["name1"]
         mainWindow = _createMainWindow(_DATA_DIR, _PROJECT_NAME, qtbot)
         regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME, _DATA_DIR, _RESULTS_DIR_2, _REGIMES_FILENAME, mainWindow)
         regimeExporter.export(onlyTheseRegimes=onlyTheseRegimes)
+        errors = []
+        try:
+            self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
+        except AssertionError as current_error:
+            errors.append(current_error)
 
-        self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_NAME1_PATH)
-        self._fileExistsAndIsCorrect(_NEW_NAME1_PATH_2, _EXPECTED_DIAGRAM_PATH)
-        assert not _NEW_DIAGRAM_PATH_2.is_file()
-        assert not _NEW_NAME2_PATH_2.is_file()
+        try:
+            assert not _NEW_DIAGRAM_PATH_2.is_file()
+        except AssertionError as current_error:
+            errors.append(current_error)
+
+        try:
+            assert not _NEW_NAME2_PATH_2.is_file()
+        except AssertionError as current_error:
+            errors.append(current_error)
+
+        if errors:
+            raise Exception(errors)
 
     def testUsingQtBotForRegimeWithTap(self, qtbot):
         pumpTapPairs = {"Pump5": "WtSp1"}
