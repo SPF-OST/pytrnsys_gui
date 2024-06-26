@@ -1,8 +1,9 @@
 import dataclasses as _dc
+import matplotlib.testing.compare as _mpltc  # type: ignore[import]
 import os as _os
 import pathlib as _pl
+import pytest as _pt
 import typing as _tp
-import matplotlib.testing.compare as _mpltc  # type: ignore[import]
 
 import pytrnsys.utils.log as _ulog
 
@@ -86,7 +87,6 @@ pathFinder = PathFinder(
     _PROJECT_NAME, _BASE_FOLDER_FILE_PATH, _EXPECTED_FILES_PATH, _RESULTS_DIR_NAME, _RESULTS_DIR_NAME_2
 )
 
-
 _DATA_DIR = pathFinder.projectDir
 _RESULTS_DIR = pathFinder.resultsDir
 _RESULTS_DIR_2 = pathFinder.resultsDir2
@@ -99,7 +99,6 @@ def _ensureDirExists(dirPath):
 
 _ensureDirExists(_RESULTS_DIR)
 _ensureDirExists(_RESULTS_DIR_2)
-
 
 pathFinder.setFileEnding("_diagram")
 _EXPECTED_DIAGRAM_PATH = pathFinder.expectedPdfPath
@@ -145,10 +144,19 @@ class TestPrintRegimesAndCopyFiles:
         regimeExporter = _rdopfp.RegimeExporter(_PROJECT_NAME, _DATA_DIR, _RESULTS_DIR, _REGIMES_FILENAME, mainWindow)
         regimeExporter.export()
 
-        self._fileExistsAndIsCorrect(_NEW_DIAGRAM_PATH, _EXPECTED_DIAGRAM_PATH)
-        self._fileExistsAndIsCorrect(_NEW_NAME1_PATH, _EXPECTED_NAME1_PATH)
-        self._fileExistsAndIsCorrect(_NEW_NAME1_SVG_PATH, _EXPECTED_NAME1_SVG_PATH)
-        self._fileExistsAndIsCorrect(_NEW_NAME2_PATH, _EXPECTED_NAME2_PATH)
+        files_to_compare = {'new_file': [_NEW_DIAGRAM_PATH, _NEW_NAME1_PATH, _NEW_NAME1_SVG_PATH, _NEW_NAME2_PATH],
+                            'expected_file': [_EXPECTED_DIAGRAM_PATH, _EXPECTED_NAME1_PATH, _EXPECTED_NAME1_SVG_PATH,
+                                              _EXPECTED_NAME2_PATH]}
+
+        errors = []
+        for i, new_file in enumerate(files_to_compare['new_file']):
+            try:
+                self._fileExistsAndIsCorrect(new_file, files_to_compare['expected_file'][i])
+            except AssertionError as current_error:
+                errors.append(current_error)
+
+        if errors:
+            raise Exception(errors)
 
     @staticmethod
     def _fileExistsAndIsCorrect(producedFile, expectedFile):
@@ -190,6 +198,5 @@ class TestPrintRegimesAndCopyFiles:
 
         pathFinder2.setFileEnding("_diagram")
         assert not pathFinder2.newPdfPath.is_file()
-
 
 # non-qtbot solution?
