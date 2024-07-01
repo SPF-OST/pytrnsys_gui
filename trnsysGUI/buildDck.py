@@ -20,8 +20,6 @@ class buildDck(_rcm.GetConfigMixin):
         self.pathConfig = pathConfig
         self.path = pathConfig
 
-        self._ddckPlaceHolderValuesJsonPath = None
-
         self._defaultInputs()
         self.cmds = []
 
@@ -73,7 +71,11 @@ class buildDck(_rcm.GetConfigMixin):
         deckExplanation = []
         deckExplanation.append("! ** New deck built from list of ddcks. **\n")
         deck = _btd.BuildTrnsysDeck(
-            self.path, self.nameBase, self._ddckFilePathWithComponentNames, self._ddckPlaceHolderValuesJsonPath
+            self.path,
+            self.nameBase,
+            self._ddckFilePathWithComponentNames,
+            self._defaultVisibility,
+            self._ddckPlaceHolderValuesJsonPath,
         )
         result = deck.readDeckList(
             self.pathConfig,
@@ -116,8 +118,6 @@ class buildDck(_rcm.GetConfigMixin):
         self.lines = tool.readFile(path, name, self.inputs, parseFileCreated=parseFileCreated, controlDataType=False)
         if "pathBaseSimulations" in self.inputs:
             self.path = self.inputs["pathBaseSimulations"]
-        if "pathToConnectionInfo" in self.inputs:
-            self._ddckPlaceHolderValuesJsonPath = self.inputs["pathToConnectionInfo"]
 
         resultsFolder = self.inputs.get("addResultsFolder")
         if not resultsFolder:
