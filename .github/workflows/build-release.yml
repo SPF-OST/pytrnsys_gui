@@ -9,7 +9,7 @@ on:
       - build-executable-push
 
 jobs:
-  build-exe:
+  build-release:
     runs-on: [self-hosted, etna]
     env:
       NORMAL_PUSH_TO_MASTER: ${{github.event_name == 'repository_dispatch' && github.event.client_payload.type == 'build-executable-push'}}
@@ -52,7 +52,7 @@ jobs:
         run: |
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
           $ref_name="${{github.ref_name}}".replace("/","-")
-          $date = $(venv\Scripts\python -c "import datetime; print(datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds'))")
+          $date = $(venv\Scripts\python -c "import datetime; print(datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds').replace(':','_'))")
           echo "file_name_base=pytrnsys-gui-${ref_name}-gui=${pytrnsys_gui_sha}-pytrnsys=${{steps.sha.outputs.pytrnsys_sha}}-${date}" >> $env:GITHUB_OUTPUT
       
       - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
