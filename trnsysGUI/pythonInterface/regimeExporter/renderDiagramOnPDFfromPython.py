@@ -36,9 +36,7 @@ class RegimeExporter:
         temperaturesPintFileName = f"{self.projectName}_T.prt"
         return self.projectDir / temperaturesPintFileName
 
-    def export(
-        self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
-    ) -> None:
+    def export(self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None) -> None:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()

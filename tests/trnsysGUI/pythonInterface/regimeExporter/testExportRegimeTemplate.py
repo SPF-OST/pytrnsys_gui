@@ -5,7 +5,7 @@ import pytest as _pt
 import trnsysGUI as _GUI
 import trnsysGUI.pythonInterface.regimeExporter.exportRegimes as _er
 
-_DATA_DIR_BASE = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\"
+_DATA_DIR_BASE = _pl.Path(_GUI.__file__).parent / "..\\tests\\trnsysGUI\\data\\"
 
 
 class TestExportRegimeTemplate:
