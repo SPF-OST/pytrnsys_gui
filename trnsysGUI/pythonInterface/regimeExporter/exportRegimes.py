@@ -22,8 +22,8 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
             if "BlockName" in curDict:
                 curBlockName = curDict["BlockName"]
                 if curBlockName == "Pump":
-                    curPump = _pu._PumpModelVersion1.from_dict(curDict)
-                    data[curPump.BlockDisplayName] = curPump.massFlowRateInKgPerH
+                    curPump = _pu.PumpModel.from_dict(curDict)
+                    data[curPump.BlockDisplayName] = curPump.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
                 elif curBlockName == "TVentil":
                     desiredValueName = "PositionForMassFlowSolver"
                     data = getData(curDict, data, desiredValueName)
