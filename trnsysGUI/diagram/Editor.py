@@ -64,6 +64,7 @@ class Editor(_qtw.QWidget):
     def __init__(self, parent, projectFolder, jsonPath, loadValue, logger):
         super().__init__(parent)
 
+        self.forceOverwrite = False
         self.logger = logger
 
         self.logger.info("Initializing the diagram editor")
@@ -574,7 +575,7 @@ Tcw=1
         return True
 
     def _doesFileExistAndDontOverwrite(self, folderPath):
-        if not _pl.Path(folderPath).exists():
+        if not _pl.Path(folderPath).exists() or self.forceOverwrite:
             return False
 
         qmb = _qtw.QMessageBox(self)

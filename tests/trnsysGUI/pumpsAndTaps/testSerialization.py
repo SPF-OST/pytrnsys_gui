@@ -1,7 +1,7 @@
 import json as _json
 import pathlib as _pl
 
-import trnsysGUI.pumpsAndTaps._serialization as _ser
+import trnsysGUI.pumpsAndTaps.serialization as _ser
 
 
 class TestSerialization:

@@ -4,7 +4,7 @@ import dataclasses_jsonschema as _dcj
 
 from trnsysGUI import createSinglePipePortItem as _cspi, internalPiping as _ip
 from trnsysGUI.massFlowSolver import networkModel as _mfn
-from trnsysGUI.pumpsAndTaps import _pumpsAndTabsBase as _ptb, _serialization as _ser
+from trnsysGUI.pumpsAndTaps import _pumpsAndTabsBase as _ptb, serialization as _ser
 
 
 class TapBase(_ptb.PumpsAndTabsBase):
