@@ -25,7 +25,7 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         self.w = 40
         self.h = 40
 
-        self._massFlowRateInKgPerH = _defaults.DEFAULT_MASS_FLOW_RATE
+        self.massFlowRateInKgPerH = _defaults.DEFAULT_MASS_FLOW_RATE
 
     @classmethod
     @_tp.override
@@ -60,7 +60,7 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
 
         blockItemWithPrescribedMassFlowModel = _ser.BlockItemWithPrescribedMassFlowBaseModel(
             blockItemModel,
-            self._massFlowRateInKgPerH,
+            self.massFlowRateInKgPerH,
         )
 
         return blockItemWithPrescribedMassFlowModel
@@ -71,10 +71,10 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         blockItemModel = blockItemWithPrescribedMassFlow.blockItem
         self._decodeBaseModel(blockItemModel)
 
-        self._massFlowRateInKgPerH = blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+        self.massFlowRateInKgPerH = blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
 
     def mouseDoubleClickEvent(self, event: _qtw.QGraphicsSceneMouseEvent) -> None:
-        dialogModel = _dialog.Model(self.displayName, self.flippedH, self.flippedV, self._massFlowRateInKgPerH)
+        dialogModel = _dialog.Model(self.displayName, self.flippedH, self.flippedV, self.massFlowRateInKgPerH)
 
         maybeCancelled = _dialog.Dialog.showDialogAndGetResult(dialogModel, self._renameHelper)
         if _cancel.isCancelled(maybeCancelled):
@@ -87,4 +87,4 @@ class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphi
         self.setDisplayName(newDialogModel.name)
         self.updateFlipStateH(newDialogModel.isHorizontallyFlipped)
         self.updateFlipStateV(newDialogModel.isVerticallyFlipped)
-        self._massFlowRateInKgPerH = newDialogModel.massFlowRateKgPerH
+        self.massFlowRateInKgPerH = newDialogModel.massFlowRateKgPerH

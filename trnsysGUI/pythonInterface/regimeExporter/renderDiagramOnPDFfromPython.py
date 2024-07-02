@@ -101,14 +101,14 @@ class RegimeExporter:
             blockItemName = blockItem.displayName
             desiredValue = regimeRow[blockItemName]
             if isinstance(blockItem, _pump.Pump):
-                blockItem._massFlowRateInKgPerH = desiredValue
+                blockItem.massFlowRateInKgPerH = desiredValue
                 if pumpTapPairs and (blockItemName in pumpTapPairs):
                     associatedTap = pumpTapPairs[blockItemName]
                     if isinstance(associatedTap, list):
                         for tap in associatedTap:
-                            mainTaps[tap]._massFlowRateInKgPerH = desiredValue
+                            mainTaps[tap].massFlowRateInKgPerH = desiredValue
                     else:
-                        mainTaps[associatedTap]._massFlowRateInKgPerH = desiredValue
+                        mainTaps[associatedTap].massFlowRateInKgPerH = desiredValue
             elif isinstance(blockItem, _tv.TVentil):
                 blockItem.positionForMassFlowSolver = desiredValue
             else:

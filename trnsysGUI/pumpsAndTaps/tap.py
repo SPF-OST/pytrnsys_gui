@@ -23,7 +23,7 @@ class Tap(_tapBase.TapBase):
         return _img.TAP_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:
-        return -self._massFlowRateInKgPerH
+        return -self.massFlowRateInKgPerH
 
     def exportPipeAndTeeTypesForTemp(self, startingUnit: int) -> _tp.Tuple[str, int]:
         fromAdjacentHasPiping = _hecom.getAdjacentConnection(self._graphicalPortItem)
