@@ -1,7 +1,6 @@
 import pathlib as _pl
 import pandas as _pd
 import pytest as _pt
-import unittest as _ut
 
 import trnsysGUI as _GUI
 import trnsysGUI.pythonInterface.regimeExporter.exportRegimes as _er

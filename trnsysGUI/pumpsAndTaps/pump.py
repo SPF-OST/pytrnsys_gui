@@ -10,7 +10,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from . import _pumpsAndTabsBase as _patb
-from . import _serialization as _ser
+from . import serialization as _ser
 
 
 class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attributes

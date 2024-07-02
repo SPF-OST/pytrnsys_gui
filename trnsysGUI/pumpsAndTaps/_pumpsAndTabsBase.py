@@ -13,7 +13,7 @@ import trnsysGUI.names.rename as _rename
 
 from . import _defaults
 from . import _dialog
-from . import _serialization as _ser
+from . import serialization as _ser
 
 
 class PumpsAndTabsBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
