@@ -53,7 +53,7 @@ jobs:
           $pytrnsys_gui_sha=$(git rev-parse --short HEAD)
           $ref_name="${{github.ref_name}}".replace("/","-")
           $date = $(venv\Scripts\python -c "import datetime; print(datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds').replace(':','_'))")
-          echo "file_name_base=pytrnsys-gui-${ref_name}-gui${pytrnsys_gui_sha}-pytrnsys${{steps.sha.outputs.pytrnsys_sha}}-${date}" >> $env:GITHUB_OUTPUT
+          echo "file_name_base=pytrnsys-gui-${ref_name}-gui_${pytrnsys_gui_sha}-pytrnsys_${{steps.sha.outputs.pytrnsys_sha}}-${date}" >> $env:GITHUB_OUTPUT
       
       - if: env.TAG_PUSH_TO_MASTER == 'true' || env.NORMAL_PUSH_TO_MASTER == 'true'
         name: Create zip file
