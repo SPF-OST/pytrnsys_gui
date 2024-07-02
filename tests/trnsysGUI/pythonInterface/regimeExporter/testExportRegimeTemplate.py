@@ -1,23 +1,27 @@
 import pathlib as _pl
 import pandas as _pd
+import pytest as _pt
+import unittest as _ut
 
 import trnsysGUI as _GUI
 import trnsysGUI.pythonInterface.regimeExporter.exportRegimes as _er
 
-_PROJECT_NAME = "diagramForRegimes"
-_DATA_DIR = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\{_PROJECT_NAME}"
-_EXPECTED_CVSS_DIR = _DATA_DIR / "expectedCSVs"
+_DATA_DIR_BASE = _pl.Path(_GUI.__file__).parent / f"..\\tests\\trnsysGUI\\data\\"
 
 
 class TestExportRegimeTemplate:
-    def testExportTemplate(self):
-        projectJson = _DATA_DIR / f"{_PROJECT_NAME}.json"
-        regimeFileName = _DATA_DIR / "regimeTemplate.csv"
-        expectedFileName = _EXPECTED_CVSS_DIR / "expectedRegimeTemplate.csv"
 
-        _er.exportRegimeTemplate(projectJson, regimeFileName)
+    @_pt.mark.parametrize("projectName", ["diagramForRegimes", "diagramWithTapForRegimes"])
+    def testExportTemplate(self, projectName):
+        dataDir = _DATA_DIR_BASE / f"{projectName}"
+        expectedCsvDir = dataDir / "expectedCSVs"
+        projectJson = dataDir / f"{projectName}.json"
+        regimeFilePath = dataDir / "regimeTemplate.csv"
+        expectedFilePath = expectedCsvDir / "expectedRegimeTemplate.csv"
 
-        expectedContent = _pd.read_csv(expectedFileName)
-        actualContent = _pd.read_csv(regimeFileName)
+        _er.exportRegimeTemplate(projectJson, regimeFilePath)
+
+        expectedContent = _pd.read_csv(expectedFilePath)
+        actualContent = _pd.read_csv(regimeFilePath)
 
         _pd.testing.assert_frame_equal(expectedContent, actualContent, check_dtype=False)

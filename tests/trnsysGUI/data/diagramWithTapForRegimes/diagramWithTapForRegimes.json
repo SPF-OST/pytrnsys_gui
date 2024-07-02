@@ -5,63 +5,70 @@
             ".__BlockDict__": true,
             "BlockDisplayName": "WtSp1",
             "BlockName": "WTap_main",
-            "Id": 1,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
-            "blockPosition": [
-                -85.0,
-                -303.0
-            ],
-            "flippedH": false,
-            "flippedV": false,
-            "portsIdsIn": [],
-            "portsIdsOut": [
-                2
-            ],
-            "rotationN": 0,
-            "trnsysId": 1
+            "__version__": "14afd9a0-54d6-44c7-b147-c79af3b782bb",
+            "blockItemWithPrescribedMassFlow": {
+                "__version__": "e9fd1a0e-c00a-46e2-abfb-7381fa1b2e2d",
+                "blockItem": {
+                    "__version__": "7b792574-5fa6-4c3e-b2e3-7e4eb71d7746",
+                    "blockPosition": [
+                        -85.0,
+                        -303.0
+                    ],
+                    "flippedH": false,
+                    "flippedV": false,
+                    "rotationN": 0,
+                    "trnsysId": 1
+                },
+                "massFlowRateInKgPerH": 1000.0
+            },
+            "portId": 2
         },
-        "Block-3": {
+        "Block-2": {
             ".__BlockDict__": true,
             "BlockDisplayName": "WtTp3",
             "BlockName": "WTap",
-            "Id": 3,
-            "__version__": "bbc03f36-d1a1-4d97-a9c0-d212ea3a0203",
-            "blockPosition": [
-                -86.0,
-                -375.0
-            ],
-            "flippedH": false,
-            "flippedV": false,
-            "portsIdsIn": [
-                4
-            ],
-            "portsIdsOut": [],
-            "rotationN": 0,
-            "trnsysId": 2
+            "__version__": "14afd9a0-54d6-44c7-b147-c79af3b782bb",
+            "blockItemWithPrescribedMassFlow": {
+                "__version__": "e9fd1a0e-c00a-46e2-abfb-7381fa1b2e2d",
+                "blockItem": {
+                    "__version__": "7b792574-5fa6-4c3e-b2e3-7e4eb71d7746",
+                    "blockPosition": [
+                        -86.0,
+                        -375.0
+                    ],
+                    "flippedH": false,
+                    "flippedV": false,
+                    "rotationN": 0,
+                    "trnsysId": 2
+                },
+                "massFlowRateInKgPerH": 1000.0
+            },
+            "portId": 4
         },
-        "Block-5": {
+        "Block-3": {
             ".__BlockDict__": true,
             "BlockDisplayName": "Pump5",
             "BlockName": "Pump",
-            "Id": 5,
-            "__version__": "9552365f-ef11-4fac-ba35-644e94b54088",
-            "blockPosition": [
-                -166.0,
-                -302.0
-            ],
-            "flippedH": false,
-            "flippedV": false,
-            "massFlowRateInKgPerH": 500,
-            "portsIdsIn": [
-                6
-            ],
-            "portsIdsOut": [
-                7
-            ],
-            "rotationN": -1,
-            "trnsysId": 3
+            "__version__": "3d1e7f06-c7a6-49af-98b8-f593b34c5754",
+            "blockItemWithPrescribedMassFlow": {
+                "__version__": "e9fd1a0e-c00a-46e2-abfb-7381fa1b2e2d",
+                "blockItem": {
+                    "__version__": "7b792574-5fa6-4c3e-b2e3-7e4eb71d7746",
+                    "blockPosition": [
+                        -166.0,
+                        -302.0
+                    ],
+                    "flippedH": false,
+                    "flippedV": false,
+                    "rotationN": -1,
+                    "trnsysId": 3
+                },
+                "massFlowRateInKgPerH": 500.0
+            },
+            "inputPortId": 6,
+            "outputPortId": 7
         },
-        "Connection-8": {
+        "Connection-4": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 1,
@@ -99,7 +106,7 @@
                 "name": "loop1UVal"
             }
         },
-        "Connection-9": {
+        "Connection-5": {
             ".__ConnectionDict__": true,
             "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
             "connectionId": 2,
@@ -134,10 +141,10 @@
             }
         },
         "IDs": {
-            "GlobalId": 10,
+            "GlobalId": 11,
             "__idDct__": true,
-            "globalConnID": 3,
-            "trnsysID": 6
+            "globalConnID": 4,
+            "trnsysID": 7
         },
         "Strings": {
             "DiagramName": "diagramWithTapForRegimes.json",

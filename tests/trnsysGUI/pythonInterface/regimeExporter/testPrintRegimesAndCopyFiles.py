@@ -135,6 +135,7 @@ def _createMainWindow(projectFolder, projectName, qtbot):
 
 class TestPrintRegimesAndCopyFiles:
     def testMplInstallation(self):
+        """ Checks whether Inkscape is installed correctly. """
         assert "pdf" in _mpltc.comparable_formats()
         assert "svg" in _mpltc.comparable_formats()
 

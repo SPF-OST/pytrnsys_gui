@@ -2,7 +2,7 @@ import json
 
 import pandas as _pd
 
-import trnsysGUI.pumpsAndTaps._serialization as _pu
+import trnsysGUI.pumpsAndTaps._serialization as _se
 
 
 def exportRegimeTemplate(projectJson, regimeFileName):
@@ -24,20 +24,24 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
         if "BlockName" in curDict:
             curBlockName = curDict["BlockName"]
             if curBlockName == "Pump":
-                curPump = _pu.PumpModel.from_dict(curDict)
+                curPump = _se.PumpModel.from_dict(curDict)
                 data[curPump.BlockDisplayName] = curPump.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
             elif curBlockName == "TVentil":
                 desiredValueName = "PositionForMassFlowSolver"
                 data = getData(curDict, data, desiredValueName)
+            elif curBlockName == "WTap_main" or curBlockName == "WTap":
+                curTap = _se.TerminalWithPrescribedMassFlowModel.from_dict(curDict)
+                data[curTap.BlockDisplayName] = curTap.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+
     pumpsAndValvesAndValues = _pd.DataFrame(data, index=["dummy_regime"])
     pumpsAndValvesAndValues.index.name = "regimeName"
     return pumpsAndValvesAndValues
 
 
 def getData(curDict, data, desiredValueName):
-    bockItemName = curDict["BlockDisplayName"]
+    blockItemName = curDict["BlockDisplayName"]
     value = float(curDict[desiredValueName])
-    data[bockItemName] = value
+    data[blockItemName] = value
     return data
 
 
