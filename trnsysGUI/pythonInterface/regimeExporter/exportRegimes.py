@@ -17,16 +17,18 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
     data = {}
     undesiredBlocks = [".__BlockDct__", "IDs", "Strings"]
     for block in jsonValues["Blocks"]:
-        if block not in undesiredBlocks:
-            curDict = jsonValues["Blocks"][block]
-            if "BlockName" in curDict:
-                curBlockName = curDict["BlockName"]
-                if curBlockName == "Pump":
-                    curPump = _pu.PumpModel.from_dict(curDict)
-                    data[curPump.BlockDisplayName] = curPump.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
-                elif curBlockName == "TVentil":
-                    desiredValueName = "PositionForMassFlowSolver"
-                    data = getData(curDict, data, desiredValueName)
+        if block in undesiredBlocks:
+            continue
+
+        curDict = jsonValues["Blocks"][block]
+        if "BlockName" in curDict:
+            curBlockName = curDict["BlockName"]
+            if curBlockName == "Pump":
+                curPump = _pu.PumpModel.from_dict(curDict)
+                data[curPump.BlockDisplayName] = curPump.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
+            elif curBlockName == "TVentil":
+                desiredValueName = "PositionForMassFlowSolver"
+                data = getData(curDict, data, desiredValueName)
     pumpsAndValvesAndValues = _pd.DataFrame(data, index=["dummy_regime"])
     pumpsAndValvesAndValues.index.name = "regimeName"
     return pumpsAndValvesAndValues

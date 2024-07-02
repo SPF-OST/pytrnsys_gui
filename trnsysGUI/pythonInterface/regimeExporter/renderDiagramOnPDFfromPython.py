@@ -37,17 +37,17 @@ class RegimeExporter:
         return self.projectDir / temperaturesPintFileName
 
     def export(
-        self, pumpTapPairs: _tp.Optional[_tp.Dict] = None, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
+        self, onlyTheseRegimes: _tp.Optional[_tp.Sequence[str]] = None
     ) -> None:
 
         if not onlyTheseRegimes:
             self._makeDiagramFiles()
 
         regimeValues = _gdr.getRegimes(self.projectDir / self.regimesFileName, onlyTheseRegimes)
-        pumpsAndValvesNames = list(regimeValues.columns)
-        pumpsAndValves, mainTaps = self.getPumpsAndValvesAndMainTaps(pumpsAndValvesNames)
+        pumpsAndValvesAndTapsNames = list(regimeValues.columns)
+        pumpsAndValvesAndTaps = self.getPumpsAndValvesAndMainTaps(pumpsAndValvesAndTapsNames)
 
-        self._simulateAndVisualizeMassFlows(mainTaps, pumpTapPairs, pumpsAndValves, regimeValues)
+        self._simulateAndVisualizeMassFlows(pumpsAndValvesAndTaps, regimeValues)
 
     def _makeDiagramFiles(self, regimeName="diagram") -> None:
         pdfName = self.resultsDir / f"{self.projectName}_{regimeName}.pdf"
@@ -56,24 +56,21 @@ class RegimeExporter:
         self._printDiagramToSVG(svgName)
 
     def getPumpsAndValvesAndMainTaps(self, pumpsAndValvesNames):
-        pumpsAndValves = []
-        mainTaps = {}
+        pumpsAndValvesAndTaps = []
         blockItemsAndConnections = self.mainWindow.editor.trnsysObj
         for blockItem in blockItemsAndConnections:
-            if isinstance(blockItem, (_pump.Pump, _tv.TVentil)):
+            if isinstance(blockItem, (_pump.Pump, _tv.TVentil, _tb.TapBase)):
                 if blockItem.displayName in pumpsAndValvesNames:
-                    pumpsAndValves.append(blockItem)
-            elif isinstance(blockItem, _tb.TapBase):
-                mainTaps[blockItem.displayName] = blockItem
+                    pumpsAndValvesAndTaps.append(blockItem)
 
-        return pumpsAndValves, mainTaps
+        return pumpsAndValvesAndTaps
 
-    def _simulateAndVisualizeMassFlows(self, mainTaps, pumpTapPairs, pumpsAndValves, regimeValues) -> None:
+    def _simulateAndVisualizeMassFlows(self, pumpsAndValvesAndTaps, regimeValues) -> None:
 
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
 
-            self._adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps)
+            self._adjustPumpsAndValves(pumpsAndValvesAndTaps, regimeRow)
 
             exception = runMassFlowSolver(self.mainWindow)
 
@@ -95,22 +92,18 @@ class RegimeExporter:
             massFlowSolverVisualizer.close()
 
     @staticmethod
-    def _adjustPumpsAndValves(pumpsAndValves, regimeRow, pumpTapPairs, mainTaps) -> None:
+    def _adjustPumpsAndValves(pumpsAndValvesAndTaps, regimeRow) -> None:
 
-        for blockItem in pumpsAndValves:
+        for blockItem in pumpsAndValvesAndTaps:
             blockItemName = blockItem.displayName
             desiredValue = regimeRow[blockItemName]
-            if isinstance(blockItem, _pump.Pump):
+
+            if isinstance(blockItem, (_pump.Pump, _tb.TapBase)):
                 blockItem.massFlowRateInKgPerH = desiredValue
-                if pumpTapPairs and (blockItemName in pumpTapPairs):
-                    associatedTap = pumpTapPairs[blockItemName]
-                    if isinstance(associatedTap, list):
-                        for tap in associatedTap:
-                            mainTaps[tap].massFlowRateInKgPerH = desiredValue
-                    else:
-                        mainTaps[associatedTap].massFlowRateInKgPerH = desiredValue
+
             elif isinstance(blockItem, _tv.TVentil):
                 blockItem.positionForMassFlowSolver = desiredValue
+
             else:
                 raise AssertionError(f"Encountered blockItem of type {blockItem}, instead of a pump or a Valve")
 

@@ -194,7 +194,6 @@ class TestPrintRegimesAndCopyFiles:
             raise ExceptionGroup("multiple errors", errors)
 
     def testUsingQtBotForRegimeWithTap(self, qtbot):
-        pumpTapPairs = {"Pump5": ["WtSp1", "WtTp3"]}
         onlyTheseRegimes = ["dummy_regime"]
         projectName = "diagramWithTapForRegimes"
         regimeEnding = "_dummy_regime"
@@ -211,7 +210,7 @@ class TestPrintRegimesAndCopyFiles:
 
         mainWindow = _createMainWindow(dataDir, projectName, qtbot)
         regimeExporter = _rdopfp.RegimeExporter(projectName, dataDir, resultsDir, _REGIMES_FILENAME, mainWindow)
-        regimeExporter.export(pumpTapPairs=pumpTapPairs, onlyTheseRegimes=onlyTheseRegimes)
+        regimeExporter.export(onlyTheseRegimes=onlyTheseRegimes)
 
         errors = []
         try:
