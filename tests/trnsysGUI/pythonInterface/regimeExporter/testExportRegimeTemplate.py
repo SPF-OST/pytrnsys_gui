@@ -10,7 +10,7 @@ _DATA_DIR_BASE = _pl.Path(_GUI.__file__).parent / "..\\tests\\trnsysGUI\\data\\"
 
 class TestExportRegimeTemplate:
 
-    @_pt.mark.parametrize("projectName", ["diagramForRegimes", "diagramWithTapForRegimes"])
+    @_pt.mark.parametrize("projectName", ["diagramForRegimes", "diagramWithTapForRegimes", "diagramWithSourceSinksForRegimes"])
     def testExportTemplate(self, projectName):
         dataDir = _DATA_DIR_BASE / f"{projectName}"
         expectedCsvDir = dataDir / "expectedCSVs"

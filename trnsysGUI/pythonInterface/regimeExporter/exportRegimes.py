@@ -40,6 +40,12 @@ def getPumpsAndValvesWithValuesFromJson(projectJson):
         curTap = _se.TerminalWithPrescribedMassFlowModel.from_dict(blocks[tap])
         data[curTap.BlockDisplayName] = curTap.blockItemWithPrescribedMassFlow.massFlowRateInKgPerH
 
+    sourceSinks = [x for x in blockNamesInJson if blocks[x]["BlockName"] in ("Sink", "Source", "SourceSink", "Geotherm", "Water")]
+    for sourceSink in sourceSinks:
+        """ This isn't in the json yet, so I am applying a default value directly at first. """
+        BlockDisplayName = blocks[sourceSink]["BlockDisplayName"]
+        data[BlockDisplayName] = 500.0
+
     componentsAndValues = _pd.DataFrame(data, index=["dummy_regime"])
     componentsAndValues.index.name = "regimeName"
 
