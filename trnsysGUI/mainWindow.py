@@ -45,6 +45,7 @@ class MainWindow(_qtw.QMainWindow):
         self.labelVisState = False
         self.calledByVisualizeMf = False
         self.currentFile = "Untitled"
+        self.showBoxOnClose = True
 
         # Toolbar actions
         saveDiaAction = _qtw.QAction(_img.INBOX_PNG.icon(), "Save", self)
@@ -553,17 +554,20 @@ class MainWindow(_qtw.QMainWindow):
         self.logger.info("File exported to %s." % fileName)
 
     def closeEvent(self, e):
-        qmb = _qtw.QMessageBox()
-        qmb.setText("Do you want to save the current state of the project before closing the program?")
-        qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Close | _qtw.QMessageBox.Cancel)
-        qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
-        ret = qmb.exec()
-        if ret == _qtw.QMessageBox.Cancel:
-            e.ignore()
-        elif ret == _qtw.QMessageBox.Close:
-            e.accept()
-        elif ret == _qtw.QMessageBox.Save:
-            self.editor.save()
+        if self.showBoxOnClose:
+            qmb = _qtw.QMessageBox()
+            qmb.setText("Do you want to save the current state of the project before closing the program?")
+            qmb.setStandardButtons(_qtw.QMessageBox.Save | _qtw.QMessageBox.Close | _qtw.QMessageBox.Cancel)
+            qmb.setDefaultButton(_qtw.QMessageBox.Cancel)
+            ret = qmb.exec()
+            if ret == _qtw.QMessageBox.Cancel:
+                e.ignore()
+            elif ret == _qtw.QMessageBox.Close:
+                e.accept()
+            elif ret == _qtw.QMessageBox.Save:
+                self.editor.save()
+                e.accept()
+        else:
             e.accept()
 
     def ensureSettingsExist(self):

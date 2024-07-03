@@ -1,0 +1,5 @@
+regimeName,QSrc,QSnk
+direct,500.0,500.0
+charge,500.0,0.0
+discharge,0.0,500.0
+charge_while_direct,1000.0,500.0

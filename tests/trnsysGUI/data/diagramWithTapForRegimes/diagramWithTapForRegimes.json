@@ -1,0 +1,168 @@
+{
+    "Blocks": {
+        ".__BlockDct__": true,
+        "Block-1": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "WtSp1",
+            "BlockName": "WTap_main",
+            "__version__": "14afd9a0-54d6-44c7-b147-c79af3b782bb",
+            "blockItemWithPrescribedMassFlow": {
+                "__version__": "e9fd1a0e-c00a-46e2-abfb-7381fa1b2e2d",
+                "blockItem": {
+                    "__version__": "7b792574-5fa6-4c3e-b2e3-7e4eb71d7746",
+                    "blockPosition": [
+                        -85.0,
+                        -303.0
+                    ],
+                    "flippedH": false,
+                    "flippedV": false,
+                    "rotationN": 0,
+                    "trnsysId": 1
+                },
+                "massFlowRateInKgPerH": 1000.0
+            },
+            "portId": 2
+        },
+        "Block-2": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "WtTp3",
+            "BlockName": "WTap",
+            "__version__": "14afd9a0-54d6-44c7-b147-c79af3b782bb",
+            "blockItemWithPrescribedMassFlow": {
+                "__version__": "e9fd1a0e-c00a-46e2-abfb-7381fa1b2e2d",
+                "blockItem": {
+                    "__version__": "7b792574-5fa6-4c3e-b2e3-7e4eb71d7746",
+                    "blockPosition": [
+                        -86.0,
+                        -375.0
+                    ],
+                    "flippedH": false,
+                    "flippedV": false,
+                    "rotationN": 0,
+                    "trnsysId": 2
+                },
+                "massFlowRateInKgPerH": 1000.0
+            },
+            "portId": 4
+        },
+        "Block-3": {
+            ".__BlockDict__": true,
+            "BlockDisplayName": "Pump5",
+            "BlockName": "Pump",
+            "__version__": "3d1e7f06-c7a6-49af-98b8-f593b34c5754",
+            "blockItemWithPrescribedMassFlow": {
+                "__version__": "e9fd1a0e-c00a-46e2-abfb-7381fa1b2e2d",
+                "blockItem": {
+                    "__version__": "7b792574-5fa6-4c3e-b2e3-7e4eb71d7746",
+                    "blockPosition": [
+                        -166.0,
+                        -302.0
+                    ],
+                    "flippedH": false,
+                    "flippedV": false,
+                    "rotationN": -1,
+                    "trnsysId": 3
+                },
+                "massFlowRateInKgPerH": 500.0
+            },
+            "inputPortId": 6,
+            "outputPortId": 7
+        },
+        "Connection-4": {
+            ".__ConnectionDict__": true,
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
+            "connectionId": 1,
+            "diameterInCm": {
+                "name": "loop1Dia"
+            },
+            "fromPortId": 2,
+            "id": 8,
+            "labelPos": [
+                -88.0,
+                -286.0
+            ],
+            "lengthInM": {
+                "name": "loop1Len"
+            },
+            "massFlowLabelPos": [
+                -88.0,
+                -286.0
+            ],
+            "name": "WtSp1_Pump5",
+            "segmentsCorners": [
+                [
+                    -147.0,
+                    -283.0
+                ],
+                [
+                    -147.0,
+                    -302.0
+                ]
+            ],
+            "shallBeSimulated": true,
+            "toPortId": 6,
+            "trnsysId": 4,
+            "uValueInWPerM2K": {
+                "name": "loop1UVal"
+            }
+        },
+        "Connection-5": {
+            ".__ConnectionDict__": true,
+            "__version__": "74032e79-2abc-4fcf-9328-5d697ef31023",
+            "connectionId": 2,
+            "diameterInCm": {
+                "name": "loop1Dia"
+            },
+            "fromPortId": 7,
+            "id": 9,
+            "labelPos": [
+                -149.0,
+                -339.0
+            ],
+            "lengthInM": {
+                "name": "loop1Len"
+            },
+            "massFlowLabelPos": [
+                -149.0,
+                -339.0
+            ],
+            "name": "Pump5_WtTp3",
+            "segmentsCorners": [
+                [
+                    -146.0,
+                    -355.0
+                ]
+            ],
+            "shallBeSimulated": true,
+            "toPortId": 4,
+            "trnsysId": 5,
+            "uValueInWPerM2K": {
+                "name": "loop1UVal"
+            }
+        },
+        "IDs": {
+            "GlobalId": 11,
+            "__idDct__": true,
+            "globalConnID": 4,
+            "trnsysID": 7
+        },
+        "Strings": {
+            "DiagramName": "diagramWithTapForRegimes.json",
+            "ProjectFolder": "C:\\Users\\alex.hobe\\Projects\\pytrnsys_gui\\tests\\trnsysGUI\\data\\diagramWithTapForRegimes",
+            "__nameDct__": true
+        }
+    },
+    "hydraulicLoops": [
+        {
+            "__version__": "990b8023-eb4b-408e-8d54-23caa5916b2a",
+            "connectionsTrnsysId": [
+                4,
+                5
+            ],
+            "fluidName": "water",
+            "hasUserDefinedName": false,
+            "name": "loop1",
+            "useLoopWideDefaults": true
+        }
+    ]
+}

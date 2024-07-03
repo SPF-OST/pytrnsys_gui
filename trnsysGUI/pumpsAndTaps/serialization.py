@@ -3,12 +3,12 @@ import typing as _tp
 import uuid as _uuid
 
 import dataclasses_jsonschema as _dcj
-
 import pytrnsys.utils.serialization as _ser
+
 import trnsysGUI.blockItemModel as _bim
 import trnsysGUI.blockItems.names as _bnames
+import trnsysGUI.pumpsAndTaps.defaults as _defaults
 import trnsysGUI.serialization as _gser
-from . import _defaults
 
 
 @_dc.dataclass

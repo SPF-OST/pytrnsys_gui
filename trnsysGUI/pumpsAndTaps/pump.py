@@ -10,7 +10,7 @@ import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
 from . import _pumpsAndTabsBase as _patb
-from . import _serialization as _ser
+from . import serialization as _ser
 
 
 class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attributes
@@ -50,7 +50,7 @@ class Pump(_patb.PumpsAndTabsBase):  # pylint: disable=too-many-instance-attribu
         return _img.PUMP_SVG
 
     def _getCanonicalMassFlowRate(self) -> float:
-        return self._massFlowRateInKgPerH
+        return self.massFlowRateInKgPerH
 
     def encode(self) -> _tp.Tuple[str, _dcj.JsonDict]:
         blockItemWithPrescribedMassFlowModel = self._createBlockItemWithPrescribedMassFlowForEncode()
