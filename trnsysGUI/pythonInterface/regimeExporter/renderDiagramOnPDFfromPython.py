@@ -68,7 +68,9 @@ class RegimeExporter:
 
         return pumpsAndValvesAndTaps
 
-    def _simulateAndVisualizeMassFlows(self, relevantBlockItems: _tp.Sequence[_BlockItem], regimeValues: _pd.DataFrame) -> None:
+    def _simulateAndVisualizeMassFlows(
+        self, relevantBlockItems: _tp.Sequence[_BlockItem], regimeValues: _pd.DataFrame
+    ) -> None:
 
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
