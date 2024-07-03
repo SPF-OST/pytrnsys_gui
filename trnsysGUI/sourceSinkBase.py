@@ -7,7 +7,6 @@ import trnsysGUI.createSinglePipePortItem as _cspi
 import trnsysGUI.images as _img
 import trnsysGUI.internalPiping as _ip
 import trnsysGUI.massFlowSolver.networkModel as _mfn
-import trnsysGUI.pumpsAndTaps.defaults as _defaults
 
 
 class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicItemMixin):
@@ -17,7 +16,7 @@ class SourceSinkBase(_bip.BlockItemHasInternalPiping, _gimx.SvgBlockItemGraphicI
         self.w = 60
         self.h = 60
 
-        self.massFlowRateInKgPerH = _defaults.DEFAULT_MASS_FLOW_RATE
+        self.massFlowRateInKgPerH = 500
 
         self.inputs.append(_cspi.createSinglePipePortItem("i", 1, self))
         self.outputs.append(_cspi.createSinglePipePortItem("o", 1, self))
