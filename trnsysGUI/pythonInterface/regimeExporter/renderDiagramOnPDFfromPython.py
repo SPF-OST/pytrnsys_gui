@@ -4,19 +4,24 @@ import pathlib as _pl
 import subprocess as _sp
 import typing as _tp
 
+import PyQt5.QtCore as _qtc
 import PyQt5.QtGui as _qtg
 import PyQt5.QtPrintSupport as _qtp
 import PyQt5.QtSvg as _qtsvg
-import PyQt5.QtCore as _qtc
+import pandas as _pd
 
-import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.MassFlowVisualizer as _mfv
+import trnsysGUI.TVentil as _tv
+import trnsysGUI.diagram.Editor as _de
 import trnsysGUI.mainWindow as _mw
+import trnsysGUI.pumpsAndTaps._tapBase as _tb
 import trnsysGUI.pumpsAndTaps.pump as _pump
 import trnsysGUI.pythonInterface.regimeExporter.getDesiredRegimes as _gdr
-import trnsysGUI.TVentil as _tv
-import trnsysGUI.pumpsAndTaps._tapBase as _tb
 import trnsysGUI.sourceSinkBase as _ssb
+
+
+_BlockItems = (_pump.Pump, _tv.TVentil, _tb.TapBase, _ssb.SourceSinkBase)
+_BlockItem = _pump.Pump | _tv.TVentil | _tb.TapBase | _ssb.SourceSinkBase
 
 
 @_dc.dataclass
@@ -28,12 +33,12 @@ class RegimeExporter:
     mainWindow: _mw.MainWindow  # type: ignore[name-defined]
 
     @property
-    def massFlowRatesPrintFilePath(self):
+    def massFlowRatesPrintFilePath(self) -> _pl.Path:
         massFlowRatesPrintFileName = f"{self.projectName}_Mfr.prt"
         return self.projectDir / massFlowRatesPrintFileName
 
     @property
-    def temperaturesPrintFilePath(self):
+    def temperaturesPrintFilePath(self) -> _pl.Path:
         temperaturesPintFileName = f"{self.projectName}_T.prt"
         return self.projectDir / temperaturesPintFileName
 
@@ -43,39 +48,37 @@ class RegimeExporter:
             self._makeDiagramFiles()
 
         regimeValues = _gdr.getRegimes(self.projectDir / self.regimesFileName, onlyTheseRegimes)
-        pumpsAndValvesAndTapsNames = list(regimeValues.columns)
-        pumpsAndValvesAndTaps = self.getPumpsAndValvesAndMainTaps(pumpsAndValvesAndTapsNames)
+        relevantNames = list(regimeValues.columns)
+        relevantBlockItems = self.getRelevantBlockItems(relevantNames)
 
-        self._simulateAndVisualizeMassFlows(pumpsAndValvesAndTaps, regimeValues)
+        self._simulateAndVisualizeMassFlows(relevantBlockItems, regimeValues)
 
-    def _makeDiagramFiles(self, regimeName="diagram") -> None:
+    def _makeDiagramFiles(self, regimeName: str = "diagram") -> None:
         pdfName = self.resultsDir / f"{self.projectName}_{regimeName}.pdf"
         svgName = self.resultsDir / f"{self.projectName}_{regimeName}.svg"
         self._printDiagramToPDF(pdfName)
         self._printDiagramToSVG(svgName)
 
-    def getPumpsAndValvesAndMainTaps(self, pumpsAndValvesNames):
-        pumpsAndValvesAndTaps = []
+    def getRelevantBlockItems(self, relevantNames: _tp.Sequence[str]) -> _tp.Sequence[_BlockItem]:
         blockItemsAndConnections = self.mainWindow.editor.trnsysObj
-        for blockItem in blockItemsAndConnections:
-            if isinstance(blockItem, (_pump.Pump, _tv.TVentil, _tb.TapBase, _ssb.SourceSinkBase)):
-                if blockItem.displayName in pumpsAndValvesNames:
-                    pumpsAndValvesAndTaps.append(blockItem)
+
+        pumpsAndValvesAndTaps = [
+            b for b in blockItemsAndConnections if isinstance(b, _BlockItems) and b.displayName in relevantNames
+        ]
 
         return pumpsAndValvesAndTaps
 
-    def _simulateAndVisualizeMassFlows(self, pumpsAndValvesAndTaps, regimeValues) -> None:
+    def _simulateAndVisualizeMassFlows(self, relevantBlockItems: _tp.Sequence[_BlockItem], regimeValues: _pd.DataFrame) -> None:
 
         for regimeName in regimeValues.index:
             regimeRow = regimeValues.loc[regimeName]
 
-            self._adjustPumpsAndValves(pumpsAndValvesAndTaps, regimeRow)
+            self._adjustPumpsAndValves(relevantBlockItems, regimeRow)
 
-            exception = runMassFlowSolver(self.mainWindow)
-
-            if not exception:
+            try:
+                _exportMassFlowSolverDeckAndRunTrnsys(self.mainWindow.editor)
                 timeStep = 2
-            else:
+            except (FileNotFoundError, _sp.CalledProcessError):
                 regimeName = regimeName + "_FAILED"
                 timeStep = 1
 
@@ -91,55 +94,46 @@ class RegimeExporter:
             massFlowSolverVisualizer.close()
 
     @staticmethod
-    def _adjustPumpsAndValves(pumpsAndValvesAndTaps, regimeRow) -> None:
+    def _adjustPumpsAndValves(relevantBlockItems: _tp.Sequence[_BlockItem], regimeRow: _pd.Series) -> None:
 
-        for blockItem in pumpsAndValvesAndTaps:
+        for blockItem in relevantBlockItems:
             blockItemName = blockItem.displayName
             desiredValue = regimeRow[blockItemName]
 
-            if isinstance(blockItem, (_pump.Pump, _tb.TapBase, _ssb.SourceSinkBase)):
-                blockItem.massFlowRateInKgPerH = desiredValue
-
-            elif isinstance(blockItem, _tv.TVentil):
-                blockItem.positionForMassFlowSolver = desiredValue
-
-            else:
-                raise AssertionError(f"Encountered blockItem of type {blockItem}, instead of a pump or a Valve")
+            match blockItem:
+                case _pump.Pump() | _tb.TapBase() | _ssb.SourceSinkBase() as hasMassFlowRate:
+                    hasMassFlowRate.massFlowRateInKgPerH = desiredValue
+                case _tv.TVentil() as valve:
+                    valve.positionForMassFlowSolver = desiredValue
+                case _:
+                    _tp.assert_never(blockItem)
 
     def _printDiagramToPDF(self, fileName: _pl.Path) -> None:
-        if fileName != "":
-            printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
-            printer.setOrientation(_qtp.QPrinter.Landscape)
-            printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
-            printer.setOutputFileName(str(fileName))
-            painter = _qtg.QPainter(printer)
-            self.mainWindow.editor.diagramScene.render(painter)
-            painter.end()
+        printer = _qtp.QPrinter(_qtp.QPrinter.HighResolution)
+        printer.setOrientation(_qtp.QPrinter.Landscape)
+        printer.setOutputFormat(_qtp.QPrinter.PdfFormat)
+        printer.setOutputFileName(str(fileName))
+        painter = _qtg.QPainter(printer)
+        self.mainWindow.editor.diagramScene.render(painter)
+        painter.end()
 
     def _printDiagramToSVG(self, fileName: _pl.Path) -> None:
         # upside down and tiny compared to canvas
-        if fileName != "":
-            generator = _qtsvg.QSvgGenerator()
-            generator.setSize(_qtc.QSize(1600, 1600))
-            generator.setViewBox(_qtc.QRect(0, 0, 1600, 1600))
-            generator.setFileName(str(fileName))
-            painter = _qtg.QPainter(generator)
-            self.mainWindow.editor.diagramScene.render(painter)
-            painter.end()
+        generator = _qtsvg.QSvgGenerator()
+        generator.setSize(_qtc.QSize(1600, 1600))
+        generator.setViewBox(_qtc.QRect(0, 0, 1600, 1600))
+        generator.setFileName(str(fileName))
+        painter = _qtg.QPainter(generator)
+        self.mainWindow.editor.diagramScene.render(painter)
+        painter.end()
 
 
-def runMassFlowSolver(mainWindow) -> _tp.Optional[Exception]:
-    exception = _exportMassFlowSolverDeckAndRunTrnsys(mainWindow.editor)
-    return exception
-
-
-def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor):  # type: ignore[name-defined]
+def _exportMassFlowSolverDeckAndRunTrnsys(editor: _de.Editor) -> None:  # type: ignore[name-defined]
     exportedFilePath = str(_exportHydraulic(editor, formatting="mfs"))
 
     trnExePath = str(_getTrnExePath())
 
-    _, exception = runDck(trnExePath, exportedFilePath)
-    return exception
+    runDck(trnExePath, exportedFilePath)
 
 
 def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[name-defined]
@@ -147,7 +141,7 @@ def _exportHydraulic(editor: _de.Editor, *, formatting) -> str:  # type: ignore[
     return exportedFilePath
 
 
-def _getTrnExePath():
+def _getTrnExePath() -> _pl.PureWindowsPath:
     isRunDuringCi = _os.environ.get("CI") == "true"
     if isRunDuringCi:
         return _pl.PureWindowsPath(r"C:\CI-Progams\TRNSYS18\Exe\TrnEXE.exe")
@@ -155,16 +149,8 @@ def _getTrnExePath():
     return _pl.PureWindowsPath(r"C:\TRNSYS18\Exe\TrnEXE.exe")
 
 
-def runDck(cmd, dckName):
-    exception = None
-    try:
-        if _os.path.isfile(dckName):
-            _sp.run([cmd, dckName, "/H"], shell=True, check=True)
-            skipOthers = False
-        else:
-            raise FileNotFoundError("File not found: " + dckName)
-    except _sp.CalledProcessError as caughtException:
-        skipOthers = True
-        exception = caughtException
+def runDck(cmd: str, dckName: str) -> None:
+    if not _os.path.isfile(dckName):
+        raise FileNotFoundError("File not found: " + dckName)
 
-    return skipOthers, exception
+    _sp.run([cmd, dckName, "/H"], shell=True, check=True)
